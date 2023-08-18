@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 
+import { validatorWalletFactory } from "../../state/source/wallets/factory";
 import { describe, Sandbox } from "../../test-framework";
 import { ValidatorSet } from "./validator-set";
 
@@ -7,6 +8,7 @@ describe<{
 	sandbox: Sandbox;
 	validatorSet: ValidatorSet;
 	walletRepository: any;
+	validatorWalletFactory: any;
 	cryptoConfiguration: any;
 }>("ValidatorSet", ({ it, assert, beforeEach, stub }) => {
 	beforeEach(async (context) => {
@@ -23,6 +25,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+		context.sandbox.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 
 		context.validatorSet = context.sandbox.app.resolve(ValidatorSet);

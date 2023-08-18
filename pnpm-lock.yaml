@@ -2680,9 +2680,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../state
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -2708,9 +2705,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../state
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils

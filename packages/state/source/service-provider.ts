@@ -11,8 +11,8 @@ import { StateBuilder } from "./state-builder";
 import { StateStore } from "./stores/state";
 import { TransactionValidator } from "./transaction-validator";
 import { WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
+import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 import { registerIndexers } from "./wallets/indexers";
-import { walletFactory } from "./wallets/wallet-factory";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -44,6 +44,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
+
+		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 
 		this.app
 			.bind(Identifiers.WalletRepository)

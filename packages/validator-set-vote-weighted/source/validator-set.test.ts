@@ -1,18 +1,17 @@
+import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
+import { spy } from "sinon";
 
-import { Wallets } from "../../state";
-import { walletFactory } from "../../state/source/wallets/wallet-factory";
-import { registerIndexers } from "../../state/source/wallets/indexers";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
+import { Wallets } from "../../state";
+import { validatorWalletFactory, walletFactory } from "../../state/source/wallets/factory";
+import { registerIndexers } from "../../state/source/wallets/indexers";
 import { describe, Sandbox } from "../../test-framework";
 import { buildValidatorAndVoteWallets } from "../test/build-validator-and-vote-balances";
-
 import { ValidatorSet } from "./validator-set";
-import { spy } from "sinon";
-import { injectable, Selectors } from "@mainsail/container";
 
 describe<{
 	sandbox: Sandbox;
@@ -72,6 +71,7 @@ describe<{
 			.bind(Identifiers.Cryptography.Identity.PublicKeyFactory)
 			.to(PublicKeyFactory)
 			.inSingletonScope();
+		context.sandbox.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 
 		registerIndexers(context.sandbox.app);
 
@@ -122,7 +122,7 @@ describe<{
 		assert.true(buildValidatorRankingSpy.notCalled);
 
 		let currentHeight = 0;
-		for (let i = 0; i < activeValidators; i++) {
+		for (let index = 0; index < activeValidators; index++) {
 			await validatorSet.handleCommitBlock({
 				commit: { height: currentHeight },
 			} as Contracts.Crypto.ICommittedBlock);
@@ -142,7 +142,7 @@ describe<{
 		buildValidatorRankingSpy.resetHistory();
 
 		// Simulate another round
-		for (let i = 0; i < activeValidators - 1; i++) {
+		for (let index = 0; index < activeValidators - 1; index++) {
 			await validatorSet.handleCommitBlock({
 				commit: { height: currentHeight },
 			} as Contracts.Crypto.ICommittedBlock);

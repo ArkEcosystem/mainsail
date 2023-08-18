@@ -1,7 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { Wallets } from "@mainsail/state";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
@@ -12,7 +11,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
-	#validators: Contracts.Consensus.IValidatorWallet[] = [];
+	@inject(Identifiers.ValidatorWalletFactory)
+	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
+
+	#validators: Contracts.State.IValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
 	public async initialize(): Promise<void> {
@@ -21,7 +23,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 
 	public async handleCommitBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {}
 
-	public getActiveValidators(): Contracts.Consensus.IValidatorWallet[] {
+	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
 		if (this.#validators.length === 0) {
 			this.#init();
 		}
@@ -29,7 +31,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		return this.#validators;
 	}
 
-	public getValidator(index: number): Contracts.Consensus.IValidatorWallet {
+	public getValidator(index: number): Contracts.State.IValidatorWallet {
 		return this.#validators[index];
 	}
 
@@ -48,11 +50,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#indexByWalletPublicKey = new Map();
 
 		for (let index = 0; index < this.cryptoConfiguration.getMilestone().activeValidators; index++) {
-			const wallet = new Wallets.ValidatorWallet(this.walletRepository.findByUsername(`genesis_${index + 1}`));
+			const validator = this.validatorWalletFactory(this.walletRepository.findByUsername(`genesis_${index + 1}`));
 
-			this.#validators.push(wallet);
+			this.#validators.push(validator);
 
-			const walletPublicKey = wallet.getWalletPublicKey();
+			const walletPublicKey = validator.getWalletPublicKey();
 			Utils.assert.defined<string>(walletPublicKey);
 			this.#indexByWalletPublicKey.set(walletPublicKey, index);
 		}

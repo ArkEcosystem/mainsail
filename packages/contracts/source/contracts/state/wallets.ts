@@ -93,7 +93,20 @@ export interface WalletHolder {
 	clone(): WalletHolder;
 }
 
+export interface IValidatorWallet {
+	getWalletPublicKey(): string;
+	getConsensusPublicKey(): string;
+	getUsername(): string;
+	getVoteBalance(): BigNumber;
+	getRank(): number;
+	setRank(rank: number): void;
+	unsetRank(): void;
+	isResigned(): boolean;
+}
+
 export type WalletFactory = (address: string) => Wallet;
+
+export type ValidatorWalletFactory = (wallet: Wallet) => IValidatorWallet;
 
 export interface WalletValidatorAttributes {
 	username: string;

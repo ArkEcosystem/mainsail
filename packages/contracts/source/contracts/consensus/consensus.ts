@@ -1,5 +1,3 @@
-import { BigNumber } from "@mainsail/utils";
-
 import { IProcessableUnit } from "../block-processor";
 import {
 	IBlock,
@@ -12,6 +10,7 @@ import {
 	IProposalLockProof,
 	IValidatorSetMajority,
 } from "../crypto";
+import { IValidatorWallet } from "../state";
 import { ProcessorResult, Step } from "./enums";
 
 export interface IRoundState extends IProcessableUnit {
@@ -119,17 +118,6 @@ export interface IValidator {
 	propose(round: number, block: IBlock, lockProof?: IProposalLockProof): Promise<IProposal>;
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
 	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
-}
-
-export interface IValidatorWallet {
-	getWalletPublicKey(): string;
-	getConsensusPublicKey(): string;
-	getUsername(): string;
-	getVoteBalance(): BigNumber;
-	getRank(): number;
-	setRank(rank: number): void;
-	unsetRank(): void;
-	isResigned(): boolean;
 }
 
 export interface IValidatorRepository {
