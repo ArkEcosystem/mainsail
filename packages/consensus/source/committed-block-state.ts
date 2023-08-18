@@ -12,7 +12,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 
 	#committedBlock!: Contracts.Crypto.ICommittedBlock;
 	#processorResult?: boolean;
-	#validators = new Map<string, Contracts.Consensus.IValidatorWallet>();
+	#validators = new Map<string, Contracts.State.IValidatorWallet>();
 
 	get height(): number {
 		return this.#committedBlock.commit.height;

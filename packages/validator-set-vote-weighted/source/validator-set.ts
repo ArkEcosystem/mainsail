@@ -12,7 +12,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
-	#validators: Contracts.Consensus.IValidatorWallet[] = [];
+	#validators: Contracts.State.IValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
 	public async initialize(): Promise<void> {
@@ -30,12 +30,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		}
 	}
 
-	public getActiveValidators(): Contracts.Consensus.IValidatorWallet[] {
+	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 		return this.#validators.slice(0, activeValidators);
 	}
 
-	public getValidator(index: number): Contracts.Consensus.IValidatorWallet {
+	public getValidator(index: number): Contracts.State.IValidatorWallet {
 		return this.#validators[index];
 	}
 
