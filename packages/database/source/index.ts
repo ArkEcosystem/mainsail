@@ -18,8 +18,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.Database.TransactionStorage)
 			.toConstantValue(rootStorage.openDB({ name: "transactions" }));
 
-		this.app.bind(Identifiers.Database.RoundStorage).toConstantValue(rootStorage.openDB({ name: "rounds" }));
-
 		this.app.bind(Identifiers.Database.Service).to(DatabaseService).inSingletonScope();
 	}
 

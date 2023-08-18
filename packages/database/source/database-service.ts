@@ -1,14 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { BigNumber, sortBy, sortByDesc } from "@mainsail/utils";
 import { Database } from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.IDatabaseService {
-	@inject(Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
-
 	@inject(Identifiers.Database.BlockStorage)
 	private readonly blockStorage!: Database;
 
@@ -17,9 +13,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 	@inject(Identifiers.Database.TransactionStorage)
 	private readonly transactionStorage!: Database;
-
-	@inject(Identifiers.Database.RoundStorage)
-	private readonly roundStorage!: Database;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
@@ -134,45 +127,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 			blocks.filter((block) => block !== undefined),
 			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block.data,
 		);
-	}
-
-	public async getRound(round: number): Promise<Contracts.Database.IRound[]> {
-		const roundByNumber: Contracts.Database.IRound[] = this.roundStorage
-			.get(round)
-			?.map((r: { balance: string; round: number; publicKey: string }) => ({
-				balance: BigNumber.make(r.balance),
-				publicKey: r.publicKey,
-				round: r.round,
-			}));
-
-		if (!roundByNumber) {
-			return [];
-		}
-
-		return sortBy(sortByDesc(roundByNumber, "balance"), "publicKey");
-	}
-
-	public async saveRound(activeValidators: readonly Contracts.State.Wallet[]): Promise<void> {
-		this.logger.info(`Saving round ${activeValidators[0].getAttribute("validator.round").toLocaleString()}`);
-
-		const roundNumber: number = activeValidators[0].getAttribute("validator.round");
-
-		if (!this.roundStorage.doesExist(roundNumber)) {
-			await this.roundStorage.put(
-				roundNumber,
-				activeValidators.map((validator: Contracts.State.Wallet) => ({
-					balance: validator.getAttribute("validator.voteBalance").toString(),
-					publicKey: validator.getPublicKey(),
-					round: validator.getAttribute("validator.round"),
-				})),
-			);
-		}
-	}
-
-	public async deleteRound(round: number): Promise<void> {
-		for (const key of this.roundStorage.getKeys({ start: round })) {
-			await this.roundStorage.remove(key);
-		}
 	}
 
 	public async verifyBlockchain(): Promise<boolean> {

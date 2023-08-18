@@ -119,36 +119,32 @@ describeSkip<{
 		container.bind(Identifiers.Database.BlockStorage).toConstantValue(context.blockStorage);
 		container.bind(Identifiers.Database.BlockHeightStorage).toConstantValue(context.blockHeightStorage);
 		container.bind(Identifiers.Database.TransactionStorage).toConstantValue(context.transactionRepository);
-		container.bind(Identifiers.Database.RoundStorage).toConstantValue({
-			deleteFrom: () => {},
-			getRound: () => {},
-			save: () => {},
-		});
+
 		container.bind(Identifiers.Database.Service).to(DatabaseService);
 		container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 
 		container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
 		container.bind(Identifiers.WalletRepository).toConstantValue({
-			createWallet: () => {},
-			findByPublicKey: () => {},
-			findByUsername: () => {},
+			createWallet: () => { },
+			findByPublicKey: () => { },
+			findByUsername: () => { },
 		});
 		container.bind(Identifiers.BlockState).toConstantValue(context.blockState);
 		container.bind(Identifiers.DposState).toConstantValue({
-			buildValidatorRanking: () => {},
-			getRoundValidators: () => {},
-			setValidatorsRound: () => {},
+			buildValidatorRanking: () => { },
+			getRoundValidators: () => { },
+			setValidatorsRound: () => { },
 		});
 		container.bind(Identifiers.TriggerService).toConstantValue({
-			call: () => {},
+			call: () => { },
 		});
 		container.bind(Identifiers.EventDispatcherService).toConstantValue(context.events);
 
 		container.bind(Identifiers.LogService).toConstantValue({
-			debug: () => {},
-			error: () => {},
-			info: () => {},
-			warning: () => {},
+			debug: () => { },
+			error: () => { },
+			info: () => { },
+			warning: () => { },
 		});
 
 		container.bind(Identifiers.RoundState).toConstantValue(context.roundState);
