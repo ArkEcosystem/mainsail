@@ -155,6 +155,8 @@ jobs:
               run: cd packages/validator && pnpm run test
             - name: Test validator-set-static
               run: cd packages/validator-set-static && pnpm run test
+            - name: Test validator-set-vote-weighted
+              run: cd packages/validator-set-vote-weighted && pnpm run test
             - name: Test webhooks
               run: cd packages/webhooks && pnpm run test
         strategy:
