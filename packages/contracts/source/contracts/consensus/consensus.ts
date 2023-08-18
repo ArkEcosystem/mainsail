@@ -20,9 +20,9 @@ export interface IRoundState extends IProcessableUnit {
 	hasProposal(): boolean;
 	hasPrevote(validatorIndex: number): boolean;
 	hasPrecommit(validatorIndex: number): boolean;
-	addProposal(proposal: IProposal): Promise<boolean>;
-	addPrevote(prevote: IPrevote): Promise<boolean>;
-	addPrecommit(precommit: IPrecommit): Promise<boolean>;
+	addProposal(proposal: IProposal): void;
+	addPrevote(prevote: IPrevote): void;
+	addPrecommit(precommit: IPrecommit): void;
 	hasMajorityPrevotes(): boolean;
 	hasMajorityPrevotesAny(): boolean;
 	hasMajorityPrevotesNull(): boolean;

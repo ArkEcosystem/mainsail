@@ -86,10 +86,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return false;
 	}
 
-	public async addProposal(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		this.#proposal = proposal;
+	public addProposal(proposal: Contracts.Crypto.IProposal): void {
+		if (this.#proposal) {
+			throw new Error("Proposal already exists.");
+		}
 
-		return true;
+		this.#proposal = proposal;
 	}
 
 	public getProposal(): Contracts.Crypto.IProposal | undefined {
@@ -128,30 +130,28 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#prevotes.has(validatorIndex);
 	}
 
-	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
+	public addPrevote(prevote: Contracts.Crypto.IPrevote): void {
 		if (this.#prevotes.has(prevote.validatorIndex)) {
-			return false;
+			throw new Error("Prevote already exists.");
 		}
 
 		this.#prevotes.set(prevote.validatorIndex, prevote);
 		this.#validatorsSignedPrevote[prevote.validatorIndex] = true;
 		this.#increasePrevoteCount(prevote.blockId);
-		return true;
 	}
 
 	public hasPrecommit(validatorIndex: number): boolean {
 		return this.#precommits.has(validatorIndex);
 	}
 
-	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
+	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): void {
 		if (this.#precommits.has(precommit.validatorIndex)) {
-			return false;
+			throw new Error("Precommit already exists.");
 		}
 
 		this.#precommits.set(precommit.validatorIndex, precommit);
 		this.#validatorsSignedPrecommit[precommit.validatorIndex] = true;
 		this.#increasePrecommitCount(precommit.blockId);
-		return true;
 	}
 
 	public hasMajorityPrevotes(): boolean {
