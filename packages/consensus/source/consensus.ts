@@ -165,15 +165,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	public async onTimeoutStartRound(): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
-		const proposerWallet = roundState.getValidator(roundState.proposer);
 
 		this.logger.info(
-			`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${proposerWallet.getUsername()}`,
+			`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer.getUsername()}`,
 		);
 
-		const proposer = this.validatorsRepository.getValidator(roundState.proposer);
+		const proposer = this.validatorsRepository.getValidator(roundState.proposer.getConsensusPublicKey());
 		if (proposer) {
-			this.logger.info(`Found registered proposer: ${proposerWallet.getUsername()}`);
+			this.logger.info(`Found registered proposer: ${roundState.proposer.getUsername()}`);
 
 			// TODO: Error handling
 			await this.#propose(proposer);

@@ -15,14 +15,14 @@ import { ProcessorResult, Step } from "./enums";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
-	readonly proposer: string;
+	readonly proposer: IValidatorWallet;
 	getProposal(): IProposal | undefined;
 	hasProposal(): boolean;
 	hasPrevote(validatorIndex: number): boolean;
 	hasPrecommit(validatorIndex: number): boolean;
-	addProposal(proposal: IProposal): Promise<boolean>;
-	addPrevote(prevote: IPrevote): Promise<boolean>;
-	addPrecommit(precommit: IPrecommit): Promise<boolean>;
+	addProposal(proposal: IProposal): void;
+	addPrevote(prevote: IPrevote): void;
+	addPrecommit(precommit: IPrecommit): void;
 	hasMajorityPrevotes(): boolean;
 	hasMajorityPrevotesAny(): boolean;
 	hasMajorityPrevotesNull(): boolean;

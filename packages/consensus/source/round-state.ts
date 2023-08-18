@@ -24,14 +24,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#round = 0;
 	#proposal?: Contracts.Crypto.IProposal;
 	#processorResult?: boolean;
-	#prevotes = new Map<string, Contracts.Crypto.IPrevote>();
+	#prevotes = new Map<number, Contracts.Crypto.IPrevote>();
 	#prevotesCount = new Map<string | undefined, number>();
-	#precommits = new Map<string, Contracts.Crypto.IPrecommit>();
+	#precommits = new Map<number, Contracts.Crypto.IPrecommit>();
 	#precommitsCount = new Map<string | undefined, number>();
 	#validators = new Map<string, Contracts.State.IValidatorWallet>();
 	#validatorsSignedPrevote: boolean[] = [];
 	#validatorsSignedPrecommit: boolean[] = [];
-	#proposer!: string;
+	#proposer!: Contracts.State.IValidatorWallet;
 
 	get height(): number {
 		return this.#height;
@@ -45,7 +45,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return [...this.#validators.keys()];
 	}
 
-	get proposer(): string {
+	get proposer(): Contracts.State.IValidatorWallet {
 		return this.#proposer;
 	}
 
@@ -63,7 +63,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 		const validatorIndex = this.proposerPicker.getValidatorIndex(round);
 
-		this.#proposer = validators[validatorIndex].getConsensusPublicKey();
+		this.#proposer = validators[validatorIndex];
 
 		return this;
 	}
@@ -86,10 +86,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return false;
 	}
 
-	public async addProposal(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		this.#proposal = proposal;
+	public addProposal(proposal: Contracts.Crypto.IProposal): void {
+		if (this.#proposal) {
+			throw new Error("Proposal already exists.");
+		}
 
-		return true;
+		this.#proposal = proposal;
 	}
 
 	public getProposal(): Contracts.Crypto.IProposal | undefined {
@@ -125,39 +127,31 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public hasPrevote(validatorIndex: number): boolean {
-		return this.#prevotes.has(this.validatorSet.getValidator(validatorIndex).getConsensusPublicKey());
+		return this.#prevotes.has(validatorIndex);
 	}
 
-	public async addPrevote(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
-		const validator = this.validatorSet.getValidator(prevote.validatorIndex);
-		if (!this.#validators.has(validator.getConsensusPublicKey())) {
-			throw new Error(`Prevote by ${validator.getUsername()} is already set`);
+	public addPrevote(prevote: Contracts.Crypto.IPrevote): void {
+		if (this.#prevotes.has(prevote.validatorIndex)) {
+			throw new Error("Prevote already exists.");
 		}
 
-		this.#prevotes.set(validator.getConsensusPublicKey(), prevote);
+		this.#prevotes.set(prevote.validatorIndex, prevote);
 		this.#validatorsSignedPrevote[prevote.validatorIndex] = true;
 		this.#increasePrevoteCount(prevote.blockId);
-		return true;
 	}
 
 	public hasPrecommit(validatorIndex: number): boolean {
-		return this.#precommits.has(this.validatorSet.getValidator(validatorIndex).getConsensusPublicKey());
+		return this.#precommits.has(validatorIndex);
 	}
 
-	public async addPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
-		const validator = this.validatorSet.getValidator(precommit.validatorIndex);
-		if (!this.#validators.has(validator.getConsensusPublicKey())) {
-			return false;
+	public addPrecommit(precommit: Contracts.Crypto.IPrecommit): void {
+		if (this.#precommits.has(precommit.validatorIndex)) {
+			throw new Error("Precommit already exists.");
 		}
 
-		if (this.#precommits.has(validator.getConsensusPublicKey())) {
-			return false;
-		}
-
-		this.#precommits.set(validator.getConsensusPublicKey(), precommit);
+		this.#precommits.set(precommit.validatorIndex, precommit);
 		this.#validatorsSignedPrecommit[precommit.validatorIndex] = true;
 		this.#increasePrecommitCount(precommit.blockId);
-		return true;
 	}
 
 	public hasMajorityPrevotes(): boolean {
@@ -193,15 +187,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public getPrevote(validatorIndex: number): Contracts.Crypto.IPrevote | undefined {
-		const validator = this.validatorSet.getValidator(validatorIndex);
-
-		return this.#prevotes.get(validator.getConsensusPublicKey());
+		return this.#prevotes.get(validatorIndex);
 	}
 
 	public getPrecommit(validatorIndex: number): Contracts.Crypto.IPrecommit | undefined {
-		const validator = this.validatorSet.getValidator(validatorIndex);
-
-		return this.#precommits.get(validator.getConsensusPublicKey());
+		return this.#precommits.get(validatorIndex);
 	}
 
 	public getValidatorsSignedPrevote(): boolean[] {
@@ -252,13 +242,13 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#precommitsCount.get(blockId) ?? 0;
 	}
 
-	#getValidatorMajority(s: Map<string, { signature: string; blockId?: string }>): Map<string, { signature: string }> {
+	#getValidatorMajority(s: Map<number, { signature: string; blockId?: string }>): Map<string, { signature: string }> {
 		Utils.assert.defined<Contracts.Crypto.IProposal>(this.#proposal);
-		const filtered = new Map();
+		const filtered: Map<string, { signature: string }> = new Map();
 
 		for (const [key, value] of s) {
 			if (value.blockId === this.#proposal.block.block.header.id) {
-				filtered.set(key, value);
+				filtered.set(this.validatorSet.getValidator(key).getConsensusPublicKey(), value);
 			}
 		}
 

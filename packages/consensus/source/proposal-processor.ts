@@ -55,7 +55,7 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
-		await roundState.addProposal(proposal);
+		roundState.addProposal(proposal);
 		await this.storage.saveProposal(proposal);
 
 		if (broadcast) {
