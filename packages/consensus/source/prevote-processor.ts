@@ -43,7 +43,7 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
-		await roundState.addPrevote(prevote);
+		roundState.addPrevote(prevote);
 		await this.storage.savePrevote(prevote);
 
 		if (broadcast) {

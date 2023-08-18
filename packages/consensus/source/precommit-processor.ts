@@ -43,7 +43,7 @@ export class PrecommitProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
-		await roundState.addPrecommit(precommit);
+		roundState.addPrecommit(precommit);
 		await this.storage.savePrecommit(precommit);
 
 		if (broadcast) {
