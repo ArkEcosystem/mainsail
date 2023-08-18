@@ -52,18 +52,18 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 	}
 
 	public async saveProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
-		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(proposal.validatorIndex);
-		await this.proposalStorage.put(`${proposal.round}-${validatorPublicKey}`, proposal.toData());
+		const validator = this.validatorSet.getValidator(proposal.validatorIndex);
+		await this.proposalStorage.put(`${proposal.round}-${validator.getConsensusPublicKey()}`, proposal.toData());
 	}
 
 	public async savePrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
-		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(prevote.validatorIndex);
-		await this.prevoteStorage.put(`${prevote.round}-${validatorPublicKey}`, prevote.toData());
+		const validator = this.validatorSet.getValidator(prevote.validatorIndex);
+		await this.prevoteStorage.put(`${prevote.round}-${validator.getConsensusPublicKey()}`, prevote.toData());
 	}
 
 	public async savePrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
-		const validatorPublicKey = this.validatorSet.getValidatorConsensusPublicKeyByIndex(precommit.validatorIndex);
-		await this.precommitStorage.put(`${precommit.round}-${validatorPublicKey}`, precommit.toData());
+		const validator = this.validatorSet.getValidator(precommit.validatorIndex);
+		await this.precommitStorage.put(`${precommit.round}-${validator.getConsensusPublicKey()}`, precommit.toData());
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.IProposal[]> {

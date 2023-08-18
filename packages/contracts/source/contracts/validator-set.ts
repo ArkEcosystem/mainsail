@@ -5,6 +5,6 @@ export interface IValidatorSet {
 	initialize(): Promise<void>;
 	handleCommitBlock(block: ICommittedBlock): Promise<void>;
 	getActiveValidators(): IValidatorWallet[];
-	getValidatorConsensusPublicKeyByIndex(validatorIndex: number): string;
+	getValidator(validatorIndex: number): IValidatorWallet;
 	getValidatorIndexByWalletPublicKey(walletPublicKey: string): number;
 }
