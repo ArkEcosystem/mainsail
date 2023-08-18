@@ -13,8 +13,8 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 	@inject(Identifiers.Database.PrecommitStorage)
 	private readonly precommitStorage!: Database;
 
-	@inject(Identifiers.Database.ConsensusStorage)
-	private readonly consensusStorage!: Database;
+	@inject(Identifiers.Database.ConsensusStateStorage)
+	private readonly stateStorage!: Database;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -23,11 +23,11 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
 
 	public async getState(): Promise<Contracts.Consensus.IConsensusStateData | undefined> {
-		if (!this.consensusStorage.doesExist("consensus-state")) {
+		if (!this.stateStorage.doesExist("consensus-state")) {
 			return undefined;
 		}
 
-		const data = await this.consensusStorage.get("consensus-state");
+		const data = await this.stateStorage.get("consensus-state");
 
 		return {
 			height: data.height,
@@ -48,7 +48,7 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 			validRound: state.validRound,
 		};
 
-		await this.consensusStorage.put("consensus-state", data);
+		await this.stateStorage.put("consensus-state", data);
 	}
 
 	public async saveProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
@@ -86,7 +86,7 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 			this.proposalStorage.clearAsync(),
 			this.prevoteStorage.clearAsync(),
 			this.precommitStorage.clearAsync(),
-			this.consensusStorage.clearAsync(),
+			this.stateStorage.clearAsync(),
 		]);
 	}
 }

@@ -1,13 +1,4 @@
-import { BigNumber } from "@mainsail/utils";
-
 import { IBlock, IBlockData, ICommittedBlock, ITransaction } from "./crypto";
-import { Wallet } from "./state";
-
-export interface IRound {
-	publicKey: string;
-	round: number;
-	balance: BigNumber;
-}
 
 export interface IDatabaseService {
 	getBlock(id: string): Promise<IBlock | undefined>;
@@ -29,12 +20,6 @@ export interface IDatabaseService {
 	saveBlocks(blocks: ICommittedBlock[]): Promise<void>;
 
 	findBlocksByIds(ids: string[]): Promise<IBlockData[]>;
-
-	getRound(round: number): Promise<IRound[]>;
-
-	saveRound(activeValidators: readonly Wallet[]): Promise<void>;
-
-	deleteRound(round: number): Promise<void>;
 
 	getForgedTransactionsIds(ids: string[]): Promise<string[]>;
 

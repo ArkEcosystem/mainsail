@@ -119,11 +119,7 @@ describeSkip<{
 		container.bind(Identifiers.Database.BlockStorage).toConstantValue(context.blockStorage);
 		container.bind(Identifiers.Database.BlockHeightStorage).toConstantValue(context.blockHeightStorage);
 		container.bind(Identifiers.Database.TransactionStorage).toConstantValue(context.transactionRepository);
-		container.bind(Identifiers.Database.RoundStorage).toConstantValue({
-			deleteFrom: () => {},
-			getRound: () => {},
-			save: () => {},
-		});
+
 		container.bind(Identifiers.Database.Service).to(DatabaseService);
 		container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 
