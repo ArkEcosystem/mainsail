@@ -106,6 +106,8 @@ export interface IValidatorWallet {
 
 export type WalletFactory = (address: string) => Wallet;
 
+export type ValidatorWalletFactory = (wallet: Wallet) => IValidatorWallet;
+
 export interface WalletValidatorAttributes {
 	username: string;
 	voteBalance: BigNumber;

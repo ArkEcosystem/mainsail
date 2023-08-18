@@ -1,7 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { Wallets } from "@mainsail/state";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
@@ -11,6 +10,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+
+	@inject(Identifiers.ValidatorWalletFactory)
+	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
 	#validators: Contracts.State.IValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
@@ -68,12 +70,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
 
-		for (const validator of this.walletRepository.allByUsername()) {
-			const validatorWallet = new Wallets.ValidatorWallet(validator);
-			if (validatorWallet.isResigned()) {
-				validatorWallet.unsetRank();
+		for (const wallet of this.walletRepository.allByUsername()) {
+			const validator = this.validatorWalletFactory(wallet);
+			if (validator.isResigned()) {
+				validator.unsetRank();
 			} else {
-				this.#validators.push(validatorWallet);
+				this.#validators.push(validator);
 			}
 		}
 
