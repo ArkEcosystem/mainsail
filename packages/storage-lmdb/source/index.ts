@@ -8,7 +8,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const rootStorage = open({
 			compression: true,
 			name: "core",
-			path: this.app.dataPath(),
+			path: join(this.app.dataPath(), "ledger.mdb"),
 		});
 
 		this.app.bind(Identifiers.Database.RootStorage).toConstantValue(rootStorage);
@@ -16,7 +16,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const consensusStorage = open({
 			compression: true,
 			name: "consensus",
-			path: join(this.app.dataPath(), "consensus"),
+			path: join(this.app.dataPath(), "consensus.mdb"),
 		});
 		this.app.bind(Identifiers.Database.ConsensusStorage).toConstantValue(consensusStorage);
 	}
