@@ -28,12 +28,18 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// Storage for uncommitted blocks
 		const consensusStorage = this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage);
 
-		this.app.bind(Identifiers.Database.ProposalStorage).toConstantValue(consensusStorage.openDB({ name: "proposals" }));
-		this.app.bind(Identifiers.Database.PrevoteStorage).toConstantValue(consensusStorage.openDB({ name: "prevotes" }));
+		this.app
+			.bind(Identifiers.Database.ProposalStorage)
+			.toConstantValue(consensusStorage.openDB({ name: "proposals" }));
+		this.app
+			.bind(Identifiers.Database.PrevoteStorage)
+			.toConstantValue(consensusStorage.openDB({ name: "prevotes" }));
 		this.app
 			.bind(Identifiers.Database.PrecommitStorage)
 			.toConstantValue(consensusStorage.openDB({ name: "precommits" }));
-		this.app.bind(Identifiers.Database.ConsensusStateStorage).toConstantValue(consensusStorage.openDB({ name: "consensus" }));
+		this.app
+			.bind(Identifiers.Database.ConsensusStateStorage)
+			.toConstantValue(consensusStorage.openDB({ name: "consensus" }));
 		this.app.bind(Identifiers.Consensus.Storage).to(Storage).inSingletonScope();
 
 		this.app.bind(Identifiers.Consensus.Bootstrapper).to(Bootstrapper).inSingletonScope();

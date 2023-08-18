@@ -125,26 +125,26 @@ describeSkip<{
 
 		container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
 		container.bind(Identifiers.WalletRepository).toConstantValue({
-			createWallet: () => { },
-			findByPublicKey: () => { },
-			findByUsername: () => { },
+			createWallet: () => {},
+			findByPublicKey: () => {},
+			findByUsername: () => {},
 		});
 		container.bind(Identifiers.BlockState).toConstantValue(context.blockState);
 		container.bind(Identifiers.DposState).toConstantValue({
-			buildValidatorRanking: () => { },
-			getRoundValidators: () => { },
-			setValidatorsRound: () => { },
+			buildValidatorRanking: () => {},
+			getRoundValidators: () => {},
+			setValidatorsRound: () => {},
 		});
 		container.bind(Identifiers.TriggerService).toConstantValue({
-			call: () => { },
+			call: () => {},
 		});
 		container.bind(Identifiers.EventDispatcherService).toConstantValue(context.events);
 
 		container.bind(Identifiers.LogService).toConstantValue({
-			debug: () => { },
-			error: () => { },
-			info: () => { },
-			warning: () => { },
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
 		});
 
 		container.bind(Identifiers.RoundState).toConstantValue(context.roundState);
