@@ -11,8 +11,8 @@ import { StateBuilder } from "./state-builder";
 import { StateStore } from "./stores/state";
 import { TransactionValidator } from "./transaction-validator";
 import { WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
+import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 import { registerIndexers } from "./wallets/indexers";
-import { walletFactory, validatorWalletFactory } from "./wallets/wallet-factory";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
