@@ -349,6 +349,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			}
 
 			this.logger.info(`Timeout to prevote ${this.#height}/${this.#round} expired`);
+			this.roundStateRepository.getRoundState(this.#height, this.#round).logPrevotes();
 
 			this.#step = Contracts.Consensus.Step.Precommit;
 			await this.#precommit();
@@ -362,6 +363,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			}
 
 			this.logger.info(`Timeout to precommit ${this.#height}/${this.#round} expired`);
+			this.roundStateRepository.getRoundState(this.#height, this.#round).logPrevotes();
+			this.roundStateRepository.getRoundState(this.#height, this.#round).logPrecommits();
 
 			await this.startRound(this.#round + 1);
 		});
