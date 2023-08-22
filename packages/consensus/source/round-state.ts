@@ -20,6 +20,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
+	@inject(Identifiers.LogService)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#height = 0;
 	#round = 0;
 	#proposal?: Contracts.Crypto.IProposal;
@@ -208,6 +211,26 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	public getValidatorPrecommitSignatures(): Map<string, { signature: string }> {
 		return this.#getValidatorMajority(this.#precommits);
+	}
+
+	public logPrevotes(): void {
+		for (const key of this.#prevotesCount.keys()) {
+			const voters = [...this.#prevotes.values()]
+				.filter((prevote) => prevote.blockId === key)
+				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).getUsername());
+
+			this.logger.debug(`Block ${key ?? "null"} prevoted by: ${voters.join(", ")}`);
+		}
+	}
+
+	public logPrecommits(): void {
+		for (const key of this.#precommitsCount.keys()) {
+			const voters = [...this.#precommits.values()]
+				.filter((precommit) => precommit.blockId === key)
+				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).getUsername());
+
+			this.logger.debug(`Block ${key ?? "null"} precommitted by: ${voters.join(", ")}`);
+		}
 	}
 
 	#hasMinorityPrevotes(): boolean {
