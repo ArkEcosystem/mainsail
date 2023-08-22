@@ -5,69 +5,69 @@ export const validatorMnemonic =
 	"sudden head royal retire duck discover danger then basic rice wish left whip chronic enrich sun behind idea remind retire coyote select goddess exile";
 
 export const blockData: Contracts.Crypto.IBlockData = {
-	id: "b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0",
-	version: 1,
-	timestamp: 1690944882035,
+	generatorPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 	height: 2,
-	previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+	id: "b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0",
 	numberOfTransactions: 2,
+	payloadHash: "fb4b688d26293c5c24ef9c42d325283c67e2016c841d7ad35d4b887a423c28b0",
+	payloadLength: 380,
+	previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+	reward: BigNumber.ZERO,
+	timestamp: 1_690_944_882_035,
 	totalAmount: BigNumber.make("2"),
 	totalFee: BigNumber.make("2"),
-	reward: BigNumber.ZERO,
-	payloadLength: 380,
-	payloadHash: "fb4b688d26293c5c24ef9c42d325283c67e2016c841d7ad35d4b887a423c28b0",
-	generatorPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 	transactions: [
 		{
-			version: 1,
-			network: 30,
-			typeGroup: 1,
-			type: 0,
-			nonce: BigNumber.ZERO,
-			senderPublicKey: "287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
-			fee: BigNumber.ONE,
 			amount: BigNumber.ONE,
 			expiration: 0,
+			fee: BigNumber.ONE,
+			id: "69d2e1503ca29bad075dbb5b9eb703ce83eb2def1ae69d798f3ea6020628a774",
+			network: 30,
+			nonce: BigNumber.ZERO,
 			recipientId: "ark19palawayc7yp5pgfw9l8rv6tv0e3usqzrseplzdwqnuyhekk4smskdkz3s",
+			senderPublicKey: "287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
+			sequence: 0,
 			signature:
 				"ef4c4e285824ee65dee3f0652282fee31b02849cb221b6de18f28c648a7c5dcba2a97a1d210974cd4129cc925657993e12cdfe0b36a487cc4d2f886a09e33a5c",
-			id: "69d2e1503ca29bad075dbb5b9eb703ce83eb2def1ae69d798f3ea6020628a774",
-			sequence: 0,
-			timestamp: 1690944882035,
+			timestamp: 1_690_944_882_035,
+			type: 0,
+			typeGroup: 1,
+			version: 1,
 		},
 		{
-			version: 1,
-			network: 30,
-			typeGroup: 1,
-			type: 0,
-			nonce: BigNumber.ZERO,
-			senderPublicKey: "287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
-			fee: BigNumber.ONE,
 			amount: BigNumber.ONE,
 			expiration: 0,
+			fee: BigNumber.ONE,
+			id: "db752428baf39c66bd509769df2fc97c741ad205191f6029c109c7a832c8ab5b",
+			network: 30,
+			nonce: BigNumber.ZERO,
 			recipientId: "ark19palawayc7yp5pgfw9l8rv6tv0e3usqzrseplzdwqnuyhekk4smskdkz3s",
+			senderPublicKey: "287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
+			sequence: 1,
 			signature:
 				"ff8e1b3862ebde59bc77394ea7c0e4afe20b1129faa3afa86fc936c8d172a3bff17034515e5b286dac0f27475b69808aff39ce6a0683a8768db088609a0bffd8",
-			id: "db752428baf39c66bd509769df2fc97c741ad205191f6029c109c7a832c8ab5b",
-			sequence: 1,
-			timestamp: 1690944882035,
+			timestamp: 1_690_944_882_035,
+			type: 0,
+			typeGroup: 1,
+			version: 1,
 		},
 	],
+	version: 1,
 };
 
 export const serializedBlock =
 	"0173452bb48901020000000000000000000000000000000000000000000000000000000000000000000000020000000200000000000000020000000000000000000000000000007c010000fb4b688d26293c5c24ef9c42d325283c67e2016c841d7ad35d4b887a423c28b02a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9dba000000ff011e0100000000000000000000000000287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac3701000000000000000001000000000000000000000005011d1f1d0e1d04181e0401140108090e051f07030c1a0b0c0f19111c100002031019011f020d0e00131c041719161615101b10ef4c4e285824ee65dee3f0652282fee31b02849cb221b6de18f28c648a7c5dcba2a97a1d210974cd4129cc925657993e12cdfe0b36a487cc4d2f886a09e33a5cba000000ff011e0100000000000000000000000000287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac3701000000000000000001000000000000000000000005011d1f1d0e1d04181e0401140108090e051f07030c1a0b0c0f19111c100002031019011f020d0e00131c041719161615101b10ff8e1b3862ebde59bc77394ea7c0e4afe20b1129faa3afa86fc936c8d172a3bff17034515e5b286dac0f27475b69808aff39ce6a0683a8768db088609a0bffd8";
 
 export const proposalData: Contracts.Crypto.IProposalData = {
-	round: 1,
-	validatorIndex: 0,
-	signature:
-		"9474091adfe65f47d6f07bf3c31bbfdae66fb289fabc3aa69c70319990ac78a8b19d83766c18fdb25d3f3f0edc238dde01e5121806adf3c483c36e6d94813b33d76e3d823e8db8615cceb1ff9cfa0471cbd543bfd91d7aca939af533c7eb9b3d",
-	height: 2,
-	validRound: undefined,
 	block: {
 		serialized: serializedBlock,
 	},
+	height: 2,
+	round: 1,
+	signature:
+		"9474091adfe65f47d6f07bf3c31bbfdae66fb289fabc3aa69c70319990ac78a8b19d83766c18fdb25d3f3f0edc238dde01e5121806adf3c483c36e6d94813b33d76e3d823e8db8615cceb1ff9cfa0471cbd543bfd91d7aca939af533c7eb9b3d",
+	validRound: undefined,
+	validatorIndex: 0,
 };
 
 export const serializedProposal =
@@ -77,13 +77,13 @@ export const serializedProposalForSignature =
 	"01000000070200000173452bb48901020000000000000000000000000000000000000000000000000000000000000000000000020000000200000000000000020000000000000000000000000000007c010000fb4b688d26293c5c24ef9c42d325283c67e2016c841d7ad35d4b887a423c28b02a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9dba000000ff011e0100000000000000000000000000287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac3701000000000000000001000000000000000000000005011d1f1d0e1d04181e0401140108090e051f07030c1a0b0c0f19111c100002031019011f020d0e00131c041719161615101b10ef4c4e285824ee65dee3f0652282fee31b02849cb221b6de18f28c648a7c5dcba2a97a1d210974cd4129cc925657993e12cdfe0b36a487cc4d2f886a09e33a5cba000000ff011e0100000000000000000000000000287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac3701000000000000000001000000000000000000000005011d1f1d0e1d04181e0401140108090e051f07030c1a0b0c0f19111c100002031019011f020d0e00131c041719161615101b10ff8e1b3862ebde59bc77394ea7c0e4afe20b1129faa3afa86fc936c8d172a3bff17034515e5b286dac0f27475b69808aff39ce6a0683a8768db088609a0bffd800";
 
 export const precommitData: Contracts.Crypto.IPrecommitData = {
-	type: Contracts.Crypto.MessageType.Precommit,
-	round: 1,
-	validatorIndex: 0,
-	signature:
-		"8b8ec21cbbe54aa59e2f7590e3abb7d88339ebed43ec0c2dab4917b963ae614db4316d7d26b80ac2d31d2ff4e0fa4af90a7343e5a15636f81d9c41f7a67af8b6f090acc4384299fc60d14235b377251b6c2f4db948d6c03996e832cbcf676b0a",
-	height: 1,
 	blockId: blockData.id,
+	height: 1,
+	round: 1,
+	signature:
+		"80d42ab744b04a6b5e883bedb211b716ea6c8df010ba1368f2cf2a6adecce97ae8173a6edd4f91ce98a3c0b8c976ea811051733d0cfd1a7bf868af07787577d74393f8201a194bb867584c0e38842de2b05bbe4a2affe24a9b7469f1c5e2effd",
+	type: Contracts.Crypto.MessageType.Precommit,
+	validatorIndex: 0,
 };
 
 export const serializedPrecommit =
@@ -93,26 +93,26 @@ export const serializedPrecommitForSignature =
 	"02010000000100000001b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0";
 
 export const precommitDataNoBlock: Contracts.Crypto.IPrecommitData = {
-	type: Contracts.Crypto.MessageType.Precommit,
+	blockId: undefined,
+	height: 1,
 	round: 1,
-	validatorIndex: 0,
 	signature:
 		"904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d",
-	height: 1,
-	blockId: undefined,
+	type: Contracts.Crypto.MessageType.Precommit,
+	validatorIndex: 0,
 };
 
 export const serializedPrecommitNoBlock =
 	"0201000000010000000000904c8055242bd7736a1cf7ce20c8fedeee5f2f8fe3f6cab6a166c36c1be0f616c2b7a333912becfa3ecb799c8cd420a012bf41018f5c52f67a2858a6d5bd016e8ef6f56a84d8a734ba6ce5f9a5260201fd9d73ce8688ff0019df2c07a1c33c4d";
 
 export const prevoteData: Contracts.Crypto.IPrevoteData = {
-	type: Contracts.Crypto.MessageType.Prevote,
-	round: 1,
-	validatorIndex: 0,
-	signature:
-		"85f3ddb26799dcc8d83dad963f9f4747c68d84dbd3af45dd85485e172071b27e40fe178c277d6a2e9625d03783ca9265165adc48c4ec0d46802a53b96142f7bf336431e0046cf44ff593381c30f03a9e9204a9b959bf0562c1d1c41394b0c6fd",
-	height: 1,
 	blockId: blockData.id,
+	height: 1,
+	round: 1,
+	signature:
+		"92ad9e18902e1ced7a747ce4db05c8206010d6d5bb6a6426daf1a0997bbcd442f62ec6bf566e3c2753e943471262542d10be3c0af590a49cc0deeb44c08a767bf65cff927578fde2f366847769a705fd70f6bf87f200c9e2190bfdafc8e86aa8",
+	type: Contracts.Crypto.MessageType.Prevote,
+	validatorIndex: 0,
 };
 
 export const serializedPrevote =
@@ -122,13 +122,13 @@ export const serializedPrevoteForSignature =
 	"01010000000100000001b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0";
 
 export const prevoteDataNoBlock: Contracts.Crypto.IPrevoteData = {
-	type: Contracts.Crypto.MessageType.Prevote,
+	blockId: undefined,
+	height: 1,
 	round: 1,
-	validatorIndex: 0,
 	signature:
 		"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",
-	height: 1,
-	blockId: undefined,
+	type: Contracts.Crypto.MessageType.Prevote,
+	validatorIndex: 0,
 };
 
 export const serializedPrevoteNoBlock =
