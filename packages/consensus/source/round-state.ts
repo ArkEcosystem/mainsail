@@ -20,6 +20,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
+	@inject(Identifiers.LogService)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#height = 0;
 	#round = 0;
 	#proposal?: Contracts.Crypto.IProposal;
@@ -216,7 +219,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 				.filter((prevote) => prevote.blockId === key)
 				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).getUsername());
 
-			console.log(`BlockId ${key} prevoted by: ${voters.join(", ")}`);
+			this.logger.debug(`BlockId ${key} prevoted by: ${voters.join(", ")}`);
 		}
 	}
 
@@ -226,7 +229,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 				.filter((precommit) => precommit.blockId === key)
 				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).getUsername());
 
-			console.log(`BlockId ${key} precommitted by: ${voters.join(", ")}`);
+			this.logger.debug(`BlockId ${key} precommitted by: ${voters.join(", ")}`);
 		}
 	}
 
