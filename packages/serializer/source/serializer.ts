@@ -42,18 +42,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		}
 
 		for (const [property, schema] of Object.entries(configuration.schema)) {
-			let value = data[property];
-			const isOptional = schema["optional"] ?? false;
-
-			if (!isOptional) {
-				// TODO: temporary workaround for `getBlocksForRound` returning block data without a `transactions` field
-
-				if (schema.type === "transactions") {
-					value = value ?? [];
-				}
-
-				Utils.assert.defined(value);
-			}
+			const value = data[property];
 
 			if (schema.type === "uint8") {
 				result.writeUint8(value);
