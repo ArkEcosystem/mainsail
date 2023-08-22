@@ -210,6 +210,26 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#getValidatorMajority(this.#precommits);
 	}
 
+	public logPrevotes(): void {
+		for (const key of this.#prevotesCount.keys()) {
+			const voters = [...this.#prevotes.values()]
+				.filter((prevote) => prevote.blockId === key)
+				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).getUsername());
+
+			console.log(`BlockId ${key} prevoted by: ${voters.join(", ")}`);
+		}
+	}
+
+	public logPrecommits(): void {
+		for (const key of this.#precommitsCount.keys()) {
+			const voters = [...this.#precommits.values()]
+				.filter((precommit) => precommit.blockId === key)
+				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).getUsername());
+
+			console.log(`BlockId ${key} precommitted by: ${voters.join(", ")}`);
+		}
+	}
+
 	#hasMinorityPrevotes(): boolean {
 		return this.#isMinority(this.#prevotes.size);
 	}
