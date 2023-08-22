@@ -44,46 +44,33 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		for (const [property, schema] of Object.entries(configuration.schema)) {
 			const value = data[property];
 
-			const writeOptional = (write) => {
-				// @ts-ignore
-				if (schema.optional) {
-					if (value === undefined) {
-						result.writeUint8(0);
-						return;
-					} else {
-						result.writeUint8(1);
-						write();
-					}
-				}
-			};
-
 			if (schema.type === "uint8") {
-				result.writeUint8(value);
+				this.#writeOptional(schema, result, value, () => result.writeUint8(value));
 				continue;
 			}
 
 			if (schema.type === "uint16") {
-				result.writeUint16(value);
+				this.#writeOptional(schema, result, value, () => result.writeUint16(value));
 				continue;
 			}
 
 			if (schema.type === "uint32") {
-				result.writeUint32(value);
+				this.#writeOptional(schema, result, value, () => result.writeUint32(value));
 				continue;
 			}
 
 			if (schema.type === "uint48") {
-				result.writeUint48(value);
+				this.#writeOptional(schema, result, value, () => result.writeUint48(value));
 				continue;
 			}
 
 			if (schema.type === "uint64") {
-				result.writeUint64(value);
+				this.#writeOptional(schema, result, value, () => result.writeUint64(value));
 				continue;
 			}
 
 			if (schema.type === "bigint") {
-				result.writeUint64(value.toString());
+				this.#writeOptional(schema, result, value, () => result.writeUint64(value));
 				continue;
 			}
 
@@ -93,7 +80,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-				writeOptional(() => result.writeBytes(Buffer.from(value, "hex")));
+				this.#writeOptional(schema, result, value, () => result.writeBytes(Buffer.from(value, "hex")));
 				continue;
 			}
 
@@ -166,32 +153,35 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 	): Promise<T> {
 		for (const [property, schema] of Object.entries(configuration.schema)) {
 			if (schema.type === "uint8") {
-				target[property] = source.readUint8();
+				target[property] = this.#readOptional<number>(schema, source, () => source.readUint8());
 				continue;
 			}
 
 			if (schema.type === "uint16") {
-				target[property] = source.readUint16();
+				target[property] = this.#readOptional<number>(schema, source, () => source.readUint16());
 				continue;
 			}
 
 			if (schema.type === "uint32") {
-				target[property] = source.readUint32();
+				target[property] = this.#readOptional<number>(schema, source, () => source.readUint32());
 				continue;
 			}
 
 			if (schema.type === "uint48") {
-				target[property] = source.readUint48();
+				target[property] = this.#readOptional<number>(schema, source, () => source.readUint48());
 				continue;
 			}
 
 			if (schema.type === "uint64") {
-				target[property] = +source.readUint64().toString();
+				target[property] = this.#readOptional<number>(schema, source, () => +source.readUint64().toString());
 				continue;
 			}
 
 			if (schema.type === "bigint") {
-				target[property] = BigNumber.make(source.readUint64().toString());
+				target[property] = this.#readOptional<BigNumber>(schema, source, () =>
+					BigNumber.make(source.readUint64().toString()),
+				);
+
 				continue;
 			}
 
@@ -200,19 +190,10 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				continue;
 			}
 
-			const readOptional = <T>(read): T | undefined => {
-				// @ts-ignore
-				if (schema.optional) {
-					const isPresent = source.readUint8();
-					if (isPresent === 0) {
-						return undefined;
-					}
-				}
-				return read();
-			};
-
 			if (schema.type === "blockId") {
-				target[property] = readOptional<string>(() => source.readBytes(this.hashSize).toString("hex"));
+				target[property] = this.#readOptional<string>(schema, source, () =>
+					source.readBytes(this.hashSize).toString("hex"),
+				);
 
 				continue;
 			}
@@ -271,4 +252,26 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 
 		return target;
 	}
+
+	#writeOptional = (schema: { optional?: true }, result: ByteBuffer, value: any, write: () => void) => {
+		if (schema.optional) {
+			if (value === undefined) {
+				result.writeUint8(0);
+				return;
+			} else {
+				result.writeUint8(1);
+			}
+		}
+		write();
+	};
+
+	#readOptional = <T>(schema: { optional?: true }, source: ByteBuffer, read: () => T): T | undefined => {
+		if (schema.optional) {
+			const isPresent = source.readUint8();
+			if (isPresent === 0) {
+				return undefined;
+			}
+		}
+		return read();
+	};
 }
