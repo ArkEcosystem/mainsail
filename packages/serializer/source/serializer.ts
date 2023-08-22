@@ -44,6 +44,19 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 		for (const [property, schema] of Object.entries(configuration.schema)) {
 			const value = data[property];
 
+			const writeOptional = (write) => {
+				// @ts-ignore
+				if (schema.optional) {
+					if (value === undefined) {
+						result.writeUint8(0);
+						return;
+					} else {
+						result.writeUint8(1);
+						write();
+					}
+				}
+			};
+
 			if (schema.type === "uint8") {
 				result.writeUint8(value);
 				continue;
@@ -80,19 +93,7 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 			}
 
 			if (schema.type === "blockId") {
-				if (schema.optional) {
-					// When marked as optional, prepend a length byte
-					// to prevent having to pad the buffer for the full hash size.
-					const blockId = value ?? "";
-					result.writeUint8(blockId.length / 2);
-
-					if (blockId) {
-						result.writeBytes(Buffer.from(blockId, "hex"));
-					}
-				} else {
-					result.writeBytes(Buffer.from(value, "hex"));
-				}
-
+				writeOptional(() => result.writeBytes(Buffer.from(value, "hex")));
 				continue;
 			}
 
@@ -199,20 +200,19 @@ export class Serializer implements Contracts.Serializer.ISerializer {
 				continue;
 			}
 
-			if (schema.type === "blockId") {
-				// If the blockId is marked as optional, read the length first, otherwise
-				// the length is equal to the hashSize.
-				let blockId: string | undefined;
+			const readOptional = <T>(read): T | undefined => {
+				// @ts-ignore
 				if (schema.optional) {
-					const blockIdLength = source.readUint8();
-					if (blockIdLength > 0) {
-						blockId = source.readBytes(blockIdLength).toString("hex");
+					const isPresent = source.readUint8();
+					if (isPresent === 0) {
+						return undefined;
 					}
-				} else {
-					blockId = source.readBytes(this.hashSize).toString("hex");
 				}
+				return read();
+			};
 
-				target[property] = blockId;
+			if (schema.type === "blockId") {
+				target[property] = readOptional<string>(() => source.readBytes(this.hashSize).toString("hex"));
 
 				continue;
 			}
