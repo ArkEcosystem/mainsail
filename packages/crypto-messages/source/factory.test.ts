@@ -89,21 +89,9 @@ describe<{
 	});
 
 	it("#makePrecommit - should correctly make signed precommit", async ({ factory, identity, verifier }) => {
-		const precommit = await factory.makePrecommit(
-			{
-				type: Contracts.Crypto.MessageType.Precommit,
-				blockId: blockData.id,
-				height: 1,
-				round: 1,
-				validatorIndex: 0,
-			},
-			identity.keys,
-		);
+		const precommit = await factory.makePrecommit(precommitData, identity.keys);
 
-		assert.equal(
-			precommit.signature,
-			"8b8ec21cbbe54aa59e2f7590e3abb7d88339ebed43ec0c2dab4917b963ae614db4316d7d26b80ac2d31d2ff4e0fa4af90a7343e5a15636f81d9c41f7a67af8b6f090acc4384299fc60d14235b377251b6c2f4db948d6c03996e832cbcf676b0a",
-		);
+		assert.equal(precommit.signature, precommitData.signature);
 
 		const { verified, errors } = await verifier.verifyPrecommit(precommit);
 		assert.equal(errors, []);
@@ -133,21 +121,9 @@ describe<{
 	});
 
 	it("#makePrevote - should correctly make signed prevote", async ({ factory, identity, verifier }) => {
-		const prevote = await factory.makePrevote(
-			{
-				type: Contracts.Crypto.MessageType.Prevote,
-				blockId: blockData.id,
-				height: 1,
-				round: 1,
-				validatorIndex: 0,
-			},
-			identity.keys,
-		);
+		const prevote = await factory.makePrevote(prevoteData, identity.keys);
 
-		assert.equal(
-			prevote.signature,
-			"85f3ddb26799dcc8d83dad963f9f4747c68d84dbd3af45dd85485e172071b27e40fe178c277d6a2e9625d03783ca9265165adc48c4ec0d46802a53b96142f7bf336431e0046cf44ff593381c30f03a9e9204a9b959bf0562c1d1c41394b0c6fd",
-		);
+		assert.equal(prevote.signature, prevoteData.signature);
 
 		const { verified, errors } = await verifier.verifyPrevote(prevote);
 		assert.equal(errors, []);
