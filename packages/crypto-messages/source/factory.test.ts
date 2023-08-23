@@ -87,6 +87,36 @@ describe<{
 		assert.equal(errors, []);
 		assert.true(verified);
 	});
+	it("#makeProposal - should correctly make signed proposal, with validRound", async ({
+		blockFactory,
+		factory,
+		identity,
+		verifier,
+	}) => {
+		const block: Contracts.Crypto.IProposedBlock = {
+			block: await blockFactory.fromData(blockData),
+			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
+		};
+
+		const proposal = await factory.makeProposal(
+			{
+				block,
+				round: 1,
+				validRound: 0,
+				validatorIndex: 0,
+			},
+			identity.keys,
+		);
+
+		assert.equal(
+			proposal.signature,
+			"a363e8a7cbea147f5f711a6042ac0185594b1cfbd96fb8eae6d52f77b00ef33c9028e5a60a6a897f28e33a6a2ba17bb206bdf91e25eb9acdab46b857422b7caa3bd07387253c6976362bd1ab36aa681b0c90a40e3b0b20ea1c0c884fda0b3cce",
+		);
+
+		const { verified, errors } = await verifier.verifyProposal(proposal);
+		assert.equal(errors, []);
+		assert.true(verified);
+	});
 
 	it("#makePrecommit - should correctly make signed precommit", async ({ factory, identity, verifier }) => {
 		const precommit = await factory.makePrecommit(precommitData, identity.keys);
