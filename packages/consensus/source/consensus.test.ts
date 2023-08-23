@@ -21,6 +21,7 @@ type Context = {
 	block: any;
 	aggregator: any;
 	proposal: any;
+	proposer: any;
 	roundState: Contracts.Consensus.IRoundState;
 	roundStateRepository: any;
 };
@@ -115,6 +116,11 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			validatorPublicKey: "validatorPublicKey",
 		};
 
+		context.proposer = {
+			getConsensusPublicKey: () => "consensusPublicKey",
+			getUsername: () => "username",
+		};
+
 		context.roundState = {
 			getBlock: () => {},
 			getProcessorResult: () => false,
@@ -126,6 +132,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			height: 2,
 			logPrecommits: () => {},
 			logPrevotes: () => {},
+			proposer: context.proposer,
 			round: 0,
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
@@ -204,23 +211,22 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus,
 		validatorsRepository,
 		roundStateRepository,
+		proposer,
 		logger,
 	}) => {
-		const validatorPublicKey = "publicKey";
-
 		const spyLoggerInfo = spy(logger, "info");
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
 		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
-			proposer: validatorPublicKey,
+			proposer: proposer,
 		});
 
 		await consensus.onTimeoutStartRound();
 
 		spyGetValidator.calledOnce();
-		spyGetValidator.calledWith(validatorPublicKey);
+		spyGetValidator.calledWith(proposer.getConsensusPublicKey());
 		spyGetRoundState.calledOnce();
 		spyGetRoundState.calledWith(2, 0);
-		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getUsername()}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
@@ -232,8 +238,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposalProcessor,
 		block,
 		proposal,
+		proposer,
 	}) => {
-		const validatorPublicKey = "publicKey";
 		const validator = {
 			prepareBlock: () => {},
 			propose: () => {},
@@ -245,7 +251,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerInfo = spy(logger, "info");
 		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
 			hasProposal: () => false,
-			proposer: validatorPublicKey,
+			proposer,
 		});
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
 		const spyProposalProcess = spy(proposalProcessor, "process");
@@ -255,14 +261,14 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetRoundState.calledTimes(2);
 		spyGetRoundState.calledWith(2, 0);
 		spyGetValidator.calledOnce();
-		spyGetValidator.calledWith(validatorPublicKey);
+		spyGetValidator.calledWith(proposer.getConsensusPublicKey());
 		spyValidatorPrepareBlock.calledOnce();
 		spyValidatorPrepareBlock.calledWith(2, 0);
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(0, block);
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal.serialized);
-		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer ${validatorPublicKey}`);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getUsername()}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
@@ -582,7 +588,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus.setRound(1);
 		await consensus.onProposalLocked(roundState);
 
-		spyGetProcessorResult.neverCalled();
+		spyGetProcessorResult.calledOnce();
 
 		spyValidatorSetGetActiveValidators.calledOnce();
 		spyValidatorsRepositoryGetValidators.calledOnce();
@@ -690,9 +696,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		logger,
 		proposal,
 	}) => {
-		const validatorPublicKey = "publicKey";
+		const walletPublicKey = "publicKey";
+		const consensusPublicKey = "consensusPublicKey";
 		const validator = {
-			getWalletPublicKey: () => validatorPublicKey,
+			getWalletPublicKey: () => walletPublicKey,
 			precommit: () => {},
 		};
 
@@ -705,7 +712,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
-				getAttribute: () => validatorPublicKey,
+				getConsensusPublicKey: () => consensusPublicKey,
 			},
 		]);
 		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
@@ -722,7 +729,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyGetActiveValidators.calledOnce();
 		spyGetValidators.calledOnce();
-		spyGetValidators.calledWith([validatorPublicKey]);
+		spyGetValidators.calledWith([consensusPublicKey]);
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0, block.data.id);
 		spyPrecommitProcess.calledOnce();
@@ -759,9 +766,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		precommitProcessor,
 		block,
 	}) => {
-		const validatorPublicKey = "publicKey";
+		const walletPublicKey = "publicKey";
+		const consensusPublicKey = "consensusPublicKey";
 		const validator = {
-			getWalletPublicKey: () => validatorPublicKey,
+			getWalletPublicKey: () => walletPublicKey,
 			precommit: () => {},
 		};
 
@@ -774,7 +782,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
-				getAttribute: () => validatorPublicKey,
+				getConsensusPublicKey: () => consensusPublicKey,
 			},
 		]);
 		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
@@ -790,7 +798,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyGetActiveValidators.calledOnce();
 		spyGetValidators.calledOnce();
-		spyGetValidators.calledWith([validatorPublicKey]);
+		spyGetValidators.calledWith([consensusPublicKey]);
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0, block.data.id);
 		spyPrecommitProcess.calledOnce();
@@ -805,7 +813,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyGetActiveValidators.calledOnce();
 		spyGetValidators.calledOnce();
-		spyGetValidators.calledWith([validatorPublicKey]);
+		spyGetValidators.calledWith([consensusPublicKey]);
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0, block.data.id);
 		spyPrecommitProcess.calledOnce();
@@ -823,9 +831,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		precommitProcessor,
 		roundState,
 	}) => {
-		const validatorPublicKey = "publicKey";
+		const walletPublicKey = "publicKey";
+		const consensusPublicKey = "consensusPublicKey";
 		const validator = {
-			getWalletPublicKey: () => validatorPublicKey,
+			getWalletPublicKey: () => walletPublicKey,
 			precommit: () => {},
 		};
 
@@ -838,7 +847,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
-				getAttribute: () => validatorPublicKey,
+				getConsensusPublicKey: () => consensusPublicKey,
 			},
 		]);
 		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
@@ -852,7 +861,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyGetActiveValidators.calledOnce();
 		spyGetValidators.calledOnce();
-		spyGetValidators.calledWith([validatorPublicKey]);
+		spyGetValidators.calledWith([consensusPublicKey]);
 
 		spyValidatorPrecommit.neverCalled();
 		spyPrecommitProcess.neverCalled();
@@ -962,9 +971,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		precommitProcessor,
 		roundState,
 	}) => {
-		const validatorPublicKey = "publicKey";
+		const walletPublicKey = "publicKey";
+		const consensusPublicKey = "consensusPublicKey";
 		const validator = {
-			getWalletPublicKey: () => validatorPublicKey,
+			getWalletPublicKey: () => walletPublicKey,
 			precommit: () => {},
 		};
 
@@ -977,7 +987,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
-				getAttribute: () => validatorPublicKey,
+				getConsensusPublicKey: () => consensusPublicKey,
 			},
 		]);
 		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
@@ -988,7 +998,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyGetActiveValidators.calledOnce();
 		spyGetValidators.calledOnce();
-		spyGetValidators.calledWith([validatorPublicKey]);
+		spyGetValidators.calledWith([consensusPublicKey]);
 
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0);
@@ -1099,7 +1109,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyConsensusStartRound.neverCalled();
 		spyRoundStateRepositoryClear.neverCalled();
 		spyStorageClear.neverCalled();
-		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${2} received +2/3 precommit but is invalid`);
+		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${2} received +2/3 precommits but is invalid`);
 		assert.equal(consensus.getHeight(), 2);
 	});
 
@@ -1282,9 +1292,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		validatorsRepository,
 		precommitProcessor,
 	}) => {
-		const validatorPublicKey = "publicKey";
+		const walletPublicKey = "publicKey";
+		const consensusPublicKey = "consensusPublicKey";
 		const validator = {
-			getWalletPublicKey: () => validatorPublicKey,
+			getWalletPublicKey: () => walletPublicKey,
 			precommit: () => {},
 		};
 
@@ -1296,7 +1307,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([
 			{
-				getAttribute: () => validatorPublicKey,
+				getConsensusPublicKey: () => consensusPublicKey,
 			},
 		]);
 		const spyGetValidators = stub(validatorsRepository, "getValidators").returnValue([validator]);
@@ -1307,7 +1318,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyGetActiveValidators.calledOnce();
 		spyGetValidators.calledOnce();
-		spyGetValidators.calledWith([validatorPublicKey]);
+		spyGetValidators.calledWith([consensusPublicKey]);
 
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0);
