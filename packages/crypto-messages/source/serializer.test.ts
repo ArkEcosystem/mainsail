@@ -1,20 +1,19 @@
 import { describe, Sandbox } from "../../test-framework";
 import {
-	blockData,
 	precommitData,
 	precommitDataNoBlock,
 	prevoteData,
 	prevoteDataNoBlock,
 	proposalData,
+	serializedBlock,
 	serializedPrecommit,
-	serializedPrecommitNoBlock,
 	serializedPrecommitForSignature,
+	serializedPrecommitNoBlock,
 	serializedPrevote,
-	serializedPrevoteNoBlock,
 	serializedPrevoteForSignature,
+	serializedPrevoteNoBlock,
 	serializedProposal,
 	serializedProposalForSignature,
-	serializedBlock,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Serializer } from "./serializer";
@@ -33,9 +32,9 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
+					block: { serialized: serializedBlock },
 					round: proposalData.round,
 					validatorIndex: proposalData.validatorIndex,
-					block: { serialized: serializedBlock },
 				},
 				{ includeSignature: false },
 			)
@@ -48,10 +47,10 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
-					round: proposalData.round,
-					validatorIndex: proposalData.validatorIndex,
 					block: { serialized: serializedBlock },
+					round: proposalData.round,
 					signature: proposalData.signature,
+					validatorIndex: proposalData.validatorIndex,
 				},
 				{ includeSignature: true },
 			)
