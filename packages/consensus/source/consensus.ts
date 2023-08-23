@@ -388,26 +388,27 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			return;
 		}
 
-		let block: Contracts.Crypto.IBlock;
-		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
+		let proposal: Contracts.Crypto.IProposal | undefined;
 
 		if (this.#validValue) {
-			block = this.#validValue.getBlock();
-			lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
+			const block = this.#validValue.getBlock();
+			const lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
 
 			this.logger.info(
 				`Proposing valid block ${this.#height}/${
 					this.#round
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
+
+			proposal = await proposer.propose(this.#round, block, lockProof);
 		} else {
-			block = await proposer.prepareBlock(this.#height, this.#round);
+			const block = await proposer.prepareBlock(this.#height, this.#round);
 
 			this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
+			proposal = await proposer.propose(this.#round, block);
 		}
 
-		const proposal = await proposer.propose(this.#round, block, lockProof);
-
+		Utils.assert.defined(proposal);
 		void this.proposalProcessor.process(proposal.serialized);
 	}
 
