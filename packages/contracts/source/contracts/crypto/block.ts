@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utils";
-import { IValidatorSetMajority } from "./signatures";
+import { IAggregatedSignature } from "./signatures";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
 export interface IBlockVerification {
@@ -70,19 +70,19 @@ export interface IBlockCommit {
 
 export interface IProposedBlock {
 	readonly block: IBlock;
-	readonly lockProof?: IValidatorSetMajority;
+	readonly lockProof?: IAggregatedSignature;
 	readonly serialized: string;
 }
 
 export interface IProposedBlockData {
 	readonly block: IBlockData;
-	readonly lockProof?: IValidatorSetMajority;
+	readonly lockProof?: IAggregatedSignature;
 	readonly serialized: string;
 }
 
 export interface IProposedBlockJson {
 	readonly block: IBlockJson;
-	readonly lockProof?: IValidatorSetMajority;
+	readonly lockProof?: IAggregatedSignature;
 	readonly serialized: string;
 }
 
@@ -143,7 +143,7 @@ export interface IBlockSerializer {
 
 	serializeCommit(commit: IBlockCommit): Promise<Buffer>;
 
-	serializeLockProof(proof: IValidatorSetMajority): Promise<Buffer>;
+	serializeLockProof(proof: IAggregatedSignature): Promise<Buffer>;
 
 	serializeProposed(proposedBlock: IProposedBlockSerializable): Promise<Buffer>;
 
@@ -160,7 +160,7 @@ export interface IBlockDeserializer {
 
 	deserializeWithTransactions(serialized: Buffer): Promise<IBlockWithTransactions>;
 
-	deserializeLockProof(serialized: Buffer): Promise<IValidatorSetMajority>;
+	deserializeLockProof(serialized: Buffer): Promise<IAggregatedSignature>;
 
 	deserializeCommit(serialized: Buffer): Promise<IBlockCommit>;
 }

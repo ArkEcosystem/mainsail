@@ -19,7 +19,7 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 
 	public async aggregateMajorityPrevotes(
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Contracts.Crypto.IValidatorSetMajority> {
+	): Promise<Contracts.Crypto.IAggregatedSignature> {
 		if (!roundState.hasMajorityPrevotes()) {
 			throw new Error("called aggregateMajorityPrevotes without majority");
 		}
@@ -29,7 +29,7 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 
 	public async aggregateMajorityPrecommits(
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Contracts.Crypto.IValidatorSetMajority> {
+	): Promise<Contracts.Crypto.IAggregatedSignature> {
 		if (!roundState.hasMajorityPrecommits()) {
 			throw new Error("called aggregateMajorityPrecommits without majority");
 		}
@@ -39,7 +39,7 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 
 	public async getProposalLockProof(
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Contracts.Crypto.IValidatorSetMajority> {
+	): Promise<Contracts.Crypto.IAggregatedSignature> {
 		const majority = await this.aggregateMajorityPrevotes(roundState);
 
 		const proposal = roundState.getProposal();
@@ -84,7 +84,7 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	async #aggregateValidatorSetMajority(
 		roundState: Contracts.Consensus.IRoundState,
 		majority: Map<string, { signature: string }>,
-	): Promise<Contracts.Crypto.IValidatorSetMajority> {
+	): Promise<Contracts.Crypto.IAggregatedSignature> {
 		const signatures: Buffer[] = [];
 
 		const numberOfValidators = this.configuration.getMilestone().activeValidators;

@@ -73,7 +73,7 @@ export class Verifier implements Contracts.Crypto.IMessageVerifier {
 
 	public async verifyProposalLockProof(
 		prevote: Contracts.Crypto.ISignaturePrevoteData,
-		lockProof: Contracts.Crypto.IValidatorSetMajority,
+		lockProof: Contracts.Crypto.IAggregatedSignature,
 	): Promise<Contracts.Crypto.IMessageVerificationResult> {
 		const errors: string[] = [];
 

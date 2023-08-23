@@ -143,8 +143,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		});
 	}
 
-	public async serializeLockProof(lockProof: Contracts.Crypto.IValidatorSetMajority): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IValidatorSetMajority>(lockProof, {
+	public async serializeLockProof(lockProof: Contracts.Crypto.IAggregatedSignature): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.IAggregatedSignature>(lockProof, {
 			length: this.lockProofSize(),
 			skip: 0,
 			schema: {

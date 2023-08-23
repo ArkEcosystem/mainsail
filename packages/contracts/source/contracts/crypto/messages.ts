@@ -1,6 +1,6 @@
 import { IProposedBlock } from "./block";
 import { IKeyPair } from "./identities";
-import { IValidatorSetMajority } from "./signatures";
+import { IAggregatedSignature } from "./signatures";
 
 export enum MessageType {
 	Prevote = 1,
@@ -128,6 +128,6 @@ export interface IMessageVerifier {
 	verifyPrecommit(precommit: IPrecommit): Promise<IMessageVerificationResult>;
 	verifyProposalLockProof(
 		prevote: ISignaturePrevoteData,
-		lockProof: IValidatorSetMajority,
+		lockProof: IAggregatedSignature,
 	): Promise<IMessageVerificationResult>;
 }

@@ -1,4 +1,4 @@
-export interface IValidatorSetMajority {
+export interface IAggregatedSignature {
 	signature: string;
 	validators: boolean[];
 }
