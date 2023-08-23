@@ -131,7 +131,13 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 		}
 
 		const proposer = this.validatorSet.getValidator(this.proposerPicker.getValidatorIndex(proposal.round));
-		return proposal.block.block.data.generatorPublicKey !== proposer.getWalletPublicKey();
+		const isInvalid = proposal.block.block.data.generatorPublicKey !== proposer.getWalletPublicKey();
+
+		if (isInvalid) {
+			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with invalid block generator`);
+		}
+
+		return isInvalid;
 	}
 
 	#isInvalidHeightOrRound(message: { height: number; round: number }): boolean {
