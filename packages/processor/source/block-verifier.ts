@@ -6,7 +6,7 @@ import {
 	ForgedTransactionsVerifier,
 	IncompatibleTransactionsVerifier,
 	NonceVerifier,
-	ValidatorVerifier,
+	// ValidatorVerifier,
 	VerifyBlockVerifier,
 } from "./verifiers";
 import { CommitVerifier } from "./verifiers/commit-verifier";
@@ -45,9 +45,9 @@ export class BlockVerifier implements Contracts.BlockProcessor.Verifier {
 			return false;
 		}
 
-		if (!(await this.app.resolve(ValidatorVerifier).execute(unit))) {
-			return false;
-		}
+		// if (!(await this.app.resolve(ValidatorVerifier).execute(unit))) {
+		// 	return false;
+		// }
 
 		if (!(await this.app.resolve(ChainedVerifier).execute(unit))) {
 			return false;
