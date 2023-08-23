@@ -80,7 +80,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"9474091adfe65f47d6f07bf3c31bbfdae66fb289fabc3aa69c70319990ac78a8b19d83766c18fdb25d3f3f0edc238dde01e5121806adf3c483c36e6d94813b33d76e3d823e8db8615cceb1ff9cfa0471cbd543bfd91d7aca939af533c7eb9b3d",
+			"8b4db95de1a65f70ae05cbfce0013f4ad3a5545b32206288751517661d59633dd289a743c5ab0892c5be4e1a91547692030d1120248fefba361e276e1364ced22d5b00348efadc27e8d3ffd7080686c9d4ae22596c255725e0b4dad712389c29",
 		);
 
 		const { verified, errors } = await verifier.verifyProposal(proposal);
