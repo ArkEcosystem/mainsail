@@ -230,6 +230,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
+	// TODO: Add test for valid round
 	it("#onTimeoutStartRound - local validator should propose", async ({
 		consensus,
 		validatorsRepository,
@@ -351,7 +352,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 
-		proposal.validRound = 1;
+		proposal.validRound = 0;
 		await consensus.onProposal(roundState);
 
 		spyBlockProcessorProcess.neverCalled();
