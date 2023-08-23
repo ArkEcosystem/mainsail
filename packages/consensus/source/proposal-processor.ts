@@ -93,7 +93,7 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 	}
 
 	async #hasInvalidLockProof(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		if (!proposal.validRound) {
+		if (proposal.validRound === undefined) {
 			return false;
 		}
 
