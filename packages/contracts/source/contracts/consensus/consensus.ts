@@ -33,7 +33,6 @@ export interface IRoundState extends IProcessableUnit {
 export interface IAggregator {
 	aggregateMajorityPrevotes(roundState: IRoundState): Promise<IAggregatedSignature>;
 	aggregateMajorityPrecommits(roundState: IRoundState): Promise<IAggregatedSignature>;
-	getProposalLockProof(roundState: IRoundState): Promise<IAggregatedSignature>;
 	getProposedCommitBlock(roundState: IRoundState): Promise<ICommittedBlock>;
 }
 

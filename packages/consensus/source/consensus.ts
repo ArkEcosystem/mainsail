@@ -396,7 +396,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (this.#validValue) {
 			const block = this.#validValue.getBlock();
-			const lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
+			const lockProof = await this.aggregator.aggregateMajorityPrevotes(this.#validValue);
 
 			this.logger.info(
 				`Proposing valid block ${this.#height}/${

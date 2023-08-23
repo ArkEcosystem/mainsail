@@ -37,19 +37,6 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 		return this.#aggregateValidatorSetMajority(roundState, roundState.getValidatorPrecommitSignatures());
 	}
 
-	public async getProposalLockProof(
-		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Contracts.Crypto.IAggregatedSignature> {
-		const majority = await this.aggregateMajorityPrevotes(roundState);
-
-		const proposal = roundState.getProposal();
-		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
-
-		return {
-			...majority,
-		};
-	}
-
 	public async getProposedCommitBlock(
 		roundState: Contracts.Consensus.IRoundState,
 	): Promise<Contracts.Crypto.ICommittedBlock> {
