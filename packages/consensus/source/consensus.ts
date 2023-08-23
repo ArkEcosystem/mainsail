@@ -182,7 +182,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	// TODO: Implement proposal for validRound >= 0.
 	protected async onProposal(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
@@ -190,7 +189,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#step !== Contracts.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
-			proposal.validRound
+			proposal.validRound !== undefined
 		) {
 			return;
 		}
