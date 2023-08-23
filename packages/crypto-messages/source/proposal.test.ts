@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework";
-import { blockData, proposalData, serializedBlock } from "../test/fixtures/proposal";
+import { blockData, proposalData, proposalDataWithValidRound, serializedBlock } from "../test/fixtures/proposal";
 import { Proposal } from "./proposal";
 
 describe<{
@@ -18,6 +18,11 @@ describe<{
 	};
 
 	const proposal = new Proposal({ ...proposalData, block, serialized: Buffer.from("dead", "hex") });
+	const proposalWithValidRound = new Proposal({
+		...proposalDataWithValidRound,
+		block,
+		serialized: Buffer.from("dead", "hex"),
+	});
 
 	it("#height", () => {
 		assert.equal(proposal.height, 2);
@@ -65,6 +70,14 @@ describe<{
 			signature: proposalData.signature,
 			validRound: proposalData.validRound,
 			validatorIndex: proposalData.validatorIndex,
+		});
+
+		assert.equal(proposalWithValidRound.toSerializableData(), {
+			block: block,
+			round: proposalDataWithValidRound.round,
+			signature: proposalDataWithValidRound.signature,
+			validRound: proposalDataWithValidRound.validRound,
+			validatorIndex: proposalDataWithValidRound.validatorIndex,
 		});
 	});
 });
