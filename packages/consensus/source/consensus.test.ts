@@ -73,7 +73,9 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			run: () => {},
 		};
 
-		context.aggregator = {};
+		context.aggregator = {
+			getProposalLockProof: () => {},
+		};
 
 		context.validatorsRepository = {
 			getValidator: () => {},
@@ -270,6 +272,61 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal.serialized);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getUsername()}`);
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+	});
+
+	it("#onTimeoutStartRound - local validator should propose validRound", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		logger,
+		proposalProcessor,
+		block,
+		proposal,
+		proposer,
+		roundState,
+		aggregator,
+	}) => {
+		const validator = {
+			prepareBlock: () => {},
+			propose: () => {},
+		};
+
+		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+
+		const spyLoggerInfo = spy(logger, "info");
+		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
+			hasProposal: () => false,
+			proposer,
+		});
+		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
+		const spyProposalProcess = spy(proposalProcessor, "process");
+
+		const lockProof = {
+			signature: "signature",
+			validators: [],
+		};
+		const spyGetProposalLockProof = stub(aggregator, "getProposalLockProof").returnValue(lockProof);
+
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(block);
+
+		consensus.setValidRound(roundState);
+		consensus.setRound(1);
+		await consensus.onTimeoutStartRound();
+
+		spyGetRoundState.calledTimes(2);
+		spyGetRoundState.calledWith(2, 1);
+		spyGetValidator.calledOnce();
+		spyGetValidator.calledWith(proposer.getConsensusPublicKey());
+		spyValidatorPrepareBlock.neverCalled();
+		spyGetProposalLockProof.calledOnce();
+		spyValidatorPropose.calledOnce();
+		spyValidatorPropose.calledWith(1, 0, block, lockProof);
+		spyProposalProcess.calledOnce();
+		spyProposalProcess.calledWith(proposal.serialized);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${1} with proposer: ${proposer.getUsername()}`);
+		spyLoggerInfo.calledWith(`Proposing valid block ${2}/${1} from round ${0} with blockId: ${block.data.id}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 

@@ -85,6 +85,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
+	// TODO: Only for testing
+	public setValidRound(round: Contracts.Consensus.IRoundState): void {
+		this.#validValue = round;
+	}
+
 	public getState(): Contracts.Consensus.IConsensusState {
 		return {
 			height: this.#height,
