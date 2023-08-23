@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+
 import { describe, Sandbox } from "../../test-framework";
 import { blockData, proposalData, serializedBlock } from "../test/fixtures/proposal";
 import { Proposal } from "./proposal";
@@ -8,10 +9,10 @@ describe<{
 }>("Proposal", ({ it, assert }) => {
 	const block: Contracts.Crypto.IProposedBlock = {
 		block: {
+			data: blockData,
 			header: { ...blockData, transactions: [] },
 			serialized: serializedBlock,
 			transactions: [],
-			data: blockData,
 		},
 		serialized: serializedBlock,
 	};
@@ -59,10 +60,11 @@ describe<{
 
 	it("#toSerializableData", () => {
 		assert.equal(proposal.toSerializableData(), {
-			round: proposalData.round,
 			block: block,
-			validatorIndex: proposalData.validatorIndex,
+			round: proposalData.round,
 			signature: proposalData.signature,
+			validRound: proposalData.validRound,
+			validatorIndex: proposalData.validatorIndex,
 		});
 	});
 });
