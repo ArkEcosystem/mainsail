@@ -21,7 +21,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		return this.serializer.serialize<Contracts.Crypto.ISerializableProposalData>(proposal, {
 			length:
 				4 + // round
-				(proposal.validRound ? 5 : 1) + // validRound
+				(proposal.validRound === undefined ? 1 : 5) + // validRound
 				4 + // serialized block length
 				proposal.block.serialized.length / 2 + // serialized block
 				1 + // validatorIndex
