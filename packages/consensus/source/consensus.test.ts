@@ -265,7 +265,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrepareBlock.calledOnce();
 		spyValidatorPrepareBlock.calledWith(2, 0);
 		spyValidatorPropose.calledOnce();
-		spyValidatorPropose.calledWith(0, block);
+		spyValidatorPropose.calledWith(0, undefined, block);
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal.serialized);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getUsername()}`);
