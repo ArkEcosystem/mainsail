@@ -30,7 +30,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	// TODO: Rename identifier
 	@inject(Identifiers.Consensus.ValidatorRepository)
-	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
+	private readonly validatorsRepository!: Contracts.Validator.IValidatorRepository;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
@@ -382,7 +382,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return false;
 	}
 
-	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
+	async #propose(proposer: Contracts.Validator.IValidator): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		if (roundState.hasProposal()) {
 			return;
