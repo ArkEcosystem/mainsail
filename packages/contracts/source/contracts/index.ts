@@ -4,7 +4,6 @@ export * as Crypto from "./crypto";
 export * as Database from "./database";
 export * as Fee from "./fees";
 export * as Flags from "./flags";
-export * as Forger from "./forger";
 export * as Kernel from "./kernel";
 export * as NetworkGenerator from "./network-generator";
 export * as P2P from "./p2p";
