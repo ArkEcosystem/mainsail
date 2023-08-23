@@ -1,5 +1,6 @@
 import { IProposedBlock } from "./block";
 import { IKeyPair } from "./identities";
+import { IValidatorSetMajority } from "./signatures";
 
 export enum MessageType {
 	Prevote = 1,
@@ -77,11 +78,6 @@ export interface IPrecommit extends IPrecommitData {
 	toSignatureData(): ISignaturePrecommitData;
 	toData(): IPrecommitData;
 	toString(): string;
-}
-
-export interface IValidatorSetMajority {
-	signature: string;
-	validators: boolean[];
 }
 
 export interface SerializeProposalOptions {

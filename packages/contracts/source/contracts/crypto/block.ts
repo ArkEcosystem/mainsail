@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utils";
-import { IValidatorSetMajority } from "./messages";
+import { IValidatorSetMajority } from "./signatures";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
 export interface IBlockVerification {
