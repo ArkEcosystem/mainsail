@@ -66,6 +66,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 			block: this.#block,
 			round: this.#round,
 			signature: this.#signature,
+			validRound: this.#validRound,
 			validatorIndex: this.#validatorIndex,
 		};
 	}

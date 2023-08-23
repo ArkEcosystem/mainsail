@@ -30,6 +30,7 @@ export interface IProposalData {
 
 export interface ISerializableProposalData {
 	readonly round: number;
+	readonly validRound?: number;
 	readonly block: { serialized: string };
 	readonly validatorIndex: number;
 	readonly signature?: string;
