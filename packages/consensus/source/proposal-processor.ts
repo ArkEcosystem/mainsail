@@ -15,6 +15,9 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
 
@@ -39,6 +42,10 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 		}
 
 		if (this.#isInvalidProposer(proposal)) {
+			return Contracts.Consensus.ProcessorResult.Invalid;
+		}
+
+		if (this.#isInvalidBlockGenerator(proposal)) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
@@ -114,6 +121,17 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 
 	#isInvalidProposer(proposal: Contracts.Crypto.IProposal): boolean {
 		return proposal.validatorIndex !== this.proposerPicker.getValidatorIndex(proposal.round);
+	}
+
+	#isInvalidBlockGenerator(proposal: Contracts.Crypto.IProposal): boolean {
+		if (proposal.validRound !== undefined) {
+			// We assume that this check passed when block was proposed first time, so we don't need to check it again.
+			// The check also cannot be repeated because we don't hold the value when the block was proposed first time.
+			return false;
+		}
+
+		const proposer = this.validatorSet.getValidator(this.proposerPicker.getValidatorIndex(proposal.round));
+		return proposal.block.block.data.generatorPublicKey !== proposer.getWalletPublicKey();
 	}
 
 	#isInvalidHeightOrRound(message: { height: number; round: number }): boolean {
