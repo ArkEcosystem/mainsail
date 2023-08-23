@@ -10,12 +10,14 @@ import {
 	prevoteData,
 	prevoteDataNoBlock,
 	proposalData,
+	proposalDataWithValidRound,
 	serializedBlock,
 	serializedPrecommit,
 	serializedPrecommitNoBlock,
 	serializedPrevote,
 	serializedPrevoteNoBlock,
 	serializedProposal,
+	serializedProposalDataWithValidRound,
 	validatorMnemonic,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -186,6 +188,12 @@ describe<{
 		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
 
 		assert.equal(proposal.toData(), proposalData);
+	});
+
+	it.skip("#makeProposalFromBytes - should be ok, with validRound", async ({ factory, identity, verifier }) => {
+		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposalDataWithValidRound, "hex"));
+
+		assert.equal(proposal.toData(), proposalDataWithValidRound);
 	});
 
 	it("#makePrevoteFromBytes - should be ok", async ({ factory, identity, verifier }) => {
