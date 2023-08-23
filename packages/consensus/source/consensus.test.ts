@@ -124,6 +124,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			hasProcessorResult: () => false,
 			hasProposal: () => false,
 			height: 2,
+			logPrecommits: () => {},
+			logPrevotes: () => {},
 			round: 0,
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
@@ -493,7 +495,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
 
-	it.only("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
+	it("#onProposalLocked - broadcast prevote block id, if block is valid and lockedRound is undefined", async ({
 		consensus,
 		validatorSet,
 		validatorsRepository,
