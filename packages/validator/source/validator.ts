@@ -5,7 +5,7 @@ import { BigNumber, isEmpty } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
-export class Validator implements Contracts.Consensus.IValidator {
+export class Validator implements Contracts.Validator.IValidator {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -39,7 +39,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 	#keyPair!: Contracts.Crypto.IKeyPair;
 	#walletPublicKey!: string;
 
-	public configure(walletPublicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Consensus.IValidator {
+	public configure(walletPublicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Validator.IValidator {
 		this.#walletPublicKey = walletPublicKey;
 		this.#keyPair = keyPair;
 
@@ -62,6 +62,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 
 	public async propose(
 		round: number,
+		validRound: number | undefined,
 		block: Contracts.Crypto.IBlock,
 		lockProof?: Contracts.Crypto.IProposalLockProof,
 	): Promise<Contracts.Crypto.IProposal> {
@@ -70,6 +71,7 @@ export class Validator implements Contracts.Consensus.IValidator {
 			{
 				block: { serialized: serializedProposedBlock.toString("hex") },
 				round,
+				validRound,
 				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
 			},
 			this.#keyPair,

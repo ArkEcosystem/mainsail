@@ -7,14 +7,14 @@ import { Validator } from "./validator";
 
 describe<{
 	sandbox: Sandbox;
-	validator: Contracts.Consensus.IValidator;
+	validator: Contracts.Validator.IValidator;
 }>("Validator", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
 		const { consensusKeyPair, walletPublicKey } = validatorKeys[0];
 		context.validator = context.sandbox.app
-			.resolve<Contracts.Consensus.IValidator>(Validator)
+			.resolve<Contracts.Validator.IValidator>(Validator)
 			.configure(walletPublicKey, consensusKeyPair);
 	});
 
@@ -30,7 +30,7 @@ describe<{
 
 	it("#propose - should create signed proposal", async ({ validator }) => {
 		const block = await validator.prepareBlock(1, 1);
-		const proposal = await validator.propose(1, block);
+		const proposal = await validator.propose(1, undefined, block);
 		assert.defined(proposal);
 		assert.defined(proposal.signature);
 	});

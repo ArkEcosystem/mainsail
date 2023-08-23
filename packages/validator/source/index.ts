@@ -18,7 +18,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			"consensus",
 		);
 
-		const validators: Contracts.Consensus.IValidator[] = [];
+		const validators: Contracts.Validator.IValidator[] = [];
 		const secrets = this.app.config("validators.secrets");
 		Utils.assert.defined<string[]>(secrets);
 
@@ -28,7 +28,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			validators.push(
 				this.app
-					.resolve<Contracts.Consensus.IValidator>(Validator)
+					.resolve<Contracts.Validator.IValidator>(Validator)
 					.configure(walletPublicKey, consensusKeyPair),
 			);
 		}

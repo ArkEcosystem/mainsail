@@ -30,7 +30,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	// TODO: Rename identifier
 	@inject(Identifiers.Consensus.ValidatorRepository)
-	private readonly validatorsRepository!: Contracts.Consensus.IValidatorRepository;
+	private readonly validatorsRepository!: Contracts.Validator.IValidatorRepository;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
@@ -83,6 +83,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	public getValidRound(): number | undefined {
 		return this.#validValue ? this.#validValue.round : undefined;
+	}
+
+	// TODO: Only for testing
+	public setValidRound(round: Contracts.Consensus.IRoundState): void {
+		this.#validValue = round;
 	}
 
 	public getState(): Contracts.Consensus.IConsensusState {
@@ -182,7 +187,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	// TODO: Implement proposal for validRound >= 0.
 	protected async onProposal(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
@@ -190,7 +194,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			this.#step !== Contracts.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
-			proposal.validRound
+			proposal.validRound !== undefined
 		) {
 			return;
 		}
@@ -382,32 +386,33 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return false;
 	}
 
-	async #propose(proposer: Contracts.Consensus.IValidator): Promise<void> {
+	async #propose(proposer: Contracts.Validator.IValidator): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		if (roundState.hasProposal()) {
 			return;
 		}
 
-		let block: Contracts.Crypto.IBlock;
-		let lockProof: Contracts.Crypto.IProposalLockProof | undefined;
+		let proposal: Contracts.Crypto.IProposal | undefined;
 
 		if (this.#validValue) {
-			block = this.#validValue.getBlock();
-			lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
+			const block = this.#validValue.getBlock();
+			const lockProof = await this.aggregator.getProposalLockProof(this.#validValue);
 
 			this.logger.info(
 				`Proposing valid block ${this.#height}/${
 					this.#round
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
+
+			proposal = await proposer.propose(this.#round, this.#validValue.round, block, lockProof);
 		} else {
-			block = await proposer.prepareBlock(this.#height, this.#round);
+			const block = await proposer.prepareBlock(this.#height, this.#round);
 
 			this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
+			proposal = await proposer.propose(this.#round, undefined, block);
 		}
 
-		const proposal = await proposer.propose(this.#round, block, lockProof);
-
+		Utils.assert.defined(proposal);
 		void this.proposalProcessor.process(proposal.serialized);
 	}
 
