@@ -5,7 +5,12 @@ export interface IValidator {
 	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
 	prepareBlock(height: number, round: number): Promise<IBlock>;
-	propose(round: number, block: IBlock, lockProof?: IProposalLockProof): Promise<IProposal>;
+	propose(
+		round: number,
+		validRound: number | undefined,
+		block: IBlock,
+		lockProof?: IProposalLockProof,
+	): Promise<IProposal>;
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
 	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
 }

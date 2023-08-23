@@ -62,6 +62,7 @@ export class Validator implements Contracts.Validator.IValidator {
 
 	public async propose(
 		round: number,
+		validRound: number | undefined,
 		block: Contracts.Crypto.IBlock,
 		lockProof?: Contracts.Crypto.IProposalLockProof,
 	): Promise<Contracts.Crypto.IProposal> {
@@ -70,6 +71,7 @@ export class Validator implements Contracts.Validator.IValidator {
 			{
 				block: { serialized: serializedProposedBlock.toString("hex") },
 				round,
+				validRound,
 				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
 			},
 			this.#keyPair,

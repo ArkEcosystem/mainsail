@@ -400,12 +400,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
 
-			proposal = await proposer.propose(this.#round, block, lockProof);
+			proposal = await proposer.propose(this.#round, this.#validValue.round, block, lockProof);
 		} else {
 			const block = await proposer.prepareBlock(this.#height, this.#round);
 
 			this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
-			proposal = await proposer.propose(this.#round, block);
+			proposal = await proposer.propose(this.#round, undefined, block);
 		}
 
 		Utils.assert.defined(proposal);
