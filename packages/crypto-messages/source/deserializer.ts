@@ -18,6 +18,10 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 				round: {
 					type: "uint32",
 				},
+				validRound: {
+					optional: true,
+					type: "uint32",
+				},
 				block: {
 					type: "hex",
 				},

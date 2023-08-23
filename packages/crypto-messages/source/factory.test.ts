@@ -10,12 +10,14 @@ import {
 	prevoteData,
 	prevoteDataNoBlock,
 	proposalData,
+	proposalDataWithValidRound,
 	serializedBlock,
 	serializedPrecommit,
 	serializedPrecommitNoBlock,
 	serializedPrevote,
 	serializedPrevoteNoBlock,
 	serializedProposal,
+	serializedProposalDataWithValidRound,
 	validatorMnemonic,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
@@ -80,7 +82,37 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"9474091adfe65f47d6f07bf3c31bbfdae66fb289fabc3aa69c70319990ac78a8b19d83766c18fdb25d3f3f0edc238dde01e5121806adf3c483c36e6d94813b33d76e3d823e8db8615cceb1ff9cfa0471cbd543bfd91d7aca939af533c7eb9b3d",
+			"8b4db95de1a65f70ae05cbfce0013f4ad3a5545b32206288751517661d59633dd289a743c5ab0892c5be4e1a91547692030d1120248fefba361e276e1364ced22d5b00348efadc27e8d3ffd7080686c9d4ae22596c255725e0b4dad712389c29",
+		);
+
+		const { verified, errors } = await verifier.verifyProposal(proposal);
+		assert.equal(errors, []);
+		assert.true(verified);
+	});
+	it("#makeProposal - should correctly make signed proposal, with validRound", async ({
+		blockFactory,
+		factory,
+		identity,
+		verifier,
+	}) => {
+		const block: Contracts.Crypto.IProposedBlock = {
+			block: await blockFactory.fromData(blockData),
+			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
+		};
+
+		const proposal = await factory.makeProposal(
+			{
+				block,
+				round: 1,
+				validRound: 0,
+				validatorIndex: 0,
+			},
+			identity.keys,
+		);
+
+		assert.equal(
+			proposal.signature,
+			"a363e8a7cbea147f5f711a6042ac0185594b1cfbd96fb8eae6d52f77b00ef33c9028e5a60a6a897f28e33a6a2ba17bb206bdf91e25eb9acdab46b857422b7caa3bd07387253c6976362bd1ab36aa681b0c90a40e3b0b20ea1c0c884fda0b3cce",
 		);
 
 		const { verified, errors } = await verifier.verifyProposal(proposal);
@@ -156,6 +188,12 @@ describe<{
 		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
 
 		assert.equal(proposal.toData(), proposalData);
+	});
+
+	it.skip("#makeProposalFromBytes - should be ok, with validRound", async ({ factory, identity, verifier }) => {
+		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposalDataWithValidRound, "hex"));
+
+		assert.equal(proposal.toData(), proposalDataWithValidRound);
 	});
 
 	it("#makePrevoteFromBytes - should be ok", async ({ factory, identity, verifier }) => {

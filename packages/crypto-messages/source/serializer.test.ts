@@ -1,20 +1,22 @@
 import { describe, Sandbox } from "../../test-framework";
 import {
-	blockData,
 	precommitData,
 	precommitDataNoBlock,
 	prevoteData,
 	prevoteDataNoBlock,
 	proposalData,
-	serializedPrecommit,
-	serializedPrecommitNoBlock,
-	serializedPrecommitForSignature,
-	serializedPrevote,
-	serializedPrevoteNoBlock,
-	serializedPrevoteForSignature,
-	serializedProposal,
-	serializedProposalForSignature,
+	proposalDataWithValidRound,
 	serializedBlock,
+	serializedPrecommit,
+	serializedPrecommitForSignature,
+	serializedPrecommitNoBlock,
+	serializedPrevote,
+	serializedPrevoteForSignature,
+	serializedPrevoteNoBlock,
+	serializedProposal,
+	serializedProposalDataWithValidRound,
+	serializedProposalDataWithValidRoundForSignature,
+	serializedProposalForSignature,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Serializer } from "./serializer";
@@ -33,9 +35,9 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
+					block: { serialized: serializedBlock },
 					round: proposalData.round,
 					validatorIndex: proposalData.validatorIndex,
-					block: { serialized: serializedBlock },
 				},
 				{ includeSignature: false },
 			)
@@ -48,10 +50,10 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
-					round: proposalData.round,
-					validatorIndex: proposalData.validatorIndex,
 					block: { serialized: serializedBlock },
+					round: proposalData.round,
 					signature: proposalData.signature,
+					validatorIndex: proposalData.validatorIndex,
 				},
 				{ includeSignature: true },
 			)
@@ -60,6 +62,38 @@ describe<{
 		assert.equal(serialized, serializedProposal);
 	});
 
+	it("#serializeProposal - should correctly serialize for signature, with valid round", async ({ serializer }) => {
+		const serialized = (
+			await serializer.serializeProposal(
+				{
+					block: { serialized: serializedBlock },
+					round: proposalDataWithValidRound.round,
+					validRound: proposalDataWithValidRound.validRound,
+					validatorIndex: proposalDataWithValidRound.validatorIndex,
+				},
+				{ includeSignature: false },
+			)
+		).toString("hex");
+
+		assert.equal(serialized, serializedProposalDataWithValidRoundForSignature);
+	});
+
+	it("#serializeProposal - should correctly serialize with signature, with valid round", async ({ serializer }) => {
+		const serialized = (
+			await serializer.serializeProposal(
+				{
+					block: { serialized: serializedBlock },
+					round: proposalDataWithValidRound.round,
+					signature: proposalDataWithValidRound.signature,
+					validRound: proposalDataWithValidRound.validRound,
+					validatorIndex: proposalDataWithValidRound.validatorIndex,
+				},
+				{ includeSignature: true },
+			)
+		).toString("hex");
+
+		assert.equal(serialized, serializedProposalDataWithValidRound);
+	});
 	it("#serializePrecommit - should correctly serialize for signature", async ({ serializer }) => {
 		const serialized = (await serializer.serializePrecommitForSignature(precommitData)).toString("hex");
 		assert.equal(serialized, serializedPrecommitForSignature);

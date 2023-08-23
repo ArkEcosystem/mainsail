@@ -1,6 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
+
 import { describe, Sandbox } from "../../test-framework";
-import { blockData, proposalData, serializedBlock } from "../test/fixtures/proposal";
+import { blockData, proposalData, proposalDataWithValidRound, serializedBlock } from "../test/fixtures/proposal";
 import { Proposal } from "./proposal";
 
 describe<{
@@ -8,15 +9,20 @@ describe<{
 }>("Proposal", ({ it, assert }) => {
 	const block: Contracts.Crypto.IProposedBlock = {
 		block: {
+			data: blockData,
 			header: { ...blockData, transactions: [] },
 			serialized: serializedBlock,
 			transactions: [],
-			data: blockData,
 		},
 		serialized: serializedBlock,
 	};
 
 	const proposal = new Proposal({ ...proposalData, block, serialized: Buffer.from("dead", "hex") });
+	const proposalWithValidRound = new Proposal({
+		...proposalDataWithValidRound,
+		block,
+		serialized: Buffer.from("dead", "hex"),
+	});
 
 	it("#height", () => {
 		assert.equal(proposal.height, 2);
@@ -59,10 +65,19 @@ describe<{
 
 	it("#toSerializableData", () => {
 		assert.equal(proposal.toSerializableData(), {
-			round: proposalData.round,
 			block: block,
-			validatorIndex: proposalData.validatorIndex,
+			round: proposalData.round,
 			signature: proposalData.signature,
+			validRound: proposalData.validRound,
+			validatorIndex: proposalData.validatorIndex,
+		});
+
+		assert.equal(proposalWithValidRound.toSerializableData(), {
+			block: block,
+			round: proposalDataWithValidRound.round,
+			signature: proposalDataWithValidRound.signature,
+			validRound: proposalDataWithValidRound.validRound,
+			validatorIndex: proposalDataWithValidRound.validatorIndex,
 		});
 	});
 });
