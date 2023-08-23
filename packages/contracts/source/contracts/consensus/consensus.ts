@@ -1,13 +1,5 @@
 import { IProcessableUnit } from "../block-processor";
-import {
-	IBlockCommit,
-	ICommittedBlock,
-	IPrecommit,
-	IPrevote,
-	IProposal,
-	IProposalLockProof,
-	IValidatorSetMajority,
-} from "../crypto";
+import { IBlockCommit, ICommittedBlock, IPrecommit, IPrevote, IProposal, IValidatorSetMajority } from "../crypto";
 import { IValidatorWallet } from "../state";
 import { ProcessorResult, Step } from "./enums";
 
@@ -41,7 +33,7 @@ export interface IRoundState extends IProcessableUnit {
 export interface IAggregator {
 	aggregateMajorityPrevotes(roundState: IRoundState): Promise<IValidatorSetMajority>;
 	aggregateMajorityPrecommits(roundState: IRoundState): Promise<IValidatorSetMajority>;
-	getProposalLockProof(roundState: IRoundState): Promise<IProposalLockProof>;
+	getProposalLockProof(roundState: IRoundState): Promise<IValidatorSetMajority>;
 	getProposedCommitBlock(roundState: IRoundState): Promise<ICommittedBlock>;
 }
 

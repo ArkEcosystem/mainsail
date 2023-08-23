@@ -39,7 +39,7 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 
 	public async getProposalLockProof(
 		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Contracts.Crypto.IProposalLockProof> {
+	): Promise<Contracts.Crypto.IValidatorSetMajority> {
 		const majority = await this.aggregateMajorityPrevotes(roundState);
 
 		const proposal = roundState.getProposal();
