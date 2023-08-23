@@ -20,6 +20,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -110,7 +113,32 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
-		return this.aggregator.getProposedCommitBlock(this);
+		const majority = await this.aggregator.aggregateMajorityPrecommits(this);
+
+		const proposal = this.getProposal();
+		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+
+		const {
+			round,
+			block: { block },
+		} = proposal;
+
+		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
+			block,
+			commit: {
+				blockId: block.data.id,
+				height: block.data.height,
+				round,
+				...majority,
+			},
+		};
+
+		const serialized = await this.blockSerializer.serializeFull(commitBlock);
+
+		return {
+			...commitBlock,
+			serialized: serialized.toString("hex"),
+		};
 	}
 
 	public setProcessorResult(processorResult: boolean): void {
