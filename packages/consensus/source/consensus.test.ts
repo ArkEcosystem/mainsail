@@ -19,7 +19,6 @@ type Context = {
 	proposerPicker: any;
 	logger: any;
 	block: any;
-	aggregator: any;
 	proposal: any;
 	proposer: any;
 	roundState: Contracts.Consensus.IRoundState;
@@ -73,10 +72,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			run: () => {},
 		};
 
-		context.aggregator = {
-			getProposalLockProof: () => {},
-		};
-
 		context.validatorsRepository = {
 			getValidator: () => {},
 			getValidators: () => {},
@@ -126,6 +121,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.roundState = {
 			getBlock: () => {},
 			getProcessorResult: () => false,
+			aggregatePrevotes: () => {},
 			getProposal: () => context.proposal,
 			hasPrecommit: () => false,
 			hasPrevote: () => false,
@@ -149,8 +145,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
-		context.sandbox.app.bind(Identifiers.Consensus.Aggregator).toConstantValue(context.aggregator);
-		context.sandbox.app
+		+context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(context.validatorSet);
@@ -285,7 +280,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		proposal,
 		proposer,
 		roundState,
-		aggregator,
 	}) => {
 		const validator = {
 			prepareBlock: () => {},
@@ -307,8 +301,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			signature: "signature",
 			validators: [],
 		};
-		const spyGetProposalLockProof = stub(aggregator, "getProposalLockProof").returnValue(lockProof);
 
+		const spyRoundStateAggregatePrevotes = stub(roundState, "aggregatePrevotes").returnValue(lockProof);
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(block);
 
 		consensus.setValidRound(roundState);
@@ -320,7 +314,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.getConsensusPublicKey());
 		spyValidatorPrepareBlock.neverCalled();
-		spyGetProposalLockProof.calledOnce();
+		spyRoundStateAggregatePrevotes.calledOnce();
+		spyRoundStateGetBlock.calledOnce();
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 0, block, lockProof);
 		spyProposalProcess.calledOnce();
