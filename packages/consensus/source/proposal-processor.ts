@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
@@ -12,8 +12,9 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
 
-	@inject(Identifiers.Cryptography.Message.Verifier)
-	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
+	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "consensus")
+	private readonly signature!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.IAggregator;
@@ -51,11 +52,11 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (this.#isInvalidBlockGenerator(proposal)) {
+		if (await this.#hasInvalidSignature(proposal)) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (await this.#hasInvalidSignature(proposal)) {
+		if (this.#isInvalidBlockGenerator(proposal)) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
@@ -88,14 +89,18 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 		}
 	}
 
-	async #hasInvalidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		const { errors } = await this.verifier.verifyProposal(proposal);
-		if (errors.length > 0) {
-			this.logger.debug(`Received invalid proposal: ${proposal.toString()} errors: ${JSON.stringify(errors)}`);
-			return true;
-		}
+	#isInvalidProposer(proposal: Contracts.Crypto.IProposal): boolean {
+		return proposal.validatorIndex !== this.proposerPicker.getValidatorIndex(proposal.round);
+	}
 
-		return false;
+	async #hasInvalidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
+		const verified = this.signature.verify(
+			Buffer.from(proposal.signature, "hex"),
+			proposal.serialized,
+			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),
+		);
+
+		return !verified;
 	}
 
 	async #hasInvalidLockProof(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
@@ -128,10 +133,6 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 		}
 
 		return !verified;
-	}
-
-	#isInvalidProposer(proposal: Contracts.Crypto.IProposal): boolean {
-		return proposal.validatorIndex !== this.proposerPicker.getValidatorIndex(proposal.round);
 	}
 
 	#isInvalidBlockGenerator(proposal: Contracts.Crypto.IProposal): boolean {
