@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Aggregator implements Contracts.Consensus.IAggregator {
@@ -11,7 +12,9 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
 	async aggregate(majority: Map<number, { signature: string }>): Promise<Contracts.Crypto.IAggregatedSignature> {
-		// TODO: Check size
+		if (!Utils.isMajority(majority.size, this.configuration)) {
+			throw new Error("Failed to aggregate signatures, because the majority is not reached.");
+		}
 
 		const signatures: Buffer[] = [];
 
