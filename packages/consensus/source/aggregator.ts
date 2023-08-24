@@ -42,14 +42,11 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	}
 
 	async verify(signature: Contracts.Crypto.IAggregatedSignature, data: Buffer): Promise<boolean> {
-		// TODO: Extract to utils
-		const isDefined = (item: Buffer | undefined): item is Buffer => !!item;
-
 		const validatorPublicKeys: Buffer[] = signature.validators
 			.map((v, index) =>
 				v ? Buffer.from(this.validatorSet.getValidator(index).getConsensusPublicKey(), "hex") : undefined,
 			)
-			.filter(isDefined);
+			.filter((item): item is Buffer => !!item);
 
 		if (!Utils.isMajority(validatorPublicKeys.length, this.configuration)) {
 			return false;
