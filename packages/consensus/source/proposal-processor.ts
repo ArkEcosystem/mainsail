@@ -103,6 +103,12 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			return false;
 		}
 
+		if (proposal.validRound >= proposal.round) {
+			this.logger.debug(
+				`Received proposal ${proposal.height}/${proposal.round} has validRound ${proposal.validRound} >= round ${proposal.round}`,
+			);
+		}
+
 		const lockProof = proposal.block.lockProof;
 		if (!lockProof) {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with missing lock proof`);
