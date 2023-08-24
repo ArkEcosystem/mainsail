@@ -9,6 +9,9 @@ export class PrecommitProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
+	@inject(Identifiers.Cryptography.Message.Serializer)
+	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
+
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
 	private readonly signature!: Contracts.Crypto.ISignature;
@@ -65,9 +68,9 @@ export class PrecommitProcessor implements Contracts.Consensus.IProcessor {
 	}
 
 	async #hasInvalidSignature(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
-		const verified = this.signature.verify(
+		const verified = await this.signature.verify(
 			Buffer.from(precommit.signature, "hex"),
-			precommit.serialized,
+			await this.serializer.serializePrecommitForSignature(precommit),
 			Buffer.from(this.validatorSet.getValidator(precommit.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
 

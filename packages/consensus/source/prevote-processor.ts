@@ -9,6 +9,9 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
+	@inject(Identifiers.Cryptography.Message.Serializer)
+	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
+
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
 	private readonly signature!: Contracts.Crypto.ISignature;
@@ -65,9 +68,9 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 	}
 
 	async #hasInvalidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
-		const verified = this.signature.verify(
+		const verified = await this.signature.verify(
 			Buffer.from(prevote.signature, "hex"),
-			prevote.serialized,
+			await this.serializer.serializePrevoteForSignature(prevote),
 			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
 
