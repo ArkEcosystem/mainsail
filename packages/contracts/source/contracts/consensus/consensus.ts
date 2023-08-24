@@ -26,6 +26,8 @@ export interface IRoundState extends IProcessableUnit {
 	getValidatorPrecommitSignatures(): Map<string, { signature: string }>;
 	getValidatorsSignedPrevote(): boolean[];
 	getValidatorsSignedPrecommit(): boolean[];
+	aggregatePrevotes(): Promise<IAggregatedSignature>;
+	aggregatePrecommits(): Promise<IAggregatedSignature>;
 	logPrevotes(): void;
 	logPrecommits(): void;
 }
@@ -33,6 +35,7 @@ export interface IRoundState extends IProcessableUnit {
 export interface IAggregator {
 	aggregateMajorityPrevotes(roundState: IRoundState): Promise<IAggregatedSignature>;
 	aggregateMajorityPrecommits(roundState: IRoundState): Promise<IAggregatedSignature>;
+	aggregate(signatures: Map<number, { signature: string }>): Promise<IAggregatedSignature>;
 }
 
 export interface IVerifier {

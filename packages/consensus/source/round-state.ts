@@ -241,6 +241,14 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#getValidatorMajority(this.#precommits);
 	}
 
+	public async aggregatePrevotes(): Promise<Contracts.Crypto.IAggregatedSignature> {
+		return this.aggregator.aggregate(this.#getValidatorMajority2(this.#prevotes));
+	}
+
+	public async aggregatePrecommits(): Promise<Contracts.Crypto.IAggregatedSignature> {
+		return this.aggregator.aggregate(this.#getValidatorMajority2(this.#precommits));
+	}
+
 	public logPrevotes(): void {
 		for (const key of this.#prevotesCount.keys()) {
 			const voters = [...this.#prevotes.values()]
@@ -300,6 +308,21 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		for (const [key, value] of s) {
 			if (value.blockId === this.#proposal.block.block.header.id) {
 				filtered.set(this.validatorSet.getValidator(key).getConsensusPublicKey(), value);
+			}
+		}
+
+		return filtered;
+	}
+
+	#getValidatorMajority2(
+		s: Map<number, { signature: string; blockId?: string }>,
+	): Map<number, { signature: string }> {
+		Utils.assert.defined<Contracts.Crypto.IProposal>(this.#proposal);
+		const filtered: Map<number, { signature: string }> = new Map();
+
+		for (const [key, value] of s) {
+			if (value.blockId === this.#proposal.block.block.header.id) {
+				filtered.set(key, value);
 			}
 		}
 
