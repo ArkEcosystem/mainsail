@@ -56,7 +56,6 @@ export const Identifiers = {
 			Deserializer: Symbol.for("Crypto<Message.Deserializer>"),
 			Factory: Symbol.for("Crypto<Message.Factory>"),
 			Serializer: Symbol.for("Crypto<Message.Serializer>"),
-			Verifier: Symbol.for("Crypto<Message.Verifier>"),
 		},
 		Serializer: Symbol.for("Crypto<Serializer>"),
 		Signature: Symbol.for("Crypto<Signature>"),

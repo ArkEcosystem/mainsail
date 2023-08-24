@@ -6,13 +6,11 @@ import { MessageFactory } from "./factory";
 import { makeKeywords } from "./keywords";
 import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
-import { Verifier } from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Message.Verifier).to(Verifier).inSingletonScope();
 		this.app.bind(Identifiers.Cryptography.Message.Factory).to(MessageFactory).inSingletonScope();
 
 		this.#registerValidation();
