@@ -32,6 +32,7 @@ export interface IRoundState extends IProcessableUnit {
 
 export interface IAggregator {
 	aggregate(signatures: Map<number, { signature: string }>): Promise<IAggregatedSignature>;
+	verify(signature: IAggregatedSignature, data: Buffer): Promise<boolean>;
 }
 
 export interface IVerifier {
