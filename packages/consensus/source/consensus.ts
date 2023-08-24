@@ -7,9 +7,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Bootstrapper)
 	private readonly bootstrapper!: Contracts.Consensus.IBootstrapper;
 
-	@inject(Identifiers.Consensus.Aggregator)
-	private readonly aggregator!: Contracts.Consensus.IAggregator;
-
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
@@ -396,7 +393,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		if (this.#validValue) {
 			const block = this.#validValue.getBlock();
-			const lockProof = await this.aggregator.aggregateMajorityPrevotes(this.#validValue);
+			const lockProof = await this.#validValue.aggregatePrevotes();
 
 			this.logger.info(
 				`Proposing valid block ${this.#height}/${

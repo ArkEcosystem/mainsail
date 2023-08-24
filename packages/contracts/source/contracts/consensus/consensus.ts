@@ -33,8 +33,6 @@ export interface IRoundState extends IProcessableUnit {
 }
 
 export interface IAggregator {
-	aggregateMajorityPrevotes(roundState: IRoundState): Promise<IAggregatedSignature>;
-	aggregateMajorityPrecommits(roundState: IRoundState): Promise<IAggregatedSignature>;
 	aggregate(signatures: Map<number, { signature: string }>): Promise<IAggregatedSignature>;
 }
 

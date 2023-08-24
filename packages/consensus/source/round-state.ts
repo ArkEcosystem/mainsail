@@ -113,7 +113,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
-		const majority = await this.aggregator.aggregateMajorityPrecommits(this);
+		const majority = await this.aggregatePrecommits();
 
 		const proposal = this.getProposal();
 		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);

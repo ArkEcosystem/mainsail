@@ -10,18 +10,6 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	@tagged("type", "consensus")
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
-	public async aggregateMajorityPrevotes(
-		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Contracts.Crypto.IAggregatedSignature> {
-		throw new Error("Method not implemented.");
-	}
-
-	public async aggregateMajorityPrecommits(
-		roundState: Contracts.Consensus.IRoundState,
-	): Promise<Contracts.Crypto.IAggregatedSignature> {
-		throw new Error("Method not implemented.");
-	}
-
 	async aggregate(majority: Map<number, { signature: string }>): Promise<Contracts.Crypto.IAggregatedSignature> {
 		// TODO: Check size
 
