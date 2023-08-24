@@ -94,9 +94,9 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 	}
 
 	async #hasInvalidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		const verified = this.signature.verify(
+		const verified = await this.signature.verify(
 			Buffer.from(proposal.signature, "hex"),
-			proposal.serialized,
+			await this.messageSerializer.serializeProposal(proposal, { includeSignature: false }),
 			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
 
