@@ -112,7 +112,7 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 		const data = await this.messageSerializer.serializePrevoteForSignature({
 			blockId: proposal.block.block.header.id,
 			height: proposal.height,
-			round: proposal.round,
+			round: proposal.validRound,
 			type: Contracts.Crypto.MessageType.Prevote,
 		});
 		const verified = await this.aggregator.verify(lockProof, data);
