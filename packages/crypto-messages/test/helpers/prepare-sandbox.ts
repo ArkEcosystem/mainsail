@@ -12,9 +12,9 @@ import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-s
 import { ServiceProvider as CoreCryptoTransaction } from "../../../crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation";
+import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
 import { ServiceProvider as CoreFees } from "../../../fees";
 import { ServiceProvider as CoreFeesStatic } from "../../../fees-static";
-import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
 import { ServiceProvider as CoreSerializer } from "../../../serializer";
 import { ServiceProvider as CoreState } from "../../../state";
 import { Sandbox } from "../../../test-framework";
@@ -22,10 +22,9 @@ import { ServiceProvider as CoreTransactions } from "../../../transactions";
 import { ServiceProvider as CoreValidation } from "../../../validation";
 import { Deserializer } from "../../source/deserializer";
 import { MessageFactory } from "../../source/factory";
-import { Serializer } from "../../source/serializer";
-import { Verifier } from "../../source/verifier";
-import { schemas } from "../../source/schemas";
 import { makeKeywords } from "../../source/keywords";
+import { schemas } from "../../source/schemas";
+import { Serializer } from "../../source/serializer";
 
 export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox = new Sandbox();
@@ -56,7 +55,6 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer);
-	context.sandbox.app.bind(Identifiers.Cryptography.Message.Verifier).to(Verifier).inSingletonScope();
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).to(MessageFactory).inSingletonScope();
 
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);

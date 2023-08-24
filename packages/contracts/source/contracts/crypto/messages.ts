@@ -120,9 +120,3 @@ export interface IMessageVerificationResult {
 	readonly verified: boolean;
 	readonly errors: string[];
 }
-
-export interface IMessageVerifier {
-	verifyProposal(proposal: IProposal): Promise<IMessageVerificationResult>;
-	verifyPrevote(prevote: IPrevote): Promise<IMessageVerificationResult>;
-	verifyPrecommit(precommit: IPrecommit): Promise<IMessageVerificationResult>;
-}

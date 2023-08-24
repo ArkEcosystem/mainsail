@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
@@ -9,8 +9,12 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
-	@inject(Identifiers.Cryptography.Message.Verifier)
-	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
+	@inject(Identifiers.Cryptography.Signature)
+	@tagged("type", "consensus")
+	private readonly signature!: Contracts.Crypto.ISignature;
+
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
@@ -20,9 +24,6 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
-
-	@inject(Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
 
 	async process(data: Buffer, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		const prevote = await this.#makePrevote(data);
@@ -64,13 +65,13 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 	}
 
 	async #hasInvalidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
-		const { errors } = await this.verifier.verifyPrevote(prevote);
-		if (errors.length > 0) {
-			this.logger.warning(`Received invalid prevote: ${prevote.toString()} errors: ${JSON.stringify(errors)}`);
-			return true;
-		}
+		const verified = this.signature.verify(
+			Buffer.from(prevote.signature, "hex"),
+			prevote.serialized,
+			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).getConsensusPublicKey(), "hex"),
+		);
 
-		return false;
+		return !verified;
 	}
 
 	#isInvalidHeightOrRound(message: { height: number; round: number }): boolean {
