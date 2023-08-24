@@ -6,5 +6,6 @@ export * from "./hash";
 export * from "./identities";
 export * from "./messages";
 export * from "./networks";
+export * from "./signatures";
 export * from "./transactions";
 export * from "./validator";

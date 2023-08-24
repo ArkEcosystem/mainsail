@@ -9,8 +9,14 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
+	@inject(Identifiers.Cryptography.Message.Serializer)
+	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
+
 	@inject(Identifiers.Cryptography.Message.Verifier)
 	private readonly verifier!: Contracts.Crypto.IMessageVerifier;
+
+	@inject(Identifiers.Consensus.Aggregator)
+	private readonly aggregator!: Contracts.Consensus.IAggregator;
 
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
@@ -93,24 +99,29 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 	}
 
 	async #hasInvalidLockProof(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		if (!proposal.validRound) {
+		if (proposal.validRound === undefined) {
 			return false;
+		}
+
+		if (proposal.validRound >= proposal.round) {
+			this.logger.debug(
+				`Received proposal ${proposal.height}/${proposal.round} has validRound ${proposal.validRound} >= round ${proposal.round}`,
+			);
 		}
 
 		const lockProof = proposal.block.lockProof;
 		if (!lockProof) {
+			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with missing lock proof`);
 			return true;
 		}
 
-		const { verified } = await this.verifier.verifyProposalLockProof(
-			{
-				blockId: proposal.block.block.header.id,
-				height: proposal.height,
-				round: proposal.round,
-				type: Contracts.Crypto.MessageType.Prevote,
-			},
-			lockProof,
-		);
+		const data = await this.messageSerializer.serializePrevoteForSignature({
+			blockId: proposal.block.block.header.id,
+			height: proposal.height,
+			round: proposal.validRound,
+			type: Contracts.Crypto.MessageType.Prevote,
+		});
+		const verified = await this.aggregator.verify(lockProof, data);
 
 		if (!verified) {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with invalid lock proof`);

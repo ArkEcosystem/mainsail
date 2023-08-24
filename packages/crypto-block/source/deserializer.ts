@@ -47,12 +47,12 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		return { data: block, transactions };
 	}
 
-	public async deserializeLockProof(serialized: Buffer): Promise<Contracts.Crypto.IProposalLockProof> {
+	public async deserializeLockProof(serialized: Buffer): Promise<Contracts.Crypto.IAggregatedSignature> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		const commit = {} as Contracts.Crypto.IProposalLockProof;
+		const commit = {} as Contracts.Crypto.IAggregatedSignature;
 
-		await this.serializer.deserialize<Contracts.Crypto.IProposalLockProof>(buffer, commit, {
+		await this.serializer.deserialize<Contracts.Crypto.IAggregatedSignature>(buffer, commit, {
 			length: this.blockSerializer.lockProofSize(),
 			schema: {
 				signature: {

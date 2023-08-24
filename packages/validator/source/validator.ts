@@ -64,7 +64,7 @@ export class Validator implements Contracts.Validator.IValidator {
 		round: number,
 		validRound: number | undefined,
 		block: Contracts.Crypto.IBlock,
-		lockProof?: Contracts.Crypto.IProposalLockProof,
+		lockProof?: Contracts.Crypto.IAggregatedSignature,
 	): Promise<Contracts.Crypto.IProposal> {
 		const serializedProposedBlock = await this.blockSerializer.serializeProposed({ block, lockProof });
 		return this.messagesFactory.makeProposal(

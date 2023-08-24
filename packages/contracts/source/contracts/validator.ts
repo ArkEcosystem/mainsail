@@ -1,4 +1,4 @@
-import { IBlock, IKeyPair, IPrecommit, IPrevote, IProposal, IProposalLockProof } from "./crypto";
+import { IAggregatedSignature, IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
 
 export interface IValidator {
 	configure(publicKey: string, keyPair: IKeyPair): IValidator;
@@ -9,7 +9,7 @@ export interface IValidator {
 		round: number,
 		validRound: number | undefined,
 		block: IBlock,
-		lockProof?: IProposalLockProof,
+		lockProof?: IAggregatedSignature,
 	): Promise<IProposal>;
 	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
 	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;

@@ -1,13 +1,5 @@
 import { IProcessableUnit } from "../block-processor";
-import {
-	IBlockCommit,
-	ICommittedBlock,
-	IPrecommit,
-	IPrevote,
-	IProposal,
-	IProposalLockProof,
-	IValidatorSetMajority,
-} from "../crypto";
+import { IAggregatedSignature, IBlockCommit, IPrecommit, IPrevote, IProposal } from "../crypto";
 import { IValidatorWallet } from "../state";
 import { ProcessorResult, Step } from "./enums";
 
@@ -30,19 +22,17 @@ export interface IRoundState extends IProcessableUnit {
 	getPrevote(validatorIndex: number): IPrevote | undefined;
 	getPrecommit(validatorIndex: number): IPrecommit | undefined;
 	getValidator(consensusPublicKey: string): IValidatorWallet;
-	getValidatorPrevoteSignatures(): Map<string, { signature: string }>;
-	getValidatorPrecommitSignatures(): Map<string, { signature: string }>;
 	getValidatorsSignedPrevote(): boolean[];
 	getValidatorsSignedPrecommit(): boolean[];
+	aggregatePrevotes(): Promise<IAggregatedSignature>;
+	aggregatePrecommits(): Promise<IAggregatedSignature>;
 	logPrevotes(): void;
 	logPrecommits(): void;
 }
 
 export interface IAggregator {
-	aggregateMajorityPrevotes(roundState: IRoundState): Promise<IValidatorSetMajority>;
-	aggregateMajorityPrecommits(roundState: IRoundState): Promise<IValidatorSetMajority>;
-	getProposalLockProof(roundState: IRoundState): Promise<IProposalLockProof>;
-	getProposedCommitBlock(roundState: IRoundState): Promise<ICommittedBlock>;
+	aggregate(signatures: Map<number, { signature: string }>): Promise<IAggregatedSignature>;
+	verify(signature: IAggregatedSignature, data: Buffer): Promise<boolean>;
 }
 
 export interface IVerifier {

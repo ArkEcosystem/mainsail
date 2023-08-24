@@ -45,11 +45,6 @@ export interface IProposal extends IProposalData {
 	toString(): string;
 }
 
-export interface IProposalLockProof {
-	readonly signature: string;
-	readonly validators: boolean[];
-}
-
 export interface IPrevoteData {
 	readonly type: MessageType;
 	readonly height: number;
@@ -82,11 +77,6 @@ export interface IPrecommit extends IPrecommitData {
 	toSignatureData(): ISignaturePrecommitData;
 	toData(): IPrecommitData;
 	toString(): string;
-}
-
-export interface IValidatorSetMajority {
-	signature: string;
-	validators: boolean[];
 }
 
 export interface SerializeProposalOptions {
@@ -135,8 +125,4 @@ export interface IMessageVerifier {
 	verifyProposal(proposal: IProposal): Promise<IMessageVerificationResult>;
 	verifyPrevote(prevote: IPrevote): Promise<IMessageVerificationResult>;
 	verifyPrecommit(precommit: IPrecommit): Promise<IMessageVerificationResult>;
-	verifyProposalLockProof(
-		prevote: ISignaturePrevoteData,
-		lockProof: IProposalLockProof,
-	): Promise<IMessageVerificationResult>;
 }

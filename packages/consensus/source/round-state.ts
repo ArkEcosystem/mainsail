@@ -20,6 +20,9 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -110,7 +113,32 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
-		return this.aggregator.getProposedCommitBlock(this);
+		const majority = await this.aggregatePrecommits();
+
+		const proposal = this.getProposal();
+		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+
+		const {
+			round,
+			block: { block },
+		} = proposal;
+
+		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
+			block,
+			commit: {
+				blockId: block.data.id,
+				height: block.data.height,
+				round,
+				...majority,
+			},
+		};
+
+		const serialized = await this.blockSerializer.serializeFull(commitBlock);
+
+		return {
+			...commitBlock,
+			serialized: serialized.toString("hex"),
+		};
 	}
 
 	public setProcessorResult(processorResult: boolean): void {
@@ -205,12 +233,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#validatorsSignedPrecommit;
 	}
 
-	public getValidatorPrevoteSignatures(): Map<string, { signature: string }> {
-		return this.#getValidatorMajority(this.#prevotes);
+	public async aggregatePrevotes(): Promise<Contracts.Crypto.IAggregatedSignature> {
+		return this.aggregator.aggregate(this.#getSignatures(this.#prevotes));
 	}
 
-	public getValidatorPrecommitSignatures(): Map<string, { signature: string }> {
-		return this.#getValidatorMajority(this.#precommits);
+	public async aggregatePrecommits(): Promise<Contracts.Crypto.IAggregatedSignature> {
+		return this.aggregator.aggregate(this.#getSignatures(this.#precommits));
 	}
 
 	public logPrevotes(): void {
@@ -265,13 +293,13 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#precommitsCount.get(blockId) ?? 0;
 	}
 
-	#getValidatorMajority(s: Map<number, { signature: string; blockId?: string }>): Map<string, { signature: string }> {
+	#getSignatures(s: Map<number, { signature: string; blockId?: string }>): Map<number, { signature: string }> {
 		Utils.assert.defined<Contracts.Crypto.IProposal>(this.#proposal);
-		const filtered: Map<string, { signature: string }> = new Map();
+		const filtered: Map<number, { signature: string }> = new Map();
 
 		for (const [key, value] of s) {
 			if (value.blockId === this.#proposal.block.block.header.id) {
-				filtered.set(this.validatorSet.getValidator(key).getConsensusPublicKey(), value);
+				filtered.set(key, value);
 			}
 		}
 
