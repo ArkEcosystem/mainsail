@@ -74,12 +74,6 @@ export interface IProposedBlock {
 	readonly serialized: string;
 }
 
-export interface IProposedBlockData {
-	readonly block: IBlockData;
-	readonly lockProof?: IAggregatedSignature;
-	readonly serialized: string;
-}
-
 export interface IProposedBlockJson {
 	readonly block: IBlockJson;
 	readonly lockProof?: IAggregatedSignature;
