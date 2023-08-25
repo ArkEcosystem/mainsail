@@ -190,8 +190,6 @@ export class GenesisBlockGenerator extends Generator {
 
 		const serialized = await this.blockSerializer.serializeFull(commitBlock);
 
-		console.log("Serialized", serialized.toString("hex"));
-
 		return {
 			...commitBlock,
 			serialized: serialized.toString("hex"),
