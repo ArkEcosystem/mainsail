@@ -23,15 +23,8 @@ export class CommitVerifier implements Contracts.BlockProcessor.Handler {
 
 	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
 		const { block, commit } = await unit.getProposedCommitBlock();
-		const { height, round, validators, signature } = commit;
-
-		if (commit.height !== block.header.height) {
-			return false;
-		}
-
-		// if (commit.blockId !== block.header.id) {
-		// 	return false;
-		// }
+		const { round, validators, signature } = commit;
+		const height = block.data.height;
 
 		const publicKeys: Buffer[] = [];
 		for (const [index, validator] of validators.entries()) {
