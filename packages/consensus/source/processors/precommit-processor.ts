@@ -54,7 +54,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 			void this.broadcaster.broadcastPrecommit(precommit);
 		}
 
-		this.handle(roundState);
+		void this.getConsensus().handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}

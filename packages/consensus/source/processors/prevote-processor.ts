@@ -54,7 +54,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 			void this.broadcaster.broadcastPrevote(prevote);
 		}
 
-		this.handle(roundState);
+		void this.getConsensus().handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}

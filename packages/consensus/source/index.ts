@@ -4,7 +4,7 @@ import { RootDatabase } from "lmdb";
 
 import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
-import { CommittedBlockProcessor } from "./committed-block-processor";
+import { CommittedBlockProcessor } from "./processors/committed-block-processor";
 import { Consensus } from "./consensus";
 import { PrecommitProcessor } from "./processors/precommit-processor";
 import { PrevoteProcessor } from "./processors/prevote-processor";

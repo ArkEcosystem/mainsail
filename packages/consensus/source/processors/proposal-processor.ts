@@ -75,7 +75,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			void this.broadcaster.broadcastProposal(proposal);
 		}
 
-		this.handle(roundState);
+		void this.getConsensus().handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}
