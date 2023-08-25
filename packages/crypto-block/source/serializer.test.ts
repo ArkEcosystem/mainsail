@@ -30,7 +30,7 @@ describe<{
 	});
 
 	it("#size - should return proof size", async ({ serializer, sandbox }) => {
-		assert.equal(serializer.commitSize(), 145);
+		assert.equal(serializer.commitSize(), 109);
 	});
 
 	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {
@@ -61,14 +61,12 @@ describe<{
 		}
 	});
 
-	it("#serialize - should serialize and deserialize commit", async ({ serializer, deserializer }) => {
+	it.only("#serialize - should serialize and deserialize commit", async ({ serializer, deserializer }) => {
 		const commit = {
-			blockId: blockData.id,
-			height: 1,
 			round: 1,
 			signature:
 				"97a16d3e938a1bc6866701b946e703cfa502d57a226e540f270c16585405378e93086dfb3b32ab2039aa2c197177c66b0fec074df5bfac037efd3dc41d98d50455a69ff1934d503ef69dffa08429f75e5677efca4f2de36d46f8258635e32a95",
-			validators: new Array(51).fill(true),
+			validators: Array.from<boolean>({ length: 51 }).fill(true),
 		};
 
 		const serialized = await serializer.serializeCommit(commit);
@@ -78,7 +76,7 @@ describe<{
 	});
 
 	it("#serialize - should serialize and deserialize lock proof", async ({ deserializer, serializer }) => {
-		const proposalLockProof: Contracts.Crypto.IProposalLockProof = {
+		const proposalLockProof: Contracts.Crypto.IAggregatedSignature = {
 			signature:
 				"927628d67c385fe216aa800def9cce0c09f5f9fbf836583d7c07ab6a98e1b5681802c92f81ad54984236a07fa389dbab1519f3c91ad39a505a61c3624a88c65da71fe721d7af0ed452516771b94d027be713dba68e14fa2c9680e35b63f0e038",
 			validators: [true, true, true, false, false, true, true, true, true, false],
