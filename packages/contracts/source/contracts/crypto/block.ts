@@ -161,6 +161,6 @@ export interface IBlockVerifier {
 	verify(block: IBlock): Promise<IBlockVerification>;
 }
 
-export interface ICommittedBlockHandler {
+export interface ICommitHandler {
 	handleCommittedBlock(block: ICommittedBlock): Promise<void>;
 }

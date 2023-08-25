@@ -1,7 +1,7 @@
-import { ICommittedBlockHandler } from "./crypto";
+import { ICommitHandler } from "./crypto";
 import { IValidatorWallet } from "./state";
 
-export interface IValidatorSet extends ICommittedBlockHandler {
+export interface IValidatorSet extends ICommitHandler {
 	initialize(): Promise<void>;
 	getActiveValidators(): IValidatorWallet[];
 	getValidator(validatorIndex: number): IValidatorWallet;
