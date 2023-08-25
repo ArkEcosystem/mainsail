@@ -35,10 +35,10 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (this.#isInvalidHeightOrRound(prevote)) {
+		if (!this.#hasValidHeightOrRound(prevote)) {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
-		if (await this.#hasInvalidSignature(prevote)) {
+		if (!(await this.#hasValidSignature(prevote))) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
@@ -67,20 +67,16 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 		}
 	}
 
-	async #hasInvalidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
-		const verified = await this.signature.verify(
+	async #hasValidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
+		return this.signature.verify(
 			Buffer.from(prevote.signature, "hex"),
 			await this.serializer.serializePrevoteForSignature(prevote),
 			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
-
-		return !verified;
 	}
 
-	#isInvalidHeightOrRound(message: { height: number; round: number }): boolean {
-		return !(
-			message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound()
-		);
+	#hasValidHeightOrRound(message: { height: number; round: number }): boolean {
+		return message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound();
 	}
 
 	#getConsensus(): Contracts.Consensus.IConsensusService {
