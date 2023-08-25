@@ -160,3 +160,7 @@ export interface IBlockDeserializer {
 export interface IBlockVerifier {
 	verify(block: IBlock): Promise<IBlockVerification>;
 }
+
+export interface ICommittedBlockHandler {
+	handleCommittedBlock(block: ICommittedBlock): Promise<void>;
+}

@@ -12,7 +12,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 
 	private validatorIndexMatrix: Array<number> = [];
 
-	public handleCommittedBlock(committedBlock: Contracts.Crypto.ICommittedBlock): void {
+	public async handleCommittedBlock(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		const { activeValidators } = this.configuration.getMilestone();
 
 		const height = committedBlock.block.data.height;
