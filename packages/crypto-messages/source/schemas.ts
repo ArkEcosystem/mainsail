@@ -9,7 +9,7 @@ export const schemas: Record<
 		$id: "precommit",
 		properties: {
 			blockId: { $ref: "blockId" },
-			height: { minimum: 0, type: "integer" },
+			height: { minimum: 1, type: "integer" },
 			round: { minimum: 0, type: "integer" },
 			signature: { $ref: "consensusSignature" },
 			type: { enum: [Contracts.Crypto.MessageType.Precommit] },
