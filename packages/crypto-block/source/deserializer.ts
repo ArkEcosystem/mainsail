@@ -75,12 +75,6 @@ export class Deserializer implements Contracts.Crypto.IBlockDeserializer {
 		await this.serializer.deserialize<Contracts.Crypto.IBlockCommit>(buffer, commit, {
 			length: this.blockSerializer.commitSize(),
 			schema: {
-				blockId: {
-					type: "hash",
-				},
-				height: {
-					type: "uint32",
-				},
 				round: {
 					type: "uint32",
 				},
