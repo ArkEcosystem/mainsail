@@ -1,14 +1,14 @@
 {
-    "address": "ark14jdqnhv94ufq8j6s2nflyk8yd8lcxxlslu0w9nvs66jxu5k3rwhqqvk9fh",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "0ee7987bdaf7e87ca2788300b9117ee58e38cd23f761264254a293cf74b0b775",
-        "publicKey": "a9ee8ce301694ca8f36d9af28307e8c5ad6fe92e14487f7295ed1c832c8cad612968d354f21578dfe65c8a1a23dccd7a"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "6147eab259bc914fa4bfa57518a3cf3e2a22a8462f63ee9437aecb036c4ecade",
-        "publicKey": "ac9a09dd85af1203cb5054d3f258e469ff831bf0ff1ee2cd90d6a46e52d11bae"
-    },
-    "passphrase": "more math leave borrow lamp abstract news enlist mango glimpse circle unusual devote proof open trick kite tiny benefit gauge physical fitness boss dash"
+	"address": "ark14jdqnhv94ufq8j6s2nflyk8yd8lcxxlslu0w9nvs66jxu5k3rwhqqvk9fh",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "0ee7987bdaf7e87ca2788300b9117ee58e38cd23f761264254a293cf74b0b775",
+		"publicKey": "a9ee8ce301694ca8f36d9af28307e8c5ad6fe92e14487f7295ed1c832c8cad612968d354f21578dfe65c8a1a23dccd7a"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "6147eab259bc914fa4bfa57518a3cf3e2a22a8462f63ee9437aecb036c4ecade",
+		"publicKey": "ac9a09dd85af1203cb5054d3f258e469ff831bf0ff1ee2cd90d6a46e52d11bae"
+	},
+	"passphrase": "more math leave borrow lamp abstract news enlist mango glimpse circle unusual devote proof open trick kite tiny benefit gauge physical fitness boss dash"
 }
