@@ -1,13 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { CommittedBlockState } from "./committed-block-state";
+import { CommittedBlockState } from "../committed-block-state";
+import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class CommittedBlockProcessor implements Contracts.Consensus.IProcessor {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
-
+export class CommittedBlockProcessor extends AbstractProcessor {
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
@@ -37,7 +35,7 @@ export class CommittedBlockProcessor implements Contracts.Consensus.IProcessor {
 
 		committedBlockState.setProcessorResult(result);
 
-		await this.#getConsensus().handleCommittedBlockState(committedBlockState);
+		void this.getConsensus().handleCommittedBlockState(committedBlockState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}
@@ -48,9 +46,5 @@ export class CommittedBlockProcessor implements Contracts.Consensus.IProcessor {
 		} catch {
 			return undefined;
 		}
-	}
-
-	#getConsensus(): Contracts.Consensus.IConsensusService {
-		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 	}
 }

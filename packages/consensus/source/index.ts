@@ -4,11 +4,8 @@ import { RootDatabase } from "lmdb";
 
 import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
-import { CommittedBlockProcessor } from "./committed-block-processor";
 import { Consensus } from "./consensus";
-import { PrecommitProcessor } from "./precommit-processor";
-import { PrevoteProcessor } from "./prevote-processor";
-import { ProposalProcessor } from "./proposal-processor";
+import { CommittedBlockProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors";
 import { ProposerPicker } from "./proposer-picker";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";

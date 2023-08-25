@@ -1,11 +1,10 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-@injectable()
-export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
+import { AbstractProcessor } from "./abstract-processor";
 
+@injectable()
+export class PrevoteProcessor extends AbstractProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
@@ -35,10 +34,11 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (this.#isInvalidHeightOrRound(prevote)) {
+		if (!this.hasValidHeightOrRound(prevote)) {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
-		if (await this.#hasInvalidSignature(prevote)) {
+
+		if (!(await this.#hasValidSignature(prevote))) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
@@ -54,7 +54,7 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 			void this.broadcaster.broadcastPrevote(prevote);
 		}
 
-		void this.#getConsensus().handle(roundState);
+		void this.getConsensus().handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}
@@ -67,23 +67,11 @@ export class PrevoteProcessor implements Contracts.Consensus.IProcessor {
 		}
 	}
 
-	async #hasInvalidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
-		const verified = await this.signature.verify(
+	async #hasValidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
+		return this.signature.verify(
 			Buffer.from(prevote.signature, "hex"),
 			await this.serializer.serializePrevoteForSignature(prevote),
 			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
-
-		return !verified;
-	}
-
-	#isInvalidHeightOrRound(message: { height: number; round: number }): boolean {
-		return !(
-			message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound()
-		);
-	}
-
-	#getConsensus(): Contracts.Consensus.IConsensusService {
-		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 	}
 }

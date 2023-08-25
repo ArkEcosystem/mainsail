@@ -1,11 +1,10 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-@injectable()
-export class ProposalProcessor implements Contracts.Consensus.IProcessor {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
+import { AbstractProcessor } from "./abstract-processor";
 
+@injectable()
+export class ProposalProcessor extends AbstractProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
@@ -44,23 +43,23 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (this.#isInvalidHeightOrRound(proposal)) {
+		if (!this.hasValidHeightOrRound(proposal)) {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
-		if (this.#isInvalidProposer(proposal)) {
+		if (!this.#hasValidProposer(proposal)) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (await this.#hasInvalidSignature(proposal)) {
+		if (!(await this.#hasValidSignature(proposal))) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (this.#isInvalidBlockGenerator(proposal)) {
+		if (!this.#hasValidBlockGenerator(proposal)) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (await this.#hasInvalidLockProof(proposal)) {
+		if (!(await this.#hasValidLockProof(proposal))) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
@@ -76,7 +75,7 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			void this.broadcaster.broadcastProposal(proposal);
 		}
 
-		void this.#getConsensus().handle(roundState);
+		void this.getConsensus().handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}
@@ -89,29 +88,29 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 		}
 	}
 
-	#isInvalidProposer(proposal: Contracts.Crypto.IProposal): boolean {
-		return proposal.validatorIndex !== this.proposerPicker.getValidatorIndex(proposal.round);
+	#hasValidProposer(proposal: Contracts.Crypto.IProposal): boolean {
+		return proposal.validatorIndex === this.proposerPicker.getValidatorIndex(proposal.round);
 	}
 
-	async #hasInvalidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		const verified = await this.signature.verify(
+	async #hasValidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
+		return this.signature.verify(
 			Buffer.from(proposal.signature, "hex"),
 			await this.messageSerializer.serializeProposal(proposal, { includeSignature: false }),
 			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
-
-		return !verified;
 	}
 
-	async #hasInvalidLockProof(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
+	async #hasValidLockProof(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
 		if (proposal.validRound === undefined) {
-			return false;
+			return true;
 		}
 
 		if (proposal.validRound >= proposal.round) {
 			this.logger.debug(
 				`Received proposal ${proposal.height}/${proposal.round} has validRound ${proposal.validRound} >= round ${proposal.round}`,
 			);
+
+			return false;
 		}
 
 		const lockProof = proposal.block.lockProof;
@@ -132,33 +131,23 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with invalid lock proof`);
 		}
 
-		return !verified;
+		return verified;
 	}
 
-	#isInvalidBlockGenerator(proposal: Contracts.Crypto.IProposal): boolean {
+	#hasValidBlockGenerator(proposal: Contracts.Crypto.IProposal): boolean {
 		if (proposal.validRound !== undefined) {
 			// We assume that this check passed when block was proposed first time, so we don't need to check it again.
 			// The check also cannot be repeated because we don't hold the value when the block was proposed first time.
-			return false;
+			return true;
 		}
 
 		const proposer = this.validatorSet.getValidator(this.proposerPicker.getValidatorIndex(proposal.round));
-		const isInvalid = proposal.block.block.data.generatorPublicKey !== proposer.getWalletPublicKey();
+		const isValid = proposal.block.block.data.generatorPublicKey === proposer.getWalletPublicKey();
 
-		if (isInvalid) {
+		if (!isValid) {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with invalid block generator`);
 		}
 
-		return isInvalid;
-	}
-
-	#isInvalidHeightOrRound(message: { height: number; round: number }): boolean {
-		return !(
-			message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound()
-		);
-	}
-
-	#getConsensus(): Contracts.Consensus.IConsensusService {
-		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
+		return isValid;
 	}
 }
