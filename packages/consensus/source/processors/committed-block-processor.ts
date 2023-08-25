@@ -5,7 +5,7 @@ import { CommittedBlockState } from "../committed-block-state";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class CommittedBlockProcessor extends AbstractProcessor implements Contracts.Consensus.IProcessor {
+export class CommittedBlockProcessor extends AbstractProcessor {
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 

@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.IProcessor {
+export class PrecommitProcessor extends AbstractProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
