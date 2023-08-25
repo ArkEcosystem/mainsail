@@ -19,8 +19,8 @@ export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
 
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messageSerializer!: Contracts.Crypto.IMessageFactory;
+	@inject(Identifiers.Cryptography.Message.Serializer)
+	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
 
 	async generate(
 		genesisMnemonic: string,
@@ -261,19 +261,19 @@ export class GenesisBlockGenerator extends Generator {
 	): Promise<Contracts.Crypto.IBlockCommit> {
 		const signatures: Buffer[] = [];
 
-		for (const [index, wallet] of validators.entries()) {
-			const precommit = await this.messageSerializer.makePrecommit(
-				{
-					blockId: genesisBlock.id,
-					height: genesisBlock.height,
-					round: 0,
-					type: Contracts.Crypto.MessageType.Precommit,
-					validatorIndex: index,
-				},
-				wallet.consensusKeys,
+		for (const wallet of validators) {
+			const bytes = await this.messageSerializer.serializePrecommitForSignature({
+				blockId: genesisBlock.id,
+				height: genesisBlock.height,
+				round: 0,
+				type: Contracts.Crypto.MessageType.Precommit,
+			});
+			const signature: string = await this.signatureFactory.sign(
+				bytes,
+				Buffer.from(wallet.consensusKeys.privateKey, "hex"),
 			);
 
-			signatures.push(Buffer.from(precommit.signature, "hex"));
+			signatures.push(Buffer.from(signature, "hex"));
 		}
 
 		return {
