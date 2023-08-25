@@ -54,28 +54,28 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	public async commit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		unit.getWalletRepository().commitChanges();
 
-		const commitBlock = await unit.getProposedCommitBlock();
-		await this.databaseService.saveBlocks([commitBlock]);
+		const committedBlock = await unit.getProposedCommitBlock();
+		await this.databaseService.saveBlocks([committedBlock]);
 
-		await this.validatorSet.handleCommitBlock(commitBlock);
+		await this.validatorSet.handleCommitBlock(committedBlock);
 
 		const committedRound = this.state.getLastCommittedRound();
 		this.state.setLastCommittedRound(committedRound + unit.round + 1);
 
-		this.state.setLastBlock(commitBlock.block);
+		this.state.setLastBlock(committedBlock.block);
 
-		this.proposerPicker.handleCommittedBlock(commitBlock.commit);
+		this.proposerPicker.handleCommittedBlock(committedBlock);
 
 		this.logger.info(
-			`Block ${commitBlock.block.header.height.toLocaleString()} with ${commitBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
+			`Block ${committedBlock.block.header.height.toLocaleString()} with ${committedBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
 		);
 
-		for (const transaction of commitBlock.block.transactions) {
+		for (const transaction of committedBlock.block.transactions) {
 			await this.transactionPool.removeForgedTransaction(transaction);
 			await this.#emitTransactionEvents(transaction);
 		}
 
-		void this.events.dispatch(Enums.BlockEvent.Applied, commitBlock);
+		void this.events.dispatch(Enums.BlockEvent.Applied, committedBlock);
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {

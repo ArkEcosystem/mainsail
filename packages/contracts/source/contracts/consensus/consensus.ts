@@ -1,5 +1,5 @@
 import { IProcessableUnit } from "../block-processor";
-import { IAggregatedSignature, IBlockCommit, IPrecommit, IPrevote, IProposal } from "../crypto";
+import { IAggregatedSignature, ICommittedBlock, IPrecommit, IPrevote, IProposal } from "../crypto";
 import { IValidatorWallet } from "../state";
 import { ProcessorResult, Step } from "./enums";
 
@@ -96,7 +96,7 @@ export interface IScheduler {
 }
 
 export interface IProposerPicker {
-	handleCommittedBlock(block: IBlockCommit): void;
+	handleCommittedBlock(block: ICommittedBlock): void;
 	getValidatorIndex(round: number): number;
 }
 

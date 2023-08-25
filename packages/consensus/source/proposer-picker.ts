@@ -12,10 +12,10 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 
 	private validatorIndexMatrix: Array<number> = [];
 
-	public handleCommittedBlock(commit: Contracts.Crypto.IBlockCommit): void {
+	public handleCommittedBlock(committedBlock: Contracts.Crypto.ICommittedBlock): void {
 		const { activeValidators } = this.configuration.getMilestone();
 
-		const { height } = commit;
+		const height = committedBlock.block.data.height;
 		if (this.validatorIndexMatrix.length === 0 || height % activeValidators === 0) {
 			const roundHeight = height - (height % activeValidators) + 1;
 			this.#updateValidatorMatrix(activeValidators, roundHeight);
@@ -34,7 +34,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 		const seed = this.#calculateSeed(height);
 		const rng = seedrandom(seed);
 
-		const matrix = [...new Array(activeValidators).keys()];
+		const matrix = [...Array.from({ length: activeValidators }).keys()];
 
 		// Based on https://stackoverflow.com/a/12646864
 		for (let index = matrix.length - 1; index > 0; index--) {
