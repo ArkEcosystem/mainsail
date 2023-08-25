@@ -1,11 +1,10 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-@injectable()
-export class ProposalProcessor implements Contracts.Consensus.IProcessor {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
+import { AbstractProcessor } from "./abstract-processor";
 
+@injectable()
+export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
@@ -44,7 +43,7 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (!this.#hasValidHeightOrRound(proposal)) {
+		if (!this.hasValidHeightOrRound(proposal)) {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
 
@@ -76,7 +75,7 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 			void this.broadcaster.broadcastProposal(proposal);
 		}
 
-		void this.#getConsensus().handle(roundState);
+		this.handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}
@@ -150,13 +149,5 @@ export class ProposalProcessor implements Contracts.Consensus.IProcessor {
 		}
 
 		return isValid;
-	}
-
-	#hasValidHeightOrRound(message: { height: number; round: number }): boolean {
-		return message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound();
-	}
-
-	#getConsensus(): Contracts.Consensus.IConsensusService {
-		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 	}
 }

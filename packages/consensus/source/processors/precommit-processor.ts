@@ -1,11 +1,10 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-@injectable()
-export class PrecommitProcessor implements Contracts.Consensus.IProcessor {
-	@inject(Identifiers.Application)
-	private readonly app!: Contracts.Kernel.Application;
+import { AbstractProcessor } from "./abstract-processor";
 
+@injectable()
+export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.IProcessor {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
@@ -35,9 +34,10 @@ export class PrecommitProcessor implements Contracts.Consensus.IProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (!this.#hasValidHeightOrRound(precommit)) {
+		if (!this.hasValidHeightOrRound(precommit)) {
 			return Contracts.Consensus.ProcessorResult.Skipped;
 		}
+
 		if (!(await this.#hasValidSignature(precommit))) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
@@ -54,7 +54,7 @@ export class PrecommitProcessor implements Contracts.Consensus.IProcessor {
 			void this.broadcaster.broadcastPrecommit(precommit);
 		}
 
-		void this.#getConsensus().handle(roundState);
+		this.handle(roundState);
 
 		return Contracts.Consensus.ProcessorResult.Accepted;
 	}
@@ -73,13 +73,5 @@ export class PrecommitProcessor implements Contracts.Consensus.IProcessor {
 			await this.serializer.serializePrecommitForSignature(precommit),
 			Buffer.from(this.validatorSet.getValidator(precommit.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
-	}
-
-	#hasValidHeightOrRound(message: { height: number; round: number }): boolean {
-		return message.height === this.#getConsensus().getHeight() && message.round >= this.#getConsensus().getRound();
-	}
-
-	#getConsensus(): Contracts.Consensus.IConsensusService {
-		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
 	}
 }
