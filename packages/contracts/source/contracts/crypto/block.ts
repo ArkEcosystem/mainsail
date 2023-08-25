@@ -59,7 +59,6 @@ export interface IBlockJson {
 }
 
 export interface IBlockCommit {
-	readonly blockId: string;
 	readonly height: number;
 	readonly round: number;
 	readonly signature: string;

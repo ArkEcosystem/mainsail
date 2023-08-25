@@ -269,7 +269,7 @@ export class GenesisBlockGenerator extends Generator {
 		}
 
 		return {
-			blockId: genesisBlock.id,
+			// blockId: genesisBlock.id,
 			height: genesisBlock.height,
 			round: 0,
 			signature: await this.signatureFactory.aggregate(signatures),

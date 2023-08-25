@@ -126,7 +126,6 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
 			block,
 			commit: {
-				blockId: block.data.id,
 				height: block.data.height,
 				round,
 				...majority,

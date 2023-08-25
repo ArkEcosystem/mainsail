@@ -29,9 +29,9 @@ export class CommitVerifier implements Contracts.BlockProcessor.Handler {
 			return false;
 		}
 
-		if (commit.blockId !== block.header.id) {
-			return false;
-		}
+		// if (commit.blockId !== block.header.id) {
+		// 	return false;
+		// }
 
 		const publicKeys: Buffer[] = [];
 		for (const [index, validator] of validators.entries()) {
