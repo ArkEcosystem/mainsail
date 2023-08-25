@@ -162,5 +162,5 @@ export interface IBlockVerifier {
 }
 
 export interface ICommitHandler {
-	handleCommittedBlock(block: ICommittedBlock): Promise<void>;
+	onCommit(committedBlock: ICommittedBlock): Promise<void>;
 }

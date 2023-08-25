@@ -51,7 +51,7 @@ export class StateBuilder {
 			this.logger.info(`State Generation - Bootstrap - Blocks: ${lastBlockHeight}`);
 
 			for await (const committedBlock of this.databaseService.readCommittedBlocksByHeight(0, lastBlockHeight)) {
-				this.#buildCommittedRound(committedBlock);
+				await this.#buildCommittedRound(committedBlock);
 
 				await this.#buildBlockRewards(committedBlock.block.data);
 				await this.#buildSentTransactions(committedBlock.block.transactions);
@@ -92,10 +92,10 @@ export class StateBuilder {
 		}
 	}
 
-	#buildCommittedRound(committedBlock: Contracts.Crypto.ICommittedBlock): void {
+	async #buildCommittedRound(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		const lastCommittedRound = this.stateStore.getLastCommittedRound();
 		this.stateStore.setLastCommittedRound(lastCommittedRound + committedBlock.commit.round + 1);
-		this.proposerPicker.handleCommittedBlock(committedBlock);
+		await this.proposerPicker.onCommit(committedBlock);
 	}
 
 	#verifyWalletsConsistency(): void {
