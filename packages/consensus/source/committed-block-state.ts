@@ -15,7 +15,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 	#validators = new Map<string, Contracts.State.IValidatorWallet>();
 
 	get height(): number {
-		return this.#committedBlock.commit.height;
+		return this.#committedBlock.block.data.height;
 	}
 
 	get round(): number {

@@ -61,10 +61,10 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		proposerPicker.handleCommittedBlock({ height: 0 } as Contracts.Crypto.IBlockCommit);
+		await proposerPicker.onCommit({ block: { data: { height: 0 } } });
 
-		for (let i = 0; i < activeValidators; i++) {
-			assert.equal(proposerPicker.getValidatorIndex(i), expectedIndexesRound1[i]);
+		for (let index = 0; index < activeValidators; index++) {
+			assert.equal(proposerPicker.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}
 
 		assert.equal(proposerPicker.getValidatorIndex(activeValidators), expectedIndexesRound1[0]);
@@ -75,8 +75,8 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		for (let i = 1; i < activeValidators; i++) {
-			proposerPicker.handleCommittedBlock({ height: i } as Contracts.Crypto.IBlockCommit);
+		for (let index = 1; index < activeValidators; index++) {
+			await proposerPicker.onCommit({ block: { data: { height: index } } });
 			assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 		}
 	});
@@ -86,10 +86,10 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		proposerPicker.handleCommittedBlock({ height: 5 } as Contracts.Crypto.IBlockCommit);
+		await proposerPicker.onCommit({ block: { data: { height: 5 } } });
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
-		proposerPicker.handleCommittedBlock({ height: activeValidators } as Contracts.Crypto.IBlockCommit);
+		await proposerPicker.onCommit({ block: { data: { height: activeValidators } } });
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
 	});
 
@@ -98,16 +98,15 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		proposerPicker.handleCommittedBlock({ height: 1 } as Contracts.Crypto.IBlockCommit);
+		await proposerPicker.onCommit({ block: { data: { height: 1 } } });
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
 		// shuffled index wraps around (e.g. prolonged rounds)
-		for (let i = 0; i < 51 * 4; i++) {
-			assert.equal(proposerPicker.getValidatorIndex(i), expectedIndexesRound1[i % activeValidators]);
+		for (let index = 0; index < 51 * 4; index++) {
+			assert.equal(proposerPicker.getValidatorIndex(index), expectedIndexesRound1[index % activeValidators]);
 		}
 	});
 
-	const validatorIndexMatrix = (proposalPicker: ProposerPicker): ReadonlyArray<number> => {
-		return (proposalPicker as any).validatorIndexMatrix;
-	};
+	const validatorIndexMatrix = (proposalPicker: ProposerPicker): ReadonlyArray<number> =>
+		(proposalPicker as any).validatorIndexMatrix;
 });

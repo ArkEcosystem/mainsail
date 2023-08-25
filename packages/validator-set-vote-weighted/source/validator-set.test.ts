@@ -117,15 +117,13 @@ describe<{
 
 		const { activeValidators } = cryptoConfiguration.getMilestone();
 
-		await validatorSet.handleCommitBlock({ commit: { height: 1 } } as Contracts.Crypto.ICommittedBlock);
+		await validatorSet.onCommit({ block: { data: { height: 1 } } });
 
 		assert.true(buildValidatorRankingSpy.notCalled);
 
 		let currentHeight = 0;
 		for (let index = 0; index < activeValidators; index++) {
-			await validatorSet.handleCommitBlock({
-				commit: { height: currentHeight },
-			} as Contracts.Crypto.ICommittedBlock);
+			await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 
 			// Genesis block (= height 0) builds the ranking too
 			assert.equal(buildValidatorRankingSpy.callCount, 1);
@@ -135,7 +133,7 @@ describe<{
 
 		// The ranking got updated twice, once for the genesis block and again after `activeDelegators` blocks
 		assert.equal(currentHeight, 5);
-		await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 		assert.equal(buildValidatorRankingSpy.callCount, 2);
 		currentHeight++;
 
@@ -143,16 +141,14 @@ describe<{
 
 		// Simulate another round
 		for (let index = 0; index < activeValidators - 1; index++) {
-			await validatorSet.handleCommitBlock({
-				commit: { height: currentHeight },
-			} as Contracts.Crypto.ICommittedBlock);
+			await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 			assert.true(buildValidatorRankingSpy.notCalled);
 			currentHeight++;
 		}
 
 		// Called again after another round
 		assert.equal(currentHeight, 10);
-		await validatorSet.handleCommitBlock({ commit: { height: currentHeight } } as Contracts.Crypto.ICommittedBlock);
+		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});
 });

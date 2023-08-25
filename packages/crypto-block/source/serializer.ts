@@ -37,8 +37,6 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 
 	public commitSize(): number {
 		return (
-			this.hashByteLength + // blockId
-			4 + // height
 			4 + // round
 			+this.lockProofSize()
 		);
@@ -177,12 +175,6 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 			length: this.commitSize(),
 			skip: 0,
 			schema: {
-				blockId: {
-					type: "hash",
-				},
-				height: {
-					type: "uint32",
-				},
 				round: {
 					type: "uint32",
 				},

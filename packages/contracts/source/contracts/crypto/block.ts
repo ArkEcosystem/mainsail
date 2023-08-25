@@ -59,8 +59,6 @@ export interface IBlockJson {
 }
 
 export interface IBlockCommit {
-	readonly blockId: string;
-	readonly height: number;
 	readonly round: number;
 	readonly signature: string;
 	readonly validators: boolean[];
@@ -70,12 +68,6 @@ export interface IBlockCommit {
 
 export interface IProposedBlock {
 	readonly block: IBlock;
-	readonly lockProof?: IAggregatedSignature;
-	readonly serialized: string;
-}
-
-export interface IProposedBlockData {
-	readonly block: IBlockData;
 	readonly lockProof?: IAggregatedSignature;
 	readonly serialized: string;
 }
@@ -167,4 +159,8 @@ export interface IBlockDeserializer {
 
 export interface IBlockVerifier {
 	verify(block: IBlock): Promise<IBlockVerification>;
+}
+
+export interface ICommitHandler {
+	onCommit(committedBlock: ICommittedBlock): Promise<void>;
 }
