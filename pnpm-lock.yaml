@@ -129,7 +129,7 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2
 
-  packages/api:
+  packages/api-development:
     dependencies:
       '@hapi/boom':
         specifier: 9.1.4
@@ -528,9 +528,9 @@ importers:
 
   packages/core:
     dependencies:
-      '@mainsail/api':
+      '@mainsail/api-development':
         specifier: workspace:*
-        version: link:../api
+        version: link:../api-development
       '@mainsail/bootstrap':
         specifier: workspace:*
         version: link:../bootstrap

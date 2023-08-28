@@ -14,7 +14,7 @@ export class Server {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "api")
+	@tagged("plugin", "api-development")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.LogService)

@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/api",
+	"name": "@mainsail/api-development",
 	"version": "0.0.1",
-	"description": "Public API for Mainsail",
+	"description": "Development API for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -45,7 +45,7 @@
 	},
 	"arkecosystem": {
 		"core": {
-			"alias": "api"
+			"alias": "api-development"
 		}
 	}
 }
