@@ -53,7 +53,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
 
-	readonly #lock = new Utils.Lock();
+	readonly #handlerLock = new Utils.Lock();
 
 	public getHeight(): number {
 		return this.#height;
@@ -113,7 +113,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
-		await this.#lock.runExclusive(async () => {
+		await this.#handlerLock.runExclusive(async () => {
 			if (!roundState.hasProcessorResult() && roundState.hasProposal()) {
 				const result = await this.processor.process(roundState);
 				roundState.setProcessorResult(result);
@@ -150,7 +150,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	// TODO: Check if can be joined with handle
 	async handleCommittedBlockState(committedBlockState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
-		await this.#lock.runExclusive(async () => {
+		await this.#handlerLock.runExclusive(async () => {
 			await this.onMajorityPrecommit(committedBlockState);
 		});
 	}
@@ -336,7 +336,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onTimeoutPropose(height: number, round: number): Promise<void> {
-		await this.#lock.runExclusive(async () => {
+		await this.#handlerLock.runExclusive(async () => {
 			if (this.#step !== Contracts.Consensus.Step.Propose || this.#height !== height || this.#round !== round) {
 				return;
 			}
@@ -349,7 +349,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onTimeoutPrevote(height: number, round: number): Promise<void> {
-		await this.#lock.runExclusive(async () => {
+		await this.#handlerLock.runExclusive(async () => {
 			if (this.#step !== Contracts.Consensus.Step.Prevote || this.#height !== height || this.#round !== round) {
 				return;
 			}
@@ -363,7 +363,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	public async onTimeoutPrecommit(height: number, round: number): Promise<void> {
-		await this.#lock.runExclusive(async () => {
+		await this.#handlerLock.runExclusive(async () => {
 			if (this.#height !== height || this.#round !== round) {
 				return;
 			}
