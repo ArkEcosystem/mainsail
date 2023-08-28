@@ -32,7 +32,7 @@ export class CommittedBlockProcessor extends AbstractProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (!(await this.#isCommitValid(committedBlock))) {
+		if (!(await this.#hasValidCommit(committedBlock))) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
@@ -59,7 +59,7 @@ export class CommittedBlockProcessor extends AbstractProcessor {
 		}
 	}
 
-	async #isCommitValid(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<boolean> {
+	async #hasValidCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<boolean> {
 		const { commit, block } = committedBlock;
 
 		const publicKeys: Buffer[] = [];
