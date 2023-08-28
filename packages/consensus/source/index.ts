@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import { RootDatabase } from "lmdb";
 
 import { Aggregator } from "./aggregator";
@@ -21,6 +21,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommittedBlockProcessor).to(CommittedBlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
 
 		// Storage for uncommitted blocks
 		const consensusStorage = this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage);
