@@ -23,5 +23,4 @@ export interface Processor {
 
 export interface Verifier {
 	verify(unit: IProcessableUnit): Promise<boolean>;
-	verifyCommittedBlock(unit: IProcessableUnit): Promise<boolean>;
 }
