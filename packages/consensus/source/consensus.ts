@@ -35,6 +35,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Storage)
 	private readonly storage!: Contracts.Consensus.IConsensusStorage;
 
+	@inject(Identifiers.Consensus.CommitLock)
+	private readonly commitLock!: Contracts.Kernel.ILock;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -310,16 +313,18 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} blockId: ${block.data.id}`);
 
-		await this.processor.commit(roundState);
+		await this.commitLock.runExclusive(async () => {
+			await this.processor.commit(roundState);
 
-		this.#height++;
-		this.#lockedValue = undefined;
-		this.#validValue = undefined;
+			this.#height++;
+			this.#lockedValue = undefined;
+			this.#validValue = undefined;
 
-		this.roundStateRepository.clear();
-		await this.storage.clear();
+			this.roundStateRepository.clear();
+			await this.storage.clear();
 
-		await this.startRound(0);
+			await this.startRound(0);
+		});
 	}
 
 	protected async onMinorityWithHigherRound(roundState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
