@@ -6,6 +6,9 @@ export abstract class AbstractProcessor implements Contracts.Consensus.IProcesso
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Consensus.CommitLock)
+	protected readonly commitLock!: Contracts.Kernel.ILock;
+
 	public abstract process(data: Buffer): Promise<Contracts.Consensus.ProcessorResult>;
 
 	protected hasValidHeightOrRound(message: { height: number; round: number }): boolean {

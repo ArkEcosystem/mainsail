@@ -34,29 +34,31 @@ export class PrecommitProcessor extends AbstractProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (!this.hasValidHeightOrRound(precommit)) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
-		}
+		return this.commitLock.runNonExclusive(async () => {
+			if (!this.hasValidHeightOrRound(precommit)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
 
-		if (!(await this.#hasValidSignature(precommit))) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (!(await this.#hasValidSignature(precommit))) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		const roundState = this.roundStateRepo.getRoundState(precommit.height, precommit.round);
-		if (roundState.hasPrecommit(precommit.validatorIndex)) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
-		}
+			const roundState = this.roundStateRepo.getRoundState(precommit.height, precommit.round);
+			if (roundState.hasPrecommit(precommit.validatorIndex)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
 
-		roundState.addPrecommit(precommit);
-		await this.storage.savePrecommit(precommit);
+			roundState.addPrecommit(precommit);
+			await this.storage.savePrecommit(precommit);
 
-		if (broadcast) {
-			void this.broadcaster.broadcastPrecommit(precommit);
-		}
+			if (broadcast) {
+				void this.broadcaster.broadcastPrecommit(precommit);
+			}
 
-		void this.getConsensus().handle(roundState);
+			void this.getConsensus().handle(roundState);
 
-		return Contracts.Consensus.ProcessorResult.Accepted;
+			return Contracts.Consensus.ProcessorResult.Accepted;
+		});
 	}
 
 	async #makePrecommit(data: Buffer): Promise<Contracts.Crypto.IPrecommit | undefined> {

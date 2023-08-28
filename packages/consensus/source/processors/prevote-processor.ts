@@ -34,29 +34,31 @@ export class PrevoteProcessor extends AbstractProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (!this.hasValidHeightOrRound(prevote)) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
-		}
+		return this.commitLock.runNonExclusive(async () => {
+			if (!this.hasValidHeightOrRound(prevote)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
 
-		if (!(await this.#hasValidSignature(prevote))) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (!(await this.#hasValidSignature(prevote))) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		const roundState = this.roundStateRepo.getRoundState(prevote.height, prevote.round);
-		if (roundState.hasPrevote(prevote.validatorIndex)) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
-		}
+			const roundState = this.roundStateRepo.getRoundState(prevote.height, prevote.round);
+			if (roundState.hasPrevote(prevote.validatorIndex)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
 
-		roundState.addPrevote(prevote);
-		await this.storage.savePrevote(prevote);
+			roundState.addPrevote(prevote);
+			await this.storage.savePrevote(prevote);
 
-		if (broadcast) {
-			void this.broadcaster.broadcastPrevote(prevote);
-		}
+			if (broadcast) {
+				void this.broadcaster.broadcastPrevote(prevote);
+			}
 
-		void this.getConsensus().handle(roundState);
+			void this.getConsensus().handle(roundState);
 
-		return Contracts.Consensus.ProcessorResult.Accepted;
+			return Contracts.Consensus.ProcessorResult.Accepted;
+		});
 	}
 
 	async #makePrevote(data: Buffer): Promise<Contracts.Crypto.IPrevote | undefined> {

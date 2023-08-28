@@ -43,41 +43,43 @@ export class ProposalProcessor extends AbstractProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (!this.hasValidHeightOrRound(proposal)) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
-		}
+		return this.commitLock.runNonExclusive(async () => {
+			if (!this.hasValidHeightOrRound(proposal)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
 
-		if (!this.#hasValidProposer(proposal)) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (!this.#hasValidProposer(proposal)) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		if (!(await this.#hasValidSignature(proposal))) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (!(await this.#hasValidSignature(proposal))) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		if (!this.#hasValidBlockGenerator(proposal)) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (!this.#hasValidBlockGenerator(proposal)) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		if (!(await this.#hasValidLockProof(proposal))) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (!(await this.#hasValidLockProof(proposal))) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
-		if (roundState.hasProposal()) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
-		}
+			const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
+			if (roundState.hasProposal()) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
 
-		roundState.addProposal(proposal);
-		await this.storage.saveProposal(proposal);
+			roundState.addProposal(proposal);
+			await this.storage.saveProposal(proposal);
 
-		if (broadcast) {
-			void this.broadcaster.broadcastProposal(proposal);
-		}
+			if (broadcast) {
+				void this.broadcaster.broadcastProposal(proposal);
+			}
 
-		void this.getConsensus().handle(roundState);
+			void this.getConsensus().handle(roundState);
 
-		return Contracts.Consensus.ProcessorResult.Accepted;
+			return Contracts.Consensus.ProcessorResult.Accepted;
+		});
 	}
 
 	async #makeProposal(data: Buffer): Promise<Contracts.Crypto.IProposal | undefined> {
