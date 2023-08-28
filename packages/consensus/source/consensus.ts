@@ -53,6 +53,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
 
+	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Utils.Lock();
 
 	public getHeight(): number {
