@@ -32,6 +32,10 @@ export class CommittedBlockProcessor extends AbstractProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
+		if (!this.#hasValidHeight(committedBlock)) {
+			return Contracts.Consensus.ProcessorResult.Skipped;
+		}
+
 		if (!(await this.#hasValidCommit(committedBlock))) {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
@@ -57,6 +61,10 @@ export class CommittedBlockProcessor extends AbstractProcessor {
 		} catch {
 			return undefined;
 		}
+	}
+
+	#hasValidHeight(committedBlock: Contracts.Crypto.ICommittedBlock): boolean {
+		return committedBlock.block.data.height === this.getConsensus().getHeight();
 	}
 
 	async #hasValidCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<boolean> {
