@@ -97,7 +97,7 @@
 			"package": "@mainsail/consensus"
 		},
 		{
-			"package": "@mainsail/api"
+			"package": "@mainsail/api-development"
 		},
 		{
 			"package": "@mainsail/webhooks"
