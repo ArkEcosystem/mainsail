@@ -61,7 +61,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 
 		this.#downloadingProposalByHeight.add(peer.header.height);
 
-		void this.#downloadProposalFromPeer({ peerHeader: peer.header, peer });
+		void this.#downloadProposalFromPeer({ peer, peerHeader: peer.header });
 	}
 
 	public isDownloading(): boolean {
