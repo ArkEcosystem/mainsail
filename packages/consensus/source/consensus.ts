@@ -17,7 +17,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
 
 	@inject(Identifiers.Consensus.PrevoteProcessor)
-	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
+	private readonly prevoteProcessor!: Contracts.Consensus.IPrevoteProcessor;
 
 	@inject(Identifiers.Consensus.PrecommitProcessor)
 	private readonly precommitProcessor!: Contracts.Consensus.IProcessor;
@@ -432,7 +432,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const prevote = await validator.prevote(this.#height, this.#round, value);
 
-			void this.prevoteProcessor.process(prevote.serialized);
+			void this.prevoteProcessor.process(prevote);
 		}
 
 		await this.#saveState();

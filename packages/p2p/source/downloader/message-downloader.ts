@@ -34,10 +34,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Consensus.PrevoteProcessor)
-	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
+	private readonly prevoteProcessor!: Contracts.Consensus.IPrevoteProcessor;
 
 	@inject(Identifiers.Consensus.PrecommitProcessor)
 	private readonly precommitProcessor!: Contracts.Consensus.IProcessor;
+
+	@inject(Identifiers.Cryptography.Message.Factory)
+	private readonly factory!: Contracts.Crypto.IMessageFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
@@ -129,7 +132,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 			for (const prevoteBuffer of result.prevotes) {
 				// TODO: handle response
-				await this.prevoteProcessor.process(prevoteBuffer, false);
+				const prevote = await this.factory.makePrevoteFromBytes(prevoteBuffer);
+				await this.prevoteProcessor.process(prevote, false);
 			}
 
 			for (const precommitBuffer of result.precommits) {
