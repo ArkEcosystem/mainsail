@@ -14,13 +14,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly state!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Consensus.ProposalProcessor)
-	private readonly proposalProcessor!: Contracts.Consensus.IProcessor;
+	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
 
 	@inject(Identifiers.Consensus.PrevoteProcessor)
-	private readonly prevoteProcessor!: Contracts.Consensus.IProcessor;
+	private readonly prevoteProcessor!: Contracts.Consensus.IPrevoteProcessor;
 
 	@inject(Identifiers.Consensus.PrecommitProcessor)
-	private readonly precommitProcessor!: Contracts.Consensus.IProcessor;
+	private readonly precommitProcessor!: Contracts.Consensus.IPrecommitProcessor;
 
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler!: Contracts.Consensus.IScheduler;
@@ -416,7 +416,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		Utils.assert.defined(proposal);
-		void this.proposalProcessor.process(proposal.serialized);
+		void this.proposalProcessor.process(proposal);
 	}
 
 	async #prevote(value?: string): Promise<void> {
@@ -432,7 +432,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const prevote = await validator.prevote(this.#height, this.#round, value);
 
-			void this.prevoteProcessor.process(prevote.serialized);
+			void this.prevoteProcessor.process(prevote);
 		}
 
 		await this.#saveState();
@@ -451,7 +451,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const precommit = await validator.precommit(this.#height, this.#round, value);
 
-			void this.precommitProcessor.process(precommit.serialized);
+			void this.precommitProcessor.process(precommit);
 		}
 
 		await this.#saveState();

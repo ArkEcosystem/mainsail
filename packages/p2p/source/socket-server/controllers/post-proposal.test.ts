@@ -11,18 +11,26 @@ describe<{
 		process: () => {},
 	};
 
+	const factory = {
+		makeProposalFromBytes: () => {},
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
+		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
 		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue(processor);
 
 		context.controller = context.sandbox.app.resolve(PostProposalController);
 	});
 
 	it("#handle - should call processor", async ({ controller }) => {
+		const spyOnFactory = spy(factory, "makeProposalFromBytes");
 		const spyOnProcess = spy(processor, "process");
 
 		await controller.handle({ payload: { proposal: Buffer.from("") } }, {});
 		spyOnProcess.calledOnce();
+		spyOnFactory.calledOnce();
+		spyOnFactory.calledWith(Buffer.from(""));
 	});
 });

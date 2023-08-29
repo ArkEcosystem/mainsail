@@ -11,18 +11,26 @@ describe<{
 		process: () => {},
 	};
 
+	const factory = {
+		makePrecommitFromBytes: () => {},
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
+		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
 		context.sandbox.app.bind(Identifiers.Consensus.PrecommitProcessor).toConstantValue(processor);
 
 		context.controller = context.sandbox.app.resolve(PostPrecommitController);
 	});
 
 	it("#handle - should call processor", async ({ controller }) => {
+		const spyOnFactory = spy(factory, "makePrecommitFromBytes");
 		const spyOnProcess = spy(processor, "process");
 
 		await controller.handle({ payload: { precommit: Buffer.from("") } }, {});
 		spyOnProcess.calledOnce();
+		spyOnFactory.calledOnce();
+		spyOnFactory.calledWith(Buffer.from(""));
 	});
 });

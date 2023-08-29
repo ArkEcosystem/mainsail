@@ -4,10 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class PrevoteProcessor extends AbstractProcessor {
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
-
+export class PrevoteProcessor extends AbstractProcessor implements Contracts.Consensus.IPrevoteProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
 
@@ -27,13 +24,7 @@ export class PrevoteProcessor extends AbstractProcessor {
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	async process(data: Buffer, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
-		const prevote = await this.#makePrevote(data);
-
-		if (!prevote) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
-
+	async process(prevote: Contracts.Crypto.IPrevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidHeightOrRound(prevote)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
@@ -59,14 +50,6 @@ export class PrevoteProcessor extends AbstractProcessor {
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
-	}
-
-	async #makePrevote(data: Buffer): Promise<Contracts.Crypto.IPrevote | undefined> {
-		try {
-			return await this.factory.makePrevoteFromBytes(data);
-		} catch {
-			return undefined;
-		}
 	}
 
 	async #hasValidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
