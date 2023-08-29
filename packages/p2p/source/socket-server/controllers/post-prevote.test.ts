@@ -11,8 +11,14 @@ describe<{
 		process: () => {},
 	};
 
+	const factory = {
+		makePrevoteFromBytes: () => {},
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
+
+		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
 
 		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(processor);
 
@@ -20,9 +26,13 @@ describe<{
 	});
 
 	it("#handle - should call processor", async ({ controller }) => {
+		const spyOnFactory = spy(factory, "makePrevoteFromBytes");
+
 		const spyOnProcess = spy(processor, "process");
 
 		await controller.handle({ payload: { prevote: Buffer.from("") } }, {});
 		spyOnProcess.calledOnce();
+		spyOnFactory.calledOnce();
+		spyOnFactory.calledWith(Buffer.from(""));
 	});
 });
