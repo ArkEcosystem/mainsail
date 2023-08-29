@@ -1,3 +1,4 @@
+export * as ApiSync from "./api-sync";
 export * as BlockProcessor from "./block-processor";
 export * as Consensus from "./consensus";
 export * as Crypto from "./crypto";

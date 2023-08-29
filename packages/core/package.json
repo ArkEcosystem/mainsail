@@ -26,6 +26,9 @@
 	},
 	"dependencies": {
 		"@mainsail/api-development": "workspace:*",
+		"@mainsail/api-database": "workspace:*",
+		"@mainsail/api-sync": "workspace:*",
+		"@mainsail/api-http": "workspace:*",
 		"@mainsail/bootstrap": "workspace:*",
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",

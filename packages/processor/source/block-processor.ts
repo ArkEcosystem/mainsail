@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 // TODO: Move enums to contracts
 import { Enums } from "@mainsail/kernel";
@@ -35,6 +35,10 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.BlockVerifier)
 	private readonly verifier!: Contracts.BlockProcessor.Verifier;
 
+	@inject(Identifiers.ApiSync)
+	@optional()
+	private readonly apiSync: Contracts.ApiSync.ISync | undefined;
+
 	public async process(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
 		try {
 			if (!(await this.verifier.verify(unit))) {
@@ -59,6 +63,10 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		await this.validatorSet.onCommit(committedBlock);
 		await this.proposerPicker.onCommit(committedBlock);
+
+		if (this.apiSync) {
+			await this.apiSync.applyCommittedBlock(committedBlock);
+		}
 
 		const committedRound = this.state.getLastCommittedRound();
 		this.state.setLastCommittedRound(committedRound + unit.round + 1);

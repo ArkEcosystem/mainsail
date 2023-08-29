@@ -85,6 +85,12 @@
 			"package": "@mainsail/p2p"
 		},
 		{
+			"package": "@mainsail/api-database"
+		},
+		{
+			"package": "@mainsail/api-sync"
+		},
+		{
 			"package": "@mainsail/processor"
 		},
 		{
@@ -98,6 +104,9 @@
 		},
 		{
 			"package": "@mainsail/api-development"
+		},
+		{
+			"package": "@mainsail/api-http"
 		},
 		{
 			"package": "@mainsail/webhooks"

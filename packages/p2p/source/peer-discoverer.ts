@@ -87,11 +87,11 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 					});
 				}
 			}
-		} catch {}
+		} catch { }
 
 		if (!peerList || peerList.length === 0) {
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.app.terminate("No seed peers defined in peers.json");
+			await this.app.terminate("No seed peers defined in peers.json");
 		}
 
 		const peers: Contracts.P2P.Peer[] = peerList.map((peer) => {
