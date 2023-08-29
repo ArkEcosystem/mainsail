@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
 import { Utils } from "@mainsail/kernel";
+import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { Consensus } from "./consensus";
 
@@ -120,9 +120,9 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.roundState = {
+			aggregatePrevotes: () => {},
 			getBlock: () => {},
 			getProcessorResult: () => false,
-			aggregatePrevotes: () => {},
 			getProposal: () => context.proposal,
 			hasPrecommit: () => false,
 			hasPrevote: () => false,
@@ -229,7 +229,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	// TODO: Add test for valid round
 	it("#onTimeoutStartRound - local validator should propose", async ({
 		consensus,
 		validatorsRepository,
@@ -267,7 +266,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(0, undefined, block);
 		spyProposalProcess.calledOnce();
-		spyProposalProcess.calledWith(proposal.serialized);
+		spyProposalProcess.calledWith(proposal);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getUsername()}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
@@ -321,7 +320,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 0, block, lockProof);
 		spyProposalProcess.calledOnce();
-		spyProposalProcess.calledWith(proposal.serialized);
+		spyProposalProcess.calledWith(proposal);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${1} with proposer: ${proposer.getUsername()}`);
 		spyLoggerInfo.calledWith(`Proposing valid block ${2}/${1} from round ${0} with blockId: ${block.data.id}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
@@ -500,7 +499,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.calledWith(2, 0);
 
 		spyPrevoteProcess.calledOnce();
-		spyPrevoteProcess.calledWith(prevote.serialized);
+		spyPrevoteProcess.calledWith(prevote);
 		spyLoggerInfo.calledWith(`Received proposal ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
@@ -601,7 +600,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.calledWith(2, 1, block.data.id);
 
 		spyPrevoteProcess.calledOnce();
-		spyPrevoteProcess.calledWith(prevote.serialized);
+		spyPrevoteProcess.calledWith(prevote);
 		spyLoggerInfo.calledWith(`Received proposal ${2}/${1} with locked blockId: ${proposal.block.block.data.id}`);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
@@ -652,7 +651,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.calledWith(2, 1);
 
 		spyPrevoteProcess.calledOnce();
-		spyPrevoteProcess.calledWith(prevote.serialized);
+		spyPrevoteProcess.calledWith(prevote);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 	});
@@ -788,7 +787,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0, block.data.id);
 		spyPrecommitProcess.calledOnce();
-		spyPrecommitProcess.calledWith(precommit.serialized);
+		spyPrecommitProcess.calledWith(precommit);
 		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 
 		assert.equal(consensus.getLockedRound(), 0);
@@ -857,7 +856,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0, block.data.id);
 		spyPrecommitProcess.calledOnce();
-		spyPrecommitProcess.calledWith(precommit.serialized);
+		spyPrecommitProcess.calledWith(precommit);
 
 		assert.equal(consensus.getLockedRound(), 0);
 		assert.equal(consensus.getValidRound(), 0);
@@ -872,7 +871,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrecommit.calledOnce();
 		spyValidatorPrecommit.calledWith(2, 0, block.data.id);
 		spyPrecommitProcess.calledOnce();
-		spyPrecommitProcess.calledWith(precommit.serialized);
+		spyPrecommitProcess.calledWith(precommit);
 
 		assert.equal(consensus.getLockedRound(), 0);
 		assert.equal(consensus.getValidRound(), 0);
@@ -1059,7 +1058,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrecommit.calledWith(2, 0);
 
 		spyPrecommitProcess.calledOnce();
-		spyPrecommitProcess.calledWith(precommit.serialized);
+		spyPrecommitProcess.calledWith(precommit);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
@@ -1298,7 +1297,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.calledWith(2, 0);
 
 		spyPrevoteProcess.calledOnce();
-		spyPrevoteProcess.calledWith(prevote.serialized);
+		spyPrevoteProcess.calledWith(prevote);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 	});
@@ -1379,7 +1378,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrecommit.calledWith(2, 0);
 
 		spyPrevoteProcess.calledOnce();
-		spyPrevoteProcess.calledWith(precommit.serialized);
+		spyPrevoteProcess.calledWith(precommit);
 
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 	});
