@@ -99,10 +99,6 @@ export interface IProposerPicker extends ICommitHandler {
 	getValidatorIndex(round: number): number;
 }
 
-export interface IProcessor {
-	process(data: Buffer, broadcast?: boolean): Promise<ProcessorResult>;
-}
-
 export interface IProposalProcessor {
 	process(proposal: IProposal, broadcast?: boolean): Promise<ProcessorResult>;
 }
