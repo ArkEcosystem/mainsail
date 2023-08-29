@@ -128,12 +128,15 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		let error: Error | undefined;
 
 		try {
-			console.log(`Downloading messages from ${job.peer.ip}`);
 			const result = await this.communicator.getMessages(job.peer);
 
-			for (const prevoteBuffer of result.prevotes) {
-				const prevote = await this.factory.makePrevoteFromBytes(prevoteBuffer);
+			const prevotes: Map<number, Contracts.Crypto.IPrevote> = new Map();
+			for (const buffer of result.prevotes) {
+				const prevote = await this.factory.makePrevoteFromBytes(buffer);
+				prevotes.set(prevote.validatorIndex, prevote);
+			}
 
+			for (const prevote of prevotes.values()) {
 				if (prevote.height !== job.peerHeader.height) {
 					throw new Error(
 						`Received prevote height ${prevote.height} does not match expected height ${job.peerHeader.height}`,
@@ -153,9 +156,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 			}
 
-			for (const precommitBuffer of result.precommits) {
-				const precommit = await this.factory.makePrecommitFromBytes(precommitBuffer);
+			const precommits: Map<number, Contracts.Crypto.IPrecommit> = new Map();
+			for (const buffer of result.precommits) {
+				const precommit = await this.factory.makePrecommitFromBytes(buffer);
+				precommits.set(precommit.validatorIndex, precommit);
+			}
 
+			for (const precommit of precommits.values()) {
 				if (precommit.height !== job.peerHeader.height) {
 					throw new Error(
 						`Received precommit height ${precommit.height} does not match expected height ${job.peerHeader.height}`,
@@ -172,6 +179,19 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
 					throw new Error(`Received precommit is invalid`);
+				}
+			}
+
+			// Check if received all the requested data
+			for (const index of job.prevoteIndexes) {
+				if (!prevotes.has(index)) {
+					throw new Error(`Missing prevote for validator ${index}`);
+				}
+			}
+
+			for (const index of job.precommitIndexes) {
+				if (!precommits.has(index)) {
+					throw new Error(`Missing precommit for validator ${index}`);
 				}
 			}
 		} catch (error_) {
