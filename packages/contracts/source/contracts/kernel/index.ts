@@ -4,6 +4,7 @@ export * from "./config";
 export * from "./container";
 export * from "./events";
 export * from "./filesystem";
+export * from "./lock";
 export * from "./log";
 export * from "./pipeline";
 export * from "./process-actions";

@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { Utils } from "@mainsail/kernel";
 
 import { Consensus } from "./consensus";
 
@@ -145,6 +146,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
+		context.sandbox.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
 		+context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);

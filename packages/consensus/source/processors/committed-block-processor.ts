@@ -32,27 +32,29 @@ export class CommittedBlockProcessor extends AbstractProcessor {
 			return Contracts.Consensus.ProcessorResult.Invalid;
 		}
 
-		if (!this.#hasValidHeight(committedBlock)) {
-			return Contracts.Consensus.ProcessorResult.Skipped;
-		}
+		return this.commitLock.runNonExclusive(async () => {
+			if (!this.#hasValidHeight(committedBlock)) {
+				return Contracts.Consensus.ProcessorResult.Skipped;
+			}
 
-		if (!(await this.#hasValidCommit(committedBlock))) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (!(await this.#hasValidCommit(committedBlock))) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		const committedBlockState = this.app.resolve(CommittedBlockState).configure(committedBlock);
+			const committedBlockState = this.app.resolve(CommittedBlockState).configure(committedBlock);
 
-		const result = await this.processor.process(committedBlockState);
+			const result = await this.processor.process(committedBlockState);
 
-		if (result === false) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
+			if (result === false) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
 
-		committedBlockState.setProcessorResult(result);
+			committedBlockState.setProcessorResult(result);
 
-		void this.getConsensus().handleCommittedBlockState(committedBlockState);
+			void this.getConsensus().handleCommittedBlockState(committedBlockState);
 
-		return Contracts.Consensus.ProcessorResult.Accepted;
+			return Contracts.Consensus.ProcessorResult.Accepted;
+		});
 	}
 
 	async #makeCommittedBlock(data: Buffer): Promise<Contracts.Crypto.ICommittedBlock | undefined> {
