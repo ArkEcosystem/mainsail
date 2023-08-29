@@ -5,7 +5,7 @@ import { getRandomPeer } from "../utils";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	peerHeight: number;
+	peerHeader: Contracts.P2P.IHeaderData;
 };
 @injectable()
 export class ProposalDownloader implements Contracts.P2P.Downloader {
@@ -61,7 +61,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 
 		this.#downloadingProposalByHeight.add(peer.state.height);
 
-		void this.#downloadProposalFromPeer({ peerHeight: peer.state.height, peer });
+		void this.#downloadProposalFromPeer({ peerHeader: peer.state, peer });
 	}
 
 	public isDownloading(): boolean {
@@ -79,9 +79,15 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			}
 
 			const proposal = await this.factory.makeProposalFromBytes(result.proposal);
-			if (proposal.height !== job.peerHeight) {
+			if (proposal.height !== job.peerHeader.height) {
 				throw new Error(
-					`Received proposal height ${proposal.height} does not match expected height ${job.peerHeight}`,
+					`Received proposal height ${proposal.height} does not match expected height ${job.peerHeader.height}`,
+				);
+			}
+
+			if (proposal.round !== job.peerHeader.round) {
+				throw new Error(
+					`Received proposal round ${proposal.round} does not match expected round ${job.peerHeader.round}`,
 				);
 			}
 
@@ -93,7 +99,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			error = error_;
 		}
 
-		this.#downloadingProposalByHeight.delete(job.peerHeight);
+		this.#downloadingProposalByHeight.delete(job.peerHeader.height);
 
 		if (error) {
 			this.peerDisposer.banPeer(job.peer, `Error downloading or processing proposal - ${error.message}}`);
