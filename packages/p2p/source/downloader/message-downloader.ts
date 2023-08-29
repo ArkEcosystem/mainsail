@@ -131,15 +131,21 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			const result = await this.communicator.getMessages(job.peer);
 
 			for (const prevoteBuffer of result.prevotes) {
-				// TODO: handle response
 				const prevote = await this.factory.makePrevoteFromBytes(prevoteBuffer);
-				await this.prevoteProcessor.process(prevote, false);
+				const response = await this.prevoteProcessor.process(prevote, false);
+
+				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+					throw new Error(`Received prevote is invalid`);
+				}
 			}
 
 			for (const precommitBuffer of result.precommits) {
-				// TODO: handle response
 				const precommit = await this.factory.makePrecommitFromBytes(precommitBuffer);
-				await this.precommitProcessor.process(precommit, false);
+				const response = await this.precommitProcessor.process(precommit, false);
+
+				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+					throw new Error(`Received precommit is invalid`);
+				}
 			}
 		} catch (error_) {
 			error = error_;
