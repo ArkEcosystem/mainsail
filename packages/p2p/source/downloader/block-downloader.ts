@@ -37,7 +37,10 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	private readonly stateStore!: Contracts.State.StateStore;
 
 	@inject(Identifiers.Consensus.CommittedBlockProcessor)
-	private readonly committedBlockProcessor!: Contracts.Consensus.IProcessor;
+	private readonly committedBlockProcessor!: Contracts.Consensus.ICommittedBlockProcessor;
+
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -117,8 +120,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		try {
 			job.status = JobStatus.Processing;
 			for (const buff of job.blocks) {
+				const committedBlock = await this.blockFactory.fromCommittedBytes(buff);
 				// TODO: Handle response
-				await this.committedBlockProcessor.process(buff);
+				await this.committedBlockProcessor.process(committedBlock);
 			}
 		} catch (error) {
 			this.peerDisposer.banPeer(job.peer, `Error processing downloaded blocks - ${error.message}}`);

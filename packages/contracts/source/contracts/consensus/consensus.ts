@@ -1,5 +1,5 @@
 import { IProcessableUnit } from "../block-processor";
-import { IAggregatedSignature, ICommitHandler, IPrecommit, IPrevote, IProposal } from "../crypto";
+import { IAggregatedSignature, ICommitHandler, ICommittedBlock, IPrecommit, IPrevote, IProposal } from "../crypto";
 import { IValidatorWallet } from "../state";
 import { ProcessorResult, Step } from "./enums";
 
@@ -116,5 +116,5 @@ export interface IPrecommitProcessor {
 }
 
 export interface ICommittedBlockProcessor {
-	process(prevote: IPrecommit, broadcast?: boolean): Promise<ProcessorResult>;
+	process(committedBlock: ICommittedBlock, broadcast?: boolean): Promise<ProcessorResult>;
 }

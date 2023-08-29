@@ -6,15 +6,12 @@ import { CommittedBlockState } from "../committed-block-state";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class CommittedBlockProcessor extends AbstractProcessor {
+export class CommittedBlockProcessor extends AbstractProcessor implements Contracts.Consensus.ICommittedBlockProcessor {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
-
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -25,13 +22,7 @@ export class CommittedBlockProcessor extends AbstractProcessor {
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.IAggregator;
 
-	async process(data: Buffer): Promise<Contracts.Consensus.ProcessorResult> {
-		const committedBlock = await this.#makeCommittedBlock(data);
-
-		if (!committedBlock) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
-
+	async process(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.#hasValidHeight(committedBlock)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
@@ -55,14 +46,6 @@ export class CommittedBlockProcessor extends AbstractProcessor {
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
-	}
-
-	async #makeCommittedBlock(data: Buffer): Promise<Contracts.Crypto.ICommittedBlock | undefined> {
-		try {
-			return await this.blockFactory.fromCommittedBytes(data);
-		} catch {
-			return undefined;
-		}
 	}
 
 	#hasValidHeight(committedBlock: Contracts.Crypto.ICommittedBlock): boolean {
