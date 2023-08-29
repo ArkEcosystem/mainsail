@@ -51,7 +51,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		let peers = this.repository.getPeers();
 
 		while (
-			(peers = peers.filter((peer) => peer.state.height > this.#getLastRequestedBlockHeight())) &&
+			(peers = peers.filter((peer) => peer.header.height > this.#getLastRequestedBlockHeight())) &&
 			peers.length > 0
 		) {
 			void this.download(getRandomPeer(peers));
@@ -60,7 +60,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	public download(peer: Contracts.P2P.Peer): void {
 		if (
-			peer.state.height - 1 <= this.#getLastRequestedBlockHeight() ||
+			peer.header.height - 1 <= this.#getLastRequestedBlockHeight() ||
 			this.#downloadJobs.length >= constants.MAX_DOWNLOAD_BLOCKS_JOBS
 		) {
 			return;
@@ -71,7 +71,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			heightFrom: this.#getLastRequestedBlockHeight() + 1,
 			heightTo: this.#calculateHeightTo(peer),
 			peer,
-			peerHeight: peer.state.height - 1,
+			peerHeight: peer.header.height - 1,
 			status: JobStatus.Downloading,
 		};
 
@@ -194,7 +194,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	#replyJob(job: DownloadJob) {
 		const index = this.#downloadJobs.indexOf(job);
 
-		const peers = this.repository.getPeers().filter((peer) => peer.state.height >= job.heightTo);
+		const peers = this.repository.getPeers().filter((peer) => peer.header.height >= job.heightTo);
 
 		if (peers.length === 0) {
 			// Remove higher jobs, because peer is no longer available
@@ -209,7 +209,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			heightFrom: index === 0 ? this.stateStore.getLastHeight() + 1 : job.heightFrom,
 			heightTo: this.#downloadJobs.length === 1 ? this.#calculateHeightTo(peer) : job.heightTo,
 			peer,
-			peerHeight: peer.state.height - 1,
+			peerHeight: peer.header.height - 1,
 			status: JobStatus.Downloading,
 		};
 
@@ -220,8 +220,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	#calculateHeightTo(peer: Contracts.P2P.Peer): number {
 		// Check that we don't exceed maxDownloadBlocks
-		return peer.state.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
+		return peer.header.height - this.#getLastRequestedBlockHeight() > constants.MAX_DOWNLOAD_BLOCKS
 			? this.#getLastRequestedBlockHeight() + constants.MAX_DOWNLOAD_BLOCKS
-			: peer.state.height - 1; // Stored block height is always 1 less than the consensus height
+			: peer.header.height - 1; // Stored block height is always 1 less than the consensus height
 	}
 }

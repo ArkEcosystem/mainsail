@@ -11,7 +11,7 @@ export class HeaderService implements Contracts.P2P.IHeaderService {
 	#pending = new Set<Contracts.P2P.Peer>();
 
 	public async handle(peer: Contracts.P2P.Peer, peerHeader: Contracts.P2P.IHeaderData): Promise<void> {
-		peer.state = peerHeader;
+		peer.header = peerHeader;
 
 		if (this.#hasPendingCheck(peer)) {
 			return;

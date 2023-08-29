@@ -70,7 +70,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		let peers = this.repository.getPeers();
 
-		while ((peers = peers.filter((peer) => header.canDownloadMessages(peer.state))) && peers.length > 0) {
+		while ((peers = peers.filter((peer) => header.canDownloadMessages(peer.header))) && peers.length > 0) {
 			void this.download(getRandomPeer(peers));
 		}
 	}
@@ -81,11 +81,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const header = this.headerFactory();
-		if (!header.canDownloadMessages(peer.state)) {
+		if (!header.canDownloadMessages(peer.header)) {
 			return;
 		}
 
-		const downloads = this.#getDownloadsByHeight(peer.state.height);
+		const downloads = this.#getDownloadsByHeight(peer.header.height);
 
 		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes);
 		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits);
@@ -96,7 +96,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const job: DownloadJob = {
 			peer,
-			peerHeader: peer.state,
+			peerHeader: peer.header,
 			precommitIndexes,
 			prevoteIndexes,
 		};
@@ -239,7 +239,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		for (const [index, prevote] of prevotes.entries()) {
 			if (
-				peer.state.validatorsSignedPrevote[index] &&
+				peer.header.validatorsSignedPrevote[index] &&
 				!prevote &&
 				!header.roundState.getValidatorsSignedPrevote()[index]
 			) {
@@ -256,7 +256,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		for (const [index, precommit] of precommits.entries()) {
 			if (
-				peer.state.validatorsSignedPrecommit[index] &&
+				peer.header.validatorsSignedPrecommit[index] &&
 				!precommit &&
 				!header.roundState.getValidatorsSignedPrecommit()[index]
 			) {
