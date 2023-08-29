@@ -11,7 +11,7 @@ type DownloadsByHeight = {
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	peerHeight: number;
+	peerHeader: Contracts.P2P.IHeaderData;
 	prevoteIndexes: number[];
 	precommitIndexes: number[];
 };
@@ -96,7 +96,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const job: DownloadJob = {
 			peer,
-			peerHeight: peer.state.height,
+			peerHeader: peer.state,
 			precommitIndexes,
 			prevoteIndexes,
 		};
@@ -128,14 +128,21 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		let error: Error | undefined;
 
 		try {
+			console.log(`Downloading messages from ${job.peer.ip}`);
 			const result = await this.communicator.getMessages(job.peer);
 
 			for (const prevoteBuffer of result.prevotes) {
 				const prevote = await this.factory.makePrevoteFromBytes(prevoteBuffer);
 
-				if (prevote.height !== job.peerHeight) {
+				if (prevote.height !== job.peerHeader.height) {
 					throw new Error(
-						`Received prevote height ${prevote.height} does not match expected height ${job.peerHeight}`,
+						`Received prevote height ${prevote.height} does not match expected height ${job.peerHeader.height}`,
+					);
+				}
+
+				if (prevote.round !== job.peerHeader.round) {
+					throw new Error(
+						`Received prevote round ${prevote.round} does not match expected round ${job.peerHeader.round}`,
 					);
 				}
 
@@ -149,9 +156,15 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			for (const precommitBuffer of result.precommits) {
 				const precommit = await this.factory.makePrecommitFromBytes(precommitBuffer);
 
-				if (precommit.height !== job.peerHeight) {
+				if (precommit.height !== job.peerHeader.height) {
 					throw new Error(
-						`Received precommit height ${precommit.height} does not match expected height ${job.peerHeight}`,
+						`Received precommit height ${precommit.height} does not match expected height ${job.peerHeader.height}`,
+					);
+				}
+
+				if (precommit.round !== job.peerHeader.round) {
+					throw new Error(
+						`Received precommit round ${precommit.round} does not match expected round ${job.peerHeader.round}`,
 					);
 				}
 
@@ -185,11 +198,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#removeDownloadJob(job: DownloadJob): void {
 		// Return if the height was already removed, because the block was applied.
-		if (!this.#downloadsByHeight.has(job.peerHeight)) {
+		if (!this.#downloadsByHeight.has(job.peerHeader.height)) {
 			return;
 		}
 
-		const downloadsByHeight = this.#downloadsByHeight.get(job.peerHeight)!;
+		const downloadsByHeight = this.#downloadsByHeight.get(job.peerHeader.height)!;
 
 		for (const index of job.prevoteIndexes) {
 			downloadsByHeight.prevotes[index] = false;
