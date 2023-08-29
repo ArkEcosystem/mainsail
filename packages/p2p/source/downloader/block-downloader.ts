@@ -117,9 +117,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		this.logger.debug(`Processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
 
+		let height = job.heightFrom;
 		try {
 			job.status = JobStatus.Processing;
-			let height = job.heightFrom;
 			for (const buff of job.blocks) {
 				const committedBlock = await this.blockFactory.fromCommittedBytes(buff);
 
@@ -142,7 +142,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		if (job.heightTo !== this.stateStore.getLastHeight()) {
+		if (job.heightTo !== height - 1) {
 			this.#handleMissingBlocks(job);
 			return;
 		}
