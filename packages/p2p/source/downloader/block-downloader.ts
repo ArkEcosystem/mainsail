@@ -119,10 +119,21 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		try {
 			job.status = JobStatus.Processing;
+			let height = job.heightFrom;
 			for (const buff of job.blocks) {
 				const committedBlock = await this.blockFactory.fromCommittedBytes(buff);
-				// TODO: Handle response
-				await this.committedBlockProcessor.process(committedBlock);
+
+				if (committedBlock.block.data.height !== height) {
+					throw new Error(
+						`Received block height ${committedBlock.block.data.height} does not match expected height ${height}`,
+					);
+				}
+				height++;
+
+				const response = await this.committedBlockProcessor.process(committedBlock);
+				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+					throw new Error(`Received block is invalid`);
+				}
 			}
 		} catch (error) {
 			this.peerDisposer.banPeer(job.peer, `Error processing downloaded blocks - ${error.message}}`);
