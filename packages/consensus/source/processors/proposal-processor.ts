@@ -4,10 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class ProposalProcessor extends AbstractProcessor {
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
-
+export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.IProposalProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
 
@@ -36,13 +33,10 @@ export class ProposalProcessor extends AbstractProcessor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async process(data: Buffer, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
-		const proposal = await this.#makeProposal(data);
-
-		if (!proposal) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
-
+	async process(
+		proposal: Contracts.Crypto.IProposal,
+		broadcast = true,
+	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidHeightOrRound(proposal)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
@@ -80,14 +74,6 @@ export class ProposalProcessor extends AbstractProcessor {
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
-	}
-
-	async #makeProposal(data: Buffer): Promise<Contracts.Crypto.IProposal | undefined> {
-		try {
-			return await this.factory.makeProposalFromBytes(data);
-		} catch {
-			return undefined;
-		}
 	}
 
 	#hasValidProposer(proposal: Contracts.Crypto.IProposal): boolean {

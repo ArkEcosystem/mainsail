@@ -102,3 +102,19 @@ export interface IProposerPicker extends ICommitHandler {
 export interface IProcessor {
 	process(data: Buffer, broadcast?: boolean): Promise<ProcessorResult>;
 }
+
+export interface IProposalProcessor {
+	process(proposal: IProposal, broadcast?: boolean): Promise<ProcessorResult>;
+}
+
+export interface IPrevoteProcessor {
+	process(prevote: IPrevote, broadcast?: boolean): Promise<ProcessorResult>;
+}
+
+export interface IPrecommitProcessor {
+	process(prevote: IPrecommit, broadcast?: boolean): Promise<ProcessorResult>;
+}
+
+export interface ICommittedBlockProcessor {
+	process(prevote: IPrecommit, broadcast?: boolean): Promise<ProcessorResult>;
+}

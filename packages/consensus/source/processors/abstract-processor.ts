@@ -2,14 +2,12 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export abstract class AbstractProcessor implements Contracts.Consensus.IProcessor {
+export class AbstractProcessor {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.CommitLock)
 	protected readonly commitLock!: Contracts.Kernel.ILock;
-
-	public abstract process(data: Buffer): Promise<Contracts.Consensus.ProcessorResult>;
 
 	protected hasValidHeightOrRound(message: { height: number; round: number }): boolean {
 		return message.height === this.getConsensus().getHeight() && message.round >= this.getConsensus().getRound();
