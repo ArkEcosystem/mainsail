@@ -19,8 +19,9 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
-
 		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(processor);
+		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.PeerDisposer).toConstantValue({});
 
 		context.controller = context.sandbox.app.resolve(PostPrevoteController);
 	});
