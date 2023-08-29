@@ -4,10 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class PrecommitProcessor extends AbstractProcessor {
-	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
-
+export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.IPrecommitProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
 
@@ -27,13 +24,10 @@ export class PrecommitProcessor extends AbstractProcessor {
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	async process(data: Buffer, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
-		const precommit = await this.#makePrecommit(data);
-
-		if (!precommit) {
-			return Contracts.Consensus.ProcessorResult.Invalid;
-		}
-
+	async process(
+		precommit: Contracts.Crypto.IPrecommit,
+		broadcast = true,
+	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidHeightOrRound(precommit)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
@@ -59,14 +53,6 @@ export class PrecommitProcessor extends AbstractProcessor {
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
-	}
-
-	async #makePrecommit(data: Buffer): Promise<Contracts.Crypto.IPrecommit | undefined> {
-		try {
-			return await this.factory.makePrecommitFromBytes(data);
-		} catch {
-			return undefined;
-		}
 	}
 
 	async #hasValidSignature(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
