@@ -182,16 +182,19 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 			}
 
-			// Check if received all the requested data
-			for (const index of job.prevoteIndexes) {
-				if (!prevotes.has(index)) {
-					throw new Error(`Missing prevote for validator ${index}`);
+			// ALlow response to be empty
+			if (prevotes.size > 0 || precommits.size > 0) {
+				// Check if received all the requested data
+				for (const index of job.prevoteIndexes) {
+					if (!prevotes.has(index)) {
+						throw new Error(`Missing prevote for validator ${index}`);
+					}
 				}
-			}
 
-			for (const index of job.precommitIndexes) {
-				if (!precommits.has(index)) {
-					throw new Error(`Missing precommit for validator ${index}`);
+				for (const index of job.precommitIndexes) {
+					if (!precommits.has(index)) {
+						throw new Error(`Missing precommit for validator ${index}`);
+					}
 				}
 			}
 		} catch (error_) {
