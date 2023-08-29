@@ -11,7 +11,7 @@ type DownloadsByHeight = {
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	height: number;
+	peerHeight: number;
 	prevoteIndexes: number[];
 	precommitIndexes: number[];
 };
@@ -95,8 +95,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const job: DownloadJob = {
-			height: peer.state.height,
 			peer,
+			peerHeight: peer.state.height,
 			precommitIndexes,
 			prevoteIndexes,
 		};
@@ -132,6 +132,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 			for (const prevoteBuffer of result.prevotes) {
 				const prevote = await this.factory.makePrevoteFromBytes(prevoteBuffer);
+
+				if (prevote.height !== job.peerHeight) {
+					throw new Error(
+						`Received prevote height ${prevote.height} does not match expected height ${job.peerHeight}`,
+					);
+				}
+
 				const response = await this.prevoteProcessor.process(prevote, false);
 
 				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
@@ -141,6 +148,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 			for (const precommitBuffer of result.precommits) {
 				const precommit = await this.factory.makePrecommitFromBytes(precommitBuffer);
+
+				if (precommit.height !== job.peerHeight) {
+					throw new Error(
+						`Received precommit height ${precommit.height} does not match expected height ${job.peerHeight}`,
+					);
+				}
+
 				const response = await this.precommitProcessor.process(precommit, false);
 
 				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
@@ -171,11 +185,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#removeDownloadJob(job: DownloadJob): void {
 		// Return if the height was already removed, because the block was applied.
-		if (!this.#downloadsByHeight.has(job.height)) {
+		if (!this.#downloadsByHeight.has(job.peerHeight)) {
 			return;
 		}
 
-		const downloadsByHeight = this.#downloadsByHeight.get(job.height)!;
+		const downloadsByHeight = this.#downloadsByHeight.get(job.peerHeight)!;
 
 		for (const index of job.prevoteIndexes) {
 			downloadsByHeight.prevotes[index] = false;
