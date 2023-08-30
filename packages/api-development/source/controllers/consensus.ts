@@ -39,16 +39,14 @@ export class ConsensusController extends Controller {
 
 			for (const message of messages) {
 				const validator = validators[message.validatorIndex];
-				if (message.blockId) {
-					const key = `b/${message.height}/${message.round}/${message.blockId}`;
-					if (!collected[key]) {
-						collected[key] = {};
-					}
-
-					const name = nameLookup.get(validator.getWalletPublicKey()!) ?? validator.getWalletPublicKey();
-					collected[key][name] = message.signature;
-					collected.absent.splice(collected.absent.indexOf(name), 1);
+				const key = `b/${message.height}/${message.round}/${message.blockId}`;
+				if (!collected[key]) {
+					collected[key] = {};
 				}
+
+				const name = nameLookup.get(validator.getWalletPublicKey()!) ?? validator.getWalletPublicKey();
+				collected[key][name] = message.signature;
+				collected.absent.splice(collected.absent.indexOf(name), 1);
 			}
 
 			return collected;
@@ -59,15 +57,17 @@ export class ConsensusController extends Controller {
 				height: state.height,
 				lockedRound: state.lockedRound,
 				lockedValue: state.lockedValue ? state.lockedValue.getProposal()?.block.block.header.id : null,
-				precommits: collectMessages(precommits),
-				prevotes: collectMessages(prevotes),
-				proposals: proposals.map((p) => ({
-					data: p.toData(),
-					lockProof: p.block.lockProof,
-					name:
-						nameLookup.get(validators[p.validatorIndex].getWalletPublicKey()!) ??
-						validators[p.validatorIndex].getWalletPublicKey(),
-				})),
+				precommits: collectMessages(precommits.sort((a, b) => b.round - a.round)),
+				prevotes: collectMessages(prevotes.sort((a, b) => b.round - a.round)),
+				proposals: proposals
+					.sort((a, b) => b.round - a.round)
+					.map((p) => ({
+						data: p.toData(),
+						lockProof: p.block.lockProof,
+						name:
+							nameLookup.get(validators[p.validatorIndex].getWalletPublicKey()!) ??
+							validators[p.validatorIndex].getWalletPublicKey(),
+					})),
 				round: state.round,
 				step: state.step,
 				validRound: state.validRound,
