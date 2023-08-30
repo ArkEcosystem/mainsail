@@ -146,8 +146,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	public getNetworkHeight(): number {
 		const medians = this.repository
 			.getPeers()
-			.filter((peer) => peer.state.height)
-			.map((peer) => peer.state.height)
+			.filter((peer) => peer.header.height)
+			.map((peer) => peer.header.height)
 			.sort((a, b) => {
 				Utils.assert.defined<string>(a);
 				Utils.assert.defined<string>(b);

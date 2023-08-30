@@ -11,7 +11,7 @@ type DownloadsByHeight = {
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	height: number;
+	peerHeader: Contracts.P2P.IHeaderData;
 	prevoteIndexes: number[];
 	precommitIndexes: number[];
 };
@@ -70,7 +70,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		let peers = this.repository.getPeers();
 
-		while ((peers = peers.filter((peer) => header.canDownloadMessages(peer.state))) && peers.length > 0) {
+		while ((peers = peers.filter((peer) => header.canDownloadMessages(peer.header))) && peers.length > 0) {
 			void this.download(getRandomPeer(peers));
 		}
 	}
@@ -81,11 +81,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const header = this.headerFactory();
-		if (!header.canDownloadMessages(peer.state)) {
+		if (!header.canDownloadMessages(peer.header)) {
 			return;
 		}
 
-		const downloads = this.#getDownloadsByHeight(peer.state.height);
+		const downloads = this.#getDownloadsByHeight(peer.header.height);
 
 		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes);
 		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits);
@@ -95,8 +95,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const job: DownloadJob = {
-			height: peer.state.height,
 			peer,
+			peerHeader: peer.header,
 			precommitIndexes,
 			prevoteIndexes,
 		};
@@ -130,16 +130,68 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		try {
 			const result = await this.communicator.getMessages(job.peer);
 
-			for (const prevoteBuffer of result.prevotes) {
-				// TODO: handle response
-				const prevote = await this.factory.makePrevoteFromBytes(prevoteBuffer);
-				await this.prevoteProcessor.process(prevote, false);
+			const prevotes: Map<number, Contracts.Crypto.IPrevote> = new Map();
+			for (const buffer of result.prevotes) {
+				const prevote = await this.factory.makePrevoteFromBytes(buffer);
+				prevotes.set(prevote.validatorIndex, prevote);
+
+				if (prevote.height !== job.peerHeader.height) {
+					throw new Error(
+						`Received prevote height ${prevote.height} does not match expected height ${job.peerHeader.height}`,
+					);
+				}
+
+				if (prevote.round !== job.peerHeader.round) {
+					throw new Error(
+						`Received prevote round ${prevote.round} does not match expected round ${job.peerHeader.round}`,
+					);
+				}
+
+				const response = await this.prevoteProcessor.process(prevote, false);
+
+				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+					throw new Error(`Received prevote is invalid`);
+				}
 			}
 
-			for (const precommitBuffer of result.precommits) {
-				// TODO: handle response
-				const precommit = await this.factory.makePrecommitFromBytes(precommitBuffer);
-				await this.precommitProcessor.process(precommit, false);
+			const precommits: Map<number, Contracts.Crypto.IPrecommit> = new Map();
+			for (const buffer of result.precommits) {
+				const precommit = await this.factory.makePrecommitFromBytes(buffer);
+				precommits.set(precommit.validatorIndex, precommit);
+
+				if (precommit.height !== job.peerHeader.height) {
+					throw new Error(
+						`Received precommit height ${precommit.height} does not match expected height ${job.peerHeader.height}`,
+					);
+				}
+
+				if (precommit.round !== job.peerHeader.round) {
+					throw new Error(
+						`Received precommit round ${precommit.round} does not match expected round ${job.peerHeader.round}`,
+					);
+				}
+
+				const response = await this.precommitProcessor.process(precommit, false);
+
+				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+					throw new Error(`Received precommit is invalid`);
+				}
+			}
+
+			// ALlow response to be empty
+			if (prevotes.size > 0 || precommits.size > 0) {
+				// Check if received all the requested data
+				for (const index of job.prevoteIndexes) {
+					if (!prevotes.has(index)) {
+						throw new Error(`Missing prevote for validator ${index}`);
+					}
+				}
+
+				for (const index of job.precommitIndexes) {
+					if (!precommits.has(index)) {
+						throw new Error(`Missing precommit for validator ${index}`);
+					}
+				}
 			}
 		} catch (error_) {
 			error = error_;
@@ -165,11 +217,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#removeDownloadJob(job: DownloadJob): void {
 		// Return if the height was already removed, because the block was applied.
-		if (!this.#downloadsByHeight.has(job.height)) {
+		if (!this.#downloadsByHeight.has(job.peerHeader.height)) {
 			return;
 		}
 
-		const downloadsByHeight = this.#downloadsByHeight.get(job.height)!;
+		const downloadsByHeight = this.#downloadsByHeight.get(job.peerHeader.height)!;
 
 		for (const index of job.prevoteIndexes) {
 			downloadsByHeight.prevotes[index] = false;
@@ -186,7 +238,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		for (const [index, prevote] of prevotes.entries()) {
 			if (
-				peer.state.validatorsSignedPrevote[index] &&
+				peer.header.validatorsSignedPrevote[index] &&
 				!prevote &&
 				!header.roundState.getValidatorsSignedPrevote()[index]
 			) {
@@ -203,7 +255,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		for (const [index, precommit] of precommits.entries()) {
 			if (
-				peer.state.validatorsSignedPrecommit[index] &&
+				peer.header.validatorsSignedPrecommit[index] &&
 				!precommit &&
 				!header.roundState.getValidatorsSignedPrecommit()[index]
 			) {

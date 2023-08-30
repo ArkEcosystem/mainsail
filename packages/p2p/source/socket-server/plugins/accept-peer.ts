@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { getPeerIp } from "../../utils/get-peer-ip";
+import { getPeerIp } from "../../utils";
 
 @injectable()
 export class AcceptPeerPlugin {

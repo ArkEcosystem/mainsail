@@ -21,7 +21,7 @@ export interface Peer {
 	version: string | undefined;
 	latency: number | undefined;
 
-	state: IHeaderData;
+	header: IHeaderData;
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;

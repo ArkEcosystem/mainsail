@@ -63,6 +63,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerHeaderService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerHeaderFactory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.PeerDisposer).toConstantValue({});
 
 		context.server = context.sandbox.app.resolve(ServerProxy);
 	});

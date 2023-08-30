@@ -120,9 +120,9 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 	}
 
 	#update(peer: Contracts.P2P.Peer): void {
-		Utils.assert.defined<number>(peer.state.height);
+		Utils.assert.defined<number>(peer.header.height);
 		Utils.assert.defined<number>(this.#nodeHeight);
-		if (peer.state.height > this.#nodeHeight) {
+		if (peer.header.height > this.#nodeHeight) {
 			this.#quorumDetails.peersNoQuorum++;
 			this.#quorumDetails.peersOverHeight++;
 		} else {

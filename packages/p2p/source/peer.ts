@@ -24,7 +24,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
 
-	#state: Contracts.P2P.IHeaderData | undefined;
+	#header: Contracts.P2P.IHeaderData | undefined;
 
 	#transactionsQueue!: Contracts.Kernel.Queue;
 
@@ -39,15 +39,15 @@ export class Peer implements Contracts.P2P.Peer {
 		return `${this.port % 443 === 0 ? "https://" : "http://"}${this.ip}:${this.port}`;
 	}
 
-	public get state(): Contracts.P2P.IHeaderData {
+	public get header(): Contracts.P2P.IHeaderData {
 		// State can be undefined when the peer is not yet verified.
-		Utils.assert.defined<Contracts.P2P.IHeaderData>(this.#state);
+		Utils.assert.defined<Contracts.P2P.IHeaderData>(this.#header);
 
-		return this.#state;
+		return this.#header;
 	}
 
-	public set state(state: Contracts.P2P.IHeaderData) {
-		this.#state = state;
+	public set header(header: Contracts.P2P.IHeaderData) {
+		this.#header = header;
 	}
 
 	public recentlyPinged(): boolean {

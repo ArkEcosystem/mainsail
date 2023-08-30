@@ -5,7 +5,7 @@ import { getRandomPeer } from "../utils";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	height: number;
+	peerHeader: Contracts.P2P.IHeaderData;
 };
 @injectable()
 export class ProposalDownloader implements Contracts.P2P.Downloader {
@@ -38,7 +38,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const header = this.headerFactory();
-		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.state));
+		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.header));
 
 		if (peers.length > 0) {
 			this.download(getRandomPeer(peers));
@@ -50,25 +50,24 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		if (this.#downloadingProposalByHeight.has(peer.state.height)) {
+		if (this.#downloadingProposalByHeight.has(peer.header.height)) {
 			return;
 		}
 
 		const header = this.headerFactory();
-		if (!header.canDownloadProposal(peer.state)) {
+		if (!header.canDownloadProposal(peer.header)) {
 			return;
 		}
 
-		this.#downloadingProposalByHeight.add(peer.state.height);
+		this.#downloadingProposalByHeight.add(peer.header.height);
 
-		void this.#downloadProposalFromPeer({ height: peer.state.height, peer });
+		void this.#downloadProposalFromPeer({ peer, peerHeader: peer.header });
 	}
 
 	public isDownloading(): boolean {
 		return this.#downloadingProposalByHeight.size > 0;
 	}
 
-	// TODO: Handle errors & response checks
 	async #downloadProposalFromPeer(job: DownloadJob): Promise<void> {
 		let error: Error | undefined;
 
@@ -80,14 +79,27 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			}
 
 			const proposal = await this.factory.makeProposalFromBytes(result.proposal);
+			if (proposal.height !== job.peerHeader.height) {
+				throw new Error(
+					`Received proposal height ${proposal.height} does not match expected height ${job.peerHeader.height}`,
+				);
+			}
 
-			// TODO: Handle response
-			await this.proposalProcessor.process(proposal, false);
+			if (proposal.round !== job.peerHeader.round) {
+				throw new Error(
+					`Received proposal round ${proposal.round} does not match expected round ${job.peerHeader.round}`,
+				);
+			}
+
+			const response = await this.proposalProcessor.process(proposal, false);
+			if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+				throw new Error(`Received proposal is invalid`);
+			}
 		} catch (error_) {
 			error = error_;
 		}
 
-		this.#downloadingProposalByHeight.delete(job.height);
+		this.#downloadingProposalByHeight.delete(job.peerHeader.height);
 
 		if (error) {
 			this.peerDisposer.banPeer(job.peer, `Error downloading or processing proposal - ${error.message}}`);
