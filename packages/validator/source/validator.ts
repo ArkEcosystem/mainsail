@@ -154,14 +154,16 @@ export class Validator implements Contracts.Validator.IValidator {
 		const previousBlock = await this.database.getLastBlock();
 		Utils.assert.defined<Contracts.Crypto.IBlock>(previousBlock);
 
+		const height = previousBlock.data.height + 1;
+
 		return this.blockFactory.make({
 			generatorPublicKey: this.#walletPublicKey,
-			height: previousBlock.data.height + 1,
+			height: height,
 			numberOfTransactions: transactions.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,
 			previousBlock: previousBlock.data.id,
-			reward: BigNumber.make(this.cryptoConfiguration.getMilestone().reward),
+			reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
 			timestamp: dayjs().valueOf(),
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
