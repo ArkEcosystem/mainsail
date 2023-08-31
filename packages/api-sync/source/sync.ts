@@ -28,9 +28,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const transactionRepository = makeTransactionRepository(entityManager);
 
 			await blockRepository.save({
+				blockSignature: commit.signature,
 				generatorPublicKey: header.generatorPublicKey,
 				height: header.height,
-				blockSignature: commit.signature,
 				id: header.id,
 				numberOfTransactions: header.numberOfTransactions,
 				payloadHash: header.payloadHash,
@@ -39,38 +39,42 @@ export class Sync implements Contracts.ApiSync.ISync {
 				reward: header.reward.toFixed(),
 				timestamp: header.timestamp,
 				totalAmount: header.totalAmount.toFixed(),
-				version: header.version,
 				totalFee: header.totalFee.toFixed(),
+				version: header.version,
 			});
 
 			await transactionRepository.save(
 				transactions.map(({ data }) => ({
-					blockHeight: header.height,
-					blockId: header.id,
-					id: data.id,
-					nonce: data.nonce.toFixed(),
-
 					amount: data.amount.toFixed(),
-					recipientId: data.recipientId,
 					// TODO: necessary?
 					// serialized: data.serialized,
 					asset: data.asset,
 
-					sequence: data.sequence,
+					blockHeight: header.height,
+
+					blockId: header.id,
 
 					fee: data.fee.toFixed(),
 
-					type: data.type,
+					id: data.id,
+
+					nonce: data.nonce.toFixed(),
+
+					recipientId: data.recipientId,
 
 					senderPublicKey: data.senderPublicKey,
 
-					version: data.version,
+					sequence: data.sequence,
 
 					timestamp: header.timestamp,
+
+					type: data.type,
 
 					typeGroup: data.typeGroup,
 
 					vendorField: data.vendorField,
+
+					version: data.version,
 				})),
 			);
 

@@ -2,25 +2,27 @@ export const defaults = {
 	database: {
 		applicationName: "mainsail/api-http",
 		database: process.env.CORE_DB_DATABASE || `${process.env.CORE_TOKEN}_${process.env.CORE_NETWORK_NAME}`,
-		entityPrefix: "public.",
-		host: process.env.CORE_DB_HOST || "localhost",
 		dropSchema: false,
-		password: process.env.CORE_DB_PASSWORD || "password",
-		// TODO
-		logger: "simple-console",
-
-		type: "postgres",
-
+		entityPrefix: "public.",
 		// TODO
 		extra: {
 			options: "-c statement_timeout=3000ms",
 		},
 
+		host: process.env.CORE_DB_HOST || "localhost",
+
+		// TODO
+		logger: "simple-console",
+
 		logging: true,
+
+		password: process.env.CORE_DB_PASSWORD || "password",
 
 		port: process.env.CORE_DB_PORT || 5432,
 
 		synchronize: false,
+
+		type: "postgres",
 		username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN,
 	},
 	options: {
