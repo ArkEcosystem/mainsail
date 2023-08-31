@@ -56,15 +56,21 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
-		await this.emit(peer, Routes.PostProposal, { proposal }, { timeout: 2000 });
+		try {
+			await this.emit(peer, Routes.PostProposal, { proposal }, { timeout: 2000 });
+		} catch {}
 	}
 
 	public async postPrevote(peer: Contracts.P2P.Peer, prevote: Buffer): Promise<void> {
-		await this.emit(peer, Routes.PostPrevote, { prevote }, { timeout: 2000 });
+		try {
+			await this.emit(peer, Routes.PostPrevote, { prevote }, { timeout: 2000 });
+		} catch {}
 	}
 
 	public async postPrecommit(peer: Contracts.P2P.Peer, precommit: Buffer): Promise<void> {
-		await this.emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 2000 });
+		try {
+			await this.emit(peer, Routes.PostPrecommit, { precommit }, { timeout: 2000 });
+		} catch {}
 	}
 
 	public async pingPorts(peer: Contracts.P2P.Peer): Promise<void> {
