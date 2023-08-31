@@ -1,5 +1,5 @@
-import { injectable } from "@mainsail/container";
 import { Models } from "@mainsail/api-database";
+import { injectable } from "@mainsail/container";
 
 import { Resource } from "../types";
 

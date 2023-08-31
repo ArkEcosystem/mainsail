@@ -87,7 +87,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 					});
 				}
 			}
-		} catch { }
+		} catch {}
 
 		if (!peerList || peerList.length === 0) {
 			// eslint-disable-next-line @typescript-eslint/no-floating-promises

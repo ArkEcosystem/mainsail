@@ -1,4 +1,28 @@
 export const defaults = {
+	database: {
+		applicationName: "mainsail/api-http",
+		database: process.env.CORE_DB_DATABASE || `${process.env.CORE_TOKEN}_${process.env.CORE_NETWORK_NAME}`,
+		entityPrefix: "public.",
+		host: process.env.CORE_DB_HOST || "localhost",
+		dropSchema: false,
+		password: process.env.CORE_DB_PASSWORD || "password",
+		// TODO
+		logger: "simple-console",
+
+		type: "postgres",
+
+		// TODO
+		extra: {
+			options: "-c statement_timeout=3000ms",
+		},
+
+		logging: true,
+
+		port: process.env.CORE_DB_PORT || 5432,
+
+		synchronize: false,
+		username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN,
+	},
 	options: {
 		estimateTotalCount: !process.env.CORE_API_NO_ESTIMATED_TOTAL_COUNT,
 	},
@@ -47,21 +71,4 @@ export const defaults = {
 			},
 		},
 	},
-	database: {
-		type: "postgres",
-		applicationName: "mainsail/api-http",
-		host: process.env.CORE_DB_HOST || "localhost",
-		port: process.env.CORE_DB_PORT || 5432,
-		database: process.env.CORE_DB_DATABASE || `${process.env.CORE_TOKEN}_${process.env.CORE_NETWORK_NAME}`,
-		username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN,
-		password: process.env.CORE_DB_PASSWORD || "password",
-		entityPrefix: "public.",
-		synchronize: false,
-		dropSchema: false,
-		logging: true, // TODO
-		logger: "simple-console", // TODO
-		extra: {
-			options: "-c statement_timeout=3000ms"
-		},
-	}
 };

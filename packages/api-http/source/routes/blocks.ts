@@ -88,5 +88,4 @@ export const register = (server: Hapi.Server): void => {
 	// 	},
 	// 	path: "/blocks/{id}",
 	// });
-
 };

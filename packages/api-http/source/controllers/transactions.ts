@@ -1,10 +1,10 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
 import { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import { inject, injectable } from "@mainsail/container";
 
+import { Identifiers as ApiIdentifiers } from "../identifiers";
 import { TransactionResource } from "../resources";
 import { Controller } from "./controller";
-import { Identifiers as ApiIdentifiers } from "../identifiers";
 
 @injectable()
 export class TransactionsController extends Controller {
@@ -14,13 +14,14 @@ export class TransactionsController extends Controller {
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [transactions, totalCount] = await this.transactionRepository.createQueryBuilder().
-			select().
-			orderBy("blockHeight", "DESC").
-			orderBy("sequence", "DESC").
-			offset(pagination.offset).
-			limit(pagination.limit).
-			getManyAndCount();
+		const [transactions, totalCount] = await this.transactionRepository
+			.createQueryBuilder()
+			.select()
+			.orderBy("blockHeight", "DESC")
+			.orderBy("sequence", "DESC")
+			.offset(pagination.offset)
+			.limit(pagination.limit)
+			.getManyAndCount();
 
 		return this.toPagination(
 			{
@@ -69,8 +70,6 @@ export class TransactionsController extends Controller {
 
 	// 	return this.respondWithResource(transaction.data, TransactionResource, false);
 	// }
-
-
 
 	// public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 	// 	const pagination: Pagination = super.getListingPage(request);

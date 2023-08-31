@@ -1,3 +1,3 @@
 export const Identifiers = {
-    Factory: Symbol.for("Database.Factory"),
-}
+	Factory: Symbol.for("Database.Factory"),
+};

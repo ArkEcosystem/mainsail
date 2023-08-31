@@ -1,5 +1,9 @@
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Repositories as ApiDatabaseRepositories,
+} from "@mainsail/api-database";
 import { Providers, Utils } from "@mainsail/kernel";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers, Repositories as ApiDatabaseRepositories } from "@mainsail/api-database";
 import Joi from "joi";
 
 import Handlers from "./handlers";
@@ -42,9 +46,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): object {
 		return Joi.object({
+			// TODO: schema
+			database: Joi.object().required(),
+
 			options: Joi.object({
 				estimateTotalCount: Joi.bool().required(),
 			}).required(),
+
 			plugins: Joi.object({
 				cache: Joi.object({
 					checkperiod: Joi.number().integer().min(0).required(),
@@ -68,6 +76,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				trustProxy: Joi.bool().required(),
 				whitelist: Joi.array().items(Joi.string()).required(),
 			}).required(),
+
 			server: Joi.object({
 				http: Joi.object({
 					enabled: Joi.bool().required(),
@@ -84,8 +93,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					}).required(),
 				}).required(),
 			}).required(),
-			// TODO: schema
-			database: Joi.object().required(),
 		}).unknown(true);
 	}
 
@@ -94,16 +101,17 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		Utils.assert.defined<ApiDatabaseContracts.PostgresConnectionOptions>(options);
 
 		try {
-			const dataSource = await this.app.get<ApiDatabaseContracts.DatabaseFactory>(ApiDatabaseIdentifiers.Factory).make(options);
+			const dataSource = await this.app
+				.get<ApiDatabaseContracts.DatabaseFactory>(ApiDatabaseIdentifiers.Factory)
+				.make(options);
 
 			this.app.bind(ApiIdentifiers.DataSource).toConstantValue(dataSource);
-			this.app.bind(ApiIdentifiers.BlockRepository).toConstantValue(
-				ApiDatabaseRepositories.makeBlockRepository(dataSource)
-			);
-			this.app.bind(ApiIdentifiers.TransactionRepository).toConstantValue(
-				ApiDatabaseRepositories.makeTransactionRepository(dataSource)
-			);
-
+			this.app
+				.bind(ApiIdentifiers.BlockRepository)
+				.toConstantValue(ApiDatabaseRepositories.makeBlockRepository(dataSource));
+			this.app
+				.bind(ApiIdentifiers.TransactionRepository)
+				.toConstantValue(ApiDatabaseRepositories.makeTransactionRepository(dataSource));
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);
 		}

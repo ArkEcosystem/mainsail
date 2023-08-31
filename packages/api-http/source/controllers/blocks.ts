@@ -1,10 +1,10 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable } from "@mainsail/container";
 import { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import { inject, injectable } from "@mainsail/container";
 
+import { Identifiers as ApiIdentifiers } from "../identifiers";
 import { BlockResource, TransactionResource } from "../resources";
 import { Controller } from "./controller";
-import { Identifiers as ApiIdentifiers } from "../identifiers";
 
 @injectable()
 export class BlocksController extends Controller {
@@ -17,12 +17,13 @@ export class BlocksController extends Controller {
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const blocks = await this.blockRepository.createQueryBuilder().
-			select().
-			orderBy("height", "DESC").
-			offset(pagination.offset).
-			limit(pagination.limit).
-			getMany();
+		const blocks = await this.blockRepository
+			.createQueryBuilder()
+			.select()
+			.orderBy("height", "DESC")
+			.offset(pagination.offset)
+			.limit(pagination.limit)
+			.getMany();
 
 		const totalCount = blocks[0]?.height ?? 0;
 
@@ -40,13 +41,14 @@ export class BlocksController extends Controller {
 	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [transactions, totalCount] = await this.transactionRepository.createQueryBuilder().
-			select().
-			where("block_id = :blockId", { blockId: request.params.id }).
-			orderBy("sequence", "ASC").
-			offset(pagination.offset).
-			limit(pagination.limit).
-			getManyAndCount();
+		const [transactions, totalCount] = await this.transactionRepository
+			.createQueryBuilder()
+			.select()
+			.where("block_id = :blockId", { blockId: request.params.id })
+			.orderBy("sequence", "ASC")
+			.offset(pagination.offset)
+			.limit(pagination.limit)
+			.getManyAndCount();
 
 		return this.toPagination(
 			{
@@ -92,7 +94,6 @@ export class BlocksController extends Controller {
 	// 		return this.respondWithResource(block.data, BlockResource, false);
 	// 	}
 	// }
-
 
 	// private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.IBlock | undefined> {
 	// 	let block: Contracts.Crypto.IBlock | undefined;
