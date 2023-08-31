@@ -88,7 +88,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const blockToCompare =
 			block.data.height === heightToRequest
 				? block
-				: await this.database.findBlockByHeights([heightToRequest])[0];
+				: (await this.database.findBlockByHeights([heightToRequest]))[0];
 
 		if (receivedCommittedBlock.block.data.height !== blockToCompare.data.height) {
 			throw new Error("Received block does not match the requested height");
