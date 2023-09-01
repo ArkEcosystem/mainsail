@@ -24,7 +24,8 @@ export class StateStore implements Contracts.State.StateStore {
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 
 	// The last committed round
-	#committedRound = 0;
+	// Use -1 for genesis block. First round value is 0.
+	#committedRound = -1;
 
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
