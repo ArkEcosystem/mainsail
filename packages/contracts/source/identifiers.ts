@@ -150,6 +150,7 @@ export const Identifiers = {
 	},
 	StateBuilder: Symbol.for("State<StateBuilder>"),
 	StateStore: Symbol.for("State<StateStore>"),
+	StateVerifier: Symbol.for("State<Verifier>"),
 	TransactionHandler: Symbol.for("TransactionHandler"),
 	TransactionHandlerConstructors: Symbol.for("TransactionHandlerConstructors"),
 	TransactionHandlerProvider: Symbol.for("Provider<TransactionHandler>"),
