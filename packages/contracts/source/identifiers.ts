@@ -1,4 +1,5 @@
 export const Identifiers = {
+	ApiSync: Symbol.for("ApiSync<Sync>"),
 	Application: Symbol.for("Application<Instance>"),
 	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
 	ApplicationEnvironment: Symbol.for("Application<Environment>"),

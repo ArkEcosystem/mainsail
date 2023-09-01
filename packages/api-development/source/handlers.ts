@@ -11,7 +11,7 @@ import * as Transactions from "./routes/transactions";
 import * as Wallets from "./routes/wallets";
 
 export = {
-	name: "Public API",
+	name: "Development API",
 	async register(server: Hapi.Server): Promise<void> {
 		const handlers = [Blockchain, Blocks, Consensus, Delegates, Node, Peers, Rounds, Transactions, Wallets];
 

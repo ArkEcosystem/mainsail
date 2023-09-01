@@ -66,8 +66,8 @@ export class Server {
 			await this.server.start();
 
 			this.logger.info(`${this.name} Server started at ${this.server.info.uri}`);
-		} catch {
-			await this.app.terminate(`Failed to start ${this.name} Server!`);
+		} catch (error) {
+			await this.app.terminate(`Failed to start ${this.name} Server!`, error);
 		}
 	}
 
@@ -76,8 +76,8 @@ export class Server {
 			await this.server.stop();
 
 			this.logger.info(`${this.name} Server stopped at ${this.server.info.uri}`);
-		} catch {
-			await this.app.terminate(`Failed to stop ${this.name} Server!`);
+		} catch (error) {
+			await this.app.terminate(`Failed to stop ${this.name} Server!`, error);
 		}
 	}
 
