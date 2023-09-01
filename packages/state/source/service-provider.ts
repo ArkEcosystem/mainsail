@@ -4,7 +4,6 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { BlockState } from "./block-state";
-import { DatabaseInteraction } from "./database-interactions";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { StateBuilder } from "./state-builder";
@@ -66,16 +65,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.TransactionValidatorFactory).toAutoFactory(Identifiers.TransactionValidator);
 
-		this.app.bind(Identifiers.DatabaseInteraction).to(DatabaseInteraction).inSingletonScope();
-
 		this.app.bind(Identifiers.StateBuilder).to(StateBuilder);
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
 		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
-	}
-
-	public async boot(): Promise<void> {
-		await this.app.get<DatabaseInteraction>(Identifiers.DatabaseInteraction).initialize();
 	}
 
 	public async bootWhen(serviceProvider?: string): Promise<boolean> {

@@ -94,8 +94,6 @@ export const Identifiers = {
 		Service: Symbol.for("Database<Service>"),
 		TransactionStorage: Symbol.for("Database<TransactionStorage>"),
 	},
-	// @deprecated
-	DatabaseInteraction: Symbol.for("Database<DatabaseInteraction>"),
 	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),
 	EventDispatcherService: Symbol.for("Service<EventDispatcher>"),
 	Fee: {
