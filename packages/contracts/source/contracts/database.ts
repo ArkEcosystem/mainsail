@@ -22,6 +22,4 @@ export interface IDatabaseService {
 	findBlocksByIds(ids: string[]): Promise<IBlockData[]>;
 
 	getForgedTransactionsIds(ids: string[]): Promise<string[]>;
-
-	verifyBlockchain(): Promise<boolean>;
 }
