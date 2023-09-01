@@ -24,6 +24,7 @@ export const Identifiers = {
 		Bootstrapper: Symbol.for("Bootstrapper<Consensus>"),
 		CommitLock: Symbol.for("CommitLock<Consensus>"),
 		CommittedBlockProcessor: Symbol.for("Consensus<CommittedBlock.Processor>"),
+		CommittedBlockStateFactory: Symbol.for("Consensus<CommittedBlockState.Factory>"),
 		PrecommitProcessor: Symbol.for("Consensus<Precommit.Processor>"),
 		PrevoteProcessor: Symbol.for("Consensus<Prevote.Processor>"),
 		ProposalProcessor: Symbol.for("Consensus<Proposal.Processor>"),

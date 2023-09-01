@@ -1,9 +1,11 @@
+import { interfaces } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { RootDatabase } from "lmdb";
 
 import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
+import { CommittedBlockState } from "./committed-block-state";
 import { Consensus } from "./consensus";
 import { CommittedBlockProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors";
 import { ProposerPicker } from "./proposer-picker";
@@ -22,6 +24,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.CommittedBlockProcessor).to(CommittedBlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
+
+		this.app
+			.bind(Identifiers.Consensus.CommittedBlockStateFactory)
+			.toFactory((context: interfaces.Context) => () => context.container.resolve(CommittedBlockState));
 
 		// Storage for uncommitted blocks
 		const consensusStorage = this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage);
