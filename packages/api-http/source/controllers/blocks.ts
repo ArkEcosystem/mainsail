@@ -1,8 +1,5 @@
 import Hapi from "@hapi/hapi";
-import {
-	Contracts as ApiDatabaseContracts,
-	Identifiers as ApiDatabaseIdentifiers,
-} from "@mainsail/api-database";
+import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { BlockResource, TransactionResource } from "../resources";

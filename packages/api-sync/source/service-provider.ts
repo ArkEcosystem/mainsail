@@ -8,8 +8,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.ApiSync).to(Sync).inSingletonScope();
 	}
 
-	public async boot(): Promise<void> { }
+	public async boot(): Promise<void> {}
 
-	public async dispose(): Promise<void> { }
-
+	public async dispose(): Promise<void> {}
 }

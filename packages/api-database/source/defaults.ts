@@ -1,28 +1,28 @@
 export const defaults = {
-    database: {
-        applicationName: "mainsail/api-http",
-        database: process.env.CORE_DB_DATABASE || `${process.env.CORE_TOKEN}_${process.env.CORE_NETWORK_NAME}`,
-        entityPrefix: "public.",
-        // TODO
-        extra: {
-            options: "-c statement_timeout=3000ms",
-        },
+	database: {
+		applicationName: "mainsail/api-http",
+		database: process.env.CORE_DB_DATABASE || `${process.env.CORE_TOKEN}_${process.env.CORE_NETWORK_NAME}`,
+		entityPrefix: "public.",
+		// TODO
+		extra: {
+			options: "-c statement_timeout=3000ms",
+		},
 
-        host: process.env.CORE_DB_HOST || "localhost",
+		host: process.env.CORE_DB_HOST || "localhost",
 
-        logger: "simple-console",
+		logger: "simple-console",
 
-        logging: process.env.CORE_DB_LOGGING_ENABLED || false,
+		logging: process.env.CORE_DB_LOGGING_ENABLED || false,
 
-        password: process.env.CORE_DB_PASSWORD || "password",
+		migrationsRun: process.env.CORE_DB_MIGRATIONS_RUN || true,
 
-        port: process.env.CORE_DB_PORT || 5432,
+		password: process.env.CORE_DB_PASSWORD || "password",
 
-        synchronize: process.env.CORE_DB_SYNCHRONIZE || false,
+		port: process.env.CORE_DB_PORT || 5432,
 
-        migrationsRun: process.env.CORE_DB_MIGRATIONS_RUN || true,
+		synchronize: process.env.CORE_DB_SYNCHRONIZE || false,
 
-        type: "postgres",
-        username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN,
-    },
-}
+		type: "postgres",
+		username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN,
+	},
+};

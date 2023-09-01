@@ -1,10 +1,11 @@
 import { Providers, Utils } from "@mainsail/kernel";
-import { Identifiers } from "./identifiers";
-import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { DataSource } from "typeorm";
+
+import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
+import { Identifiers } from "./identifiers";
 import { Block, Transaction } from "./models";
-import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 import { makeBlockRepository, makeTransactionRepository } from "./repositories";
+import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -38,11 +39,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			await dataSource.initialize();
 
 			// Temporary workaround to ensure entities are synchronized when running for the first time.
-			const [synchronized] = await dataSource.query("select exists(select 1 from migrations where name = 'synchronized' limit 1)");
+			const [synchronized] = await dataSource.query(
+				"select exists(select 1 from migrations where name = 'synchronized' limit 1)",
+			);
 			if (!synchronized.exists) {
 				await dataSource.synchronize(true);
 				await dataSource.runMigrations();
-				await dataSource.query("insert into migrations (timestamp, name) values (extract(epoch from now()), 'synchronized')")
+				await dataSource.query(
+					"insert into migrations (timestamp, name) values (extract(epoch from now()), 'synchronized')",
+				);
 			}
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
@@ -51,14 +56,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			// Bind factories to allow creating repositories in a transaction context
 
-			this.app.bind(Identifiers.BlockRepositoryFactory).toFactory(() => {
-				return (dataSource: RepositoryDataSource) => makeBlockRepository(dataSource)
-			});
+			this.app
+				.bind(Identifiers.BlockRepositoryFactory)
+				.toFactory(() => (dataSource: RepositoryDataSource) => makeBlockRepository(dataSource));
 
-			this.app.bind(Identifiers.TransactionRepositoryFactory).toFactory(() => {
-				return (dataSource: RepositoryDataSource) => makeTransactionRepository(dataSource)
-			});
-
+			this.app
+				.bind(Identifiers.TransactionRepositoryFactory)
+				.toFactory(() => (dataSource: RepositoryDataSource) => makeTransactionRepository(dataSource));
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);
 		}
