@@ -25,7 +25,7 @@ export class StateStore implements Contracts.State.StateStore {
 
 	// The last committed round
 	// Use -1 for genesis block. First round value is 0.
-	#committedRound = -1;
+	#committedRound = 0;
 
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
