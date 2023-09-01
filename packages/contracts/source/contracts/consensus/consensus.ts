@@ -30,6 +30,8 @@ export interface IRoundState extends IProcessableUnit {
 	logPrecommits(): void;
 }
 
+export type ICommittedBlockStateFactory = (committedBlock: ICommittedBlock) => IProcessableUnit;
+
 export interface IAggregator {
 	aggregate(signatures: Map<number, { signature: string }>): Promise<IAggregatedSignature>;
 	verify(signature: IAggregatedSignature, data: Buffer): Promise<boolean>;

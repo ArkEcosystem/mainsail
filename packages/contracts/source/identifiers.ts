@@ -24,6 +24,7 @@ export const Identifiers = {
 		Bootstrapper: Symbol.for("Bootstrapper<Consensus>"),
 		CommitLock: Symbol.for("CommitLock<Consensus>"),
 		CommittedBlockProcessor: Symbol.for("Consensus<CommittedBlock.Processor>"),
+		CommittedBlockStateFactory: Symbol.for("Consensus<CommittedBlockState.Factory>"),
 		PrecommitProcessor: Symbol.for("Consensus<Precommit.Processor>"),
 		PrevoteProcessor: Symbol.for("Consensus<Prevote.Processor>"),
 		ProposalProcessor: Symbol.for("Consensus<Proposal.Processor>"),
@@ -93,8 +94,6 @@ export const Identifiers = {
 		Service: Symbol.for("Database<Service>"),
 		TransactionStorage: Symbol.for("Database<TransactionStorage>"),
 	},
-	// @deprecated
-	DatabaseInteraction: Symbol.for("Database<DatabaseInteraction>"),
 	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),
 	EventDispatcherService: Symbol.for("Service<EventDispatcher>"),
 	Fee: {
@@ -149,8 +148,8 @@ export const Identifiers = {
 	State: {
 		ValidatorMutator: Symbol.for("State<ValidatorMutator>"),
 	},
-	StateBuilder: Symbol.for("State<StateBuilder>"),
 	StateStore: Symbol.for("State<StateStore>"),
+	StateVerifier: Symbol.for("State<Verifier>"),
 	TransactionHandler: Symbol.for("TransactionHandler"),
 	TransactionHandlerConstructors: Symbol.for("TransactionHandlerConstructors"),
 	TransactionHandlerProvider: Symbol.for("Provider<TransactionHandler>"),

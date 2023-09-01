@@ -24,7 +24,6 @@ import {
 } from "../../crypto-transaction";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
-import { StateBuilder } from "../source";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
 import { StateStore } from "../source/stores";
@@ -62,7 +61,6 @@ export interface Setup {
 	factory: Factories.FactoryBuilder;
 	blockState: BlockState;
 	stateStore: StateStore;
-	stateBuilder: StateBuilder;
 	transactionValidator: TransactionValidator;
 	spies: Spies;
 }
@@ -290,8 +288,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker);
 
-	const stateBuilder = sandbox.app.resolve<StateBuilder>(StateBuilder);
-
 	if (!skipBoot) {
 		try {
 			await sandbox.boot();
@@ -328,7 +324,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 			logger,
 			revertSpy,
 		},
-		stateBuilder,
 		stateStore,
 		transactionValidator,
 		walletRepo,

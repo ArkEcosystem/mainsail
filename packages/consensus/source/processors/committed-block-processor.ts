@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { CommittedBlockState } from "../committed-block-state";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
@@ -22,6 +21,9 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.IAggregator;
 
+	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
+	private readonly committedBlockStateFactory!: Contracts.Consensus.ICommittedBlockStateFactory;
+
 	async process(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.#hasValidHeight(committedBlock)) {
@@ -32,7 +34,7 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			const committedBlockState = this.app.resolve(CommittedBlockState).configure(committedBlock);
+			const committedBlockState = this.committedBlockStateFactory(committedBlock);
 
 			const result = await this.processor.process(committedBlockState);
 
