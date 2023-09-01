@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Bootstrapper {
@@ -43,6 +44,12 @@ export class Bootstrapper {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	@inject(Identifiers.BlockProcessor)
+	private readonly blockProcessor!: Contracts.BlockProcessor.Processor;
+
+	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
+	private readonly committedBlockStateFactory!: Contracts.Consensus.ICommittedBlockStateFactory;
+
 	public async bootstrap(): Promise<void> {
 		try {
 			await this.#setGenesisBlock();
@@ -50,6 +57,8 @@ export class Bootstrapper {
 			await this.#processGenesisBlock();
 
 			await this.#initState();
+
+			await this.#processBlocks();
 
 			this.stateVerifier.verifyWalletsConsistency();
 
@@ -98,6 +107,22 @@ export class Bootstrapper {
 	async #initState(): Promise<void> {
 		await this.validatorSet.initialize();
 		await this.proposerPicker.onCommit(this.stateStore.getGenesisBlock());
+	}
+
+	async #processBlocks(): Promise<void> {
+		const lastBlock = await this.databaseService.getLastBlock();
+		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(lastBlock);
+
+		for await (const committedBlock of this.databaseService.readCommittedBlocksByHeight(1, lastBlock.data.height)) {
+			const committedBlockState = await this.committedBlockStateFactory(committedBlock);
+			const result = await this.blockProcessor.process(committedBlockState);
+			if (result === false) {
+				// TODO: Handle block processing failure
+				this.logger.critical(`Cannot process block: ${committedBlock.block.data.height}`);
+				return;
+			}
+			await this.blockProcessor.commit(committedBlockState);
+		}
 	}
 
 	// TODO: Check legacy bootstrap
