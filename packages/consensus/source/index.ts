@@ -1,5 +1,5 @@
 import { interfaces } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { RootDatabase } from "lmdb";
 
@@ -27,7 +27,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.Consensus.CommittedBlockStateFactory)
-			.toFactory((context: interfaces.Context) => () => context.container.resolve(CommittedBlockState));
+			.toFactory(
+				(context: interfaces.Context) => (committedBlock: Contracts.Crypto.ICommittedBlock) =>
+					context.container.resolve(CommittedBlockState).configure(committedBlock),
+			);
 
 		// Storage for uncommitted blocks
 		const consensusStorage = this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage);
