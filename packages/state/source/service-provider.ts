@@ -6,7 +6,6 @@ import Joi from "joi";
 import { BlockState } from "./block-state";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
-import { StateBuilder } from "./state-builder";
 import { StateVerifier } from "./state-verifier";
 import { StateStore } from "./stores/state";
 import { TransactionValidator } from "./transaction-validator";
@@ -66,7 +65,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.TransactionValidatorFactory).toAutoFactory(Identifiers.TransactionValidator);
 
-		this.app.bind(Identifiers.StateBuilder).to(StateBuilder);
 		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);

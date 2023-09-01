@@ -148,7 +148,6 @@ export const Identifiers = {
 	State: {
 		ValidatorMutator: Symbol.for("State<ValidatorMutator>"),
 	},
-	StateBuilder: Symbol.for("State<StateBuilder>"),
 	StateStore: Symbol.for("State<StateStore>"),
 	StateVerifier: Symbol.for("State<Verifier>"),
 	TransactionHandler: Symbol.for("TransactionHandler"),
