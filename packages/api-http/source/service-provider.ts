@@ -1,9 +1,4 @@
-import {
-	Contracts as ApiDatabaseContracts,
-	Identifiers as ApiDatabaseIdentifiers,
-	Repositories as ApiDatabaseRepositories,
-} from "@mainsail/api-database";
-import { Providers, Utils } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import Handlers from "./handlers";
@@ -13,8 +8,6 @@ import { Server } from "./server";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		await this.configureDatabase();
-
 		if (this.config().get("server.http.enabled")) {
 			await this.buildServer("http", ApiIdentifiers.HTTP);
 		}
@@ -46,9 +39,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): object {
 		return Joi.object({
-			// TODO: schema
-			database: Joi.object().required(),
-
 			options: Joi.object({
 				estimateTotalCount: Joi.bool().required(),
 			}).required(),
@@ -94,27 +84,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				}).required(),
 			}).required(),
 		}).unknown(true);
-	}
-
-	private async configureDatabase(): Promise<void> {
-		const options = this.config().get<ApiDatabaseContracts.PostgresConnectionOptions>("database");
-		Utils.assert.defined<ApiDatabaseContracts.PostgresConnectionOptions>(options);
-
-		try {
-			const dataSource = await this.app
-				.get<ApiDatabaseContracts.DatabaseFactory>(ApiDatabaseIdentifiers.Factory)
-				.make(options);
-
-			this.app.bind(ApiIdentifiers.DataSource).toConstantValue(dataSource);
-			this.app
-				.bind(ApiIdentifiers.BlockRepository)
-				.toConstantValue(ApiDatabaseRepositories.makeBlockRepository(dataSource));
-			this.app
-				.bind(ApiIdentifiers.TransactionRepository)
-				.toConstantValue(ApiDatabaseRepositories.makeTransactionRepository(dataSource));
-		} catch (error) {
-			await this.app.terminate("Failed to configure database!", error);
-		}
 	}
 
 	private async buildServer(type: string, id: symbol): Promise<void> {

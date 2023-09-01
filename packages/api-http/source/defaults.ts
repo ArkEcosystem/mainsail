@@ -1,30 +1,4 @@
 export const defaults = {
-	database: {
-		applicationName: "mainsail/api-http",
-		database: process.env.CORE_DB_DATABASE || `${process.env.CORE_TOKEN}_${process.env.CORE_NETWORK_NAME}`,
-		dropSchema: false,
-		entityPrefix: "public.",
-		// TODO
-		extra: {
-			options: "-c statement_timeout=3000ms",
-		},
-
-		host: process.env.CORE_DB_HOST || "localhost",
-
-		// TODO
-		logger: "simple-console",
-
-		logging: true,
-
-		password: process.env.CORE_DB_PASSWORD || "password",
-
-		port: process.env.CORE_DB_PORT || 5432,
-
-		synchronize: false,
-
-		type: "postgres",
-		username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN,
-	},
 	options: {
 		estimateTotalCount: !process.env.CORE_API_NO_ESTIMATED_TOTAL_COUNT,
 	},
@@ -60,7 +34,7 @@ export const defaults = {
 		http: {
 			enabled: !process.env.CORE_API_DISABLED,
 			host: process.env.CORE_API_HOST || "0.0.0.0",
-			port: process.env.CORE_API_PORT || 4006, // TODO
+			port: process.env.CORE_API_PORT || 4003
 		},
 		// @see https://hapijs.com/api#-serveroptionstls
 		https: {

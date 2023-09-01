@@ -65,7 +65,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		await this.proposerPicker.onCommit(committedBlock);
 
 		if (this.apiSync) {
-			await this.apiSync.applyCommittedBlock(committedBlock);
+			await this.apiSync.onCommit(committedBlock);
 		}
 
 		const committedRound = this.state.getLastCommittedRound();

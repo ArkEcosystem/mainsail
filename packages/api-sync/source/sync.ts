@@ -1,21 +1,23 @@
-import { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
-import { Identifiers as ApiSyncIdentifiers } from "./identifiers";
-import { makeBlockRepository } from "./repositories";
-import { makeTransactionRepository } from "./repositories/transaction-repository";
-
 @injectable()
 export class Sync implements Contracts.ApiSync.ISync {
-	@inject(ApiSyncIdentifiers.DataSource)
+	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
+
+	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
+	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async applyCommittedBlock(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
+	public async onCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		const {
 			block: { header, transactions },
 			commit,
@@ -24,8 +26,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 		const t0 = performance.now();
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
-			const blockRepository = makeBlockRepository(entityManager);
-			const transactionRepository = makeTransactionRepository(entityManager);
+			const blockRepository = this.blockRepositoryFactory(entityManager);
+			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 
 			await blockRepository.save({
 				blockSignature: commit.signature,

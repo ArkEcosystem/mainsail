@@ -13,7 +13,7 @@ export class Controller {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "api-development")
+	@tagged("plugin", "api-http")
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
 	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {

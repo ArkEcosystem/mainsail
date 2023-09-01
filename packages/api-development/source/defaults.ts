@@ -34,13 +34,13 @@ export const defaults = {
 		http: {
 			enabled: !process.env.CORE_API_DEV_DISABLED,
 			host: process.env.CORE_API_DEV_HOST || "0.0.0.0",
-			port: process.env.CORE_API_DEV_PORT || 4003,
+			port: process.env.CORE_API_DEV_PORT || 4006,
 		},
 		// @see https://hapijs.com/api#-serveroptionstls
 		https: {
 			enabled: !!process.env.CORE_API_DEV_SSL,
 			host: process.env.CORE_API_DEV_SSL_HOST || "0.0.0.0",
-			port: process.env.CORE_API_DEV_SSL_PORT || 8443,
+			port: process.env.CORE_API_DEV_SSL_PORT || 8446,
 			tls: {
 				cert: process.env.CORE_API_DEV_SSL_CERT,
 				key: process.env.CORE_API_DEV_SSL_KEY,

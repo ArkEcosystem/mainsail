@@ -1,5 +1,3 @@
-import { ICommittedBlock } from "./crypto";
+import { ICommitHandler } from "./crypto";
 
-export interface ISync {
-	applyCommittedBlock(block: ICommittedBlock): Promise<void>;
-}
+export interface ISync extends ICommitHandler { }

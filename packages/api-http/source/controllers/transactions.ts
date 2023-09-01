@@ -1,14 +1,16 @@
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers as ApiIdentifiers } from "../identifiers";
 import { TransactionResource } from "../resources";
 import { Controller } from "./controller";
 
 @injectable()
 export class TransactionsController extends Controller {
-	@inject(ApiIdentifiers.TransactionRepository)
+	@inject(ApiDatabaseIdentifiers.TransactionRepository)
 	private readonly transactionRepository!: ApiDatabaseContracts.ITransactionRepository;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {

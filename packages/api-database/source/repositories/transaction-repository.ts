@@ -3,5 +3,5 @@ import { Transaction } from "../models";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): ITransactionRepository =>
 	dataSource.getRepository(Transaction).extend({
-		// Add any default extensions here
+		// Add any extensions here
 	});
