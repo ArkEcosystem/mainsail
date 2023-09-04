@@ -1,6 +1,10 @@
 import { IBlock, IBlockData, ICommittedBlock } from "../crypto";
 
 export interface StateStore {
+	isBootstrap(): boolean;
+
+	setBootstrap(value: boolean): void;
+
 	getGenesisBlock(): ICommittedBlock;
 
 	setGenesisBlock(block: ICommittedBlock): void;
