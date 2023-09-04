@@ -5,4 +5,7 @@ export const Identifiers = {
 
 	TransactionRepository: Symbol.for("API<TransactionRepository>"),
 	TransactionRepositoryFactory: Symbol.for("API<Factory.TransactionRepositoryFactory>"),
+
+	ValidatorRoundRepository: Symbol.for("API<ValidatorRoundRepository>"),
+	ValidatorRoundRepositoryFactory: Symbol.for("API<Factory.ValidatorRoundRepositoryFactory>"),
 };
