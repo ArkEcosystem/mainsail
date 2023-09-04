@@ -17,8 +17,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 
 		const height = committedBlock.block.data.height;
 		if (this.validatorIndexMatrix.length === 0 || height % activeValidators === 0) {
-			const roundHeight = height - (height % activeValidators) + 1;
-			this.#updateValidatorMatrix(activeValidators, roundHeight);
+			this.#updateValidatorMatrix(activeValidators);
 		}
 	}
 
@@ -30,8 +29,8 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 		return this.validatorIndexMatrix[offset % activeValidators];
 	}
 
-	#updateValidatorMatrix(activeValidators: number, height: number): void {
-		const seed = this.#calculateSeed(height);
+	#updateValidatorMatrix(activeValidators: number): void {
+		const seed = this.#calculateSeed();
 		const rng = seedrandom(seed);
 
 		const matrix = [...Array.from({ length: activeValidators }).keys()];
@@ -45,8 +44,8 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 		this.validatorIndexMatrix = matrix;
 	}
 
-	#calculateSeed(round: number): string {
-		const totalRound = this.#getTotalRound(round);
+	#calculateSeed(): string {
+		const totalRound = this.state.getLastCommittedRound();
 
 		// TODO: take block id into account
 
@@ -55,6 +54,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 
 	#getTotalRound(round: number): number {
 		const committedRound = this.state.getLastCommittedRound();
+
 		return committedRound + round;
 	}
 }

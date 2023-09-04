@@ -11,7 +11,7 @@ type Context = {
 	logger: any;
 };
 
-describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
+describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.state = {
 			getLastBlock: () => {},
@@ -43,13 +43,13 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 
 	// Calculated indexes seeded from height 1 for the first 51 validators
 	const expectedIndexesRound1 = [
-		17, 18, 16, 49, 20, 29, 11, 47, 6, 3, 37, 30, 27, 31, 4, 33, 7, 42, 10, 40, 43, 28, 45, 21, 8, 41, 2, 51, 46,
-		48, 38, 50, 32, 13, 15, 25, 36, 34, 23, 1, 52, 39, 5, 0, 19, 9, 35, 24, 26, 12, 44, 22, 14,
+		12, 30, 4, 39, 16, 7, 31, 52, 44, 47, 13, 46, 19, 29, 6, 28, 14, 17, 0, 3, 38, 25, 9, 20, 37, 40, 11, 33, 10,
+		43, 45, 50, 22, 5, 36, 8, 21, 26, 18, 23, 15, 48, 1, 49, 32, 51, 34, 35, 42, 24, 27, 2, 41,
 	];
 
 	const expectedIndexesRound2 = [
-		48, 18, 50, 47, 33, 39, 38, 22, 9, 43, 16, 0, 30, 12, 37, 34, 46, 44, 23, 27, 45, 3, 19, 40, 42, 31, 49, 7, 26,
-		17, 20, 51, 13, 21, 32, 28, 8, 4, 24, 14, 11, 6, 2, 1, 35, 25, 15, 10, 29, 41, 36, 52, 5,
+		16, 12, 2, 8, 17, 15, 41, 28, 38, 43, 7, 19, 51, 1, 9, 11, 22, 40, 18, 30, 3, 47, 46, 42, 27, 13, 35, 4, 29, 6,
+		5, 31, 50, 21, 44, 25, 32, 33, 20, 24, 48, 37, 23, 26, 49, 0, 10, 14, 39, 52, 36, 45, 34,
 	];
 
 	it("#validatorIndexMatrix - should return empty matrix", async ({ proposerPicker }) => {
@@ -81,7 +81,11 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 		}
 	});
 
-	it("#handleCommittedBlock - builds validator matrix based on round height", async ({ proposerPicker, sandbox }) => {
+	it("#handleCommittedBlock - builds validator matrix based on round height", async ({
+		proposerPicker,
+		sandbox,
+		state,
+	}) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
@@ -89,8 +93,12 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert }) => {
 		await proposerPicker.onCommit({ block: { data: { height: 5 } } });
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
+		const spyOnGetLastCommittedRound = stub(state, "getLastCommittedRound").returnValue(51);
+
 		await proposerPicker.onCommit({ block: { data: { height: activeValidators } } });
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
+
+		spyOnGetLastCommittedRound.calledOnce();
 	});
 
 	it("#handleCommittedBlock - should shuffle validator matrix on full round", async ({ proposerPicker, sandbox }) => {
