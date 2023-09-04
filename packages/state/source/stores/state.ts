@@ -23,12 +23,22 @@ export class StateStore implements Contracts.State.StateStore {
 
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 
+	#isBootstrap = true;
+
 	// The last committed round
 	#committedRound = 0;
 
 	// Stores the last n blocks in ascending height. The amount of last blocks
 	// can be configured with the option `state.maxLastBlocks`.
 	#lastBlocks: OrderedMap<number, Contracts.Crypto.IBlock> = OrderedMap<number, Contracts.Crypto.IBlock>();
+
+	public isBootstrap(): boolean {
+		return this.#isBootstrap;
+	}
+
+	public setBootstrap(value: boolean): void {
+		this.#isBootstrap = value;
+	}
 
 	public getGenesisBlock(): Contracts.Crypto.ICommittedBlock {
 		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(this.#genesisBlock);

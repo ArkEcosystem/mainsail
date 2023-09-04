@@ -59,10 +59,9 @@ export class Bootstrapper {
 			await this.#initState();
 
 			await this.#processBlocks();
+			this.stateStore.setBootstrap(false);
 
 			this.stateVerifier.verifyWalletsConsistency();
-
-			// await this.stateBuilder.run();
 
 			await this.transactionPool.readdTransactions();
 
