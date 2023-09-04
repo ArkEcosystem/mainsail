@@ -48,14 +48,6 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 				result.errors.push("Invalid block version");
 			}
 
-			// TODO: Fix
-			// if (
-			// 	blockData.timestamp >
-			// 	this.slots.getTime() + this.configuration.getMilestone(blockData.height).blockTime
-			// ) {
-			// 	result.errors.push("Invalid block timestamp");
-			// }
-
 			const size: number = this.serializer.totalSize(blockData);
 			if (size > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);

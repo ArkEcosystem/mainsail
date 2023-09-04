@@ -6,6 +6,7 @@ import {
 	ForgedTransactionsVerifier,
 	IncompatibleTransactionsVerifier,
 	NonceVerifier,
+	TimestampVerifier,
 	VerifyBlockVerifier,
 } from "./verifiers";
 
@@ -20,6 +21,10 @@ export class BlockVerifier implements Contracts.BlockProcessor.Verifier {
 		}
 
 		if (!(await this.app.resolve(VerifyBlockVerifier).execute(unit))) {
+			return false;
+		}
+
+		if (!(await this.app.resolve(TimestampVerifier).execute(unit))) {
 			return false;
 		}
 
