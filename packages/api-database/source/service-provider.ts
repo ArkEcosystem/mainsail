@@ -4,10 +4,10 @@ import { DataSource } from "typeorm";
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
 import { Block, Transaction } from "./models";
-import { makeBlockRepository, makeTransactionRepository } from "./repositories";
-import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 import { ValidatorRound } from "./models/validator-round";
+import { makeBlockRepository, makeTransactionRepository } from "./repositories";
 import { makeValidatorRoundRepository } from "./repositories/validator-round-repository";
+import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -55,7 +55,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.BlockRepository).toConstantValue(makeBlockRepository(dataSource));
 			this.app.bind(Identifiers.TransactionRepository).toConstantValue(makeTransactionRepository(dataSource));
-			this.app.bind(Identifiers.ValidatorRoundRepository).toConstantValue(makeValidatorRoundRepository(dataSource));
+			this.app
+				.bind(Identifiers.ValidatorRoundRepository)
+				.toConstantValue(makeValidatorRoundRepository(dataSource));
 
 			// Bind factories to allow creating repositories in a transaction context
 
@@ -70,7 +72,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app
 				.bind(Identifiers.ValidatorRoundRepositoryFactory)
 				.toFactory(() => (dataSource: RepositoryDataSource) => makeValidatorRoundRepository(dataSource));
-
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);
 		}

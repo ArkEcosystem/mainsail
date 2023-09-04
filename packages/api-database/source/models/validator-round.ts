@@ -5,14 +5,14 @@ import { Column, Entity } from "typeorm";
 })
 export class ValidatorRound {
 	@Column({
-		type: "bigint",
 		primary: true,
+		type: "bigint",
 	})
 	public readonly height!: number;
 
 	@Column({
-		type: "int",
 		primary: true,
+		type: "int",
 	})
 	public readonly round!: number;
 
