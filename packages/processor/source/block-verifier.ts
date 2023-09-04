@@ -6,6 +6,7 @@ import {
 	ForgedTransactionsVerifier,
 	IncompatibleTransactionsVerifier,
 	NonceVerifier,
+	TimestampVerifier,
 	VerifyBlockVerifier,
 } from "./verifiers";
 
@@ -15,20 +16,23 @@ export class BlockVerifier implements Contracts.BlockProcessor.Verifier {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public async verify(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+		if (!(await this.app.resolve(ChainedVerifier).execute(unit))) {
+			return false;
+		}
+
 		if (!(await this.app.resolve(VerifyBlockVerifier).execute(unit))) {
 			return false;
 		}
 
-		// TODO: might not be needed
+		if (!(await this.app.resolve(TimestampVerifier).execute(unit))) {
+			return false;
+		}
+
 		if (!(await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit))) {
 			return false;
 		}
 
 		if (!(await this.app.resolve(NonceVerifier).execute(unit))) {
-			return false;
-		}
-
-		if (!(await this.app.resolve(ChainedVerifier).execute(unit))) {
 			return false;
 		}
 
