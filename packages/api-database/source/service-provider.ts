@@ -3,9 +3,8 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, Transaction } from "./models";
-import { ValidatorRound } from "./models/validator-round";
-import { makeBlockRepository, makeTransactionRepository } from "./repositories";
+import { Block, Transaction, ValidatorRound, Wallet } from "./models";
+import { makeBlockRepository, makeTransactionRepository, makeWalletRepository } from "./repositories";
 import { makeValidatorRoundRepository } from "./repositories/validator-round-repository";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 
@@ -34,7 +33,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const dataSource = new DataSource({
 				...options,
 				// TODO: allow entities to be extended by plugins
-				entities: [Block, Transaction, ValidatorRound],
+				entities: [Block, Transaction, ValidatorRound, Wallet],
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 
@@ -58,6 +57,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app
 				.bind(Identifiers.ValidatorRoundRepository)
 				.toConstantValue(makeValidatorRoundRepository(dataSource));
+			this.app.bind(Identifiers.WalletRepository).toConstantValue(makeWalletRepository(dataSource));
 
 			// Bind factories to allow creating repositories in a transaction context
 
@@ -72,6 +72,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app
 				.bind(Identifiers.ValidatorRoundRepositoryFactory)
 				.toFactory(() => (dataSource: RepositoryDataSource) => makeValidatorRoundRepository(dataSource));
+
+			this.app
+				.bind(Identifiers.WalletRepositoryFactory)
+				.toFactory(() => (dataSource: RepositoryDataSource) => makeWalletRepository(dataSource));
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);
 		}

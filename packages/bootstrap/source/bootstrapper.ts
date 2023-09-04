@@ -105,7 +105,9 @@ export class Bootstrapper {
 
 	async #initState(): Promise<void> {
 		await this.validatorSet.initialize();
-		await this.proposerPicker.onCommit(this.stateStore.getGenesisBlock());
+
+		const committedBlockState = this.committedBlockStateFactory(this.stateStore.getGenesisBlock());
+		await this.proposerPicker.onCommit(committedBlockState);
 	}
 
 	async #processBlocks(): Promise<void> {
@@ -113,7 +115,7 @@ export class Bootstrapper {
 		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(lastBlock);
 
 		for await (const committedBlock of this.databaseService.readCommittedBlocksByHeight(1, lastBlock.data.height)) {
-			const committedBlockState = await this.committedBlockStateFactory(committedBlock);
+			const committedBlockState = this.committedBlockStateFactory(committedBlock);
 			const result = await this.blockProcessor.process(committedBlockState);
 			if (result === false) {
 				// TODO: Handle block processing failure

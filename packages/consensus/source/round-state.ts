@@ -39,6 +39,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#validatorsSignedPrecommit: boolean[] = [];
 	#proposer!: Contracts.State.IValidatorWallet;
 
+	#committedBlock: Contracts.Crypto.ICommittedBlock | undefined;
+
 	get height(): number {
 		return this.#height;
 	}
@@ -113,30 +115,34 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
-		const majority = await this.aggregatePrecommits();
+		if (!this.#committedBlock) {
+			const majority = await this.aggregatePrecommits();
 
-		const proposal = this.getProposal();
-		Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
+			const proposal = this.getProposal();
+			Utils.assert.defined<Contracts.Crypto.IProposal>(proposal);
 
-		const {
-			round,
-			block: { block },
-		} = proposal;
-
-		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
-			block,
-			commit: {
+			const {
 				round,
-				...majority,
-			},
-		};
+				block: { block },
+			} = proposal;
 
-		const serialized = await this.blockSerializer.serializeFull(commitBlock);
+			const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
+				block,
+				commit: {
+					round,
+					...majority,
+				},
+			};
 
-		return {
-			...commitBlock,
-			serialized: serialized.toString("hex"),
-		};
+			const serialized = await this.blockSerializer.serializeFull(commitBlock);
+
+			this.#committedBlock = {
+				...commitBlock,
+				serialized: serialized.toString("hex"),
+			};
+		}
+
+		return this.#committedBlock;
 	}
 
 	public setProcessorResult(processorResult: boolean): void {

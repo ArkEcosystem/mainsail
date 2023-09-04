@@ -69,11 +69,11 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		this.state.setLastBlock(committedBlock.block);
 
-		await this.validatorSet.onCommit(committedBlock);
-		await this.proposerPicker.onCommit(committedBlock);
+		await this.validatorSet.onCommit(unit);
+		await this.proposerPicker.onCommit(unit);
 
 		if (this.apiSync) {
-			await this.apiSync.onCommit(committedBlock);
+			await this.apiSync.onCommit(unit);
 		}
 
 		this.logger.info(

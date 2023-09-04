@@ -3,6 +3,7 @@ import { BigNumber } from "@mainsail/utils";
 import { Mutable } from "../../utils";
 import { IAggregatedSignature } from "./signatures";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
+import { IProcessableUnit } from "../block-processor";
 
 export interface IBlockVerification {
 	readonly verified: boolean;
@@ -162,5 +163,5 @@ export interface IBlockVerifier {
 }
 
 export interface ICommitHandler {
-	onCommit(committedBlock: ICommittedBlock): Promise<void>;
+	onCommit(unit: IProcessableUnit): Promise<void>;
 }
