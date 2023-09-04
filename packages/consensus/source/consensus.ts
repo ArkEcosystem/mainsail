@@ -468,16 +468,26 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	async #bootstrap(): Promise<void> {
-		// TODO: handle outdated state (e.g. last block height != stored height)
-
 		const state = await this.bootstrapper.run();
-		if (state) {
+
+		if (state && state.height === this.state.getLastBlock().data.height + 1) {
 			this.#step = state.step;
 			this.#height = state.height;
 			this.#round = state.round;
 			this.#lockedValue = state.lockedValue;
 			this.#validValue = state.validValue;
 		} else {
+			if (state) {
+				this.logger.warning(
+					`Skipping state restore, because stored height is ${state.height}, but should be ${
+						this.state.getLastBlock().data.height + 1
+					}`,
+				);
+
+				await this.storage.clear();
+				this.roundStateRepository.clear();
+			}
+
 			const lastBlock = this.state.getLastBlock();
 			this.#height = lastBlock.data.height + 1;
 		}
