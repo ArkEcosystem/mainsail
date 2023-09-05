@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import seedrandom from "seedrandom";
 
 @injectable()
@@ -13,10 +14,12 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	private validatorIndexMatrix: Array<number> = [];
 
 	public async onCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
-		const { activeValidators } = this.configuration.getMilestone();
-
-		const height = committedBlock.block.data.height;
-		if (this.validatorIndexMatrix.length === 0 || height % activeValidators === 0) {
+		const { height } = committedBlock.block.data;
+		if (
+			this.validatorIndexMatrix.length === 0 ||
+			Utils.roundCalculator.isNewRound(height + 1, this.configuration)
+		) {
+			const { activeValidators } = this.configuration.getMilestone();
 			this.#updateValidatorMatrix(activeValidators);
 		}
 	}

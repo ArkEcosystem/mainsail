@@ -23,11 +23,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	}
 
 	public async onCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
-		const { activeValidators } = this.cryptoConfiguration.getMilestone();
-
-		// Update ranking every `activeValidators` blocks.
-		const height = committedBlock.block.data.height;
-		if (height % activeValidators === 0) {
+		const { height } = committedBlock.block.data;
+		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
 			this.buildValidatorRanking();
 		}
 	}

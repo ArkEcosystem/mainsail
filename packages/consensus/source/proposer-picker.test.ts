@@ -31,11 +31,16 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 		context.sandbox.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(context.proposerPicker);
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 
-		const config = {
-			getMilestone: () => ({
-				activeValidators: 53,
-			}),
+		const milestone = {
+			height: 0,
+			activeValidators: 53,
 		};
+
+		const config = {
+			getMilestone: () => milestone,
+			get: () => [milestone],
+		};
+
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 
 		context.proposerPicker = context.sandbox.app.resolve(ProposerPicker);
