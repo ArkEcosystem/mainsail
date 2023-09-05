@@ -167,7 +167,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		this.nextUpdateNetworkStatusScheduled = false;
 
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.updateNetworkStatus();
+		void this.updateNetworkStatus();
 	}
 }

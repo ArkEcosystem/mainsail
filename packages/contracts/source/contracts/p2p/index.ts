@@ -15,3 +15,4 @@ export * from "./peer-processor";
 export * from "./peer-repository";
 export * from "./peer-verifier";
 export * from "./server";
+export * from "./state";
