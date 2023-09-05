@@ -16,8 +16,7 @@ export class ValidatorRoundsController extends Controller {
 		const [validatorRounds, totalCount] = await this.validatorRoundepository
 			.createQueryBuilder()
 			.select()
-			.addOrderBy("height", "DESC")
-			.addOrderBy("round", "ASC")
+			.addOrderBy("round", "DESC")
 			.offset(pagination.offset)
 			.limit(pagination.limit)
 			.getManyAndCount();
