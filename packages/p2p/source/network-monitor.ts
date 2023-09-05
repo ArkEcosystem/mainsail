@@ -3,8 +3,6 @@ import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
-import { NetworkState } from "./network-state";
-
 // @TODO review the implementation
 @injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
@@ -156,12 +154,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			});
 
 		return medians[Math.floor(medians.length / 2)] || 0;
-	}
-
-	public async getNetworkState(): Promise<Contracts.P2P.NetworkState> {
-		// await this.cleansePeers({ fast: true, forcePing: true });
-
-		return await NetworkState.analyze(this, this.repository);
 	}
 
 	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {

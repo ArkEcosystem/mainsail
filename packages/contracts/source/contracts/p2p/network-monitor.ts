@@ -1,5 +1,3 @@
-import { NetworkState } from "./network-state";
-
 export interface IRateLimitStatus {
 	blocked: boolean;
 	exceededLimitOnEndpoint: boolean;
@@ -18,5 +16,4 @@ export interface NetworkMonitor {
 		peerCount?: number;
 	}): Promise<void>;
 	getNetworkHeight(): number;
-	getNetworkState(): Promise<NetworkState>;
 }
