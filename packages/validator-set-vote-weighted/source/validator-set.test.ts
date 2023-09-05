@@ -30,7 +30,7 @@ describe<{
 
 		context.cryptoConfiguration = {
 			getMilestone: () => milestone,
-			get: () => [milestone]
+			get: () => [milestone],
 		};
 
 		context.sandbox = new Sandbox();

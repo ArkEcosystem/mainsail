@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => { },
+			getLastBlock: () => {},
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		context.sandbox = new Sandbox();
@@ -38,7 +38,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		const config = {
 			getMilestone: () => milestone,
-			get: () => [milestone]
+			get: () => [milestone],
 		};
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
