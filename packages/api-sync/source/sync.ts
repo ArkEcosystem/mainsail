@@ -77,11 +77,16 @@ export class Sync implements Contracts.ApiSync.ISync {
 			);
 
 			const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
-			await validatorRoundRepository.upsert({
-				round,
-				roundHeight,
-				validators: this.validatorSet.getActiveValidators().map(validator => validator.getWalletPublicKey()),
-			}, ["round"]);
+			await validatorRoundRepository.upsert(
+				{
+					round,
+					roundHeight,
+					validators: this.validatorSet
+						.getActiveValidators()
+						.map((validator) => validator.getWalletPublicKey()),
+				},
+				["round"],
+			);
 		});
 
 		const t1 = performance.now();
