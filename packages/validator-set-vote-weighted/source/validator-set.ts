@@ -24,8 +24,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 
 	public async onCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		const { height } = committedBlock.block.data;
-		if (Utils.roundCalculator.isNewRound(height, this.cryptoConfiguration)) {
-			console.log("Utils.roundCalculator.isNewRound", height);
+		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
 			this.buildValidatorRanking();
 		}
 	}

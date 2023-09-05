@@ -124,7 +124,7 @@ describe<{
 		await validatorSet.onCommit({ block: { data: { height: 0 } } });
 		assert.true(buildValidatorRankingSpy.calledOnce);
 
-		let currentHeight = 1;
+		let currentHeight = 0;
 		for (let index = 0; index < activeValidators; index++) {
 			await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 
@@ -135,7 +135,7 @@ describe<{
 		}
 
 		// The ranking now got updated thrice
-		assert.equal(currentHeight, 6);
+		assert.equal(currentHeight, 5);
 		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 		assert.equal(buildValidatorRankingSpy.callCount, 3);
 		currentHeight++;
@@ -150,7 +150,7 @@ describe<{
 		}
 
 		// Called again after another round
-		assert.equal(currentHeight, 11);
+		assert.equal(currentHeight, 10);
 		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});

@@ -15,7 +15,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 
 	public async onCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		const { height } = committedBlock.block.data;
-		if (this.validatorIndexMatrix.length === 0 || Utils.roundCalculator.isNewRound(height, this.configuration)) {
+		if (this.validatorIndexMatrix.length === 0 || Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
 			const { activeValidators } = this.configuration.getMilestone();
 			this.#updateValidatorMatrix(activeValidators);
 		}

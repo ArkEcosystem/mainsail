@@ -100,7 +100,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		const spyOnGetLastCommittedRound = stub(state, "getLastCommittedRound").returnValue(51);
 
-		await proposerPicker.onCommit({ block: { data: { height: activeValidators + 1 } } });
+		await proposerPicker.onCommit({ block: { data: { height: activeValidators } } });
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
 
 		spyOnGetLastCommittedRound.calledOnce();
