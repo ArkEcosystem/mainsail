@@ -1,5 +1,5 @@
 import { injectable, Selectors } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
 import { spy } from "sinon";
 
@@ -20,13 +20,17 @@ describe<{
 	cryptoConfiguration: any;
 }>("ValidatorSet", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
+		const milestone = {
+			height: 0,
+			activeValidators: 5,
+			address: {
+				base58: 23,
+			},
+		};
+
 		context.cryptoConfiguration = {
-			getMilestone: () => ({
-				activeValidators: 5,
-				address: {
-					base58: 23,
-				},
-			}),
+			getMilestone: () => milestone,
+			get: () => [milestone]
 		};
 
 		context.sandbox = new Sandbox();
@@ -117,24 +121,23 @@ describe<{
 
 		const { activeValidators } = cryptoConfiguration.getMilestone();
 
-		await validatorSet.onCommit({ block: { data: { height: 1 } } });
+		await validatorSet.onCommit({ block: { data: { height: 0 } } });
+		assert.true(buildValidatorRankingSpy.calledOnce);
 
-		assert.true(buildValidatorRankingSpy.notCalled);
-
-		let currentHeight = 0;
+		let currentHeight = 1;
 		for (let index = 0; index < activeValidators; index++) {
 			await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 
-			// Genesis block (= height 0) builds the ranking too
-			assert.equal(buildValidatorRankingSpy.callCount, 1);
+			// Genesis block (= height 0) and the first block thereafter rebuild the ranking
+			assert.equal(buildValidatorRankingSpy.callCount, 2);
 
 			currentHeight++;
 		}
 
-		// The ranking got updated twice, once for the genesis block and again after `activeDelegators` blocks
-		assert.equal(currentHeight, 5);
+		// The ranking now got updated thrice
+		assert.equal(currentHeight, 6);
 		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
-		assert.equal(buildValidatorRankingSpy.callCount, 2);
+		assert.equal(buildValidatorRankingSpy.callCount, 3);
 		currentHeight++;
 
 		buildValidatorRankingSpy.resetHistory();
@@ -147,7 +150,7 @@ describe<{
 		}
 
 		// Called again after another round
-		assert.equal(currentHeight, 10);
+		assert.equal(currentHeight, 11);
 		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});

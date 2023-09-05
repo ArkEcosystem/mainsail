@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => {},
+			getLastBlock: () => { },
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => {},
+			getActiveValidators: () => { },
 		};
 
 		context.logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -31,11 +31,16 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 		context.sandbox.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(context.proposerPicker);
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 
-		const config = {
-			getMilestone: () => ({
-				activeValidators: 53,
-			}),
+		const milestone = {
+			height: 0,
+			activeValidators: 53,
 		};
+
+		const config = {
+			getMilestone: () => milestone,
+			get: () => [milestone]
+		};
+
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 
 		context.proposerPicker = context.sandbox.app.resolve(ProposerPicker);
@@ -95,7 +100,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		const spyOnGetLastCommittedRound = stub(state, "getLastCommittedRound").returnValue(51);
 
-		await proposerPicker.onCommit({ block: { data: { height: activeValidators } } });
+		await proposerPicker.onCommit({ block: { data: { height: activeValidators + 1 } } });
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
 
 		spyOnGetLastCommittedRound.calledOnce();

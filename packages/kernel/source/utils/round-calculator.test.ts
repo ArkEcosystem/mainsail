@@ -178,6 +178,7 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 	beforeEach(setup);
 
 	it("should determine the beginning of a new round", ({ configuration }) => {
+		assert.true(isNewRound(0, configuration));
 		assert.true(isNewRound(1, configuration));
 		assert.false(isNewRound(2, configuration));
 		assert.false(isNewRound(52, configuration));
@@ -190,6 +191,7 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 
 	it("should be ok when changing delegate count", ({ configuration }) => {
 		const milestones = [
+			{ activeValidators: 1, height: 0 }, // R0
 			{ activeValidators: 2, height: 1 }, // R1
 			{ activeValidators: 3, height: 3 }, // R2
 			{ activeValidators: 1, height: 6 }, // R3
@@ -198,6 +200,9 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 		];
 
 		configuration.set("milestones", milestones);
+
+		// 1 Delegate
+		assert.true(isNewRound(0, configuration));
 
 		// 2 Delegates
 		assert.true(isNewRound(1, configuration));
@@ -214,7 +219,7 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 		assert.true(isNewRound(8, configuration));
 		assert.true(isNewRound(9, configuration));
 
-		// 51 Delegates
+		// 53 Delegates
 		assert.true(isNewRound(10, configuration));
 		assert.false(isNewRound(11, configuration));
 		assert.true(isNewRound(63, configuration));
