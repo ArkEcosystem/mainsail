@@ -30,6 +30,9 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Consensus.ProposalProcessor)
 	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
 
+	@inject(Identifiers.P2PState)
+	private readonly state!: Contracts.P2P.State;
+
 	#downloadingProposalByHeight = new Set<number>();
 
 	public tryToDownload(): void {
@@ -95,6 +98,8 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			if (response === Contracts.Consensus.ProcessorResult.Invalid) {
 				throw new Error(`Received proposal is invalid`);
 			}
+
+			this.state.updateLastMessage();
 		} catch (error_) {
 			error = error_;
 		}

@@ -49,7 +49,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	private readonly stateStore!: Contracts.State.StateStore;
+
+	@inject(Identifiers.P2PState)
+	private readonly state!: Contracts.P2P.State;
 
 	#downloadsByHeight = new Map<number, DownloadsByHeight>();
 
@@ -57,7 +60,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	public initialize(): void {
 		this.events.listen(Enums.BlockEvent.Applied, {
 			handle: () => {
-				this.#downloadsByHeight.delete(this.state.getLastHeight());
+				this.#downloadsByHeight.delete(this.stateStore.getLastHeight());
 			},
 		});
 	}
@@ -180,6 +183,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 			// ALlow response to be empty
 			if (prevotes.size > 0 || precommits.size > 0) {
+				this.state.updateLastMessage();
+
 				// Check if received all the requested data
 				for (const index of job.prevoteIndexes) {
 					if (!prevotes.has(index)) {
