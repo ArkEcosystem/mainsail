@@ -10,6 +10,9 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.P2PState)
+	private readonly state!: Contracts.P2P.State;
+
 	@inject(Identifiers.PeerDiscoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
@@ -77,6 +80,14 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			nextRunDelaySeconds = 60;
 
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
+		}
+
+		if (this.state.shouldCleansePeers()) {
+			await this.cleansePeers({
+				fast: true,
+				forcePing: true,
+				peerCount: this.repository.getPeers().length,
+			});
 		}
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
