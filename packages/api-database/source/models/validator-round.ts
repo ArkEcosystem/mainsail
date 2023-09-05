@@ -8,17 +8,17 @@ export class ValidatorRound {
 		primary: true,
 		type: "bigint",
 	})
-	public readonly height!: number;
-
-	@Column({
-		primary: true,
-		type: "int",
-	})
 	public readonly round!: number;
 
 	@Column({
-		nullable: false,
-		type: "jsonb", // TODO: bitpack to save bytes (see serializer for validatorSet)
+		unique: true,
+		type: "bigint",
 	})
-	public readonly validators!: boolean[];
+	public readonly roundHeight!: number;
+
+	@Column({
+		nullable: false,
+		type: "jsonb",
+	})
+	public readonly validators!: string[];
 }

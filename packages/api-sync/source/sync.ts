@@ -1,10 +1,14 @@
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { performance } from "perf_hooks";
 
 @injectable()
 export class Sync implements Contracts.ApiSync.ISync {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
@@ -16,6 +20,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
+
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -69,14 +76,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 				})),
 			);
 
-			// TODO: should we also write rounds that failed to reach consensus?
-			await validatorRoundRepository.save({
-				height: header.height,
-				round: commit.round,
-				validators: commit.validators,
-			});
-
-			// TODO: rounds, wallets, ...
+			const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
+			await validatorRoundRepository.upsert({
+				round,
+				roundHeight,
+				validators: this.validatorSet.getActiveValidators().map(validator => validator.getWalletPublicKey()),
+			}, ["round"]);
 		});
 
 		const t1 = performance.now();
