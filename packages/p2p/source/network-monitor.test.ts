@@ -5,7 +5,6 @@ import importFresh from "import-fresh";
 
 import { describeSkip, Sandbox } from "../../test-framework";
 import { NetworkMonitor } from "./network-monitor";
-import { NetworkState } from "./network-state";
 import { Peer } from "./peer";
 import { PeerVerificationResult } from "./peer-verifier";
 
