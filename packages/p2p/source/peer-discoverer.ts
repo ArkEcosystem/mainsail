@@ -62,14 +62,12 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 						.call("validateAndAcceptPeer", { ip: p.ip, options: {} }),
 				),
 			);
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.#pingPeerPorts(pingAll);
+			void this.#pingPeerPorts(pingAll);
 
 			return true;
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.#pingPeerPorts();
+		void this.#pingPeerPorts();
 
 		return false;
 	}
@@ -90,7 +88,6 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		} catch {}
 
 		if (!peerList || peerList.length === 0) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
 			await this.app.terminate("No seed peers defined in peers.json");
 		}
 

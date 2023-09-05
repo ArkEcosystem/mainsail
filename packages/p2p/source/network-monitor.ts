@@ -54,7 +54,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		this.#initializing = false;
 	}
 
-	public async updateNetworkStatus(initialRun?: boolean): Promise<void> {
+	public async updateNetworkStatus(initialRun = false): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			return;
 		}
@@ -88,10 +88,10 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 				forcePing: true,
 				peerCount: this.repository.getPeers().length,
 			});
+			this.state.updateLastMessage();
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.#scheduleUpdateNetworkStatus(nextRunDelaySeconds);
+		void this.#scheduleUpdateNetworkStatus(nextRunDelaySeconds);
 	}
 
 	public async cleansePeers({
