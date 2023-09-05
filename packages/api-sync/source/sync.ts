@@ -1,10 +1,14 @@
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { performance } from "perf_hooks";
 
 @injectable()
 export class Sync implements Contracts.ApiSync.ISync {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
@@ -13,6 +17,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
+	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
+
+	@inject(Identifiers.ValidatorSet)
+	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -28,6 +38,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
+			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 
 			await blockRepository.save({
 				blockSignature: commit.signature,
@@ -48,39 +59,33 @@ export class Sync implements Contracts.ApiSync.ISync {
 			await transactionRepository.save(
 				transactions.map(({ data }) => ({
 					amount: data.amount.toFixed(),
-					// TODO: necessary?
-					// serialized: data.serialized,
 					asset: data.asset,
-
 					blockHeight: header.height,
-
 					blockId: header.id,
-
 					fee: data.fee.toFixed(),
-
 					id: data.id,
-
 					nonce: data.nonce.toFixed(),
-
 					recipientId: data.recipientId,
-
 					senderPublicKey: data.senderPublicKey,
-
 					sequence: data.sequence,
-
 					timestamp: header.timestamp,
-
 					type: data.type,
-
 					typeGroup: data.typeGroup,
-
 					vendorField: data.vendorField,
-
 					version: data.version,
 				})),
 			);
 
-			// TODO: rounds, wallets, ...
+			const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
+			if (Utils.roundCalculator.isNewRound(header.height, this.configuration)) {
+				await validatorRoundRepository.save({
+					round,
+					roundHeight,
+					validators: this.validatorSet
+						.getActiveValidators()
+						.map((validator) => validator.getWalletPublicKey()),
+				});
+			}
 		});
 
 		const t1 = performance.now();

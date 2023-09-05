@@ -24,6 +24,7 @@ describe<{
 		});
 
 		const milestones = [
+			{ activeValidators: 4, height: 0 },
 			{ activeValidators: 4, height: 1 },
 			{ activeValidators: 4, height: 5 },
 			{ activeValidators: 8, height: 9 },

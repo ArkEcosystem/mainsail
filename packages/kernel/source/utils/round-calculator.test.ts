@@ -53,12 +53,14 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	});
 
 	it("static delegate count - should calculate correct round for each height in round", ({ configuration }) => {
-		const milestones = [{ activeValidators: 4, height: 1 }];
+		const milestones = [{ activeValidators: 4, height: 0 }];
 
 		const config = { ...crypto, milestones };
 		configuration.setConfig(config);
 
 		const testVector = [
+			// Round 0
+			{ activeValidators: 4, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1
 			{ activeValidators: 4, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
 			{ activeValidators: 4, height: 2, nextRound: 1, round: 1, roundHeight: 1 },
@@ -88,7 +90,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 	it("dynamic delegate count - should calculate the correct with dynamic delegate count", ({ configuration }) => {
 		const milestones = [
-			{ activeValidators: 2, height: 1 },
+			{ activeValidators: 2, height: 0 },
 			{ activeValidators: 3, height: 3 },
 			{ activeValidators: 1, height: 9 },
 			{ activeValidators: 3, height: 12 },
@@ -98,6 +100,8 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		configuration.setConfig(config);
 
 		const testVector = [
+			// Round 0 - milestone
+			{ activeValidators: 2, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1 - milestone
 			{ activeValidators: 2, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
 			{ activeValidators: 2, height: 2, nextRound: 2, round: 1, roundHeight: 1 },
@@ -133,7 +137,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 	it("dynamic delegate count - should throw if active delegates is not changed on new round", ({ configuration }) => {
 		const milestones = [
-			{ activeValidators: 3, height: 1 },
+			{ activeValidators: 3, height: 0 },
 			// { activeValidators: 4, height: 3 }, // Next milestone should be 4
 		];
 

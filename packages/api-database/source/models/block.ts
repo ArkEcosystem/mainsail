@@ -34,7 +34,7 @@ export class Block {
 
 	@Column({
 		nullable: false,
-		type: "integer",
+		type: "bigint",
 		unique: true,
 	})
 	public readonly height!: number;
