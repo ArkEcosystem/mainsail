@@ -180,7 +180,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 				continue;
 			}
 
-			if ((current.height - previous.height) % previous.activeValidators !== 0) {
+			if ((current.height - Math.max(previous.height, 1)) % previous.activeValidators !== 0) {
 				throw new Exceptions.InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${current.height}. The number of validators can only be changed at the beginning of a new round.`,
 				);

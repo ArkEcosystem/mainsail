@@ -11,13 +11,13 @@ export const getMilestonesWhichAffectActiveValidatorCount = (
 ): Array<MilestoneSearchResult> => {
 	const milestones: Array<MilestoneSearchResult> = [
 		{
-			data: configuration.getMilestone(1).activeValidators,
+			data: configuration.getMilestone(0).activeValidators,
 			found: true,
-			height: 1,
+			height: 0,
 		},
 	];
 
-	let nextMilestone = configuration.getNextMilestoneWithNewKey(1, "activeValidators");
+	let nextMilestone = configuration.getNextMilestoneWithNewKey(0, "activeValidators");
 
 	while (nextMilestone.found) {
 		milestones.push(nextMilestone);
