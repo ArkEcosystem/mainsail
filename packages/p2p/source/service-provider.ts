@@ -21,6 +21,7 @@ import { PeerRepository } from "./peer-repository";
 import { PeerVerifier } from "./peer-verifier";
 import { Server } from "./socket-server/server";
 import { Throttle } from "./throttle";
+import { State } from "./state";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -133,7 +134,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerBroadcaster).to(Broadcaster).inSingletonScope();
 
-		this.app.bind<Server>(Identifiers.P2PServer).to(Server).inSingletonScope();
+		this.app.bind(Identifiers.P2PServer).to(Server).inSingletonScope();
+
+		this.app.bind(Identifiers.P2PState).to(State).inSingletonScope();
 	}
 
 	async #buildServer(): Promise<void> {
