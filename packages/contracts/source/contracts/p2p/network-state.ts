@@ -6,5 +6,4 @@ export interface NetworkState {
 
 	getQuorum();
 	getOverHeightBlockHeaders();
-	toJson();
 }

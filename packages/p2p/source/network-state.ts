@@ -103,17 +103,6 @@ export class NetworkState implements Contracts.P2P.NetworkState {
 		return Object.values(this.#quorumDetails.peersOverHeightBlockHeaders);
 	}
 
-	public toJson(): string {
-		const data = {
-			lastBlockId: this.#lastBlockId,
-			nodeHeight: this.#nodeHeight,
-			quorum: this.getQuorum(),
-			quorumDetails: this.#quorumDetails,
-		};
-
-		return JSON.stringify(data, undefined, 2);
-	}
-
 	#setLastBlock(lastBlock: Contracts.Crypto.IBlock): void {
 		this.#nodeHeight = lastBlock.data.height;
 		this.#lastBlockId = lastBlock.data.id;
