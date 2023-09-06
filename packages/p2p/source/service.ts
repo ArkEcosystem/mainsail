@@ -73,8 +73,11 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	async #checkReceivedMessages(): Promise<void> {
-		if (this.state.getLastMessageTime().isAfter(dayjs().subtract(8, "seconds"))) {
-			const peersCount = Math.max(this.repository.getPeers().length * 0.2, 5);
+		if (this.state.getLastMessageTime().isBefore(dayjs().subtract(8, "seconds"))) {
+			const peersCount = Math.min(
+				this.repository.getPeers().length,
+				Math.max(Math.ceil(this.repository.getPeers().length * 0.2), 5),
+			);
 
 			this.logger.info(`Cleansing ${Utils.pluralize("peer", peersCount, true)}`);
 
