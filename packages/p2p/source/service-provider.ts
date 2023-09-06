@@ -10,7 +10,7 @@ import { ProposalDownloader } from "./downloader/proposal-downloader";
 import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
-import { NetworkMonitor } from "./network-monitor";
+import { Service } from "./service";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
@@ -130,7 +130,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerMessageDownloader).to(MessageDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Service).to(Service).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerBroadcaster).to(Broadcaster).inSingletonScope();
 

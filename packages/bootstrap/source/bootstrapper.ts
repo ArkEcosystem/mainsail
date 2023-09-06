@@ -19,8 +19,8 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.PeerNetworkMonitor)
-	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
+	@inject(Identifiers.P2P.Service)
+	private readonly p2pService!: Contracts.P2P.Service;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
@@ -67,7 +67,7 @@ export class Bootstrapper {
 
 			void this.consensus.run();
 
-			await this.networkMonitor.boot();
+			await this.p2pService.boot();
 		} catch (error) {
 			this.logger.error(error.stack);
 		}

@@ -1,4 +1,4 @@
-export interface NetworkMonitor {
+export interface Service {
 	boot(): Promise<void>;
 	getNetworkHeight(): number;
 }

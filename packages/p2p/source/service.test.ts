@@ -3,7 +3,7 @@ import { Enums, Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 
-import { describeSkip, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework/distribution";
 import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
 import { PeerVerificationResult } from "./peer-verifier";

@@ -4,7 +4,7 @@ import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
 @injectable()
-export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
+export class Service implements Contracts.P2P.Service {
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;

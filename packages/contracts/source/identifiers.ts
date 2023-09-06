@@ -114,6 +114,7 @@ export const Identifiers = {
 	MixinService: Symbol.for("Service<Mixin>"),
 	P2P: {
 		Server: Symbol.for("P2P<Server>"),
+		Service: Symbol.for("P2P<Service>"),
 	},
 	P2PLogger: Symbol.for("Logger<P2P>"),
 	P2PServer: Symbol.for("Server<P2P>"),
@@ -128,7 +129,6 @@ export const Identifiers = {
 	PeerHeaderFactory: Symbol.for("Factory<PeerHeader>"),
 	PeerHeaderService: Symbol.for("Peer<HeaderService>"),
 	PeerMessageDownloader: Symbol.for("Peer<Downloader>"),
-	PeerNetworkMonitor: Symbol.for("Peer<NetworkMonitor>"),
 	PeerProcessor: Symbol.for("Peer<Processor>"),
 	PeerProposalDownloader: Symbol.for("Peer<ProposalDownloader>"),
 	PeerRepository: Symbol.for("Peer<Repository>"),

@@ -9,15 +9,15 @@ export class NodeController extends Controller {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
-	@inject(Identifiers.PeerNetworkMonitor)
-	private readonly networkMonitor!: Contracts.P2P.NetworkMonitor;
+	@inject(Identifiers.P2P.Service)
+	private readonly p2pService!: Contracts.P2P.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const lastBlock = this.stateStore.getLastBlock();
-		const networkHeight = this.networkMonitor.getNetworkHeight();
+		const networkHeight = this.p2pService.getNetworkHeight();
 
 		return {
 			data: {
@@ -31,7 +31,7 @@ export class NodeController extends Controller {
 
 	public async syncing(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const lastBlock = this.stateStore.getLastBlock();
-		const networkHeight = this.networkMonitor.getNetworkHeight();
+		const networkHeight = this.p2pService.getNetworkHeight();
 
 		return {
 			data: {
