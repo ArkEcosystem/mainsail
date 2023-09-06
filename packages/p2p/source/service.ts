@@ -28,6 +28,8 @@ export class Service implements Contracts.P2P.Service {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
+
 	public async boot(): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			this.logger.info("Skipping P2P service boot, because test environment is used");
@@ -57,6 +59,11 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	async #checkMinPeers(): Promise<void> {
+		if (this.#lastMinPeerCheck.isAfter(dayjs().subtract(1, "minute"))) {
+			return;
+		}
+		this.#lastMinPeerCheck = dayjs();
+
 		if (!this.repository.hasMinimumPeers()) {
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
 
