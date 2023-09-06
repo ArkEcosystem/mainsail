@@ -27,8 +27,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public nextUpdateNetworkStatusScheduled: boolean | undefined;
-
 	public async boot(): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			this.logger.info("Skipping P2P service boot, because test environment is used");
@@ -50,20 +48,23 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	public async mainLoop(): Promise<void> {
 		while (true) {
-			await this.performNetworkCheck();
+			await this.#checkMinPeers();
+			await this.#checkReceivedMessages();
 
-			await Utils.sleep(16 * 1000);
+			await Utils.sleep(1000);
 		}
 	}
 
-	public async performNetworkCheck(): Promise<void> {
+	async #checkMinPeers(): Promise<void> {
 		if (!this.repository.hasMinimumPeers()) {
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
 
 			await this.peerDiscoverer.populateSeedPeers();
 			await this.peerDiscoverer.discoverPeers(true);
 		}
+	}
 
+	async #checkReceivedMessages(): Promise<void> {
 		if (this.state.shouldCleansePeers()) {
 			await this.cleansePeers({
 				fast: true,
