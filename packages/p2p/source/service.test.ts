@@ -3,14 +3,14 @@ import { Enums, Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 
-import { describeSkip, Sandbox } from "../../test-framework";
-import { NetworkMonitor } from "./network-monitor";
+import { describeSkip, Sandbox } from "../../test-framework/distribution";
 import { Peer } from "./peer";
 import { PeerVerificationResult } from "./peer-verifier";
+import { Service } from "./service";
 
 describeSkip<{
 	sandbox: Sandbox;
-	networkMonitor: NetworkMonitor;
+	networkMonitor: Service;
 	configuration: Providers.PluginConfiguration;
 }>("NetworkMonitor", ({ it, assert, beforeEach, stub, spy, match, each }) => {
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, notice: () => {}, warning: () => {} };
@@ -39,7 +39,7 @@ describeSkip<{
 			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.bind(Identifiers.ApplicationVersion).toConstantValue("0.0.1");
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor);
+		context.sandbox.app.bind(Identifiers.PeerNetworkMonitor).to(Service);
 		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(emitter);
 		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(repository);
@@ -47,7 +47,7 @@ describeSkip<{
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
 		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
-		context.networkMonitor = context.sandbox.app.resolve(NetworkMonitor);
+		context.networkMonitor = context.sandbox.app.resolve(Service);
 	});
 
 	// it("#boot - should populate peers from seed peers config by calling validateAndAcceptPeer, when peer discovery is disabled", async ({

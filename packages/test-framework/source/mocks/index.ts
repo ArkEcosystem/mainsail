@@ -1,4 +1,3 @@
-export * as NetworkMonitor from "./network-monitor";
 export * as PeerRepository from "./peer-repository";
 export * as TransactionPoolQuery from "./query";
 export * as ServiceProviderRepository from "./service-provider-repository";

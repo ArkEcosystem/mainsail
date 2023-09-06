@@ -10,7 +10,6 @@ import { ProposalDownloader } from "./downloader/proposal-downloader";
 import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
-import { NetworkMonitor } from "./network-monitor";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
@@ -19,7 +18,9 @@ import { PeerDisposer } from "./peer-disposer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { PeerVerifier } from "./peer-verifier";
+import { Service } from "./service";
 import { Server } from "./socket-server/server";
+import { State } from "./state";
 import { Throttle } from "./throttle";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
@@ -129,11 +130,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerMessageDownloader).to(MessageDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerNetworkMonitor).to(NetworkMonitor).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Service).to(Service).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerBroadcaster).to(Broadcaster).inSingletonScope();
 
-		this.app.bind<Server>(Identifiers.P2PServer).to(Server).inSingletonScope();
+		this.app.bind(Identifiers.P2PServer).to(Server).inSingletonScope();
+
+		this.app.bind(Identifiers.P2PState).to(State).inSingletonScope();
 	}
 
 	async #buildServer(): Promise<void> {

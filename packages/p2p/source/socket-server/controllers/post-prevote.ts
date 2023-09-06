@@ -18,6 +18,9 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
+	@inject(Identifiers.P2PState)
+	private readonly state!: Contracts.P2P.State;
+
 	public async handle(
 		request: Contracts.P2P.IPostPrevoteRequest,
 		h: Hapi.ResponseToolkit,
@@ -30,6 +33,8 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 			if (result === Contracts.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid prevote");
 			}
+
+			this.state.resetLastMessageTime();
 		} catch (error) {
 			this.peerDisposer.banPeer(this.peerRepository.getPeer(getPeerIp(request)), error.message);
 		}

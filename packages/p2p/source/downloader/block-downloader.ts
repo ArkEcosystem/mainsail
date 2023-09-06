@@ -36,6 +36,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
+	@inject(Identifiers.P2PState)
+	private readonly state!: Contracts.P2P.State;
+
 	@inject(Identifiers.Consensus.CommittedBlockProcessor)
 	private readonly committedBlockProcessor!: Contracts.Consensus.ICommittedBlockProcessor;
 
@@ -135,6 +138,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					throw new Error(`Received block is invalid`);
 				}
 			}
+
+			this.state.resetLastMessageTime();
 		} catch (error) {
 			this.peerDisposer.banPeer(job.peer, `Error processing downloaded blocks - ${error.message}}`);
 
