@@ -74,10 +74,7 @@ export class Service implements Contracts.P2P.Service {
 
 	async #checkReceivedMessages(): Promise<void> {
 		if (this.state.getLastMessageTime().isBefore(dayjs().subtract(8, "seconds"))) {
-			const peersCount = Math.min(
-				this.repository.getPeers().length,
-				Math.max(Math.ceil(this.repository.getPeers().length * 0.2), 5),
-			);
+			const peersCount = Math.max(Math.ceil(this.repository.getPeers().length * 0.2), 5);
 
 			await this.cleansePeers({
 				fast: true,
@@ -86,17 +83,16 @@ export class Service implements Contracts.P2P.Service {
 		}
 	}
 
-	public async cleansePeers({ fast = false, peerCount }: { fast?: boolean; peerCount?: number } = {}): Promise<void> {
-		let peers = this.repository.getPeers();
-		let max = peers.length;
+	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
+		const max = Math.min(this.repository.getPeers().length, peerCount);
+		const peers = Utils.shuffle(this.repository.getPeers()).slice(0, max);
+
+		if (max === 0) {
+			return;
+		}
 
 		let unresponsivePeers = 0;
 		const pingDelay = fast ? 1500 : this.configuration.getRequired<number>("verifyTimeout");
-
-		if (peerCount) {
-			peers = Utils.shuffle(peers).slice(0, peerCount);
-			max = Math.min(peers.length, peerCount);
-		}
 
 		this.logger.info(`Checking ${Utils.pluralize("peer", max, true)}`);
 
