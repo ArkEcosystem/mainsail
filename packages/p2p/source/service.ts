@@ -79,8 +79,6 @@ export class Service implements Contracts.P2P.Service {
 				Math.max(Math.ceil(this.repository.getPeers().length * 0.2), 5),
 			);
 
-			this.logger.info(`Cleansing ${Utils.pluralize("peer", peersCount, true)}`);
-
 			await this.cleansePeers({
 				fast: true,
 				peerCount: peersCount,
