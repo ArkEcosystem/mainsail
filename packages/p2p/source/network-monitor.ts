@@ -37,7 +37,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		await this.peerDiscoverer.populateSeedPeers();
 
-		await this.updateNetworkStatus(true);
+		await this.performNetworkCheck(true);
 
 		for (const [version, peers] of Object.entries(
 			Utils.groupBy(this.repository.getPeers(), (peer) => peer.version),
@@ -46,7 +46,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 	}
 
-	public async updateNetworkStatus(initialRun = false): Promise<void> {
+	public async performNetworkCheck(initialRun = false): Promise<void> {
 		try {
 			if (await this.peerDiscoverer.discoverPeers(initialRun)) {
 				// await this.cleansePeers();
@@ -74,7 +74,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			this.state.updateLastMessage();
 		}
 
-		void this.#scheduleUpdateNetworkStatus(nextRunDelaySeconds);
+		void this.#scheduleNetworkCheck(nextRunDelaySeconds);
 	}
 
 	public async cleansePeers({
@@ -143,7 +143,7 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		return medians[Math.floor(medians.length / 2)] || 0;
 	}
 
-	async #scheduleUpdateNetworkStatus(nextUpdateInSeconds): Promise<void> {
+	async #scheduleNetworkCheck(nextUpdateInSeconds): Promise<void> {
 		if (this.nextUpdateNetworkStatusScheduled) {
 			return;
 		}
@@ -154,6 +154,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 		this.nextUpdateNetworkStatusScheduled = false;
 
-		void this.updateNetworkStatus();
+		void this.performNetworkCheck();
 	}
 }

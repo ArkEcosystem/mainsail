@@ -5,7 +5,7 @@ export interface IRateLimitStatus {
 
 export interface NetworkMonitor {
 	boot(): Promise<void>;
-	updateNetworkStatus(initialRun?: boolean): Promise<void>;
+	performNetworkCheck(initialRun?: boolean): Promise<void>;
 	cleansePeers({
 		fast,
 		forcePing,
