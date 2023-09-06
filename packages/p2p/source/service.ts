@@ -50,6 +50,7 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	public async mainLoop(): Promise<void> {
+		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			await this.#checkMinPeers();
 			await this.#checkReceivedMessages();
