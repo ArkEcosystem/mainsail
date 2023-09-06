@@ -1,6 +1,8 @@
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
+@injectable()
 export class State implements Contracts.P2P.State {
 	#lastMessage: dayjs.Dayjs = dayjs();
 
