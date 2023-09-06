@@ -15,6 +15,10 @@ describe<{
 		makePrevoteFromBytes: () => {},
 	};
 
+	const state = {
+		resetLastMessageTime: () => {},
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
@@ -22,18 +26,20 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(processor);
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerDisposer).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.P2PState).toConstantValue(state);
 
 		context.controller = context.sandbox.app.resolve(PostPrevoteController);
 	});
 
 	it("#handle - should call processor", async ({ controller }) => {
 		const spyOnFactory = spy(factory, "makePrevoteFromBytes");
-
 		const spyOnProcess = spy(processor, "process");
+		const spyOnResetLastMessageTime = spy(state, "resetLastMessageTime");
 
 		await controller.handle({ payload: { prevote: Buffer.from("") } }, {});
 		spyOnProcess.calledOnce();
 		spyOnFactory.calledOnce();
 		spyOnFactory.calledWith(Buffer.from(""));
+		spyOnResetLastMessageTime.calledOnce();
 	});
 });
