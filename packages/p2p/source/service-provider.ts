@@ -10,7 +10,6 @@ import { ProposalDownloader } from "./downloader/proposal-downloader";
 import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
-import { Service } from "./service";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
@@ -19,9 +18,10 @@ import { PeerDisposer } from "./peer-disposer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
 import { PeerVerifier } from "./peer-verifier";
+import { Service } from "./service";
 import { Server } from "./socket-server/server";
-import { Throttle } from "./throttle";
 import { State } from "./state";
+import { Throttle } from "./throttle";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
 
 export class ServiceProvider extends Providers.ServiceProvider {
