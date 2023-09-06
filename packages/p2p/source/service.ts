@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
+import dayjs from "dayjs";
 import delay from "delay";
 
 @injectable()
@@ -65,10 +66,14 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	async #checkReceivedMessages(): Promise<void> {
-		if (this.state.shouldCleansePeers()) {
+		if (this.state.getLastMessageTime().isAfter(dayjs().subtract(8, "seconds"))) {
+			const peersCount = Math.max(this.repository.getPeers().length * 0.2, 5);
+
+			this.logger.info(`Cleansing ${Utils.pluralize("peer", peersCount, true)}`);
+
 			await this.cleansePeers({
 				fast: true,
-				peerCount: Math.max(this.repository.getPeers().length * 0.2, 5),
+				peerCount: peersCount,
 			});
 		}
 	}

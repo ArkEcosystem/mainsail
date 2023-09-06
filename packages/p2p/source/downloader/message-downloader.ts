@@ -183,7 +183,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 			// ALlow response to be empty
 			if (prevotes.size > 0 || precommits.size > 0) {
-				this.state.updateLastMessage();
+				this.state.resetLastMessageTime();
 
 				// Check if received all the requested data
 				for (const index of job.prevoteIndexes) {

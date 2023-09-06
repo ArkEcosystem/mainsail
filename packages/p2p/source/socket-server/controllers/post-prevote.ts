@@ -34,7 +34,7 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 				throw new Error("Invalid prevote");
 			}
 
-			this.state.updateLastMessage();
+			this.state.resetLastMessageTime();
 		} catch (error) {
 			this.peerDisposer.banPeer(this.peerRepository.getPeer(getPeerIp(request)), error.message);
 		}

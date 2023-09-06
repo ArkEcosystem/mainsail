@@ -1,4 +1,6 @@
+import { Dayjs } from "dayjs";
+
 export interface State {
-	updateLastMessage(): void;
-	shouldCleansePeers(): boolean;
+	resetLastMessageTime(): void;
+	getLastMessageTime(): Dayjs;
 }

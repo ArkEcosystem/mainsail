@@ -139,7 +139,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				}
 			}
 
-			this.state.updateLastMessage();
+			this.state.resetLastMessageTime();
 		} catch (error) {
 			this.peerDisposer.banPeer(job.peer, `Error processing downloaded blocks - ${error.message}}`);
 

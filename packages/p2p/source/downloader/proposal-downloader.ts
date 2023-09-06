@@ -99,7 +99,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 				throw new Error(`Received proposal is invalid`);
 			}
 
-			this.state.updateLastMessage();
+			this.state.resetLastMessageTime();
 		} catch (error_) {
 			error = error_;
 		}
