@@ -205,7 +205,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		this.#removeDownloadJob(job);
 
 		if (error) {
-			this.peerDisposer.banPeer(job.peer, `Error downloading or processing messages - ${error.message}}`);
+			this.peerDisposer.banPeer(job.peer, error);
 			this.tryToDownload();
 		}
 	}

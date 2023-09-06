@@ -23,12 +23,12 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
-	public banPeer(peer: Contracts.P2P.Peer, reason: string): void {
+	public banPeer(peer: Contracts.P2P.Peer, error: Error): void {
 		if (this.isBanned(peer.ip)) {
 			return;
 		}
 
-		this.logger.debug(`Banning peer ${peer.ip}, because: ${reason}`);
+		this.logger.debug(`Banning peer ${peer.ip}, because: ${error.message}`);
 
 		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {
