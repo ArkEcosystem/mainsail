@@ -26,7 +26,6 @@ const init = (context: Context) => {
 	app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.StateStore).toConstantValue({});
 	app.bind(Identifiers.WalletRepository).toConstantValue({});
-	app.bind(Identifiers.PeerNetworkMonitor).toConstantValue({});
 	app.bind(Identifiers.PeerRepository).toConstantValue({});
 	app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 	app.bind(Identifiers.TransactionPoolProcessorFactory).toConstantValue({});
