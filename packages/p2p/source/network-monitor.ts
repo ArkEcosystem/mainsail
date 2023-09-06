@@ -40,7 +40,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		await this.updateNetworkStatus(true);
 
 		for (const [version, peers] of Object.entries(
-			// @ts-ignore
 			Utils.groupBy(this.repository.getPeers(), (peer) => peer.version),
 		)) {
 			this.logger.info(`Discovered ${Utils.pluralize("peer", peers.length, true)} with v${version}.`);
@@ -48,11 +47,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	}
 
 	public async updateNetworkStatus(initialRun = false): Promise<void> {
-		if (this.configuration.getOptional("disableDiscovery", false)) {
-			this.logger.warning("Skipped peer discovery because the relay is in non-discovery mode.");
-			return;
-		}
-
 		try {
 			if (await this.peerDiscoverer.discoverPeers(initialRun)) {
 				// await this.cleansePeers();
