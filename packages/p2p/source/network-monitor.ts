@@ -3,7 +3,6 @@ import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
-// @TODO review the implementation
 @injectable()
 export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 	@inject(Identifiers.PluginConfiguration)
@@ -36,52 +35,42 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		await this.peerDiscoverer.populateSeedPeers();
-
-		await this.performNetworkCheck(true);
+		await this.peerDiscoverer.discoverPeers(true);
 
 		for (const [version, peers] of Object.entries(
 			Utils.groupBy(this.repository.getPeers(), (peer) => peer.version),
 		)) {
 			this.logger.info(`Discovered ${Utils.pluralize("peer", peers.length, true)} with v${version}.`);
 		}
+
+		void this.mainLoop();
 	}
 
-	public async performNetworkCheck(initialRun = false): Promise<void> {
-		try {
-			if (await this.peerDiscoverer.discoverPeers(initialRun)) {
-				// await this.cleansePeers();
-			}
-		} catch (error) {
-			this.logger.error(`Network Status: ${error.message}`);
+	public async mainLoop(): Promise<void> {
+		while (true) {
+			await this.performNetworkCheck();
+
+			await Utils.sleep(16 * 1000);
 		}
+	}
 
-		let nextRunDelaySeconds = 600;
-
+	public async performNetworkCheck(): Promise<void> {
 		if (!this.repository.hasMinimumPeers()) {
-			await this.peerDiscoverer.populateSeedPeers();
-
-			nextRunDelaySeconds = 60;
-
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
+
+			await this.peerDiscoverer.populateSeedPeers();
+			await this.peerDiscoverer.discoverPeers(true);
 		}
 
 		if (this.state.shouldCleansePeers()) {
 			await this.cleansePeers({
 				fast: true,
-				forcePing: true,
-				peerCount: this.repository.getPeers().length,
 			});
 			this.state.updateLastMessage();
 		}
-
-		void this.#scheduleNetworkCheck(nextRunDelaySeconds);
 	}
 
-	public async cleansePeers({
-		fast = false,
-		forcePing = false,
-		peerCount,
-	}: { fast?: boolean; forcePing?: boolean; peerCount?: number } = {}): Promise<void> {
+	public async cleansePeers({ fast = false, peerCount }: { fast?: boolean; peerCount?: number } = {}): Promise<void> {
 		let peers = this.repository.getPeers();
 		let max = peers.length;
 
@@ -94,7 +83,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		}
 
 		this.logger.info(`Checking ${Utils.pluralize("peer", max, true)}`);
-		const peerErrors = {};
 
 		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
 		// in that case we want to keep on with our program execution while ping promises can finish in the background
@@ -122,9 +110,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			await delay(pingDelay).finally(resolvesFirst);
 		});
 
-		for (const key of Object.keys(peerErrors)) {
-			const peerCount = peerErrors[key].length;
-			this.logger.debug(`Removed ${Utils.pluralize("peer", peerCount, true)} because of "${key}"`);
+		if (unresponsivePeers > 0) {
+			this.logger.debug(`Removed ${Utils.pluralize("peer", unresponsivePeers, true)}`);
 		}
 	}
 
@@ -141,19 +128,5 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 			});
 
 		return medians[Math.floor(medians.length / 2)] || 0;
-	}
-
-	async #scheduleNetworkCheck(nextUpdateInSeconds): Promise<void> {
-		if (this.nextUpdateNetworkStatusScheduled) {
-			return;
-		}
-
-		this.nextUpdateNetworkStatusScheduled = true;
-
-		await Utils.sleep(nextUpdateInSeconds * 1000);
-
-		this.nextUpdateNetworkStatusScheduled = false;
-
-		void this.performNetworkCheck();
 	}
 }
