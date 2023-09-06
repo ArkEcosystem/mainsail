@@ -30,35 +30,24 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	public nextUpdateNetworkStatusScheduled: boolean | undefined;
 
-	#initializing = true;
-
 	public async boot(): Promise<void> {
-		await this.peerDiscoverer.populateSeedPeers();
-
-		if (this.configuration.getOptional("skipDiscovery", false)) {
-			this.logger.warning("Skipped peer discovery because the relay is in skip-discovery mode.");
-		} else {
-			await this.updateNetworkStatus(true);
-
-			for (const [version, peers] of Object.entries(
-				// @ts-ignore
-				Utils.groupBy(this.repository.getPeers(), (peer) => peer.version),
-			)) {
-				this.logger.info(`Discovered ${Utils.pluralize("peer", peers.length, true)} with v${version}.`);
-			}
-		}
-
-		// Give time to cooldown rate limits after peer verifier finished.
-		await Utils.sleep(1000);
-
-		this.#initializing = false;
-	}
-
-	public async updateNetworkStatus(initialRun = false): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
 			return;
 		}
 
+		await this.peerDiscoverer.populateSeedPeers();
+
+		await this.updateNetworkStatus(true);
+
+		for (const [version, peers] of Object.entries(
+			// @ts-ignore
+			Utils.groupBy(this.repository.getPeers(), (peer) => peer.version),
+		)) {
+			this.logger.info(`Discovered ${Utils.pluralize("peer", peers.length, true)} with v${version}.`);
+		}
+	}
+
+	public async updateNetworkStatus(initialRun = false): Promise<void> {
 		if (this.configuration.getOptional("disableDiscovery", false)) {
 			this.logger.warning("Skipped peer discovery because the relay is in non-discovery mode.");
 			return;
@@ -142,13 +131,6 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		for (const key of Object.keys(peerErrors)) {
 			const peerCount = peerErrors[key].length;
 			this.logger.debug(`Removed ${Utils.pluralize("peer", peerCount, true)} because of "${key}"`);
-		}
-
-		if (this.#initializing) {
-			this.logger.info(
-				`${max - unresponsivePeers} of ${Utils.pluralize("peer", max, true)} on the network are responsive`,
-			);
-			this.logger.info(`Median Network Height: ${this.getNetworkHeight().toLocaleString()}`);
 		}
 	}
 
