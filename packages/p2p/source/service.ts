@@ -54,7 +54,7 @@ export class Service implements Contracts.P2P.Service {
 			await this.#checkMinPeers();
 			await this.#checkReceivedMessages();
 
-			await Utils.sleep(1000);
+			await Utils.sleep(2000);
 		}
 	}
 
