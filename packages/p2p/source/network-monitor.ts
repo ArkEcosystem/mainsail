@@ -31,6 +31,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 
 	public async boot(): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
+			this.logger.info("Skipping P2P service boot, because test environment is used");
+
 			return;
 		}
 
@@ -65,8 +67,8 @@ export class NetworkMonitor implements Contracts.P2P.NetworkMonitor {
 		if (this.state.shouldCleansePeers()) {
 			await this.cleansePeers({
 				fast: true,
+				peerCount: Math.max(this.repository.getPeers().length * 0.2, 5),
 			});
-			this.state.updateLastMessage();
 		}
 	}
 
