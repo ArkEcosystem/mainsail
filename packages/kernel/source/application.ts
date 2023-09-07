@@ -189,10 +189,12 @@ export class Application implements Contracts.Kernel.Application {
 		}
 
 		if (error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack);
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error);
 		}
 
 		await this.#disposeServiceProviders();
+
+		process.exit(1);
 	}
 
 	public bind<T>(
@@ -270,7 +272,7 @@ export class Application implements Contracts.Kernel.Application {
 
 			try {
 				await serviceProvider.dispose();
-			} catch {}
+			} catch { }
 		}
 	}
 

@@ -110,7 +110,14 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	}
 
 	public error(message: any): void {
-		this.#log("error", message);
+		// AggregateErrors
+		if ("errors" in message) {
+			for (const error of message.errors) {
+				this.#log("error", error);
+			}
+		} else {
+			this.#log("error", message);
+		}
 	}
 
 	public warning(message: any): void {
