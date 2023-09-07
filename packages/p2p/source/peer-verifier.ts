@@ -12,6 +12,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
@@ -33,7 +36,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		}
 
 		try {
-			const status = await this.communicator.getStatus(peer, { blockOnError: false });
+			const status = await this.communicator.getStatus(peer);
 			peer.version = status.config.version;
 
 			this.#verifyConfig(status.config);
@@ -48,6 +51,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return true;
 		} catch (error) {
 			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`);
+
+			this.peerDisposer.banPeer(peer, error, false);
 
 			return false;
 		}
@@ -72,11 +77,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 
 		const heightToRequest = state.header.height < block.data.height ? state.header.height : block.data.height;
 
-		const { blocks } = await this.communicator.getBlocks(
-			peer,
-			{ fromHeight: heightToRequest, limit: 1 },
-			{ blockOnError: false },
-		);
+		const { blocks } = await this.communicator.getBlocks(peer, { fromHeight: heightToRequest, limit: 1 });
 
 		if (blocks.length !== 1) {
 			throw new Error("Failed to get blocks from peer");

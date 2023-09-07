@@ -16,6 +16,9 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -33,6 +36,9 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 								return hisPeers || [];
 							} catch (error) {
 								this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
+
+								this.peerDisposer.banPeer(peer, error);
+
 								return [];
 							}
 						}),

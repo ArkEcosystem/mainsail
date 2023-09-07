@@ -10,3 +10,5 @@ export interface Socket {
 		remoteAddress: string;
 	};
 }
+
+export type NesError = { isNes: true; type: string } & Error;

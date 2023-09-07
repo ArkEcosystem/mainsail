@@ -9,6 +9,7 @@
 import WebSocket from "ws";
 
 import { parseNesMessage, stringifyNesMessage } from "./utils";
+import { errorTypes } from "./constants";
 
 /* eslint no-undef: 0 */
 const version = "2";
@@ -18,17 +19,6 @@ const nextTick = function (callback) {
 	return (err) => {
 		setTimeout(() => callback(err), 0);
 	};
-};
-
-// NesError types
-
-const errorTypes = {
-	DISCONNECT: "disconnect",
-	PROTOCOL: "protocol",
-	SERVER: "server",
-	TIMEOUT: "timeout",
-	USER: "user",
-	WS: "ws",
 };
 
 const NesError = function (err, type) {

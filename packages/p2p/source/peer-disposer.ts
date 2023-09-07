@@ -3,6 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
+import { errorTypes } from "./hapi-nes";
+
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	@inject(Identifiers.PluginConfiguration)
@@ -23,12 +25,22 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
-	public banPeer(peer: Contracts.P2P.Peer, reason: string): void {
-		if (this.isBanned(peer.ip)) {
+	public banPeer(peer: Contracts.P2P.Peer, error: Error | Contracts.P2P.NesError, checkRepository = true): void {
+		if ((checkRepository && !this.repository.hasPeer(peer.ip)) || this.isBanned(peer.ip)) {
 			return;
 		}
 
-		this.logger.debug(`Banning peer ${peer.ip}, because: ${reason}`);
+		if (
+			this.#isNesError(error) &&
+			(error.type === errorTypes.WS || error.type === errorTypes.DISCONNECT || error.type === errorTypes.TIMEOUT)
+		) {
+			this.logger.debug(`Disposing peer ${peer.ip}, because: ${error.message}`);
+			this.disposePeer(peer);
+
+			return;
+		}
+
+		this.logger.debug(`Banning peer ${peer.ip}, because: ${error.message}`);
 
 		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {
@@ -39,8 +51,8 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	}
 
 	public disposePeer(peer: Contracts.P2P.Peer): void {
-		this.connector.disconnect(peer);
 		this.repository.forgetPeer(peer);
+		this.connector.disconnect(peer);
 		peer.dispose();
 
 		void this.events.dispatch(Enums.PeerEvent.Removed, peer);
@@ -58,5 +70,10 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		}
 
 		return false;
+	}
+
+	#isNesError(error: Error | Contracts.P2P.NesError): error is Contracts.P2P.NesError {
+		// @ts-ignore
+		return !!error.isNes;
 	}
 }
