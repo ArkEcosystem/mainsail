@@ -3,7 +3,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { isValidVersion } from "../../utils";
+import { getPeerIp, isValidVersion } from "../../utils";
 import {
 	GetBlocksRoute,
 	GetCommonBlocksRoute,
@@ -26,6 +26,9 @@ export class ValidatePlugin {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.PeerProcessor)
+	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
+
 	public register(server) {
 		if (this.configuration.getRequired("developmentMode.enabled")) {
 			return;
@@ -46,6 +49,10 @@ export class ValidatePlugin {
 
 		server.ext({
 			method: async (request, h) => {
+				if (!this.peerProcessor.validatePeerIp(getPeerIp(request))) {
+					return Boom.badRequest("Validation failed");
+				}
+
 				const version = request.payload?.headers?.version;
 				if (version && !isValidVersion(this.app, version)) {
 					return Boom.badRequest("Validation failed (invalid version)");
