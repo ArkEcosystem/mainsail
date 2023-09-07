@@ -30,7 +30,11 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 			return;
 		}
 
-		if (this.#isNesError(error) && (error.type === errorTypes.WS || error.type === errorTypes.DISCONNECT)) {
+		if (
+			this.#isNesError(error) &&
+			(error.type === errorTypes.WS || error.type === errorTypes.DISCONNECT || error.type === errorTypes.TIMEOUT)
+		) {
+			this.logger.debug(`Disposing peer ${peer.ip}, because: ${error.message}`);
 			this.disposePeer(peer);
 
 			return;
