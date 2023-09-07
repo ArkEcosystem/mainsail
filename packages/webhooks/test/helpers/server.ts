@@ -14,10 +14,10 @@ export type Context = {
 
 const initApp = (context: Context) => {
 	const logger = {
-		info: () => { },
-		debug: () => { },
-		error: () => { },
-		notice: () => { },
+		info: () => {},
+		debug: () => {},
+		error: () => {},
+		notice: () => {},
 	};
 
 	context.app = new Application(new Container());

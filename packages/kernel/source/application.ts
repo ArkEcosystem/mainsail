@@ -273,7 +273,7 @@ export class Application implements Contracts.Kernel.Application {
 
 			try {
 				await serviceProvider.dispose();
-			} catch { }
+			} catch {}
 		}
 	}
 
