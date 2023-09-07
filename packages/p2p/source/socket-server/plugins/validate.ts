@@ -29,6 +29,9 @@ export class ValidatePlugin {
 	@inject(Identifiers.PeerProcessor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	public register(server) {
 		if (this.configuration.getRequired("developmentMode.enabled")) {
 			return;
@@ -50,21 +53,31 @@ export class ValidatePlugin {
 		server.ext({
 			method: async (request, h) => {
 				if (!this.peerProcessor.validatePeerIp(getPeerIp(request))) {
-					return Boom.badRequest("Validation failed");
+					return this.#disposeAndReturnBadRequest(request, "Validation failed");
 				}
 
 				const version = request.payload?.headers?.version;
 				if (version && !isValidVersion(this.app, version)) {
-					return Boom.badRequest("Validation failed (invalid version)");
+					return this.#disposeAndReturnBadRequest(request, "Validation failed (invalid version)");
 				}
 
 				const result = allRoutesConfigByPath[request.path]?.validation?.validate(request.payload);
 				if (result && result.error) {
-					return Boom.badRequest("Validation failed");
+					return this.#banAndReturnBadRequest(request, "Validation failed");
 				}
 				return h.continue;
 			},
 			type: "onPostAuth",
 		});
 	}
+
+	#disposeAndReturnBadRequest = (request: Contracts.P2P.Request, error: string) => {
+		this.peerDisposer.disposePeer({ ip: getPeerIp(request) });
+		return Boom.badRequest(error);
+	};
+
+	#banAndReturnBadRequest = (request: Contracts.P2P.Request, error: string) => {
+		this.peerDisposer.banPeer({ ip: getPeerIp(request) }, new Error(error), false);
+		return Boom.badRequest(error);
+	};
 }
