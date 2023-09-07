@@ -31,7 +31,6 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		}
 
 		if (this.#isNesError(error) && (error.type === errorTypes.WS || error.type === errorTypes.DISCONNECT)) {
-			console.log("DISPOSING, ", error.message);
 			this.disposePeer(peer);
 
 			return;
