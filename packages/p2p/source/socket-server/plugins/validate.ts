@@ -1,4 +1,4 @@
-import Boom from "@hapi/boom";
+import { ResponseToolkit } from "@hapi/hapi";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
@@ -16,9 +16,10 @@ import {
 	PostProposalRoute,
 	PostTransactionsRoute,
 } from "../routes";
+import { BasePlugin } from "./base-plugin";
 
 @injectable()
-export class ValidatePlugin {
+export class ValidatePlugin extends BasePlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -28,9 +29,6 @@ export class ValidatePlugin {
 
 	@inject(Identifiers.PeerProcessor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
-
-	@inject(Identifiers.PeerDisposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	public register(server) {
 		if (this.configuration.getRequired("developmentMode.enabled")) {
@@ -51,33 +49,23 @@ export class ValidatePlugin {
 		};
 
 		server.ext({
-			method: async (request, h) => {
+			method: async (request: Contracts.P2P.Request, h: ResponseToolkit) => {
 				if (!this.peerProcessor.validatePeerIp(getPeerIp(request))) {
-					return this.#disposeAndReturnBadRequest(request, "Validation failed");
+					return this.disposeAndReturnBadRequest(request, h, "Validation failed");
 				}
 
 				const version = request.payload?.headers?.version;
 				if (version && !isValidVersion(this.app, version)) {
-					return this.#disposeAndReturnBadRequest(request, "Validation failed (invalid version)");
+					return this.disposeAndReturnBadRequest(request, h, "Validation failed (invalid version)");
 				}
 
 				const result = allRoutesConfigByPath[request.path]?.validation?.validate(request.payload);
 				if (result && result.error) {
-					return this.#banAndReturnBadRequest(request, "Validation failed");
+					return this.banAndReturnBadRequest(request, h, "Validation failed");
 				}
 				return h.continue;
 			},
 			type: "onPostAuth",
 		});
 	}
-
-	#disposeAndReturnBadRequest = (request: Contracts.P2P.Request, error: string) => {
-		this.peerDisposer.disposePeer(getPeerIp(request));
-		return Boom.badRequest(error);
-	};
-
-	#banAndReturnBadRequest = (request: Contracts.P2P.Request, error: string) => {
-		this.peerDisposer.banPeer(getPeerIp(request), new Error(error), false);
-		return Boom.badRequest(error);
-	};
 }

@@ -1,4 +1,3 @@
-import Boom from "@hapi/boom";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
@@ -15,9 +14,10 @@ import {
 	PostProposalRoute,
 	PostTransactionsRoute,
 } from "../routes";
+import { BasePlugin } from "./base-plugin";
 
 @injectable()
-export class CodecPlugin {
+export class CodecPlugin extends BasePlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -51,7 +51,7 @@ export class CodecPlugin {
 				try {
 					request.payload = allRoutesConfigByPath[request.path].codec.request.deserialize(request.payload);
 				} catch (error) {
-					return Boom.badRequest(`Payload deserializing failed: ${error}`);
+					return this.disposeAndReturnBadRequest(request, h, `Payload deserializing failed: ${error}`);
 				}
 				return h.continue;
 			},
