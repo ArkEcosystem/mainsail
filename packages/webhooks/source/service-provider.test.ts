@@ -17,9 +17,10 @@ type Context = {
 
 const init = (context: Context) => {
 	const logger = {
-		debug: () => {},
-		error: () => {},
-		notice: () => {},
+		info: () => { },
+		debug: () => { },
+		error: () => { },
+		notice: () => { },
 	};
 
 	const app = new Application(new Container());

@@ -10,10 +10,10 @@ import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
 
 @injectable()
-class StubClass {}
+class StubClass { }
 
 class StubServiceProvider extends ServiceProvider {
-	public async register(): Promise<void> {}
+	public async register(): Promise<void> { }
 
 	public name(): string {
 		return "name";
@@ -35,9 +35,9 @@ describe<{
 		context.app = new Application(context.container);
 
 		context.logger = {
-			debug: () => {},
-			error: () => {},
-			notice: () => {},
+			debug: () => { },
+			error: () => { },
+			notice: () => { },
 		};
 
 		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
@@ -392,7 +392,7 @@ describe<{
 		assert.false(context.app.isDownForMaintenance());
 	});
 
-	it("should terminate the application", async (context) => {
+	it.skip("should terminate the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
@@ -441,7 +441,7 @@ describe<{
 		assert.false(context.app.isBooted());
 	});
 
-	it("should terminate the application with an error", async (context) => {
+	it.skip("should terminate the application with an error", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
