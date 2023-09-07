@@ -3,13 +3,17 @@ import Hapi from "@hapi/hapi";
 import { IBlockData } from "../crypto";
 import { IHeaderData } from "./header";
 import { Socket } from "./nes";
-import { PeerBroadcast, PeerPingResponse } from "./peer";
+import { PeerBroadcast, PeerConfig, PeerState } from "./peer";
 
 export interface Request extends Hapi.Request {
 	socket?: Socket;
 	payload: {
 		headers: IHeaderData;
 	};
+}
+
+export interface Response {
+	headers?: IHeaderData;
 }
 
 export interface IGetBlocksRequest extends Request {
@@ -20,7 +24,9 @@ export interface IGetBlocksRequest extends Request {
 	};
 }
 
-export type IGetBlocksResponse = { blocks: Buffer[] };
+export interface IGetBlocksResponse extends Response {
+	blocks: Buffer[];
+}
 
 export interface IGetCommonBlocksRequest extends Request {
 	payload: {
@@ -29,7 +35,7 @@ export interface IGetCommonBlocksRequest extends Request {
 	};
 }
 
-export interface IGetCommonBlocksResponse {
+export interface IGetCommonBlocksResponse extends Response {
 	common: IBlockData;
 	lastBlockHeight: number;
 }
@@ -40,16 +46,19 @@ export interface IGetMessagesRequest extends Request {
 	};
 }
 
-export interface IGetMessagesResponse {
+export interface IGetMessagesResponse extends Response {
 	precommits: Buffer[];
 	prevotes: Buffer[];
 }
 
-export type IGetPeersResponse = {
+export interface IGetPeersResponse extends Response {
 	peers: PeerBroadcast[];
-};
+}
 
-export type IGetStatusResponse = PeerPingResponse;
+export interface IGetStatusResponse extends Response {
+	state: PeerState;
+	config: PeerConfig;
+}
 
 export interface IGetProposalRequest extends Request {
 	payload: {
@@ -57,7 +66,7 @@ export interface IGetProposalRequest extends Request {
 	};
 }
 
-export interface IGetProposalResponse {
+export interface IGetProposalResponse extends Response {
 	proposal: Buffer;
 }
 
@@ -68,7 +77,7 @@ export interface IPostPrecommitRequest extends Request {
 	};
 }
 
-export interface IPostPrecommitResponse {}
+export interface IPostPrecommitResponse extends Response {}
 
 export interface IPostPrevoteRequest extends Request {
 	payload: {
@@ -77,7 +86,7 @@ export interface IPostPrevoteRequest extends Request {
 	};
 }
 
-export interface IPostPrevoteResponse {}
+export interface IPostPrevoteResponse extends Response {}
 
 export interface IPostProposalRequest extends Request {
 	payload: {
@@ -86,7 +95,7 @@ export interface IPostProposalRequest extends Request {
 	};
 }
 
-export interface IPostProposalResponse {}
+export interface IPostProposalResponse extends Response {}
 
 export interface IPostTransactionsRequest extends Request {
 	payload: {
@@ -95,6 +104,6 @@ export interface IPostTransactionsRequest extends Request {
 	};
 }
 
-export type IPostTransactionsResponse = {
+export interface IPostTransactionsResponse extends Response {
 	accept: string[];
-};
+}

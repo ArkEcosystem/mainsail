@@ -9,7 +9,6 @@ import { Peer } from "./peer";
 
 export type EmitOptions = {
 	timeout: number;
-	blockOnError?: boolean;
 };
 
 export interface PeerCommunicator {
