@@ -141,7 +141,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 			this.state.resetLastMessageTime();
 		} catch (error) {
-			this.peerDisposer.banPeer(job.peer, error);
+			this.peerDisposer.banPeer(job.peer.ip, error);
 
 			this.#handleJobError(job, error);
 			return;
@@ -188,7 +188,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		if (size + configuration.block.maxPayload < constants.DEFAULT_MAX_PAYLOAD) {
 			// Peer did't respond with all requested blocks and didn't exceed maxPayload
 			this.peerDisposer.banPeer(
-				job.peer,
+				job.peer.ip,
 				new Error("Peer didn't respond with all requested blocks and didn't exceed maxPayload"),
 			);
 		}

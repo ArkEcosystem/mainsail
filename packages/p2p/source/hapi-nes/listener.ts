@@ -124,7 +124,6 @@ export class Listener {
 
 	private _add(ws, req) {
 		// Socket object
-
 		const socket = new Socket(ws, req, this);
 
 		this._sockets.add(socket);

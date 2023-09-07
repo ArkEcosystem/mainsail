@@ -72,12 +72,12 @@ export class ValidatePlugin {
 	}
 
 	#disposeAndReturnBadRequest = (request: Contracts.P2P.Request, error: string) => {
-		this.peerDisposer.disposePeer({ ip: getPeerIp(request) });
+		this.peerDisposer.disposePeer(getPeerIp(request));
 		return Boom.badRequest(error);
 	};
 
 	#banAndReturnBadRequest = (request: Contracts.P2P.Request, error: string) => {
-		this.peerDisposer.banPeer({ ip: getPeerIp(request) }, new Error(error), false);
+		this.peerDisposer.banPeer(getPeerIp(request), new Error(error), false);
 		return Boom.badRequest(error);
 	};
 }
