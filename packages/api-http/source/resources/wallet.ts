@@ -5,11 +5,11 @@ import { Resource } from "../types";
 
 @injectable()
 export class WalletResource implements Resource {
-    public raw(resource: Models.Wallet): object {
-        return resource;
-    }
+	public raw(resource: Models.Wallet): object {
+		return resource;
+	}
 
-    public transform(resource: Models.Wallet): object {
-        return resource;
-    }
+	public transform(resource: Models.Wallet): object {
+		return resource;
+	}
 }

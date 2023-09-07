@@ -66,7 +66,9 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		await proposerPicker.onCommit({ getProposedCommitBlock: async () => ({ block: { header: { height: 0 } } }) } as Contracts.BlockProcessor.IProcessableUnit);
+		await proposerPicker.onCommit({
+			getProposedCommitBlock: async () => ({ block: { header: { height: 0 } } }),
+		} as Contracts.BlockProcessor.IProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerPicker.getValidatorIndex(index), expectedIndexesRound1[index]);
@@ -81,7 +83,9 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		for (let index = 1; index < activeValidators; index++) {
-			await proposerPicker.onCommit({ getProposedCommitBlock: async () => ({ block: { header: { height: index } } }) } as Contracts.BlockProcessor.IProcessableUnit);
+			await proposerPicker.onCommit({
+				getProposedCommitBlock: async () => ({ block: { header: { height: index } } }),
+			} as Contracts.BlockProcessor.IProcessableUnit);
 
 			assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 		}
@@ -96,13 +100,17 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		await proposerPicker.onCommit({ getProposedCommitBlock: async () => ({ block: { header: { height: 5 } } }) } as Contracts.BlockProcessor.IProcessableUnit);
+		await proposerPicker.onCommit({
+			getProposedCommitBlock: async () => ({ block: { header: { height: 5 } } }),
+		} as Contracts.BlockProcessor.IProcessableUnit);
 
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
 		const spyOnGetLastCommittedRound = stub(state, "getLastCommittedRound").returnValue(51);
 
-		await proposerPicker.onCommit({ getProposedCommitBlock: async () => ({ block: { header: { height: activeValidators } } }) } as Contracts.BlockProcessor.IProcessableUnit);
+		await proposerPicker.onCommit({
+			getProposedCommitBlock: async () => ({ block: { header: { height: activeValidators } } }),
+		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
 
 		spyOnGetLastCommittedRound.calledOnce();
@@ -113,7 +121,9 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		await proposerPicker.onCommit({ getProposedCommitBlock: async () => ({ block: { header: { height: 1 } } }) } as Contracts.BlockProcessor.IProcessableUnit);
+		await proposerPicker.onCommit({
+			getProposedCommitBlock: async () => ({ block: { header: { height: 1 } } }),
+		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
 		// shuffled index wraps around (e.g. prolonged rounds)

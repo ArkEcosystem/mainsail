@@ -84,7 +84,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
 			if (Utils.roundCalculator.isNewRound(header.height, this.configuration)) {
-				await validatorRoundRepository.createQueryBuilder()
+				await validatorRoundRepository
+					.createQueryBuilder()
 					.insert()
 					.orIgnore()
 					.values({
@@ -98,16 +99,19 @@ export class Sync implements Contracts.ApiSync.ISync {
 			}
 
 			const dirtyWallets = unit.getWalletRepository().getDirtyWallets();
-			await walletRepository.upsert(dirtyWallets.map(holder => {
-				const wallet = holder.getWallet();
-				return {
-					address: wallet.getAddress(),
-					publicKey: wallet.getPublicKey(),
-					balance: wallet.getBalance().toFixed(),
-					nonce: wallet.getNonce().toFixed(),
-					attributes: wallet.getAttributes(),
-				}
-			}), ["address"]);
+			await walletRepository.upsert(
+				dirtyWallets.map((holder) => {
+					const wallet = holder.getWallet();
+					return {
+						address: wallet.getAddress(),
+						attributes: wallet.getAttributes(),
+						balance: wallet.getBalance().toFixed(),
+						nonce: wallet.getNonce().toFixed(),
+						publicKey: wallet.getPublicKey(),
+					};
+				}),
+				["address"],
+			);
 		});
 
 		const t1 = performance.now();

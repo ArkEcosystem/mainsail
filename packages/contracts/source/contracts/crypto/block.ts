@@ -1,9 +1,9 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utils";
+import { IProcessableUnit } from "../block-processor";
 import { IAggregatedSignature } from "./signatures";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
-import { IProcessableUnit } from "../block-processor";
 
 export interface IBlockVerification {
 	readonly verified: boolean;
