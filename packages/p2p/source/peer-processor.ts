@@ -5,7 +5,6 @@ import { Enums, Providers, Utils as KernelUtils } from "@mainsail/kernel";
 import { isValidVersion } from "./utils";
 import { isValidPeerIp } from "./validation";
 
-// @TODO review the implementation
 @injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.Application)
@@ -30,9 +29,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.P2PLogger)
 	private readonly logger!: Contracts.P2P.Logger;
 
-	public server: any;
-	public nextUpdateNetworkStatusScheduled = false;
-
 	@postConstruct()
 	public initialize(): void {
 		this.events.listen(Enums.CryptoEvent.MilestoneChanged, {
@@ -50,7 +46,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		}
 
 		if (this.validatePeerIp(ip, options)) {
-			await this.#acceptNewPeer(ip, options);
+			await this.#acceptNewPeer(ip);
 		}
 	}
 
@@ -61,7 +57,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		if (!isValidPeerIp(ip) || this.repository.hasPendingPeer(ip)) {
+		if (!isValidPeerIp(ip)) {
 			return false;
 		}
 
@@ -90,7 +86,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		return true;
 	}
 
-	async #acceptNewPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
+	async #acceptNewPeer(ip: string): Promise<void> {
 		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(ip);
 
 		this.repository.setPendingPeer(peer);
