@@ -1,5 +1,5 @@
 import { injectable, Selectors } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
 import { spy } from "sinon";
 
@@ -121,12 +121,16 @@ describe<{
 
 		const { activeValidators } = cryptoConfiguration.getMilestone();
 
-		await validatorSet.onCommit({ block: { data: { height: 0 } } });
+		await validatorSet.onCommit({
+			getProposedCommitBlock: async () => ({ block: { header: { height: 0 } } }),
+		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 
 		let currentHeight = 0;
 		for (let index = 0; index < activeValidators; index++) {
-			await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
+			await validatorSet.onCommit({
+				getProposedCommitBlock: async () => ({ block: { header: { height: currentHeight } } }),
+			} as Contracts.BlockProcessor.IProcessableUnit);
 
 			// Genesis block (= height 0) and the first block thereafter rebuild the ranking
 			assert.equal(buildValidatorRankingSpy.callCount, 2);
@@ -136,7 +140,9 @@ describe<{
 
 		// The ranking now got updated thrice
 		assert.equal(currentHeight, 5);
-		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
+		await validatorSet.onCommit({
+			getProposedCommitBlock: async () => ({ block: { header: { height: currentHeight } } }),
+		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.equal(buildValidatorRankingSpy.callCount, 3);
 		currentHeight++;
 
@@ -144,14 +150,18 @@ describe<{
 
 		// Simulate another round
 		for (let index = 0; index < activeValidators - 1; index++) {
-			await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
+			await validatorSet.onCommit({
+				getProposedCommitBlock: async () => ({ block: { header: { height: currentHeight } } }),
+			} as Contracts.BlockProcessor.IProcessableUnit);
 			assert.true(buildValidatorRankingSpy.notCalled);
 			currentHeight++;
 		}
 
 		// Called again after another round
 		assert.equal(currentHeight, 10);
-		await validatorSet.onCommit({ block: { data: { height: currentHeight } } });
+		await validatorSet.onCommit({
+			getProposedCommitBlock: async () => ({ block: { header: { height: currentHeight } } }),
+		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});
 });

@@ -1,5 +1,6 @@
 export const Identifiers = {
 	BlockRepository: Symbol.for("API<BlockRepository>"),
+
 	BlockRepositoryFactory: Symbol.for("API<Factory.BlockRepository>"),
 	DataSource: Symbol.for("API<DatabSource>"),
 
@@ -8,4 +9,7 @@ export const Identifiers = {
 
 	ValidatorRoundRepository: Symbol.for("API<ValidatorRoundRepository>"),
 	ValidatorRoundRepositoryFactory: Symbol.for("API<Factory.ValidatorRoundRepositoryFactory>"),
+
+	WalletRepository: Symbol.for("API<WalletRepository>"),
+	WalletRepositoryFactory: Symbol.for("API<Factory.WalletRepositoryFactory>"),
 };
