@@ -12,6 +12,9 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
+	@inject(Identifiers.PeerDisposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
@@ -48,6 +51,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 			return true;
 		} catch (error) {
 			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`);
+
+			this.peerDisposer.banPeer(peer, error, false);
 
 			return false;
 		}

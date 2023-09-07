@@ -25,8 +25,8 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
-	public banPeer(peer: Contracts.P2P.Peer, error: Error | Contracts.P2P.NesError): void {
-		if (!this.repository.hasPeer(peer.ip) || this.isBanned(peer.ip)) {
+	public banPeer(peer: Contracts.P2P.Peer, error: Error | Contracts.P2P.NesError, checkRepository = true): void {
+		if ((checkRepository && !this.repository.hasPeer(peer.ip)) || this.isBanned(peer.ip)) {
 			return;
 		}
 
