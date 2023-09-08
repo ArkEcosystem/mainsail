@@ -9,7 +9,7 @@ export interface IProcessableUnit {
 	getProcessorResult(): boolean;
 	setProcessorResult(processorResult: boolean): void;
 	getBlock(): IBlock;
-	getProposedCommitBlock(): Promise<ICommittedBlock>;
+	getCommittedBlock(): Promise<ICommittedBlock>;
 }
 
 export interface Handler {

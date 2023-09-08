@@ -15,9 +15,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerConnector)
-	private readonly connector!: Contracts.P2P.PeerConnector;
-
 	@inject(Identifiers.PeerRepository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
@@ -104,8 +101,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
 			void this.events.dispatch(Enums.PeerEvent.Added, peer);
-		} else {
-			this.connector.disconnect(peer);
 		}
 
 		this.repository.forgetPendingPeer(peer);

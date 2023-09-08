@@ -9,8 +9,8 @@ const TEN_SECONDS_IN_MILLISECONDS = 10_000;
 
 @injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
-	@inject(Identifiers.LogService)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.Application)
+	private readonly app!: Contracts.Kernel.Application;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
 	readonly #errors: Map<string, string> = new Map<string, string>();
@@ -99,8 +99,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		this.#lastConnectionCreate.set(peer.ip, Date.now());
 
 		connection.onError = (error) => {
-			this.logger.debug(`Socket error (peer ${Utils.IpAddress.normalizeAddress(peer.ip)}) : ${error.message}`);
-			this.disconnect(peer);
+			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).banPeer(peer, error);
 		};
 
 		await connection.connect({ retries: 1, timeout: 5000 });

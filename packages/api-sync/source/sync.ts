@@ -21,13 +21,18 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
+	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async onCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
+	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+		const committedBlock = await unit.getCommittedBlock();
+
 		const {
 			block: { header, transactions },
 			commit,
@@ -39,6 +44,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
+			const walletRepository = this.walletRepositoryFactory(entityManager);
 
 			await blockRepository.save({
 				blockSignature: commit.signature,
@@ -78,14 +84,34 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
 			if (Utils.roundCalculator.isNewRound(header.height, this.configuration)) {
-				await validatorRoundRepository.save({
-					round,
-					roundHeight,
-					validators: this.validatorSet
-						.getActiveValidators()
-						.map((validator) => validator.getWalletPublicKey()),
-				});
+				await validatorRoundRepository
+					.createQueryBuilder()
+					.insert()
+					.orIgnore()
+					.values({
+						round,
+						roundHeight,
+						validators: this.validatorSet
+							.getActiveValidators()
+							.map((validator) => validator.getWalletPublicKey()),
+					})
+					.execute();
 			}
+
+			const dirtyWallets = unit.getWalletRepository().getDirtyWallets();
+			await walletRepository.upsert(
+				dirtyWallets.map((holder) => {
+					const wallet = holder.getWallet();
+					return {
+						address: wallet.getAddress(),
+						attributes: wallet.getAttributes(),
+						balance: wallet.getBalance().toFixed(),
+						nonce: wallet.getNonce().toFixed(),
+						publicKey: wallet.getPublicKey(),
+					};
+				}),
+				["address"],
+			);
 		});
 
 		const t1 = performance.now();

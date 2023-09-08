@@ -84,11 +84,15 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 	}
 
-	public commitChanges(): void {
-		// Replace clones with originals
-		const changedHolders = this.getIndex(Contracts.State.WalletIndexes.Addresses)
+	public getDirtyWallets(): ReadonlyArray<Contracts.State.WalletHolder> {
+		return this.getIndex(Contracts.State.WalletIndexes.Addresses)
 			.values()
 			.filter((walletHolder) => walletHolder.getWallet().isChanged() || walletHolder.getOriginal() !== undefined);
+	}
+
+	public commitChanges(): void {
+		// Replace clones with originals
+		const changedHolders = this.getDirtyWallets();
 
 		for (const holder of changedHolders) {
 			const original = holder.getOriginal();
