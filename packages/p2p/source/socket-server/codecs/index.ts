@@ -1,5 +1,4 @@
 import { getBlocks } from "./get-blocks";
-import { getCommonBlocks } from "./get-common-blocks";
 import { getMessages } from "./get-messages";
 import { getPeers } from "./get-peers";
 import { getProposal } from "./get-proposal";
@@ -11,7 +10,6 @@ import { postTransactions } from "./post-transactions";
 
 export const Codecs = {
 	getBlocks,
-	getCommonBlocks,
 	getMessages,
 	getPeers,
 	getProposal,
