@@ -38,7 +38,7 @@ export class Service implements Contracts.P2P.Service {
 		}
 
 		await this.peerDiscoverer.populateSeedPeers();
-		await this.peerDiscoverer.discoverPeers(true);
+		await this.peerDiscoverer.discoverPeers();
 
 		for (const [version, peers] of Object.entries(
 			Utils.groupBy(this.repository.getPeers(), (peer) => peer.version),
@@ -69,7 +69,7 @@ export class Service implements Contracts.P2P.Service {
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
 
 			await this.peerDiscoverer.populateSeedPeers();
-			await this.peerDiscoverer.discoverPeers(true);
+			await this.peerDiscoverer.discoverPeers();
 		}
 	}
 

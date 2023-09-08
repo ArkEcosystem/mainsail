@@ -22,60 +22,31 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async discoverPeers(pingAll?: boolean): Promise<boolean> {
-		const maxPeersPerPeer = 50;
-		const ownPeers: Contracts.P2P.Peer[] = this.repository.getPeers();
-		const theirPeers: Contracts.P2P.Peer[] = Object.values(
-			(
-				await Promise.all(
-					Utils.shuffle(this.repository.getPeers())
-						.slice(0, 8)
-						.map(async (peer: Contracts.P2P.Peer) => {
-							try {
-								const { peers: hisPeers } = await this.communicator.getPeers(peer);
-								return hisPeers || [];
-							} catch (error) {
-								this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
-
-								this.peerDisposer.banPeer(peer.ip, error);
-
-								return [];
-							}
-						}),
-				)
-			)
-				.map((peers) =>
-					Object.fromEntries(
-						Utils.shuffle(peers)
-							.slice(0, maxPeersPerPeer)
-							.map((current: Contracts.P2P.PeerBroadcast) => [current.ip, this.peerFactory(current.ip)]),
-					),
-				)
-				.reduce(
-					(accumulator: object, current: { [ip: string]: Contracts.P2P.Peer }) => ({
-						...accumulator,
-						...current,
-					}),
-					{},
-				),
+	public async discoverPeers(pingAll?: boolean): Promise<void> {
+		await Promise.all(
+			Utils.shuffle(this.repository.getPeers())
+				.slice(0, 8)
+				.map(async (peer: Contracts.P2P.Peer) => {
+					await this.discoverPeersByPeer(peer);
+				}),
 		);
 
-		if (pingAll || !this.repository.hasMinimumPeers() || ownPeers.length < theirPeers.length * 0.75) {
-			await Promise.all(
-				theirPeers.map((p) =>
-					this.app
-						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
-						.call("validateAndAcceptPeer", { ip: p.ip, options: {} }),
-				),
-			);
-			void this.#pingPeerPorts(pingAll);
-
-			return true;
-		}
-
 		void this.#pingPeerPorts();
+	}
 
-		return false;
+	async discoverPeersByPeer(peer: Contracts.P2P.Peer): Promise<void> {
+		try {
+			const { peers } = await this.communicator.getPeers(peer);
+
+			for (const peer of peers) {
+				await this.app
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.call("validateAndAcceptPeer", { ip: peer.ip, options: {} });
+			}
+		} catch (error) {
+			this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
+			this.peerDisposer.banPeer(peer.ip, error);
+		}
 	}
 
 	async populateSeedPeers(): Promise<any> {

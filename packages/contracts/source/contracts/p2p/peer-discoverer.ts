@@ -1,4 +1,7 @@
+import { Peer } from "./peer";
+
 export interface PeerDiscoverer {
-	discoverPeers(pingAll?: boolean): Promise<boolean>;
+	discoverPeers(): Promise<void>;
+	discoverPeersByPeer(peer: Peer): Promise<void>;
 	populateSeedPeers(): Promise<void>;
 }
