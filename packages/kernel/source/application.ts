@@ -189,7 +189,7 @@ export class Application implements Contracts.Kernel.Application {
 		}
 
 		if (error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack);
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack ?? error.message);
 		}
 
 		await this.#disposeServiceProviders();

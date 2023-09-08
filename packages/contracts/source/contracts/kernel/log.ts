@@ -1,21 +1,21 @@
 export interface Logger {
 	make(options?: any): Promise<Logger>;
 
-	emergency(message: any): void;
+	emergency(message: string): void;
 
-	alert(message: any): void;
+	alert(message: string): void;
 
-	critical(message: any): void;
+	critical(message: string): void;
 
-	error(message: any): void;
+	error(message: string): void;
 
-	warning(message: any): void;
+	warning(message: string): void;
 
-	notice(message: any): void;
+	notice(message: string): void;
 
-	info(message: any): void;
+	info(message: string): void;
 
-	debug(message: any): void;
+	debug(message: string): void;
 
 	suppressConsoleOutput(suppress: boolean): void;
 
