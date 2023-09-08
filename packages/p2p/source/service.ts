@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
+import { shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -68,6 +69,10 @@ export class Service implements Contracts.P2P.Service {
 			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`);
 
 			await this.peerDiscoverer.populateSeedPeers();
+
+			for (const peer of shuffle(this.repository.getPeers()).slice(0, 8)) {
+				await this.peerDiscoverer.discoverPeers(peer);
+			}
 		}
 	}
 
