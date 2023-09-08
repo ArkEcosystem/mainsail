@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => { },
+			getLastBlock: () => {},
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		context.sandbox = new Sandbox();
