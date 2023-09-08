@@ -28,20 +28,7 @@ describe<{
 		await assert.resolves(() => serviceProvider.register());
 	});
 
-	it("#bootWhen - should return false when process.env.DISABLE_P2P_SERVER", async ({ serviceProvider }) => {
-		process.env.DISABLE_P2P_SERVER = "true";
-		assert.false(await serviceProvider.bootWhen());
-
-		delete process.env.DISABLE_P2P_SERVER;
-	});
-
-	it("#bootWhen - should return true when !process.env.DISABLE_P2P_SERVER", async ({ serviceProvider }) => {
-		assert.true(await serviceProvider.bootWhen());
-	});
-
-	it("#boot - should call the server boot method", async ({ sandbox, serviceProvider }) => {
-		const peerEventListener = { initialize: () => {} };
-
+	it("#boot - should call the server initialize", async ({ sandbox, serviceProvider }) => {
 		const spyServerInitialize = stub(server, "initialize");
 		const spyServerBoot = stub(server, "boot");
 
@@ -53,34 +40,16 @@ describe<{
 		await serviceProvider.boot();
 
 		spyServerInitialize.calledOnce();
-		spyServerBoot.calledOnce();
+		spyServerBoot.neverCalled();
 	});
 
-	it("#dispose - should call the server dispose method when process.env.DISABLE_P2P_SERVER is undefined", async ({
-		sandbox,
-		serviceProvider,
-	}) => {
+	it("#dispose - should call the server dispose", async ({ sandbox, serviceProvider }) => {
 		const spyServerDispose = stub(server, "dispose");
 		sandbox.app.bind(Identifiers.P2PServer).toConstantValue(server);
 
 		await serviceProvider.dispose();
 
 		spyServerDispose.calledOnce();
-	});
-
-	it("#dispose - should not call the server dispose method when process.env.DISABLE_P2P_SERVER = true", async ({
-		sandbox,
-		serviceProvider,
-	}) => {
-		const spyServerDispose = stub(server, "dispose");
-		sandbox.app.bind(Identifiers.P2PServer).toConstantValue(server);
-
-		process.env.DISABLE_P2P_SERVER = "true";
-		await serviceProvider.dispose();
-
-		spyServerDispose.neverCalled();
-
-		delete process.env.DISABLE_P2P_SERVER; // reset to initial undefined value
 	});
 
 	it("#required - should return true", async ({ serviceProvider }) => {
