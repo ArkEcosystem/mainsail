@@ -14,7 +14,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	private validatorIndexMatrix: Array<number> = [];
 
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
-		const committedBlock = await unit.getProposedCommitBlock();
+		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (
 			this.validatorIndexMatrix.length === 0 ||

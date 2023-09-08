@@ -23,7 +23,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	}
 
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
-		const committedBlock = await unit.getProposedCommitBlock();
+		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
 			this.buildValidatorRanking();
@@ -91,7 +91,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 					const username = a.getUsername();
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-							`Validator "${username}" appears twice in the list.`,
+						`Validator "${username}" appears twice in the list.`,
 					);
 				}
 

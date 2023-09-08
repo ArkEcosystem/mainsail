@@ -14,15 +14,15 @@ type Context = {
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.state = {
-			getLastBlock: () => {},
+			getLastBlock: () => { },
 			getLastCommittedRound: () => 0,
 		};
 		context.validatorSet = {
-			getActiveValidators: () => {},
+			getActiveValidators: () => { },
 		};
 
 		context.logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -67,7 +67,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		await proposerPicker.onCommit({
-			getProposedCommitBlock: async () => ({ block: { header: { height: 0 } } }),
+			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -84,7 +84,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		for (let index = 1; index < activeValidators; index++) {
 			await proposerPicker.onCommit({
-				getProposedCommitBlock: async () => ({ block: { header: { height: index } } }),
+				getCommittedBlock: async () => ({ block: { header: { height: index } } }),
 			} as Contracts.BlockProcessor.IProcessableUnit);
 
 			assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
@@ -101,7 +101,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		await proposerPicker.onCommit({
-			getProposedCommitBlock: async () => ({ block: { header: { height: 5 } } }),
+			getCommittedBlock: async () => ({ block: { header: { height: 5 } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
 
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
@@ -109,7 +109,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 		const spyOnGetLastCommittedRound = stub(state, "getLastCommittedRound").returnValue(51);
 
 		await proposerPicker.onCommit({
-			getProposedCommitBlock: async () => ({ block: { header: { height: activeValidators } } }),
+			getCommittedBlock: async () => ({ block: { header: { height: activeValidators } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
 
@@ -122,7 +122,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		await proposerPicker.onCommit({
-			getProposedCommitBlock: async () => ({ block: { header: { height: 1 } } }),
+			getCommittedBlock: async () => ({ block: { header: { height: 1 } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
