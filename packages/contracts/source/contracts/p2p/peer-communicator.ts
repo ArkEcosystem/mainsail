@@ -28,6 +28,4 @@ export interface PeerCommunicator {
 		options?: Partial<EmitOptions>,
 	): Promise<IGetBlocksResponse>;
 	getStatus(peer: Peer, options?: Partial<EmitOptions>): Promise<IGetStatusResponse>;
-
-	hasCommonBlocks(peer: Peer, ids: string[], timeoutMsec?: number): Promise<any>;
 }

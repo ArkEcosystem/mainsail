@@ -6,7 +6,6 @@ import { Providers } from "@mainsail/kernel";
 import { getPeerIp, isValidVersion } from "../../utils";
 import {
 	GetBlocksRoute,
-	GetCommonBlocksRoute,
 	GetMessagesRoute,
 	GetPeersRoute,
 	GetProposalRoute,
@@ -37,7 +36,6 @@ export class ValidatePlugin extends BasePlugin {
 
 		const allRoutesConfigByPath = {
 			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
-			...this.app.resolve(GetCommonBlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetMessagesRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetProposalRoute).getRoutesConfigByPath(),

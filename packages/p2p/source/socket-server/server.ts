@@ -12,7 +12,6 @@ import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
 import {
 	GetBlocksRoute,
-	GetCommonBlocksRoute,
 	GetMessagesRoute,
 	GetPeersRoute,
 	GetProposalRoute,
@@ -52,7 +51,6 @@ export class Server implements Contracts.P2P.Server {
 		});
 
 		this.app.resolve(GetBlocksRoute).register(this.server);
-		this.app.resolve(GetCommonBlocksRoute).register(this.server);
 		this.app.resolve(GetMessagesRoute).register(this.server);
 		this.app.resolve(GetPeersRoute).register(this.server);
 		this.app.resolve(GetProposalRoute).register(this.server);

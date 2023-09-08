@@ -18,10 +18,6 @@ export const buildRateLimiter = (options) =>
 					rateLimit: 2,
 				},
 				{
-					endpoint: Routes.GetCommonBlocks,
-					rateLimit: 9,
-				},
-				{
 					endpoint: Routes.PostTransactions,
 					rateLimit: options.rateLimitPostTransactions,
 				},

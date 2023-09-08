@@ -114,21 +114,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return this.emit<Contracts.P2P.IGetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
 	}
 
-	public async hasCommonBlocks(peer: Contracts.P2P.Peer, ids: string[], timeoutMsec?: number): Promise<any> {
-		const body: any = await this.emit(
-			peer,
-			Routes.GetCommonBlocks,
-			{ ids },
-			{ timeout: timeoutMsec && timeoutMsec < 5000 ? timeoutMsec : 5000 },
-		);
-
-		if (!body || !body.common) {
-			return false;
-		}
-
-		return body.common;
-	}
-
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
 		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
