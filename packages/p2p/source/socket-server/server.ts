@@ -4,7 +4,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { plugin as hapiNesPlugin } from "../hapi-nes";
 import { AcceptPeerPlugin } from "./plugins/accept-peer";
-import { AwaitBlockPlugin } from "./plugins/await-block";
 import { CodecPlugin } from "./plugins/codec";
 import { HeaderHandlePlugin } from "./plugins/header-handle";
 import { HeaderIncludePlugin } from "./plugins/header-include";
@@ -64,7 +63,6 @@ export class Server implements Contracts.P2P.Server {
 
 		// onPreAuth
 		this.app.resolve(RateLimitPlugin).register(this.server);
-		this.app.resolve(AwaitBlockPlugin).register(this.server);
 
 		// onPostAuth
 		this.app.resolve(CodecPlugin).register(this.server);
