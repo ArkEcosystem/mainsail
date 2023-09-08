@@ -1,4 +1,4 @@
-import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
@@ -35,20 +35,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerActions();
 	}
 
-	public async bootWhen(): Promise<boolean> {
-		return !process.env[Constants.Flags.DISABLE_P2P_SERVER];
-	}
-
 	public async boot(): Promise<void> {
 		await this.#buildServer();
-
-		await this.app.get<Server>(Identifiers.P2PServer).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		if (!process.env[Constants.Flags.DISABLE_P2P_SERVER]) {
-			await this.app.get<Server>(Identifiers.P2PServer).dispose();
-		}
+		await this.app.get<Contracts.P2P.Server>(Identifiers.P2PServer).dispose();
 	}
 
 	public async required(): Promise<boolean> {
@@ -140,7 +132,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	async #buildServer(): Promise<void> {
-		const server: Server = this.app.get<Server>(Identifiers.P2PServer);
+		const server = this.app.get<Contracts.P2P.Server>(Identifiers.P2PServer);
 		const serverConfig = this.config().getRequired<{ hostname: string; port: number }>("server");
 		Utils.assert.defined(serverConfig);
 

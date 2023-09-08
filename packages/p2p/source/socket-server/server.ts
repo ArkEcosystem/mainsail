@@ -25,7 +25,7 @@ import {
 
 // todo: review the implementation
 @injectable()
-export class Server {
+export class Server implements Contracts.P2P.Server {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
