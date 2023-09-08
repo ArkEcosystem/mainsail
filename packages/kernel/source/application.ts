@@ -189,7 +189,16 @@ export class Application implements Contracts.Kernel.Application {
 		}
 
 		if (error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error);
+			let errors: Error[] = [error];
+
+			// Check for AggregateError
+			if ("errors" in error) {
+				errors = [...errors, ...(error as unknown as Record<string, any>).errors];
+			}
+
+			for (const error of errors) {
+				this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack ?? error.message);
+			}
 		}
 
 		await this.#disposeServiceProviders();
@@ -273,7 +282,7 @@ export class Application implements Contracts.Kernel.Application {
 
 			try {
 				await serviceProvider.dispose();
-			} catch {}
+			} catch { }
 		}
 	}
 
