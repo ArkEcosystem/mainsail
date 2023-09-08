@@ -67,7 +67,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 		this.#silentConsole = suppress;
 	}
 
-	public async dispose(): Promise<void> { }
+	public async dispose(): Promise<void> {}
 
 	#log(level: string, message: string): void {
 		if (this.#silentConsole) {
