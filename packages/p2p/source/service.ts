@@ -115,7 +115,7 @@ export class Service implements Contracts.P2P.Service {
 					if (!(await this.peerVerifier.verify(peer))) {
 						unresponsivePeers++;
 
-						this.peerDisposer.disposePeer(peer);
+						this.peerDisposer.disposePeer(peer.ip);
 					}
 				}),
 			).then(resolvesFirst);

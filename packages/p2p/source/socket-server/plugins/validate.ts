@@ -1,9 +1,9 @@
-import Boom from "@hapi/boom";
+import { ResponseToolkit } from "@hapi/hapi";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { isValidVersion } from "../../utils";
+import { getPeerIp, isValidVersion } from "../../utils";
 import {
 	GetBlocksRoute,
 	GetCommonBlocksRoute,
@@ -16,15 +16,19 @@ import {
 	PostProposalRoute,
 	PostTransactionsRoute,
 } from "../routes";
+import { BasePlugin } from "./base-plugin";
 
 @injectable()
-export class ValidatePlugin {
+export class ValidatePlugin extends BasePlugin {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
+
+	@inject(Identifiers.PeerProcessor)
+	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server) {
 		if (this.configuration.getRequired("developmentMode.enabled")) {
@@ -45,15 +49,19 @@ export class ValidatePlugin {
 		};
 
 		server.ext({
-			method: async (request, h) => {
+			method: async (request: Contracts.P2P.Request, h: ResponseToolkit) => {
+				if (!this.peerProcessor.validatePeerIp(getPeerIp(request))) {
+					return this.disposeAndReturnBadRequest(request, h, "Validation failed");
+				}
+
 				const version = request.payload?.headers?.version;
 				if (version && !isValidVersion(this.app, version)) {
-					return Boom.badRequest("Validation failed (invalid version)");
+					return this.disposeAndReturnBadRequest(request, h, "Validation failed (invalid version)");
 				}
 
 				const result = allRoutesConfigByPath[request.path]?.validation?.validate(request.payload);
 				if (result && result.error) {
-					return Boom.badRequest("Validation failed");
+					return this.banAndReturnBadRequest(request, h, "Validation failed");
 				}
 				return h.continue;
 			},

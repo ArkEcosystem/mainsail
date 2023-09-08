@@ -99,7 +99,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		this.#lastConnectionCreate.set(peer.ip, Date.now());
 
 		connection.onError = (error) => {
-			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).banPeer(peer, error);
+			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).banPeer(peer.ip, error);
 		};
 
 		await connection.connect({ retries: 1, timeout: 5000 });

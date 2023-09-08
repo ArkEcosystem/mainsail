@@ -37,7 +37,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 							} catch (error) {
 								this.logger.debug(`Failed to get peers from ${peer.ip}: ${error.message}`);
 
-								this.peerDisposer.banPeer(peer, error);
+								this.peerDisposer.banPeer(peer.ip, error);
 
 								return [];
 							}
@@ -105,7 +105,6 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 		return Promise.all(
 			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
-				// TODO: disconnect peer on error
 				this.app
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } }),

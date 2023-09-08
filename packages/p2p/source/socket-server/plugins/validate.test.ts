@@ -11,6 +11,7 @@ describe<{
 	validatePlugin: ValidatePlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
 	const utils = {
+		getPeerIp: () => "",
 		isValidVersion: () => true,
 	};
 
@@ -45,6 +46,10 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue({ validatePeerIp: () => true });
+		context.sandbox.app
+			.bind(Identifiers.PeerDisposer)
+			.toConstantValue({ banPeer: () => {}, disposePeer: () => {} });
 
 		context.validatePlugin = context.sandbox.app.resolve(ValidatePluginProxy);
 	});
