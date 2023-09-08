@@ -23,6 +23,9 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
+	@inject(Identifiers.PeerDiscoverer)
+	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
+
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -96,6 +99,8 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
 			void this.events.dispatch(Enums.PeerEvent.Added, peer);
+
+			await this.peerDiscoverer.discoverPeers(peer);
 		}
 
 		this.repository.forgetPendingPeer(peer);

@@ -10,9 +10,6 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.PeerFactory)
 	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
-	@inject(Identifiers.PeerRepository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
-
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
@@ -22,19 +19,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async discoverPeers(pingAll?: boolean): Promise<void> {
-		await Promise.all(
-			Utils.shuffle(this.repository.getPeers())
-				.slice(0, 8)
-				.map(async (peer: Contracts.P2P.Peer) => {
-					await this.discoverPeersByPeer(peer);
-				}),
-		);
-
-		void this.#pingPeerPorts();
-	}
-
-	async discoverPeersByPeer(peer: Contracts.P2P.Peer): Promise<void> {
+	async discoverPeers(peer: Contracts.P2P.Peer): Promise<void> {
 		try {
 			const { peers } = await this.communicator.getPeers(peer);
 
@@ -100,16 +85,5 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		}
 
 		return [];
-	}
-
-	async #pingPeerPorts(pingAll?: boolean): Promise<void> {
-		let peers = this.repository.getPeers();
-		if (!pingAll) {
-			peers = Utils.shuffle(peers).slice(0, Math.floor(peers.length / 2));
-		}
-
-		this.logger.debug(`Checking ports of ${Utils.pluralize("peer", peers.length, true)}.`);
-
-		await Promise.all(peers.map((peer) => this.communicator.pingPorts(peer)));
 	}
 }
