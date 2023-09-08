@@ -97,35 +97,35 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return this;
 	}
 
-	public emergency(message: any): void {
+	public emergency(message: string): void {
 		this.#log("emergency", message);
 	}
 
-	public alert(message: any): void {
+	public alert(message: string): void {
 		this.#log("alert", message);
 	}
 
-	public critical(message: any): void {
+	public critical(message: string): void {
 		this.#log("critical", message);
 	}
 
-	public error(message: any): void {
+	public error(message: string): void {
 		this.#log("error", message);
 	}
 
-	public warning(message: any): void {
+	public warning(message: string): void {
 		this.#log("warning", message);
 	}
 
-	public notice(message: any): void {
+	public notice(message: string): void {
 		this.#log("notice", message);
 	}
 
-	public info(message: any): void {
+	public info(message: string): void {
 		this.#log("info", message);
 	}
 
-	public debug(message: any): void {
+	public debug(message: string): void {
 		this.#log("debug", message);
 	}
 
@@ -150,7 +150,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		}
 	}
 
-	#log(level: string, message: any): void {
+	#log(level: string, message: string): void {
 		if (this.#silentConsole) {
 			return;
 		}
