@@ -17,6 +17,7 @@ type Context = {
 
 const init = (context: Context) => {
 	const logger = {
+		info: () => {},
 		debug: () => {},
 		error: () => {},
 		notice: () => {},

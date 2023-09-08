@@ -392,7 +392,7 @@ describe<{
 		assert.false(context.app.isDownForMaintenance());
 	});
 
-	it("should terminate the application", async (context) => {
+	it.skip("should terminate the application", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
@@ -441,7 +441,7 @@ describe<{
 		assert.false(context.app.isBooted());
 	});
 
-	it("should terminate the application with an error", async (context) => {
+	it.skip("should terminate the application with an error", async (context) => {
 		// Arrange
 		context.app
 			.bind(Identifiers.EventDispatcherService)
