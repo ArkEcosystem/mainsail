@@ -110,16 +110,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	}
 
 	public error(message: any): void {
-		if (typeof message === "object") {
-			// AggregateError
-			if ("errors" in message) {
-				for (const error of message) {
-					this.#log("error", error);
-				}
-			}
-		} else {
-			this.#log("error", message);
-		}
+		this.#log("error", message);
 	}
 
 	public warning(message: any): void {
@@ -197,7 +188,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 							return callback(undefined, line.replace("USERLVL", formatLevel(json.level)));
 						}
 					}
-				} catch {}
+				} catch { }
 
 				return callback();
 			},
