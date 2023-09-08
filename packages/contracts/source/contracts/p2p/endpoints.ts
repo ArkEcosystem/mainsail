@@ -1,6 +1,5 @@
 import Hapi from "@hapi/hapi";
 
-import { IBlockData } from "../crypto";
 import { IHeaderData } from "./header";
 import { Socket } from "./nes";
 import { PeerBroadcast, PeerConfig, PeerState } from "./peer";
@@ -26,18 +25,6 @@ export interface IGetBlocksRequest extends Request {
 
 export interface IGetBlocksResponse extends Response {
 	blocks: Buffer[];
-}
-
-export interface IGetCommonBlocksRequest extends Request {
-	payload: {
-		headers: IHeaderData;
-		ids: string[];
-	};
-}
-
-export interface IGetCommonBlocksResponse extends Response {
-	common: IBlockData;
-	lastBlockHeight: number;
 }
 
 export interface IGetMessagesRequest extends Request {
