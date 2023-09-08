@@ -114,7 +114,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		throw new Error("Block is not available, because proposal is not set");
 	}
 
-	public async getProposedCommitBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
+	public async getCommittedBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
 		if (!this.#committedBlock) {
 			const majority = await this.aggregatePrecommits();
 

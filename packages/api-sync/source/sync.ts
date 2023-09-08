@@ -31,7 +31,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
-		const committedBlock = await unit.getProposedCommitBlock();
+		const committedBlock = await unit.getCommittedBlock();
 
 		const {
 			block: { header, transactions },

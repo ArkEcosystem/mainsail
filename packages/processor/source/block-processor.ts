@@ -58,7 +58,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	public async commit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		unit.getWalletRepository().commitChanges();
 
-		const committedBlock = await unit.getProposedCommitBlock();
+		const committedBlock = await unit.getCommittedBlock();
 
 		if (!this.state.isBootstrap()) {
 			await this.databaseService.saveBlocks([committedBlock]);
