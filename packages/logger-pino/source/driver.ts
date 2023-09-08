@@ -188,7 +188,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 							return callback(undefined, line.replace("USERLVL", formatLevel(json.level)));
 						}
 					}
-				} catch { }
+				} catch {}
 
 				return callback();
 			},
