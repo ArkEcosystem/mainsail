@@ -16,7 +16,8 @@ describe<{
 		const missing = stub(processManager, "missing").returnValue(true);
 		const isStopped = stub(processManager, "isStopped").returnValue(false);
 
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process does not exist.');
+		cli.flags = { network: "testnet", token: "arkdoesnotexist" };
+		await assert.rejects(() => cli.execute(Command), 'The "arkdoesnotexist-core" process does not exist.');
 	});
 
 	it("should throw if the process is stopped", async ({ processManager, cli }) => {

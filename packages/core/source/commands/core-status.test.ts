@@ -13,7 +13,8 @@ describe<{
 	});
 
 	it("should throw if the process does not exist", async ({ cli }) => {
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process does not exist.');
+		cli.flags = { network: "testnet", token: "arkdoesnotexist" };
+		await assert.rejects(() => cli.execute(Command), 'The "arkdoesnotexist-core" process does not exist.');
 	});
 
 	it("should render a table with the process information", async ({ processManager, cli }) => {
