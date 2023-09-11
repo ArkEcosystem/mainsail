@@ -10,7 +10,7 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
+			.setFlag("token", "The name of the token.", Joi.string().required())
 			.setFlag("error", "Only display the error output.", Joi.boolean())
 			.setFlag("lines", "The number of lines to output.", Joi.number().default(15));
 	}

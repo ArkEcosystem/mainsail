@@ -9,7 +9,7 @@ export class Command extends Commands.Command {
 	public description = "Restart the Core process.";
 
 	public configure(): void {
-		this.definition.setFlag("token", "The name of the token.", Joi.string());
+		this.definition.setFlag("token", "The name of the token.", Joi.string().required());
 	}
 
 	public async execute(): Promise<void> {
