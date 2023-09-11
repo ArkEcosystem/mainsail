@@ -1,0 +1,92 @@
+{
+	"name": "@mainsail/api",
+	"version": "0.0.1",
+	"description": "API of the Mainsail Blockchain",
+	"license": "MIT",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"bin": {
+		"api": "./bin/run"
+	},
+	"files": [
+		"/bin",
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail core:run -- --env=test --token=ark --network=testnet",
+		"api": "node ./bin/run",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/api-database": "workspace:*",
+		"@mainsail/api-http": "workspace:*",
+		"@mainsail/bootstrap": "workspace:*",
+		"@mainsail/cli": "workspace:*",
+		"@mainsail/configuration-generator": "workspace:*",
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-address-base58": "workspace:*",
+		"@mainsail/crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
+		"@mainsail/crypto-hash-bcrypto": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-messages": "workspace:*",
+		"@mainsail/crypto-signature-schnorr": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
+		"@mainsail/crypto-transaction-multi-signature-registration": "workspace:*",
+		"@mainsail/crypto-transaction-transfer": "workspace:*",
+		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
+		"@mainsail/crypto-transaction-validator-resignation": "workspace:*",
+		"@mainsail/crypto-transaction-vote": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/fees": "workspace:*",
+		"@mainsail/fees-static": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/logger-pino": "workspace:*",
+		"@mainsail/processor": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"@mainsail/validation": "workspace:*",
+		"@mainsail/validator": "workspace:*",
+		"@mainsail/validator-set-static": "workspace:*",
+		"bip39": "3.0.4",
+		"boxen": "4.2.0",
+		"cross-env": "7.0.3",
+		"dayjs": "1.10.7",
+		"env-paths": "2.2.1",
+		"envfile": "5.2.0",
+		"execa": "3.4.0",
+		"fs-extra": "8.1.0",
+		"joi": "17.9.2",
+		"kleur": "4.1.4",
+		"prompts": "2.4.0",
+		"tmp": "0.2.1",
+		"uvu": "^0.5.6"
+	},
+	"devDependencies": {
+		"@types/boxen": "3.0.1",
+		"@types/env-paths": "2.1.0",
+		"@types/execa": "2.0.0",
+		"@types/fs-extra": "8.1.0",
+		"@types/prompts": "2.4.0",
+		"@types/tmp": "0.2.1"
+	},
+	"peerDependencies": {
+		"pm2": "^5.3.0"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}
