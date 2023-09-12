@@ -7,7 +7,6 @@ import { WalletEvent } from "./wallet-event";
 export class Wallet implements Contracts.State.Wallet {
 	protected publicKey: Contracts.State.IAttribute<string> | undefined = undefined;
 	protected balance = new BigNumberAttribute(BigNumber.ZERO);
-	protected nonce = new BigNumberAttribute(BigNumber.ZERO);
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<any>>();
 
@@ -17,7 +16,9 @@ export class Wallet implements Contracts.State.Wallet {
 		protected readonly address: string,
 		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
 		protected readonly events?: Contracts.Kernel.EventDispatcher,
-	) {}
+	) {
+		this.setAttribute("nonce", BigNumber.ZERO);
+	}
 
 	public isChanged(): boolean {
 		return this.#changed;
@@ -68,22 +69,11 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getNonce(): BigNumber {
-		return this.nonce.get();
+		return this.getAttribute<BigNumber>("nonce");
 	}
 
 	public setNonce(nonce: BigNumber): void {
-		const previousValue = this.nonce.get();
-
-		this.nonce.set(nonce);
-		this.#changed = true;
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: "nonce",
-			previousValue,
-			publicKey: this.publicKey,
-			value: nonce,
-			wallet: this,
-		});
+		this.setAttribute("nonce", nonce);
 	}
 
 	public increaseBalance(balance: BigNumber): Contracts.State.Wallet {
@@ -99,11 +89,11 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public increaseNonce(): void {
-		this.setNonce(this.nonce.get().plus(BigNumber.ONE));
+		this.setNonce(this.getNonce().plus(BigNumber.ONE));
 	}
 
 	public decreaseNonce(): void {
-		this.setNonce(this.nonce.get().minus(BigNumber.ONE));
+		this.setNonce(this.getNonce().minus(BigNumber.ONE));
 	}
 
 	public getAttributes(): Record<string, any> {
@@ -195,7 +185,6 @@ export class Wallet implements Contracts.State.Wallet {
 		const cloned = new Wallet(this.address, this.attributeRepository);
 		cloned.publicKey = this.publicKey?.clone();
 		cloned.balance = this.balance.clone();
-		cloned.nonce = this.nonce.clone();
 		return cloned;
 	}
 }
