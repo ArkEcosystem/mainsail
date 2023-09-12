@@ -1,15 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { BigNumberAttribute, factory, GenericAttribute } from "../attributes";
-import { WalletEvent } from "./wallet-event";
+import { factory } from "../attributes";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected publicKey: Contracts.State.IAttribute<string> | undefined = undefined;
-	protected balance = new BigNumberAttribute(BigNumber.ZERO);
-
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<any>>();
-
 	#changed = false;
 
 	public constructor(
@@ -29,43 +24,19 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getPublicKey(): string | undefined {
-		return this.publicKey ? this.publicKey.get() : undefined;
+		return this.getAttribute<string>("publicKey");
 	}
 
 	public setPublicKey(publicKey: string): void {
-		if (!this.publicKey) {
-			this.publicKey = new GenericAttribute<string>("");
-		}
-
-		this.publicKey.set(publicKey);
-		this.#changed = true;
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: "publicKey",
-			previousValue: undefined,
-			publicKey: this.publicKey,
-			value: publicKey,
-			wallet: this,
-		});
+		this.setAttribute("publicKey", publicKey);
 	}
 
 	public getBalance(): BigNumber {
-		return this.balance.get();
+		return this.getAttribute("balance");
 	}
 
 	public setBalance(balance: BigNumber): void {
-		const previousValue = this.balance.get();
-
-		this.balance.set(balance);
-		this.#changed = true;
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: "balance",
-			previousValue,
-			publicKey: this.publicKey,
-			value: balance,
-			wallet: this,
-		});
+		this.setAttribute("balance", balance);
 	}
 
 	public getNonce(): BigNumber {
@@ -77,13 +48,13 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public increaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.balance.get().plus(balance));
+		this.setBalance(this.getBalance().plus(balance));
 
 		return this;
 	}
 
 	public decreaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.balance.get().minus(balance));
+		this.setBalance(this.getBalance().minus(balance));
 
 		return this;
 	}
@@ -182,9 +153,6 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(): Wallet {
-		const cloned = new Wallet(this.address, this.attributeRepository);
-		cloned.publicKey = this.publicKey?.clone();
-		cloned.balance = this.balance.clone();
-		return cloned;
+		return new Wallet(this.address, this.attributeRepository);
 	}
 }
