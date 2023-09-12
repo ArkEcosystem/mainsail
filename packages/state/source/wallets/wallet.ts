@@ -2,6 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { factory } from "../attributes";
+import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<any>>();
@@ -123,18 +124,19 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public forgetAttribute(key: string): boolean {
-		return true;
-		// const na = Symbol();
-		// const previousValue = this.attributesOld.get(key, na);
-		// const wasSet = this.attributesOld.forget(key);
-		// this.#changed = true;
-		// this.events?.dispatchSync(WalletEvent.PropertySet, {
-		// 	key,
-		// 	previousValue: previousValue === na ? undefined : previousValue,
-		// 	publicKey: this.publicKey,
-		// 	wallet: this,
-		// });
-		// return wasSet;
+		const attribute = this.attributes.get(key);
+		const previousValue = attribute ? attribute.get() : undefined;
+
+		this.attributes.delete(key);
+
+		this.events?.dispatchSync(WalletEvent.PropertySet, {
+			key,
+			previousValue: previousValue,
+			publicKey: this.getPublicKey(),
+			wallet: this,
+		});
+
+		return !!attribute;
 	}
 
 	public hasAttribute(key: string): boolean {
