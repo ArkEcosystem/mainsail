@@ -106,9 +106,6 @@
 			"package": "@mainsail/api-development"
 		},
 		{
-			"package": "@mainsail/api-http"
-		},
-		{
 			"package": "@mainsail/webhooks"
 		},
 		{
