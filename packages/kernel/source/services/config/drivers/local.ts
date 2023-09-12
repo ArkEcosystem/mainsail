@@ -21,6 +21,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.ValidationService)
 	private readonly validationService!: Contracts.Kernel.Validator;
 
+	@inject(Identifiers.ConfigFlags)
+	private readonly configFlags!: KeyValuePair;
+
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
 			const config: Record<string, Contracts.Types.Primitive> = dotenv.parseFile(this.app.environmentFile());
@@ -50,8 +53,12 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadApplication(): void {
+		const { initializationFileName } = this.configFlags;
+		console.log(initializationFileName);
+		assert.defined<string>(initializationFileName);
+
 		this.validationService.validate(
-			this.#loadFromLocation(["app.json", "app.js"]),
+			this.#loadFromLocation([initializationFileName]),
 			Joi.object({
 				flags: Joi.array().items(Joi.string()).optional(),
 				plugins: Joi.array()

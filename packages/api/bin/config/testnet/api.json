@@ -61,55 +61,16 @@
 			"package": "@mainsail/logger-pino"
 		},
 		{
-			"package": "@mainsail/state"
-		},
-		{
-			"package": "@mainsail/storage-lmdb"
-		},
-		{
-			"package": "@mainsail/database"
-		},
-		{
 			"package": "@mainsail/transactions"
-		},
-		{
-			"package": "@mainsail/transaction-pool"
 		},
 		{
 			"package": "@mainsail/crypto-messages"
 		},
 		{
-			"package": "@mainsail/p2p"
-		},
-		{
 			"package": "@mainsail/api-database"
 		},
 		{
-			"package": "@mainsail/api-sync"
-		},
-		{
-			"package": "@mainsail/processor"
-		},
-		{
-			"package": "@mainsail/validator-set-static"
-		},
-		{
-			"package": "@mainsail/validator"
-		},
-		{
-			"package": "@mainsail/consensus"
-		},
-		{
-			"package": "@mainsail/api-development"
-		},
-		{
 			"package": "@mainsail/api-http"
-		},
-		{
-			"package": "@mainsail/webhooks"
-		},
-		{
-			"package": "@mainsail/bootstrap"
 		}
 	]
 }

@@ -17,8 +17,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string())
+			.setFlag("token", "The name of the token.", Joi.string().required())
+			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
 	}
 
@@ -61,35 +61,32 @@ export class Command extends Commands.Command {
 		const configSource = resolve(__dirname, `../../bin/config/${flags.network}`);
 
 		await this.components.taskList([
+			// TODO: overwrites core .env... so ideally we would use separate folders for core and api?
+			// {
+			// 	task: () => {
+			// 		if (!existsSync(`${configSource}/.env`)) {
+			// 			this.components.fatal(`Couldn't find the environment file at ${configSource}/.env.`);
+			// 		}
+
+			// 		copySync(`${configSource}/.env`, `${configDestination}/.env`);
+			// 	},
+			// 	title: "Publish environment",
+			// },
 			{
 				task: () => {
-					if (flags.reset) {
-						removeSync(configDestination);
-					}
-
-					if (existsSync(configDestination)) {
-						this.components.fatal("Please use the --reset flag if you wish to reset your configuration.");
-					}
-
-					if (!existsSync(configSource)) {
-						this.components.fatal(`Couldn't find the core configuration files at ${configSource}.`);
+					if (existsSync(join(configDestination, "api.json"))) {
+						if (flags.reset) {
+							removeSync(join(configDestination, "api.json"));
+						} else {
+							this.components.fatal("Please use the --reset flag if you wish to reset your configuration.");
+						}
 					}
 
 					ensureDirSync(configDestination);
+					copySync(join(configSource, "api.json"), join(configDestination, "api.json"));
 				},
-				title: "Prepare directories",
+				title: "Publish api.json"
 			},
-			{
-				task: () => {
-					if (!existsSync(`${configSource}/.env`)) {
-						this.components.fatal(`Couldn't find the environment file at ${configSource}/.env.`);
-					}
-
-					copySync(`${configSource}/.env`, `${configDestination}/.env`);
-				},
-				title: "Publish environment",
-			},
-			{ task: () => copySync(configSource, configDestination), title: "Publish configuration" },
 		]);
 	}
 }
