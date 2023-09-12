@@ -80,15 +80,13 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getAttribute<T>(key: string, defaultValue?: T): T {
-		// return this.attributesOld.get<T>(key, defaultValue);
-
 		const attribute = this.attributes.get(key);
 
 		if (attribute) {
 			return attribute.get();
 		}
 
-		// Check if attribute name is valid
+		this.#checkAttributeName(key);
 
 		if (defaultValue !== undefined) {
 			return defaultValue;
@@ -99,33 +97,35 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public setAttribute<T = any>(key: string, value: T): boolean {
 		let attribute = this.attributes.get(key);
+		const wasSet = !!attribute;
+		const previousValue = attribute ? attribute.get() : undefined;
 
 		if (!attribute) {
-			// TODO: Check if attribute name is valid
-
 			attribute = factory(key, value);
 			this.attributes.set(key, attribute);
 		}
 
 		attribute.set(value);
-		return true;
 
-		// const wasSet = this.attributesOld.set<T>(key, value);
-		// this.#changed = true;
+		this.events?.dispatchSync(WalletEvent.PropertySet, {
+			key: key,
+			previousValue,
+			publicKey: this.getPublicKey(),
+			value,
 
-		// this.events?.dispatchSync(WalletEvent.PropertySet, {
-		// 	key: key,
-		// 	publicKey: this.publicKey,
-		// 	value,
-		// 	wallet: this,
-		// });
+			wallet: this,
+		});
 
-		// return wasSet;
+		return wasSet;
 	}
 
 	public forgetAttribute(key: string): boolean {
 		const attribute = this.attributes.get(key);
 		const previousValue = attribute ? attribute.get() : undefined;
+
+		if (!attribute) {
+			this.#checkAttributeName(key);
+		}
 
 		this.attributes.delete(key);
 
@@ -163,5 +163,11 @@ export class Wallet implements Contracts.State.Wallet {
 		}
 
 		return clone;
+	}
+
+	#checkAttributeName(name: string): void {
+		if (!this.attributeRepository.has(name)) {
+			throw new Error(`Attribute name "${name}" is not registered.`);
+		}
 	}
 }
