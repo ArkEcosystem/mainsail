@@ -16,6 +16,7 @@ export class AttributeMutator implements Contracts.State.ValidatorMutator {
 		wallet: Contracts.State.Wallet,
 		block: Contracts.Crypto.IBlockData,
 	): Promise<void> {
-		wallet.setAttribute<Contracts.Crypto.IBlockData | undefined>("validatorLastBlock");
+		// eslint-disable-next-line unicorn/no-useless-undefined
+		wallet.setAttribute<Contracts.Crypto.IBlockData | undefined>("validatorLastBlock", undefined);
 	}
 }
