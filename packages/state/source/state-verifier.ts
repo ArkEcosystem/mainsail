@@ -35,8 +35,8 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 				throw new Error("Non-genesis wallet with negative balance.");
 			}
 
-			if (wallet.hasAttribute("validator.voteBalance")) {
-				const voteBalance: BigNumber = wallet.getAttribute("validator.voteBalance");
+			if (wallet.hasAttribute("validatorVoteBalance")) {
+				const voteBalance: BigNumber = wallet.getAttribute("validatorVoteBalance");
 
 				if (voteBalance.isLessThan(0)) {
 					logNegativeBalance(wallet, "vote balance", voteBalance);

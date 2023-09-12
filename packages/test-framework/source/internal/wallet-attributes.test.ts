@@ -7,12 +7,11 @@ describe("WalletAttributes", ({ it, assert }) => {
 	it("#getWalletAttributeSet - should return attributes", () => {
 		const attributes = getWalletAttributeSet();
 
-		assert.true(attributes.has("validator.rank"));
-		assert.true(attributes.has("validator.resigned"));
-		assert.true(attributes.has("validator.round"));
-		assert.true(attributes.has("validator.username"));
-		assert.true(attributes.has("validator.voteBalance"));
-		assert.true(attributes.has("validator"));
+		assert.true(attributes.has("validatorRank"));
+		assert.true(attributes.has("validatorResigned"));
+		assert.true(attributes.has("validatorRound"));
+		assert.true(attributes.has("validatorUsername"));
+		assert.true(attributes.has("validatorVoteBalance"));
 		assert.true(attributes.has("multiSignature"));
 		assert.true(attributes.has("vote"));
 	});

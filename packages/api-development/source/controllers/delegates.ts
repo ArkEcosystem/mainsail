@@ -41,7 +41,7 @@ export class DelegatesController extends Controller {
 			wallet = this.walletRepository.findByUsername(walletId);
 		}
 
-		if (!wallet || !wallet.hasAttribute("validator.username")) {
+		if (!wallet || !wallet.hasAttribute("validatorUsername")) {
 			return notFound("Wallet not found");
 		}
 

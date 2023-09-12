@@ -71,5 +71,5 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	context.sandbox.app
 		.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
-		.set("validator.consensusPublicKey");
+		.set("validatorConsensusPublicKey");
 };

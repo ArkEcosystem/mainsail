@@ -107,7 +107,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 				throw new Exceptions.VotedForNonValidatorError(vote);
 			}
 
-			if (validatorWallet.hasAttribute("validator.resigned")) {
+			if (validatorWallet.hasAttribute("validatorResigned")) {
 				throw new Exceptions.VotedForResignedValidatorError(vote);
 			}
 		}

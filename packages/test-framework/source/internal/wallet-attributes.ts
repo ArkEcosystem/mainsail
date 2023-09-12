@@ -2,12 +2,11 @@ import { Services } from "@mainsail/kernel";
 
 export function getWalletAttributeSet(): Services.Attributes.AttributeSet {
 	const attributes: Services.Attributes.AttributeSet = new Services.Attributes.AttributeSet();
-	attributes.set("validator.rank");
-	attributes.set("validator.resigned");
-	attributes.set("validator.round");
-	attributes.set("validator.username");
-	attributes.set("validator.voteBalance");
-	attributes.set("validator");
+	attributes.set("validatorRank");
+	attributes.set("validatorResigned");
+	attributes.set("validatorRound");
+	attributes.set("validatorUsername");
+	attributes.set("validatorVoteBalance");
 	attributes.set("multiSignature");
 	attributes.set("vote");
 

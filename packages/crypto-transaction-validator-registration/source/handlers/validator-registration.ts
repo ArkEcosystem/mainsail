@@ -17,7 +17,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public walletAttributes(): ReadonlyArray<string> {
-		return ["validator.rank", "validator.round", "validator.username", "validator.voteBalance", "validator"];
+		return ["validatorRank", "validatorRound", "validatorUsername", "validatorVoteBalance", "validatorLastBlock"];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
@@ -35,14 +35,11 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 			const wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
 
-			wallet.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
-				rank: undefined,
-				username: transaction.asset.validator.username,
-				voteBalance: BigNumber.ZERO,
-			});
+			wallet.setAttribute<string>("validatorUsername", transaction.asset.validator.username);
+			wallet.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
 			// TODO: Add this as a wallet attribute
-			wallet.setAttribute("validator.consensusPublicKey", transaction.asset.validator.publicKey);
+			wallet.setAttribute("validatorConsensusPublicKey", transaction.asset.validator.publicKey);
 
 			walletRepository.index(wallet);
 		}
@@ -138,13 +135,11 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.publicKey);
 
-		sender.setAttribute<Contracts.State.WalletValidatorAttributes>("validator", {
-			round: 0,
-			username: transaction.data.asset.validator.username,
-			voteBalance: BigNumber.ZERO,
-		});
+		sender.setAttribute<number>("validatorRound", 0); //TODO: use BigNumber
+		sender.setAttribute<string>("validatorUsername", transaction.data.asset.validator.username);
+		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
-		sender.setAttribute("validator.consensusPublicKey", transaction.data.asset.validator.publicKey);
+		sender.setAttribute("validatorConsensusPublicKey", transaction.data.asset.validator.publicKey);
 
 		walletRepository.index(sender);
 	}
@@ -159,8 +154,10 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		sender.forgetAttribute("validator");
-		sender.forgetAttribute("validator.consensusPublicKey");
+		sender.forgetAttribute("validatorRound");
+		sender.forgetAttribute("validatorUsername");
+		sender.forgetAttribute("validatorVoteBalance");
+		sender.forgetAttribute("validatorConsensusPublicKey");
 
 		walletRepository.index(sender);
 	}

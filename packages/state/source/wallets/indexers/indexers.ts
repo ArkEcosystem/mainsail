@@ -14,12 +14,12 @@ export const publicKeysIndexer = (index: Contracts.State.WalletIndex, wallet: Co
 
 export const usernamesIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.WalletHolder) => {
 	if (wallet.getWallet().isValidator()) {
-		index.set(wallet.getWallet().getAttribute("validator.username"), wallet);
+		index.set(wallet.getWallet().getAttribute("validatorUsername"), wallet);
 	}
 };
 
 export const resignationsIndexer = (index: Contracts.State.WalletIndex, wallet: Contracts.State.WalletHolder) => {
-	if (wallet.getWallet().isValidator() && wallet.getWallet().hasAttribute("validator.resigned")) {
-		index.set(wallet.getWallet().getAttribute("validator.username"), wallet);
+	if (wallet.getWallet().isValidator() && wallet.getWallet().hasAttribute("validatorResigned")) {
+		index.set(wallet.getWallet().getAttribute("validatorUsername"), wallet);
 	}
 };

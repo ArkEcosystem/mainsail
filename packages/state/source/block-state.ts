@@ -104,10 +104,10 @@ export class BlockState implements Contracts.State.BlockState {
 				const voteBalanceChange: BigNumber = senderValidatorAmount.plus(transaction.fee).times(revert ? 1 : -1);
 
 				const voteBalance: BigNumber = validator
-					.getAttribute("validator.voteBalance", BigNumber.ZERO)
+					.getAttribute("validatorVoteBalance", BigNumber.ZERO)
 					.plus(voteBalanceChange);
 
-				validator.setAttribute("validator.voteBalance", voteBalance);
+				validator.setAttribute("validatorVoteBalance", voteBalance);
 			}
 
 			if (transaction.asset.votes.length > 0) {
@@ -117,10 +117,10 @@ export class BlockState implements Contracts.State.BlockState {
 				const voteBalanceChange: BigNumber = senderValidatorAmount.times(revert ? -1 : 1);
 
 				const voteBalance: BigNumber = validator
-					.getAttribute("validator.voteBalance", BigNumber.ZERO)
+					.getAttribute("validatorVoteBalance", BigNumber.ZERO)
 					.plus(voteBalanceChange);
 
-				validator.setAttribute("validator.voteBalance", voteBalance);
+				validator.setAttribute("validatorVoteBalance", voteBalance);
 			}
 		} else {
 			// Update vote balance of the sender's validator
@@ -144,11 +144,11 @@ export class BlockState implements Contracts.State.BlockState {
 
 				const total: BigNumber = amount.plus(transaction.fee);
 
-				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
+				const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
 
 				// General case : sender validator vote balance reduced by amount + fees (or increased if revert)
 				validator.setAttribute(
-					"validator.voteBalance",
+					"validatorVoteBalance",
 					revert ? voteBalance.plus(total) : voteBalance.minus(total),
 				);
 			}
@@ -165,9 +165,9 @@ export class BlockState implements Contracts.State.BlockState {
 					if (recipientWallet.hasVoted()) {
 						const vote = recipientWallet.getAttribute("vote");
 						const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(vote);
-						const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
+						const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
 						validator.setAttribute(
-							"validator.voteBalance",
+							"validatorVoteBalance",
 							revert ? voteBalance.minus(amount) : voteBalance.plus(amount),
 						);
 					}
@@ -179,10 +179,10 @@ export class BlockState implements Contracts.State.BlockState {
 				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(
 					recipient.getAttribute("vote"),
 				);
-				const voteBalance: BigNumber = validator.getAttribute("validator.voteBalance", BigNumber.ZERO);
+				const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
 
 				validator.setAttribute(
-					"validator.voteBalance",
+					"validatorVoteBalance",
 					revert ? voteBalance.minus(transaction.amount) : voteBalance.plus(transaction.amount),
 				);
 			}

@@ -258,7 +258,7 @@ describe<{
 
 		spySuper.calledOnce();
 		spyHasAttribute.calledWith("vote");
-		spyValidatorHasAttribute.calledWith("validator.resigned");
+		spyValidatorHasAttribute.calledWith("validatorResigned");
 		spyValidatorIsValidator.calledOnce();
 	});
 
@@ -302,7 +302,7 @@ describe<{
 
 		spySuper.neverCalled();
 		spyHasAttribute.calledWith("vote");
-		spyValidatorHasAttribute.calledWith("validator.resigned");
+		spyValidatorHasAttribute.calledWith("validatorResigned");
 	});
 
 	it("throwIfCannotBeApplied - should throw if voted is not validator", async ({ handler, walletRepository }) => {

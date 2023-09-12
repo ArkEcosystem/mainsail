@@ -38,15 +38,15 @@ describe<{
 		context.sandbox.app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
 		const attributes = context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes);
 		attributes.set("validator");
-		attributes.set("validator.username");
-		attributes.set("validator.voteBalance");
-		attributes.set("validator.producedBlocks");
-		attributes.set("validator.forgedTotal");
-		attributes.set("validator.approval");
+		attributes.set("validatorUsername");
+		attributes.set("validatorVoteBalance");
+		attributes.set("validatorProducedBlocks");
+		attributes.set("validatorForgedTotal");
+		attributes.set("validatorApproval");
 		attributes.set("vote");
-		attributes.set("validator.resigned");
-		attributes.set("validator.rank");
-		attributes.set("validator.round");
+		attributes.set("validatorResigned");
+		attributes.set("validatorRank");
+		attributes.set("validatorRound");
 
 		// @ts-ignore
 		@injectable()

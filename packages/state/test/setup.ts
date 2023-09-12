@@ -97,15 +97,15 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 	sandbox.app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
 	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.username");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.voteBalance");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.producedBlocks");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.forgedTotal");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.approval");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorUsername");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorVoteBalance");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorProducedBlocks");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorForgedTotal");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorApproval");
 	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("vote");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.resigned");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.rank");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator.round");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorResigned");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorRank");
+	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorRound");
 
 	registerIndexers(sandbox.app);
 
