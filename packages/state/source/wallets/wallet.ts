@@ -9,11 +9,15 @@ export class Wallet implements Contracts.State.Wallet {
 	protected publicKey: Contracts.State.IAttribute<string> | undefined = undefined;
 	protected balance = new BigNumberAttribute(BigNumber.ZERO);
 	protected nonce = new BigNumberAttribute(BigNumber.ZERO);
+	protected readonly attributesOld: Services.Attributes.AttributeMap = new Services.Attributes.AttributeMap(
+		new Services.Attributes.AttributeSet(),
+	);
+
 	#changed = false;
 
 	public constructor(
 		protected readonly address: string,
-		protected readonly attributes: Services.Attributes.AttributeMap,
+		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
 		protected readonly events?: Contracts.Kernel.EventDispatcher,
 	) {}
 
@@ -107,7 +111,7 @@ export class Wallet implements Contracts.State.Wallet {
 	public getData(): Contracts.State.WalletData {
 		return {
 			address: this.address,
-			attributes: this.attributes,
+			attributes: this.attributesOld,
 			balance: this.balance.get(),
 			nonce: this.nonce.get(),
 			publicKey: this.publicKey?.get(),
@@ -115,15 +119,15 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getAttributes(): Record<string, any> {
-		return this.attributes.all();
+		return this.attributesOld.all();
 	}
 
 	public getAttribute<T>(key: string, defaultValue?: T): T {
-		return this.attributes.get<T>(key, defaultValue);
+		return this.attributesOld.get<T>(key, defaultValue);
 	}
 
 	public setAttribute<T = any>(key: string, value: T): boolean {
-		const wasSet = this.attributes.set<T>(key, value);
+		const wasSet = this.attributesOld.set<T>(key, value);
 		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
@@ -138,8 +142,8 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public forgetAttribute(key: string): boolean {
 		const na = Symbol();
-		const previousValue = this.attributes.get(key, na);
-		const wasSet = this.attributes.forget(key);
+		const previousValue = this.attributesOld.get(key, na);
+		const wasSet = this.attributesOld.forget(key);
 		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
@@ -153,7 +157,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public hasAttribute(key: string): boolean {
-		return this.attributes.has(key);
+		return this.attributesOld.has(key);
 	}
 
 	public isValidator(): boolean {
@@ -169,7 +173,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(): Wallet {
-		const cloned = new Wallet(this.address, this.attributes.clone());
+		const cloned = new Wallet(this.address, this.attributeRepository);
 		cloned.publicKey = this.publicKey?.clone();
 		cloned.balance = this.balance.clone();
 		cloned.nonce = this.nonce.clone();
