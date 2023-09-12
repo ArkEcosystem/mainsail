@@ -17,7 +17,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public walletAttributes(): ReadonlyArray<string> {
-		return ["validatorRank", "validatorRound", "validatorUsername", "validatorVoteBalance"];
+		return ["validatorRank", "validatorRound", "validatorUsername", "validatorVoteBalance", "validatorLastBlock"];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
