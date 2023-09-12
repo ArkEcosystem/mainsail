@@ -41,6 +41,6 @@ export class Command extends Commands.Command {
 		});
 
 		// Prevent resolving execute method
-		return new Promise(() => { });
+		return new Promise(() => {});
 	}
 }

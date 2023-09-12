@@ -24,8 +24,8 @@ export class Command extends Commands.Command {
 
 		const flags: Contracts.AnyObject = {
 			...this.getFlags(),
-			name: Object.keys(bin)[0],
 			allowMissingConfigFiles: true,
+			name: Object.keys(bin)[0],
 		};
 
 		await Utils.Builder.buildApplication({
@@ -34,6 +34,6 @@ export class Command extends Commands.Command {
 		});
 
 		// Prevent resolving execute method
-		return new Promise(() => { });
+		return new Promise(() => {});
 	}
 }
