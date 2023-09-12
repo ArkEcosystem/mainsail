@@ -33,8 +33,8 @@ export const buildValidatorAndVoteWallets = async (
 		const delegateKey = delegateKeys[index];
 		const delegate = await walletRepo.findByPublicKey(await addressFactory.fromPublicKey(delegateKey));
 		// delegate.setPublicKey(delegateKey);
-		delegate.setAttribute("validator.username", `validator${index}`);
-		delegate.setAttribute("validator.voteBalance", BigNumber.ZERO);
+		delegate.setAttribute("validatorUsername", `validator${index}`);
+		delegate.setAttribute("validatorVoteBalance", BigNumber.ZERO);
 
 		// @ts-ignore
 		delegate.events = undefined;

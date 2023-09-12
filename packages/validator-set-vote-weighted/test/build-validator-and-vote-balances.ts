@@ -29,8 +29,8 @@ export const buildValidatorAndVoteWallets = async (
 	for (let index = 0; index < numberDelegates; index++) {
 		const delegateKey = delegateKeys[index];
 		const delegate = await walletRepository.findByPublicKey(delegateKey);
-		delegate.setAttribute("validator.username", `validator${index}`);
-		delegate.setAttribute("validator.voteBalance", BigNumber.ZERO);
+		delegate.setAttribute("validatorUsername", `validator${index}`);
+		delegate.setAttribute("validatorVoteBalance", BigNumber.ZERO);
 
 		const voter = await walletRepository.findByPublicKey(voterKeys[index]);
 		const totalBalance = BigNumber.make(index + 1)

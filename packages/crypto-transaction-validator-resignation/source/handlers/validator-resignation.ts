@@ -17,7 +17,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public walletAttributes(): ReadonlyArray<string> {
-		return ["validator.resigned"];
+		return ["validatorResigned"];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
@@ -32,7 +32,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			AppUtils.assert.defined<string>(transaction.senderPublicKey);
 
 			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
-			wallet.setAttribute("validator.resigned", true);
+			wallet.setAttribute("validatorResigned", true);
 			walletRepository.index(wallet);
 		}
 	}
@@ -49,14 +49,14 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			throw new Exceptions.WalletNotAValidatorError();
 		}
 
-		if (wallet.hasAttribute("validator.resigned")) {
+		if (wallet.hasAttribute("validatorResigned")) {
 			throw new Exceptions.WalletAlreadyResignedError();
 		}
 
 		const requiredValidatorsCount: number = this.configuration.getMilestone().activeValidators;
 		const currentValidatorsCount: number = walletRepository
 			.allByUsername()
-			.filter((w) => w.hasAttribute("validator.resigned") === false).length;
+			.filter((w) => w.hasAttribute("validatorResigned") === false).length;
 
 		if (currentValidatorsCount - 1 < requiredValidatorsCount) {
 			throw new Exceptions.NotEnoughValidatorsError();
@@ -86,7 +86,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 				transaction.data.senderPublicKey,
 			);
 			throw new Exceptions.PoolError(
-				`Validator resignation for "${wallet.getAttribute("validator.username")}" already in the pool`,
+				`Validator resignation for "${wallet.getAttribute("validatorUsername")}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
@@ -102,7 +102,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 
 		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		senderWallet.setAttribute("validator.resigned", true);
+		senderWallet.setAttribute("validatorResigned", true);
 
 		walletRepository.index(senderWallet);
 	}
@@ -117,7 +117,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 
 		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		senderWallet.forgetAttribute("validator.resigned");
+		senderWallet.forgetAttribute("validatorResigned");
 
 		walletRepository.index(senderWallet);
 	}

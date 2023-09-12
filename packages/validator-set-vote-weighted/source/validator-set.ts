@@ -57,9 +57,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 					voter.getAttribute("vote"),
 				);
 
-				const voteBalance: Utils.BigNumber = validator.getAttribute("validator.voteBalance");
+				const voteBalance: Utils.BigNumber = validator.getAttribute("validatorVoteBalance");
 
-				validator.setAttribute("validator.voteBalance", voteBalance.plus(voter.getBalance()));
+				validator.setAttribute("validatorVoteBalance", voteBalance.plus(voter.getBalance()));
 			}
 		}
 	}

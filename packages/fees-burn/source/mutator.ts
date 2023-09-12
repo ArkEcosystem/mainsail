@@ -22,8 +22,8 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 			);
 
 			validatorWallet.setAttribute(
-				"validator.voteBalance",
-				validatorWallet.getAttribute<BigNumber>("validator.voteBalance").minus(amount),
+				"validatorVoteBalance",
+				validatorWallet.getAttribute<BigNumber>("validatorVoteBalance").minus(amount),
 			);
 		}
 
@@ -43,8 +43,8 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 			);
 
 			validatorWallet.setAttribute(
-				"validator.voteBalance",
-				validatorWallet.getAttribute<BigNumber>("validator.voteBalance").plus(amount),
+				"validatorVoteBalance",
+				validatorWallet.getAttribute<BigNumber>("validatorVoteBalance").plus(amount),
 			);
 		}
 

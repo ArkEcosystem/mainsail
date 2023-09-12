@@ -15,30 +15,30 @@ export class ValidatorWallet implements Contracts.State.IValidatorWallet {
 	}
 
 	public getConsensusPublicKey(): string {
-		return this.wallet.getAttribute<string>("validator.consensusPublicKey");
+		return this.wallet.getAttribute<string>("validatorConsensusPublicKey");
 	}
 
 	public getUsername(): string {
-		return this.wallet.getAttribute<string>("validator.username");
+		return this.wallet.getAttribute<string>("validatorUsername");
 	}
 
 	public getVoteBalance(): Utils.BigNumber {
-		return this.wallet.getAttribute<Utils.BigNumber>("validator.voteBalance");
+		return this.wallet.getAttribute<Utils.BigNumber>("validatorVoteBalance");
 	}
 
 	public getRank(): number {
-		return this.wallet.getAttribute<number>("validator.rank");
+		return this.wallet.getAttribute<number>("validatorRank");
 	}
 
 	public setRank(rank: number): void {
-		this.wallet.setAttribute("validator.rank", rank);
+		this.wallet.setAttribute("validatorRank", rank);
 	}
 
 	public unsetRank(): void {
-		this.wallet.forgetAttribute("validator.rank");
+		this.wallet.forgetAttribute("validatorRank");
 	}
 
 	public isResigned(): boolean {
-		return this.wallet.hasAttribute("validator.resigned");
+		return this.wallet.hasAttribute("validatorResigned");
 	}
 }
