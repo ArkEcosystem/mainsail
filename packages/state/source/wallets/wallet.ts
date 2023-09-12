@@ -2,12 +2,13 @@ import { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
+import { BigNumberAttribute, StringAttribute } from "./attributes";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected publicKey: string | undefined = undefined;
-	protected balance = BigNumber.ZERO;
-	protected nonce = BigNumber.ZERO;
+	protected publicKey: StringAttribute | undefined = undefined;
+	protected balance = new BigNumberAttribute(BigNumber.ZERO);
+	protected nonce = new BigNumberAttribute(BigNumber.ZERO);
 	#changed = false;
 
 	public constructor(
@@ -25,18 +26,20 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getPublicKey(): string | undefined {
-		return this.publicKey;
+		return this.publicKey ? this.publicKey.get() : undefined;
 	}
 
 	public setPublicKey(publicKey: string): void {
-		const previousValue = this.publicKey;
+		if (!this.publicKey) {
+			this.publicKey = new StringAttribute("");
+		}
 
-		this.publicKey = publicKey;
+		this.publicKey.set(publicKey);
 		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: "publicKey",
-			previousValue,
+			previousValue: undefined,
 			publicKey: this.publicKey,
 			value: publicKey,
 			wallet: this,
@@ -44,13 +47,13 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getBalance(): BigNumber {
-		return this.balance;
+		return this.balance.get();
 	}
 
 	public setBalance(balance: BigNumber): void {
-		const previousValue = this.balance;
+		const previousValue = this.balance.get();
 
-		this.balance = balance;
+		this.balance.set(balance);
 		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
@@ -63,13 +66,13 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getNonce(): BigNumber {
-		return this.nonce;
+		return this.nonce.get();
 	}
 
 	public setNonce(nonce: BigNumber): void {
-		const previousValue = this.nonce;
+		const previousValue = this.nonce.get();
 
-		this.nonce = nonce;
+		this.nonce.set(nonce);
 		this.#changed = true;
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
@@ -82,32 +85,32 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public increaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.balance.plus(balance));
+		this.setBalance(this.balance.get().plus(balance));
 
 		return this;
 	}
 
 	public decreaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.balance.minus(balance));
+		this.setBalance(this.balance.get().minus(balance));
 
 		return this;
 	}
 
 	public increaseNonce(): void {
-		this.setNonce(this.nonce.plus(BigNumber.ONE));
+		this.setNonce(this.nonce.get().plus(BigNumber.ONE));
 	}
 
 	public decreaseNonce(): void {
-		this.setNonce(this.nonce.minus(BigNumber.ONE));
+		this.setNonce(this.nonce.get().minus(BigNumber.ONE));
 	}
 
 	public getData(): Contracts.State.WalletData {
 		return {
 			address: this.address,
 			attributes: this.attributes,
-			balance: this.balance,
-			nonce: this.nonce,
-			publicKey: this.publicKey,
+			balance: this.balance.get(),
+			nonce: this.nonce.get(),
+			publicKey: this.publicKey?.get(),
 		};
 	}
 
