@@ -10,7 +10,7 @@ export function getWalletAttributeSet(): Contracts.State.IAttributeRepository {
 	attributes.set("validatorUsername", Contracts.State.AttributeType.String);
 	attributes.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
 	attributes.set("multiSignature", Contracts.State.AttributeType.Object);
-	attributes.set("vote", Contracts.State.AttributeType.Object);
+	attributes.set("vote", Contracts.State.AttributeType.String);
 	return attributes;
 }
 
