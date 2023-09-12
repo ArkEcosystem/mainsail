@@ -1,5 +1,7 @@
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
+@injectable()
 export class AttributeRepository implements Contracts.State.IAttributeRepository {
 	#attributes: Map<string, Contracts.State.AttributeType> = new Map();
 
