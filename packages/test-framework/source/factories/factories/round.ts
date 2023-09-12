@@ -41,7 +41,7 @@ export const registerRoundFactory = async (
 					knownAttributes,
 				);
 				wallet.setPublicKey(publicKey);
-				wallet.setAttribute("validatorRank", undefined);
+				wallet.setAttribute("validatorRank");
 				wallet.setAttribute("validatorRound", options.round || 1);
 				wallet.setAttribute("validatorUsername", `genesis_${index + 1}`);
 				wallet.setAttribute("validatorVoteBalance", BigNumber.make("300000000000000"));
