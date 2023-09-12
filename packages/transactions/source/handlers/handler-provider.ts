@@ -1,14 +1,14 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { InternalTransactionType } from "@mainsail/crypto-transaction";
-import { Services, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 
 import { TransactionHandlerConstructor } from "./transaction";
 
 @injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
 	@inject(Identifiers.WalletAttributes)
-	private readonly attributeSet!: Services.Attributes.AttributeSet;
+	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
 	@inject(Identifiers.TransactionHandlerConstructors)
 	private readonly handlerConstructors!: TransactionHandlerConstructor[];
@@ -53,8 +53,8 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 		}
 
 		for (const attribute of handler.walletAttributes()) {
-			if (!this.attributeSet.has(attribute)) {
-				this.attributeSet.set(attribute);
+			if (!this.attributeRepository.has(attribute.name)) {
+				this.attributeRepository.set(attribute.name, attribute.type);
 			}
 		}
 

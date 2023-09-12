@@ -16,8 +16,14 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		return [];
 	}
 
-	public walletAttributes(): ReadonlyArray<string> {
-		return ["validatorRank", "validatorRound", "validatorUsername", "validatorVoteBalance", "validatorLastBlock"];
+	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
+		return [
+			{ name: "validatorRank", type: Contracts.State.AttributeType.Number },
+			{ name: "validatorRound", type: Contracts.State.AttributeType.Number },
+			{ name: "validatorUsername", type: Contracts.State.AttributeType.String },
+			{ name: "validatorVoteBalance", type: Contracts.State.AttributeType.BigNumber },
+			{ name: "validatorLastBlock", type: Contracts.State.AttributeType.String },
+		];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {

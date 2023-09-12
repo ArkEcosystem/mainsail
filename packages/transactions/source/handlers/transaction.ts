@@ -195,7 +195,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
 
-	public abstract walletAttributes(): ReadonlyArray<string>;
+	public abstract walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }>;
 
 	public abstract isActivated(): Promise<boolean>;
 

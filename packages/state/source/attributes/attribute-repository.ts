@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 export class AttributeRepository implements Contracts.State.IAttributeRepository {
 	#attributes: Map<string, Contracts.State.AttributeType> = new Map();
 
-	public add(name: string, type: Contracts.State.AttributeType): void {
+	public set(name: string, type: Contracts.State.AttributeType): void {
 		this.#attributes.set(name, type);
 	}
 

@@ -16,8 +16,8 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		return [ValidatorRegistrationTransactionHandler];
 	}
 
-	public walletAttributes(): ReadonlyArray<string> {
-		return ["vote"];
+	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
+		return [{ name: "vote", type: Contracts.State.AttributeType.String }];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {

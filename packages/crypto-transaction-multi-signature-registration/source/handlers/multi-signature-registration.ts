@@ -22,8 +22,9 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		return [];
 	}
 
-	public walletAttributes(): ReadonlyArray<string> {
-		return ["multiSignature"];
+	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
+		// TODO: Register custom attribute
+		return [{ name: "multiSignature", type: Contracts.State.AttributeType.String }];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {

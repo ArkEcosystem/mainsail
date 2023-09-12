@@ -1,5 +1,5 @@
 export interface IAttributeRepository {
-	add(name: string, type: AttributeType): void;
+	set(name: string, type: AttributeType): void;
 	has(name: string): boolean;
 	getAttributeType<T>(name: string): AttributeType;
 }
