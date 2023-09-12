@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { BigNumberAttribute, GenericAttribute } from "./attributes";
+import { BigNumberAttribute, GenericAttribute } from "../attributes";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
