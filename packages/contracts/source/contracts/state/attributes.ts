@@ -16,4 +16,5 @@ export enum AttributeType {
 	Number = "number",
 	String = "string",
 	BigNumber = "bigNumber",
+	Object = "object",
 }

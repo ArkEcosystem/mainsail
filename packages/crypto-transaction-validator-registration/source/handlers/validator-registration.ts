@@ -22,7 +22,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			{ name: "validatorRound", type: Contracts.State.AttributeType.Number },
 			{ name: "validatorUsername", type: Contracts.State.AttributeType.String },
 			{ name: "validatorVoteBalance", type: Contracts.State.AttributeType.BigNumber },
-			{ name: "validatorLastBlock", type: Contracts.State.AttributeType.String },
+			{ name: "validatorLastBlock", type: Contracts.State.AttributeType.Object },
 		];
 	}
 
