@@ -26,6 +26,10 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getPublicKey(): string | undefined {
+		if (!this.hasAttribute("publicKey")) {
+			return undefined;
+		}
+
 		return this.getAttribute<string>("publicKey");
 	}
 
@@ -101,7 +105,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const previousValue = attribute ? attribute.get() : undefined;
 
 		if (!attribute) {
-			attribute = factory(key, value);
+			attribute = factory(this.attributeRepository.getAttributeType(key), value);
 			this.attributes.set(key, attribute);
 		}
 
