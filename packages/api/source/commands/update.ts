@@ -17,7 +17,7 @@ export class Command extends Commands.Command {
 			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("force", "Force an update.", Joi.boolean().default(false))
 			.setFlag("updateProcessManager", "Update process manager.", Joi.boolean().default(false))
-			.setFlag("restart", "Restart all running processes.", Joi.boolean())
+			.setFlag("restart", "Restart all running processes.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {

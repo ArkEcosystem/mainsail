@@ -19,8 +19,8 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = {
 			...this.getFlags(),
-			initializationFileName: "api.json",
 			allowMissingConfigFiles: true,
+			initializationFileName: "api.json",
 		};
 
 		await Utils.Builder.buildApplication({
@@ -29,6 +29,6 @@ export class Command extends Commands.Command {
 		});
 
 		// Prevent resolving execute method
-		return new Promise(() => { });
+		return new Promise(() => {});
 	}
 }

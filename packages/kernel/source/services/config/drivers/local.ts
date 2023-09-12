@@ -54,8 +54,8 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadApplication(): void {
 		const locations = this.configFlags.initializationFileName
-			? [this.configFlags.initializationFileName] :
-			["app.json", "app.js"];
+			? [this.configFlags.initializationFileName]
+			: ["app.json", "app.js"];
 
 		this.validationService.validate(
 			this.#loadFromLocation(locations),
@@ -154,7 +154,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
 	}
 
-	#skipFileIfNotExists(filename: string, alwaysOptional: boolean = false): boolean {
+	#skipFileIfNotExists(filename: string, alwaysOptional = false): boolean {
 		if (!existsSync(this.app.configPath(filename))) {
 			return alwaysOptional || this.configFlags.allowMissingConfigFiles === true;
 		}

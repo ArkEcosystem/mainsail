@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
-		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
+		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue =>
 			// TODO: read from database, API doesn't have access to the in-memory state
 
 			// const blockHeight = app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
@@ -12,8 +12,7 @@ export const responseHeaders = {
 			// responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
 			// responsePropertyToUpdate.headers["X-Block-Height"] = blockHeight;
 
-			return h.continue;
-		};
+			h.continue;
 	},
 	name: "response-headers",
 

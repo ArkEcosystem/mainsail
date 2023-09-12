@@ -78,14 +78,16 @@ export class Command extends Commands.Command {
 						if (flags.reset) {
 							removeSync(join(configDestination, "api.json"));
 						} else {
-							this.components.fatal("Please use the --reset flag if you wish to reset your configuration.");
+							this.components.fatal(
+								"Please use the --reset flag if you wish to reset your configuration.",
+							);
 						}
 					}
 
 					ensureDirSync(configDestination);
 					copySync(join(configSource, "api.json"), join(configDestination, "api.json"));
 				},
-				title: "Publish api.json"
+				title: "Publish api.json",
 			},
 		]);
 	}
