@@ -13,6 +13,7 @@ export class Wallet implements Contracts.State.Wallet {
 		protected readonly events?: Contracts.Kernel.EventDispatcher,
 	) {
 		this.setAttribute("nonce", BigNumber.ZERO);
+		this.setAttribute("balance", BigNumber.ZERO);
 	}
 
 	public isChanged(): boolean {
@@ -153,6 +154,12 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(): Wallet {
-		return new Wallet(this.address, this.attributeRepository);
+		const clone = new Wallet(this.address, this.attributeRepository);
+
+		for (const [key, value] of this.attributes.entries()) {
+			clone.attributes.set(key, value.clone());
+		}
+
+		return clone;
 	}
 }
