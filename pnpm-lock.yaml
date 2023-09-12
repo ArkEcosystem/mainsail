@@ -137,9 +137,6 @@ importers:
       '@mainsail/api-http':
         specifier: workspace:*
         version: link:../api-http
-      '@mainsail/bootstrap':
-        specifier: workspace:*
-        version: link:../bootstrap
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
@@ -152,96 +149,18 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-address-base58':
-        specifier: workspace:*
-        version: link:../crypto-address-base58
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-block':
-        specifier: workspace:*
-        version: link:../crypto-block
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
-      '@mainsail/crypto-hash-bcrypto':
-        specifier: workspace:*
-        version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-messages':
-        specifier: workspace:*
-        version: link:../crypto-messages
-      '@mainsail/crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../crypto-transaction-vote
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
-      '@mainsail/processor':
-        specifier: workspace:*
-        version: link:../processor
-      '@mainsail/serializer':
-        specifier: workspace:*
-        version: link:../serializer
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      '@mainsail/validator':
-        specifier: workspace:*
-        version: link:../validator
-      '@mainsail/validator-set-static':
-        specifier: workspace:*
-        version: link:../validator-set-static
-      bip39:
-        specifier: 3.0.4
-        version: 3.0.4
       boxen:
         specifier: 4.2.0
         version: 4.2.0
