@@ -1,28 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-export class BigNumberAttribute implements Contracts.State.IAttribute<BigNumber> {
-	#changed = false;
-	#value: BigNumber;
+import { GenericAttribute } from "./generic-attribute";
 
-	constructor(value: BigNumber) {
-		this.#value = value;
-	}
-
-	public isChanged(): boolean {
-		return this.#changed;
-	}
-
-	public get(): BigNumber {
-		return this.#value;
-	}
-
-	public set(value: BigNumber): void {
-		this.#value = value;
-		this.#changed = true;
-	}
-
+export class BigNumberAttribute extends GenericAttribute<BigNumber> implements Contracts.State.IAttribute<BigNumber> {
 	public clone(): BigNumberAttribute {
-		return new BigNumberAttribute(new BigNumber(this.#value));
+		return new BigNumberAttribute(new BigNumber(this.get()));
 	}
 }
