@@ -170,9 +170,9 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public clone(): Wallet {
 		const cloned = new Wallet(this.address, this.attributes.clone());
-		cloned.publicKey = this.publicKey;
-		cloned.balance = this.balance;
-		cloned.nonce = this.nonce;
+		cloned.publicKey = this.publicKey?.clone();
+		cloned.balance = this.balance.clone();
+		cloned.nonce = this.nonce.clone();
 		return cloned;
 	}
 }
