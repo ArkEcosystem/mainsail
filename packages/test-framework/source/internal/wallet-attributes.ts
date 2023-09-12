@@ -1,18 +1,17 @@
-import { Services } from "@mainsail/kernel";
+import { Contracts } from "@mainsail/contracts";
 
-export function getWalletAttributeSet(): Services.Attributes.AttributeSet {
-	const attributes: Services.Attributes.AttributeSet = new Services.Attributes.AttributeSet();
-	attributes.set("validatorRank");
-	attributes.set("validatorResigned");
-	attributes.set("validatorRound");
-	attributes.set("validatorUsername");
-	attributes.set("validatorVoteBalance");
-	attributes.set("multiSignature");
-	attributes.set("vote");
+import { AttributeRepository } from "../../../state/source/attributes/attribute-repository";
 
+export function getWalletAttributeSet(): Contracts.State.IAttributeRepository {
+	const attributes = new AttributeRepository();
+	attributes.set("validatorRank", Contracts.State.AttributeType.Number);
+	attributes.set("validatorResigned", Contracts.State.AttributeType.Boolean);
+	attributes.set("validatorRound", Contracts.State.AttributeType.Number);
+	attributes.set("validatorUsername", Contracts.State.AttributeType.String);
+	attributes.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
+	attributes.set("multiSignature", Contracts.State.AttributeType.String);
+	attributes.set("vote", Contracts.State.AttributeType.String);
 	return attributes;
 }
 
-export const knownAttributes: Services.Attributes.AttributeMap = new Services.Attributes.AttributeMap(
-	getWalletAttributeSet(),
-);
+export const knownAttributes: Contracts.State.IAttributeRepository = getWalletAttributeSet();
