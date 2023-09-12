@@ -57,38 +57,39 @@ export class Command extends Commands.Command {
 			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(this.environment.getPaths(flags.token, flags.network));
 
-		const configDestination = this.app.getCorePath("config");
+		const configDestination = join(this.app.getCorePath("config"), "mainsail-api");
 		const configSource = resolve(__dirname, `../../bin/config/${flags.network}`);
 
 		await this.components.taskList([
-			// TODO: overwrites core .env... so ideally we would use separate folders for core and api?
-			// {
-			// 	task: () => {
-			// 		if (!existsSync(`${configSource}/.env`)) {
-			// 			this.components.fatal(`Couldn't find the environment file at ${configSource}/.env.`);
-			// 		}
-
-			// 		copySync(`${configSource}/.env`, `${configDestination}/.env`);
-			// 	},
-			// 	title: "Publish environment",
-			// },
 			{
 				task: () => {
-					if (existsSync(join(configDestination, "api.json"))) {
-						if (flags.reset) {
-							removeSync(join(configDestination, "api.json"));
-						} else {
-							this.components.fatal(
-								"Please use the --reset flag if you wish to reset your configuration.",
-							);
-						}
+					if (flags.reset) {
+						removeSync(configDestination);
+					}
+
+					if (existsSync(configDestination)) {
+						this.components.fatal("Please use the --reset flag if you wish to reset your configuration.");
+					}
+
+					if (!existsSync(configSource)) {
+						this.components.fatal(`Couldn't find the core configuration files at ${configSource}.`);
 					}
 
 					ensureDirSync(configDestination);
-					copySync(join(configSource, "api.json"), join(configDestination, "api.json"));
 				},
-				title: "Publish api.json",
+				title: "Prepare directories",
 			},
+			{
+				task: () => {
+					if (!existsSync(`${configSource}/.env`)) {
+						this.components.fatal(`Couldn't find the environment file at ${configSource}/.env.`);
+					}
+
+					copySync(`${configSource}/.env`, `${configDestination}/.env`);
+				},
+				title: "Publish environment",
+			},
+			{ task: () => copySync(configSource, configDestination), title: "Publish configuration" },
 		]);
 	}
 }

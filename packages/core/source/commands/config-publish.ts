@@ -2,7 +2,7 @@ import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
 import Joi from "joi";
-import { resolve } from "path";
+import { join, resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -57,7 +57,7 @@ export class Command extends Commands.Command {
 			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(this.environment.getPaths(flags.token, flags.network));
 
-		const configDestination = this.app.getCorePath("config");
+		const configDestination = join(this.app.getCorePath("config"), "mainsail");
 		const configSource = resolve(__dirname, `../../bin/config/${flags.network}`);
 
 		await this.components.taskList([

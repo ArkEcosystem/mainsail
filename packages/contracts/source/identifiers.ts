@@ -6,6 +6,7 @@ export const Identifiers = {
 	ApplicationNamespace: Symbol.for("Application<Namespace>"),
 	ApplicationNetwork: Symbol.for("Application<Network>"),
 	ApplicationToken: Symbol.for("Application<Token>"),
+	ApplicationName: Symbol.for("Application<Name>"),
 	ApplicationVersion: Symbol.for("Application<Version>"),
 	BlockHistoryService: Symbol.for("Service<BlockHistory>"),
 	BlockProcessor: Symbol.for("Block<Processor>"),

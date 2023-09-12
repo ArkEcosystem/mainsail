@@ -53,12 +53,8 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadApplication(): void {
-		const locations = this.configFlags.initializationFileName
-			? [this.configFlags.initializationFileName]
-			: ["app.json", "app.js"];
-
 		this.validationService.validate(
-			this.#loadFromLocation(locations),
+			this.#loadFromLocation(["app.json", "app.js"]),
 			Joi.object({
 				flags: Joi.array().items(Joi.string()).optional(),
 				plugins: Joi.array()

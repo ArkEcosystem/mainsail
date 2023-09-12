@@ -81,6 +81,10 @@ export class Application implements Contracts.Kernel.Application {
 		return this.get(Identifiers.ApplicationNetwork);
 	}
 
+	public name(): string {
+		return this.get(Identifiers.ApplicationName);
+	}
+
 	public useNetwork(value: string): void {
 		this.rebind<string>(Identifiers.ApplicationNetwork).toConstantValue(value);
 	}
@@ -282,7 +286,7 @@ export class Application implements Contracts.Kernel.Application {
 
 			try {
 				await serviceProvider.dispose();
-			} catch {}
+			} catch { }
 		}
 	}
 

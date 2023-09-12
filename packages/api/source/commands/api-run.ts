@@ -1,6 +1,8 @@
 import { Commands, Contracts, Utils } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import Joi from "joi";
+import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -17,10 +19,13 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
+		const { bin } = require(resolve(__dirname, "../../package.json"));
+		AppUtils.assert.defined<Record<string, string>>(bin);
+
 		const flags: Contracts.AnyObject = {
 			...this.getFlags(),
+			name: Object.keys(bin)[0],
 			allowMissingConfigFiles: true,
-			initializationFileName: "api.json",
 		};
 
 		await Utils.Builder.buildApplication({
@@ -29,6 +34,6 @@ export class Command extends Commands.Command {
 		});
 
 		// Prevent resolving execute method
-		return new Promise(() => {});
+		return new Promise(() => { });
 	}
 }
