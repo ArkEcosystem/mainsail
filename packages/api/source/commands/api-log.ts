@@ -4,9 +4,9 @@ import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "core:log";
+	public signature = "api:log";
 
-	public description = "Display the Core process log.";
+	public description = "Display the API process log.";
 
 	public configure(): void {
 		this.definition
@@ -17,7 +17,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		await this.app
-			.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "core")
+			.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "api")
 			.log(this.getFlag("error"), this.getFlag("lines"));
 	}
 }

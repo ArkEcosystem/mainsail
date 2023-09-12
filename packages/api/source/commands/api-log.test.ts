@@ -1,13 +1,13 @@
 import { Identifiers } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 
-import { Command } from "./core-log";
+import { Command } from "./api-log";
 
 describe<{
 	cli: Console;
-}>("CoreLogCommnad", ({ beforeEach, it, stub }) => {
+}>("ApiLogCommnad", ({ beforeEach, it, stub }) => {
 	const process = {
-		log: () => {},
+		log: () => { },
 	};
 
 	beforeEach((context) => {

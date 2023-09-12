@@ -6,7 +6,7 @@ import { Contracts } from "@mainsail/contracts";
 export class Command extends Commands.Command {
 	public signature = "version";
 
-	public description = "Display the current installed version of Core.";
+	public description = "Display the current installed version of API.";
 
 	public requiresNetwork = false;
 

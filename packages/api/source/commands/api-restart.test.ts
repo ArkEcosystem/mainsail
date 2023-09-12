@@ -1,7 +1,7 @@
 import { Identifiers, Services } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
 
-import { Command } from "./core-restart";
+import { Command } from "./api-restart";
 
 describe<{
 	cli: Console;
@@ -16,14 +16,14 @@ describe<{
 		const missing = stub(processManager, "missing").returnValue(true);
 		const isStopped = stub(processManager, "isStopped").returnValue(false);
 
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process does not exist.');
+		await assert.rejects(() => cli.execute(Command), 'The "ark-api" process does not exist.');
 	});
 
 	it("should throw if the process is stopped", async ({ processManager, cli }) => {
 		const missing = stub(processManager, "missing").returnValue(false);
 		const isStopped = stub(processManager, "isStopped").returnValue(true);
 
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process is not running.');
+		await assert.rejects(() => cli.execute(Command), 'The "ark-api" process is not running.');
 	});
 
 	it("should restart the process", async ({ processManager, cli }) => {

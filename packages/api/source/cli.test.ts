@@ -31,8 +31,7 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 		prompts.inject([false]);
 
 		await cli.execute("distribution");
-
-		assert.true(message.includes(`is not a mainsail command.`));
+		assert.true(message.includes(`is not a api command.`));
 		assert.equal(process.exitCode, 2);
 	});
 
@@ -44,7 +43,7 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 	});
 
 	it("should not set exitCode when a valid command appears with the help flag", async () => {
-		const cli = new CommandLineInterface(["update", "--help"]);
+		const cli = new CommandLineInterface(["reinstall", "--help"]);
 
 		await assert.resolves(() => cli.execute("distribution"));
 		assert.undefined(process.exitCode);

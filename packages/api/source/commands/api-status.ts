@@ -4,15 +4,15 @@ import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "core:status";
+	public signature = "api:status";
 
-	public description = "Display the status of the Core process.";
+	public description = "Display the status of the API process.";
 
 	public configure(): void {
 		this.definition.setFlag("token", "The name of the token.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {
-		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "core").status();
+		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "api").status();
 	}
 }

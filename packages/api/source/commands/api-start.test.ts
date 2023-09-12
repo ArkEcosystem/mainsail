@@ -1,19 +1,16 @@
 import { Identifiers, Services } from "@mainsail/cli";
 import { Console, describe } from "@mainsail/test-framework";
-import { writeJSONSync } from "fs-extra";
 import { resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { Command } from "./core-start";
+import { Command } from "./api-start";
 
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("CoreStartCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("ApiStartCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
-
-		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/delegates.json`, { secrets: ["bip39"] });
 
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
@@ -33,11 +30,11 @@ describe<{
 					CORE_ENV: "production",
 					NODE_ENV: "production",
 				},
-				name: "ark-core",
+				name: "ark-api",
 				node_args: undefined,
-				script: resolve(__dirname, "../../../../packages/core/bin/run"),
+				script: resolve(__dirname, "../../../../packages/api/bin/run"),
 			},
-			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core" },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-api" },
 		);
 	});
 });

@@ -1,35 +1,34 @@
 import { Commands, Contracts, Utils } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import Joi from "joi";
-import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "core:start";
+	public signature = "api:run";
 
-	public description = "Start the API process.";
+	public description = "Run the API process in foreground. Exiting the process will stop it from running.";
 
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string().required())
 			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("env", "", Joi.string().default("production"))
-			.setFlag("daemon", "Start the API process as a daemon.", Joi.boolean().default(true))
 			.setFlag("skipPrompts", "Skip prompts.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
-		const flags: Contracts.AnyObject = { ...this.getFlags() };
+		const flags: Contracts.AnyObject = {
+			...this.getFlags(),
+			initializationFileName: "api.json",
+			allowMissingConfigFiles: true,
+		};
 
-		this.actions.abortRunningProcess(`${flags.token}-api`);
-
-		await this.actions.daemonizeProcess(
-			{
-				args: `core:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
-				name: `${flags.token}-api`,
-				script: resolve(__dirname, "../../bin/run"),
-			},
+		await Utils.Builder.buildApplication({
 			flags,
-		);
+			plugins: {},
+		});
+
+		// Prevent resolving execute method
+		return new Promise(() => { });
 	}
 }

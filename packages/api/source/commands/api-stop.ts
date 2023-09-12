@@ -4,9 +4,9 @@ import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "core:stop";
+	public signature = "api:stop";
 
-	public description = "Stop the Core process.";
+	public description = "Stop the API process.";
 
 	public configure(): void {
 		this.definition
@@ -15,6 +15,6 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "core").stop(this.getFlag("daemon"));
+		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "api").stop(this.getFlag("daemon"));
 	}
 }

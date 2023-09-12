@@ -4,15 +4,15 @@ import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "core:restart";
+	public signature = "api:restart";
 
-	public description = "Restart the Core process.";
+	public description = "Restart the API process.";
 
 	public configure(): void {
-		this.definition.setFlag("token", "The name of the token.", Joi.string());
+		this.definition.setFlag("token", "The name of the token.", Joi.string().required());
 	}
 
 	public async execute(): Promise<void> {
-		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "core").restart();
+		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "api").restart();
 	}
 }
