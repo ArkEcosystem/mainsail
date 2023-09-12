@@ -20,6 +20,8 @@ export interface Application {
 
 	network(): string;
 
+	name(): string;
+
 	useNetwork(value: string): void;
 
 	dataPath(path?: string): string;

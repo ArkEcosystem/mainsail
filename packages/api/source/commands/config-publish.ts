@@ -17,8 +17,8 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string())
+			.setFlag("token", "The name of the token.", Joi.string().required())
+			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
 	}
 
@@ -57,7 +57,7 @@ export class Command extends Commands.Command {
 			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(this.environment.getPaths(flags.token, flags.network));
 
-		const configDestination = join(this.app.getCorePath("config"), "mainsail");
+		const configDestination = join(this.app.getCorePath("config"), "mainsail-api");
 		const configSource = resolve(__dirname, `../../bin/config/${flags.network}`);
 
 		await this.components.taskList([

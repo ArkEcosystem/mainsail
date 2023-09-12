@@ -21,6 +21,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.ValidationService)
 	private readonly validationService!: Contracts.Kernel.Validator;
 
+	@inject(Identifiers.ConfigFlags)
+	private readonly configFlags!: KeyValuePair;
+
 	public async loadEnvironmentVariables(): Promise<void> {
 		try {
 			const config: Record<string, Contracts.Types.Primitive> = dotenv.parseFile(this.app.environmentFile());
@@ -74,6 +77,10 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadPeers(): void {
+		if (this.#skipFileIfNotExists("peers.json")) {
+			return;
+		}
+
 		this.validationService.validate(
 			this.#loadFromLocation(["peers.json"]),
 			Joi.object({
@@ -99,6 +106,10 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadValidators(): void {
+		if (this.#skipFileIfNotExists("validators.json")) {
+			return;
+		}
+
 		this.validationService.validate(
 			this.#loadFromLocation(["validators.json"]),
 			Joi.object({
@@ -114,7 +125,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadCryptography(): void {
-		if (!existsSync(this.app.configPath("crypto.json"))) {
+		if (this.#skipFileIfNotExists("crypto.json", true)) {
 			return;
 		}
 
@@ -124,7 +135,6 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	#loadFromLocation(files: string[]): KeyValuePair {
 		for (const file of files) {
 			const fullPath: string = this.app.configPath(file);
-
 			if (existsSync(fullPath)) {
 				const config: KeyValuePair =
 					extname(fullPath) === ".json"
@@ -138,5 +148,13 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		}
 
 		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
+	}
+
+	#skipFileIfNotExists(filename: string, alwaysOptional = false): boolean {
+		if (!existsSync(this.app.configPath(filename))) {
+			return alwaysOptional || this.configFlags.allowMissingConfigFiles === true;
+		}
+
+		return false;
 	}
 }
