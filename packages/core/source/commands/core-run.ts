@@ -23,7 +23,10 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const flags: Contracts.AnyObject = { ...this.getFlags() };
+		const flags: Contracts.AnyObject = {
+			...this.getFlags(),
+			initializationFileName: "app.json",
+		};
 
 		await Utils.Builder.buildApplication({
 			flags,
@@ -33,6 +36,6 @@ export class Command extends Commands.Command {
 		});
 
 		// Prevent resolving execute method
-		return new Promise(() => {});
+		return new Promise(() => { });
 	}
 }

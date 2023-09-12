@@ -54,7 +54,6 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadApplication(): void {
 		const { initializationFileName } = this.configFlags;
-		console.log(initializationFileName);
 		assert.defined<string>(initializationFileName);
 
 		this.validationService.validate(
@@ -81,6 +80,10 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadPeers(): void {
+		if (this.#skipFileIfNotExists("peers.json")) {
+			return;
+		}
+
 		this.validationService.validate(
 			this.#loadFromLocation(["peers.json"]),
 			Joi.object({
@@ -106,6 +109,10 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadValidators(): void {
+		if (this.#skipFileIfNotExists("validators.json")) {
+			return;
+		}
+
 		this.validationService.validate(
 			this.#loadFromLocation(["validators.json"]),
 			Joi.object({
@@ -121,7 +128,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	}
 
 	#loadCryptography(): void {
-		if (!existsSync(this.app.configPath("crypto.json"))) {
+		if (this.#skipFileIfNotExists("crypto.json")) {
 			return;
 		}
 
@@ -131,7 +138,6 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	#loadFromLocation(files: string[]): KeyValuePair {
 		for (const file of files) {
 			const fullPath: string = this.app.configPath(file);
-
 			if (existsSync(fullPath)) {
 				const config: KeyValuePair =
 					extname(fullPath) === ".json"
@@ -145,5 +151,13 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		}
 
 		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
+	}
+
+	#skipFileIfNotExists(filename: string): boolean {
+		if (!existsSync(this.app.configPath(filename))) {
+			return this.configFlags.allowMissingConfigFiles === true;
+		}
+
+		return false;
 	}
 }

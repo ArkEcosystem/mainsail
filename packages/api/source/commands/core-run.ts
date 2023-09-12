@@ -17,7 +17,11 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const flags: Contracts.AnyObject = { ...this.getFlags() };
+		const flags: Contracts.AnyObject = {
+			...this.getFlags(),
+			initializationFileName: "api.json",
+			allowMissingConfigFiles: true,
+		};
 
 		await Utils.Builder.buildApplication({
 			flags,
