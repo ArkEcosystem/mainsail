@@ -53,9 +53,9 @@ describe<{
 		const wallet2 = context.walletRepo.findByAddress("efg");
 		const wallet3 = context.walletRepo.findByAddress("hij");
 
-		wallet1.setAttribute("validator.username", "username1");
-		wallet2.setAttribute("validator.username", "username2");
-		wallet3.setAttribute("validator.username", "username3");
+		wallet1.setAttribute("validatorUsername", "username1");
+		wallet2.setAttribute("validatorUsername", "username2");
+		wallet3.setAttribute("validatorUsername", "username3");
 
 		const allWallets = [wallet1, wallet2, wallet3];
 		context.walletRepo.index(allWallets);
@@ -65,7 +65,7 @@ describe<{
 		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet3.getAddress()));
 
 		const wallet4 = context.walletRepoCopyOnWrite.findByAddress("klm");
-		wallet4.setAttribute("validator.username", "username4");
+		wallet4.setAttribute("validatorUsername", "username4");
 		context.walletRepoCopyOnWrite.index(wallet4);
 
 		assert.true(context.walletRepoCopyOnWrite.allByUsername().some((w) => w.getAddress() === wallet1.getAddress()));
@@ -163,10 +163,10 @@ describe<{
 
 	it.skip("findByUsername - should return a copy", (context) => {
 		const wallet = context.walletRepo.findByAddress("abcdef");
-		wallet.setAttribute("validator.username", "test");
+		wallet.setAttribute("validatorUsername", "test");
 		context.walletRepo.index(wallet);
 
-		const temporaryWallet = context.walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("validator.username"));
+		const temporaryWallet = context.walletRepoCopyOnWrite.findByUsername(wallet.getAttribute("validatorUsername"));
 		temporaryWallet.setBalance(BigNumber.ONE);
 
 		assert.not.equal(wallet.getBalance(), temporaryWallet.getBalance());
@@ -192,7 +192,7 @@ describe<{
 		wallet.setAttribute("validator", { username: "test" });
 		context.walletRepo.index(wallet);
 
-		assert.true(context.walletRepoCopyOnWrite.hasByUsername(wallet.getAttribute("validator.username")));
+		assert.true(context.walletRepoCopyOnWrite.hasByUsername(wallet.getAttribute("validatorUsername")));
 	});
 
 	it.skip("hasByIndex - should be ok", (context) => {
@@ -211,6 +211,6 @@ describe<{
 
 		assert.not.equal(clone, wallet);
 		assert.equal(clone.getAddress(), wallet.getAddress());
-		assert.equal(clone.getAttribute("validator.username"), wallet.getAttribute("validator.username"));
+		assert.equal(clone.getAttribute("validatorUsername"), wallet.getAttribute("validatorUsername"));
 	});
 });

@@ -169,11 +169,11 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.false(wallet.isChanged());
-		wallet.setAttribute("validator", {});
+		wallet.setAttribute("multiSignature", {});
 		wallet.setAttribute("vote", {});
 
 		assert.true(wallet.isChanged());
-		assert.equal(wallet.getAttributes(), { validator: {}, vote: {} });
+		assert.equal(wallet.getAttributes(), { multiSignature: {}, vote: {} });
 	});
 
 	it("should return whether wallet is validator", (context) => {
@@ -181,7 +181,7 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap);
 
 		assert.false(wallet.isValidator());
-		wallet.setAttribute("validator", {});
+		wallet.setAttribute("validatorUsername", "username");
 		assert.true(wallet.isValidator());
 	});
 
@@ -346,12 +346,12 @@ describe<{
 	});
 
 	it("should emit on setAttribute", async (context) => {
-		context.wallet.setAttribute("validator.username", "dummy");
+		context.wallet.setAttribute("validatorUsername", "dummy");
 
 		assert.true(context.dispatchSyncSpy.calledOnce);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				key: "validator.username",
+				key: "validatorUsername",
 				publicKey: undefined,
 				value: "dummy",
 				wallet: context.wallet,
@@ -360,13 +360,13 @@ describe<{
 	});
 
 	it("should emit on forgetAttribute", async (context) => {
-		context.wallet.setAttribute("validator.username", "dummy");
-		context.wallet.forgetAttribute("validator.username");
+		context.wallet.setAttribute("validatorUsername", "dummy");
+		context.wallet.forgetAttribute("validatorUsername");
 
 		assert.true(context.dispatchSyncSpy.calledTwice);
 		assert.true(
 			context.dispatchSyncSpy.calledWith(WalletEvent.PropertySet, {
-				key: "validator.username",
+				key: "validatorUsername",
 				previousValue: "dummy",
 				publicKey: undefined,
 				wallet: context.wallet,
@@ -375,11 +375,11 @@ describe<{
 	});
 
 	it("should clone", async (context) => {
-		context.wallet.setAttribute("validator.username", "dummy");
+		context.wallet.setAttribute("validatorUsername", "dummy");
 		const clone = context.wallet.clone();
 
 		assert.equal(clone.getAddress(), "Abcde");
-		assert.equal(clone.getAttribute("validator.username"), "dummy");
+		assert.equal(clone.getAttribute("validatorUsername"), "dummy");
 	});
 });
 
@@ -416,14 +416,14 @@ describe<{
 	});
 
 	it("should emit on setAttribute", async (context) => {
-		context.clone.setAttribute("validator.username", "dummy");
+		context.clone.setAttribute("validatorUsername", "dummy");
 
 		assert.false(context.dispatchSyncSpy.called);
 	});
 
 	it("should emit on forgetAttribute", async (context) => {
-		context.clone.setAttribute("validator.username", "dummy");
-		context.clone.forgetAttribute("validator.username");
+		context.clone.setAttribute("validatorUsername", "dummy");
+		context.clone.forgetAttribute("validatorUsername");
 
 		assert.false(context.dispatchSyncSpy.called);
 	});
