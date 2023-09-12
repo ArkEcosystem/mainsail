@@ -1,3 +1,4 @@
+export * from "./attributes";
 export * from "./block-state";
 export * from "./state-store";
 export * from "./state-verifier";

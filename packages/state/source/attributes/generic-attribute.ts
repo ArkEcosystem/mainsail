@@ -1,4 +1,6 @@
-export class GenericAttribute<T> {
+import { Contracts } from "@mainsail/contracts";
+
+export class GenericAttribute<T> implements Contracts.State.IAttribute<T> {
 	#changed = false;
 	#value: T;
 
@@ -19,7 +21,7 @@ export class GenericAttribute<T> {
 		this.#changed = true;
 	}
 
-	public clone(): GenericAttribute<T> {
+	public clone(): Contracts.State.IAttribute<T> {
 		return new GenericAttribute(this.#value);
 	}
 }

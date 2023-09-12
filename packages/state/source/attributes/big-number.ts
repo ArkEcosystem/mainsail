@@ -1,6 +1,7 @@
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-export class BigNumberAttribute {
+export class BigNumberAttribute implements Contracts.State.IAttribute<BigNumber> {
 	#changed = false;
 	#value: BigNumber;
 

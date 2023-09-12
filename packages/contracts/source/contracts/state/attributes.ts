@@ -1,0 +1,19 @@
+export interface IAttributeRepository {
+	add(name: string, type: AttributeType): void;
+	has(name: string): boolean;
+	getAttributeType<T>(name: string): AttributeType;
+}
+
+export interface IAttribute<T> {
+	isChanged(): boolean;
+	get(): T;
+	set(value: T): void;
+	clone(): IAttribute<T>;
+}
+
+export enum AttributeType {
+	Boolean = "boolean",
+	Number = "number",
+	String = "string",
+	BigNumber = "bigNumber",
+}

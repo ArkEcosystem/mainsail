@@ -6,7 +6,7 @@ import { BigNumberAttribute, GenericAttribute } from "../attributes";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected publicKey: GenericAttribute<string> | undefined = undefined;
+	protected publicKey: Contracts.State.IAttribute<string> | undefined = undefined;
 	protected balance = new BigNumberAttribute(BigNumber.ZERO);
 	protected nonce = new BigNumberAttribute(BigNumber.ZERO);
 	#changed = false;

@@ -1,15 +1,9 @@
-import { AttributeType } from "./enums";
+import { Contracts } from "@mainsail/contracts";
 
-interface IAttributeRepository {
-	add(name: string, type: AttributeType): void;
-	has(name: string): boolean;
-	getAttributeType<T>(name: string): AttributeType;
-}
+export class AttributeRepository implements Contracts.State.IAttributeRepository {
+	#attributes: Map<string, Contracts.State.AttributeType> = new Map();
 
-export class AttributeRepository implements IAttributeRepository {
-	#attributes: Map<string, AttributeType> = new Map();
-
-	public add(name: string, type: AttributeType): void {
+	public add(name: string, type: Contracts.State.AttributeType): void {
 		this.#attributes.set(name, type);
 	}
 
@@ -17,7 +11,7 @@ export class AttributeRepository implements IAttributeRepository {
 		return this.#attributes.has(name);
 	}
 
-	getAttributeType<T>(name: string): AttributeType {
+	getAttributeType<T>(name: string): Contracts.State.AttributeType {
 		const attributeType = this.#attributes.get(name);
 
 		if (!attributeType) {
