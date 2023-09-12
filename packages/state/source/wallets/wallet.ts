@@ -1,5 +1,4 @@
 import { Contracts } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { BigNumberAttribute, factory, GenericAttribute } from "../attributes";
@@ -9,9 +8,6 @@ export class Wallet implements Contracts.State.Wallet {
 	protected publicKey: Contracts.State.IAttribute<string> | undefined = undefined;
 	protected balance = new BigNumberAttribute(BigNumber.ZERO);
 	protected nonce = new BigNumberAttribute(BigNumber.ZERO);
-	protected readonly attributesOld: Services.Attributes.AttributeMap = new Services.Attributes.AttributeMap(
-		new Services.Attributes.AttributeSet(),
-	);
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<any>>();
 
@@ -110,18 +106,14 @@ export class Wallet implements Contracts.State.Wallet {
 		this.setNonce(this.nonce.get().minus(BigNumber.ONE));
 	}
 
-	public getData(): Contracts.State.WalletData {
-		return {
-			address: this.address,
-			attributes: this.attributesOld,
-			balance: this.balance.get(),
-			nonce: this.nonce.get(),
-			publicKey: this.publicKey?.get(),
-		};
-	}
-
 	public getAttributes(): Record<string, any> {
-		return this.attributesOld.all();
+		const result = {};
+
+		for (const [key, value] of this.attributes.entries()) {
+			result[key] = value.get();
+		}
+
+		return result;
 	}
 
 	public getAttribute<T>(key: string, defaultValue?: T): T {
@@ -169,19 +161,18 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public forgetAttribute(key: string): boolean {
-		const na = Symbol();
-		const previousValue = this.attributesOld.get(key, na);
-		const wasSet = this.attributesOld.forget(key);
-		this.#changed = true;
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key,
-			previousValue: previousValue === na ? undefined : previousValue,
-			publicKey: this.publicKey,
-			wallet: this,
-		});
-
-		return wasSet;
+		return true;
+		// const na = Symbol();
+		// const previousValue = this.attributesOld.get(key, na);
+		// const wasSet = this.attributesOld.forget(key);
+		// this.#changed = true;
+		// this.events?.dispatchSync(WalletEvent.PropertySet, {
+		// 	key,
+		// 	previousValue: previousValue === na ? undefined : previousValue,
+		// 	publicKey: this.publicKey,
+		// 	wallet: this,
+		// });
+		// return wasSet;
 	}
 
 	public hasAttribute(key: string): boolean {
