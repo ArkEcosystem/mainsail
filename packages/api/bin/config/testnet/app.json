@@ -1,0 +1,13 @@
+{
+	"plugins": [
+		{
+			"package": "@mainsail/logger-pino"
+		},
+		{
+			"package": "@mainsail/api-database"
+		},
+		{
+			"package": "@mainsail/api-http"
+		}
+	]
+}

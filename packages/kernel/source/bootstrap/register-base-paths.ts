@@ -31,7 +31,7 @@ export class RegisterBasePaths implements Bootstrapper {
 				path = this.configRepository.get(`app.flags.paths.${type}`);
 			} else {
 				// 3. If the default path is used we'll append the network name to it.
-				path = `${path}/${this.app.network()}`;
+				path = `${path}/${this.app.network()}/${this.app.name()}`;
 			}
 
 			path = resolve(expandTilde(path));

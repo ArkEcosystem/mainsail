@@ -3,6 +3,7 @@ export const Identifiers = {
 	Application: Symbol.for("Application<Instance>"),
 	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
 	ApplicationEnvironment: Symbol.for("Application<Environment>"),
+	ApplicationName: Symbol.for("Application<Name>"),
 	ApplicationNamespace: Symbol.for("Application<Namespace>"),
 	ApplicationNetwork: Symbol.for("Application<Network>"),
 	ApplicationToken: Symbol.for("Application<Token>"),

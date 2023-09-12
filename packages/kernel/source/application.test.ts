@@ -54,17 +54,18 @@ describe<{
 				network: "testnet",
 				paths: { config: resolve(__dirname, "../test/stubs/config") },
 				token: "ark",
+				name: "local",
 			},
 		});
 
-		assert.equal(context.app.dirPrefix(), "ark/testnet");
+		assert.equal(context.app.dirPrefix(), "ark/testnet/local");
 	});
 
 	it("should bootstrap the application with a config path from process.env", async (context) => {
 		process.env.CORE_PATH_CONFIG = resolve(__dirname, "../test/stubs/config");
 
 		await context.app.bootstrap({
-			flags: { network: "testnet", token: "ark" },
+			flags: { network: "testnet", token: "ark", name: "local" },
 		});
 
 		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);
