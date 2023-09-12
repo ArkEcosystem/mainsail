@@ -1,14 +1,16 @@
 import Hapi from "@hapi/hapi";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
 		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
-			const blockHeight = app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
+			// TODO: read from database, API doesn't have access to the in-memory state
 
-			const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
-			responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
-			responsePropertyToUpdate.headers["X-Block-Height"] = blockHeight;
+			// const blockHeight = app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
+
+			// const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
+			// responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
+			// responsePropertyToUpdate.headers["X-Block-Height"] = blockHeight;
 
 			return h.continue;
 		};
