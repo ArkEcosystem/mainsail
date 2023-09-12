@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { BigNumber } from "packages/utils/distribution";
+import { BigNumber } from "@mainsail/utils";
 
 import { BigNumberAttribute } from "./big-number-attribute";
 import { GenericAttribute } from "./generic-attribute";

@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { BigNumberAttribute, GenericAttribute } from "../attributes";
+import { BigNumberAttribute, factory, GenericAttribute } from "../attributes";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
@@ -12,6 +12,8 @@ export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributesOld: Services.Attributes.AttributeMap = new Services.Attributes.AttributeMap(
 		new Services.Attributes.AttributeSet(),
 	);
+
+	protected readonly attributes = new Map<string, Contracts.State.IAttribute<any>>();
 
 	#changed = false;
 
@@ -123,21 +125,47 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getAttribute<T>(key: string, defaultValue?: T): T {
-		return this.attributesOld.get<T>(key, defaultValue);
+		// return this.attributesOld.get<T>(key, defaultValue);
+
+		const attribute = this.attributes.get(key);
+
+		if (attribute) {
+			return attribute.get();
+		}
+
+		// Check if attribute name is valid
+
+		if (defaultValue !== undefined) {
+			return defaultValue;
+		}
+
+		throw new Error(`Attribute "${key}" does not exist.`);
 	}
 
 	public setAttribute<T = any>(key: string, value: T): boolean {
-		const wasSet = this.attributesOld.set<T>(key, value);
-		this.#changed = true;
+		let attribute = this.attributes.get(key);
 
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: key,
-			publicKey: this.publicKey,
-			value,
-			wallet: this,
-		});
+		if (!attribute) {
+			// TODO: Check if attribute name is valid
 
-		return wasSet;
+			attribute = factory(key, value);
+			this.attributes.set(key, attribute);
+		}
+
+		attribute.set(value);
+		return true;
+
+		// const wasSet = this.attributesOld.set<T>(key, value);
+		// this.#changed = true;
+
+		// this.events?.dispatchSync(WalletEvent.PropertySet, {
+		// 	key: key,
+		// 	publicKey: this.publicKey,
+		// 	value,
+		// 	wallet: this,
+		// });
+
+		// return wasSet;
 	}
 
 	public forgetAttribute(key: string): boolean {
@@ -157,7 +185,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public hasAttribute(key: string): boolean {
-		return this.attributesOld.has(key);
+		return this.attributes.has(key);
 	}
 
 	public isValidator(): boolean {
