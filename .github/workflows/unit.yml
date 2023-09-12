@@ -36,6 +36,8 @@ jobs:
               run: pnpm install
             - name: Build
               run: pnpm run build
+            - name: Test api
+              run: cd packages/api && pnpm run test              
             - name: Test api-development
               run: cd packages/api-development && pnpm run test
             - name: Test bootstrap
