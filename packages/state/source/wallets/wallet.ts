@@ -2,11 +2,11 @@ import { Contracts } from "@mainsail/contracts";
 import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { BigNumberAttribute, StringAttribute } from "./attributes";
+import { BigNumberAttribute, GenericAttribute } from "./attributes";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected publicKey: StringAttribute | undefined = undefined;
+	protected publicKey: GenericAttribute<string> | undefined = undefined;
 	protected balance = new BigNumberAttribute(BigNumber.ZERO);
 	protected nonce = new BigNumberAttribute(BigNumber.ZERO);
 	#changed = false;
@@ -31,7 +31,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public setPublicKey(publicKey: string): void {
 		if (!this.publicKey) {
-			this.publicKey = new StringAttribute("");
+			this.publicKey = new GenericAttribute<string>("");
 		}
 
 		this.publicKey.set(publicKey);

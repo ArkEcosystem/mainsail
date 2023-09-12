@@ -1,2 +1,2 @@
 export * from "./big-number";
-export * from "./string";
+export * from "./generic-attribute";
