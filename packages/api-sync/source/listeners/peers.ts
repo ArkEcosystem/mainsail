@@ -21,7 +21,7 @@ export class Peers implements ApiSyncContracts.EventListener {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#flushInterval?: NodeJS.Timeout;
+	#syncInterval?: NodeJS.Timeout;
 	#addedPeers: Map<string, Contracts.P2P.Peer> = new Map();
 	#removedPeers: Map<string, Contracts.P2P.Peer> = new Map();
 
@@ -33,8 +33,8 @@ export class Peers implements ApiSyncContracts.EventListener {
 
 		const syncInterval = this.configuration.getMilestone().blockTime * 2;
 
-		this.#flushInterval = setInterval(async () => {
-			await this.#flushToDatabase();
+		this.#syncInterval = setInterval(async () => {
+			await this.#syncToDatabase();
 		}, syncInterval);
 	}
 
@@ -42,8 +42,8 @@ export class Peers implements ApiSyncContracts.EventListener {
 		this.events.forget(Enums.PeerEvent.Added, this);
 		this.events.forget(Enums.PeerEvent.Removed, this);
 
-		if (this.#flushInterval) {
-			clearInterval(this.#flushInterval);
+		if (this.#syncInterval) {
+			clearInterval(this.#syncInterval);
 		}
 	}
 
@@ -77,8 +77,8 @@ export class Peers implements ApiSyncContracts.EventListener {
 		this.#removedPeers.set(peer.ip, peer);
 	}
 
-	async #flushToDatabase(): Promise<void> {
-		this.logger.debug(`flushing peers to database (added: ${this.#addedPeers.size} removed: ${this.#removedPeers.size}))`);
+	async #syncToDatabase(): Promise<void> {
+		this.logger.debug(`syncing peers to database (added: ${this.#addedPeers.size} removed: ${this.#removedPeers.size}))`);
 
 		const addedPeers = [...this.#addedPeers.values()];
 		const removedPeers = [...this.#removedPeers.values()];

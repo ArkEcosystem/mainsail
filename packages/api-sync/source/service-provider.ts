@@ -12,11 +12,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		this.#bootListeners();
+		await this.#bootListeners();
 	}
 
 	public async dispose(): Promise<void> {
-		this.#disposeListeners();
+		await this.#disposeListeners();
 	}
 
 	async #bootListeners(): Promise<void> {
