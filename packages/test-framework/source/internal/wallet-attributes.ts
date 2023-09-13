@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { Attributes } from "@mainsail/state";
 
-export function getWalletAttributeSet(): Contracts.State.IAttributeRepository {
+export function getAttributeRepository(): Contracts.State.IAttributeRepository {
 	const attributes = new Attributes.AttributeRepository();
 	attributes.set("balance", Contracts.State.AttributeType.BigNumber);
 	attributes.set("nonce", Contracts.State.AttributeType.BigNumber);
@@ -15,5 +15,3 @@ export function getWalletAttributeSet(): Contracts.State.IAttributeRepository {
 	attributes.set("vote", Contracts.State.AttributeType.String);
 	return attributes;
 }
-
-export const knownAttributes: Contracts.State.IAttributeRepository = getWalletAttributeSet();

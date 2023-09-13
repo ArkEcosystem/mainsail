@@ -4,7 +4,7 @@ import { BigNumber } from "@mainsail/utils";
 import { join } from "path";
 
 import passphrases from "../../internal/passphrases.json";
-import { knownAttributes } from "../../internal/wallet-attributes";
+import { getAttributeRepository } from "../../internal/wallet-attributes";
 import { FactoryBuilder } from "../factory-builder";
 import { generateApp } from "./generate-app";
 
@@ -38,7 +38,7 @@ export const registerRoundFactory = async (
 					await app
 						.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
 						.fromPublicKey(publicKey),
-					knownAttributes,
+					getAttributeRepository(),
 				);
 				wallet.setPublicKey(publicKey);
 				// eslint-disable-next-line unicorn/no-useless-undefined

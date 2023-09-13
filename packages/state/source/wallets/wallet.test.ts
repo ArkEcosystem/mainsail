@@ -2,14 +2,14 @@ import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe, getWalletAttributeSet } from "../../../test-framework";
+import { describe, getAttributeRepository } from "../../../test-framework";
 import { Wallet, WalletEvent } from ".";
 
 describe<{
 	attributeMap: Contracts.State.IAttributeRepository;
 }>("Models - Wallet", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
-		context.attributeMap = getWalletAttributeSet();
+		context.attributeMap = getAttributeRepository();
 	});
 
 	it("returns the address", (context) => {
@@ -105,7 +105,7 @@ describe<{
 	});
 
 	it("should get, set and forget custom attributes", (context) => {
-		const customAttributeSet = getWalletAttributeSet();
+		const customAttributeSet = getAttributeRepository();
 		customAttributeSet.set("customAttribute", Contracts.State.AttributeType.Object);
 
 		const address = "Abcde";
@@ -125,7 +125,7 @@ describe<{
 	});
 
 	it("should set is changed when forget known attributes", (context) => {
-		const customAttributeSet = getWalletAttributeSet();
+		const customAttributeSet = getAttributeRepository();
 		customAttributeSet.set("customAttribute", Contracts.State.AttributeType.Object);
 
 		const address = "Abcde";
@@ -143,7 +143,7 @@ describe<{
 
 	// TODO: Change behavior to not set isChanged when forgetting unknown attributes
 	it("should set is changed when forget unknown attributes", (context) => {
-		const customAttributeSet = getWalletAttributeSet();
+		const customAttributeSet = getAttributeRepository();
 		customAttributeSet.set("customAttribute", Contracts.State.AttributeType.Object);
 
 		const address = "Abcde";
@@ -222,7 +222,7 @@ describe<{
 			dispatchSync: () => {},
 		};
 
-		context.wallet = new Wallet("Abcde", getWalletAttributeSet(), context.events);
+		context.wallet = new Wallet("Abcde", getAttributeRepository(), context.events);
 	});
 
 	it("should emit on setAttribute", async (context) => {
@@ -274,7 +274,7 @@ describe<{
 			dispatchSync: () => {},
 		};
 
-		const wallet = new Wallet("Abcde", getWalletAttributeSet(), context.events);
+		const wallet = new Wallet("Abcde", getAttributeRepository(), context.events);
 
 		context.clone = wallet.clone();
 	});
