@@ -1,9 +1,8 @@
 import { Contracts } from "@mainsail/contracts";
-
-import { AttributeRepository } from "../../../state/source/attributes/attribute-repository";
+import { Attributes } from "@mainsail/state";
 
 export function getWalletAttributeSet(): Contracts.State.IAttributeRepository {
-	const attributes = new AttributeRepository();
+	const attributes = new Attributes.AttributeRepository();
 	attributes.set("validatorRank", Contracts.State.AttributeType.Number);
 	attributes.set("validatorResigned", Contracts.State.AttributeType.Boolean);
 	attributes.set("validatorRound", Contracts.State.AttributeType.Number);
