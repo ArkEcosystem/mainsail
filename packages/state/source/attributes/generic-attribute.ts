@@ -1,27 +1,21 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class GenericAttribute<T> implements Contracts.State.IAttribute<T> {
-	#changed = false;
-	#value: T;
+export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<T> {
+	protected value: T;
 
 	constructor(value: T) {
-		this.#value = value;
-	}
-
-	public isChanged(): boolean {
-		return this.#changed;
+		this.value = value;
 	}
 
 	public get(): T {
-		return this.#value;
+		return this.value;
 	}
 
 	public set(value: T): void {
-		this.#value = value;
-		this.#changed = true;
+		this.value = value;
 	}
 
-	public clone(): Contracts.State.IAttribute<T> {
-		return new GenericAttribute(this.#value);
-	}
+	public abstract clone(): Contracts.State.IAttribute<T>;
+
+	// public abstract check(value: unknown): value is T;
 }

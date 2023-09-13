@@ -5,7 +5,6 @@ export interface IAttributeRepository {
 }
 
 export interface IAttribute<T> {
-	isChanged(): boolean;
 	get(): T;
 	set(value: T): void;
 	clone(): IAttribute<T>;

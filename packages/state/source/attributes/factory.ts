@@ -1,50 +1,29 @@
 import { Contracts } from "@mainsail/contracts";
-import { BigNumber, isBoolean, isObject, isString } from "@mainsail/utils";
 
+// import { BigNumber } from "@mainsail/utils";
 import { BigNumberAttribute } from "./big-number-attribute";
-import { GenericAttribute } from "./generic-attribute";
+import { BooleanAttribute } from "./boolean-attribute";
+import { NumberAttribute } from "./number-attribute";
 import { ObjectAttribute } from "./object-attribute";
+import { StringAttribute } from "./string-attribute";
 
-const isBigNumber = (value: any): value is BigNumber => value instanceof BigNumber;
+// const isBigNumber = (value: any): value is BigNumber => value instanceof BigNumber;
 
-export const factory = <T>(attributeType: Contracts.State.AttributeType, value: T): Contracts.State.IAttribute<T> => {
-	if (attributeType === Contracts.State.AttributeType.Object) {
-		if (isObject(value)) {
-			return new ObjectAttribute(value) as unknown as Contracts.State.IAttribute<T>;
-		}
-		throw new Error(`Attribute value is not an object.`);
+const factories: Record<Contracts.State.AttributeType, new (value: any) => Contracts.State.IAttribute<any>> = {
+	[Contracts.State.AttributeType.Object]: ObjectAttribute,
+	[Contracts.State.AttributeType.BigNumber]: BigNumberAttribute,
+	[Contracts.State.AttributeType.Boolean]: BooleanAttribute,
+	[Contracts.State.AttributeType.String]: StringAttribute,
+	[Contracts.State.AttributeType.Number]: NumberAttribute,
+};
+
+export const factory = <T>(
+	attributeType: Contracts.State.AttributeType,
+	value: unknown,
+): Contracts.State.IAttribute<T> => {
+	if (!factories[attributeType]) {
+		throw new Error(`Attribute type [${attributeType}] is not supported.`);
 	}
 
-	if (attributeType === Contracts.State.AttributeType.BigNumber) {
-		if (isBigNumber(value)) {
-			return new BigNumberAttribute(value) as unknown as Contracts.State.IAttribute<T>;
-		}
-		throw new Error(`Attribute value is not a BigNumber.`);
-	}
-
-	if (attributeType === Contracts.State.AttributeType.Boolean) {
-		if (isBoolean(value)) {
-			return new GenericAttribute(value);
-		}
-
-		throw new Error(`Attribute value is not a boolean.`);
-	}
-
-	if (attributeType === Contracts.State.AttributeType.String) {
-		if (isString(value)) {
-			return new GenericAttribute(value);
-		}
-
-		throw new Error(`Attribute value is not a boolean.`);
-	}
-
-	if (attributeType === Contracts.State.AttributeType.Number) {
-		if (isString(value)) {
-			return new GenericAttribute(value);
-		}
-
-		throw new Error(`Attribute value is not a number.`);
-	}
-
-	throw new Error(`Attribute type [${attributeType}] is not supported.`);
+	return new factories[attributeType](value) as Contracts.State.IAttribute<T>;
 };
