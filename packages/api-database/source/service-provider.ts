@@ -4,8 +4,14 @@ import { DataSource } from "typeorm";
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
 import { Block, Transaction, ValidatorRound, Wallet } from "./models";
-import { makeBlockRepository, makeTransactionRepository, makeWalletRepository } from "./repositories";
-import { makeValidatorRoundRepository } from "./repositories/validator-round-repository";
+import { Peer } from "./models/peer";
+import {
+	makeBlockRepository,
+	makePeerRepository,
+	makeTransactionRepository,
+	makeValidatorRoundRepository,
+	makeWalletRepository,
+} from "./repositories";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -33,7 +39,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const dataSource = new DataSource({
 				...options,
 				// TODO: allow entities to be extended by plugins
-				entities: [Block, Transaction, ValidatorRound, Wallet],
+				entities: [Block, Peer, Transaction, ValidatorRound, Wallet],
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 
@@ -53,6 +59,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.BlockRepository).toConstantValue(makeBlockRepository(dataSource));
+			this.app.bind(Identifiers.PeerRepository).toConstantValue(makePeerRepository(dataSource));
 			this.app.bind(Identifiers.TransactionRepository).toConstantValue(makeTransactionRepository(dataSource));
 			this.app
 				.bind(Identifiers.ValidatorRoundRepository)
@@ -64,6 +71,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app
 				.bind(Identifiers.BlockRepositoryFactory)
 				.toFactory(() => (dataSource: RepositoryDataSource) => makeBlockRepository(dataSource));
+
+			this.app
+				.bind(Identifiers.PeerRepositoryFactory)
+				.toFactory(() => (dataSource: RepositoryDataSource) => makePeerRepository(dataSource));
 
 			this.app
 				.bind(Identifiers.TransactionRepositoryFactory)
