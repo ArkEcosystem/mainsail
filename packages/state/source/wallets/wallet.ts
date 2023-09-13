@@ -6,7 +6,7 @@ import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
-	#changed = false;
+	#changedAttributes = new Set<string>();
 
 	public constructor(
 		protected readonly address: string,
@@ -18,7 +18,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public isChanged(): boolean {
-		return this.#changed;
+		return this.#changedAttributes.size > 0;
 	}
 
 	public getAddress(): string {
@@ -107,9 +107,10 @@ export class Wallet implements Contracts.State.Wallet {
 		if (!attribute) {
 			attribute = factory(this.attributeRepository.getAttributeType(key), value);
 			this.attributes.set(key, attribute);
+		} else {
+			attribute.set(value);
 		}
-
-		attribute.set(value);
+		this.#changedAttributes.add(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: key,
@@ -132,6 +133,7 @@ export class Wallet implements Contracts.State.Wallet {
 		}
 
 		this.attributes.delete(key);
+		this.#changedAttributes.add(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key,
