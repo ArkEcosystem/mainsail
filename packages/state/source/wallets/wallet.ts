@@ -96,7 +96,7 @@ export class Wallet implements Contracts.State.Wallet {
 			return defaultValue;
 		}
 
-		throw new Error(`Attribute "${key}" does not exist.`);
+		throw new Error(`Attribute "${key}" is not set.`);
 	}
 
 	public setAttribute<T>(key: string, value: T): boolean {
