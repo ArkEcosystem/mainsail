@@ -15,6 +15,8 @@ export class Wallet implements Contracts.State.Wallet {
 	) {
 		this.setAttribute("nonce", BigNumber.ZERO);
 		this.setAttribute("balance", BigNumber.ZERO);
+
+		this.#changedAttributes.clear();
 	}
 
 	public isChanged(): boolean {
