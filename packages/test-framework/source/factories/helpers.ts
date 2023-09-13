@@ -4,7 +4,6 @@ import memoize from "fast-memoize";
 import {
 	registerBlockFactory,
 	registerIdentityFactory,
-	registerRoundFactory,
 	registerTransactionFactory,
 	registerWalletFactory,
 } from "./factories";
@@ -17,8 +16,6 @@ const createFactory = memoize(async (config?: Contracts.Crypto.NetworkConfigPart
 	await registerBlockFactory(factory, config);
 
 	await registerIdentityFactory(factory, config);
-
-	await registerRoundFactory(factory, config);
 
 	await registerTransactionFactory(factory, config);
 
