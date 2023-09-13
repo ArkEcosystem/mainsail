@@ -7,4 +7,8 @@ export class BigNumberAttribute extends GenericAttribute<BigNumber> implements C
 	public clone(): BigNumberAttribute {
 		return new BigNumberAttribute(new BigNumber(this.get()));
 	}
+
+	public check(value: unknown): value is BigNumber {
+		return value instanceof BigNumber;
+	}
 }

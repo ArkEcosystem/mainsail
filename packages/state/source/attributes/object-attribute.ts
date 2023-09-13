@@ -7,4 +7,8 @@ export class ObjectAttribute extends GenericAttribute<object> implements Contrac
 	public clone(): ObjectAttribute {
 		return new ObjectAttribute(cloneDeep(this.get()));
 	}
+
+	public check(value: unknown): value is object {
+		return typeof value === "object";
+	}
 }

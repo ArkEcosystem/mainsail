@@ -17,5 +17,5 @@ export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<
 
 	public abstract clone(): Contracts.State.IAttribute<T>;
 
-	// public abstract check(value: unknown): value is T;
+	public abstract check(value: unknown): value is T;
 }
