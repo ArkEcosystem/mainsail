@@ -73,8 +73,10 @@ export class Transaction {
 
 	@Column({
 		default: undefined,
+		nullable: true,
+		type: "varchar",
 	})
-	public recipientId!: string;
+	public recipientId!: string | undefined;
 
 	@Column({
 		default: undefined,
