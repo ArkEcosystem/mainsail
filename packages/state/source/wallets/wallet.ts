@@ -5,7 +5,7 @@ import { factory } from "../attributes";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected readonly attributes = new Map<string, Contracts.State.IAttribute<any>>();
+	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 	#changed = false;
 
 	public constructor(
@@ -87,7 +87,7 @@ export class Wallet implements Contracts.State.Wallet {
 		const attribute = this.attributes.get(key);
 
 		if (attribute) {
-			return attribute.get();
+			return attribute.get() as T;
 		}
 
 		this.#checkAttributeName(key);
@@ -99,7 +99,7 @@ export class Wallet implements Contracts.State.Wallet {
 		throw new Error(`Attribute "${key}" does not exist.`);
 	}
 
-	public setAttribute<T = any>(key: string, value: T): boolean {
+	public setAttribute<T>(key: string, value: T): boolean {
 		let attribute = this.attributes.get(key);
 		const wasSet = !!attribute;
 		const previousValue = attribute ? attribute.get() : undefined;

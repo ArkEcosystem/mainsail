@@ -1,10 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 
 export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<T> {
-	protected value: T;
+	protected value!: T;
 
 	constructor(value: T) {
-		this.value = value;
+		this.set(value);
 	}
 
 	public get(): T {
@@ -12,7 +12,12 @@ export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<
 	}
 
 	public set(value: T): void {
-		this.value = value;
+		if (this.check(value)) {
+			this.value = value;
+			return;
+		}
+
+		throw new Error(`Value [${value}] is not valid for attribute [${this.constructor.name}].`);
 	}
 
 	public abstract clone(): Contracts.State.IAttribute<T>;
