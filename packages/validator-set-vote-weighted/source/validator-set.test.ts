@@ -9,7 +9,7 @@ import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { Wallets } from "../../state";
 import { validatorWalletFactory, walletFactory } from "../../state/source/wallets/factory";
 import { registerIndexers } from "../../state/source/wallets/indexers";
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox, getAttributeRepository } from "../../test-framework";
 import { buildValidatorAndVoteWallets } from "../test/build-validator-and-vote-balances";
 import { ValidatorSet } from "./validator-set";
 
@@ -35,18 +35,7 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
-		const attributes = context.sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes);
-		attributes.set("validator");
-		attributes.set("validatorUsername");
-		attributes.set("validatorVoteBalance");
-		attributes.set("validatorProducedBlocks");
-		attributes.set("validatorForgedTotal");
-		attributes.set("validatorApproval");
-		attributes.set("vote");
-		attributes.set("validatorResigned");
-		attributes.set("validatorRank");
-		attributes.set("validatorRound");
+		context.sandbox.app.bind(Identifiers.WalletAttributes).toConstantValue(getAttributeRepository());
 
 		// @ts-ignore
 		@injectable()
