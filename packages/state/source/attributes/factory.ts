@@ -1,13 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 
-// import { BigNumber } from "@mainsail/utils";
 import { BigNumberAttribute } from "./big-number-attribute";
 import { BooleanAttribute } from "./boolean-attribute";
 import { NumberAttribute } from "./number-attribute";
 import { ObjectAttribute } from "./object-attribute";
 import { StringAttribute } from "./string-attribute";
-
-// const isBigNumber = (value: any): value is BigNumber => value instanceof BigNumber;
 
 const factories: Record<Contracts.State.AttributeType, new (value: any) => Contracts.State.IAttribute<any>> = {
 	[Contracts.State.AttributeType.Object]: ObjectAttribute,
