@@ -24,6 +24,7 @@ import {
 } from "../../crypto-transaction";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
+import { AttributeRepository } from "../source/attributes";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
 import { StateStore } from "../source/stores";
@@ -35,7 +36,6 @@ import {
 	WalletRepositoryCopyOnWrite,
 } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
-import { AttributeRepository } from "../source/attributes";
 
 export interface Spies {
 	applySpy: SinonSpy;
