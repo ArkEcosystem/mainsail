@@ -4,9 +4,15 @@ import { DataSource } from "typeorm";
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
 import { Block, Transaction, ValidatorRound, Wallet } from "./models";
-import { makeBlockRepository, makePeerRepository, makeTransactionRepository, makeValidatorRoundRepository, makeWalletRepository } from "./repositories";
-import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 import { Peer } from "./models/peer";
+import {
+	makeBlockRepository,
+	makePeerRepository,
+	makeTransactionRepository,
+	makeValidatorRoundRepository,
+	makeWalletRepository,
+} from "./repositories";
+import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

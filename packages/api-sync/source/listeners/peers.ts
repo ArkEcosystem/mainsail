@@ -1,11 +1,12 @@
-import { Enums } from "@mainsail/kernel";
-import { inject, injectable } from "@mainsail/container";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import * as ApiSyncContracts from "../contracts";
+import { Enums } from "@mainsail/kernel";
+
+import { EventListener } from "../contracts";
 
 @injectable()
-export class Peers implements ApiSyncContracts.EventListener {
+export class Peers implements EventListener {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
@@ -47,7 +48,7 @@ export class Peers implements ApiSyncContracts.EventListener {
 		}
 	}
 
-	public async handle({ name, data }: { name: Contracts.Kernel.EventName; data: Contracts.P2P.Peer; }): Promise<void> {
+	public async handle({ name, data }: { name: Contracts.Kernel.EventName; data: Contracts.P2P.Peer }): Promise<void> {
 		switch (name) {
 			case Enums.PeerEvent.Added: {
 				await this.#handleAddedPeer(data);
@@ -57,7 +58,8 @@ export class Peers implements ApiSyncContracts.EventListener {
 				await this.#handleRemovedPeer(data);
 				break;
 			}
-			default: throw new Exceptions.NotImplemented("Peers.handle", name.toString());
+			default:
+				throw new Exceptions.NotImplemented("Peers.handle", name.toString());
 		}
 	}
 
@@ -69,7 +71,7 @@ export class Peers implements ApiSyncContracts.EventListener {
 		this.#addedPeers.set(peer.ip, peer);
 	}
 
-	async  #handleRemovedPeer(peer: Contracts.P2P.Peer): Promise<void> {
+	async #handleRemovedPeer(peer: Contracts.P2P.Peer): Promise<void> {
 		if (this.#addedPeers.has(peer.ip)) {
 			this.#addedPeers.delete(peer.ip);
 		}
@@ -78,7 +80,9 @@ export class Peers implements ApiSyncContracts.EventListener {
 	}
 
 	async #syncToDatabase(): Promise<void> {
-		this.logger.debug(`syncing peers to database (added: ${this.#addedPeers.size} removed: ${this.#removedPeers.size}))`);
+		this.logger.debug(
+			`syncing peers to database (added: ${this.#addedPeers.size} removed: ${this.#removedPeers.size}))`,
+		);
 
 		const addedPeers = [...this.#addedPeers.values()];
 		const removedPeers = [...this.#removedPeers.values()];
@@ -96,15 +100,15 @@ export class Peers implements ApiSyncContracts.EventListener {
 
 			if (this.#addedPeers.size > 0) {
 				await peerRepository.upsert(
-					[...this.#addedPeers.values()].map(peer => ({
+					[...this.#addedPeers.values()].map((peer) => ({
 						ip: peer.ip,
-						port: peer.port,
 						latency: peer.latency,
-						version: peer.version,
-						ports: peer.ports as Record<string, any>,
 						plugins: peer.plugins as Record<string, any>,
+						port: peer.port,
+						ports: peer.ports as Record<string, any>,
+						version: peer.version,
 					})),
-					["ip"]
+					["ip"],
 				);
 			}
 
@@ -113,9 +117,7 @@ export class Peers implements ApiSyncContracts.EventListener {
 		});
 	}
 
-
 	async #truncate(): Promise<void> {
 		await this.peerRepositoryFactory(this.dataSource).clear();
 	}
-
 }

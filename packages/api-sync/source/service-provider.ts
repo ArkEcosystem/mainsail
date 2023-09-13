@@ -1,8 +1,9 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { Sync } from "./sync";
-import * as Listeners from "./listeners/peers";
+
 import * as ApiSyncContracts from "./contracts";
+import { Peers } from "./listeners/peers";
+import { Sync } from "./sync";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	#listeners: ApiSyncContracts.EventListener[] = [];
@@ -20,11 +21,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	async #bootListeners(): Promise<void> {
-		for (const constructor of [Listeners.Peers]) {
+		for (const constructor of [Peers]) {
 			const listener = this.app.resolve(constructor);
 			await listener.boot();
 			this.#listeners.push(listener);
-		};
+		}
 	}
 
 	async #disposeListeners(): Promise<void> {
@@ -34,5 +35,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.#listeners = [];
 	}
-
 }
