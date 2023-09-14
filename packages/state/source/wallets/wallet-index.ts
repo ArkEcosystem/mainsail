@@ -28,10 +28,6 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 		return [...this.#walletByKey.values()];
 	}
 
-	public index(walletHolder: Contracts.State.WalletHolder): void {
-		this.indexer(this, walletHolder);
-	}
-
 	public has(key: string): boolean {
 		return this.#walletByKey.has(key);
 	}

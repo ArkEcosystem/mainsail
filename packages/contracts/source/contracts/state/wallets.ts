@@ -6,7 +6,6 @@ import { IBlockData, IMultiSignatureAsset } from "../crypto";
 
 export interface WalletIndex {
 	readonly indexer: WalletIndexer;
-	index(walletHolder: WalletHolder): void;
 	has(key: string): boolean;
 	get(key: string): WalletHolder | undefined;
 	set(key: string, walletHolder: WalletHolder): void;
