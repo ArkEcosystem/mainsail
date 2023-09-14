@@ -126,8 +126,6 @@ export interface WalletRepository {
 
 	findByIndex(index: string, key: string): Wallet;
 
-	findByIndexes(indexes: string[], key: string): Wallet;
-
 	hasByAddress(address: string): boolean;
 
 	hasByPublicKey(publicKey: string): boolean;

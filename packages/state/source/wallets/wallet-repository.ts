@@ -83,15 +83,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.getIndex(index).get(key)!.getWallet();
 	}
 
-	public findByIndexes(indexes: string[], key: string): Contracts.State.Wallet {
-		for (const index of indexes) {
-			if (this.hasByIndex(index, key)) {
-				return this.findByIndex(index, key);
-			}
-		}
-		throw new Error(`Wallet ${key} doesn't exist in indexes ${indexes.join(", ")}`);
-	}
-
 	public hasByAddress(address: string): boolean {
 		return this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address);
 	}

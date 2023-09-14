@@ -315,30 +315,6 @@ describe<{
 		}, "Wallet genesis_1 doesn't exist in index usernames");
 	});
 
-	it("findByIndexes - should copy and index wallet from blockchain wallet repository if key exist in blockchain wallet repository", (context) => {
-		const blockchainWallet = context.walletRepositoryBlockchain.findByAddress("address");
-
-		assert.equal(context.walletRepositoryBlockchain.findByIndexes(["addresses"], "address"), blockchainWallet);
-		assert.false(context.walletRepositoryClone.findByIndexes(["addresses"], "address") === blockchainWallet);
-
-		const wallet = context.walletRepositoryClone.findByIndexes(["addresses"], "address");
-		assert.equal(wallet, blockchainWallet);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
-	});
-
-	it("findByIndexes - should return wallet from wallet repository clone", async (context) => {
-		const wallet = context.walletRepositoryClone.findByAddress("address");
-
-		assert.equal(context.walletRepositoryClone.findByIndexes(["addresses"], "address"), wallet);
-		assert.true(context.walletRepositoryClone.getIndex(Contracts.State.WalletIndexes.Addresses).has("address"));
-	});
-
-	it("findByIndexes - should throw error if wallet does not exist in blockchain or copy wallet repository", (context) => {
-		assert.throws(() => {
-			context.walletRepositoryClone.findByIndexes(["addresses"], "address");
-		}, "Wallet address doesn't exist in indexes addresses");
-	});
-
 	it("findByIndex - should copy and index wallet from blockchain wallet repository if exist in blockchain wallet repository", async (context) => {
 		const blockchainWallet = context.walletRepositoryBlockchain.findByAddress("address");
 		blockchainWallet.setAttribute("validatorUsername", context.username);

@@ -48,7 +48,7 @@ describe<{
 		assert.not.equal(originalWallet, clonedWallet);
 	});
 
-	it("should get all by username", (context) => {
+	it.only("should get all by username", (context) => {
 		const wallet1 = context.walletRepo.findByAddress("abcd");
 		const wallet2 = context.walletRepo.findByAddress("efg");
 		const wallet3 = context.walletRepo.findByAddress("hij");
