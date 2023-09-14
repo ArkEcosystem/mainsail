@@ -46,8 +46,11 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 			// TODO: Add this as a wallet attribute
 			wallet.setAttribute("validatorConsensusPublicKey", transaction.asset.validator.publicKey);
-
-			walletRepository.index(wallet);
+			walletRepository.setOnIndex(
+				Contracts.State.WalletIndexes.Usernames,
+				transaction.asset.validator.username,
+				wallet,
+			);
 		}
 	}
 
@@ -146,8 +149,11 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
 		sender.setAttribute("validatorConsensusPublicKey", transaction.data.asset.validator.publicKey);
-
-		walletRepository.index(sender);
+		walletRepository.setOnIndex(
+			Contracts.State.WalletIndexes.Usernames,
+			transaction.data.asset.validator.username,
+			sender,
+		);
 	}
 
 	public async revertForSender(
@@ -156,6 +162,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	): Promise<void> {
 		await super.revertForSender(walletRepository, transaction);
 
+		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
@@ -165,7 +172,10 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		sender.forgetAttribute("validatorVoteBalance");
 		sender.forgetAttribute("validatorConsensusPublicKey");
 
-		walletRepository.index(sender);
+		walletRepository.forgetOnIndex(
+			Contracts.State.WalletIndexes.Usernames,
+			transaction.data.asset.validator.username,
+		);
 	}
 
 	public async applyToRecipient(

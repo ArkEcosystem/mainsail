@@ -33,7 +33,11 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 
 			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
 			wallet.setAttribute("validatorResigned", true);
-			walletRepository.index(wallet);
+			walletRepository.setOnIndex(
+				Contracts.State.WalletIndexes.Resignations,
+				wallet.getAttribute("validatorUsername"),
+				wallet,
+			);
 		}
 	}
 	public async isActivated(): Promise<boolean> {
@@ -103,8 +107,11 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		senderWallet.setAttribute("validatorResigned", true);
-
-		walletRepository.index(senderWallet);
+		walletRepository.setOnIndex(
+			Contracts.State.WalletIndexes.Resignations,
+			senderWallet.getAttribute("validatorUsername"),
+			senderWallet,
+		);
 	}
 
 	public async revertForSender(
@@ -118,8 +125,10 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		senderWallet.forgetAttribute("validatorResigned");
-
-		walletRepository.index(senderWallet);
+		walletRepository.forgetOnIndex(
+			Contracts.State.WalletIndexes.Resignations,
+			senderWallet.getAttribute("validatorUsername"),
+		);
 	}
 
 	public async applyToRecipient(
