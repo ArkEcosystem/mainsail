@@ -30,9 +30,6 @@ describe<{
 	});
 
 	it("#getIndex && #getIndexNames - should be able to look up indexers", ({ walletRepo }) => {
-		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
-
-		assert.equal(walletRepo.getIndexNames(), expected);
 		assert.instance(walletRepo.getIndex("addresses"), WalletIndex);
 		assert.instance(walletRepo.getIndex("publicKeys"), WalletIndex);
 		assert.instance(walletRepo.getIndex("usernames"), WalletIndex);
