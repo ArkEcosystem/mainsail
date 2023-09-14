@@ -11,8 +11,9 @@ import {
 	Utils,
 	Verifier,
 } from "@mainsail/crypto-transaction";
-import { Application, Services } from "@mainsail/kernel";
+import { Application } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import dayjs from "dayjs";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../crypto-config";
@@ -26,13 +27,12 @@ import { TransferTransactionHandler } from "../../../crypto-transaction-transfer
 import { ValidatorRegistrationTransactionHandler } from "../../../crypto-transaction-validator-registration/source/handlers";
 import { ValidatorResignationTransactionHandler } from "../../../crypto-transaction-validator-resignation/source/handlers";
 import { VoteTransactionHandler } from "../../../crypto-transaction-vote/source/handlers";
-import { describe } from "../../../test-framework/source";
+import { describe, getAttributeRepository } from "../../../test-framework";
 import { Validator } from "../../../validation/source/validator";
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
-import dayjs from "dayjs";
 
 const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
 const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;
@@ -175,7 +175,7 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 
 describe<{
 	app: Application;
-}>("Registry", ({ assert, afterEach, beforeEach, it, spy, stub }) => {
+}>("Registry", ({ assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		const app = new Application(new Container());
 
@@ -183,9 +183,9 @@ describe<{
 		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.LogService).toConstantValue({});
 
-		app.bind<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
-			.to(Services.Attributes.AttributeSet)
-			.inSingletonScope();
+		app.bind<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes).toConstantValue(
+			getAttributeRepository(),
+		);
 		app.bind(Identifiers.WalletRepository).toConstantValue({});
 		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 
