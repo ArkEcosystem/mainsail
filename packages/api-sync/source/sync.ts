@@ -15,6 +15,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
+	private readonly stateRepositoryFactory!: ApiDatabaseContracts.IStateRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
@@ -42,6 +45,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
+			const stateRepository = this.stateRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
@@ -61,6 +65,11 @@ export class Sync implements Contracts.ApiSync.ISync {
 				totalFee: header.totalFee.toFixed(),
 				version: header.version,
 			});
+
+			await stateRepository.upsert({
+				id: 1,
+				height: header.height,
+			}, ["id"]);
 
 			await transactionRepository.save(
 				transactions.map(({ data }) => ({
