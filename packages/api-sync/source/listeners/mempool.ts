@@ -17,6 +17,8 @@ export class Mempool extends AbstractListener<Contracts.Crypto.ITransactionData,
 	protected getEventMapping(): ListenerEventMapping {
 		return {
 			[Enums.TransactionEvent.AddedToPool]: ListenerEvent.OnAdded,
+			[Enums.TransactionEvent.Applied]: ListenerEvent.OnRemoved,
+			[Enums.TransactionEvent.Expired]: ListenerEvent.OnRemoved,
 			[Enums.TransactionEvent.RemovedFromPool]: ListenerEvent.OnRemoved,
 		};
 	}
