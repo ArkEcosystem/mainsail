@@ -129,8 +129,6 @@ export interface WalletRepository {
 
 	getIndex(name: string): WalletIndex;
 
-	getIndexNames(): string[];
-
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 
 	forgetOnIndex(index: string, key: string): void;

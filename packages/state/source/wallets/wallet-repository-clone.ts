@@ -102,7 +102,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 
 		// Update indexes
-		for (const indexName of this.getIndexNames()) {
+		for (const indexName of this.indexSet.all()) {
 			const localIndex = this.getIndex(indexName);
 			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
 
@@ -112,7 +112,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 
 		// Remove from forget indexes
-		for (const indexName of this.getIndexNames()) {
+		for (const indexName of this.indexSet.all()) {
 			const forgetIndex = this.#getForgetIndex(indexName);
 			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
 

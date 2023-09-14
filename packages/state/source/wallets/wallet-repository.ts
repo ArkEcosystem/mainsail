@@ -35,10 +35,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.indexes[name];
 	}
 
-	public getIndexNames(): string[] {
-		return Object.keys(this.indexes);
-	}
-
 	public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
 		return this.allByIndex(Contracts.State.WalletIndexes.Addresses);
 	}
@@ -119,7 +115,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		const walletHolder = origin.findHolder(wallet);
 		const walletHolderClone = walletHolder.clone();
 
-		for (const indexName of origin.getIndexNames()) {
+		for (const indexName of origin.indexSet.all()) {
 			const walletKeys = origin.getIndex(indexName).walletKeys(walletHolder);
 
 			const index = this.getIndex(indexName);
