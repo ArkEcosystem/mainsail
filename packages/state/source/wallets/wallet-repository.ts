@@ -20,11 +20,11 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	@postConstruct()
 	public initialize(): void {
-		for (const { name, indexer } of this.indexerIndexes) {
+		for (const { name } of this.indexerIndexes) {
 			if (this.indexes[name]) {
 				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
 			}
-			this.indexes[name] = new WalletIndex(indexer);
+			this.indexes[name] = new WalletIndex();
 		}
 	}
 

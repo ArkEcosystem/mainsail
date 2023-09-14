@@ -5,7 +5,6 @@ import { IBlockData, IMultiSignatureAsset } from "../crypto";
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
 export interface WalletIndex {
-	readonly indexer: WalletIndexer;
 	has(key: string): boolean;
 	get(key: string): WalletHolder | undefined;
 	set(key: string, walletHolder: WalletHolder): void;
