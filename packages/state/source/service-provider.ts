@@ -10,13 +10,17 @@ import { BalanceMutator } from "./mutators/balance";
 import { StateVerifier } from "./state-verifier";
 import { StateStore } from "./stores/state";
 import { TransactionValidator } from "./transaction-validator";
-import { WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
+import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
-import { registerIndexers } from "./wallets/indexers";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		registerIndexers(this.app);
+		// Register indexes
+		this.app.bind(Identifiers.WalletRepositoryIndexSet).to(IndexSet).inSingletonScope();
+		const indexSet = this.app.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet);
+		indexSet.set(Contracts.State.WalletIndexes.Addresses);
+		indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
+		indexSet.set(Contracts.State.WalletIndexes.Usernames);
 
 		this.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
 		const attributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
