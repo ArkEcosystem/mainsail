@@ -85,8 +85,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app
 				.bind(Identifiers.MempoolTransactionRepositoryFactory)
 				.toFactory(() => (dataSource: RepositoryDataSource) => makeMempoolTransactionRepository(dataSource));
-			
-      this.app
+
+			this.app
 				.bind(Identifiers.StateRepositoryFactory)
 				.toFactory(() => (dataSource: RepositoryDataSource) => makeStateRepository(dataSource));
 

@@ -1,7 +1,6 @@
 import { type DataSource, EntityManager, Repository } from "typeorm";
 
-import { MempoolTransaction } from "./models";
-import { State } from "./models";
+import { MempoolTransaction, State } from "./models";
 import { Block } from "./models/block";
 import { Peer } from "./models/peer";
 import { Transaction } from "./models/transaction";

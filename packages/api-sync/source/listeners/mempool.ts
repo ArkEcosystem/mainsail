@@ -42,11 +42,11 @@ export class Mempool extends AbstractListener<Contracts.Crypto.ITransactionData,
 			nonce: event.nonce.toFixed(),
 			recipientId: event.recipientId,
 			senderPublicKey: event.senderPublicKey,
+			signature: event.signature!,
 			type: event.type,
 			typeGroup: event.typeGroup,
 			vendorField: event.vendorField,
 			version: event.version,
-			signature: event.signature!,
 		};
 	}
 
