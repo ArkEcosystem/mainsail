@@ -262,11 +262,17 @@ export class Service implements Contracts.TransactionPool.Service {
 				AppUtils.assert.defined<string>(removedTransaction.id);
 				this.storage.removeTransaction(removedTransaction.id);
 				this.logger.debug(`Removed forged tx ${removedTransaction.id}`);
+
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
+				this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
 			}
 
 			if (!removedTransactions.some((t) => t.id === transaction.id)) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.error(`Removed forged tx ${transaction.id} from storage`);
+
+				// eslint-disable-next-line @typescript-eslint/no-floating-promises
+				this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 		});
 	}
