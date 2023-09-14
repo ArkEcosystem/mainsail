@@ -61,7 +61,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.BlockRepository).toConstantValue(makeBlockRepository(dataSource));
 			this.app.bind(Identifiers.PeerRepository).toConstantValue(makePeerRepository(dataSource));
-			this.app.bind(Identifiers.MempoolTransactionRepository).toConstantValue(makeMempoolTransactionRepository(dataSource));
+			this.app
+				.bind(Identifiers.MempoolTransactionRepository)
+				.toConstantValue(makeMempoolTransactionRepository(dataSource));
 			this.app.bind(Identifiers.TransactionRepository).toConstantValue(makeTransactionRepository(dataSource));
 			this.app
 				.bind(Identifiers.ValidatorRoundRepository)

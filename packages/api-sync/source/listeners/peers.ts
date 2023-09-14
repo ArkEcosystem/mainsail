@@ -1,7 +1,12 @@
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers, Models } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
+
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener";
 
 @injectable()
@@ -13,7 +18,7 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 		return {
 			[Enums.PeerEvent.Added]: ListenerEvent.OnAdded,
 			[Enums.PeerEvent.Removed]: ListenerEvent.OnRemoved,
-		}
+		};
 	}
 
 	protected getEventId(event: Contracts.P2P.Peer): string {
@@ -37,7 +42,9 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 		};
 	}
 
-	protected makeEntityRepository(dataSource: ApiDatabaseContracts.RepositoryDataSource): ApiDatabaseContracts.Repository<Models.Peer> {
+	protected makeEntityRepository(
+		dataSource: ApiDatabaseContracts.RepositoryDataSource,
+	): ApiDatabaseContracts.Repository<Models.Peer> {
 		return this.peerRepositoryFactory(dataSource);
 	}
 }

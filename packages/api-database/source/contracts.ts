@@ -1,11 +1,11 @@
-import { type DataSource, EntityManager, Entity, Repository } from "typeorm";
+import { type DataSource, EntityManager, Repository } from "typeorm";
 
+import { MempoolTransaction } from "./models";
 import { Block } from "./models/block";
 import { Peer } from "./models/peer";
 import { Transaction } from "./models/transaction";
 import { ValidatorRound } from "./models/validator-round";
 import { Wallet } from "./models/wallet";
-import { MempoolTransaction } from "./models";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
@@ -26,5 +26,5 @@ export type IMempoolTransactionRepositoryFactory = (dataSource: RepositoryDataSo
 export type IValidatorRoundRepositoryFactory = (dataSource: RepositoryDataSource) => IValidatorRoundRepository;
 export type IWalletRepositoryFactory = (dataSource: RepositoryDataSource) => IWalletRepository;
 
-export { type Repository, Entity };
+export { Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";

@@ -31,7 +31,6 @@ export class MempoolTransaction {
 	})
 	public typeGroup!: number;
 
-
 	@Column({
 		nullable: false,
 		type: "bigint",

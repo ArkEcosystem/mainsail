@@ -1,10 +1,10 @@
-import { Identifiers } from "@mainsail/contracts";
 import { interfaces } from "@mainsail/container";
+import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import * as ApiSyncContracts from "./contracts";
-import { Peers } from "./listeners/peers";
 import { Mempool } from "./listeners/mempool";
+import { Peers } from "./listeners/peers";
 import { Sync } from "./sync";
 
 export class ServiceProvider extends Providers.ServiceProvider {
