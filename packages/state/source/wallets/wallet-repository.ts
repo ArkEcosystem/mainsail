@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { WalletHolder } from "./wallet-holder";
@@ -7,7 +7,7 @@ import { WalletIndex } from "./wallet-index";
 // @TODO review the implementation
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
-	@multiInject(Identifiers.WalletRepositoryIndexSet)
+	@inject(Identifiers.WalletRepositoryIndexSet)
 	protected readonly indexSet!: Contracts.State.IndexSet;
 
 	@inject(Identifiers.WalletFactory)
