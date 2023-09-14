@@ -91,5 +91,5 @@ export class Block {
 		// TODO: length depends on signature size...
 		// length: 256,
 	})
-	public readonly blockSignature!: string;
+	public readonly signature!: string;
 }
