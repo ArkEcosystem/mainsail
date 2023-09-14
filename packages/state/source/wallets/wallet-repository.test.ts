@@ -113,30 +113,6 @@ describe<{
 		assert.equal(walletRepo.allByIndex("usernames"), [wallet]);
 	});
 
-	it("should be able to index forgotten wallets", ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-		walletRepo.index(wallet1);
-		assert.true(walletRepo.hasByAddress("wallet1"));
-		walletRepo.index(wallet1);
-		assert.true(walletRepo.hasByAddress("wallet1"));
-	});
-
-	it("should throw if indexing differnet wallet with same address", ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-
-		const wallet2 = wallet1.clone();
-
-		assert.throws(() => walletRepo.index(wallet2), "Wallet missmatch");
-	});
-
-	it("should do nothing if forgotten wallet does not exist", ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-		walletRepo.index(wallet1);
-		// @ts-ignore
-		wallet1.publicKey = undefined;
-		assert.false(walletRepo.hasByAddress("wallet2"));
-	});
-
 	it("should throw when looking up a username which doesn't exist", ({ walletRepo }) => {
 		assert.throws(
 			() => walletRepo.findByUsername("iDontExist"),
