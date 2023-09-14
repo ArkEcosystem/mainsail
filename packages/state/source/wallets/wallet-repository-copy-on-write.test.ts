@@ -4,7 +4,6 @@ import { BigNumber } from "@mainsail/utils";
 import { describeSkip } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from ".";
-import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
 
 describeSkip<{
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
@@ -31,10 +30,6 @@ describeSkip<{
 	it("should be able to look up indexers", (context) => {
 		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
 		assert.equal(context.walletRepoCopyOnWrite.getIndexNames(), expected);
-		assert.equal(context.walletRepoCopyOnWrite.getIndex("addresses").indexer, addressesIndexer);
-		assert.equal(context.walletRepoCopyOnWrite.getIndex("publicKeys").indexer, publicKeysIndexer);
-		assert.equal(context.walletRepoCopyOnWrite.getIndex("usernames").indexer, usernamesIndexer);
-		assert.equal(context.walletRepoCopyOnWrite.getIndex("resignations").indexer, resignationsIndexer);
 	});
 
 	it("should find wallets by address", (context) => {

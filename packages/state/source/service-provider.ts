@@ -21,6 +21,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		indexSet.set(Contracts.State.WalletIndexes.Addresses);
 		indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
 		indexSet.set(Contracts.State.WalletIndexes.Usernames);
+		// TODO: remove resignations index
+		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
 		this.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
 		const attributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);

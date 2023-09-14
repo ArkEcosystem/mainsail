@@ -2,8 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 
 import { describe } from "../../../test-framework";
 import { setUp } from "../../test/setup";
-import { Wallet, WalletRepository } from ".";
-import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
+import { Wallet, WalletIndex, WalletRepository } from ".";
 import { WalletHolder } from "./wallet-holder";
 
 describe<{
@@ -34,10 +33,10 @@ describe<{
 		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
 
 		assert.equal(walletRepo.getIndexNames(), expected);
-		assert.equal(walletRepo.getIndex("addresses").indexer, addressesIndexer);
-		assert.equal(walletRepo.getIndex("publicKeys").indexer, publicKeysIndexer);
-		assert.equal(walletRepo.getIndex("usernames").indexer, usernamesIndexer);
-		assert.equal(walletRepo.getIndex("resignations").indexer, resignationsIndexer);
+		assert.instance(walletRepo.getIndex("addresses"), WalletIndex);
+		assert.instance(walletRepo.getIndex("publicKeys"), WalletIndex);
+		assert.instance(walletRepo.getIndex("usernames"), WalletIndex);
+		assert.instance(walletRepo.getIndex("resignations"), WalletIndex);
 		assert.throws(() => walletRepo.getIndex("iDontExist"));
 	});
 

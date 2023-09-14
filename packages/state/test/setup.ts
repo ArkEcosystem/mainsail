@@ -29,12 +29,7 @@ import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
 import { StateStore } from "../source/stores";
 import { TransactionValidator } from "../source/transaction-validator";
-import {
-	registerIndexers,
-	WalletRepository,
-	WalletRepositoryClone,
-	WalletRepositoryCopyOnWrite,
-} from "../source/wallets";
+import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
 
 export interface Spies {
@@ -96,6 +91,21 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	};
 
 	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+
+	sandbox.app.bind(Identifiers.WalletRepositoryIndexSet).to(IndexSet).inSingletonScope();
+	sandbox.app
+		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.set(Contracts.State.WalletIndexes.Addresses);
+	sandbox.app
+		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.set(Contracts.State.WalletIndexes.PublicKeys);
+	sandbox.app
+		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.set(Contracts.State.WalletIndexes.Usernames);
+	sandbox.app
+		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.set(Contracts.State.WalletIndexes.Resignations);
+
 	sandbox.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
@@ -133,8 +143,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
 		.set("validatorRound", Contracts.State.AttributeType.Number);
-
-	registerIndexers(sandbox.app);
 
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 

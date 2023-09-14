@@ -18,13 +18,11 @@ describe<{
 	beforeEach(async (context) => {
 		context.wallet = new WalletHolder(await context.factory.get("Wallet").make<Wallets.Wallet>());
 
-		context.walletIndex = new WalletIndex((index, wallet) => {
-			index.set(wallet.getWallet().getAddress(), wallet);
-		}, true);
+		context.walletIndex = new WalletIndex();
 	});
 
 	it("should return entries", (context) => {
-		context.walletIndex.index(context.wallet);
+		context.walletIndex.set(context.wallet.getWallet().getAddress(), context.wallet);
 		const entries = context.walletIndex.entries();
 
 		assert.equal(entries.length, 1);
@@ -33,7 +31,7 @@ describe<{
 	});
 
 	it("should return keys", (context) => {
-		context.walletIndex.index(context.wallet);
+		context.walletIndex.set(context.wallet.getWallet().getAddress(), context.wallet);
 
 		assert.true(context.walletIndex.keys().includes(context.wallet.getWallet().getAddress()));
 	});
@@ -41,7 +39,7 @@ describe<{
 	it("should return walletKeys", (context) => {
 		assert.equal(context.walletIndex.walletKeys(context.wallet), []);
 
-		context.walletIndex.index(context.wallet);
+		context.walletIndex.set(context.wallet.getWallet().getAddress(), context.wallet);
 
 		assert.equal(context.walletIndex.walletKeys(context.wallet), [context.wallet.getWallet().getAddress()]);
 	});
@@ -49,7 +47,6 @@ describe<{
 	it("set - should set and get addresses", (context) => {
 		assert.false(context.walletIndex.has(context.wallet.getWallet().getAddress()));
 
-		context.walletIndex.index(context.wallet);
 		context.walletIndex.set(context.wallet.getWallet().getAddress(), context.wallet);
 
 		assert.equal(context.walletIndex.get(context.wallet.getWallet().getAddress()), context.wallet);
@@ -77,7 +74,7 @@ describe<{
 	it("forget - should index and forget wallets", (context) => {
 		assert.false(context.walletIndex.has(context.wallet.getWallet().getAddress()));
 
-		context.walletIndex.index(context.wallet);
+		context.walletIndex.set(context.wallet.getWallet().getAddress(), context.wallet);
 		assert.true(context.walletIndex.has(context.wallet.getWallet().getAddress()));
 
 		context.walletIndex.forget(context.wallet.getWallet().getAddress());
@@ -89,7 +86,7 @@ describe<{
 	});
 
 	it("forgetWallet - should forget wallet", (context) => {
-		context.walletIndex.index(context.wallet);
+		context.walletIndex.set(context.wallet.getWallet().getAddress(), context.wallet);
 		assert.equal(context.walletIndex.get(context.wallet.getWallet().getAddress()), context.wallet);
 
 		context.walletIndex.forgetWallet(context.wallet);
