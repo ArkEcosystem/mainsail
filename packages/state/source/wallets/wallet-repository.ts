@@ -7,8 +7,8 @@ import { WalletIndex } from "./wallet-index";
 // @TODO review the implementation
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
-	@multiInject(Identifiers.WalletRepositoryIndexerIndex)
-	protected readonly indexerIndexes!: Contracts.State.WalletIndexerIndex[];
+	@multiInject(Identifiers.WalletRepositoryIndexSet)
+	protected readonly indexSet!: Contracts.State.IndexSet;
 
 	@inject(Identifiers.WalletFactory)
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
@@ -20,7 +20,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	@postConstruct()
 	public initialize(): void {
-		for (const { name } of this.indexerIndexes) {
+		for (const name of this.indexSet.getAll()) {
 			if (this.indexes[name]) {
 				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
 			}

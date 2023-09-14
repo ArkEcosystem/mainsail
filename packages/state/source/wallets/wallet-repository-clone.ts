@@ -16,7 +16,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	public initialize(): void {
 		super.initialize();
 
-		for (const { name } of this.indexerIndexes) {
+		for (const name of this.indexSet.getAll()) {
 			this.#forgetIndexes[name] = new WalletIndex();
 		}
 	}
