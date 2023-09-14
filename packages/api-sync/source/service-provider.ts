@@ -1,7 +1,9 @@
+import { interfaces } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import * as ApiSyncContracts from "./contracts";
+import { Mempool } from "./listeners/mempool";
 import { Peers } from "./listeners/peers";
 import { Sync } from "./sync";
 
@@ -21,8 +23,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	async #bootListeners(): Promise<void> {
-		for (const constructor of [Peers]) {
-			const listener = this.app.resolve(constructor);
+		for (const constructor of [Peers, Mempool]) {
+			const listener = this.app.resolve(constructor as interfaces.Newable<ApiSyncContracts.EventListener>);
 			await listener.boot();
 			this.#listeners.push(listener);
 		}

@@ -55,10 +55,8 @@ export enum TransactionEvent {
 	AddedToPool = "transaction.pool.added",
 	Applied = "transaction.applied",
 	Expired = "transaction.expired",
-	Forged = "transaction.forged",
 	RejectedByPool = "transaction.pool.rejected",
 	RemovedFromPool = "transaction.pool.removed",
-	Reverted = "transaction.reverted",
 }
 
 export enum ScheduleEvent {

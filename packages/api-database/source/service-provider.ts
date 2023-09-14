@@ -3,10 +3,11 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, State, Transaction, ValidatorRound, Wallet } from "./models";
+import { Block, MempoolTransaction, State, Transaction, ValidatorRound, Wallet } from "./models";
 import { Peer } from "./models/peer";
 import {
 	makeBlockRepository,
+	makeMempoolTransactionRepository,
 	makePeerRepository,
 	makeStateRepository,
 	makeTransactionRepository,
@@ -40,7 +41,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const dataSource = new DataSource({
 				...options,
 				// TODO: allow entities to be extended by plugins
-				entities: [Block, Peer, State, Transaction, ValidatorRound, Wallet],
+				entities: [Block, Peer, MempoolTransaction, State, Transaction, ValidatorRound, Wallet],
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 
@@ -61,6 +62,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.BlockRepository).toConstantValue(makeBlockRepository(dataSource));
 			this.app.bind(Identifiers.PeerRepository).toConstantValue(makePeerRepository(dataSource));
+			this.app
+				.bind(Identifiers.MempoolTransactionRepository)
+				.toConstantValue(makeMempoolTransactionRepository(dataSource));
 			this.app.bind(Identifiers.StateRepository).toConstantValue(makeStateRepository(dataSource));
 			this.app.bind(Identifiers.TransactionRepository).toConstantValue(makeTransactionRepository(dataSource));
 			this.app
@@ -77,6 +81,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app
 				.bind(Identifiers.PeerRepositoryFactory)
 				.toFactory(() => (dataSource: RepositoryDataSource) => makePeerRepository(dataSource));
+
+			this.app
+				.bind(Identifiers.MempoolTransactionRepositoryFactory)
+				.toFactory(() => (dataSource: RepositoryDataSource) => makeMempoolTransactionRepository(dataSource));
 
 			this.app
 				.bind(Identifiers.StateRepositoryFactory)
