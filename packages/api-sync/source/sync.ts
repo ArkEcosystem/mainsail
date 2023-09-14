@@ -51,7 +51,6 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 
 			await blockRepository.save({
-				blockSignature: commit.signature,
 				generatorPublicKey: header.generatorPublicKey,
 				height: header.height,
 				id: header.id,
@@ -60,6 +59,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 				payloadLength: header.payloadLength,
 				previousBlock: header.previousBlock,
 				reward: header.reward.toFixed(),
+				signature: commit.signature,
 				timestamp: header.timestamp,
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
@@ -86,6 +86,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 					recipientId: data.recipientId,
 					senderPublicKey: data.senderPublicKey,
 					sequence: data.sequence,
+					signature: data.signature,
 					timestamp: header.timestamp,
 					type: data.type,
 					typeGroup: data.typeGroup,
