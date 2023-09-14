@@ -45,7 +45,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
 			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
-			super.index(wallet);
+			this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, this.findHolder(wallet));
 		}
 
 		return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
@@ -118,27 +118,6 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 			for (const [key] of forgetIndex.entries()) {
 				originalIndex.forget(key);
-			}
-		}
-	}
-
-	protected indexWallet(wallet: Contracts.State.Wallet): void {
-		const indexKeys = {};
-		const walletHolder = this.findHolder(wallet);
-
-		for (const indexName of this.getIndexNames()) {
-			indexKeys[indexName] = this.getIndex(indexName).walletKeys(walletHolder);
-		}
-
-		super.indexWallet(wallet);
-
-		for (const indexName of this.getIndexNames()) {
-			const walletKeys = this.getIndex(indexName).walletKeys(walletHolder);
-
-			for (const key of indexKeys[indexName]) {
-				if (!walletKeys.includes(key)) {
-					this.#getForgetIndex(indexName).set(key, walletHolder);
-				}
 			}
 		}
 	}

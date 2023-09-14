@@ -99,16 +99,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.getIndex(indexName).has(key);
 	}
 
-	public index(wallets: Contracts.State.Wallet | Contracts.State.Wallet[]): void {
-		if (!Array.isArray(wallets)) {
-			this.indexWallet(wallets);
-		} else {
-			for (const wallet of wallets) {
-				this.indexWallet(wallet);
-			}
-		}
-	}
-
 	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {
 		const walletHolder = this.findHolder(wallet);
 
@@ -163,14 +153,5 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		}
 
 		return walletHolder;
-	}
-
-	protected indexWallet(wallet: Contracts.State.Wallet): void {
-		const walletHolder = this.findHolder(wallet);
-
-		for (const index of Object.values(this.indexes).filter((index) => index.autoIndex)) {
-			index.forgetWallet(walletHolder);
-			index.index(walletHolder);
-		}
 	}
 }
