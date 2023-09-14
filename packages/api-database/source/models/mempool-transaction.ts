@@ -78,4 +78,12 @@ export class MempoolTransaction {
 		// TODO: separate tables for 1:n assets
 	})
 	public asset!: Record<string, any> | undefined;
+
+	@Column({
+		nullable: false,
+		type: "varchar",
+		// TODO: length depends on signature size...
+		// length: 256,
+	})
+	public readonly signature!: string;
 }

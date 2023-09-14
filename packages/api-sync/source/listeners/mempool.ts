@@ -46,6 +46,7 @@ export class Mempool extends AbstractListener<Contracts.Crypto.ITransactionData,
 			typeGroup: event.typeGroup,
 			vendorField: event.vendorField,
 			version: event.version,
+			signature: event.signature!,
 		};
 	}
 
