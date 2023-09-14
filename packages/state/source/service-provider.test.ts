@@ -26,17 +26,9 @@ describe<{
 	});
 
 	it("should boot and dispose", async (context) => {
-		const stubbedApp = stub(context.app, "get").returnValue({
-			bind: () => {},
-			boot: () => {},
-			initialize: () => {},
-		});
-
 		await context.serviceProvider.register();
 
 		assert.resolves(async () => await context.serviceProvider.boot());
-
-		stubbedApp.restore();
 	});
 
 	it("should boot when the package is database", async (context) => {

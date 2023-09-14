@@ -88,23 +88,23 @@ describe<{
 		spyValidatorIsValidator = stub(validatorWallet, "isValidator");
 	});
 
-	it("#dependencies -  shoudl depend on ValidatorRegistrationTransaction", ({ handler }) => {
+	it("#dependencies -  should depend on ValidatorRegistrationTransaction", ({ handler }) => {
 		assert.equal(handler.dependencies(), [ValidatorRegistrationTransactionHandler]);
 	});
 
-	it("#walletAttributes -  shoudl return vote", ({ handler }) => {
-		assert.equal(handler.walletAttributes(), ["vote"]);
+	it("#walletAttributes -  should return vote", ({ handler }) => {
+		assert.equal(handler.walletAttributes(), [{ name: "vote", type: Contracts.State.AttributeType.String }]);
 	});
 
-	it("#getConstructor -  shoudl return VoteTransaction", ({ handler }) => {
+	it("#getConstructor -  should return VoteTransaction", ({ handler }) => {
 		assert.equal(handler.getConstructor(), VoteTransaction);
 	});
 
-	it("#isActivated -  shoudl return true", async ({ handler }) => {
+	it("#isActivated -  should return true", async ({ handler }) => {
 		assert.true(await handler.isActivated());
 	});
 
-	it("#bootstrap -  shoudl set wallet vote attribute", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  should set wallet vote attribute", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(false);
 		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
@@ -121,7 +121,7 @@ describe<{
 		spyForgetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw if wallet already voted", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  should throw if wallet already voted", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(true);
 		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
 
@@ -140,7 +140,7 @@ describe<{
 		spyForgetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl forget wallet vote attribute", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  should forget wallet vote attribute", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(true);
 		spyGetAttribute.returnValue("validatorPublicKey");
 		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
@@ -161,7 +161,7 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw if walled didn't vote", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  should throw if walled didn't vote", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(false);
 		spyGetAttribute.returnValue("validatorPublicKey");
 		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
@@ -181,7 +181,7 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw on unvote missmatch", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  should throw on unvote missmatch", async ({ handler, walletRepository }) => {
 		spyHasAttribute.returnValue(true);
 		spyGetAttribute.returnValue("invalidPublicKey");
 		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
@@ -202,7 +202,7 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw if transaction contains 0 votes and unvotes", async ({
+	it("#bootstrap -  should throw if transaction contains 0 votes and unvotes", async ({
 		handler,
 		walletRepository,
 	}) => {
@@ -217,7 +217,7 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw on max votes exceeded", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  should throw on max votes exceeded", async ({ handler, walletRepository }) => {
 		const transactions = [getTransaction(["validatorPublicKey", "secondValidatorPublicKey"], [])];
 
 		await assert.rejects(
@@ -229,7 +229,7 @@ describe<{
 		spySetAttribute.neverCalled();
 	});
 
-	it("#bootstrap -  shoudl throw on max unotes exceeded", async ({ handler, walletRepository }) => {
+	it("#bootstrap -  should throw on max unotes exceeded", async ({ handler, walletRepository }) => {
 		const transactions = [getTransaction([], ["validatorPublicKey", "secondValidatorPublicKey"])];
 
 		await assert.rejects(

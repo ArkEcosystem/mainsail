@@ -1,12 +1,12 @@
 import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../../crypto-config";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
 import { describe, Sandbox } from "../../../test-framework";
+import { AttributeRepository } from "../attributes";
 import {
 	addressesIndexer,
 	publicKeysIndexer,
@@ -30,9 +30,19 @@ describe<{
 		const sandbox = new Sandbox();
 		const app = sandbox.app;
 
-		app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
-
-		app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorUsername");
+		sandbox.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
+		sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+			.set("nonce", Contracts.State.AttributeType.BigNumber);
+		sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+			.set("balance", Contracts.State.AttributeType.BigNumber);
+		sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+			.set("publicKey", Contracts.State.AttributeType.String);
+		sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+			.set("validatorUsername", Contracts.State.AttributeType.String);
 
 		app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
 		app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();

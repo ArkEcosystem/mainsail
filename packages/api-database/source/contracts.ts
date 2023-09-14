@@ -1,6 +1,7 @@
 import { type DataSource, EntityManager, Repository } from "typeorm";
 
 import { MempoolTransaction } from "./models";
+import { State } from "./models";
 import { Block } from "./models/block";
 import { Peer } from "./models/peer";
 import { Transaction } from "./models/transaction";
@@ -17,6 +18,7 @@ export type IPeerRepository = Repository<Peer>;
 export type IMempoolTransactionRepository = Repository<MempoolTransaction>;
 export type ITransactionRepository = Repository<Transaction>;
 export type IValidatorRoundRepository = Repository<ValidatorRound>;
+export type IStateRepository = Repository<State>;
 export type IWalletRepository = Repository<Wallet>;
 
 export type IBlockRepositoryFactory = (dataSource: RepositoryDataSource) => IBlockRepository;
@@ -24,6 +26,7 @@ export type IPeerRepositoryFactory = (dataSource: RepositoryDataSource) => IPeer
 export type ITransactionRepositoryFactory = (dataSource: RepositoryDataSource) => ITransactionRepository;
 export type IMempoolTransactionRepositoryFactory = (dataSource: RepositoryDataSource) => IMempoolTransactionRepository;
 export type IValidatorRoundRepositoryFactory = (dataSource: RepositoryDataSource) => IValidatorRoundRepository;
+export type IStateRepositoryFactory = (dataSource: RepositoryDataSource) => IStateRepository;
 export type IWalletRepositoryFactory = (dataSource: RepositoryDataSource) => IWalletRepository;
 
 export { Entity, Repository } from "typeorm";

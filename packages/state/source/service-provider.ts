@@ -1,8 +1,9 @@
 import { Selectors } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
+import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
@@ -16,6 +17,12 @@ import { registerIndexers } from "./wallets/indexers";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		registerIndexers(this.app);
+
+		this.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
+		const attributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
+		attributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
+		attributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
+		attributeRepository.set("publicKey", Contracts.State.AttributeType.String);
 
 		this.app
 			.bind(Identifiers.WalletRepository)

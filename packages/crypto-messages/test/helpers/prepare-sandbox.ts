@@ -1,5 +1,4 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
@@ -70,6 +69,6 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	}
 
 	context.sandbox.app
-		.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
-		.set("validatorConsensusPublicKey");
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorConsensusPublicKey", Contracts.State.AttributeType.String);
 };

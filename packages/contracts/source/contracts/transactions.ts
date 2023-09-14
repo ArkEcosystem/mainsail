@@ -1,6 +1,6 @@
 import { IMultiSignatureAsset, ITransaction, ITransactionData, TransactionConstructor } from "./crypto";
 import { EventDispatcher } from "./kernel";
-import { Wallet, WalletRepository } from "./state";
+import { AttributeType, Wallet, WalletRepository } from "./state";
 
 export type TransactionHandlerConstructor = new () => ITransactionHandler;
 
@@ -36,7 +36,7 @@ export interface ITransactionHandler {
 
 	dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
 
-	walletAttributes(): ReadonlyArray<string>;
+	walletAttributes(): ReadonlyArray<{ name: string; type: AttributeType }>;
 
 	isActivated(): Promise<boolean>;
 

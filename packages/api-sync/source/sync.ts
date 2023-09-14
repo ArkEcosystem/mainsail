@@ -15,6 +15,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
+	private readonly stateRepositoryFactory!: ApiDatabaseContracts.IStateRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
@@ -42,12 +45,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
+			const stateRepository = this.stateRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 
 			await blockRepository.save({
-				blockSignature: commit.signature,
 				generatorPublicKey: header.generatorPublicKey,
 				height: header.height,
 				id: header.id,
@@ -56,11 +59,20 @@ export class Sync implements Contracts.ApiSync.ISync {
 				payloadLength: header.payloadLength,
 				previousBlock: header.previousBlock,
 				reward: header.reward.toFixed(),
+				signature: commit.signature,
 				timestamp: header.timestamp,
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				version: header.version,
 			});
+
+			await stateRepository.upsert(
+				{
+					height: header.height,
+					id: 1,
+				},
+				["id"],
+			);
 
 			await transactionRepository.save(
 				transactions.map(({ data }) => ({
@@ -74,6 +86,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 					recipientId: data.recipientId,
 					senderPublicKey: data.senderPublicKey,
 					sequence: data.sequence,
+					signature: data.signature,
 					timestamp: header.timestamp,
 					type: data.type,
 					typeGroup: data.typeGroup,

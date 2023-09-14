@@ -6,7 +6,6 @@ describe("Helpers", ({ it, assert }) => {
 	it("should register all factories", async () => {
 		assert.defined(await factory("Block", cryptoConfig));
 		assert.defined(await factory("Identity", cryptoConfig));
-		assert.defined(await factory("Round", cryptoConfig));
 		assert.defined(await factory("Transfer", cryptoConfig));
 		assert.defined(await factory("ValidatorRegistration", cryptoConfig));
 		assert.defined(await factory("ValidatorResignation", cryptoConfig));

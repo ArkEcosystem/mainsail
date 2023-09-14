@@ -16,7 +16,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		return [];
 	}
 
-	public walletAttributes(): ReadonlyArray<string> {
+	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
 		return [];
 	}
 

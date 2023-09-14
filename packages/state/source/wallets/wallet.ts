@@ -1,23 +1,26 @@
 import { Contracts } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
+import { factory } from "../attributes";
 import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
-	protected publicKey: string | undefined = undefined;
-	protected balance = BigNumber.ZERO;
-	protected nonce = BigNumber.ZERO;
-	#changed = false;
+	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
+	#changedAttributes = new Set<string>();
 
 	public constructor(
 		protected readonly address: string,
-		protected readonly attributes: Services.Attributes.AttributeMap,
+		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
 		protected readonly events?: Contracts.Kernel.EventDispatcher,
-	) {}
+	) {
+		this.setAttribute("nonce", BigNumber.ZERO);
+		this.setAttribute("balance", BigNumber.ZERO);
+
+		this.#changedAttributes.clear();
+	}
 
 	public isChanged(): boolean {
-		return this.#changed;
+		return this.#changedAttributes.size > 0;
 	}
 
 	public getAddress(): string {
@@ -25,108 +28,98 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getPublicKey(): string | undefined {
-		return this.publicKey;
+		if (!this.hasAttribute("publicKey")) {
+			return undefined;
+		}
+
+		return this.getAttribute<string>("publicKey");
 	}
 
 	public setPublicKey(publicKey: string): void {
-		const previousValue = this.publicKey;
-
-		this.publicKey = publicKey;
-		this.#changed = true;
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: "publicKey",
-			previousValue,
-			publicKey: this.publicKey,
-			value: publicKey,
-			wallet: this,
-		});
+		this.setAttribute("publicKey", publicKey);
 	}
 
 	public getBalance(): BigNumber {
-		return this.balance;
+		return this.getAttribute("balance");
 	}
 
 	public setBalance(balance: BigNumber): void {
-		const previousValue = this.balance;
-
-		this.balance = balance;
-		this.#changed = true;
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: "balance",
-			previousValue,
-			publicKey: this.publicKey,
-			value: balance,
-			wallet: this,
-		});
+		this.setAttribute("balance", balance);
 	}
 
 	public getNonce(): BigNumber {
-		return this.nonce;
+		return this.getAttribute<BigNumber>("nonce");
 	}
 
 	public setNonce(nonce: BigNumber): void {
-		const previousValue = this.nonce;
-
-		this.nonce = nonce;
-		this.#changed = true;
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: "nonce",
-			previousValue,
-			publicKey: this.publicKey,
-			value: nonce,
-			wallet: this,
-		});
+		this.setAttribute("nonce", nonce);
 	}
 
 	public increaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.balance.plus(balance));
+		this.setBalance(this.getBalance().plus(balance));
 
 		return this;
 	}
 
 	public decreaseBalance(balance: BigNumber): Contracts.State.Wallet {
-		this.setBalance(this.balance.minus(balance));
+		this.setBalance(this.getBalance().minus(balance));
 
 		return this;
 	}
 
 	public increaseNonce(): void {
-		this.setNonce(this.nonce.plus(BigNumber.ONE));
+		this.setNonce(this.getNonce().plus(BigNumber.ONE));
 	}
 
 	public decreaseNonce(): void {
-		this.setNonce(this.nonce.minus(BigNumber.ONE));
-	}
-
-	public getData(): Contracts.State.WalletData {
-		return {
-			address: this.address,
-			attributes: this.attributes,
-			balance: this.balance,
-			nonce: this.nonce,
-			publicKey: this.publicKey,
-		};
+		this.setNonce(this.getNonce().minus(BigNumber.ONE));
 	}
 
 	public getAttributes(): Record<string, any> {
-		return this.attributes.all();
+		const result = {};
+
+		for (const [key, value] of this.attributes.entries()) {
+			result[key] = value.get();
+		}
+
+		return result;
 	}
 
 	public getAttribute<T>(key: string, defaultValue?: T): T {
-		return this.attributes.get<T>(key, defaultValue);
+		const attribute = this.attributes.get(key);
+
+		if (attribute) {
+			return attribute.get() as T;
+		}
+
+		this.#checkAttributeName(key);
+
+		if (defaultValue !== undefined) {
+			return defaultValue;
+		}
+
+		throw new Error(`Attribute "${key}" is not set.`);
 	}
 
-	public setAttribute<T = any>(key: string, value: T): boolean {
-		const wasSet = this.attributes.set<T>(key, value);
-		this.#changed = true;
+	public setAttribute<T>(key: string, value: T): boolean {
+		let attribute = this.attributes.get(key);
+		const wasSet = !!attribute;
+		const previousValue = attribute ? attribute.get() : undefined;
+
+		if (!attribute) {
+			attribute = factory(this.attributeRepository.getAttributeType(key), value);
+			this.attributes.set(key, attribute);
+		} else {
+			attribute.set(value);
+		}
+		this.#changedAttributes.add(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: key,
-			publicKey: this.publicKey,
+			previousValue,
+			publicKey: this.getPublicKey(),
 			value,
+
 			wallet: this,
 		});
 
@@ -134,19 +127,24 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public forgetAttribute(key: string): boolean {
-		const na = Symbol();
-		const previousValue = this.attributes.get(key, na);
-		const wasSet = this.attributes.forget(key);
-		this.#changed = true;
+		const attribute = this.attributes.get(key);
+		const previousValue = attribute ? attribute.get() : undefined;
+
+		if (!attribute) {
+			this.#checkAttributeName(key);
+		}
+
+		this.attributes.delete(key);
+		this.#changedAttributes.add(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key,
-			previousValue: previousValue === na ? undefined : previousValue,
-			publicKey: this.publicKey,
+			previousValue: previousValue,
+			publicKey: this.getPublicKey(),
 			wallet: this,
 		});
 
-		return wasSet;
+		return !!attribute;
 	}
 
 	public hasAttribute(key: string): boolean {
@@ -166,10 +164,18 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(): Wallet {
-		const cloned = new Wallet(this.address, this.attributes.clone());
-		cloned.publicKey = this.publicKey;
-		cloned.balance = this.balance;
-		cloned.nonce = this.nonce;
-		return cloned;
+		const clone = new Wallet(this.address, this.attributeRepository);
+
+		for (const [key, value] of this.attributes.entries()) {
+			clone.attributes.set(key, value.clone());
+		}
+
+		return clone;
+	}
+
+	#checkAttributeName(name: string): void {
+		if (!this.attributeRepository.has(name)) {
+			throw new Error(`Attribute name "${name}" is not registered.`);
+		}
 	}
 }
