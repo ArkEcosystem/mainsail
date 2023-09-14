@@ -20,7 +20,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	@postConstruct()
 	public initialize(): void {
-		for (const name of this.indexSet.getAll()) {
+		for (const name of this.indexSet.all()) {
 			if (this.indexes[name]) {
 				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
 			}

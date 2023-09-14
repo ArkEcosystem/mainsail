@@ -9,7 +9,7 @@ export class IndexSet implements Contracts.State.IndexSet {
 		this.#indexNames.add(indexName);
 	}
 
-	getAll(): string[] {
+	all(): string[] {
 		return [...this.#indexNames.values()];
 	}
 }
