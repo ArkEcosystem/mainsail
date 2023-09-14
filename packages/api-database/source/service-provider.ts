@@ -3,10 +3,11 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, Transaction, ValidatorRound, Wallet } from "./models";
+import { Block, MempoolTransaction, Transaction, ValidatorRound, Wallet } from "./models";
 import { Peer } from "./models/peer";
 import {
 	makeBlockRepository,
+	makeMempoolTransactionRepository,
 	makePeerRepository,
 	makeTransactionRepository,
 	makeValidatorRoundRepository,
@@ -39,7 +40,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const dataSource = new DataSource({
 				...options,
 				// TODO: allow entities to be extended by plugins
-				entities: [Block, Peer, Transaction, ValidatorRound, Wallet],
+				entities: [Block, Peer, MempoolTransaction, Transaction, ValidatorRound, Wallet],
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 
@@ -60,6 +61,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.BlockRepository).toConstantValue(makeBlockRepository(dataSource));
 			this.app.bind(Identifiers.PeerRepository).toConstantValue(makePeerRepository(dataSource));
+			this.app.bind(Identifiers.MempoolTransactionRepository).toConstantValue(makeMempoolTransactionRepository(dataSource));
 			this.app.bind(Identifiers.TransactionRepository).toConstantValue(makeTransactionRepository(dataSource));
 			this.app
 				.bind(Identifiers.ValidatorRoundRepository)
@@ -75,6 +77,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app
 				.bind(Identifiers.PeerRepositoryFactory)
 				.toFactory(() => (dataSource: RepositoryDataSource) => makePeerRepository(dataSource));
+
+			this.app
+				.bind(Identifiers.MempoolTransactionRepositoryFactory)
+				.toFactory(() => (dataSource: RepositoryDataSource) => makeMempoolTransactionRepository(dataSource));
 
 			this.app
 				.bind(Identifiers.TransactionRepositoryFactory)
