@@ -1,4 +1,3 @@
-export * as Attributes from "./attributes";
 export * as Cache from "./cache";
 export * as Config from "./config";
 export * as Events from "./events";
