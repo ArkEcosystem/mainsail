@@ -66,10 +66,13 @@ export class Sync implements Contracts.ApiSync.ISync {
 				version: header.version,
 			});
 
-			await stateRepository.upsert({
-				id: 1,
-				height: header.height,
-			}, ["id"]);
+			await stateRepository.upsert(
+				{
+					height: header.height,
+					id: 1,
+				},
+				["id"],
+			);
 
 			await transactionRepository.save(
 				transactions.map(({ data }) => ({

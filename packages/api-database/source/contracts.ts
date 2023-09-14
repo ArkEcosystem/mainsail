@@ -1,11 +1,11 @@
 import { type DataSource, EntityManager, Repository } from "typeorm";
 
+import { State } from "./models";
 import { Block } from "./models/block";
 import { Peer } from "./models/peer";
 import { Transaction } from "./models/transaction";
 import { ValidatorRound } from "./models/validator-round";
 import { Wallet } from "./models/wallet";
-import { State } from "./models";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
