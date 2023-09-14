@@ -17,10 +17,6 @@ export interface WalletIndex {
 	clear(): void;
 }
 
-export type WalletIndexer = (index: WalletIndex, walletHolder: WalletHolder) => void;
-
-export type WalletIndexerIndex = { name: string; indexer: WalletIndexer };
-
 export enum WalletIndexes {
 	Addresses = "addresses",
 	PublicKeys = "publicKeys",
