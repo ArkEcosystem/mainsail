@@ -24,6 +24,7 @@ import {
 } from "../../crypto-transaction";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
+import { AttributeRepository } from "../source/attributes";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
 import { StateStore } from "../source/stores";
@@ -95,17 +96,43 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	};
 
 	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
-	sandbox.app.bind(Identifiers.WalletAttributes).to(Services.Attributes.AttributeSet).inSingletonScope();
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validator");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorUsername");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorVoteBalance");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorProducedBlocks");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorForgedTotal");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorApproval");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("vote");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorResigned");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorRank");
-	sandbox.app.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes).set("validatorRound");
+	sandbox.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("nonce", Contracts.State.AttributeType.BigNumber);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("balance", Contracts.State.AttributeType.BigNumber);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("publicKey", Contracts.State.AttributeType.String);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorUsername", Contracts.State.AttributeType.String);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorProducedBlocks", Contracts.State.AttributeType.Number);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorForgedTotal", Contracts.State.AttributeType.BigNumber);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorApproval", Contracts.State.AttributeType.BigNumber);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("vote", Contracts.State.AttributeType.String);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorResigned", Contracts.State.AttributeType.Boolean);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorRank", Contracts.State.AttributeType.Number);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorRound", Contracts.State.AttributeType.Number);
 
 	registerIndexers(sandbox.app);
 

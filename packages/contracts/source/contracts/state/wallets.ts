@@ -32,14 +32,6 @@ export enum WalletIndexes {
 	Locks = "locks",
 }
 
-export interface WalletData {
-	address: string;
-	publicKey?: string;
-	balance: BigNumber;
-	nonce: BigNumber;
-	attributes: Record<string, any>;
-}
-
 export interface Wallet {
 	getAddress(): string;
 
@@ -64,8 +56,6 @@ export interface Wallet {
 	increaseNonce(): void;
 
 	decreaseNonce(): void;
-
-	getData(): WalletData;
 
 	getAttributes(): Record<string, any>;
 

@@ -65,7 +65,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	});
 
 	context.sandbox.app
-		.get<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
-		.set("validatorConsensusPublicKey");
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorConsensusPublicKey", Contracts.State.AttributeType.String);
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 };

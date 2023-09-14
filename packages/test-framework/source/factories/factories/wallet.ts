@@ -1,10 +1,9 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
 import { generateMnemonic } from "bip39";
 import { join } from "path";
 
-import { getWalletAttributeSet } from "../../internal/wallet-attributes";
+import { getAttributeRepository } from "../../internal/wallet-attributes";
 import { FactoryBuilder } from "../factory-builder";
 import { generateApp } from "./generate-app";
 
@@ -23,7 +22,7 @@ export const registerWalletFactory = async (
 			await app
 				.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
 				.fromMnemonic(passphrase),
-			new Services.Attributes.AttributeMap(getWalletAttributeSet()),
+			getAttributeRepository(),
 		);
 		wallet.setPublicKey(
 			await app

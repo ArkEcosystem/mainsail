@@ -16,8 +16,8 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		return [ValidatorRegistrationTransactionHandler];
 	}
 
-	public walletAttributes(): ReadonlyArray<string> {
-		return ["validatorResigned"];
+	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
+		return [{ name: "validatorResigned", type: Contracts.State.AttributeType.Boolean }];
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {

@@ -1,6 +1,6 @@
 import { interfaces, Selectors } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 
 import { TransactionHandlerConstructor, TransactionHandlerProvider } from "./handlers";
 import { TransactionHandlerRegistry } from "./handlers/handler-registry";
@@ -32,11 +32,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async register(): Promise<void> {
-		this.app
-			.bind<Services.Attributes.AttributeSet>(Identifiers.WalletAttributes)
-			.to(Services.Attributes.AttributeSet)
-			.inSingletonScope();
-
 		this.app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
 
 		this.app
