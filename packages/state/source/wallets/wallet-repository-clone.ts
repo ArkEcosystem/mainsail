@@ -1,7 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { WalletIndex } from "./wallet-index";
 import { WalletRepository } from "./wallet-repository";
 
 @injectable()
@@ -10,14 +9,14 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	@tagged("state", "blockchain")
 	private readonly originalWalletRepository!: WalletRepository;
 
-	readonly #forgetIndexes: Record<string, Contracts.State.WalletIndex> = {};
+	readonly #forgetIndexes: Record<string, Set<string>> = {};
 
 	@postConstruct()
 	public initialize(): void {
 		super.initialize();
 
 		for (const name of this.indexSet.all()) {
-			this.#forgetIndexes[name] = new WalletIndex();
+			this.#forgetIndexes[name] = new Set();
 		}
 	}
 
@@ -61,17 +60,14 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	public hasByIndex(indexName: string, key: string): boolean {
 		return (
 			this.getIndex(indexName).has(key) ||
-			(this.originalWalletRepository.getIndex(indexName).has(key) && !this.#getForgetIndex(indexName).has(key))
+			(this.originalWalletRepository.getIndex(indexName).has(key) && !this.#getForgetSet(indexName).has(key))
 		);
 	}
 
 	public forgetOnIndex(index: string, key: string): void {
 		if (this.getIndex(index).has(key) || this.originalWalletRepository.getIndex(index).has(key)) {
-			const wallet = this.findByIndex(index, key);
-
 			this.getIndex(index).forget(key);
-
-			this.#getForgetIndex(index).set(key, wallet);
+			this.#getForgetSet(index).add(key);
 		}
 	}
 
@@ -106,16 +102,15 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 		// Remove from forget indexes
 		for (const indexName of this.indexSet.all()) {
-			const forgetIndex = this.#getForgetIndex(indexName);
 			const originalIndex = this.originalWalletRepository.getIndex(indexName);
 
-			for (const [key] of forgetIndex.entries()) {
+			for (const key of this.#getForgetSet(indexName).values()) {
 				originalIndex.forget(key);
 			}
 		}
 	}
 
-	#getForgetIndex(name: string): Contracts.State.WalletIndex {
+	#getForgetSet(name: string): Set<string> {
 		if (!this.#forgetIndexes[name]) {
 			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
