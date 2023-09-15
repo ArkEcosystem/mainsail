@@ -16,8 +16,8 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	public initialize(): void {
 		super.initialize();
 
-		for (const { name, indexer, autoIndex } of this.indexerIndexes) {
-			this.#forgetIndexes[name] = new WalletIndex(indexer, autoIndex);
+		for (const name of this.indexSet.all()) {
+			this.#forgetIndexes[name] = new WalletIndex();
 		}
 	}
 
@@ -45,7 +45,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
 			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
-			super.index(wallet);
+			this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, this.findHolder(wallet));
 		}
 
 		return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
@@ -102,7 +102,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 
 		// Update indexes
-		for (const indexName of this.getIndexNames()) {
+		for (const indexName of this.indexSet.all()) {
 			const localIndex = this.getIndex(indexName);
 			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
 
@@ -112,33 +112,12 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 
 		// Remove from forget indexes
-		for (const indexName of this.getIndexNames()) {
+		for (const indexName of this.indexSet.all()) {
 			const forgetIndex = this.#getForgetIndex(indexName);
 			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
 
 			for (const [key] of forgetIndex.entries()) {
 				originalIndex.forget(key);
-			}
-		}
-	}
-
-	protected indexWallet(wallet: Contracts.State.Wallet): void {
-		const indexKeys = {};
-		const walletHolder = this.findHolder(wallet);
-
-		for (const indexName of this.getIndexNames()) {
-			indexKeys[indexName] = this.getIndex(indexName).walletKeys(walletHolder);
-		}
-
-		super.indexWallet(wallet);
-
-		for (const indexName of this.getIndexNames()) {
-			const walletKeys = this.getIndex(indexName).walletKeys(walletHolder);
-
-			for (const key of indexKeys[indexName]) {
-				if (!walletKeys.includes(key)) {
-					this.#getForgetIndex(indexName).set(key, walletHolder);
-				}
 			}
 		}
 	}

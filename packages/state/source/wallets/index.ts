@@ -1,4 +1,4 @@
-export * from "./indexers";
+export * from "./index-set";
 export * from "./validator-wallet";
 export * from "./wallet";
 export * from "./wallet-event";

@@ -5,7 +5,7 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 	#walletByKey: Map<string, Contracts.State.WalletHolder>;
 	#keysByWallet: Map<Contracts.State.WalletHolder, Set<string>>;
 
-	public constructor(public readonly indexer: Contracts.State.WalletIndexer, public readonly autoIndex: boolean) {
+	public constructor() {
 		this.#walletByKey = new Map();
 		this.#keysByWallet = new Map();
 	}
@@ -26,10 +26,6 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 
 	public values(): ReadonlyArray<Contracts.State.WalletHolder> {
 		return [...this.#walletByKey.values()];
-	}
-
-	public index(walletHolder: Contracts.State.WalletHolder): void {
-		this.indexer(this, walletHolder);
 	}
 
 	public has(key: string): boolean {

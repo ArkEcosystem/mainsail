@@ -1,6 +1,6 @@
 import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 import { spy } from "sinon";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
@@ -8,8 +8,7 @@ import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { Wallets } from "../../state";
 import { validatorWalletFactory, walletFactory } from "../../state/source/wallets/factory";
-import { registerIndexers } from "../../state/source/wallets/indexers";
-import { describe, Sandbox, getAttributeRepository } from "../../test-framework";
+import { describe, getAttributeRepository, getIndexSet, Sandbox } from "../../test-framework";
 import { buildValidatorAndVoteWallets } from "../test/build-validator-and-vote-balances";
 import { ValidatorSet } from "./validator-set";
 
@@ -21,16 +20,16 @@ describe<{
 }>("ValidatorSet", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		const milestone = {
-			height: 0,
 			activeValidators: 5,
 			address: {
 				base58: 23,
 			},
+			height: 0,
 		};
 
 		context.cryptoConfiguration = {
-			getMilestone: () => milestone,
 			get: () => [milestone],
+			getMilestone: () => milestone,
 		};
 
 		context.sandbox = new Sandbox();
@@ -51,6 +50,8 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
 
+		context.sandbox.app.bind(Identifiers.WalletRepositoryIndexSet).toConstantValue(getIndexSet());
+
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app
 			.bind(Identifiers.Cryptography.Identity.AddressFactory)
@@ -65,8 +66,6 @@ describe<{
 			.to(PublicKeyFactory)
 			.inSingletonScope();
 		context.sandbox.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
-
-		registerIndexers(context.sandbox.app);
 
 		context.sandbox.app
 			.bind(Identifiers.WalletRepository)

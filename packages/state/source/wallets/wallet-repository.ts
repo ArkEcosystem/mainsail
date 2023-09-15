@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { WalletHolder } from "./wallet-holder";
@@ -7,8 +7,8 @@ import { WalletIndex } from "./wallet-index";
 // @TODO review the implementation
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
-	@multiInject(Identifiers.WalletRepositoryIndexerIndex)
-	protected readonly indexerIndexes!: Contracts.State.WalletIndexerIndex[];
+	@inject(Identifiers.WalletRepositoryIndexSet)
+	protected readonly indexSet!: Contracts.State.IndexSet;
 
 	@inject(Identifiers.WalletFactory)
 	private readonly createWalletFactory!: Contracts.State.WalletFactory;
@@ -20,11 +20,11 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	@postConstruct()
 	public initialize(): void {
-		for (const { name, indexer, autoIndex } of this.indexerIndexes) {
+		for (const name of this.indexSet.all()) {
 			if (this.indexes[name]) {
 				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
 			}
-			this.indexes[name] = new WalletIndex(indexer, autoIndex);
+			this.indexes[name] = new WalletIndex();
 		}
 	}
 
@@ -33,10 +33,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
 		return this.indexes[name];
-	}
-
-	public getIndexNames(): string[] {
-		return Object.keys(this.indexes);
 	}
 
 	public allByAddress(): ReadonlyArray<Contracts.State.Wallet> {
@@ -83,15 +79,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.getIndex(index).get(key)!.getWallet();
 	}
 
-	public findByIndexes(indexes: string[], key: string): Contracts.State.Wallet {
-		for (const index of indexes) {
-			if (this.hasByIndex(index, key)) {
-				return this.findByIndex(index, key);
-			}
-		}
-		throw new Error(`Wallet ${key} doesn't exist in indexes ${indexes.join(", ")}`);
-	}
-
 	public hasByAddress(address: string): boolean {
 		return this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address);
 	}
@@ -106,16 +93,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public hasByIndex(indexName: string, key: string): boolean {
 		return this.getIndex(indexName).has(key);
-	}
-
-	public index(wallets: Contracts.State.Wallet | Contracts.State.Wallet[]): void {
-		if (!Array.isArray(wallets)) {
-			this.indexWallet(wallets);
-		} else {
-			for (const wallet of wallets) {
-				this.indexWallet(wallet);
-			}
-		}
 	}
 
 	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {
@@ -138,7 +115,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		const walletHolder = origin.findHolder(wallet);
 		const walletHolderClone = walletHolder.clone();
 
-		for (const indexName of origin.getIndexNames()) {
+		for (const indexName of origin.indexSet.all()) {
 			const walletKeys = origin.getIndex(indexName).walletKeys(walletHolder);
 
 			const index = this.getIndex(indexName);
@@ -152,7 +129,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	protected findOrCreate(address: string): Contracts.State.WalletHolder {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
-		if (address && !index.has(address)) {
+		if (!index.has(address)) {
 			index.set(address, new WalletHolder(this.createWalletFactory(address)));
 		}
 		return index.get(address)!;
@@ -172,14 +149,5 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		}
 
 		return walletHolder;
-	}
-
-	protected indexWallet(wallet: Contracts.State.Wallet): void {
-		const walletHolder = this.findHolder(wallet);
-
-		for (const index of Object.values(this.indexes).filter((index) => index.autoIndex)) {
-			index.forgetWallet(walletHolder);
-			index.index(walletHolder);
-		}
 	}
 }

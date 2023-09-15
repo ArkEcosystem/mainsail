@@ -5,9 +5,6 @@ import { IBlockData, IMultiSignatureAsset } from "../crypto";
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
 export interface WalletIndex {
-	readonly indexer: WalletIndexer;
-	readonly autoIndex: boolean;
-	index(walletHolder: WalletHolder): void;
 	has(key: string): boolean;
 	get(key: string): WalletHolder | undefined;
 	set(key: string, walletHolder: WalletHolder): void;
@@ -19,10 +16,6 @@ export interface WalletIndex {
 	walletKeys(walletHolder: WalletHolder): string[];
 	clear(): void;
 }
-
-export type WalletIndexer = (index: WalletIndex, walletHolder: WalletHolder) => void;
-
-export type WalletIndexerIndex = { name: string; indexer: WalletIndexer; autoIndex: boolean };
 
 export enum WalletIndexes {
 	Addresses = "addresses",
@@ -126,8 +119,6 @@ export interface WalletRepository {
 
 	findByIndex(index: string, key: string): Wallet;
 
-	findByIndexes(indexes: string[], key: string): Wallet;
-
 	hasByAddress(address: string): boolean;
 
 	hasByPublicKey(publicKey: string): boolean;
@@ -137,10 +128,6 @@ export interface WalletRepository {
 	hasByIndex(indexName: string, key: string): boolean;
 
 	getIndex(name: string): WalletIndex;
-
-	getIndexNames(): string[];
-
-	index(wallet: Wallet): void;
 
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 

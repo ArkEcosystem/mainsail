@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Attributes } from "@mainsail/state";
+import { Attributes, Wallets } from "@mainsail/state";
 
 export function getAttributeRepository(): Contracts.State.IAttributeRepository {
 	const attributes = new Attributes.AttributeRepository();
@@ -14,4 +14,12 @@ export function getAttributeRepository(): Contracts.State.IAttributeRepository {
 	attributes.set("multiSignature", Contracts.State.AttributeType.Object);
 	attributes.set("vote", Contracts.State.AttributeType.String);
 	return attributes;
+}
+
+export function getIndexSet(): Contracts.State.IndexSet {
+	const indexSet = new Wallets.IndexSet();
+	indexSet.set(Contracts.State.WalletIndexes.Addresses);
+	indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
+	indexSet.set(Contracts.State.WalletIndexes.Usernames);
+	return indexSet;
 }

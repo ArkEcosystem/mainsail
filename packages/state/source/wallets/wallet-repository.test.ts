@@ -2,8 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 
 import { describe } from "../../../test-framework";
 import { setUp } from "../../test/setup";
-import { Wallet, WalletRepository } from ".";
-import { addressesIndexer, publicKeysIndexer, resignationsIndexer, usernamesIndexer } from "./indexers";
+import { Wallet, WalletIndex, WalletRepository } from ".";
 import { WalletHolder } from "./wallet-holder";
 
 describe<{
@@ -31,13 +30,10 @@ describe<{
 	});
 
 	it("#getIndex && #getIndexNames - should be able to look up indexers", ({ walletRepo }) => {
-		const expected = ["addresses", "publicKeys", "usernames", "resignations"];
-
-		assert.equal(walletRepo.getIndexNames(), expected);
-		assert.equal(walletRepo.getIndex("addresses").indexer, addressesIndexer);
-		assert.equal(walletRepo.getIndex("publicKeys").indexer, publicKeysIndexer);
-		assert.equal(walletRepo.getIndex("usernames").indexer, usernamesIndexer);
-		assert.equal(walletRepo.getIndex("resignations").indexer, resignationsIndexer);
+		assert.instance(walletRepo.getIndex("addresses"), WalletIndex);
+		assert.instance(walletRepo.getIndex("publicKeys"), WalletIndex);
+		assert.instance(walletRepo.getIndex("usernames"), WalletIndex);
+		assert.instance(walletRepo.getIndex("resignations"), WalletIndex);
 		assert.throws(() => walletRepo.getIndex("iDontExist"));
 	});
 
@@ -111,30 +107,6 @@ describe<{
 		assert.false(walletRepo.hasByIndex("usernames", nonExistingUsername));
 		assert.equal(walletRepo.allByUsername(), [wallet]);
 		assert.equal(walletRepo.allByIndex("usernames"), [wallet]);
-	});
-
-	it("should be able to index forgotten wallets", ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-		walletRepo.index(wallet1);
-		assert.true(walletRepo.hasByAddress("wallet1"));
-		walletRepo.index(wallet1);
-		assert.true(walletRepo.hasByAddress("wallet1"));
-	});
-
-	it("should throw if indexing differnet wallet with same address", ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-
-		const wallet2 = wallet1.clone();
-
-		assert.throws(() => walletRepo.index(wallet2), "Wallet missmatch");
-	});
-
-	it("should do nothing if forgotten wallet does not exist", ({ walletRepo }) => {
-		const wallet1 = walletRepo.findByAddress("wallet1");
-		walletRepo.index(wallet1);
-		// @ts-ignore
-		wallet1.publicKey = undefined;
-		assert.false(walletRepo.hasByAddress("wallet2"));
 	});
 
 	it("should throw when looking up a username which doesn't exist", ({ walletRepo }) => {
