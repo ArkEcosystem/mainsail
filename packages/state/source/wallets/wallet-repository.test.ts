@@ -3,7 +3,6 @@ import { Identifiers } from "@mainsail/contracts";
 import { describe } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletIndex, WalletRepository } from ".";
-import { WalletHolder } from "./wallet-holder";
 
 describe<{
 	walletRepo: WalletRepository;
@@ -66,9 +65,8 @@ describe<{
 
 	it("should get and set wallets by public key", async ({ walletRepo }) => {
 		const wallet = walletRepo.findByAddress("abcde");
-		const walletHolder = new WalletHolder(wallet);
 		const publicKey = "02337416a26d8d49ec27059bd0589c49bb474029c3627715380f4df83fb431aece";
-		walletRepo.getIndex("publicKeys").set(publicKey, walletHolder);
+		walletRepo.getIndex("publicKeys").set(publicKey, wallet);
 		assert.equal(await walletRepo.findByPublicKey(publicKey), wallet);
 		assert.equal(walletRepo.findByIndex("publicKeys", publicKey), wallet);
 
@@ -94,9 +92,8 @@ describe<{
 	it("should get and set wallets by username", ({ walletRepo }) => {
 		const username = "testUsername";
 		const wallet = walletRepo.findByAddress("abcdef");
-		const walletHolder = new WalletHolder(wallet);
 
-		walletRepo.getIndex("usernames").set(username, walletHolder);
+		walletRepo.getIndex("usernames").set(username, wallet);
 		assert.equal(walletRepo.findByUsername(username), wallet);
 		assert.equal(walletRepo.findByIndex("usernames", username), wallet);
 
