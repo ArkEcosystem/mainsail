@@ -2,15 +2,15 @@ import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 export class WalletIndex implements Contracts.State.WalletIndex {
-	#walletByKey: Map<string, Contracts.State.WalletHolder>;
-	#keysByWallet: Map<Contracts.State.WalletHolder, Set<string>>;
+	#walletByKey: Map<string, Contracts.State.Wallet>;
+	#keysByWallet: Map<Contracts.State.Wallet, Set<string>>;
 
 	public constructor() {
 		this.#walletByKey = new Map();
 		this.#keysByWallet = new Map();
 	}
 
-	public entries(): ReadonlyArray<[string, Contracts.State.WalletHolder]> {
+	public entries(): ReadonlyArray<[string, Contracts.State.Wallet]> {
 		return [...this.#walletByKey.entries()];
 	}
 
@@ -18,13 +18,13 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 		return [...this.#walletByKey.keys()];
 	}
 
-	public walletKeys(walletHolder: Contracts.State.WalletHolder): string[] {
+	public walletKeys(walletHolder: Contracts.State.Wallet): string[] {
 		const walletKeys = this.#keysByWallet.get(walletHolder);
 
 		return walletKeys ? [...walletKeys.keys()] : [];
 	}
 
-	public values(): ReadonlyArray<Contracts.State.WalletHolder> {
+	public values(): ReadonlyArray<Contracts.State.Wallet> {
 		return [...this.#walletByKey.values()];
 	}
 
@@ -32,14 +32,14 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 		return this.#walletByKey.has(key);
 	}
 
-	public get(key: string): Contracts.State.WalletHolder {
+	public get(key: string): Contracts.State.Wallet {
 		const walletHolder = this.#walletByKey.get(key);
-		Utils.assert.defined<Contracts.State.WalletHolder>(walletHolder);
+		Utils.assert.defined<Contracts.State.Wallet>(walletHolder);
 
 		return walletHolder;
 	}
 
-	public set(key: string, walletHolder: Contracts.State.WalletHolder): void {
+	public set(key: string, walletHolder: Contracts.State.Wallet): void {
 		const existingWallet = this.#walletByKey.get(key)!;
 
 		// Remove given key in case where key points to different wallet
@@ -73,7 +73,7 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 		}
 	}
 
-	public forgetWallet(wallet: Contracts.State.WalletHolder): void {
+	public forgetWallet(wallet: Contracts.State.Wallet): void {
 		const keys = this.#keysByWallet.get(wallet)!;
 
 		if (keys) {

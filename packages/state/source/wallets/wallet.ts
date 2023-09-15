@@ -183,7 +183,7 @@ export class Wallet implements Contracts.State.Wallet {
 		return this.hasAttribute("multiSignature");
 	}
 
-	public clone(): Wallet {
+	public clone(): Contracts.State.Wallet {
 		return new Wallet(this.address, this.attributeRepository, undefined, this);
 	}
 
@@ -191,7 +191,15 @@ export class Wallet implements Contracts.State.Wallet {
 		return !!this.originalWallet;
 	}
 
-	public applyToOriginal(): void {
+	public getOriginal(): Contracts.State.Wallet {
+		if (this.originalWallet) {
+			return this.originalWallet;
+		}
+
+		throw new Error("This is not a clone wallet");
+	}
+
+	public applyChanges(): void {
 		if (this.originalWallet) {
 			for (const attributeName of this.#forgetAttributes) {
 				this.originalWallet.forgetAttribute(attributeName);

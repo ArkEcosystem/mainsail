@@ -23,9 +23,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
 		this.#cloneAllByIndex(indexName);
-		return this.getIndex(indexName)
-			.values()
-			.map((walletHolder) => walletHolder.getWallet());
+		return this.getIndex(indexName).values();
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
@@ -35,17 +33,17 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 		if (this.blockchainWalletRepository.hasByAddress(address)) {
 			const walletToClone = this.blockchainWalletRepository.findByAddress(address);
-			return this.cloneWallet(this.blockchainWalletRepository, walletToClone).getWallet();
+			return this.cloneWallet(this.blockchainWalletRepository, walletToClone);
 		}
 
-		return this.findOrCreate(address).getWallet();
+		return this.findOrCreate(address);
 	}
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
 			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
-			this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, this.findHolder(wallet));
+			this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, wallet);
 		}
 
 		return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
@@ -53,11 +51,11 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 	public findByIndex(index: string, key: string): Contracts.State.Wallet {
 		if (super.hasByIndex(index, key)) {
-			return this.getIndex(index).get(key)!.getWallet();
+			return this.getIndex(index).get(key)!;
 		}
 
 		const walletToClone = this.blockchainWalletRepository.findByIndex(index, key);
-		return this.cloneWallet(this.blockchainWalletRepository, walletToClone).getWallet();
+		return this.cloneWallet(this.blockchainWalletRepository, walletToClone);
 	}
 
 	public hasByIndex(indexName: string, key: string): boolean {
@@ -73,7 +71,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 			this.getIndex(index).forget(key);
 
-			this.#getForgetIndex(index).set(key, this.findHolder(wallet));
+			this.#getForgetIndex(index).set(key, wallet);
 		}
 	}
 
@@ -84,21 +82,16 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 	}
 
-	public getDirtyWallets(): ReadonlyArray<Contracts.State.WalletHolder> {
+	public getDirtyWallets(): ReadonlyArray<Contracts.State.Wallet> {
 		return this.getIndex(Contracts.State.WalletIndexes.Addresses)
 			.values()
-			.filter((walletHolder) => walletHolder.getWallet().isChanged() || walletHolder.getOriginal() !== undefined);
+			.filter((walletHolder) => walletHolder.isChanged());
 	}
 
 	public commitChanges(): void {
-		// Replace clones with originals
-		const changedHolders = this.getDirtyWallets();
-
-		for (const holder of changedHolders) {
-			const original = holder.getOriginal();
-			if (original) {
-				original.setWallet(holder.getWallet());
-			}
+		// Merge clones to originals
+		for (const wallet of this.getDirtyWallets()) {
+			wallet.applyChanges();
 		}
 
 		// Update indexes
@@ -106,8 +99,8 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			const localIndex = this.getIndex(indexName);
 			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
 
-			for (const [key, holder] of localIndex.entries()) {
-				originalIndex.set(key, holder.getOriginal() ?? holder);
+			for (const [key, wallet] of localIndex.entries()) {
+				originalIndex.set(key, wallet.isClone() ? wallet.getOriginal() : wallet);
 			}
 		}
 
@@ -131,7 +124,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 	#cloneAllByIndex(indexName: string) {
 		for (const wallet of this.blockchainWalletRepository.getIndex(indexName).values()) {
-			this.findByAddress(wallet.getWallet().getAddress());
+			this.findByAddress(wallet.getAddress());
 		}
 	}
 }

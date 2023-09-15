@@ -113,16 +113,13 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			const dirtyWallets = unit.getWalletRepository().getDirtyWallets();
 			await walletRepository.upsert(
-				dirtyWallets.map((holder) => {
-					const wallet = holder.getWallet();
-					return {
-						address: wallet.getAddress(),
-						attributes: wallet.getAttributes(),
-						balance: wallet.getBalance().toFixed(),
-						nonce: wallet.getNonce().toFixed(),
-						publicKey: wallet.getPublicKey(),
-					};
-				}),
+				dirtyWallets.map((wallet) => ({
+					address: wallet.getAddress(),
+					attributes: wallet.getAttributes(),
+					balance: wallet.getBalance().toFixed(),
+					nonce: wallet.getNonce().toFixed(),
+					publicKey: wallet.getPublicKey(),
+				})),
 				["address"],
 			);
 		});
