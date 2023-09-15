@@ -146,8 +146,12 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public forgetAttribute(key: string): boolean {
+		if (!this.hasAttribute(key)) {
+			return false;
+		}
+
 		const attribute = this.attributes.get(key);
-		const previousValue = this.hasAttribute(key) ? this.getAttribute(key) : undefined;
+		const previousValue = this.getAttribute(key);
 
 		if (!attribute) {
 			this.#checkAttributeName(key);

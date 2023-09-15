@@ -141,8 +141,7 @@ describe<{
 		assert.true(clone.isChanged());
 	});
 
-	// TODO: Change behavior to not set isChanged when forgetting unknown attributes
-	it("should set is changed when forget unknown attributes", (context) => {
+	it("should not set is changed when forget unknown attributes", (context) => {
 		const customAttributeSet = getAttributeRepository();
 		customAttributeSet.set("customAttribute", Contracts.State.AttributeType.Object);
 
@@ -152,7 +151,7 @@ describe<{
 		assert.false(wallet.isChanged());
 
 		wallet.forgetAttribute("customAttribute");
-		assert.true(wallet.isChanged());
+		assert.false(wallet.isChanged());
 	});
 
 	it("should get all attributes", (context) => {
