@@ -9,11 +9,9 @@ export interface WalletIndex {
 	get(key: string): Wallet | undefined;
 	set(key: string, wallet: Wallet): void;
 	forget(key: string): void;
-	forgetWallet(wallet: Wallet): void;
 	entries(): ReadonlyArray<[string, Wallet]>;
 	values(): ReadonlyArray<Wallet>;
 	keys(): string[];
-	walletKeys(wallet: Wallet): string[];
 	clear(): void;
 }
 
