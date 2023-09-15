@@ -8,7 +8,7 @@ import { WalletRepository } from "./wallet-repository";
 export class WalletRepositoryClone extends WalletRepository implements Contracts.State.WalletRepositoryClone {
 	@inject(Identifiers.WalletRepository)
 	@tagged("state", "blockchain")
-	private readonly blockchainWalletRepository!: WalletRepository;
+	private readonly originalWalletRepository!: WalletRepository;
 
 	readonly #forgetIndexes: Record<string, Contracts.State.WalletIndex> = {};
 
@@ -31,9 +31,9 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			return super.findByIndex(Contracts.State.WalletIndexes.Addresses, address);
 		}
 
-		if (this.blockchainWalletRepository.hasByAddress(address)) {
-			const walletToClone = this.blockchainWalletRepository.findByAddress(address);
-			return this.cloneWallet(this.blockchainWalletRepository, walletToClone);
+		if (this.originalWalletRepository.hasByAddress(address)) {
+			const walletToClone = this.originalWalletRepository.findByAddress(address);
+			return this.cloneWallet(this.originalWalletRepository, walletToClone);
 		}
 
 		return this.findOrCreate(address);
@@ -54,19 +54,19 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			return this.getIndex(index).get(key)!;
 		}
 
-		const walletToClone = this.blockchainWalletRepository.findByIndex(index, key);
-		return this.cloneWallet(this.blockchainWalletRepository, walletToClone);
+		const walletToClone = this.originalWalletRepository.findByIndex(index, key);
+		return this.cloneWallet(this.originalWalletRepository, walletToClone);
 	}
 
 	public hasByIndex(indexName: string, key: string): boolean {
 		return (
 			this.getIndex(indexName).has(key) ||
-			(this.blockchainWalletRepository.getIndex(indexName).has(key) && !this.#getForgetIndex(indexName).has(key))
+			(this.originalWalletRepository.getIndex(indexName).has(key) && !this.#getForgetIndex(indexName).has(key))
 		);
 	}
 
 	public forgetOnIndex(index: string, key: string): void {
-		if (this.getIndex(index).has(key) || this.blockchainWalletRepository.getIndex(index).has(key)) {
+		if (this.getIndex(index).has(key) || this.originalWalletRepository.getIndex(index).has(key)) {
 			const wallet = this.findByIndex(index, key);
 
 			this.getIndex(index).forget(key);
@@ -97,7 +97,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		// Update indexes
 		for (const indexName of this.indexSet.all()) {
 			const localIndex = this.getIndex(indexName);
-			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
+			const originalIndex = this.originalWalletRepository.getIndex(indexName);
 
 			for (const [key, wallet] of localIndex.entries()) {
 				originalIndex.set(key, wallet.isClone() ? wallet.getOriginal() : wallet);
@@ -107,7 +107,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		// Remove from forget indexes
 		for (const indexName of this.indexSet.all()) {
 			const forgetIndex = this.#getForgetIndex(indexName);
-			const originalIndex = this.blockchainWalletRepository.getIndex(indexName);
+			const originalIndex = this.originalWalletRepository.getIndex(indexName);
 
 			for (const [key] of forgetIndex.entries()) {
 				originalIndex.forget(key);
@@ -123,7 +123,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	}
 
 	#cloneAllByIndex(indexName: string) {
-		for (const wallet of this.blockchainWalletRepository.getIndex(indexName).values()) {
+		for (const wallet of this.originalWalletRepository.getIndex(indexName).values()) {
 			this.findByAddress(wallet.getAddress());
 		}
 	}
