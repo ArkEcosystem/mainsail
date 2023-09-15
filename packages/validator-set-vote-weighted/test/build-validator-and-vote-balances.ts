@@ -31,6 +31,7 @@ export const buildValidatorAndVoteWallets = async (
 		const delegate = await walletRepository.findByPublicKey(delegateKey);
 		delegate.setAttribute("validatorUsername", `validator${index}`);
 		delegate.setAttribute("validatorVoteBalance", BigNumber.ZERO);
+		walletRepository.setOnIndex(Contracts.State.WalletIndexes.Usernames, `validator${index}`, delegate);
 
 		const voter = await walletRepository.findByPublicKey(voterKeys[index]);
 		const totalBalance = BigNumber.make(index + 1)
@@ -40,10 +41,7 @@ export const buildValidatorAndVoteWallets = async (
 		voter.setPublicKey(`v${delegateKey}`);
 		voter.setAttribute("vote", delegateKey);
 
-		walletRepository.index(delegate);
-		walletRepository.index(voter);
-
-		delegates.push(delegate as Contracts.State.Wallet);
+		delegates.push(delegate);
 	}
 	return delegates;
 };
