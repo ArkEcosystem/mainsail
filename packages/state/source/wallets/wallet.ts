@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { factory } from "../attributes";
@@ -6,21 +7,23 @@ import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
-	#changedAttributes = new Set<string>();
+	#setAttributes = new Set<string>();
+	#forgetAttributes = new Set<string>();
 
 	public constructor(
 		protected readonly address: string,
 		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
 		protected readonly events?: Contracts.Kernel.EventDispatcher,
+		protected readonly originalWallet?: Wallet,
 	) {
 		this.setAttribute("nonce", BigNumber.ZERO);
 		this.setAttribute("balance", BigNumber.ZERO);
 
-		this.#changedAttributes.clear();
+		this.#setAttributes.clear();
 	}
 
 	public isChanged(): boolean {
-		return this.#changedAttributes.size > 0;
+		return this.#setAttributes.size > 0 || this.#forgetAttributes.size > 0;
 	}
 
 	public getAddress(): string {
@@ -85,16 +88,30 @@ export class Wallet implements Contracts.State.Wallet {
 		return result;
 	}
 
-	public getAttribute<T>(key: string, defaultValue?: T): T {
-		const attribute = this.attributes.get(key);
-
-		if (attribute) {
-			return attribute.get() as T;
+	public hasAttribute(key: string): boolean {
+		if (this.attributes.has(key)) {
+			return true;
 		}
 
-		this.#checkAttributeName(key);
+		if (this.originalWallet?.hasAttribute(key) && !this.#forgetAttributes.has(key)) {
+			return true;
+		}
+		return false;
+	}
 
-		if (defaultValue !== undefined) {
+	public getAttribute<T>(key: string, defaultValue?: T): T {
+		if (this.hasAttribute(key)) {
+			const attribute = this.attributes.get(key);
+
+			if (attribute) {
+				return attribute.get() as T;
+			}
+
+			Utils.assert.defined<Wallet>(this.originalWallet);
+			return this.originalWallet.getAttribute<T>(key);
+		}
+
+		if (defaultValue) {
 			return defaultValue;
 		}
 
@@ -103,8 +120,8 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public setAttribute<T>(key: string, value: T): boolean {
 		let attribute = this.attributes.get(key);
-		const wasSet = !!attribute;
-		const previousValue = attribute ? attribute.get() : undefined;
+		const wasSet = this.hasAttribute(key);
+		const previousValue = wasSet ? this.getAttribute(key) : undefined;
 
 		if (!attribute) {
 			attribute = factory(this.attributeRepository.getAttributeType(key), value);
@@ -112,7 +129,9 @@ export class Wallet implements Contracts.State.Wallet {
 		} else {
 			attribute.set(value);
 		}
-		this.#changedAttributes.add(key);
+
+		this.#setAttributes.add(key);
+		this.#forgetAttributes.delete(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key: key,
@@ -128,14 +147,15 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public forgetAttribute(key: string): boolean {
 		const attribute = this.attributes.get(key);
-		const previousValue = attribute ? attribute.get() : undefined;
+		const previousValue = this.hasAttribute(key) ? this.getAttribute(key) : undefined;
 
 		if (!attribute) {
 			this.#checkAttributeName(key);
 		}
 
 		this.attributes.delete(key);
-		this.#changedAttributes.add(key);
+		this.#setAttributes.delete(key);
+		this.#forgetAttributes.add(key);
 
 		this.events?.dispatchSync(WalletEvent.PropertySet, {
 			key,
@@ -145,10 +165,6 @@ export class Wallet implements Contracts.State.Wallet {
 		});
 
 		return !!attribute;
-	}
-
-	public hasAttribute(key: string): boolean {
-		return this.attributes.has(key);
 	}
 
 	public isValidator(): boolean {
@@ -164,13 +180,23 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(): Wallet {
-		const clone = new Wallet(this.address, this.attributeRepository);
+		return new Wallet(this.address, this.attributeRepository, undefined, this);
+	}
 
-		for (const [key, value] of this.attributes.entries()) {
-			clone.attributes.set(key, value.clone());
+	public isClone(): boolean {
+		return !!this.originalWallet;
+	}
+
+	public applyToOriginal(): void {
+		if (this.originalWallet) {
+			for (const attributeName of this.#forgetAttributes) {
+				this.originalWallet.forgetAttribute(attributeName);
+			}
+
+			for (const attributeName of this.#setAttributes) {
+				this.originalWallet.setAttribute(attributeName, this.attributes.get(attributeName)!.get());
+			}
 		}
-
-		return clone;
 	}
 
 	#checkAttributeName(name: string): void {

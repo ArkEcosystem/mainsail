@@ -208,7 +208,7 @@ describe<{
 		const clone = wallet.clone();
 
 		assert.false(clone.isChanged());
-		assert.equal(clone, wallet);
+		assert.equal(clone.getAddress(), wallet.getAddress());
 	});
 });
 
