@@ -37,14 +37,6 @@ describe<{
 		assert.true(context.walletIndex.keys().includes(context.wallet.getAddress()));
 	});
 
-	it("should return walletKeys", (context) => {
-		assert.equal(context.walletIndex.walletKeys(context.wallet), []);
-
-		context.walletIndex.set(context.wallet.getAddress(), context.wallet);
-
-		assert.equal(context.walletIndex.walletKeys(context.wallet), [context.wallet.getAddress()]);
-	});
-
 	it("set - should set and get addresses", (context) => {
 		assert.false(context.walletIndex.has(context.wallet.getAddress()));
 
@@ -84,17 +76,5 @@ describe<{
 
 	it("forget - should not throw if key is not indexed", (context) => {
 		context.walletIndex.forget(context.wallet.getAddress());
-	});
-
-	it("forgetWallet - should forget wallet", (context) => {
-		context.walletIndex.set(context.wallet.getAddress(), context.wallet);
-		assert.equal(context.walletIndex.get(context.wallet.getAddress()), context.wallet);
-
-		context.walletIndex.forgetWallet(context.wallet);
-		assert.false(context.walletIndex.has(context.wallet.getAddress()));
-	});
-
-	it("forgetWallet - should not throw if wallet is not indexed", (context) => {
-		context.walletIndex.forgetWallet(context.wallet);
 	});
 });
