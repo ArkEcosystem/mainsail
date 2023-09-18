@@ -64,6 +64,11 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		);
 	}
 
+	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {
+		this.getIndex(index).set(key, wallet);
+		this.#getForgetSet(index).delete(key);
+	}
+
 	public forgetOnIndex(index: string, key: string): void {
 		if (this.getIndex(index).has(key) || this.originalWalletRepository.getIndex(index).has(key)) {
 			this.getIndex(index).forget(key);
