@@ -99,10 +99,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		this.getIndex(index).forget(key);
 	}
 
-	protected cloneWallet(origin: WalletRepository, wallet: Contracts.State.Wallet): Contracts.State.Wallet {
-		return wallet.clone();
-	}
-
 	protected findOrCreate(address: string): Contracts.State.Wallet {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 		if (!index.has(address)) {

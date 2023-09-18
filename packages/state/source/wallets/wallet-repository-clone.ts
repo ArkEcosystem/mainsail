@@ -31,8 +31,8 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 
 		if (this.originalWalletRepository.hasByAddress(address)) {
-			const walletToClone = this.originalWalletRepository.findByAddress(address);
-			return this.cloneWallet(this.originalWalletRepository, walletToClone);
+			const clone = this.originalWalletRepository.findByAddress(address).clone();
+			this.getIndex(Contracts.State.WalletIndexes.Addresses).set(address, clone);
 		}
 
 		return this.findOrCreate(address);
@@ -53,8 +53,9 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			return this.getIndex(index).get(key)!;
 		}
 
-		const walletToClone = this.originalWalletRepository.findByIndex(index, key);
-		return this.cloneWallet(this.originalWalletRepository, walletToClone);
+		const clone = this.originalWalletRepository.findByIndex(index, key).clone();
+		this.getIndex(Contracts.State.WalletIndexes.Addresses).set(clone.getAddress(), clone);
+		return clone;
 	}
 
 	public hasByIndex(indexName: string, key: string): boolean {
