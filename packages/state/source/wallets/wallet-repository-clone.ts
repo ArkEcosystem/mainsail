@@ -76,13 +76,6 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 	}
 
-	public reset(): void {
-		super.reset();
-		for (const walletIndex of Object.values(this.#forgetIndexes)) {
-			walletIndex.clear();
-		}
-	}
-
 	public getDirtyWallets(): ReadonlyArray<Contracts.State.Wallet> {
 		return this.getIndex(Contracts.State.WalletIndexes.Addresses)
 			.values()

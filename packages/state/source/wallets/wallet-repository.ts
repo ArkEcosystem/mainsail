@@ -99,12 +99,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		this.getIndex(index).forget(key);
 	}
 
-	public reset(): void {
-		for (const walletIndex of Object.values(this.indexes)) {
-			walletIndex.clear();
-		}
-	}
-
 	protected cloneWallet(origin: WalletRepository, wallet: Contracts.State.Wallet): Contracts.State.Wallet {
 		return wallet.clone();
 

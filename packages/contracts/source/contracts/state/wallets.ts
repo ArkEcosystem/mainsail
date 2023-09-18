@@ -132,8 +132,6 @@ export interface WalletRepository {
 }
 
 export interface WalletRepositoryClone extends WalletRepository {
-	reset(): void;
-
 	getDirtyWallets(): ReadonlyArray<Wallet>;
 	commitChanges(): void;
 }
