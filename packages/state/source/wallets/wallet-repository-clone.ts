@@ -26,36 +26,35 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
-		if (super.hasByIndex(Contracts.State.WalletIndexes.Addresses, address)) {
-			return super.findByIndex(Contracts.State.WalletIndexes.Addresses, address);
-		}
+		const wallet = this.#findByIndex(Contracts.State.WalletIndexes.Addresses, address);
 
-		if (this.originalWalletRepository.hasByAddress(address)) {
-			const clone = this.originalWalletRepository.findByAddress(address).clone();
-			this.getIndex(Contracts.State.WalletIndexes.Addresses).set(address, clone);
+		if (wallet) {
+			return wallet;
 		}
 
 		return this.findOrCreate(address);
 	}
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
-		if (!super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
-			const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
-			wallet.setPublicKey(publicKey);
-			this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, wallet);
+		const foundWallet = this.#findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
+
+		if (foundWallet) {
+			return foundWallet;
 		}
 
-		return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
+		const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
+		this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, wallet);
+		return wallet;
 	}
 
 	public findByIndex(index: string, key: string): Contracts.State.Wallet {
-		if (super.hasByIndex(index, key)) {
-			return this.getIndex(index).get(key)!;
+		const wallet = this.#findByIndex(index, key);
+
+		if (!wallet) {
+			throw new Error(`Wallet ${key} doesn't exist on index ${index}`);
 		}
 
-		const clone = this.originalWalletRepository.findByIndex(index, key).clone();
-		this.getIndex(Contracts.State.WalletIndexes.Addresses).set(clone.getAddress(), clone);
-		return clone;
+		return wallet;
 	}
 
 	public hasByIndex(indexName: string, key: string): boolean {
@@ -107,6 +106,28 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 				originalIndex.forget(key);
 			}
 		}
+	}
+
+	#findByIndex(index: string, key: string): Contracts.State.Wallet | undefined {
+		const localIndex = this.getIndex(index);
+		if (localIndex.has(key)) {
+			return localIndex.get(key)!;
+		}
+
+		const originalIndex = this.originalWalletRepository.getIndex(index);
+		if (originalIndex.has(key) && !this.#getForgetSet(index).has(key)) {
+			const originalWallet = originalIndex.get(key)!;
+
+			const localAddressIndex = this.getIndex(Contracts.State.WalletIndexes.Addresses);
+
+			if (!localAddressIndex.has(originalWallet.getAddress())) {
+				localAddressIndex.set(originalWallet.getAddress(), originalWallet.clone());
+			}
+
+			return localAddressIndex.get(originalWallet.getAddress())!;
+		}
+
+		return undefined;
 	}
 
 	#getForgetSet(name: string): Set<string> {
