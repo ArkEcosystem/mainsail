@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../..//test-framework";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -25,8 +25,13 @@ describe<{
 		await apiContext.reset();
 	});
 
-	it("/transactions", async () => {
-		const { statusCode, data } = await request("/transactions");
+	it("/blocks", async () => {
+		const { statusCode, data } = await request("/blocks");
+		assert.equal(statusCode, 200);
+	});
+
+	it("/blocks/{id}/transactions", async () => {
+		const { statusCode, data } = await request("/blocks/1/transactions");
 		assert.equal(statusCode, 200);
 	});
 });
