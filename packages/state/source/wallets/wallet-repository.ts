@@ -3,7 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { WalletIndex } from "./wallet-index";
 
-// @TODO review the implementation
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
 	@inject(Identifiers.WalletRepositoryIndexSet)
@@ -20,9 +19,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	@postConstruct()
 	public initialize(): void {
 		for (const name of this.indexSet.all()) {
-			if (this.indexes[name]) {
-				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
-			}
 			this.indexes[name] = new WalletIndex();
 		}
 	}
