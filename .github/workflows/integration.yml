@@ -48,8 +48,9 @@ jobs:
               run: pnpm install
             - name: Build
               run: pnpm run build
+
             - name: Test api-http
-              run: cd packages/api && pnpm run test:integration
+              run: cd packages/api-http && pnpm run test:integration
         strategy:
             matrix:
                 node-version:
