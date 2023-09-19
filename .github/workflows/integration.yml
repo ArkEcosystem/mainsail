@@ -1,0 +1,68 @@
+jobs:
+    integration:
+        concurrency:
+            cancel-in-progress: true
+            group: ${{ github.head_ref }}-integration
+        runs-on: ubuntu-latest
+
+        services:
+            postgres:
+                image: postgres:15
+                env:
+                    POSTGRES_DB: test_db
+                    POSTGRES_USER: test_db
+                    POSTGRES_PASSWORD: password
+                ports:
+                    - 127.0.0.1:5432:5432
+                options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  run_install: false
+                  version: latest
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+              shell: bash
+            - name: Cache pnpm modules
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+            - name: Cache lerna
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-lerna
+                  path: ./.cache
+                  restore-keys: ${{ runner.os }}-lerna-
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm run build
+
+            - name: Test api-http
+              run: cd packages/api-http && pnpm run test:integration
+        strategy:
+            matrix:
+                node-version:
+                    - 20.x
+name: CI
+on:
+    pull_request:
+        types:
+            - ready_for_review
+            - synchronize
+            - opened
+    push:
+        branches:
+            - main
+            - develop
