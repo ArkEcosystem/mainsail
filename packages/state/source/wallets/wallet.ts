@@ -199,7 +199,7 @@ export class Wallet implements Contracts.State.Wallet {
 		throw new Error("This is not a clone wallet");
 	}
 
-	public applyChanges(): void {
+	public commitChanges(): void {
 		if (this.originalWallet) {
 			for (const attributeName of this.#forgetAttributes) {
 				this.originalWallet.forgetAttribute(attributeName);

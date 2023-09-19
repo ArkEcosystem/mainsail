@@ -85,7 +85,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	public commitChanges(): void {
 		// Merge clones to originals
 		for (const wallet of this.getDirtyWallets()) {
-			wallet.applyChanges();
+			wallet.commitChanges();
 		}
 
 		for (const indexName of this.indexSet.all()) {
