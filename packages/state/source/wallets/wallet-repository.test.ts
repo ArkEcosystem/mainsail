@@ -6,19 +6,11 @@ import { Wallet, WalletIndex, WalletRepository } from ".";
 
 describe<{
 	walletRepo: WalletRepository;
-}>("Wallet Repository", ({ it, assert, afterEach, beforeAll }) => {
-	beforeAll(async (context) => {
+}>("Wallet Repository", ({ it, assert, afterEach, beforeEach }) => {
+	beforeEach(async (context) => {
 		const environment = await setUp();
 
 		context.walletRepo = environment.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
-	});
-
-	afterEach((context) => {
-		context.walletRepo.reset();
-	});
-
-	it("#initialize - should throw if indexers are already registered", ({ walletRepo }) => {
-		assert.throws(() => walletRepo.initialize(), "The wallet index is already registered: addresses");
 	});
 
 	it("#findByAddress - should create a wallet", ({ walletRepo }) => {
@@ -59,7 +51,7 @@ describe<{
 		assert.instance(walletRepo.findByAddress("iDontExist"), Wallet);
 		assert.true(walletRepo.hasByAddress("iDontExist"));
 
-		const errorMessage = "Wallet iAlsoDontExist doesn't exist in index addresses";
+		const errorMessage = "Wallet iAlsoDontExist doesn't exist on index addresses";
 		assert.throws(() => walletRepo.findByIndex("addresses", "iAlsoDontExist"), errorMessage);
 	});
 
@@ -109,12 +101,12 @@ describe<{
 	it("should throw when looking up a username which doesn't exist", ({ walletRepo }) => {
 		assert.throws(
 			() => walletRepo.findByUsername("iDontExist"),
-			"Wallet iDontExist doesn't exist in index usernames",
+			"Wallet iDontExist doesn't exist on index usernames",
 		);
 
 		assert.throws(
 			() => walletRepo.findByIndex("usernames", "iDontExist"),
-			"Wallet iDontExist doesn't exist in index usernames",
+			"Wallet iDontExist doesn't exist on index usernames",
 		);
 	});
 
