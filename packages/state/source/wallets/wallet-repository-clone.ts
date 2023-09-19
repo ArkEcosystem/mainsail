@@ -88,22 +88,19 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			wallet.applyChanges();
 		}
 
-		// Update indexes
 		for (const indexName of this.indexSet.all()) {
-			const localIndex = this.getIndex(indexName);
-			const originalIndex = this.originalWalletRepository.getIndex(indexName);
-
-			for (const [key, wallet] of localIndex.entries()) {
-				originalIndex.set(key, wallet.isClone() ? wallet.getOriginal() : wallet);
+			// Update indexes
+			for (const [key, wallet] of this.getIndex(indexName).entries()) {
+				this.originalWalletRepository.setOnIndex(
+					indexName,
+					key,
+					wallet.isClone() ? wallet.getOriginal() : wallet,
+				);
 			}
-		}
 
-		// Remove from forget indexes
-		for (const indexName of this.indexSet.all()) {
-			const originalIndex = this.originalWalletRepository.getIndex(indexName);
-
+			// Remove from forget indexes
 			for (const key of this.#getForgetSet(indexName).values()) {
-				originalIndex.forget(key);
+				this.originalWalletRepository.forgetOnIndex(indexName, key);
 			}
 		}
 	}
