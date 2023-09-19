@@ -56,7 +56,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		const index = this.getIndex(Contracts.State.WalletIndexes.PublicKeys);
-		if (publicKey && !index.has(publicKey)) {
+		if (!index.has(publicKey)) {
 			const wallet = this.findOrCreate(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			index.set(publicKey, wallet);
