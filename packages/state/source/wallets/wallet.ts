@@ -19,6 +19,7 @@ export class Wallet implements Contracts.State.Wallet {
 		if (!originalWallet) {
 			this.setAttribute("nonce", BigNumber.ZERO);
 			this.setAttribute("balance", BigNumber.ZERO);
+			this.#setAttributes.clear();
 		}
 	}
 
