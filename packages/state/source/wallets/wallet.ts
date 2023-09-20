@@ -16,10 +16,11 @@ export class Wallet implements Contracts.State.Wallet {
 		protected readonly events?: Contracts.Kernel.EventDispatcher,
 		protected readonly originalWallet?: Wallet,
 	) {
-		this.setAttribute("nonce", BigNumber.ZERO);
-		this.setAttribute("balance", BigNumber.ZERO);
-
-		this.#setAttributes.clear();
+		if (!originalWallet) {
+			this.setAttribute("nonce", BigNumber.ZERO);
+			this.setAttribute("balance", BigNumber.ZERO);
+			this.#setAttributes.clear();
+		}
 	}
 
 	public isChanged(): boolean {

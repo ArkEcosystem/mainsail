@@ -45,6 +45,6 @@ export class WalletsController extends Controller {
 			return notFound("Wallet not found");
 		}
 
-		return this.toResource(wallet, WalletResource, false);
+		return this.toResource(wallet, WalletResource, true);
 	}
 }
