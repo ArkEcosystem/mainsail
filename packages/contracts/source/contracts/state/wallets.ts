@@ -70,7 +70,7 @@ export interface Wallet {
 
 	getOriginal(): Wallet;
 
-	commitChanges(): void;
+	commitChanges(walletRepository: WalletRepository): void;
 }
 
 export interface IValidatorWallet {
