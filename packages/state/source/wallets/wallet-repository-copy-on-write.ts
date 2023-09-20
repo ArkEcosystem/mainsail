@@ -14,20 +14,27 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 	private readonly blockchainWalletRepository!: WalletRepository;
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
-		if (publicKey && !this.hasByPublicKey(publicKey)) {
-			this.cloneWallet(
-				this.blockchainWalletRepository,
-				await this.blockchainWalletRepository.findByPublicKey(publicKey),
-			);
+		if (super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
+			return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
 		}
-		return this.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)!;
+
+		const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
+		wallet.setPublicKey(publicKey);
+		this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, wallet);
+
+		return wallet;
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
-		if (address && !this.hasByAddress(address)) {
-			this.cloneWallet(this.blockchainWalletRepository, this.blockchainWalletRepository.findByAddress(address));
+		if (this.hasByAddress(address)) {
+			return super.findByAddress(address);
 		}
-		return this.findByIndex(Contracts.State.WalletIndexes.Addresses, address)!;
+
+		if (this.blockchainWalletRepository.hasByAddress(address)) {
+			return this.#cloneWallet(address);
+		}
+
+		return this.findOrCreate(address);
 	}
 
 	public hasByIndex(index: string, key: string): boolean {
@@ -38,16 +45,21 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 			return false;
 		}
 
-		this.cloneWallet(this.blockchainWalletRepository, this.blockchainWalletRepository.findByIndex(index, key));
 		return true;
 	}
 
 	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
 		for (const wallet of this.blockchainWalletRepository.allByUsername()) {
 			if (!super.hasByAddress(wallet.getAddress())) {
-				this.cloneWallet(this.blockchainWalletRepository, wallet);
+				this.#cloneWallet(wallet.getAddress());
 			}
 		}
 		return super.allByUsername();
+	}
+
+	#cloneWallet(address: string): Contracts.State.Wallet {
+		const clone = this.blockchainWalletRepository.findByAddress(address).clone();
+		this.getIndex(Contracts.State.WalletIndexes.Addresses).set(address, clone);
+		return clone;
 	}
 }

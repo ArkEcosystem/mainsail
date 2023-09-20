@@ -3,7 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { WalletIndex } from "./wallet-index";
 
-// @TODO review the implementation
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
 	@inject(Identifiers.WalletRepositoryIndexSet)
@@ -20,9 +19,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	@postConstruct()
 	public initialize(): void {
 		for (const name of this.indexSet.all()) {
-			if (this.indexes[name]) {
-				throw new Exceptions.WalletIndexAlreadyRegisteredError(name);
-			}
 			this.indexes[name] = new WalletIndex();
 		}
 	}
@@ -56,7 +52,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		const index = this.getIndex(Contracts.State.WalletIndexes.PublicKeys);
-		if (publicKey && !index.has(publicKey)) {
+		if (!index.has(publicKey)) {
 			const wallet = this.findOrCreate(await this.addressFactory.fromPublicKey(publicKey));
 			wallet.setPublicKey(publicKey);
 			index.set(publicKey, wallet);
@@ -70,7 +66,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public findByIndex(index: string, key: string): Contracts.State.Wallet {
 		if (!this.hasByIndex(index, key)) {
-			throw new Error(`Wallet ${key} doesn't exist in index ${index}`);
+			throw new Error(`Wallet ${key} doesn't exist on index ${index}`);
 		}
 		return this.getIndex(index).get(key)!;
 	}
@@ -97,27 +93,6 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public forgetOnIndex(index: string, key: string): void {
 		this.getIndex(index).forget(key);
-	}
-
-	public reset(): void {
-		for (const walletIndex of Object.values(this.indexes)) {
-			walletIndex.clear();
-		}
-	}
-
-	protected cloneWallet(origin: WalletRepository, wallet: Contracts.State.Wallet): Contracts.State.Wallet {
-		const walletClone = wallet.clone();
-
-		for (const indexName of origin.indexSet.all()) {
-			const walletKeys = origin.getIndex(indexName).walletKeys(wallet);
-
-			const index = this.getIndex(indexName);
-			for (const key of walletKeys) {
-				index.set(key, walletClone);
-			}
-		}
-
-		return walletClone;
 	}
 
 	protected findOrCreate(address: string): Contracts.State.Wallet {

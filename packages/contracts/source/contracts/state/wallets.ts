@@ -9,11 +9,9 @@ export interface WalletIndex {
 	get(key: string): Wallet | undefined;
 	set(key: string, wallet: Wallet): void;
 	forget(key: string): void;
-	forgetWallet(wallet: Wallet): void;
 	entries(): ReadonlyArray<[string, Wallet]>;
 	values(): ReadonlyArray<Wallet>;
 	keys(): string[];
-	walletKeys(wallet: Wallet): string[];
 	clear(): void;
 }
 
@@ -72,7 +70,7 @@ export interface Wallet {
 
 	getOriginal(): Wallet;
 
-	applyChanges(): void;
+	commitChanges(): void;
 }
 
 export interface IValidatorWallet {
@@ -134,8 +132,6 @@ export interface WalletRepository {
 }
 
 export interface WalletRepositoryClone extends WalletRepository {
-	reset(): void;
-
 	getDirtyWallets(): ReadonlyArray<Wallet>;
 	commitChanges(): void;
 }
