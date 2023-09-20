@@ -12,6 +12,7 @@ export class Wallet implements Contracts.State.Wallet {
 	public constructor(
 		protected readonly address: string,
 		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
+		protected readonly walletRepository: Contracts.State.WalletRepository,
 		protected readonly originalWallet?: Wallet,
 	) {
 		if (!originalWallet) {
@@ -164,8 +165,8 @@ export class Wallet implements Contracts.State.Wallet {
 		return this.hasAttribute("multiSignature");
 	}
 
-	public clone(): Contracts.State.Wallet {
-		return new Wallet(this.address, this.attributeRepository, this);
+	public clone(walletRepository: Contracts.State.WalletRepository): Contracts.State.Wallet {
+		return new Wallet(this.address, this.attributeRepository, walletRepository, this);
 	}
 
 	public isClone(): boolean {

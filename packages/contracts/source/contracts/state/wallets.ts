@@ -64,7 +64,7 @@ export interface Wallet {
 
 	hasMultiSignature(): boolean;
 
-	clone(): Wallet;
+	clone(walletRepository: WalletRepository): Wallet;
 
 	isClone(): boolean;
 

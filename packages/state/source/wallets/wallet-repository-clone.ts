@@ -119,7 +119,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			const localAddressIndex = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 
 			if (!localAddressIndex.has(originalWallet.getAddress())) {
-				localAddressIndex.set(originalWallet.getAddress(), originalWallet.clone());
+				localAddressIndex.set(originalWallet.getAddress(), originalWallet.clone(this));
 			}
 
 			return localAddressIndex.get(originalWallet.getAddress())!;

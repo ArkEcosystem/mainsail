@@ -59,7 +59,7 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 	}
 
 	#cloneWallet(address: string): Contracts.State.Wallet {
-		const clone = this.blockchainWalletRepository.findByAddress(address).clone();
+		const clone = this.blockchainWalletRepository.findByAddress(address).clone(this);
 		this.getIndex(Contracts.State.WalletIndexes.Addresses).set(address, clone);
 		return clone;
 	}

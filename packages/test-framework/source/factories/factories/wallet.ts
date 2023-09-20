@@ -23,6 +23,7 @@ export const registerWalletFactory = async (
 				.get<Contracts.Crypto.IAddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
 				.fromMnemonic(passphrase),
 			getAttributeRepository(),
+			app.getTagged<Contracts.State.WalletRepository>(Identifiers.WalletRepository, "state", "blockchain"),
 		);
 		wallet.setPublicKey(
 			await app
