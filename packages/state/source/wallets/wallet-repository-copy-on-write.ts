@@ -26,8 +26,9 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
-		if (this.hasByAddress(address)) {
-			return super.findByAddress(address);
+		const addressIndex = this.getIndex(Contracts.State.WalletIndexes.Addresses);
+		if (addressIndex.has(address)) {
+			return addressIndex.get(address)!;
 		}
 
 		if (this.blockchainWalletRepository.hasByAddress(address)) {
