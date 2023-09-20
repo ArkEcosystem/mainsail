@@ -1,8 +1,10 @@
-import { IBlockRepository, RepositoryDataSource } from "../contracts";
+import { IBlockRepository, IBlockRepositoryExtension, RepositoryDataSource } from "../contracts";
 import { Block } from "../models/block";
+import { makeExtendedRepository } from "./repository-extension";
+// import { BlockFilter } from "../search/filters/block-filter";
 
 export const makeBlockRepository = (dataSource: RepositoryDataSource): IBlockRepository =>
-	dataSource.getRepository(Block).extend({
+	makeExtendedRepository<Block, IBlockRepositoryExtension>(Block, dataSource, {
 		async getLatest(): Promise<Block | null> {
 			return this.createQueryBuilder().select().orderBy("height", "DESC").limit(1).getOne();
 		},
@@ -15,4 +17,6 @@ export const makeBlockRepository = (dataSource: RepositoryDataSource): IBlockRep
 
 			return Number(result.height);
 		},
+
+		//getFilter(): BlockFilter { return new BlockFilter() },
 	});

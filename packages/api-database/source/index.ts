@@ -3,3 +3,4 @@ export * from "./identifiers";
 export * as Models from "./models";
 export * as Repositories from "./repositories";
 export * from "./service-provider";
+export * as Search from "./search";
