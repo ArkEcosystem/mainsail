@@ -131,6 +131,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 		this.#setAttributes.add(key);
 		this.#forgetAttributes.delete(key);
+		this.walletRepository.setDirtyWallet(this);
 
 		return wasSet;
 	}
@@ -149,6 +150,7 @@ export class Wallet implements Contracts.State.Wallet {
 		this.attributes.delete(key);
 		this.#setAttributes.delete(key);
 		this.#forgetAttributes.add(key);
+		this.walletRepository.setDirtyWallet(this);
 
 		return !!attribute;
 	}
