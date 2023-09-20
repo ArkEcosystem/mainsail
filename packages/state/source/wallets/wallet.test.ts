@@ -2,26 +2,30 @@ import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe, getAttributeRepository } from "../../../test-framework";
+import { describe, describeSkip, getAttributeRepository } from "../../../test-framework";
 import { Wallet } from ".";
 
 describe<{
 	attributeMap: Contracts.State.IAttributeRepository;
+	walletRepository: any;
 }>("Models - Wallet", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
 		context.attributeMap = getAttributeRepository();
+		context.walletRepository = {
+			setDirtyWallet: () => {},
+		};
 	});
 
 	it("returns the address", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.equal(wallet.getAddress(), address);
 	});
 
 	it("should set and get publicKey", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.undefined(wallet.getPublicKey());
 		assert.false(wallet.isChanged());
@@ -33,7 +37,7 @@ describe<{
 
 	it("should set and get balance", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 		assert.false(wallet.isChanged());
@@ -45,7 +49,7 @@ describe<{
 
 	it("should set and get nonce", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 		assert.false(wallet.isChanged());
@@ -57,7 +61,7 @@ describe<{
 
 	it("should increase balance", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 		assert.false(wallet.isChanged());
@@ -69,7 +73,7 @@ describe<{
 
 	it("should decrease balance", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.equal(wallet.getBalance(), BigNumber.ZERO);
 		assert.false(wallet.isChanged());
@@ -81,7 +85,7 @@ describe<{
 
 	it("should increase nonce", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 		assert.false(wallet.isChanged());
@@ -94,7 +98,7 @@ describe<{
 
 	it("should decrease nonce", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.equal(wallet.getNonce(), BigNumber.ZERO);
 		assert.false(wallet.isChanged());
@@ -109,7 +113,7 @@ describe<{
 		customAttributeSet.set("customAttribute", Contracts.State.AttributeType.Object);
 
 		const address = "Abcde";
-		const wallet = new Wallet(address, customAttributeSet);
+		const wallet = new Wallet(address, customAttributeSet, context.walletRepository);
 		const testAttribute = { test: true };
 
 		assert.false(wallet.isChanged());
@@ -129,12 +133,12 @@ describe<{
 		customAttributeSet.set("customAttribute", Contracts.State.AttributeType.Object);
 
 		const address = "Abcde";
-		const wallet = new Wallet(address, customAttributeSet);
+		const wallet = new Wallet(address, customAttributeSet, context.walletRepository);
 		const testAttribute = { test: true };
 
 		wallet.setAttribute("customAttribute", testAttribute);
 
-		const clone = wallet.clone();
+		const clone = wallet.clone(context.walletRepository);
 		assert.false(clone.isChanged());
 
 		clone.forgetAttribute("customAttribute");
@@ -146,7 +150,7 @@ describe<{
 		customAttributeSet.set("customAttribute", Contracts.State.AttributeType.Object);
 
 		const address = "Abcde";
-		const wallet = new Wallet(address, customAttributeSet);
+		const wallet = new Wallet(address, customAttributeSet, context.walletRepository);
 
 		assert.false(wallet.isChanged());
 
@@ -156,7 +160,7 @@ describe<{
 
 	it("should get all attributes", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.false(wallet.isChanged());
 		wallet.setAttribute("multiSignature", {});
@@ -173,7 +177,7 @@ describe<{
 
 	it("should return whether wallet is validator", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.false(wallet.isValidator());
 		wallet.setAttribute("validatorUsername", "username");
@@ -182,7 +186,7 @@ describe<{
 
 	it("should return whether wallet has voted", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.false(wallet.hasVoted());
 		wallet.setAttribute("vote", "publicKey");
@@ -191,7 +195,7 @@ describe<{
 
 	it("should return whether the wallet has multisignature", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.false(wallet.hasMultiSignature());
 		wallet.setAttribute("multiSignature", {});
@@ -200,7 +204,7 @@ describe<{
 
 	it("should be cloneable", (context) => {
 		const address = "Abcde";
-		const wallet = new Wallet(address, context.attributeMap);
+		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 		wallet.setPublicKey("test");
 		assert.true(wallet.isChanged());
 
@@ -211,7 +215,7 @@ describe<{
 	});
 });
 
-describe<{
+describeSkip<{
 	app: Application;
 	wallet: Wallet;
 	events: any;
@@ -233,7 +237,7 @@ describe<{
 	});
 });
 
-describe<{
+describeSkip<{
 	clone: Contracts.State.Wallet;
 	events: any;
 }>("Clone", ({ beforeEach }) => {

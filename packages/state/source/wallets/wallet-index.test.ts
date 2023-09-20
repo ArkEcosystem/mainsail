@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { describe, Factories } from "../../../test-framework";
 import { setUp } from "../../test/setup";
@@ -9,15 +9,21 @@ describe<{
 	factory: Factories.FactoryBuilder;
 	wallet: Contracts.State.Wallet;
 	walletIndex: WalletIndex;
+	app: Contracts.Kernel.Application;
 }>("WalletIndex", ({ it, beforeAll, beforeEach, assert }) => {
 	beforeAll(async (context) => {
 		const environment = await setUp();
 
 		context.factory = environment.factory;
+		context.app = environment.app;
 	});
 
 	beforeEach(async (context) => {
-		context.wallet = await context.factory.get("Wallet").make<Wallets.Wallet>();
+		context.wallet = new Wallets.Wallet(
+			"address",
+			context.app.get(Identifiers.WalletAttributes),
+			context.app.getTagged(Identifiers.WalletRepository, "state", "blockchain"),
+		);
 
 		context.walletIndex = new WalletIndex();
 	});
@@ -52,7 +58,11 @@ describe<{
 	});
 
 	it("set - should override key with new wallet", async (context) => {
-		const anotherWallet = await context.factory.get("Wallet").make<Wallets.Wallet>();
+		const anotherWallet = new Wallets.Wallet(
+			"address2",
+			context.app.get(Identifiers.WalletAttributes),
+			context.app.getTagged(Identifiers.WalletRepository, "state", "blockchain"),
+		);
 
 		context.walletIndex.set("key1", context.wallet);
 		context.walletIndex.set("key1", anotherWallet);
