@@ -95,7 +95,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		this.getIndex(index).forget(key);
 	}
 
-	public setChangedWallet(wallet: Contracts.State.Wallet): void {}
+	public setDirtyWallet(wallet: Contracts.State.Wallet): void {}
 
 	protected findOrCreate(address: string): Contracts.State.Wallet {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);

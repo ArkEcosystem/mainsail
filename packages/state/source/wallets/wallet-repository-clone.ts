@@ -10,7 +10,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	private readonly originalWalletRepository!: WalletRepository;
 
 	readonly #forgetIndexes: Record<string, Set<string>> = {};
-	readonly #changedWallets = new Set<Contracts.State.Wallet>();
+	readonly #dirtyWallets = new Set<Contracts.State.Wallet>();
 
 	@postConstruct()
 	public initialize(): void {
@@ -79,16 +79,16 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	}
 
 	public getDirtyWallets(): IterableIterator<Contracts.State.Wallet> {
-		return this.#changedWallets.values();
+		return this.#dirtyWallets.values();
 	}
 
-	public setChangedWallet(wallet: Contracts.State.Wallet): void {
-		this.#changedWallets.add(wallet);
+	public setDirtyWallet(wallet: Contracts.State.Wallet): void {
+		this.#dirtyWallets.add(wallet);
 	}
 
 	public commitChanges(): void {
 		// Merge clones to originals
-		for (const wallet of this.#changedWallets.values()) {
+		for (const wallet of this.#dirtyWallets.values()) {
 			wallet.commitChanges(this.originalWalletRepository);
 		}
 

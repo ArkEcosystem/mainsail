@@ -130,7 +130,7 @@ export interface WalletRepository {
 
 	forgetOnIndex(index: string, key: string): void;
 
-	setChangedWallet(wallet: Wallet): void;
+	setDirtyWallet(wallet: Wallet): void;
 }
 
 export interface WalletRepositoryClone extends WalletRepository {
