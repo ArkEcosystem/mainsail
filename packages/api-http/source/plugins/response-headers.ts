@@ -4,10 +4,10 @@ import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifier
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
-		const blockRepository = app.get<ApiDatabaseContracts.IBlockRepository>(ApiDatabaseIdentifiers.BlockRepository);
+		const blockRepositoryFactory = app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(ApiDatabaseIdentifiers.BlockRepositoryFactory);
 
 		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
-			const blockHeight = await blockRepository.getLatestHeight();
+			const blockHeight = await blockRepositoryFactory().getLatestHeight();
 
 			const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
 			responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};

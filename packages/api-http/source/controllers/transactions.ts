@@ -7,13 +7,13 @@ import { Controller } from "./controller";
 
 @injectable()
 export class TransactionsController extends Controller {
-	@inject(ApiDatabaseIdentifiers.TransactionRepository)
-	private readonly transactionRepository!: ApiDatabaseContracts.ITransactionRepository;
+	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [transactions, totalCount] = await this.transactionRepository
+		const [transactions, totalCount] = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.orderBy("blockHeight", "DESC")

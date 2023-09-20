@@ -7,6 +7,9 @@ describe<{
 }>("Transactions", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
+	// TODO:
+	let options = { transform: false };
+
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
 		apiContext = await prepareSandbox(context);
@@ -26,7 +29,7 @@ describe<{
 	});
 
 	it("/transactions", async () => {
-		const { statusCode, data } = await request("/transactions");
+		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);
 	});
 });

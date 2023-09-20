@@ -9,8 +9,9 @@ export const register = (server: Hapi.Server): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.index(request),
 		method: "GET",
+		path: "/blocks",
+		handler: (request: Hapi.Request) => controller.index(request),
 		options: {
 			plugins: {
 				pagination: {
@@ -20,15 +21,62 @@ export const register = (server: Hapi.Server): void => {
 			validate: {
 				query: Joi.object({
 					transform: Joi.bool().default(true),
+
+					/* TODO */
+					// ...server.app.schemas.blockCriteriaSchemas,
+					// orderBy: server.app.schemas.blocksOrderBy,
+					// .concat(blockSortingSchema)
 				}).concat(pagination),
 			},
 		},
-		path: "/blocks",
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.transactions(request),
 		method: "GET",
+		path: "/blocks/first",
+		handler: (request: Hapi.Request) => controller.first(request),
+		options: {
+			validate: {
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}),
+			},
+		},
+	});
+
+	server.route({
+		method: "GET",
+		path: "/blocks/last",
+		handler: (request: Hapi.Request) => controller.last(request),
+		options: {
+			validate: {
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}),
+			},
+		},
+	});
+
+	server.route({
+		method: "GET",
+		path: "/blocks/{id}",
+		handler: (request: Hapi.Request) => controller.show(request),
+		options: {
+			validate: {
+				params: Joi.object({
+					id: server.app.schemas.blockId,
+				}),
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}),
+			},
+		},
+	});
+
+	server.route({
+		method: "GET",
+		path: "/blocks/{id}/transactions",
+		handler: (request: Hapi.Request) => controller.transactions(request),
 		options: {
 			plugins: {
 				pagination: {
@@ -44,48 +92,5 @@ export const register = (server: Hapi.Server): void => {
 				}).concat(pagination),
 			},
 		},
-		path: "/blocks/{id}/transactions",
 	});
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.first(request),
-	// 	method: "GET",
-	// 	options: {
-	// 		validate: {
-	// 			query: Joi.object({
-	// 				transform: Joi.bool().default(true),
-	// 			}),
-	// 		},
-	// 	},
-	// 	path: "/blocks/first",
-	// });
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.last(request),
-	// 	method: "GET",
-	// 	options: {
-	// 		validate: {
-	// 			query: Joi.object({
-	// 				transform: Joi.bool().default(true),
-	// 			}),
-	// 		},
-	// 	},
-	// 	path: "/blocks/last",
-	// });
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.show(request),
-	// 	method: "GET",
-	// 	options: {
-	// 		validate: {
-	// 			params: Joi.object({
-	// 				id: blockId,
-	// 			}),
-	// 			query: Joi.object({
-	// 				transform: Joi.bool().default(true),
-	// 			}),
-	// 		},
-	// 	},
-	// 	path: "/blocks/{id}",
-	// });
 };

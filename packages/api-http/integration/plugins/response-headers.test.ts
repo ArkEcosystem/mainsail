@@ -1,7 +1,8 @@
 import { describe, Sandbox } from "../../../test-framework";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
-import * as blocks from "../../test/fixtures/blocks.json";
 import got from "got";
+
+import blocks from "../../test/fixtures/blocks.json";
 
 describe<{
     sandbox: Sandbox;

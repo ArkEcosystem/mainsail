@@ -6,22 +6,35 @@ import { ServiceProvider as CoreApiHttp } from "../../../api-http";
 import { Sandbox } from "../../../test-framework";
 
 export class ApiContext {
-	public readonly blockRepository: ApiDatabaseContracts.IBlockRepository;
-	public readonly transactionRepository: ApiDatabaseContracts.ITransactionRepository;
-	public readonly walletRepository: ApiDatabaseContracts.IWalletRepository;
-	public readonly peerRepository: ApiDatabaseContracts.IPeerRepository;
-	public readonly stateRepository: ApiDatabaseContracts.IStateRepository;
-
 	public constructor(
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
 	) {
-		this.blockRepository = app.get<ApiDatabaseContracts.IBlockRepository>(ApiDatabaseIdentifiers.BlockRepository);
-		this.transactionRepository = app.get<ApiDatabaseContracts.ITransactionRepository>(ApiDatabaseIdentifiers.TransactionRepository);
-		this.walletRepository = app.get<ApiDatabaseContracts.IWalletRepository>(ApiDatabaseIdentifiers.WalletRepository);
-		this.peerRepository = app.get<ApiDatabaseContracts.IPeerRepository>(ApiDatabaseIdentifiers.PeerRepository);
-		this.stateRepository = app.get<ApiDatabaseContracts.IStateRepository>(ApiDatabaseIdentifiers.StateRepository);
+	}
+
+	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
+		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
+	}
+
+	public get blockRepository(): ApiDatabaseContracts.IBlockRepository {
+		return this.app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(ApiDatabaseIdentifiers.BlockRepositoryFactory)();
+	}
+
+	public get transactionRepository(): ApiDatabaseContracts.ITransactionRepository {
+		return this.app.get<ApiDatabaseContracts.ITransactionRepositoryFactory>(ApiDatabaseIdentifiers.TransactionRepositoryFactory)();
+	}
+
+	public get walletRepository(): ApiDatabaseContracts.IWalletRepository {
+		return this.app.get<ApiDatabaseContracts.IWalletRepositoryFactory>(ApiDatabaseIdentifiers.WalletRepositoryFactory)();
+	}
+
+	public get peerRepository(): ApiDatabaseContracts.IPeerRepository {
+		return this.app.get<ApiDatabaseContracts.IPeerRepositoryFactory>(ApiDatabaseIdentifiers.PeerRepositoryFactory)();
+	}
+
+	public get stateRepository(): ApiDatabaseContracts.IStateRepository {
+		return this.app.get<ApiDatabaseContracts.IStateRepositoryFactory>(ApiDatabaseIdentifiers.StateRepositoryFactory)();
 	}
 
 	public async reset() {

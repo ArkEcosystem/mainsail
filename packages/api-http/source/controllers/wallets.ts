@@ -7,13 +7,13 @@ import { Controller } from "./controller";
 
 @injectable()
 export class WalletsController extends Controller {
-	@inject(ApiDatabaseIdentifiers.WalletRepository)
-	private readonly walletRepository!: ApiDatabaseContracts.IWalletRepository;
+	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
+	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [wallets, totalCount] = await this.walletRepository
+		const [wallets, totalCount] = await this.walletRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.addOrderBy("balance", "DESC")
