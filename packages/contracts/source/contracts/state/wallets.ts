@@ -129,6 +129,8 @@ export interface WalletRepository {
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 
 	forgetOnIndex(index: string, key: string): void;
+
+	setChangedWallet(wallet: Wallet): void;
 }
 
 export interface WalletRepositoryClone extends WalletRepository {
