@@ -3,7 +3,7 @@ import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { describe, getAttributeRepository } from "../../../test-framework";
-import { Wallet, WalletEvent } from ".";
+import { Wallet } from ".";
 
 describe<{
 	attributeMap: Contracts.State.IAttributeRepository;
@@ -221,38 +221,7 @@ describe<{
 			dispatchSync: () => {},
 		};
 
-		context.wallet = new Wallet("Abcde", getAttributeRepository(), context.events);
-	});
-
-	it("should emit on setAttribute", async (context) => {
-		const spyOnEvents = spy(context.events, "dispatchSync");
-
-		context.wallet.setAttribute("validatorUsername", "dummy");
-
-		spyOnEvents.calledOnce();
-		spyOnEvents.calledWith(WalletEvent.PropertySet, {
-			key: "validatorUsername",
-			previousValue: undefined,
-			publicKey: undefined,
-			value: "dummy",
-			wallet: context.wallet,
-		});
-	});
-
-	it("should emit on forgetAttribute", async (context) => {
-		context.wallet.setAttribute("validatorUsername", "dummy");
-
-		const spyOnEvents = spy(context.events, "dispatchSync");
-
-		context.wallet.forgetAttribute("validatorUsername");
-
-		spyOnEvents.calledOnce();
-		spyOnEvents.calledWith(WalletEvent.PropertySet, {
-			key: "validatorUsername",
-			previousValue: "dummy",
-			publicKey: undefined,
-			wallet: context.wallet,
-		});
+		context.wallet = new Wallet("Abcde", getAttributeRepository());
 	});
 
 	it("should clone", async (context) => {
@@ -267,7 +236,7 @@ describe<{
 describe<{
 	clone: Contracts.State.Wallet;
 	events: any;
-}>("Clone", ({ it, beforeEach, spy }) => {
+}>("Clone", ({ beforeEach }) => {
 	beforeEach(async (context) => {
 		context.events = {
 			dispatchSync: () => {},
@@ -276,22 +245,5 @@ describe<{
 		const wallet = new Wallet("Abcde", getAttributeRepository(), context.events);
 
 		context.clone = wallet.clone();
-	});
-
-	it("should not emit on setAttribute", async (context) => {
-		const spyOnEvents = spy(context.events, "dispatchSync");
-
-		context.clone.setAttribute("validatorUsername", "dummy");
-
-		spyOnEvents.neverCalled();
-	});
-
-	it("should not emit on forgetAttribute", async (context) => {
-		const spyOnEvents = spy(context.events, "dispatchSync");
-
-		context.clone.setAttribute("validatorUsername", "dummy");
-		context.clone.forgetAttribute("validatorUsername");
-
-		spyOnEvents.neverCalled();
 	});
 });
