@@ -31,13 +31,13 @@ export type IStateRepository = ExtendedRepository<State> & IStateRepositoryExten
 export type IWalletRepositoryExtension = {};
 export type IWalletRepository = ExtendedRepository<Wallet> & IWalletRepositoryExtension;
 
-export type IBlockRepositoryFactory = (dataSource: RepositoryDataSource) => IBlockRepository;
-export type IPeerRepositoryFactory = (dataSource: RepositoryDataSource) => IPeerRepository;
-export type ITransactionRepositoryFactory = (dataSource: RepositoryDataSource) => ITransactionRepository;
-export type IMempoolTransactionRepositoryFactory = (dataSource: RepositoryDataSource) => IMempoolTransactionRepository;
-export type IValidatorRoundRepositoryFactory = (dataSource: RepositoryDataSource) => IValidatorRoundRepository;
-export type IStateRepositoryFactory = (dataSource: RepositoryDataSource) => IStateRepository;
-export type IWalletRepositoryFactory = (dataSource: RepositoryDataSource) => IWalletRepository;
+export type IBlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => IBlockRepository;
+export type IPeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPeerRepository;
+export type ITransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionRepository;
+export type IMempoolTransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => IMempoolTransactionRepository;
+export type IValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => IValidatorRoundRepository;
+export type IStateRepositoryFactory = (customDataSource?: RepositoryDataSource) => IStateRepository;
+export type IWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => IWalletRepository;
 
 export { Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";

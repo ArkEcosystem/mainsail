@@ -60,47 +60,36 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			}
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
-			this.app.bind(Identifiers.BlockRepository).toConstantValue(makeBlockRepository(dataSource));
-			this.app.bind(Identifiers.PeerRepository).toConstantValue(makePeerRepository(dataSource));
-			this.app
-				.bind(Identifiers.MempoolTransactionRepository)
-				.toConstantValue(makeMempoolTransactionRepository(dataSource));
-			this.app.bind(Identifiers.StateRepository).toConstantValue(makeStateRepository(dataSource));
-			this.app.bind(Identifiers.TransactionRepository).toConstantValue(makeTransactionRepository(dataSource));
-			this.app
-				.bind(Identifiers.ValidatorRoundRepository)
-				.toConstantValue(makeValidatorRoundRepository(dataSource));
-			this.app.bind(Identifiers.WalletRepository).toConstantValue(makeWalletRepository(dataSource));
 
 			// Bind factories to allow creating repositories in a transaction context
 
 			this.app
 				.bind(Identifiers.BlockRepositoryFactory)
-				.toFactory(() => (dataSource: RepositoryDataSource) => makeBlockRepository(dataSource));
+				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeBlockRepository(customDataSource ?? dataSource));
 
 			this.app
 				.bind(Identifiers.PeerRepositoryFactory)
-				.toFactory(() => (dataSource: RepositoryDataSource) => makePeerRepository(dataSource));
+				.toFactory(() => (customDataSource?: RepositoryDataSource) => makePeerRepository(customDataSource ?? dataSource));
 
 			this.app
 				.bind(Identifiers.MempoolTransactionRepositoryFactory)
-				.toFactory(() => (dataSource: RepositoryDataSource) => makeMempoolTransactionRepository(dataSource));
+				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeMempoolTransactionRepository(customDataSource ?? dataSource));
 
 			this.app
 				.bind(Identifiers.StateRepositoryFactory)
-				.toFactory(() => (dataSource: RepositoryDataSource) => makeStateRepository(dataSource));
+				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeStateRepository(customDataSource ?? dataSource));
 
 			this.app
 				.bind(Identifiers.TransactionRepositoryFactory)
-				.toFactory(() => (dataSource: RepositoryDataSource) => makeTransactionRepository(dataSource));
+				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeTransactionRepository(customDataSource ?? dataSource));
 
 			this.app
 				.bind(Identifiers.ValidatorRoundRepositoryFactory)
-				.toFactory(() => (dataSource: RepositoryDataSource) => makeValidatorRoundRepository(dataSource));
+				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeValidatorRoundRepository(customDataSource ?? dataSource));
 
 			this.app
 				.bind(Identifiers.WalletRepositoryFactory)
-				.toFactory(() => (dataSource: RepositoryDataSource) => makeWalletRepository(dataSource));
+				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeWalletRepository(customDataSource ?? dataSource));
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);
 		}

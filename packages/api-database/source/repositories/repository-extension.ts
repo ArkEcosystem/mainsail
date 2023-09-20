@@ -23,12 +23,12 @@ export type ThisRepositoryExtension<TEntity extends ObjectLiteral> = ThisType<Ex
 
 export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepository>(entity: EntityTarget<TEntity>, dataSource: RepositoryDataSource, extend: CustomRepository & ThisType<Repository<TEntity> & CustomRepository>): ExtendedRepository<TEntity> & CustomRepository => {
     return dataSource.getRepository(entity).extend<RepositoryExtension<TEntity> & CustomRepository>({
-        ...makeRepositoryExtension(),
+        ...getRepositoryExtension(),
         ...extend,
     });
 }
 
-const makeRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> & ThisRepositoryExtension<TEntity> => ({
+const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> & ThisRepositoryExtension<TEntity> => ({
     queryHelper: new QueryHelper(),
 
     findManyByExpression(
