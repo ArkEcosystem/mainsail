@@ -1,16 +1,28 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers, Application } from "@mainsail/kernel";
 
-import { ServiceProvider as CoreApiDatabase, Identifiers as ApiDatabaseIdentifiers } from "../../../api-database";
+import { ServiceProvider as CoreApiDatabase, Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "../../../api-database";
 import { ServiceProvider as CoreApiHttp } from "../../../api-http";
 import { Sandbox } from "../../../test-framework";
 
 export class ApiContext {
+	public readonly blockRepository: ApiDatabaseContracts.IBlockRepository;
+	public readonly transactionRepository: ApiDatabaseContracts.ITransactionRepository;
+	public readonly walletRepository: ApiDatabaseContracts.IWalletRepository;
+	public readonly peerRepository: ApiDatabaseContracts.IPeerRepository;
+	public readonly stateRepository: ApiDatabaseContracts.IStateRepository;
+
 	public constructor(
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {}
+	) {
+		this.blockRepository = app.get<ApiDatabaseContracts.IBlockRepository>(ApiDatabaseIdentifiers.BlockRepository);
+		this.transactionRepository = app.get<ApiDatabaseContracts.ITransactionRepository>(ApiDatabaseIdentifiers.TransactionRepository);
+		this.walletRepository = app.get<ApiDatabaseContracts.IWalletRepository>(ApiDatabaseIdentifiers.WalletRepository);
+		this.peerRepository = app.get<ApiDatabaseContracts.IPeerRepository>(ApiDatabaseIdentifiers.PeerRepository);
+		this.stateRepository = app.get<ApiDatabaseContracts.IStateRepository>(ApiDatabaseIdentifiers.StateRepository);
+	}
 
 	public async reset() {
 		const dataSource = this.app.get<any>(ApiDatabaseIdentifiers.DataSource);

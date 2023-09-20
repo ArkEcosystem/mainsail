@@ -1,18 +1,20 @@
 import Hapi from "@hapi/hapi";
 import { Contracts } from "@mainsail/contracts";
+import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
-		return (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue =>
-			// TODO: read from database, API doesn't have access to the in-memory state
+		const blockRepository = app.get<ApiDatabaseContracts.IBlockRepository>(ApiDatabaseIdentifiers.BlockRepository);
 
-			// const blockHeight = app.get<Contracts.State.StateStore>(Identifiers.StateStore).getLastHeight();
+		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
+			const blockHeight = await blockRepository.getLatestHeight();
 
-			// const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
-			// responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
-			// responsePropertyToUpdate.headers["X-Block-Height"] = blockHeight;
+			const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
+			responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
+			responsePropertyToUpdate.headers["x-block-height"] = blockHeight;
 
-			h.continue;
+			return h.continue;
+		}
 	},
 	name: "response-headers",
 

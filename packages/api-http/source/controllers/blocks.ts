@@ -24,7 +24,7 @@ export class BlocksController extends Controller {
 			.limit(pagination.limit)
 			.getMany();
 
-		const totalCount = blocks[0]?.height ?? 0;
+		const totalCount = Number(blocks[0]?.height ?? 0);
 
 		return this.toPagination(
 			{

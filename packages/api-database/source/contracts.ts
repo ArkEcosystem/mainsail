@@ -11,6 +11,7 @@ export type RepositoryDataSource = DataSource | EntityManager;
 
 export type IBlockRepository = Repository<Block> & {
 	getLatest(): Promise<Block | null>;
+	getLatestHeight(): Promise<number | undefined>;
 };
 
 export type IPeerRepository = Repository<Peer>;

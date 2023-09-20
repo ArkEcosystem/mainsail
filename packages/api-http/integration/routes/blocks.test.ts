@@ -4,7 +4,7 @@ import { request } from "../../test/helpers/request";
 
 describe<{
 	sandbox: Sandbox;
-}>("Validator", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
+}>("Blocks", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
 	beforeAll(async (context) => {
