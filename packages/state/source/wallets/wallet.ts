@@ -3,7 +3,6 @@ import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { factory } from "../attributes";
-import { WalletEvent } from "./wallet-event";
 
 export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
@@ -13,7 +12,6 @@ export class Wallet implements Contracts.State.Wallet {
 	public constructor(
 		protected readonly address: string,
 		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
-		protected readonly events?: Contracts.Kernel.EventDispatcher,
 		protected readonly originalWallet?: Wallet,
 	) {
 		if (!originalWallet) {
@@ -122,7 +120,6 @@ export class Wallet implements Contracts.State.Wallet {
 	public setAttribute<T>(key: string, value: T): boolean {
 		let attribute = this.attributes.get(key);
 		const wasSet = this.hasAttribute(key);
-		const previousValue = wasSet ? this.getAttribute(key) : undefined;
 
 		if (!attribute) {
 			attribute = factory(this.attributeRepository.getAttributeType(key), value);
@@ -134,15 +131,6 @@ export class Wallet implements Contracts.State.Wallet {
 		this.#setAttributes.add(key);
 		this.#forgetAttributes.delete(key);
 
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key: key,
-			previousValue,
-			publicKey: this.getPublicKey(),
-			value,
-
-			wallet: this,
-		});
-
 		return wasSet;
 	}
 
@@ -152,7 +140,6 @@ export class Wallet implements Contracts.State.Wallet {
 		}
 
 		const attribute = this.attributes.get(key);
-		const previousValue = this.getAttribute(key);
 
 		if (!attribute) {
 			this.#checkAttributeName(key);
@@ -161,13 +148,6 @@ export class Wallet implements Contracts.State.Wallet {
 		this.attributes.delete(key);
 		this.#setAttributes.delete(key);
 		this.#forgetAttributes.add(key);
-
-		this.events?.dispatchSync(WalletEvent.PropertySet, {
-			key,
-			previousValue: previousValue,
-			publicKey: this.getPublicKey(),
-			wallet: this,
-		});
 
 		return !!attribute;
 	}
@@ -185,7 +165,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(): Contracts.State.Wallet {
-		return new Wallet(this.address, this.attributeRepository, undefined, this);
+		return new Wallet(this.address, this.attributeRepository, this);
 	}
 
 	public isClone(): boolean {

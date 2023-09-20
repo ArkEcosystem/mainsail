@@ -38,12 +38,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) =>
-				walletFactory(
-					container.get(Identifiers.WalletAttributes),
-					container.get(Identifiers.EventDispatcherService),
-				),
-			)
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 		this.app
