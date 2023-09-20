@@ -100,7 +100,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	protected findOrCreate(address: string): Contracts.State.Wallet {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 		if (!index.has(address)) {
-			index.set(address, this.createWalletFactory(address));
+			index.set(address, this.createWalletFactory(address, this));
 		}
 		return index.get(address)!;
 	}

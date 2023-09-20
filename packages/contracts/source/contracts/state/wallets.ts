@@ -84,7 +84,7 @@ export interface IValidatorWallet {
 	isResigned(): boolean;
 }
 
-export type WalletFactory = (address: string) => Wallet;
+export type WalletFactory = (address: string, walletRepository: WalletRepository) => Wallet;
 
 export type ValidatorWalletFactory = (wallet: Wallet) => IValidatorWallet;
 
