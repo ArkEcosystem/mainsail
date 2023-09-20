@@ -43,6 +43,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 
 		const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
+		wallet.setPublicKey(publicKey);
 		this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, wallet);
 		return wallet;
 	}
