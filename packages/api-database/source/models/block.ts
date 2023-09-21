@@ -22,7 +22,7 @@ export class Block {
 		type: "bigint",
 		unique: true,
 	})
-	public readonly timestamp!: number;
+	public readonly timestamp!: string;
 
 	@Column({
 		type: "varchar",
@@ -37,7 +37,7 @@ export class Block {
 		type: "bigint",
 		unique: true,
 	})
-	public readonly height!: number;
+	public readonly height!: string;
 
 	@Column({
 		nullable: false,

@@ -6,6 +6,7 @@ export type SchemaObject = {
 
 export const pagination = Joi.object({
 	limit: Joi.number().integer().min(1).default(100).max(Joi.ref("$configuration.plugins.pagination.limit")),
+	offset: Joi.number().integer().min(0),
 	page: Joi.number().integer().positive().default(1),
 });
 

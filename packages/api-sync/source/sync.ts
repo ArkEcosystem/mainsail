@@ -52,7 +52,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			await blockRepository.save({
 				generatorPublicKey: header.generatorPublicKey,
-				height: header.height,
+				height: header.height.toFixed(),
 				id: header.id,
 				numberOfTransactions: header.numberOfTransactions,
 				payloadHash: header.payloadHash,
@@ -60,7 +60,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 				previousBlock: header.previousBlock,
 				reward: header.reward.toFixed(),
 				signature: commit.signature,
-				timestamp: header.timestamp,
+				timestamp: header.timestamp.toFixed(),
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				version: header.version,

@@ -4,8 +4,11 @@ import { request } from "../../test/helpers/request";
 
 describe<{
 	sandbox: Sandbox;
-}>("Validator", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
+}>("Transactions", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
+
+	// TODO:
+	let options = { transform: false };
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
@@ -26,7 +29,7 @@ describe<{
 	});
 
 	it("/transactions", async () => {
-		const { statusCode, data } = await request("/transactions");
+		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);
 	});
 });

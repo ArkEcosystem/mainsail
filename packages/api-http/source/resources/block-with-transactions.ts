@@ -9,6 +9,8 @@ type BlockDataWithTransactionData = {
 	transactions: Contracts.Crypto.ITransactionData[];
 };
 
+// TODO: delete in favour of BlockResource
+
 @injectable()
 export class BlockWithTransactionsResource implements Resource {
 	@inject(Identifiers.WalletRepository)

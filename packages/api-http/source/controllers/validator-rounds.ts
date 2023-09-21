@@ -7,13 +7,13 @@ import { Controller } from "./controller";
 
 @injectable()
 export class ValidatorRoundsController extends Controller {
-	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepository)
-	private readonly validatorRoundepository!: ApiDatabaseContracts.IValidatorRoundRepository;
+	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
+	private readonly validatorRoundepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [validatorRounds, totalCount] = await this.validatorRoundepository
+		const [validatorRounds, totalCount] = await this.validatorRoundepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.addOrderBy("round", "DESC")

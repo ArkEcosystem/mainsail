@@ -1,5 +1,9 @@
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Search,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { BlockResource, TransactionResource } from "../resources";
@@ -7,16 +11,16 @@ import { Controller } from "./controller";
 
 @injectable()
 export class BlocksController extends Controller {
-	@inject(ApiDatabaseIdentifiers.BlockRepository)
-	private readonly blockRepository!: ApiDatabaseContracts.IBlockRepository;
+	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
+	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.TransactionRepository)
-	private readonly transactionRepository!: ApiDatabaseContracts.ITransactionRepository;
+	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const blocks = await this.blockRepository
+		const blocks = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.orderBy("height", "DESC")
@@ -24,7 +28,9 @@ export class BlocksController extends Controller {
 			.limit(pagination.limit)
 			.getMany();
 
-		const totalCount = blocks[0]?.height ?? 0;
+		// TODO: join transactions
+
+		const totalCount = Number(blocks[0]?.height ?? 0);
 
 		return this.toPagination(
 			{
@@ -33,14 +39,58 @@ export class BlocksController extends Controller {
 				totalCount,
 			},
 			BlockResource,
-			false,
+			request.query.transform,
 		);
+	}
+
+	public async first(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const block = await this.blockRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("height = :height", { height: 1 })
+			.getOne();
+
+		// TODO: join transactions
+
+		return this.respondWithResource(block, BlockResource, request.query.transform);
+	}
+
+	public async last(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const block = await this.blockRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.orderBy("height", "DESC")
+			.limit(1)
+			.getOne();
+
+		// TODO: join transactions
+
+		return this.respondWithResource(block, BlockResource, request.query.transform);
+	}
+
+	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const blockRepository = this.blockRepositoryFactory();
+		const transactionRepository = this.transactionRepositoryFactory();
+		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
+
+		// const transactionCriteria = {
+		// 	typeGroup: Enums.TransactionTypeGroup.Core,
+		// 	type: Enums.TransactionType.MultiPayment,
+		// };
+
+		const block = await blockRepository.findOneByCriteriaJoinTransactions(
+			transactionRepository,
+			blockCriteria,
+			// transactionCriteria,
+		);
+
+		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
 	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [transactions, totalCount] = await this.transactionRepository
+		const [transactions, totalCount] = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.where("block_id = :blockId", { blockId: request.params.id })
@@ -56,43 +106,9 @@ export class BlocksController extends Controller {
 				totalCount,
 			},
 			TransactionResource,
-			false,
+			request.query.transform,
 		);
 	}
-
-	// public async first(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const block = this.stateStore.getGenesisBlock();
-
-	// 	if (request.query.transform) {
-	// 		return this.respondWithResource(block, BlockWithTransactionsResource, true);
-	// 	} else {
-	// 		return this.respondWithResource(block.block.data, BlockResource, false);
-	// 	}
-	// }
-
-	// public async last(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const block = this.stateStore.getLastBlock();
-
-	// 	if (request.query.transform) {
-	// 		return this.respondWithResource(block, BlockWithTransactionsResource, true);
-	// 	} else {
-	// 		return this.respondWithResource(block.data, BlockResource, false);
-	// 	}
-	// }
-
-	// public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const block = await this.getBlock(request.params.id);
-
-	// 	if (!block) {
-	// 		return notFound("Block not found");
-	// 	}
-
-	// 	if (request.query.transform) {
-	// 		return this.respondWithResource(block, BlockWithTransactionsResource, true);
-	// 	} else {
-	// 		return this.respondWithResource(block.data, BlockResource, false);
-	// 	}
-	// }
 
 	// private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.IBlock | undefined> {
 	// 	let block: Contracts.Crypto.IBlock | undefined;
@@ -109,4 +125,10 @@ export class BlocksController extends Controller {
 
 	// 	return block;
 	// }
+
+	private getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
+		const asHeight = Number(idOrHeight);
+		// NOTE: This assumes all block ids are sha256 and never a valid nubmer below this threshold.
+		return asHeight && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
+	}
 }
