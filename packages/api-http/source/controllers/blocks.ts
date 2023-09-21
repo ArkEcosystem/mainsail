@@ -1,10 +1,9 @@
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import { Search, Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { BlockResource, TransactionResource } from "../resources";
 import { Controller } from "./controller";
-import { Search } from "@mainsail/api-database";
 
 @injectable()
 export class BlocksController extends Controller {
@@ -66,16 +65,20 @@ export class BlocksController extends Controller {
 	}
 
 	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		this.getBlockCriteriaByIdOrHeight("");
+		const blockRepository = this.blockRepositoryFactory();
+		const transactionRepository = this.transactionRepositoryFactory();
+		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 
-		const block = await this.blockRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.orderBy("height", "DESC")
-			.limit(1)
-			.getOne();
+		// const transactionCriteria = {
+		// 	typeGroup: Enums.TransactionTypeGroup.Core,
+		// 	type: Enums.TransactionType.MultiPayment,
+		// };
 
-		// TODO: join transactions
+		const block = await blockRepository.findOneByCriteriaJoinTransactions(
+			transactionRepository,
+			blockCriteria,
+			// transactionCriteria,
+		);
 
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}

@@ -8,12 +8,25 @@ import { ValidatorRound } from "./models/validator-round";
 import { Wallet } from "./models/wallet";
 // import { BlockFilter } from "./search/filters/block-filter";
 import { ExtendedRepository } from "./repositories/repository-extension";
+import { Criteria } from "./search";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
 export type IBlockRepositoryExtension = {
 	getLatest(): Promise<Block | null>;
 	getLatestHeight(): Promise<number | undefined>;
+
+	findOneByCriteriaJoinTransactions(
+		transactionRepository: ITransactionRepository,
+		blockCriteria: Criteria.OrBlockCriteria,
+		// transactionCriteria: Search.Criteria.OrTransactionCriteria,
+	): Promise<Block | undefined>;
+
+	findManyByCriteriaJoinTransactions(
+		transactionRepository: ITransactionRepository,
+		blockCriteria: Criteria.OrBlockCriteria,
+	): Promise<Block[]>;
+
 	//getFilter(): BlockFilter;
 };
 export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExtension;

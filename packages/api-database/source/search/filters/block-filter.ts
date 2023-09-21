@@ -3,7 +3,7 @@ import { Block } from "../../models/block";
 import { handleOrCriteria, optimizeExpression, handleAndCriteria, handleNumericCriteria } from "../search";
 
 export class BlockFilter {
-    public async getExpression(
+    public static async getExpression(
         ...criteria: Criteria.OrBlockCriteria[]
     ): Promise<Expressions.Expression<Block>> {
         const expressions = await Promise.all(
@@ -13,7 +13,7 @@ export class BlockFilter {
         return optimizeExpression({ op: "and", expressions });
     }
 
-    private async handleBlockCriteria(
+    private static async handleBlockCriteria(
         criteria: Criteria.BlockCriteria,
     ): Promise<Expressions.Expression<Block>> {
         return handleAndCriteria(criteria, async (key) => {

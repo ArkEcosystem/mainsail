@@ -14,14 +14,14 @@ export interface RepositoryExtension<TEntity extends ObjectLiteral> {
 
     findManyByExpression(
         expression: Expressions.Expression<TEntity>,
-        sorting: Sorting,
+        sorting?: Sorting,
     ): Promise<TEntity[]>;
 };
 
 export type ExtendedRepository<TEntity extends ObjectLiteral> = RepositoryExtension<TEntity> & Repository<TEntity>;
 export type ThisRepositoryExtension<TEntity extends ObjectLiteral> = ThisType<ExtendedRepository<TEntity>>;
 
-export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepository>(entity: EntityTarget<TEntity>, dataSource: RepositoryDataSource, extend: CustomRepository & ThisType<Repository<TEntity> & CustomRepository>): ExtendedRepository<TEntity> & CustomRepository => {
+export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepository>(entity: EntityTarget<TEntity>, dataSource: RepositoryDataSource, extend: CustomRepository & ThisType<ExtendedRepository<TEntity> & CustomRepository>): ExtendedRepository<TEntity> & CustomRepository => {
     return dataSource.getRepository(entity).extend<RepositoryExtension<TEntity> & CustomRepository>({
         ...getRepositoryExtension(),
         ...extend,
