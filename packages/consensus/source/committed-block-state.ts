@@ -1,18 +1,23 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class CommittedBlockState implements Contracts.BlockProcessor.IProcessableUnit {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "clone")
-	private readonly walletRepository!: Contracts.State.WalletRepositoryClone;
+	@inject(Identifiers.WalletRepositoryCloneFactory)
+	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	#walletRepository!: Contracts.State.WalletRepositoryClone;
 	#committedBlock!: Contracts.Crypto.ICommittedBlock;
 	#processorResult?: boolean;
 	#validators = new Map<string, Contracts.State.IValidatorWallet>();
+
+	@postConstruct()
+	public initialize(): void {
+		this.#walletRepository = this.walletRepositoryFactory();
+	}
 
 	get height(): number {
 		return this.#committedBlock.block.data.height;
@@ -39,7 +44,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 	}
 
 	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
-		return this.walletRepository;
+		return this.#walletRepository;
 	}
 
 	public getBlock(): Contracts.Crypto.IBlock {

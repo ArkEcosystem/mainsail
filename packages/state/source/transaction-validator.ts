@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { strictEqual } from "assert";
 
@@ -7,12 +7,18 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "clone")
-	private walletRepository!: Contracts.State.WalletRepository;
+	@inject(Identifiers.WalletRepositoryCloneFactory)
+	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
+
+	#walletRepository!: Contracts.State.WalletRepositoryClone;
+
+	@postConstruct()
+	public initialize(): void {
+		this.#walletRepository = this.walletRepositoryFactory();
+	}
 
 	public async validate(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const deserialized: Contracts.Crypto.ITransaction = await this.transactionFactory.fromBytes(
@@ -20,6 +26,6 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 		);
 		strictEqual(transaction.id, deserialized.id);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		await handler.apply(this.walletRepository, transaction);
+		await handler.apply(this.#walletRepository, transaction);
 	}
 }
