@@ -1,4 +1,8 @@
-import { IMempoolTransactionRepository, IMempoolTransactionRepositoryExtension, RepositoryDataSource } from "../contracts";
+import {
+	IMempoolTransactionRepository,
+	IMempoolTransactionRepositoryExtension,
+	RepositoryDataSource,
+} from "../contracts";
 import { MempoolTransaction } from "../models";
 import { makeExtendedRepository } from "./repository-extension";
 

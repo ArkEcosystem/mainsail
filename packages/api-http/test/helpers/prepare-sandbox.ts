@@ -1,7 +1,11 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers, Application } from "@mainsail/kernel";
 
-import { ServiceProvider as CoreApiDatabase, Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "../../../api-database";
+import {
+	ServiceProvider as CoreApiDatabase,
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+} from "../../../api-database";
 import { ServiceProvider as CoreApiHttp } from "../../../api-http";
 import { Sandbox } from "../../../test-framework";
 
@@ -10,31 +14,40 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {
-	}
+	) {}
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
 	}
 
 	public get blockRepository(): ApiDatabaseContracts.IBlockRepository {
-		return this.app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(ApiDatabaseIdentifiers.BlockRepositoryFactory)();
+		return this.app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(
+			ApiDatabaseIdentifiers.BlockRepositoryFactory,
+		)();
 	}
 
 	public get transactionRepository(): ApiDatabaseContracts.ITransactionRepository {
-		return this.app.get<ApiDatabaseContracts.ITransactionRepositoryFactory>(ApiDatabaseIdentifiers.TransactionRepositoryFactory)();
+		return this.app.get<ApiDatabaseContracts.ITransactionRepositoryFactory>(
+			ApiDatabaseIdentifiers.TransactionRepositoryFactory,
+		)();
 	}
 
 	public get walletRepository(): ApiDatabaseContracts.IWalletRepository {
-		return this.app.get<ApiDatabaseContracts.IWalletRepositoryFactory>(ApiDatabaseIdentifiers.WalletRepositoryFactory)();
+		return this.app.get<ApiDatabaseContracts.IWalletRepositoryFactory>(
+			ApiDatabaseIdentifiers.WalletRepositoryFactory,
+		)();
 	}
 
 	public get peerRepository(): ApiDatabaseContracts.IPeerRepository {
-		return this.app.get<ApiDatabaseContracts.IPeerRepositoryFactory>(ApiDatabaseIdentifiers.PeerRepositoryFactory)();
+		return this.app.get<ApiDatabaseContracts.IPeerRepositoryFactory>(
+			ApiDatabaseIdentifiers.PeerRepositoryFactory,
+		)();
 	}
 
 	public get stateRepository(): ApiDatabaseContracts.IStateRepository {
-		return this.app.get<ApiDatabaseContracts.IStateRepositoryFactory>(ApiDatabaseIdentifiers.StateRepositoryFactory)();
+		return this.app.get<ApiDatabaseContracts.IStateRepositoryFactory>(
+			ApiDatabaseIdentifiers.StateRepositoryFactory,
+		)();
 	}
 
 	public async reset() {

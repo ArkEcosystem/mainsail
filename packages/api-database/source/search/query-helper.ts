@@ -1,90 +1,88 @@
 import { EntityMetadata } from "typeorm";
+
 import { Expression } from "./expressions";
 
 export type SqlExpression = {
-    query: string;
-    parameters: Record<string, any>;
+	query: string;
+	parameters: Record<string, any>;
 };
 
 export class QueryHelper<TEntity> {
-    private paramNo = 1;
+	private paramNo = 1;
 
-    public getColumnName(metadata: EntityMetadata, property: keyof TEntity): string {
-        const column = metadata.columns.find((c) => c.propertyName === property);
-        if (!column) {
-            throw new Error(`Can't find ${String(property)} column`);
-        }
-        return column.databaseName;
-    }
+	public getColumnName(metadata: EntityMetadata, property: keyof TEntity): string {
+		const column = metadata.columns.find((c) => c.propertyName === property);
+		if (!column) {
+			throw new Error(`Can't find ${String(property)} column`);
+		}
+		return column.databaseName;
+	}
 
-    public getWhereExpressionSql(
-        metadata: EntityMetadata,
-        expression: Expression<TEntity>,
-    ): SqlExpression {
-        switch (expression.op) {
-            case "true": {
-                return { query: "TRUE", parameters: {} };
-            }
-            case "false": {
-                return { query: "FALSE", parameters: {} };
-            }
-            case "equal": {
-                const column = this.getColumnName(metadata, expression.property);
-                const param = `p${this.paramNo++}`;
-                const query = `${column} = :${param}`;
-                const parameters = { [param]: expression.value };
-                return { query, parameters };
-            }
-            case "between": {
-                const column = this.getColumnName(metadata, expression.property);
-                const paramFrom = `p${this.paramNo++}`;
-                const paramTo = `p${this.paramNo++}`;
-                const query = `${column} BETWEEN :${paramFrom} AND :${paramTo}`;
-                const parameters = { [paramFrom]: expression.from, [paramTo]: expression.to };
-                return { query, parameters };
-            }
-            case "greaterThanEqual": {
-                const column = this.getColumnName(metadata, expression.property);
-                const param = `p${this.paramNo++}`;
-                const query = `${column} >= :${param}`;
-                const parameters = { [param]: expression.value };
-                return { query, parameters };
-            }
-            case "lessThanEqual": {
-                const column = this.getColumnName(metadata, expression.property);
-                const param = `p${this.paramNo++}`;
-                const query = `${column} <= :${param}`;
-                const parameters = { [param]: expression.value };
-                return { query, parameters };
-            }
-            case "like": {
-                const column = this.getColumnName(metadata, expression.property);
-                const param = `p${this.paramNo++}`;
-                const query = `${column} LIKE :${param}`;
-                const parameters = { [param]: expression.pattern };
-                return { query, parameters };
-            }
-            case "contains": {
-                const column = this.getColumnName(metadata, expression.property);
-                const param = `p${this.paramNo++}`;
-                const query = `${column} @> :${param}`;
-                const parameters = { [param]: expression.value };
-                return { query, parameters };
-            }
-            case "and": {
-                const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
-                const query = `(${built.map((b) => b.query).join(" AND ")})`;
-                const parameters = built.reduce((acc, b) => Object.assign({}, acc, b.parameters), {});
-                return { query, parameters };
-            }
-            case "or": {
-                const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
-                const query = `(${built.map((b) => b.query).join(" OR ")})`;
-                const parameters = built.reduce((acc, b) => Object.assign({}, acc, b.parameters), {});
-                return { query, parameters };
-            }
-            default:
-                throw new Error(`Unexpected expression`);
-        }
-    }
+	public getWhereExpressionSql(metadata: EntityMetadata, expression: Expression<TEntity>): SqlExpression {
+		switch (expression.op) {
+			case "true": {
+				return { parameters: {}, query: "TRUE" };
+			}
+			case "false": {
+				return { parameters: {}, query: "FALSE" };
+			}
+			case "equal": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} = :${parameter}`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
+			case "between": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameterFrom = `p${this.paramNo++}`;
+				const parameterTo = `p${this.paramNo++}`;
+				const query = `${column} BETWEEN :${parameterFrom} AND :${parameterTo}`;
+				const parameters = { [parameterFrom]: expression.from, [parameterTo]: expression.to };
+				return { parameters, query };
+			}
+			case "greaterThanEqual": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} >= :${parameter}`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
+			case "lessThanEqual": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} <= :${parameter}`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
+			case "like": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} LIKE :${parameter}`;
+				const parameters = { [parameter]: expression.pattern };
+				return { parameters, query };
+			}
+			case "contains": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} @> :${parameter}`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
+			case "and": {
+				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
+				const query = `(${built.map((b) => b.query).join(" AND ")})`;
+				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
+				return { parameters, query };
+			}
+			case "or": {
+				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
+				const query = `(${built.map((b) => b.query).join(" OR ")})`;
+				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
+				return { parameters, query };
+			}
+			default:
+				throw new Error(`Unexpected expression`);
+		}
+	}
 }

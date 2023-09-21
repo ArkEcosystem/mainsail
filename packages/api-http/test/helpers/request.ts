@@ -4,7 +4,7 @@ import { IncomingHttpHeaders } from "http";
 export const request = async <T = Record<string, any>>(
 	path: string,
 	options?: any,
-): Promise<{ statusCode: number; data: T, headers: IncomingHttpHeaders }> => {
+): Promise<{ statusCode: number; data: T; headers: IncomingHttpHeaders }> => {
 	path = path.startsWith("/") ? path.slice(1) : path;
 
 	let query = "";

@@ -40,7 +40,7 @@ describe<{
 
 		const { statusCode, data } = await request("/blocks/first", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[blocks.length - 1])
+		assert.equal(data.data, blocks[blocks.length - 1]);
 	});
 
 	it("/blocks/{height}", async () => {
@@ -48,7 +48,7 @@ describe<{
 
 		const { statusCode, data } = await request("/blocks/1", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[blocks.length - 1])
+		assert.equal(data.data, blocks[blocks.length - 1]);
 	});
 
 	it("/blocks/{id}", async () => {
@@ -57,7 +57,7 @@ describe<{
 		const id = blocks[blocks.length - 1].id;
 		const { statusCode, data } = await request(`/blocks/${id}`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[blocks.length - 1])
+		assert.equal(data.data, blocks[blocks.length - 1]);
 	});
 
 	it("/blocks/{id}/transactions", async () => {

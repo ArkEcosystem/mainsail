@@ -1,10 +1,12 @@
 import Hapi from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import { Contracts } from "@mainsail/contracts";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
-		const blockRepositoryFactory = app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(ApiDatabaseIdentifiers.BlockRepositoryFactory);
+		const blockRepositoryFactory = app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(
+			ApiDatabaseIdentifiers.BlockRepositoryFactory,
+		);
 
 		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
 			const blockHeight = await blockRepositoryFactory().getLatestHeight();
@@ -14,7 +16,7 @@ export const responseHeaders = {
 			responsePropertyToUpdate.headers["x-block-height"] = blockHeight;
 
 			return h.continue;
-		}
+		};
 	},
 	name: "response-headers",
 

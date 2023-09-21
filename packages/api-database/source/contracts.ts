@@ -34,7 +34,8 @@ export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExten
 export type IPeerRepositoryExtension = {};
 export type IPeerRepository = ExtendedRepository<Peer> & IPeerRepositoryExtension;
 export type IMempoolTransactionRepositoryExtension = {};
-export type IMempoolTransactionRepository = ExtendedRepository<MempoolTransaction> & IMempoolTransactionRepositoryExtension;
+export type IMempoolTransactionRepository = ExtendedRepository<MempoolTransaction> &
+	IMempoolTransactionRepositoryExtension;
 export type ITransactionRepositoryExtension = {};
 export type ITransactionRepository = ExtendedRepository<Transaction> & ITransactionRepositoryExtension;
 export type IValidatorRoundRepositoryExtension = {};
@@ -47,7 +48,9 @@ export type IWalletRepository = ExtendedRepository<Wallet> & IWalletRepositoryEx
 export type IBlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => IBlockRepository;
 export type IPeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPeerRepository;
 export type ITransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionRepository;
-export type IMempoolTransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => IMempoolTransactionRepository;
+export type IMempoolTransactionRepositoryFactory = (
+	customDataSource?: RepositoryDataSource,
+) => IMempoolTransactionRepository;
 export type IValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => IValidatorRoundRepository;
 export type IStateRepositoryFactory = (customDataSource?: RepositoryDataSource) => IStateRepository;
 export type IWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => IWalletRepository;

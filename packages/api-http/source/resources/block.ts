@@ -11,19 +11,12 @@ export class BlockResource implements Resource {
 
 	public transform(resource: Models.Block): object {
 		return {
-			id: resource.id,
-			version: resource.version,
-			height: +resource.height,
-			previous: resource.previousBlock,
+			confirmations: 0,
 			forged: {
-				reward: resource.reward,
-				fee: resource.totalFee,
 				amount: resource.totalAmount,
+				fee: resource.totalFee,
+				reward: resource.reward,
 				// total: blockData.reward.plus(blockData.totalFee).toFixed(),
-			},
-			payload: {
-				hash: resource.payloadHash,
-				length: resource.payloadLength,
 			},
 			generator: {
 				// username: generator.hasAttribute("delegate.username")
@@ -32,10 +25,19 @@ export class BlockResource implements Resource {
 				// address: generator.getAddress(),
 				// publicKey: generator.getPublicKey(),
 			},
+			height: +resource.height,
+			id: resource.id,
+			payload: {
+				hash: resource.payloadHash,
+				length: resource.payloadLength,
+			},
+			previous: resource.previousBlock,
 			signature: resource.signature,
-			confirmations: 0, // lastBlock ? lastBlock.data.height - blockData.height : 0,
-			transactions: resource.numberOfTransactions,
 			timestamp: +resource.timestamp,
+			// lastBlock ? lastBlock.data.height - blockData.height : 0,
+			transactions: resource.numberOfTransactions,
+
+			version: resource.version,
 		};
 	}
 }

@@ -65,31 +65,52 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			this.app
 				.bind(Identifiers.BlockRepositoryFactory)
-				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeBlockRepository(customDataSource ?? dataSource));
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeBlockRepository(customDataSource ?? dataSource),
+				);
 
 			this.app
 				.bind(Identifiers.PeerRepositoryFactory)
-				.toFactory(() => (customDataSource?: RepositoryDataSource) => makePeerRepository(customDataSource ?? dataSource));
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makePeerRepository(customDataSource ?? dataSource),
+				);
 
 			this.app
 				.bind(Identifiers.MempoolTransactionRepositoryFactory)
-				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeMempoolTransactionRepository(customDataSource ?? dataSource));
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeMempoolTransactionRepository(customDataSource ?? dataSource),
+				);
 
 			this.app
 				.bind(Identifiers.StateRepositoryFactory)
-				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeStateRepository(customDataSource ?? dataSource));
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeStateRepository(customDataSource ?? dataSource),
+				);
 
 			this.app
 				.bind(Identifiers.TransactionRepositoryFactory)
-				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeTransactionRepository(customDataSource ?? dataSource));
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTransactionRepository(customDataSource ?? dataSource),
+				);
 
 			this.app
 				.bind(Identifiers.ValidatorRoundRepositoryFactory)
-				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeValidatorRoundRepository(customDataSource ?? dataSource));
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeValidatorRoundRepository(customDataSource ?? dataSource),
+				);
 
 			this.app
 				.bind(Identifiers.WalletRepositoryFactory)
-				.toFactory(() => (customDataSource?: RepositoryDataSource) => makeWalletRepository(customDataSource ?? dataSource));
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeWalletRepository(customDataSource ?? dataSource),
+				);
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);
 		}
