@@ -128,6 +128,7 @@ export class BlocksController extends Controller {
 
 	private getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
 		const asHeight = Number(idOrHeight);
-		return asHeight && asHeight <= 50_000_000 ? { height: asHeight } : { id: idOrHeight };
+		// NOTE: This assumes all block ids are sha256 and never a valid nubmer below this threshold.
+		return asHeight && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
 	}
 }
