@@ -12,6 +12,7 @@ export class Wallet implements Contracts.State.Wallet {
 	public constructor(
 		protected readonly address: string,
 		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
+		protected walletRepository: Contracts.State.WalletRepository,
 		protected readonly originalWallet?: Wallet,
 	) {
 		if (!originalWallet) {
@@ -130,6 +131,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 		this.#setAttributes.add(key);
 		this.#forgetAttributes.delete(key);
+		this.walletRepository.setDirtyWallet(this);
 
 		return wasSet;
 	}
@@ -148,6 +150,7 @@ export class Wallet implements Contracts.State.Wallet {
 		this.attributes.delete(key);
 		this.#setAttributes.delete(key);
 		this.#forgetAttributes.add(key);
+		this.walletRepository.setDirtyWallet(this);
 
 		return !!attribute;
 	}
@@ -164,8 +167,8 @@ export class Wallet implements Contracts.State.Wallet {
 		return this.hasAttribute("multiSignature");
 	}
 
-	public clone(): Contracts.State.Wallet {
-		return new Wallet(this.address, this.attributeRepository, this);
+	public clone(walletRepository: Contracts.State.WalletRepository): Contracts.State.Wallet {
+		return new Wallet(this.address, this.attributeRepository, walletRepository, this);
 	}
 
 	public isClone(): boolean {
@@ -180,7 +183,7 @@ export class Wallet implements Contracts.State.Wallet {
 		throw new Error("This is not a clone wallet");
 	}
 
-	public commitChanges(): void {
+	public commitChanges(walletRepository: Contracts.State.WalletRepository): void {
 		if (this.originalWallet) {
 			for (const attributeName of this.#forgetAttributes) {
 				this.originalWallet.forgetAttribute(attributeName);
@@ -189,6 +192,8 @@ export class Wallet implements Contracts.State.Wallet {
 			for (const attributeName of this.#setAttributes) {
 				this.originalWallet.setAttribute(attributeName, this.attributes.get(attributeName)!.get());
 			}
+		} else {
+			this.walletRepository = walletRepository;
 		}
 	}
 

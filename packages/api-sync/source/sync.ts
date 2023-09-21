@@ -111,7 +111,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 					.execute();
 			}
 
-			const dirtyWallets = unit.getWalletRepository().getDirtyWallets();
+			const dirtyWallets = [...unit.getWalletRepository().getDirtyWallets()];
 			await walletRepository.upsert(
 				dirtyWallets.map((wallet) => ({
 					address: wallet.getAddress(),

@@ -10,6 +10,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	private readonly originalWalletRepository!: WalletRepository;
 
 	readonly #forgetIndexes: Record<string, Set<string>> = {};
+	readonly #dirtyWallets = new Set<Contracts.State.Wallet>();
 
 	@postConstruct()
 	public initialize(): void {
@@ -77,16 +78,18 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 	}
 
-	public getDirtyWallets(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.getIndex(Contracts.State.WalletIndexes.Addresses)
-			.values()
-			.filter((walletHolder) => walletHolder.isChanged());
+	public getDirtyWallets(): IterableIterator<Contracts.State.Wallet> {
+		return this.#dirtyWallets.values();
+	}
+
+	public setDirtyWallet(wallet: Contracts.State.Wallet): void {
+		this.#dirtyWallets.add(wallet);
 	}
 
 	public commitChanges(): void {
 		// Merge clones to originals
-		for (const wallet of this.getDirtyWallets()) {
-			wallet.commitChanges();
+		for (const wallet of this.#dirtyWallets.values()) {
+			wallet.commitChanges(this.originalWalletRepository);
 		}
 
 		for (const indexName of this.indexSet.all()) {
@@ -119,7 +122,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			const localAddressIndex = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 
 			if (!localAddressIndex.has(originalWallet.getAddress())) {
-				localAddressIndex.set(originalWallet.getAddress(), originalWallet.clone());
+				localAddressIndex.set(originalWallet.getAddress(), originalWallet.clone(this));
 			}
 
 			return localAddressIndex.get(originalWallet.getAddress())!;

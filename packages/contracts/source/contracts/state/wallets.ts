@@ -64,13 +64,13 @@ export interface Wallet {
 
 	hasMultiSignature(): boolean;
 
-	clone(): Wallet;
+	clone(walletRepository: WalletRepository): Wallet;
 
 	isClone(): boolean;
 
 	getOriginal(): Wallet;
 
-	commitChanges(): void;
+	commitChanges(walletRepository: WalletRepository): void;
 }
 
 export interface IValidatorWallet {
@@ -84,7 +84,7 @@ export interface IValidatorWallet {
 	isResigned(): boolean;
 }
 
-export type WalletFactory = (address: string) => Wallet;
+export type WalletFactory = (address: string, walletRepository: WalletRepository) => Wallet;
 
 export type ValidatorWalletFactory = (wallet: Wallet) => IValidatorWallet;
 
@@ -129,10 +129,12 @@ export interface WalletRepository {
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 
 	forgetOnIndex(index: string, key: string): void;
+
+	setDirtyWallet(wallet: Wallet): void;
 }
 
 export interface WalletRepositoryClone extends WalletRepository {
-	getDirtyWallets(): ReadonlyArray<Wallet>;
+	getDirtyWallets(): IterableIterator<Wallet>;
 	commitChanges(): void;
 }
 

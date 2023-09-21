@@ -1,12 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import memoize from "fast-memoize";
 
-import {
-	registerBlockFactory,
-	registerIdentityFactory,
-	registerTransactionFactory,
-	registerWalletFactory,
-} from "./factories";
+import { registerBlockFactory, registerIdentityFactory, registerTransactionFactory } from "./factories";
 import { Factory } from "./factory";
 import { FactoryBuilder } from "./factory-builder";
 
@@ -18,8 +13,6 @@ const createFactory = memoize(async (config?: Contracts.Crypto.NetworkConfigPart
 	await registerIdentityFactory(factory, config);
 
 	await registerTransactionFactory(factory, config);
-
-	await registerWalletFactory(factory, config);
 
 	return factory;
 });

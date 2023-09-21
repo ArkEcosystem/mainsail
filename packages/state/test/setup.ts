@@ -253,12 +253,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app
 		.bind(Identifiers.WalletFactory)
-		.toFactory(({ container }) =>
-			walletFactory(
-				container.get(Identifiers.WalletAttributes),
-				container.get(Identifiers.EventDispatcherService),
-			),
-		)
+		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 	sandbox.app
@@ -343,9 +338,9 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	await Factories.Factories.registerBlockFactory(factory);
 	await Factories.Factories.registerTransactionFactory(factory);
-	await Factories.Factories.registerWalletFactory(factory);
 
 	return {
+		app: sandbox.app,
 		blockState,
 		factory,
 		sandbox,
