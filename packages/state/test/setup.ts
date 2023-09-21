@@ -50,9 +50,9 @@ export interface Spies {
 }
 
 export interface Setup {
+	app: Contracts.Kernel.Application;
 	sandbox: Sandbox;
 	walletRepo: WalletRepository;
-	walletRepoClone: WalletRepositoryClone;
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
 	factory: Factories.FactoryBuilder;
 	blockState: BlockState;
@@ -342,7 +342,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		stateStore,
 		transactionValidator,
 		walletRepo,
-		// walletRepoClone,
 		walletRepoCopyOnWrite,
 	};
 };
