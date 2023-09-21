@@ -40,6 +40,7 @@ export class BlockFilter {
 					);
 				case "numberOfTransactions":
 					return handleOrCriteria(criteria.numberOfTransactions, async (c) =>
+                        // @ts-ignore
 						handleNumericCriteria("numberOfTransactions", c),
 					);
 				case "totalAmount":
@@ -59,6 +60,7 @@ export class BlockFilter {
 					);
 				case "payloadLength":
 					return handleOrCriteria(criteria.payloadLength, async (c) =>
+                        // @ts-ignore
 						handleNumericCriteria("payloadLength", c),
 					);
 				case "payloadHash":
