@@ -38,14 +38,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
-
-		this.app
-			.bind(Identifiers.WalletRepository)
-			.to(WalletRepositoryClone)
-			.inRequestScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)));
 
 		this.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
 			({ container }) =>
@@ -57,22 +50,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 						),
 		);
 
-		this.app
-			.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
-
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 
 		this.app
 			.bind(Identifiers.WalletRepository)
 			.to(WalletRepositoryCopyOnWrite)
 			.inRequestScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
-
-		this.app
-			.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
 		this.app.bind(Identifiers.BlockState).to(BlockState);
