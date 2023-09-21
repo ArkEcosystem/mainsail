@@ -338,7 +338,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	await Factories.Factories.registerBlockFactory(factory);
 	await Factories.Factories.registerTransactionFactory(factory);
-	await Factories.Factories.registerWalletFactory(factory);
 
 	return {
 		app: sandbox.app,
