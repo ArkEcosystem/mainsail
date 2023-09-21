@@ -43,6 +43,23 @@ describe<{
 		assert.equal(data.data, blocks[blocks.length - 1])
 	});
 
+	it("/blocks/{height}", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		const { statusCode, data } = await request("/blocks/1", options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, blocks[blocks.length - 1])
+	});
+
+	it("/blocks/{id}", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		const id = blocks[blocks.length - 1].id;
+		const { statusCode, data } = await request(`/blocks/${id}`, options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, blocks[blocks.length - 1])
+	});
+
 	it("/blocks/{id}/transactions", async () => {
 		const { statusCode, data } = await request("/blocks/1/transactions", options);
 		assert.equal(statusCode, 200);
