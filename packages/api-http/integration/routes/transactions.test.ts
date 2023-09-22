@@ -36,7 +36,22 @@ describe<{
 
 		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, transactions);
+		assert.equal(data.data, [...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)));
+	});
+
+	it("/transactions?type", async () => {
+		await apiContext.transactionRepository.save(transactions);
+
+		const testCases = [
+			{ path: "/transactions?type=0", result: [...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)) },
+			{ path: "/transactions?type=1", result: [] }
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
 	});
 
 	it("/transactions/{id}", async () => {
