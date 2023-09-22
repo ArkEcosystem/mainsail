@@ -264,9 +264,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 			() =>
 				container
 					.resolve(WalletRepositoryClone)
-					.setOriginalWalletRepository(
-						container.getTagged(Identifiers.WalletRepository, "state", "blockchain"),
-					),
+					.configure(container.getTagged(Identifiers.WalletRepository, "state", "blockchain")),
 	);
 
 	const walletRepo: WalletRepository = sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
