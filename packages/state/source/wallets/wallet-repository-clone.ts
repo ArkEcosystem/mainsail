@@ -19,7 +19,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		}
 	}
 
-	public setOriginalWalletRepository(originalWalletRepository: WalletRepository): WalletRepositoryClone {
+	public configure(originalWalletRepository: WalletRepository): WalletRepositoryClone {
 		this.#originalWalletRepository = originalWalletRepository;
 		return this;
 	}

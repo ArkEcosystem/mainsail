@@ -45,9 +45,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				() =>
 					container
 						.resolve(WalletRepositoryClone)
-						.setOriginalWalletRepository(
-							container.getTagged(Identifiers.WalletRepository, "state", "blockchain"),
-						),
+						.configure(container.getTagged(Identifiers.WalletRepository, "state", "blockchain")),
 		);
 
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
