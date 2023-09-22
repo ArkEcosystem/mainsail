@@ -3,6 +3,7 @@ import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions";
 import { pagination } from "../schemas";
+import { transactionSortingSchema } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(TransactionsController);
@@ -20,8 +21,12 @@ export const register = (server: Hapi.Server): void => {
 			},
 			validate: {
 				query: Joi.object({
+					...server.app.schemas.transactionCriteriaSchemas,
+					orderBy: server.app.schemas.transactionsOrderBy,
 					transform: Joi.bool().default(true),
-				}).concat(pagination),
+				})
+					.concat(transactionSortingSchema)
+					.concat(pagination),
 			},
 		},
 	});

@@ -8,7 +8,7 @@ import { ValidatorRound } from "./models/validator-round";
 import { Wallet } from "./models/wallet";
 // import { BlockFilter } from "./search/filters/block-filter";
 import { ExtendedRepository } from "./repositories/repository-extension";
-import { Criteria } from "./search";
+import { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
@@ -36,8 +36,17 @@ export type IPeerRepository = ExtendedRepository<Peer> & IPeerRepositoryExtensio
 export type IMempoolTransactionRepositoryExtension = {};
 export type IMempoolTransactionRepository = ExtendedRepository<MempoolTransaction> &
 	IMempoolTransactionRepositoryExtension;
-export type ITransactionRepositoryExtension = {};
+
+export type ITransactionRepositoryExtension = {
+	findManyByCritera(
+		transactionCriteria: Criteria.OrTransactionCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Transaction>>
+};
 export type ITransactionRepository = ExtendedRepository<Transaction> & ITransactionRepositoryExtension;
+
 export type IValidatorRoundRepositoryExtension = {};
 export type IValidatorRoundRepository = ExtendedRepository<ValidatorRound> & IValidatorRoundRepositoryExtension;
 export type IStateRepositoryExtension = {};

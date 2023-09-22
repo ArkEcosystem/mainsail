@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers, Search } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { TransactionResource } from "../resources";
@@ -14,25 +14,23 @@ export class TransactionsController extends Controller {
 	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.IMempoolTransactionRepositoryFactory;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const pagination = this.getQueryPagination(request.query);
+		const criteria: Search.Criteria.TransactionCriteria = request.query;
+		const pagination = this.getListingPage(request);
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions();
 
-		const [transactions, totalCount] = await this.transactionRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.orderBy("blockHeight", "DESC")
-			.orderBy("sequence", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getManyAndCount();
+		const transactions = await this.transactionRepositoryFactory().
+			findManyByCritera(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
 		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: transactions,
-				totalCount,
-			},
+			transactions,
 			TransactionResource,
-			false,
+			request.query.transform,
 		);
 	}
 
