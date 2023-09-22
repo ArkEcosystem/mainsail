@@ -50,9 +50,9 @@ export interface Spies {
 }
 
 export interface Setup {
+	app: Contracts.Kernel.Application;
 	sandbox: Sandbox;
 	walletRepo: WalletRepository;
-	walletRepoClone: WalletRepositoryClone;
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
 	factory: Factories.FactoryBuilder;
 	blockState: BlockState;
@@ -241,8 +241,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	// sandbox.app.container.bind(Identifiers.DatabaseBlockRepository).to(MockBlockRepository);
-	// sandbox.app.container.bind(Identifiers.DatabaseTransactionRepository).to(MockTransactionRepository);
 	sandbox.app.container.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
 
 	sandbox.app
@@ -253,19 +251,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app
 		.bind(Identifiers.WalletFactory)
-		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
-		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
-
-	sandbox.app
-		.bind(Identifiers.WalletRepository)
-		.to(WalletRepositoryClone)
-		.inRequestScope()
-		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
-
-	sandbox.app
-		.bind(Identifiers.WalletFactory)
-		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
-		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
+		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)));
 
 	sandbox.app
 		.bind(Identifiers.WalletRepository)
@@ -273,15 +259,12 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.inRequestScope()
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
-	sandbox.app
-		.bind(Identifiers.WalletFactory)
-		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
-		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
-
-	const walletRepoClone: WalletRepositoryClone = sandbox.app.getTagged(
-		Identifiers.WalletRepository,
-		"state",
-		"clone",
+	sandbox.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
+		({ container }) =>
+			() =>
+				container
+					.resolve(WalletRepositoryClone)
+					.configure(container.getTagged(Identifiers.WalletRepository, "state", "blockchain")),
 	);
 
 	const walletRepo: WalletRepository = sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
@@ -357,7 +340,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		stateStore,
 		transactionValidator,
 		walletRepo,
-		walletRepoClone,
 		walletRepoCopyOnWrite,
 	};
 };

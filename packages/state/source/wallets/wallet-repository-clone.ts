@@ -1,13 +1,11 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { injectable, postConstruct } from "@mainsail/container";
+import { Contracts, Exceptions } from "@mainsail/contracts";
 
 import { WalletRepository } from "./wallet-repository";
 
 @injectable()
 export class WalletRepositoryClone extends WalletRepository implements Contracts.State.WalletRepositoryClone {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly originalWalletRepository!: WalletRepository;
+	#originalWalletRepository!: WalletRepository;
 
 	readonly #forgetIndexes: Record<string, Set<string>> = {};
 	readonly #dirtyWallets = new Set<Contracts.State.Wallet>();
@@ -19,6 +17,11 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		for (const name of this.indexSet.all()) {
 			this.#forgetIndexes[name] = new Set();
 		}
+	}
+
+	public configure(originalWalletRepository: WalletRepository): WalletRepositoryClone {
+		this.#originalWalletRepository = originalWalletRepository;
+		return this;
 	}
 
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
@@ -62,7 +65,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	public hasByIndex(indexName: string, key: string): boolean {
 		return (
 			this.getIndex(indexName).has(key) ||
-			(this.originalWalletRepository.getIndex(indexName).has(key) && !this.#getForgetSet(indexName).has(key))
+			(this.#originalWalletRepository.getIndex(indexName).has(key) && !this.#getForgetSet(indexName).has(key))
 		);
 	}
 
@@ -72,7 +75,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	}
 
 	public forgetOnIndex(index: string, key: string): void {
-		if (this.getIndex(index).has(key) || this.originalWalletRepository.getIndex(index).has(key)) {
+		if (this.getIndex(index).has(key) || this.#originalWalletRepository.getIndex(index).has(key)) {
 			this.getIndex(index).forget(key);
 			this.#getForgetSet(index).add(key);
 		}
@@ -89,13 +92,13 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	public commitChanges(): void {
 		// Merge clones to originals
 		for (const wallet of this.#dirtyWallets.values()) {
-			wallet.commitChanges(this.originalWalletRepository);
+			wallet.commitChanges(this.#originalWalletRepository);
 		}
 
 		for (const indexName of this.indexSet.all()) {
 			// Update indexes
 			for (const [key, wallet] of this.getIndex(indexName).entries()) {
-				this.originalWalletRepository.setOnIndex(
+				this.#originalWalletRepository.setOnIndex(
 					indexName,
 					key,
 					wallet.isClone() ? wallet.getOriginal() : wallet,
@@ -104,7 +107,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 			// Remove from forget indexes
 			for (const key of this.#getForgetSet(indexName).values()) {
-				this.originalWalletRepository.forgetOnIndex(indexName, key);
+				this.#originalWalletRepository.forgetOnIndex(indexName, key);
 			}
 		}
 	}
@@ -115,7 +118,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			return localIndex.get(key)!;
 		}
 
-		const originalIndex = this.originalWalletRepository.getIndex(index);
+		const originalIndex = this.#originalWalletRepository.getIndex(index);
 		if (originalIndex.has(key) && !this.#getForgetSet(index).has(key)) {
 			const originalWallet = originalIndex.get(key)!;
 
@@ -139,7 +142,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	}
 
 	#cloneAllByIndex(indexName: string) {
-		for (const wallet of this.originalWalletRepository.getIndex(indexName).values()) {
+		for (const wallet of this.#originalWalletRepository.getIndex(indexName).values()) {
 			this.findByAddress(wallet.getAddress());
 		}
 	}

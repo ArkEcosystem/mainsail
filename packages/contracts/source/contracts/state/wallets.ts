@@ -138,6 +138,8 @@ export interface WalletRepositoryClone extends WalletRepository {
 	commitChanges(): void;
 }
 
+export type WalletRepositoryCloneFactory = () => WalletRepositoryClone;
+
 export enum SearchScope {
 	Wallets,
 	Validators,

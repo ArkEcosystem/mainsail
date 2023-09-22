@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -10,9 +10,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "clone")
-	private readonly walletRepository!: Contracts.State.WalletRepositoryClone;
+	@inject(Identifiers.WalletRepositoryCloneFactory)
+	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -40,6 +39,12 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	#proposer!: Contracts.State.IValidatorWallet;
 
 	#committedBlock: Contracts.Crypto.ICommittedBlock | undefined;
+	#walletRepository!: Contracts.State.WalletRepositoryClone;
+
+	@postConstruct()
+	public initialize(): void {
+		this.#walletRepository = this.walletRepositoryFactory();
+	}
 
 	get height(): number {
 		return this.#height;
@@ -83,7 +88,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
-		return this.walletRepository;
+		return this.#walletRepository;
 	}
 
 	public hasProposal(): boolean {
