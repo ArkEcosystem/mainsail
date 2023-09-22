@@ -14,7 +14,7 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {}
+	) { }
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
@@ -29,6 +29,12 @@ export class ApiContext {
 	public get transactionRepository(): ApiDatabaseContracts.ITransactionRepository {
 		return this.app.get<ApiDatabaseContracts.ITransactionRepositoryFactory>(
 			ApiDatabaseIdentifiers.TransactionRepositoryFactory,
+		)();
+	}
+
+	public get mempoolTransactionRepository(): ApiDatabaseContracts.IMempoolTransactionRepository {
+		return this.app.get<ApiDatabaseContracts.IMempoolTransactionRepositoryFactory>(
+			ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory,
 		)();
 	}
 

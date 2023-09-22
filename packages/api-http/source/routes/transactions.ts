@@ -11,6 +11,7 @@ export const register = (server: Hapi.Server): void => {
 	server.route({
 		handler: (request: Hapi.Request) => controller.index(request),
 		method: "GET",
+		path: "/transactions",
 		options: {
 			plugins: {
 				pagination: {
@@ -23,8 +24,71 @@ export const register = (server: Hapi.Server): void => {
 				}).concat(pagination),
 			},
 		},
-		path: "/transactions",
 	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
+		path: "/transactions/{id}",
+		options: {
+			validate: {
+				params: Joi.object({
+					// TODO: length depends on hash size...
+					id: Joi.string().hex(), /* .length(64), */
+				}),
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}),
+			},
+		},
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.unconfirmed(request),
+		method: "GET",
+		path: "/transactions/unconfirmed",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}).concat(pagination),
+			},
+		},
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.showUnconfirmed(request),
+		method: "GET",
+		path: "/transactions/unconfirmed/{id}",
+		options: {
+			validate: {
+				params: Joi.object({
+					// TODO: length depends on hash size...
+					id: Joi.string().hex(), /* .length(64), */
+				}),
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}),
+			},
+		},
+	});
+
+	// server.route({
+	// 	handler: (request: Hapi.Request) => controller.types(request),
+	// 	method: "GET",
+	// 	path: "/transactions/types",
+	// });
+
+	// server.route({
+	// 	handler: (request: Hapi.Request) => controller.schemas(request),
+	// 	method: "GET",
+	// 	path: "/transactions/schemas",
+	// });
 
 	// server.route({
 	// 	handler: (request: Hapi.Request) => controller.store(request),
@@ -54,64 +118,5 @@ export const register = (server: Hapi.Server): void => {
 	// 		},
 	// 	},
 	// 	path: "/transactions",
-	// });
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.show(request),
-	// 	method: "GET",
-	// 	options: {
-	// 		validate: {
-	// 			params: Joi.object({
-	// 				id: Joi.string().hex().length(64),
-	// 			}),
-	// 			query: Joi.object({
-	// 				transform: Joi.bool().default(true),
-	// 			}),
-	// 		},
-	// 	},
-	// 	path: "/transactions/{id}",
-	// });
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.unconfirmed(request),
-	// 	method: "GET",
-	// 	options: {
-	// 		plugins: {
-	// 			pagination: {
-	// 				enabled: true,
-	// 			},
-	// 		},
-	// 		validate: {
-	// 			query: Joi.object({
-	// 				transform: Joi.bool().default(true),
-	// 			}).concat(pagination),
-	// 		},
-	// 	},
-	// 	path: "/transactions/unconfirmed",
-	// });
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.showUnconfirmed(request),
-	// 	method: "GET",
-	// 	options: {
-	// 		validate: {
-	// 			params: Joi.object({
-	// 				id: Joi.string().hex().length(64),
-	// 			}),
-	// 		},
-	// 	},
-	// 	path: "/transactions/unconfirmed/{id}",
-	// });
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.types(request),
-	// 	method: "GET",
-	// 	path: "/transactions/types",
-	// });
-
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.schemas(request),
-	// 	method: "GET",
-	// 	path: "/transactions/schemas",
 	// });
 };

@@ -10,6 +10,9 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory)
+	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.IMempoolTransactionRepositoryFactory;
+
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = this.getQueryPagination(request.query);
 
@@ -33,73 +36,47 @@ export class TransactionsController extends Controller {
 		);
 	}
 
-	// public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const result = await this.processor.process(request.payload.transactions);
-	// 	return {
-	// 		data: {
-	// 			accept: result.accept,
-	// 			broadcast: result.broadcast,
-	// 			excess: result.excess,
-	// 			invalid: result.invalid,
-	// 		},
-	// 		errors: result.errors,
-	// 	};
-	// }
+	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const transaction = await this.transactionRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("id = :id", { id: request.params.id })
+			.getOne();
 
-	// public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	console.log("ID:", request.params.id);
+		return this.respondWithResource(transaction, TransactionResource, request.query.transform);
+	}
 
-	// 	const transaction = await this.database.getTransaction(request.params.id);
-	// 	if (!transaction) {
-	// 		return notFound("Transaction not found");
-	// 	}
+	public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const pagination = super.getListingPage(request);
 
-	// 	// TODO: Include block
-	// 	// if (request.query.transform) {
-	// 	// 	const block = await this.database.getBlock(transaction.data.blockId);
+		const [transactions, totalCount] = await this.mempoolTransactionlRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.orderBy("fee", "DESC")
+			.offset(pagination.offset)
+			.limit(pagination.limit)
+			.getManyAndCount();
 
-	// 	// 	return this.respondWithResource(
-	// 	// 		{ block: block.data, data: transaction.data },
-	// 	// 		TransactionWithBlockResource,
-	// 	// 		true,
-	// 	// 	);
-	// 	// } else {
-	// 	// 	return this.respondWithResource(transaction.data, TransactionResource, false);
-	// 	// }
+		return super.toPagination(
+			{
+				meta: { totalCountIsEstimate: false },
+				results: transactions,
+				totalCount,
+			},
+			TransactionResource,
+			request.query.transform
+		);
+	}
 
-	// 	return this.respondWithResource(transaction.data, TransactionResource, false);
-	// }
+	public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const transaction = await this.mempoolTransactionlRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("id = :id", { id: request.params.id })
+			.getOne();
 
-	// public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const pagination: Pagination = super.getListingPage(request);
-	// 	const all: Contracts.Crypto.ITransaction[] = await this.poolQuery.getFromHighestPriority().all();
-	// 	const transactions: Contracts.Crypto.ITransaction[] = all.slice(
-	// 		pagination.offset,
-	// 		pagination.offset + pagination.limit,
-	// 	);
-	// 	const results = transactions.map((t) => t.data);
-	// 	const resultsPage = {
-	// 		meta: { totalCountIsEstimate: false },
-	// 		results,
-	// 		totalCount: all.length,
-	// 	};
-
-	// 	return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
-	// }
-
-	// public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
-	// 		.getFromHighestPriority()
-	// 		.whereId(request.params.id);
-
-	// 	if ((await transactionQuery.has()) === false) {
-	// 		return notFound("Transaction not found");
-	// 	}
-
-	// 	const transaction: Contracts.Crypto.ITransaction = await transactionQuery.first();
-
-	// 	return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
-	// }
+		return super.respondWithResource(transaction, TransactionResource, request.query.transform);
+	}
 
 	// public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 	// 	const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
@@ -147,5 +124,18 @@ export class TransactionsController extends Controller {
 	// 	}
 
 	// 	return { data: schemasByType };
+	// }
+
+	// public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	// 	const result = await this.processor.process(request.payload.transactions);
+	// 	return {
+	// 		data: {
+	// 			accept: result.accept,
+	// 			broadcast: result.broadcast,
+	// 			excess: result.excess,
+	// 			invalid: result.invalid,
+	// 		},
+	// 		errors: result.errors,
+	// 	};
 	// }
 }

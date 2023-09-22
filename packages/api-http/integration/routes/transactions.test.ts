@@ -2,6 +2,9 @@ import { describe, Sandbox } from "../../../test-framework";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
+import transactions from "../../test/fixtures/transactions.json";
+import unconfirmedTransactions from "../../test/fixtures/unconfirmed_transactions.json";
+
 describe<{
 	sandbox: Sandbox;
 }>("Transactions", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
@@ -29,7 +32,37 @@ describe<{
 	});
 
 	it("/transactions", async () => {
+		await apiContext.transactionRepository.save(transactions);
+
 		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);
+		assert.equal(data.data, transactions);
+	});
+
+	it("/transactions/{id}", async () => {
+		await apiContext.transactionRepository.save(transactions);
+
+		const id = transactions[transactions.length - 1].id;
+		const { statusCode, data } = await request(`/transactions/${id}`, options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, transactions[transactions.length - 1]);
+	});
+
+	it("/transactions/unconfirmed", async () => {
+		await apiContext.mempoolTransactionRepository.save(unconfirmedTransactions);
+
+		const { statusCode, data } = await request(`/transactions/unconfirmed`, options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, unconfirmedTransactions);
+	});
+
+	it("/transactions/unconfirmed/{id}", async () => {
+		await apiContext.mempoolTransactionRepository.save(unconfirmedTransactions);
+
+		const id = unconfirmedTransactions[unconfirmedTransactions.length - 1].id;
+
+		const { statusCode, data } = await request(`/transactions/unconfirmed/${id}`, options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, unconfirmedTransactions[unconfirmedTransactions.length - 1]);
 	});
 });
