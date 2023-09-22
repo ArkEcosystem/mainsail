@@ -50,14 +50,14 @@ export class MempoolTransaction {
 		nullable: true,
 		type: "varchar",
 	})
-	public recipientId!: string | undefined;
+	public recipientId!: string | undefined | null;
 
 	@Column({
 		default: undefined,
 		nullable: true,
 		type: "bytea",
 	})
-	public vendorField: string | undefined;
+	public vendorField: string | undefined | null;
 
 	@Column({
 		nullable: false,
@@ -77,7 +77,7 @@ export class MempoolTransaction {
 		type: "jsonb",
 		// TODO: separate tables for 1:n assets
 	})
-	public asset!: Record<string, any> | undefined;
+	public asset!: Record<string, any> | undefined | null;
 
 	@Column({
 		nullable: false,

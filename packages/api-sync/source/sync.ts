@@ -78,7 +78,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 				transactions.map(({ data }) => ({
 					amount: data.amount.toFixed(),
 					asset: data.asset,
-					blockHeight: header.height,
+					blockHeight: header.height.toFixed(),
 					blockId: header.id,
 					fee: data.fee.toFixed(),
 					id: data.id,
@@ -87,7 +87,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 					senderPublicKey: data.senderPublicKey,
 					sequence: data.sequence,
 					signature: data.signature,
-					timestamp: header.timestamp,
+					timestamp: header.timestamp.toFixed(),
 					type: data.type,
 					typeGroup: data.typeGroup,
 					vendorField: data.vendorField,
