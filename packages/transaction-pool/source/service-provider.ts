@@ -17,6 +17,7 @@ import { SenderMempool } from "./sender-mempool";
 import { SenderState } from "./sender-state";
 import { Service } from "./service";
 import { Storage } from "./storage";
+import { TransactionValidator } from "./transaction-validator";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -52,6 +53,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerServices(): void {
+		this.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
+		this.app.bind(Identifiers.TransactionValidatorFactory).toAutoFactory(Identifiers.TransactionValidator);
+
 		this.app.bind(Identifiers.TransactionPoolCollator).to(Collator);
 		this.app.bind(Identifiers.TransactionPoolExpirationService).to(ExpirationService);
 		this.app.bind(Identifiers.TransactionPoolMempool).to(Mempool).inSingletonScope();
