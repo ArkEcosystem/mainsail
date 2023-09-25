@@ -23,8 +23,6 @@ export interface StateStore {
 
 	getLastBlocksByHeight(start: number, end?: number, headersOnly?: boolean): IBlockData[];
 
-	getCommonBlocks(ids: string[]): IBlockData[];
-
 	getLastCommittedRound(): number;
 
 	setLastCommittedRound(committedRound: number): void;

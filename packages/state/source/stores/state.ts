@@ -122,18 +122,6 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.#mapToBlockData(blocks, headersOnly).toArray() as Contracts.Crypto.IBlockData[];
 	}
 
-	public getCommonBlocks(ids: string[]): Contracts.Crypto.IBlockData[] {
-		const idsHash = {};
-
-		for (const id of ids) {
-			idsHash[id] = true;
-		}
-
-		return this.getLastBlocksData(true)
-			.filter((block) => idsHash[block.id])
-			.toArray() as Contracts.Crypto.IBlockData[];
-	}
-
 	public getLastCommittedRound(): number {
 		return this.#committedRound;
 	}
