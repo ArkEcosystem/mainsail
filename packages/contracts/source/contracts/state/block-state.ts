@@ -12,17 +12,8 @@ export interface VoteBalanceMutator {
 		recipient: Wallet,
 		transaction: ITransactionData,
 	): Promise<void>;
-
-	revert(
-		walletRepository: WalletRepository,
-		sender: Wallet,
-		recipient: Wallet,
-		transaction: ITransactionData,
-	): Promise<void>;
 }
 
 export interface ValidatorMutator {
 	apply(walletRepository: WalletRepository, wallet: Wallet, block: IBlockData): Promise<void>;
-
-	revert(walletRepository: WalletRepository, wallet: Wallet, block: IBlockData): Promise<void>;
 }
