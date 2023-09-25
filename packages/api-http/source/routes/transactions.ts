@@ -83,17 +83,17 @@ export const register = (server: Hapi.Server): void => {
 		},
 	});
 
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.types(request),
-	// 	method: "GET",
-	// 	path: "/transactions/types",
-	// });
+	server.route({
+		handler: (request: Hapi.Request) => controller.types(request),
+		method: "GET",
+		path: "/transactions/types",
+	});
 
-	// server.route({
-	// 	handler: (request: Hapi.Request) => controller.schemas(request),
-	// 	method: "GET",
-	// 	path: "/transactions/schemas",
-	// });
+	server.route({
+		handler: (request: Hapi.Request) => controller.schemas(request),
+		method: "GET",
+		path: "/transactions/schemas",
+	});
 
 	// server.route({
 	// 	handler: (request: Hapi.Request) => controller.store(request),

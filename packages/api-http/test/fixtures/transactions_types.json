@@ -1,0 +1,614 @@
+[
+    {
+        "type": 0,
+        "typeGroup": 1,
+        "version": 1,
+        "key": "transfer",
+        "schema": {
+            "id": {
+                "anyOf": [
+                    {
+                        "$ref": "transactionId"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            },
+            "fee": {
+                "bignumber": {
+                    "minimum": 1,
+                    "bypassGenesis": true
+                }
+            },
+            "type": {
+                "transactionType": 0
+            },
+            "nonce": {
+                "bignumber": {
+                    "minimum": 0
+                }
+            },
+            "amount": {
+                "bignumber": {
+                    "minimum": 1,
+                    "bypassGenesis": true
+                }
+            },
+            "network": {
+                "$ref": "networkByte"
+            },
+            "version": {
+                "enum": [
+                    1
+                ]
+            },
+            "signature": {
+                "$ref": "alphanumeric"
+            },
+            "typeGroup": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "expiration": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "signatures": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "allOf": [
+                        {
+                            "maxLength": 130,
+                            "minLength": 130
+                        },
+                        {
+                            "$ref": "alphanumeric"
+                        }
+                    ]
+                },
+                "maxItems": 16,
+                "minItems": 1,
+                "uniqueItems": true
+            },
+            "recipientId": {
+                "$ref": "address"
+            },
+            "vendorField": {
+                "anyOf": [
+                    {
+                        "type": "null"
+                    },
+                    {
+                        "type": "string",
+                        "format": "vendorField"
+                    }
+                ]
+            },
+            "senderPublicKey": {
+                "$ref": "publicKey"
+            }
+        }
+    },
+    {
+        "type": 2,
+        "typeGroup": 1,
+        "version": 1,
+        "key": "validatorRegistration",
+        "schema": {
+            "id": {
+                "anyOf": [
+                    {
+                        "$ref": "transactionId"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            },
+            "fee": {
+                "bignumber": {
+                    "minimum": 1,
+                    "bypassGenesis": true
+                }
+            },
+            "type": {
+                "transactionType": 2
+            },
+            "asset": {
+                "type": "object",
+                "required": [
+                    "validator"
+                ],
+                "properties": {
+                    "validator": {
+                        "type": "object",
+                        "required": [
+                            "username",
+                            "publicKey"
+                        ],
+                        "properties": {
+                            "username": {
+                                "$ref": "validatorUsername"
+                            },
+                            "publicKey": {
+                                "$ref": "consensusPublicKey"
+                            }
+                        },
+                        "unevaluatedProperties": false
+                    }
+                },
+                "unevaluatedProperties": false
+            },
+            "nonce": {
+                "bignumber": {
+                    "minimum": 0
+                }
+            },
+            "amount": {
+                "bignumber": {
+                    "maximum": 0,
+                    "minimum": 0,
+                    "bypassGenesis": true
+                }
+            },
+            "network": {
+                "$ref": "networkByte"
+            },
+            "version": {
+                "enum": [
+                    1
+                ]
+            },
+            "signature": {
+                "$ref": "alphanumeric"
+            },
+            "typeGroup": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "signatures": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "allOf": [
+                        {
+                            "maxLength": 130,
+                            "minLength": 130
+                        },
+                        {
+                            "$ref": "alphanumeric"
+                        }
+                    ]
+                },
+                "maxItems": 16,
+                "minItems": 1,
+                "uniqueItems": true
+            },
+            "senderPublicKey": {
+                "$ref": "publicKey"
+            }
+        }
+    },
+    {
+        "type": 3,
+        "typeGroup": 1,
+        "version": 1,
+        "key": "vote",
+        "schema": {
+            "id": {
+                "anyOf": [
+                    {
+                        "$ref": "transactionId"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            },
+            "fee": {
+                "bignumber": {
+                    "minimum": 1,
+                    "bypassGenesis": true
+                }
+            },
+            "type": {
+                "transactionType": 3
+            },
+            "asset": {
+                "type": "object",
+                "required": [
+                    "unvotes",
+                    "votes"
+                ],
+                "properties": {
+                    "votes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "publicKey"
+                        },
+                        "maxItems": 1,
+                        "minItems": 0
+                    },
+                    "unvotes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "publicKey"
+                        },
+                        "maxItems": 1,
+                        "minItems": 0
+                    }
+                },
+                "minVotesUnvotesLength": 1,
+                "unevaluatedProperties": false
+            },
+            "nonce": {
+                "bignumber": {
+                    "minimum": 0
+                }
+            },
+            "amount": {
+                "bignumber": {
+                    "maximum": 0,
+                    "minimum": 0,
+                    "bypassGenesis": true
+                }
+            },
+            "network": {
+                "$ref": "networkByte"
+            },
+            "version": {
+                "enum": [
+                    1
+                ]
+            },
+            "signature": {
+                "$ref": "alphanumeric"
+            },
+            "typeGroup": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "signatures": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "allOf": [
+                        {
+                            "maxLength": 130,
+                            "minLength": 130
+                        },
+                        {
+                            "$ref": "alphanumeric"
+                        }
+                    ]
+                },
+                "maxItems": 16,
+                "minItems": 1,
+                "uniqueItems": true
+            },
+            "recipientId": {
+                "$ref": "address"
+            },
+            "senderPublicKey": {
+                "$ref": "publicKey"
+            }
+        }
+    },
+    {
+        "type": 4,
+        "typeGroup": 1,
+        "version": 1,
+        "key": "multiSignature",
+        "schema": {
+            "id": {
+                "anyOf": [
+                    {
+                        "$ref": "transactionId"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            },
+            "fee": {
+                "bignumber": {
+                    "minimum": 1,
+                    "bypassGenesis": true
+                }
+            },
+            "type": {
+                "transactionType": 4
+            },
+            "asset": {
+                "type": "object",
+                "required": [
+                    "multiSignature"
+                ],
+                "properties": {
+                    "multiSignature": {
+                        "type": "object",
+                        "required": [
+                            "min",
+                            "publicKeys"
+                        ],
+                        "properties": {
+                            "min": {
+                                "type": "integer",
+                                "maximum": {
+                                    "$data": "1/publicKeys/length"
+                                },
+                                "minimum": 1
+                            },
+                            "publicKeys": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "publicKey"
+                                },
+                                "maxItems": 16,
+                                "minItems": 1,
+                                "uniqueItems": true
+                            }
+                        },
+                        "unevaluatedProperties": false
+                    }
+                },
+                "unevaluatedProperties": false
+            },
+            "nonce": {
+                "bignumber": {
+                    "minimum": 0
+                }
+            },
+            "amount": {
+                "bignumber": {
+                    "maximum": 0,
+                    "minimum": 0,
+                    "bypassGenesis": true
+                }
+            },
+            "network": {
+                "$ref": "networkByte"
+            },
+            "version": {
+                "enum": [
+                    1
+                ]
+            },
+            "signature": {
+                "$ref": "alphanumeric"
+            },
+            "typeGroup": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "signatures": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "allOf": [
+                        {
+                            "maxLength": 130,
+                            "minLength": 130
+                        },
+                        {
+                            "$ref": "alphanumeric"
+                        },
+                        {
+                            "maxLength": 130,
+                            "minLength": 130
+                        },
+                        {
+                            "$ref": "alphanumeric"
+                        }
+                    ]
+                },
+                "maxItems": {
+                    "$data": "1/asset/multiSignature/publicKeys/length"
+                },
+                "minItems": {
+                    "$data": "1/asset/multiSignature/min"
+                },
+                "uniqueItems": true
+            },
+            "senderPublicKey": {
+                "$ref": "publicKey"
+            }
+        }
+    },
+    {
+        "type": 6,
+        "typeGroup": 1,
+        "version": 1,
+        "key": "multiPayment",
+        "schema": {
+            "id": {
+                "anyOf": [
+                    {
+                        "$ref": "transactionId"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            },
+            "fee": {
+                "bignumber": {
+                    "minimum": 1,
+                    "bypassGenesis": true
+                }
+            },
+            "type": {
+                "transactionType": 6
+            },
+            "asset": {
+                "type": "object",
+                "required": [
+                    "payments"
+                ],
+                "properties": {
+                    "payments": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "amount",
+                                "recipientId"
+                            ],
+                            "properties": {
+                                "amount": {
+                                    "bignumber": {
+                                        "minimum": 1
+                                    }
+                                },
+                                "recipientId": {
+                                    "$ref": "address"
+                                }
+                            },
+                            "unevaluatedProperties": false
+                        },
+                        "minItems": 2,
+                        "uniqueItems": false,
+                        "maxMultiPaymentLimit": {}
+                    }
+                },
+                "unevaluatedProperties": false
+            },
+            "nonce": {
+                "bignumber": {
+                    "minimum": 0
+                }
+            },
+            "amount": {
+                "bignumber": {
+                    "maximum": 0,
+                    "minimum": 0,
+                    "bypassGenesis": true
+                }
+            },
+            "network": {
+                "$ref": "networkByte"
+            },
+            "version": {
+                "enum": [
+                    1
+                ]
+            },
+            "signature": {
+                "$ref": "alphanumeric"
+            },
+            "typeGroup": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "signatures": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "allOf": [
+                        {
+                            "maxLength": 130,
+                            "minLength": 130
+                        },
+                        {
+                            "$ref": "alphanumeric"
+                        }
+                    ]
+                },
+                "maxItems": 16,
+                "minItems": 1,
+                "uniqueItems": true
+            },
+            "vendorField": {
+                "anyOf": [
+                    {
+                        "type": "null"
+                    },
+                    {
+                        "type": "string",
+                        "format": "vendorField"
+                    }
+                ]
+            },
+            "senderPublicKey": {
+                "$ref": "publicKey"
+            }
+        }
+    },
+    {
+        "type": 7,
+        "typeGroup": 1,
+        "version": 1,
+        "key": "validatorResignation",
+        "schema": {
+            "id": {
+                "anyOf": [
+                    {
+                        "$ref": "transactionId"
+                    },
+                    {
+                        "type": "null"
+                    }
+                ]
+            },
+            "fee": {
+                "bignumber": {
+                    "minimum": 1,
+                    "bypassGenesis": true
+                }
+            },
+            "type": {
+                "transactionType": 7
+            },
+            "nonce": {
+                "bignumber": {
+                    "minimum": 0
+                }
+            },
+            "amount": {
+                "bignumber": {
+                    "maximum": 0,
+                    "minimum": 0,
+                    "bypassGenesis": true
+                }
+            },
+            "network": {
+                "$ref": "networkByte"
+            },
+            "version": {
+                "enum": [
+                    1
+                ]
+            },
+            "signature": {
+                "$ref": "alphanumeric"
+            },
+            "typeGroup": {
+                "type": "integer",
+                "minimum": 0
+            },
+            "signatures": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "allOf": [
+                        {
+                            "maxLength": 130,
+                            "minLength": 130
+                        },
+                        {
+                            "$ref": "alphanumeric"
+                        }
+                    ]
+                },
+                "maxItems": 16,
+                "minItems": 1,
+                "uniqueItems": true
+            },
+            "senderPublicKey": {
+                "$ref": "publicKey"
+            }
+        }
+    }
+]

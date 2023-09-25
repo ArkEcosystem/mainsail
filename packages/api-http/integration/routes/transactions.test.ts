@@ -4,6 +4,8 @@ import { request } from "../../test/helpers/request";
 
 import transactions from "../../test/fixtures/transactions.json";
 import unconfirmedTransactions from "../../test/fixtures/unconfirmed_transactions.json";
+import transactionTypes from "../../test/fixtures/transactions_types.json";
+import transactionSchemas from "../../test/fixtures/transactions_schemas.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -79,5 +81,30 @@ describe<{
 		const { statusCode, data } = await request(`/transactions/unconfirmed/${id}`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, unconfirmedTransactions[unconfirmedTransactions.length - 1]);
+	});
+
+	it("/transactions/types", async () => {
+		await apiContext.transactionTypeRepository.save(transactionTypes);
+
+		const { statusCode, data } = await request(`/transactions/types`, options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, {
+			"1": {
+				"Transfer": 0,
+				"ValidatorRegistration": 2,
+				"Vote": 3,
+				"MultiSignature": 4,
+				"MultiPayment": 6,
+				"ValidatorResignation": 7
+			}
+		});
+	});
+
+	it("/transactions/schemas", async () => {
+		await apiContext.transactionTypeRepository.save(transactionTypes);
+
+		const { statusCode, data } = await request(`/transactions/schemas`, options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, transactionSchemas);
 	});
 });

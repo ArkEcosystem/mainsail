@@ -10,6 +10,9 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
+	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.ITransactionTypeRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory)
 	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.IMempoolTransactionRepositoryFactory;
 
@@ -76,53 +79,45 @@ export class TransactionsController extends Controller {
 		return super.respondWithResource(transaction, TransactionResource, request.query.transform);
 	}
 
-	// public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
-	// 	const typeGroups: Record<string | number, Record<string, number>> = {};
+	public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const rows = await this.transactionTypeRepositoryFactory().createQueryBuilder().
+			select().
+			addOrderBy("type", "ASC").
+			addOrderBy("type_group", "ASC").
+			getMany();
 
-	// 	for (const handler of activatedTransactionHandlers) {
-	// 		const constructor = handler.getConstructor();
+		const typeGroups: Record<string | number, Record<string, number>> = {};
 
-	// 		const type: number | undefined = constructor.type;
-	// 		const typeGroup: number | undefined = constructor.typeGroup;
-	// 		const key: string | undefined = constructor.key;
+		for (const { type, typeGroup, key } of rows) {
+			if (typeGroups[typeGroup] === undefined) {
+				typeGroups[typeGroup] = {};
+			}
 
-	// 		AppUtils.assert.defined<number>(type);
-	// 		AppUtils.assert.defined<number>(typeGroup);
-	// 		AppUtils.assert.defined<string>(key);
+			typeGroups[typeGroup][key[0].toUpperCase() + key.slice(1)] = type;
+		}
 
-	// 		if (typeGroups[typeGroup] === undefined) {
-	// 			typeGroups[typeGroup] = {};
-	// 		}
+		return { data: typeGroups };
+	}
 
-	// 		typeGroups[typeGroup][key[0].toUpperCase() + key.slice(1)] = type;
-	// 	}
+	public async schemas(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const rows = await this.transactionTypeRepositoryFactory().createQueryBuilder().
+			select().
+			addOrderBy("type", "ASC").
+			addOrderBy("type_group", "ASC").
+			getMany();
 
-	// 	return { data: typeGroups };
-	// }
+		const schemasByType: Record<string, Record<string, any>> = {};
 
-	// public async schemas(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
-	// 	const schemasByType: Record<string, Record<string, any>> = {};
+		for (const { type, typeGroup, schema } of rows) {
+			if (schemasByType[typeGroup] === undefined) {
+				schemasByType[typeGroup] = {};
+			}
 
-	// 	for (const handler of activatedTransactionHandlers) {
-	// 		const constructor = handler.getConstructor();
+			schemasByType[typeGroup][type] = schema;
+		}
 
-	// 		const type: number | undefined = constructor.type;
-	// 		const typeGroup: number | undefined = constructor.typeGroup;
-
-	// 		AppUtils.assert.defined<number>(type);
-	// 		AppUtils.assert.defined<number>(typeGroup);
-
-	// 		if (schemasByType[typeGroup] === undefined) {
-	// 			schemasByType[typeGroup] = {};
-	// 		}
-
-	// 		schemasByType[typeGroup][type] = constructor.getSchema().properties;
-	// 	}
-
-	// 	return { data: schemasByType };
-	// }
+		return { data: schemasByType };
+	}
 
 	// public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 	// 	const result = await this.processor.process(request.payload.transactions);

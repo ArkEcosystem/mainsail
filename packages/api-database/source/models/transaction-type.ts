@@ -23,8 +23,14 @@ export class TransactionType {
     public version!: number;
 
     @Column({
+        type: "varchar",
         nullable: false,
+    })
+    public key!: string;
+
+    @Column({
         type: "jsonb",
+        nullable: false,
     })
     public schema!: Record<string, any>;
 }

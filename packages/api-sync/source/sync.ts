@@ -150,12 +150,14 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const type: number | undefined = constructor.type;
 			const typeGroup: number | undefined = constructor.typeGroup;
 			const version: number | undefined = constructor.version;
+			const key: string | undefined = constructor.key;
 
 			Utils.assert.defined<number>(type);
 			Utils.assert.defined<number>(typeGroup);
 			Utils.assert.defined<number>(version);
+			Utils.assert.defined<string>(key);
 
-			types.push({ type, typeGroup, version, schema: constructor.getSchema().properties });
+			types.push({ type, typeGroup, version, key, schema: constructor.getSchema().properties });
 		}
 
 		types.sort((a, b) => {
