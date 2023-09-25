@@ -28,7 +28,10 @@ export class StateStore implements Contracts.State.StateStore {
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
-	public constructor() {}
+	public constructor() {
+		this.setAttribute("height", 0);
+		this.setAttribute("committedRound", 0);
+	}
 
 	public isBootstrap(): boolean {
 		return this.#isBootstrap;
