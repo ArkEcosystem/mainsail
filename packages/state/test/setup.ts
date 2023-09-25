@@ -145,12 +145,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
-	sandbox.app
-		.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration)
-		.set("storage.maxLastBlocks", defaults.storage.maxLastBlocks);
-	sandbox.app
-		.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration)
-		.set("storage.maxLastTransactionIds", defaults.storage.maxLastTransactionIds);
 	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();

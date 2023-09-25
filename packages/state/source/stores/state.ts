@@ -1,6 +1,6 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils } from "@mainsail/kernel";
+import { Enums, Utils } from "@mainsail/kernel";
 
 // @TODO extract block and transaction behaviours into their respective stores
 // @TODO review the implementation
@@ -8,10 +8,6 @@ import { Enums, Providers, Utils } from "@mainsail/kernel";
 export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "state")
-	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -43,10 +39,6 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setGenesisBlock(block: Contracts.Crypto.ICommittedBlock): void {
 		this.#genesisBlock = block;
-	}
-
-	public getMaxLastBlocks(): number {
-		return this.pluginConfiguration.getRequired<number>("storage.maxLastBlocks");
 	}
 
 	public getLastHeight(): number {

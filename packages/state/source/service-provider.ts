@@ -1,7 +1,6 @@
 import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import Joi from "joi";
 
 import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
@@ -67,17 +66,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async bootWhen(serviceProvider?: string): Promise<boolean> {
 		return serviceProvider === "@mainsail/database";
-	}
-
-	public configSchema(): object {
-		return Joi.object({
-			storage: Joi.object({
-				maxLastBlocks: Joi.number().integer().min(1).required(),
-				maxLastTransactionIds: Joi.number().integer().min(1).required(),
-			}).required(),
-			walletSync: Joi.object({
-				enabled: Joi.boolean().required(),
-			}).required(),
-		}).unknown(true);
 	}
 }

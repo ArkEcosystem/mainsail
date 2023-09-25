@@ -9,8 +9,6 @@ export interface StateStore {
 
 	setGenesisBlock(block: ICommittedBlock): void;
 
-	getMaxLastBlocks(): number;
-
 	getLastHeight(): number;
 
 	getLastBlock(): IBlock;
