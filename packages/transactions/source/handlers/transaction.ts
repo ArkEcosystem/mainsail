@@ -99,14 +99,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 		await this.applyToRecipient(walletRepository, transaction);
 	}
 
-	public async revert(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		await this.revertForSender(walletRepository, transaction);
-		await this.revertForRecipient(walletRepository, transaction);
-	}
-
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
@@ -134,23 +126,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 		sender.setBalance(newBalance);
 	}
 
-	public async revertForSender(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
-		const data: Contracts.Crypto.ITransactionData = transaction.data;
-
-		sender.increaseBalance(data.amount.plus(data.fee));
-
-		this.#verifyTransactionNonceRevert(sender, transaction);
-
-		sender.decreaseNonce();
-	}
-
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
 
 	public async throwIfCannotEnterPool(
@@ -171,14 +146,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
 			throw new Exceptions.UnexpectedNonceError(nonce, wallet, false);
-		}
-	}
-
-	#verifyTransactionNonceRevert(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
-		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
-
-		if (!wallet.getNonce().isEqualTo(nonce)) {
-			throw new Exceptions.UnexpectedNonceError(nonce, wallet, true);
 		}
 	}
 
@@ -205,11 +172,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 	): Promise<void>;
 
 	public abstract applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void>;
-
-	public abstract revertForRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void>;
