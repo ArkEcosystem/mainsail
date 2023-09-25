@@ -3,8 +3,8 @@ import { type DataSource, EntityManager } from "typeorm";
 import { MempoolTransaction, State } from "./models";
 import { Block } from "./models/block";
 import { Peer } from "./models/peer";
-import { TransactionType } from "./models/transaction-type";
 import { Transaction } from "./models/transaction";
+import { TransactionType } from "./models/transaction-type";
 import { ValidatorRound } from "./models/validator-round";
 import { Wallet } from "./models/wallet";
 import { ExtendedRepository } from "./repositories/repository-extension";
@@ -45,7 +45,7 @@ export type ITransactionRepositoryExtension = {
 		sorting: Sorting,
 		pagination: Pagination,
 		options?: Options,
-	): Promise<ResultsPage<Transaction>>
+	): Promise<ResultsPage<Transaction>>;
 };
 export type ITransactionRepository = ExtendedRepository<Transaction> & ITransactionRepositoryExtension;
 

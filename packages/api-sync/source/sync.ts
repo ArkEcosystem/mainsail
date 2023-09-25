@@ -1,4 +1,8 @@
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers, Models } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
@@ -157,15 +161,13 @@ export class Sync implements Contracts.ApiSync.ISync {
 			Utils.assert.defined<number>(version);
 			Utils.assert.defined<string>(key);
 
-			types.push({ type, typeGroup, version, key, schema: constructor.getSchema().properties });
+			types.push({ key, schema: constructor.getSchema().properties, type, typeGroup, version });
 		}
 
 		types.sort((a, b) => {
-
 			if (a.type !== b.type) {
 				return a.type - b.type;
 			}
-
 
 			if (a.typeGroup !== b.typeGroup) {
 				return a.typeGroup - b.typeGroup;

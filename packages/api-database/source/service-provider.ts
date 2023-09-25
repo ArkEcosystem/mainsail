@@ -42,7 +42,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const dataSource = new DataSource({
 				...options,
 				// TODO: allow entities to be extended by plugins
-				entities: [Block, Peer, MempoolTransaction, State, TransactionType, Transaction, ValidatorRound, Wallet],
+				entities: [
+					Block,
+					Peer,
+					MempoolTransaction,
+					State,
+					TransactionType,
+					Transaction,
+					ValidatorRound,
+					Wallet,
+				],
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 

@@ -38,15 +38,21 @@ describe<{
 
 		const { statusCode, data } = await request("/transactions", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, [...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)));
+		assert.equal(
+			data.data,
+			[...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+		);
 	});
 
 	it("/transactions?type", async () => {
 		await apiContext.transactionRepository.save(transactions);
 
 		const testCases = [
-			{ path: "/transactions?type=0", result: [...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)) },
-			{ path: "/transactions?type=1", result: [] }
+			{
+				path: "/transactions?type=0",
+				result: [...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			},
+			{ path: "/transactions?type=1", result: [] },
 		];
 
 		for (const { path, result } of testCases) {
@@ -90,13 +96,13 @@ describe<{
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, {
 			"1": {
-				"Transfer": 0,
-				"ValidatorRegistration": 2,
-				"Vote": 3,
-				"MultiSignature": 4,
-				"MultiPayment": 6,
-				"ValidatorResignation": 7
-			}
+				Transfer: 0,
+				ValidatorRegistration: 2,
+				Vote: 3,
+				MultiSignature: 4,
+				MultiPayment: 6,
+				ValidatorResignation: 7,
+			},
 		});
 	});
 

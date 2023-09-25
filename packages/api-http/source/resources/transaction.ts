@@ -1,5 +1,5 @@
-import { injectable } from "@mainsail/container";
 import { Models } from "@mainsail/api-database";
+import { injectable } from "@mainsail/container";
 
 import { Resource } from "../types";
 
@@ -24,10 +24,10 @@ export class TransactionResource implements Resource {
 			id: resource.id,
 			nonce: resource.nonce,
 
-			senderPublicKey: resource.senderPublicKey,
-			signature: resource.signature,
-
 			recipient,
+			senderPublicKey: resource.senderPublicKey,
+
+			signature: resource.signature,
 			// TODO
 			// sender,
 			// timestamp: AppUtils.formatTimestamp(blockData.timestamp),

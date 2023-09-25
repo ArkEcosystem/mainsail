@@ -1,9 +1,7 @@
-import Joi from "joi";
 import { Search } from "@mainsail/api-database";
+import Joi from "joi";
 
-const isSchema = (value: Joi.Schema | SchemaObject): value is Joi.Schema => {
-	return Joi.isSchema(value);
-};
+const isSchema = (value: Joi.Schema | SchemaObject): value is Joi.Schema => Joi.isSchema(value);
 
 // Criteria
 
@@ -23,24 +21,20 @@ export const createCriteriaSchema = (schemaObject: SchemaObject): Joi.ObjectSche
 	return Joi.object(schema);
 };
 
-export const createRangeCriteriaSchema = (item: Joi.Schema): Joi.Schema => {
-	return Joi.alternatives(item, Joi.object({ from: item, to: item }).or("from", "to"));
-};
+export const createRangeCriteriaSchema = (item: Joi.Schema): Joi.Schema =>
+	Joi.alternatives(item, Joi.object({ from: item, to: item }).or("from", "to"));
 
 // Sorting
 
 export const createSortingSchema = (
 	schemaObject: SchemaObject,
 	wildcardPaths: string[] = [],
-	transform: boolean = true,
+	transform = true,
 ): Joi.ObjectSchema => {
-	const getObjectPaths = (object: SchemaObject): string[] => {
-		return Object.entries(object)
-			.map(([key, value]) => {
-				return isSchema(value) ? key : getObjectPaths(value).map((p) => `${key}.${p}`);
-			})
-			.flat();
-	};
+	const getObjectPaths = (object: SchemaObject): string[] =>
+		Object.entries(object).flatMap(([key, value]) =>
+			isSchema(value) ? key : getObjectPaths(value).map((p) => `${key}.${p}`),
+		);
 
 	const exactPaths = getObjectPaths(schemaObject);
 
@@ -72,7 +66,7 @@ export const createSortingSchema = (
 				}
 
 				if (transform) {
-					sorting.push({ property, direction: direction as "asc" | "desc" });
+					sorting.push({ direction: direction, property });
 				}
 			}
 		}
@@ -112,12 +106,12 @@ export const orderBy = Joi.alternatives().try(
 export const address = Joi.string().alphanum().length(34);
 
 export const delegateIdentifier = Joi.string()
-	.regex(/^[a-zA-Z0-9!@$&_.]+$/)
+	.regex(/^[\w!$&.@]+$/)
 	.min(1)
 	.max(66);
 
 export const username = Joi.string()
-	.regex(/^[a-z0-9!@$&_.]+$/)
+	.regex(/^[\d!$&.@_a-z]+$/)
 	.min(1)
 	.max(20);
 
@@ -141,7 +135,7 @@ export const numberFixedOrBetween = Joi.alternatives().try(
 
 export const walletId = Joi.alternatives().try(
 	Joi.string()
-		.regex(/^[a-z0-9!@$&_.]+$/)
+		.regex(/^[\d!$&.@_a-z]+$/)
 		.min(1)
 		.max(20),
 	Joi.string().alphanum().length(34),
@@ -168,36 +162,36 @@ const orLikeCriteria = (value: any) => orCriteria(likeCriteria(value));
 const orContainsCriteria = (value: any) => orCriteria(containsCriteria(value));
 
 export const blockCriteriaSchemas = {
-	id: orEqualCriteria(blockId),
-	version: orEqualCriteria(Joi.number().integer().min(0)),
-	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
-	previousBlock: orEqualCriteria(blockId),
 	height: orNumericCriteria(Joi.number().integer().min(0)),
-	numberOfTransactions: orNumericCriteria(Joi.number().integer().min(0)),
-	totalAmount: orNumericCriteria(Joi.number().integer().min(0)),
-	totalFee: orNumericCriteria(Joi.number().integer().min(0)),
-	reward: orNumericCriteria(Joi.number().integer().min(0)),
-	payloadLength: orNumericCriteria(Joi.number().integer().min(0)),
-	payloadHash: orEqualCriteria(Joi.string().hex()),
-	generatorPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
+	id: orEqualCriteria(blockId),
 	blockSignature: orEqualCriteria(Joi.string().hex()),
+	numberOfTransactions: orNumericCriteria(Joi.number().integer().min(0)),
+	generatorPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
+	payloadHash: orEqualCriteria(Joi.string().hex()),
+	payloadLength: orNumericCriteria(Joi.number().integer().min(0)),
+	previousBlock: orEqualCriteria(blockId),
+	reward: orNumericCriteria(Joi.number().integer().min(0)),
+	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
+	totalAmount: orNumericCriteria(Joi.number().integer().min(0)),
+	version: orEqualCriteria(Joi.number().integer().min(0)),
+	totalFee: orNumericCriteria(Joi.number().integer().min(0)),
 };
 
 export const transactionCriteriaSchemas = {
 	address: orEqualCriteria(address),
-	senderId: orEqualCriteria(address),
-	recipientId: orEqualCriteria(address),
-	id: orEqualCriteria(Joi.string().hex().length(64)),
-	version: orEqualCriteria(Joi.number().integer().positive()),
 	blockId: orEqualCriteria(blockId),
+	id: orEqualCriteria(Joi.string().hex().length(64)),
+	amount: orNumericCriteria(Joi.number().integer().min(0)),
+	nonce: orNumericCriteria(Joi.number().integer().positive()),
+	asset: orContainsCriteria(Joi.object()),
+	recipientId: orEqualCriteria(address),
+	fee: orNumericCriteria(Joi.number().integer().min(0)),
+	senderId: orEqualCriteria(address),
+	senderPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
 	sequence: orNumericCriteria(Joi.number().integer().positive()),
 	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
-	nonce: orNumericCriteria(Joi.number().integer().positive()),
-	senderPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
 	type: orEqualCriteria(Joi.number().integer().min(0)),
 	typeGroup: orEqualCriteria(Joi.number().integer().min(0)),
+	version: orEqualCriteria(Joi.number().integer().positive()),
 	vendorField: orLikeCriteria(Joi.string().max(255, "utf8")),
-	amount: orNumericCriteria(Joi.number().integer().min(0)),
-	fee: orNumericCriteria(Joi.number().integer().min(0)),
-	asset: orContainsCriteria(Joi.object()),
 };

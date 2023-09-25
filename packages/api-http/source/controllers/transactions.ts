@@ -1,5 +1,9 @@
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers, Search } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Search,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { TransactionResource } from "../resources";
@@ -22,19 +26,14 @@ export class TransactionsController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
-		const transactions = await this.transactionRepositoryFactory().
-			findManyByCritera(
-				criteria,
-				sorting,
-				pagination,
-				options,
-			);
-
-		return this.toPagination(
-			transactions,
-			TransactionResource,
-			request.query.transform,
+		const transactions = await this.transactionRepositoryFactory().findManyByCritera(
+			criteria,
+			sorting,
+			pagination,
+			options,
 		);
+
+		return this.toPagination(transactions, TransactionResource, request.query.transform);
 	}
 
 	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
@@ -65,7 +64,7 @@ export class TransactionsController extends Controller {
 				totalCount,
 			},
 			TransactionResource,
-			request.query.transform
+			request.query.transform,
 		);
 	}
 
@@ -80,11 +79,12 @@ export class TransactionsController extends Controller {
 	}
 
 	public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const rows = await this.transactionTypeRepositoryFactory().createQueryBuilder().
-			select().
-			addOrderBy("type", "ASC").
-			addOrderBy("type_group", "ASC").
-			getMany();
+		const rows = await this.transactionTypeRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.addOrderBy("type", "ASC")
+			.addOrderBy("type_group", "ASC")
+			.getMany();
 
 		const typeGroups: Record<string | number, Record<string, number>> = {};
 
@@ -100,11 +100,12 @@ export class TransactionsController extends Controller {
 	}
 
 	public async schemas(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const rows = await this.transactionTypeRepositoryFactory().createQueryBuilder().
-			select().
-			addOrderBy("type", "ASC").
-			addOrderBy("type_group", "ASC").
-			getMany();
+		const rows = await this.transactionTypeRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.addOrderBy("type", "ASC")
+			.addOrderBy("type_group", "ASC")
+			.getMany();
 
 		const schemasByType: Record<string, Record<string, any>> = {};
 

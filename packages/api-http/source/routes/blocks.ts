@@ -11,7 +11,6 @@ export const register = (server: Hapi.Server): void => {
 	server.route({
 		handler: (request: Hapi.Request) => controller.index(request),
 		method: "GET",
-		path: "/blocks",
 		options: {
 			plugins: {
 				pagination: {
@@ -29,12 +28,12 @@ export const register = (server: Hapi.Server): void => {
 				}).concat(pagination),
 			},
 		},
+		path: "/blocks",
 	});
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.first(request),
 		method: "GET",
-		path: "/blocks/first",
 		options: {
 			validate: {
 				query: Joi.object({
@@ -42,12 +41,12 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/blocks/first",
 	});
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.last(request),
 		method: "GET",
-		path: "/blocks/last",
 		options: {
 			validate: {
 				query: Joi.object({
@@ -55,12 +54,12 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/blocks/last",
 	});
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.show(request),
 		method: "GET",
-		path: "/blocks/{id}",
 		options: {
 			validate: {
 				params: Joi.object({
@@ -71,12 +70,12 @@ export const register = (server: Hapi.Server): void => {
 				}),
 			},
 		},
+		path: "/blocks/{id}",
 	});
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.transactions(request),
 		method: "GET",
-		path: "/blocks/{id}/transactions",
 		options: {
 			plugins: {
 				pagination: {
@@ -92,5 +91,6 @@ export const register = (server: Hapi.Server): void => {
 				}).concat(pagination),
 			},
 		},
+		path: "/blocks/{id}/transactions",
 	});
 };

@@ -6,7 +6,6 @@ import { makeExtendedRepository } from "./repository-extension";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): ITransactionRepository =>
 	makeExtendedRepository<Transaction, ITransactionRepositoryExtension>(Transaction, dataSource, {
-
 		async findManyByCritera(
 			transactionCriteria: Criteria.OrTransactionCriteria,
 			sorting: Sorting,
@@ -15,6 +14,5 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): ITr
 		): Promise<ResultsPage<Transaction>> {
 			const transactionExpression = await TransactionFilter.getExpression(transactionCriteria);
 			return this.listByExpression(transactionExpression, sorting, pagination, options);
-		}
-
+		},
 	});
