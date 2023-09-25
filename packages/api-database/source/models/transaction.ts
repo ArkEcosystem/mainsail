@@ -76,14 +76,14 @@ export class Transaction {
 		nullable: true,
 		type: "varchar",
 	})
-	public recipientId!: string | undefined | null;
+	public recipientId!: string | undefined;
 
 	@Column({
 		default: undefined,
 		nullable: true,
 		type: "bytea",
 	})
-	public vendorField: string | undefined | null;
+	public vendorField: string | undefined;
 
 	@Column({
 		nullable: false,
@@ -103,7 +103,7 @@ export class Transaction {
 		type: "jsonb",
 		// TODO: separate tables for 1:n assets
 	})
-	public asset: Record<string, any> | undefined | null;
+	public asset: Record<string, any> | undefined;
 
 	@Column({
 		nullable: false,

@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 
 import { Transaction } from "../../models";
 import { EqualCriteria, OrTransactionCriteria, TransactionCriteria } from "../criteria";
-import { AndExpression, EqualExpression, Expression } from "../expressions";
+import { ContainsExpression, EqualExpression, Expression } from "../expressions";
 import {
 	handleAndCriteria,
 	handleNumericCriteria,
@@ -138,38 +138,11 @@ export class TransactionFilter {
 			value: criteria,
 		};
 
-		const multipaymentRecipientIdExpression: AndExpression<Transaction> = {
-			expressions: [
-				{ op: "equal", property: "typeGroup", value: Contracts.Crypto.TransactionTypeGroup.Core },
-				{ op: "equal", property: "type", value: Contracts.Crypto.TransactionType.MultiPayment },
-				{ op: "contains", property: "asset", value: { payments: [{ recipientId: criteria }] } },
-			],
-			op: "and",
+		const multipaymentRecipientIdExpression: ContainsExpression<Transaction> = {
+			op: "contains",
+			property: "asset",
+			value: { payments: [{ recipientId: criteria }] },
 		};
-
-		// TODO: handle sender/recipient
-		// if (this.walletRepository.hasByAddress(criteria)) {
-		//     const recipientWallet = this.walletRepository.findByAddress(criteria);
-		//     if (recipientWallet && recipientWallet.getPublicKey()) {
-		//         const delegateRegistrationExpression: AndExpression<Transaction> = {
-		//             op: "and",
-		//             expressions: [
-		//                 { op: "equal", property: "typeGroup", value: Contracts.Crypto.TransactionTypeGroup.Core },
-		//                 { op: "equal", property: "type", value: Contracts.Crypto.TransactionType.ValidatorRegistration },
-		//                 { op: "equal", property: "senderPublicKey", value: recipientWallet.getPublicKey() },
-		//             ],
-		//         };
-
-		//         return {
-		//             op: "or",
-		//             expressions: [
-		//                 recipientIdExpression,
-		//                 multipaymentRecipientIdExpression,
-		//                 delegateRegistrationExpression,
-		//             ],
-		//         };
-		//     }
-		// }
 
 		return {
 			expressions: [recipientIdExpression, multipaymentRecipientIdExpression],

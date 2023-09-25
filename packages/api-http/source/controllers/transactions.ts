@@ -119,17 +119,4 @@ export class TransactionsController extends Controller {
 
 		return { data: schemasByType };
 	}
-
-	// public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const result = await this.processor.process(request.payload.transactions);
-	// 	return {
-	// 		data: {
-	// 			accept: result.accept,
-	// 			broadcast: result.broadcast,
-	// 			excess: result.excess,
-	// 			invalid: result.invalid,
-	// 		},
-	// 		errors: result.errors,
-	// 	};
-	// }
 }
