@@ -4,8 +4,6 @@ import { Enums, Utils } from "@mainsail/kernel";
 
 import { factory } from "../attributes";
 
-// @TODO extract block and transaction behaviours into their respective stores
-// @TODO review the implementation
 @injectable()
 export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Application)
@@ -22,9 +20,7 @@ export class StateStore implements Contracts.State.StateStore {
 
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastBlock?: Contracts.Crypto.IBlock;
-
 	#isBootstrap = true;
-	#committedRound = 0;
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
@@ -51,10 +47,6 @@ export class StateStore implements Contracts.State.StateStore {
 		this.#genesisBlock = block;
 	}
 
-	public getLastHeight(): number {
-		return this.getLastBlock().data.height;
-	}
-
 	public getLastBlock(): Contracts.Crypto.IBlock {
 		Utils.assert.defined<Contracts.Crypto.IBlock>(this.#lastBlock);
 		return this.#lastBlock;
@@ -63,6 +55,7 @@ export class StateStore implements Contracts.State.StateStore {
 	public setLastBlock(block: Contracts.Crypto.IBlock): void {
 		this.#lastBlock = block;
 		this.configuration.setHeight(block.data.height);
+		this.setAttribute("height", block.data.height);
 
 		if (this.configuration.isNewMilestone()) {
 			this.logger.notice("Milestone change");
@@ -73,12 +66,16 @@ export class StateStore implements Contracts.State.StateStore {
 		}
 	}
 
+	public getLastHeight(): number {
+		return this.getAttribute("height");
+	}
+
 	public getLastCommittedRound(): number {
-		return this.#committedRound;
+		return this.getAttribute("committedRound");
 	}
 
 	public setLastCommittedRound(committedRound: number): void {
-		this.#committedRound = committedRound;
+		this.setAttribute("committedRound", committedRound);
 	}
 
 	public hasAttribute(key: string): boolean {
