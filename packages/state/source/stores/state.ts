@@ -19,8 +19,6 @@ export class StateStore implements Contracts.State.StateStore {
 	#lastBlock?: Contracts.Crypto.IBlock;
 
 	#isBootstrap = true;
-
-	// The last committed round
 	#committedRound = 0;
 
 	public isBootstrap(): boolean {

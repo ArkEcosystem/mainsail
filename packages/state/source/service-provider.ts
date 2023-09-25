@@ -22,11 +22,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// TODO: remove resignations index
 		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
+		this.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
+		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
+		stateAttributeRepository.set("height", Contracts.State.AttributeType.Number);
+		stateAttributeRepository.set("committedRound", Contracts.State.AttributeType.Number);
+
 		this.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
-		const attributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
-		attributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
-		attributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
-		attributeRepository.set("publicKey", Contracts.State.AttributeType.String);
+		const walletAttributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
+		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
 
 		this.app
 			.bind(Identifiers.WalletRepository)

@@ -150,6 +150,7 @@ export const Identifiers = {
 	State: {
 		ValidatorMutator: Symbol.for("State<ValidatorMutator>"),
 	},
+	StateAttributes: Symbol.for("Attributes<State>"),
 	StateStore: Symbol.for("State<StateStore>"),
 	StateVerifier: Symbol.for("State<Verifier>"),
 	TransactionHandler: Symbol.for("TransactionHandler"),
@@ -178,7 +179,7 @@ export const Identifiers = {
 	ValidationService: Symbol.for("Service<Validation>"),
 	ValidatorSet: Symbol.for("Set<ValidatorSet>"),
 	ValidatorWalletFactory: Symbol.for("State<ValidatorWalletFactory>"),
-	WalletAttributes: Symbol.for("Wallet<Attributes>"),
+	WalletAttributes: Symbol.for("Attributes<Wallet>"),
 	WalletFactory: Symbol.for("State<WalletFactory>"),
 	WalletRepository: Symbol.for("Repository<Wallet>"),
 	WalletRepositoryCloneFactory: Symbol.for("Factory<Repository<Wallet>>"),
