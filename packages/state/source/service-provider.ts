@@ -9,7 +9,6 @@ import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { StateVerifier } from "./state-verifier";
 import { StateStore } from "./stores/state";
-import { TransactionValidator } from "./transaction-validator";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 
@@ -59,10 +58,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 
 		this.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
-
-		this.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
-
-		this.app.bind(Identifiers.TransactionValidatorFactory).toAutoFactory(Identifiers.TransactionValidator);
 
 		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
 
