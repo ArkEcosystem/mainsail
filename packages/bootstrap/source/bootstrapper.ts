@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -53,6 +53,10 @@ export class Bootstrapper {
 	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
 	private readonly committedBlockStateFactory!: Contracts.Consensus.ICommittedBlockStateFactory;
 
+	@inject(Identifiers.ApiSync)
+	@optional()
+	private readonly apiSync: Contracts.ApiSync.ISync | undefined;
+
 	public async bootstrap(): Promise<void> {
 		try {
 			await this.#setGenesisBlock();
@@ -60,6 +64,10 @@ export class Bootstrapper {
 			await this.#processGenesisBlock();
 
 			await this.#initState();
+
+			if (this.apiSync) {
+				await this.apiSync.bootstrap();
+			}
 
 			await this.#processBlocks();
 			this.stateStore.setBootstrap(false);

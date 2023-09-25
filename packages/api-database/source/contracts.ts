@@ -4,11 +4,11 @@ import { MempoolTransaction, State } from "./models";
 import { Block } from "./models/block";
 import { Peer } from "./models/peer";
 import { Transaction } from "./models/transaction";
+import { TransactionType } from "./models/transaction-type";
 import { ValidatorRound } from "./models/validator-round";
 import { Wallet } from "./models/wallet";
-// import { BlockFilter } from "./search/filters/block-filter";
 import { ExtendedRepository } from "./repositories/repository-extension";
-import { Criteria } from "./search";
+import { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
@@ -26,9 +26,8 @@ export type IBlockRepositoryExtension = {
 		transactionRepository: ITransactionRepository,
 		blockCriteria: Criteria.OrBlockCriteria,
 	): Promise<Block[]>;
-
-	//getFilter(): BlockFilter;
 };
+
 export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExtension;
 
 export type IPeerRepositoryExtension = {};
@@ -36,8 +35,20 @@ export type IPeerRepository = ExtendedRepository<Peer> & IPeerRepositoryExtensio
 export type IMempoolTransactionRepositoryExtension = {};
 export type IMempoolTransactionRepository = ExtendedRepository<MempoolTransaction> &
 	IMempoolTransactionRepositoryExtension;
-export type ITransactionRepositoryExtension = {};
+
+export type ITransactionTypeRepositoryExtension = {};
+export type ITransactionTypeRepository = ExtendedRepository<TransactionType> & ITransactionTypeRepositoryExtension;
+
+export type ITransactionRepositoryExtension = {
+	findManyByCritera(
+		transactionCriteria: Criteria.OrTransactionCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Transaction>>;
+};
 export type ITransactionRepository = ExtendedRepository<Transaction> & ITransactionRepositoryExtension;
+
 export type IValidatorRoundRepositoryExtension = {};
 export type IValidatorRoundRepository = ExtendedRepository<ValidatorRound> & IValidatorRoundRepositoryExtension;
 export type IStateRepositoryExtension = {};
@@ -48,6 +59,7 @@ export type IWalletRepository = ExtendedRepository<Wallet> & IWalletRepositoryEx
 export type IBlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => IBlockRepository;
 export type IPeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPeerRepository;
 export type ITransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionRepository;
+export type ITransactionTypeRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionTypeRepository;
 export type IMempoolTransactionRepositoryFactory = (
 	customDataSource?: RepositoryDataSource,
 ) => IMempoolTransactionRepository;

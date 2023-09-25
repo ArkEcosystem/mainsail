@@ -1,7 +1,8 @@
 import { EntityTarget, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 
 import { RepositoryDataSource } from "../contracts";
-import { Expressions, QueryHelper, Sorting } from "../search";
+import { Expressions, Options, Pagination, QueryHelper, ResultsPage, Sorting } from "../search";
+import { Expression } from "../search/expressions";
 
 export interface RepositoryExtension<TEntity extends ObjectLiteral> {
 	queryHelper: QueryHelper<TEntity>;
@@ -10,7 +11,16 @@ export interface RepositoryExtension<TEntity extends ObjectLiteral> {
 
 	addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Sorting): void;
 
+	addSkipOffset(queryBuilder: SelectQueryBuilder<TEntity>, pagination: Pagination): void;
+
 	findManyByExpression(expression: Expressions.Expression<TEntity>, sorting?: Sorting): Promise<TEntity[]>;
+
+	listByExpression(
+		expression: Expression<TEntity>,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<TEntity>>;
 }
 
 export type ExtendedRepository<TEntity extends ObjectLiteral> = RepositoryExtension<TEntity> & Repository<TEntity>;
@@ -40,12 +50,16 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 		}
 	},
 
+	addSkipOffset(queryBuilder: SelectQueryBuilder<TEntity>, pagination: Pagination): void {
+		queryBuilder.skip(pagination.offset).take(pagination.limit);
+	},
+
 	addWhere(queryBuilder: SelectQueryBuilder<TEntity>, expression: Expressions.Expression<TEntity>): void {
 		const sqlExpression = this.queryHelper.getWhereExpressionSql(this.metadata, expression);
 		queryBuilder.where(sqlExpression.query, sqlExpression.parameters);
 	},
 
-	findManyByExpression(expression: Expressions.Expression<TEntity>, sorting: Sorting = []): Promise<TEntity[]> {
+	async findManyByExpression(expression: Expressions.Expression<TEntity>, sorting: Sorting = []): Promise<TEntity[]> {
 		const queryBuilder: SelectQueryBuilder<TEntity> = this.createQueryBuilder().select();
 
 		this.addWhere(queryBuilder, expression);
@@ -54,9 +68,65 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 		return queryBuilder.getMany();
 	},
 
-	queryHelper: new QueryHelper(),
+	async listByExpression(
+		expression: Expression<TEntity>,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<TEntity>> {
+		const queryRunner = this.manager.connection.createQueryRunner("slave");
 
-	// private addSkipOffset(queryBuilder: SelectQueryBuilder<TEntity>, pagination: Contracts.Search.Pagination): void {
-	// 	queryBuilder.skip(pagination.offset).take(pagination.limit);
-	// }
+		try {
+			await queryRunner.startTransaction("REPEATABLE READ");
+
+			try {
+				const resultsQueryBuilder = this.createQueryBuilder().setQueryRunner(queryRunner).select();
+				this.addWhere(resultsQueryBuilder, expression);
+				this.addOrderBy(resultsQueryBuilder, sorting);
+				this.addSkipOffset(resultsQueryBuilder, pagination);
+
+				const results = await resultsQueryBuilder.getMany();
+
+				if (options?.estimateTotalCount === false) {
+					// typeorm@0.2.25 generates slow COUNT(DISTINCT primary_key_column) for getCount or getManyAndCount
+
+					const totalCountQueryBuilder = this.createQueryBuilder()
+						.setQueryRunner(queryRunner)
+						.select("COUNT(*) AS total_count");
+
+					this.addWhere(totalCountQueryBuilder, expression);
+
+					const totalCountRow = await totalCountQueryBuilder.getRawOne();
+					const totalCount = Number.parseFloat(totalCountRow["total_count"]);
+
+					await queryRunner.commitTransaction();
+
+					return { meta: { totalCountIsEstimate: false }, results, totalCount };
+				}
+
+				let totalCountEstimated = 0;
+				const [resultsSql, resultsParameters] = resultsQueryBuilder.getQueryAndParameters();
+				const resultsExplainedRows = await queryRunner.query(`EXPLAIN ${resultsSql}`, resultsParameters);
+				for (const resultsExplainedRow of resultsExplainedRows) {
+					const match = resultsExplainedRow["QUERY PLAN"].match(/rows=(\d+)/);
+					if (match) {
+						totalCountEstimated = Number.parseFloat(match[1]);
+					}
+				}
+
+				const totalCount = Math.max(totalCountEstimated, results.length);
+
+				await queryRunner.commitTransaction();
+
+				return { meta: { totalCountIsEstimate: true }, results, totalCount };
+			} catch (error) {
+				await queryRunner.rollbackTransaction();
+				throw error;
+			}
+		} finally {
+			await queryRunner.release();
+		}
+	},
+
+	queryHelper: new QueryHelper(),
 });

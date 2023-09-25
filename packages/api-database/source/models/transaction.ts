@@ -41,9 +41,9 @@ export class Transaction {
 
 	@Column({
 		nullable: false,
-		type: "integer",
+		type: "bigint",
 	})
-	public blockHeight!: number;
+	public blockHeight!: string;
 
 	@Column({
 		nullable: false,
@@ -55,7 +55,7 @@ export class Transaction {
 		nullable: false,
 		type: "bigint",
 	})
-	public timestamp!: number;
+	public timestamp!: string;
 
 	@Column({
 		nullable: false,
@@ -103,7 +103,7 @@ export class Transaction {
 		type: "jsonb",
 		// TODO: separate tables for 1:n assets
 	})
-	public asset!: Record<string, any> | undefined;
+	public asset: Record<string, any> | undefined;
 
 	@Column({
 		nullable: false,

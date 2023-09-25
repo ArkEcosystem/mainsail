@@ -1,4 +1,8 @@
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
@@ -21,6 +25,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
+	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.ITransactionTypeRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
 
@@ -30,8 +37,15 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	@inject(Identifiers.TransactionHandlerRegistry)
+	private readonly transactionHandlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	public async bootstrap(): Promise<void> {
+		await this.#bootstrapTransactionTypes();
+	}
 
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
@@ -78,7 +92,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 				transactions.map(({ data }) => ({
 					amount: data.amount.toFixed(),
 					asset: data.asset,
-					blockHeight: header.height,
+					blockHeight: header.height.toFixed(),
 					blockId: header.id,
 					fee: data.fee.toFixed(),
 					id: data.id,
@@ -87,7 +101,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 					senderPublicKey: data.senderPublicKey,
 					sequence: data.sequence,
 					signature: data.signature,
-					timestamp: header.timestamp,
+					timestamp: header.timestamp.toFixed(),
 					type: data.type,
 					typeGroup: data.typeGroup,
 					vendorField: data.vendorField,
@@ -127,5 +141,41 @@ export class Sync implements Contracts.ApiSync.ISync {
 		const t1 = performance.now();
 
 		this.logger.debug(`synced committed block: ${header.height} in ${t1 - t0}ms`);
+	}
+
+	async #bootstrapTransactionTypes(): Promise<void> {
+		const transactionHandlers = await this.transactionHandlerRegistry.getActivatedHandlers();
+
+		const types: Models.TransactionType[] = [];
+
+		for (const handler of transactionHandlers) {
+			const constructor = handler.getConstructor();
+
+			const type: number | undefined = constructor.type;
+			const typeGroup: number | undefined = constructor.typeGroup;
+			const version: number | undefined = constructor.version;
+			const key: string | undefined = constructor.key;
+
+			Utils.assert.defined<number>(type);
+			Utils.assert.defined<number>(typeGroup);
+			Utils.assert.defined<number>(version);
+			Utils.assert.defined<string>(key);
+
+			types.push({ key, schema: constructor.getSchema().properties, type, typeGroup, version });
+		}
+
+		types.sort((a, b) => {
+			if (a.type !== b.type) {
+				return a.type - b.type;
+			}
+
+			if (a.typeGroup !== b.typeGroup) {
+				return a.typeGroup - b.typeGroup;
+			}
+
+			return a.version - b.version;
+		});
+
+		await this.transactionTypeRepositoryFactory().upsert(types, ["type", "typeGroup", "version"]);
 	}
 }

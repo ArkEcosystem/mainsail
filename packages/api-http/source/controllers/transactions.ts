@@ -1,5 +1,9 @@
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Search,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { TransactionResource } from "../resources";
@@ -10,142 +14,109 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const pagination = this.getQueryPagination(request.query);
+	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
+	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.ITransactionTypeRepositoryFactory;
 
-		const [transactions, totalCount] = await this.transactionRepositoryFactory()
+	@inject(ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory)
+	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.IMempoolTransactionRepositoryFactory;
+
+	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const criteria: Search.Criteria.TransactionCriteria = request.query;
+		const pagination = this.getListingPage(request);
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions();
+
+		const transactions = await this.transactionRepositoryFactory().findManyByCritera(
+			criteria,
+			sorting,
+			pagination,
+			options,
+		);
+
+		return this.toPagination(transactions, TransactionResource, request.query.transform);
+	}
+
+	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const transaction = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.orderBy("blockHeight", "DESC")
-			.orderBy("sequence", "DESC")
+			.where("id = :id", { id: request.params.id })
+			.getOne();
+
+		return this.respondWithResource(transaction, TransactionResource, request.query.transform);
+	}
+
+	public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const pagination = super.getListingPage(request);
+
+		const [transactions, totalCount] = await this.mempoolTransactionlRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.orderBy("fee", "DESC")
 			.offset(pagination.offset)
 			.limit(pagination.limit)
 			.getManyAndCount();
 
-		return this.toPagination(
+		return super.toPagination(
 			{
 				meta: { totalCountIsEstimate: false },
 				results: transactions,
 				totalCount,
 			},
 			TransactionResource,
-			false,
+			request.query.transform,
 		);
 	}
 
-	// public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const result = await this.processor.process(request.payload.transactions);
-	// 	return {
-	// 		data: {
-	// 			accept: result.accept,
-	// 			broadcast: result.broadcast,
-	// 			excess: result.excess,
-	// 			invalid: result.invalid,
-	// 		},
-	// 		errors: result.errors,
-	// 	};
-	// }
+	public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const transaction = await this.mempoolTransactionlRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("id = :id", { id: request.params.id })
+			.getOne();
 
-	// public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	console.log("ID:", request.params.id);
+		return super.respondWithResource(transaction, TransactionResource, request.query.transform);
+	}
 
-	// 	const transaction = await this.database.getTransaction(request.params.id);
-	// 	if (!transaction) {
-	// 		return notFound("Transaction not found");
-	// 	}
+	public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const rows = await this.transactionTypeRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.addOrderBy("type", "ASC")
+			.addOrderBy("type_group", "ASC")
+			.getMany();
 
-	// 	// TODO: Include block
-	// 	// if (request.query.transform) {
-	// 	// 	const block = await this.database.getBlock(transaction.data.blockId);
+		const typeGroups: Record<string | number, Record<string, number>> = {};
 
-	// 	// 	return this.respondWithResource(
-	// 	// 		{ block: block.data, data: transaction.data },
-	// 	// 		TransactionWithBlockResource,
-	// 	// 		true,
-	// 	// 	);
-	// 	// } else {
-	// 	// 	return this.respondWithResource(transaction.data, TransactionResource, false);
-	// 	// }
+		for (const { type, typeGroup, key } of rows) {
+			if (typeGroups[typeGroup] === undefined) {
+				typeGroups[typeGroup] = {};
+			}
 
-	// 	return this.respondWithResource(transaction.data, TransactionResource, false);
-	// }
+			typeGroups[typeGroup][key[0].toUpperCase() + key.slice(1)] = type;
+		}
 
-	// public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const pagination: Pagination = super.getListingPage(request);
-	// 	const all: Contracts.Crypto.ITransaction[] = await this.poolQuery.getFromHighestPriority().all();
-	// 	const transactions: Contracts.Crypto.ITransaction[] = all.slice(
-	// 		pagination.offset,
-	// 		pagination.offset + pagination.limit,
-	// 	);
-	// 	const results = transactions.map((t) => t.data);
-	// 	const resultsPage = {
-	// 		meta: { totalCountIsEstimate: false },
-	// 		results,
-	// 		totalCount: all.length,
-	// 	};
+		return { data: typeGroups };
+	}
 
-	// 	return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
-	// }
+	public async schemas(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+		const rows = await this.transactionTypeRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.addOrderBy("type", "ASC")
+			.addOrderBy("type_group", "ASC")
+			.getMany();
 
-	// public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
-	// 		.getFromHighestPriority()
-	// 		.whereId(request.params.id);
+		const schemasByType: Record<string, Record<string, any>> = {};
 
-	// 	if ((await transactionQuery.has()) === false) {
-	// 		return notFound("Transaction not found");
-	// 	}
+		for (const { type, typeGroup, schema } of rows) {
+			if (schemasByType[typeGroup] === undefined) {
+				schemasByType[typeGroup] = {};
+			}
 
-	// 	const transaction: Contracts.Crypto.ITransaction = await transactionQuery.first();
+			schemasByType[typeGroup][type] = schema;
+		}
 
-	// 	return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
-	// }
-
-	// public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
-	// 	const typeGroups: Record<string | number, Record<string, number>> = {};
-
-	// 	for (const handler of activatedTransactionHandlers) {
-	// 		const constructor = handler.getConstructor();
-
-	// 		const type: number | undefined = constructor.type;
-	// 		const typeGroup: number | undefined = constructor.typeGroup;
-	// 		const key: string | undefined = constructor.key;
-
-	// 		AppUtils.assert.defined<number>(type);
-	// 		AppUtils.assert.defined<number>(typeGroup);
-	// 		AppUtils.assert.defined<string>(key);
-
-	// 		if (typeGroups[typeGroup] === undefined) {
-	// 			typeGroups[typeGroup] = {};
-	// 		}
-
-	// 		typeGroups[typeGroup][key[0].toUpperCase() + key.slice(1)] = type;
-	// 	}
-
-	// 	return { data: typeGroups };
-	// }
-
-	// public async schemas(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-	// 	const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
-	// 	const schemasByType: Record<string, Record<string, any>> = {};
-
-	// 	for (const handler of activatedTransactionHandlers) {
-	// 		const constructor = handler.getConstructor();
-
-	// 		const type: number | undefined = constructor.type;
-	// 		const typeGroup: number | undefined = constructor.typeGroup;
-
-	// 		AppUtils.assert.defined<number>(type);
-	// 		AppUtils.assert.defined<number>(typeGroup);
-
-	// 		if (schemasByType[typeGroup] === undefined) {
-	// 			schemasByType[typeGroup] = {};
-	// 		}
-
-	// 		schemasByType[typeGroup][type] = constructor.getSchema().properties;
-	// 	}
-
-	// 	return { data: schemasByType };
-	// }
+		return { data: schemasByType };
+	}
 }

@@ -32,6 +32,18 @@ export class ApiContext {
 		)();
 	}
 
+	public get transactionTypeRepository(): ApiDatabaseContracts.ITransactionTypeRepository {
+		return this.app.get<ApiDatabaseContracts.ITransactionTypeRepositoryFactory>(
+			ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory,
+		)();
+	}
+
+	public get mempoolTransactionRepository(): ApiDatabaseContracts.IMempoolTransactionRepository {
+		return this.app.get<ApiDatabaseContracts.IMempoolTransactionRepositoryFactory>(
+			ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory,
+		)();
+	}
+
 	public get walletRepository(): ApiDatabaseContracts.IWalletRepository {
 		return this.app.get<ApiDatabaseContracts.IWalletRepositoryFactory>(
 			ApiDatabaseIdentifiers.WalletRepositoryFactory,

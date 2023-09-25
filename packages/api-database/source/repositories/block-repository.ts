@@ -29,7 +29,7 @@ export const makeBlockRepository = (dataSource: RepositoryDataSource): IBlockRep
 			//     transactionModels,
 			// );
 
-			return await this.findManyByExpression(blockExpression);
+			return this.findManyByExpression(blockExpression);
 		},
 
 		async findOneByCriteriaJoinTransactions(

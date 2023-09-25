@@ -33,3 +33,24 @@ export type BlockDataWithTransactionData = {
 	data: Contracts.Crypto.IBlockData;
 	transactions: Contracts.Crypto.ITransactionData[];
 };
+
+export type TransactionCriteria = {
+	address?: OrEqualCriteria<string>;
+	senderId?: OrEqualCriteria<string>;
+	recipientId?: OrEqualCriteria<string>;
+	id?: OrEqualCriteria<string>;
+	version?: OrEqualCriteria<number>;
+	blockId?: OrEqualCriteria<string>;
+	sequence?: OrNumericCriteria<number>;
+	timestamp?: OrNumericCriteria<number>;
+	nonce?: OrNumericCriteria<string>;
+	senderPublicKey?: OrEqualCriteria<string>;
+	type?: OrEqualCriteria<number>;
+	typeGroup?: OrEqualCriteria<number>;
+	vendorField?: OrLikeCriteria<string>;
+	amount?: OrNumericCriteria<string>;
+	fee?: OrNumericCriteria<string>;
+	asset?: OrContainsCriteria<Record<string, any>>;
+};
+
+export type OrTransactionCriteria = OrCriteria<TransactionCriteria>;

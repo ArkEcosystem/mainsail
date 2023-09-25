@@ -3,7 +3,7 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, MempoolTransaction, State, Transaction, ValidatorRound, Wallet } from "./models";
+import { Block, MempoolTransaction, State, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
 import { Peer } from "./models/peer";
 import {
 	makeBlockRepository,
@@ -11,6 +11,7 @@ import {
 	makePeerRepository,
 	makeStateRepository,
 	makeTransactionRepository,
+	makeTransactionTypeRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
 } from "./repositories";
@@ -41,7 +42,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const dataSource = new DataSource({
 				...options,
 				// TODO: allow entities to be extended by plugins
-				entities: [Block, Peer, MempoolTransaction, State, Transaction, ValidatorRound, Wallet],
+				entities: [
+					Block,
+					Peer,
+					MempoolTransaction,
+					State,
+					TransactionType,
+					Transaction,
+					ValidatorRound,
+					Wallet,
+				],
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 
@@ -96,6 +106,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeTransactionRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind(Identifiers.TransactionTypeRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeTransactionTypeRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

@@ -1,0 +1,16 @@
+[
+	{
+		"amount": "1000000000",
+		"asset": null,
+		"fee": "10000000",
+		"id": "d2cb98495105ee8abfab78de00cf16174062748a7f2f31d3fd9e30e6e5451961",
+		"nonce": "9",
+		"senderPublicKey": "ac9a09dd85af1203cb5054d3f258e469ff831bf0ff1ee2cd90d6a46e52d11bae",
+		"signature": "67e741a0bea08d06152d28f172f44bf84460a1997009a82f58442c1d5f721bece997d95499eb87d9d51ac63f1bcb26fb4415fb6430096ac89589ad7469600a35",
+		"recipientId": "ark1z5a7wer7hcrzhd3jhdcjjhqd64zjjd8h8fsteheerm3tvrqc4xas4v00dw",
+		"type": 0,
+		"typeGroup": 1,
+		"vendorField": null,
+		"version": 1
+	}
+]

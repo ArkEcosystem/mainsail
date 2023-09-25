@@ -7,12 +7,12 @@ export const request = async <T = Record<string, any>>(
 ): Promise<{ statusCode: number; data: T; headers: IncomingHttpHeaders }> => {
 	path = path.startsWith("/") ? path.slice(1) : path;
 
-	let query = "";
+	let transform = "";
 	if (options?.transform === false) {
-		query += "?transform=false";
+		transform += path.includes("?") ? "&transform=false" : "?transform=false";
 	}
 
-	const response = await got(`http://localhost:4003/api/${path}${query}`);
+	const response = await got(`http://localhost:4003/api/${path}${transform}`);
 	// console.log(response);
 
 	const { statusCode, headers, body } = response;

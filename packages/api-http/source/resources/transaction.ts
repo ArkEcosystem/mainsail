@@ -1,50 +1,43 @@
+import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
 
 import { Resource } from "../types";
 
 @injectable()
 export class TransactionResource implements Resource {
-	public raw(resource: Contracts.Crypto.ITransactionData): object {
-		return resource;
+	public raw(resource: Models.Transaction): object {
+		return JSON.parse(JSON.stringify(resource));
 	}
 
-	public async transform(resource: Contracts.Crypto.ITransactionData): Promise<object> {
-		return resource;
-
-		// AppUtils.assert.defined<string>(resource.senderPublicKey);
-		// const wallet = await this.walletRepository.findByPublicKey(resource.senderPublicKey);
+	public async transform(resource: Models.Transaction): Promise<object> {
+		// TODO: address can be calculated from public key, no need to lookup the wallet
+		// const wallet = await this.walletRepository.findByPublicKey(transactionData.senderPublicKey);
 		// const sender: string = wallet.getAddress();
+		const recipient = resource.recipientId; // ?? sender;
+		// const confirmations: number = this.stateStore.getLastHeight() - blockData.height + 1;
 
-		// return {
-		// 	amount: resource.amount.toFixed(),
-		// 	asset: resource.asset,
-		// 	blockId: resource.blockId,
-		// 	confirmations: 0,
-		// 	fee: resource.fee.toFixed(),
-		// 	id: resource.id,
-		// 	// ! resource.block ? lastBlock.data.height - resource.block.height + 1 : 0
-		// 	// timestamp:
-		// 	// 	typeof resource.timestamp !== "undefined" ? AppUtils.formatTimestamp(resource.timestamp) : undefined,
-		// 	nonce: resource.nonce?.toFixed(),
+		return {
+			amount: resource.amount,
+			asset: resource.asset,
+			blockId: resource.blockId,
+			fee: resource.fee,
+			id: resource.id,
+			nonce: resource.nonce,
 
-		// 	recipient: resource.recipientId || sender,
+			recipient,
+			senderPublicKey: resource.senderPublicKey,
 
-		// 	sender,
+			signature: resource.signature,
+			// TODO
+			// sender,
+			// timestamp: AppUtils.formatTimestamp(blockData.timestamp),
+			//confirmations,
+			//signatures: resource.signatures,
 
-		// 	senderPublicKey: resource.senderPublicKey,
-
-		// 	signature: resource.signature,
-
-		// 	signatures: resource.signatures,
-
-		// 	type: resource.type,
-
-		// 	typeGroup: resource.typeGroup,
-
-		// 	vendorField: resource.vendorField,
-
-		// 	version: resource.version,
-		// };
+			type: resource.type,
+			typeGroup: resource.typeGroup,
+			vendorField: resource.vendorField,
+			version: resource.version,
+		};
 	}
 }
