@@ -2,6 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
+import { factory } from "../attributes";
+
 // @TODO extract block and transaction behaviours into their respective stores
 // @TODO review the implementation
 @injectable()
@@ -15,11 +17,18 @@ export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
+	@inject(Identifiers.StateAttributes)
+	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
+
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastBlock?: Contracts.Crypto.IBlock;
 
 	#isBootstrap = true;
 	#committedRound = 0;
+
+	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
+
+	public constructor() {}
 
 	public isBootstrap(): boolean {
 		return this.#isBootstrap;
@@ -67,5 +76,32 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setLastCommittedRound(committedRound: number): void {
 		this.#committedRound = committedRound;
+	}
+
+	public hasAttribute(key: string): boolean {
+		return this.attributes.has(key);
+	}
+
+	public setAttribute<T>(key: string, value: T): void {
+		let attribute = this.attributes.get(key);
+
+		if (!attribute) {
+			attribute = factory(this.attributeRepository.getAttributeType(key), value);
+			this.attributes.set(key, attribute);
+		} else {
+			attribute.set(value);
+		}
+	}
+
+	public getAttribute<T>(key: string): T {
+		if (this.hasAttribute(key)) {
+			const attribute = this.attributes.get(key);
+
+			if (attribute) {
+				return attribute.get() as T;
+			}
+		}
+
+		throw new Error(`Attribute "${key}" is not set.`);
 	}
 }
