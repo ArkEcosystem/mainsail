@@ -2592,25 +2592,7 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      immutable:
-        specifier: 4.0.0-rc.14
-        version: 4.0.0-rc.14
-      joi:
-        specifier: 17.9.2
-        version: 17.9.2
-      lmdb:
-        specifier: 2.7.11
-        version: 2.7.11
     devDependencies:
-      '@types/sinon':
-        specifier: ^10.0.14
-        version: 10.0.14
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
-      sinon:
-        specifier: ^15.0.4
-        version: 15.0.4
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -10652,10 +10634,6 @@ packages:
     resolution: {integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==}
     engines: {node: '>= 4'}
     dev: true
-
-  /immutable@4.0.0-rc.14:
-    resolution: {integrity: sha512-pfkvmRKJSoW7JFx0QeYlAmT+kNYvn5j0u7bnpNq4N2RCvHSTlLT208G8jgaquNe+Q8kCPHKOSpxJkyvLDpYq0w==}
-    dev: false
 
   /immutable@4.3.1:
     resolution: {integrity: sha512-lj9cnmB/kVS0QHsJnYKD1uo3o39nrbKxszjnqS9Fr6NB7bZzW45U6WSGBPKXDL/CvDKqDNPA4r3DoDQ8GTxo2A==}
