@@ -28,7 +28,6 @@ import { AttributeRepository } from "../source/attributes";
 import { BlockState } from "../source/block-state";
 import { defaults } from "../source/defaults";
 import { StateStore } from "../source/stores";
-import { TransactionValidator } from "../source/transaction-validator";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
 
@@ -57,7 +56,6 @@ export interface Setup {
 	factory: Factories.FactoryBuilder;
 	blockState: BlockState;
 	stateStore: StateStore;
-	transactionValidator: TransactionValidator;
 	spies: Spies;
 }
 
@@ -295,10 +293,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	const blockState = sandbox.app.get<BlockState>(Identifiers.BlockState);
 
-	sandbox.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
-
-	const transactionValidator = sandbox.app.get<TransactionValidator>(Identifiers.TransactionValidator);
-
 	sandbox.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker);
 
 	if (!skipBoot) {
@@ -338,7 +332,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 			revertSpy,
 		},
 		stateStore,
-		transactionValidator,
 		walletRepo,
 		walletRepoCopyOnWrite,
 	};
