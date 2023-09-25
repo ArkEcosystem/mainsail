@@ -26,25 +26,4 @@ export class BalanceMutator implements Contracts.State.ValidatorMutator {
 
 		wallet.increaseBalance(amount);
 	}
-
-	public async revert(
-		walletRepository: Contracts.State.WalletRepository,
-		wallet: Contracts.State.Wallet,
-		block: Contracts.Crypto.IBlockData,
-	): Promise<void> {
-		const amount = block.reward.plus(block.totalFee);
-
-		if (wallet.hasVoted()) {
-			const validatorWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-				wallet.getAttribute<string>("vote"),
-			);
-
-			validatorWallet.setAttribute(
-				"validatorVoteBalance",
-				validatorWallet.getAttribute<BigNumber>("validatorVoteBalance").minus(amount),
-			);
-		}
-
-		wallet.decreaseBalance(amount);
-	}
 }

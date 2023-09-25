@@ -75,15 +75,4 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 		recipient.increaseBalance(transaction.data.amount);
 	}
-
-	public async revertForRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		Utils.assert.defined<string>(transaction.data.recipientId);
-
-		const recipient: Contracts.State.Wallet = walletRepository.findByAddress(transaction.data.recipientId);
-
-		recipient.decreaseBalance(transaction.data.amount);
-	}
 }

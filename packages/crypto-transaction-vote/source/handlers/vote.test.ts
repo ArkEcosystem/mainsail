@@ -638,70 +638,9 @@ describe<{
 		spySetAttribute.calledWith("vote", "validatorPublicKey");
 	});
 
-	it("revertForSender - should forget attribute on vote", async ({ handler, walletRepository }) => {
-		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
-		const spySuper = stub(Handlers.TransactionHandler.prototype, "revertForSender");
-
-		await assert.resolves(() =>
-			handler.revertForSender(
-				walletRepository,
-				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
-			),
-		);
-
-		spySuper.calledOnce();
-		spyForgetAttribute.calledOnce();
-		spyForgetAttribute.calledWith("vote");
-	});
-
-	it("revertForSender - should set attribute on unvote", async ({ handler, walletRepository }) => {
-		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
-		const spySuper = stub(Handlers.TransactionHandler.prototype, "revertForSender");
-
-		await assert.resolves(() =>
-			handler.revertForSender(
-				walletRepository,
-				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.ITransaction,
-			),
-		);
-
-		spySuper.calledOnce();
-		spySetAttribute.calledOnce();
-		spySetAttribute.calledWith("vote", "validatorPublicKey");
-	});
-
-	it("revertForSender - should set vote attribute with unvoted publicKey and forgetAttribute", async ({
-		handler,
-		walletRepository,
-	}) => {
-		stub(walletRepository, "findByPublicKey").resolvedValue(wallet);
-		const spySuper = stub(Handlers.TransactionHandler.prototype, "revertForSender");
-
-		await assert.resolves(() =>
-			handler.revertForSender(
-				walletRepository,
-				getTransaction(["validatorPublicKey"], ["secondValidatorPublicKey"]) as Contracts.Crypto.ITransaction,
-			),
-		);
-
-		spySuper.calledOnce();
-		spyForgetAttribute.calledOnce();
-		spySetAttribute.calledOnce();
-		spySetAttribute.calledWith("vote", "secondValidatorPublicKey");
-	});
-
 	it("applyToRecipient - should pass", async ({ handler, walletRepository }) => {
 		await assert.resolves(() =>
 			handler.applyToRecipient(
-				walletRepository,
-				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
-			),
-		);
-	});
-
-	it("revertForRecipient - should pass", async ({ handler, walletRepository }) => {
-		await assert.resolves(() =>
-			handler.revertForRecipient(
 				walletRepository,
 				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.ITransaction,
 			),

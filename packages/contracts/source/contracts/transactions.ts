@@ -15,11 +15,7 @@ export interface ITransactionHandler {
 
 	apply(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
-	revert(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
-
 	applyToSender(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
-
-	revertForSender(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 
 	emitEvents(transaction: ITransaction, emitter: EventDispatcher): void;
 
@@ -43,8 +39,6 @@ export interface ITransactionHandler {
 	bootstrap(walletRepository: WalletRepository, transactions: ITransaction[]): Promise<void>;
 
 	applyToRecipient(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
-
-	revertForRecipient(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 }
 
 export interface ITransactionHandlerRegistry {

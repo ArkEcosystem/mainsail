@@ -177,34 +177,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	public async revertForSender(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		await super.revertForSender(walletRepository, transaction);
-
-		Utils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
-		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.votes);
-		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset?.unvotes);
-
-		if (transaction.data.asset.votes.length > 0) {
-			sender.forgetAttribute("vote");
-		}
-
-		for (const unvote of transaction.data.asset.unvotes) {
-			sender.setAttribute("vote", unvote);
-		}
-	}
-
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {}
-
-	public async revertForRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {}

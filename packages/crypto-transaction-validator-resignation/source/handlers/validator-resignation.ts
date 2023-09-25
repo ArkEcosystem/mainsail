@@ -114,30 +114,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		);
 	}
 
-	public async revertForSender(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		await super.revertForSender(walletRepository, transaction);
-
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
-		senderWallet.forgetAttribute("validatorResigned");
-		walletRepository.forgetOnIndex(
-			Contracts.State.WalletIndexes.Resignations,
-			senderWallet.getAttribute("validatorUsername"),
-		);
-	}
-
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-		// tslint:disable-next-line: no-empty
-	): Promise<void> {}
-
-	public async revertForRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 		// tslint:disable-next-line: no-empty

@@ -137,15 +137,6 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		await super.applyToSender(walletRepository, transaction);
 	}
 
-	public async revertForSender(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		await super.revertForSender(walletRepository, transaction);
-		// Nothing else to do for the sender since the recipient wallet
-		// is made into a multi sig wallet.
-	}
-
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
@@ -159,20 +150,5 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		);
 
 		recipientWallet.setAttribute("multiSignature", data.asset.multiSignature);
-	}
-
-	public async revertForRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
-
-		AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
-
-		const recipientWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-			await this.publicKeyFactory.fromMultiSignatureAsset(data.asset.multiSignature),
-		);
-
-		recipientWallet.forgetAttribute("multiSignature");
 	}
 }

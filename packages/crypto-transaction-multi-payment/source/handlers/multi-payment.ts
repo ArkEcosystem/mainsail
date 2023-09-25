@@ -76,23 +76,6 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		sender.decreaseBalance(totalPaymentsAmount);
 	}
 
-	public async revertForSender(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		await super.revertForSender(walletRepository, transaction);
-
-		AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
-
-		const totalPaymentsAmount = transaction.data.asset.payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
-
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
-		sender.increaseBalance(totalPaymentsAmount);
-	}
-
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
@@ -103,19 +86,6 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 			const recipient: Contracts.State.Wallet = walletRepository.findByAddress(payment.recipientId);
 
 			recipient.increaseBalance(payment.amount);
-		}
-	}
-
-	public async revertForRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.data.asset?.payments);
-
-		for (const payment of transaction.data.asset.payments) {
-			const recipient: Contracts.State.Wallet = walletRepository.findByAddress(payment.recipientId);
-
-			recipient.decreaseBalance(payment.amount);
 		}
 	}
 }

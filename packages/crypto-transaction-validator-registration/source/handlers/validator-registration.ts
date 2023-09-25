@@ -156,34 +156,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		);
 	}
 
-	public async revertForSender(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {
-		await super.revertForSender(walletRepository, transaction);
-
-		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
-		sender.forgetAttribute("validatorRound");
-		sender.forgetAttribute("validatorUsername");
-		sender.forgetAttribute("validatorVoteBalance");
-		sender.forgetAttribute("validatorConsensusPublicKey");
-
-		walletRepository.forgetOnIndex(
-			Contracts.State.WalletIndexes.Usernames,
-			transaction.data.asset.validator.username,
-		);
-	}
-
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {}
-
-	public async revertForRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {}

@@ -84,14 +84,14 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		try {
-			const handler: Contracts.Transactions.ITransactionHandler =
-				await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-
-			await this.triggers.call("revertTransaction", {
-				handler,
-				transaction,
-				walletRepository: this.walletRepository,
-			});
+			// TODO: Implement transaction revert
+			// const handler: Contracts.Transactions.ITransactionHandler =
+			// 	await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
+			// await this.triggers.call("revertTransaction", {
+			// 	handler,
+			// 	transaction,
+			// 	walletRepository: this.walletRepository,
+			// });
 		} catch (error) {
 			this.#corrupt = true;
 			throw error;
