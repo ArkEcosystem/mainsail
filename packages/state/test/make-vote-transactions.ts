@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+
 import { VoteBuilder } from "../../crypto-transaction-vote";
 
 export const makeVoteTransactions = async (
