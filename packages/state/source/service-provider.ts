@@ -1,14 +1,13 @@
 import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import Joi from "joi";
 
 import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
+import { StateStore } from "./state";
 import { StateVerifier } from "./state-verifier";
-import { StateStore } from "./stores/state";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 
@@ -23,11 +22,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// TODO: remove resignations index
 		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
+		this.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
+		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.StateAttributes);
+		stateAttributeRepository.set("height", Contracts.State.AttributeType.Number);
+		stateAttributeRepository.set("totalRound", Contracts.State.AttributeType.Number);
+
 		this.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
-		const attributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
-		attributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
-		attributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
-		attributeRepository.set("publicKey", Contracts.State.AttributeType.String);
+		const walletAttributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
+		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
 
 		this.app
 			.bind(Identifiers.WalletRepository)
@@ -63,21 +67,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
 		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
-	}
-
-	public async bootWhen(serviceProvider?: string): Promise<boolean> {
-		return serviceProvider === "@mainsail/database";
-	}
-
-	public configSchema(): object {
-		return Joi.object({
-			storage: Joi.object({
-				maxLastBlocks: Joi.number().integer().min(1).required(),
-				maxLastTransactionIds: Joi.number().integer().min(1).required(),
-			}).required(),
-			walletSync: Joi.object({
-				enabled: Joi.boolean().required(),
-			}).required(),
-		}).unknown(true);
 	}
 }

@@ -22,15 +22,10 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"immutable": "4.0.0-rc.14",
-		"joi": "17.9.2",
-		"lmdb": "2.7.11"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/sinon": "^10.0.14",
 		"import-fresh": "3.3.0",
-		"sinon": "^15.0.4",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

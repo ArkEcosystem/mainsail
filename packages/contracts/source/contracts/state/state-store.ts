@@ -1,4 +1,4 @@
-import { IBlock, IBlockData, ICommittedBlock } from "../crypto";
+import { IBlock, ICommittedBlock } from "../crypto";
 
 export interface StateStore {
 	isBootstrap(): boolean;
@@ -9,23 +9,13 @@ export interface StateStore {
 
 	setGenesisBlock(block: ICommittedBlock): void;
 
-	getMaxLastBlocks(): number;
-
 	getLastHeight(): number;
 
 	getLastBlock(): IBlock;
 
 	setLastBlock(block: IBlock): void;
 
-	getLastBlocks(): IBlock[];
+	getTotalRound(): number;
 
-	getLastBlockIds(): string[];
-
-	getLastBlocksByHeight(start: number, end?: number, headersOnly?: boolean): IBlockData[];
-
-	getCommonBlocks(ids: string[]): IBlockData[];
-
-	getLastCommittedRound(): number;
-
-	setLastCommittedRound(committedRound: number): void;
+	setTotalRound(totalRound: number): void;
 }

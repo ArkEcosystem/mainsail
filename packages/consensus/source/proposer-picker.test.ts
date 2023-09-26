@@ -15,7 +15,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.state = {
 			getLastBlock: () => {},
-			getLastCommittedRound: () => 0,
+			getTotalRound: () => 0,
 		};
 		context.validatorSet = {
 			getActiveValidators: () => {},
@@ -106,14 +106,14 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
 
-		const spyOnGetLastCommittedRound = stub(state, "getLastCommittedRound").returnValue(51);
+		const spyOnGetTotalRound = stub(state, "getTotalRound").returnValue(51);
 
 		await proposerPicker.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: activeValidators } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
 
-		spyOnGetLastCommittedRound.calledOnce();
+		spyOnGetTotalRound.calledOnce();
 	});
 
 	it("#handleCommittedBlock - should shuffle validator matrix on full round", async ({ proposerPicker, sandbox }) => {

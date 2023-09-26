@@ -26,10 +26,9 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	}
 
 	public getValidatorIndex(round: number): number {
-		const totalRound = this.#getTotalRound(round);
 		const { activeValidators } = this.configuration.getMilestone();
 
-		const offset = totalRound % activeValidators;
+		const offset = (this.state.getTotalRound() + round) % activeValidators;
 		return this.validatorIndexMatrix[offset % activeValidators];
 	}
 
@@ -49,16 +48,10 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	}
 
 	#calculateSeed(): string {
-		const totalRound = this.state.getLastCommittedRound();
+		const totalRound = this.state.getTotalRound();
 
 		// TODO: take block id into account
 
 		return `${totalRound}`;
-	}
-
-	#getTotalRound(round: number): number {
-		const committedRound = this.state.getLastCommittedRound();
-
-		return committedRound + round;
 	}
 }
