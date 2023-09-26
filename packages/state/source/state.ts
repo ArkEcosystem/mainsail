@@ -108,12 +108,12 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public getAttribute<T>(key: string): T {
-		if (this.hasAttribute(key)) {
-			const attribute = this.attributes.get(key);
+		if (this.attributes.has(key)) {
+			return this.attributes.get(key)!.get() as T;
+		}
 
-			if (attribute) {
-				return attribute.get() as T;
-			}
+		if (this.#originalStateStore) {
+			return this.#originalStateStore.getAttribute<T>(key);
 		}
 
 		throw new Error(`Attribute "${key}" is not set.`);
