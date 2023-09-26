@@ -31,8 +31,9 @@ export class StateStore implements Contracts.State.StateStore {
 		this.setAttribute("totalRound", 0);
 	}
 
-	configure(stateStore?: Contracts.State.StateStore) {
+	configure(stateStore?: Contracts.State.StateStore): Contracts.State.StateStore {
 		this.#originalStateStore = stateStore;
+		return this;
 	}
 
 	public isBootstrap(): boolean {

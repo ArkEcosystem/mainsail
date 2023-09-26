@@ -1,7 +1,7 @@
 import { IBlock, ICommittedBlock } from "../crypto";
 
 export interface StateStore {
-	configure(stateStore?: StateStore): void;
+	configure(stateStore?: StateStore): StateStore;
 
 	isBootstrap(): boolean;
 	setBootstrap(value: boolean): void;
