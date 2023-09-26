@@ -81,8 +81,10 @@ export class Wallet implements Contracts.State.Wallet {
 	public getAttributes(): Record<string, any> {
 		const result = {};
 
-		for (const [key, value] of this.attributes.entries()) {
-			result[key] = value.get();
+		for (const name of this.attributeRepository.getAttributeNames()) {
+			if (this.hasAttribute(name)) {
+				result[name] = this.getAttribute(name);
+			}
 		}
 
 		return result;
