@@ -85,7 +85,15 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public hasAttribute(key: string): boolean {
-		return this.attributes.has(key);
+		if (this.attributes.has(key)) {
+			return true;
+		}
+
+		if (this.#originalStateStore) {
+			return this.#originalStateStore.hasAttribute(key);
+		}
+
+		return false;
 	}
 
 	public setAttribute<T>(key: string, value: T): void {
