@@ -1,10 +1,10 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { SinonSpy } from "sinon";
 
-import { describeSkip, Factories } from "../../../test-framework";
-import { makeChainedBlocks } from "../../test/make-chained-block";
-import { setUp } from "../../test/setup";
-import { StateStore } from ".";
+import { describeSkip, Factories } from "../../test-framework/distribution";
+import { makeChainedBlocks } from "../test/make-chained-block";
+import { setUp } from "../test/setup";
+import { StateStore } from "./stores";
 
 describeSkip<{
 	blocks: Contracts.Crypto.IBlock[];

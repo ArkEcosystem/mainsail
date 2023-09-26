@@ -2,7 +2,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
-import { factory } from "../attributes";
+import { factory } from "./attributes";
 
 @injectable()
 export class StateStore implements Contracts.State.StateStore {
