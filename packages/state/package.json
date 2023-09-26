@@ -25,6 +25,7 @@
 		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
+		"import-fresh": "3.3.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

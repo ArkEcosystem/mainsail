@@ -29,10 +29,4 @@ describe<{
 
 		assert.resolves(async () => await context.serviceProvider.boot());
 	});
-
-	it("should boot when the package is database", async (context) => {
-		assert.false(await context.serviceProvider.bootWhen());
-		assert.false(await context.serviceProvider.bootWhen("not-database"));
-		assert.true(await context.serviceProvider.bootWhen("@mainsail/database"));
-	});
 });

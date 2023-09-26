@@ -68,8 +68,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
 		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
 	}
-
-	public async bootWhen(serviceProvider?: string): Promise<boolean> {
-		return serviceProvider === "@mainsail/database";
-	}
 }
