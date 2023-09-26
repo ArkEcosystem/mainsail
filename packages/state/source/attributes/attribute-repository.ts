@@ -13,6 +13,10 @@ export class AttributeRepository implements Contracts.State.IAttributeRepository
 		return this.#attributes.has(name);
 	}
 
+	public getAttributeNames(): IterableIterator<string> {
+		return this.#attributes.keys();
+	}
+
 	public getAttributeType<T>(name: string): Contracts.State.AttributeType {
 		const attributeType = this.#attributes.get(name);
 
