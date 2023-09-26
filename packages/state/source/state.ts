@@ -71,11 +71,11 @@ export class StateStore implements Contracts.State.StateStore {
 		return this.getAttribute("height");
 	}
 
-	public getLastCommittedRound(): number {
+	public getTotalRound(): number {
 		return this.getAttribute("committedRound");
 	}
 
-	public setLastCommittedRound(committedRound: number): void {
+	public setTotalRound(committedRound: number): void {
 		this.setAttribute("committedRound", committedRound);
 	}
 

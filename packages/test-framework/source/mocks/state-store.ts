@@ -1,5 +1,4 @@
 import { Contracts } from "@mainsail/contracts";
-import { Stores } from "@mainsail/state";
 
 let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;
 let lastHeight = 0;
@@ -12,7 +11,7 @@ export const setLastHeight = (height: number) => {
 	lastHeight = height;
 };
 
-class StateStoreMocks implements Partial<Stores.StateStore> {
+class StateStoreMocks implements Partial<Contracts.State.StateStore> {
 	public getLastBlock(): Contracts.Crypto.IBlock {
 		return mockBlock as Contracts.Crypto.IBlock;
 	}

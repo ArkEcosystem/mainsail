@@ -493,7 +493,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 
 		this.logger.info(
-			`Completed consensus bootstrap for ${this.#height}/${this.#round}/${this.state.getLastCommittedRound()}`,
+			`Completed consensus bootstrap for ${this.#height}/${this.#round}/${this.state.getTotalRound()}`,
 		);
 	}
 }

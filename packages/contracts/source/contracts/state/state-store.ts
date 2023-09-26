@@ -15,7 +15,7 @@ export interface StateStore {
 
 	setLastBlock(block: IBlock): void;
 
-	getLastCommittedRound(): number;
+	getTotalRound(): number;
 
-	setLastCommittedRound(committedRound: number): void;
+	setTotalRound(totalRound: number): void;
 }
