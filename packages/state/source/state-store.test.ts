@@ -1,9 +1,9 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/distribution";
 import { AttributeRepository } from "./attributes";
-import { StateStore } from "./state";
+import { StateStore } from "./state-store";
 
 describe<{
 	sandbox: Sandbox;

@@ -26,7 +26,7 @@ import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
 import { BlockState } from "../source/block-state";
-import { StateStore } from "../source/state";
+import { StateStore } from "../source/state-store";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
 
