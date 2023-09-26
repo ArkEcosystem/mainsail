@@ -21,6 +21,7 @@ export class StateStore implements Contracts.State.StateStore {
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastBlock?: Contracts.Crypto.IBlock;
 	#isBootstrap = true;
+	#originalStateStore?: Contracts.State.StateStore;
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
@@ -28,6 +29,10 @@ export class StateStore implements Contracts.State.StateStore {
 	public initialize() {
 		this.setAttribute("height", 0);
 		this.setAttribute("totalRound", 0);
+	}
+
+	configure(stateStore?: Contracts.State.StateStore) {
+		this.#originalStateStore = stateStore;
 	}
 
 	public isBootstrap(): boolean {
