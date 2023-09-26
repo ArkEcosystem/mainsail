@@ -27,7 +27,7 @@ export class StateStore implements Contracts.State.StateStore {
 	@postConstruct()
 	public initialize() {
 		this.setAttribute("height", 0);
-		this.setAttribute("committedRound", 0);
+		this.setAttribute("totalRound", 0);
 	}
 
 	public isBootstrap(): boolean {
@@ -72,11 +72,11 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public getTotalRound(): number {
-		return this.getAttribute("committedRound");
+		return this.getAttribute("totalRound");
 	}
 
-	public setTotalRound(committedRound: number): void {
-		this.setAttribute("committedRound", committedRound);
+	public setTotalRound(totalRound: number): void {
+		this.setAttribute("totalRound", totalRound);
 	}
 
 	public hasAttribute(key: string): boolean {

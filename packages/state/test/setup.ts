@@ -109,7 +109,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.set("height", Contracts.State.AttributeType.Number);
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
-		.set("committedRound", Contracts.State.AttributeType.Number);
+		.set("totalRound", Contracts.State.AttributeType.Number);
 
 	sandbox.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
 	sandbox.app

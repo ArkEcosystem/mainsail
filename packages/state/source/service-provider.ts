@@ -25,7 +25,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
 		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.StateAttributes);
 		stateAttributeRepository.set("height", Contracts.State.AttributeType.Number);
-		stateAttributeRepository.set("committedRound", Contracts.State.AttributeType.Number);
+		stateAttributeRepository.set("totalRound", Contracts.State.AttributeType.Number);
 
 		this.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
 		const walletAttributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);

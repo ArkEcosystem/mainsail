@@ -38,7 +38,7 @@ describe<{
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
-			.set("committedRound", Contracts.State.AttributeType.Number);
+			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
@@ -48,9 +48,9 @@ describe<{
 		context.stateStore = context.sandbox.app.resolve(StateStore);
 	});
 
-	it("#initialize - should set height and committedRound", ({ stateStore }) => {
+	it("#initialize - should set height and totalRound", ({ stateStore }) => {
 		assert.equal(stateStore.getAttribute("height"), 0);
-		assert.equal(stateStore.getAttribute("committedRound"), 0);
+		assert.equal(stateStore.getAttribute("totalRound"), 0);
 	});
 
 	it("#isBootstrap - should return true by default", ({ stateStore }) => {
@@ -119,13 +119,13 @@ describe<{
 		assert.equal(stateStore.getLastHeight(), 1);
 	});
 
-	it("#getLastCommittedRound - should return committedRound", ({ stateStore }) => {
-		assert.equal(stateStore.getLastCommittedRound(), 0);
+	it("#getTotalRound - should return totalRound", ({ stateStore }) => {
+		assert.equal(stateStore.getTotalRound(), 0);
 	});
 
-	it("#setLastCommittedRound - should set committedRound", ({ stateStore }) => {
-		stateStore.setLastCommittedRound(1);
-		assert.equal(stateStore.getLastCommittedRound(), 1);
+	it("#setTotalRound - should set totalRound", ({ stateStore }) => {
+		stateStore.setTotalRound(1);
+		assert.equal(stateStore.getTotalRound(), 1);
 	});
 
 	it("#hasAttribute - should return true if attribute is set", ({ stateStore }) => {
