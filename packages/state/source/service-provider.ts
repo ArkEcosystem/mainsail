@@ -23,7 +23,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
 		this.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
-		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
+		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.StateAttributes);
 		stateAttributeRepository.set("height", Contracts.State.AttributeType.Number);
 		stateAttributeRepository.set("committedRound", Contracts.State.AttributeType.Number);
 

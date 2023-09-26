@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
@@ -24,7 +24,8 @@ export class StateStore implements Contracts.State.StateStore {
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
-	public constructor() {
+	@postConstruct()
+	public initialize() {
 		this.setAttribute("height", 0);
 		this.setAttribute("committedRound", 0);
 	}
