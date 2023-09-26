@@ -9,11 +9,11 @@ export class AttributeRepository implements Contracts.State.IAttributeRepository
 		this.#attributes.set(name, type);
 	}
 
-	has(name: string): boolean {
+	public has(name: string): boolean {
 		return this.#attributes.has(name);
 	}
 
-	getAttributeType<T>(name: string): Contracts.State.AttributeType {
+	public getAttributeType<T>(name: string): Contracts.State.AttributeType {
 		const attributeType = this.#attributes.get(name);
 
 		if (!attributeType) {
