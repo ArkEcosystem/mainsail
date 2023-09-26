@@ -26,8 +26,7 @@ import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
 import { BlockState } from "../source/block-state";
-import { defaults } from "../source/defaults";
-import { StateStore } from "../source/stores";
+import { StateStore } from "../source/state";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
 
@@ -103,6 +102,14 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app
 		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
 		.set(Contracts.State.WalletIndexes.Resignations);
+
+	sandbox.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+		.set("height", Contracts.State.AttributeType.Number);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+		.set("committedRound", Contracts.State.AttributeType.Number);
 
 	sandbox.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
 	sandbox.app
