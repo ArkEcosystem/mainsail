@@ -7,12 +7,12 @@ import { StateStore } from "./state-store";
 
 describe<{
 	sandbox: Sandbox;
-	stateStore: StateStore;
+	stateStore: Contracts.State.StateStore;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
 	eventDispatcher: any;
-}>("StateStore", ({ it, beforeEach, assert, spy, stub, clock }) => {
+}>("StateStore", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
 			notice: () => {},
@@ -45,7 +45,7 @@ describe<{
 
 		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(Identifiers.StateAttributes);
 
-		context.stateStore = context.sandbox.app.resolve(StateStore);
+		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 	});
 
 	it("#initialize - should set height and totalRound", ({ stateStore }) => {
@@ -152,5 +152,61 @@ describe<{
 
 	it("#getAttribute - should throw if attribute is not registered", ({ stateStore }) => {
 		assert.throws(() => stateStore.getAttribute("unknownAttribute"), 'Attribute "unknownAttribute" is not set.');
+	});
+});
+
+describe<{
+	sandbox: Sandbox;
+	stateStore: Contracts.State.StateStore;
+	stateStoreClone: Contracts.State.StateStore;
+	attributeRepository: AttributeRepository;
+	logger: any;
+	cryptoConfiguration: any;
+	eventDispatcher: any;
+}>("StateStore - Clone", ({ it, beforeEach, assert, spy, stub }) => {
+	beforeEach(async (context) => {
+		context.logger = {
+			notice: () => {},
+		};
+
+		context.cryptoConfiguration = {
+			isNewMilestone: () => false,
+			setHeight: () => {},
+		};
+
+		context.eventDispatcher = {
+			dispatch: () => {},
+		};
+
+		context.sandbox = new Sandbox();
+
+		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
+		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.set("height", Contracts.State.AttributeType.Number);
+		context.sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.set("totalRound", Contracts.State.AttributeType.Number);
+		context.sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.set("customAttribute", Contracts.State.AttributeType.Number);
+
+		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(Identifiers.StateAttributes);
+
+		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
+		context.stateStoreClone = context.sandbox.app.resolve(StateStore).configure(context.stateStore);
+	});
+
+	it("#initialize - should return original height and totalRound", ({ stateStore, sandbox }) => {
+		stateStore.setAttribute("height", 1);
+		stateStore.setAttribute("totalRound", 2);
+
+		const stateStoreClone = sandbox.app.resolve(StateStore).configure(stateStore);
+
+		assert.equal(stateStoreClone.getAttribute("height"), 1);
+		assert.equal(stateStoreClone.getAttribute("totalRound"), 2);
 	});
 });
