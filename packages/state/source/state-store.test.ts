@@ -219,4 +219,88 @@ describe<{
 		assert.equal(stateStoreClone.getLastHeight(), 1);
 		assert.false(stateStoreClone.isBootstrap());
 	});
+
+	it("#setBootstrap - should be set only on clone", ({ stateStore, stateStoreClone }) => {
+		assert.true(stateStore.isBootstrap());
+		assert.true(stateStoreClone.isBootstrap());
+
+		stateStoreClone.setBootstrap(false);
+
+		assert.true(stateStore.isBootstrap());
+		assert.false(stateStoreClone.isBootstrap());
+	});
+
+	it("#setGenesisBlock - should be set only on clone", ({ stateStore, stateStoreClone }) => {
+		assert.throws(() => stateStore.getGenesisBlock());
+		assert.throws(() => stateStoreClone.getGenesisBlock());
+
+		const genesisBlock = { block: { data: { height: 0 } } };
+		stateStoreClone.setGenesisBlock(genesisBlock as any);
+
+		assert.throws(() => stateStore.getGenesisBlock());
+		assert.equal(stateStoreClone.getGenesisBlock(), genesisBlock);
+	});
+
+	it("#setLastBlock - should be set only on clone", ({ stateStore, stateStoreClone }) => {
+		assert.throws(() => stateStore.getLastBlock());
+		assert.throws(() => stateStoreClone.getLastBlock());
+
+		const block = { data: { height: 1 } };
+		stateStoreClone.setLastBlock(block as any);
+
+		assert.throws(() => stateStore.getLastBlock());
+		assert.equal(stateStoreClone.getLastBlock(), block);
+		assert.equal(stateStore.getLastHeight(), 0);
+		assert.equal(stateStoreClone.getLastHeight(), 1);
+	});
+
+	it("#setTotalRound - should be set only on clone", ({ stateStore, stateStoreClone }) => {
+		assert.equal(stateStore.getTotalRound(), 0);
+		assert.equal(stateStoreClone.getTotalRound(), 0);
+
+		stateStoreClone.setTotalRound(1);
+
+		assert.equal(stateStore.getTotalRound(), 0);
+		assert.equal(stateStoreClone.getTotalRound(), 1);
+	});
+
+	it("#setAttribute - should be set only on clone", ({ stateStore, stateStoreClone }) => {
+		assert.throws(() => stateStore.getAttribute("customAttribute"));
+		assert.throws(() => stateStoreClone.getAttribute("customAttribute"));
+
+		stateStoreClone.setAttribute("customAttribute", 1);
+
+		assert.throws(() => stateStore.getAttribute("customAttribute"));
+		assert.equal(stateStoreClone.getAttribute("customAttribute"), 1);
+	});
+
+	it("hasAttribute - should be true only on clone", ({ stateStore, stateStoreClone }) => {
+		assert.false(stateStore.hasAttribute("customAttribute"));
+		assert.false(stateStoreClone.hasAttribute("customAttribute"));
+
+		stateStoreClone.setAttribute("customAttribute", 1);
+
+		assert.false(stateStore.hasAttribute("customAttribute"));
+		assert.true(stateStoreClone.hasAttribute("customAttribute"));
+	});
+
+	it("#geAttribute - should return if set on original", ({ stateStore, stateStoreClone }) => {
+		assert.throws(() => stateStore.getAttribute("customAttribute"));
+		assert.throws(() => stateStoreClone.getAttribute("customAttribute"));
+
+		stateStore.setAttribute("customAttribute", 1);
+
+		assert.equal(stateStore.getAttribute("customAttribute"), 1);
+		assert.equal(stateStoreClone.getAttribute("customAttribute"), 1);
+	});
+
+	it("#geAttribute - should return if set on clone", ({ stateStore, stateStoreClone }) => {
+		assert.throws(() => stateStore.getAttribute("customAttribute"));
+		assert.throws(() => stateStoreClone.getAttribute("customAttribute"));
+
+		stateStoreClone.setAttribute("customAttribute", 1);
+
+		assert.throws(() => stateStore.getAttribute("customAttribute"));
+		assert.equal(stateStoreClone.getAttribute("customAttribute"), 1);
+	});
 });
