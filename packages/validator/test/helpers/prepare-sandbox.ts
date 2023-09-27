@@ -1,5 +1,4 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
@@ -11,8 +10,8 @@ import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key
 import { ServiceProvider as CoreCryptoMessages } from "../../../crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "../../../crypto-transaction";
-import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
 import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation";
+import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
 import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/events";
 import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers";
 import { ServiceProvider as CoreSerializer } from "../../../serializer";
@@ -40,13 +39,16 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoValidation).register();
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
+
+	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+
 	await context.sandbox.app.resolve(CoreState).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 	await context.sandbox.app.resolve(CoreTransactions).register();
 	await context.sandbox.app.resolve(CoreCryptoBlock).register();
 	await context.sandbox.app.resolve(CoreCryptoMessages).register();
 
-	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
 	context.sandbox.app.bind(Identifiers.TransactionPoolCollator).toConstantValue({
 		getBlockCandidateTransactions: () => [],
 	});
@@ -67,5 +69,4 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
 		.set("validatorConsensusPublicKey", Contracts.State.AttributeType.String);
-	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 };
