@@ -6,7 +6,7 @@ import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
-import { StateStore } from "./state";
+import { StateStore } from "./state-store";
 import { StateVerifier } from "./state-verifier";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
@@ -61,7 +61,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 
-		this.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
+		this.app.bind(Identifiers.StateStore).toConstantValue(this.app.resolve(StateStore).configure());
 
 		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
 

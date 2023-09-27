@@ -15,6 +15,8 @@ describe<{
 	beforeEach((context) => {
 		const app = new Application(new Container());
 		app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		app.bind(Identifiers.LogService).toConstantValue({});
+		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
 		context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
 		context.app = app;
@@ -27,6 +29,6 @@ describe<{
 	it("should boot and dispose", async (context) => {
 		await context.serviceProvider.register();
 
-		assert.resolves(async () => await context.serviceProvider.boot());
+		await assert.resolves(() => context.serviceProvider.boot());
 	});
 });

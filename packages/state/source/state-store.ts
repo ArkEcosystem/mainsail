@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
@@ -21,13 +21,23 @@ export class StateStore implements Contracts.State.StateStore {
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastBlock?: Contracts.Crypto.IBlock;
 	#isBootstrap = true;
+	#originalStateStore?: StateStore;
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
-	@postConstruct()
-	public initialize() {
-		this.setAttribute("height", 0);
-		this.setAttribute("totalRound", 0);
+	configure(stateStore?: StateStore): StateStore {
+		this.#originalStateStore = stateStore;
+
+		if (stateStore) {
+			this.#genesisBlock = stateStore.#genesisBlock;
+			this.#lastBlock = stateStore.#lastBlock;
+			this.#isBootstrap = stateStore.#isBootstrap;
+		} else {
+			this.setAttribute("height", 0);
+			this.setAttribute("totalRound", 0);
+		}
+
+		return this;
 	}
 
 	public isBootstrap(): boolean {
@@ -80,7 +90,15 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public hasAttribute(key: string): boolean {
-		return this.attributes.has(key);
+		if (this.attributes.has(key)) {
+			return true;
+		}
+
+		if (this.#originalStateStore) {
+			return this.#originalStateStore.hasAttribute(key);
+		}
+
+		return false;
 	}
 
 	public setAttribute<T>(key: string, value: T): void {
@@ -95,14 +113,26 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public getAttribute<T>(key: string): T {
-		if (this.hasAttribute(key)) {
-			const attribute = this.attributes.get(key);
+		if (this.attributes.has(key)) {
+			return this.attributes.get(key)!.get() as T;
+		}
 
-			if (attribute) {
-				return attribute.get() as T;
-			}
+		if (this.#originalStateStore) {
+			return this.#originalStateStore.getAttribute<T>(key);
 		}
 
 		throw new Error(`Attribute "${key}" is not set.`);
+	}
+
+	public commitChanges(): void {
+		if (this.#originalStateStore) {
+			this.#originalStateStore.#lastBlock = this.#lastBlock;
+			this.#originalStateStore.#genesisBlock = this.#genesisBlock;
+			this.#originalStateStore.#isBootstrap = this.#isBootstrap;
+
+			for (const [key, attribute] of this.attributes.entries()) {
+				this.#originalStateStore.setAttribute(key, attribute.get());
+			}
+		}
 	}
 }

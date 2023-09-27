@@ -49,14 +49,14 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CryptoBlock).register();
 
 	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => {} });
+	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 	await context.sandbox.app.resolve(CoreState).register();
 
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Deserializer).to(Deserializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).to(MessageFactory).inSingletonScope();
-
-	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 	for (const keyword of Object.values(
 		makeKeywords(context.sandbox.app.get(Identifiers.Cryptography.Configuration)),
