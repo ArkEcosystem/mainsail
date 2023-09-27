@@ -16,6 +16,7 @@ export const register = (server: Hapi.Server): void => {
 			validate: {
 				query: Joi.object({
 					...walletCriteriaSchemaObject,
+					transform: Joi.bool().default(true),
 				}).
 					concat(walletSortingSchema).
 					concat(pagination),
@@ -36,6 +37,7 @@ export const register = (server: Hapi.Server): void => {
 			validate: {
 				query: Joi.object({
 					...walletCriteriaSchemaObject,
+					transform: Joi.bool().default(true),
 				}).
 					concat(walletSortingSchema).
 					concat(pagination),
@@ -55,6 +57,9 @@ export const register = (server: Hapi.Server): void => {
 				params: Joi.object({
 					id: walletParamSchema,
 				}),
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				})
 			},
 		},
 	});

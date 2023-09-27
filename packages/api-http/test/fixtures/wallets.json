@@ -1,0 +1,38 @@
+[
+    {
+        "address": "ark1d85azse70sftzd47z3lrjfqxdyf8l8jvjwv9ldhnnn6nhm88wgjqqx9j26",
+        "publicKey": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
+        "balance": "0",
+        "nonce": "0",
+        "attributes": {
+            "vote": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
+            "nonce": "0",
+            "balance": "0",
+            "publicKey": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
+            "validatorUsername": "genesis_26",
+            "validatorLastBlock": {
+                "id": "2fb821b518e67bef1dc3ae7d110e797aec0ab6b0fe0990da1d2db1efe4e2b806",
+                "height": 5586,
+                "reward": "0",
+                "version": 1,
+                "totalFee": "0",
+                "timestamp": 1695806407393,
+                "payloadHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "totalAmount": "0",
+                "payloadLength": 0,
+                "previousBlock": "a73861139978abdbb77cc9bf387578da220c55f9714dc7315c4e59b2b385b2f3",
+                "generatorPublicKey": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
+                "numberOfTransactions": 0
+            },
+            "validatorVoteBalance": "0",
+            "validatorConsensusPublicKey": "a8a23e59184ccc73445540b4bd912606153916ec795c2d81d29b6175008317da1f9e16ae34dd95ece4f1a228a45005b4"
+        }
+    },
+    {
+        "address": "ark1z5a7wer7hcrzhd3jhdcjjhqd64zjjd8h8fsteheerm3tvrqc4xas4v00dw",
+        "publicKey": "a73861139978abdbb77cc9bf387578da220c55f9714dc7315c4e59b2b385b2f3",
+        "balance": "0",
+        "nonce": "0",
+        "attributes": {}
+    }
+]
