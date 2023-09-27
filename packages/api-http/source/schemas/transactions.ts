@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { createSortingSchema, transactionCriteriaSchemas } from ".";
+import { createSortingSchema, transactionCriteriaSchemas, walletAddressSchema, walletPublicKeySchema } from ".";
 
 export const transactionIdSchema = Joi.string().hex().length(64);
 
@@ -11,9 +11,8 @@ export const transactionCriteriaSchemaObject = {
 			.regex(/^[\d%a-z]{1,64}$/)
 			.regex(/%/),
 	),
-	// TODO
-	recipientId: Joi.string(),
-	senderPublicKey: Joi.string(), // TODO
+	recipientId: walletAddressSchema,
+	senderPublicKey: walletPublicKeySchema,
 	vendorField: Joi.string().max(256),
 };
 

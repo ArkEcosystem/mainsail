@@ -41,6 +41,7 @@ export type ITransactionTypeRepository = ExtendedRepository<TransactionType> & I
 
 export type ITransactionRepositoryExtension = {
 	findManyByCritera(
+		walletRepository: IWalletRepository,
 		transactionCriteria: Criteria.OrTransactionCriteria,
 		sorting: Sorting,
 		pagination: Pagination,
@@ -53,7 +54,15 @@ export type IValidatorRoundRepositoryExtension = {};
 export type IValidatorRoundRepository = ExtendedRepository<ValidatorRound> & IValidatorRoundRepositoryExtension;
 export type IStateRepositoryExtension = {};
 export type IStateRepository = ExtendedRepository<State> & IStateRepositoryExtension;
-export type IWalletRepositoryExtension = {};
+
+export type IWalletRepositoryExtension = {
+	findManyByCritera(
+		transactionCriteria: Criteria.OrWalletCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Wallet>>;
+};
 export type IWalletRepository = ExtendedRepository<Wallet> & IWalletRepositoryExtension;
 
 export type IBlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => IBlockRepository;

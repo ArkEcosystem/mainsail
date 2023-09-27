@@ -103,7 +103,7 @@ export const orderBy = Joi.alternatives().try(
 	Joi.array().items(Joi.string().regex(/^[._a-z]{1,40}:(asc|desc)$/i)),
 );
 
-export const address = Joi.string().alphanum().length(34);
+export const address = Joi.string().alphanum(); /* TODO .length(34); */
 
 export const delegateIdentifier = Joi.string()
 	.regex(/^[\w!$&.@]+$/)
@@ -131,15 +131,6 @@ export const numberFixedOrBetween = Joi.alternatives().try(
 		from: Joi.number().integer().min(0),
 		to: Joi.number().integer().min(0),
 	}),
-);
-
-export const walletId = Joi.alternatives().try(
-	Joi.string()
-		.regex(/^[\d!$&.@_a-z]+$/)
-		.min(1)
-		.max(20),
-	Joi.string().alphanum().length(34),
-	Joi.string().hex().length(66),
 );
 
 export const blocksOrderBy = orderBy.default("height:desc");
