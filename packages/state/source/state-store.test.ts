@@ -7,7 +7,7 @@ import { StateStore } from "./state-store";
 
 describe<{
 	sandbox: Sandbox;
-	stateStore: Contracts.State.StateStore;
+	stateStore: StateStore;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
@@ -152,6 +152,10 @@ describe<{
 
 	it("#getAttribute - should throw if attribute is not registered", ({ stateStore }) => {
 		assert.throws(() => stateStore.getAttribute("unknownAttribute"), 'Attribute "unknownAttribute" is not set.');
+	});
+
+	it("#commitChanges - should pass", ({ stateStore }) => {
+		stateStore.commitChanges();
 	});
 });
 
@@ -302,5 +306,32 @@ describe<{
 
 		assert.throws(() => stateStore.getAttribute("customAttribute"));
 		assert.equal(stateStoreClone.getAttribute("customAttribute"), 1);
+	});
+
+	it("#commitChanges - should copy changes back to original", ({ stateStore, stateStoreClone }) => {
+		assert.equal(stateStore.getAttribute("height"), 0);
+		assert.equal(stateStore.getAttribute("totalRound"), 0);
+		assert.false(stateStore.hasAttribute("customAttribute"));
+		assert.true(stateStore.isBootstrap());
+		assert.throws(() => stateStore.getGenesisBlock());
+		assert.throws(() => stateStore.getLastBlock());
+
+		const genesisBlock = { block: { data: { height: 0 } } };
+		const block = { data: { height: 1 } };
+
+		stateStoreClone.setTotalRound(2);
+		stateStoreClone.setBootstrap(false);
+		stateStoreClone.setGenesisBlock(genesisBlock as any);
+		stateStoreClone.setLastBlock(block as any);
+		stateStoreClone.setAttribute("customAttribute", 1);
+
+		stateStoreClone.commitChanges();
+
+		assert.equal(stateStore.getAttribute("height"), 1);
+		assert.equal(stateStore.getAttribute("totalRound"), 2);
+		assert.equal(stateStore.getAttribute("customAttribute"), 1);
+		assert.false(stateStore.isBootstrap());
+		assert.equal(stateStore.getGenesisBlock(), genesisBlock);
+		assert.equal(stateStore.getLastBlock(), block);
 	});
 });

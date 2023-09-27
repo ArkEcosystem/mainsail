@@ -21,7 +21,7 @@ export class StateStore implements Contracts.State.StateStore {
 	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
 	#lastBlock?: Contracts.Crypto.IBlock;
 	#isBootstrap = true;
-	#originalStateStore?: Contracts.State.StateStore;
+	#originalStateStore?: StateStore;
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
@@ -122,5 +122,17 @@ export class StateStore implements Contracts.State.StateStore {
 		}
 
 		throw new Error(`Attribute "${key}" is not set.`);
+	}
+
+	public commitChanges(): void {
+		if (this.#originalStateStore) {
+			this.#originalStateStore.#lastBlock = this.#lastBlock;
+			this.#originalStateStore.#genesisBlock = this.#genesisBlock;
+			this.#originalStateStore.#isBootstrap = this.#isBootstrap;
+
+			for (const [key, attribute] of this.attributes.entries()) {
+				this.#originalStateStore.setAttribute(key, attribute.get());
+			}
+		}
 	}
 }
