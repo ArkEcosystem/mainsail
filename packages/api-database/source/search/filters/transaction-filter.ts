@@ -1,5 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
+import { IWalletRepository } from "../../contracts";
 import { Transaction } from "../../models";
 import { EqualCriteria, OrTransactionCriteria, TransactionCriteria } from "../criteria";
 import { ContainsExpression, EqualExpression, Expression } from "../expressions";
@@ -10,10 +11,12 @@ import {
 	hasOrCriteria,
 	optimizeExpression,
 } from "../search";
-import { IWalletRepository } from "../../contracts";
 
 export class TransactionFilter {
-	public static async getExpression(walletRepository: IWalletRepository, ...criteria: OrTransactionCriteria[]): Promise<Expression<Transaction>> {
+	public static async getExpression(
+		walletRepository: IWalletRepository,
+		...criteria: OrTransactionCriteria[]
+	): Promise<Expression<Transaction>> {
 		const expressions = await Promise.all(
 			criteria.map((c) => handleOrCriteria(c, (c) => this.handleTransactionCriteria(c, walletRepository))),
 		);
@@ -21,7 +24,10 @@ export class TransactionFilter {
 		return optimizeExpression({ expressions, op: "and" });
 	}
 
-	private static async handleTransactionCriteria(criteria: TransactionCriteria, walletRepository): Promise<Expression<Transaction>> {
+	private static async handleTransactionCriteria(
+		criteria: TransactionCriteria,
+		walletRepository,
+	): Promise<Expression<Transaction>> {
 		const expression: Expression<Transaction> = await handleAndCriteria(criteria, async (key) => {
 			switch (key) {
 				case "address":
@@ -109,7 +115,10 @@ export class TransactionFilter {
 		return { expressions: [expression, await this.getAutoTypeGroupExpression(criteria)], op: "and" };
 	}
 
-	private static async handleAddressCriteria(criteria: EqualCriteria<string>, walletRepository: IWalletRepository): Promise<Expression<Transaction>> {
+	private static async handleAddressCriteria(
+		criteria: EqualCriteria<string>,
+		walletRepository: IWalletRepository,
+	): Promise<Expression<Transaction>> {
 		const expressions: Expression<Transaction>[] = await Promise.all([
 			this.handleSenderIdCriteria(criteria, walletRepository),
 			this.handleRecipientIdCriteria(criteria),
@@ -118,8 +127,12 @@ export class TransactionFilter {
 		return { expressions, op: "or" };
 	}
 
-	private static async handleSenderIdCriteria(criteria: EqualCriteria<string>, walletRepository: IWalletRepository): Promise<Expression<Transaction>> {
-		const wallet = await walletRepository.createQueryBuilder()
+	private static async handleSenderIdCriteria(
+		criteria: EqualCriteria<string>,
+		walletRepository: IWalletRepository,
+	): Promise<Expression<Transaction>> {
+		const wallet = await walletRepository
+			.createQueryBuilder()
 			.select("public_key")
 			.where("address = :address", { address: criteria })
 			.getRawOne<{ public_key: string }>();
@@ -131,7 +144,9 @@ export class TransactionFilter {
 		return this.handleSenderPublicKeyCriteria(wallet.public_key);
 	}
 
-	private static async handleSenderPublicKeyCriteria(criteria: EqualCriteria<string>): Promise<Expression<Transaction>> {
+	private static async handleSenderPublicKeyCriteria(
+		criteria: EqualCriteria<string>,
+	): Promise<Expression<Transaction>> {
 		return { op: "equal", property: "senderPublicKey", value: criteria };
 	}
 

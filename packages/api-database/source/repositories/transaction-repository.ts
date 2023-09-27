@@ -1,4 +1,9 @@
-import { ITransactionRepository, ITransactionRepositoryExtension, IWalletRepository, RepositoryDataSource } from "../contracts";
+import {
+	ITransactionRepository,
+	ITransactionRepositoryExtension,
+	IWalletRepository,
+	RepositoryDataSource,
+} from "../contracts";
 import { Transaction } from "../models";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { TransactionFilter } from "../search/filters/transaction-filter";

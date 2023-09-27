@@ -2,7 +2,13 @@ import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets";
-import { pagination, transactionSortingSchema, walletCriteriaSchemaObject, walletParamSchema, walletSortingSchema } from "../schemas";
+import {
+	pagination,
+	transactionSortingSchema,
+	walletCriteriaSchemaObject,
+	walletParamSchema as walletParameterSchema,
+	walletSortingSchema,
+} from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(WalletsController);
@@ -11,64 +17,68 @@ export const register = (server: Hapi.Server): void => {
 	server.route({
 		handler: (request: Hapi.Request) => controller.index(request),
 		method: "GET",
-		path: "/wallets",
 		options: {
-			validate: {
-				query: Joi.object({
-					...walletCriteriaSchemaObject,
-					transform: Joi.bool().default(true),
-				}).
-					concat(walletSortingSchema).
-					concat(pagination),
-			},
 			plugins: {
 				pagination: {
 					enabled: true,
 				},
 			},
-		},
-	});
-
-	server.route({
-		method: "GET",
-		path: "/wallets/top",
-		handler: (request: Hapi.Request) => controller.top(request),
-		options: {
 			validate: {
 				query: Joi.object({
 					...walletCriteriaSchemaObject,
 					transform: Joi.bool().default(true),
-				}).
-					concat(walletSortingSchema).
-					concat(pagination),
+				})
+					.concat(walletSortingSchema)
+					.concat(pagination),
 			},
+		},
+		path: "/wallets",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.top(request),
+		method: "GET",
+		options: {
 			plugins: {
 				pagination: { enabled: true },
 			},
+			validate: {
+				query: Joi.object({
+					...walletCriteriaSchemaObject,
+					transform: Joi.bool().default(true),
+				})
+					.concat(walletSortingSchema)
+					.concat(pagination),
+			},
 		},
+		path: "/wallets/top",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/wallets/{id}",
 		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
 		options: {
 			validate: {
 				params: Joi.object({
-					id: walletParamSchema,
+					id: walletParameterSchema,
 				}),
 				query: Joi.object({
 					transform: Joi.bool().default(true),
-				})
+				}),
 			},
 		},
+		path: "/wallets/{id}",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/wallets/{id}/transactions",
 		handler: (request: Hapi.Request) => controller.transactions(request),
+		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					id: server.app.schemas.walletId,
@@ -81,19 +91,19 @@ export const register = (server: Hapi.Server): void => {
 					.concat(transactionSortingSchema)
 					.concat(pagination),
 			},
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
 		},
+		path: "/wallets/{id}/transactions",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/wallets/{id}/transactions/sent",
 		handler: (request: Hapi.Request) => controller.transactionsSent(request),
+		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					id: server.app.schemas.walletId,
@@ -106,19 +116,19 @@ export const register = (server: Hapi.Server): void => {
 					.concat(transactionSortingSchema)
 					.concat(pagination),
 			},
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
 		},
+		path: "/wallets/{id}/transactions/sent",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/wallets/{id}/transactions/received",
 		handler: (request: Hapi.Request) => controller.transactionsReceived(request),
+		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					id: server.app.schemas.walletId,
@@ -131,19 +141,19 @@ export const register = (server: Hapi.Server): void => {
 					.concat(transactionSortingSchema)
 					.concat(pagination),
 			},
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
 		},
+		path: "/wallets/{id}/transactions/received",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/wallets/{id}/votes",
 		handler: (request: Hapi.Request) => controller.votes(request),
+		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					id: server.app.schemas.walletId,
@@ -156,12 +166,8 @@ export const register = (server: Hapi.Server): void => {
 					.concat(transactionSortingSchema)
 					.concat(pagination),
 			},
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
 		},
+		path: "/wallets/{id}/votes",
 	});
 
 	// TODO: locks

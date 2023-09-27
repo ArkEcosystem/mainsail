@@ -115,6 +115,6 @@ export class Controller {
 	}
 
 	protected getEmptyPage(): ResultsPage<any> {
-		return { results: [], totalCount: 0, meta: { totalCountIsEstimate: false } };
+		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
 	}
 }

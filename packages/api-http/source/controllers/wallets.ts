@@ -1,12 +1,17 @@
-import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers, Models, Search } from "@mainsail/api-database";
+import Hapi from "@hapi/hapi";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+	Search,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
+import { TransactionResource } from "../resources";
 import { WalletResource } from "../resources/wallet";
 import { Controller } from "./controller";
-import { TransactionResource } from "../resources";
 
 @injectable()
 export class WalletsController extends Controller {
@@ -22,12 +27,7 @@ export class WalletsController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
-		const wallets = await this.walletRepositoryFactory().findManyByCritera(
-			criteria,
-			sorting,
-			pagination,
-			options
-		);
+		const wallets = await this.walletRepositoryFactory().findManyByCritera(criteria, sorting, pagination, options);
 
 		return this.toPagination(wallets, WalletResource, request.query.transform);
 	}
@@ -38,12 +38,7 @@ export class WalletsController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
-		const wallets = await this.walletRepositoryFactory().findManyByCritera(
-			criteria,
-			sorting,
-			pagination,
-			options
-		);
+		const wallets = await this.walletRepositoryFactory().findManyByCritera(criteria, sorting, pagination, options);
 
 		return this.toPagination(wallets, WalletResource, request.query.transform);
 	}
@@ -106,9 +101,9 @@ export class WalletsController extends Controller {
 		}
 
 		return this.getTransactions(request, {
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
-			type: Contracts.Crypto.TransactionType.Vote,
 			senderPublicKey: wallet.publicKey,
+			type: Contracts.Crypto.TransactionType.Vote,
+			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
 		});
 	}
 
@@ -132,8 +127,8 @@ export class WalletsController extends Controller {
 	}
 
 	private async getWallet(walletId: string): Promise<Models.Wallet | null> {
-		return this.walletRepositoryFactory().
-			createQueryBuilder()
+		return this.walletRepositoryFactory()
+			.createQueryBuilder()
 			.select()
 			.where("address = :address", { address: walletId })
 			.orWhere("public_key = :publicKey", { publicKey: walletId })
