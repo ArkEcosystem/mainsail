@@ -25,10 +25,14 @@ export class StateStore implements Contracts.State.StateStore {
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
-	configure(stateStore?: Contracts.State.StateStore): Contracts.State.StateStore {
+	configure(stateStore?: StateStore): StateStore {
 		this.#originalStateStore = stateStore;
 
-		if (!this.#originalStateStore) {
+		if (stateStore) {
+			this.#genesisBlock = stateStore.#genesisBlock;
+			this.#lastBlock = stateStore.#lastBlock;
+			this.#isBootstrap = stateStore.#isBootstrap;
+		} else {
 			this.setAttribute("height", 0);
 			this.setAttribute("totalRound", 0);
 		}

@@ -157,8 +157,8 @@ describe<{
 
 describe<{
 	sandbox: Sandbox;
-	stateStore: Contracts.State.StateStore;
-	stateStoreClone: Contracts.State.StateStore;
+	stateStore: StateStore;
+	stateStoreClone: StateStore;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
@@ -197,16 +197,26 @@ describe<{
 		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(Identifiers.StateAttributes);
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
+
 		context.stateStoreClone = context.sandbox.app.resolve(StateStore).configure(context.stateStore);
 	});
 
-	it("#initialize - should return original height and totalRound", ({ stateStore, sandbox }) => {
-		stateStore.setAttribute("height", 1);
-		stateStore.setAttribute("totalRound", 2);
+	it("#initialize - should return original height and totalRound, isBootstrap, lastBlock and genesisBlock", ({
+		stateStore,
+		sandbox,
+	}) => {
+		const genesisBlock = { block: { data: { height: 0 } } };
+		const block = { data: { height: 1 } };
+
+		stateStore.setTotalRound(2);
+		stateStore.setBootstrap(false);
+		stateStore.setGenesisBlock(genesisBlock as any);
+		stateStore.setLastBlock(block as any);
 
 		const stateStoreClone = sandbox.app.resolve(StateStore).configure(stateStore);
 
-		assert.equal(stateStoreClone.getAttribute("height"), 1);
-		assert.equal(stateStoreClone.getAttribute("totalRound"), 2);
+		assert.equal(stateStoreClone.getTotalRound(), 2);
+		assert.equal(stateStoreClone.getLastHeight(), 1);
+		assert.false(stateStoreClone.isBootstrap());
 	});
 });
