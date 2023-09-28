@@ -171,8 +171,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 		const codec = Codecs[event];
 
-		this.connector.forgetError(peer);
-
 		const timeBeforeSocketCall: number = Date.now();
 
 		await this.connector.connect(peer);

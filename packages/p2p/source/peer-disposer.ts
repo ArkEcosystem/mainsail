@@ -51,11 +51,12 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	}
 
 	public disposePeer(ip: string): void {
+		void this.connector.disconnect(ip);
+
 		if (this.repository.hasPeer(ip)) {
 			const peer = this.repository.getPeer(ip);
 
 			this.repository.forgetPeer(peer);
-			this.connector.disconnect(peer);
 			peer.dispose();
 
 			void this.events.dispatch(Enums.PeerEvent.Removed, peer);
