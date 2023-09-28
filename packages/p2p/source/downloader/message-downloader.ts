@@ -4,7 +4,7 @@ import { Enums, Utils } from "@mainsail/kernel";
 
 import { getRandomPeer } from "../utils";
 
-type DownloadsByHeight = {
+type DownloadsByRound = {
 	precommits: boolean[];
 	prevotes: boolean[];
 };
@@ -55,7 +55,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2PState)
 	private readonly state!: Contracts.P2P.State;
 
-	#downloadsByHeight = new Map<number, DownloadsByHeight>();
+	#downloadsByHeight: Map<number, Map<number, DownloadsByRound>> = new Map();
 
 	@postConstruct()
 	public initialize(): void {
@@ -89,7 +89,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		const downloads = this.#getDownloadsByHeight(peer.header.height);
+		const downloads = this.#getDownloadsByRound(peer.header.height, peer.header.round);
 
 		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes, header);
 		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits, header);
@@ -106,6 +106,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			prevoteIndexes,
 		};
 
+		console.log(
+			`Downloading messages from ${peer.ip} . ${header.height}/${header.round}`,
+			prevoteIndexes,
+			precommitIndexes,
+		);
+
 		this.#setDownloadJob(job, downloads);
 		void this.#downloadMessagesFromPeer(job);
 	}
@@ -114,9 +120,15 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return this.#downloadsByHeight.size > 0;
 	}
 
-	#getDownloadsByHeight(height: number): DownloadsByHeight {
+	#getDownloadsByRound(height: number, round: number): DownloadsByRound {
 		if (!this.#downloadsByHeight.has(height)) {
-			this.#downloadsByHeight.set(height, {
+			this.#downloadsByHeight.set(height, new Map<number, DownloadsByRound>());
+		}
+
+		const roundsByHeight = this.#downloadsByHeight.get(height)!;
+
+		if (!roundsByHeight.has(round)) {
+			roundsByHeight.set(round, {
 				precommits: Array.from<boolean>({
 					length: this.cryptoConfiguration.getMilestone().activeValidators,
 				}).fill(false),
@@ -126,7 +138,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			});
 		}
 
-		return this.#downloadsByHeight.get(height)!;
+		return roundsByHeight.get(round)!;
 	}
 
 	async #downloadMessagesFromPeer(job: DownloadJob): Promise<void> {
@@ -232,30 +244,34 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
-	#setDownloadJob(job: DownloadJob, downloadsByHeight: DownloadsByHeight): void {
+	#setDownloadJob(job: DownloadJob, downloadsByRound: DownloadsByRound): void {
 		for (const index of job.prevoteIndexes) {
-			downloadsByHeight.prevotes[index] = true;
+			downloadsByRound.prevotes[index] = true;
 		}
 
 		for (const index of job.precommitIndexes) {
-			downloadsByHeight.precommits[index] = true;
+			downloadsByRound.precommits[index] = true;
 		}
 	}
 
 	#removeDownloadJob(job: DownloadJob): void {
 		// Return if the height was already removed, because the block was applied.
-		if (!this.#downloadsByHeight.has(job.peerHeader.height)) {
+		const roundsByHeight = this.#downloadsByHeight.get(job.ourHeader.height);
+		if (!roundsByHeight) {
 			return;
 		}
 
-		const downloadsByHeight = this.#downloadsByHeight.get(job.peerHeader.height)!;
+		const downloadsByRound = roundsByHeight.get(job.ourHeader.round);
+		if (!downloadsByRound) {
+			return;
+		}
 
 		for (const index of job.prevoteIndexes) {
-			downloadsByHeight.prevotes[index] = false;
+			downloadsByRound.prevotes[index] = false;
 		}
 
 		for (const index of job.precommitIndexes) {
-			downloadsByHeight.precommits[index] = false;
+			downloadsByRound.precommits[index] = false;
 		}
 	}
 
