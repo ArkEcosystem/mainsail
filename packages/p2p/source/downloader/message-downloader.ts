@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
+import { Enums, Utils } from "@mainsail/kernel";
 
 import { getRandomPeer } from "../utils";
 
@@ -12,6 +12,7 @@ type DownloadsByHeight = {
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
 	peerHeader: Contracts.P2P.IHeaderData;
+	ourHeader: Contracts.P2P.IHeader;
 	prevoteIndexes: number[];
 	precommitIndexes: number[];
 };
@@ -90,8 +91,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const downloads = this.#getDownloadsByHeight(peer.header.height);
 
-		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes);
-		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits);
+		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes, header);
+		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits, header);
 
 		if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
 			return;
@@ -100,6 +101,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const job: DownloadJob = {
 			peer,
 			peerHeader: peer.header,
+			ourHeader: header,
 			precommitIndexes,
 			prevoteIndexes,
 		};
@@ -185,16 +187,26 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			if (prevotes.size > 0 || precommits.size > 0) {
 				this.state.resetLastMessageTime();
 
-				// Check if received all the requested data
-				for (const index of job.prevoteIndexes) {
-					if (!prevotes.has(index)) {
-						throw new Error(`Missing prevote for validator ${index}`);
+				if (job.peerHeader.round > job.ourHeader.round) {
+					if (!Utils.isMajority(prevotes.size, this.cryptoConfiguration)) {
+						throw new Error(`Peer didn't return +2/3 prevotes`);
 					}
-				}
 
-				for (const index of job.precommitIndexes) {
-					if (!precommits.has(index)) {
-						throw new Error(`Missing precommit for validator ${index}`);
+					if (!Utils.isMajority(precommits.size, this.cryptoConfiguration)) {
+						throw new Error(`Peer didn't return +2/3 precommits`);
+					}
+				} else {
+					// Check if received all the requested data
+					for (const index of job.prevoteIndexes) {
+						if (!prevotes.has(index)) {
+							throw new Error(`Missing prevote for validator ${index}`);
+						}
+					}
+
+					for (const index of job.precommitIndexes) {
+						if (!precommits.has(index)) {
+							throw new Error(`Missing precommit for validator ${index}`);
+						}
 					}
 				}
 			}
@@ -237,10 +249,17 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
-	#getPrevoteIndexesToDownload(peer: Contracts.P2P.Peer, prevotes: boolean[]): number[] {
-		const indexes: number[] = [];
+	#getPrevoteIndexesToDownload(
+		peer: Contracts.P2P.Peer,
+		prevotes: boolean[],
+		header: Contracts.P2P.IHeader,
+	): number[] {
+		// Request all because their node have +2/3 prevotes for our round
+		if (peer.header.round > header.round) {
+			return [...Array(prevotes.length).keys()]; // Array of all indexes
+		}
 
-		const header = this.headerFactory();
+		const indexes: number[] = [];
 		for (const [index, prevote] of prevotes.entries()) {
 			if (
 				peer.header.validatorsSignedPrevote[index] &&
@@ -254,10 +273,18 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return indexes;
 	}
 
-	#getPrecommitIndexesToDownload(peer: Contracts.P2P.Peer, precommits: boolean[]): number[] {
+	#getPrecommitIndexesToDownload(
+		peer: Contracts.P2P.Peer,
+		precommits: boolean[],
+		header: Contracts.P2P.IHeader,
+	): number[] {
+		// Request all because their node have +2/3 precommits for our round
+		if (peer.header.round > header.round) {
+			return [...Array(precommits.length).keys()]; // Array of all indexes
+		}
+
 		const indexes: number[] = [];
 
-		const header = this.headerFactory();
 		for (const [index, precommit] of precommits.entries()) {
 			if (
 				peer.header.validatorsSignedPrecommit[index] &&
