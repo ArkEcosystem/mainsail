@@ -13,7 +13,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	private readonly app!: Contracts.Kernel.Application;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
-	readonly #errors: Map<string, string> = new Map<string, string>();
 	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
 
 	public all(): Client[] {
@@ -73,22 +72,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		};
 
 		return connection.request(options);
-	}
-
-	public getError(peer: Contracts.P2P.Peer): string | undefined {
-		return this.#errors.get(peer.ip);
-	}
-
-	public setError(peer: Contracts.P2P.Peer, error: string): void {
-		this.#errors.set(peer.ip, error);
-	}
-
-	public hasError(peer: Contracts.P2P.Peer, error: string): boolean {
-		return this.getError(peer) === error;
-	}
-
-	public forgetError(peer: Contracts.P2P.Peer): void {
-		this.#errors.delete(peer.ip);
 	}
 
 	private async create(peer: Contracts.P2P.Peer): Promise<Client> {

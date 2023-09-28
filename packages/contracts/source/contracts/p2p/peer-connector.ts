@@ -11,12 +11,4 @@ export interface PeerConnector {
 	disconnect(peer: Peer): void;
 
 	emit(peer: Peer, event: string, payload: any, timeout?: number): Promise<any>;
-
-	getError(peer: Peer): string | undefined;
-
-	setError(peer: Peer, error: string): void;
-
-	hasError(peer: Peer, error: string): boolean;
-
-	forgetError(peer: Peer): void;
 }
