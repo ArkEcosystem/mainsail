@@ -1,5 +1,3 @@
-import { IRoundState } from "../consensus/consensus";
-
 export type IHeaderData = {
 	version: string;
 	height: number;
@@ -13,7 +11,6 @@ export type IHeaderData = {
 export interface IHeader {
 	height: number;
 	round: number;
-	roundState: IRoundState;
 	validatorsSignedPrecommit: boolean[];
 	validatorsSignedPrevote: boolean[];
 

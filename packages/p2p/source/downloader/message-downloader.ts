@@ -279,11 +279,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		// Request missing prevotes
 		for (const [index, prevote] of prevotes.entries()) {
-			if (
-				peer.header.validatorsSignedPrevote[index] &&
-				!prevote &&
-				!header.roundState.getValidatorsSignedPrevote()[index]
-			) {
+			if (peer.header.validatorsSignedPrevote[index] && !prevote && !header.validatorsSignedPrevote[index]) {
 				indexes.push(index);
 			}
 		}
@@ -314,7 +310,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			if (
 				peer.header.validatorsSignedPrecommit[index] &&
 				!precommit &&
-				!header.roundState.getValidatorsSignedPrecommit()[index]
+				!header.validatorsSignedPrecommit[index]
 			) {
 				indexes.push(index);
 			}
