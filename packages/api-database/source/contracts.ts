@@ -40,6 +40,15 @@ export type IMempoolTransactionRepository = ExtendedRepository<MempoolTransactio
 export type ITransactionTypeRepositoryExtension = {};
 export type ITransactionTypeRepository = ExtendedRepository<TransactionType> & ITransactionTypeRepositoryExtension;
 
+export type FeeStatistics = {
+	type: number;
+	typeGroup: number;
+	avg: string;
+	min: string;
+	max: string;
+	sum: string;
+};
+
 export type ITransactionRepositoryExtension = {
 	findManyByCritera(
 		walletRepository: IWalletRepository,
@@ -48,6 +57,11 @@ export type ITransactionRepositoryExtension = {
 		pagination: Pagination,
 		options?: Options,
 	): Promise<ResultsPage<Transaction>>;
+
+	getFeeStatistics(
+		days?: number,
+		minFee?: number
+	): Promise<FeeStatistics[]>;
 };
 export type ITransactionRepository = ExtendedRepository<Transaction> & ITransactionRepositoryExtension;
 

@@ -24,6 +24,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"pg": "8.11.3",
+		"dayjs": "1.10.7",
 		"reflect-metadata": "0.1.13",
 		"typeorm": "0.3.17"
 	},

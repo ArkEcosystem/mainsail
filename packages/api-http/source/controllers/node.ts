@@ -10,6 +10,12 @@ export class NodeController extends Controller {
     @inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
     private readonly stateRepositoryFactory!: ApiDatabaseContracts.IStateRepositoryFactory;
 
+    @inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
+    private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
+
+    @inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
+    private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.ITransactionTypeRepositoryFactory;
+
     @inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
     private readonly peerRepositoryFactory!: ApiDatabaseContracts.IPeerRepositoryFactory;
 
@@ -18,7 +24,7 @@ export class NodeController extends Controller {
 
         return {
             data: {
-                synced: state?.isSynced ?? false,
+                synced: false, // TODO
                 now: state?.height ?? 0,
                 blocksCount: state ? (
                     await this.peerRepositoryFactory().getMedianPeerHeight()
@@ -34,7 +40,7 @@ export class NodeController extends Controller {
 
         return {
             data: {
-                syncing: state ? !state.isSynced : true,
+                syncing: false, // TODO
                 blocks: state ? (
                     await this.peerRepositoryFactory().getMedianPeerHeight()
                     - state.height
@@ -43,6 +49,36 @@ export class NodeController extends Controller {
                 id: state?.id ?? 0,
             },
         };
+    }
+
+    public async fees(request: Hapi.Request) {
+        const transactionTypes = await this.transactionTypeRepositoryFactory()
+            .createQueryBuilder()
+            .select()
+            .addOrderBy("type", "ASC")
+            .addOrderBy("type_group", "ASC")
+            .getMany();
+
+        const results = await this.transactionRepositoryFactory()
+            .getFeeStatistics(request.query.days);
+
+        const groupedByTypeGroup = {};
+        for (const transactionType of transactionTypes) {
+            if (!groupedByTypeGroup[transactionType.typeGroup]) {
+                groupedByTypeGroup[transactionType.typeGroup] = {};
+            }
+
+            const result = results.find(({ type, typeGroup }) => type === transactionType.type && typeGroup === transactionType.typeGroup);
+
+            groupedByTypeGroup[transactionType.typeGroup][transactionType.key] = {
+                avg: result?.avg ?? "0",
+                max: result?.max ?? "0",
+                min: result?.min ?? "0",
+                sum: result?.sum ?? "0",
+            };
+        }
+
+        return { meta: { days: request.query.days }, data: groupedByTypeGroup };
     }
 
     // public async configuration(request: Hapi.Request, h: Hapi.ResponseToolkit) {
@@ -85,38 +121,6 @@ export class NodeController extends Controller {
     //     return {
     //         data: Managers.configManager.all(),
     //     };
-    // }
-
-    // public async fees(request: Hapi.Request) {
-    //     // @ts-ignore
-    //     const handlers = this.nullHandlerRegistry.getRegisteredHandlers();
-    //     const handlersKey = {};
-    //     const txsTypes: Array<{ type: number; typeGroup: number }> = [];
-    //     for (const handler of handlers) {
-    //         handlersKey[`${handler.getConstructor().type}-${handler.getConstructor().typeGroup}`] =
-    //             handler.getConstructor().key;
-    //         txsTypes.push({ type: handler.getConstructor().type!, typeGroup: handler.getConstructor().typeGroup! });
-    //     }
-
-    //     const results = await this.transactionRepository.getFeeStatistics(txsTypes, request.query.days);
-
-    //     const groupedByTypeGroup = {};
-    //     for (const result of results) {
-    //         if (!groupedByTypeGroup[result.typeGroup]) {
-    //             groupedByTypeGroup[result.typeGroup] = {};
-    //         }
-
-    //         const handlerKey = handlersKey[`${result.type}-${result.typeGroup}`];
-
-    //         groupedByTypeGroup[result.typeGroup][handlerKey] = {
-    //             avg: result.avg,
-    //             max: result.max,
-    //             min: result.min,
-    //             sum: result.sum,
-    //         };
-    //     }
-
-    //     return { meta: { days: request.query.days }, data: groupedByTypeGroup };
     // }
 
     private async getState(): Promise<Models.State | null> {
