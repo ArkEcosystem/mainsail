@@ -15,16 +15,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
 	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
 
-	public all(): Client[] {
-		return [...this.connections].map(([key, value]) => value);
-	}
-
-	public connection(peer: Contracts.P2P.Peer): Client | undefined {
-		const connection: Client | undefined = this.connections.get(`${peer.ip}`);
-
-		return connection;
-	}
-
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
 		return this.connection(peer) || (await this.create(peer));
 	}
@@ -53,6 +43,12 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		};
 
 		return connection.request(options);
+	}
+
+	private connection(peer: Contracts.P2P.Peer): Client | undefined {
+		const connection: Client | undefined = this.connections.get(`${peer.ip}`);
+
+		return connection;
 	}
 
 	private async create(peer: Contracts.P2P.Peer): Promise<Client> {
