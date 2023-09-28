@@ -13,49 +13,19 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	private readonly app!: Contracts.Kernel.Application;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
-	readonly #errors: Map<string, string> = new Map<string, string>();
 	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
 
-	public all(): Client[] {
-		return [...this.connections].map(([key, value]) => value);
-	}
-
-	public connection(peer: Contracts.P2P.Peer): Client | undefined {
-		const connection: Client | undefined = this.connections.get(`${peer.ip}`);
-
-		return connection;
-	}
-
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
-		if (!this.connection(peer)) {
-			// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
-			const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
-			if (timeSinceLastConnectionCreate < TEN_SECONDS_IN_MILLISECONDS) {
-				await delay(TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate);
-			}
-		}
-		return this.connection(peer) || (await this.create(peer));
+		return this.connections.get(peer.ip) || (await this.#create(peer));
 	}
 
-	public disconnect(peer: Contracts.P2P.Peer): void {
-		const connection = this.connection(peer);
+	public async disconnect(ip: string): Promise<void> {
+		const connection = this.connections.get(ip);
 
 		if (connection) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			connection.terminate();
-
-			this.connections.delete(`${peer.ip}`);
+			await connection.terminate();
+			this.connections.delete(ip);
 		}
-
-		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
-		setTimeout(
-			() => {
-				if (!this.connection(peer)) {
-					this.#lastConnectionCreate.delete(peer.ip);
-				}
-			},
-			Math.max(TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate, 0), // always between 0-10 seconds
-		);
 	}
 
 	public async emit(peer: Contracts.P2P.Peer, event: string, payload: any, timeout?: number): Promise<any> {
@@ -75,23 +45,11 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		return connection.request(options);
 	}
 
-	public getError(peer: Contracts.P2P.Peer): string | undefined {
-		return this.#errors.get(peer.ip);
-	}
+	async #create(peer: Contracts.P2P.Peer): Promise<Client> {
+		// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
+		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
+		await delay(Math.max(0, TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate));
 
-	public setError(peer: Contracts.P2P.Peer, error: string): void {
-		this.#errors.set(peer.ip, error);
-	}
-
-	public hasError(peer: Contracts.P2P.Peer, error: string): boolean {
-		return this.getError(peer) === error;
-	}
-
-	public forgetError(peer: Contracts.P2P.Peer): void {
-		this.#errors.delete(peer.ip);
-	}
-
-	private async create(peer: Contracts.P2P.Peer): Promise<Client> {
 		const connection = new Client(`ws://${Utils.IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
 			timeout: 10_000,
 		});
@@ -102,7 +60,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).banPeer(peer.ip, error);
 		};
 
-		await connection.connect({ retries: 1, timeout: 5000 });
+		await connection.connect({ reconnect: false });
 
 		return connection;
 	}
