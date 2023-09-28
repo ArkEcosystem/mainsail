@@ -234,11 +234,11 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#precommits.get(validatorIndex);
 	}
 
-	public getValidatorsSignedPrevote(): boolean[] {
+	public getValidatorsSignedPrevote(): readonly boolean[] {
 		return this.#validatorsSignedPrevote;
 	}
 
-	public getValidatorsSignedPrecommit(): boolean[] {
+	public getValidatorsSignedPrecommit(): readonly boolean[] {
 		return this.#validatorsSignedPrecommit;
 	}
 

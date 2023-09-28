@@ -4,15 +4,15 @@ export type IHeaderData = {
 	round: number;
 	step: number;
 	proposedBlockId?: string;
-	validatorsSignedPrevote: boolean[];
-	validatorsSignedPrecommit: boolean[];
+	validatorsSignedPrevote: readonly boolean[];
+	validatorsSignedPrecommit: readonly boolean[];
 };
 
 export interface IHeader {
 	height: number;
 	round: number;
-	validatorsSignedPrecommit: boolean[];
-	validatorsSignedPrevote: boolean[];
+	validatorsSignedPrecommit: readonly boolean[];
+	validatorsSignedPrevote: readonly boolean[];
 
 	toData(): IHeaderData;
 	canDownloadProposal(headerData: IHeaderData): boolean;

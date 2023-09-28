@@ -15,8 +15,8 @@ export class Header implements Contracts.P2P.IHeader {
 	public height!: number;
 	public round!: number;
 	public step!: Contracts.Consensus.Step;
-	public validatorsSignedPrecommit!: boolean[];
-	public validatorsSignedPrevote!: boolean[];
+	public validatorsSignedPrecommit!: readonly boolean[];
+	public validatorsSignedPrevote!: readonly boolean[];
 	public proposal?: Contracts.Crypto.IProposal;
 
 	@postConstruct()
