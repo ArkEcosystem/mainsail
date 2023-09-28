@@ -1,8 +1,4 @@
-import {
-	IBlockRepository,
-	IBlockRepositoryExtension,
-	RepositoryDataSource,
-} from "../contracts";
+import { IBlockRepository, IBlockRepositoryExtension, RepositoryDataSource } from "../contracts";
 import { Block } from "../models/block";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { BlockFilter } from "../search/filters";
@@ -20,13 +16,8 @@ export const makeBlockRepository = (dataSource: RepositoryDataSource): IBlockRep
 			return this.listByExpression(blockExpression, sorting, pagination, options);
 		},
 
-		async findOneByCriteria(
-			blockCriteria: Criteria.OrBlockCriteria,
-		): Promise<Block | undefined> {
-			const block = await this.createQueryBuilder()
-				.where(blockCriteria)
-				.limit(1)
-				.getOne();
+		async findOneByCriteria(blockCriteria: Criteria.OrBlockCriteria): Promise<Block | undefined> {
+			const block = await this.createQueryBuilder().where(blockCriteria).limit(1).getOne();
 
 			if (!block) {
 				return undefined;

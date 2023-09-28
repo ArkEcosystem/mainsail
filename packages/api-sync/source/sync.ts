@@ -81,7 +81,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 					.filter((t) => t.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core)
 					.filter((t) => t.type === Contracts.Crypto.TransactionType.MultiPayment)
 					.flatMap((t) => t.data.asset!.payments!)
-					.reduce((sum, payment) => sum.plus(payment.amount), Utils.BigNumber.ZERO).toFixed(),
+					.reduce((sum, payment) => sum.plus(payment.amount), Utils.BigNumber.ZERO)
+					.toFixed(),
 				version: header.version,
 			});
 

@@ -1,5 +1,5 @@
-import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
+import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -27,18 +27,9 @@ export class BlocksController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
-		const blocks = await this.blockRepositoryFactory()
-			.findManyByCriteria(
-				criteria,
-				sorting,
-				pagination,
-				options,
-			);
+		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
-		return this.toPagination(blocks,
-			BlockResource,
-			request.query.transform,
-		);
+		return this.toPagination(blocks, BlockResource, request.query.transform);
 	}
 
 	public async first(request: Hapi.Request, h: Hapi.ResponseToolkit) {
@@ -66,18 +57,14 @@ export class BlocksController extends Controller {
 		const blockRepository = this.blockRepositoryFactory();
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 
-		const block = await blockRepository.findOneByCriteria(
-			blockCriteria,
-		);
+		const block = await blockRepository.findOneByCriteria(blockCriteria);
 
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
 	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
-		const block = await this.blockRepositoryFactory().findOneByCriteria(
-			blockCriteria,
-		);
+		const block = await this.blockRepositoryFactory().findOneByCriteria(blockCriteria);
 
 		if (!block) {
 			return Boom.notFound("Block not found");
