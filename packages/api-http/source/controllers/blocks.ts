@@ -1,4 +1,5 @@
 import Hapi from "@hapi/hapi";
+import Boom from "@hapi/boom";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -17,27 +18,24 @@ export class BlocksController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
+	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
+
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const pagination = this.getQueryPagination(request.query);
+		const criteria: Search.Criteria.BlockCriteria = request.query;
+		const pagination = this.getListingPage(request);
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions();
 
 		const blocks = await this.blockRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.orderBy("height", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getMany();
+			.findManyByCriteria(
+				criteria,
+				sorting,
+				pagination,
+				options,
+			);
 
-		// TODO: join transactions
-
-		const totalCount = Number(blocks[0]?.height ?? 0);
-
-		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: blocks,
-				totalCount,
-			},
+		return this.toPagination(blocks,
 			BlockResource,
 			request.query.transform,
 		);
@@ -50,8 +48,6 @@ export class BlocksController extends Controller {
 			.where("height = :height", { height: 1 })
 			.getOne();
 
-		// TODO: join transactions
-
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
@@ -63,68 +59,48 @@ export class BlocksController extends Controller {
 			.limit(1)
 			.getOne();
 
-		// TODO: join transactions
-
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
 	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const blockRepository = this.blockRepositoryFactory();
-		const transactionRepository = this.transactionRepositoryFactory();
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 
-		// const transactionCriteria = {
-		// 	typeGroup: Enums.TransactionTypeGroup.Core,
-		// 	type: Enums.TransactionType.MultiPayment,
-		// };
-
-		const block = await blockRepository.findOneByCriteriaJoinTransactions(
-			transactionRepository,
+		const block = await blockRepository.findOneByCriteria(
 			blockCriteria,
-			// transactionCriteria,
 		);
 
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
 	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const pagination = this.getQueryPagination(request.query);
-
-		const [transactions, totalCount] = await this.transactionRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.where("block_id = :blockId", { blockId: request.params.id })
-			.orderBy("sequence", "ASC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getManyAndCount();
-
-		return this.toPagination(
-			{
-				meta: { totalCountIsEstimate: false },
-				results: transactions,
-				totalCount,
-			},
-			TransactionResource,
-			request.query.transform,
+		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
+		const block = await this.blockRepositoryFactory().findOneByCriteria(
+			blockCriteria,
 		);
+
+		if (!block) {
+			return Boom.notFound("Block not found");
+		}
+
+		const pagination = this.getListingPage(request);
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions();
+
+		const walletRepository = this.walletRepositoryFactory();
+		const criteria: Search.Criteria.TransactionCriteria = { ...request.query, blockId: block.id };
+		console.log(criteria);
+
+		const transactions = await this.transactionRepositoryFactory().findManyByCritera(
+			walletRepository,
+			criteria,
+			sorting,
+			pagination,
+			options,
+		);
+
+		return this.toPagination(transactions, TransactionResource, request.query.transform);
 	}
-
-	// private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.IBlock | undefined> {
-	// 	let block: Contracts.Crypto.IBlock | undefined;
-
-	// 	if (/^-?\d+$/.test(idOrHeight)) {
-	// 		const blocks = await this.database.findBlockByHeights([Number.parseInt(idOrHeight)]);
-
-	// 		if (blocks.length > 0) {
-	// 			block = blocks[0];
-	// 		}
-	// 	} else {
-	// 		block = await this.database.getBlock(idOrHeight);
-	// 	}
-
-	// 	return block;
-	// }
 
 	private getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
 		const asHeight = Number(idOrHeight);

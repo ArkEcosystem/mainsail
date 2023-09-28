@@ -1,45 +1,38 @@
 import {
 	IBlockRepository,
 	IBlockRepositoryExtension,
-	ITransactionRepository,
 	RepositoryDataSource,
 } from "../contracts";
 import { Block } from "../models/block";
-import { Criteria } from "../search";
+import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { BlockFilter } from "../search/filters";
 import { makeExtendedRepository } from "./repository-extension";
 
 export const makeBlockRepository = (dataSource: RepositoryDataSource): IBlockRepository =>
 	makeExtendedRepository<Block, IBlockRepositoryExtension>(Block, dataSource, {
-		async findManyByCriteriaJoinTransactions(
-			// @ts-ignore
-			transactionRepository: ITransactionRepository,
+		async findManyByCriteria(
 			blockCriteria: Criteria.OrBlockCriteria,
-		): Promise<Block[]> {
+			sorting: Sorting,
+			pagination: Pagination,
+			options?: Options,
+		): Promise<ResultsPage<Block>> {
 			const blockExpression = await BlockFilter.getExpression(blockCriteria);
-			//	const transactionBlockCriteria = blockModels.map((b) => ({ blockId: b.id }));
-			// const transactionExpression = await this.transactionFilter.getExpression(
-			//     transactionCriteria,
-			//     transactionBlockCriteria,
-			// );
-
-			// const transactionModels = await this.transactionRepository.findManyByExpression(transactionExpression);
-			// const blockDataWithTransactionData = this.modelConverter.getBlockDataWithTransactionData(
-			//     blockModels,
-			//     transactionModels,
-			// );
-
-			return this.findManyByExpression(blockExpression);
+			return this.listByExpression(blockExpression, sorting, pagination, options);
 		},
 
-		async findOneByCriteriaJoinTransactions(
-			transactionRepository: ITransactionRepository,
+		async findOneByCriteria(
 			blockCriteria: Criteria.OrBlockCriteria,
-			// transactionCriteria: Search.Criteria.OrTransactionCriteria,
 		): Promise<Block | undefined> {
-			const data = await this.findManyByCriteriaJoinTransactions(transactionRepository, blockCriteria);
+			const block = await this.createQueryBuilder()
+				.where(blockCriteria)
+				.limit(1)
+				.getOne();
 
-			return data[0];
+			if (!block) {
+				return undefined;
+			}
+
+			return block;
 		},
 
 		async getLatest(): Promise<Block | null> {
