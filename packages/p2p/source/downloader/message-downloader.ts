@@ -99,9 +99,9 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const job: DownloadJob = {
+			ourHeader: header,
 			peer,
 			peerHeader: peer.header,
-			ourHeader: header,
 			precommitIndexes,
 			prevoteIndexes,
 		};
@@ -140,13 +140,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				const prevote = await this.factory.makePrevoteFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
 
-				if (prevote.height !== job.peerHeader.height) {
+				if (prevote.height !== job.ourHeader.height) {
 					throw new Error(
 						`Received prevote height ${prevote.height} does not match expected height ${job.peerHeader.height}`,
 					);
 				}
 
-				if (prevote.round !== job.peerHeader.round) {
+				if (prevote.round !== job.ourHeader.round) {
 					throw new Error(
 						`Received prevote round ${prevote.round} does not match expected round ${job.peerHeader.round}`,
 					);
@@ -164,13 +164,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				const precommit = await this.factory.makePrecommitFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
 
-				if (precommit.height !== job.peerHeader.height) {
+				if (precommit.height !== job.ourHeader.height) {
 					throw new Error(
 						`Received precommit height ${precommit.height} does not match expected height ${job.peerHeader.height}`,
 					);
 				}
 
-				if (precommit.round !== job.peerHeader.round) {
+				if (precommit.round !== job.ourHeader.round) {
 					throw new Error(
 						`Received precommit round ${precommit.round} does not match expected round ${job.peerHeader.round}`,
 					);
@@ -256,7 +256,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	): number[] {
 		// Request all because their node have +2/3 prevotes for our round
 		if (peer.header.round > header.round) {
-			return [...Array(prevotes.length).keys()]; // Array of all indexes
+			return [...Array.from({ length: prevotes.length }).keys()]; // Array of all indexes
 		}
 
 		const indexes: number[] = [];
@@ -280,7 +280,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	): number[] {
 		// Request all because their node have +2/3 precommits for our round
 		if (peer.header.round > header.round) {
-			return [...Array(precommits.length).keys()]; // Array of all indexes
+			return [...Array.from({ length: precommits.length }).keys()]; // Array of all indexes
 		}
 
 		const indexes: number[] = [];
