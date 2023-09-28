@@ -89,7 +89,6 @@ export class BlocksController extends Controller {
 
 		const walletRepository = this.walletRepositoryFactory();
 		const criteria: Search.Criteria.TransactionCriteria = { ...request.query, blockId: block.id };
-		console.log(criteria);
 
 		const transactions = await this.transactionRepositoryFactory().findManyByCritera(
 			walletRepository,
