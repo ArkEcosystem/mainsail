@@ -26,13 +26,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	}
 
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
-		if (!this.connection(peer)) {
-			// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
-			const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
-			if (timeSinceLastConnectionCreate < TEN_SECONDS_IN_MILLISECONDS) {
-				await delay(TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate);
-			}
-		}
 		return this.connection(peer) || (await this.create(peer));
 	}
 
@@ -43,16 +36,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 			await connection.terminate();
 			this.connections.delete(`${peer.ip}`);
 		}
-
-		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
-		setTimeout(
-			() => {
-				if (!this.connection(peer)) {
-					this.#lastConnectionCreate.delete(peer.ip);
-				}
-			},
-			Math.max(TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate, 0), // always between 0-10 seconds
-		);
 	}
 
 	public async emit(peer: Contracts.P2P.Peer, event: string, payload: any, timeout?: number): Promise<any> {
@@ -73,6 +56,10 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	}
 
 	private async create(peer: Contracts.P2P.Peer): Promise<Client> {
+		// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
+		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
+		await delay(Math.max(0, TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate));
+
 		const connection = new Client(`ws://${Utils.IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
 			timeout: 10_000,
 		});
