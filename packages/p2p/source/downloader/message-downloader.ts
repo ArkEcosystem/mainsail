@@ -188,12 +188,22 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				this.state.resetLastMessageTime();
 
 				if (job.peerHeader.round > job.ourHeader.round) {
-					if (!Utils.isMajority(prevotes.size, this.cryptoConfiguration)) {
-						throw new Error(`Peer didn't return +2/3 prevotes`);
+					if (
+						!Utils.isMajority(
+							prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(),
+							this.cryptoConfiguration,
+						)
+					) {
+						throw new Error(`Peer didn't return enough prevotes for +2/3 majority`);
 					}
 
-					if (!Utils.isMajority(precommits.size, this.cryptoConfiguration)) {
-						throw new Error(`Peer didn't return +2/3 precommits`);
+					if (
+						!Utils.isMajority(
+							precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(),
+							this.cryptoConfiguration,
+						)
+					) {
+						throw new Error(`Peer didn't return enough precommits for +2/3 majority`);
 					}
 				} else {
 					// Check if received all the requested data
@@ -254,12 +264,20 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		prevotes: boolean[],
 		header: Contracts.P2P.IHeader,
 	): number[] {
+		const indexes: number[] = [];
+
 		// Request all because their node have +2/3 prevotes for our round
 		if (peer.header.round > header.round) {
-			return [...Array.from({ length: prevotes.length }).keys()]; // Array of all indexes
+			for (const [index, prevote] of prevotes.entries()) {
+				if (!prevote) {
+					indexes.push(index);
+				}
+			}
+
+			return indexes;
 		}
 
-		const indexes: number[] = [];
+		// Request missing prevotes
 		for (const [index, prevote] of prevotes.entries()) {
 			if (
 				peer.header.validatorsSignedPrevote[index] &&
@@ -278,13 +296,20 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		precommits: boolean[],
 		header: Contracts.P2P.IHeader,
 	): number[] {
-		// Request all because their node have +2/3 precommits for our round
-		if (peer.header.round > header.round) {
-			return [...Array.from({ length: precommits.length }).keys()]; // Array of all indexes
-		}
-
 		const indexes: number[] = [];
 
+		// Request all because their node have +2/3 precommits for our round
+		if (peer.header.round > header.round) {
+			for (const [index, precommit] of precommits.entries()) {
+				if (!precommit) {
+					indexes.push(index);
+				}
+			}
+
+			return indexes;
+		}
+
+		// Request missing precommits
 		for (const [index, precommit] of precommits.entries()) {
 			if (
 				peer.header.validatorsSignedPrecommit[index] &&
