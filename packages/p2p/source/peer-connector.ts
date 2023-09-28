@@ -16,11 +16,11 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
 
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
-		return this.connection(peer) || (await this.create(peer));
+		return this.#connection(peer) || (await this.#create(peer));
 	}
 
 	public async disconnect(peer: Contracts.P2P.Peer): Promise<void> {
-		const connection = this.connection(peer);
+		const connection = this.#connection(peer);
 
 		if (connection) {
 			await connection.terminate();
@@ -45,13 +45,13 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		return connection.request(options);
 	}
 
-	private connection(peer: Contracts.P2P.Peer): Client | undefined {
+	#connection(peer: Contracts.P2P.Peer): Client | undefined {
 		const connection: Client | undefined = this.connections.get(`${peer.ip}`);
 
 		return connection;
 	}
 
-	private async create(peer: Contracts.P2P.Peer): Promise<Client> {
+	async #create(peer: Contracts.P2P.Peer): Promise<Client> {
 		// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
 		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
 		await delay(Math.max(0, TEN_SECONDS_IN_MILLISECONDS - timeSinceLastConnectionCreate));
