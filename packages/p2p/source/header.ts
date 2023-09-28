@@ -16,6 +16,8 @@ export class Header implements Contracts.P2P.IHeader {
 	public round!: number;
 	public step!: Contracts.Consensus.Step;
 	public roundState!: Contracts.Consensus.IRoundState;
+	public validatorsSignedPrecommit!: boolean[];
+	public validatorsSignedPrevote!: boolean[];
 
 	@postConstruct()
 	public init() {
@@ -24,6 +26,8 @@ export class Header implements Contracts.P2P.IHeader {
 		this.step = this.consensus.getStep();
 
 		this.roundState = this.roundStateRepo.getRoundState(this.height, this.round);
+		this.validatorsSignedPrecommit = this.roundState.getValidatorsSignedPrecommit();
+		this.validatorsSignedPrevote = this.roundState.getValidatorsSignedPrevote();
 	}
 
 	public toData(): Contracts.P2P.IHeaderData {
@@ -40,7 +44,17 @@ export class Header implements Contracts.P2P.IHeader {
 		};
 	}
 
+	public getValidatorsSignedPrecommitCount(): number {
+		return this.validatorsSignedPrecommit.filter((signed) => signed).length;
+	}
+
+	public getValidatorsSignedPrevoteCount(): number {
+		return this.validatorsSignedPrevote.filter((signed) => signed).length;
+	}
+
 	public canDownloadProposal(data: Contracts.P2P.IHeaderData): boolean {
+		return false;
+
 		if (!this.#isRoundSufficient(data)) {
 			return false;
 		}
@@ -54,7 +68,7 @@ export class Header implements Contracts.P2P.IHeader {
 		}
 
 		// Their node already received +2/3 prevotes and precommits for our round
-		if(data.round > this.round) {
+		if (data.round > this.round) {
 			return true;
 		}
 

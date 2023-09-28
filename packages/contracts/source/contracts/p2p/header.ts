@@ -14,10 +14,14 @@ export interface IHeader {
 	height: number;
 	round: number;
 	roundState: IRoundState;
+	validatorsSignedPrecommit: boolean[];
+	validatorsSignedPrevote: boolean[];
 
 	toData(): IHeaderData;
 	canDownloadProposal(headerData: IHeaderData): boolean;
 	canDownloadMessages(headerData: IHeaderData): boolean;
+	getValidatorsSignedPrecommitCount(): number;
+	getValidatorsSignedPrevoteCount(): number;
 }
 
 export type HeaderFactory = () => IHeader;
