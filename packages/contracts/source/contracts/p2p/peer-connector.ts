@@ -8,7 +8,7 @@ export interface PeerConnector {
 
 	connect(peer: Peer): Promise<Client>;
 
-	disconnect(peer: Peer): void;
+	disconnect(peer: Peer): Promise<void>;
 
 	emit(peer: Peer, event: string, payload: any, timeout?: number): Promise<any>;
 }

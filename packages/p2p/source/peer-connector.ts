@@ -36,13 +36,11 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		return this.connection(peer) || (await this.create(peer));
 	}
 
-	public disconnect(peer: Contracts.P2P.Peer): void {
+	public async disconnect(peer: Contracts.P2P.Peer): Promise<void> {
 		const connection = this.connection(peer);
 
 		if (connection) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			connection.terminate();
-
+			await connection.terminate();
 			this.connections.delete(`${peer.ip}`);
 		}
 
