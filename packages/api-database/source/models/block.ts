@@ -65,6 +65,12 @@ export class Block {
 
 	@Column({
 		nullable: false,
+		type: "bigint",
+	})
+	public readonly totalMultiPaymentTransferred!: string;
+
+	@Column({
+		nullable: false,
 		type: "integer",
 	})
 	public readonly payloadLength!: number;

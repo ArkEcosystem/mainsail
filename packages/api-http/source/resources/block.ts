@@ -1,5 +1,6 @@
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
+import { BigNumber } from "@mainsail/utils";
 
 import { Resource } from "../types";
 
@@ -13,10 +14,10 @@ export class BlockResource implements Resource {
 		return {
 			confirmations: 0,
 			forged: {
-				amount: resource.totalAmount,
+				amount: BigNumber.make(resource.totalAmount).plus(resource.totalMultiPaymentTransferred).toFixed(),
 				fee: resource.totalFee,
 				reward: resource.reward,
-				// total: blockData.reward.plus(blockData.totalFee).toFixed(),
+				total: BigNumber.make(resource.reward).plus(resource.totalFee).toFixed(),
 			},
 			generator: {
 				// username: generator.hasAttribute("delegate.username")
