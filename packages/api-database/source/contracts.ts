@@ -28,7 +28,10 @@ export type IBlockRepositoryExtension = {
 
 export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExtension;
 
-export type IPeerRepositoryExtension = {};
+export type IPeerRepositoryExtension = {
+	getMedianPeerHeight(): Promise<number>;
+};
+
 export type IPeerRepository = ExtendedRepository<Peer> & IPeerRepositoryExtension;
 export type IMempoolTransactionRepositoryExtension = {};
 export type IMempoolTransactionRepository = ExtendedRepository<MempoolTransaction> &

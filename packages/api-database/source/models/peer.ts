@@ -27,6 +27,12 @@ export class Peer {
 		nullable: true,
 		type: "integer",
 	})
+	public height!: number;
+
+	@Column({
+		nullable: true,
+		type: "integer",
+	})
 	public latency!: number | undefined;
 
 	@Column({

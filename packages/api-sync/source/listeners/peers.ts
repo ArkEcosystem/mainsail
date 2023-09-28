@@ -35,6 +35,7 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 		return {
 			ip: event.ip,
 			latency: event.latency,
+			height: event.header.height,
 			plugins: event.plugins as Record<string, any>,
 			port: event.port,
 			ports: event.ports as Record<string, any>,

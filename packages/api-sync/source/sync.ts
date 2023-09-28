@@ -93,8 +93,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			await stateRepository.upsert(
 				{
-					height: header.height,
 					id: 1,
+					height: header.height,
 				},
 				["id"],
 			);
