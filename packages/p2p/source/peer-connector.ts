@@ -16,15 +16,15 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
 
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
-		return this.#connection(peer) || (await this.#create(peer));
+		return this.connections.get(peer.ip) || (await this.#create(peer));
 	}
 
-	public async disconnect(peer: Contracts.P2P.Peer): Promise<void> {
-		const connection = this.#connection(peer);
+	public async disconnect(ip: string): Promise<void> {
+		const connection = this.connections.get(ip);
 
 		if (connection) {
 			await connection.terminate();
-			this.connections.delete(`${peer.ip}`);
+			this.connections.delete(ip);
 		}
 	}
 
@@ -43,12 +43,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		};
 
 		return connection.request(options);
-	}
-
-	#connection(peer: Contracts.P2P.Peer): Client | undefined {
-		const connection: Client | undefined = this.connections.get(`${peer.ip}`);
-
-		return connection;
 	}
 
 	async #create(peer: Contracts.P2P.Peer): Promise<Client> {

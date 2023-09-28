@@ -3,8 +3,7 @@ import { Peer } from "./peer";
 
 export interface PeerConnector {
 	connect(peer: Peer): Promise<Client>;
-
-	disconnect(peer: Peer): Promise<void>;
+	disconnect(ip: string): Promise<void>;
 
 	emit(peer: Peer, event: string, payload: any, timeout?: number): Promise<any>;
 }
