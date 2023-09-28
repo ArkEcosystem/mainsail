@@ -60,7 +60,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).banPeer(peer.ip, error);
 		};
 
-		await connection.connect({ retries: 1, timeout: 5000 });
+		await connection.connect({ reconnect: false });
 
 		return connection;
 	}
