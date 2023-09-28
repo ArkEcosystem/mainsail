@@ -54,3 +54,13 @@ export type TransactionCriteria = {
 };
 
 export type OrTransactionCriteria = OrCriteria<TransactionCriteria>;
+
+export type WalletCriteria = {
+	address?: OrEqualCriteria<string>;
+	publicKey?: OrEqualCriteria<string>;
+	balance?: OrNumericCriteria<string>;
+	nonce?: OrNumericCriteria<string>;
+	attributes?: OrContainsCriteria<Record<string, any>>;
+};
+
+export type OrWalletCriteria = OrCriteria<WalletCriteria>;

@@ -20,13 +20,18 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory)
 	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.IMempoolTransactionRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
+	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
+
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const criteria: Search.Criteria.TransactionCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
+		const walletRepository = this.walletRepositoryFactory();
 		const transactions = await this.transactionRepositoryFactory().findManyByCritera(
+			walletRepository,
 			criteria,
 			sorting,
 			pagination,
