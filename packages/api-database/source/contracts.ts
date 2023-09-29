@@ -16,16 +16,14 @@ export type IBlockRepositoryExtension = {
 	getLatest(): Promise<Block | null>;
 	getLatestHeight(): Promise<number | undefined>;
 
-	findOneByCriteriaJoinTransactions(
-		transactionRepository: ITransactionRepository,
-		blockCriteria: Criteria.OrBlockCriteria,
-		// transactionCriteria: Search.Criteria.OrTransactionCriteria,
-	): Promise<Block | undefined>;
+	findOneByCriteria(blockCriteria: Criteria.OrBlockCriteria): Promise<Block | undefined>;
 
-	findManyByCriteriaJoinTransactions(
-		transactionRepository: ITransactionRepository,
+	findManyByCriteria(
 		blockCriteria: Criteria.OrBlockCriteria,
-	): Promise<Block[]>;
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Block>>;
 };
 
 export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExtension;

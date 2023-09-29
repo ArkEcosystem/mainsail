@@ -3,6 +3,7 @@ import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
 import blocks from "../../test/fixtures/blocks.json";
+import blockTransactions from "../../test/fixtures/block_transactions.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -61,7 +62,11 @@ describe<{
 	});
 
 	it("/blocks/{id}/transactions", async () => {
-		const { statusCode, data } = await request("/blocks/1/transactions", options);
+		await apiContext.blockRepository.save(blocks);
+		await apiContext.transactionRepository.save(blockTransactions);
+
+		const { statusCode, data } = await request(`/blocks/1/transactions`, options);
 		assert.equal(statusCode, 200);
+		assert.equal(data.data, blockTransactions);
 	});
 });
