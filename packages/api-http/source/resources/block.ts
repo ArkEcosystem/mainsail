@@ -14,7 +14,7 @@ export class BlockResource implements Resource {
 		return {
 			confirmations: 0,
 			forged: {
-				amount: BigNumber.make(resource.totalAmount).plus(resource.totalMultiPaymentTransferred).toFixed(),
+				amount: BigNumber.make(resource.totalAmount),
 				fee: resource.totalFee,
 				reward: resource.reward,
 				total: BigNumber.make(resource.reward).plus(resource.totalFee).toFixed(),
