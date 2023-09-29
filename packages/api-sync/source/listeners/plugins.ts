@@ -59,6 +59,7 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 
 				const value = config[key];
 				if (typeof value === "object") {
+					// @ts-ignore
 					config[key] = this.sanitizeConfiguration(value);
 				}
 			}
