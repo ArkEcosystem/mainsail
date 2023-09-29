@@ -51,7 +51,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 		const committedBlock = await unit.getCommittedBlock();
 
 		const {
-			block: { header, transactions },
+			block: { header, transactions: blockTransactions },
 			commit,
 		} = committedBlock;
 
@@ -63,6 +63,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
+
+			const transactions: Models.Transaction[] = blockTransactions.map(transaction => this.#normalizeTransaction(header, transaction));
 
 			await blockRepository.save({
 				generatorPublicKey: header.generatorPublicKey,
@@ -78,11 +80,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				totalMultiPaymentTransferred: transactions
-					.filter((t) => t.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core)
-					.filter((t) => t.type === Contracts.Crypto.TransactionType.MultiPayment)
-					.flatMap((t) => t.data.asset!.payments!)
-					.reduce((sum, payment) => sum.plus(payment.amount), Utils.BigNumber.ZERO)
-					.toFixed(),
+					.reduce((sum, transaction) => sum.plus(transaction.totalMultiPaymentTransferred ?? Utils.BigNumber.ZERO), Utils.BigNumber.ZERO).toFixed(),
 				version: header.version,
 			});
 
@@ -94,26 +92,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 				["id"],
 			);
 
-			await transactionRepository.save(
-				transactions.map(({ data }) => ({
-					amount: data.amount.toFixed(),
-					asset: data.asset,
-					blockHeight: header.height.toFixed(),
-					blockId: header.id,
-					fee: data.fee.toFixed(),
-					id: data.id,
-					nonce: data.nonce.toFixed(),
-					recipientId: data.recipientId,
-					senderPublicKey: data.senderPublicKey,
-					sequence: data.sequence,
-					signature: data.signature,
-					timestamp: header.timestamp.toFixed(),
-					type: data.type,
-					typeGroup: data.typeGroup,
-					vendorField: data.vendorField,
-					version: data.version,
-				})),
-			);
+			await transactionRepository.save(transactions);
 
 			const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
 			if (Utils.roundCalculator.isNewRound(header.height, this.configuration)) {
@@ -147,6 +126,33 @@ export class Sync implements Contracts.ApiSync.ISync {
 		const t1 = performance.now();
 
 		this.logger.debug(`synced committed block: ${header.height} in ${t1 - t0}ms`);
+	}
+
+	#normalizeTransaction(header: Contracts.Crypto.IBlockHeader, { data }: Contracts.Crypto.ITransaction): Models.Transaction {
+		let totalMultiPaymentTransferred: string | undefined;
+		if (data.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core && data.type === Contracts.Crypto.TransactionType.MultiPayment) {
+			totalMultiPaymentTransferred = data.asset!.payments!.reduce((sum, payment) => sum.plus(payment.amount), Utils.BigNumber.ZERO).toFixed();
+		}
+
+		return {
+			amount: data.amount.toFixed(),
+			blockHeight: header.height.toFixed(),
+			blockId: header.id,
+			fee: data.fee.toFixed(),
+			id: data.id!,
+			nonce: data.nonce.toFixed(),
+			recipientId: data.recipientId,
+			senderPublicKey: data.senderPublicKey,
+			sequence: data.sequence!,
+			signature: data.signature!,
+			timestamp: header.timestamp.toFixed(),
+			type: data.type,
+			typeGroup: data.typeGroup,
+			vendorField: data.vendorField,
+			version: data.version,
+			asset: data.asset,
+			totalMultiPaymentTransferred,
+		};
 	}
 
 	async #bootstrapTransactionTypes(): Promise<void> {

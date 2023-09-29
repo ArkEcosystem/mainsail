@@ -100,6 +100,13 @@ export class Transaction {
 	@Column({
 		default: undefined,
 		nullable: true,
+		type: "bigint",
+	})
+	public readonly totalMultiPaymentTransferred: string | undefined;
+
+	@Column({
+		default: undefined,
+		nullable: true,
 		type: "jsonb",
 		// TODO: separate tables for 1:n assets
 	})
