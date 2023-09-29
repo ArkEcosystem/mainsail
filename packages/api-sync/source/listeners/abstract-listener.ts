@@ -29,12 +29,14 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 	#addedEvents: Map<string, TEventData> = new Map();
 	#removedEvents: Map<string, TEventData> = new Map();
 
-	public async boot(): Promise<void> {
-		await this.#truncate();
-
+	public async register(): Promise<void> {
 		for (const eventName of Object.keys(this.getEventMapping())) {
 			this.events.listen(eventName, this);
 		}
+	}
+
+	public async boot(): Promise<void> {
+		await this.#truncate();
 
 		const syncInterval = this.getSyncIntervalMs();
 

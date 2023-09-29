@@ -3,12 +3,24 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, MempoolTransaction, State, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
+import {
+	Block,
+	Configuration,
+	MempoolTransaction,
+	Plugin,
+	State,
+	Transaction,
+	TransactionType,
+	ValidatorRound,
+	Wallet,
+} from "./models";
 import { Peer } from "./models/peer";
 import {
 	makeBlockRepository,
+	makeConfigurationRepository,
 	makeMempoolTransactionRepository,
 	makePeerRepository,
+	makePluginRepository,
 	makeStateRepository,
 	makeTransactionRepository,
 	makeTransactionTypeRepository,
@@ -44,8 +56,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				// TODO: allow entities to be extended by plugins
 				entities: [
 					Block,
+					Configuration,
 					Peer,
 					MempoolTransaction,
+					Plugin,
 					State,
 					TransactionType,
 					Transaction,
@@ -81,6 +95,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				);
 
 			this.app
+				.bind(Identifiers.ConfigurationRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeConfigurationRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
 				.bind(Identifiers.PeerRepositoryFactory)
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
@@ -92,6 +113,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeMempoolTransactionRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind(Identifiers.PluginRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makePluginRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

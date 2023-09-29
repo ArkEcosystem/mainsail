@@ -234,6 +234,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
       pg:
         specifier: 8.11.3
         version: 8.11.3
@@ -335,6 +338,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      dayjs:
+        specifier: 1.10.7
+        version: 1.10.7
       joi:
         specifier: 17.9.2
         version: 17.9.2
