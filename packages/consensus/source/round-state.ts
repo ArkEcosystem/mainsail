@@ -230,16 +230,16 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 		return this.#prevotes.get(validatorIndex);
 	}
 
-	public getPrevotes(): IterableIterator<Contracts.Crypto.IPrevote> {
-		return this.#prevotes.values();
+	public getPrevotes(): Contracts.Crypto.IPrevote[] {
+		return [...this.#prevotes.values()];
 	}
 
 	public getPrecommit(validatorIndex: number): Contracts.Crypto.IPrecommit | undefined {
 		return this.#precommits.get(validatorIndex);
 	}
 
-	public getPrecommits(): IterableIterator<Contracts.Crypto.IPrecommit> {
-		return this.#precommits.values();
+	public getPrecommits(): Contracts.Crypto.IPrecommit[] {
+		return [...this.#precommits.values()];
 	}
 
 	public getValidatorsSignedPrevote(): readonly boolean[] {
