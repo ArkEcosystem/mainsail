@@ -151,11 +151,11 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 		return {
 			amount: data.amount.toFixed(),
+			asset: data.asset,
 			blockHeight: header.height.toFixed(),
 			blockId: header.id,
 			fee: data.fee.toFixed(),
 			id: data.id!,
-			asset: data.asset,
 			nonce: data.nonce.toFixed(),
 			recipientId: data.recipientId,
 			senderPublicKey: data.senderPublicKey,
