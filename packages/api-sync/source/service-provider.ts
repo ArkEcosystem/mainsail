@@ -5,6 +5,7 @@ import { Providers } from "@mainsail/kernel";
 import * as ApiSyncContracts from "./contracts";
 import { Mempool } from "./listeners/mempool";
 import { Peers } from "./listeners/peers";
+import { Plugins } from "./listeners/plugins";
 import { Sync } from "./sync";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -12,6 +13,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ApiSync).to(Sync).inSingletonScope();
+
+		// Listen to events during register, so we can catch all boot events.
+		await this.#registerListeners();
 	}
 
 	public async boot(): Promise<void> {
@@ -22,11 +26,17 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.#disposeListeners();
 	}
 
-	async #bootListeners(): Promise<void> {
-		for (const constructor of [Peers, Mempool]) {
+	async #registerListeners(): Promise<void> {
+		for (const constructor of [Peers, Plugins, Mempool]) {
 			const listener = this.app.resolve(constructor as interfaces.Newable<ApiSyncContracts.EventListener>);
-			await listener.boot();
+			await listener.register();
 			this.#listeners.push(listener);
+		}
+	}
+
+	async #bootListeners(): Promise<void> {
+		for (const listener of this.#listeners) {
+			await listener.boot();
 		}
 	}
 

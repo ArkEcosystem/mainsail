@@ -10,6 +10,9 @@ import { performance } from "perf_hooks";
 
 @injectable()
 export class Sync implements Contracts.ApiSync.ISync {
+	@inject(Identifiers.Application)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
@@ -18,6 +21,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
+	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.IConfigurationRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	private readonly stateRepositoryFactory!: ApiDatabaseContracts.IStateRepositoryFactory;
@@ -44,6 +50,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
+		await this.#bootstrapConfiguration();
 		await this.#bootstrapTransactionTypes();
 	}
 
@@ -141,6 +148,17 @@ export class Sync implements Contracts.ApiSync.ISync {
 		const t1 = performance.now();
 
 		this.logger.debug(`synced committed block: ${header.height} in ${t1 - t0}ms`);
+	}
+
+	async #bootstrapConfiguration(): Promise<void> {
+		await this.configurationRepositoryFactory().upsert(
+			{
+				cryptoConfiguration: (this.configuration.all() ?? {}) as Record<string, any>,
+				id: 1,
+				version: this.app.version(),
+			},
+			["id"],
+		);
 	}
 
 	async #bootstrapTransactionTypes(): Promise<void> {
