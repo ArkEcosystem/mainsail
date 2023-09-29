@@ -1,12 +1,6 @@
 import { type DataSource, EntityManager } from "typeorm";
 
-import { MempoolTransaction, State } from "./models";
-import { Block } from "./models/block";
-import { Peer } from "./models/peer";
-import { Transaction } from "./models/transaction";
-import { TransactionType } from "./models/transaction-type";
-import { ValidatorRound } from "./models/validator-round";
-import { Wallet } from "./models/wallet";
+import { Block, MempoolTransaction, Peer, Plugin, State, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
 import { ExtendedRepository } from "./repositories/repository-extension";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
 
@@ -67,6 +61,8 @@ export type ITransactionRepository = ExtendedRepository<Transaction> & ITransact
 
 export type IValidatorRoundRepositoryExtension = {};
 export type IValidatorRoundRepository = ExtendedRepository<ValidatorRound> & IValidatorRoundRepositoryExtension;
+export type IPluginRepositoryExtension = {};
+export type IPluginRepository = ExtendedRepository<Plugin> & IPluginRepositoryExtension;
 export type IStateRepositoryExtension = {};
 export type IStateRepository = ExtendedRepository<State> & IStateRepositoryExtension;
 
@@ -88,6 +84,7 @@ export type IMempoolTransactionRepositoryFactory = (
 	customDataSource?: RepositoryDataSource,
 ) => IMempoolTransactionRepository;
 export type IValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => IValidatorRoundRepository;
+export type IPluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPluginRepository;
 export type IStateRepositoryFactory = (customDataSource?: RepositoryDataSource) => IStateRepository;
 export type IWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => IWalletRepository;
 

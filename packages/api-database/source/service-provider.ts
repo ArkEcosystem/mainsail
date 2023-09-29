@@ -3,12 +3,13 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, MempoolTransaction, State, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
+import { Block, MempoolTransaction, State, Plugin, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
 import { Peer } from "./models/peer";
 import {
 	makeBlockRepository,
 	makeMempoolTransactionRepository,
 	makePeerRepository,
+	makePluginRepository,
 	makeStateRepository,
 	makeTransactionRepository,
 	makeTransactionTypeRepository,
@@ -46,6 +47,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Block,
 					Peer,
 					MempoolTransaction,
+					Plugin,
 					State,
 					TransactionType,
 					Transaction,
@@ -92,6 +94,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeMempoolTransactionRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind(Identifiers.PluginRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makePluginRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
