@@ -11,11 +11,6 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.IGetMessagesRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.IGetMessagesResponse> {
-		const result = {
-			precommits: [],
-			prevotes: [],
-		};
-
 		const { height, round, validatorsSignedPrevote, validatorsSignedPrecommit } = request.payload.headers;
 
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
@@ -23,20 +18,31 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 			Identifiers.Consensus.RoundStateRepository,
 		);
 
-		if (height !== consensus.getHeight()) {
-			return result;
+		if (height !== consensus.getHeight() || round < consensus.getRound()) {
+			return {
+				precommits: [],
+				prevotes: [],
+			};
 		}
 
-		if (round > consensus.getRound()) {
-			return result;
+		// Use the highest round with minority prevotes
+		let roundState = roundStateRepo.getRoundState(height, consensus.getRound());
+		if (roundState.round >= 1 && !roundState.hasMinorityPrevotesOrPrecommits()) {
+			roundState = roundStateRepo.getRoundState(height, consensus.getRound() - 1);
 		}
 
-		const roundState = roundStateRepo.getRoundState(height, round);
-
-		return {
-			precommits: this.getPrecommits(validatorsSignedPrecommit, roundState),
-			prevotes: this.getPrevotes(validatorsSignedPrevote, roundState),
-		};
+		if (round === roundState.round) {
+			// Return only deltas
+			return {
+				precommits: this.getPrecommits(validatorsSignedPrecommit, roundState),
+				prevotes: this.getPrevotes(validatorsSignedPrevote, roundState),
+			};
+		} else {
+			return {
+				precommits: roundState.getPrecommits().map((precommit) => precommit.serialized),
+				prevotes: roundState.getPrevotes().map((prevote) => prevote.serialized),
+			};
+		}
 	}
 
 	private getPrevotes(
