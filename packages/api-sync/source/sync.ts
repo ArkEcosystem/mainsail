@@ -64,7 +64,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 
-			const transactions: Models.Transaction[] = blockTransactions.map(transaction => this.#normalizeTransaction(header, transaction));
+			const transactions: Models.Transaction[] = blockTransactions.map((transaction) =>
+				this.#normalizeTransaction(header, transaction),
+			);
 
 			await blockRepository.save({
 				generatorPublicKey: header.generatorPublicKey,
@@ -80,7 +82,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				totalMultiPaymentTransferred: transactions
-					.reduce((sum, transaction) => sum.plus(transaction.totalMultiPaymentTransferred ?? Utils.BigNumber.ZERO), Utils.BigNumber.ZERO).toFixed(),
+					.reduce(
+						(sum, transaction) =>
+							sum.plus(transaction.totalMultiPaymentTransferred ?? Utils.BigNumber.ZERO),
+						Utils.BigNumber.ZERO,
+					)
+					.toFixed(),
 				version: header.version,
 			});
 
@@ -128,10 +135,18 @@ export class Sync implements Contracts.ApiSync.ISync {
 		this.logger.debug(`synced committed block: ${header.height} in ${t1 - t0}ms`);
 	}
 
-	#normalizeTransaction(header: Contracts.Crypto.IBlockHeader, { data }: Contracts.Crypto.ITransaction): Models.Transaction {
+	#normalizeTransaction(
+		header: Contracts.Crypto.IBlockHeader,
+		{ data }: Contracts.Crypto.ITransaction,
+	): Models.Transaction {
 		let totalMultiPaymentTransferred: string | undefined;
-		if (data.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core && data.type === Contracts.Crypto.TransactionType.MultiPayment) {
-			totalMultiPaymentTransferred = data.asset!.payments!.reduce((sum, payment) => sum.plus(payment.amount), Utils.BigNumber.ZERO).toFixed();
+		if (
+			data.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core &&
+			data.type === Contracts.Crypto.TransactionType.MultiPayment
+		) {
+			totalMultiPaymentTransferred = data
+				.asset!.payments!.reduce((sum, payment) => sum.plus(payment.amount), Utils.BigNumber.ZERO)
+				.toFixed();
 		}
 
 		return {
@@ -140,18 +155,18 @@ export class Sync implements Contracts.ApiSync.ISync {
 			blockId: header.id,
 			fee: data.fee.toFixed(),
 			id: data.id!,
+			asset: data.asset,
 			nonce: data.nonce.toFixed(),
 			recipientId: data.recipientId,
 			senderPublicKey: data.senderPublicKey,
 			sequence: data.sequence!,
 			signature: data.signature!,
 			timestamp: header.timestamp.toFixed(),
+			totalMultiPaymentTransferred,
 			type: data.type,
 			typeGroup: data.typeGroup,
 			vendorField: data.vendorField,
 			version: data.version,
-			asset: data.asset,
-			totalMultiPaymentTransferred,
 		};
 	}
 
