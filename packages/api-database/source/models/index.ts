@@ -1,4 +1,5 @@
 export * from "./block";
+export * from "./configuration";
 export * from "./mempool-transaction";
 export * from "./peer";
 export * from "./state";

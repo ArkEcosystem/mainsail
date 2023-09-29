@@ -3,10 +3,11 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, MempoolTransaction, State, Plugin, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
+import { Block, MempoolTransaction, State, Plugin, Transaction, TransactionType, ValidatorRound, Wallet, Configuration } from "./models";
 import { Peer } from "./models/peer";
 import {
 	makeBlockRepository,
+	makeConfigurationRepository,
 	makeMempoolTransactionRepository,
 	makePeerRepository,
 	makePluginRepository,
@@ -45,6 +46,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				// TODO: allow entities to be extended by plugins
 				entities: [
 					Block,
+					Configuration,
 					Peer,
 					MempoolTransaction,
 					Plugin,
@@ -80,6 +82,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeBlockRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind(Identifiers.ConfigurationRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeConfigurationRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

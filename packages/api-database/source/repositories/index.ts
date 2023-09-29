@@ -1,4 +1,5 @@
 export { makeBlockRepository } from "./block-repository";
+export { makeConfigurationRepository } from "./configuration-repository";
 export { makeMempoolTransactionRepository } from "./mempool-transaction-repository";
 export { makePeerRepository } from "./peer-repository";
 export { makePluginRepository } from "./plugin-repository";

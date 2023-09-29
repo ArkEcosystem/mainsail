@@ -1,6 +1,6 @@
 import { type DataSource, EntityManager } from "typeorm";
 
-import { Block, MempoolTransaction, Peer, Plugin, State, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
+import { Block, Configuration, MempoolTransaction, Peer, Plugin, State, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
 import { ExtendedRepository } from "./repositories/repository-extension";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
 
@@ -21,6 +21,9 @@ export type IBlockRepositoryExtension = {
 };
 
 export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExtension;
+
+export type IConfigurationRepositoryExtension = {};
+export type IConfigurationRepository = ExtendedRepository<Configuration> & IConfigurationRepositoryExtension;
 
 export type IPeerRepositoryExtension = {
 	getMedianPeerHeight(): Promise<number>;
@@ -77,6 +80,7 @@ export type IWalletRepositoryExtension = {
 export type IWalletRepository = ExtendedRepository<Wallet> & IWalletRepositoryExtension;
 
 export type IBlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => IBlockRepository;
+export type IConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => IConfigurationRepository;
 export type IPeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPeerRepository;
 export type ITransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionRepository;
 export type ITransactionTypeRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionTypeRepository;
