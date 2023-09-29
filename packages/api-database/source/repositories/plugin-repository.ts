@@ -3,5 +3,4 @@ import { Plugin } from "../models";
 import { makeExtendedRepository } from "./repository-extension";
 
 export const makePluginRepository = (dataSource: RepositoryDataSource): IPluginRepository =>
-	makeExtendedRepository<Plugin, IPluginRepositoryExtension>(Plugin, dataSource, {
-	});
+	makeExtendedRepository<Plugin, IPluginRepositoryExtension>(Plugin, dataSource, {});

@@ -38,8 +38,8 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 		const configuration = serviceProvider.config().all();
 
 		return {
-			name,
 			configuration: this.sanitizeConfiguration(configuration),
+			name,
 		};
 	}
 
@@ -52,14 +52,14 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 	private sanitizeConfiguration(config: Contracts.Types.JsonObject): any {
 		for (const key in config) {
 			if (config.hasOwnProperty(key)) {
-				if (key.toLowerCase() === 'password') {
-					config[key] = '-';
+				if (key.toLowerCase() === "password") {
+					config[key] = "-";
 					continue;
 				}
 
-				const value = config[key]
+				const value = config[key];
 				if (typeof value === "object") {
-					config[key] = this.sanitizeConfiguration(value as Contracts.Types.JsonObject);
+					config[key] = this.sanitizeConfiguration(value);
 				}
 			}
 		}

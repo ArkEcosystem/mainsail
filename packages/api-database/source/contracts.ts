@@ -1,6 +1,17 @@
 import { type DataSource, EntityManager } from "typeorm";
 
-import { Block, Configuration, MempoolTransaction, Peer, Plugin, State, Transaction, TransactionType, ValidatorRound, Wallet } from "./models";
+import {
+	Block,
+	Configuration,
+	MempoolTransaction,
+	Peer,
+	Plugin,
+	State,
+	Transaction,
+	TransactionType,
+	ValidatorRound,
+	Wallet,
+} from "./models";
 import { ExtendedRepository } from "./repositories/repository-extension";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
 
@@ -55,10 +66,7 @@ export type ITransactionRepositoryExtension = {
 		options?: Options,
 	): Promise<ResultsPage<Transaction>>;
 
-	getFeeStatistics(
-		days?: number,
-		minFee?: number
-	): Promise<FeeStatistics[]>;
+	getFeeStatistics(days?: number, minFee?: number): Promise<FeeStatistics[]>;
 };
 export type ITransactionRepository = ExtendedRepository<Transaction> & ITransactionRepositoryExtension;
 

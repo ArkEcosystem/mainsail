@@ -3,7 +3,17 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
-import { Block, MempoolTransaction, State, Plugin, Transaction, TransactionType, ValidatorRound, Wallet, Configuration } from "./models";
+import {
+	Block,
+	Configuration,
+	MempoolTransaction,
+	Plugin,
+	State,
+	Transaction,
+	TransactionType,
+	ValidatorRound,
+	Wallet,
+} from "./models";
 import { Peer } from "./models/peer";
 import {
 	makeBlockRepository,

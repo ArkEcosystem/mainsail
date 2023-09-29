@@ -100,8 +100,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			await stateRepository.upsert(
 				{
-					id: 1,
 					height: header.height,
+					id: 1,
 				},
 				["id"],
 			);
@@ -180,11 +180,11 @@ export class Sync implements Contracts.ApiSync.ISync {
 	async #bootstrapConfiguration(): Promise<void> {
 		await this.configurationRepositoryFactory().upsert(
 			{
+				cryptoConfiguration: (this.configuration.all() ?? {}) as Record<string, any>,
 				id: 1,
 				version: this.app.version(),
-				cryptoConfiguration: (this.configuration.all() ?? {}) as Record<string, any>,
 			},
-			["id"]
+			["id"],
 		);
 	}
 

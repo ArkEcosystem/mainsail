@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 import {
 	FeeStatistics,
 	ITransactionRepository,
@@ -9,7 +11,6 @@ import { Transaction } from "../models";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { TransactionFilter } from "../search/filters/transaction-filter";
 import { makeExtendedRepository } from "./repository-extension";
-import dayjs from "dayjs";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): ITransactionRepository =>
 	makeExtendedRepository<Transaction, ITransactionRepositoryExtension>(Transaction, dataSource, {
@@ -24,10 +25,7 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): ITr
 			return this.listByExpression(transactionExpression, sorting, pagination, options);
 		},
 
-		async getFeeStatistics(
-			days?: number,
-			minFee?: number
-		): Promise<FeeStatistics[]> {
+		async getFeeStatistics(days?: number, minFee?: number): Promise<FeeStatistics[]> {
 			minFee = minFee || 0;
 
 			if (days) {
@@ -48,7 +46,8 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): ITr
 			}
 
 			// no days parameter, take the stats from each type for its last 20 txs
-			return this.manager.query<FeeStatistics[]>(`
+			return this.manager.query<FeeStatistics[]>(
+				`
 				select t_outer.type_group as "typeGroup", t_outer.type as "type", 
 					COALESCE(AVG(fee), 0)::int8 AS "avg",
 					COALESCE(MIN(fee), 0)::int8 AS "min",
@@ -63,6 +62,8 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): ITr
 				) t_limit on true
 				group by t_outer.type_group, t_outer.type
 				order by t_outer.type_group, t_outer.type;
-			`, [minFee, 20]);
-		}
+			`,
+				[minFee, 20],
+			);
+		},
 	});
