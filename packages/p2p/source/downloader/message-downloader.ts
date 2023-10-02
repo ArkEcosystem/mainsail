@@ -141,6 +141,16 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return roundsByHeight.get(round)!;
 	}
 
+	#checkMessage({ height, round }: { height: number; round: number }, header: Contracts.P2P.IHeader): boolean {
+		if (height !== header.height) {
+			throw new Error(`Received message height ${height} does not match expected height ${header.height}`);
+		}
+
+		if (round !== header.round) {
+			throw new Error(`Received message round ${round} does not match expected round ${header.round}`);
+		}
+	}
+
 	async #downloadMessagesFromPeer(job: DownloadJob): Promise<void> {
 		let error: Error | undefined;
 
@@ -152,17 +162,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				const prevote = await this.factory.makePrevoteFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
 
-				if (prevote.height !== job.ourHeader.height) {
-					throw new Error(
-						`Received prevote height ${prevote.height} does not match expected height ${job.peerHeader.height}`,
-					);
-				}
-
-				if (prevote.round !== job.ourHeader.round) {
-					throw new Error(
-						`Received prevote round ${prevote.round} does not match expected round ${job.peerHeader.round}`,
-					);
-				}
+				this.#checkMessage(prevote, job.ourHeader);
 
 				const response = await this.prevoteProcessor.process(prevote, false);
 
@@ -176,17 +176,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				const precommit = await this.factory.makePrecommitFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
 
-				if (precommit.height !== job.ourHeader.height) {
-					throw new Error(
-						`Received precommit height ${precommit.height} does not match expected height ${job.peerHeader.height}`,
-					);
-				}
-
-				if (precommit.round !== job.ourHeader.round) {
-					throw new Error(
-						`Received precommit round ${precommit.round} does not match expected round ${job.peerHeader.round}`,
-					);
-				}
+				this.#checkMessage(precommit, job.ourHeader);
 
 				const response = await this.precommitProcessor.process(precommit, false);
 
