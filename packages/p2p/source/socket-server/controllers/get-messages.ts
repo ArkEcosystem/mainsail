@@ -27,7 +27,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 
 		// Use the highest round with minority prevotes
 		let roundState = roundStateRepo.getRoundState(height, consensus.getRound());
-		if (roundState.round >= 1 && !roundState.hasMinorityPrevotesOrPrecommits()) {
+		if (roundState.round >= 1 && roundState.round > round && !roundState.hasMinorityPrevotesOrPrecommits()) {
 			roundState = roundStateRepo.getRoundState(height, consensus.getRound() - 1);
 		}
 
