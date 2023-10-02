@@ -60,6 +60,11 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 				return false;
 			}
 
+			const { parentData, parentDataProperty } = parentSchema;
+			if (parentData && parentDataProperty) {
+				parentData[parentDataProperty] = bignum;
+			}
+
 			return true;
 		},
 		errors: false,
