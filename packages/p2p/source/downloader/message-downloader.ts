@@ -10,6 +10,7 @@ type DownloadsByRound = {
 };
 
 type DownloadJob = {
+	isFullDownload: boolean;
 	peer: Contracts.P2P.Peer;
 	peerHeader: Contracts.P2P.IHeaderData;
 	ourHeader: Contracts.P2P.IHeader;
@@ -55,6 +56,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2PState)
 	private readonly state!: Contracts.P2P.State;
 
+	#fullDownloadsByHeight: Map<number, Set<number>> = new Map();
 	#downloadsByHeight: Map<number, Map<number, DownloadsByRound>> = new Map();
 
 	@postConstruct()
@@ -89,35 +91,82 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		const downloads = this.#getDownloadsByRound(peer.header.height, peer.header.round);
+		if (peer.header.round === header.round) {
+			const downloads = this.#getDownloadsByRound(peer.header.height, peer.header.round);
 
-		const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes, header);
-		const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits, header);
+			const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes, header);
+			const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits, header);
 
-		if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
-			return;
+			if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
+				return;
+			}
+
+			const job: DownloadJob = {
+				isFullDownload: false,
+				ourHeader: header,
+				peer,
+				peerHeader: peer.header,
+				precommitIndexes,
+				prevoteIndexes,
+			};
+
+			// console.log(
+			// 	`Downloading messages from ${peer.ip} . ${header.height}/${header.round}`,
+			// 	prevoteIndexes,
+			// 	precommitIndexes,
+			// );
+
+			this.#setDownloadJob(job, downloads);
+			void this.#downloadMessagesFromPeer(job);
+		} else if (peer.header.round > header.round) {
+			const round = this.#getHighestRoundToDownload(peer.header);
+
+			if (this.#canDownloadFullRound(peer.header.height, round)) {
+				return;
+			}
+
+			this.#setFullDownload(peer.header.height, round);
+
+			const job: DownloadJob = {
+				isFullDownload: true,
+				ourHeader: header,
+				peer,
+				peerHeader: peer.header,
+				precommitIndexes: [],
+				prevoteIndexes: [],
+			};
+
+			void this.#downloadMessagesFromPeer(job);
 		}
-
-		const job: DownloadJob = {
-			ourHeader: header,
-			peer,
-			peerHeader: peer.header,
-			precommitIndexes,
-			prevoteIndexes,
-		};
-
-		console.log(
-			`Downloading messages from ${peer.ip} . ${header.height}/${header.round}`,
-			prevoteIndexes,
-			precommitIndexes,
-		);
-
-		this.#setDownloadJob(job, downloads);
-		void this.#downloadMessagesFromPeer(job);
 	}
 
 	public isDownloading(): boolean {
-		return this.#downloadsByHeight.size > 0;
+		return this.#downloadsByHeight.size > 0 || this.#fullDownloadsByHeight.size > 0;
+	}
+
+	#getHighestRoundToDownload(peerHeader: Contracts.P2P.IHeaderData): number {
+		if (Utils.isMinority(peerHeader.validatorsSignedPrevote.length, this.cryptoConfiguration)) {
+			return peerHeader.round;
+		}
+
+		return peerHeader.round - 1;
+	}
+
+	#canDownloadFullRound(height: number, round: number): boolean {
+		if (!this.#fullDownloadsByHeight.has(height)) {
+			return true;
+		}
+
+		const highestDownloadingRound = Math.max(...this.#fullDownloadsByHeight.get(height)!.values());
+		return round > highestDownloadingRound;
+	}
+
+	#setFullDownload(height: number, round: number): void {
+		if (!this.#fullDownloadsByHeight.has(height)) {
+			this.#fullDownloadsByHeight.set(height, new Set<number>());
+		}
+
+		this.#fullDownloadsByHeight.get(height)!.add(round);
 	}
 
 	#getDownloadsByRound(height: number, round: number): DownloadsByRound {
@@ -268,23 +317,27 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#removeDownloadJob(job: DownloadJob): void {
-		// Return if the height was already removed, because the block was applied.
-		const roundsByHeight = this.#downloadsByHeight.get(job.ourHeader.height);
-		if (!roundsByHeight) {
-			return;
-		}
+		if (job.isFullDownload) {
+			this.#fullDownloadsByHeight.get(job.ourHeader.height)?.delete(job.ourHeader.round);
+		} else {
+			// Return if the height was already removed, because the block was applied.
+			const roundsByHeight = this.#downloadsByHeight.get(job.ourHeader.height);
+			if (!roundsByHeight) {
+				return;
+			}
 
-		const downloadsByRound = roundsByHeight.get(job.ourHeader.round);
-		if (!downloadsByRound) {
-			return;
-		}
+			const downloadsByRound = roundsByHeight.get(job.ourHeader.round);
+			if (!downloadsByRound) {
+				return;
+			}
 
-		for (const index of job.prevoteIndexes) {
-			downloadsByRound.prevotes[index] = false;
-		}
+			for (const index of job.prevoteIndexes) {
+				downloadsByRound.prevotes[index] = false;
+			}
 
-		for (const index of job.precommitIndexes) {
-			downloadsByRound.precommits[index] = false;
+			for (const index of job.precommitIndexes) {
+				downloadsByRound.precommits[index] = false;
+			}
 		}
 	}
 
