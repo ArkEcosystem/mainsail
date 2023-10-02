@@ -157,40 +157,55 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		job: DownloadJob,
 	) {
 		// ALlow response to be empty
-		if (prevotes.size > 0 || precommits.size > 0) {
-			this.state.resetLastMessageTime();
+		if (prevotes.size === 0 && precommits.size === 0) {
+			return;
+		}
 
-			if (job.peerHeader.round > job.ourHeader.round) {
-				if (
-					!Utils.isMajority(
-						prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(),
-						this.cryptoConfiguration,
-					)
-				) {
-					throw new Error(`Peer didn't return enough prevotes for +2/3 majority`);
-				}
+		this.state.resetLastMessageTime();
 
-				if (
-					!Utils.isMajority(
-						precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(),
-						this.cryptoConfiguration,
-					)
-				) {
-					throw new Error(`Peer didn't return enough precommits for +2/3 majority`);
-				}
-			} else {
-				// Check if received all the requested data
-				for (const index of job.prevoteIndexes) {
-					if (!prevotes.has(index)) {
-						throw new Error(`Missing prevote for validator ${index}`);
-					}
-				}
+		if (job.peerHeader.round === job.ourHeader.round) {
+			this.#checkSameRoundResponse(prevotes, precommits, job);
+		} else {
+			this.#checkDifferentRoundResponse(prevotes, precommits, job);
+		}
+	}
 
-				for (const index of job.precommitIndexes) {
-					if (!precommits.has(index)) {
-						throw new Error(`Missing precommit for validator ${index}`);
-					}
-				}
+	#checkDifferentRoundResponse(
+		prevotes: Map<number, Contracts.Crypto.IPrevote>,
+		precommits: Map<number, Contracts.Crypto.IPrecommit>,
+		job: DownloadJob,
+	) {
+		if (
+			!Utils.isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), this.cryptoConfiguration)
+		) {
+			throw new Error(`Peer didn't return enough prevotes for +2/3 majority`);
+		}
+
+		if (
+			!Utils.isMajority(
+				precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(),
+				this.cryptoConfiguration,
+			)
+		) {
+			throw new Error(`Peer didn't return enough precommits for +2/3 majority`);
+		}
+	}
+
+	#checkSameRoundResponse(
+		prevotes: Map<number, Contracts.Crypto.IPrevote>,
+		precommits: Map<number, Contracts.Crypto.IPrecommit>,
+		job: DownloadJob,
+	) {
+		// Check if received all the requested data
+		for (const index of job.prevoteIndexes) {
+			if (!prevotes.has(index)) {
+				throw new Error(`Missing prevote for validator ${index}`);
+			}
+		}
+
+		for (const index of job.precommitIndexes) {
+			if (!precommits.has(index)) {
+				throw new Error(`Missing precommit for validator ${index}`);
 			}
 		}
 	}
