@@ -64,6 +64,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		this.events.listen(Enums.BlockEvent.Applied, {
 			handle: () => {
 				this.#downloadsByHeight.delete(this.stateStore.getLastHeight());
+				this.#fullDownloadsByHeight.delete(this.stateStore.getLastHeight());
 			},
 		});
 	}
