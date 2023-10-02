@@ -257,13 +257,13 @@ describe<{
 			$id: "test",
 			properties: {
 				id: { type: "string" },
-				amount: { bignumber: { minimum: 15 } },
+				amount: { bignumber: { minimum: 1 } },
 			},
 			type: "object",
 		};
 		context.validator.addSchema(schema);
 
-		const object: any = { id: "test", amount: "12" };
+		const object: any = { id: "test", amount: "notanumber" };
 		assert.false(object.amount instanceof BigNumber);
 		assert.defined(context.validator.validate("test", object).error);
 		assert.false(object.amount instanceof BigNumber);
