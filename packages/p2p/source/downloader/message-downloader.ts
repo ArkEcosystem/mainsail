@@ -83,28 +83,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
-	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData): boolean {
-		if (ourHeader.height !== peerHeader.height || ourHeader.round > peerHeader.round) {
-			return false;
-		}
-
-		const round = this.#getHighestRoundToDownload(ourHeader, peerHeader);
-		if (ourHeader.round === round) {
-			const downloads = this.#getDownloadsByRound(peerHeader.height, peerHeader.round);
-
-			const prevoteIndexes = this.#getPrevoteIndexesToDownload(ourHeader, peerHeader, downloads.prevotes);
-			const precommitIndexes = this.#getPrecommitIndexesToDownload(ourHeader, peerHeader, downloads.precommits);
-
-			if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
-				return false;
-			}
-
-			return true;
-		}
-
-		return this.#canDownloadFullRound(peerHeader.height, round);
-	}
-
 	public download(peer: Contracts.P2P.Peer): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
@@ -147,6 +125,28 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	public isDownloading(): boolean {
 		return this.#downloadsByHeight.size > 0 || this.#fullDownloadsByHeight.size > 0;
+	}
+
+	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData): boolean {
+		if (ourHeader.height !== peerHeader.height || ourHeader.round > peerHeader.round) {
+			return false;
+		}
+
+		const round = this.#getHighestRoundToDownload(ourHeader, peerHeader);
+		if (ourHeader.round === round) {
+			const downloads = this.#getDownloadsByRound(peerHeader.height, peerHeader.round);
+
+			const prevoteIndexes = this.#getPrevoteIndexesToDownload(ourHeader, peerHeader, downloads.prevotes);
+			const precommitIndexes = this.#getPrecommitIndexesToDownload(ourHeader, peerHeader, downloads.precommits);
+
+			if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
+				return false;
+			}
+
+			return true;
+		}
+
+		return this.#canDownloadFullRound(peerHeader.height, round);
 	}
 
 	#getHighestRoundToDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData): number {
