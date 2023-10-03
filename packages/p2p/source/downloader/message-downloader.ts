@@ -88,7 +88,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return false;
 		}
 
-		if (ourHeader.round === peerHeader.round) {
+		const round = this.#getHighestRoundToDownload(ourHeader, peerHeader);
+		if (ourHeader.round === round) {
 			const downloads = this.#getDownloadsByRound(peerHeader.height, peerHeader.round);
 
 			const prevoteIndexes = this.#getPrevoteIndexesToDownload(ourHeader, peerHeader, downloads.prevotes);
@@ -101,7 +102,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return true;
 		}
 
-		const round = this.#getHighestRoundToDownload(peerHeader);
 		return this.#canDownloadFullRound(peerHeader.height, round);
 	}
 
@@ -130,13 +130,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			this.#setDownloadJob(job, downloads);
 			void this.#downloadMessagesFromPeer(job);
 		} else if (peer.header.round > header.round) {
-			const round = this.#getHighestRoundToDownload(peer.header);
-
-			if (!this.#canDownloadFullRound(peer.header.height, round)) {
-				return;
-			}
-
-			this.#setFullDownload(peer.header.height, round);
+			this.#setFullDownload(peer.header.height, this.#getHighestRoundToDownload(header, peer.header));
 
 			const job: DownloadJob = {
 				isFullDownload: true,
@@ -155,7 +149,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return this.#downloadsByHeight.size > 0 || this.#fullDownloadsByHeight.size > 0;
 	}
 
-	#getHighestRoundToDownload(peerHeader: Contracts.P2P.IHeaderData): number {
+	#getHighestRoundToDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData): number {
+		if (peerHeader.round <= ourHeader.round) {
+			return peerHeader.round;
+		}
+
 		if (Utils.isMinority(peerHeader.validatorsSignedPrevote.length, this.cryptoConfiguration)) {
 			return peerHeader.round;
 		}
