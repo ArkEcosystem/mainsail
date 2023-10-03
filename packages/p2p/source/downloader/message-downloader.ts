@@ -380,16 +380,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		peerHeader: Contracts.P2P.IHeaderData,
 		prevotes: boolean[],
 	): number[] {
-		const indexes: number[] = [];
-
-		// Request missing prevotes
-		for (const [index, prevote] of prevotes.entries()) {
-			if (peerHeader.validatorsSignedPrevote[index] && !prevote && !ourHeader.validatorsSignedPrevote[index]) {
-				indexes.push(index);
-			}
-		}
-
-		return indexes;
+		return this.#getIndexesToDownload(
+			ourHeader.validatorsSignedPrevote,
+			peerHeader.validatorsSignedPrevote,
+			prevotes,
+		);
 	}
 
 	#getPrecommitIndexesToDownload(
@@ -397,15 +392,23 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		peerHeader: Contracts.P2P.IHeaderData,
 		precommits: boolean[],
 	): number[] {
+		return this.#getIndexesToDownload(
+			ourHeader.validatorsSignedPrecommit,
+			peerHeader.validatorsSignedPrecommit,
+			precommits,
+		);
+	}
+
+	#getIndexesToDownload(
+		ourValidatorsSignedMessage: readonly boolean[],
+		peerValidatorsSignedMessage: readonly boolean[],
+		messages: boolean[],
+	): number[] {
 		const indexes: number[] = [];
 
-		// Request missing precommits
-		for (const [index, precommit] of precommits.entries()) {
-			if (
-				peerHeader.validatorsSignedPrecommit[index] &&
-				!precommit &&
-				!ourHeader.validatorsSignedPrecommit[index]
-			) {
+		// Request missing messages
+		for (const [index, precommit] of messages.entries()) {
+			if (!precommit && peerValidatorsSignedMessage[index] && !ourValidatorsSignedMessage[index]) {
 				indexes.push(index);
 			}
 		}
