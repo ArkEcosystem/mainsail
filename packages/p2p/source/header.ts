@@ -71,7 +71,7 @@ export class Header implements Contracts.P2P.IHeader {
 			return true;
 		}
 
-		// Ship check for prevotes if we are waiting for precommits
+		// Skip check for prevotes if we are waiting for precommits
 		if ([Contracts.Consensus.Step.Prevote, Contracts.Consensus.Step.Propose].includes(this.step)) {
 			for (let index = 0; index < data.validatorsSignedPrevote.length; index++) {
 				if (data.validatorsSignedPrevote[index] && !this.validatorsSignedPrevote[index]) {
