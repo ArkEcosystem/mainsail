@@ -353,26 +353,51 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#removeDownloadJob(job: DownloadJob): void {
 		if (job.isFullDownload) {
-			this.#fullDownloadsByHeight.get(job.ourHeader.height)?.delete(job.ourHeader.round);
+			this.#removeFullDownloadJob(job);
 		} else {
-			// Return if the height was already removed, because the block was applied.
-			const roundsByHeight = this.#downloadsByHeight.get(job.ourHeader.height);
-			if (!roundsByHeight) {
-				return;
-			}
+			this.#removePartialDownloadJob(job);
+		}
+	}
 
-			const downloadsByRound = roundsByHeight.get(job.ourHeader.round);
-			if (!downloadsByRound) {
-				return;
-			}
+	#removeFullDownloadJob(job: DownloadJob) {
+		this.#fullDownloadsByHeight.get(job.ourHeader.height)?.delete(job.ourHeader.round);
 
-			for (const index of job.prevoteIndexes) {
-				downloadsByRound.prevotes[index] = false;
-			}
+		// Cleanup
+		if (this.#fullDownloadsByHeight.get(job.ourHeader.height)?.size === 0) {
+			this.#fullDownloadsByHeight.delete(job.ourHeader.height);
+		}
+	}
 
-			for (const index of job.precommitIndexes) {
-				downloadsByRound.precommits[index] = false;
-			}
+	#removePartialDownloadJob(job: DownloadJob) {
+		// Return if the height was already removed, because the block was applied.
+		const roundsByHeight = this.#downloadsByHeight.get(job.ourHeader.height);
+		if (!roundsByHeight) {
+			return;
+		}
+
+		const downloadsByRound = roundsByHeight.get(job.ourHeader.round);
+		if (!downloadsByRound) {
+			return;
+		}
+
+		for (const index of job.prevoteIndexes) {
+			downloadsByRound.prevotes[index] = false;
+		}
+
+		for (const index of job.precommitIndexes) {
+			downloadsByRound.precommits[index] = false;
+		}
+
+		// Cleanup
+		if (
+			downloadsByRound.prevotes.every((value) => !value) &&
+			downloadsByRound.precommits.every((value) => !value)
+		) {
+			roundsByHeight.delete(job.ourHeader.round);
+		}
+
+		if (this.#downloadsByHeight.get(job.ourHeader.height)?.size === 0) {
+			this.#downloadsByHeight.delete(job.ourHeader.height);
 		}
 	}
 
