@@ -77,9 +77,32 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		let peers = this.repository.getPeers();
 
-		while ((peers = peers.filter((peer) => header.canDownloadMessages(peer.header))) && peers.length > 0) {
+		// TODO: Check loop
+		while ((peers = peers.filter((peer) => this.#canDownload(header, peer.header))) && peers.length > 0) {
 			void this.download(getRandomPeer(peers));
 		}
+	}
+
+	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData): boolean {
+		if (ourHeader.height !== peerHeader.height || ourHeader.round > peerHeader.round) {
+			return false;
+		}
+
+		if (ourHeader.round === peerHeader.round) {
+			const downloads = this.#getDownloadsByRound(peerHeader.height, peerHeader.round);
+
+			const prevoteIndexes = this.#getPrevoteIndexesToDownload(ourHeader, peerHeader, downloads.prevotes);
+			const precommitIndexes = this.#getPrecommitIndexesToDownload(ourHeader, peerHeader, downloads.precommits);
+
+			if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
+				return false;
+			}
+
+			return true;
+		}
+
+		const round = this.#getHighestRoundToDownload(peerHeader);
+		return this.#canDownloadFullRound(peerHeader.height, round);
 	}
 
 	public download(peer: Contracts.P2P.Peer): void {
@@ -88,27 +111,20 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const header = this.headerFactory();
-		if (!header.canDownloadMessages(peer.header)) {
+		if (!this.#canDownload(header, peer.header)) {
 			return;
 		}
 
 		if (peer.header.round === header.round) {
 			const downloads = this.#getDownloadsByRound(peer.header.height, peer.header.round);
 
-			const prevoteIndexes = this.#getPrevoteIndexesToDownload(peer, downloads.prevotes, header);
-			const precommitIndexes = this.#getPrecommitIndexesToDownload(peer, downloads.precommits, header);
-
-			if (prevoteIndexes.length === 0 && precommitIndexes.length === 0) {
-				return;
-			}
-
 			const job: DownloadJob = {
 				isFullDownload: false,
 				ourHeader: header,
 				peer,
 				peerHeader: peer.header,
-				precommitIndexes,
-				prevoteIndexes,
+				precommitIndexes: this.#getPrecommitIndexesToDownload(header, peer.header, downloads.precommits),
+				prevoteIndexes: this.#getPrevoteIndexesToDownload(header, peer.header, downloads.prevotes),
 			};
 
 			this.#setDownloadJob(job, downloads);
@@ -361,27 +377,17 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
+	// TODO: Resolve duplicate
 	#getPrevoteIndexesToDownload(
-		peer: Contracts.P2P.Peer,
+		ourHeader: Contracts.P2P.IHeader,
+		peerHeader: Contracts.P2P.IHeaderData,
 		prevotes: boolean[],
-		header: Contracts.P2P.IHeader,
 	): number[] {
 		const indexes: number[] = [];
 
-		// Request all because their node have +2/3 prevotes for our round
-		if (peer.header.round > header.round) {
-			for (const [index, prevote] of prevotes.entries()) {
-				if (!prevote) {
-					indexes.push(index);
-				}
-			}
-
-			return indexes;
-		}
-
 		// Request missing prevotes
 		for (const [index, prevote] of prevotes.entries()) {
-			if (peer.header.validatorsSignedPrevote[index] && !prevote && !header.validatorsSignedPrevote[index]) {
+			if (peerHeader.validatorsSignedPrevote[index] && !prevote && !ourHeader.validatorsSignedPrevote[index]) {
 				indexes.push(index);
 			}
 		}
@@ -390,29 +396,18 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#getPrecommitIndexesToDownload(
-		peer: Contracts.P2P.Peer,
+		ourHeader: Contracts.P2P.IHeader,
+		peerHeader: Contracts.P2P.IHeaderData,
 		precommits: boolean[],
-		header: Contracts.P2P.IHeader,
 	): number[] {
 		const indexes: number[] = [];
-
-		// Request all because their node have +2/3 precommits for our round
-		if (peer.header.round > header.round) {
-			for (const [index, precommit] of precommits.entries()) {
-				if (!precommit) {
-					indexes.push(index);
-				}
-			}
-
-			return indexes;
-		}
 
 		// Request missing precommits
 		for (const [index, precommit] of precommits.entries()) {
 			if (
-				peer.header.validatorsSignedPrecommit[index] &&
+				peerHeader.validatorsSignedPrecommit[index] &&
 				!precommit &&
-				!header.validatorsSignedPrecommit[index]
+				!ourHeader.validatorsSignedPrecommit[index]
 			) {
 				indexes.push(index);
 			}

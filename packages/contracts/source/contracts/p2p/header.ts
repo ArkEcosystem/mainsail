@@ -16,7 +16,6 @@ export interface IHeader {
 
 	toData(): IHeaderData;
 	canDownloadProposal(headerData: IHeaderData): boolean;
-	canDownloadMessages(headerData: IHeaderData): boolean;
 	getValidatorsSignedPrecommitCount(): number;
 	getValidatorsSignedPrevoteCount(): number;
 }

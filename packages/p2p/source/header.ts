@@ -61,34 +61,6 @@ export class Header implements Contracts.P2P.IHeader {
 		return this.proposal === undefined && !!data.proposedBlockId;
 	}
 
-	public canDownloadMessages(data: Contracts.P2P.IHeaderData): boolean {
-		if (!this.#isRoundSufficient(data)) {
-			return false;
-		}
-
-		// Their node already received +2/3 prevotes and precommits for our round
-		if (data.round > this.round) {
-			return true;
-		}
-
-		// Skip check for prevotes if we are waiting for precommits
-		if ([Contracts.Consensus.Step.Prevote, Contracts.Consensus.Step.Propose].includes(this.step)) {
-			for (let index = 0; index < data.validatorsSignedPrevote.length; index++) {
-				if (data.validatorsSignedPrevote[index] && !this.validatorsSignedPrevote[index]) {
-					return true;
-				}
-			}
-		}
-
-		for (let index = 0; index < data.validatorsSignedPrecommit.length; index++) {
-			if (data.validatorsSignedPrecommit[index] && !this.validatorsSignedPrecommit[index]) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	#isRoundSufficient(data: Contracts.P2P.IHeaderData): boolean {
 		return data.height === this.height && data.round >= this.round;
 	}
