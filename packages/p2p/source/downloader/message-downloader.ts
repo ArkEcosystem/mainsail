@@ -199,13 +199,25 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return roundsByHeight.get(round)!;
 	}
 
-	#checkMessage({ height, round }: { height: number; round: number }, job: DownloadJob): void {
-		if (height !== job.ourHeader.height) {
-			throw new Error(`Received message height ${height} does not match expected height ${job.ourHeader.height}`);
+	#checkMessage(
+		message: Contracts.Crypto.IPrecommit | Contracts.Crypto.IPrevote,
+		firstMessage: Contracts.Crypto.IPrecommit | Contracts.Crypto.IPrevote,
+		job: DownloadJob,
+	): void {
+		if (message.height !== firstMessage.height || message.round !== firstMessage.round) {
+			throw new Error(
+				`Received message height ${message.height} and round ${message.round} does not match expected height ${firstMessage.height} and round ${firstMessage.round}`,
+			);
 		}
 
-		if (round < job.ourHeader.round) {
-			throw new Error(`Received message round ${round} is lower than round ${job.ourHeader.round}`);
+		if (message.height !== job.ourHeader.height) {
+			throw new Error(
+				`Received message height ${message.height} does not match expected height ${job.ourHeader.height}`,
+			);
+		}
+
+		if (message.round < job.ourHeader.round) {
+			throw new Error(`Received message round ${message.round} is lower than round ${job.ourHeader.round}`);
 		}
 	}
 
@@ -274,13 +286,22 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		try {
 			const result = await this.communicator.getMessages(job.peer);
 
+			if (job.isFullDownload) {
+				console.log(
+					`Received: ${result.prevotes.length} prevotes and ${result.precommits.length} precommits from ${job.peer.ip} for full download`,
+				);
+			}
+
+			let firstPrevote: Contracts.Crypto.IPrevote | undefined;
 			const prevotes: Map<number, Contracts.Crypto.IPrevote> = new Map();
 			for (const buffer of result.prevotes) {
 				const prevote = await this.factory.makePrevoteFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
 
-				// TODO: Check that all messages are from the same height and round
-				this.#checkMessage(prevote, job);
+				if (firstPrevote === undefined) {
+					firstPrevote = prevote;
+				}
+				this.#checkMessage(prevote, firstPrevote, job);
 
 				const response = await this.prevoteProcessor.process(prevote, false);
 
@@ -289,13 +310,16 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 			}
 
+			let firstPrecommit: Contracts.Crypto.IPrevote | undefined;
 			const precommits: Map<number, Contracts.Crypto.IPrecommit> = new Map();
 			for (const buffer of result.precommits) {
 				const precommit = await this.factory.makePrecommitFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
 
-				// TODO: Check that all messages are from the same height and round
-				this.#checkMessage(precommit, job);
+				if (firstPrecommit === undefined) {
+					firstPrecommit = precommit;
+				}
+				this.#checkMessage(precommit, firstPrecommit, job);
 
 				const response = await this.precommitProcessor.process(precommit, false);
 
@@ -329,6 +353,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#removeDownloadJob(job: DownloadJob): void {
 		if (job.isFullDownload) {
+			console.log("Full download finished");
 			this.#fullDownloadsByHeight.get(job.ourHeader.height)?.delete(job.ourHeader.round);
 		} else {
 			// Return if the height was already removed, because the block was applied.
