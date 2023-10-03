@@ -18,7 +18,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 			Identifiers.Consensus.RoundStateRepository,
 		);
 
-		if (height !== consensus.getHeight() || round < consensus.getRound()) {
+		if (height !== consensus.getHeight() || round > consensus.getRound()) {
 			return {
 				precommits: [],
 				prevotes: [],
