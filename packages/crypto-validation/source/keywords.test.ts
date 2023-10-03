@@ -251,5 +251,4 @@ describe<{
 		assert.false(object.amount instanceof BigNumber);
 		assert.equal(object.amount, "12");
 	});
-
 });
