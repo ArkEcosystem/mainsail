@@ -77,9 +77,9 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		let peers = this.repository.getPeers();
 
-		// TODO: Check loop
+		// Create download jobs as long as we can download
 		while ((peers = peers.filter((peer) => this.#canDownload(header, peer.header))) && peers.length > 0) {
-			void this.download(getRandomPeer(peers));
+			this.download(getRandomPeer(peers));
 		}
 	}
 
@@ -375,7 +375,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
-	// TODO: Resolve duplicate
 	#getPrevoteIndexesToDownload(
 		ourHeader: Contracts.P2P.IHeader,
 		peerHeader: Contracts.P2P.IHeaderData,
