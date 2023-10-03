@@ -111,22 +111,24 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				prevoteIndexes,
 			};
 
-			// console.log(
-			// 	`Downloading messages from ${peer.ip} . ${header.height}/${header.round}`,
-			// 	prevoteIndexes,
-			// 	precommitIndexes,
-			// );
+			console.log(
+				`Downloading messages from ${peer.ip} . ${header.height}/${header.round}, PR:${peer.header.round}`,
+				prevoteIndexes,
+				precommitIndexes,
+			);
 
 			this.#setDownloadJob(job, downloads);
 			void this.#downloadMessagesFromPeer(job);
 		} else if (peer.header.round > header.round) {
 			const round = this.#getHighestRoundToDownload(peer.header);
 
-			if (this.#canDownloadFullRound(peer.header.height, round)) {
+			if (!this.#canDownloadFullRound(peer.header.height, round)) {
 				return;
 			}
 
 			this.#setFullDownload(peer.header.height, round);
+
+			console.log(`Downloading full messages from ${peer.ip} . ${header.height}/${round}`);
 
 			const job: DownloadJob = {
 				isFullDownload: true,
@@ -158,7 +160,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return true;
 		}
 
-		const highestDownloadingRound = Math.max(...this.#fullDownloadsByHeight.get(height)!.values());
+		const rounds = [...this.#fullDownloadsByHeight.get(height)!.values()];
+		if (rounds.length === 0) {
+			return true;
+		}
+
+		const highestDownloadingRound = Math.max(...rounds);
+		console.log(`Highest downloading round for height ${height} is ${highestDownloadingRound}`);
 		return round > highestDownloadingRound;
 	}
 
@@ -191,13 +199,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return roundsByHeight.get(round)!;
 	}
 
-	#checkMessage({ height, round }: { height: number; round: number }, header: Contracts.P2P.IHeader): void {
-		if (height !== header.height) {
-			throw new Error(`Received message height ${height} does not match expected height ${header.height}`);
+	#checkMessage({ height, round }: { height: number; round: number }, job: DownloadJob): void {
+		if (height !== job.ourHeader.height) {
+			throw new Error(`Received message height ${height} does not match expected height ${job.ourHeader.height}`);
 		}
 
-		if (round !== header.round) {
-			throw new Error(`Received message round ${round} does not match expected round ${header.round}`);
+		if (round < job.ourHeader.round) {
+			throw new Error(`Received message round ${round} is lower than round ${job.ourHeader.round}`);
 		}
 	}
 
@@ -271,7 +279,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				const prevote = await this.factory.makePrevoteFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
 
-				this.#checkMessage(prevote, job.ourHeader);
+				// TODO: Check that all messages are from the same height and round
+				this.#checkMessage(prevote, job);
 
 				const response = await this.prevoteProcessor.process(prevote, false);
 
@@ -285,7 +294,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				const precommit = await this.factory.makePrecommitFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
 
-				this.#checkMessage(precommit, job.ourHeader);
+				// TODO: Check that all messages are from the same height and round
+				this.#checkMessage(precommit, job);
 
 				const response = await this.precommitProcessor.process(precommit, false);
 
