@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.ITransactionFactory {
@@ -31,12 +30,7 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 	}
 
 	public async fromJson(json: Contracts.Crypto.ITransactionJson): Promise<Contracts.Crypto.ITransaction> {
-		const data: Contracts.Crypto.ITransactionData = { ...json } as unknown as Contracts.Crypto.ITransactionData;
-		data.amount = BigNumber.make(data.amount);
-		data.fee = BigNumber.make(data.fee);
-		data.nonce = BigNumber.make(data.nonce);
-
-		return this.fromData(data);
+		return this.fromData(this.transactionTypeFactory.get(json.type, json.typeGroup, json.version).getData(json));
 	}
 
 	public async fromData(

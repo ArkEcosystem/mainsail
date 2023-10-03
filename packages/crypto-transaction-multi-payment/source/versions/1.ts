@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
@@ -47,6 +48,18 @@ export class MultiPaymentTransaction extends Transaction {
 				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
 			},
 		});
+	}
+
+	public static getData(json: Contracts.Crypto.ITransactionJson): Contracts.Crypto.ITransactionData {
+		const data = Transaction.getData(json);
+
+		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
+
+		for (const payment of data.asset.payments) {
+			payment.amount = BigNumber.make(payment.amount);
+		}
+
+		return data;
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {

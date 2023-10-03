@@ -233,4 +233,22 @@ describe<{
 			}).error,
 		);
 	});
+
+	it("keyword bignumber should not modify parent", (context) => {
+		const schema = {
+			$id: "test",
+			properties: {
+				id: { type: "string" },
+				amount: { bignumber: { minimum: 1 } },
+			},
+			type: "object",
+		};
+		context.validator.addSchema(schema);
+
+		const object: any = { id: "test", amount: "12" };
+		assert.false(object.amount instanceof BigNumber);
+		assert.undefined(context.validator.validate("test", object).error);
+		assert.false(object.amount instanceof BigNumber);
+		assert.equal(object.amount, "12");
+	});
 });

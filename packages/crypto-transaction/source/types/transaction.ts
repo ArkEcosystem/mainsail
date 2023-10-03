@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { ByteBuffer } from "@mainsail/utils";
+import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export abstract class Transaction implements Contracts.Crypto.ITransaction {
@@ -36,6 +36,14 @@ export abstract class Transaction implements Contracts.Crypto.ITransaction {
 
 	public static getSchema(): Contracts.Crypto.ITransactionSchema {
 		throw new Exceptions.NotImplemented(this.constructor.name, "getSchema");
+	}
+
+	public static getData(json: Contracts.Crypto.ITransactionJson): Contracts.Crypto.ITransactionData {
+		const data: Contracts.Crypto.ITransactionData = { ...json } as unknown as Contracts.Crypto.ITransactionData;
+		data.amount = BigNumber.make(data.amount);
+		data.fee = BigNumber.make(data.fee);
+		data.nonce = BigNumber.make(data.nonce);
+		return data;
 	}
 
 	public hasVendorField(): boolean {

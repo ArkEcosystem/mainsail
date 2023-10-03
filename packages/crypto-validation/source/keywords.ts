@@ -73,7 +73,6 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 			},
 			type: "object",
 		},
-		modifying: true,
 	};
 
 	return { bignum, maxBytes };
