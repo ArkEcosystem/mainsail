@@ -239,14 +239,14 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		this.state.resetLastMessageTime();
 
-		if (job.peerHeader.round === job.ourHeader.round) {
-			this.#checkSameRoundResponse(prevotes, precommits, job);
+		if (job.isFullDownload) {
+			this.#checkFullRoundResponse(prevotes, precommits, job);
 		} else {
-			this.#checkDifferentRoundResponse(prevotes, precommits, job);
+			this.#checkPartialRoundResponse(prevotes, precommits, job);
 		}
 	}
 
-	#checkDifferentRoundResponse(
+	#checkFullRoundResponse(
 		prevotes: Map<number, Contracts.Crypto.IPrevote>,
 		precommits: Map<number, Contracts.Crypto.IPrecommit>,
 		job: DownloadJob,
@@ -267,7 +267,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
-	#checkSameRoundResponse(
+	#checkPartialRoundResponse(
 		prevotes: Map<number, Contracts.Crypto.IPrevote>,
 		precommits: Map<number, Contracts.Crypto.IPrecommit>,
 		job: DownloadJob,
