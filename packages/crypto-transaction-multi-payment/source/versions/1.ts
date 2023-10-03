@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class MultiPaymentTransaction extends Transaction {
@@ -49,14 +50,26 @@ export class MultiPaymentTransaction extends Transaction {
 		});
 	}
 
+	public static getData(json: Contracts.Crypto.ITransactionJson): Contracts.Crypto.ITransactionData {
+		const data = Transaction.getData(json);
+
+		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
+
+		data.asset.payments.forEach(payment => {
+			payment.amount = BigNumber.make(payment.amount);
+		});
+
+		return data;
+	}
+
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
 		if (data.asset && data.asset.payments) {
 			const buff: ByteBuffer = ByteBuffer.fromSize(
 				2 +
-					data.asset.payments.length * this.app.get<number>(Identifiers.Cryptography.Size.Address) +
-					data.asset.payments.length * 8,
+				data.asset.payments.length * this.app.get<number>(Identifiers.Cryptography.Size.Address) +
+				data.asset.payments.length * 8,
 			);
 			buff.writeUint16(data.asset.payments.length);
 

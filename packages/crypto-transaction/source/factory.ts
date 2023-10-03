@@ -30,8 +30,10 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 	}
 
 	public async fromJson(json: Contracts.Crypto.ITransactionJson): Promise<Contracts.Crypto.ITransaction> {
-		const data: Contracts.Crypto.ITransactionData = { ...json } as unknown as Contracts.Crypto.ITransactionData;
-		return this.fromData(data);
+		return this.fromData(
+			this.transactionTypeFactory.get(json.type, json.typeGroup, json.version)
+				.getData(json)
+		);
 	}
 
 	public async fromData(

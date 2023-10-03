@@ -126,12 +126,12 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 		sender.setBalance(newBalance);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
+	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void { }
 
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {}
+	): Promise<void> { }
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,

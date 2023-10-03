@@ -48,11 +48,6 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 				return false;
 			}
 
-			const { parentData, parentDataProperty } = parentSchema;
-			if (parentData && parentDataProperty) {
-				parentData[parentDataProperty] = bignum;
-			}
-
 			if (bignum.isLessThan(minimum)) {
 				if (bignum.isZero() && schema.bypassGenesis && parentSchema.parentData?.id) {
 					return isGenesisTransaction(configuration, parentSchema.parentData.id);
@@ -78,7 +73,6 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 			},
 			type: "object",
 		},
-		modifying: true,
 	};
 
 	return { bignum, maxBytes };

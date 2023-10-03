@@ -234,7 +234,7 @@ describe<{
 		);
 	});
 
-	it("keyword bignumber should be able to modify parent", (context) => {
+	it("keyword bignumber should not modify parent", (context) => {
 		const schema = {
 			$id: "test",
 			properties: {
@@ -248,24 +248,8 @@ describe<{
 		const object: any = { id: "test", amount: "12" };
 		assert.false(object.amount instanceof BigNumber);
 		assert.undefined(context.validator.validate("test", object).error);
-		assert.true(object.amount instanceof BigNumber);
-		assert.equal(object.amount, BigNumber.make(12));
+		assert.false(object.amount instanceof BigNumber);
+		assert.equal(object.amount, "12");
 	});
 
-	it("keyword bignumber should not modify parent on error", (context) => {
-		const schema = {
-			$id: "test",
-			properties: {
-				id: { type: "string" },
-				amount: { bignumber: { minimum: 1 } },
-			},
-			type: "object",
-		};
-		context.validator.addSchema(schema);
-
-		const object: any = { id: "test", amount: "notanumber" };
-		assert.false(object.amount instanceof BigNumber);
-		assert.defined(context.validator.validate("test", object).error);
-		assert.false(object.amount instanceof BigNumber);
-	});
 });
