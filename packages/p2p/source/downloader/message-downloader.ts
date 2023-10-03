@@ -111,12 +111,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				prevoteIndexes,
 			};
 
-			console.log(
-				`Downloading messages from ${peer.ip} . ${header.height}/${header.round}, PR:${peer.header.round}`,
-				prevoteIndexes,
-				precommitIndexes,
-			);
-
 			this.#setDownloadJob(job, downloads);
 			void this.#downloadMessagesFromPeer(job);
 		} else if (peer.header.round > header.round) {
@@ -127,8 +121,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			}
 
 			this.#setFullDownload(peer.header.height, round);
-
-			console.log(`Downloading full messages from ${peer.ip} . ${header.height}/${round}`);
 
 			const job: DownloadJob = {
 				isFullDownload: true,
@@ -166,7 +158,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const highestDownloadingRound = Math.max(...rounds);
-		console.log(`Highest downloading round for height ${height} is ${highestDownloadingRound}`);
 		return round > highestDownloadingRound;
 	}
 
@@ -286,12 +277,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		try {
 			const result = await this.communicator.getMessages(job.peer);
 
-			if (job.isFullDownload) {
-				console.log(
-					`Received: ${result.prevotes.length} prevotes and ${result.precommits.length} precommits from ${job.peer.ip} for full download`,
-				);
-			}
-
 			let firstPrevote: Contracts.Crypto.IPrevote | undefined;
 			const prevotes: Map<number, Contracts.Crypto.IPrevote> = new Map();
 			for (const buffer of result.prevotes) {
@@ -353,7 +338,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	#removeDownloadJob(job: DownloadJob): void {
 		if (job.isFullDownload) {
-			console.log("Full download finished");
 			this.#fullDownloadsByHeight.get(job.ourHeader.height)?.delete(job.ourHeader.round);
 		} else {
 			// Return if the height was already removed, because the block was applied.
