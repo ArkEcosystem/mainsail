@@ -88,31 +88,32 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		const header = this.headerFactory();
-		if (!this.#canDownload(header, peer.header)) {
+		const ourHeader = this.headerFactory();
+		if (!this.#canDownload(ourHeader, peer.header)) {
 			return;
 		}
 
-		if (peer.header.round === header.round) {
+		const round = this.#getHighestRoundToDownload(ourHeader, peer.header);
+		if (ourHeader.round === round) {
 			const downloads = this.#getDownloadsByRound(peer.header.height, peer.header.round);
 
 			const job: DownloadJob = {
 				isFullDownload: false,
-				ourHeader: header,
+				ourHeader: ourHeader,
 				peer,
 				peerHeader: peer.header,
-				precommitIndexes: this.#getPrecommitIndexesToDownload(header, peer.header, downloads.precommits),
-				prevoteIndexes: this.#getPrevoteIndexesToDownload(header, peer.header, downloads.prevotes),
+				precommitIndexes: this.#getPrecommitIndexesToDownload(ourHeader, peer.header, downloads.precommits),
+				prevoteIndexes: this.#getPrevoteIndexesToDownload(ourHeader, peer.header, downloads.prevotes),
 			};
 
 			this.#setDownloadJob(job, downloads);
 			void this.#downloadMessagesFromPeer(job);
-		} else if (peer.header.round > header.round) {
-			this.#setFullDownload(peer.header.height, this.#getHighestRoundToDownload(header, peer.header));
+		} else if (peer.header.round > ourHeader.round) {
+			this.#setFullDownload(peer.header.height, round);
 
 			const job: DownloadJob = {
 				isFullDownload: true,
-				ourHeader: header,
+				ourHeader: ourHeader,
 				peer,
 				peerHeader: peer.header,
 				precommitIndexes: [],
