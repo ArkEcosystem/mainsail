@@ -49,19 +49,4 @@ export class Header implements Contracts.P2P.IHeader {
 	public getValidatorsSignedPrevoteCount(): number {
 		return this.validatorsSignedPrevote.filter((signed) => signed).length;
 	}
-
-	public canDownloadProposal(data: Contracts.P2P.IHeaderData): boolean {
-		// TODO: Handle proposal download for future rounds
-		return false;
-
-		if (!this.#isRoundSufficient(data)) {
-			return false;
-		}
-
-		return this.proposal === undefined && !!data.proposedBlockId;
-	}
-
-	#isRoundSufficient(data: Contracts.P2P.IHeaderData): boolean {
-		return data.height === this.height && data.round >= this.round;
-	}
 }

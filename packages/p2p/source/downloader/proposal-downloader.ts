@@ -41,7 +41,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const header = this.headerFactory();
-		const peers = this.repository.getPeers().filter((peer) => header.canDownloadProposal(peer.header));
+		const peers = this.repository.getPeers().filter((peer) => this.#canDownload(header, peer.header));
 
 		if (peers.length > 0) {
 			this.download(getRandomPeer(peers));
@@ -58,7 +58,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const header = this.headerFactory();
-		if (!header.canDownloadProposal(peer.header)) {
+		if (!this.#canDownload(header, peer.header)) {
 			return;
 		}
 
@@ -69,6 +69,14 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 
 	public isDownloading(): boolean {
 		return this.#downloadingProposalByHeight.size > 0;
+	}
+
+	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData) {
+		if (ourHeader.height !== peerHeader.height || ourHeader.round === peerHeader.round) {
+			return false;
+		}
+
+		return ourHeader.proposal === undefined && !!peerHeader.proposedBlockId;
 	}
 
 	async #downloadProposalFromPeer(job: DownloadJob): Promise<void> {

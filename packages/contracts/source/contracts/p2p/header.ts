@@ -1,3 +1,5 @@
+import { Contracts } from "../..";
+
 export type IHeaderData = {
 	version: string;
 	height: number;
@@ -11,11 +13,11 @@ export type IHeaderData = {
 export interface IHeader {
 	height: number;
 	round: number;
+	proposal?: Contracts.Crypto.IProposal;
 	validatorsSignedPrecommit: readonly boolean[];
 	validatorsSignedPrevote: readonly boolean[];
 
 	toData(): IHeaderData;
-	canDownloadProposal(headerData: IHeaderData): boolean;
 	getValidatorsSignedPrecommitCount(): number;
 	getValidatorsSignedPrevoteCount(): number;
 }
