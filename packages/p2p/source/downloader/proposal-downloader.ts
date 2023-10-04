@@ -33,7 +33,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2PState)
 	private readonly state!: Contracts.P2P.State;
 
-	#downloadingProposalByHeight = new Set<number>();
+	#downloadsByHeight = new Set<number>();
 
 	public tryToDownload(): void {
 		if (this.blockDownloader.isDownloading()) {
@@ -53,7 +53,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		if (this.#downloadingProposalByHeight.has(peer.header.height)) {
+		if (this.#downloadsByHeight.has(peer.header.height)) {
 			return;
 		}
 
@@ -62,13 +62,13 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		this.#downloadingProposalByHeight.add(peer.header.height);
+		this.#downloadsByHeight.add(peer.header.height);
 
 		void this.#downloadProposalFromPeer({ peer, peerHeader: peer.header });
 	}
 
 	public isDownloading(): boolean {
-		return this.#downloadingProposalByHeight.size > 0;
+		return this.#downloadsByHeight.size > 0;
 	}
 
 	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData) {
@@ -112,7 +112,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			error = error_;
 		}
 
-		this.#downloadingProposalByHeight.delete(job.peerHeader.height);
+		this.#downloadsByHeight.delete(job.peerHeader.height);
 
 		if (error) {
 			this.peerDisposer.banPeer(job.peer.ip, error);
