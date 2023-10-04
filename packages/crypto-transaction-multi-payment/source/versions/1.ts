@@ -20,7 +20,7 @@ export class MultiPaymentTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "multiPayment",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
+				amount: { bignumber: { minimum: 1 } },
 				asset: {
 					properties: {
 						payments: {
@@ -68,8 +68,8 @@ export class MultiPaymentTransaction extends Transaction {
 		if (data.asset && data.asset.payments) {
 			const buff: ByteBuffer = ByteBuffer.fromSize(
 				2 +
-					data.asset.payments.length * this.app.get<number>(Identifiers.Cryptography.Size.Address) +
-					data.asset.payments.length * 8,
+				data.asset.payments.length * this.app.get<number>(Identifiers.Cryptography.Size.Address) +
+				data.asset.payments.length * 8,
 			);
 			buff.writeUint16(data.asset.payments.length);
 
@@ -90,14 +90,18 @@ export class MultiPaymentTransaction extends Transaction {
 		const payments: Contracts.Crypto.IMultiPaymentItem[] = [];
 		const total: number = buf.readUint16();
 
+		let totalPaymentsAmount = BigNumber.ZERO;
 		for (let index = 0; index < total; index++) {
-			payments.push({
+			let payment = {
 				amount: BigNumber.make(buf.readUint64().toString()),
 				recipientId: await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf)),
-			});
+			};
+
+			totalPaymentsAmount = totalPaymentsAmount.plus(payment.amount);
+			payments.push(payment);
 		}
 
-		data.amount = BigNumber.ZERO;
+		data.amount = totalPaymentsAmount;
 		data.asset = { payments };
 	}
 }

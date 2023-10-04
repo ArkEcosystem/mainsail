@@ -28,10 +28,12 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 				throw new Exceptions.MaximumPaymentCountExceededError(limit);
 			}
 
-			this.data.asset.payments.push({
+			const payment = {
 				amount: BigNumber.make(amount),
 				recipientId,
-			});
+			};
+			this.data.asset.payments.push(payment);
+			this.data.amount = this.data.amount.plus(payment.amount);
 		}
 
 		return this;
