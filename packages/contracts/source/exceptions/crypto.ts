@@ -370,3 +370,9 @@ export class MultiSignatureKeyCountMismatchError extends Exception {
 		);
 	}
 }
+
+export class MultiPaymentAmountMismatchError extends Exception {
+	public constructor() {
+		super(`Payment amounts mismatch.`);
+	}
+}

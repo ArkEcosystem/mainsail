@@ -52,6 +52,10 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		const payments: Contracts.Crypto.IMultiPaymentItem[] = transaction.data.asset.payments;
 		const totalPaymentsAmount = payments.reduce((a, p) => a.plus(p.amount), BigNumber.ZERO);
 
+		if (!transaction.data.amount.isEqualTo(totalPaymentsAmount)) {
+			throw new Exceptions.MultiPaymentAmountMismatchError();
+		}
+
 		if (wallet.getBalance().minus(totalPaymentsAmount).minus(transaction.data.fee).isNegative()) {
 			throw new Exceptions.InsufficientBalanceError();
 		}
