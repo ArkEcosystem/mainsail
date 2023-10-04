@@ -1,12 +1,12 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository!: Contracts.State.WalletRepository;
+	// TODO: Check which wallet repository is used here
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
@@ -50,7 +50,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#indexByWalletPublicKey = new Map();
 
 		for (let index = 0; index < this.cryptoConfiguration.getMilestone().activeValidators; index++) {
-			const validator = this.validatorWalletFactory(this.walletRepository.findByUsername(`genesis_${index + 1}`));
+			const validator = this.validatorWalletFactory(
+				this.stateService.getWalletRepository().findByUsername(`genesis_${index + 1}`),
+			);
 
 			this.#validators.push(validator);
 

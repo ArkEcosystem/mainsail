@@ -1,4 +1,3 @@
-import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -35,12 +34,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
 
 		this.app
-			.bind(Identifiers.WalletRepository)
-			.to(WalletRepository)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
-
-		this.app
 			.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)));
 
@@ -63,12 +56,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		);
 
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
-
-		this.app
-			.bind(Identifiers.WalletRepository)
-			.to(WalletRepositoryCopyOnWrite)
-			.inRequestScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 

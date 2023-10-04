@@ -1,4 +1,4 @@
-import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -37,9 +37,8 @@ export class Bootstrapper {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private walletRepository!: Contracts.State.WalletRepository;
+	@inject(Identifiers.StateService)
+	private stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Consensus.ProposerPicker)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
@@ -111,7 +110,7 @@ export class Bootstrapper {
 
 		const genesisBlock = this.stateStore.getGenesisBlock();
 		for (const handler of registeredHandlers.values()) {
-			await handler.bootstrap(this.walletRepository, genesisBlock.block.transactions);
+			await handler.bootstrap(this.stateService.getWalletRepository(), genesisBlock.block.transactions);
 		}
 	}
 

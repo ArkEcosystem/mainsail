@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Services } from "@mainsail/kernel";
 
@@ -14,9 +14,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "copy-on-write")
-	private walletRepository!: Contracts.State.WalletRepository;
+	@inject(Identifiers.StateService)
+	private stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
@@ -27,7 +26,13 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
+	#walletRepository!: Contracts.State.WalletRepository;
 	#corrupt = false;
+
+	@postConstruct()
+	public initialize(): void {
+		this.#walletRepository = this.stateService.createWalletRepositoryCopyOnWrite();
+	}
 
 	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
@@ -56,7 +61,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			await this.triggers.call("verifyTransaction", {
 				handler,
 				transaction,
-				walletRepository: this.walletRepository,
+				walletRepository: this.#walletRepository,
 			})
 		) {
 			if (this.#corrupt) {
@@ -67,12 +72,12 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 				await this.triggers.call("throwIfCannotEnterPool", {
 					handler,
 					transaction,
-					walletRepository: this.walletRepository,
+					walletRepository: this.#walletRepository,
 				});
 				await this.triggers.call("applyTransaction", {
 					handler,
 					transaction,
-					walletRepository: this.walletRepository,
+					walletRepository: this.#walletRepository,
 				});
 			} catch (error) {
 				throw new Exceptions.TransactionFailedToApplyError(transaction, error);

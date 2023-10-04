@@ -183,7 +183,6 @@ export const Identifiers = {
 	ValidatorWalletFactory: Symbol.for("State<ValidatorWalletFactory>"),
 	WalletAttributes: Symbol.for("Attributes<Wallet>"),
 	WalletFactory: Symbol.for("State<WalletFactory>"),
-	WalletRepository: Symbol.for("Repository<Wallet>"),
 	WalletRepositoryCloneFactory: Symbol.for("Factory<Repository<Clone<Wallet>>>"),
 	WalletRepositoryCopyOnWriteFactory: Symbol.for("Factory<Repository<CopyOnWrite<Wallet>>>"),
 	WalletRepositoryFactory: Symbol.for("Factory<Repository<Wallet>>"),

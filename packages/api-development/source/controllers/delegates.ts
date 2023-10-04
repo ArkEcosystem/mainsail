@@ -1,6 +1,6 @@
 import { Boom, notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { WalletResource } from "../resources";
@@ -8,12 +8,18 @@ import { Controller } from "./controller";
 
 @injectable()
 export class DelegatesController extends Controller {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository!: Contracts.State.WalletRepository;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
+
+	#walletRepository!: Contracts.State.WalletRepository;
+
+	@postConstruct()
+	public initialize(): void {
+		this.#walletRepository = this.stateService.getWalletRepository();
+	}
 
 	public index(request: Hapi.Request) {
-		const wallets = this.walletRepository.allByUsername();
+		const wallets = this.#walletRepository.allByUsername();
 
 		const pagination = this.getQueryPagination(request.query);
 
@@ -33,12 +39,12 @@ export class DelegatesController extends Controller {
 
 		let wallet: Contracts.State.Wallet | undefined;
 
-		if (this.walletRepository.hasByAddress(walletId)) {
-			wallet = this.walletRepository.findByAddress(walletId);
-		} else if (this.walletRepository.hasByPublicKey(walletId)) {
-			wallet = await this.walletRepository.findByPublicKey(walletId);
-		} else if (this.walletRepository.hasByUsername(walletId)) {
-			wallet = this.walletRepository.findByUsername(walletId);
+		if (this.#walletRepository.hasByAddress(walletId)) {
+			wallet = this.#walletRepository.findByAddress(walletId);
+		} else if (this.#walletRepository.hasByPublicKey(walletId)) {
+			wallet = await this.#walletRepository.findByPublicKey(walletId);
+		} else if (this.#walletRepository.hasByUsername(walletId)) {
+			wallet = this.#walletRepository.findByUsername(walletId);
 		}
 
 		if (!wallet || !wallet.hasAttribute("validatorUsername")) {
