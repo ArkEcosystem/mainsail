@@ -1,5 +1,6 @@
 import Hapi from "@hapi/hapi";
 
+import * as Blockchain from "./routes/blockchain";
 import * as Blocks from "./routes/blocks";
 import * as Node from "./routes/node";
 import * as Transactions from "./routes/transactions";
@@ -10,7 +11,7 @@ import * as Wallets from "./routes/wallets";
 export = {
 	name: "Public API",
 	async register(server: Hapi.Server): Promise<void> {
-		const handlers = [Blocks, Transactions, Node, ValidatorRounds, Votes, Wallets];
+		const handlers = [Blocks, Blockchain, Transactions, Node, ValidatorRounds, Votes, Wallets];
 
 		for (const handler of handlers) {
 			handler.register(server);

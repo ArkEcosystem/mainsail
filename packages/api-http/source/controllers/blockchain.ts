@@ -1,0 +1,28 @@
+import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
+import { inject, injectable } from "@mainsail/container";
+
+import { Controller } from "./controller";
+
+@injectable()
+export class BlockchainController extends Controller {
+	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
+	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
+
+	public async index() {
+		const block = await this.blockRepositoryFactory().getLatest();
+
+		return {
+			data: {
+				block: block
+					? {
+							height: block.height,
+							id: block.id,
+					  }
+					: null,
+
+				// TODO: calculate supply
+				supply: "0",
+			},
+		};
+	}
+}
