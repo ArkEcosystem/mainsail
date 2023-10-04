@@ -16,6 +16,8 @@ type DownloadJob = {
 	ourHeader: Contracts.P2P.IHeader;
 	prevoteIndexes: number[];
 	precommitIndexes: number[];
+	round: number;
+	height: number;
 };
 
 /* Terminology:
@@ -103,12 +105,14 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			const downloads = this.#getDownloadsByRound(peer.header.height, peer.header.round);
 
 			const job: DownloadJob = {
+				height: ourHeader.height,
 				isFullDownload: false,
 				ourHeader: ourHeader,
 				peer,
 				peerHeader: peer.header,
 				precommitIndexes: this.#getPrecommitIndexesToDownload(ourHeader, peer.header, downloads.precommits),
 				prevoteIndexes: this.#getPrevoteIndexesToDownload(ourHeader, peer.header, downloads.prevotes),
+				round,
 			};
 
 			this.#setDownloadJob(job, downloads);
@@ -117,12 +121,14 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			this.#setFullDownload(peer.header.height, round);
 
 			const job: DownloadJob = {
+				height: ourHeader.height,
 				isFullDownload: true,
 				ourHeader: ourHeader,
 				peer,
 				peerHeader: peer.header,
 				precommitIndexes: [],
 				prevoteIndexes: [],
+				round,
 			};
 
 			void this.#downloadMessagesFromPeer(job);
@@ -221,20 +227,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			);
 		}
 
-		if (message.height !== job.ourHeader.height) {
-			throw new Error(
-				`Received message height ${message.height} does not match expected height ${job.ourHeader.height}`,
-			);
+		if (message.height !== job.height) {
+			throw new Error(`Received message height ${message.height} does not match expected height ${job.height}`);
 		}
 
-		if (message.round < job.ourHeader.round) {
-			throw new Error(`Received message round ${message.round} is lower than round ${job.ourHeader.round}`);
-		}
-
-		if (job.isFullDownload && message.round === job.ourHeader.round) {
-			throw new Error(
-				`Received message round ${message.round} is should be higher than round ${job.ourHeader.round}`,
-			);
+		if (message.round < job.round) {
+			throw new Error(`Received message round ${message.round} is lower than requested round ${job.round}`);
 		}
 	}
 
@@ -375,22 +373,22 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#removeFullDownloadJob(job: DownloadJob) {
-		this.#fullDownloadsByHeight.get(job.ourHeader.height)?.delete(job.ourHeader.round);
+		this.#fullDownloadsByHeight.get(job.height)?.delete(job.round);
 
 		// Cleanup
-		if (this.#fullDownloadsByHeight.get(job.ourHeader.height)?.size === 0) {
-			this.#fullDownloadsByHeight.delete(job.ourHeader.height);
+		if (this.#fullDownloadsByHeight.get(job.height)?.size === 0) {
+			this.#fullDownloadsByHeight.delete(job.height);
 		}
 	}
 
 	#removePartialDownloadJob(job: DownloadJob) {
 		// Return if the height was already removed, because the block was applied.
-		const roundsByHeight = this.#downloadsByHeight.get(job.ourHeader.height);
+		const roundsByHeight = this.#downloadsByHeight.get(job.height);
 		if (!roundsByHeight) {
 			return;
 		}
 
-		const downloadsByRound = roundsByHeight.get(job.ourHeader.round);
+		const downloadsByRound = roundsByHeight.get(job.round);
 		if (!downloadsByRound) {
 			return;
 		}
@@ -408,11 +406,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			downloadsByRound.prevotes.every((value) => !value) &&
 			downloadsByRound.precommits.every((value) => !value)
 		) {
-			roundsByHeight.delete(job.ourHeader.round);
+			roundsByHeight.delete(job.round);
 		}
 
-		if (this.#downloadsByHeight.get(job.ourHeader.height)?.size === 0) {
-			this.#downloadsByHeight.delete(job.ourHeader.height);
+		if (this.#downloadsByHeight.get(job.height)?.size === 0) {
+			this.#downloadsByHeight.delete(job.height);
 		}
 	}
 
