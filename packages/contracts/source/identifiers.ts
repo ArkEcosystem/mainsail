@@ -185,6 +185,7 @@ export const Identifiers = {
 	WalletFactory: Symbol.for("State<WalletFactory>"),
 	WalletRepository: Symbol.for("Repository<Wallet>"),
 	WalletRepositoryCloneFactory: Symbol.for("Factory<RepositoryClone<Wallet>>"),
+	WalletRepositoryFactory: Symbol.for("Factory<Repository<Wallet>>"),
 	WalletRepositoryIndexSet: Symbol.for("IndexSet<Repository<Wallet>>"),
 	WatcherDatabaseService: Symbol.for("Watcher<DatabaseService>"),
 	WatcherEventListener: Symbol.for("Watcher<EventListener>"),

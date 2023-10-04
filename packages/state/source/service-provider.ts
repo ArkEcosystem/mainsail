@@ -6,11 +6,11 @@ import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
+import { Service } from "./service";
 import { StateStore } from "./state-store";
 import { StateVerifier } from "./state-verifier";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
-import { Service } from "./service";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -43,6 +43,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)));
+
+		this.app.bind(Identifiers.WalletRepositoryFactory).toFactory(
+			({ container }) =>
+				() =>
+					container.resolve(WalletRepository),
+		);
 
 		this.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
 			({ container }) =>
