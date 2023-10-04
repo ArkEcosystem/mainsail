@@ -10,18 +10,18 @@ export class BlockchainController extends Controller {
 
 	public async index() {
 		const block = await this.blockRepositoryFactory().getLatest();
+		const state = await this.getState();
 
 		return {
 			data: {
 				block: block
 					? {
-							height: block.height,
-							id: block.id,
-					  }
+						height: block.height,
+						id: block.id,
+					}
 					: null,
 
-				// TODO: calculate supply
-				supply: "0",
+				supply: state.supply,
 			},
 		};
 	}
