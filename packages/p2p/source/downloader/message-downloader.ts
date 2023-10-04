@@ -166,7 +166,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return peerHeader.round;
 		}
 
-		if (Utils.isMinority(peerHeader.validatorsSignedPrevote.length, this.cryptoConfiguration)) {
+		if (
+			Utils.isMinority(
+				peerHeader.validatorsSignedPrevote.filter((value) => value).length,
+				this.cryptoConfiguration,
+			)
+		) {
 			return peerHeader.round;
 		}
 
