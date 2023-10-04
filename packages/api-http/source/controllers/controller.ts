@@ -1,5 +1,10 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Models,
+} from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
@@ -15,6 +20,9 @@ export class Controller {
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "api-http")
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
+
+	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
+	protected readonly stateRepositoryFactory!: ApiDatabaseContracts.IStateRepositoryFactory;
 
 	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
 		return {
@@ -116,5 +124,11 @@ export class Controller {
 
 	protected getEmptyPage(): ResultsPage<any> {
 		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
+	}
+
+	protected async getState(): Promise<Models.State> {
+		const stateRepository = this.stateRepositoryFactory();
+		const state = await stateRepository.createQueryBuilder().getOne();
+		return state ?? ({ height: 0 } as Models.State);
 	}
 }

@@ -40,6 +40,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
 
+	@inject(Identifiers.StateStore)
+	private readonly stateStore!: Contracts.State.StateStore;
+
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -51,6 +54,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 	public async bootstrap(): Promise<void> {
 		await this.#bootstrapConfiguration();
+		await this.#bootstrapState();
 		await this.#bootstrapTransactionTypes();
 	}
 
@@ -87,13 +91,15 @@ export class Sync implements Contracts.ApiSync.ISync {
 				version: header.version,
 			});
 
-			await stateRepository.upsert(
-				{
+			await stateRepository
+				.createQueryBuilder()
+				.update()
+				.set({
 					height: header.height,
-					id: 1,
-				},
-				["id"],
-			);
+					supply: () => `supply + ${header.reward}`,
+				})
+				.where("id = :id", { id: 1 })
+				.execute();
 
 			await transactionRepository.save(
 				transactions.map(({ data }) => ({
@@ -159,6 +165,20 @@ export class Sync implements Contracts.ApiSync.ISync {
 			},
 			["id"],
 		);
+	}
+
+	async #bootstrapState(): Promise<void> {
+		const genesisBlock = this.stateStore.getGenesisBlock();
+		await this.stateRepositoryFactory()
+			.createQueryBuilder()
+			.insert()
+			.orIgnore()
+			.values({
+				height: 0,
+				id: 1,
+				supply: genesisBlock.block.data.totalAmount.toFixed(),
+			})
+			.execute();
 	}
 
 	async #bootstrapTransactionTypes(): Promise<void> {
