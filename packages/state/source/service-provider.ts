@@ -45,10 +45,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
 			({ container }) =>
-				() =>
-					container
-						.resolve(WalletRepositoryClone)
-						.configure(container.getTagged(Identifiers.WalletRepository, "state", "blockchain")),
+				(walletRepository: WalletRepository) =>
+					container.resolve(WalletRepositoryClone).configure(walletRepository),
 		);
 
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
@@ -62,6 +60,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 
 		this.app.bind(Identifiers.StateStore).toConstantValue(this.app.resolve(StateStore).configure());
+		this.app.bind(Identifiers.StateStoreFactory).toFactory(
+			({ container }) =>
+				(originalStateStore?: StateStore) =>
+					container.resolve(StateStore).configure(originalStateStore),
+		);
 
 		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
 
