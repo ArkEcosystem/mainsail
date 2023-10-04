@@ -9,10 +9,14 @@ export const register = (server: Hapi.Server): void => {
 	server.bind(controller);
 
 	server.route({
-		method: "GET",
-		path: "/votes",
 		handler: (request: Hapi.Request) => controller.index(request),
+		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				query: Joi.object({
 					...server.app.schemas.transactionCriteriaSchemas,
@@ -22,19 +26,15 @@ export const register = (server: Hapi.Server): void => {
 					.concat(transactionSortingSchema)
 					.concat(pagination),
 			},
-			plugins: {
-				pagination: {
-					enabled: true,
-				},
-			},
 		},
+		path: "/votes",
 	});
 
 	server.route({
-		method: "GET",
-		path: "/votes/{id}",
 		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
 		options: {
+			plugins: {},
 			validate: {
 				params: Joi.object({
 					id: transactionIdSchema,
@@ -43,8 +43,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				}),
 			},
-			plugins: {
-			},
 		},
+		path: "/votes/{id}",
 	});
 };
