@@ -10,6 +10,7 @@ import { StateStore } from "./state-store";
 import { StateVerifier } from "./state-verifier";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
+import { Service } from "./service";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -66,6 +67,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					container.resolve(StateStore).configure(originalStateStore),
 		);
 
+		this.app.bind(Identifiers.StateService).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);

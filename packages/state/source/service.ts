@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class Service {
+export class Service implements Contracts.State.Service {
 	@inject(Identifiers.StateStore)
 	private readonly baseStateStore!: Contracts.State.StateStore;
 
@@ -20,7 +20,7 @@ export class Service {
 		return this.baseWalletRepository;
 	}
 
-	public createWalletRepositoryClone(): Contracts.State.WalletRepository {
+	public createWalletRepositoryClone(): Contracts.State.WalletRepositoryClone {
 		return this.walletRepositoryCloneFactory(this.getWalletRepository());
 	}
 }
