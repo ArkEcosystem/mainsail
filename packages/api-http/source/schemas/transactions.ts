@@ -2,7 +2,7 @@ import Joi from "joi";
 
 import { createSortingSchema, transactionCriteriaSchemas, walletAddressSchema, walletPublicKeySchema } from ".";
 
-export const transactionIdSchema = Joi.string().hex().length(64);
+export const transactionIdSchema = Joi.string().hex().max(96);
 
 export const transactionCriteriaSchemaObject = {
 	id: Joi.alternatives(

@@ -1,0 +1,25 @@
+[
+    {
+        "id": "3b08e13ba7ce26d8ee6de200b6cfb7ca90c583115e547c1b2ba7472a104a49b6",
+        "version": 1,
+        "type": 3,
+        "typeGroup": 1,
+        "blockId": "f99740cb19bbf7c85d78664532ef867ed36481655ed08868df3ab9657aae46e4",
+        "blockHeight": "60",
+        "sequence": 0,
+        "timestamp": "1696396878929",
+        "nonce": "1",
+        "senderPublicKey": "ac9a09dd85af1203cb5054d3f258e469ff831bf0ff1ee2cd90d6a46e52d11bae",
+        "recipientId": null,
+        "vendorField": null,
+        "amount": "0",
+        "fee": "100000000",
+        "asset": {
+            "votes": [
+                "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873"
+            ],
+            "unvotes": []
+        },
+        "signature": "219488e7d81f6133df7d978787278fe39633064111e687557764f7e45af75f4905e0a54325e4ac3ffce39f9a9aeb75ca758420e88abe7531173edaebfc74cbb1"
+    }
+]
