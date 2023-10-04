@@ -54,7 +54,7 @@ describe<{
 	});
 
 	const transactionOriginal = {
-		amount: 0,
+		amount: 1,
 		asset: {
 			payments: [
 				{
@@ -79,10 +79,10 @@ describe<{
 		assert.undefined(validator.validate("multiPayment", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
+	it("#getSchema - amount should be bigNumber, bigger equal 1", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
-		const validValues = [0, "0", BigNumber.ZERO];
+		const validValues = [1, "1", BigNumber.ONE, "2"];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -92,7 +92,7 @@ describe<{
 			assert.undefined(validator.validate("multiPayment", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
+		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, {}];
 
 		for (const value of invalidValues) {
 			const transaction = {
