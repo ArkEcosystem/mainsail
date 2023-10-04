@@ -32,7 +32,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		}
 
 		if (round === roundState.round) {
-			// Return only deltas
+			// Return only missing messages
 			return {
 				precommits: this.getPrecommits(validatorsSignedPrecommit, roundState),
 				prevotes: this.getPrevotes(validatorsSignedPrevote, roundState),

@@ -18,6 +18,11 @@ type DownloadJob = {
 	precommitIndexes: number[];
 };
 
+/* Terminology:
+ * Full download -> download at least 1/3 prevotes for the higher round, that will allow consensus to move forward
+ * Partial download -> download only the missing prevotes and precommits for the current round
+ */
+
 @injectable()
 export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.PeerCommunicator)
@@ -239,7 +244,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		this.state.resetLastMessageTime();
 
-		if (job.isFullDownload) {
+		// Check actual received round, because we might have received a full response even if we marked request as a partial
+		const receivedRound =
+			prevotes.size > 0 ? prevotes.values().next().value.round : precommits.values().next().value.round;
+
+		if (job.ourHeader.round !== receivedRound) {
 			this.#checkFullRoundResponse(prevotes, precommits, job);
 		} else {
 			this.#checkPartialRoundResponse(prevotes, precommits, job);
