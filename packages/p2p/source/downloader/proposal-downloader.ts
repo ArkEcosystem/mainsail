@@ -55,10 +55,6 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			return;
 		}
 
-		if (this.#downloadsByHeight.has(peer.header.height)) {
-			return;
-		}
-
 		const ourHeader = this.headerFactory();
 		if (!this.#canDownload(ourHeader, peer.header)) {
 			return;
@@ -80,7 +76,14 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData) {
-		if (ourHeader.height !== peerHeader.height || ourHeader.round === peerHeader.round) {
+		if (ourHeader.height !== peerHeader.height || ourHeader.round !== peerHeader.round) {
+			return false;
+		}
+
+		if (
+			this.#downloadsByHeight.has(peerHeader.height) &&
+			this.#downloadsByHeight.get(peerHeader.height)!.has(peerHeader.round)
+		) {
 			return false;
 		}
 
