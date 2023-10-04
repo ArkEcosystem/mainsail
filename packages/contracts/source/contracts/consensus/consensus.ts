@@ -21,9 +21,11 @@ export interface IRoundState extends IProcessableUnit {
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	getPrevote(validatorIndex: number): IPrevote | undefined;
 	getPrecommit(validatorIndex: number): IPrecommit | undefined;
+	getPrevotes(): IPrevote[];
+	getPrecommits(): IPrecommit[];
 	getValidator(consensusPublicKey: string): IValidatorWallet;
-	getValidatorsSignedPrevote(): boolean[];
-	getValidatorsSignedPrecommit(): boolean[];
+	getValidatorsSignedPrevote(): readonly boolean[];
+	getValidatorsSignedPrecommit(): readonly boolean[];
 	aggregatePrevotes(): Promise<IAggregatedSignature>;
 	aggregatePrecommits(): Promise<IAggregatedSignature>;
 	logPrevotes(): void;

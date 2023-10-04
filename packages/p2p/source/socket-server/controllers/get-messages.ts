@@ -11,11 +11,6 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.IGetMessagesRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.IGetMessagesResponse> {
-		const result = {
-			precommits: [],
-			prevotes: [],
-		};
-
 		const { height, round, validatorsSignedPrevote, validatorsSignedPrecommit } = request.payload.headers;
 
 		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
@@ -23,23 +18,37 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 			Identifiers.Consensus.RoundStateRepository,
 		);
 
-		if (height !== consensus.getHeight()) {
-			return result;
+		if (height !== consensus.getHeight() || round > consensus.getRound()) {
+			return {
+				precommits: [],
+				prevotes: [],
+			};
 		}
 
-		if (round > consensus.getRound()) {
-			return result;
+		// Use the highest round with minority prevotes
+		let roundState = roundStateRepo.getRoundState(height, consensus.getRound());
+		if (roundState.round >= 1 && roundState.round > round && !roundState.hasMinorityPrevotesOrPrecommits()) {
+			roundState = roundStateRepo.getRoundState(height, consensus.getRound() - 1);
 		}
 
-		const roundState = roundStateRepo.getRoundState(height, round);
-
-		return {
-			precommits: this.getPrecommits(validatorsSignedPrecommit, roundState),
-			prevotes: this.getPrevotes(validatorsSignedPrevote, roundState),
-		};
+		if (round === roundState.round) {
+			// Return only missing messages
+			return {
+				precommits: this.getPrecommits(validatorsSignedPrecommit, roundState),
+				prevotes: this.getPrevotes(validatorsSignedPrevote, roundState),
+			};
+		} else {
+			return {
+				precommits: roundState.getPrecommits().map((precommit) => precommit.serialized),
+				prevotes: roundState.getPrevotes().map((prevote) => prevote.serialized),
+			};
+		}
 	}
 
-	private getPrevotes(validatorsSignedPrevote: boolean[], roundState: Contracts.Consensus.IRoundState): Buffer[] {
+	private getPrevotes(
+		validatorsSignedPrevote: readonly boolean[],
+		roundState: Contracts.Consensus.IRoundState,
+	): Buffer[] {
 		const prevotes: Buffer[] = [];
 
 		for (const [index, voted] of validatorsSignedPrevote.entries()) {
@@ -57,7 +66,10 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		return prevotes;
 	}
 
-	private getPrecommits(validatorsSignedPrecommit: boolean[], roundState: Contracts.Consensus.IRoundState): Buffer[] {
+	private getPrecommits(
+		validatorsSignedPrecommit: readonly boolean[],
+		roundState: Contracts.Consensus.IRoundState,
+	): Buffer[] {
 		const precommits: Buffer[] = [];
 
 		for (const [index, voted] of validatorsSignedPrecommit.entries()) {

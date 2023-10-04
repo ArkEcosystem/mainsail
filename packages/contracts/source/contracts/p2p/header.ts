@@ -1,4 +1,4 @@
-import { IRoundState } from "../consensus/consensus";
+import { Contracts } from "../..";
 
 export type IHeaderData = {
 	version: string;
@@ -6,18 +6,20 @@ export type IHeaderData = {
 	round: number;
 	step: number;
 	proposedBlockId?: string;
-	validatorsSignedPrevote: boolean[];
-	validatorsSignedPrecommit: boolean[];
+	validatorsSignedPrevote: readonly boolean[];
+	validatorsSignedPrecommit: readonly boolean[];
 };
 
 export interface IHeader {
 	height: number;
 	round: number;
-	roundState: IRoundState;
+	proposal?: Contracts.Crypto.IProposal;
+	validatorsSignedPrecommit: readonly boolean[];
+	validatorsSignedPrevote: readonly boolean[];
 
 	toData(): IHeaderData;
-	canDownloadProposal(headerData: IHeaderData): boolean;
-	canDownloadMessages(headerData: IHeaderData): boolean;
+	getValidatorsSignedPrecommitCount(): number;
+	getValidatorsSignedPrevoteCount(): number;
 }
 
 export type HeaderFactory = () => IHeader;
