@@ -12,6 +12,9 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.WalletRepositoryCloneFactory)
 	private readonly walletRepositoryCloneFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
+	@inject(Identifiers.WalletRepositoryCopyOnWriteFactory)
+	private readonly walletRepositoryCopyOnWriteFactory!: Contracts.State.WalletRepositoryCloneFactory;
+
 	#baseWalletRepository!: Contracts.State.WalletRepository;
 
 	@postConstruct()
@@ -29,5 +32,9 @@ export class Service implements Contracts.State.Service {
 
 	public createWalletRepositoryClone(): Contracts.State.WalletRepositoryClone {
 		return this.walletRepositoryCloneFactory(this.getWalletRepository());
+	}
+
+	public createWalletRepositoryCopyOnWrite(): Contracts.State.WalletRepository {
+		return this.walletRepositoryCopyOnWriteFactory(this.getWalletRepository());
 	}
 }

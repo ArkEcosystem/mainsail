@@ -5,4 +5,5 @@ export interface Service {
 	getStateStore(): StateStore;
 	getWalletRepository(): WalletRepository;
 	createWalletRepositoryClone(): WalletRepositoryClone;
+	createWalletRepositoryCopyOnWrite(): WalletRepository;
 }
