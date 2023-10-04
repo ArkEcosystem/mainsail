@@ -34,9 +34,10 @@ describe<{
 		await apiContext.blockRepository.save(blocks);
 
 		const block = blocks[0];
+		await apiContext.stateRepository.save({ id: 1, height: +block.height, supply: "1500000" });
 
 		const { statusCode, data } = await request("/blockchain", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, { block: { id: block.id, height: block.height }, supply: "0" });
+		assert.equal(data.data, { block: { id: block.id, height: block.height }, supply: "1500000" });
 	});
 });
