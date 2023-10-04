@@ -91,8 +91,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 				version: header.version,
 			});
 
-			await stateRepository.
-				createQueryBuilder()
+			await stateRepository
+				.createQueryBuilder()
 				.update()
 				.set({
 					height: header.height,
@@ -173,13 +173,11 @@ export class Sync implements Contracts.ApiSync.ISync {
 			.createQueryBuilder()
 			.insert()
 			.orIgnore()
-			.values(
-				{
-					id: 1,
-					height: 0,
-					supply: genesisBlock.block.data.totalAmount.toFixed(),
-				},
-			)
+			.values({
+				height: 0,
+				id: 1,
+				supply: genesisBlock.block.data.totalAmount.toFixed(),
+			})
 			.execute();
 	}
 
