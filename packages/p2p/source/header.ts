@@ -28,6 +28,7 @@ export class Header implements Contracts.P2P.IHeader {
 		const roundState = this.roundStateRepo.getRoundState(this.height, this.round);
 		this.validatorsSignedPrecommit = roundState.getValidatorsSignedPrecommit();
 		this.validatorsSignedPrevote = roundState.getValidatorsSignedPrevote();
+		this.proposal = roundState.getProposal();
 	}
 
 	public toData(): Contracts.P2P.IHeaderData {
