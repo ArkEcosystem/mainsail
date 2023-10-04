@@ -230,6 +230,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		if (message.round < job.ourHeader.round) {
 			throw new Error(`Received message round ${message.round} is lower than round ${job.ourHeader.round}`);
 		}
+
+		if (job.isFullDownload && message.round === job.ourHeader.round) {
+			throw new Error(
+				`Received message round ${message.round} is should be higher than round ${job.ourHeader.round}`,
+			);
+		}
 	}
 
 	#checkResponse(
@@ -248,7 +254,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const receivedRound =
 			prevotes.size > 0 ? prevotes.values().next().value.round : precommits.values().next().value.round;
 
-		if (job.ourHeader.round !== receivedRound) {
+		if (job.ourHeader.round < receivedRound) {
 			this.#checkFullRoundResponse(prevotes, precommits, job);
 		} else {
 			this.#checkPartialRoundResponse(prevotes, precommits, job);
