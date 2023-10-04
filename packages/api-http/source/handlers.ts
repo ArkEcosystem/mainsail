@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 
-import * as Blocks from "./routes/blocks";
 import * as Blockchain from "./routes/blockchain";
+import * as Blocks from "./routes/blocks";
 import * as Node from "./routes/node";
 import * as Transactions from "./routes/transactions";
 import * as ValidatorRounds from "./routes/validator-rounds";
