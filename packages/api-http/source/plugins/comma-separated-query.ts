@@ -1,22 +1,22 @@
 import Hapi from "@hapi/hapi";
 
 export const commaArrayQuery = {
-    name: "comma-array-query",
-    version: "1.0.0",
+	name: "comma-array-query",
+	onRequest(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
+		const query = {};
+		const separator = ",";
 
-    register(server: Hapi.Server): void {
-        server.ext("onRequest", this.onRequest);
-    },
+		for (const [key, value] of Object.entries(request.query as { [key: string]: string })) {
+			query[key] = value.includes(separator) ? value.split(separator) : value;
+		}
 
-    onRequest(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
-        const query = {};
-        const separator = ",";
+		request.query = query;
+		return h.continue;
+	},
 
-        for (const [key, value] of Object.entries(request.query as { [key: string]: string })) {
-            query[key] = value.indexOf(separator) > -1 ? value.split(separator) : value;
-        }
+	register(server: Hapi.Server): void {
+		server.ext("onRequest", this.onRequest);
+	},
 
-        request.query = query;
-        return h.continue;
-    },
+	version: "1.0.0",
 };

@@ -2,19 +2,19 @@ import Hapi from "@hapi/hapi";
 import { set } from "@mainsail/utils";
 
 export const dotSeparatedQuery = {
-    name: "dot-separated-query",
-    version: "1.0.0",
+	name: "dot-separated-query",
+	onRequest(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
+		const query = {};
+		for (const [key, value] of Object.entries(request.query)) {
+			set(query, key, value);
+		}
+		request.query = query;
+		return h.continue;
+	},
 
-    register(server: Hapi.Server): void {
-        server.ext("onRequest", this.onRequest);
-    },
+	register(server: Hapi.Server): void {
+		server.ext("onRequest", this.onRequest);
+	},
 
-    onRequest(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
-        const query = {};
-        for (const [key, value] of Object.entries(request.query)) {
-            set(query, key, value);
-        }
-        request.query = query;
-        return h.continue;
-    },
+	version: "1.0.0",
 };
