@@ -1,3 +1,5 @@
+import { commaArrayQuery } from "./comma-separated-query";
+import { dotSeparatedQuery } from "./dot-separated-query";
 import { hapiAjv } from "./hapi-ajv";
 import { pagination } from "./pagination";
 import { rateLimit } from "./rate-limit";
@@ -20,6 +22,8 @@ export const preparePlugins = (config) => [
 		},
 		plugin: rateLimit,
 	},
+	{ plugin: commaArrayQuery },
+	{ plugin: dotSeparatedQuery },
 	{
 		options: {
 			query: {
