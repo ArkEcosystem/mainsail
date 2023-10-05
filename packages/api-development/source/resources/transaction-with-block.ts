@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 
@@ -14,13 +14,6 @@ export class TransactionWithBlockResource implements Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	#walletRepository!: Contracts.State.WalletRepository;
-
-	@postConstruct()
-	public initialize(): void {
-		this.#walletRepository = this.stateService.getWalletRepository();
-	}
-
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
 
@@ -34,7 +27,7 @@ export class TransactionWithBlockResource implements Resource {
 
 		AppUtils.assert.defined<string>(transactionData.senderPublicKey);
 
-		const wallet = await this.#walletRepository.findByPublicKey(transactionData.senderPublicKey);
+		const wallet = await this.stateService.getWalletRepository().findByPublicKey(transactionData.senderPublicKey);
 		const sender: string = wallet.getAddress();
 		const recipient: string = transactionData.recipientId ?? sender;
 		const confirmations: number = this.stateStore.getLastHeight() - blockData.height + 1;

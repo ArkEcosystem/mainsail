@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
@@ -13,13 +13,6 @@ type BlockDataWithTransactionData = {
 export class BlockWithTransactionsResource implements Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
-
-	#walletRepository!: Contracts.State.WalletRepository;
-
-	@postConstruct()
-	public initialize(): void {
-		this.#walletRepository = this.stateService.getWalletRepository();
-	}
 
 	@inject(Identifiers.StateStore)
 	private readonly stateStore!: Contracts.State.StateStore;
@@ -40,9 +33,9 @@ export class BlockWithTransactionsResource implements Resource {
 
 		// const totalAmountTransferred: Utils.BigNumber = blockData.totalAmount.plus(totalMultiPaymentTransferred);
 		const totalAmountTransferred: BigNumber = blockData.totalAmount;
-		const generator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(
-			blockData.generatorPublicKey,
-		);
+		const generator: Contracts.State.Wallet = await this.stateService
+			.getWalletRepository()
+			.findByPublicKey(blockData.generatorPublicKey);
 		const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
 
 		return {

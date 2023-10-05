@@ -16,6 +16,13 @@ export class Controller {
 	@tagged("plugin", "api-development")
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
+
+	protected getWalletRepository(): Contracts.State.WalletRepository {
+		return this.stateService.getWalletRepository();
+	}
+
 	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
 		return {
 			limit: query.limit,
