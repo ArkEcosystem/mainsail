@@ -14,9 +14,6 @@ export class TransactionWithBlockResource implements Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
-
 	public raw(resource: TransactionDataWithBlockData): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
@@ -30,7 +27,7 @@ export class TransactionWithBlockResource implements Resource {
 		const wallet = await this.stateService.getWalletRepository().findByPublicKey(transactionData.senderPublicKey);
 		const sender: string = wallet.getAddress();
 		const recipient: string = transactionData.recipientId ?? sender;
-		const confirmations: number = this.stateStore.getLastHeight() - blockData.height + 1;
+		const confirmations: number = this.stateService.getStateStore().getLastHeight() - blockData.height + 1;
 
 		return {
 			amount: transactionData.amount.toFixed(),

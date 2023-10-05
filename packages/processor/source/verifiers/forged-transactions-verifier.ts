@@ -13,11 +13,11 @@ export class ForgedTransactionsVerifier implements Contracts.BlockProcessor.Hand
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
-		if (this.stateStore.isBootstrap()) {
+		if (this.stateService.getStateStore().isBootstrap()) {
 			return true;
 		}
 

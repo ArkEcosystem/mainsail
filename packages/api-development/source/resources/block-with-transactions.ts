@@ -14,9 +14,6 @@ export class BlockWithTransactionsResource implements Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
-
 	public raw(resource: BlockDataWithTransactionData): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
@@ -36,7 +33,7 @@ export class BlockWithTransactionsResource implements Resource {
 		const generator: Contracts.State.Wallet = await this.stateService
 			.getWalletRepository()
 			.findByPublicKey(blockData.generatorPublicKey);
-		const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
+		const lastBlock: Contracts.Crypto.IBlock = this.stateService.getStateStore().getLastBlock();
 
 		return {
 			confirmations: lastBlock ? lastBlock.data.height - blockData.height : 0,

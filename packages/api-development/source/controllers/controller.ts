@@ -17,7 +17,7 @@ export class Controller {
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.StateService)
-	private readonly stateService!: Contracts.State.Service;
+	protected readonly stateService!: Contracts.State.Service;
 
 	protected getWalletRepository(): Contracts.State.WalletRepository {
 		return this.stateService.getWalletRepository();

@@ -40,8 +40,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -168,7 +168,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 
 	async #bootstrapState(): Promise<void> {
-		const genesisBlock = this.stateStore.getGenesisBlock();
+		const genesisBlock = this.stateService.getStateStore().getGenesisBlock();
 		await this.stateRepositoryFactory()
 			.createQueryBuilder()
 			.insert()

@@ -16,8 +16,7 @@ export const getHeaders = (app: Contracts.Kernel.Application) => {
 		version: app.version(),
 	};
 
-	const state: Contracts.State.StateStore = app.get<Contracts.State.StateStore>(Identifiers.StateStore);
-	headers.height = state.getLastHeight();
+	headers.height = app.get<Contracts.State.Service>(Identifiers.StateService).getStateStore().getLastHeight();
 
 	return headers;
 };

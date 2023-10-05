@@ -59,7 +59,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 
-		this.app.bind(Identifiers.StateStore).toConstantValue(this.app.resolve(StateStore).configure());
 		this.app.bind(Identifiers.StateStoreFactory).toFactory(
 			({ container }) =>
 				(originalStateStore?: StateStore) =>

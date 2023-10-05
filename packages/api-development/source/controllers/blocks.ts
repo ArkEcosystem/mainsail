@@ -11,11 +11,8 @@ export class BlocksController extends Controller {
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.IDatabaseService;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
-
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.stateStore.getLastBlock();
+		const lastBlock = this.stateService.getStateStore().getLastBlock();
 
 		const pagination = this.getQueryPagination(request.query);
 
@@ -49,7 +46,7 @@ export class BlocksController extends Controller {
 	}
 
 	public async first(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const block = this.stateStore.getGenesisBlock();
+		const block = this.stateService.getStateStore().getGenesisBlock();
 
 		if (request.query.transform) {
 			return this.respondWithResource(block, BlockWithTransactionsResource, true);
@@ -59,7 +56,7 @@ export class BlocksController extends Controller {
 	}
 
 	public async last(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const block = this.stateStore.getLastBlock();
+		const block = this.stateService.getStateStore().getLastBlock();
 
 		if (request.query.transform) {
 			return this.respondWithResource(block, BlockWithTransactionsResource, true);

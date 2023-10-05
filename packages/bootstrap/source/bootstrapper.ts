@@ -1,4 +1,4 @@
-import { inject, injectable, optional } from "@mainsail/container";
+import { inject, injectable, optional, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -31,9 +31,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
-
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
 
@@ -56,6 +53,13 @@ export class Bootstrapper {
 	@optional()
 	private readonly apiSync: Contracts.ApiSync.ISync | undefined;
 
+	#stateStore!: Contracts.State.StateStore;
+
+	@postConstruct()
+	public initialize(): void {
+		this.#stateStore = this.stateService.getStateStore();
+	}
+
 	public async bootstrap(): Promise<void> {
 		try {
 			await this.#setGenesisBlock();
@@ -69,7 +73,7 @@ export class Bootstrapper {
 			}
 
 			await this.#processBlocks();
-			this.stateStore.setBootstrap(false);
+			this.#stateStore.setBootstrap(false);
 
 			this.stateVerifier.verifyWalletsConsistency();
 
@@ -88,13 +92,13 @@ export class Bootstrapper {
 		const genesisBlockJson = this.configuration.get("genesisBlock");
 		const genesisBlock = await this.blockFactory.fromCommittedJson(genesisBlockJson);
 
-		this.stateStore.setGenesisBlock(genesisBlock);
-		this.stateStore.setLastBlock(genesisBlock.block);
+		this.#stateStore.setGenesisBlock(genesisBlock);
+		this.#stateStore.setLastBlock(genesisBlock.block);
 	}
 
 	async #storeGenesisBlock(): Promise<void> {
 		if (!(await this.databaseService.getLastBlock())) {
-			const genesisBlock = this.stateStore.getGenesisBlock();
+			const genesisBlock = this.#stateStore.getGenesisBlock();
 			await this.databaseService.saveBlocks([genesisBlock]);
 		}
 	}
@@ -108,7 +112,7 @@ export class Bootstrapper {
 			)
 			.getRegisteredHandlers();
 
-		const genesisBlock = this.stateStore.getGenesisBlock();
+		const genesisBlock = this.#stateStore.getGenesisBlock();
 		for (const handler of registeredHandlers.values()) {
 			await handler.bootstrap(this.stateService.getWalletRepository(), genesisBlock.block.transactions);
 		}
@@ -117,7 +121,7 @@ export class Bootstrapper {
 	async #initState(): Promise<void> {
 		await this.validatorSet.initialize();
 
-		const committedBlockState = this.committedBlockStateFactory(this.stateStore.getGenesisBlock());
+		const committedBlockState = this.committedBlockStateFactory(this.#stateStore.getGenesisBlock());
 		await this.proposerPicker.onCommit(committedBlockState);
 	}
 
