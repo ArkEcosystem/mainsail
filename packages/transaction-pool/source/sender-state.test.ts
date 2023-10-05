@@ -6,6 +6,7 @@ import { Enums } from "@mainsail/kernel";
 import crypto from "../../core/bin/config/testnet/crypto.json";
 import { describe } from "../../test-framework";
 import { SenderState } from ".";
+import { countReset } from "console";
 
 describe<{
 	configuration: any;
@@ -18,6 +19,7 @@ describe<{
 	config: Configuration;
 	blockSerializer: any;
 	walletRepository: any;
+	stateService: any;
 }>("SenderState", ({ it, assert, beforeEach, stub, spy }) => {
 	beforeEach((context) => {
 		context.configuration = {
@@ -45,6 +47,10 @@ describe<{
 
 		context.walletRepository = {};
 
+		context.stateService = {
+			createWalletRepositoryCopyOnWrite: () => context.walletRepository,
+		};
+
 		context.container = new Container();
 		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 		context.container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
@@ -52,7 +58,7 @@ describe<{
 		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
 		context.container.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
 		context.container.bind(Identifiers.EventDispatcherService).toConstantValue(context.emitter);
-		context.container.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+		context.container.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 

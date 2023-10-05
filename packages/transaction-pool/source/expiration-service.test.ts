@@ -9,18 +9,20 @@ describe<{
 	app: any;
 	configuration: any;
 	stateStore: any;
+	stateService: any;
 	container: Container;
 	config: Configuration;
 }>("ExpirationService", ({ it, assert, stub, beforeAll }) => {
 	beforeAll((context) => {
 		context.configuration = { getRequired: () => {} };
 		context.stateStore = { getLastHeight: () => {} };
+		context.stateService = { getStateStore: () => context.stateStore };
 		context.app = { get: () => {} };
 
 		context.container = new Container();
 		context.container.bind(Identifiers.Application).toConstantValue(context.app);
 		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
-		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
