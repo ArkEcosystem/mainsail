@@ -10,6 +10,7 @@ type Context = {
 	blockProcessor: any;
 	bootstrapper: any;
 	state: any;
+	stateService: any;
 	storage: any;
 	prevoteProcessor: any;
 	precommitProcessor: any;
@@ -136,10 +137,14 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.IRoundState;
 
+		context.stateService = {
+			getStateStore: () => context.state,
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(context.blockProcessor);
-		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.state);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(context.prevoteProcessor);
 		context.sandbox.app.bind(Identifiers.Consensus.PrecommitProcessor).toConstantValue(context.precommitProcessor);
 		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue(context.proposalProcessor);

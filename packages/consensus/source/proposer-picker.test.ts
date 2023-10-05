@@ -5,7 +5,8 @@ import { ProposerPicker } from "./proposer-picker";
 
 type Context = {
 	sandbox: Sandbox;
-	state: any;
+	stateStore: any;
+	stateService: any;
 	validatorSet: any;
 	proposerPicker: ProposerPicker;
 	logger: any;
@@ -13,10 +14,15 @@ type Context = {
 
 describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
-		context.state = {
+		context.stateStore = {
 			getLastBlock: () => {},
 			getTotalRound: () => 0,
 		};
+
+		context.stateService = {
+			getStateStore: () => context.stateStore,
+		};
+
 		context.validatorSet = {
 			getActiveValidators: () => {},
 		};
@@ -27,18 +33,18 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.state);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(context.proposerPicker);
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 
 		const milestone = {
-			height: 0,
 			activeValidators: 53,
+			height: 0,
 		};
 
 		const config = {
-			getMilestone: () => milestone,
 			get: () => [milestone],
+			getMilestone: () => milestone,
 		};
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
@@ -94,7 +100,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 	it("#handleCommittedBlock - builds validator matrix based on round height", async ({
 		proposerPicker,
 		sandbox,
-		state,
+		stateStore: state,
 	}) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
