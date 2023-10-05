@@ -186,7 +186,7 @@ describe<{
 		app.bind<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes).toConstantValue(
 			getAttributeRepository(),
 		);
-		app.bind(Identifiers.WalletRepository).toConstantValue({});
+		app.bind(Identifiers.StateService).toConstantValue({});
 		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
