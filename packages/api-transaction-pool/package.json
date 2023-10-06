@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/api-http",
+	"name": "@mainsail/api-transaction-pool",
 	"version": "0.0.1",
-	"description": "HTTP API for Mainsail",
+	"description": "Transaction Pool API for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -28,6 +28,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.10.7",
 		"joi": "17.9.2",
@@ -49,7 +50,7 @@
 	},
 	"arkecosystem": {
 		"core": {
-			"alias": "api-http"
+			"alias": "api-transaction-pool"
 		}
 	}
 }

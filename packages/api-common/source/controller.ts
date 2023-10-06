@@ -1,20 +1,15 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 
-import { Options, Pagination, Resource, ResultsPage, Sorting } from "./contracts";
+import { Pagination, Resource, ResultsPage, Sorting } from "./contracts";
 import { SchemaObject } from "./schemas";
 
 @injectable()
 export abstract class AbstractController {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "api-http")
-	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
 	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
 		return {
@@ -58,14 +53,6 @@ export abstract class AbstractController {
 			direction: s.split(":")[1] === "desc" ? "desc" : "asc",
 			property: s.split(":")[0],
 		}));
-	}
-
-	protected getListingOptions(): Options {
-		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
-
-		return {
-			estimateTotalCount,
-		};
 	}
 
 	protected async respondWithResource(data, transformer, transform = true): Promise<any> {
