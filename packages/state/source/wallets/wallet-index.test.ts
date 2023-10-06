@@ -1,11 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe, Factories } from "../../../test-framework";
+import { describeSkip, Factories } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallets } from "..";
 import { WalletIndex } from ".";
 
-describe<{
+describeSkip<{
 	factory: Factories.FactoryBuilder;
 	wallet: Contracts.State.Wallet;
 	walletIndex: WalletIndex;

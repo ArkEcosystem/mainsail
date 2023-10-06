@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 
@@ -11,12 +11,8 @@ type TransactionDataWithBlockData = {
 
 @injectable()
 export class TransactionWithBlockResource implements Resource {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	protected readonly walletRepository!: Contracts.State.WalletRepository;
-
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	public raw(resource: TransactionDataWithBlockData): object {
 		return JSON.parse(JSON.stringify(resource));
@@ -28,10 +24,10 @@ export class TransactionWithBlockResource implements Resource {
 
 		AppUtils.assert.defined<string>(transactionData.senderPublicKey);
 
-		const wallet = await this.walletRepository.findByPublicKey(transactionData.senderPublicKey);
+		const wallet = await this.stateService.getWalletRepository().findByPublicKey(transactionData.senderPublicKey);
 		const sender: string = wallet.getAddress();
 		const recipient: string = transactionData.recipientId ?? sender;
-		const confirmations: number = this.stateStore.getLastHeight() - blockData.height + 1;
+		const confirmations: number = this.stateService.getStateStore().getLastHeight() - blockData.height + 1;
 
 		return {
 			amount: transactionData.amount.toFixed(),

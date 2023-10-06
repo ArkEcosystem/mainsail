@@ -5,8 +5,8 @@ import { Enums } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
-	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.BlockState)
 	private readonly blockState!: Contracts.State.BlockState;
@@ -60,12 +60,13 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		const committedBlock = await unit.getCommittedBlock();
 
-		if (!this.state.isBootstrap()) {
+		const stateStore = this.stateService.getStateStore();
+		if (!stateStore.isBootstrap()) {
 			await this.databaseService.saveBlocks([committedBlock]);
 		}
 
-		this.state.setTotalRound(this.state.getTotalRound() + unit.round + 1);
-		this.state.setLastBlock(committedBlock.block);
+		stateStore.setTotalRound(stateStore.getTotalRound() + unit.round + 1);
+		stateStore.setLastBlock(committedBlock.block);
 
 		await this.validatorSet.onCommit(unit);
 		await this.proposerPicker.onCommit(unit);

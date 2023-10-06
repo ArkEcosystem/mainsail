@@ -8,8 +8,8 @@ export class Service implements Contracts.TransactionPool.Service {
 	@tagged("plugin", "transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Fee.Matcher)
 	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
@@ -94,7 +94,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			this.storage.addTransaction({
-				height: this.stateStore.getLastHeight(),
+				height: this.stateService.getStateStore().getLastHeight(),
 				id: transaction.id,
 				senderPublicKey: transaction.data.senderPublicKey,
 				serialized: transaction.serialized,
@@ -145,7 +145,7 @@ export class Service implements Contracts.TransactionPool.Service {
 					await this.#addTransactionToMempool(previouslyForgedTransaction);
 
 					this.storage.addTransaction({
-						height: this.stateStore.getLastHeight(),
+						height: this.stateService.getStateStore().getLastHeight(),
 						id: previouslyForgedTransaction.id,
 						senderPublicKey: previouslyForgedTransaction.data.senderPublicKey,
 						serialized: previouslyForgedTransaction.serialized,
@@ -161,7 +161,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-			const lastHeight: number = this.stateStore.getLastHeight();
+			const lastHeight: number = this.stateService.getStateStore().getLastHeight();
 			const expiredHeight: number = lastHeight - maxTransactionAge;
 
 			for (const { height, id, serialized } of this.storage.getAllTransactions()) {
@@ -296,7 +296,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	async #removeOldTransactions(): Promise<void> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-		const lastHeight: number = this.stateStore.getLastHeight();
+		const lastHeight: number = this.stateService.getStateStore().getLastHeight();
 		const expiredHeight: number = lastHeight - maxTransactionAge;
 
 		for (const { senderPublicKey, id } of this.storage.getOldTransactions(expiredHeight)) {

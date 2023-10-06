@@ -13,13 +13,16 @@ describe<{
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
 	};
+	const stateService = {
+		getStateStore: () => stateStore,
+	};
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
-		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(stateService);
 
 		context.controller = context.sandbox.app.resolve(GetBlocksController);
 	});

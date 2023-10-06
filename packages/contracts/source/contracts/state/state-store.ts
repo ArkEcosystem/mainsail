@@ -18,3 +18,5 @@ export interface StateStore {
 	getAttribute<T>(key: string): T;
 	setAttribute<T>(key: string, value: T): void;
 }
+
+export type StateStoreFactory = (originalStateStore?: StateStore) => StateStore;

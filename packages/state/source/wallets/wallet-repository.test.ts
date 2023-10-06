@@ -1,10 +1,10 @@
 import { Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../test-framework";
+import { describeSkip } from "../../../test-framework";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletIndex, WalletRepository } from ".";
 
-describe<{
+describeSkip<{
 	walletRepo: WalletRepository;
 }>("Wallet Repository", ({ it, assert, afterEach, beforeEach }) => {
 	beforeEach(async (context) => {

@@ -8,8 +8,8 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	private validatorIndexMatrix: Array<number> = [];
 
@@ -28,7 +28,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	public getValidatorIndex(round: number): number {
 		const { activeValidators } = this.configuration.getMilestone();
 
-		const offset = (this.state.getTotalRound() + round) % activeValidators;
+		const offset = (this.stateService.getStateStore().getTotalRound() + round) % activeValidators;
 		return this.validatorIndexMatrix[offset % activeValidators];
 	}
 
@@ -48,7 +48,7 @@ export class ProposerPicker implements Contracts.Consensus.IProposerPicker {
 	}
 
 	#calculateSeed(): string {
-		const totalRound = this.state.getTotalRound();
+		const totalRound = this.stateService.getStateStore().getTotalRound();
 
 		// TODO: take block id into account
 

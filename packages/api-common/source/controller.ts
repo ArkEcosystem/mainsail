@@ -4,6 +4,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Pagination, Resource, ResultsPage, Sorting } from "./contracts";
+
 import { SchemaObject } from "./schemas";
 
 @injectable()

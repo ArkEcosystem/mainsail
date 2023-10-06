@@ -18,8 +18,8 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.IDatabaseService;
@@ -73,7 +73,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	}
 
 	async #verifyHighestCommonBlock(peer: Contracts.P2P.Peer, state: Contracts.P2P.PeerState): Promise<void> {
-		const block = this.stateStore.getLastBlock();
+		const block = this.stateService.getStateStore().getLastBlock();
 
 		const heightToRequest = state.header.height < block.data.height ? state.header.height : block.data.height;
 

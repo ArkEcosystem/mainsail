@@ -6,8 +6,8 @@ export class TimestampVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
@@ -17,7 +17,7 @@ export class TimestampVerifier implements Contracts.BlockProcessor.Handler {
 
 	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
 		const result =
-			this.stateStore.getLastBlock().data.timestamp <
+			this.stateService.getStateStore().getLastBlock().data.timestamp <
 			unit.getBlock().data.timestamp + this.configuration.getMilestone().blockTime;
 
 		if (!result) {

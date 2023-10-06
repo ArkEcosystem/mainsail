@@ -1,4 +1,3 @@
-import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -6,6 +5,7 @@ import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
+import { Service } from "./service";
 import { StateStore } from "./state-store";
 import { StateVerifier } from "./state-verifier";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
@@ -34,35 +34,38 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
 
 		this.app
-			.bind(Identifiers.WalletRepository)
-			.to(WalletRepository)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
-
-		this.app
 			.bind(Identifiers.WalletFactory)
 			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)));
 
-		this.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
+		this.app.bind(Identifiers.WalletRepositoryFactory).toFactory(
 			({ container }) =>
 				() =>
-					container
-						.resolve(WalletRepositoryClone)
-						.configure(container.getTagged(Identifiers.WalletRepository, "state", "blockchain")),
+					container.resolve(WalletRepository),
+		);
+
+		this.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
+			({ container }) =>
+				(walletRepository: WalletRepository) =>
+					container.resolve(WalletRepositoryClone).configure(walletRepository),
+		);
+
+		this.app.bind(Identifiers.WalletRepositoryCopyOnWriteFactory).toFactory(
+			({ container }) =>
+				(walletRepository: WalletRepository) =>
+					container.resolve(WalletRepositoryCopyOnWrite).configure(walletRepository),
 		);
 
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 
-		this.app
-			.bind(Identifiers.WalletRepository)
-			.to(WalletRepositoryCopyOnWrite)
-			.inRequestScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
-
 		this.app.bind(Identifiers.BlockState).to(BlockState);
 
-		this.app.bind(Identifiers.StateStore).toConstantValue(this.app.resolve(StateStore).configure());
+		this.app.bind(Identifiers.StateStoreFactory).toFactory(
+			({ container }) =>
+				(originalStateStore?: StateStore) =>
+					container.resolve(StateStore).configure(originalStateStore),
+		);
 
+		this.app.bind(Identifiers.StateService).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);

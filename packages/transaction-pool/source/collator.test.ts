@@ -12,6 +12,7 @@ describe<{
 	validator: any;
 	createTransactionValidator: any;
 	stateStore: any;
+	stateService: any;
 	pool: any;
 	expirationService: any;
 	poolQuery: any;
@@ -22,6 +23,7 @@ describe<{
 		context.validator = { validate: () => {} };
 		context.createTransactionValidator = () => context.validator;
 		context.stateStore = { getLastBlock: () => {} };
+		context.stateService = { getStateStore: () => context.stateStore };
 		context.pool = { removeTransaction: () => {} };
 		context.expirationService = { isExpired: () => {} };
 		context.poolQuery = {
@@ -40,7 +42,7 @@ describe<{
 		context.container
 			.bind(Identifiers.TransactionValidatorFactory)
 			.toConstantValue(context.createTransactionValidator);
-		context.container.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+		context.container.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
 		context.container.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
 		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);

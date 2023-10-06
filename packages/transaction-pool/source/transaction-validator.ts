@@ -7,8 +7,8 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@inject(Identifiers.WalletRepositoryCloneFactory)
-	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryCloneFactory;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
@@ -17,7 +17,7 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 
 	@postConstruct()
 	public initialize(): void {
-		this.#walletRepository = this.walletRepositoryFactory();
+		this.#walletRepository = this.stateService.createWalletRepositoryClone();
 	}
 
 	public async validate(transaction: Contracts.Crypto.ITransaction): Promise<void> {

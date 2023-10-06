@@ -16,6 +16,7 @@ describe<{
 	sandbox: Sandbox;
 	validatorSet: ValidatorSet;
 	walletRepository: any;
+	stateService: any;
 	cryptoConfiguration: any;
 }>("ValidatorSet", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
@@ -65,25 +66,22 @@ describe<{
 			.bind(Identifiers.Cryptography.Identity.PublicKeyFactory)
 			.to(PublicKeyFactory)
 			.inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.WalletFactory)
+			.toFactory(() => walletFactory(context.sandbox.app.get(Identifiers.WalletAttributes)));
 		context.sandbox.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 
-		context.sandbox.app
-			.bind(Identifiers.WalletRepository)
-			.to(Wallets.WalletRepository)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
+		context.walletRepository = context.sandbox.app.resolve(Wallets.WalletRepository);
+
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({
+			getWalletRepository: () => context.walletRepository,
+		});
 
 		context.sandbox.app
 			.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) =>
-				walletFactory(
-					container.get(Identifiers.WalletAttributes),
-					container.get(Identifiers.EventDispatcherService),
-				),
-			)
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
-		context.walletRepository = context.sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 		context.validatorSet = context.sandbox.app.resolve(ValidatorSet);
 
 		await buildValidatorAndVoteWallets(5, context.walletRepository);
@@ -91,14 +89,11 @@ describe<{
 
 	it("buildValidatorRanking - should build ranking and sort validators by vote balance", async ({ validatorSet }) => {
 		await validatorSet.initialize();
-
 		const validators = validatorSet.getActiveValidators();
 		assert.is(validators.length, 5);
-
 		for (let index = 0; index < 5; index++) {
 			const validator = validators[index];
 			const total = Utils.BigNumber.make((5 - index) * 1000).times(Utils.BigNumber.SATOSHI);
-
 			assert.equal(validator.getRank(), index + 1);
 			assert.equal(validator.getVoteBalance(), total);
 		}

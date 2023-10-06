@@ -17,12 +17,13 @@ describe<{
 	});
 
 	const stateStore = { getLastBlock: () => {} };
+	const stateService = { getStateStore: () => stateStore };
 	const slots = { getSlotInfo: () => {} };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(stateService);
 
 		context.controller = context.sandbox.app.resolve(GetStatusControllerProxy);
 	});
