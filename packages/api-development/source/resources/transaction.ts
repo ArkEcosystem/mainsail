@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 
@@ -6,9 +6,8 @@ import { Resource } from "../types";
 
 @injectable()
 export class TransactionResource implements Resource {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	protected readonly walletRepository!: Contracts.State.WalletRepository;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	public raw(resource: Contracts.Crypto.ITransactionData): object {
 		return JSON.parse(JSON.stringify(resource));
@@ -17,7 +16,7 @@ export class TransactionResource implements Resource {
 	public async transform(resource: Contracts.Crypto.ITransactionData): Promise<object> {
 		AppUtils.assert.defined<string>(resource.senderPublicKey);
 
-		const wallet = await this.walletRepository.findByPublicKey(resource.senderPublicKey);
+		const wallet = await this.stateService.getWalletRepository().findByPublicKey(resource.senderPublicKey);
 		const sender: string = wallet.getAddress();
 
 		return {

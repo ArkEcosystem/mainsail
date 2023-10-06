@@ -6,9 +6,6 @@ import { Controller } from "./controller";
 
 @injectable()
 export class NodeController extends Controller {
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
-
 	@inject(Identifiers.P2P.Service)
 	private readonly p2pService!: Contracts.P2P.Service;
 
@@ -16,7 +13,7 @@ export class NodeController extends Controller {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.stateStore.getLastBlock();
+		const lastBlock = this.stateService.getStateStore().getLastBlock();
 		const networkHeight = this.p2pService.getNetworkHeight();
 
 		return {
@@ -30,7 +27,7 @@ export class NodeController extends Controller {
 	}
 
 	public async syncing(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.stateStore.getLastBlock();
+		const lastBlock = this.stateService.getStateStore().getLastBlock();
 		const networkHeight = this.p2pService.getNetworkHeight();
 
 		return {
@@ -48,7 +45,7 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				constants: this.configuration.getMilestone(this.stateStore.getLastHeight()),
+				constants: this.configuration.getMilestone(this.stateService.getStateStore().getLastHeight()),
 				core: {
 					version: this.app.version(),
 				},

@@ -1,12 +1,12 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository!: Contracts.State.WalletRepository;
+	// TODO: Check which wallet repository should be used
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
@@ -14,8 +14,15 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	@inject(Identifiers.ValidatorWalletFactory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
+	#walletRepository!: Contracts.State.WalletRepository;
+
 	#validators: Contracts.State.IValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
+
+	@postConstruct()
+	public init(): void {
+		this.#walletRepository = this.stateService.getWalletRepository();
+	}
 
 	public async initialize(): Promise<void> {
 		await this.buildVoteBalances();
@@ -51,9 +58,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 
 	// NOTE: only public for tests
 	public async buildVoteBalances(): Promise<void> {
-		for (const voter of this.walletRepository.allByPublicKey()) {
+		for (const voter of this.#walletRepository.allByPublicKey()) {
 			if (voter.hasVoted()) {
-				const validator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(
 					voter.getAttribute("vote"),
 				);
 
@@ -68,7 +75,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
 
-		for (const wallet of this.walletRepository.allByUsername()) {
+		for (const wallet of this.#walletRepository.allByUsername()) {
 			const validator = this.validatorWalletFactory(wallet);
 			if (validator.isResigned()) {
 				validator.unsetRank();

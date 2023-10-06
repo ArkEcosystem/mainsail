@@ -10,8 +10,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
-	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Consensus.ProposalProcessor)
 	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
@@ -469,8 +469,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	async #bootstrap(): Promise<void> {
 		const state = await this.bootstrapper.run();
+		const stateStore = this.stateService.getStateStore();
 
-		if (state && state.height === this.state.getLastBlock().data.height + 1) {
+		if (state && state.height === stateStore.getLastBlock().data.height + 1) {
 			this.#step = state.step;
 			this.#height = state.height;
 			this.#round = state.round;
@@ -480,7 +481,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			if (state) {
 				this.logger.warning(
 					`Skipping state restore, because stored height is ${state.height}, but should be ${
-						this.state.getLastBlock().data.height + 1
+						stateStore.getLastBlock().data.height + 1
 					}`,
 				);
 
@@ -488,12 +489,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				this.roundStateRepository.clear();
 			}
 
-			const lastBlock = this.state.getLastBlock();
+			const lastBlock = stateStore.getLastBlock();
 			this.#height = lastBlock.data.height + 1;
 		}
 
 		this.logger.info(
-			`Completed consensus bootstrap for ${this.#height}/${this.#round}/${this.state.getTotalRound()}`,
+			`Completed consensus bootstrap for ${this.#height}/${this.#round}/${stateStore.getTotalRound()}`,
 		);
 	}
 }

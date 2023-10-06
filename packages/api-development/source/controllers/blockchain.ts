@@ -1,15 +1,10 @@
 // import { Utils } from "@mainsail/kernel";
-import { inject } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Controller } from "./controller";
 
 export class BlockchainController extends Controller {
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
-
 	public async index() {
-		const { data } = this.stateStore.getLastBlock();
+		const { data } = this.stateService.getStateStore().getLastBlock();
 
 		return {
 			data: {

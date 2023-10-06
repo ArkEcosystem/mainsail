@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class CommittedBlockState implements Contracts.BlockProcessor.IProcessableUnit {
-	@inject(Identifiers.WalletRepositoryCloneFactory)
-	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryCloneFactory;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -16,7 +16,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 
 	@postConstruct()
 	public initialize(): void {
-		this.#walletRepository = this.walletRepositoryFactory();
+		this.#walletRepository = this.stateService.createWalletRepositoryClone();
 	}
 
 	get height(): number {

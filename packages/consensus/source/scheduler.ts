@@ -7,8 +7,8 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.StateStore)
-	private readonly state!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
@@ -25,7 +25,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 
 		const timeout = Math.max(
 			0,
-			this.state.getLastBlock().data.timestamp -
+			this.stateService.getStateStore().getLastBlock().data.timestamp -
 				dayjs().valueOf() +
 				this.cryptoConfiguration.getMilestone().blockTime,
 		);

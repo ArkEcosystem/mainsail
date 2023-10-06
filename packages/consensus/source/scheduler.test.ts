@@ -35,12 +35,16 @@ describe<{
 		getLastBlock: () => {},
 	};
 
+	const stateService = {
+		getStateStore: () => stateStore,
+	};
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
-		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(stateService);
 
 		context.scheduler = context.sandbox.app.resolve(SchedulerProxy);
 	});

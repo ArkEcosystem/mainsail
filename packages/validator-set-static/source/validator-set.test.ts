@@ -8,12 +8,17 @@ describe<{
 	sandbox: Sandbox;
 	validatorSet: ValidatorSet;
 	walletRepository: any;
+	stateService: any;
 	validatorWalletFactory: any;
 	cryptoConfiguration: any;
 }>("ValidatorSet", ({ it, assert, beforeEach, stub }) => {
 	beforeEach(async (context) => {
 		context.walletRepository = {
 			findByUsername: () => {},
+		};
+
+		context.stateService = {
+			getWalletRepository: () => context.walletRepository,
 		};
 
 		context.cryptoConfiguration = {
@@ -24,7 +29,7 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 

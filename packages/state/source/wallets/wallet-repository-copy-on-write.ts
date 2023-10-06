@@ -1,5 +1,5 @@
-import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
 import { WalletRepository } from "./wallet-repository";
 
@@ -9,9 +9,13 @@ import { WalletRepository } from "./wallet-repository";
 
 @injectable()
 export class WalletRepositoryCopyOnWrite extends WalletRepository {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly blockchainWalletRepository!: WalletRepository;
+	#blockchainWalletRepository!: WalletRepository;
+
+	public configure(walletRepository: WalletRepository): WalletRepositoryCopyOnWrite {
+		this.#blockchainWalletRepository = walletRepository;
+
+		return this;
+	}
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
 		if (super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
@@ -31,7 +35,7 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 			return addressIndex.get(address)!;
 		}
 
-		if (this.blockchainWalletRepository.hasByAddress(address)) {
+		if (this.#blockchainWalletRepository.hasByAddress(address)) {
 			return this.#cloneWallet(address);
 		}
 
@@ -42,7 +46,7 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 		if (super.hasByIndex(index, key)) {
 			return true;
 		}
-		if (this.blockchainWalletRepository.hasByIndex(index, key) === false) {
+		if (this.#blockchainWalletRepository.hasByIndex(index, key) === false) {
 			return false;
 		}
 
@@ -50,7 +54,7 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 	}
 
 	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
-		for (const wallet of this.blockchainWalletRepository.allByUsername()) {
+		for (const wallet of this.#blockchainWalletRepository.allByUsername()) {
 			if (!super.hasByAddress(wallet.getAddress())) {
 				this.#cloneWallet(wallet.getAddress());
 			}
@@ -59,7 +63,7 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 	}
 
 	#cloneWallet(address: string): Contracts.State.Wallet {
-		const clone = this.blockchainWalletRepository.findByAddress(address).clone(this);
+		const clone = this.#blockchainWalletRepository.findByAddress(address).clone(this);
 		this.getIndex(Contracts.State.WalletIndexes.Addresses).set(address, clone);
 		return clone;
 	}

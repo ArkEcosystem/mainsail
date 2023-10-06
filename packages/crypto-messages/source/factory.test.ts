@@ -62,7 +62,6 @@ describe<{
 			block: await blockFactory.fromData(blockData),
 			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
 		};
-
 		const proposal = await factory.makeProposal(
 			{
 				block,
@@ -71,7 +70,6 @@ describe<{
 			},
 			identity.keys,
 		);
-
 		assert.equal(
 			proposal.signature,
 			"8b4db95de1a65f70ae05cbfce0013f4ad3a5545b32206288751517661d59633dd289a743c5ab0892c5be4e1a91547692030d1120248fefba361e276e1364ced22d5b00348efadc27e8d3ffd7080686c9d4ae22596c255725e0b4dad712389c29",

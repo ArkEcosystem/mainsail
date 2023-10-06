@@ -5,11 +5,9 @@ import { Sandbox } from "../../../test-framework";
 import { validatorMnemonic } from "../fixtures/proposal";
 
 export const prepareWallet = async (context: { sandbox: Sandbox }): Promise<Contracts.Consensus.IValidatorWallet> => {
-	const walletRepository = context.sandbox.app.getTagged<Contracts.State.WalletRepository>(
-		Identifiers.WalletRepository,
-		"state",
-		"blockchain",
-	);
+	const walletRepository = context.sandbox.app
+		.get<Contracts.State.Service>(Identifiers.StateService)
+		.getWalletRepository();
 	const consensusPublicKeyFactory = context.sandbox.app.getTagged<Contracts.Crypto.IPublicKeyFactory>(
 		Identifiers.Cryptography.Identity.PublicKeyFactory,
 		"type",

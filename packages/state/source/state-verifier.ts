@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
@@ -7,9 +7,8 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private walletRepository!: Contracts.State.WalletRepository;
+	@inject(Identifiers.StateService)
+	private stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.LogService)
 	private logger!: Contracts.Kernel.Logger;
@@ -17,7 +16,7 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 	verifyWalletsConsistency(): void {
 		this.logger.info(
 			`Number of registered validators: ${Object.keys(
-				this.walletRepository.allByUsername(),
+				this.stateService.getWalletRepository().allByUsername(),
 			).length.toLocaleString()}`,
 		);
 
@@ -28,7 +27,7 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 			this.configuration.get("genesisBlock.block.transactions").map((current) => [current.senderPublicKey, true]),
 		);
 
-		for (const wallet of this.walletRepository.allByAddress()) {
+		for (const wallet of this.stateService.getWalletRepository().allByAddress()) {
 			if (wallet.getBalance().isLessThan(0) && !genesisPublicKeys[wallet.getPublicKey()!]) {
 				logNegativeBalance(wallet, "balance", wallet.getBalance());
 

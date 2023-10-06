@@ -1,4 +1,4 @@
-import { interfaces, Selectors } from "@mainsail/container";
+import { interfaces } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -33,11 +33,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
-
-		this.app
-			.bind(Identifiers.WalletRepository)
-			.toConstantValue(null)
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "null"));
 
 		this.app
 			.bind(Identifiers.TransactionHandlerConstructors)

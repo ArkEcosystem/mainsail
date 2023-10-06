@@ -10,8 +10,8 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.WalletRepositoryCloneFactory)
-	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryCloneFactory;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -43,7 +43,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 
 	@postConstruct()
 	public initialize(): void {
-		this.#walletRepository = this.walletRepositoryFactory();
+		this.#walletRepository = this.stateService.createWalletRepositoryClone();
 	}
 
 	get height(): number {

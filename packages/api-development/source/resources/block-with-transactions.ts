@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
@@ -11,12 +11,8 @@ type BlockDataWithTransactionData = {
 
 @injectable()
 export class BlockWithTransactionsResource implements Resource {
-	@inject(Identifiers.WalletRepository)
-	@tagged("state", "blockchain")
-	private readonly walletRepository!: Contracts.State.WalletRepository;
-
-	@inject(Identifiers.StateStore)
-	private readonly stateStore!: Contracts.State.StateStore;
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
 
 	public raw(resource: BlockDataWithTransactionData): object {
 		return JSON.parse(JSON.stringify(resource));
@@ -34,10 +30,10 @@ export class BlockWithTransactionsResource implements Resource {
 
 		// const totalAmountTransferred: Utils.BigNumber = blockData.totalAmount.plus(totalMultiPaymentTransferred);
 		const totalAmountTransferred: BigNumber = blockData.totalAmount;
-		const generator: Contracts.State.Wallet = await this.walletRepository.findByPublicKey(
-			blockData.generatorPublicKey,
-		);
-		const lastBlock: Contracts.Crypto.IBlock = this.stateStore.getLastBlock();
+		const generator: Contracts.State.Wallet = await this.stateService
+			.getWalletRepository()
+			.findByPublicKey(blockData.generatorPublicKey);
+		const lastBlock: Contracts.Crypto.IBlock = this.stateService.getStateStore().getLastBlock();
 
 		return {
 			confirmations: lastBlock ? lastBlock.data.height - blockData.height : 0,

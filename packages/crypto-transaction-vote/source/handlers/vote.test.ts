@@ -68,7 +68,7 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.WalletRepository).toConstantValue(context.walletRepository);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});

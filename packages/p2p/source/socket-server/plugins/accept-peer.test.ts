@@ -32,7 +32,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
 
 		context.acceptPeerPlugin = context.sandbox.app.resolve<AcceptPeerPlugin>(AcceptPeerPlugin);
 	});
