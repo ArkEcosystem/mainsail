@@ -10,6 +10,10 @@ export class Server extends AbstractServer {
 	@tagged("plugin", "api-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	protected baseName(): string {
+		return "Transaction Pool API";
+	}
+
 	protected pluginConfiguration(): Providers.PluginConfiguration {
 		return this.configuration;
 	}

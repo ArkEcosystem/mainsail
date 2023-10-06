@@ -1,40 +1,24 @@
-import { Providers } from "@mainsail/kernel";
+import { AbstractServiceProvider, ServerConstructor } from "@mainsail/api-common";
 import Joi from "joi";
-
 import Handlers from "./handlers";
-import { Identifiers as ApiIdentifiers } from "./identifiers";
-// import { preparePlugins } from "./plugins";
+import { Identifiers as ApiTransactionPoolIdentifiers } from "./identifiers";
 import { Server } from "./server";
 
-export class ServiceProvider extends Providers.ServiceProvider {
-	public async register(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.buildServer("http", ApiIdentifiers.HTTP);
-		}
-
-		if (this.config().get("server.https.enabled")) {
-			await this.buildServer("https", ApiIdentifiers.HTTPS);
-		}
+export class ServiceProvider extends AbstractServiceProvider<Server> {
+	protected httpIdentifier(): symbol {
+		return ApiTransactionPoolIdentifiers.HTTP;
 	}
 
-	public async boot(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.app.get<Server>(ApiIdentifiers.HTTP).boot();
-		}
-
-		if (this.config().get("server.https.enabled")) {
-			await this.app.get<Server>(ApiIdentifiers.HTTPS).boot();
-		}
+	protected httpsIdentifier(): symbol {
+		return ApiTransactionPoolIdentifiers.HTTPS;
 	}
 
-	public async dispose(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.app.get<Server>(ApiIdentifiers.HTTP).dispose();
-		}
+	protected getServerConstructor(): ServerConstructor<Server> {
+		return Server;
+	}
 
-		if (this.config().get("server.https.enabled")) {
-			await this.app.get<Server>(ApiIdentifiers.HTTPS).dispose();
-		}
+	protected getHandlers(): any | any[] {
+		return Handlers;
 	}
 
 	public configSchema(): object {
@@ -67,24 +51,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}).unknown(true);
 	}
 
-	private async buildServer(type: string, id: symbol): Promise<void> {
-		this.app.bind<Server>(id).to(Server).inSingletonScope();
-
-		const server: Server = this.app.get<Server>(id);
-
-		await server.initialize(`Transaction Pool API (${type.toUpperCase()})`, {
-			...this.config().get(`server.${type}`),
-
-			routes: {
-				cors: true,
-			},
-		});
-
-		//		await server.register(preparePlugins(this.config().get("plugins")));
-
-		await server.register({
-			plugin: Handlers,
-			routes: { prefix: "/api" },
-		});
-	}
 }
