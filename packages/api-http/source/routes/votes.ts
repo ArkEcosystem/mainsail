@@ -1,8 +1,9 @@
 import Hapi from "@hapi/hapi";
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 import { VotesController } from "../controllers/votes";
-import { pagination, transactionIdSchema, transactionSortingSchema } from "../schemas";
+import { transactionIdSchema, transactionSortingSchema } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(VotesController);
@@ -24,7 +25,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/votes",

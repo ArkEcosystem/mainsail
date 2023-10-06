@@ -1,5 +1,3 @@
-export * as Resources from "./resources";
-
 export type Sorting = {
 	property: string;
 	direction: "asc" | "desc";

@@ -1,10 +1,9 @@
+import { Contracts } from "@mainsail/api-common";
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
 
-import { Resource } from "../types";
-
 @injectable()
-export class WalletResource implements Resource {
+export class WalletResource implements Contracts.Resource {
 	public raw(resource: Models.Wallet): object {
 		return resource;
 	}
