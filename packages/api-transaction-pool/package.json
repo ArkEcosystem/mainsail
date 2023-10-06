@@ -16,8 +16,7 @@
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source",
-		"test:integration": "uvu -r tsm integration .test.ts"
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@hapi/boom": "9.1.4",

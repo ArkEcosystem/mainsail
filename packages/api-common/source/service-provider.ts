@@ -43,7 +43,7 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
         }
     }
 
-    public configSchema(): object {
+    public configSchema(): Joi.ObjectSchema {
         return Joi.object({
             plugins: Joi.object({
                 pagination: Joi.object({

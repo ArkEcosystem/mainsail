@@ -12,6 +12,10 @@ export class Server extends AbstractServer {
 	@tagged("plugin", "api-http")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	protected baseName(): string {
+		return "Public API";
+	}
+
 	protected pluginConfiguration(): Providers.PluginConfiguration {
 		return this.configuration;
 	}
