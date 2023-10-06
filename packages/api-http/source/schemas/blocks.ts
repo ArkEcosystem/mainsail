@@ -1,6 +1,7 @@
 import Joi from "joi";
 
-import { blockCriteriaSchemas, createSortingSchema } from "./schemas";
+import { Schemas } from "@mainsail/api-common";
+import { blockCriteriaSchemas } from "./schemas";
 
 const blockHeightSchema = Joi.number().integer().min(1);
 const blockIdSchema = Joi.alternatives(Joi.string().min(13).max(20).regex(/^\d+$/), Joi.string().hex().length(64));
@@ -26,7 +27,7 @@ export const blockCriteriaSchemaObject = {
 };
 
 export const blockParamSchema = Joi.alternatives(blockIdSchema, blockHeightSchema);
-export const blockSortingSchema = createSortingSchema(blockCriteriaSchemas, [], false);
+export const blockSortingSchema = Schemas.createSortingSchema(blockCriteriaSchemas, [], false);
 
 export const blockQueryLevelOptions = [
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "version" },

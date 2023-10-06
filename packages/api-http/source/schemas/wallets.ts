@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { createCriteriaSchema, createRangeCriteriaSchema, createSortingSchema } from "./schemas";
+import { Schemas } from "@mainsail/api-common";
 
 export const walletAddressSchema = Joi.string().alphanum(); /* TODO: .length(34); */
 export const walletPublicKeySchema = Joi.string().hex(); /* TODO: .length(66); */
@@ -23,8 +23,8 @@ export const walletCriteriaSchemaObject = {
 			.regex(/%/),
 	),
 	attributes: Joi.object(),
-	balance: createRangeCriteriaSchema(Joi.number().integer().positive()),
-	nonce: createRangeCriteriaSchema(Joi.number().integer().positive()),
+	balance: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
+	nonce: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
 	publicKey: Joi.alternatives(
 		walletPublicKeySchema,
 		Joi.string()
@@ -34,5 +34,5 @@ export const walletCriteriaSchemaObject = {
 };
 
 export const walletParamSchema = Joi.alternatives(walletAddressSchema, walletPublicKeySchema, walletUsernameSchema);
-export const walletCriteriaSchema = createCriteriaSchema(walletCriteriaSchemaObject);
-export const walletSortingSchema = createSortingSchema(walletCriteriaSchemaObject, ["attributes"]);
+export const walletCriteriaSchema = Schemas.createCriteriaSchema(walletCriteriaSchemaObject);
+export const walletSortingSchema = Schemas.createSortingSchema(walletCriteriaSchemaObject, ["attributes"]);

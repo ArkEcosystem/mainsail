@@ -2,8 +2,8 @@ import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets";
+import { Schemas } from "@mainsail/api-common";
 import {
-	pagination,
 	transactionSortingSchema,
 	walletCriteriaSchemaObject,
 	walletParamSchema as walletParameterSchema,
@@ -29,7 +29,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(walletSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets",
@@ -48,7 +48,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(walletSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/top",
@@ -89,7 +89,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/{id}/transactions",
@@ -114,7 +114,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/{id}/transactions/sent",
@@ -139,7 +139,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/{id}/transactions/received",
@@ -164,7 +164,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/wallets/{id}/votes",

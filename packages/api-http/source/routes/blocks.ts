@@ -1,8 +1,9 @@
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
+import { Schemas } from "@mainsail/api-common";
 import { BlocksController } from "../controllers/blocks";
-import { blockSortingSchema, pagination, transactionSortingSchema } from "../schemas";
+import { blockSortingSchema, transactionSortingSchema } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(BlocksController);
@@ -24,7 +25,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(blockSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/blocks",
@@ -91,7 +92,7 @@ export const register = (server: Hapi.Server): void => {
 					transform: Joi.bool().default(true),
 				})
 					.concat(transactionSortingSchema)
-					.concat(pagination),
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/blocks/{id}/transactions",

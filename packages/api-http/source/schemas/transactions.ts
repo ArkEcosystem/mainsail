@@ -1,6 +1,8 @@
 import Joi from "joi";
 
-import { createSortingSchema, transactionCriteriaSchemas, walletAddressSchema, walletPublicKeySchema } from ".";
+import { Schemas } from "@mainsail/api-common";
+import { walletAddressSchema, walletPublicKeySchema } from "./wallets";
+import { transactionCriteriaSchemas } from "./schemas";
 
 export const transactionIdSchema = Joi.string().hex().max(96);
 
@@ -17,7 +19,7 @@ export const transactionCriteriaSchemaObject = {
 };
 
 export const transactionParamSchema = transactionIdSchema;
-export const transactionSortingSchema = createSortingSchema(transactionCriteriaSchemas, [], false);
+export const transactionSortingSchema = Schemas.createSortingSchema(transactionCriteriaSchemas, [], false);
 
 export const transactionQueryLevelOptions = [
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "version" },

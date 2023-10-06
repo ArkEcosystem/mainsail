@@ -1,10 +1,9 @@
+import { Contracts } from "@mainsail/api-common";
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
 
-import { Resource } from "../types";
-
 @injectable()
-export class ValidatorRoundResource implements Resource {
+export class ValidatorRoundResource implements Contracts.Resource {
 	public raw(resource: Models.ValidatorRound): object {
 		return resource;
 	}

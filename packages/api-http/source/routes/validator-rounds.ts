@@ -1,8 +1,8 @@
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
+import { Schemas } from "@mainsail/api-common";
 import { ValidatorRoundsController } from "../controllers/validator-rounds";
-import { pagination } from "../schemas";
 
 export const register = (server: Hapi.Server): void => {
 	const controller = server.app.app.resolve(ValidatorRoundsController);
@@ -18,7 +18,7 @@ export const register = (server: Hapi.Server): void => {
 				},
 			},
 			validate: {
-				query: Joi.object({}).concat(pagination),
+				query: Joi.object({}).concat(Schemas.pagination),
 			},
 		},
 		path: "/validator-rounds",
