@@ -25,9 +25,9 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
+		"@mainsail/api-common": "workspace:*",
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/api-development": "workspace:*",
-		"@mainsail/api-common": "workspace:*",
 		"@mainsail/api-http": "workspace:*",
 		"@mainsail/api-sync": "workspace:*",
 		"@mainsail/bootstrap": "workspace:*",

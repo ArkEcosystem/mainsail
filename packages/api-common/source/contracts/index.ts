@@ -1,26 +1,25 @@
-
 export type Sorting = {
-    property: string;
-    direction: "asc" | "desc";
+	property: string;
+	direction: "asc" | "desc";
 }[];
 
 export type Pagination = {
-    offset: number;
-    limit: number;
+	offset: number;
+	limit: number;
 };
 
 export type Options = {
-    estimateTotalCount?: boolean;
+	estimateTotalCount?: boolean;
 };
 
 export type ResultsPage<T> = {
-    results: T[];
-    totalCount: number;
-    meta: { totalCountIsEstimate: boolean };
+	results: T[];
+	totalCount: number;
+	meta: { totalCountIsEstimate: boolean };
 };
 
 export interface Resource {
-    raw(resource): object;
+	raw(resource): object;
 
-    transform(resource): object;
+	transform(resource): object;
 }

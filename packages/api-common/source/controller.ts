@@ -9,112 +9,112 @@ import { SchemaObject } from "./schemas";
 
 @injectable()
 export abstract class AbstractController {
-    @inject(Identifiers.Application)
-    protected readonly app!: Contracts.Kernel.Application;
+	@inject(Identifiers.Application)
+	protected readonly app!: Contracts.Kernel.Application;
 
-    @inject(Identifiers.PluginConfiguration)
-    @tagged("plugin", "api-http")
-    protected readonly apiConfiguration!: Providers.PluginConfiguration;
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "api-http")
+	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
-    protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
-        return {
-            limit: query.limit,
-            offset: (query.page - 1) * query.limit || 0,
-        };
-    }
+	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
+		return {
+			limit: query.limit,
+			offset: (query.page - 1) * query.limit || 0,
+		};
+	}
 
-    protected getQueryCriteria(query: Hapi.RequestQuery, schemaObject: SchemaObject): unknown {
-        const schemaObjectKeys = Object.keys(schemaObject);
-        const criteria = {};
-        for (const [key, value] of Object.entries(query)) {
-            if (schemaObjectKeys.includes(key)) {
-                criteria[key] = value;
-            }
-        }
-        return criteria;
-    }
+	protected getQueryCriteria(query: Hapi.RequestQuery, schemaObject: SchemaObject): unknown {
+		const schemaObjectKeys = Object.keys(schemaObject);
+		const criteria = {};
+		for (const [key, value] of Object.entries(query)) {
+			if (schemaObjectKeys.includes(key)) {
+				criteria[key] = value;
+			}
+		}
+		return criteria;
+	}
 
-    protected getListingPage(request: Hapi.Request): Pagination {
-        const pagination = {
-            limit: request.query.limit || 100,
-            offset: (request.query.page - 1) * request.query.limit || 0,
-        };
+	protected getListingPage(request: Hapi.Request): Pagination {
+		const pagination = {
+			limit: request.query.limit || 100,
+			offset: (request.query.page - 1) * request.query.limit || 0,
+		};
 
-        if (request.query.offset) {
-            pagination.offset = request.query.offset;
-        }
+		if (request.query.offset) {
+			pagination.offset = request.query.offset;
+		}
 
-        return pagination;
-    }
+		return pagination;
+	}
 
-    protected getListingOrder(request: Hapi.Request): Sorting {
-        if (!request.query.orderBy) {
-            return [];
-        }
+	protected getListingOrder(request: Hapi.Request): Sorting {
+		if (!request.query.orderBy) {
+			return [];
+		}
 
-        const orderBy = Array.isArray(request.query.orderBy) ? request.query.orderBy : request.query.orderBy.split(",");
+		const orderBy = Array.isArray(request.query.orderBy) ? request.query.orderBy : request.query.orderBy.split(",");
 
-        return orderBy.map((s: string) => ({
-            direction: s.split(":")[1] === "desc" ? "desc" : "asc",
-            property: s.split(":")[0],
-        }));
-    }
+		return orderBy.map((s: string) => ({
+			direction: s.split(":")[1] === "desc" ? "desc" : "asc",
+			property: s.split(":")[0],
+		}));
+	}
 
-    protected getListingOptions(): Options {
-        const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
+	protected getListingOptions(): Options {
+		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
 
-        return {
-            estimateTotalCount,
-        };
-    }
+		return {
+			estimateTotalCount,
+		};
+	}
 
-    protected async respondWithResource(data, transformer, transform = true): Promise<any> {
-        if (!data) {
-            return Boom.notFound();
-        }
+	protected async respondWithResource(data, transformer, transform = true): Promise<any> {
+		if (!data) {
+			return Boom.notFound();
+		}
 
-        return { data: await this.toResource(data, transformer, transform) };
-    }
+		return { data: await this.toResource(data, transformer, transform) };
+	}
 
-    protected async respondWithCollection(data, transformer, transform = true): Promise<object> {
-        return {
-            data: await this.toCollection(data, transformer, transform),
-        };
-    }
+	protected async respondWithCollection(data, transformer, transform = true): Promise<object> {
+		return {
+			data: await this.toCollection(data, transformer, transform),
+		};
+	}
 
-    protected async toResource<T, R extends Resource>(
-        item: T,
-        transformer: new () => R,
-        transform = true,
-    ): Promise<ReturnType<R["raw"]> | ReturnType<R["transform"]>> {
-        const resource = this.app.resolve<R>(transformer);
+	protected async toResource<T, R extends Resource>(
+		item: T,
+		transformer: new () => R,
+		transform = true,
+	): Promise<ReturnType<R["raw"]> | ReturnType<R["transform"]>> {
+		const resource = this.app.resolve<R>(transformer);
 
-        if (transform) {
-            return resource.transform(item) as ReturnType<R["transform"]>;
-        } else {
-            return resource.raw(item) as ReturnType<R["raw"]>;
-        }
-    }
+		if (transform) {
+			return resource.transform(item) as ReturnType<R["transform"]>;
+		} else {
+			return resource.raw(item) as ReturnType<R["raw"]>;
+		}
+	}
 
-    protected async toCollection<T, R extends Resource>(
-        items: T[],
-        transformer: new () => R,
-        transform = true,
-    ): Promise<ReturnType<R["raw"]>[] | ReturnType<R["transform"]>[]> {
-        return Promise.all(items.map(async (item) => await this.toResource(item, transformer, transform)));
-    }
+	protected async toCollection<T, R extends Resource>(
+		items: T[],
+		transformer: new () => R,
+		transform = true,
+	): Promise<ReturnType<R["raw"]>[] | ReturnType<R["transform"]>[]> {
+		return Promise.all(items.map(async (item) => await this.toResource(item, transformer, transform)));
+	}
 
-    protected async toPagination<T, R extends Resource>(
-        resultsPage: ResultsPage<T>,
-        transformer: new () => R,
-        transform = true,
-    ): Promise<ResultsPage<ReturnType<R["raw"]>> | ResultsPage<ReturnType<R["transform"]>>> {
-        const items = await this.toCollection(resultsPage.results, transformer, transform);
+	protected async toPagination<T, R extends Resource>(
+		resultsPage: ResultsPage<T>,
+		transformer: new () => R,
+		transform = true,
+	): Promise<ResultsPage<ReturnType<R["raw"]>> | ResultsPage<ReturnType<R["transform"]>>> {
+		const items = await this.toCollection(resultsPage.results, transformer, transform);
 
-        return { ...resultsPage, results: items };
-    }
+		return { ...resultsPage, results: items };
+	}
 
-    protected getEmptyPage(): ResultsPage<any> {
-        return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
-    }
+	protected getEmptyPage(): ResultsPage<any> {
+		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
+	}
 }

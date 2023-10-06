@@ -1,4 +1,4 @@
-import { AbstractController,Contracts as ApiCommonContracts } from "@mainsail/api-common";
+import { AbstractController, Contracts as ApiCommonContracts } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
