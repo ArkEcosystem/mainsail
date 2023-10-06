@@ -4,16 +4,14 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import * as Schemas from "./schemas";
-
 @injectable()
 export class Server extends AbstractServer {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "api-http")
+	@tagged("plugin", "api-transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	protected baseName(): string {
-		return "Public API";
+		return "Transaction Pool API";
 	}
 
 	protected pluginConfiguration(): Providers.PluginConfiguration {
@@ -21,16 +19,6 @@ export class Server extends AbstractServer {
 	}
 
 	protected defaultOptions(): Record<string, any> {
-		const validateContext = {
-			configuration: {
-				plugins: {
-					pagination: {
-						limit: this.configuration.getRequired<number>("plugins.pagination.limit"),
-					},
-				},
-			},
-		};
-
 		return {
 			router: {
 				stripTrailingSlash: true,
@@ -47,16 +35,12 @@ export class Server extends AbstractServer {
 					async failAction(request, h, error) {
 						return badData(error.message);
 					},
-
-					options: {
-						context: validateContext,
-					},
 				},
 			},
 		};
 	}
 
 	protected schemas(): any {
-		return Schemas;
+		return {};
 	}
 }

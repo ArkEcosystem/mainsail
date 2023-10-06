@@ -91,6 +91,9 @@
 			"package": "@mainsail/api-sync"
 		},
 		{
+			"package": "@mainsail/api-transaction-pool"
+		},
+		{
 			"package": "@mainsail/processor"
 		},
 		{

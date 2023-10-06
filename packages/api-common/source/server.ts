@@ -4,6 +4,11 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
 
+export enum ServerType {
+	Http = "HTTP",
+	Https = "HTTPS",
+}
+
 @injectable()
 export abstract class AbstractServer {
 	@inject(Identifiers.Application)
@@ -14,15 +19,21 @@ export abstract class AbstractServer {
 
 	private server: HapiServer;
 
-	private name!: string;
+	protected abstract baseName(): string;
+	private serverType!: ServerType;
+
+	public get prettyName(): string {
+		return `${this.baseName()} (${this.serverType})`;
+	}
 
 	public get uri(): string {
 		return this.server.info.uri;
 	}
 
-	public async initialize(name: string, optionsServer: Contracts.Types.JsonObject): Promise<void> {
-		this.name = name;
+	public async initialize(type: ServerType, optionsServer: Contracts.Types.JsonObject): Promise<void> {
 		this.server = new HapiServer(this.getServerOptions(optionsServer));
+
+		this.serverType = type;
 
 		const timeout: number = this.pluginConfiguration().getRequired<number>("plugins.socketTimeout");
 		this.server.listener.timeout = timeout;
@@ -57,9 +68,9 @@ export abstract class AbstractServer {
 		try {
 			await this.server.start();
 
-			this.logger.info(`${this.name} Server started at ${this.server.info.uri}`);
+			this.logger.info(`${this.prettyName} Server started at ${this.server.info.uri}`);
 		} catch (error) {
-			await this.app.terminate(`Failed to start ${this.name} Server!`, error);
+			await this.app.terminate(`Failed to start ${this.prettyName} Server!`, error);
 		}
 	}
 
@@ -67,9 +78,9 @@ export abstract class AbstractServer {
 		try {
 			await this.server.stop();
 
-			this.logger.info(`${this.name} Server stopped at ${this.server.info.uri}`);
+			this.logger.info(`${this.prettyName} Server stopped at ${this.server.info.uri}`);
 		} catch (error) {
-			await this.app.terminate(`Failed to stop ${this.name} Server!`, error);
+			await this.app.terminate(`Failed to stop ${this.prettyName} Server!`, error);
 		}
 	}
 
