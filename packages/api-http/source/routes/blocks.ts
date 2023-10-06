@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
-import { Schemas } from "@mainsail/api-common";
 import { BlocksController } from "../controllers/blocks";
 import { blockSortingSchema, transactionSortingSchema } from "../schemas";
 

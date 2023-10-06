@@ -1,8 +1,8 @@
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
-import { Schemas } from "@mainsail/api-common";
-import { walletAddressSchema, walletPublicKeySchema } from "./wallets";
 import { transactionCriteriaSchemas } from "./schemas";
+import { walletAddressSchema, walletPublicKeySchema } from "./wallets";
 
 export const transactionIdSchema = Joi.string().hex().max(96);
 

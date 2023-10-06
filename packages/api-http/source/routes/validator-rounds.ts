@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
-import { Schemas } from "@mainsail/api-common";
 import { ValidatorRoundsController } from "../controllers/validator-rounds";
 
 export const register = (server: Hapi.Server): void => {

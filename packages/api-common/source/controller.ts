@@ -4,8 +4,8 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { SchemaObject } from "./schemas";
 import { Options, Pagination, Resource, ResultsPage, Sorting } from "./contracts";
+import { SchemaObject } from "./schemas";
 
 @injectable()
 export abstract class AbstractController {

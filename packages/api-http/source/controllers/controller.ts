@@ -1,3 +1,4 @@
+import { AbstractController,Contracts as ApiCommonContracts } from "@mainsail/api-common";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -6,7 +7,6 @@ import {
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { Contracts as ApiCommonContracts, AbstractController } from "@mainsail/api-common";
 
 @injectable()
 export class Controller extends AbstractController {

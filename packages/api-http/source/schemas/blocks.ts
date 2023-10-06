@@ -1,6 +1,6 @@
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
-import { Schemas } from "@mainsail/api-common";
 import { blockCriteriaSchemas } from "./schemas";
 
 const blockHeightSchema = Joi.number().integer().min(1);

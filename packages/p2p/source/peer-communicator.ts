@@ -198,7 +198,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			throw validationError;
 		}
 
-		void this.headerService.handle(peer, parsedResponsePayload.headers!);
+		void this.headerService.handle(peer, parsedResponsePayload.headers);
 
 		return parsedResponsePayload;
 	}
