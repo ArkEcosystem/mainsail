@@ -35,7 +35,6 @@ export class Server extends AbstractServer {
 					async failAction(request, h, error) {
 						return badData(error.message);
 					},
-
 				},
 			},
 		};

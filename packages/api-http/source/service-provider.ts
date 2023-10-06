@@ -6,7 +6,6 @@ import { Identifiers as ApiIdentifiers } from "./identifiers";
 import { Server } from "./server";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
-
 	protected httpIdentifier(): symbol {
 		return ApiIdentifiers.HTTP;
 	}
@@ -53,8 +52,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					trustProxy: Joi.bool().required(),
 					whitelist: Joi.array().items(Joi.string()).required(),
 				}).required(),
-
-			}).unknown(true)
+			}).unknown(true),
 		);
 	}
 }

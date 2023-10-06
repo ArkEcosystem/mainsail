@@ -1,12 +1,12 @@
 import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import { AbstractController } from "@mainsail/api-common";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { AbstractController } from "@mainsail/api-common";
 
 // import { TransactionResource } from "../resources";
 
-class TransactionResource { }
+class TransactionResource {}
 
 @injectable()
 export class TransactionsController extends AbstractController {
@@ -32,10 +32,7 @@ export class TransactionsController extends AbstractController {
 	public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const pagination = super.getListingPage(request);
 		const all = await this.poolQuery.getFromHighestPriority().all();
-		const transactions = all.slice(
-			pagination.offset,
-			pagination.offset + pagination.limit,
-		);
+		const transactions = all.slice(pagination.offset, pagination.offset + pagination.limit);
 		const results = transactions.map((t) => t.data);
 		const resultsPage = {
 			meta: { totalCountIsEstimate: false },
@@ -47,9 +44,7 @@ export class TransactionsController extends AbstractController {
 	}
 
 	public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const transactionQuery = this.poolQuery
-			.getFromHighestPriority()
-			.whereId(request.params.id);
+		const transactionQuery = this.poolQuery.getFromHighestPriority().whereId(request.params.id);
 
 		if ((await transactionQuery.has()) === false) {
 			return notFound("Transaction not found");
