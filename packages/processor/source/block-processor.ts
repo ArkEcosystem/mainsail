@@ -70,6 +70,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 		await this.validatorSet.onCommit(unit);
 		await this.proposerPicker.onCommit(unit);
+		await this.stateService.onCommit(unit);
 
 		if (this.apiSync) {
 			await this.apiSync.onCommit(unit);

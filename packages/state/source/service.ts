@@ -1,6 +1,8 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { Exporter } from "./exporter";
+
 @injectable()
 export class Service implements Contracts.State.Service {
 	@inject(Identifiers.StateStoreFactory)
@@ -14,6 +16,9 @@ export class Service implements Contracts.State.Service {
 
 	@inject(Identifiers.WalletRepositoryCopyOnWriteFactory)
 	private readonly walletRepositoryCopyOnWriteFactory!: Contracts.State.WalletRepositoryCloneFactory;
+
+	@inject(Identifiers.StateExporter)
+	private readonly exporter!: Exporter;
 
 	#baseStateStore!: Contracts.State.StateStore;
 	#baseWalletRepository!: Contracts.State.WalletRepository;
@@ -38,5 +43,13 @@ export class Service implements Contracts.State.Service {
 
 	public createWalletRepositoryCopyOnWrite(): Contracts.State.WalletRepository {
 		return this.walletRepositoryCopyOnWriteFactory(this.getWalletRepository());
+	}
+
+	public async onCommit(): Promise<void> {
+		if (this.#baseStateStore.isBootstrap()) {
+			return;
+		}
+
+		await this.exporter.export(this.#baseStateStore, this.#baseWalletRepository);
 	}
 }
