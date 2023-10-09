@@ -80,7 +80,6 @@ export class Sync implements Contracts.ApiSync.ISync {
 			commit,
 		} = committedBlock;
 
-
 		const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
 		const dirtyWallets = [...unit.getWalletRepository().getDirtyWallets()];
 
@@ -128,13 +127,15 @@ export class Sync implements Contracts.ApiSync.ISync {
 				publicKey: wallet.getPublicKey()!,
 			})),
 
-			... (Utils.roundCalculator.isNewRound(header.height, this.configuration) ? {
-				round,
-				roundHeight,
-				validators: this.validatorSet
-					.getActiveValidators()
-					.map((validator) => validator.getWalletPublicKey()),
-			} : {}),
+			...(Utils.roundCalculator.isNewRound(header.height, this.configuration)
+				? {
+						round,
+						roundHeight,
+						validators: this.validatorSet
+							.getActiveValidators()
+							.map((validator) => validator.getWalletPublicKey()),
+				  }
+				: {}),
 		};
 
 		return this.#queueDeferredSync(deferredSync);
@@ -214,23 +215,23 @@ export class Sync implements Contracts.ApiSync.ISync {
 				const maxDelay = 30_000;
 
 				let success = false;
-				let baseDelay = 500;
+				const baseDelay = 500;
 
 				let attempts = 0;
 				do {
-
 					try {
 						await this.#syncToDatabase(deferredSync);
 						success = true;
-					} catch (ex) {
+					} catch (error) {
 						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
 						attempts++;
-						this.logger.warning(`sync encountered exception: ${ex.message}. retry #${attempts} in ... ${nextAttemptDelay}ms`);
+						this.logger.warning(
+							`sync encountered exception: ${error.message}. retry #${attempts} in ... ${nextAttemptDelay}ms`,
+						);
 						await delay(nextAttemptDelay);
 					}
-
-				} while (!success)
-			}
+				} while (!success);
+			},
 		});
 	}
 
@@ -255,7 +256,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 				})
 				.where("id = :id", { id: 1 })
 				// TODO: consider additional check constraint (OLD.height = NEW.height - 1)
-				.andWhere("height = :previousHeight", { previousHeight: Utils.BigNumber.make(deferred.block.height).minus(1).toFixed() })
+				.andWhere("height = :previousHeight", {
+					previousHeight: Utils.BigNumber.make(deferred.block.height).minus(1).toFixed(),
+				})
 				.execute();
 
 			await transactionRepository.save(deferred.transactions);
@@ -269,9 +272,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 					.execute();
 			}
 
-			await walletRepository.upsert(deferred.wallets,
-				["address"],
-			);
+			await walletRepository.upsert(deferred.wallets, ["address"]);
 		});
 
 		const t1 = performance.now();
