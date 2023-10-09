@@ -145,9 +145,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
 		.set("validatorRank", Contracts.State.AttributeType.Number);
-	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
-		.set("validatorRound", Contracts.State.AttributeType.Number);
 
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 

@@ -65,8 +65,4 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
 		getValidatorIndexByWalletPublicKey: () => 0,
 	});
-
-	context.sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
-		.set("validatorConsensusPublicKey", Contracts.State.AttributeType.String);
 };

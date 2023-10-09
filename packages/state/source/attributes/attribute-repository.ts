@@ -6,6 +6,9 @@ export class AttributeRepository implements Contracts.State.IAttributeRepository
 	#attributes: Map<string, Contracts.State.AttributeType> = new Map();
 
 	public set(name: string, type: Contracts.State.AttributeType): void {
+		if (this.#attributes.has(name)) {
+			throw new Error(`Attribute "${name}" is already defined`);
+		}
 		this.#attributes.set(name, type);
 	}
 
