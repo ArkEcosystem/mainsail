@@ -10,7 +10,11 @@ export class Importer {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async import(maxHeight: number): Promise<void> {
+	async import(
+		maxHeight: number,
+		stateStore: Contracts.State.StateStore,
+		walletRepository: Contracts.State.WalletRepository,
+	): Promise<void> {
 		// ...
 		const fileName = await this.#findImportFile(maxHeight);
 		if (!fileName) {
