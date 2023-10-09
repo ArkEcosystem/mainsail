@@ -2736,6 +2736,9 @@ importers:
         specifier: 11.1.1
         version: 11.1.1
     devDependencies:
+      '@types/fs-extra':
+        specifier: 11.0.2
+        version: 11.0.2
       import-fresh:
         specifier: 3.3.0
         version: 3.3.0
@@ -5652,6 +5655,13 @@ packages:
 
   /@types/fs-extra@11.0.1:
     resolution: {integrity: sha512-MxObHvNl4A69ofaTRU8DFqvgzzv8s9yRtaPPm5gud9HDNvpB3GPQFvNuTWAI59B9huVGV5jXYJwbCsmBsOGYWA==}
+    dependencies:
+      '@types/jsonfile': 6.1.1
+      '@types/node': 20.1.0
+    dev: true
+
+  /@types/fs-extra@11.0.2:
+    resolution: {integrity: sha512-c0hrgAOVYr21EX8J0jBMXGLMgJqVf/v6yxi0dLaJboW9aQPh16Id+z6w2Tx1hm+piJOLv8xPfVKZCLfjPw/IMQ==}
     dependencies:
       '@types/jsonfile': 6.1.1
       '@types/node': 20.1.0
