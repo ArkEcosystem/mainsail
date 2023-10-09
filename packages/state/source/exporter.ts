@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { createWriteStream, ensureDirSync } from "fs-extra";
+import { copyFile, createWriteStream, ensureDirSync } from "fs-extra";
 import { join } from "path";
 
 @injectable()
@@ -8,19 +8,24 @@ export class Exporter {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.LogService)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	public async export(
 		stateStore: Contracts.State.StateStore,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		const heigh = stateStore.getLastHeight();
 
-		ensureDirSync(this.app.dataPath("state-export"));
+		ensureDirSync(this.app.tempPath("state-export"));
 		const temporaryPath = this.app.tempPath(join("state-export", `${heigh}.zip`));
-		const dataPath = this.app.dataPath(join("state-export", `${heigh}.zip`));
 
-		console.log(`Exporting state at height ${heigh} at path: ${temporaryPath}, ${dataPath}`);
+		this.logger.info(`Exporting state at height ${heigh}...`);
 
 		await this.#export(temporaryPath, stateStore, walletRepository);
+
+		ensureDirSync(this.app.dataPath("state-export"));
+		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${heigh}.zip`)));
 	}
 
 	async #export(
