@@ -200,7 +200,9 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public toJson(): Contracts.Types.JsonObject {
-		const result = {};
+		const result = {
+			address: this.address,
+		};
 
 		for (const name of this.attributeRepository.getAttributeNames()) {
 			if (this.hasAttribute(name)) {
