@@ -2,11 +2,33 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { copyFile, createWriteStream, ensureDirSync } from "fs-extra";
 import { join } from "path";
+import { Writable } from "stream";
+
+// Exported file format:
+// - fileVersion
+// - appVersion
+// - StateStore as JSON
+// - Each wallet as JSON
+// - Each index as key-wallet address pair
+
+class Iterator {
+	#iteration = 0;
+
+	async next(): Promise<void> {
+		if (this.#iteration % 1000 === 0) {
+			await new Promise((resolve) => setTimeout(resolve, 0));
+		}
+		this.#iteration++;
+	}
+}
 
 @injectable()
 export class Exporter {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.WalletRepositoryIndexSet)
+	protected readonly indexSet!: Contracts.State.IndexSet;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -20,12 +42,14 @@ export class Exporter {
 		ensureDirSync(this.app.tempPath("state-export"));
 		const temporaryPath = this.app.tempPath(join("state-export", `${heigh}.zip`));
 
-		this.logger.info(`Exporting state at height ${heigh}...`);
+		this.logger.info(`Exporting state at height ${heigh}`);
 
 		await this.#export(temporaryPath, stateStore, walletRepository);
 
 		ensureDirSync(this.app.dataPath("state-export"));
 		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${heigh}.zip`)));
+
+		this.logger.info(`State export done for height ${heigh}`);
 	}
 
 	async #export(
@@ -35,17 +59,11 @@ export class Exporter {
 	): Promise<void> {
 		return new Promise(async (resolve) => {
 			const writeStream = createWriteStream(temporaryPath);
-			writeStream.write(`${JSON.stringify(stateStore.toJson())}\n`);
 
-			let iteration = 0;
-			for (const wallet of walletRepository.allByAddress()) {
-				writeStream.write(`${JSON.stringify(wallet.toJson())}\n`);
-
-				if (iteration % 1000 === 0) {
-					await new Promise((resolve) => setTimeout(resolve, 0));
-				}
-				iteration++;
-			}
+			await this.#exportVersion(writeStream);
+			await this.#exportStateStore(writeStream, stateStore);
+			await this.#exportWallets(writeStream, walletRepository);
+			await this.#exportIndexes(writeStream, walletRepository);
 
 			writeStream.end();
 
@@ -55,5 +73,47 @@ export class Exporter {
 
 			// TODO: Handle stream errors
 		});
+	}
+
+	async #exportVersion(stream: Writable): Promise<void> {
+		stream.write(`${1}\n`); // File version
+		stream.write(`${this.app.version()}\n`);
+		stream.write("\n");
+	}
+
+	async #exportStateStore(stream: Writable, stateStore: Contracts.State.StateStore): Promise<void> {
+		stream.write(`${JSON.stringify(stateStore.toJson())}\n`);
+		stream.write("\n");
+	}
+
+	async #exportWallets(stream: Writable, walletRepository: Contracts.State.WalletRepository): Promise<void> {
+		const iterator = new Iterator();
+		for (const wallet of walletRepository.allByAddress()) {
+			stream.write(`${JSON.stringify(wallet.toJson())}\n`);
+			await iterator.next();
+		}
+		stream.write("\n");
+	}
+
+	async #exportIndexes(stream: Writable, walletRepository: Contracts.State.WalletRepository): Promise<void> {
+		for (const indexName of this.indexSet.all()) {
+			const index = walletRepository.getIndex(indexName);
+			if (index.size() === 0) {
+				continue;
+			}
+
+			await this.#exportIndex(stream, indexName, index);
+		}
+	}
+
+	async #exportIndex(stream: Writable, indexName: string, index: Contracts.State.WalletIndex): Promise<void> {
+		stream.write(`${indexName}\n`);
+
+		const iterator = new Iterator();
+		for (const [key, wallet] of index.entries()) {
+			stream.write(`${key}:${wallet.getAddress()}\n`);
+			await iterator.next();
+		}
+		stream.write("\n");
 	}
 }
