@@ -2732,6 +2732,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      fs-extra:
+        specifier: 11.1.1
+        version: 11.1.1
     devDependencies:
       import-fresh:
         specifier: 3.3.0
