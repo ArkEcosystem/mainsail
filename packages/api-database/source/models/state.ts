@@ -11,9 +11,9 @@ export class State {
 	public id!: number;
 
 	@Column({
-		type: "integer",
+		type: "bigint",
 	})
-	public height!: number;
+	public height!: string;
 
 	@Column({
 		type: "bigint",
