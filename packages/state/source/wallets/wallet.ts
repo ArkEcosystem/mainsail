@@ -199,6 +199,18 @@ export class Wallet implements Contracts.State.Wallet {
 		}
 	}
 
+	public toJson(): Contracts.Types.JsonObject {
+		const result = {};
+
+		for (const name of this.attributeRepository.getAttributeNames()) {
+			if (this.hasAttribute(name)) {
+				result[name] = this.getAttribute(name);
+			}
+		}
+
+		return result;
+	}
+
 	#checkAttributeName(name: string): void {
 		if (!this.attributeRepository.has(name)) {
 			throw new Error(`Attribute name "${name}" is not registered.`);

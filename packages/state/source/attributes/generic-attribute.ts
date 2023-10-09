@@ -20,6 +20,10 @@ export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<
 		throw new Error(`Value ${value} is not valid for attribute [${this.constructor.name}].`);
 	}
 
+	public toJson(): Contracts.Types.JsonValue {
+		return this.value;
+	}
+
 	public abstract clone(): Contracts.State.IAttribute<T>;
 
 	public abstract check(value: unknown): value is T;

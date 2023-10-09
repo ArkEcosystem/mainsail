@@ -1,6 +1,6 @@
 import { CacheStore, Pipeline, Queue } from "../kernel";
 
-export type { Class, JsonObject, PackageJson, Primitive } from "type-fest";
+export type { Class, JsonObject, PackageJson, Primitive, JsonValue } from "type-fest";
 
 export type KeyValuePair<T = any> = Record<string, T>;
 
