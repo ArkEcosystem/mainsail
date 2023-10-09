@@ -2,6 +2,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Exporter } from "./exporter";
+import { Importer } from "./importer";
 
 @injectable()
 export class Service implements Contracts.State.Service {
@@ -19,6 +20,9 @@ export class Service implements Contracts.State.Service {
 
 	@inject(Identifiers.StateExporter)
 	private readonly exporter!: Exporter;
+
+	@inject(Identifiers.StateImporter)
+	private readonly importer!: Importer;
 
 	#baseStateStore!: Contracts.State.StateStore;
 	#baseWalletRepository!: Contracts.State.WalletRepository;
@@ -51,5 +55,9 @@ export class Service implements Contracts.State.Service {
 		}
 
 		await this.exporter.export(this.#baseStateStore, this.#baseWalletRepository);
+	}
+
+	public async restore(maxHeight: number): Promise<void> {
+		await this.importer.import(maxHeight);
 	}
 }
