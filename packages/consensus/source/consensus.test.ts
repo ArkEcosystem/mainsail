@@ -1138,6 +1138,33 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getHeight(), 3);
 	});
 
+	it("#onMajorityPrecommit - should terminate if processor throws", async ({
+		sandbox,
+		consensus,
+		blockProcessor,
+		roundState,
+		proposal,
+	}) => {
+		const fakeTimers = clock();
+
+		const error = new Error("error");
+		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
+		const spyBlockProcessorCommit = stub(blockProcessor, "commit").rejectedValue(error);
+
+		roundState.getProcessorResult = () => true;
+
+		assert.equal(consensus.getHeight(), 2);
+		void consensus.onMajorityPrecommit(roundState);
+		await fakeTimers.nextAsync();
+
+		spyRoundStateGetBlock.calledOnce();
+		spyBlockProcessorCommit.calledOnce();
+		spyBlockProcessorCommit.calledWith(roundState);
+		spyAppTerminate.calledOnce();
+		spyAppTerminate.calledWith("Failed to commit block", error);
+	});
+
 	it("#onMajorityPrecommit - should log and do nothing if result is invalid", async ({
 		consensus,
 		blockProcessor,

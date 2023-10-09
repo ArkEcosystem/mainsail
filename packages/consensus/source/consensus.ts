@@ -4,6 +4,9 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.IConsensusService {
+	@inject(Identifiers.Application)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Consensus.Bootstrapper)
 	private readonly bootstrapper!: Contracts.Consensus.IBootstrapper;
 
@@ -315,7 +318,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} blockId: ${block.data.id}`);
 
 		await this.commitLock.runExclusive(async () => {
-			await this.processor.commit(roundState);
+			try {
+				await this.processor.commit(roundState);
+			} catch (error) {
+				await this.app.terminate("Failed to commit block", error);
+			}
 
 			this.#height++;
 			this.#lockedValue = undefined;
