@@ -103,14 +103,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public getAttribute<T>(key: string, defaultValue?: T): T {
 		if (this.hasAttribute(key)) {
-			const attribute = this.attributes.get(key);
-
-			if (attribute) {
-				return attribute.get() as T;
-			}
-
-			Utils.assert.defined<Wallet>(this.originalWallet);
-			return this.originalWallet.getAttribute<T>(key);
+			return this.getAttributeHolder<T>(key).get();
 		}
 
 		if (defaultValue) {
@@ -206,11 +199,22 @@ export class Wallet implements Contracts.State.Wallet {
 
 		for (const name of this.attributeRepository.getAttributeNames()) {
 			if (this.hasAttribute(name)) {
-				result[name] = this.getAttribute(name);
+				result[name] = this.getAttributeHolder(name).toJson();
 			}
 		}
 
 		return result;
+	}
+
+	protected getAttributeHolder<T>(key: string): Contracts.State.IAttribute<T> {
+		const attribute = this.attributes.get(key) as Contracts.State.IAttribute<T>;
+
+		if (attribute) {
+			return attribute;
+		}
+
+		Utils.assert.defined<Wallet>(this.originalWallet);
+		return this.originalWallet?.getAttributeHolder<T>(key);
 	}
 
 	#checkAttributeName(name: string): void {
