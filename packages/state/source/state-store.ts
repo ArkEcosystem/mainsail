@@ -113,15 +113,11 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public getAttribute<T>(key: string): T {
-		if (this.attributes.has(key)) {
-			return this.attributes.get(key)!.get() as T;
+		if (!this.hasAttribute(key)) {
+			throw new Error(`Attribute "${key}" is not set.`);
 		}
 
-		if (this.#originalStateStore) {
-			return this.#originalStateStore.getAttribute<T>(key);
-		}
-
-		throw new Error(`Attribute "${key}" is not set.`);
+		return this.getAttributeHolder<T>(key).get();
 	}
 
 	public commitChanges(): void {
@@ -134,5 +130,28 @@ export class StateStore implements Contracts.State.StateStore {
 				this.#originalStateStore.setAttribute(key, attribute.get());
 			}
 		}
+	}
+
+	public toJson(): Contracts.Types.JsonObject {
+		const result = {};
+
+		for (const name of this.attributeRepository.getAttributeNames()) {
+			if (this.hasAttribute(name)) {
+				result[name] = this.getAttributeHolder(name).toJson();
+			}
+		}
+
+		return result;
+	}
+
+	protected getAttributeHolder<T>(key: string): Contracts.State.IAttribute<T> {
+		const attribute = this.attributes.get(key) as Contracts.State.IAttribute<T>;
+
+		if (attribute) {
+			return attribute;
+		}
+
+		Utils.assert.defined<StateStore>(this.#originalStateStore);
+		return this.#originalStateStore?.getAttributeHolder<T>(key);
 	}
 }

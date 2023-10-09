@@ -1,4 +1,5 @@
 import { IBlock, ICommittedBlock } from "../crypto";
+import { JsonObject } from "../types";
 
 export interface StateStore {
 	isBootstrap(): boolean;
@@ -17,6 +18,8 @@ export interface StateStore {
 	hasAttribute(key: string): boolean;
 	getAttribute<T>(key: string): T;
 	setAttribute<T>(key: string, value: T): void;
+
+	toJson(): JsonObject;
 }
 
 export type StateStoreFactory = (originalStateStore?: StateStore) => StateStore;
