@@ -35,12 +35,11 @@ export class Exporter {
 	): Promise<void> {
 		return new Promise(async (resolve) => {
 			const writeStream = createWriteStream(temporaryPath);
-			writeStream.write(`{"state": ${JSON.stringify(stateStore.toJson())}, "wallets": [\n`);
+			writeStream.write(`${JSON.stringify(stateStore.toJson())}\n`);
 
 			let iteration = 0;
 			for (const wallet of walletRepository.allByAddress()) {
-				writeStream.write(JSON.stringify(wallet.toJson()));
-				writeStream.write(",\n");
+				writeStream.write(`${JSON.stringify(wallet.toJson())}\n`);
 
 				if (iteration % 1000 === 0) {
 					await new Promise((resolve) => setTimeout(resolve, 0));
@@ -48,12 +47,13 @@ export class Exporter {
 				iteration++;
 			}
 
-			writeStream.write(`]}`);
 			writeStream.end();
 
 			writeStream.on("finish", () => {
 				resolve();
 			});
+
+			// TODO: Handle stream errors
 		});
 	}
 }
