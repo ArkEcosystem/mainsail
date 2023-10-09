@@ -3,6 +3,7 @@ import { Providers } from "@mainsail/kernel";
 
 import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
+import { Exporter } from "./exporter";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { Service } from "./service";
@@ -62,13 +63,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
 
-		this.app.bind(Identifiers.BlockState).to(BlockState);
-
 		this.app.bind(Identifiers.StateStoreFactory).toFactory(
 			({ container }) =>
 				(originalStateStore?: StateStore) =>
 					container.resolve(StateStore).configure(originalStateStore),
 		);
+
+		this.app.bind(Identifiers.BlockState).to(BlockState);
+		this.app.bind(Identifiers.StateExporter).to(Exporter);
 
 		this.app.bind(Identifiers.StateService).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
