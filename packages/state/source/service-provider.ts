@@ -32,6 +32,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
+		walletAttributeRepository.set("validatorUsername", Contracts.State.AttributeType.String);
+		walletAttributeRepository.set("validatorConsensusPublicKey", Contracts.State.AttributeType.String);
+		walletAttributeRepository.set("validatorRank", Contracts.State.AttributeType.Number);
+		walletAttributeRepository.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("validatorLastBlockId", Contracts.State.AttributeType.String);
 
 		this.app
 			.bind(Identifiers.WalletFactory)

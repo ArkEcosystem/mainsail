@@ -128,6 +128,10 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
 
+	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
+		return [];
+	}
+
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
@@ -161,8 +165,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;
 
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
-
-	public abstract walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }>;
 
 	public abstract isActivated(): Promise<boolean>;
 
