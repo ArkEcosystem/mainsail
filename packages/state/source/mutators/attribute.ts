@@ -8,6 +8,6 @@ export class AttributeMutator implements Contracts.State.ValidatorMutator {
 		wallet: Contracts.State.Wallet,
 		block: Contracts.Crypto.IBlockData,
 	): Promise<void> {
-		wallet.setAttribute<Contracts.Crypto.IBlockData>("validatorLastBlock", block);
+		wallet.setAttribute<string>("validatorLastBlockId", block.id);
 	}
 }

@@ -21,7 +21,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			{ name: "validatorRank", type: Contracts.State.AttributeType.Number },
 			{ name: "validatorUsername", type: Contracts.State.AttributeType.String },
 			{ name: "validatorVoteBalance", type: Contracts.State.AttributeType.BigNumber },
-			{ name: "validatorLastBlock", type: Contracts.State.AttributeType.Object },
+			{ name: "validatorLastBlockId", type: Contracts.State.AttributeType.String },
 		];
 	}
 
