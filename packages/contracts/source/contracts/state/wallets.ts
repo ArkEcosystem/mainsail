@@ -13,6 +13,7 @@ export interface WalletIndex {
 	entries(): ReadonlyArray<[string, Wallet]>;
 	values(): ReadonlyArray<Wallet>;
 	keys(): string[];
+	size(): number;
 	clear(): void;
 }
 
