@@ -8,7 +8,6 @@ export function getAttributeRepository(): Contracts.State.IAttributeRepository {
 	attributes.set("publicKey", Contracts.State.AttributeType.String);
 	attributes.set("validatorRank", Contracts.State.AttributeType.Number);
 	attributes.set("validatorResigned", Contracts.State.AttributeType.Boolean);
-	attributes.set("validatorRound", Contracts.State.AttributeType.Number);
 	attributes.set("validatorUsername", Contracts.State.AttributeType.String);
 	attributes.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
 	attributes.set("multiSignature", Contracts.State.AttributeType.Object);

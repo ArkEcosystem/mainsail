@@ -19,7 +19,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
 		return [
 			{ name: "validatorRank", type: Contracts.State.AttributeType.Number },
-			{ name: "validatorRound", type: Contracts.State.AttributeType.Number },
 			{ name: "validatorUsername", type: Contracts.State.AttributeType.String },
 			{ name: "validatorVoteBalance", type: Contracts.State.AttributeType.BigNumber },
 			{ name: "validatorLastBlock", type: Contracts.State.AttributeType.Object },
@@ -144,7 +143,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
 		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.publicKey);
 
-		sender.setAttribute<number>("validatorRound", 0); //TODO: use BigNumber
 		sender.setAttribute<string>("validatorUsername", transaction.data.asset.validator.username);
 		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
