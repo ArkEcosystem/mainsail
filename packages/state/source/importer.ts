@@ -58,6 +58,7 @@ export class Importer {
 		await this.#readVersion(reader);
 		await this.#readState(reader, stateStore);
 		await this.#readWallets(reader, walletRepository);
+		await this.#readIndexes(reader, walletRepository);
 	}
 
 	async #readVersion(reader: Interface): Promise<void> {
@@ -89,6 +90,40 @@ export class Importer {
 			Utils.assert.defined<string>(data.address);
 			const wallet = walletRepository.findByAddress(data.address);
 			wallet.fromJson(data);
+		}
+	}
+
+	async #readIndexes(reader: Interface, walletRepository: Contracts.State.WalletRepository): Promise<void> {
+		while (true) {
+			const { value, done } = await reader[Symbol.asyncIterator]().next();
+			if (done || value === "") {
+				break;
+			}
+
+			await this.#readIndex(reader, walletRepository, value);
+		}
+	}
+
+	async #readIndex(
+		reader: Interface,
+		walletRepository: Contracts.State.WalletRepository,
+		indexName: string,
+	): Promise<void> {
+		while (true) {
+			const { value, done } = await reader[Symbol.asyncIterator]().next();
+			if (done || value === "") {
+				break;
+			}
+
+			const [key, address] = value.split(":");
+			Utils.assert.defined<string>(key);
+			Utils.assert.defined<string>(address);
+
+			if (!walletRepository.hasByAddress(address)) {
+				throw new Error(`Wallet ${address} not found`);
+			}
+
+			walletRepository.setOnIndex(indexName, key, walletRepository.findByAddress(address));
 		}
 	}
 }
