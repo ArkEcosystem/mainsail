@@ -38,7 +38,7 @@ export class Bootstrapper {
 	private stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
+	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -122,7 +122,7 @@ export class Bootstrapper {
 		await this.validatorSet.initialize();
 
 		const committedBlockState = this.committedBlockStateFactory(this.#stateStore.getGenesisBlock());
-		await this.proposerPicker.onCommit(committedBlockState);
+		await this.proposerSelector.onCommit(committedBlockState);
 	}
 
 	async #processBlocks(): Promise<void> {
