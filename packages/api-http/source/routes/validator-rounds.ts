@@ -23,4 +23,17 @@ export const register = (server: Hapi.Server): void => {
 		},
 		path: "/validator-rounds",
 	});
+
+	server.route({
+		method: "GET",
+		path: "/rounds/{id}/delegates",
+		handler: (request: Hapi.Request) => controller.delegates(request),
+		options: {
+			validate: {
+				params: Joi.object({
+					id: Joi.number().integer().min(1),
+				}),
+			},
+		},
+	});
 };
