@@ -18,7 +18,7 @@ type Context = {
 	scheduler: any;
 	validatorsRepository: any;
 	validatorSet: any;
-	proposerPicker: any;
+	proposerSelector: any;
 	logger: any;
 	block: any;
 	proposal: any;
@@ -89,7 +89,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			getValidatorIndexByWalletPublicKey: () => "",
 		};
 
-		context.proposerPicker = {
+		context.proposerSelector = {
 			getValidatorIndex: () => {},
 		};
 
@@ -156,7 +156,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(context.validatorSet);
-		context.sandbox.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(context.proposerPicker);
+		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.RoundStateRepository)
 			.toConstantValue(context.roundStateRepository);
