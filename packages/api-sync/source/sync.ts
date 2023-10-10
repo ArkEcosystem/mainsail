@@ -6,6 +6,7 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Types, Utils } from "@mainsail/kernel";
+import { sleep } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 interface DeferredSync {
@@ -129,12 +130,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height, this.configuration)
 				? {
-						round,
-						roundHeight,
-						validators: this.validatorSet
-							.getActiveValidators()
-							.map((validator) => validator.getWalletPublicKey()),
-				  }
+					round,
+					roundHeight,
+					validators: this.validatorSet
+						.getActiveValidators()
+						.map((validator) => validator.getWalletPublicKey()),
+				}
 				: {}),
 		};
 
@@ -203,11 +204,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 
 	async #queueDeferredSync(deferredSync: DeferredSync): Promise<void> {
-		// Limit backlog of pending syncs; normal case the backlog is never expected to be full to begin with.
-		const maxBacklog = 1;
-
-		while (this.#queue.size() > maxBacklog) {
-			await new Promise((resolve) => setTimeout(resolve, 25));
+		while (this.#queue.size() > 0) {
+			await drainQueue(this.#queue);
 		}
 
 		void this.#queue.push({
@@ -228,7 +226,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 						this.logger.warning(
 							`sync encountered exception: ${error.message}. retry #${attempts} in ... ${nextAttemptDelay}ms`,
 						);
-						await delay(nextAttemptDelay);
+						await sleep(nextAttemptDelay);
 					}
 				} while (!success);
 			},
@@ -281,4 +279,4 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 }
 
-const delay = async (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.on('drain', resolve));
