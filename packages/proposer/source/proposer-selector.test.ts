@@ -1,18 +1,18 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { ProposerPicker } from "./proposer-picker";
+import { ProposerSelector } from "./proposer-selector";
 
 type Context = {
 	sandbox: Sandbox;
 	stateStore: any;
 	stateService: any;
 	validatorSet: any;
-	proposerPicker: ProposerPicker;
+	proposerPicker: ProposerSelector;
 	logger: any;
 };
 
-describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
+describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.stateStore = {
 			getLastBlock: () => {},
@@ -49,7 +49,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 
-		context.proposerPicker = context.sandbox.app.resolve(ProposerPicker);
+		context.proposerPicker = context.sandbox.app.resolve(ProposerSelector);
 	});
 
 	// Calculated indexes seeded from height 1 for the first 51 validators
@@ -138,6 +138,6 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 		}
 	});
 
-	const validatorIndexMatrix = (proposalPicker: ProposerPicker): ReadonlyArray<number> =>
+	const validatorIndexMatrix = (proposalPicker: ProposerSelector): ReadonlyArray<number> =>
 		(proposalPicker as any).validatorIndexMatrix;
 });
