@@ -1017,6 +1017,9 @@ importers:
       '@mainsail/processor':
         specifier: workspace:*
         version: link:../processor
+      '@mainsail/proposer':
+        specifier: workspace:*
+        version: link:../proposer
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
