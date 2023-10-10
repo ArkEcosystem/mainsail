@@ -65,13 +65,14 @@ export class WalletFilter {
 	private static async handleAttributesCriteria(criteria: Record<string, any>): Promise<Expression<Wallet>> {
 		if (criteria.vote) {
 			return {
+				jsonFieldAccessor: {
+					fieldName: "vote",
+					operator: "->>",
+				},
 				op: "equal",
 				property: "attributes",
 				value: criteria.vote,
-				jsonFieldAccessor: {
-					operator: "->>", "fieldName": "vote"
-				}
-			}
+			};
 		}
 
 		// TODO

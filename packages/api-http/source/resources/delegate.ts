@@ -4,11 +4,11 @@ import { injectable } from "@mainsail/container";
 
 @injectable()
 export class DelegateResource implements Contracts.Resource {
-    public raw(resource: Models.Wallet): object {
-        return resource;
-    }
+	public raw(resource: Models.Wallet): object {
+		return resource;
+	}
 
-    public transform(resource: Models.Wallet): object {
-        return resource;
-    }
+	public transform(resource: Models.Wallet): object {
+		return resource;
+	}
 }

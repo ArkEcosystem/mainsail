@@ -87,6 +87,6 @@ export type DelegateCriteria = {
 	//     rewards: Utils.BigNumber;
 	//     total: Utils.BigNumber;
 	// };
-}
+};
 
 export type OrDelegateCriteria = OrCriteria<DelegateCriteria>;

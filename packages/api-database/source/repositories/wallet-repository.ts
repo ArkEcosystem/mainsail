@@ -17,7 +17,6 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): IWalletR
 			return this.listByExpression(walletExpression, sorting, pagination, options);
 		},
 
-
 		async findManyDelegatesByCritera(
 			delegateCriteria: Criteria.OrDelegateCriteria,
 			sorting: Sorting,

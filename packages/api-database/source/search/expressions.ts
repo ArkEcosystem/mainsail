@@ -75,4 +75,4 @@ export type JsonFieldOperator = "->>";
 export type JsonFieldAccessor = {
 	operator: JsonFieldOperator;
 	fieldName: string;
-}
+};

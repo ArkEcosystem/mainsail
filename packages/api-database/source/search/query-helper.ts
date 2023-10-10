@@ -10,7 +10,11 @@ export type SqlExpression = {
 export class QueryHelper<TEntity> {
 	private paramNo = 1;
 
-	public getColumnName(metadata: EntityMetadata, property: keyof TEntity, jsonFieldAccessor?: JsonFieldAccessor): string {
+	public getColumnName(
+		metadata: EntityMetadata,
+		property: keyof TEntity,
+		jsonFieldAccessor?: JsonFieldAccessor,
+	): string {
 		const column = metadata.columns.find((c) => c.propertyName === property);
 		if (!column) {
 			throw new Error(`Can't find ${String(property)} column`);
@@ -94,5 +98,4 @@ export class QueryHelper<TEntity> {
 				throw new Error(`Unexpected expression`);
 		}
 	}
-
 }

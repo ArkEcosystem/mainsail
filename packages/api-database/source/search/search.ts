@@ -119,16 +119,16 @@ export const handleNumericCriteria = async <TEntity, TProperty extends keyof TEn
 > => {
 	if (typeof criteria === "object") {
 		if ("from" in criteria && "to" in criteria) {
-			return { from: criteria.from, op: "between", property, to: criteria.to, jsonFieldAccessor };
+			return { from: criteria.from, jsonFieldAccessor, op: "between", property, to: criteria.to };
 		}
 		if ("from" in criteria) {
-			return { op: "greaterThanEqual", property, value: criteria.from, jsonFieldAccessor };
+			return { jsonFieldAccessor, op: "greaterThanEqual", property, value: criteria.from };
 		}
 		/* istanbul ignore else */
 		if ("to" in criteria) {
-			return { op: "lessThanEqual", property, value: criteria.to, jsonFieldAccessor };
+			return { jsonFieldAccessor, op: "lessThanEqual", property, value: criteria.to };
 		}
 	}
 
-	return { op: "equal", property, value: criteria, jsonFieldAccessor };
+	return { jsonFieldAccessor, op: "equal", property, value: criteria };
 };

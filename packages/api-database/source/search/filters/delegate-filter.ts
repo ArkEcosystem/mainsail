@@ -32,20 +32,20 @@ export class DelegateFilter {
 				case "votes":
 					return handleOrCriteria(criteria.votes, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("attributes", c, { operator: "->>", "fieldName": "validatorVoteBalance" }),
+						handleNumericCriteria("attributes", c, { fieldName: "validatorVoteBalance", operator: "->>" }),
 					);
 				case "rank":
 					return handleOrCriteria(criteria.rank, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("attributes", c, { operator: "->>", "fieldName": "validatorRank" }),
+						handleNumericCriteria("attributes", c, { fieldName: "validatorRank", operator: "->>" }),
 					);
 
 				case "isResigned":
 					return handleOrCriteria(criteria.isResigned, async (c) => ({
+						jsonFieldAccessor: { fieldName: "validatorResigned", operator: "->>" },
 						op: "equal",
 						property: "attributes",
 						value: c,
-						jsonFieldAccessor: { operator: "->>", "fieldName": "validatorResigned" }
 					}));
 
 				default:
@@ -53,5 +53,4 @@ export class DelegateFilter {
 			}
 		});
 	}
-
 }
