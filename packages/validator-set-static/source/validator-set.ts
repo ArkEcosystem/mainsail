@@ -54,6 +54,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 				this.stateService.getWalletRepository().findByUsername(`genesis_${index + 1}`),
 			);
 
+			validator.setRank(index + 1);
+
 			this.#validators.push(validator);
 
 			const walletPublicKey = validator.getWalletPublicKey();

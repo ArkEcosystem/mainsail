@@ -79,7 +79,14 @@ export type IStateRepository = ExtendedRepository<State> & IStateRepositoryExten
 
 export type IWalletRepositoryExtension = {
 	findManyByCritera(
-		transactionCriteria: Criteria.OrWalletCriteria,
+		walletCriteria: Criteria.OrWalletCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Wallet>>;
+
+	findManyDelegatesByCritera(
+		delegateCriteria: Criteria.OrDelegateCriteria,
 		sorting: Sorting,
 		pagination: Pagination,
 		options?: Options,

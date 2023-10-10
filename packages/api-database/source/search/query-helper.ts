@@ -1,6 +1,6 @@
 import { EntityMetadata } from "typeorm";
 
-import { Expression } from "./expressions";
+import { Expression, JsonFieldAccessor } from "./expressions";
 
 export type SqlExpression = {
 	query: string;
@@ -10,11 +10,24 @@ export type SqlExpression = {
 export class QueryHelper<TEntity> {
 	private paramNo = 1;
 
-	public getColumnName(metadata: EntityMetadata, property: keyof TEntity): string {
+	public getColumnName(
+		metadata: EntityMetadata,
+		property: keyof TEntity,
+		jsonFieldAccessor?: JsonFieldAccessor,
+	): string {
 		const column = metadata.columns.find((c) => c.propertyName === property);
 		if (!column) {
 			throw new Error(`Can't find ${String(property)} column`);
 		}
+
+		if (jsonFieldAccessor) {
+			if (column.type !== "jsonb") {
+				throw new Error(`Can't apply json field accessor to ${String(property)} column`);
+			}
+
+			return `${column.databaseName}${jsonFieldAccessor.operator}'${jsonFieldAccessor.fieldName}'`;
+		}
+
 		return column.databaseName;
 	}
 
@@ -27,14 +40,14 @@ export class QueryHelper<TEntity> {
 				return { parameters: {}, query: "FALSE" };
 			}
 			case "equal": {
-				const column = this.getColumnName(metadata, expression.property);
+				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
 			case "between": {
-				const column = this.getColumnName(metadata, expression.property);
+				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameterFrom = `p${this.paramNo++}`;
 				const parameterTo = `p${this.paramNo++}`;
 				const query = `${column} BETWEEN :${parameterFrom} AND :${parameterTo}`;
@@ -42,28 +55,28 @@ export class QueryHelper<TEntity> {
 				return { parameters, query };
 			}
 			case "greaterThanEqual": {
-				const column = this.getColumnName(metadata, expression.property);
+				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column} >= :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
 			case "lessThanEqual": {
-				const column = this.getColumnName(metadata, expression.property);
+				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column} <= :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 				return { parameters, query };
 			}
 			case "like": {
-				const column = this.getColumnName(metadata, expression.property);
+				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column} LIKE :${parameter}`;
 				const parameters = { [parameter]: expression.pattern };
 				return { parameters, query };
 			}
 			case "contains": {
-				const column = this.getColumnName(metadata, expression.property);
+				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column} @> :${parameter}`;
 				const parameters = { [parameter]: expression.value };

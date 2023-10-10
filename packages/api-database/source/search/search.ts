@@ -5,6 +5,7 @@ import {
 	EqualExpression,
 	Expression,
 	GreaterThanEqualExpression,
+	JsonFieldAccessor,
 	LessThanEqualExpression,
 	OrExpression,
 } from "./expressions";
@@ -109,6 +110,7 @@ export const handleOrCriteria = async <TEntity, TCriteria>(
 export const handleNumericCriteria = async <TEntity, TProperty extends keyof TEntity>(
 	property: TProperty,
 	criteria: NumericCriteria<NonNullable<TEntity[TProperty]>>,
+	jsonFieldAccessor?: JsonFieldAccessor,
 ): Promise<
 	| EqualExpression<TEntity>
 	| BetweenExpression<TEntity>
@@ -117,16 +119,16 @@ export const handleNumericCriteria = async <TEntity, TProperty extends keyof TEn
 > => {
 	if (typeof criteria === "object") {
 		if ("from" in criteria && "to" in criteria) {
-			return { from: criteria.from, op: "between", property, to: criteria.to };
+			return { from: criteria.from, jsonFieldAccessor, op: "between", property, to: criteria.to };
 		}
 		if ("from" in criteria) {
-			return { op: "greaterThanEqual", property, value: criteria.from };
+			return { jsonFieldAccessor, op: "greaterThanEqual", property, value: criteria.from };
 		}
 		/* istanbul ignore else */
 		if ("to" in criteria) {
-			return { op: "lessThanEqual", property, value: criteria.to };
+			return { jsonFieldAccessor, op: "lessThanEqual", property, value: criteria.to };
 		}
 	}
 
-	return { op: "equal", property, value: criteria };
+	return { jsonFieldAccessor, op: "equal", property, value: criteria };
 };
