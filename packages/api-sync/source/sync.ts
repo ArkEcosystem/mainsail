@@ -73,6 +73,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 		await this.#queue.start();
 	}
 
+	public async beforeCommit(): Promise<void> {
+		while (this.#queue.size() > 0) {
+			await drainQueue(this.#queue);
+		}
+	}
+
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 
@@ -204,10 +210,6 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 
 	async #queueDeferredSync(deferredSync: DeferredSync): Promise<void> {
-		while (this.#queue.size() > 0) {
-			await drainQueue(this.#queue);
-		}
-
 		void this.#queue.push({
 			handle: async () => {
 				const maxDelay = 30_000;
