@@ -66,7 +66,10 @@ export class Bootstrapper {
 			await this.#storeGenesisBlock();
 
 			await this.#restoreState();
-			await this.#processGenesisBlock();
+
+			if (this.#stateStore.getLastHeight() === 0) {
+				await this.#processGenesisBlock();
+			}
 
 			await this.#initState();
 
@@ -118,14 +121,20 @@ export class Bootstrapper {
 		for (const handler of registeredHandlers.values()) {
 			await handler.bootstrap(this.stateService.getWalletRepository(), genesisBlock.block.transactions);
 		}
+
+		await this.databaseService.saveBlocks([genesisBlock]);
 	}
 
 	async #restoreState(): Promise<void> {
 		const lastBlock = await this.databaseService.getLastBlock();
-		this.stateService.restore(lastBlock?.data?.height ?? 0);
+		await this.stateService.restore(lastBlock?.data?.height ?? 0);
 	}
 
 	async #initState(): Promise<void> {
+		const block = await this.databaseService.getBlockByHeight(this.#stateStore.getLastHeight());
+		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+		this.#stateStore.setLastBlock(block);
+
 		await this.validatorSet.initialize();
 
 		const committedBlockState = this.committedBlockStateFactory(this.#stateStore.getGenesisBlock());
@@ -136,7 +145,10 @@ export class Bootstrapper {
 		const lastBlock = await this.databaseService.getLastBlock();
 		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(lastBlock);
 
-		for await (const committedBlock of this.databaseService.readCommittedBlocksByHeight(1, lastBlock.data.height)) {
+		for await (const committedBlock of this.databaseService.readCommittedBlocksByHeight(
+			this.#stateStore.getLastHeight() + 1,
+			lastBlock.data.height,
+		)) {
 			const committedBlockState = this.committedBlockStateFactory(committedBlock);
 			const result = await this.blockProcessor.process(committedBlockState);
 			if (result === false) {
