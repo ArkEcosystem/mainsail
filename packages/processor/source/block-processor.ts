@@ -20,7 +20,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@inject(Identifiers.Consensus.ProposerPicker)
+	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
 	@inject(Identifiers.EventDispatcherService)

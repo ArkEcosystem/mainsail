@@ -37,7 +37,7 @@ export class Bootstrapper {
 	@inject(Identifiers.StateService)
 	private stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.Consensus.ProposerPicker)
+	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
 	@inject(Identifiers.ValidatorSet)

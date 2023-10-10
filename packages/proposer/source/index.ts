@@ -5,6 +5,6 @@ import { ProposerSelector } from "./proposer-selector";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerSelector).inSingletonScope();
+		this.app.bind(Identifiers.Proposer.Selector).to(ProposerSelector).inSingletonScope();
 	}
 }

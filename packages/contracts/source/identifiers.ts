@@ -29,7 +29,6 @@ export const Identifiers = {
 		PrecommitProcessor: Symbol.for("Consensus<Precommit.Processor>"),
 		PrevoteProcessor: Symbol.for("Consensus<Prevote.Processor>"),
 		ProposalProcessor: Symbol.for("Consensus<Proposal.Processor>"),
-		ProposerPicker: Symbol.for("Consensus<ProposerPicker>"),
 		RoundStateRepository: Symbol.for("Repository<Consensus.RoundState>"),
 		Scheduler: Symbol.for("Scheduler<Consensus>"),
 		Service: Symbol.for("Service<Consensus>"),
@@ -140,6 +139,9 @@ export const Identifiers = {
 	PluginConfiguration: Symbol.for("PluginConfiguration"),
 	ProcessActionsManager: Symbol.for("Manager<ProcessAction>"),
 	ProcessActionsService: Symbol.for("Service<ProcessActions>"),
+	Proposer: {
+		Selector: Symbol.for("Proposer<Selector>"),
+	},
 	QueueFactory: Symbol.for("Factory<Queue>"),
 	QueueManager: Symbol.for("Manager<Queue>"),
 	QueueService: Symbol.for("Service<Queue>"),

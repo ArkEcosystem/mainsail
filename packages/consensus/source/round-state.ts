@@ -16,7 +16,7 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
-	@inject(Identifiers.Consensus.ProposerPicker)
+	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)

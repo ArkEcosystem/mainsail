@@ -15,7 +15,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.IAggregator;
 
-	@inject(Identifiers.Consensus.ProposerPicker)
+	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
 
 	@inject(Identifiers.ValidatorSet)
