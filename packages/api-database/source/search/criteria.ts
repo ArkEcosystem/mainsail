@@ -64,3 +64,29 @@ export type WalletCriteria = {
 };
 
 export type OrWalletCriteria = OrCriteria<WalletCriteria>;
+
+export type DelegateCriteria = {
+	address?: OrEqualCriteria<string>;
+	publicKey?: OrEqualCriteria<string>;
+	balance?: OrNumericCriteria<string>;
+	nonce?: OrNumericCriteria<string>;
+	votes?: OrEqualCriteria<string>;
+	rank?: OrEqualCriteria<number>;
+	isResigned?: OrEqualCriteria<boolean>;
+
+	// TODO: waiting for equivalent wallet attributes
+	// blocks: {
+	//     produced: number;
+	//     last: DelegateResourceLastBlock | undefined;
+	// };
+	// production: {
+	//     approval: number;
+	// };
+	// forged: {
+	//     fees: Utils.BigNumber;
+	//     rewards: Utils.BigNumber;
+	//     total: Utils.BigNumber;
+	// };
+}
+
+export type OrDelegateCriteria = OrCriteria<DelegateCriteria>;
