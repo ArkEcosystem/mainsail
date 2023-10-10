@@ -8,7 +8,6 @@ import { Bootstrapper } from "./bootstrapper";
 import { CommittedBlockState } from "./committed-block-state";
 import { Consensus } from "./consensus";
 import { CommittedBlockProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors";
-import { ProposerPicker } from "./proposer-picker";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
 import { Storage } from "./storage";
@@ -22,7 +21,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.PrevoteProcessor).to(PrevoteProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommittedBlockProcessor).to(CommittedBlockProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
 
 		this.app
