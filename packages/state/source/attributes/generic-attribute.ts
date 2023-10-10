@@ -4,7 +4,9 @@ export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<
 	protected value!: T;
 
 	constructor(value: unknown) {
-		this.set(value);
+		if (value) {
+			this.set(value);
+		}
 	}
 
 	public get(): T {
@@ -22,6 +24,13 @@ export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<
 
 	public toJson(): Contracts.Types.JsonValue {
 		return this.value;
+	}
+
+	public fromJson(value: Contracts.Types.JsonValue): Contracts.State.IAttribute<T> {
+		this.check(value);
+		this.set(value);
+
+		return this;
 	}
 
 	public abstract clone(): Contracts.State.IAttribute<T>;

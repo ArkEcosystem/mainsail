@@ -11,4 +11,17 @@ export class BigNumberAttribute extends GenericAttribute<BigNumber> implements C
 	public check(value: unknown): value is BigNumber {
 		return value instanceof BigNumber;
 	}
+
+	public toJson() {
+		return this.value.toString();
+	}
+
+	public fromJson(value: Contracts.Types.JsonValue): Contracts.State.IAttribute<BigNumber> {
+		if (typeof value !== "string") {
+			throw new TypeError(`Value ${value} is not valid for attribute [${this.constructor.name}].`);
+		}
+
+		this.set(new BigNumber(value));
+		return this;
+	}
 }

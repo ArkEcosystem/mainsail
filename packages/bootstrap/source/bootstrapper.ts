@@ -64,6 +64,8 @@ export class Bootstrapper {
 		try {
 			await this.#setGenesisBlock();
 			await this.#storeGenesisBlock();
+
+			await this.#restoreState();
 			await this.#processGenesisBlock();
 
 			await this.#initState();
@@ -116,6 +118,11 @@ export class Bootstrapper {
 		for (const handler of registeredHandlers.values()) {
 			await handler.bootstrap(this.stateService.getWalletRepository(), genesisBlock.block.transactions);
 		}
+	}
+
+	async #restoreState(): Promise<void> {
+		const lastBlock = await this.databaseService.getLastBlock();
+		this.stateService.restore(lastBlock?.data?.height ?? 0);
 	}
 
 	async #initState(): Promise<void> {

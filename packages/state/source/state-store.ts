@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
-import { factory } from "./attributes";
+import { factory, jsonFactory } from "./attributes";
 
 @injectable()
 export class StateStore implements Contracts.State.StateStore {
@@ -142,6 +142,17 @@ export class StateStore implements Contracts.State.StateStore {
 		}
 
 		return result;
+	}
+
+	public fromJson(data: Contracts.Types.JsonObject): void {
+		this.attributes.clear();
+
+		for (const [key, value] of Object.entries(data)) {
+			Utils.assert.defined<Contracts.Types.JsonValue>(value);
+
+			const attribute = jsonFactory(this.attributeRepository.getAttributeType(key), value);
+			this.attributes.set(key, attribute);
+		}
 	}
 
 	protected getAttributeHolder<T>(key: string): Contracts.State.IAttribute<T> {

@@ -20,6 +20,7 @@ export interface StateStore {
 	setAttribute<T>(key: string, value: T): void;
 
 	toJson(): JsonObject;
+	fromJson(data: JsonObject): void;
 }
 
 export type StateStoreFactory = (originalStateStore?: StateStore) => StateStore;

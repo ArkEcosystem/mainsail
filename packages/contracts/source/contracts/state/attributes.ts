@@ -12,6 +12,7 @@ export interface IAttribute<T> {
 	set(value: T): void;
 	clone(): IAttribute<T>;
 	toJson(): JsonValue;
+	fromJson(value: JsonValue): IAttribute<T>;
 }
 
 export enum AttributeType {
