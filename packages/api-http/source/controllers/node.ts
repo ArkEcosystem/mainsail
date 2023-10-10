@@ -32,7 +32,7 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				blocksCount: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - state.height : 0,
+				blocksCount: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - +state.height : 0,
 				// TODO
 				now: state?.height ?? 0,
 				synced: false,
@@ -47,7 +47,7 @@ export class NodeController extends Controller {
 		return {
 			data: {
 				// TODO
-				blocks: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - state.height : 0,
+				blocks: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - +state.height : 0,
 				height: state?.height ?? 0,
 				id: state?.id ?? 0,
 				syncing: false,
@@ -97,7 +97,7 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				constants: this.getMilestone(state.height, cryptoConfiguration),
+				constants: this.getMilestone(+state.height, cryptoConfiguration),
 				core: {
 					version: configuration.version,
 				},

@@ -5,8 +5,16 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { Types, Utils } from "@mainsail/kernel";
+import { sleep } from "@mainsail/utils";
 import { performance } from "perf_hooks";
+
+interface DeferredSync {
+	block: Models.Block;
+	transactions: Models.Transaction[];
+	validatorRound?: Models.ValidatorRound;
+	wallets: Models.Wallet[];
+}
 
 @injectable()
 export class Sync implements Contracts.ApiSync.ISync {
@@ -52,10 +60,23 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.QueueFactory)
+	private readonly createQueue!: Types.QueueFactory;
+	#queue!: Contracts.Kernel.Queue;
+
 	public async bootstrap(): Promise<void> {
 		await this.#bootstrapConfiguration();
 		await this.#bootstrapState();
 		await this.#bootstrapTransactionTypes();
+
+		this.#queue = await this.createQueue();
+		await this.#queue.start();
+	}
+
+	public async beforeCommit(): Promise<void> {
+		while (this.#queue.size() > 0) {
+			await drainQueue(this.#queue);
+		}
 	}
 
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
@@ -66,16 +87,11 @@ export class Sync implements Contracts.ApiSync.ISync {
 			commit,
 		} = committedBlock;
 
-		const t0 = performance.now();
+		const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
+		const dirtyWallets = [...unit.getWalletRepository().getDirtyWallets()];
 
-		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
-			const blockRepository = this.blockRepositoryFactory(entityManager);
-			const stateRepository = this.stateRepositoryFactory(entityManager);
-			const transactionRepository = this.transactionRepositoryFactory(entityManager);
-			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
-			const walletRepository = this.walletRepositoryFactory(entityManager);
-
-			await blockRepository.save({
+		const deferredSync: DeferredSync = {
+			block: {
 				generatorPublicKey: header.generatorPublicKey,
 				height: header.height.toFixed(),
 				id: header.id,
@@ -89,71 +105,47 @@ export class Sync implements Contracts.ApiSync.ISync {
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				version: header.version,
-			});
+			},
 
-			await stateRepository
-				.createQueryBuilder()
-				.update()
-				.set({
-					height: header.height,
-					supply: () => `supply + ${header.reward}`,
-				})
-				.where("id = :id", { id: 1 })
-				.execute();
+			transactions: transactions.map(({ data }) => ({
+				amount: data.amount.toFixed(),
+				asset: data.asset,
+				blockHeight: header.height.toFixed(),
+				blockId: header.id,
+				fee: data.fee.toFixed(),
+				id: data.id!,
+				nonce: data.nonce.toFixed(),
+				recipientId: data.recipientId,
+				senderPublicKey: data.senderPublicKey,
+				sequence: data.sequence!,
+				signature: data.signature!,
+				timestamp: header.timestamp.toFixed(),
+				type: data.type,
+				typeGroup: data.typeGroup,
+				vendorField: data.vendorField,
+				version: data.version,
+			})),
 
-			await transactionRepository.save(
-				transactions.map(({ data }) => ({
-					amount: data.amount.toFixed(),
-					asset: data.asset,
-					blockHeight: header.height.toFixed(),
-					blockId: header.id,
-					fee: data.fee.toFixed(),
-					id: data.id,
-					nonce: data.nonce.toFixed(),
-					recipientId: data.recipientId,
-					senderPublicKey: data.senderPublicKey,
-					sequence: data.sequence,
-					signature: data.signature,
-					timestamp: header.timestamp.toFixed(),
-					type: data.type,
-					typeGroup: data.typeGroup,
-					vendorField: data.vendorField,
-					version: data.version,
-				})),
-			);
+			wallets: dirtyWallets.map((wallet) => ({
+				address: wallet.getAddress(),
+				attributes: wallet.getAttributes(),
+				balance: wallet.getBalance().toFixed(),
+				nonce: wallet.getNonce().toFixed(),
+				publicKey: wallet.getPublicKey()!,
+			})),
 
-			const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
-			if (Utils.roundCalculator.isNewRound(header.height, this.configuration)) {
-				await validatorRoundRepository
-					.createQueryBuilder()
-					.insert()
-					.orIgnore()
-					.values({
+			...(Utils.roundCalculator.isNewRound(header.height, this.configuration)
+				? {
 						round,
 						roundHeight,
 						validators: this.validatorSet
 							.getActiveValidators()
 							.map((validator) => validator.getWalletPublicKey()),
-					})
-					.execute();
-			}
+				  }
+				: {}),
+		};
 
-			const dirtyWallets = [...unit.getWalletRepository().getDirtyWallets()];
-			await walletRepository.upsert(
-				dirtyWallets.map((wallet) => ({
-					address: wallet.getAddress(),
-					attributes: wallet.getAttributes(),
-					balance: wallet.getBalance().toFixed(),
-					nonce: wallet.getNonce().toFixed(),
-					publicKey: wallet.getPublicKey(),
-				})),
-				["address"],
-			);
-		});
-
-		const t1 = performance.now();
-
-		this.logger.debug(`synced committed block: ${header.height} in ${t1 - t0}ms`);
+		return this.#queueDeferredSync(deferredSync);
 	}
 
 	async #bootstrapConfiguration(): Promise<void> {
@@ -174,7 +166,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 			.insert()
 			.orIgnore()
 			.values({
-				height: 0,
+				height: "0",
 				id: 1,
 				supply: genesisBlock.block.data.totalAmount.toFixed(),
 			})
@@ -216,4 +208,77 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 		await this.transactionTypeRepositoryFactory().upsert(types, ["type", "typeGroup", "version"]);
 	}
+
+	async #queueDeferredSync(deferredSync: DeferredSync): Promise<void> {
+		void this.#queue.push({
+			handle: async () => {
+				const maxDelay = 30_000;
+
+				let success = false;
+				const baseDelay = 500;
+
+				let attempts = 0;
+				do {
+					try {
+						await this.#syncToDatabase(deferredSync);
+						success = true;
+					} catch (error) {
+						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
+						attempts++;
+						this.logger.warning(
+							`sync encountered exception: ${error.message}. retry #${attempts} in ... ${nextAttemptDelay}ms`,
+						);
+						await sleep(nextAttemptDelay);
+					}
+				} while (!success);
+			},
+		});
+	}
+
+	async #syncToDatabase(deferred: DeferredSync): Promise<void> {
+		const t0 = performance.now();
+
+		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
+			const blockRepository = this.blockRepositoryFactory(entityManager);
+			const stateRepository = this.stateRepositoryFactory(entityManager);
+			const transactionRepository = this.transactionRepositoryFactory(entityManager);
+			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
+			const walletRepository = this.walletRepositoryFactory(entityManager);
+
+			await blockRepository.save(deferred.block);
+
+			await stateRepository
+				.createQueryBuilder()
+				.update()
+				.set({
+					height: deferred.block.height,
+					supply: () => `supply + ${deferred.block.reward}`,
+				})
+				.where("id = :id", { id: 1 })
+				// TODO: consider additional check constraint (OLD.height = NEW.height - 1)
+				.andWhere("height = :previousHeight", {
+					previousHeight: Utils.BigNumber.make(deferred.block.height).minus(1).toFixed(),
+				})
+				.execute();
+
+			await transactionRepository.save(deferred.transactions);
+
+			if (deferred.validatorRound) {
+				await validatorRoundRepository
+					.createQueryBuilder()
+					.insert()
+					.orIgnore()
+					.values(deferred.validatorRound)
+					.execute();
+			}
+
+			await walletRepository.upsert(deferred.wallets, ["address"]);
+		});
+
+		const t1 = performance.now();
+
+		this.logger.debug(`synced committed block: ${deferred.block.height} in ${t1 - t0}ms`);
+	}
 }
+
+const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
