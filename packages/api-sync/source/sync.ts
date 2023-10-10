@@ -130,12 +130,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height, this.configuration)
 				? {
-					round,
-					roundHeight,
-					validators: this.validatorSet
-						.getActiveValidators()
-						.map((validator) => validator.getWalletPublicKey()),
-				}
+						round,
+						roundHeight,
+						validators: this.validatorSet
+							.getActiveValidators()
+							.map((validator) => validator.getWalletPublicKey()),
+				  }
 				: {}),
 		};
 
@@ -279,4 +279,4 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 }
 
-const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.on('drain', resolve));
+const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.on("drain", resolve));
