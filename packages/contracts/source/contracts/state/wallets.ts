@@ -60,6 +60,7 @@ export interface Wallet {
 	commitChanges(walletRepository: WalletRepository): void;
 
 	toJson(): JsonObject;
+	fromJson(data: JsonObject): Wallet;
 }
 
 export interface IValidatorWallet {

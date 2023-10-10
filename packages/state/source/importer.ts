@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { createReadStream, readdirSync } from "fs-extra";
 import { join } from "path";
 import readline, { Interface } from "readline";
@@ -56,11 +57,7 @@ export class Importer {
 
 		await this.#readVersion(reader);
 		await this.#readState(reader, stateStore);
-
-		// for await (const line of reader) {
-		// 	// Each line in input.txt will be successively available here as `line`.
-		// 	console.log(`Line from file: ${line}`);
-		// }
+		await this.#readWallets(reader, walletRepository);
 	}
 
 	async #readVersion(reader: Interface): Promise<void> {
@@ -78,5 +75,20 @@ export class Importer {
 		await reader[Symbol.asyncIterator]().next(); // Empty Line
 
 		stateStore.fromJson(JSON.parse(state));
+	}
+
+	async #readWallets(reader: Interface, walletRepository: Contracts.State.WalletRepository): Promise<void> {
+		while (true) {
+			const { value, done } = await reader[Symbol.asyncIterator]().next();
+			if (done || value === "") {
+				break;
+			}
+
+			const data = JSON.parse(value);
+
+			Utils.assert.defined<string>(data.address);
+			const wallet = walletRepository.findByAddress(data.address);
+			wallet.fromJson(data);
+		}
 	}
 }
