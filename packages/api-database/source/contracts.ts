@@ -109,3 +109,7 @@ export type IWalletRepositoryFactory = (customDataSource?: RepositoryDataSource)
 
 export { Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
+
+export interface IMigrations {
+	run(): Promise<void>;
+}

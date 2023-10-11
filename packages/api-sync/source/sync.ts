@@ -27,6 +27,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
+	@inject(ApiDatabaseIdentifiers.Migrations)
+	private readonly migrations!: ApiDatabaseContracts.IMigrations;
+
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
 
@@ -65,6 +68,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 	#queue!: Contracts.Kernel.Queue;
 
 	public async bootstrap(): Promise<void> {
+		await this.migrations.run();
+
 		await this.#bootstrapConfiguration();
 		await this.#bootstrapState();
 		await this.#bootstrapTransactionTypes();
@@ -136,12 +141,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height, this.configuration)
 				? {
-						round,
-						roundHeight,
-						validators: this.validatorSet
-							.getActiveValidators()
-							.map((validator) => validator.getWalletPublicKey()),
-				  }
+					round,
+					roundHeight,
+					validators: this.validatorSet
+						.getActiveValidators()
+						.map((validator) => validator.getWalletPublicKey()),
+				}
 				: {}),
 		};
 

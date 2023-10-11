@@ -28,6 +28,7 @@ import {
 	makeWalletRepository,
 } from "./repositories";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
+import { Migrations } from "./migrations";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -69,21 +70,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 
+			// Note: this only initializes the connection pool, etc. but does not run migrations.
+			// Migrations are handled during bootstrap elsewhere in the main process (see sync.ts)
 			await dataSource.initialize();
 
-			// Temporary workaround to ensure entities are synchronized when running for the first time.
-			const [synchronized] = await dataSource.query(
-				"select exists(select 1 from migrations where name = 'synchronized' limit 1)",
-			);
-			if (!synchronized.exists) {
-				await dataSource.synchronize(true);
-				await dataSource.runMigrations();
-				await dataSource.query(
-					"insert into migrations (timestamp, name) values (extract(epoch from now()), 'synchronized')",
-				);
-			}
-
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
+			this.app.bind(Identifiers.Migrations).to(Migrations).inSingletonScope();
 
 			// Bind factories to allow creating repositories in a transaction context
 
