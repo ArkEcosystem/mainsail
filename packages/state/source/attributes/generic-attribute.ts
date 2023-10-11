@@ -4,7 +4,7 @@ export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<
 	protected value!: T;
 
 	constructor(value: unknown) {
-		if (value) {
+		if (value !== undefined) {
 			this.set(value);
 		}
 	}
