@@ -2673,10 +2673,16 @@ importers:
       fs-extra:
         specifier: 11.1.1
         version: 11.1.1
+      pumpify:
+        specifier: 2.0.1
+        version: 2.0.1
     devDependencies:
       '@types/fs-extra':
         specifier: 11.0.2
         version: 11.0.2
+      '@types/pumpify':
+        specifier: 1.4.2
+        version: 1.4.2
       import-fresh:
         specifier: 3.3.0
         version: 3.3.0
@@ -5631,6 +5637,13 @@ packages:
 
   /@types/pumpify@1.4.1:
     resolution: {integrity: sha512-l7u/Dnh1OG9T7VH6TvulR0g8oE8hgIW5409mSUKi8Vxw2+JV18aTa06Sv5bvNjrD0zbsB/cuZ/iTFQgFNfzIuw==}
+    dependencies:
+      '@types/duplexify': 3.6.1
+      '@types/node': 20.1.0
+    dev: true
+
+  /@types/pumpify@1.4.2:
+    resolution: {integrity: sha512-UBMrvkSFjQNWy0999fubiO8uFIuDJsbap4KnS+xsi2ax40w6mivT2zRPLywPDervsD6EMdvESHF72YMsgHSpXA==}
     dependencies:
       '@types/duplexify': 3.6.1
       '@types/node': 20.1.0

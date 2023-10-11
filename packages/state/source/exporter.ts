@@ -2,7 +2,9 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { copyFile, createWriteStream, ensureDirSync } from "fs-extra";
 import { join } from "path";
+import Pumpify from "pumpify";
 import { Writable } from "stream";
+import { createGzip } from "zlib";
 
 // Exported file format:
 // - fileVersion
@@ -58,7 +60,7 @@ export class Exporter {
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		return new Promise(async (resolve, reject) => {
-			const writeStream = createWriteStream(temporaryPath);
+			const writeStream = new Pumpify(createGzip(), createWriteStream(temporaryPath));
 
 			await this.#exportVersion(writeStream);
 			await this.#exportStateStore(writeStream, stateStore);
