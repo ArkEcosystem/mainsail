@@ -32,7 +32,6 @@
 		"@hapi/hapi": "21.3.2",
 		"@types/benchmark": "^1.0.33",
 		"@types/deepmerge": "^2.2.0",
-		"@types/hapi__hapi": "^20.0.13",
 		"benchmark": "^2.1.4",
 		"bignumber.js": "^9.0.1",
 		"uvu": "^0.5.6"
