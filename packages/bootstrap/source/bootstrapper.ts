@@ -123,6 +123,9 @@ export class Bootstrapper {
 		}
 
 		await this.databaseService.saveBlocks([genesisBlock]);
+
+		const committedBlockState = this.committedBlockStateFactory(this.#stateStore.getGenesisBlock());
+		await this.proposerSelector.onCommit(committedBlockState);
 	}
 
 	async #restoreState(): Promise<void> {
@@ -136,9 +139,6 @@ export class Bootstrapper {
 		this.#stateStore.setLastBlock(block);
 
 		await this.validatorSet.initialize();
-
-		const committedBlockState = this.committedBlockStateFactory(this.#stateStore.getGenesisBlock());
-		await this.proposerSelector.onCommit(committedBlockState);
 	}
 
 	async #processBlocks(): Promise<void> {
