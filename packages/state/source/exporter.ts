@@ -57,7 +57,7 @@ export class Exporter {
 		stateStore: Contracts.State.StateStore,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
-		return new Promise(async (resolve) => {
+		return new Promise(async (resolve, reject) => {
 			const writeStream = createWriteStream(temporaryPath);
 
 			await this.#exportVersion(writeStream);
@@ -71,7 +71,9 @@ export class Exporter {
 				resolve();
 			});
 
-			// TODO: Handle stream errors
+			writeStream.on("error", (error) => {
+				reject(error);
+			});
 		});
 	}
 
