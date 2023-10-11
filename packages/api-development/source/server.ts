@@ -47,7 +47,7 @@ export class Server {
 
 		this.server.ext("onPreResponse", (request, h) => {
 			if ("isBoom" in request.response && request.response.isServer) {
-				this.logger.error(request.response.stack!);
+				this.logger.error(request.response.stack);
 			}
 			return h.continue;
 		});

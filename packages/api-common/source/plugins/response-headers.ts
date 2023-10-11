@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { Contracts } from "@mainsail/contracts";
+
 import { ApiServer } from "../contracts";
 
 export const responseHeaders = {

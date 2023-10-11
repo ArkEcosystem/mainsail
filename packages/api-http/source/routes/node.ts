@@ -1,6 +1,7 @@
-import { Contracts } from "@mainsail/api-common";
 import Hapi from "@hapi/hapi";
+import { Contracts } from "@mainsail/api-common";
 import Joi from "joi";
+
 import { NodeController } from "../controllers/node";
 
 export const register = (server: Contracts.ApiServer): void => {

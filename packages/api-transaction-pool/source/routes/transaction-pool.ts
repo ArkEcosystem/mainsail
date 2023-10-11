@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
+import { Contracts } from "@mainsail/api-common";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { Contracts } from "@mainsail/api-common";
 
 import { TransactionsController } from "../controllers/transaction-pool";
 

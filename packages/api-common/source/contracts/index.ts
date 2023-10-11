@@ -1,5 +1,5 @@
-import { Contracts } from "@mainsail/contracts";
 import Hapi from "@hapi/hapi";
+import { Contracts } from "@mainsail/contracts";
 
 export type ApiServer = Hapi.Server<ServerState>;
 
@@ -9,7 +9,7 @@ export enum ServerType {
 }
 
 export interface ServerState {
-	app: Contracts.Kernel.Application,
+	app: Contracts.Kernel.Application;
 	schemas: any;
 }
 

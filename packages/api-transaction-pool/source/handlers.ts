@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/api-common";
+
 import * as TransactionPool from "./routes/transaction-pool";
 
 export = {

@@ -3,6 +3,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
+
 import { ApiServer, ServerType } from "./contracts";
 
 @injectable()
@@ -46,7 +47,7 @@ export abstract class AbstractServer {
 
 		this.server.ext("onPreResponse", (request, h) => {
 			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
-				this.logger.error(request.response.stack!);
+				this.logger.error(request.response.stack);
 			}
 			return h.continue;
 		});
