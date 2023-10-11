@@ -42,14 +42,14 @@ export class Exporter {
 		const heigh = stateStore.getLastHeight();
 
 		ensureDirSync(this.app.tempPath("state-export"));
-		const temporaryPath = this.app.tempPath(join("state-export", `${heigh}.zip`));
+		const temporaryPath = this.app.tempPath(join("state-export", `${heigh}.gz`));
 
 		this.logger.info(`Exporting state at height ${heigh}`);
 
 		await this.#export(temporaryPath, stateStore, walletRepository);
 
 		ensureDirSync(this.app.dataPath("state-export"));
-		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${heigh}.zip`)));
+		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${heigh}.gz`)));
 
 		this.logger.info(`State export done for height ${heigh}`);
 	}

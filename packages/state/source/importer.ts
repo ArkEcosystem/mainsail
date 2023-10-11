@@ -33,7 +33,7 @@ export class Importer {
 	}
 
 	async #findImportFile(maxHeigh: number): Promise<string | undefined> {
-		const regexPattern = /^\d+\.zip$/;
+		const regexPattern = /^\d+\.gz$/;
 		const heights = readdirSync(this.app.dataPath("state-export"))
 			.filter((item) => regexPattern.test(item))
 			.map((item) => +item.split(".")[0])
@@ -41,7 +41,7 @@ export class Importer {
 			.sort((a, b) => b - a);
 
 		if (heights.length > 0) {
-			return `${heights[0]}.zip`;
+			return `${heights[0]}.gz`;
 		}
 		return undefined;
 	}
