@@ -1,13 +1,13 @@
 {
-	"name": "@mainsail/consensus",
+	"name": "@mainsail/proposer",
 	"version": "0.0.1",
-	"description": "Consensus of the Mainsail Blockchain",
+	"description": "Proposer utils for Mainsail",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
-		"distribution"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
@@ -22,15 +22,11 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.10.7",
-		"delay": "5.0.0",
-		"lmdb": "2.4.2"
+		"seedrandom": "^3.0.5"
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
-		"@types/seedrandom": "^3.0.5",
-		"rewiremock": "3.14.5",
+		"import-fresh": "3.3.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

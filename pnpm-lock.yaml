@@ -838,9 +838,6 @@ importers:
       lmdb:
         specifier: 2.4.2
         version: 2.4.2
-      seedrandom:
-        specifier: ^3.0.5
-        version: 3.0.5
     devDependencies:
       '@mainsail/test-framework':
         specifier: workspace:*
@@ -1020,6 +1017,9 @@ importers:
       '@mainsail/processor':
         specifier: workspace:*
         version: link:../processor
+      '@mainsail/proposer':
+        specifier: workspace:*
+        version: link:../proposer
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
@@ -2695,6 +2695,31 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/proposer:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      seedrandom:
+        specifier: ^3.0.5
+        version: 3.0.5
+    devDependencies:
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
+      import-fresh:
+        specifier: 3.3.0
+        version: 3.3.0
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

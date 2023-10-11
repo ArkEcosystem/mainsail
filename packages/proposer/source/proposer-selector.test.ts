@@ -1,18 +1,18 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { ProposerPicker } from "./proposer-picker";
+import { ProposerSelector } from "./proposer-selector";
 
 type Context = {
 	sandbox: Sandbox;
 	stateStore: any;
 	stateService: any;
 	validatorSet: any;
-	proposerPicker: ProposerPicker;
+	proposerSelector;
 	logger: any;
 };
 
-describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
+describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.stateStore = {
 			getLastBlock: () => {},
@@ -34,7 +34,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
-		context.sandbox.app.bind(Identifiers.Consensus.ProposerPicker).toConstantValue(context.proposerPicker);
+		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 
 		const milestone = {
@@ -49,7 +49,7 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 
-		context.proposerPicker = context.sandbox.app.resolve(ProposerPicker);
+		context.proposerSelector = context.sandbox.app.resolve(ProposerSelector);
 	});
 
 	// Calculated indexes seeded from height 1 for the first 51 validators
@@ -63,42 +63,42 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 		5, 31, 50, 21, 44, 25, 32, 33, 20, 24, 48, 37, 23, 26, 49, 0, 10, 14, 39, 52, 36, 45, 34,
 	];
 
-	it("#validatorIndexMatrix - should return empty matrix", async ({ proposerPicker }) => {
-		assert.equal(validatorIndexMatrix(proposerPicker), []);
+	it("#validatorIndexMatrix - should return empty matrix", async ({ proposerSelector }) => {
+		assert.equal(validatorIndexMatrix(proposerSelector), []);
 	});
 
-	it("#getValidatorIndex - should return validator index for round", async ({ proposerPicker, sandbox }) => {
+	it("#getValidatorIndex - should return validator index for round", async ({ proposerSelector, sandbox }) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		await proposerPicker.onCommit({
+		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
-			assert.equal(proposerPicker.getValidatorIndex(index), expectedIndexesRound1[index]);
+			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}
 
-		assert.equal(proposerPicker.getValidatorIndex(activeValidators), expectedIndexesRound1[0]);
+		assert.equal(proposerSelector.getValidatorIndex(activeValidators), expectedIndexesRound1[0]);
 	});
 
-	it("#getValidatorIndex - should wrap around", async ({ proposerPicker, sandbox }) => {
+	it("#getValidatorIndex - should wrap around", async ({ proposerSelector, sandbox }) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		for (let index = 1; index < activeValidators; index++) {
-			await proposerPicker.onCommit({
+			await proposerSelector.onCommit({
 				getCommittedBlock: async () => ({ block: { header: { height: index } } }),
 			} as Contracts.BlockProcessor.IProcessableUnit);
 
-			assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
+			assert.equal(validatorIndexMatrix(proposerSelector), expectedIndexesRound1);
 		}
 	});
 
 	it("#handleCommittedBlock - builds validator matrix based on round height", async ({
-		proposerPicker,
+		proposerSelector,
 		sandbox,
 		stateStore: state,
 	}) => {
@@ -106,38 +106,41 @@ describe<Context>("ProposerPicker", ({ it, beforeEach, assert, stub }) => {
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		await proposerPicker.onCommit({
+		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 5 } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
 
-		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
+		assert.equal(validatorIndexMatrix(proposerSelector), expectedIndexesRound1);
 
 		const spyOnGetTotalRound = stub(state, "getTotalRound").returnValue(51);
 
-		await proposerPicker.onCommit({
+		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: activeValidators } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
-		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound2);
+		assert.equal(validatorIndexMatrix(proposerSelector), expectedIndexesRound2);
 
 		spyOnGetTotalRound.calledOnce();
 	});
 
-	it("#handleCommittedBlock - should shuffle validator matrix on full round", async ({ proposerPicker, sandbox }) => {
+	it("#handleCommittedBlock - should shuffle validator matrix on full round", async ({
+		proposerSelector,
+		sandbox,
+	}) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
-		await proposerPicker.onCommit({
+		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 1 } } }),
 		} as Contracts.BlockProcessor.IProcessableUnit);
-		assert.equal(validatorIndexMatrix(proposerPicker), expectedIndexesRound1);
+		assert.equal(validatorIndexMatrix(proposerSelector), expectedIndexesRound1);
 
 		// shuffled index wraps around (e.g. prolonged rounds)
 		for (let index = 0; index < 51 * 4; index++) {
-			assert.equal(proposerPicker.getValidatorIndex(index), expectedIndexesRound1[index % activeValidators]);
+			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index % activeValidators]);
 		}
 	});
 
-	const validatorIndexMatrix = (proposalPicker: ProposerPicker): ReadonlyArray<number> =>
+	const validatorIndexMatrix = (proposalPicker: ProposerSelector): ReadonlyArray<number> =>
 		(proposalPicker as any).validatorIndexMatrix;
 });

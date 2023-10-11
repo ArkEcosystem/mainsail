@@ -103,6 +103,9 @@
 			"package": "@mainsail/validator"
 		},
 		{
+			"package": "@mainsail/proposer"
+		},
+		{
 			"package": "@mainsail/consensus"
 		},
 		{

@@ -64,6 +64,7 @@
 		"@mainsail/networking-ntp": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
 		"@mainsail/processor": "workspace:*",
+		"@mainsail/proposer": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/storage-lmdb": "workspace:*",
