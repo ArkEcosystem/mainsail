@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import { WalletsController } from "../controllers/wallets";
 import { pagination } from "../schemas";
 
-export const register = (server: Hapi.Server): void => {
+export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(WalletsController);
 	server.bind(controller);
 

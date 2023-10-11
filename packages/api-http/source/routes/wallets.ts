@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { Schemas } from "@mainsail/api-common";
+import { Contracts, Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 import { WalletsController } from "../controllers/wallets";
@@ -10,7 +10,7 @@ import {
 	walletSortingSchema,
 } from "../schemas";
 
-export const register = (server: Hapi.Server): void => {
+export const register = (server: Contracts.ApiServer): void => {
 	const controller = server.app.app.resolve(WalletsController);
 	server.bind(controller);
 

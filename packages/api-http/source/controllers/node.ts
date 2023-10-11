@@ -27,7 +27,7 @@ export class NodeController extends Controller {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.IPeerRepositoryFactory;
 
-	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async status(request: Hapi.Request) {
 		const state = await this.getState();
 
 		return {
@@ -41,7 +41,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async syncing(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async syncing(request: Hapi.Request) {
 		const state = await this.getState();
 
 		return {
@@ -86,7 +86,7 @@ export class NodeController extends Controller {
 		return { data: groupedByTypeGroup, meta: { days: request.query.days } };
 	}
 
-	public async configuration(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async configuration(request: Hapi.Request) {
 		const configuration = await this.getConfiguration();
 		const state = await this.getState();
 		const plugins = await this.getPlugins();
@@ -123,7 +123,7 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async configurationCrypto() {
+	public async configurationCrypto(request: Hapi.Request) {
 		const configuration = await this.getConfiguration();
 		return {
 			data: configuration?.cryptoConfiguration ?? {},

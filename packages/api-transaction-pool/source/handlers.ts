@@ -1,10 +1,10 @@
-import Hapi from "@hapi/hapi";
+import { Contracts } from "@mainsail/api-common";
 
 import * as TransactionPool from "./routes/transaction-pool";
 
 export = {
 	name: "Transaction Pool API",
-	async register(server: Hapi.Server): Promise<void> {
+	async register(server: Contracts.ApiServer): Promise<void> {
 		const handlers = [TransactionPool];
 
 		for (const handler of handlers) {

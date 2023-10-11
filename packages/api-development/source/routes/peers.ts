@@ -4,7 +4,7 @@ import Joi from "joi";
 import { PeersController } from "../controllers/peers";
 import { orderBy, pagination } from "../schemas";
 
-export const register = (server: Hapi.Server): void => {
+export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(PeersController);
 	server.bind(controller);
 

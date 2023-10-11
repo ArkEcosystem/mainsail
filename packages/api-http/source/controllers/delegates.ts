@@ -81,7 +81,7 @@ export class DelegatesController extends Controller {
 		return this.toPagination(wallets, WalletResource, request.query.transform);
 	}
 
-	public async blocks(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async blocks(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
 		const delegate = await this.getWallet(walletId);

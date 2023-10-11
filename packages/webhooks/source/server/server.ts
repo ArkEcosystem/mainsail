@@ -12,6 +12,9 @@ import { whitelist } from "./plugins/whitelist";
 import { destroy, show, store, update } from "./schema";
 import { respondWithResource } from "./utils";
 
+export type WebhookAppState = { database: Database };
+export type WebhookServer = HapiServer<WebhookAppState>;
+
 @injectable()
 export class Server {
 	@inject(Identifiers.Application)
@@ -23,7 +26,7 @@ export class Server {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#server: HapiServer;
+	#server!: WebhookServer;
 
 	public async register(optionsServer: Contracts.Types.JsonObject): Promise<void> {
 		this.#server = new HapiServer(this.#getServerOptions(optionsServer));
@@ -119,6 +122,7 @@ export class Server {
 
 		this.#server.route({
 			handler: (request) => ({
+				// @ts-ignore TODO: check typings
 				data: request.server.app.database.all().map((webhook) => {
 					webhook = { ...webhook };
 					delete webhook.token;
@@ -159,11 +163,13 @@ export class Server {
 
 		this.#server.route({
 			async handler(request) {
+				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
 				}
 
 				const webhook: Webhook | undefined = Utils.cloneDeep(
+					// @ts-ignore TODO: check typings
 					request.server.app.database.findById(request.params.id),
 				);
 
@@ -185,10 +191,12 @@ export class Server {
 
 		this.#server.route({
 			handler: (request, h) => {
+				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
 				}
 
+				// @ts-ignore TODO: check typings
 				request.server.app.database.update(request.params.id, request.payload as Webhook);
 
 				return h.response().code(204);
@@ -202,10 +210,12 @@ export class Server {
 
 		this.#server.route({
 			handler: (request, h) => {
+				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
 				}
 
+				// @ts-ignore TODO: check typings
 				request.server.app.database.destroy(request.params.id);
 
 				return h.response().code(204);

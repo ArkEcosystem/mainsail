@@ -24,7 +24,7 @@
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "17.9.2"
+		"joi": "17.11.0"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

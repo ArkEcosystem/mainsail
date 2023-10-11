@@ -19,7 +19,7 @@ export class VotesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = {
 			...request.query,
 			type: Contracts.Crypto.TransactionType.Vote,
@@ -42,7 +42,7 @@ export class VotesController extends Controller {
 		return this.toPagination(transactions, TransactionResource, request.query.transform);
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request) {
 		const transaction = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()

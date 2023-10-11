@@ -21,7 +21,7 @@ export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -32,7 +32,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource, request.query.transform);
 	}
 
-	public async top(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async top(request: Hapi.Request) {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -43,7 +43,7 @@ export class WalletsController extends Controller {
 		return this.toPagination(wallets, WalletResource, request.query.transform);
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -51,7 +51,7 @@ export class WalletsController extends Controller {
 		return this.toResource(wallet, WalletResource, request.params.transform);
 	}
 
-	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async transactions(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -62,7 +62,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { address: wallet.address });
 	}
 
-	public async transactionsSent(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async transactionsSent(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -77,7 +77,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { senderPublicKey: wallet.publicKey });
 	}
 
-	public async transactionsReceived(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async transactionsReceived(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);
@@ -88,7 +88,7 @@ export class WalletsController extends Controller {
 		return this.getTransactions(request, { recipientId: wallet.address });
 	}
 
-	public async votes(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async votes(request: Hapi.Request) {
 		const walletId = request.params.id as string;
 
 		const wallet = await this.getWallet(walletId);

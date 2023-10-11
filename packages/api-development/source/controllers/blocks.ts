@@ -11,7 +11,7 @@ export class BlocksController extends Controller {
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.IDatabaseService;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request) {
 		const lastBlock = this.stateService.getStateStore().getLastBlock();
 
 		const pagination = this.getQueryPagination(request.query);
@@ -45,7 +45,7 @@ export class BlocksController extends Controller {
 		}
 	}
 
-	public async first(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async first(request: Hapi.Request) {
 		const block = this.stateService.getStateStore().getGenesisBlock();
 
 		if (request.query.transform) {
@@ -55,7 +55,7 @@ export class BlocksController extends Controller {
 		}
 	}
 
-	public async last(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async last(request: Hapi.Request) {
 		const block = this.stateService.getStateStore().getLastBlock();
 
 		if (request.query.transform) {
@@ -65,7 +65,7 @@ export class BlocksController extends Controller {
 		}
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request) {
 		const block = await this.getBlock(request.params.id);
 
 		if (!block) {
@@ -79,7 +79,7 @@ export class BlocksController extends Controller {
 		}
 	}
 
-	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async transactions(request: Hapi.Request) {
 		const block = await this.getBlock(request.params.id);
 
 		if (!block) {
