@@ -1,3 +1,18 @@
+import { Contracts } from "@mainsail/contracts";
+import Hapi from "@hapi/hapi";
+
+export type ApiServer = Hapi.Server<ServerState>;
+
+export enum ServerType {
+	Http = "HTTP",
+	Https = "HTTPS",
+}
+
+export interface ServerState {
+	app: Contracts.Kernel.Application,
+	schemas: any;
+}
+
 export type Sorting = {
 	property: string;
 	direction: "asc" | "desc";

@@ -6,7 +6,7 @@ import { rateLimit } from "./rate-limit";
 import { responseHeaders } from "./response-headers";
 import { whitelist } from "./whitelist";
 
-export const preparePlugins = (config) => [
+export const preparePlugins: any = (config) => [
 	{
 		options: {
 			trustProxy: config.trustProxy,

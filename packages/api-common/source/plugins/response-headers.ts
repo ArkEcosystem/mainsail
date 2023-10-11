@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { Contracts } from "@mainsail/contracts";
+import { ApiServer } from "../contracts";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
@@ -8,11 +9,10 @@ export const responseHeaders = {
 			ApiDatabaseIdentifiers.BlockRepositoryFactory,
 		);
 
-		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
+		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Hapi.Lifecycle.ReturnValue> => {
 			const blockHeight = await blockRepositoryFactory().getLatestHeight();
 
-			const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
-			responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
+			const responsePropertyToUpdate = "isBoom" in request.response ? request.response.output : request.response;
 			responsePropertyToUpdate.headers["x-block-height"] = blockHeight;
 
 			return h.continue;
@@ -20,7 +20,7 @@ export const responseHeaders = {
 	},
 	name: "response-headers",
 
-	register(server: Hapi.Server): void {
+	register(server: ApiServer): void {
 		server.ext("onPreResponse", this.getOnPreResponseHandler(server.app.app));
 	},
 

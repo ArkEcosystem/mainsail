@@ -3,11 +3,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
-
-export enum ServerType {
-	Http = "HTTP",
-	Https = "HTTPS",
-}
+import { ApiServer, ServerType } from "./contracts";
 
 @injectable()
 export abstract class AbstractServer {
@@ -17,7 +13,7 @@ export abstract class AbstractServer {
 	@inject(Identifiers.LogService)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	private server: HapiServer;
+	private server!: ApiServer;
 
 	protected abstract baseName(): string;
 	private serverType!: ServerType;
@@ -49,8 +45,8 @@ export abstract class AbstractServer {
 		});
 
 		this.server.ext("onPreResponse", (request, h) => {
-			if (request.response.isBoom && request.response.isServer) {
-				this.logger.error(request.response.stack);
+			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
+				this.logger.error(request.response.stack!);
 			}
 			return h.continue;
 		});

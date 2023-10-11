@@ -20,7 +20,7 @@ export class Server {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	private server: HapiServer;
+	private server!: HapiServer<any>;
 
 	private name!: string;
 
@@ -46,8 +46,8 @@ export class Server {
 		});
 
 		this.server.ext("onPreResponse", (request, h) => {
-			if (request.response.isBoom && request.response.isServer) {
-				this.logger.error(request.response.stack);
+			if ("isBoom" in request.response && request.response.isServer) {
+				this.logger.error(request.response.stack!);
 			}
 			return h.continue;
 		});

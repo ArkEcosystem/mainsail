@@ -8,7 +8,7 @@ export const dotSeparatedQuery = {
 		for (const [key, value] of Object.entries(request.query)) {
 			set(query, key, value);
 		}
-		request.query = query;
+		set(request, "query", query);
 		return h.continue;
 	},
 

@@ -3,7 +3,7 @@ import Joi from "joi";
 
 import { RoundsController } from "../controllers/rounds";
 
-export const register = (server: Hapi.Server): void => {
+export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(RoundsController);
 	server.bind(controller);
 

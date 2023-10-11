@@ -4,7 +4,7 @@ import Joi from "joi";
 import { BlocksController } from "../controllers/blocks";
 import { blockId, pagination } from "../schemas";
 
-export const register = (server: Hapi.Server): void => {
+export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(BlocksController);
 	server.bind(controller);
 

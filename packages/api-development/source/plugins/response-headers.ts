@@ -9,8 +9,7 @@ export const responseHeaders = {
 				.getStateStore()
 				.getLastHeight();
 
-			const responsePropertyToUpdate = request.response.isBoom ? request.response.output : request.response;
-			responsePropertyToUpdate.headers = responsePropertyToUpdate.headers ?? {};
+			const responsePropertyToUpdate = "isBoom" in request.response ? request.response.output : request.response;
 			responsePropertyToUpdate.headers["X-Block-Height"] = blockHeight;
 
 			return h.continue;
@@ -18,7 +17,7 @@ export const responseHeaders = {
 	},
 	name: "response-headers",
 
-	register(server: Hapi.Server): void {
+	register(server: Hapi.Server<any>): void {
 		server.ext("onPreResponse", this.getOnPreResponseHandler(server.app.app));
 	},
 
