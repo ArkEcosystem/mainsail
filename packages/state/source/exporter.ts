@@ -60,20 +60,22 @@ export class Exporter {
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		return new Promise(async (resolve, reject) => {
-			const writeStream = new Pumpify(createGzip(), createWriteStream(temporaryPath));
+			const writeStream = createWriteStream(temporaryPath);
+			const exportStream = new Pumpify(createGzip(), writeStream);
 
-			await this.#exportVersion(writeStream);
-			await this.#exportStateStore(writeStream, stateStore);
-			await this.#exportWallets(writeStream, walletRepository);
-			await this.#exportIndexes(writeStream, walletRepository);
+			await this.#exportVersion(exportStream);
+			await this.#exportStateStore(exportStream, stateStore);
+			await this.#exportWallets(exportStream, walletRepository);
+			await this.#exportIndexes(exportStream, walletRepository);
 
-			writeStream.end();
+			exportStream.end();
 
-			writeStream.on("finish", () => {
+			exportStream.once("finish", () => {
 				resolve();
 			});
 
-			writeStream.on("error", (error) => {
+			exportStream.once("error", (error) => {
+				writeStream.destroy();
 				reject(error);
 			});
 		});
