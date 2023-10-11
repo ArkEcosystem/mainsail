@@ -3,6 +3,7 @@ import { DataSource } from "typeorm";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
+import { Migrations } from "./migrations";
 import {
 	Block,
 	Configuration,
@@ -28,7 +29,6 @@ import {
 	makeWalletRepository,
 } from "./repositories";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
-import { Migrations } from "./migrations";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -69,8 +69,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				],
 				migrations: [__dirname + "/migrations/*.js"],
 				migrationsRun: false,
-				synchronize: false,
 				namingStrategy: new SnakeNamingStrategy(),
+				synchronize: false,
 			});
 
 			// Note: this only initializes the connection pool, etc. but does not run migrations.
