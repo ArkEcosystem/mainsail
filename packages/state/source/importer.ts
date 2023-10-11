@@ -3,7 +3,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { createReadStream, readdirSync } from "fs-extra";
 import { join } from "path";
+import Pumpify from "pumpify";
 import readline, { Interface } from "readline";
+import { createGunzip } from "zlib";
 
 @injectable()
 export class Importer {
@@ -49,10 +51,11 @@ export class Importer {
 		stateStore: Contracts.State.StateStore,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
-		const stream = createReadStream(this.app.dataPath(join("state-export", fileName)));
+		const readStream = createReadStream(this.app.dataPath(join("state-export", fileName)));
+		const importStream = new Pumpify(readStream, createGunzip());
 		const reader = readline.createInterface({
 			crlfDelay: Number.POSITIVE_INFINITY,
-			input: stream,
+			input: importStream,
 		});
 
 		await this.#readVersion(reader);
