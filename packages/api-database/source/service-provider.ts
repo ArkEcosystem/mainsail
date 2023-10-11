@@ -67,6 +67,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					ValidatorRound,
 					Wallet,
 				],
+				migrations: [__dirname + "/migrations/*.js"],
+				migrationsRun: false,
+				synchronize: false,
 				namingStrategy: new SnakeNamingStrategy(),
 			});
 
