@@ -1,11 +1,16 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 
 import { Exporter } from "./exporter";
 import { Importer } from "./importer";
 
 @injectable()
 export class Service implements Contracts.State.Service {
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "state")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.StateStoreFactory)
 	private readonly stateStoreFactory!: Contracts.State.StateStoreFactory;
 
@@ -49,12 +54,14 @@ export class Service implements Contracts.State.Service {
 		return this.walletRepositoryCopyOnWriteFactory(this.getWalletRepository());
 	}
 
-	public async onCommit(): Promise<void> {
-		if (this.#baseStateStore.isBootstrap()) {
+	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+		if (this.#baseStateStore.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
 			return;
 		}
 
-		await this.exporter.export(this.#baseStateStore, this.#baseWalletRepository);
+		if (unit.height % this.configuration.getRequired<number>("export.interval") === 0) {
+			await this.exporter.export(this.#baseStateStore, this.#baseWalletRepository);
+		}
 	}
 
 	public async restore(maxHeight: number): Promise<void> {
