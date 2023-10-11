@@ -122,7 +122,7 @@ export class Server {
 
 		this.#server.route({
 			handler: (request) => ({
-				// @ts-ignore
+				// @ts-ignore TODO: check typings
 				data: request.server.app.database.all().map((webhook) => {
 					webhook = { ...webhook };
 					delete webhook.token;
@@ -163,13 +163,13 @@ export class Server {
 
 		this.#server.route({
 			async handler(request) {
-				// @ts-ignore
+				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
 				}
 
 				const webhook: Webhook | undefined = Utils.cloneDeep(
-					// @ts-ignore
+					// @ts-ignore TODO: check typings
 					request.server.app.database.findById(request.params.id),
 				);
 
@@ -191,12 +191,12 @@ export class Server {
 
 		this.#server.route({
 			handler: (request, h) => {
-				// @ts-ignore
+				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
 				}
 
-				// @ts-ignore
+				// @ts-ignore TODO: check typings
 				request.server.app.database.update(request.params.id, request.payload as Webhook);
 
 				return h.response().code(204);
@@ -210,12 +210,12 @@ export class Server {
 
 		this.#server.route({
 			handler: (request, h) => {
-				// @ts-ignore
+				// @ts-ignore TODO: check typings
 				if (!request.server.app.database.hasById(request.params.id)) {
 					return Boom.notFound();
 				}
 
-				// @ts-ignore
+				// @ts-ignore TODO: check typings
 				request.server.app.database.destroy(request.params.id);
 
 				return h.response().code(204);
