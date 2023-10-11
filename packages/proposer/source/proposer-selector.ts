@@ -11,15 +11,10 @@ export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	private validatorIndexMatrix: Array<number> = [];
-
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
-		if (
-			this.validatorIndexMatrix.length === 0 ||
-			Utils.roundCalculator.isNewRound(height + 1, this.configuration)
-		) {
+		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
 			const { activeValidators } = this.configuration.getMilestone();
 			this.#updateValidatorMatrix(activeValidators);
 		}
@@ -29,7 +24,7 @@ export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 		const { activeValidators } = this.configuration.getMilestone();
 
 		const offset = (this.stateService.getStateStore().getTotalRound() + round) % activeValidators;
-		return this.validatorIndexMatrix[offset % activeValidators];
+		return JSON.parse(this.stateService.getStateStore().getAttribute("validatorMatrix"))[offset % activeValidators];
 	}
 
 	#updateValidatorMatrix(activeValidators: number): void {
@@ -44,7 +39,7 @@ export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 			[matrix[index], matrix[index_]] = [matrix[index_], matrix[index]];
 		}
 
-		this.validatorIndexMatrix = matrix;
+		this.stateService.getStateStore().setAttribute<string>("validatorMatrix", JSON.stringify(matrix));
 	}
 
 	#calculateSeed(): string {
