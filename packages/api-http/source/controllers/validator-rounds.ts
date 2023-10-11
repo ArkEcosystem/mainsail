@@ -1,8 +1,10 @@
+import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { ValidatorRoundResource } from "../resources";
+import { RoundResource } from "../resources/round";
 import { Controller } from "./controller";
 
 @injectable()
@@ -10,7 +12,7 @@ export class ValidatorRoundsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
 	private readonly validatorRoundepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);
 
 		const [validatorRounds, totalCount] = await this.validatorRoundepositoryFactory()
@@ -29,6 +31,26 @@ export class ValidatorRoundsController extends Controller {
 			},
 			ValidatorRoundResource,
 			false,
+		);
+	}
+
+	public async delegates(request: Hapi.Request) {
+		const round = await this.validatorRoundepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("round = :round", { round: request.params.id })
+			.getOne();
+
+		if (!round) {
+			return Boom.notFound("Round not found");
+		}
+
+		return this.respondWithCollection(
+			round.validators.map((validator) => ({
+				publicKey: validator,
+				votes: "0",
+			})),
+			RoundResource,
 		);
 	}
 }

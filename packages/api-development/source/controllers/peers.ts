@@ -13,7 +13,7 @@ export class PeersController extends Controller {
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request) {
 		const allPeers: Contracts.P2P.Peer[] = [...this.peerRepository.getPeers()];
 
 		let results = allPeers;
@@ -86,7 +86,7 @@ export class PeersController extends Controller {
 		return super.toPagination(resultsPage, PeerResource);
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request) {
 		if (!this.peerRepository.hasPeer(request.params.ip)) {
 			return Boom.notFound("Peer not found");
 		}

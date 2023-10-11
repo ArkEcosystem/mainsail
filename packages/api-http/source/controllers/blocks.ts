@@ -21,7 +21,7 @@ export class BlocksController extends Controller {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.BlockCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
@@ -32,7 +32,7 @@ export class BlocksController extends Controller {
 		return this.toPagination(blocks, BlockResource, request.query.transform);
 	}
 
-	public async first(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async first(request: Hapi.Request) {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -42,7 +42,7 @@ export class BlocksController extends Controller {
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
-	public async last(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async last(request: Hapi.Request) {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -53,7 +53,7 @@ export class BlocksController extends Controller {
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request) {
 		const blockRepository = this.blockRepositoryFactory();
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 
@@ -62,7 +62,7 @@ export class BlocksController extends Controller {
 		return this.respondWithResource(block, BlockResource, request.query.transform);
 	}
 
-	public async transactions(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async transactions(request: Hapi.Request) {
 		const blockCriteria = this.getBlockCriteriaByIdOrHeight(request.params.id);
 		const block = await this.blockRepositoryFactory().findOneByCriteria(blockCriteria);
 

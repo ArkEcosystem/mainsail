@@ -1,5 +1,5 @@
 import { Wallet } from "../../models";
-import { EqualCriteria, OrWalletCriteria, TransactionCriteria, WalletCriteria } from "../criteria";
+import { EqualCriteria, OrWalletCriteria, WalletCriteria } from "../criteria";
 import { Expression } from "../expressions";
 import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
 
@@ -62,7 +62,19 @@ export class WalletFilter {
 		};
 	}
 
-	private static async handleAttributesCriteria(criteria: TransactionCriteria): Promise<Expression<Wallet>> {
+	private static async handleAttributesCriteria(criteria: Record<string, any>): Promise<Expression<Wallet>> {
+		if (criteria.vote) {
+			return {
+				jsonFieldAccessor: {
+					fieldName: "vote",
+					operator: "->>",
+				},
+				op: "equal",
+				property: "attributes",
+				value: criteria.vote,
+			};
+		}
+
 		// TODO
 		return { op: "false" };
 	}

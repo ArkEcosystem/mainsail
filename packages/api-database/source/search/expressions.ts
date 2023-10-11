@@ -8,12 +8,14 @@ export type FalseExpression = {
 
 export type EqualExpression<TEntity> = {
 	property: keyof TEntity;
+	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "equal";
 	value: any;
 };
 
 export type BetweenExpression<TEntity> = {
 	property: keyof TEntity;
+	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "between";
 	from: any;
 	to: any;
@@ -21,24 +23,28 @@ export type BetweenExpression<TEntity> = {
 
 export type GreaterThanEqualExpression<TEntity> = {
 	property: keyof TEntity;
+	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "greaterThanEqual";
 	value: any;
 };
 
 export type LessThanEqualExpression<TEntity> = {
 	property: keyof TEntity;
+	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "lessThanEqual";
 	value: any;
 };
 
 export type LikeExpression<TEntity> = {
 	property: keyof TEntity;
+	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "like";
 	pattern: any;
 };
 
 export type ContainsExpression<TEntity> = {
 	property: keyof TEntity;
+	jsonFieldAccessor?: JsonFieldAccessor;
 	op: "contains";
 	value: any;
 };
@@ -64,3 +70,9 @@ export type Expression<TEntity> =
 	| ContainsExpression<TEntity>
 	| AndExpression<TEntity>
 	| OrExpression<TEntity>;
+
+export type JsonFieldOperator = "->>";
+export type JsonFieldAccessor = {
+	operator: JsonFieldOperator;
+	fieldName: string;
+};

@@ -18,22 +18,19 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@hapi/boom": "9.0.0",
-		"@hapi/hapi": "20.1.5",
+		"@hapi/boom": "10.0.1",
+		"@hapi/hapi": "21.3.2",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"fs-extra": "8.1.0",
-		"joi": "17.9.2",
+		"joi": "17.11.0",
 		"lowdb": "1.0.0",
 		"uuid": "8.3.2"
 	},
 	"devDependencies": {
 		"@types/fs-extra": "8.1.2",
-		"@types/hapi__boom": "7.4.1",
-		"@types/hapi__hapi": "21.0.0",
-		"@types/hapi__joi": "17.1.7",
 		"@types/tmp": "0.2.1",
 		"@types/uuid": "8.3.1",
 		"import-fresh": "3.3.0",

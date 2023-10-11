@@ -15,8 +15,8 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.IAggregator;
 
-	@inject(Identifiers.Consensus.ProposerPicker)
-	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
+	@inject(Identifiers.Proposer.Selector)
+	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -77,7 +77,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	}
 
 	#hasValidProposer(proposal: Contracts.Crypto.IProposal): boolean {
-		return proposal.validatorIndex === this.proposerPicker.getValidatorIndex(proposal.round);
+		return proposal.validatorIndex === this.proposerSelector.getValidatorIndex(proposal.round);
 	}
 
 	async #hasValidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
@@ -129,7 +129,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			return true;
 		}
 
-		const proposer = this.validatorSet.getValidator(this.proposerPicker.getValidatorIndex(proposal.round));
+		const proposer = this.validatorSet.getValidator(this.proposerSelector.getValidatorIndex(proposal.round));
 		const isValid = proposal.block.block.data.generatorPublicKey === proposer.getWalletPublicKey();
 
 		if (!isValid) {

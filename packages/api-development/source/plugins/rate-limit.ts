@@ -86,7 +86,7 @@ export const rateLimit = {
 				if (request.plugins["rate-limit"]) {
 					const data = request.plugins["rate-limit"] as RateLimitPluginData;
 
-					if (request.response.isBoom) {
+					if ("isBoom" in request.response) {
 						request.response.output.headers["X-RateLimit-Limit"] = String(options.points);
 						request.response.output.headers["X-RateLimit-Remaining"] = String(data.remaining);
 						request.response.output.headers["X-RateLimit-Reset"] = new Date(data.reset).toUTCString();

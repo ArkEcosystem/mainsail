@@ -33,7 +33,7 @@
 		"fs-extra": "8.1.0",
 		"glob": "7.1.7",
 		"got": "11.8.6",
-		"joi": "17.9.2",
+		"joi": "17.11.0",
 		"kleur": "4.0.0",
 		"latest-version": "5.1.0",
 		"listr": "0.14.3",
@@ -41,7 +41,7 @@
 		"ora": "4.1.1",
 		"prompts": "2.4.0",
 		"read-last-lines": "1.8.0",
-		"semver": "6.3.0",
+		"semver": "7.5.4",
 		"tar": "6.1.11",
 		"yargs-parser": "20.2.9"
 	},

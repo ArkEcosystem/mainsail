@@ -6,7 +6,7 @@ import Joi from "joi";
 import { TransactionsController } from "../controllers/transactions";
 import { pagination } from "../schemas";
 
-export const register = (server: Hapi.Server): void => {
+export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(TransactionsController);
 	server.bind(controller);
 
@@ -21,6 +21,7 @@ export const register = (server: Hapi.Server): void => {
 						properties: {
 							transactions: {
 								$ref: "transactions",
+								//@ts-ignore
 								maxItems: server.app.app
 									.getTagged<Providers.PluginConfiguration>(
 										Identifiers.PluginConfiguration,

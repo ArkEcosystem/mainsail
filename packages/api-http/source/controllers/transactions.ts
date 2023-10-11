@@ -23,7 +23,7 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
 
-	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = request.query;
 		const pagination = this.getListingPage(request);
 		const sorting = this.getListingOrder(request);
@@ -41,7 +41,7 @@ export class TransactionsController extends Controller {
 		return this.toPagination(transactions, TransactionResource, request.query.transform);
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request) {
 		const transaction = await this.transactionRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -51,7 +51,7 @@ export class TransactionsController extends Controller {
 		return this.respondWithResource(transaction, TransactionResource, request.query.transform);
 	}
 
-	public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async unconfirmed(request: Hapi.Request) {
 		const pagination = super.getListingPage(request);
 
 		const [transactions, totalCount] = await this.mempoolTransactionlRepositoryFactory()
@@ -73,7 +73,7 @@ export class TransactionsController extends Controller {
 		);
 	}
 
-	public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async showUnconfirmed(request: Hapi.Request) {
 		const transaction = await this.mempoolTransactionlRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -83,7 +83,7 @@ export class TransactionsController extends Controller {
 		return super.respondWithResource(transaction, TransactionResource, request.query.transform);
 	}
 
-	public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async types(request: Hapi.Request) {
 		const rows = await this.transactionTypeRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -104,7 +104,7 @@ export class TransactionsController extends Controller {
 		return { data: typeGroups };
 	}
 
-	public async schemas(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async schemas(request: Hapi.Request) {
 		const rows = await this.transactionTypeRepositoryFactory()
 			.createQueryBuilder()
 			.select()

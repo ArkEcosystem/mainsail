@@ -14,13 +14,9 @@ export const defaults = {
 
 		logging: process.env.CORE_DB_LOGGING_ENABLED || false,
 
-		migrationsRun: process.env.CORE_DB_MIGRATIONS_RUN || true,
-
 		password: process.env.CORE_DB_PASSWORD || "password",
 
 		port: process.env.CORE_DB_PORT || 5432,
-
-		synchronize: process.env.CORE_DB_SYNCHRONIZE || false,
 
 		type: "postgres",
 		username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN,

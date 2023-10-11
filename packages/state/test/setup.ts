@@ -4,7 +4,6 @@ import { Providers, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy, spy } from "sinon";
 
-import { ProposerPicker } from "../../consensus/source/proposer-picker";
 import cryptoJson from "../../core/bin/config/testnet/crypto.json";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../crypto-config";
@@ -22,6 +21,7 @@ import {
 	Utils,
 	Verifier,
 } from "../../crypto-transaction";
+import { ProposerSelector } from "../../proposer/source/proposer-selector";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
@@ -291,7 +291,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	const blockState = sandbox.app.get<BlockState>(Identifiers.BlockState);
 
-	sandbox.app.bind(Identifiers.Consensus.ProposerPicker).to(ProposerPicker);
+	sandbox.app.bind(Identifiers.Proposer.Selector).to(ProposerSelector);
 
 	if (!skipBoot) {
 		try {

@@ -20,8 +20,8 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
-	@inject(Identifiers.Consensus.ProposerPicker)
-	private readonly proposerPicker!: Contracts.Consensus.IProposerPicker;
+	@inject(Identifiers.Proposer.Selector)
+	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -56,6 +56,10 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	}
 
 	public async commit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+		if (this.apiSync) {
+			await this.apiSync.beforeCommit();
+		}
+
 		unit.getWalletRepository().commitChanges();
 
 		const committedBlock = await unit.getCommittedBlock();
@@ -69,7 +73,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		stateStore.setLastBlock(committedBlock.block);
 
 		await this.validatorSet.onCommit(unit);
-		await this.proposerPicker.onCommit(unit);
+		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
 
 		if (this.apiSync) {

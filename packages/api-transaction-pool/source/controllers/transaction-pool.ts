@@ -8,7 +8,8 @@ export class TransactionsController extends AbstractController {
 	@inject(Identifiers.TransactionPoolProcessor)
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
-	public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async store(request: Hapi.Request) {
+		// @ts-ignore
 		const result = await this.processor.process(request.payload.transactions);
 		return {
 			data: {

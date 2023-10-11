@@ -1,4 +1,5 @@
 import Hapi from "@hapi/hapi";
+import { set } from "@mainsail/utils";
 
 export const commaArrayQuery = {
 	name: "comma-array-query",
@@ -10,7 +11,8 @@ export const commaArrayQuery = {
 			query[key] = value.includes(separator) ? value.split(separator) : value;
 		}
 
-		request.query = query;
+		set(request, "query", query);
+
 		return h.continue;
 	},
 

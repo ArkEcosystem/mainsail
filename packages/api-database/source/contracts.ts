@@ -79,7 +79,14 @@ export type IStateRepository = ExtendedRepository<State> & IStateRepositoryExten
 
 export type IWalletRepositoryExtension = {
 	findManyByCritera(
-		transactionCriteria: Criteria.OrWalletCriteria,
+		walletCriteria: Criteria.OrWalletCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Wallet>>;
+
+	findManyDelegatesByCritera(
+		delegateCriteria: Criteria.OrDelegateCriteria,
 		sorting: Sorting,
 		pagination: Pagination,
 		options?: Options,
@@ -102,3 +109,7 @@ export type IWalletRepositoryFactory = (customDataSource?: RepositoryDataSource)
 
 export { Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
+
+export interface IMigrations {
+	run(): Promise<void>;
+}

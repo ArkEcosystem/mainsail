@@ -24,7 +24,8 @@ export class TransactionsController extends Controller {
 	@inject(Identifiers.TransactionPoolProcessor)
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
-	public async store(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async store(request: Hapi.Request) {
+		// @ts-ignore
 		const result = await this.processor.process(request.payload.transactions);
 		return {
 			data: {
@@ -37,7 +38,7 @@ export class TransactionsController extends Controller {
 		};
 	}
 
-	public async show(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async show(request: Hapi.Request) {
 		console.log("ID:", request.params.id);
 
 		const transaction = await this.database.getTransaction(request.params.id);
@@ -61,7 +62,7 @@ export class TransactionsController extends Controller {
 		return this.respondWithResource(transaction.data, TransactionResource, false);
 	}
 
-	public async unconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async unconfirmed(request: Hapi.Request) {
 		const pagination: Pagination = super.getListingPage(request);
 		const all: Contracts.Crypto.ITransaction[] = await this.poolQuery.getFromHighestPriority().all();
 		const transactions: Contracts.Crypto.ITransaction[] = all.slice(
@@ -78,7 +79,7 @@ export class TransactionsController extends Controller {
 		return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
 	}
 
-	public async showUnconfirmed(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async showUnconfirmed(request: Hapi.Request) {
 		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
 			.getFromHighestPriority()
 			.whereId(request.params.id);
@@ -92,7 +93,7 @@ export class TransactionsController extends Controller {
 		return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
 	}
 
-	public async types(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async types(request: Hapi.Request) {
 		const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
 		const typeGroups: Record<string | number, Record<string, number>> = {};
 
@@ -117,7 +118,7 @@ export class TransactionsController extends Controller {
 		return { data: typeGroups };
 	}
 
-	public async schemas(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+	public async schemas(request: Hapi.Request) {
 		const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
 		const schemasByType: Record<string, Record<string, any>> = {};
 
