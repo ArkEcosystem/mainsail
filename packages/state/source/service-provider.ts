@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+import Joi from "joi";
 
 import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
@@ -79,5 +80,17 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
 		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
+	}
+
+	public configSchema(): Joi.AnySchema {
+		return Joi.object({
+			export: Joi.object({
+				enabled: Joi.bool().required(),
+				interval: Joi.number().integer().min(1).required(),
+				retainFiles: Joi.number().integer().min(1).required(),
+			}).required(),
+		})
+			.required()
+			.unknown(true);
 	}
 }

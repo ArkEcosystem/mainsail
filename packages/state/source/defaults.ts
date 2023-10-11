@@ -1,11 +1,9 @@
-import { Constants } from "@mainsail/contracts";
+// TODO: Add ENV variables
 
 export const defaults = {
-	storage: {
-		maxLastBlocks: 100,
-		maxLastTransactionIds: 10_000,
-	},
-	walletSync: {
-		enabled: !!process.env[Constants.Flags.CORE_WALLET_SYNC_ENABLED],
+	export: {
+		enabled: true,
+		interval: 1000, // Blocks
+		retainFiles: 3, // Files
 	},
 };

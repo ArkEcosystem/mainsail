@@ -24,7 +24,8 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"fs-extra": "11.1.1",
-		"pumpify": "2.0.1"
+		"pumpify": "2.0.1",
+		"joi": "17.11.0"
 	},
 	"devDependencies": {
 		"import-fresh": "3.3.0",
