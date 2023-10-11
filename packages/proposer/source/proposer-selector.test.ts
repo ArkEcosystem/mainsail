@@ -1,11 +1,12 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
+import { Attributes, StateStore } from "../../state";
 import { ProposerSelector } from "./proposer-selector";
 
 type Context = {
 	sandbox: Sandbox;
-	stateStore: any;
+	stateStore: Contracts.State.StateStore;
 	stateService: any;
 	validatorSet: any;
 	proposerSelector;
@@ -14,11 +15,6 @@ type Context = {
 
 describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
-		context.stateStore = {
-			getLastBlock: () => {},
-			getTotalRound: () => 0,
-		};
-
 		context.stateService = {
 			getStateStore: () => context.stateStore,
 		};
@@ -31,12 +27,6 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 			info: () => {},
 		};
 
-		context.sandbox = new Sandbox();
-
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
-		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
-
 		const milestone = {
 			activeValidators: 53,
 			height: 0,
@@ -47,7 +37,23 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 			getMilestone: () => milestone,
 		};
 
+		context.sandbox = new Sandbox();
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
+		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
+		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
+		context.sandbox.app.bind(Identifiers.StateAttributes).to(Attributes.AttributeRepository).inSingletonScope();
+		context.sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.set("height", Contracts.State.AttributeType.Number);
+		context.sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.set("totalRound", Contracts.State.AttributeType.Number);
+		context.sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.set("validatorMatrix", Contracts.State.AttributeType.String);
+
+		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 
 		context.proposerSelector = context.sandbox.app.resolve(ProposerSelector);
 	});
@@ -80,7 +86,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 	it("#handleCommittedBlock - builds validator matrix based on round height", async ({
 		proposerSelector,
 		sandbox,
-		stateStore: state,
+		stateStore,
 	}) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
@@ -94,7 +100,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}
 
-		stub(state, "getTotalRound").returnValue(53);
+		stateStore.setTotalRound(53);
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: activeValidators } } }),
