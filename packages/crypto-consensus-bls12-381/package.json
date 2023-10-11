@@ -19,7 +19,6 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@hapi/hapi": "20.1.5",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",

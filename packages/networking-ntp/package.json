@@ -23,7 +23,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "17.9.2"
+		"joi": "17.11.0"
 	},
 	"devDependencies": {
 		"@types/hapi__sntp": "3.1.2",
