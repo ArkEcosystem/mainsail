@@ -2,8 +2,8 @@ import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { Exporter } from "./exporter";
-import { Importer } from "./importer";
+import { Exporter } from "./snapshots/exporter";
+import { Importer } from "./snapshots/importer";
 
 @injectable()
 export class Service implements Contracts.State.Service {

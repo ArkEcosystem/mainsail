@@ -4,11 +4,11 @@ import Joi from "joi";
 
 import { AttributeRepository } from "./attributes";
 import { BlockState } from "./block-state";
-import { Exporter } from "./exporter";
-import { Importer } from "./importer";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { Service } from "./service";
+import { Exporter } from "./snapshots/exporter";
+import { Importer } from "./snapshots/importer";
 import { StateStore } from "./state-store";
 import { StateVerifier } from "./state-verifier";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
