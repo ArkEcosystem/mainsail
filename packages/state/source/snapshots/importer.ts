@@ -82,6 +82,7 @@ export class Importer implements Contracts.State.Importer {
 	}
 
 	async #readWallets(reader: Interface, walletRepository: Contracts.State.WalletRepository): Promise<void> {
+		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			const { value, done } = await reader[Symbol.asyncIterator]().next();
 			if (done || value === "") {
@@ -97,6 +98,7 @@ export class Importer implements Contracts.State.Importer {
 	}
 
 	async #readIndexes(reader: Interface, walletRepository: Contracts.State.WalletRepository): Promise<void> {
+		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			const { value, done } = await reader[Symbol.asyncIterator]().next();
 			if (done || value === "") {
@@ -112,6 +114,7 @@ export class Importer implements Contracts.State.Importer {
 		walletRepository: Contracts.State.WalletRepository,
 		indexName: string,
 	): Promise<void> {
+		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			const { value, done } = await reader[Symbol.asyncIterator]().next();
 			if (done || value === "") {
