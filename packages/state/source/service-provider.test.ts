@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application, Services } from "@mainsail/kernel";
 import importFresh from "import-fresh";
 
-import { describe } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework";
 import { ServiceProvider } from ".";
 
 const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;
@@ -11,7 +11,7 @@ const importDefaults = () => importFresh<any>("../distribution/defaults.js").def
 describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
-}>("ServiceProvider", ({ beforeEach, it, assert, stub }) => {
+}>("ServiceProvider", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
 		const app = new Application(new Container());
 		app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
@@ -30,5 +30,62 @@ describe<{
 		await context.serviceProvider.register();
 
 		await assert.resolves(() => context.serviceProvider.boot());
+	});
+});
+
+describe<{
+	sandbox: Sandbox;
+	serviceProvider: ServiceProvider;
+}>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
+	const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;
+
+	beforeEach((context) => {
+		context.sandbox = new Sandbox();
+		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
+
+		for (const key of Object.keys(process.env)) {
+			if (key.includes("CORE_STATE_")) {
+				delete process.env[key];
+			}
+		}
+	});
+
+	it("should validate schema using defaults", ({ serviceProvider }) => {
+		const defaults = importDefaults();
+
+		const result = serviceProvider.configSchema().validate(defaults);
+		assert.undefined(result.error);
+
+		assert.object(result.value.export);
+		assert.boolean(result.value.export.enabled);
+		assert.number(result.value.export.interval);
+		assert.number(result.value.export.retainFiles);
+	});
+
+	it("should parse process.env.CORE_STATE_EXPORT_DISABLED", async ({ serviceProvider }) => {
+		process.env.CORE_STATE_EXPORT_DISABLED = "true";
+
+		const result = serviceProvider.configSchema().validate(importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.export.enabled, false);
+	});
+
+	it("should parse process.env.CORE_STATE_EXPORT_INTERVAL", async ({ serviceProvider }) => {
+		process.env.CORE_STATE_EXPORT_INTERVAL = "3";
+
+		const result = serviceProvider.configSchema().validate(importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.export.interval, 3);
+	});
+
+	it("should parse process.env.CORE_STATE_EXPORT_INTERVAL", async ({ serviceProvider }) => {
+		process.env.CORE_STATE_EXPORT_RETAIN_FILES = "3";
+
+		const result = serviceProvider.configSchema().validate(importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.export.retainFiles, 3);
 	});
 });
