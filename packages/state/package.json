@@ -24,14 +24,14 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"fs-extra": "11.1.1",
-		"pumpify": "2.0.1",
-		"joi": "17.11.0"
+		"joi": "17.11.0",
+		"pumpify": "2.0.1"
 	},
 	"devDependencies": {
-		"import-fresh": "3.3.0",
-		"uvu": "^0.5.6",
 		"@types/fs-extra": "11.0.2",
-		"@types/pumpify": "1.4.2"
+		"@types/pumpify": "1.4.2",
+		"import-fresh": "3.3.0",
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"
