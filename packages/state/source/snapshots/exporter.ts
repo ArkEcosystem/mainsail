@@ -136,9 +136,9 @@ export class Exporter implements Contracts.State.Exporter {
 			.filter((item) => regexPattern.test(item))
 			.map((item) => +item.split(".")[0])
 			.filter((item) => item !== height)
-			.sort((a, b) => a - b);
+			.sort((a, b) => b - a);
 
-		for (const height of heights.slice(0, this.configuration.getRequired("export.retainFiles"))) {
+		for (const height of heights.slice(this.configuration.getRequired<number>("export.retainFiles") - 1)) {
 			await remove(this.app.dataPath(join("state-export", `${height}.gz`)));
 		}
 	}
