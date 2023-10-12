@@ -20,6 +20,10 @@ export class WalletIndex implements Contracts.State.WalletIndex {
 		return [...this.#walletByKey.values()];
 	}
 
+	public size(): number {
+		return this.#walletByKey.size;
+	}
+
 	public has(key: string): boolean {
 		return this.#walletByKey.has(key);
 	}

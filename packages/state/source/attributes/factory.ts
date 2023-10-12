@@ -6,7 +6,7 @@ import { NumberAttribute } from "./number-attribute";
 import { ObjectAttribute } from "./object-attribute";
 import { StringAttribute } from "./string-attribute";
 
-const factories: Record<Contracts.State.AttributeType, new (value: any) => Contracts.State.IAttribute<any>> = {
+const factories: Record<Contracts.State.AttributeType, new (value?: any) => Contracts.State.IAttribute<any>> = {
 	[Contracts.State.AttributeType.Object]: ObjectAttribute,
 	[Contracts.State.AttributeType.BigNumber]: BigNumberAttribute,
 	[Contracts.State.AttributeType.Boolean]: BooleanAttribute,
@@ -23,4 +23,15 @@ export const factory = <T>(
 	}
 
 	return new factories[attributeType](value) as Contracts.State.IAttribute<T>;
+};
+
+export const jsonFactory = <T>(
+	attributeType: Contracts.State.AttributeType,
+	value: Contracts.Types.JsonValue,
+): Contracts.State.IAttribute<T> => {
+	if (!factories[attributeType]) {
+		throw new Error(`Attribute type [${attributeType}] is not supported.`);
+	}
+
+	return (new factories[attributeType]() as Contracts.State.IAttribute<T>).fromJson(value);
 };

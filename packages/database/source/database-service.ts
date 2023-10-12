@@ -30,6 +30,16 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return undefined;
 	}
 
+	public async getBlockByHeight(height: number): Promise<Contracts.Crypto.IBlock | undefined> {
+		const id = this.blockStorageByHeight.get(height);
+
+		if (id) {
+			return this.getBlock(id);
+		}
+
+		return undefined;
+	}
+
 	public async findCommittedBlocks(start: number, end: number): Promise<Buffer[]> {
 		const heights: number[] = [];
 

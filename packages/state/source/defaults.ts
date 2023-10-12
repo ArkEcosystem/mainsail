@@ -1,11 +1,9 @@
 import { Constants } from "@mainsail/contracts";
 
 export const defaults = {
-	storage: {
-		maxLastBlocks: 100,
-		maxLastTransactionIds: 10_000,
-	},
-	walletSync: {
-		enabled: !!process.env[Constants.Flags.CORE_WALLET_SYNC_ENABLED],
+	export: {
+		enabled: !process.env[Constants.Flags.CORE_STATE_EXPORT_DISABLED],
+		interval: process.env[Constants.Flags.CORE_STATE_EXPORT_INTERVAL] || 1000, // Blocks
+		retainFiles: process.env[Constants.Flags.CORE_STATE_EXPORT_RETAIN_FILES] || 2, // Files
 	},
 };

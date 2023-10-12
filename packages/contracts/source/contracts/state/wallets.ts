@@ -1,4 +1,5 @@
 import { BigNumber } from "@mainsail/utils";
+import { JsonObject } from "type-fest";
 
 import { IBlockData, IMultiSignatureAsset } from "../crypto";
 
@@ -12,6 +13,7 @@ export interface WalletIndex {
 	entries(): ReadonlyArray<[string, Wallet]>;
 	values(): ReadonlyArray<Wallet>;
 	keys(): string[];
+	size(): number;
 	clear(): void;
 }
 
@@ -27,50 +29,38 @@ export interface Wallet {
 	getAddress(): string;
 
 	getPublicKey(): string | undefined;
-
 	setPublicKey(publicKey: string): void;
 
 	getBalance(): BigNumber;
-
 	setBalance(balance: BigNumber): void;
+	increaseBalance(balance: BigNumber): Wallet;
+	decreaseBalance(balance: BigNumber): Wallet;
 
 	getNonce(): BigNumber;
-
 	setNonce(nonce: BigNumber): void;
+	increaseNonce(): void;
+	decreaseNonce(): void;
+
+	hasAttribute(key: string): boolean;
+	getAttribute<T = any>(key: string, defaultValue?: T): T;
+	setAttribute<T = any>(key: string, value: T): boolean;
+	forgetAttribute(key: string): boolean;
+	getAttributes(): Record<string, any>;
 
 	isChanged(): boolean;
 
-	increaseBalance(balance: BigNumber): Wallet;
-
-	decreaseBalance(balance: BigNumber): Wallet;
-
-	increaseNonce(): void;
-
-	decreaseNonce(): void;
-
-	getAttributes(): Record<string, any>;
-
-	getAttribute<T = any>(key: string, defaultValue?: T): T;
-
-	setAttribute<T = any>(key: string, value: T): boolean;
-
-	forgetAttribute(key: string): boolean;
-
-	hasAttribute(key: string): boolean;
-
 	isValidator(): boolean;
-
 	hasVoted(): boolean;
-
 	hasMultiSignature(): boolean;
 
 	clone(walletRepository: WalletRepository): Wallet;
-
 	isClone(): boolean;
-
 	getOriginal(): Wallet;
 
 	commitChanges(walletRepository: WalletRepository): void;
+
+	toJson(): JsonObject;
+	fromJson(data: JsonObject): Wallet;
 }
 
 export interface IValidatorWallet {

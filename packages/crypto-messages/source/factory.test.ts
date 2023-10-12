@@ -21,7 +21,6 @@ import {
 	validatorMnemonic,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { prepareWallet } from "../test/helpers/prepare-wallet";
 import { MessageFactory } from "./factory";
 
 describe<{
@@ -33,12 +32,13 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		const wallet = await prepareWallet(context);
+		const wallet = {};
 		const validatorSet = {
 			getActiveValidators: () => [wallet],
 		};
 
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
+		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);
 		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(

@@ -1,3 +1,5 @@
+import { JsonValue } from "../types";
+
 export interface IAttributeRepository {
 	set(name: string, type: AttributeType): void;
 	has(name: string): boolean;
@@ -9,6 +11,8 @@ export interface IAttribute<T> {
 	get(): T;
 	set(value: T): void;
 	clone(): IAttribute<T>;
+	toJson(): JsonValue;
+	fromJson(value: JsonValue): IAttribute<T>;
 }
 
 export enum AttributeType {

@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { factory } from "../attributes";
+import { factory, jsonFactory } from "../attributes";
 
 export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
@@ -103,14 +103,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public getAttribute<T>(key: string, defaultValue?: T): T {
 		if (this.hasAttribute(key)) {
-			const attribute = this.attributes.get(key);
-
-			if (attribute) {
-				return attribute.get() as T;
-			}
-
-			Utils.assert.defined<Wallet>(this.originalWallet);
-			return this.originalWallet.getAttribute<T>(key);
+			return this.getAttributeHolder<T>(key).get();
 		}
 
 		if (defaultValue) {
@@ -197,6 +190,56 @@ export class Wallet implements Contracts.State.Wallet {
 		} else {
 			this.walletRepository = walletRepository;
 		}
+	}
+
+	public toJson(): Contracts.Types.JsonObject {
+		const result = {
+			address: this.address,
+		};
+
+		for (const name of this.attributeRepository.getAttributeNames()) {
+			if (this.hasAttribute(name)) {
+				result[name] = this.getAttributeHolder(name).toJson();
+			}
+		}
+
+		return result;
+	}
+
+	public fromJson(json: Contracts.Types.JsonObject): Wallet {
+		this.attributes.clear();
+		this.#setAttributes.clear();
+
+		for (const [key, value] of Object.entries(json)) {
+			if (key === "address") {
+				continue;
+			}
+
+			Utils.assert.defined<Contracts.Types.JsonValue>(value);
+			const attribute = jsonFactory(this.attributeRepository.getAttributeType(key), value);
+			this.attributes.set(key, attribute);
+		}
+
+		if (!this.attributes.has("balance")) {
+			throw new Error(`Attribute "balance" is not set for wallet: ${this.address}`);
+		}
+
+		if (!this.attributes.has("nonce")) {
+			throw new Error(`Attribute "nonce" is not set for wallet: ${this.address}`);
+		}
+
+		return this;
+	}
+
+	protected getAttributeHolder<T>(key: string): Contracts.State.IAttribute<T> {
+		const attribute = this.attributes.get(key) as Contracts.State.IAttribute<T>;
+
+		if (attribute) {
+			return attribute;
+		}
+
+		Utils.assert.defined<Wallet>(this.originalWallet);
+		return this.originalWallet?.getAttributeHolder<T>(key);
 	}
 
 	#checkAttributeName(name: string): void {
