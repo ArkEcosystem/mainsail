@@ -1,9 +1,9 @@
-// TODO: Add ENV variables
+import { Constants } from "@mainsail/contracts";
 
 export const defaults = {
 	export: {
-		enabled: true,
-		interval: 1000, // Blocks
-		retainFiles: 3, // Files
+		enabled: !process.env[Constants.Flags.CORE_STATE_EXPORT_DISABLED],
+		interval: process.env[Constants.Flags.CORE_STATE_EXPORT_INTERVAL] || 1000, // Blocks
+		retainFiles: process.env[Constants.Flags.CORE_STATE_EXPORT_RETAIN_FILES] || 5, // Files
 	},
 };
