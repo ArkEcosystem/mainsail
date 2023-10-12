@@ -8,7 +8,7 @@ import readline, { Interface } from "readline";
 import { createGunzip } from "zlib";
 
 @injectable()
-export class Importer {
+export class Importer implements Contracts.State.Importer {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 

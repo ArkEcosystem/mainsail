@@ -2,9 +2,6 @@ import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { Exporter } from "./snapshots/exporter";
-import { Importer } from "./snapshots/importer";
-
 @injectable()
 export class Service implements Contracts.State.Service {
 	@inject(Identifiers.PluginConfiguration)
@@ -24,10 +21,10 @@ export class Service implements Contracts.State.Service {
 	private readonly walletRepositoryCopyOnWriteFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
 	@inject(Identifiers.StateExporter)
-	private readonly exporter!: Exporter;
+	private readonly exporter!: Contracts.State.Exporter;
 
 	@inject(Identifiers.StateImporter)
-	private readonly importer!: Importer;
+	private readonly importer!: Contracts.State.Importer;
 
 	#baseStateStore!: Contracts.State.StateStore;
 	#baseWalletRepository!: Contracts.State.WalletRepository;

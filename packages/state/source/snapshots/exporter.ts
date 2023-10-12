@@ -25,7 +25,7 @@ class Iterator {
 }
 
 @injectable()
-export class Exporter {
+export class Exporter implements Contracts.State.Exporter {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
