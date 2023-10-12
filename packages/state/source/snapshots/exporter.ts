@@ -1,6 +1,7 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { copyFile, createWriteStream, ensureDirSync } from "fs-extra";
+import { Providers } from "@mainsail/kernel";
+import { copyFile, createWriteStream, ensureDirSync, readdirSync, remove } from "fs-extra";
 import { join } from "path";
 import Pumpify from "pumpify";
 import { Writable } from "stream";
@@ -26,6 +27,10 @@ class Iterator {
 
 @injectable()
 export class Exporter implements Contracts.State.Exporter {
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "state")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -50,6 +55,8 @@ export class Exporter implements Contracts.State.Exporter {
 
 		ensureDirSync(this.app.dataPath("state-export"));
 		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${heigh}.gz`)));
+
+		await this.#removeExcessFiles(heigh);
 
 		this.logger.info(`State export done for height ${heigh}`);
 	}
@@ -121,5 +128,18 @@ export class Exporter implements Contracts.State.Exporter {
 			await iterator.next();
 		}
 		stream.write("\n");
+	}
+
+	async #removeExcessFiles(height: number): Promise<void> {
+		const regexPattern = /^\d+\.gz$/;
+		const heights = readdirSync(this.app.dataPath("state-export"))
+			.filter((item) => regexPattern.test(item))
+			.map((item) => +item.split(".")[0])
+			.filter((item) => item !== height)
+			.sort((a, b) => a - b);
+
+		for (const height of heights.slice(0, this.configuration.getRequired("export.retainFiles"))) {
+			await remove(this.app.dataPath(join("state-export", `${height}.gz`)));
+		}
 	}
 }
