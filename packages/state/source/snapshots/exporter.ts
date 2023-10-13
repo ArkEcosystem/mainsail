@@ -44,21 +44,21 @@ export class Exporter implements Contracts.State.Exporter {
 		stateStore: Contracts.State.StateStore,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
-		const heigh = stateStore.getLastHeight();
+		const height = stateStore.getLastHeight();
 
 		ensureDirSync(this.app.tempPath("state-export"));
-		const temporaryPath = this.app.tempPath(join("state-export", `${heigh}.gz`));
+		const temporaryPath = this.app.tempPath(join("state-export", `${height}.gz`));
 
-		this.logger.info(`Exporting state at height ${heigh}`);
+		this.logger.info(`Exporting state at height ${height}`);
 
 		await this.#export(temporaryPath, stateStore, walletRepository);
 
 		ensureDirSync(this.app.dataPath("state-export"));
-		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${heigh}.gz`)));
+		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${height}.gz`)));
 
-		await this.#removeExcessFiles(heigh);
+		await this.#removeExcessFiles(height);
 
-		this.logger.info(`State export done for height ${heigh}`);
+		this.logger.info(`State export done for height ${height}`);
 	}
 
 	async #export(
