@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { createReadStream, readdirSync } from "fs-extra";
+import { createReadStream, ensureDirSync, readdirSync } from "fs-extra";
 import { join } from "path";
 import Pumpify from "pumpify";
 import readline, { Interface } from "readline";
@@ -33,8 +33,11 @@ export class Importer implements Contracts.State.Importer {
 	}
 
 	async #findImportFile(maxHeigh: number): Promise<string | undefined> {
+		const path = this.#getImportPath();
+		ensureDirSync(path);
+
 		const regexPattern = /^\d+\.gz$/;
-		const heights = readdirSync(this.app.dataPath("state-export"))
+		const heights = readdirSync(path)
 			.filter((item) => regexPattern.test(item))
 			.map((item) => +item.split(".")[0])
 			.filter((item) => item <= maxHeigh)
@@ -131,5 +134,9 @@ export class Importer implements Contracts.State.Importer {
 
 			walletRepository.setOnIndex(indexName, key, walletRepository.findByAddress(address));
 		}
+	}
+
+	#getImportPath(): string {
+		return this.app.dataPath("state-export");
 	}
 }
