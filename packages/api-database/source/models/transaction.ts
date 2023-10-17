@@ -1,4 +1,5 @@
 import { Column, Entity } from "typeorm";
+
 import { vendorFieldTransformer } from "../transformers/vendor-field";
 
 @Entity({
@@ -82,8 +83,8 @@ export class Transaction {
 	@Column({
 		default: undefined,
 		nullable: true,
-		type: "bytea",
 		transformer: vendorFieldTransformer,
+		type: "bytea",
 	})
 	public vendorField: string | undefined;
 
