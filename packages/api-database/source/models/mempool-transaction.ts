@@ -1,4 +1,5 @@
 import { Column, Entity } from "typeorm";
+import { vendorFieldTransformer } from "../transformers/vendor-field";
 
 @Entity({
 	name: "mempool_transactions",
@@ -56,6 +57,7 @@ export class MempoolTransaction {
 		default: undefined,
 		nullable: true,
 		type: "bytea",
+		transformer: vendorFieldTransformer,
 	})
 	public vendorField: string | undefined;
 
