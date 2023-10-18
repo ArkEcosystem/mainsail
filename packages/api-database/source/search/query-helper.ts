@@ -26,13 +26,13 @@ export class QueryHelper<TEntity> {
 			}
 
 			// 'validatorBlock.height' => ['validatorBlock', 'height']
-			const pathFields = jsonFieldAccessor.fieldName.split('.');
+			const pathFields = jsonFieldAccessor.fieldName.split(".");
 
 			// ['validatorBlock', 'height'] => ['validatorBlock']
-			const lastField = pathFields.splice(- 1, 1);
+			const lastField = pathFields.splice(-1, 1);
 
 			// ['validatorBlock', 'nested', 'attribute'] => 'validatorBlock'->'nested'->'attribute'
-			const fieldPath = pathFields.map(f => `'${f}'`).join('->');
+			const fieldPath = pathFields.map((f) => `'${f}'`).join("->");
 
 			// 'validatorBlock'->'last' => 'validatorBlock'->'last'->>'height'
 			let fullFieldPath = `${fieldPath}${jsonFieldAccessor.operator}'${lastField}'`;

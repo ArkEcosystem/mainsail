@@ -15,12 +15,12 @@ export class AttributeMutator implements Contracts.State.ValidatorMutator {
 			timestamp: block.timestamp,
 		});
 
-		const totalForgedFees = wallet.getAttribute("validatorForgedFees", Utils.BigNumber.ZERO)
-			.plus(block.totalFee);
+		const totalForgedFees = wallet.getAttribute("validatorForgedFees", Utils.BigNumber.ZERO).plus(block.totalFee);
 
 		wallet.setAttribute("validatorForgedFees", totalForgedFees);
 
-		const totalForgedRewards = wallet.getAttribute("validatorForgedRewards", Utils.BigNumber.ZERO)
+		const totalForgedRewards = wallet
+			.getAttribute("validatorForgedRewards", Utils.BigNumber.ZERO)
 			.plus(block.reward);
 
 		wallet.setAttribute("validatorForgedRewards", totalForgedRewards);

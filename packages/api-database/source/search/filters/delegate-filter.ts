@@ -1,6 +1,13 @@
 import { Search } from "../..";
 import { Wallet } from "../../models";
-import { DelegateBlocks, DelegateCriteria, DelegateForged, DelegateProduction, DelegateResourceLastBlock, OrDelegateCriteria } from "../criteria";
+import {
+	DelegateBlocks,
+	DelegateCriteria,
+	DelegateForged,
+	DelegateProduction,
+	DelegateResourceLastBlock,
+	OrDelegateCriteria,
+} from "../criteria";
 import { Expression, JsonFieldCastType } from "../expressions";
 import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
 
@@ -64,19 +71,19 @@ export class DelegateFilter {
 		});
 	}
 
-	private static async handleForgedCriteria(
-		criteria?: DelegateForged,
-	): Promise<Expression<Wallet>> {
+	private static async handleForgedCriteria(criteria?: DelegateForged): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
 		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string>, fieldName: string) =>
-			expressions.push(handleOrCriteria(criteria, async (c) =>
-				// @ts-ignore
-				handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
-			));
+			expressions.push(
+				handleOrCriteria(criteria, async (c) =>
+					// @ts-ignore
+					handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
+				),
+			);
 
 		for (const item of criteria as DelegateForged[]) {
 			if (item.fees) {
@@ -93,21 +100,21 @@ export class DelegateFilter {
 		}
 
 		return { expressions: await Promise.all(expressions), op: "or" };
-	};
+	}
 
-	private static async handleBlocksCriteria(
-		criteria?: DelegateBlocks,
-	): Promise<Expression<Wallet>> {
+	private static async handleBlocksCriteria(criteria?: DelegateBlocks): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
 		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string | number>, fieldName: string) =>
-			expressions.push(handleOrCriteria(criteria, async (c) =>
-				// @ts-ignore
-				handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
-			));
+			expressions.push(
+				handleOrCriteria(criteria, async (c) =>
+					// @ts-ignore
+					handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
+				),
+			);
 
 		for (const item of criteria as DelegateBlocks[]) {
 			if (item.produced) {
@@ -120,21 +127,25 @@ export class DelegateFilter {
 		}
 
 		return { expressions: await Promise.all(expressions), op: "or" };
-	};
+	}
 
-	private static async handleLastBlockCriteria(
-		criteria?: DelegateResourceLastBlock,
-	): Promise<Expression<Wallet>> {
+	private static async handleLastBlockCriteria(criteria?: DelegateResourceLastBlock): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string | number>, fieldName: string, cast?: JsonFieldCastType) =>
-			expressions.push(handleOrCriteria(criteria, async (c) =>
-				// @ts-ignore
-				handleNumericCriteria("attributes", c, { cast, fieldName, operator: "->>" }),
-			));
+		const addExpression = (
+			criteria: Search.Criteria.OrNumericCriteria<string | number>,
+			fieldName: string,
+			cast?: JsonFieldCastType,
+		) =>
+			expressions.push(
+				handleOrCriteria(criteria, async (c) =>
+					// @ts-ignore
+					handleNumericCriteria("attributes", c, { cast, fieldName, operator: "->>" }),
+				),
+			);
 
 		for (const item of criteria as DelegateResourceLastBlock[]) {
 			if (item.id) {
@@ -147,21 +158,21 @@ export class DelegateFilter {
 		}
 
 		return { expressions: await Promise.all(expressions), op: "or" };
-	};
+	}
 
-	private static async handleProductionCriteria(
-		criteria?: DelegateProduction,
-	): Promise<Expression<Wallet>> {
+	private static async handleProductionCriteria(criteria?: DelegateProduction): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
 		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string | number>, fieldName: string) =>
-			expressions.push(handleOrCriteria(criteria, async (c) =>
-				// @ts-ignore
-				handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
-			));
+			expressions.push(
+				handleOrCriteria(criteria, async (c) =>
+					// @ts-ignore
+					handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
+				),
+			);
 
 		for (const item of criteria as DelegateProduction[]) {
 			if (item.approval) {
@@ -170,5 +181,5 @@ export class DelegateFilter {
 		}
 
 		return { expressions: await Promise.all(expressions), op: "or" };
-	};
+	}
 }
