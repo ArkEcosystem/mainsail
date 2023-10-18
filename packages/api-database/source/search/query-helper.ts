@@ -25,7 +25,31 @@ export class QueryHelper<TEntity> {
 				throw new Error(`Can't apply json field accessor to ${String(property)} column`);
 			}
 
-			return `${column.databaseName}${jsonFieldAccessor.operator}'${jsonFieldAccessor.fieldName}'`;
+			// 'validatorBlock.height' => ['validatorBlock', 'height']
+			const pathFields = jsonFieldAccessor.fieldName.split('.');
+
+			// ['validatorBlock', 'height'] => ['validatorBlock']
+			const lastField = pathFields.splice(pathFields.length - 1, 1);
+
+			// ['validatorBlock', 'nested', 'attribute'] => 'validatorBlock'->'nested'->'attribute'
+			const fieldPath = pathFields.map(f => `'${f}'`).join('->');
+
+			// 'validatorBlock'->'last' => 'validatorBlock'->'last'->>'height'
+			let fullFieldPath = `${fieldPath}${jsonFieldAccessor.operator}'${lastField}'`;
+			if (fieldPath.length > 0) {
+				// 'validatorBlock'->'last'->>'height' => column->'validatorBlock'->'last'->>'height'
+				fullFieldPath = `${column.databaseName}->${fullFieldPath}`;
+			} else {
+				// ->>'height' => column->>'height'
+				fullFieldPath = `${column.databaseName}${fullFieldPath}`;
+			}
+
+			if (jsonFieldAccessor.cast) {
+				// (column->'validatorBlock'->'last'->>'height')::bigint
+				fullFieldPath = `(${fullFieldPath})::${jsonFieldAccessor.cast}`;
+			}
+
+			return fullFieldPath;
 		}
 
 		return column.databaseName;
