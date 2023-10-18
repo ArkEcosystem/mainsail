@@ -65,6 +65,26 @@ export type WalletCriteria = {
 
 export type OrWalletCriteria = OrCriteria<WalletCriteria>;
 
+export type DelegateResourceLastBlock = {
+	id?: OrEqualCriteria<string>;
+	height?: OrNumericCriteria<number>;
+};
+
+export type DelegateForged = {
+	fees?: OrNumericCriteria<string>;
+	rewards?: OrNumericCriteria<string>;
+	total?: OrNumericCriteria<string>;
+};
+
+export type DelegateProduction = {
+	approval?: OrNumericCriteria<number>;
+};
+
+export type DelegateBlocks = {
+	produced?: OrNumericCriteria<number>;
+	last?: DelegateResourceLastBlock;
+};
+
 export type DelegateCriteria = {
 	address?: OrEqualCriteria<string>;
 	publicKey?: OrEqualCriteria<string>;
@@ -74,19 +94,9 @@ export type DelegateCriteria = {
 	rank?: OrEqualCriteria<number>;
 	isResigned?: OrEqualCriteria<boolean>;
 
-	// TODO: waiting for equivalent wallet attributes
-	// blocks: {
-	//     produced: number;
-	//     last: DelegateResourceLastBlock | undefined;
-	// };
-	// production: {
-	//     approval: number;
-	// };
-	// forged: {
-	//     fees: Utils.BigNumber;
-	//     rewards: Utils.BigNumber;
-	//     total: Utils.BigNumber;
-	// };
+	forged?: DelegateForged;
+	production?: DelegateProduction;
+	blocks?: DelegateBlocks;
 };
 
 export type OrDelegateCriteria = OrCriteria<DelegateCriteria>;

@@ -72,7 +72,9 @@ export type Expression<TEntity> =
 	| OrExpression<TEntity>;
 
 export type JsonFieldOperator = "->>";
+export type JsonFieldCastType = "bigint";
 export type JsonFieldAccessor = {
 	operator: JsonFieldOperator;
 	fieldName: string;
+	cast?: JsonFieldCastType;
 };

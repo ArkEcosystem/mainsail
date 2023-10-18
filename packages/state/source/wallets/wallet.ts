@@ -106,7 +106,7 @@ export class Wallet implements Contracts.State.Wallet {
 			return this.getAttributeHolder<T>(key).get();
 		}
 
-		if (defaultValue) {
+		if (defaultValue !== undefined) {
 			return defaultValue;
 		}
 
