@@ -16,7 +16,7 @@ select
     id, version, timestamp, previous_block,
     height, number_of_transactions, total_amount, total_fee,
     reward, payload_length, payload_hash, generator_public_key, block_signature
-from blocks
+from ark_devnet.public.blocks
 order by height asc
 ')
          as blocks(id varchar, version smallint, timestamp integer, previous_block varchar,
@@ -33,7 +33,7 @@ select
     id, version, block_id, sequence, timestamp, sender_public_key,
     recipient_id, type, vendor_field, amount, fee,
     serialized, type_group, nonce, asset, block_height
-from transactions
+from ark_devnet.public.transactions
 order by block_height asc, sequence asc
 ')
          as transactions(id varchar, version smallint, block_id varchar,
@@ -49,13 +49,22 @@ select *
 from dblink('v3_db', '
 select
     public_key, balance, round
-from rounds
+from ark_devnet.public.rounds
 order by round asc, balance desc, public_key
 ')
          as rounds(public_key varchar, balance bigint, round integer);
 
 -- WALLETS
--- TODO
+drop table if exists v3_wallets;
+create temp table v3_wallets as
+select *
+from dblink('v3_db', '
+select
+    address, public_key, balance, nonce, attributes
+from ark_devnet.public.wallets
+order by balance desc, address
+')
+         as wallets(address varchar, public_key varchar, balance bigint, nonce bigint, attributes jsonb);
 
 -- truncate mainsail tables
 truncate table blocks restart identity;
@@ -122,7 +131,19 @@ on conflict (round) do update
         validators   = excluded.validators;
 
 -- migrate wallets
--- TODO
+insert into test_db.public.wallets (address, public_key, balance, nonce, attributes)
+select address,
+       public_key,
+       balance,
+       nonce,
+       attributes  -- TODO: migrate attributes
+from v3_wallets
+order by balance desc, address
+on conflict (address) do update
+    set public_key = excluded.public_key,
+        balance    = excluded.balance,
+        nonce      = excluded.nonce,
+        attributes = excluded.attributes;
 
 --
 select (select count(1) from blocks),
