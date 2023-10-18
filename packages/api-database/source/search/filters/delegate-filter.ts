@@ -133,7 +133,7 @@ export class DelegateFilter {
 		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string | number>, fieldName: string, cast?: JsonFieldCastType) =>
 			expressions.push(handleOrCriteria(criteria, async (c) =>
 				// @ts-ignore
-				handleNumericCriteria("attributes", c, { fieldName, operator: "->>", cast }),
+				handleNumericCriteria("attributes", c, { cast, fieldName, operator: "->>" }),
 			));
 
 		for (const item of criteria as DelegateResourceLastBlock[]) {

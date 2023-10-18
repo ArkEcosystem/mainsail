@@ -29,7 +29,7 @@ export class QueryHelper<TEntity> {
 			const pathFields = jsonFieldAccessor.fieldName.split('.');
 
 			// ['validatorBlock', 'height'] => ['validatorBlock']
-			const lastField = pathFields.splice(pathFields.length - 1, 1);
+			const lastField = pathFields.splice(- 1, 1);
 
 			// ['validatorBlock', 'nested', 'attribute'] => 'validatorBlock'->'nested'->'attribute'
 			const fieldPath = pathFields.map(f => `'${f}'`).join('->');
