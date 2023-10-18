@@ -13,13 +13,14 @@ export class Wallet {
 	public address!: string;
 
 	@Column({
+		default: undefined,
 		nullable: true,
 		type: "varchar",
 		unique: true,
 		// TODO: length depends on public key size...
 		// length: 66,
 	})
-	public publicKey!: string;
+	public publicKey!: string | undefined;
 
 	@Column({
 		nullable: false,

@@ -135,7 +135,10 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.set("validatorForgedTotal", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
-		.set("validatorApproval", Contracts.State.AttributeType.BigNumber);
+		.set("validatorForgedFees", Contracts.State.AttributeType.BigNumber);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorForgedRewards", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
 		.set("vote", Contracts.State.AttributeType.String);
