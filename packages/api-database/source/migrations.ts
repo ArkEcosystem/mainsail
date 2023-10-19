@@ -20,7 +20,10 @@ export class Migrations implements IMigrations {
 		this.logger.info(`running migrations...`);
 
 		await this.#synchronizeEntities();
-		await this.dataSource.runMigrations();
+		const migrations = await this.dataSource.runMigrations();
+		for (const migration of migrations) {
+			this.logger.info(`>>> ${migration.name}`);
+		}
 	}
 
 	async #synchronizeEntities(): Promise<void> {
