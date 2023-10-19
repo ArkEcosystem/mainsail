@@ -12,10 +12,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX transactions_block_id ON transactions(block_id);
 			CREATE INDEX transactions_block_height ON transactions(block_height, sequence);
 
-			CREATE INDEX transactions_asset_payments
-    		ON transactions using gin ((asset -> 'payments'::text));
+            CREATE INDEX transactions_asset ON transactions USING GIN(asset) WITH (fastupdate = off);
+			CREATE INDEX transactions_asset_payments ON transactions using gin ((asset -> 'payments'::text)) WITH (fastupdate = off);
 
-			CREATE INDEX transactions_asset ON transactions USING GIN(asset);
             CREATE INDEX transactions_amount ON transactions(amount);
             CREATE INDEX transactions_fee ON transactions(fee);
             CREATE INDEX transactions_nonce ON transactions(nonce);
@@ -58,9 +57,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_block_id;
 			DROP INDEX transactions_block_height;
 
+			DROP INDEX transactions_asset;
 			DROP INDEX transactions_asset_payments;
 
-			DROP INDEX transactions_asset;
             DROP INDEX transactions_amount;
             DROP INDEX transactions_fee;
             DROP INDEX transactions_nonce;
