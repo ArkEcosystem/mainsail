@@ -9,7 +9,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX transactions_sender ON transactions(sender_public_key);
 
             CREATE INDEX transactions_block_id ON transactions(block_id);
-            CREATE INDEX transactions_block_height ON transactions(block_height, sequence);
+            CREATE INDEX transactions_block_height_sequence ON transactions(block_height, sequence);
 
             CREATE INDEX transactions_asset ON transactions USING GIN(asset) WITH (fastupdate = off);
             CREATE INDEX transactions_asset_payments ON transactions using gin ((asset -> 'payments'::text)) WITH (fastupdate = off);
@@ -29,14 +29,14 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX transactions_vendor_field_sequence ON transactions(vendor_field, sequence);
             CREATE INDEX transactions_version_sequence ON transactions(version, sequence);
 
-            CREATE INDEX transactions_amount_asc_sequence ON transactions(amount ASC, sequence DESC);
-            CREATE INDEX transactions_fee_asc_sequence ON transactions(fee ASC, sequence DESC);
-            CREATE INDEX transactions_nonce_asc_sequence ON transactions(nonce ASC, sequence DESC);
-            CREATE INDEX transactions_timestamp_asc_sequence ON transactions(timestamp ASC, sequence DESC);
-            CREATE INDEX transactions_type_asc_sequence ON transactions(type ASC, sequence DESC);
-            CREATE INDEX transactions_type_group_asc_sequence ON transactions(type_group ASC, sequence DESC);
-            CREATE INDEX transactions_vendor_field_asc_sequence ON transactions(vendor_field ASC, sequence DESC);
-            CREATE INDEX transactions_version_asc_sequence ON transactions(version ASC, sequence DESC);
+            CREATE INDEX transactions_amount_asc_sequence_desc ON transactions(amount ASC, sequence DESC);
+            CREATE INDEX transactions_fee_asc_sequence_desc ON transactions(fee ASC, sequence DESC);
+            CREATE INDEX transactions_nonce_asc_sequence_desc ON transactions(nonce ASC, sequence DESC);
+            CREATE INDEX transactions_timestamp_asc_sequence_desc ON transactions(timestamp ASC, sequence DESC);
+            CREATE INDEX transactions_type_asc_sequence_desc ON transactions(type ASC, sequence DESC);
+            CREATE INDEX transactions_type_group_asc_sequence_desc ON transactions(type_group ASC, sequence DESC);
+            CREATE INDEX transactions_vendor_field_asc_sequence_desc ON transactions(vendor_field ASC, sequence DESC);
+            CREATE INDEX transactions_version_asc_sequence_desc ON transactions(version ASC, sequence DESC);
 
             CREATE INDEX blocks_number_of_transactions ON blocks(number_of_transactions);
             CREATE INDEX blocks_reward ON blocks(reward);
@@ -54,7 +54,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_sender;
 
             DROP INDEX transactions_block_id;
-            DROP INDEX transactions_block_height;
+            DROP INDEX transactions_block_height_sequence;
 
             DROP INDEX transactions_asset;
             DROP INDEX transactions_asset_payments;
@@ -74,14 +74,14 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_vendor_field_sequence;
             DROP INDEX transactions_version_sequence;
 
-            DROP INDEX transactions_amount_asc_sequence;
-            DROP INDEX transactions_fee_asc_sequence;
-            DROP INDEX transactions_nonce_asc_sequence;
-            DROP INDEX transactions_timestamp_asc_sequence;
-            DROP INDEX transactions_type_asc_sequence;
-            DROP INDEX transactions_type_group_asc_sequence;
-            DROP INDEX transactions_vendor_field_asc_sequence;
-            DROP INDEX transactions_version_asc_sequence;
+            DROP INDEX transactions_amount_asc_sequence_desc;
+            DROP INDEX transactions_fee_asc_sequence_desc;
+            DROP INDEX transactions_nonce_asc_sequence_desc;
+            DROP INDEX transactions_timestamp_asc_sequence_desc;
+            DROP INDEX transactions_type_asc_sequence_desc;
+            DROP INDEX transactions_type_group_asc_sequence_desc;
+            DROP INDEX transactions_vendor_field_asc_sequence_desc;
+            DROP INDEX transactions_version_asc_sequence_desc;
 
             DROP INDEX blocks_number_of_transactions;
             DROP INDEX blocks_reward;
