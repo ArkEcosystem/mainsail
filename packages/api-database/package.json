@@ -13,11 +13,11 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"typeorm": "typeorm",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "uvu -r tsm source",
+		"typeorm": "typeorm"
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
