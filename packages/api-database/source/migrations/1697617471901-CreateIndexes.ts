@@ -5,15 +5,15 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         // language=postgresql
         await queryRunner.query(`
-			CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
+            CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
             CREATE INDEX transactions_recipient_id ON transactions(recipient_id);
             CREATE INDEX transactions_sender ON transactions(sender_public_key);
 
             CREATE INDEX transactions_block_id ON transactions(block_id);
-			CREATE INDEX transactions_block_height ON transactions(block_height, sequence);
+            CREATE INDEX transactions_block_height ON transactions(block_height, sequence);
 
             CREATE INDEX transactions_asset ON transactions USING GIN(asset) WITH (fastupdate = off);
-			CREATE INDEX transactions_asset_payments ON transactions using gin ((asset -> 'payments'::text)) WITH (fastupdate = off);
+            CREATE INDEX transactions_asset_payments ON transactions using gin ((asset -> 'payments'::text)) WITH (fastupdate = off);
 
             CREATE INDEX transactions_amount ON transactions(amount);
             CREATE INDEX transactions_fee ON transactions(fee);
@@ -50,15 +50,15 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
         // language=postgresql
         await queryRunner.query(`
-			DROP INDEX transactions_sender_nonce;
+            DROP INDEX transactions_sender_nonce;
             DROP INDEX transactions_recipient_id;
             DROP INDEX transactions_sender;
 
             DROP INDEX transactions_block_id;
-			DROP INDEX transactions_block_height;
+            DROP INDEX transactions_block_height;
 
-			DROP INDEX transactions_asset;
-			DROP INDEX transactions_asset_payments;
+            DROP INDEX transactions_asset;
+            DROP INDEX transactions_asset_payments;
 
             DROP INDEX transactions_amount;
             DROP INDEX transactions_fee;
