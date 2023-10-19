@@ -8,7 +8,7 @@
 		"blockHeight": "60",
 		"sequence": 0,
 		"timestamp": "1696396878929",
-		"nonce": "1",
+		"nonce": "10",
 		"senderPublicKey": "ac9a09dd85af1203cb5054d3f258e469ff831bf0ff1ee2cd90d6a46e52d11bae",
 		"recipientId": null,
 		"vendorField": null,
