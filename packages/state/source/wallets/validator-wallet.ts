@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 export class ValidatorWallet implements Contracts.State.IValidatorWallet {
-	constructor(private readonly wallet: Contracts.State.Wallet) {}
+	constructor(private readonly wallet: Contracts.State.Wallet) { }
 
 	public get getWallet(): Contracts.State.Wallet {
 		return this.wallet;
@@ -36,6 +36,18 @@ export class ValidatorWallet implements Contracts.State.IValidatorWallet {
 
 	public unsetRank(): void {
 		this.wallet.forgetAttribute("validatorRank");
+	}
+
+	public getApproval(): number {
+		return this.wallet.getAttribute<number>("validatorApproval");
+	}
+
+	public setApproval(approval: number): void {
+		this.wallet.setAttribute("validatorApproval", approval);
+	}
+
+	public unsetApproval(): void {
+		this.wallet.forgetAttribute("validatorApproval");
 	}
 
 	public isResigned(): boolean {

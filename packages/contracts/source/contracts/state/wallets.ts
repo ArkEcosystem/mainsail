@@ -71,6 +71,9 @@ export interface IValidatorWallet {
 	getRank(): number;
 	setRank(rank: number): void;
 	unsetRank(): void;
+	getApproval(): number;
+	setApproval(approval: number): void;
+	unsetApproval(): void;
 	isResigned(): boolean;
 }
 
