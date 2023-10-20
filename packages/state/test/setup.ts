@@ -141,6 +141,9 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.set("validatorForgedRewards", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.set("validatorApproval", Contracts.State.AttributeType.Number);
+	sandbox.app
+		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
 		.set("vote", Contracts.State.AttributeType.String);
 	sandbox.app
 		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)

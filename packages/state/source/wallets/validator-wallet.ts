@@ -38,6 +38,18 @@ export class ValidatorWallet implements Contracts.State.IValidatorWallet {
 		this.wallet.forgetAttribute("validatorRank");
 	}
 
+	public getApproval(): number {
+		return this.wallet.getAttribute<number>("validatorApproval");
+	}
+
+	public setApproval(approval: number): void {
+		this.wallet.setAttribute("validatorApproval", approval);
+	}
+
+	public unsetApproval(): void {
+		this.wallet.forgetAttribute("validatorApproval");
+	}
+
 	public isResigned(): boolean {
 		return this.wallet.hasAttribute("validatorResigned");
 	}

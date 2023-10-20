@@ -79,6 +79,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 			const validator = this.validatorWalletFactory(wallet);
 			if (validator.isResigned()) {
 				validator.unsetRank();
+				validator.unsetApproval();
 			} else {
 				this.#validators.push(validator);
 			}
@@ -108,10 +109,16 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 			return diff;
 		});
 
-		for (let index = 0; index < this.#validators.length; index++) {
-			this.#validators[index].setRank(index + 1);
+		const lastBlock = this.stateService.getStateStore().getLastBlock();
+		const totalSupply = Utils.supplyCalculator.calculateSupply(lastBlock.header.height, this.cryptoConfiguration);
 
-			const walletPublicKey = this.#validators[index].getWalletPublicKey();
+		for (let index = 0; index < this.#validators.length; index++) {
+			const validator = this.#validators[index];
+
+			validator.setRank(index + 1);
+			validator.setApproval(Utils.validatorCalculator.calculateApproval(validator.getVoteBalance(), totalSupply));
+
+			const walletPublicKey = validator.getWalletPublicKey();
 			Utils.assert.defined<string>(walletPublicKey);
 			this.#indexByPublicKey.set(walletPublicKey, index);
 		}

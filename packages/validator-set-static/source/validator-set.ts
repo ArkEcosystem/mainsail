@@ -49,12 +49,17 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#validators = [];
 		this.#indexByWalletPublicKey = new Map();
 
-		for (let index = 0; index < this.cryptoConfiguration.getMilestone().activeValidators; index++) {
+		const { activeValidators } = this.cryptoConfiguration.getMilestone();
+
+		for (let index = 0; index < activeValidators; index++) {
 			const validator = this.validatorWalletFactory(
 				this.stateService.getWalletRepository().findByUsername(`genesis_${index + 1}`),
 			);
 
 			validator.setRank(index + 1);
+
+			// All static validators have equal approval
+			validator.setApproval(100 / activeValidators);
 
 			this.#validators.push(validator);
 
