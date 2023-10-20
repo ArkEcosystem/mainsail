@@ -1,6 +1,6 @@
+import { calculateApproval } from "./calculate-forging-info";
 import { calculateRound, isNewRound } from "./round-calculator";
 import { calculateSupply } from "./supply-calculator";
-import { calculateApproval } from "./calculate-forging-info";
 export * from "./assert";
 export * as IpAddress from "./ip-address";
 export * from "./lock";

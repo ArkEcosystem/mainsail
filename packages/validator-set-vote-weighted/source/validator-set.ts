@@ -99,7 +99,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 					const username = a.getUsername();
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-						`Validator "${username}" appears twice in the list.`,
+							`Validator "${username}" appears twice in the list.`,
 					);
 				}
 
@@ -116,9 +116,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 			const validator = this.#validators[index];
 
 			validator.setRank(index + 1);
-			validator.setApproval(
-				Utils.validatorCalculator.calculateApproval(validator.getVoteBalance(), totalSupply)
-			);
+			validator.setApproval(Utils.validatorCalculator.calculateApproval(validator.getVoteBalance(), totalSupply));
 
 			const walletPublicKey = validator.getWalletPublicKey();
 			Utils.assert.defined<string>(walletPublicKey);

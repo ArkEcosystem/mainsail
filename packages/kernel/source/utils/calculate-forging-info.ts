@@ -28,9 +28,8 @@ export const getMilestonesWhichAffectActiveValidatorCount = (
 	return milestones;
 };
 
-
 const toDecimal = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
-	const decimals: number = 2;
+	const decimals = 2;
 	const exponent: number = totalSupply.toString().length - voteBalance.toString().length + 4;
 
 	// @ts-ignore
@@ -39,6 +38,5 @@ const toDecimal = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
 	return +Number(div).toFixed(2);
 };
 
-export const calculateApproval = (voteBalance: BigNumber, totalSupply: BigNumber): number => {
-	return toDecimal(voteBalance, totalSupply);
-};
+export const calculateApproval = (voteBalance: BigNumber, totalSupply: BigNumber): number =>
+	toDecimal(voteBalance, totalSupply);

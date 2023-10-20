@@ -39,7 +39,6 @@ describe<{
 	});
 });
 
-
 describe<{
 	sandbox: Sandbox;
 	configuration: Configuration;
@@ -50,18 +49,18 @@ describe<{
 	it("should calculate correctly", () => {
 		const voteBalance = toBalance(10000);
 		const approval = calculateApproval(voteBalance, totalSupply);
-		assert.equal(approval, 1.0)
+		assert.equal(approval, 1.0);
 	});
 
 	it("should calculate correctly with 2 decimals", () => {
 		const voteBalance = toBalance(16500);
 		const approval = calculateApproval(voteBalance, totalSupply);
-		assert.equal(approval, 1.65)
+		assert.equal(approval, 1.65);
 	});
 
 	it("should calculate correctly when vote balance is 0", () => {
 		const voteBalance = toBalance(0);
 		const approval = calculateApproval(voteBalance, totalSupply);
-		assert.equal(approval, 0)
+		assert.equal(approval, 0);
 	});
 });

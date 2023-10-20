@@ -42,8 +42,8 @@ describe<{
 		};
 
 		context.stateStore = {
-			getLastBlock: () => ({ header: { height: BigNumber.ZERO } })
-		}
+			getLastBlock: () => ({ header: { height: BigNumber.ZERO } }),
+		};
 
 		context.sandbox = new Sandbox();
 
