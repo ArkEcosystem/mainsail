@@ -3,7 +3,8 @@ import { Identifiers } from "@mainsail/contracts";
 import crypto from "../../../core/bin/config/testnet/crypto.json";
 import { Configuration } from "../../../crypto-config";
 import { describe, Sandbox } from "../../../test-framework";
-import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
+import { calculateApproval, getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
+import { BigNumber } from "@mainsail/utils";
 
 describe<{
 	sandbox: Sandbox;
@@ -35,5 +36,32 @@ describe<{
 		configuration.setConfig({ ...crypto, milestones: milestones });
 
 		assert.length(getMilestonesWhichAffectActiveValidatorCount(configuration), 2);
+	});
+});
+
+
+describe<{
+	sandbox: Sandbox;
+	configuration: Configuration;
+}>("calculateApproval", ({ assert, it }) => {
+	const toBalance = (n: number) => BigNumber.SATOSHI.times(n);
+	const totalSupply = BigNumber.make(toBalance(1000000));
+
+	it("should calculate correctly", () => {
+		const voteBalance = toBalance(10000);
+		const approval = calculateApproval(voteBalance, totalSupply);
+		assert.equal(approval, 1.0)
+	});
+
+	it("should calculate correctly with 2 decimals", () => {
+		const voteBalance = toBalance(16500);
+		const approval = calculateApproval(voteBalance, totalSupply);
+		assert.equal(approval, 1.65)
+	});
+
+	it("should calculate correctly when vote balance is 0", () => {
+		const voteBalance = toBalance(0);
+		const approval = calculateApproval(voteBalance, totalSupply);
+		assert.equal(approval, 0)
 	});
 });
