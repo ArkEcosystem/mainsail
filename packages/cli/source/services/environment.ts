@@ -1,4 +1,5 @@
 import { injectable } from "@mainsail/container";
+import { Constants } from "@mainsail/contracts";
 import { parseFileSync, stringifySync } from "envfile";
 import { existsSync, writeFileSync } from "fs-extra";
 import path from "path";
@@ -14,17 +15,17 @@ export class Environment {
 			paths[key] = `${value}/${network}/${name}`;
 		}
 
-		if (process.env["CORE_PATH_CONFIG"]) {
+		if (process.env[Constants.Flags.CORE_PATH_CONFIG]) {
 			paths = {
 				...paths,
-				config: path.resolve(process.env["CORE_PATH_CONFIG"]!, name),
+				config: path.resolve(process.env[Constants.Flags.CORE_PATH_CONFIG]!, name),
 			};
 		}
 
-		if (process.env["CORE_PATH_DATA"]) {
+		if (process.env[Constants.Flags.CORE_PATH_DATA]) {
 			paths = {
 				...paths,
-				data: path.resolve(process.env["CORE_PATH_DATA"]!, name),
+				data: path.resolve(process.env[Constants.Flags.CORE_PATH_DATA]!, name),
 			};
 		}
 
