@@ -31,21 +31,21 @@ describe<{
 			config: configPath,
 		});
 
-		ensureDirSync(join(configPath, "testnet"));
+		ensureDirSync(join(configPath, "testnet", "mainsail"));
 
-		await writeJSON(join(configPath, "testnet", "config.json"), config);
+		await writeJSON(join(configPath, "testnet", "mainsail", "config.json"), config);
 
 		assert.equal(await cmd.discover("token", "testnet"), config);
 	});
 
 	it("should return configuration if found on CORE_PATH_CONFIG location", async ({ cmd }) => {
-		process.env.CORE_PATH_CONFIG = join(configPath, "testnet");
+		process.env.CORE_PATH_CONFIG = join(configPath, "testnet", "custom");
 
-		ensureDirSync(join(configPath, "testnet"));
+		ensureDirSync(join(configPath, "testnet", "custom", "mainsail"));
 
-		await writeJSON(join(configPath, "testnet", "config.json"), config);
+		await writeJSON(join(configPath, "testnet", "custom", "mainsail", "config.json"), config);
 
-		assert.equal(await cmd.discover(), config);
+		assert.equal(await cmd.discover("", ""), config);
 
 		delete process.env.CORE_PATH_CONFIG;
 	});

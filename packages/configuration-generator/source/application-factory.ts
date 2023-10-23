@@ -36,9 +36,10 @@ import {
 import { Identifiers as InternalIdentifiers } from "./identifiers";
 
 export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
-	options = { address: "bech32m", bech32mPrefix: "ark", ...options };
+	options = { address: "bech32m", bech32mPrefix: "ark", name: "mainsail", ...options };
 
 	const app = new Application(new Container());
+	app.bind(Identifiers.ApplicationName).toConstantValue(options.name);
 
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();

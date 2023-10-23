@@ -21,7 +21,11 @@ export class RegisterBasePaths implements Bootstrapper {
 		const paths: Array<[string, string]> = Object.entries(envPaths(this.app.token(), { suffix: "core" }));
 
 		for (let [type, path] of paths) {
-			const processPath: string | undefined = process.env[`CORE_PATH_${type.toUpperCase()}`];
+			const environmentName = `CORE_PATH_${type.toUpperCase()}_${this.app
+				.name()
+				.toUpperCase()
+				.replace(/-/g, "_")}`;
+			const processPath: string | undefined = process.env[environmentName];
 
 			if (processPath) {
 				// 1. Check if a path is defined via process variables.
@@ -40,7 +44,7 @@ export class RegisterBasePaths implements Bootstrapper {
 
 			ensureDirSync(path);
 
-			set(process.env, `CORE_PATH_${type.toUpperCase()}`, path);
+			set(process.env, environmentName, path);
 
 			const pathMethod: string | undefined = camelCase(`use_${type}_path`);
 

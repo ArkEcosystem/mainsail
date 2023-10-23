@@ -9,6 +9,7 @@ export const Identifiers = {
 	ActionFactory: Symbol.for("Factory<Action>"),
 	AppHeader: Symbol.for("Component<AppHeader>"),
 	Application: ID.Application,
+	ApplicationName: ID.ApplicationName,
 	ApplicationPaths: Symbol.for("Paths<Application>"),
 	Ask: Symbol.for("Component<Ask>"),
 	AskDate: Symbol.for("Component<AskDate>"),

@@ -13,14 +13,20 @@ describe<{
 		context.environment = cli.app.resolve(Environment);
 	});
 
-	it("should get all paths for the given token and network", async ({ environment }) => {
-		assert.equal(Object.keys(environment.getPaths("ark", "testnet")), ["data", "config", "cache", "log", "temp"]);
+	it("should get all paths for the given token, network and name", async ({ environment }) => {
+		assert.equal(Object.keys(environment.getPaths("ark", "testnet", "mainsail")), [
+			"data",
+			"config",
+			"cache",
+			"log",
+			"temp",
+		]);
 	});
 
 	it("should respect the CORE_PATH_CONFIG environment variable", async ({ environment }) => {
 		process.env.CORE_PATH_CONFIG = "something";
 
-		assert.true(environment.getPaths("ark", "testnet").config.endsWith("/something"));
+		assert.true(environment.getPaths("ark", "testnet", "mainsail").config.endsWith("/something/mainsail"));
 	});
 
 	it("should fail to update the variables if the file doesn't exist", async ({ environment }) => {

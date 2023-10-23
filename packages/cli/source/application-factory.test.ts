@@ -10,6 +10,9 @@ describe("ApplicationFactory", ({ it, stub, assert }) => {
 				description: "Core of the Mainsail Blockchain",
 				name: "@mainsail/core",
 				version: "3.0.0-next.0",
+				bin: {
+					mainsail: "./bin/run",
+				},
 			}),
 			Application,
 		);
@@ -20,6 +23,9 @@ describe("ApplicationFactory", ({ it, stub, assert }) => {
 			description: "Core of the Mainsail Blockchain",
 			name: "@mainsail/core",
 			version: "3.0.0-next.0",
+			bin: {
+				mainsail: "./bin/run",
+			},
 		});
 
 		assert.instance(app.get<any>(Identifiers.ProcessFactory)("ark", "core"), Utils.Process);
