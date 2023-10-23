@@ -22,14 +22,8 @@ export class DiscoverConfig {
 		Utils.assert.defined<string>(applicationName);
 
 		try {
-			return await readJSON(
-				path.join(
-					process.env[`CORE_PATH_CONFIG`]!,
-					applicationName,
-					"config.json",
-				),
-			);
-		} catch { }
+			return await readJSON(path.join(process.env[`CORE_PATH_CONFIG`]!, applicationName, "config.json"));
+		} catch {}
 
 		try {
 			return await readJSON(
@@ -40,7 +34,7 @@ export class DiscoverConfig {
 					"config.json",
 				),
 			);
-		} catch { }
+		} catch {}
 
 		return undefined;
 	}

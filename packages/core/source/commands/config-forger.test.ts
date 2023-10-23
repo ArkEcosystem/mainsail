@@ -68,7 +68,9 @@ describe<{
 
 		await cli.withFlags({ skipValidation: true }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: ["random-string"] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), {
+			secrets: ["random-string"],
+		});
 	});
 
 	it("should fail to configure from a prompt if it doesn't receive a bip39", async ({ cli }) => {
