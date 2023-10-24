@@ -15,7 +15,7 @@ export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
-			const { activeValidators } = this.configuration.getMilestone();
+			const { activeValidators } = this.configuration.getMilestone(height + 1);
 			this.#updateValidatorMatrix(activeValidators);
 		}
 	}
