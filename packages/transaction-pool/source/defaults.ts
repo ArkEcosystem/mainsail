@@ -21,5 +21,5 @@ export const defaults = {
 	maxTransactionsPerRequest: process.env[Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_REQUEST] || 40,
 
 	maxTransactionsPerSender: process.env[Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_SENDER] || 150,
-	storage: `${process.env[Constants.Flags.CORE_PATH_DATA]}/transaction-pool.sqlite`,
+	storage: `${process.env[Constants.Flags.CORE_PATH_DATA]}/mainsail/transaction-pool.sqlite`,
 };

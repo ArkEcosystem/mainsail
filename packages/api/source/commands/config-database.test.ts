@@ -12,9 +12,10 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		context.envFile = `${process.env.CORE_PATH_CONFIG}/.env`;
+		context.envFile = `${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`;
 
 		context.cli = new Console();
+		context.cli.app.rebind(Identifiers.ApplicationName).toConstantValue("mainsail-api");
 	});
 
 	afterAll(() => setGracefulCleanup());

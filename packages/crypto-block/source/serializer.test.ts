@@ -61,7 +61,7 @@ describe<{
 		}
 	});
 
-	it.only("#serialize - should serialize and deserialize commit", async ({ serializer, deserializer }) => {
+	it("#serialize - should serialize and deserialize commit", async ({ serializer, deserializer }) => {
 		const commit = {
 			round: 1,
 			signature:

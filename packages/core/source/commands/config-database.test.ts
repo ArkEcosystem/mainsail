@@ -12,7 +12,7 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		context.envFile = `${process.env.CORE_PATH_CONFIG}/.env`;
+		context.envFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
 
 		context.cli = new Console();
 	});

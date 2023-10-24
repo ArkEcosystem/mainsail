@@ -5,6 +5,9 @@ export class Console {
 	public app: Application;
 
 	public pkg = {
+		bin: {
+			mainsail: "./bin/run",
+		},
 		description: "Core of the Mainsail Blockchain",
 		name: "@mainsail/core",
 		version: "3.0.0-next.0",
@@ -40,7 +43,7 @@ export class Console {
 			.toConstantValue(
 				this.app
 					.get<Services.Environment>(Identifiers.Environment)
-					.getPaths(this.flags.token, this.flags.network),
+					.getPaths(this.flags.token, this.flags.network, Object.keys(this.pkg.bin)[0]),
 			);
 
 		const cmd = this.app.resolve<Commands.Command>(command);

@@ -17,7 +17,7 @@ describe<{
 	afterAll(() => setGracefulCleanup());
 
 	it("should set the value of an environment variable", async ({ cli }) => {
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/.env`;
+		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
 
 		removeSync(environmentFile);
 		ensureFileSync(environmentFile);

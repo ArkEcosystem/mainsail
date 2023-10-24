@@ -10,6 +10,7 @@ describe<{
 	const packageName = "dummyPackageName";
 	const token = "ark";
 	const network = "testnet";
+	const applicationName = "mainsail";
 
 	beforeEach((context) => {
 		context.cli = new Console();
@@ -30,6 +31,6 @@ describe<{
 
 		await assert.resolves(() => cli.withArgs([packageName]).withFlags({ network, token }).execute(Command));
 
-		spyOnUpdate.calledWith(token, network, packageName);
+		spyOnUpdate.calledWith(token, network, applicationName, packageName);
 	});
 });

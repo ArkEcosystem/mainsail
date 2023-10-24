@@ -1,5 +1,5 @@
 import { Console, describe } from "@mainsail/test-framework";
-import { removeSync, writeFileSync } from "fs-extra";
+import { ensureDirSync, removeSync, writeFileSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./env-list";
@@ -18,7 +18,7 @@ describe<{
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.execute(Command),
-			`No environment file found at ${process.env.CORE_PATH_CONFIG}/.env`,
+			`No environment file found at ${process.env.CORE_PATH_CONFIG}/mainsail/.env`,
 		);
 	});
 
@@ -26,8 +26,9 @@ describe<{
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));
 
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/.env`;
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail`);
 
+		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
 		removeSync(environmentFile);
 		writeFileSync(environmentFile, "someKey=someValue", { flag: "w" });
 

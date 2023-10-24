@@ -93,7 +93,13 @@ export abstract class Command {
 			if (this.input.hasFlag("token") && this.input.hasFlag("network")) {
 				this.app
 					.rebind(Identifiers.ApplicationPaths)
-					.toConstantValue(this.env.getPaths(this.input.getFlag("token"), this.input.getFlag("network")));
+					.toConstantValue(
+						this.env.getPaths(
+							this.input.getFlag("token"),
+							this.input.getFlag("network"),
+							this.app.get(Identifiers.ApplicationName),
+						),
+					);
 			}
 
 			await this.initialize();
