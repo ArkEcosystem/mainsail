@@ -33,6 +33,7 @@ export class RateLimitPlugin {
 
 	public register(server) {
 		this.rateLimiter = buildRateLimiter({
+			// TODO: rebuild on milestone change
 			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 			rateLimit: this.configuration.getRequired<number>("rateLimit"),
 			rateLimitPostTransactions: this.configuration.getRequired<number>("rateLimitPostTransactions"),

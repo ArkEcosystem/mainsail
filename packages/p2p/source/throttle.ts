@@ -27,6 +27,7 @@ export class Throttle {
 
 	public async initialize(): Promise<Throttle> {
 		this.#outgoingRateLimiter = buildRateLimiter({
+			// TODO: rebuild on milestone change
 			activeValidators: this.cryptoConfiguration.getMilestone().activeValidators,
 
 			rateLimit: this.configuration.getRequired<number>("rateLimit"),
