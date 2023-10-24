@@ -162,6 +162,12 @@ export class InvalidMilestoneConfigurationError extends Exception {
 	}
 }
 
+export class InvalidNumberOfActiveValidatorsError extends Exception {
+	public constructor(message: string) {
+		super(message);
+	}
+}
+
 export class InvalidMultiSignatureAssetError extends Exception {
 	public constructor() {
 		super(`The multi signature asset is invalid.`);
