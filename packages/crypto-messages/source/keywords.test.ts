@@ -109,7 +109,7 @@ describe<{
 					type: "integer",
 				},
 				validatorIndex: { isValidatorIndex: {} },
-			}
+			},
 		};
 		context.validator.addSchema(schema);
 
@@ -134,11 +134,11 @@ describe<{
 					properties: {
 						serialized: {
 							type: "string",
-						}
-					}
+						},
+					},
 				},
 				validatorIndex: { isValidatorIndex: {} },
-			}
+			},
 		};
 		context.validator.addSchema(schema);
 
@@ -149,7 +149,7 @@ describe<{
 		const block1 = {
 			// height=2
 			serialized: "000173452bb48901020000000000000000000000000000000",
-		}
+		};
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.undefined(context.validator.validate("test", { block: block1, validatorIndex: index }).error);
@@ -169,7 +169,7 @@ describe<{
 		const block2 = {
 			// height=15
 			serialized: "000173452bb489010f0000000000000000000000000000000",
-		}
+		};
 
 		for (let index = 0; index < 15; index++) {
 			assert.undefined(context.validator.validate("test", { block: block2, validatorIndex: index }).error);

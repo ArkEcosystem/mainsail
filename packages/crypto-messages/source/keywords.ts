@@ -2,7 +2,6 @@ import { Contracts } from "@mainsail/contracts";
 import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
-
 	const limitToActiveValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore
@@ -89,10 +88,10 @@ const parseHeight = (parentSchema): number | undefined => {
 		return undefined;
 	}
 
-	const lockProofSize = 2 + parseInt(serialized.slice(0, 2), 16) * 2;
+	const lockProofSize = 2 + Number.parseInt(serialized.slice(0, 2), 16) * 2;
 	// version: 1 byte (2 hex)
 	// timestamp: 6 bytes (12 hex)
 	// height: 4 byte (8 hex)
 	const offset = lockProofSize + 2 + 12;
 	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
-}
+};

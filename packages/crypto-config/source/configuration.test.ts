@@ -106,24 +106,35 @@ describe<{
 
 	it("getNextMilestoneByKey - should throw an error if activeValidators is 0", ({ configManager }) => {
 		assert.throws(
-			() => configManager.setConfig({
-				...cryptoJson, milestones: [{
-					height: 0,
-					activeValidators: 0,
-				}]
-			}), `Bad milestone at height: 0. The number of validators must be greater than 0.`
+			() =>
+				configManager.setConfig({
+					...cryptoJson,
+					milestones: [
+						{
+							height: 0,
+							activeValidators: 0,
+						},
+					],
+				}),
+			`Bad milestone at height: 0. The number of validators must be greater than 0.`,
 		);
 
 		assert.throws(
-			() => configManager.setConfig({
-				...cryptoJson, milestones: [{
-					height: 0,
-					activeValidators: 1,
-				}, {
-					height: 15,
-					activeValidators: 0,
-				}]
-			}), `Bad milestone at height: 15. The number of validators must be greater than 0.`
+			() =>
+				configManager.setConfig({
+					...cryptoJson,
+					milestones: [
+						{
+							height: 0,
+							activeValidators: 1,
+						},
+						{
+							height: 15,
+							activeValidators: 0,
+						},
+					],
+				}),
+			`Bad milestone at height: 15. The number of validators must be greater than 0.`,
 		);
 	});
 

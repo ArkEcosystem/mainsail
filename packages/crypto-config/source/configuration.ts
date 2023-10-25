@@ -51,7 +51,6 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			this.#buildConstants();
 
 			this.#originalMilestones = (value as any).milestones;
-
 		} catch {
 			//
 		}
@@ -109,13 +108,13 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	}
 
 	public getMilestoneDiff(height: number): Contracts.Crypto.MilestoneDiff {
-		const milestoneIndex = this.#originalMilestones?.findIndex(milestone => milestone.height === height) ?? -1;
+		const milestoneIndex = this.#originalMilestones?.findIndex((milestone) => milestone.height === height) ?? -1;
 		if (milestoneIndex <= 0) {
 			return {};
 		}
 
-		const currentMilestone = this.#originalMilestones![milestoneIndex];
-		const previousMilestone = this.#originalMilestones![milestoneIndex - 1];
+		const currentMilestone = this.#originalMilestones[milestoneIndex];
+		const previousMilestone = this.#originalMilestones[milestoneIndex - 1];
 
 		const diff = {};
 		for (const [key, value] of Object.entries(currentMilestone)) {

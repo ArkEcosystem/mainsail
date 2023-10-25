@@ -1,2 +1,1 @@
-export const isMinority = (size: number, activeValidators: number): boolean =>
-	size >= activeValidators / 3 + 1;
+export const isMinority = (size: number, activeValidators: number): boolean => size >= activeValidators / 3 + 1;

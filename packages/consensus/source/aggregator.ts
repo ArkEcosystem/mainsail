@@ -15,7 +15,10 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	@tagged("type", "consensus")
 	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
 
-	public async aggregate(majority: Map<number, { signature: string }>, activeValidators: number): Promise<Contracts.Crypto.IAggregatedSignature> {
+	public async aggregate(
+		majority: Map<number, { signature: string }>,
+		activeValidators: number,
+	): Promise<Contracts.Crypto.IAggregatedSignature> {
 		if (!Utils.isMajority(majority.size, activeValidators)) {
 			throw new Error("Failed to aggregate signatures, because the majority is not reached.");
 		}
@@ -37,7 +40,11 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 		};
 	}
 
-	async verify(signature: Contracts.Crypto.IAggregatedSignature, data: Buffer, activeValidators: number): Promise<boolean> {
+	async verify(
+		signature: Contracts.Crypto.IAggregatedSignature,
+		data: Buffer,
+		activeValidators: number,
+	): Promise<boolean> {
 		const validatorPublicKeys: Buffer[] = signature.validators
 			.map((v, index) =>
 				v ? Buffer.from(this.validatorSet.getValidator(index).getConsensusPublicKey(), "hex") : undefined,
