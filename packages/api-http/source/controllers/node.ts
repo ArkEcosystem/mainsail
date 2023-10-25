@@ -33,10 +33,10 @@ export class NodeController extends Controller {
 		return {
 			data: {
 				blocksCount: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - +state.height : 0,
-				// TODO
-				now: state?.height ?? 0,
+				now: Number(state?.height ?? 0),
+				timestamp: dayjs().unix(),
+				// TODO: add flag
 				synced: false,
-				timestamp: dayjs().unix(), // TODO
 			},
 		};
 	}
@@ -46,10 +46,10 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				// TODO
 				blocks: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - +state.height : 0,
-				height: state?.height ?? 0,
+				height: Number(state?.height ?? 0),
 				id: state?.id ?? 0,
+				// TODO: add flag
 				syncing: false,
 			},
 		};

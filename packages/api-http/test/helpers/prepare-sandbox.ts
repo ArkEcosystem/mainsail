@@ -14,7 +14,7 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {}
+	) { }
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
@@ -59,6 +59,12 @@ export class ApiContext {
 	public get stateRepository(): ApiDatabaseContracts.IStateRepository {
 		return this.app.get<ApiDatabaseContracts.IStateRepositoryFactory>(
 			ApiDatabaseIdentifiers.StateRepositoryFactory,
+		)();
+	}
+
+	public get configurationRepository(): ApiDatabaseContracts.IConfigurationRepository {
+		return this.app.get<ApiDatabaseContracts.IConfigurationRepositoryFactory>(
+			ApiDatabaseIdentifiers.ConfigurationRepositoryFactory,
 		)();
 	}
 
