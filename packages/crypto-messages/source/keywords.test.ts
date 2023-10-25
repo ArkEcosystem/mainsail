@@ -177,7 +177,7 @@ describe<{
 
 		assert.defined(context.validator.validate("test", { block: block2, validatorIndex: 15 }).error);
 
-		// block 1 still acepted
+		// block 1 still accepted
 		for (let index = 0; index < activeValidators; index++) {
 			assert.undefined(context.validator.validate("test", { block: block1, validatorIndex: index }).error);
 		}
