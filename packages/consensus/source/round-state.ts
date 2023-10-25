@@ -251,11 +251,13 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	public async aggregatePrevotes(): Promise<Contracts.Crypto.IAggregatedSignature> {
-		return this.aggregator.aggregate(this.#getSignatures(this.#prevotes));
+		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		return this.aggregator.aggregate(this.#getSignatures(this.#prevotes), activeValidators);
 	}
 
 	public async aggregatePrecommits(): Promise<Contracts.Crypto.IAggregatedSignature> {
-		return this.aggregator.aggregate(this.#getSignatures(this.#precommits));
+		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		return this.aggregator.aggregate(this.#getSignatures(this.#precommits), activeValidators);
 	}
 
 	public logPrevotes(): void {
@@ -287,11 +289,13 @@ export class RoundState implements Contracts.Consensus.IRoundState {
 	}
 
 	#isMajority(size: number): boolean {
-		return Utils.isMajority(size, this.configuration);
+		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		return Utils.isMajority(size, activeValidators);
 	}
 
 	#isMinority(size: number): boolean {
-		return Utils.isMinority(size, this.configuration);
+		const { activeValidators } = this.configuration.getMilestone(this.#height);
+		return Utils.isMinority(size, activeValidators);
 	}
 
 	#increasePrevoteCount(blockId?: string): void {

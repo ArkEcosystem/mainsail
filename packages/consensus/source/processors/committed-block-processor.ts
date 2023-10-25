@@ -67,7 +67,8 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
 		}
 
-		if (!Utils.isMajority(publicKeys.length, this.configuration)) {
+		const { activeValidators } = this.configuration.getMilestone(block.header.height);
+		if (!Utils.isMajority(publicKeys.length, activeValidators)) {
 			return false;
 		}
 
@@ -78,6 +79,6 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 			type: Contracts.Crypto.MessageType.Precommit,
 		});
 
-		return this.aggregator.verify(commit, precommit);
+		return this.aggregator.verify(commit, precommit, activeValidators);
 	}
 }
