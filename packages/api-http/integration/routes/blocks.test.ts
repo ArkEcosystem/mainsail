@@ -44,6 +44,14 @@ describe<{
 		assert.equal(data.data, blocks[blocks.length - 1]);
 	});
 
+	it("/blocks/last", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		const { statusCode, data } = await request("/blocks/last", options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, blocks[0]);
+	});
+
 	it("/blocks/{height}", async () => {
 		await apiContext.blockRepository.save(blocks);
 
@@ -68,5 +76,9 @@ describe<{
 		const { statusCode, data } = await request(`/blocks/1/transactions`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, blockTransactions);
+	});
+
+	it("/blocks/{id}/transactions - 404 (Not Found)", async () => {
+		await assert.rejects(async () => request(`/blocks/xxx/transactions`, options), "Response code 404 (Not Found)");
 	});
 });
