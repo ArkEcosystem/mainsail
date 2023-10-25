@@ -1,8 +1,9 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, Unique } from "typeorm";
 
 @Entity({
 	name: "validator_rounds",
 })
+@Unique("unique_validator_round_height", ["roundHeight"])
 export class ValidatorRound {
 	@Column({
 		primary: true,
