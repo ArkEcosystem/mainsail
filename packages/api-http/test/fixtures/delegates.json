@@ -1,210 +1,210 @@
 [
-    {
-        "address": "ark1n33nkzx96wecfld5ak4rpfh42v3pvw27pt6avgt3tm35z7ca342qv5x34l",
-        "publicKey": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
-            "validatorRank": 13,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_13",
-            "validatorLastBlock": {
-                "id": "f6b3f142863cc1bb2a66230b067442764b0f8c2c62d7294d23b8564e80345400",
-                "height": 1,
-                "timestamp": 1698212688290
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "b17da79a16b43ba4e12adafb700a6125ce44359c111c8d5dda71fda385bb0d5205e8816de28bcfa21c66c36229dddbaf"
-        }
-    },
-    {
-        "address": "ark1guj9spfeugkau5kj2le788n04xg3vkwaescm3v5hrd0dyrssapesptz84v",
-        "publicKey": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
-            "validatorRank": 31,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_31",
-            "validatorLastBlock": {
-                "id": "06c09aac552063430fb8bf2a2727b17052a40ce061692505eb3595883e6d85e8",
-                "height": 2,
-                "timestamp": 1698212696291
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "ae1e968eab8da5afe443b71941fd132b542c774abad190586ab78827bdb8d816ac914e6e15f14d962e3399d4147c08e6"
-        }
-    },
-    {
-        "address": "ark1rqxw2ftnqds0lhg9e5qetw49ghlqmspy8hqnvtu9v36l3szzn4csvfx6zn",
-        "publicKey": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
-            "validatorRank": 5,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_5",
-            "validatorLastBlock": {
-                "id": "14677cb7b9af73083e3842948c69a54d28e06d05bd941926958485ac618d7835",
-                "height": 3,
-                "timestamp": 1698212704297
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "9283a37556aa42aa7e2ee363fdd63adb8e91d2a97fe61c55a298075f4075471762371209f190d6d1f674b882e039b78b"
-        }
-    },
-    {
-        "address": "ark1takyl3fwu644kdhpg26tawszppcayc8a2lk3x7rzk3aa9f93r96szr907f",
-        "publicKey": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
-            "validatorRank": 40,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_40",
-            "validatorLastBlock": {
-                "id": "4906070f6d32697b0d8a424bdaaa3b3c5b63754138e68365153ac822737de83d",
-                "height": 4,
-                "timestamp": 1698212712299
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "9429b3ab3d55edc1169dbcee25d070075b5fd2b372bb8b4f67bf82d7d9a37ca7f874a8fb54a200b6bc539f786952122c"
-        }
-    },
-    {
-        "address": "ark1hfvs4y9ssskh082fe3ermzzk87r0m354eupjcyaeemd5yfs94zxsx4776m",
-        "publicKey": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
-            "validatorRank": 17,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_17",
-            "validatorLastBlock": {
-                "id": "ce345a81896b3b6910ad7c868b677a29b3d6db11b7f8b1078ee079ab0954dc2a",
-                "height": 5,
-                "timestamp": 1698212720306
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "8b305af5825449c9a6a9a7468386a4c033b0db5b12d53aa0baa3b6809c82413d08305b23e707bd93063749109c2a521a"
-        }
-    },
-    {
-        "address": "ark1lxtpceetcx4w2nwu3v2zkwkufvae4n9kjl7xkp5l5grsuckdyy4qmnuguf",
-        "publicKey": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
-            "validatorRank": 8,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_8",
-            "validatorLastBlock": {
-                "id": "75217fab03269e0908040b95675f97678131e4ec6df1edfee0f6f8a34ef8d4a6",
-                "height": 6,
-                "timestamp": 1698212728313
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "8190ec14239cca612ae08b095876fdf2e7dc01c794c0d9182a7ad9b896eace7c50adf66bcec19c3dbc67c3ff0be4e004"
-        }
-    },
-    {
-        "address": "ark100290nk8kv6a4gv5anuma4rgxmklh2e8n86hqqmw672j3juhxw8q6lny66",
-        "publicKey": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
-            "validatorRank": 32,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_32",
-            "validatorLastBlock": {
-                "id": "d7bf62e229e68c4f1c4ed214820b7e9d9580d6a0840901df08178e0f565a90e4",
-                "height": 7,
-                "timestamp": 1698212736319
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "a48fa3df67f833f33082fa72ef25bacd0a87b46bf70287139e388e4607de7e9eebc8d3084d7c742fc51104b655ce3a9b"
-        }
-    },
-    {
-        "address": "ark1y4veyfsm5ez9v3nmfpfue6ml4q3f6f987rl7cn23rex92aefrvjq059h9n",
-        "publicKey": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
-        "balance": "0",
-        "nonce": "0",
-        "attributes": {
-            "vote": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
-            "nonce": "0",
-            "balance": "0",
-            "publicKey": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
-            "validatorRank": 53,
-            "validatorApproval": 1.8867924528301887,
-            "validatorUsername": "genesis_53",
-            "validatorLastBlock": {
-                "id": "86ad9eaffb32e6793195b7cecdcc5b577c5ce1b6e29da90b6866eadbb5144a23",
-                "height": 8,
-                "timestamp": 1698212744327
-            },
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "0",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 1,
-            "validatorConsensusPublicKey": "b06f94ebadefd0bfb2aa41e27c3159aa4f9717adccda775978a01330833dc03bfeea8e3b3e7f64fb66a909a8188ff7b1"
-        }
-    }
+	{
+		"address": "ark1n33nkzx96wecfld5ak4rpfh42v3pvw27pt6avgt3tm35z7ca342qv5x34l",
+		"publicKey": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+			"validatorRank": 13,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_13",
+			"validatorLastBlock": {
+				"id": "f6b3f142863cc1bb2a66230b067442764b0f8c2c62d7294d23b8564e80345400",
+				"height": 1,
+				"timestamp": 1698212688290
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "b17da79a16b43ba4e12adafb700a6125ce44359c111c8d5dda71fda385bb0d5205e8816de28bcfa21c66c36229dddbaf"
+		}
+	},
+	{
+		"address": "ark1guj9spfeugkau5kj2le788n04xg3vkwaescm3v5hrd0dyrssapesptz84v",
+		"publicKey": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
+			"validatorRank": 31,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_31",
+			"validatorLastBlock": {
+				"id": "06c09aac552063430fb8bf2a2727b17052a40ce061692505eb3595883e6d85e8",
+				"height": 2,
+				"timestamp": 1698212696291
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "ae1e968eab8da5afe443b71941fd132b542c774abad190586ab78827bdb8d816ac914e6e15f14d962e3399d4147c08e6"
+		}
+	},
+	{
+		"address": "ark1rqxw2ftnqds0lhg9e5qetw49ghlqmspy8hqnvtu9v36l3szzn4csvfx6zn",
+		"publicKey": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
+			"validatorRank": 5,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_5",
+			"validatorLastBlock": {
+				"id": "14677cb7b9af73083e3842948c69a54d28e06d05bd941926958485ac618d7835",
+				"height": 3,
+				"timestamp": 1698212704297
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "9283a37556aa42aa7e2ee363fdd63adb8e91d2a97fe61c55a298075f4075471762371209f190d6d1f674b882e039b78b"
+		}
+	},
+	{
+		"address": "ark1takyl3fwu644kdhpg26tawszppcayc8a2lk3x7rzk3aa9f93r96szr907f",
+		"publicKey": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
+			"validatorRank": 40,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_40",
+			"validatorLastBlock": {
+				"id": "4906070f6d32697b0d8a424bdaaa3b3c5b63754138e68365153ac822737de83d",
+				"height": 4,
+				"timestamp": 1698212712299
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "9429b3ab3d55edc1169dbcee25d070075b5fd2b372bb8b4f67bf82d7d9a37ca7f874a8fb54a200b6bc539f786952122c"
+		}
+	},
+	{
+		"address": "ark1hfvs4y9ssskh082fe3ermzzk87r0m354eupjcyaeemd5yfs94zxsx4776m",
+		"publicKey": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
+			"validatorRank": 17,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_17",
+			"validatorLastBlock": {
+				"id": "ce345a81896b3b6910ad7c868b677a29b3d6db11b7f8b1078ee079ab0954dc2a",
+				"height": 5,
+				"timestamp": 1698212720306
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8b305af5825449c9a6a9a7468386a4c033b0db5b12d53aa0baa3b6809c82413d08305b23e707bd93063749109c2a521a"
+		}
+	},
+	{
+		"address": "ark1lxtpceetcx4w2nwu3v2zkwkufvae4n9kjl7xkp5l5grsuckdyy4qmnuguf",
+		"publicKey": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
+			"validatorRank": 8,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_8",
+			"validatorLastBlock": {
+				"id": "75217fab03269e0908040b95675f97678131e4ec6df1edfee0f6f8a34ef8d4a6",
+				"height": 6,
+				"timestamp": 1698212728313
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8190ec14239cca612ae08b095876fdf2e7dc01c794c0d9182a7ad9b896eace7c50adf66bcec19c3dbc67c3ff0be4e004"
+		}
+	},
+	{
+		"address": "ark100290nk8kv6a4gv5anuma4rgxmklh2e8n86hqqmw672j3juhxw8q6lny66",
+		"publicKey": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
+			"validatorRank": 32,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_32",
+			"validatorLastBlock": {
+				"id": "d7bf62e229e68c4f1c4ed214820b7e9d9580d6a0840901df08178e0f565a90e4",
+				"height": 7,
+				"timestamp": 1698212736319
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "a48fa3df67f833f33082fa72ef25bacd0a87b46bf70287139e388e4607de7e9eebc8d3084d7c742fc51104b655ce3a9b"
+		}
+	},
+	{
+		"address": "ark1y4veyfsm5ez9v3nmfpfue6ml4q3f6f987rl7cn23rex92aefrvjq059h9n",
+		"publicKey": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
+			"validatorRank": 53,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_53",
+			"validatorLastBlock": {
+				"id": "86ad9eaffb32e6793195b7cecdcc5b577c5ce1b6e29da90b6866eadbb5144a23",
+				"height": 8,
+				"timestamp": 1698212744327
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "b06f94ebadefd0bfb2aa41e27c3159aa4f9717adccda775978a01330833dc03bfeea8e3b3e7f64fb66a909a8188ff7b1"
+		}
+	}
 ]

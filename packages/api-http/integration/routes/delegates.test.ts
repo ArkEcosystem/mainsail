@@ -8,90 +8,90 @@ import blocks from "../../test/fixtures/blocks.json";
 import delegateBlocks from "../../test/fixtures/delegate_blocks.json";
 
 describe<{
-    sandbox: Sandbox;
+	sandbox: Sandbox;
 }>("Delegates", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
-    let apiContext: ApiContext;
+	let apiContext: ApiContext;
 
-    let options = {};
+	let options = {};
 
-    beforeAll(async (context) => {
-        nock.enableNetConnect();
-        apiContext = await prepareSandbox(context);
-    });
+	beforeAll(async (context) => {
+		nock.enableNetConnect();
+		apiContext = await prepareSandbox(context);
+	});
 
-    afterAll((context) => {
-        nock.disableNetConnect();
-        apiContext.dispose();
-    });
+	afterAll((context) => {
+		nock.disableNetConnect();
+		apiContext.dispose();
+	});
 
-    beforeEach(async (context) => {
-        await apiContext.reset();
-    });
+	beforeEach(async (context) => {
+		await apiContext.reset();
+	});
 
-    afterEach(async (context) => {
-        await apiContext.reset();
-    });
+	afterEach(async (context) => {
+		await apiContext.reset();
+	});
 
-    it("/delegates", async () => {
-        await apiContext.walletRepository.save(delegates);
+	it("/delegates", async () => {
+		await apiContext.walletRepository.save(delegates);
 
-        const { statusCode, data } = await request("/delegates", options);
-        assert.equal(statusCode, 200);
-        assert.equal(data.data, delegates);
-    });
+		const { statusCode, data } = await request("/delegates", options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, delegates);
+	});
 
-    it("/delegates/{id}", async () => {
-        await apiContext.walletRepository.save(delegates);
+	it("/delegates/{id}", async () => {
+		await apiContext.walletRepository.save(delegates);
 
-        const delegate = delegates[0];
+		const delegate = delegates[0];
 
-        const testCases = [
-            {
-                id: delegate.address,
-                result: delegate,
-            },
-            {
-                id: delegate.publicKey,
-                result: delegate,
-            },
-            {
-                id: delegate.attributes.validatorUsername,
-                result: delegate,
-            },
-        ];
+		const testCases = [
+			{
+				id: delegate.address,
+				result: delegate,
+			},
+			{
+				id: delegate.publicKey,
+				result: delegate,
+			},
+			{
+				id: delegate.attributes.validatorUsername,
+				result: delegate,
+			},
+		];
 
-        for (const { id, result } of testCases) {
-            const { statusCode, data } = await request(`/delegates/${id}`, options);
-            assert.equal(statusCode, 200);
-            assert.equal(data, result);
-        }
-    });
+		for (const { id, result } of testCases) {
+			const { statusCode, data } = await request(`/delegates/${id}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data, result);
+		}
+	});
 
-    it("/delegates/{id}/voters", async () => {
-        await apiContext.walletRepository.save(delegates);
-        await apiContext.walletRepository.save(wallets);
+	it("/delegates/{id}/voters", async () => {
+		await apiContext.walletRepository.save(delegates);
+		await apiContext.walletRepository.save(wallets);
 
-        const wallet = wallets[1];
+		const wallet = wallets[1];
 
-        let { statusCode, data } = await request(`/delegates/${wallet.address}/voters`, options);
-        assert.equal(statusCode, 200);
-        assert.empty(data.data);
+		let { statusCode, data } = await request(`/delegates/${wallet.address}/voters`, options);
+		assert.equal(statusCode, 200);
+		assert.empty(data.data);
 
-        const delegate = delegates[0];
-        ({ statusCode, data } = await request(`/delegates/${delegate.address}/voters`, options));
-        assert.equal(statusCode, 200);
-        assert.equal(data.data, [delegate]);
-    });
+		const delegate = delegates[0];
+		({ statusCode, data } = await request(`/delegates/${delegate.address}/voters`, options));
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, [delegate]);
+	});
 
-    it("/delegates/{id}/blocks", async () => {
-        await apiContext.walletRepository.save(delegates);
-        await apiContext.blockRepository.save(blocks);
-        await apiContext.blockRepository.save(delegateBlocks);
+	it("/delegates/{id}/blocks", async () => {
+		await apiContext.walletRepository.save(delegates);
+		await apiContext.blockRepository.save(blocks);
+		await apiContext.blockRepository.save(delegateBlocks);
 
-        const delegate = delegates[0];
+		const delegate = delegates[0];
 
-        const { statusCode, data } = await request(`/delegates/${delegate.address}/blocks`, { transform: false });
-        assert.equal(statusCode, 200);
-        assert.equal(data.data, delegateBlocks);
-    });
+		const { statusCode, data } = await request(`/delegates/${delegate.address}/blocks`, { transform: false });
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, delegateBlocks);
+	});
 });

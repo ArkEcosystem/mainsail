@@ -1,17 +1,17 @@
 [
-    {
-        "id": "f6b3f142863cc1bb2a66230b067442764b0f8c2c62d7294d23b8564e80345400",
-        "version": 1,
-        "timestamp": "1698212688290",
-        "previousBlock": "7a5f32b733e67714a234945a16def9dfa2ea79f08da107df9fb9c980719ff192",
-        "height": "1000",
-        "numberOfTransactions": 0,
-        "totalAmount": "0",
-        "totalFee": "0",
-        "reward": "0",
-        "payloadLength": 0,
-        "payloadHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "generatorPublicKey": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
-        "signature": "abc7a616e5a708c3def07825e0d46394485c89212892c18822fcdfcb694cd7f1356f216d03f8bf3e5f89f89ddb10a4651003eff198e33b560128cac489b699008fc55d9f455ee8bf93d4df958d043aa9d20f3805cb057f156300739d0b550ae4"
-    }
+	{
+		"id": "f6b3f142863cc1bb2a66230b067442764b0f8c2c62d7294d23b8564e80345400",
+		"version": 1,
+		"timestamp": "1698212688290",
+		"previousBlock": "7a5f32b733e67714a234945a16def9dfa2ea79f08da107df9fb9c980719ff192",
+		"height": "1000",
+		"numberOfTransactions": 0,
+		"totalAmount": "0",
+		"totalFee": "0",
+		"reward": "0",
+		"payloadLength": 0,
+		"payloadHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+		"generatorPublicKey": "9c833b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+		"signature": "abc7a616e5a708c3def07825e0d46394485c89212892c18822fcdfcb694cd7f1356f216d03f8bf3e5f89f89ddb10a4651003eff198e33b560128cac489b699008fc55d9f455ee8bf93d4df958d043aa9d20f3805cb057f156300739d0b550ae4"
+	}
 ]
