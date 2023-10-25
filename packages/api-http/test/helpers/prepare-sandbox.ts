@@ -68,6 +68,12 @@ export class ApiContext {
 		)();
 	}
 
+	public get validatorRoundRepository(): ApiDatabaseContracts.IValidatorRoundRepository {
+		return this.app.get<ApiDatabaseContracts.IValidatorRoundRepositoryFactory>(
+			ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory,
+		)();
+	}
+
 	public async reset() {
 		const dataSource = this.app.get<any>(ApiDatabaseIdentifiers.DataSource);
 		await dataSource.dropDatabase();
