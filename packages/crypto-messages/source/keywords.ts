@@ -1,11 +1,15 @@
 import { Contracts } from "@mainsail/contracts";
-import { FuncKeywordDefinition } from "ajv";
+import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
+
 	const limitToActiveValidators: FuncKeywordDefinition = {
+		// TODO: Check type (same as bignum)
+		// @ts-ignore
 		compile(schema) {
-			return (data) => {
-				const { activeValidators } = configuration.getMilestone();
+			return (data, parentSchema: AnySchemaObject) => {
+				const height = parseHeight(parentSchema);
+				const { activeValidators } = configuration.getMilestone(height);
 				if (!Array.isArray(data)) {
 					return false;
 				}
@@ -30,9 +34,12 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 	};
 
 	const isValidatorIndex: FuncKeywordDefinition = {
+		// TODO: Check type (same as bignum)
+		// @ts-ignore
 		compile() {
-			return (data) => {
-				const { activeValidators } = configuration.getMilestone();
+			return (data, parentSchema: AnySchemaObject) => {
+				const height = parseHeight(parentSchema);
+				const { activeValidators } = configuration.getMilestone(height);
 
 				if (!Number.isInteger(data)) {
 					return false;
@@ -53,3 +60,39 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 		limitToActiveValidators,
 	};
 };
+
+const parseHeight = (parentSchema): number | undefined => {
+	if (!parentSchema || !parentSchema.parentData) {
+		return undefined;
+	}
+
+	if (parentSchema.parentData.height) {
+		// prevotes / precommits
+		return parentSchema.parentData.height;
+	}
+
+	if (!parentSchema.parentData.block) {
+		return undefined;
+	}
+
+	// Proposals contain the block only in serialized form (hex).
+	// We can extract the height at a fixed offset here, without needing to deserialize the whole block.
+
+	// See packages/crypto-block/source/serializer.ts#serializeProposed for reference.
+
+	const serialized = parentSchema.parentData.block.serialized;
+	if (!serialized) {
+		return undefined;
+	}
+
+	if (serialized.length < 30) {
+		return undefined;
+	}
+
+	const lockProofSize = 2 + parseInt(serialized.slice(0, 2), 16) * 2;
+	// version: 1 byte (2 hex)
+	// timestamp: 6 bytes (12 hex)
+	// height: 4 byte (8 hex)
+	const offset = lockProofSize + 2 + 12;
+	return Buffer.from(serialized.slice(offset, offset + 8), "hex").readUInt32LE();
+}
