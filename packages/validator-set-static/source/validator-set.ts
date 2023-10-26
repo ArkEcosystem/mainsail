@@ -29,9 +29,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		}
 	}
 
-	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
+	public getActiveValidators(height: number): Contracts.State.IValidatorWallet[] {
 		if (this.#validators.length === 0) {
-			this.#buildActiveValidators(0);
+			this.#buildActiveValidators(height);
 		}
 
 		return this.#validators;

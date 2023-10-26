@@ -2,6 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 export const makeHeaders = (configuration: Contracts.Crypto.IConfiguration) => {
+	// TODO: rebuild on milestone change
 	const { activeValidators } = configuration.getMilestone();
 
 	return Joi.object({

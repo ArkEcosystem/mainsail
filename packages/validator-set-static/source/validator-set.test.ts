@@ -14,7 +14,7 @@ describe<{
 }>("ValidatorSet", ({ it, assert, beforeEach, stub }) => {
 	beforeEach(async (context) => {
 		context.walletRepository = {
-			findByUsername: () => {},
+			findByUsername: () => { },
 		};
 
 		context.stateService = {
@@ -39,10 +39,10 @@ describe<{
 	it("#getActiveValidators - should return active validators", async ({ validatorSet, walletRepository }) => {
 		const findByUsernameSpy = stub(walletRepository, "findByUsername").returnValue({
 			getPublicKey: () => "publicKey",
-			setAttribute: () => {},
+			setAttribute: () => { },
 		});
 
-		const validators = await validatorSet.getActiveValidators();
+		const validators = await validatorSet.getActiveValidators(0);
 		assert.equal(validators.length, 2);
 
 		findByUsernameSpy.calledTimes(2);

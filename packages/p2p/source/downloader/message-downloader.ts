@@ -208,10 +208,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		if (!roundsByHeight.has(round)) {
 			roundsByHeight.set(round, {
 				precommits: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone().activeValidators,
+					length: this.cryptoConfiguration.getMilestone(height).activeValidators,
 				}).fill(false),
 				prevotes: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone().activeValidators,
+					length: this.cryptoConfiguration.getMilestone(height).activeValidators,
 				}).fill(false),
 			});
 		}

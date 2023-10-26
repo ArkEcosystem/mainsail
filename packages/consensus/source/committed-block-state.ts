@@ -34,7 +34,7 @@ export class CommittedBlockState implements Contracts.BlockProcessor.IProcessabl
 	public configure(committedBlock: Contracts.Crypto.ICommittedBlock): CommittedBlockState {
 		this.#committedBlock = committedBlock;
 
-		const validators = this.validatorSet.getActiveValidators();
+		const validators = this.validatorSet.getActiveValidators(this.height);
 		for (const validator of validators) {
 			const consensusPublicKey = validator.getConsensusPublicKey();
 			this.#validators.set(consensusPublicKey, validator);

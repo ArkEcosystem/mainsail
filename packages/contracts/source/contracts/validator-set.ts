@@ -3,7 +3,7 @@ import { IValidatorWallet } from "./state";
 
 export interface IValidatorSet extends ICommitHandler {
 	initialize(): Promise<void>;
-	getActiveValidators(): IValidatorWallet[];
+	getActiveValidators(height: number): IValidatorWallet[];
 	getValidator(validatorIndex: number): IValidatorWallet;
 	getValidatorIndexByWalletPublicKey(walletPublicKey: string): number;
 }

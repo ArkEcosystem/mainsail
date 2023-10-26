@@ -37,8 +37,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		}
 	}
 
-	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
-		const { activeValidators } = this.cryptoConfiguration.getMilestone();
+	public getActiveValidators(height: number): Contracts.State.IValidatorWallet[] {
+		const { activeValidators } = this.cryptoConfiguration.getMilestone(height);
 		return this.#validators.slice(0, activeValidators);
 	}
 
@@ -99,7 +99,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 					const username = a.getUsername();
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-							`Validator "${username}" appears twice in the list.`,
+						`Validator "${username}" appears twice in the list.`,
 					);
 				}
 

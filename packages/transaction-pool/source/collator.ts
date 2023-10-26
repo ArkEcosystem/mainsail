@@ -29,7 +29,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 
 	public async getBlockCandidateTransactions(): Promise<Contracts.Crypto.ITransaction[]> {
 		const height: number = this.stateService.getStateStore().getLastBlock().data.height;
-		const milestone = this.configuration.getMilestone(height);
+		const milestone = this.configuration.getMilestone(height + 1);
 
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 
