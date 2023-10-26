@@ -83,12 +83,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			throw new Error();
 		}
 
-		if (!height && this.#height) {
-			height = this.#height;
-		}
-
-		if (!height) {
-			height = 0;
+		if (height === undefined) {
+			height = this.#height ?? 0;
 		}
 
 		while (
