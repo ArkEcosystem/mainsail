@@ -15,16 +15,17 @@ describe<{
 }>("StateStore", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => {},
+			notice: () => { },
 		};
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
-			setHeight: () => {},
+			getMilestoneDiff: () => ({}),
+			setHeight: () => { },
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -102,7 +103,7 @@ describe<{
 
 		spyIsNewMilestone.calledOnce();
 		spyNotice.calledOnce();
-		spyNotice.calledWith("Milestone change");
+		spyNotice.calledWith("Milestone change: {}");
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Enums.CryptoEvent.MilestoneChanged);
 	});
@@ -170,16 +171,16 @@ describe<{
 }>("StateStore - Clone", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => {},
+			notice: () => { },
 		};
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
-			setHeight: () => {},
+			setHeight: () => { },
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		context.sandbox = new Sandbox();
