@@ -167,10 +167,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			return peerHeader.round;
 		}
 
+		const { activeValidators } = this.cryptoConfiguration.getMilestone(ourHeader.height);
+
 		if (
 			Utils.isMinority(
 				peerHeader.validatorsSignedPrevote.filter((value) => value).length,
-				this.cryptoConfiguration,
+				activeValidators,
 			)
 		) {
 			return peerHeader.round;
@@ -270,8 +272,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		precommits: Map<number, Contracts.Crypto.IPrecommit>,
 		job: DownloadJob,
 	) {
+		const { activeValidators } = this.cryptoConfiguration.getMilestone(job.height);
+
 		if (
-			!Utils.isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), this.cryptoConfiguration)
+			!Utils.isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), activeValidators)
 		) {
 			throw new Error(`Peer didn't return enough prevotes for +2/3 majority`);
 		}
@@ -279,7 +283,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		if (
 			!Utils.isMajority(
 				precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(),
-				this.cryptoConfiguration,
+				activeValidators,
 			)
 		) {
 			throw new Error(`Peer didn't return enough precommits for +2/3 majority`);
