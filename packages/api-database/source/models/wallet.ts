@@ -1,8 +1,9 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, Unique } from "typeorm";
 
 @Entity({
 	name: "wallets",
 })
+@Unique("unique_wallet_public_key", ["publicKey"])
 export class Wallet {
 	@Column({
 		primary: true,
