@@ -62,6 +62,18 @@ export class ApiContext {
 		)();
 	}
 
+	public get configurationRepository(): ApiDatabaseContracts.IConfigurationRepository {
+		return this.app.get<ApiDatabaseContracts.IConfigurationRepositoryFactory>(
+			ApiDatabaseIdentifiers.ConfigurationRepositoryFactory,
+		)();
+	}
+
+	public get validatorRoundRepository(): ApiDatabaseContracts.IValidatorRoundRepository {
+		return this.app.get<ApiDatabaseContracts.IValidatorRoundRepositoryFactory>(
+			ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory,
+		)();
+	}
+
 	public async reset() {
 		const dataSource = this.app.get<any>(ApiDatabaseIdentifiers.DataSource);
 		await dataSource.dropDatabase();
