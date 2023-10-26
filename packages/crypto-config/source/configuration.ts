@@ -104,12 +104,15 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	}
 
 	public getMilestoneDiff(height: number): Contracts.Crypto.MilestoneDiff {
+		if (!this.#originalMilestones) {
+			return {};
+		}
+
 		const milestoneIndex = this.#originalMilestones?.findIndex((milestone) => milestone.height === height) ?? -1;
 		if (milestoneIndex <= 0) {
 			return {};
 		}
 
-		Utils.assert.defined(this.#originalMilestones);
 		const currentMilestone = this.#originalMilestones[milestoneIndex];
 		const previousMilestone = this.#originalMilestones[milestoneIndex - 1];
 
