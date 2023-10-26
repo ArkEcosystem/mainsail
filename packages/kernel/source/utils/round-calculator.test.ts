@@ -161,7 +161,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 			{ activeValidators: 4, height: 14, nextRound: 4, round: 3, roundHeight: 11 },
 			{ activeValidators: 53, height: 15, nextRound: 4, round: 4, roundHeight: 15 },
 			{ activeValidators: 53, height: 67, nextRound: 5, round: 4, roundHeight: 15 },
-			// Round 4 
+			// Round 4
 			{ activeValidators: 53, height: 68, nextRound: 5, round: 5, roundHeight: 68 },
 		];
 
