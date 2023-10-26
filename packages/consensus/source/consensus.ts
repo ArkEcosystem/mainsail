@@ -409,7 +409,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
 			this.logger.info(
-				`Proposing valid block ${this.#height}/${this.#round
+				`Proposing valid block ${this.#height}/${
+					this.#round
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
 
@@ -486,7 +487,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		} else {
 			if (state) {
 				this.logger.warning(
-					`Skipping state restore, because stored height is ${state.height}, but should be ${stateStore.getLastBlock().data.height + 1
+					`Skipping state restore, because stored height is ${state.height}, but should be ${
+						stateStore.getLastBlock().data.height + 1
 					}`,
 				);
 
