@@ -15,17 +15,17 @@ describe<{
 }>("StateStore", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => { },
+			notice: () => {},
 		};
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
 			getMilestoneDiff: () => ({}),
-			setHeight: () => { },
+			setHeight: () => {},
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.sandbox = new Sandbox();
@@ -171,16 +171,16 @@ describe<{
 }>("StateStore - Clone", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => { },
+			notice: () => {},
 		};
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
-			setHeight: () => { },
+			setHeight: () => {},
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.sandbox = new Sandbox();
