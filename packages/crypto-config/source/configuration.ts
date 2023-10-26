@@ -109,6 +109,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			return {};
 		}
 
+		Utils.assert.defined(this.#originalMilestones);
 		const currentMilestone = this.#originalMilestones[milestoneIndex];
 		const previousMilestone = this.#originalMilestones[milestoneIndex - 1];
 
