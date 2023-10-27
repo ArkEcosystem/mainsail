@@ -92,7 +92,6 @@ export class Sync implements Contracts.ApiSync.ISync {
 			commit,
 		} = committedBlock;
 
-		const { round, roundHeight } = Utils.roundCalculator.calculateRound(header.height, this.configuration);
 		const dirtyWallets = [...unit.getWalletRepository().getDirtyWallets()];
 
 		const deferredSync: DeferredSync = {
@@ -139,16 +138,15 @@ export class Sync implements Contracts.ApiSync.ISync {
 				publicKey: wallet.getPublicKey()!,
 			})),
 
-			...(Utils.roundCalculator.isNewRound(header.height, this.configuration)
+			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-						validatorRound: {
-							round,
-							roundHeight,
-							validators: this.validatorSet
-								.getActiveValidators(unit.height)
-								.map((validator) => validator.getWalletPublicKey()),
-						},
-				  }
+					validatorRound: {
+						...Utils.roundCalculator.calculateRound(header.height + 1, this.configuration),
+						validators: this.validatorSet
+							.getActiveValidators()
+							.map((validator) => validator.getWalletPublicKey()),
+					},
+				}
 				: {}),
 		};
 

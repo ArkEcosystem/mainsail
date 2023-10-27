@@ -18,20 +18,20 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
 	public async initialize(): Promise<void> {
-		this.#buildActiveValidators(0);
+		this.#buildActiveValidators();
 	}
 
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
-			this.#buildActiveValidators(height + 1);
+			this.#buildActiveValidators();
 		}
 	}
 
-	public getActiveValidators(height: number): Contracts.State.IValidatorWallet[] {
+	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
 		if (this.#validators.length === 0) {
-			this.#buildActiveValidators(height);
+			this.#buildActiveValidators();
 		}
 
 		return this.#validators;
@@ -51,11 +51,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		return result;
 	}
 
-	#buildActiveValidators(height: number): void {
+	#buildActiveValidators(): void {
 		this.#validators = [];
 		this.#indexByWalletPublicKey = new Map();
 
-		const { activeValidators } = this.cryptoConfiguration.getMilestone(height);
+		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 
 		for (let index = 0; index < activeValidators; index++) {
 			const validator = this.validatorWalletFactory(

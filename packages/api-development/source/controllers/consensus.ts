@@ -25,7 +25,7 @@ export class ConsensusController extends Controller {
 		const precommits = await this.storage.getPrecommits();
 		const prevotes = await this.storage.getPrevotes();
 
-		const validators = this.validatorSet.getActiveValidators(state.height);
+		const validators = this.validatorSet.getActiveValidators();
 		const nameLookup = new Map<string, string>();
 
 		for (const validator of validators) {

@@ -24,7 +24,7 @@ export interface IConfiguration {
 
 	getMilestone(height?: number): Milestone;
 
-	getMilestoneDiff(height: number): MilestoneDiff;
+	getMilestoneDiff(height?: number): MilestoneDiff;
 
 	getNextMilestoneWithNewKey<K extends MilestoneKey>(
 		previousMilestone: number,

@@ -69,7 +69,9 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	}
 
 	public isNewMilestone(height?: number): boolean {
-		height = height || this.#height;
+		if (height === undefined) {
+			height = this.#height;
+		}
 
 		if (!this.#milestones) {
 			throw new Error();
@@ -103,9 +105,13 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestone.data;
 	}
 
-	public getMilestoneDiff(height: number): Contracts.Crypto.MilestoneDiff {
+	public getMilestoneDiff(height?: number): Contracts.Crypto.MilestoneDiff {
 		if (!this.#originalMilestones) {
 			return {};
+		}
+
+		if (height === undefined) {
+			height = this.#height ?? 0;
 		}
 
 		const milestoneIndex = this.#originalMilestones?.findIndex((milestone) => milestone.height === height) ?? -1;

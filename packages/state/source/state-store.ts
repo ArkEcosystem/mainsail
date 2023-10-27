@@ -65,15 +65,14 @@ export class StateStore implements Contracts.State.StateStore {
 
 	public setLastBlock(block: Contracts.Crypto.IBlock): void {
 		this.#lastBlock = block;
-		this.configuration.setHeight(block.data.height);
 		this.setAttribute("height", block.data.height);
 
+		// NOTE: The configuration is always set to the next height that will be proposed.
+		this.configuration.setHeight(block.data.height + 1);
 		if (this.configuration.isNewMilestone()) {
-			if (block.data.height > 0) {
-				this.logger.notice(
-					`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff(block.data.height))}`,
-				);
-			}
+			this.logger.notice(
+				`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`,
+			);
 
 			void this.app
 				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)

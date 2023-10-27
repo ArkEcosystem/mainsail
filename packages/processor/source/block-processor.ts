@@ -1,7 +1,7 @@
 import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 // TODO: Move enums to contracts
-import { Enums } from "@mainsail/kernel";
+import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.BlockProcessor.Processor {
@@ -10,6 +10,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 	@inject(Identifiers.BlockState)
 	private readonly blockState!: Contracts.State.BlockState;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.IDatabaseService;
@@ -83,6 +86,11 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		this.logger.info(
 			`Block ${committedBlock.block.header.height.toLocaleString()} with ${committedBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
 		);
+
+		if (Utils.roundCalculator.isNewRound(committedBlock.block.header.height + 1, this.cryptoConfiguration)) {
+			const roundInfo = Utils.roundCalculator.calculateRound(committedBlock.block.header.height + 1, this.cryptoConfiguration);
+			this.logger.debug(`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`);
+		}
 
 		for (const transaction of committedBlock.block.transactions) {
 			await this.transactionPool.removeForgedTransaction(transaction);

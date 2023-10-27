@@ -10,6 +10,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Bootstrapper)
 	private readonly bootstrapper!: Contracts.Consensus.IBootstrapper;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
@@ -409,8 +412,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
 			this.logger.info(
-				`Proposing valid block ${this.#height}/${
-					this.#round
+				`Proposing valid block ${this.#height}/${this.#round
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
 
@@ -465,7 +467,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	#getActiveValidators(): string[] {
-		const activeValidators = this.validatorSet.getActiveValidators(this.#height);
+		const activeValidators = this.validatorSet.getActiveValidators();
 
 		return activeValidators.map((validator) => validator.getConsensusPublicKey());
 	}
@@ -487,8 +489,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		} else {
 			if (state) {
 				this.logger.warning(
-					`Skipping state restore, because stored height is ${state.height}, but should be ${
-						stateStore.getLastBlock().data.height + 1
+					`Skipping state restore, because stored height is ${state.height}, but should be ${stateStore.getLastBlock().data.height + 1
 					}`,
 				);
 
@@ -498,6 +499,10 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const lastBlock = stateStore.getLastBlock();
 			this.#height = lastBlock.data.height + 1;
+		}
+
+		if (this.#height !== this.configuration.getHeight()) {
+			throw new Error(`bootstrapped height ${this.#height} does not match configuration height ${this.configuration.getHeight()}`);
 		}
 
 		this.logger.info(

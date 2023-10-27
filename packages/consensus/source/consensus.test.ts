@@ -9,6 +9,7 @@ type Context = {
 	consensus: Consensus;
 	blockProcessor: any;
 	bootstrapper: any;
+	cryptoConfiguration: any;
 	state: any;
 	stateService: any;
 	storage: any;
@@ -31,15 +32,21 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	beforeEach((context) => {
 		context.blockProcessor = {
 			commit: () => {},
-			process: () => {},
+			process: () => { },
 		};
 
 		context.state = {
-			getLastBlock: () => {},
+			getLastBlock: () => { },
+		};
+
+		context.cryptoConfiguration = {
+			isNewMilestone: () => false,
+			getMilestoneDiff: () => ({}),
+			setHeight: () => { },
 		};
 
 		context.proposalProcessor = {
-			process: () => {},
+			process: () => { },
 		};
 
 		context.prevoteProcessor = {
@@ -143,6 +150,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.sandbox = new Sandbox();
 
+		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(context.blockProcessor);
 		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(context.prevoteProcessor);

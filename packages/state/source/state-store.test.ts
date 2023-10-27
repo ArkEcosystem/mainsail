@@ -81,7 +81,7 @@ describe<{
 
 		assert.equal(stateStore.getAttribute("height"), 1);
 		spyOnSetHeight.calledOnce();
-		spyOnSetHeight.calledWith(1);
+		spyOnSetHeight.calledWith(block.data.height + 1); // always next height to propose
 	});
 
 	it("#setLastBlock - should emit milestone changed", ({
