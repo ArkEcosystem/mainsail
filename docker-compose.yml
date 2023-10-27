@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
     postgres:
-        image: postgres:15-alpine3.17@sha256:207a30515abe9fe51666e1821617ce83324690f3d3fc3183e23f301d35a75815
+        image: postgres:16-alpine3.18@sha256:d171d14965e28764824b33974d038aea3a6be3bf0ced3c8656c848df9b7218c5
         tmpfs: /pgtmpfs
         logging:
             driver: "none"
