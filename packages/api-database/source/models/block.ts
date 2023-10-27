@@ -1,8 +1,11 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, Unique } from "typeorm";
 
 @Entity({
 	name: "blocks",
 })
+@Unique("unique_block_height", ["height"])
+@Unique("unique_block_timestamp", ["timestamp"])
+@Unique("unique_previous_block", ["previousBlock"])
 export class Block {
 	@Column({
 		primary: true,
@@ -20,13 +23,11 @@ export class Block {
 	@Column({
 		nullable: false,
 		type: "bigint",
-		unique: true,
 	})
 	public readonly timestamp!: string;
 
 	@Column({
 		type: "varchar",
-		unique: true,
 		// TODO: length depends on hash size...
 		// length: 64,
 	})
@@ -35,7 +36,6 @@ export class Block {
 	@Column({
 		nullable: false,
 		type: "bigint",
-		unique: true,
 	})
 	public readonly height!: string;
 
