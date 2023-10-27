@@ -32,21 +32,21 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	beforeEach((context) => {
 		context.blockProcessor = {
 			commit: () => {},
-			process: () => { },
+			process: () => {},
 		};
 
 		context.state = {
-			getLastBlock: () => { },
+			getLastBlock: () => {},
 		};
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
 			getMilestoneDiff: () => ({}),
-			setHeight: () => { },
+			setHeight: () => {},
 		};
 
 		context.proposalProcessor = {
-			process: () => { },
+			process: () => {},
 		};
 
 		context.prevoteProcessor = {

@@ -140,13 +140,13 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-					validatorRound: {
-						...Utils.roundCalculator.calculateRound(header.height + 1, this.configuration),
-						validators: this.validatorSet
-							.getActiveValidators()
-							.map((validator) => validator.getWalletPublicKey()),
-					},
-				}
+						validatorRound: {
+							...Utils.roundCalculator.calculateRound(header.height + 1, this.configuration),
+							validators: this.validatorSet
+								.getActiveValidators()
+								.map((validator) => validator.getWalletPublicKey()),
+						},
+				  }
 				: {}),
 		};
 

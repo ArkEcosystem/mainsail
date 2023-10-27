@@ -70,9 +70,7 @@ export class StateStore implements Contracts.State.StateStore {
 		// NOTE: The configuration is always set to the next height that will be proposed.
 		this.configuration.setHeight(block.data.height + 1);
 		if (this.configuration.isNewMilestone()) {
-			this.logger.notice(
-				`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`,
-			);
+			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
 			void this.app
 				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)

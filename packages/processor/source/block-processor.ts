@@ -88,8 +88,13 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		);
 
 		if (Utils.roundCalculator.isNewRound(committedBlock.block.header.height + 1, this.cryptoConfiguration)) {
-			const roundInfo = Utils.roundCalculator.calculateRound(committedBlock.block.header.height + 1, this.cryptoConfiguration);
-			this.logger.debug(`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`);
+			const roundInfo = Utils.roundCalculator.calculateRound(
+				committedBlock.block.header.height + 1,
+				this.cryptoConfiguration,
+			);
+			this.logger.debug(
+				`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
+			);
 		}
 
 		for (const transaction of committedBlock.block.transactions) {
