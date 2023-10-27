@@ -141,14 +141,14 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height, this.configuration)
 				? {
-						validatorRound: {
-							round,
-							roundHeight,
-							validators: this.validatorSet
-								.getActiveValidators()
-								.map((validator) => validator.getWalletPublicKey()),
-						},
-				  }
+					validatorRound: {
+						round,
+						roundHeight,
+						validators: this.validatorSet
+							.getActiveValidators()
+							.map((validator) => validator.getWalletPublicKey()),
+					},
+				}
 				: {}),
 		};
 
@@ -252,7 +252,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 
-			await blockRepository.save(deferred.block);
+			await blockRepository
+				.createQueryBuilder()
+				.insert()
+				.orIgnore()
+				.values(deferred.block)
+				.execute();
 
 			await stateRepository
 				.createQueryBuilder()
@@ -268,7 +273,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 				})
 				.execute();
 
-			await transactionRepository.save(deferred.transactions);
+			await transactionRepository
+				.createQueryBuilder()
+				.insert()
+				.orIgnore()
+				.values(deferred.transactions)
+				.execute();
 
 			if (deferred.validatorRound) {
 				await validatorRoundRepository
