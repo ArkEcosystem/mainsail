@@ -135,6 +135,49 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		}
 	});
 
+	it("dynamic delegate count - should calculate the correct with dynamic delegate count (2)", ({ configuration }) => {
+		const milestones = [
+			{ activeValidators: 3, height: 0 },
+			{ activeValidators: 7, height: 4 },
+			{ activeValidators: 4, height: 11 },
+			{ activeValidators: 53, height: 15 },
+		];
+
+		const config = { ...crypto, milestones };
+		configuration.setConfig(config);
+
+		const testVector = [
+			// Round 0
+			{ activeValidators: 3, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			// Round 1
+			{ activeValidators: 3, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
+			{ activeValidators: 3, height: 2, nextRound: 1, round: 1, roundHeight: 1 },
+			{ activeValidators: 3, height: 3, nextRound: 2, round: 1, roundHeight: 1 },
+			// Round 2
+			{ activeValidators: 7, height: 4, nextRound: 2, round: 2, roundHeight: 4 },
+			{ activeValidators: 7, height: 10, nextRound: 3, round: 2, roundHeight: 4 },
+			// Round 3
+			{ activeValidators: 4, height: 11, nextRound: 3, round: 3, roundHeight: 11 },
+			{ activeValidators: 4, height: 14, nextRound: 4, round: 3, roundHeight: 11 },
+			{ activeValidators: 53, height: 15, nextRound: 4, round: 4, roundHeight: 15 },
+			{ activeValidators: 53, height: 67, nextRound: 5, round: 4, roundHeight: 15 },
+			// Round 4
+			{ activeValidators: 53, height: 68, nextRound: 5, round: 5, roundHeight: 68 },
+		];
+
+		for (const { height, round, roundHeight, nextRound, activeValidators } of testVector) {
+			configuration.setHeight(height);
+
+			const result = calculateRound(height, configuration);
+
+			assert.is(result.round, round);
+			assert.is(result.roundHeight, roundHeight);
+			assert.true(isNewRound(result.roundHeight, configuration));
+			assert.is(result.nextRound, nextRound);
+			assert.is(result.maxValidators, activeValidators);
+		}
+	});
+
 	it("dynamic delegate count - should throw if active delegates is not changed on new round", ({ configuration }) => {
 		const milestones = [
 			{ activeValidators: 3, height: 0 },

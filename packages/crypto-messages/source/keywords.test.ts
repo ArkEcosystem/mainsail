@@ -99,4 +99,89 @@ describe<{
 		assert.defined(context.validator.validate("test", "a").error);
 		assert.defined(context.validator.validate("test").error);
 	});
+
+	it("keyword isValidatorIndex - should be ok for parent height", (context) => {
+		const schema = {
+			$id: "test",
+			type: "object",
+			properties: {
+				height: {
+					type: "integer",
+				},
+				validatorIndex: { isValidatorIndex: {} },
+			},
+		};
+		context.validator.addSchema(schema);
+
+		const { activeValidators } = context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
+
+		for (let index = 0; index < activeValidators; index++) {
+			assert.undefined(context.validator.validate("test", { height: 1, validatorIndex: index }).error);
+		}
+
+		assert.defined(context.validator.validate("test", { height: 1, validatorIndex: activeValidators }).error);
+	});
+
+	it("keyword isValidatorIndex - should be ok for parent block", (context) => {
+		const schema = {
+			$id: "test",
+			type: "object",
+			properties: {
+				block: {
+					type: "object",
+					properties: {
+						serialized: {
+							type: "string",
+						},
+					},
+				},
+				validatorIndex: { isValidatorIndex: {} },
+			},
+		};
+		context.validator.addSchema(schema);
+
+		let { activeValidators } = context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestone();
+
+		const block1 = {
+			// height=2
+			serialized: "000173452bb48901020000000000000000000000000000000",
+		};
+
+		for (let index = 0; index < activeValidators; index++) {
+			assert.undefined(context.validator.validate("test", { block: block1, validatorIndex: index }).error);
+		}
+
+		assert.defined(context.validator.validate("test", { block: block1, validatorIndex: activeValidators }).error);
+
+		// change milestone to 15 validators at height 15
+		context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestones()[1].height = 15;
+
+		context.sandbox.app
+			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.getMilestones()[1].activeValidators = 15;
+
+		const block2 = {
+			// height=15
+			serialized: "000173452bb489010f0000000000000000000000000000000",
+		};
+
+		for (let index = 0; index < 15; index++) {
+			assert.undefined(context.validator.validate("test", { block: block2, validatorIndex: index }).error);
+		}
+
+		assert.defined(context.validator.validate("test", { block: block2, validatorIndex: 15 }).error);
+
+		// block 1 still accepted
+		for (let index = 0; index < activeValidators; index++) {
+			assert.undefined(context.validator.validate("test", { block: block1, validatorIndex: index }).error);
+		}
+
+		assert.defined(context.validator.validate("test", { block: block1, validatorIndex: 53 }).error);
+	});
 });

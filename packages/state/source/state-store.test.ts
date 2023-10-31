@@ -20,6 +20,7 @@ describe<{
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
+			getMilestoneDiff: () => ({}),
 			setHeight: () => {},
 		};
 
@@ -80,7 +81,7 @@ describe<{
 
 		assert.equal(stateStore.getAttribute("height"), 1);
 		spyOnSetHeight.calledOnce();
-		spyOnSetHeight.calledWith(1);
+		spyOnSetHeight.calledWith(block.data.height + 1); // always next height to propose
 	});
 
 	it("#setLastBlock - should emit milestone changed", ({
@@ -102,7 +103,7 @@ describe<{
 
 		spyIsNewMilestone.calledOnce();
 		spyNotice.calledOnce();
-		spyNotice.calledWith("Milestone change");
+		spyNotice.calledWith("Milestone change: {}");
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Enums.CryptoEvent.MilestoneChanged);
 	});

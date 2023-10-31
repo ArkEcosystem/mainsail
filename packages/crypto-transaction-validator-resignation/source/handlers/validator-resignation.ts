@@ -53,6 +53,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			throw new Exceptions.WalletAlreadyResignedError();
 		}
 
+		// TODO: use validator count relative to proposed block height
 		const requiredValidatorsCount: number = this.configuration.getMilestone().activeValidators;
 		const currentValidatorsCount: number = walletRepository
 			.allByUsername()

@@ -10,6 +10,9 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.Bootstrapper)
 	private readonly bootstrapper!: Contracts.Consensus.IBootstrapper;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.BlockProcessor.Processor;
 
@@ -498,6 +501,14 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			const lastBlock = stateStore.getLastBlock();
 			this.#height = lastBlock.data.height + 1;
+		}
+
+		if (this.#height !== this.configuration.getHeight()) {
+			throw new Error(
+				`bootstrapped height ${
+					this.#height
+				} does not match configuration height ${this.configuration.getHeight()}`,
+			);
 		}
 
 		this.logger.info(

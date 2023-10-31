@@ -57,6 +57,8 @@ export type MilestonePartial = Partial<Milestone> & {
 
 export type MilestoneKey = keyof Milestone;
 
+export type MilestoneDiff = { [key in MilestoneKey]?: string };
+
 export type MilestoneSearchResult<T> = {
 	found: boolean;
 	height: number;

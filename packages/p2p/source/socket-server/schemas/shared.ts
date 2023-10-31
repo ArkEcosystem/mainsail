@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 export const makeHeaders = (configuration: Contracts.Crypto.IConfiguration) => {
-	const { activeValidators } = configuration.getMilestone();
+	const activeValidators = configuration.getMaxActiveValidators();
 
 	return Joi.object({
 		height: Joi.number().integer().min(1).required(),

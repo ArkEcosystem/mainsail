@@ -11,6 +11,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	#height: number | undefined;
 	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
 	#milestones: Contracts.Crypto.Milestone[] | undefined;
+	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
+	#maxActiveValidators: number | undefined;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#config = {
@@ -21,6 +23,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 		this.#validateMilestones();
 		this.#buildConstants();
+
+		this.#originalMilestones = config.milestones;
 	}
 
 	public all(): Contracts.Crypto.NetworkConfig | undefined {
@@ -40,12 +44,14 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		}
 
 		Utils.assert.defined<Contracts.Crypto.NetworkConfig>(this.#config);
-		set(this.#config, key, value);
+		set(this.#config, key, clone(value));
 
 		try {
 			this.#validateMilestones();
 
 			this.#buildConstants();
+
+			this.#originalMilestones = (value as any).milestones;
 		} catch {
 			//
 		}
@@ -64,7 +70,9 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	}
 
 	public isNewMilestone(height?: number): boolean {
-		height = height || this.#height;
+		if (height === undefined) {
+			height = this.#height;
+		}
 
 		if (!this.#milestones) {
 			throw new Error();
@@ -78,12 +86,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			throw new Error();
 		}
 
-		if (!height && this.#height) {
-			height = this.#height;
-		}
-
-		if (!height) {
-			height = 0;
+		if (height === undefined) {
+			height = this.#height ?? 0;
 		}
 
 		while (
@@ -100,6 +104,31 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		}
 
 		return this.#milestone.data;
+	}
+
+	public getMilestoneDiff(height?: number): Contracts.Crypto.MilestoneDiff {
+		if (!this.#originalMilestones) {
+			return {};
+		}
+
+		if (height === undefined) {
+			height = this.#height ?? 0;
+		}
+
+		const milestoneIndex = this.#originalMilestones?.findIndex((milestone) => milestone.height === height) ?? -1;
+		if (milestoneIndex <= 0) {
+			return {};
+		}
+
+		const currentMilestone = this.#originalMilestones[milestoneIndex];
+		const previousMilestone = this.#originalMilestones[milestoneIndex - 1];
+
+		const diff = {};
+		for (const [key, value] of Object.entries(currentMilestone)) {
+			diff[key] = `${previousMilestone[key]} => ${value}`;
+		}
+
+		return diff;
 	}
 
 	public getNextMilestoneWithNewKey<K extends Contracts.Crypto.MilestoneKey>(
@@ -136,6 +165,11 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestones;
 	}
 
+	public getMaxActiveValidators(): number {
+		Utils.assert.defined<number>(this.#maxActiveValidators);
+		return this.#maxActiveValidators;
+	}
+
 	#buildConstants(): void {
 		if (!this.#config) {
 			throw new Error();
@@ -151,6 +185,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 		const overwriteMerge = (destination, source, options) => source;
 
+		this.#maxActiveValidators = this.#milestone.data?.activeValidators ?? undefined;
+
 		while (lastMerged < this.#milestones.length - 1) {
 			this.#milestones[lastMerged + 1] = deepmerge(
 				this.#milestones[lastMerged],
@@ -159,6 +195,13 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 					arrayMerge: overwriteMerge,
 				},
 			);
+
+			this.#maxActiveValidators = Math.max(
+				this.#maxActiveValidators ?? 0,
+				this.#milestones[lastMerged].activeValidators,
+				this.#milestones[lastMerged + 1].activeValidators,
+			);
+
 			lastMerged++;
 		}
 	}
@@ -170,11 +213,21 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 		const validatorMilestones = this.#config.milestones
 			.sort((a, b) => a.height - b.height)
-			.filter((milestone) => milestone.activeValidators);
+			.filter((milestone) => milestone.activeValidators !== undefined);
 
-		for (let index = 1; index < validatorMilestones.length; index++) {
-			const previous = validatorMilestones[index - 1];
+		for (let index = 0; index < validatorMilestones.length; index++) {
 			const current = validatorMilestones[index];
+			if (current.activeValidators === 0) {
+				throw new Exceptions.InvalidNumberOfActiveValidatorsError(
+					`Bad milestone at height: ${current.height}. The number of validators must be greater than 0.`,
+				);
+			}
+
+			if (index === 0) {
+				continue;
+			}
+
+			const previous = validatorMilestones[index - 1];
 
 			if (previous.activeValidators === current.activeValidators) {
 				continue;

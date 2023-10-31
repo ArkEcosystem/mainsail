@@ -12,6 +12,9 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@tagged("type", "consensus")
 	private readonly signature!: Contracts.Crypto.ISignature;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.IConfiguration;
+
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.IAggregator;
 
@@ -113,7 +116,9 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			round: proposal.validRound,
 			type: Contracts.Crypto.MessageType.Prevote,
 		});
-		const verified = await this.aggregator.verify(lockProof, data);
+
+		const { activeValidators } = this.configuration.getMilestone(proposal.height);
+		const verified = await this.aggregator.verify(lockProof, data, activeValidators);
 
 		if (!verified) {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with invalid lock proof`);

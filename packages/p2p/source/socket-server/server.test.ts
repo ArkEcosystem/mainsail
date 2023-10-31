@@ -35,6 +35,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		getMilestone: () => ({
 			activeValidators: 51,
 		}),
+		getMaxActiveValidators: () => 51,
 	};
 
 	beforeEach((context) => {

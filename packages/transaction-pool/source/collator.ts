@@ -6,9 +6,6 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	@inject(Identifiers.TransactionValidatorFactory)
 	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
 
-	@inject(Identifiers.StateService)
-	private readonly stateService!: Contracts.State.Service;
-
 	@inject(Identifiers.TransactionPoolService)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
@@ -28,8 +25,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
 
 	public async getBlockCandidateTransactions(): Promise<Contracts.Crypto.ITransaction[]> {
-		const height: number = this.stateService.getStateStore().getLastBlock().data.height;
-		const milestone = this.configuration.getMilestone(height);
+		const milestone = this.configuration.getMilestone();
 
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 

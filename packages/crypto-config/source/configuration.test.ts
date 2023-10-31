@@ -104,6 +104,40 @@ describe<{
 		);
 	});
 
+	it("getNextMilestoneByKey - should throw an error if activeValidators is 0", ({ configManager }) => {
+		assert.throws(
+			() =>
+				configManager.setConfig({
+					...cryptoJson,
+					milestones: [
+						{
+							height: 0,
+							activeValidators: 0,
+						},
+					],
+				}),
+			`Bad milestone at height: 0. The number of validators must be greater than 0.`,
+		);
+
+		assert.throws(
+			() =>
+				configManager.setConfig({
+					...cryptoJson,
+					milestones: [
+						{
+							height: 0,
+							activeValidators: 1,
+						},
+						{
+							height: 15,
+							activeValidators: 0,
+						},
+					],
+				}),
+			`Bad milestone at height: 15. The number of validators must be greater than 0.`,
+		);
+	});
+
 	it("getNextMilestoneByKey - should get the next milestone with a given key", ({ configManager }) => {
 		// configManager.setConfig(devnet);
 		const expected = {
@@ -157,5 +191,54 @@ describe<{
 		assert.equal(configManager.getNextMilestoneWithNewKey(4, "reward"), thirdMilestone);
 		assert.equal(configManager.getNextMilestoneWithNewKey(6, "reward"), fourthMilestone);
 		assert.equal(configManager.getNextMilestoneWithNewKey(8, "reward"), emptyMilestone);
+	});
+
+	it("getMaxActiveValidators - should return maximum active validators from all milestones", ({ configManager }) => {
+		configManager.setConfig({
+			...cryptoJson,
+			milestones: [{ height: 1, activeValidators: 1 }],
+		});
+
+		assert.equal(configManager.getMaxActiveValidators(), 1);
+
+		configManager.setConfig({
+			...cryptoJson,
+			milestones: [
+				{ height: 1, activeValidators: 1 },
+				{ height: 3, activeValidators: 5 },
+				{ height: 8, activeValidators: 2 },
+			],
+		});
+
+		assert.equal(configManager.getMaxActiveValidators(), 5);
+
+		configManager.setConfig({
+			...cryptoJson,
+			milestones: [
+				{ height: 1, activeValidators: 5 },
+				{ height: 6, activeValidators: 1 },
+				{ height: 7, activeValidators: 10 },
+			],
+		});
+
+		assert.equal(configManager.getMaxActiveValidators(), 10);
+
+		configManager.setConfig({
+			...cryptoJson,
+			milestones: [
+				{ height: 1, activeValidators: 5 },
+				{ height: 6, activeValidators: 1 },
+				{ height: 7, activeValidators: 1 },
+			],
+		});
+
+		assert.equal(configManager.getMaxActiveValidators(), 5);
+
+		configManager.setConfig({
+			...cryptoJson,
+			milestones: [{ height: 7, activeValidators: 1 }],
+		});
+
+		assert.equal(configManager.getMaxActiveValidators(), 1);
 	});
 });
