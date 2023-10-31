@@ -9,8 +9,6 @@ export class Transaction {
 	@Column({
 		primary: true,
 		type: "varchar",
-		// TODO: length depends on hash size...
-		// length: 64,
 	})
 	public id!: string;
 
@@ -36,8 +34,6 @@ export class Transaction {
 	@Column({
 		nullable: false,
 		type: "varchar",
-		// TODO: length depends on hash size..., also consider only storing height to save size since hash can be retrieved via join
-		// length: 64,
 	})
 	public blockId!: string;
 
@@ -68,8 +64,6 @@ export class Transaction {
 	@Column({
 		nullable: false,
 		type: "varchar",
-		// TODO: length depends on public key size...
-		// length: 66,
 	})
 	public senderPublicKey!: string;
 
@@ -111,8 +105,6 @@ export class Transaction {
 	@Column({
 		nullable: false,
 		type: "varchar",
-		// TODO: length depends on signature size...
-		// length: 256,
 	})
 	public readonly signature!: string;
 }
