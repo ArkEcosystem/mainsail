@@ -164,4 +164,9 @@ describe<{
 		} as Contracts.BlockProcessor.IProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});
+
+	it("getActiveValidators - should throw error if insufficient active validators", async ({ cryptoConfiguration, validatorSet }) => {
+		const { activeValidators } = cryptoConfiguration.getMilestone();
+		assert.throws(() => validatorSet.getActiveValidators(), `Expected ${activeValidators} active validators, but got 0`);
+	});
 });
