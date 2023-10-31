@@ -12,6 +12,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
 	#milestones: Contracts.Crypto.Milestone[] | undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
+	#maxActiveValidators: number | undefined;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#config = {
@@ -164,6 +165,12 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestones;
 	}
 
+
+	public getMaxActiveValidators(): number {
+		Utils.assert.defined<number>(this.#maxActiveValidators);
+		return this.#maxActiveValidators;
+	}
+
 	#buildConstants(): void {
 		if (!this.#config) {
 			throw new Error();
@@ -179,6 +186,8 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 		const overwriteMerge = (destination, source, options) => source;
 
+		this.#maxActiveValidators = this.#milestone.data?.activeValidators ?? undefined;
+
 		while (lastMerged < this.#milestones.length - 1) {
 			this.#milestones[lastMerged + 1] = deepmerge(
 				this.#milestones[lastMerged],
@@ -187,6 +196,13 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 					arrayMerge: overwriteMerge,
 				},
 			);
+
+			this.#maxActiveValidators = Math.max(
+				this.#maxActiveValidators ?? 0,
+				this.#milestones[lastMerged].activeValidators,
+				this.#milestones[lastMerged + 1].activeValidators
+			);
+
 			lastMerged++;
 		}
 	}

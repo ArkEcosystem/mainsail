@@ -32,4 +32,6 @@ export interface IConfiguration {
 	): MilestoneSearchResult<Milestone[K]>;
 
 	getMilestones(): any;
+
+	getMaxActiveValidators(): number;
 }
