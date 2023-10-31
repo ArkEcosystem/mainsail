@@ -196,9 +196,7 @@ describe<{
 	it("getMaxActiveValidators - should return maximum active validators from all milestones", ({ configManager }) => {
 		configManager.setConfig({
 			...cryptoJson,
-			milestones: [
-				{ height: 1, activeValidators: 1 },
-			]
+			milestones: [{ height: 1, activeValidators: 1 }],
 		});
 
 		assert.equal(configManager.getMaxActiveValidators(), 1);
@@ -209,7 +207,7 @@ describe<{
 				{ height: 1, activeValidators: 1 },
 				{ height: 3, activeValidators: 5 },
 				{ height: 8, activeValidators: 2 },
-			]
+			],
 		});
 
 		assert.equal(configManager.getMaxActiveValidators(), 5);
@@ -220,7 +218,7 @@ describe<{
 				{ height: 1, activeValidators: 5 },
 				{ height: 6, activeValidators: 1 },
 				{ height: 7, activeValidators: 10 },
-			]
+			],
 		});
 
 		assert.equal(configManager.getMaxActiveValidators(), 10);
@@ -231,16 +229,14 @@ describe<{
 				{ height: 1, activeValidators: 5 },
 				{ height: 6, activeValidators: 1 },
 				{ height: 7, activeValidators: 1 },
-			]
+			],
 		});
 
 		assert.equal(configManager.getMaxActiveValidators(), 5);
 
 		configManager.setConfig({
 			...cryptoJson,
-			milestones: [
-				{ height: 7, activeValidators: 1 },
-			]
+			milestones: [{ height: 7, activeValidators: 1 }],
 		});
 
 		assert.equal(configManager.getMaxActiveValidators(), 1);

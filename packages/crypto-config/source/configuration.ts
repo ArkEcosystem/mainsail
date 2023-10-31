@@ -165,7 +165,6 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		return this.#milestones;
 	}
 
-
 	public getMaxActiveValidators(): number {
 		Utils.assert.defined<number>(this.#maxActiveValidators);
 		return this.#maxActiveValidators;
@@ -200,7 +199,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 			this.#maxActiveValidators = Math.max(
 				this.#maxActiveValidators ?? 0,
 				this.#milestones[lastMerged].activeValidators,
-				this.#milestones[lastMerged + 1].activeValidators
+				this.#milestones[lastMerged + 1].activeValidators,
 			);
 
 			lastMerged++;

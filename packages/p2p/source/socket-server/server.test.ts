@@ -30,7 +30,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 	const name = "P2P server";
 	const options = { hostname: "127.0.0.1", port: 4000 };
 
-	const logger = { debug: () => { }, info: () => { }, warning: () => { } };
+	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
 	const config = {
 		getMilestone: () => ({
 			activeValidators: 51,
