@@ -42,7 +42,7 @@ describe<{
 			setAttribute: () => {},
 		});
 
-		const validators = await validatorSet.getActiveValidators(0);
+		const validators = await validatorSet.getActiveValidators();
 		assert.equal(validators.length, 2);
 
 		findByUsernameSpy.calledTimes(2);
