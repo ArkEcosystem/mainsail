@@ -9,8 +9,6 @@ export class MempoolTransaction {
 	@Column({
 		primary: true,
 		type: "varchar",
-		// TODO: length depends on hash size...
-		// length: 64,
 	})
 	public id!: string;
 
@@ -42,8 +40,6 @@ export class MempoolTransaction {
 	@Column({
 		nullable: false,
 		type: "varchar",
-		// TODO: length depends on public key size...
-		// length: 66,
 	})
 	public senderPublicKey!: string;
 
@@ -85,8 +81,6 @@ export class MempoolTransaction {
 	@Column({
 		nullable: false,
 		type: "varchar",
-		// TODO: length depends on signature size...
-		// length: 256,
 	})
 	public readonly signature!: string;
 }

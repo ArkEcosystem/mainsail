@@ -29,14 +29,14 @@ export class NodeController extends Controller {
 
 	public async status(request: Hapi.Request) {
 		const state = await this.getState();
+		const medianPeerHeight = await this.peerRepositoryFactory().getMedianPeerHeight();
+		const ownHeight = Number(state?.height ?? 0);
 
 		return {
 			data: {
-				blocksCount: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - +state.height : 0,
-				now: Number(state?.height ?? 0),
-				// TODO: add flag
-				synced: false,
-
+				blocksCount: state ? medianPeerHeight - ownHeight : 0,
+				now: ownHeight,
+				synced: ownHeight >= medianPeerHeight,
 				timestamp: dayjs().unix(),
 			},
 		};
@@ -44,14 +44,15 @@ export class NodeController extends Controller {
 
 	public async syncing(request: Hapi.Request) {
 		const state = await this.getState();
+		const medianPeerHeight = await this.peerRepositoryFactory().getMedianPeerHeight();
+		const ownHeight = Number(state?.height ?? 0);
 
 		return {
 			data: {
-				blocks: state ? (await this.peerRepositoryFactory().getMedianPeerHeight()) - +state.height : 0,
-				height: Number(state?.height ?? 0),
+				blocks: state ? medianPeerHeight - ownHeight : 0,
+				height: ownHeight,
 				id: state?.id ?? 0,
-				// TODO: add flag
-				syncing: false,
+				syncing: ownHeight < medianPeerHeight,
 			},
 		};
 	}

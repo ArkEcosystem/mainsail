@@ -8,8 +8,6 @@ export class Wallet {
 	@Column({
 		primary: true,
 		type: "varchar",
-		// TODO: length depends on address size...
-		// length: 64,
 	})
 	public address!: string;
 
@@ -18,8 +16,6 @@ export class Wallet {
 		nullable: true,
 		type: "varchar",
 		unique: true,
-		// TODO: length depends on public key size...
-		// length: 66,
 	})
 	public publicKey!: string | undefined;
 
