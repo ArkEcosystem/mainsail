@@ -249,8 +249,8 @@ describe<{
 
 		await cli.execute(Command);
 
-		existsSync.calledWith(configCore);
-		ensureDirSync.calledWith(configCore);
+		existsSync.calledWith(configCore + "/mainsail");
+		ensureDirSync.calledWith(configCore + "/mainsail");
 		writeJSONSync.calledTimes(5);
 		writeFileSync.calledOnce();
 	});
@@ -283,8 +283,8 @@ describe<{
 
 		await cli.withFlags({ distribute: false }).execute(Command);
 
-		existsSync.calledWith(configCore);
-		ensureDirSync.calledWith(configCore);
+		existsSync.calledWith(configCore + "/mainsail");
+		ensureDirSync.calledWith(configCore + "/mainsail");
 		writeJSONSync.calledTimes(5);
 		writeFileSync.calledOnce();
 	});

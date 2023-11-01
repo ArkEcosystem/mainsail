@@ -1,5 +1,5 @@
-import { injectable } from "@mainsail/container";
-import { Contracts, Exceptions } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { readJSONSync } from "fs-extra";
 import { resolve } from "path";
@@ -10,12 +10,11 @@ interface PluginEntry {
 
 @injectable()
 export class AppGenerator {
-	generateDefault(): Contracts.Types.JsonObject {
-		return readJSONSync(resolve(__dirname, "../../../core/bin/config/testnet/app.json"));
-	}
+	@inject(Identifiers.Application)
+	private app!: Contracts.Kernel.Application;
 
 	generate(options: Contracts.NetworkGenerator.InternalOptions): Contracts.Types.JsonObject {
-		const template = this.generateDefault();
+		const template = this.#loadDefault(options.packageName);
 
 		// This isn't very sophisticated, but here we ensure the correct 'address' package is part
 		// of the app.json depending on 'options'. A more generic approach would be to read all loaded container plugins.
@@ -33,5 +32,12 @@ export class AppGenerator {
 		}
 
 		return template;
+	}
+
+	#loadDefault(packageName: string = "core"): Contracts.Types.JsonObject {
+		packageName = packageName.replace("@mainsail/", "");
+
+		const applicationName = this.app.get<string>(Identifiers.ApplicationName);
+		return readJSONSync(resolve(__dirname, `../../../${packageName}/bin/config/testnet/${applicationName}/app.json`));
 	}
 }
