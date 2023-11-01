@@ -2,11 +2,13 @@ import { AbstractController, Contracts as ApiCommonContracts } from "@mainsail/a
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
-	Models, Search
+	Models,
+	Search,
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+
 import { BlockModel } from "../resources";
 
 @injectable()
@@ -35,43 +37,55 @@ export class Controller extends AbstractController {
 		return state ?? ({ height: "0", supply: "0" } as Models.State);
 	}
 
-	protected async enrichBlockResult(resultPage: Search.ResultsPage<Models.Block>, { state, generators }: { state?: Models.State, generators: Record<string, Models.Wallet> }): Promise<Search.ResultsPage<BlockModel>> {
-		state = state ?? await this.getState();
+	protected async enrichBlockResult(
+		resultPage: Search.ResultsPage<Models.Block>,
+		{ state, generators }: { state?: Models.State; generators: Record<string, Models.Wallet> },
+	): Promise<Search.ResultsPage<BlockModel>> {
+		state = state ?? (await this.getState());
 
 		const enriched: Promise<BlockModel>[] = [];
 		for (const block of resultPage.results) {
-			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]) as Promise<BlockModel>);
+			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]));
 		}
 
 		resultPage.results = await Promise.all(enriched);
 		return resultPage as Search.ResultsPage<BlockModel>;
 	}
 
-	protected async enrichBlock(block: Models.Block | null, state?: Models.State, generator?: Models.Wallet): Promise<BlockModel | null> {
+	protected async enrichBlock(
+		block: Models.Block | null,
+		state?: Models.State,
+		generator?: Models.Wallet,
+	): Promise<BlockModel | null> {
 		if (!block) {
 			return null;
 		}
 
 		const promises: Promise<any>[] = [];
 		if (!state) {
-			promises.push((async () => {
-				state = await this.getState();
-			})());
+			promises.push(
+				(async () => {
+					state = await this.getState();
+				})(),
+			);
 		}
 
 		if (!generator) {
-			promises.push((async () => {
-				generator = await this.walletRepositoryFactory().createQueryBuilder()
-					.select()
-					.where("public_key = :publicKey", { publicKey: block.generatorPublicKey })
-					.getOneOrFail();
-			})());
+			promises.push(
+				(async () => {
+					generator = await this.walletRepositoryFactory()
+						.createQueryBuilder()
+						.select()
+						.where("public_key = :publicKey", { publicKey: block.generatorPublicKey })
+						.getOneOrFail();
+				})(),
+			);
 		}
 
 		if (promises.length > 0) {
 			await Promise.all(promises);
 		}
 
-		return { ...block, state, generator } as BlockModel;
+		return { ...block, generator, state } as BlockModel;
 	}
 }

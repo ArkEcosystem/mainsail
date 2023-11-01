@@ -99,9 +99,9 @@ export class DelegatesController extends Controller {
 		const state = await this.getState();
 
 		return this.toPagination(
-			await this.enrichBlockResult(blocks, { state, generators: { [delegate.publicKey!]: delegate } }),
+			await this.enrichBlockResult(blocks, { generators: { [delegate.publicKey!]: delegate }, state }),
 			BlockResource,
-			request.query.transform
+			request.query.transform,
 		);
 	}
 

@@ -28,20 +28,21 @@ export class BlocksController extends Controller {
 		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
 		const generatorPublicKeys = blocks.results.map(({ generatorPublicKey }) => generatorPublicKey);
-		const generators = await this.walletRepositoryFactory().createQueryBuilder()
+		const generators = await this.walletRepositoryFactory()
+			.createQueryBuilder()
 			.select()
 			.where("public_key IN (:publicKeys)", { publicKeys: generatorPublicKeys })
 			.getMany();
 
 		return this.toPagination(
 			await this.enrichBlockResult(blocks, {
-				generators: generators.reduce((acc, current) => {
-					acc[current.publicKey!] = current;
-					return acc;
-				}, {})
+				generators: generators.reduce((accumulator, current) => {
+					accumulator[current.publicKey!] = current;
+					return accumulator;
+				}, {}),
 			}),
 			BlockResource,
-			request.query.transform
+			request.query.transform,
 		);
 	}
 
@@ -110,5 +111,4 @@ export class BlocksController extends Controller {
 	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request) {
 		return this.respondWithResource(await this.enrichBlock(block), BlockResource, request.query.transform);
 	}
-
 }
