@@ -48,6 +48,7 @@ export class Controller extends AbstractController {
 			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]));
 		}
 
+		// @ts-ignore
 		resultPage.results = await Promise.all(enriched);
 		return resultPage as Search.ResultsPage<BlockModel>;
 	}
