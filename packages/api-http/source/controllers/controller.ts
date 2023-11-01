@@ -45,7 +45,7 @@ export class Controller extends AbstractController {
 
 		const enriched: Promise<BlockModel>[] = [];
 		for (const block of resultPage.results) {
-			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]));
+			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]) as Promise<BlockModel>);
 		}
 
 		resultPage.results = await Promise.all(enriched);
