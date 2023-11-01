@@ -13,11 +13,13 @@ export class AppGenerator {
 	@inject(Identifiers.Application)
 	private app!: Contracts.Kernel.Application;
 
-	generateDefault(packageName: string = "core"): Contracts.Types.JsonObject {
+	generateDefault(packageName = "core"): Contracts.Types.JsonObject {
 		packageName = packageName.replace("@mainsail/", "");
 
 		const applicationName = this.app.get<string>(Identifiers.ApplicationName);
-		return readJSONSync(resolve(__dirname, `../../../${packageName}/bin/config/testnet/${applicationName}/app.json`));
+		return readJSONSync(
+			resolve(__dirname, `../../../${packageName}/bin/config/testnet/${applicationName}/app.json`),
+		);
 	}
 
 	generate(options: Contracts.NetworkGenerator.InternalOptions): Contracts.Types.JsonObject {

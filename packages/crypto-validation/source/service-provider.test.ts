@@ -18,8 +18,8 @@ describe<{
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.validator = {
-			addKeyword: () => { },
-			addSchema: () => { },
+			addKeyword: () => {},
+			addSchema: () => {},
 		};
 
 		context.sandbox = new Sandbox();
