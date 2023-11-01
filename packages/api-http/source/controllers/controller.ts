@@ -43,12 +43,12 @@ export class Controller extends AbstractController {
 	): Promise<Search.ResultsPage<BlockModel>> {
 		state = state ?? (await this.getState());
 
-		const enriched: Promise<BlockModel>[] = [];
+		const enriched: Promise<BlockModel | null>[] = [];
 		for (const block of resultPage.results) {
 			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]));
 		}
 
-		resultPage.results = await Promise.all(enriched);
+		resultPage.results = (await Promise.all(enriched)) as BlockModel[];
 		return resultPage as Search.ResultsPage<BlockModel>;
 	}
 
