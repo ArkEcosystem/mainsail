@@ -18,9 +18,6 @@ export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
-	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
-
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
 		const pagination = this.getQueryPagination(request.query);

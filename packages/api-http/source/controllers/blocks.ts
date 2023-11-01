@@ -3,6 +3,7 @@ import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
+	Models,
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
@@ -18,9 +19,6 @@ export class BlocksController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
-	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
-
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.BlockCriteria = request.query;
 		const pagination = this.getListingPage(request);
@@ -29,7 +27,22 @@ export class BlocksController extends Controller {
 
 		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
-		return this.toPagination(blocks, BlockResource, request.query.transform);
+		const generatorPublicKeys = blocks.results.map(({ generatorPublicKey }) => generatorPublicKey);
+		const generators = await this.walletRepositoryFactory().createQueryBuilder()
+			.select()
+			.where("public_key IN (:publicKeys)", { publicKeys: generatorPublicKeys })
+			.getMany();
+
+		return this.toPagination(
+			await this.enrichBlockResult(blocks, {
+				generators: generators.reduce((acc, current) => {
+					acc[current.publicKey!] = current;
+					return acc;
+				}, {})
+			}),
+			BlockResource,
+			request.query.transform
+		);
 	}
 
 	public async first(request: Hapi.Request) {
@@ -39,7 +52,7 @@ export class BlocksController extends Controller {
 			.where("height = :height", { height: 1 })
 			.getOne();
 
-		return this.respondWithResource(block, BlockResource, request.query.transform);
+		return this.respondEnrichedBlock(block, request);
 	}
 
 	public async last(request: Hapi.Request) {
@@ -50,7 +63,7 @@ export class BlocksController extends Controller {
 			.limit(1)
 			.getOne();
 
-		return this.respondWithResource(block, BlockResource, request.query.transform);
+		return this.respondEnrichedBlock(block, request);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -59,7 +72,7 @@ export class BlocksController extends Controller {
 
 		const block = await blockRepository.findOneByCriteria(blockCriteria);
 
-		return this.respondWithResource(block, BlockResource, request.query.transform);
+		return this.respondEnrichedBlock(block, request);
 	}
 
 	public async transactions(request: Hapi.Request) {
@@ -93,4 +106,9 @@ export class BlocksController extends Controller {
 		// NOTE: This assumes all block ids are sha256 and never a valid nubmer below this threshold.
 		return asHeight && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
 	}
+
+	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request) {
+		return this.respondWithResource(await this.enrichBlock(block), BlockResource, request.query.transform);
+	}
+
 }

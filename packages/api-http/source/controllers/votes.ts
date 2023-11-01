@@ -16,9 +16,6 @@ export class VotesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
 	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
-	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
-
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = {
 			...request.query,

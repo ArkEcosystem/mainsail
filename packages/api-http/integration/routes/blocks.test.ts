@@ -4,6 +4,7 @@ import { request } from "../../test/helpers/request";
 
 import blocks from "../../test/fixtures/blocks.json";
 import blockTransactions from "../../test/fixtures/block_transactions.json";
+import wallets from "../../test/fixtures/wallets.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -25,6 +26,7 @@ describe<{
 
 	beforeEach(async (context) => {
 		await apiContext.reset();
+		await apiContext.walletRepository.save(wallets);
 	});
 
 	afterEach(async (context) => {

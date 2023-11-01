@@ -17,9 +17,6 @@ export class DelegatesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
-	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
-
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);
 		const sorting = this.getListingOrder(request);
@@ -85,7 +82,7 @@ export class DelegatesController extends Controller {
 		const walletId = request.params.id as string;
 
 		const delegate = await this.getWallet(walletId);
-		if (!delegate) {
+		if (!delegate || !delegate.publicKey) {
 			return Boom.notFound("Delegate not found");
 		}
 
@@ -99,7 +96,13 @@ export class DelegatesController extends Controller {
 		const options = this.getListingOptions();
 
 		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
-		return this.toPagination(blocks, BlockResource, request.query.transform);
+		const state = await this.getState();
+
+		return this.toPagination(
+			await this.enrichBlockResult(blocks, { state, generators: { [delegate.publicKey!]: delegate } }),
+			BlockResource,
+			request.query.transform
+		);
 	}
 
 	private async getWallet(walletId: string): Promise<Models.Wallet | null> {

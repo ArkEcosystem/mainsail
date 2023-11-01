@@ -71,7 +71,7 @@ describe<{
 		await apiContext.walletRepository.save(delegates);
 		await apiContext.walletRepository.save(wallets);
 
-		const wallet = wallets[1];
+		const wallet = wallets[wallets.length - 1];
 
 		let { statusCode, data } = await request(`/delegates/${wallet.address}/voters`, options);
 		assert.equal(statusCode, 200);

@@ -1,5 +1,447 @@
 [
 	{
+		"address": "ark1rqxw2ftnqds0lhg9e5qetw49ghlqmspy8hqnvtu9v36l3szzn4csvfx6zn",
+		"publicKey": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
+			"validatorRank": 5,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_5",
+			"validatorLastBlock": {
+				"id": "5bd4f034c96f29a1949bd6b6ee480c7dc45ed42ab7dccaa9d3a913895fdad843",
+				"height": 3,
+				"timestamp": 1698830142418
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "9283a37556aa42aa7e2ee363fdd63adb8e91d2a97fe61c55a298075f4075471762371209f190d6d1f674b882e039b78b"
+		}
+	},
+	{
+		"address": "ark1takyl3fwu644kdhpg26tawszppcayc8a2lk3x7rzk3aa9f93r96szr907f",
+		"publicKey": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
+			"validatorRank": 40,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_40",
+			"validatorLastBlock": {
+				"id": "fe7c2054daa234060a1836a9b0bdbeb0161f87c9562aae4161f30432b66c5766",
+				"height": 4,
+				"timestamp": 1698830150421
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "9429b3ab3d55edc1169dbcee25d070075b5fd2b372bb8b4f67bf82d7d9a37ca7f874a8fb54a200b6bc539f786952122c"
+		}
+	},
+	{
+		"address": "ark1hfvs4y9ssskh082fe3ermzzk87r0m354eupjcyaeemd5yfs94zxsx4776m",
+		"publicKey": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
+			"validatorRank": 17,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_17",
+			"validatorLastBlock": {
+				"id": "79556e145193e87897f62ea1abdf877eef46348d4b6218823c639aba45df785e",
+				"height": 5,
+				"timestamp": 1698830158429
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8b305af5825449c9a6a9a7468386a4c033b0db5b12d53aa0baa3b6809c82413d08305b23e707bd93063749109c2a521a"
+		}
+	},
+	{
+		"address": "ark1lxtpceetcx4w2nwu3v2zkwkufvae4n9kjl7xkp5l5grsuckdyy4qmnuguf",
+		"publicKey": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
+			"validatorRank": 8,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_8",
+			"validatorLastBlock": {
+				"id": "0b2da3465e02b14fb7938468092d0d9f32280bde73e3146f75f37a74a4dd13f3",
+				"height": 6,
+				"timestamp": 1698830166437
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8190ec14239cca612ae08b095876fdf2e7dc01c794c0d9182a7ad9b896eace7c50adf66bcec19c3dbc67c3ff0be4e004"
+		}
+	},
+	{
+		"address": "ark100290nk8kv6a4gv5anuma4rgxmklh2e8n86hqqmw672j3juhxw8q6lny66",
+		"publicKey": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
+			"validatorRank": 32,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_32",
+			"validatorLastBlock": {
+				"id": "26f801416e5d48b8fdde57cedcf63d1b7d117193c100f8f07f3c71ffae69c5d7",
+				"height": 7,
+				"timestamp": 1698830174438
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "a48fa3df67f833f33082fa72ef25bacd0a87b46bf70287139e388e4607de7e9eebc8d3084d7c742fc51104b655ce3a9b"
+		}
+	},
+	{
+		"address": "ark1y4veyfsm5ez9v3nmfpfue6ml4q3f6f987rl7cn23rex92aefrvjq059h9n",
+		"publicKey": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
+			"validatorRank": 53,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_53",
+			"validatorLastBlock": {
+				"id": "2c59c4772e624a7ad8cbe98665defcee2c2f8944bf77508ce938912ad7e60665",
+				"height": 8,
+				"timestamp": 1698830182441
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "b06f94ebadefd0bfb2aa41e27c3159aa4f9717adccda775978a01330833dc03bfeea8e3b3e7f64fb66a909a8188ff7b1"
+		}
+	},
+	{
+		"address": "ark1guj9spfeugkau5kj2le788n04xg3vkwaescm3v5hrd0dyrssapesptz84v",
+		"publicKey": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
+			"validatorRank": 31,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_31",
+			"validatorLastBlock": {
+				"id": "c33ce54719c0db98742380be8afbe514ba1ee54feed75e028155f91896094fe9",
+				"height": 58,
+				"timestamp": 1698830582754
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 2,
+			"validatorConsensusPublicKey": "ae1e968eab8da5afe443b71941fd132b542c774abad190586ab78827bdb8d816ac914e6e15f14d962e3399d4147c08e6"
+		}
+	},
+	{
+		"address": "ark1zn5xx233c92a7f5tykw9886c7xh7s7g3qrgpazw5cvy592gyknds4ad843",
+		"publicKey": "14e8632a31c155df268b259c539f58f1afe8791100d01e89d4c30942a904b4db",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "14e8632a31c155df268b259c539f58f1afe8791100d01e89d4c30942a904b4db",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "14e8632a31c155df268b259c539f58f1afe8791100d01e89d4c30942a904b4db",
+			"validatorRank": 45,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_45",
+			"validatorLastBlock": {
+				"id": "5ee3e403805a8e3b1a7b795fcc0baf585d37772ffdf98aa24533aaed5c88dda7",
+				"height": 9,
+				"timestamp": 1698830190449
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "971b1abee0b05f94650d49eef026982d20fc474e1082514d9e60180999a388635dd0c773eeaebd78afe1e96143cc5ea9"
+		}
+	},
+	{
+		"address": "ark1dwtc3yaw6uynlq0s8derpck3rcegh4kkqvvlpvyj5vg2arvezw9q2m4e33",
+		"publicKey": "6b978893aed7093f81f03b7230e2d11e328bd6d60319f0b092a310ae8d99138a",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "6b978893aed7093f81f03b7230e2d11e328bd6d60319f0b092a310ae8d99138a",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "6b978893aed7093f81f03b7230e2d11e328bd6d60319f0b092a310ae8d99138a",
+			"validatorRank": 48,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_48",
+			"validatorLastBlock": {
+				"id": "e4d9bb8d46231b8a7591e362621c8a197d2a72abf6f5a414e837a43ed650ec20",
+				"height": 10,
+				"timestamp": 1698830198456
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8b97294b34dfed7df6dbb516128bbd8ff325d7c50a4948bf8a95601b592a9cd36b8194c3dc239bb6f48e899724adba0f"
+		}
+	},
+	{
+		"address": "ark1h6r94a9a67ahvdd8zec6mv9svqa2gv6sdmh9ctzy5sq9v28z46xqj3hhen",
+		"publicKey": "be865af4bdd7bb7635a71671adb0b0603aa433506eee5c2c44a4005628e2ae8c",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "be865af4bdd7bb7635a71671adb0b0603aa433506eee5c2c44a4005628e2ae8c",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "be865af4bdd7bb7635a71671adb0b0603aa433506eee5c2c44a4005628e2ae8c",
+			"validatorRank": 14,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_14",
+			"validatorLastBlock": {
+				"id": "ff27ae8a985677e17fc1f84cb78dc9b493ea8427ae6fe40673461be34eb53e7f",
+				"height": 11,
+				"timestamp": 1698830206459
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "816e8b384278346f5ce08bc8b736e426624ee28f4dc06d993b8d4452fa5ff70f96d83c0e6d3a9a95ab5f73c6eb7a8f72"
+		}
+	},
+	{
+		"address": "ark1uhlnf5tpg7mqqa6aew4t0dwqclrw65h4nvytrpvzr3yf3csh93uqv209sg",
+		"publicKey": "e5ff34d16147b600775dcbaab7b5c0c7c6ed52f59b08b185821c4898e2172c78",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "e5ff34d16147b600775dcbaab7b5c0c7c6ed52f59b08b185821c4898e2172c78",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "e5ff34d16147b600775dcbaab7b5c0c7c6ed52f59b08b185821c4898e2172c78",
+			"validatorRank": 47,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_47",
+			"validatorLastBlock": {
+				"id": "8299b9aad8a79f175841a6bb0f0796df838d01ec07c585e6f6955e3230c4a8cc",
+				"height": 12,
+				"timestamp": 1698830214467
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "85d77d1951f78cc4df295f1650494ab524c63b8deab8b6ecc59d83bdddb260a9fecd7db3335a0371a88c91dd2af346cc"
+		}
+	},
+	{
+		"address": "ark16us9qyfe5dfackneucrpmx4dspxmtc0gxvx4w07tqw5psye07pfqnlcx9a",
+		"publicKey": "d720501139a353dc5a79e6061d9aad804db5e1e8330d573fcb03a818132ff052",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "d720501139a353dc5a79e6061d9aad804db5e1e8330d573fcb03a818132ff052",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "d720501139a353dc5a79e6061d9aad804db5e1e8330d573fcb03a818132ff052",
+			"validatorRank": 20,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_20",
+			"validatorLastBlock": {
+				"id": "9cd330f8c3d3be77527abc6d42f61119ede57922c8a61828e292fe37e23d00d5",
+				"height": 13,
+				"timestamp": 1698830222475
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8d3873707565985a5789fefe5578ea7495dcbea5024ba106758db91341b66fd258a7f22a8a08e9428dc4d488d3802f34"
+		}
+	},
+	{
+		"address": "ark14d2hrxtr7gs30xjt2f7uypltutwvkt9u7g8qvshghkr3sa25em0q8rvlug",
+		"publicKey": "ab55719963f221179a4b527dc207ebe2dccb2cbcf20e0642e8bd87187554cede",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "ab55719963f221179a4b527dc207ebe2dccb2cbcf20e0642e8bd87187554cede",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "ab55719963f221179a4b527dc207ebe2dccb2cbcf20e0642e8bd87187554cede",
+			"validatorRank": 30,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_30",
+			"validatorLastBlock": {
+				"id": "d0f275834a890c2980d55cd96ab5892a86e138e805444231a27e03e51ede4b62",
+				"height": 14,
+				"timestamp": 1698830230479
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "98486d675c5052ec13770ffc09de2917ab42ec5d75de60552ac8b67f733fc47184ae658910ff1a6118aa0c3d249fd510"
+		}
+	},
+	{
+		"address": "ark1aklft5l9ufcudyf63vl0f9m8nqge9ztrrmd6epflcnnlkm0s487qhtfka5",
+		"publicKey": "edbe95d3e5e271c6913a8b3ef4976798119289631edbac853fc4e7fb6df0a9fc",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "edbe95d3e5e271c6913a8b3ef4976798119289631edbac853fc4e7fb6df0a9fc",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "edbe95d3e5e271c6913a8b3ef4976798119289631edbac853fc4e7fb6df0a9fc",
+			"validatorRank": 7,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_7",
+			"validatorLastBlock": {
+				"id": "6c099f45ecec2303b34a8d3e8333d7df67044820a3970748e038499045167c6b",
+				"height": 57,
+				"timestamp": 1698830574746
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 2,
+			"validatorConsensusPublicKey": "94817fa952ee0f6880bb0ce6fe40b6ce01c9458422ef445ae5ede7a054cea8405ff61ba2cc0c7fa2c5ff89a61810c495"
+		}
+	},
+	{
+		"address": "ark1mltzxevypnhfuuq8wx2zqa8v638xq0v4hd8krj9fvwxt374qpcusln7ajk",
+		"publicKey": "dfd62365840cee9e700771942074ecd44e603d95bb4f61c8a9638cb8faa00e39",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "dfd62365840cee9e700771942074ecd44e603d95bb4f61c8a9638cb8faa00e39",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "dfd62365840cee9e700771942074ecd44e603d95bb4f61c8a9638cb8faa00e39",
+			"validatorRank": 18,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_18",
+			"validatorLastBlock": {
+				"id": "f59c4c1d661a2d8db25f37327fc545542daf909d2f794990aa686ce41e943519",
+				"height": 18,
+				"timestamp": 1698830262497
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "aadb0ad6ccfd412181b325cdaf4adde47c5eab84c9002e509af48f892ecdd37cd828524baef016fa976de071ff6faa10"
+		}
+	},
+	{
+		"address": "ark1uft97nzxstau8fteljh67s324v7x75kdlufefcp0flkhva6tjjjqdjy3vd",
+		"publicKey": "e2565f4c4682fbc3a579fcafaf422aab3c6f52cdff1394e02f4fed76774b94a4",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "e2565f4c4682fbc3a579fcafaf422aab3c6f52cdff1394e02f4fed76774b94a4",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "e2565f4c4682fbc3a579fcafaf422aab3c6f52cdff1394e02f4fed76774b94a4",
+			"validatorRank": 4,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_4",
+			"validatorLastBlock": {
+				"id": "704cfd3f366394bb99c6138d9473b350f69a2fb270de5fb4b8a571813f906be3",
+				"height": 20,
+				"timestamp": 1698830278510
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "af21644f4b00142c3fcb9a9366657dad58502b93396ee5017113465ca06c16bedadff5f5eac30fa08dd5e0669b465671"
+		}
+	},
+	{
+		"address": "ark1yetplljezlng9x9fk8ghspavtkyul49ftr9fe5m0n2h0urxn6z2qr4ef3a",
+		"publicKey": "26561ffe5917e68298a9b1d17807ac5d89cfd4a958ca9cd36f9aaefe0cd3d094",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "26561ffe5917e68298a9b1d17807ac5d89cfd4a958ca9cd36f9aaefe0cd3d094",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "26561ffe5917e68298a9b1d17807ac5d89cfd4a958ca9cd36f9aaefe0cd3d094",
+			"validatorRank": 39,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_39",
+			"validatorLastBlock": {
+				"id": "daa11d8413cfe296a72a2d289fa510e2d5bca0014fab669a7156c3b56815b934",
+				"height": 21,
+				"timestamp": 1698830286517
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "ae3fdfe59b1bacece511266cdf84cf6f8fd0d1f690a7394daf9fe58e8b582e663c818f8491d30e4eb7f2ca87a102f4bd"
+		}
+	},
+	{
 		"address": "ark1d85azse70sftzd47z3lrjfqxdyf8l8jvjwv9ldhnnn6nhm88wgjqqx9j26",
 		"publicKey": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
 		"balance": "0",
@@ -9,27 +451,934 @@
 			"nonce": "0",
 			"balance": "0",
 			"publicKey": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
+			"validatorRank": 26,
+			"validatorApproval": 1.8867924528301887,
 			"validatorUsername": "genesis_26",
 			"validatorLastBlock": {
-				"id": "2fb821b518e67bef1dc3ae7d110e797aec0ab6b0fe0990da1d2db1efe4e2b806",
-				"height": 5586,
-				"reward": "0",
-				"version": 1,
-				"totalFee": "0",
-				"timestamp": 1695806407393,
-				"payloadHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-				"totalAmount": "0",
-				"payloadLength": 0,
-				"previousBlock": "a73861139978abdbb77cc9bf387578da220c55f9714dc7315c4e59b2b385b2f3",
-				"generatorPublicKey": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
-				"numberOfTransactions": 0
+				"id": "6a4a599165ca9bee81f95c66fcd28fd311544ab42d3dcbffe64f0895bce7b2b3",
+				"height": 22,
+				"timestamp": 1698830294525
 			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
 			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "a8a23e59184ccc73445540b4bd912606153916ec795c2d81d29b6175008317da1f9e16ae34dd95ece4f1a228a45005b4"
 		}
 	},
 	{
+		"address": "ark1f574lxuv770pg2qgcf8pfvw5rzt2rdumqz9xl0d5jwac73rp59pshgu4l2",
+		"publicKey": "4d3d5f9b8cf79e142808c24e14b1d41896a1b79b008a6fbdb493bb8f4461a143",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "4d3d5f9b8cf79e142808c24e14b1d41896a1b79b008a6fbdb493bb8f4461a143",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "4d3d5f9b8cf79e142808c24e14b1d41896a1b79b008a6fbdb493bb8f4461a143",
+			"validatorRank": 10,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_10",
+			"validatorLastBlock": {
+				"id": "c41b23b47223925bb0e073f294ee092c38f3658cf6a339231686d36dbb505bc0",
+				"height": 23,
+				"timestamp": 1698830302529
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "96dfeed2acd07c12ab5115c32001eacf9e6c3ace034e733941425c702a94190f647b221b2d6776b4241c845a8ff5536d"
+		}
+	},
+	{
+		"address": "ark10dpza8zpxa780uxfv2ensy3yqnxsuwy8q55nngyr95etlta0d78qpdkmct",
+		"publicKey": "7b422e9c41377c77f0c962b338122404cd0e3887052939a0832d32bfafaf6f8e",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "7b422e9c41377c77f0c962b338122404cd0e3887052939a0832d32bfafaf6f8e",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "7b422e9c41377c77f0c962b338122404cd0e3887052939a0832d32bfafaf6f8e",
+			"validatorRank": 21,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_21",
+			"validatorLastBlock": {
+				"id": "43e12bf1d2cf81f5a33694f762ff003889c2d40d49b3256c5a9846c3d5cf03e9",
+				"height": 24,
+				"timestamp": 1698830310534
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "83238b635e1419cfccb808b69839e6622fa8e0b42cc2991aabb34bd521707a27a396e1839dff1288e737c4da265c731c"
+		}
+	},
+	{
+		"address": "ark1amuy4se5h8qv2rqysy7x9ujndvl6p0urg9s674lkhmeskxfg453s2u8lyk",
+		"publicKey": "eef84ac334b9c0c50c04813c62f2536b3fa0bf834161af57f6bef30b1928ad23",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "eef84ac334b9c0c50c04813c62f2536b3fa0bf834161af57f6bef30b1928ad23",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "eef84ac334b9c0c50c04813c62f2536b3fa0bf834161af57f6bef30b1928ad23",
+			"validatorRank": 38,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_38",
+			"validatorLastBlock": {
+				"id": "d9a15e1d5a08d8d009141dd765aed0845709768004f3b673e648bc35c0c3c199",
+				"height": 25,
+				"timestamp": 1698830318542
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "943f80cf0a3d0e24bba13e13337238b9bf619a9ef06fdf9a37c6403f2d060e1e132f926fae7ae081a124dabea16f047e"
+		}
+	},
+	{
+		"address": "ark1sqvfprvlu6vrgwxpdyzetpn2cck8ldpp3h6y0r295rmvylt5ql7qjxngf4",
+		"publicKey": "8018908d9fe6983438c1690595866ac62c7fb4218df4478d45a0f6c27d7407fc",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "8018908d9fe6983438c1690595866ac62c7fb4218df4478d45a0f6c27d7407fc",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "8018908d9fe6983438c1690595866ac62c7fb4218df4478d45a0f6c27d7407fc",
+			"validatorRank": 41,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_41",
+			"validatorLastBlock": {
+				"id": "a9288fa9365fff917b521469af8dcbc35ba3e615c258c598f6ac13c84ad4d267",
+				"height": 26,
+				"timestamp": 1698830326548
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "87fd9049f835d4a33fdd84e902818618a1f63deb1ba39c1213fb303750280728db56b707aaac332cbaa0b0cd14205513"
+		}
+	},
+	{
+		"address": "ark1hf5laecmq6ul9t6xj0h96wkra0yjs97ehl24rdspeqs40gelqm5s8h3tm5",
+		"publicKey": "ba69fee71b06b9f2af4693ee5d3ac3ebc92817d9bfd551b601c82157a33f06e9",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "ba69fee71b06b9f2af4693ee5d3ac3ebc92817d9bfd551b601c82157a33f06e9",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "ba69fee71b06b9f2af4693ee5d3ac3ebc92817d9bfd551b601c82157a33f06e9",
+			"validatorRank": 12,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_12",
+			"validatorLastBlock": {
+				"id": "f5a9c8e90ab74311090e5a08528f3b78e2f6855efaaf60f179ea5f833da7d219",
+				"height": 27,
+				"timestamp": 1698830334554
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8043750db3cdebc5fd48e441c19eafa4a7f773c31b8d86e45fa2721d1be2f01b17118590afadad996d7912316216c0dd"
+		}
+	},
+	{
+		"address": "ark1llkd3v3rhj22skms3fh4797ms2qgrdzxsykazfnfsxmpag5jjrws3wrwv8",
+		"publicKey": "ffecd8b223bc94a85b708a6f5f17db828081b446812dd1266981b61ea29290dd",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "ffecd8b223bc94a85b708a6f5f17db828081b446812dd1266981b61ea29290dd",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "ffecd8b223bc94a85b708a6f5f17db828081b446812dd1266981b61ea29290dd",
+			"validatorRank": 34,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_34",
+			"validatorLastBlock": {
+				"id": "38260a51d813e0ea1ee6c9e0c8537126a53660ef84097534545b0ed652e951ce",
+				"height": 28,
+				"timestamp": 1698830342562
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "a340d5843d96f7c62bee7001bf8ad65036504628a17b83083e8566dac0b5a003137776da58b220e1b289361054f68247"
+		}
+	},
+	{
+		"address": "ark189gphv4h686m80fn57efrr2ehkxcwevzkh6gcwsj83gwhjqzm8yqg9frsk",
+		"publicKey": "39501bb2b7d1f5b3bd33a7b2918d59bd8d876582b5f48c3a123c50ebc802d9c8",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "39501bb2b7d1f5b3bd33a7b2918d59bd8d876582b5f48c3a123c50ebc802d9c8",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "39501bb2b7d1f5b3bd33a7b2918d59bd8d876582b5f48c3a123c50ebc802d9c8",
+			"validatorRank": 11,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_11",
+			"validatorLastBlock": {
+				"id": "897fe9334f952006ca5d1ecae00ef3904cb20b767c648db825e21009bb9744c1",
+				"height": 29,
+				"timestamp": 1698830350570
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "89b3d4f4a8443a9aebf8a80658c95a1b8bc03082d37dc1f4f8c467da51306d5d776f0ad372f8c7fb16be4e4162669a92"
+		}
+	},
+	{
+		"address": "ark148q0xcvacrtjlcs8055rvhd0vvup73xdg0dnuk8lrpn5dm6f8ezsfxfp8v",
+		"publicKey": "a9c0f3619dc0d72fe2077d28365daf63381f44cd43db3e58ff186746ef493e45",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "a9c0f3619dc0d72fe2077d28365daf63381f44cd43db3e58ff186746ef493e45",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "a9c0f3619dc0d72fe2077d28365daf63381f44cd43db3e58ff186746ef493e45",
+			"validatorRank": 44,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_44",
+			"validatorLastBlock": {
+				"id": "a01e6dc6ca215967ec5965d97834c1dec1879566f857db109176f9b4f3c83097",
+				"height": 30,
+				"timestamp": 1698830358577
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8b058ddee2cd0a506e5936fd5015db54633643524971b39db2505d4224f363e850dfeab5af46175faf0bfcb9ee591c74"
+		}
+	},
+	{
+		"address": "ark1wenx6ymr0tt3wdswdw79wvc5jxh7c40qtzep60fvgp0skkcfze5qhy5kt4",
+		"publicKey": "76666d13637ad717360e6bbc57331491afec55e058b21d3d2c405f0b5b091668",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "76666d13637ad717360e6bbc57331491afec55e058b21d3d2c405f0b5b091668",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "76666d13637ad717360e6bbc57331491afec55e058b21d3d2c405f0b5b091668",
+			"validatorRank": 46,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_46",
+			"validatorLastBlock": {
+				"id": "398c80de55c8bf6559a48fb56e681a075d6f9685d9b336502eab6c602934cf4b",
+				"height": 31,
+				"timestamp": 1698830366583
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8a904777de440cb084ed3edd0ed1739334aaaa76a524693abfdfe286a6e5519056b732da7dd403eee5339d4d9690fd43"
+		}
+	},
+	{
+		"address": "ark16fgulfxjzejmrpgcycym5qf7vw4kz9ndt0cxfy0mwlx52d47xqcsqu6k59",
+		"publicKey": "d251cfa4d21665b185182609ba013e63ab61166d5bf06491fb77cd4536be3031",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "d251cfa4d21665b185182609ba013e63ab61166d5bf06491fb77cd4536be3031",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "d251cfa4d21665b185182609ba013e63ab61166d5bf06491fb77cd4536be3031",
+			"validatorRank": 51,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_51",
+			"validatorLastBlock": {
+				"id": "d6707073d05f068e2ccc5668a3338bd5458a9cd9de7e691a06218bbde25293c8",
+				"height": 32,
+				"timestamp": 1698830374589
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "811c8e33bb6bf58779a819ca27a14e1063bf02cc3bd8b665a552f58cbe3385ff2cddf60f1e32cd9f2bf7b2b8c0c0c575"
+		}
+	},
+	{
+		"address": "ark1q3huaf5jtuwytvep8denxfu7ccqpqfggm8xcyj49yy99kv7zmtyqrvqyyp",
+		"publicKey": "046fcea6925f1c45b3213b7333279ec600102508d9cd824aa5210a5b33c2dac8",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "046fcea6925f1c45b3213b7333279ec600102508d9cd824aa5210a5b33c2dac8",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "046fcea6925f1c45b3213b7333279ec600102508d9cd824aa5210a5b33c2dac8",
+			"validatorRank": 23,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_23",
+			"validatorLastBlock": {
+				"id": "8c9dd20e4f02025902ef1f6809fd4ea8819f23cc5129651426b3cff315ad2151",
+				"height": 33,
+				"timestamp": 1698830382597
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "aab67ba60645f8a7f084d4a5728034ad92f39d3444d05808999d7da87c97aabc6ff7dc2de38d5538e764f0e8e762b829"
+		}
+	},
+	{
+		"address": "ark1hav7u26v57veatt0jr5f758sq5g5fy89n9t5a8t5pfxs0v274w7qk0nmw3",
+		"publicKey": "bf59ee2b4ca7999ead6f90e89f50f005114490e599574e9d740a4d07b15eabbc",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "bf59ee2b4ca7999ead6f90e89f50f005114490e599574e9d740a4d07b15eabbc",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "bf59ee2b4ca7999ead6f90e89f50f005114490e599574e9d740a4d07b15eabbc",
+			"validatorRank": 6,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_6",
+			"validatorLastBlock": {
+				"id": "40f9b73b914247f1199b636a27954f9b35e63acb83b9e704723e9dc672b339b6",
+				"height": 34,
+				"timestamp": 1698830390604
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8bb4f34f5945f39bbdbf27d810c345ec65ae35e0fee55acd75d4f50957a49103ddd65db1914fe635cecab75a009ff6a6"
+		}
+	},
+	{
+		"address": "ark1cr7h9u5ue8zzkhvk6djdk9uvtw2mjwkljjuwyzq2ftu5j82g0ejq05wqmf",
+		"publicKey": "c0fd72f29cc9c42b5d96d364db178c5b95b93adf94b8e2080a4af9491d487e64",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "c0fd72f29cc9c42b5d96d364db178c5b95b93adf94b8e2080a4af9491d487e64",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "c0fd72f29cc9c42b5d96d364db178c5b95b93adf94b8e2080a4af9491d487e64",
+			"validatorRank": 37,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_37",
+			"validatorLastBlock": {
+				"id": "fbb4c1fe140c738d006695334fe0ba6ee6a43a75ce8383435a085e5d7122d161",
+				"height": 35,
+				"timestamp": 1698830398611
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "90ccb380b56e08e35991b2ee505bada1c353daf8ab032a88782ee07246c870c860ecf84d0e0524a73364fdbb0ad3c37a"
+		}
+	},
+	{
+		"address": "ark1npxsrfajr4sr9m5ajpf4d7qkcp2mkmgalv2uxa736hpd8t4dtpnqaj4ylr",
+		"publicKey": "984d01a7b21d6032ee9d905356f816c055bb6d1dfb15c377d1d5c2d3aead5866",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "984d01a7b21d6032ee9d905356f816c055bb6d1dfb15c377d1d5c2d3aead5866",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "984d01a7b21d6032ee9d905356f816c055bb6d1dfb15c377d1d5c2d3aead5866",
+			"validatorRank": 9,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_9",
+			"validatorLastBlock": {
+				"id": "8c70a751d675d90b2d8ce04cd63f3367b15e872495357e35cab9300914bef713",
+				"height": 36,
+				"timestamp": 1698830406615
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "94e3820f66505af8202241fcc6f1886782c5048a67821ff4e8345786cfc22162877cc28d0c1bb1c126a31790189aa6ad"
+		}
+	},
+	{
+		"address": "ark1a8wknhnwwuegu7a046xth93mr3gqurskk4uj7x9llmx46ylem8rsrnhny8",
+		"publicKey": "e9dd69de6e77328e7bafae8cbb963b1c500e0e16b5792f18bffecd5d13f9d9c7",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "e9dd69de6e77328e7bafae8cbb963b1c500e0e16b5792f18bffecd5d13f9d9c7",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "e9dd69de6e77328e7bafae8cbb963b1c500e0e16b5792f18bffecd5d13f9d9c7",
+			"validatorRank": 22,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_22",
+			"validatorLastBlock": {
+				"id": "57ff41744cfbe0678365a519147b3538f3c8b8773c0e3dd492bb5454d145a4cb",
+				"height": 37,
+				"timestamp": 1698830414624
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "acc8a8bf90da648d9c783f4b5a5c0bb76177e0a0e452af192bf1f3e80b6540e953252b799091ef47bf0153a91f39eb16"
+		}
+	},
+	{
+		"address": "ark1475xqea9pt8f070t49llep4zepzjcz5p73mnzgzsgxwx5az2ft9q9x0392",
+		"publicKey": "afa86067a50ace97f9eba97ffc86a2c8452c0a81f477312050419c6a744a4aca",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "afa86067a50ace97f9eba97ffc86a2c8452c0a81f477312050419c6a744a4aca",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "afa86067a50ace97f9eba97ffc86a2c8452c0a81f477312050419c6a744a4aca",
+			"validatorRank": 27,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_27",
+			"validatorLastBlock": {
+				"id": "2c60444b08d2e8ccfae4cb82d3b9a4ed3954e7fd2e0ecb8a255abaf3e19a3b6e",
+				"height": 38,
+				"timestamp": 1698830422627
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "838383ba9a7de491bd07a72fa3f984ae9731a5cd2203af70a1be36d325064d84fc02c1d1b0983d64ac1f5e18c0144d2b"
+		}
+	},
+	{
+		"address": "ark13nz8m7ce398tlzvd3fd5tdhszz30sq29mh55d8dfa5flvdtty2mshch6c7",
+		"publicKey": "8cc47dfb19894ebf898d8a5b45b6f010a2f80145dde9469da9ed13f6356b22b7",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "8cc47dfb19894ebf898d8a5b45b6f010a2f80145dde9469da9ed13f6356b22b7",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "8cc47dfb19894ebf898d8a5b45b6f010a2f80145dde9469da9ed13f6356b22b7",
+			"validatorRank": 19,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_19",
+			"validatorLastBlock": {
+				"id": "806cc35e70cb8f176030fefe66c5b0ca504c903250707613647a1eac123e2e81",
+				"height": 39,
+				"timestamp": 1698830430635
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "b5c0321c0644a955dab39a3fe8a53e5865604cd6eed6165f348348a502463cecb53f1245d5aff1f3144b022d03b22000"
+		}
+	},
+	{
+		"address": "ark1awnyljzymssp5au0rlxy02apxh0t4sl65hjwfuhu9jjgu5z68wws8yvxxc",
+		"publicKey": "eba64fc844dc201a778f1fcc47aba135debac3faa5e4e4f2fc2ca48e505a3b9d",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "eba64fc844dc201a778f1fcc47aba135debac3faa5e4e4f2fc2ca48e505a3b9d",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "eba64fc844dc201a778f1fcc47aba135debac3faa5e4e4f2fc2ca48e505a3b9d",
+			"validatorRank": 24,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_24",
+			"validatorLastBlock": {
+				"id": "4d52b9b4226e3c89f870ffff52b6a34d89782c65d14e7b8527398b5fc307502f",
+				"height": 40,
+				"timestamp": 1698830438644
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8d66b08722834eb97357df8cdaff81939fb539cebe78449231115cd0ddd494d9faf58c35ae820306848473295b44c3dc"
+		}
+	},
+	{
+		"address": "ark1fg9uxay0g4kq453mw4mwr4xgw8c32mz6p0r8u3caekycwffxrg4qvt2f7y",
+		"publicKey": "4a0bc3748f456c0ad23b7576e1d4c871f1156c5a0bc67e471dcd898725261a2a",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "4a0bc3748f456c0ad23b7576e1d4c871f1156c5a0bc67e471dcd898725261a2a",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "4a0bc3748f456c0ad23b7576e1d4c871f1156c5a0bc67e471dcd898725261a2a",
+			"validatorRank": 16,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_16",
+			"validatorLastBlock": {
+				"id": "7b3a1f5b4a96128c731def519d14831bdaeb4db3cfa1eebd34f49d85ee19b66d",
+				"height": 41,
+				"timestamp": 1698830446653
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "9905a0c939db80e4796521b446ce87b4c0435df268a3a797749447e74661b0a2423af26422c3cf702d157d8461578880"
+		}
+	},
+	{
+		"address": "ark173j6lt4g05k8mn5zcsdv6l3mry7z927y2vqenf0pj347hsut6yms2nc5qj",
+		"publicKey": "f465afaea87d2c7dce82c41acd7e3b193c22abc4530199a5e1946bebc38bd137",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "f465afaea87d2c7dce82c41acd7e3b193c22abc4530199a5e1946bebc38bd137",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "f465afaea87d2c7dce82c41acd7e3b193c22abc4530199a5e1946bebc38bd137",
+			"validatorRank": 49,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_49",
+			"validatorLastBlock": {
+				"id": "d60846f763b24ea0f54467ebb56c322cb2b83fa65e506ae3a03f104e88a10822",
+				"height": 42,
+				"timestamp": 1698830454659
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "b6257b4cebfc494c2f0287dad68c60d7d2d18652cdd4f11df330cc3b6cedc41bb2a637ee7953d6ce698260f883aaf4c7"
+		}
+	},
+	{
+		"address": "ark1rz6wy2m9c7lzsp8spcrdqzf3hp74p2hxal0eqapac63xdeg7ntwqfufhwv",
+		"publicKey": "18b4e22b65c7be2804f00e06d00931b87d50aae6efdf90743dc6a266e51e9adc",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "18b4e22b65c7be2804f00e06d00931b87d50aae6efdf90743dc6a266e51e9adc",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "18b4e22b65c7be2804f00e06d00931b87d50aae6efdf90743dc6a266e51e9adc",
+			"validatorRank": 2,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_2",
+			"validatorLastBlock": {
+				"id": "7c3a053bb16154a52cbd47ff30618db2b976f5d7787232cd55f85b3b8c03c716",
+				"height": 43,
+				"timestamp": 1698830462661
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "b65edf7f05d20e92997630b2c946fafc75a969b2d13e5d3f7e333771113a81aa2804e2d8d0d06197f91d3720777aafba"
+		}
+	},
+	{
+		"address": "ark1kjn0q03mn2nfck0xmvn3xen3xcc0xt8qmt4tuhr2w8fn3gwdln5qyt43sf",
+		"publicKey": "b4a6f03e3b9aa69c59e6db271366713630f32ce0daeabe5c6a71d338a1cdfce8",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "b4a6f03e3b9aa69c59e6db271366713630f32ce0daeabe5c6a71d338a1cdfce8",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "b4a6f03e3b9aa69c59e6db271366713630f32ce0daeabe5c6a71d338a1cdfce8",
+			"validatorRank": 50,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_50",
+			"validatorLastBlock": {
+				"id": "1a9dd47602a9de5862062249984ddbf4c1e19e0d47e291a76455d8976c448305",
+				"height": 44,
+				"timestamp": 1698830470668
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "b6b2ff0404f9ddccf7486664a91abef4b1887b0af6b33043e705baa0cb2b5f7d82b8293e0868fb33b13fa654c4789a6b"
+		}
+	},
+	{
+		"address": "ark1wgr76grwrzc8th3xwkv28dav6xxvvcj5smyc88y34h0yr5whk2yqkfgvjg",
+		"publicKey": "7207ed206e18b075de267598a3b7acd18cc6625486c9839c91adde41d1d7b288",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "7207ed206e18b075de267598a3b7acd18cc6625486c9839c91adde41d1d7b288",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "7207ed206e18b075de267598a3b7acd18cc6625486c9839c91adde41d1d7b288",
+			"validatorRank": 33,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_33",
+			"validatorLastBlock": {
+				"id": "8ed1c7cf9f042faea5bf288d08a4873d831e6ff05dd37b21e38e4e5ccb968c14",
+				"height": 45,
+				"timestamp": 1698830478676
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "832e7f7fd32015d89e888e1d210b7b39280d7762357837182029f0ab1facff8be4da93d87138547b5b923b22ac12c56a"
+		}
+	},
+	{
+		"address": "ark1hjrgd03cyd7dr2dmtmag2apmpwjef3w5x0xare4lmqzduywe9yjqzzrd6f",
+		"publicKey": "bc8686be38237cd1a9bb5efa85743b0ba594c5d433cdd1e6bfd804de11d92924",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "bc8686be38237cd1a9bb5efa85743b0ba594c5d433cdd1e6bfd804de11d92924",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "bc8686be38237cd1a9bb5efa85743b0ba594c5d433cdd1e6bfd804de11d92924",
+			"validatorRank": 52,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_52",
+			"validatorLastBlock": {
+				"id": "4a1458737a56a7476cb8b136ede3a7f42b164e7e9115a45071a1e450c84476f7",
+				"height": 46,
+				"timestamp": 1698830486677
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "9071101510853cfafd9be138aad3de8c83d77b76ed32f3044201f0f9e3aa69ff165d41a5828a8516f8e6b9e99761fd85"
+		}
+	},
+	{
+		"address": "ark1lw06wca3adxz0l5c2a9756hh5xkf90z3dj9n8f94vcdzh4lr3mssv3t5cz",
+		"publicKey": "fb9fa763b1eb4c27fe98574bea6af7a1ac92bc516c8b33a4b5661a2bd7e38ee1",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "fb9fa763b1eb4c27fe98574bea6af7a1ac92bc516c8b33a4b5661a2bd7e38ee1",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "fb9fa763b1eb4c27fe98574bea6af7a1ac92bc516c8b33a4b5661a2bd7e38ee1",
+			"validatorRank": 35,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_35",
+			"validatorLastBlock": {
+				"id": "e1938a035ce8902883d31d3f1c1c748b29b03e2edab4062154011b5c9016c97e",
+				"height": 47,
+				"timestamp": 1698830494684
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "866c904686a020c725bafde34c6a36f50d0ebf7bd3869c7622ebd9ea079bd09c233c81d31d4a025bcc5a4db7ab1082c0"
+		}
+	},
+	{
+		"address": "ark1sr7hra35vqpg3mscq6y76earv3m6jdk8f8kufdseh3h7fduurxjsatl08q",
+		"publicKey": "80fd71f634600288ee180689ed67a36477a936c749edc4b619bc6fe4b79c19a5",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "80fd71f634600288ee180689ed67a36477a936c749edc4b619bc6fe4b79c19a5",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "80fd71f634600288ee180689ed67a36477a936c749edc4b619bc6fe4b79c19a5",
+			"validatorRank": 36,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_36",
+			"validatorLastBlock": {
+				"id": "657500f13c5d828775dc71b5b81a2ed9f7057770e8507f32fc5c2d6def8f1c5d",
+				"height": 48,
+				"timestamp": 1698830502691
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "ad75660474e5054d4aba9a99ae46a0f064c33cc4f37fa34951bae28e00d8c20b5651dada97d45d46cc9d1e4638c62996"
+		}
+	},
+	{
+		"address": "ark1wycvvr096qnhhu0dq28jxfftqdghdxz7ku2x3u25nqkyk4wvt8fqxt2q5f",
+		"publicKey": "7130c60de5d0277bf1ed028f23252b035176985eb71468f154982c4b55cc59d2",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "7130c60de5d0277bf1ed028f23252b035176985eb71468f154982c4b55cc59d2",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "7130c60de5d0277bf1ed028f23252b035176985eb71468f154982c4b55cc59d2",
+			"validatorRank": 43,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_43",
+			"validatorLastBlock": {
+				"id": "52a6ce581b076df54ea847e6c6b0a9acdc903ee0983d896a3b91b50cdc6c4b16",
+				"height": 49,
+				"timestamp": 1698830510694
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "a418cd50c3245cd7a28c6c9bd6cef1ab6fae91b87794ba5861961e4739625e7452653f4cd54fbc9427b3c05508cdc186"
+		}
+	},
+	{
+		"address": "ark1a3cxnyhm06xwv7mcdwsdcsf23vjqfsm5a9k2cvn42s9zxlm27xnqr67gtu",
+		"publicKey": "ec706992fb7e8ce67b786ba0dc412a8b2404c374e96cac3275540a237f6af1a6",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "ec706992fb7e8ce67b786ba0dc412a8b2404c374e96cac3275540a237f6af1a6",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "ec706992fb7e8ce67b786ba0dc412a8b2404c374e96cac3275540a237f6af1a6",
+			"validatorRank": 25,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_25",
+			"validatorLastBlock": {
+				"id": "32aab0897994d8efe51b7f6d47220f2ba8bb2b1cd4b68e423c78c47aeedf0582",
+				"height": 50,
+				"timestamp": 1698830518699
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "99a9e3282f3a5893ad993979d6a4fee266c8db355588501f84bfa5929a87c7ed2729d7524e5fe0a80162197f8d623d4e"
+		}
+	},
+	{
+		"address": "ark1q48pl7nsq4rp445aarjs63rvuknjs365mlatl9cl2pzw74scjfuqfsj96w",
+		"publicKey": "054e1ffa7005461ad69de8e50d446ce5a7284754dffabf971f5044ef56189278",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "054e1ffa7005461ad69de8e50d446ce5a7284754dffabf971f5044ef56189278",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "054e1ffa7005461ad69de8e50d446ce5a7284754dffabf971f5044ef56189278",
+			"validatorRank": 3,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_3",
+			"validatorLastBlock": {
+				"id": "63ae0e6774f5eeb1932d237d2fd1287739560f823eb49c0018752275507c6707",
+				"height": 52,
+				"timestamp": 1698830534714
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "969befe63c7ffd3e5f290b16ca41f8ed77fde58e84a71c8ebfdeebf080ed7571f24be46a84126f26cc913716db379e4f"
+		}
+	},
+	{
+		"address": "ark1sxmu9s8gkhqhdwpy4vv35h2djzg0sl6fgvzlg58xsckzz7jmv2sq9hzfzy",
+		"publicKey": "81b7c2c0e8b5c176b824ab191a5d4d9090f87f494305f450e6862c217a5b62a0",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "81b7c2c0e8b5c176b824ab191a5d4d9090f87f494305f450e6862c217a5b62a0",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "81b7c2c0e8b5c176b824ab191a5d4d9090f87f494305f450e6862c217a5b62a0",
+			"validatorRank": 42,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_42",
+			"validatorLastBlock": {
+				"id": "7902154dca9eeb9ebe3ea6835702fd15282e97c704c64cae3742a5894dda6769",
+				"height": 53,
+				"timestamp": 1698830542720
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 1,
+			"validatorConsensusPublicKey": "8ba3c51505cb2d3605fb652fd61a524f2ab6efb5c21697d90ab3fda8a3a8745f3283ec968d870d7f302c659a16070ac9"
+		}
+	},
+	{
+		"address": "ark1n33nkzx96wecfld5ak4rpfh42v3pvw27pt6avgt3tm35z7ca342qv5x34l",
+		"publicKey": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+			"validatorRank": 13,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_13",
+			"validatorLastBlock": {
+				"id": "ba456e32153484e1d3b09bb78660d2354e10fae26a13b57d295906699657962a",
+				"height": 54,
+				"timestamp": 1698830550727
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 2,
+			"validatorConsensusPublicKey": "b17da79a16b43ba4e12adafb700a6125ce44359c111c8d5dda71fda385bb0d5205e8816de28bcfa21c66c36229dddbaf"
+		}
+	},
+	{
+		"address": "ark1zqa5kh2wypff7azu2g7daa2aljt7dn64x6yus2x8j3x4a7m4gj6scx3qsu",
+		"publicKey": "103b4b5d4e20529f745c523cdef55dfc97e6cf553689c828c7944d5efb7544b5",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "103b4b5d4e20529f745c523cdef55dfc97e6cf553689c828c7944d5efb7544b5",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "103b4b5d4e20529f745c523cdef55dfc97e6cf553689c828c7944d5efb7544b5",
+			"validatorRank": 28,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_28",
+			"validatorLastBlock": {
+				"id": "88195b2ea8eb6eac84d77eb52f37f44fdc08862f611495ad5898173e76dc01d4",
+				"height": 55,
+				"timestamp": 1698830558731
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 2,
+			"validatorConsensusPublicKey": "a0434aac83269e406f40d0f137f9ae0cf0f641a23424eb704c477cdc96440f0765a21978bde00312e2dfd7a4b2dbdb82"
+		}
+	},
+	{
+		"address": "ark134y8yt4dd07tcuhx62dgf0j5cfyvzf4cpytc56229dqf3p6d2ltqs5qreu",
+		"publicKey": "8d48722ead6bfcbc72e6d29a84be54c248c126b809178a694a2b4098874d57d6",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "8d48722ead6bfcbc72e6d29a84be54c248c126b809178a694a2b4098874d57d6",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "8d48722ead6bfcbc72e6d29a84be54c248c126b809178a694a2b4098874d57d6",
+			"validatorRank": 29,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_29",
+			"validatorLastBlock": {
+				"id": "7e503d7946328c280dc9493dc3af344d467770742c2ef12b060332c0dff92db1",
+				"height": 56,
+				"timestamp": 1698830566737
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 2,
+			"validatorConsensusPublicKey": "a04d0fc952acb96898b6d60213e9bb13e8a98e1ce24adad91777abc62d394f33aed45791e31298e18434c0b9a79d0bcc"
+		}
+	},
+	{
+		"address": "ark1sc49s3uy6krhfjyx5c2xqwfl50scycz9ay8l5q92y47feng8a83srrltwr",
+		"publicKey": "862a584784d58774c886a61460393fa3e1826045e90ffa00aa257c9ccd07e9e3",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "862a584784d58774c886a61460393fa3e1826045e90ffa00aa257c9ccd07e9e3",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "862a584784d58774c886a61460393fa3e1826045e90ffa00aa257c9ccd07e9e3",
+			"validatorRank": 15,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_15",
+			"validatorLastBlock": {
+				"id": "5faab393dbbd6c0b58aa46233acbd7b60a1240607cfe650fc8506f422caab501",
+				"height": 59,
+				"timestamp": 1698830590762
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 2,
+			"validatorConsensusPublicKey": "87419293f6e0e50d352e06ca015d7bde0241267334c1484d3c29a458c76525b6eeba59e4e118ad03043b320b6d3dffbf"
+		}
+	},
+	{
 		"address": "ark1z5a7wer7hcrzhd3jhdcjjhqd64zjjd8h8fsteheerm3tvrqc4xas4v00dw",
+		"publicKey": "153be7647ebe062bb632bb71295c0dd5452934f73a60bcdf391ee2b60c18a9bb",
+		"balance": "0",
+		"nonce": "0",
+		"attributes": {
+			"vote": "153be7647ebe062bb632bb71295c0dd5452934f73a60bcdf391ee2b60c18a9bb",
+			"nonce": "0",
+			"balance": "0",
+			"publicKey": "153be7647ebe062bb632bb71295c0dd5452934f73a60bcdf391ee2b60c18a9bb",
+			"validatorRank": 1,
+			"validatorApproval": 1.8867924528301887,
+			"validatorUsername": "genesis_1",
+			"validatorLastBlock": {
+				"id": "fdb278d8aaa332135d60a52a37c73d6a5087b9711bfe52553b343d3f7d0fb98a",
+				"height": 60,
+				"timestamp": 1698830598770
+			},
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "0",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 2,
+			"validatorConsensusPublicKey": "a0468313c14d110536e82e454757e0865618bfae27671c37ffcffeb32493787cfc7f7352949f60fb13ed802aee892cad"
+		}
+	},
+	{
+		"address": "ark1x5a7wer7hcrzhd3jhdcjjhqd64zjjd8h8fsteheerm3tvrqc4xas4v00dw",
 		"publicKey": "a73861139978abdbb77cc9bf387578da220c55f9714dc7315c4e59b2b385b2f3",
 		"balance": "0",
 		"nonce": "0",
