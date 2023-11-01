@@ -1,8 +1,9 @@
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import appJson from "../../../core/bin/config/testnet/app.json";
+import appJson from "../../../core/bin/config/testnet/mainsail/app.json";
 import { describe } from "../../../test-framework";
 import { AppGenerator } from "./app";
+import { makeApplication } from "../application-factory";
 
 describe<{
 	dataPath: string;
@@ -12,9 +13,11 @@ describe<{
 		setGracefulCleanup();
 	});
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
+		const app = await makeApplication();
+
 		context.dataPath = dirSync().name;
-		context.appGenerator = new AppGenerator();
+		context.appGenerator = app.resolve(AppGenerator);
 	});
 
 	it("#generateDefault - should default data", ({ appGenerator }) => {

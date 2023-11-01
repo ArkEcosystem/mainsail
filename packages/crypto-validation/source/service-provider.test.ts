@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import cryptoJson from "../../core/bin/config/testnet/crypto.json";
+import cryptoJson from "../../core/bin/config/testnet/mainsail/crypto.json";
 import { describe, Sandbox } from "../../test-framework";
 import { ServiceProvider } from "./service-provider";
 
@@ -18,8 +18,8 @@ describe<{
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.validator = {
-			addKeyword: () => {},
-			addSchema: () => {},
+			addKeyword: () => { },
+			addSchema: () => { },
 		};
 
 		context.sandbox = new Sandbox();

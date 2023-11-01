@@ -1,4 +1,4 @@
-import cryptoConfig from "../../../core/bin/config/testnet/crypto.json";
+import cryptoConfig from "../../../core/bin/config/testnet/mainsail/crypto.json";
 import { Types } from "../factories";
 import { describe } from "../index";
 import passphrases from "./passphrases.json";

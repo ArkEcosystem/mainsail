@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import cryptoConfig from "../../../../core/bin/config/testnet/crypto.json";
+import cryptoConfig from "../../../../core/bin/config/testnet/mainsail/crypto.json";
 import { describe, Sandbox } from "../../index";
 import { FactoryBuilder } from "../factory-builder";
 import { registerBlockFactory } from "./block";

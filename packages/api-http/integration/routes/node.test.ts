@@ -1,7 +1,7 @@
 import { describe, Sandbox } from "../../../test-framework";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
-import cryptoJson from "../../../core/bin/config/testnet/crypto.json";
+import cryptoJson from "../../../core/bin/config/testnet/mainsail/crypto.json";
 
 import transactionTypes from "../../test/fixtures/transactions_types.json";
 import transactions from "../../test/fixtures/transactions.json";

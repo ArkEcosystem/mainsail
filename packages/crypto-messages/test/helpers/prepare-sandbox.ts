@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import crypto from "../../../core/bin/config/testnet/crypto.json";
+import crypto from "../../../core/bin/config/testnet/mainsail/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
 import { ServiceProvider as CryptoBlock } from "../../../crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config";
@@ -47,7 +47,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoValidation).register();
 	await context.sandbox.app.resolve(CryptoBlock).register();
 
-	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => {} });
+	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => { } });
 	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 

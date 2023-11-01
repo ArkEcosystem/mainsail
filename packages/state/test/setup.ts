@@ -4,7 +4,7 @@ import { Providers, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy, spy } from "sinon";
 
-import cryptoJson from "../../core/bin/config/testnet/crypto.json";
+import cryptoJson from "../../core/bin/config/testnet/mainsail/crypto.json";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../crypto-config";
 import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";
@@ -174,14 +174,14 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
 	sandbox.app.bind(Identifiers.Database.BlockStorage).toConstantValue({
-		deleteBlocks: () => {},
-		deleteTopBlocks: () => {},
-		saveBlocks: () => {},
+		deleteBlocks: () => { },
+		deleteTopBlocks: () => { },
+		saveBlocks: () => { },
 	});
 	sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
-		getActiveValidators: () => {},
-		handleCommitBlock: () => {},
-		initialize: () => {},
+		getActiveValidators: () => { },
+		handleCommitBlock: () => { },
+		initialize: () => { },
 	});
 	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 
@@ -282,7 +282,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 	const blockFactory = {
-		fromData: () => {},
+		fromData: () => { },
 	};
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);

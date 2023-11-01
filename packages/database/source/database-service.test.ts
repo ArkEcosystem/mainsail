@@ -18,7 +18,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import cryptoJson from "../../core/bin/config/testnet/crypto.json";
+import cryptoJson from "../../core/bin/config/testnet/mainsail/crypto.json";
 import { describe, Factories, Sandbox } from "../../test-framework";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
@@ -86,7 +86,7 @@ describe<{
 		context.sandbox.app.useDataPath(dirSync().name);
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
-			info: () => {},
+			info: () => { },
 		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
