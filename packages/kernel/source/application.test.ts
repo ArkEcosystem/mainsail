@@ -37,9 +37,9 @@ describe<{
 		context.app = new Application(context.container);
 
 		context.logger = {
-			debug: () => { },
-			error: () => { },
-			notice: () => { },
+			debug: () => {},
+			error: () => {},
+			notice: () => {},
 		};
 
 		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
