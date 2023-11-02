@@ -36,8 +36,6 @@ export interface ITransactionHandler {
 
 	isActivated(): Promise<boolean>;
 
-	bootstrap(walletRepository: WalletRepository, transactions: ITransaction[]): Promise<void>;
-
 	applyToRecipient(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
 }
 

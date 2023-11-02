@@ -171,11 +171,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public abstract isActivated(): Promise<boolean>;
 
-	public abstract bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void>;
-
 	public abstract applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,

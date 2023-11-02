@@ -30,26 +30,6 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		return MultiSignatureRegistrationTransaction;
 	}
 
-	public async bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void> {
-		for (const transaction of this.allTransactions(transactions)) {
-			AppUtils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(transaction.asset?.multiSignature);
-
-			const multiSignature: Contracts.State.WalletMultiSignatureAttributes = transaction.asset.multiSignature;
-			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-				await this.publicKeyFactory.fromMultiSignatureAsset(multiSignature),
-			);
-
-			if (wallet.hasMultiSignature()) {
-				throw new Exceptions.MultiSignatureAlreadyRegisteredError();
-			}
-
-			wallet.setAttribute("multiSignature", multiSignature);
-		}
-	}
-
 	public async isActivated(): Promise<boolean> {
 		return true;
 	}
