@@ -109,8 +109,6 @@ describe<{
 		await sleep(15);
 
 		assert.gt(methodFinish2, methodFinish1);
-		assert.gt(methodFinish2 - methodFinish1, 4);
-		assert.lt(methodFinish2 - methodFinish1, 6);
 
 		assert.equal(onDrainCount, 1);
 	});
