@@ -16,6 +16,8 @@ interface DeferredSync {
 	wallets: Models.Wallet[];
 }
 
+const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
+
 @injectable()
 export class Sync implements Contracts.ApiSync.ISync {
 	@inject(Identifiers.Application)
@@ -290,5 +292,3 @@ export class Sync implements Contracts.ApiSync.ISync {
 		this.logger.debug(`synced committed block: ${deferred.block.height} in ${t1 - t0}ms`);
 	}
 }
-
-const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
