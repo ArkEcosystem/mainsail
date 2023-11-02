@@ -30,14 +30,16 @@ describe<{
 	logger: Record<string, Function>;
 }>("Application", ({ afterEach, assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
+		delete process.env.CORE_PATH_CONFIG;
+
 		context.container = new Container();
 
 		context.app = new Application(context.container);
 
 		context.logger = {
-			debug: () => {},
-			error: () => {},
-			notice: () => {},
+			debug: () => { },
+			error: () => { },
+			notice: () => { },
 		};
 
 		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
@@ -52,7 +54,7 @@ describe<{
 		await context.app.bootstrap({
 			flags: {
 				network: "testnet",
-				paths: { config: resolve(__dirname, "../test/stubs/config") },
+				paths: { config: resolve(__dirname, "../test/stubs/config/local") },
 				token: "ark",
 				name: "local",
 			},
