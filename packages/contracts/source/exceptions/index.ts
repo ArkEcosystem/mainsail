@@ -2,6 +2,7 @@ export * from "./base";
 export * from "./cache";
 export * from "./cli";
 export * from "./config";
+export * from "./consensus";
 export * from "./container";
 export * from "./crypto";
 export * from "./filesystem";
