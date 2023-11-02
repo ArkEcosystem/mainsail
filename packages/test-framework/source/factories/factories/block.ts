@@ -14,7 +14,7 @@ export const registerBlockFactory = async (
 	config?: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
 	const app = await generateApp(
-		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/crypto.json")),
+		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/mainsail/crypto.json")),
 	);
 
 	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.ICommittedBlock> => {

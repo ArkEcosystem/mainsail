@@ -49,6 +49,7 @@ export type InternalOptions = EnvironmentOptions &
 		peers: string[];
 
 		// General
+		packageName?: string;
 		configPath?: string;
 		overwriteConfig: boolean;
 		force: boolean;

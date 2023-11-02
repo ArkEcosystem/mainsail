@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { camelCase, expandTilde, set } from "@mainsail/utils";
 import envPaths from "env-paths";
 import { ensureDirSync } from "fs-extra";
-import { resolve } from "path";
+import { join, resolve } from "path";
 
 import { ConfigRepository } from "../services/config";
 import { assert } from "../utils";
@@ -21,21 +21,19 @@ export class RegisterBasePaths implements Bootstrapper {
 		const paths: Array<[string, string]> = Object.entries(envPaths(this.app.token(), { suffix: "core" }));
 
 		for (let [type, path] of paths) {
-			const environmentName = `CORE_PATH_${type.toUpperCase()}_${this.app
-				.name()
-				.toUpperCase()
-				.replace(/-/g, "_")}`;
-			const processPath: string | undefined = process.env[environmentName];
+			const configKey = `CORE_PATH_${type.toUpperCase()}`;
+
+			const processPath: string | undefined = process.env[configKey];
 
 			if (processPath) {
 				// 1. Check if a path is defined via process variables.
-				path = processPath;
+				path = join(processPath, this.app.name());
 			} else if (this.configRepository.has(`app.flags.paths.${type}`)) {
 				// 2. Check if a path is defined via configuration repository.
 				path = this.configRepository.get(`app.flags.paths.${type}`);
 			} else {
 				// 3. If the default path is used we'll append the network name to it.
-				path = `${path}/${this.app.network()}/${this.app.name()}`;
+				path = join(path, this.app.network(), this.app.name());
 			}
 
 			path = resolve(expandTilde(path));
@@ -44,7 +42,7 @@ export class RegisterBasePaths implements Bootstrapper {
 
 			ensureDirSync(path);
 
-			set(process.env, environmentName, path);
+			set(process.env, configKey, path);
 
 			const pathMethod: string | undefined = camelCase(`use_${type}_path`);
 

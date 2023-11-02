@@ -60,7 +60,10 @@ export class Command extends Commands.Command {
 			);
 
 		const configDestination = this.app.getCorePath("config");
-		const configSource = resolve(__dirname, `../../bin/config/${flags.network}`);
+		const configSource = resolve(
+			__dirname,
+			`../../bin/config/${flags.network}/${this.app.get(Identifiers.ApplicationName)}`,
+		);
 
 		await this.components.taskList([
 			{

@@ -4,7 +4,7 @@ import { Providers, Services } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { SinonSpy, spy } from "sinon";
 
-import cryptoJson from "../../core/bin/config/testnet/crypto.json";
+import cryptoJson from "../../core/bin/config/testnet/mainsail/crypto.json";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { Configuration } from "../../crypto-config";
 import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";

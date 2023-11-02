@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import crypto from "../../../core/bin/config/testnet/crypto.json";
+import crypto from "../../../core/bin/config/testnet/mainsail/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
 import { ServiceProvider as CryptoBlock } from "../../../crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config";

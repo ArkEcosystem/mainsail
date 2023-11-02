@@ -220,6 +220,7 @@ export class Command extends Commands.Command {
 		let options: Flags = {
 			...defaults,
 			...flags,
+			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Package).name,
 		};
 
 		const configurationApp = await makeApplication(this.#getConfigurationPath(options), options);
@@ -254,9 +255,11 @@ export class Command extends Commands.Command {
 			...defaults,
 			...flags,
 			...response,
+			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Package).name,
 		};
 
-		configurationApp.rebind(Identifiers.ConfigurationPath).toConstantValue(this.#getConfigurationPath(options));
+		const path = this.#getConfigurationPath(options, configurationApp.get(CliIdentifiers.ApplicationName));
+		configurationApp.rebind(Identifiers.ConfigurationPath).toConstantValue(path);
 
 		if (!response.confirm) {
 			throw new Error("You'll need to confirm the input to continue.");
@@ -293,10 +296,12 @@ export class Command extends Commands.Command {
 		};
 	}
 
-	#getConfigurationPath(options: Flags): string {
+	#getConfigurationPath(options: Flags, applicationName?: string): string {
 		const paths = envPaths(options.token, { suffix: "core" });
 		const configPath = options.configPath ? options.configPath : paths.config;
 
-		return path.join(configPath, options.network);
+		return applicationName
+			? path.join(configPath, options.network, applicationName)
+			: path.join(configPath, options.network);
 	}
 }

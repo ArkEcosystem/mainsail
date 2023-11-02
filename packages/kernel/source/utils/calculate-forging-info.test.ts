@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 
-import crypto from "../../../core/bin/config/testnet/crypto.json";
+import crypto from "../../../core/bin/config/testnet/mainsail/crypto.json";
 import { Configuration } from "../../../crypto-config";
 import { describe, Sandbox } from "../../../test-framework";
 import { calculateApproval, getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
