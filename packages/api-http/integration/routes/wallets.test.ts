@@ -107,7 +107,7 @@ describe<{
 		await apiContext.walletRepository.save(wallets);
 		await apiContext.transactionRepository.save(walletTransactions);
 
-		const recipient = wallets[1].address;
+		const recipient = wallets[wallets.length - 2].address;
 
 		const { statusCode, data } = await request(`/wallets/${recipient}/transactions/received`, options);
 		assert.equal(statusCode, 200);

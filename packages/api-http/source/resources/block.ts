@@ -3,15 +3,20 @@ import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
 import { BigNumber } from "@mainsail/utils";
 
+export interface BlockModel extends Models.Block {
+	state: Models.State;
+	generator: Models.Wallet;
+}
+
 @injectable()
 export class BlockResource implements Contracts.Resource {
-	public raw(resource: Models.Block): object {
-		return resource;
+	public raw(resource: BlockModel): object {
+		return { ...resource, generator: undefined, state: undefined };
 	}
 
-	public transform(resource: Models.Block): object {
+	public transform(resource: BlockModel): object {
 		return {
-			confirmations: 0,
+			confirmations: +resource.state.height ? Number(resource.state.height) - Number(resource.height) : 0,
 			forged: {
 				amount: BigNumber.make(resource.totalAmount),
 				fee: resource.totalFee,
@@ -19,11 +24,9 @@ export class BlockResource implements Contracts.Resource {
 				total: BigNumber.make(resource.reward).plus(resource.totalFee).toFixed(),
 			},
 			generator: {
-				// username: generator.hasAttribute("delegate.username")
-				//     ? generator.getAttribute("delegate.username")
-				//     : undefined,
-				// address: generator.getAddress(),
-				// publicKey: generator.getPublicKey(),
+				address: resource.generator.address,
+				publicKey: resource.generator.publicKey,
+				username: resource.generator.attributes?.["validatorUsername"] ?? undefined,
 			},
 			height: +resource.height,
 			id: resource.id,
@@ -33,8 +36,7 @@ export class BlockResource implements Contracts.Resource {
 			},
 			previous: resource.previousBlock,
 			signature: resource.signature,
-			timestamp: +resource.timestamp,
-			// lastBlock ? lastBlock.data.height - blockData.height : 0,
+			timestamp: Math.trunc(+resource.timestamp / 1000),
 			transactions: resource.numberOfTransactions,
 
 			version: resource.version,

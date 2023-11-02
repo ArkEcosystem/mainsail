@@ -16,11 +16,11 @@ export const makeBlockRepository = (dataSource: RepositoryDataSource): IBlockRep
 			return this.listByExpression(blockExpression, sorting, pagination, options);
 		},
 
-		async findOneByCriteria(blockCriteria: Criteria.OrBlockCriteria): Promise<Block | undefined> {
+		async findOneByCriteria(blockCriteria: Criteria.OrBlockCriteria): Promise<Block | null> {
 			const block = await this.createQueryBuilder().where(blockCriteria).limit(1).getOne();
 
 			if (!block) {
-				return undefined;
+				return null;
 			}
 
 			return block;

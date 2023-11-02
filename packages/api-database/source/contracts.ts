@@ -21,7 +21,7 @@ export type IBlockRepositoryExtension = {
 	getLatest(): Promise<Block | null>;
 	getLatestHeight(): Promise<number | undefined>;
 
-	findOneByCriteria(blockCriteria: Criteria.OrBlockCriteria): Promise<Block | undefined>;
+	findOneByCriteria(blockCriteria: Criteria.OrBlockCriteria): Promise<Block | null>;
 
 	findManyByCriteria(
 		blockCriteria: Criteria.OrBlockCriteria,
