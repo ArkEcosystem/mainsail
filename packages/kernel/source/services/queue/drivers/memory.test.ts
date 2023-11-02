@@ -114,7 +114,7 @@ describe<{
 	});
 
 	it("Clear should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(() => { }));
+		await context.driver.push(new DummyJob(() => {}));
 
 		assert.is(context.driver.size(), 1);
 
