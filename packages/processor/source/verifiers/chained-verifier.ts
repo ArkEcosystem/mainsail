@@ -11,6 +11,10 @@ export class ChainedVerifier implements Contracts.BlockProcessor.Handler {
 	private readonly stateService!: Contracts.State.Service;
 
 	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+		if (unit.getBlock().data.height === 0) {
+			return true;
+		}
+
 		return Utils.isBlockChained(this.stateService.getStateStore().getLastBlock().data, unit.getBlock().data);
 	}
 }
