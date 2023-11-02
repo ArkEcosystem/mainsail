@@ -77,7 +77,7 @@ describe<{
 	});
 
 	it("should load the application configuration without cryptography", async (context) => {
-		context.app.rebind("path.config").toConstantValue(resolve(__dirname, "../../../../test/stubs/config"));
+		context.app.rebind("path.config").toConstantValue(resolve(__dirname, "../../../../test/stubs/config/local"));
 
 		await context.configLoader.loadConfiguration();
 
