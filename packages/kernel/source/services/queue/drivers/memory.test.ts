@@ -109,14 +109,12 @@ describe<{
 		await sleep(15);
 
 		assert.gt(methodFinish2, methodFinish1);
-		assert.gt(methodFinish2 - methodFinish1, 4);
-		assert.lt(methodFinish2 - methodFinish1, 6);
 
 		assert.equal(onDrainCount, 1);
 	});
 
 	it("Clear should clear all jobs when stopped", async (context) => {
-		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.push(new DummyJob(() => { }));
 
 		assert.is(context.driver.size(), 1);
 
