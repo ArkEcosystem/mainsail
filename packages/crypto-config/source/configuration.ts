@@ -8,10 +8,10 @@ import set from "lodash.set";
 @injectable()
 export class Configuration implements Contracts.Crypto.IConfiguration {
 	#config: Contracts.Crypto.NetworkConfig | undefined;
-	#height: number | undefined;
 	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
 	#milestones: Contracts.Crypto.Milestone[] | undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
+	#height = 0;
 	#maxActiveValidators = 0;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
@@ -65,7 +65,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		this.#height = value;
 	}
 
-	public getHeight(): number | undefined {
+	public getHeight(): number {
 		return this.#height;
 	}
 
@@ -87,7 +87,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		}
 
 		if (height === undefined) {
-			height = this.#height ?? 0;
+			height = this.#height;
 		}
 
 		while (
@@ -112,7 +112,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 		}
 
 		if (height === undefined) {
-			height = this.#height ?? 0;
+			height = this.#height;
 		}
 
 		const milestoneIndex = this.#originalMilestones?.findIndex((milestone) => milestone.height === height) ?? -1;
