@@ -12,7 +12,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
 	#milestones: Contracts.Crypto.Milestone[] | undefined;
 	#originalMilestones: Contracts.Crypto.MilestonePartial[] | undefined;
-	#maxActiveValidators: number | undefined;
+	#maxActiveValidators = 0;
 
 	public setConfig(config: Contracts.Crypto.NetworkConfigPartial): void {
 		this.#config = {
@@ -185,7 +185,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 		const overwriteMerge = (destination, source, options) => source;
 
-		this.#maxActiveValidators = this.#milestone.data?.activeValidators ?? undefined;
+		this.#maxActiveValidators = this.#milestone.data?.activeValidators ?? 0;
 
 		while (lastMerged < this.#milestones.length - 1) {
 			this.#milestones[lastMerged + 1] = deepmerge(
@@ -217,7 +217,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 
 		for (let index = 0; index < validatorMilestones.length; index++) {
 			const current = validatorMilestones[index];
-			if (current.activeValidators === 0) {
+			if (current.activeValidators === 0 && index !== 0) {
 				throw new Exceptions.InvalidNumberOfActiveValidatorsError(
 					`Bad milestone at height: ${current.height}. The number of validators must be greater than 0.`,
 				);
@@ -233,7 +233,7 @@ export class Configuration implements Contracts.Crypto.IConfiguration {
 				continue;
 			}
 
-			if ((current.height - Math.max(previous.height, 1)) % previous.activeValidators !== 0) {
+			if ((current.height - Math.max(previous.height, 1)) % (previous.activeValidators || 1) !== 0) {
 				throw new Exceptions.InvalidMilestoneConfigurationError(
 					`Bad milestone at height: ${current.height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
