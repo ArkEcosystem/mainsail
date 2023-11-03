@@ -16,6 +16,10 @@ export class TimestampVerifier implements Contracts.BlockProcessor.Handler {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+		if (unit.getBlock().data.height === 0) {
+			return true;
+		}
+
 		const result =
 			this.stateService.getStateStore().getLastBlock().data.timestamp <
 			unit.getBlock().data.timestamp + this.configuration.getMilestone().blockTime;

@@ -18,7 +18,7 @@ export interface IConfiguration {
 
 	setHeight(value: number): void;
 
-	getHeight(): number | undefined;
+	getHeight(): number;
 
 	isNewMilestone(height?: number): boolean;
 

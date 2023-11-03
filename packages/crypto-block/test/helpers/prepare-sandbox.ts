@@ -4,11 +4,10 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import crypto from "../../../core/bin/config/testnet/mainsail/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config";
-import { Configuration } from "../../../crypto-config/source/configuration";
+import { ServiceProvider as CoreCryptoConsensus } from "../../../crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr";
-import { ServiceProvider as CoreCryptoConsensus } from "../../../crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "../../../crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
@@ -18,12 +17,14 @@ import { ServiceProvider as CoreSerializer } from "../../../serializer";
 import { Sandbox } from "../../../test-framework";
 import { ServiceProvider as CoreValidation } from "../../../validation";
 import { Deserializer } from "../../source/deserializer";
-import { IDFactory } from "../../source/id.factory";
 import { BlockFactory } from "../../source/factory";
+import { IDFactory } from "../../source/id.factory";
 import { Serializer } from "../../source/serializer";
 
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
+
+	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.ConfigRepository).set("crypto", crypto);
 
 	await context.sandbox.app.resolve(CoreSerializer).register();
 	await context.sandbox.app.resolve(CoreValidation).register();
@@ -43,6 +44,4 @@ export const prepareSandbox = async (context) => {
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.IDFactory).to(IDFactory);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory);
-
-	context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 };

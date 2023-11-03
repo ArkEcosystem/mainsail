@@ -33,7 +33,7 @@ export const calculateRound = (
 
 	// Genesis round requires special treatment
 	if (height === 0) {
-		return { maxValidators: activeValidators, nextRound: 1, round: 0, roundHeight: 0 };
+		return { maxValidators: 0, nextRound: 1, round: 0, roundHeight: 0 };
 	}
 
 	const result: Contracts.Shared.RoundInfo = {

@@ -37,9 +37,6 @@ export class Bootstrapper {
 	@inject(Identifiers.StateService)
 	private stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
-
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
@@ -67,15 +64,15 @@ export class Bootstrapper {
 
 			await this.#restoreState();
 
+			if (this.apiSync) {
+				await this.apiSync.bootstrap();
+			}
+
 			if (this.#stateStore.getLastHeight() === 0) {
 				await this.#processGenesisBlock();
 			}
 
 			await this.#initState();
-
-			if (this.apiSync) {
-				await this.apiSync.bootstrap();
-			}
 
 			await this.#processBlocks();
 			this.#stateStore.setBootstrap(false);
@@ -98,7 +95,6 @@ export class Bootstrapper {
 		const genesisBlock = await this.blockFactory.fromCommittedJson(genesisBlockJson);
 
 		this.#stateStore.setGenesisBlock(genesisBlock);
-		this.#stateStore.setLastBlock(genesisBlock.block);
 	}
 
 	async #storeGenesisBlock(): Promise<void> {
@@ -109,23 +105,8 @@ export class Bootstrapper {
 	}
 
 	async #processGenesisBlock(): Promise<void> {
-		const registeredHandlers = this.app
-			.getTagged<Contracts.Transactions.ITransactionHandlerRegistry>(
-				Identifiers.TransactionHandlerRegistry,
-				"state",
-				"blockchain",
-			)
-			.getRegisteredHandlers();
-
 		const genesisBlock = this.#stateStore.getGenesisBlock();
-		for (const handler of registeredHandlers.values()) {
-			await handler.bootstrap(this.stateService.getWalletRepository(), genesisBlock.block.transactions);
-		}
-
-		await this.databaseService.saveBlocks([genesisBlock]);
-
-		const committedBlockState = this.committedBlockStateFactory(this.#stateStore.getGenesisBlock());
-		await this.proposerSelector.onCommit(committedBlockState);
+		await this.#processBlock(genesisBlock);
 	}
 
 	async #restoreState(): Promise<void> {
@@ -149,14 +130,22 @@ export class Bootstrapper {
 			this.#stateStore.getLastHeight() + 1,
 			lastBlock.data.height,
 		)) {
+			await this.#processBlock(committedBlock);
+		}
+	}
+
+	async #processBlock(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
+		try {
 			const committedBlockState = this.committedBlockStateFactory(committedBlock);
 			const result = await this.blockProcessor.process(committedBlockState);
 			if (result === false) {
-				// TODO: Handle block processing failure
-				this.logger.critical(`Cannot process block: ${committedBlock.block.data.height}`);
-				return;
+				throw new Error(`Cannot process block`);
 			}
 			await this.blockProcessor.commit(committedBlockState);
+		} catch (error) {
+			await this.app.terminate(
+				`Failed to process block at height ${committedBlock.block.data.height}: ${error.message}`,
+			);
 		}
 	}
 }

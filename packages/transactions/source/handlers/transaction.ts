@@ -52,7 +52,10 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 		this.#verifyTransactionNonceApply(sender, transaction);
 
-		if (sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative()) {
+		if (
+			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
+			this.configuration.getHeight() > 0
+		) {
 			throw new Exceptions.InsufficientBalanceError();
 		}
 
@@ -167,11 +170,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
 
 	public abstract isActivated(): Promise<boolean>;
-
-	public abstract bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void>;
 
 	public abstract applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,

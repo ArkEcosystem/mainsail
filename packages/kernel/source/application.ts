@@ -189,7 +189,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#booted = false;
 
 		if (reason) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice(reason);
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(reason);
 		}
 
 		if (error) {

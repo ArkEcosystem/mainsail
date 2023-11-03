@@ -20,22 +20,6 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		return ValidatorResignationTransaction;
 	}
 
-	public async bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void> {
-		for (const transaction of this.allTransactions(transactions)) {
-			AppUtils.assert.defined<string>(transaction.senderPublicKey);
-
-			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
-			wallet.setAttribute("validatorResigned", true);
-			walletRepository.setOnIndex(
-				Contracts.State.WalletIndexes.Resignations,
-				wallet.getAttribute("validatorUsername"),
-				wallet,
-			);
-		}
-	}
 	public async isActivated(): Promise<boolean> {
 		return true;
 	}

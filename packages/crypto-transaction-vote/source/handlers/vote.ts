@@ -24,43 +24,6 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		return VoteTransaction;
 	}
 
-	public async bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void> {
-		for (const transaction of this.allTransactions(transactions)) {
-			Utils.assert.defined<string>(transaction.senderPublicKey);
-			Utils.assert.defined<string[]>(transaction.asset?.votes);
-			Utils.assert.defined<string[]>(transaction.asset?.unvotes);
-
-			this.#checkAsset(transaction);
-
-			const wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
-
-			for (const unvote of transaction.asset.unvotes) {
-				const hasVoted: boolean = wallet.hasAttribute("vote");
-
-				if (!hasVoted) {
-					throw new Exceptions.NoVoteError();
-				} else if (wallet.getAttribute("vote") !== unvote) {
-					throw new Exceptions.UnvoteMismatchError();
-				}
-
-				wallet.forgetAttribute("vote");
-			}
-
-			for (const vote of transaction.asset.votes) {
-				const hasVoted: boolean = wallet.hasAttribute("vote");
-
-				if (hasVoted) {
-					throw new Exceptions.AlreadyVotedError();
-				}
-
-				wallet.setAttribute("vote", vote);
-			}
-		}
-	}
-
 	public async isActivated(): Promise<boolean> {
 		return true;
 	}

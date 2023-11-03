@@ -60,7 +60,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 		const testVector = [
 			// Round 0
-			{ activeValidators: 4, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			{ activeValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1
 			{ activeValidators: 4, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
 			{ activeValidators: 4, height: 2, nextRound: 1, round: 1, roundHeight: 1 },
@@ -101,7 +101,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 		const testVector = [
 			// Round 0 - milestone
-			{ activeValidators: 2, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			{ activeValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1 - milestone
 			{ activeValidators: 2, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
 			{ activeValidators: 2, height: 2, nextRound: 2, round: 1, roundHeight: 1 },
@@ -148,7 +148,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 		const testVector = [
 			// Round 0
-			{ activeValidators: 3, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			{ activeValidators: 0, height: 0, nextRound: 1, round: 0, roundHeight: 0 },
 			// Round 1
 			{ activeValidators: 3, height: 1, nextRound: 1, round: 1, roundHeight: 1 },
 			{ activeValidators: 3, height: 2, nextRound: 1, round: 1, roundHeight: 1 },

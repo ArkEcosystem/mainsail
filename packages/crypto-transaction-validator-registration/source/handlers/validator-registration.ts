@@ -20,30 +20,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		return ValidatorRegistrationTransaction;
 	}
 
-	public async bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void> {
-		for (const transaction of this.allTransactions(transactions)) {
-			AppUtils.assert.defined<string>(transaction.senderPublicKey);
-			AppUtils.assert.defined<string>(transaction.asset?.validator?.username);
-			AppUtils.assert.defined<string>(transaction.asset?.validator?.publicKey);
-
-			const wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
-
-			wallet.setAttribute<string>("validatorUsername", transaction.asset.validator.username);
-			wallet.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
-
-			// TODO: Add this as a wallet attribute
-			wallet.setAttribute("validatorConsensusPublicKey", transaction.asset.validator.publicKey);
-			walletRepository.setOnIndex(
-				Contracts.State.WalletIndexes.Usernames,
-				transaction.asset.validator.username,
-				wallet,
-			);
-		}
-	}
-
 	public async isActivated(): Promise<boolean> {
 		return true;
 	}

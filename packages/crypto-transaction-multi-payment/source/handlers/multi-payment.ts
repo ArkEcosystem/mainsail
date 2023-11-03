@@ -21,23 +21,6 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		return MultiPaymentTransaction;
 	}
 
-	public async bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void> {
-		for (const transaction of this.allTransactions(transactions)) {
-			AppUtils.assert.defined<string>(transaction.senderPublicKey);
-			AppUtils.assert.defined<object>(transaction.asset?.payments);
-
-			const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.senderPublicKey);
-			for (const payment of transaction.asset.payments) {
-				const recipient: Contracts.State.Wallet = walletRepository.findByAddress(payment.recipientId);
-				recipient.increaseBalance(payment.amount);
-				sender.decreaseBalance(payment.amount);
-			}
-		}
-	}
-
 	public async isActivated(): Promise<boolean> {
 		return true;
 	}

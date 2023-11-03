@@ -5,17 +5,15 @@ import { Configuration } from "./configuration";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-
 		try {
+			this.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+
 			const config: Contracts.Crypto.NetworkConfigPartial = this.#fromConfigRepository();
 
 			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
 			this.app.bind<Contracts.Crypto.NetworkConfigPartial>(Identifiers.Crypto).toConstantValue(config);
-		} catch {
-			// @TODO: this breaks during network config generation
-		}
+		} catch {}
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {

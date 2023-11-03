@@ -22,6 +22,7 @@ describe<{
 		};
 
 		context.cryptoConfiguration = {
+			getHeight: () => 1,
 			getMilestone: () => ({
 				activeValidators: 2,
 			}),
@@ -42,7 +43,8 @@ describe<{
 			setAttribute: () => {},
 		});
 
-		const validators = await validatorSet.getActiveValidators();
+		await validatorSet.initialize();
+		const validators = validatorSet.getActiveValidators();
 		assert.equal(validators.length, 2);
 
 		findByUsernameSpy.calledTimes(2);

@@ -24,16 +24,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
+
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
 			this.#buildActiveValidators();
 		}
 	}
 
 	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
-		if (this.#validators.length === 0) {
-			this.#buildActiveValidators();
-		}
-
 		return this.#validators;
 	}
 
@@ -52,6 +49,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 	}
 
 	#buildActiveValidators(): void {
+		if (this.cryptoConfiguration.getHeight() === 0) {
+			return;
+		}
+
 		this.#validators = [];
 		this.#indexByWalletPublicKey = new Map();
 

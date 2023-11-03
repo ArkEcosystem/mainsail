@@ -3,7 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
-import { BigNumber } from "@mainsail/utils";
 
 import { TransferTransaction } from "../versions";
 
@@ -22,16 +21,6 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 	public getConstructor(): Transactions.TransactionConstructor {
 		return TransferTransaction;
-	}
-
-	public async bootstrap(
-		walletRepository: Contracts.State.WalletRepository,
-		transactions: Contracts.Crypto.ITransaction[],
-	): Promise<void> {
-		for (const transaction of this.allTransactions(transactions)) {
-			Utils.assert.defined<string>(transaction.recipientId);
-			walletRepository.findByAddress(transaction.recipientId).increaseBalance(BigNumber.make(transaction.amount));
-		}
 	}
 
 	public async isActivated(): Promise<boolean> {
