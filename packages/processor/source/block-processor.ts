@@ -83,18 +83,23 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 			await this.apiSync.onCommit(unit);
 		}
 
-		this.logger.info(
-			`Block ${committedBlock.block.header.height.toLocaleString()} with ${committedBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
-		);
+		if (!stateStore.isBootstrap()) {
+			this.logger.info(
+				`Block ${committedBlock.block.header.height.toLocaleString()} with ${committedBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
+			);
+		}
 
 		if (Utils.roundCalculator.isNewRound(committedBlock.block.header.height + 1, this.cryptoConfiguration)) {
 			const roundInfo = Utils.roundCalculator.calculateRound(
 				committedBlock.block.header.height + 1,
 				this.cryptoConfiguration,
 			);
-			this.logger.debug(
-				`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
-			);
+
+			if (!stateStore.isBootstrap()) {
+				this.logger.debug(
+					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
+				);
+			}
 		}
 
 		for (const transaction of committedBlock.block.transactions) {
