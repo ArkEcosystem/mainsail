@@ -131,6 +131,12 @@ export class Bootstrapper {
 			lastBlock.data.height,
 		)) {
 			await this.#processBlock(committedBlock);
+
+			if (committedBlock.block.data.height % 10_000 === 0) {
+				this.logger.info(`Processed blocks: ${committedBlock.block.data.height.toLocaleString()} `);
+
+				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
+			}
 		}
 	}
 
