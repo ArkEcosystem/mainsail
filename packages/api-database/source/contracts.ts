@@ -38,6 +38,13 @@ export type IConfigurationRepository = ExtendedRepository<Configuration> & IConf
 
 export type IPeerRepositoryExtension = {
 	getMedianPeerHeight(): Promise<number>;
+
+	findManyByCriteria(
+		peerCriteria: Criteria.OrPeerCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Peer>>;
 };
 
 export type IPeerRepository = ExtendedRepository<Peer> & IPeerRepositoryExtension;

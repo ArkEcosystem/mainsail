@@ -100,3 +100,10 @@ export type DelegateCriteria = {
 };
 
 export type OrDelegateCriteria = OrCriteria<DelegateCriteria>;
+
+export type PeerCriteria = {
+	ip?: OrEqualCriteria<string>;
+	version?: OrNumericCriteria<string>;
+};
+
+export type OrPeerCriteria = OrCriteria<PeerCriteria>;
