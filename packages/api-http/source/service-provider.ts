@@ -1,4 +1,4 @@
-import { AbstractServiceProvider, ServerConstructor, Plugins } from "@mainsail/api-common";
+import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import Joi from "joi";
 
 import Handlers from "./handlers";
