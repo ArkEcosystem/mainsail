@@ -22,7 +22,9 @@ export const responseHeaders = {
 	name: "response-headers",
 
 	register(server: ApiServer): void {
-		server.ext("onPreResponse", this.getOnPreResponseHandler(server.app.app));
+		if (server.app.app.isBound(ApiDatabaseIdentifiers.BlockRepositoryFactory)) {
+			server.ext("onPreResponse", this.getOnPreResponseHandler(server.app.app));
+		}
 	},
 
 	version: "1.0.0",
