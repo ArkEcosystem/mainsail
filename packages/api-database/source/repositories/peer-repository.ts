@@ -14,7 +14,6 @@ export const makePeerRepository = (dataSource: RepositoryDataSource): IPeerRepos
 		): Promise<ResultsPage<Peer>> {
 			const peerExpression = await PeerFilter.getExpression(peerCriteria);
 			return this.listByExpression(peerExpression, sorting, pagination, options);
-
 		},
 
 		async getMedianPeerHeight(): Promise<number> {
@@ -23,5 +22,5 @@ export const makePeerRepository = (dataSource: RepositoryDataSource): IPeerRepos
 				.getRawOne<{ median_height: number }>();
 
 			return result?.median_height ?? 0;
-		}
+		},
 	});

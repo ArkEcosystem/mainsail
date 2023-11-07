@@ -1,6 +1,10 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers, Search } from "@mainsail/api-database";
+import {
+	Contracts as ApiDatabaseContracts,
+	Identifiers as ApiDatabaseIdentifiers,
+	Search,
+} from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
 import { PeerResource } from "../resources/peer";
@@ -8,37 +12,33 @@ import { Controller } from "./controller";
 
 @injectable()
 export class PeersController extends Controller {
-    @inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
-    private readonly peerRepositoryFactory!: ApiDatabaseContracts.IPeerRepositoryFactory;
+	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
+	private readonly peerRepositoryFactory!: ApiDatabaseContracts.IPeerRepositoryFactory;
 
-    public async index(request: Hapi.Request) {
-        const pagination = this.getQueryPagination(request.query);
-        const criteria: Search.Criteria.PeerCriteria = request.query;
-        const sorting = this.getListingOrder(request);
-        const options = this.getListingOptions();
+	public async index(request: Hapi.Request) {
+		const pagination = this.getQueryPagination(request.query);
+		const criteria: Search.Criteria.PeerCriteria = request.query;
+		const sorting = this.getListingOrder(request);
+		const options = this.getListingOptions();
 
-        const peers = await this.peerRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
+		const peers = await this.peerRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
-        return this.toPagination(
-            peers,
-            PeerResource,
-            request.query.transform,
-        );
-    }
+		return this.toPagination(peers, PeerResource, request.query.transform);
+	}
 
-    public async show(request: Hapi.Request) {
-        const ip = request.params.ip;
+	public async show(request: Hapi.Request) {
+		const ip = request.params.ip;
 
-        const peer = await this.peerRepositoryFactory()
-            .createQueryBuilder()
-            .select()
-            .where("ip = :ip", { ip })
-            .getOne();
+		const peer = await this.peerRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("ip = :ip", { ip })
+			.getOne();
 
-        if (!peer) {
-            return Boom.notFound("Peer not found");
-        }
+		if (!peer) {
+			return Boom.notFound("Peer not found");
+		}
 
-        return this.respondWithResource(peer, PeerResource, request.query.transform);
-    }
+		return this.respondWithResource(peer, PeerResource, request.query.transform);
+	}
 }

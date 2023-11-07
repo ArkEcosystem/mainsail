@@ -1,65 +1,65 @@
 [
-    {
-        "ip": "192.168.3.1",
-        "port": 4002,
-        "version": "0.0.1",
-        "height": 7,
-        "latency": 33,
-        "ports": {
-            "@mainsail/webhooks": -1,
-            "@mainsail/api-development": 4006
-        },
-        "plugins": {
-            "@mainsail/webhooks": {
-                "port": 4004,
-                "enabled": false
-            },
-            "@mainsail/api-development": {
-                "port": 4006,
-                "enabled": true
-            }
-        }
-    },
-    {
-        "ip": "192.168.2.1",
-        "port": 4002,
-        "version": "0.0.1",
-        "height": 4,
-        "latency": 22,
-        "ports": {
-            "@mainsail/webhooks": -1,
-            "@mainsail/api-development": 4006
-        },
-        "plugins": {
-            "@mainsail/webhooks": {
-                "port": 4004,
-                "enabled": false
-            },
-            "@mainsail/api-development": {
-                "port": 4006,
-                "enabled": true
-            }
-        }
-    },
-    {
-        "ip": "192.168.3.2",
-        "port": 4002,
-        "version": "0.0.1",
-        "height": 6,
-        "latency": 1,
-        "ports": {
-            "@mainsail/webhooks": -1,
-            "@mainsail/api-development": 4006
-        },
-        "plugins": {
-            "@mainsail/webhooks": {
-                "port": 4004,
-                "enabled": false
-            },
-            "@mainsail/api-development": {
-                "port": 4006,
-                "enabled": true
-            }
-        }
-    }
+	{
+		"ip": "192.168.3.1",
+		"port": 4002,
+		"version": "0.0.1",
+		"height": 7,
+		"latency": 33,
+		"ports": {
+			"@mainsail/webhooks": -1,
+			"@mainsail/api-development": 4006
+		},
+		"plugins": {
+			"@mainsail/webhooks": {
+				"port": 4004,
+				"enabled": false
+			},
+			"@mainsail/api-development": {
+				"port": 4006,
+				"enabled": true
+			}
+		}
+	},
+	{
+		"ip": "192.168.2.1",
+		"port": 4002,
+		"version": "0.0.1",
+		"height": 4,
+		"latency": 22,
+		"ports": {
+			"@mainsail/webhooks": -1,
+			"@mainsail/api-development": 4006
+		},
+		"plugins": {
+			"@mainsail/webhooks": {
+				"port": 4004,
+				"enabled": false
+			},
+			"@mainsail/api-development": {
+				"port": 4006,
+				"enabled": true
+			}
+		}
+	},
+	{
+		"ip": "192.168.3.2",
+		"port": 4002,
+		"version": "0.0.1",
+		"height": 6,
+		"latency": 1,
+		"ports": {
+			"@mainsail/webhooks": -1,
+			"@mainsail/api-development": 4006
+		},
+		"plugins": {
+			"@mainsail/webhooks": {
+				"port": 4004,
+				"enabled": false
+			},
+			"@mainsail/api-development": {
+				"port": 4006,
+				"enabled": true
+			}
+		}
+	}
 ]
