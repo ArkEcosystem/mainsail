@@ -2,7 +2,6 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ServerType } from "./contracts";
-import { preparePlugins } from "./plugins";
 import { AbstractServer } from "./server";
 
 export type ServerConstructor<T extends AbstractServer> = new (...arguments_: any[]) => T;
@@ -11,6 +10,7 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 	protected abstract httpsIdentifier(): symbol;
 	protected abstract getServerConstructor(): ServerConstructor<T>;
 	protected abstract getHandlers(): any | any[];
+	protected abstract getPlugins(): any[];
 
 	public async register(): Promise<void> {
 		if (this.config().get("server.http.enabled")) {
@@ -85,7 +85,7 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 			},
 		});
 
-		await server.register(preparePlugins(this.config().get("plugins")));
+		await server.register(this.getPlugins());
 
 		await server.register({
 			plugin: this.getHandlers(),
