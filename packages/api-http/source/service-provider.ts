@@ -1,4 +1,4 @@
-import { AbstractServiceProvider, ServerConstructor } from "@mainsail/api-common";
+import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import Joi from "joi";
 
 import Handlers from "./handlers";
@@ -20,6 +20,41 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 
 	protected getHandlers(): any | any[] {
 		return Handlers;
+	}
+
+	protected getPlugins(): any[] {
+		const config = this.config().get<any>("plugins");
+
+		return [
+			{
+				options: {
+					trustProxy: config.trustProxy,
+					whitelist: config.whitelist,
+				},
+				plugin: Plugins.whitelist,
+			},
+			{ plugin: Plugins.hapiAjv },
+			{
+				options: {
+					...config.rateLimit,
+					trustProxy: config.trustProxy,
+				},
+				plugin: Plugins.rateLimit,
+			},
+			{ plugin: Plugins.commaArrayQuery },
+			{ plugin: Plugins.dotSeparatedQuery },
+			{
+				options: {
+					query: {
+						limit: {
+							default: config.pagination.limit,
+						},
+					},
+				},
+				plugin: Plugins.pagination,
+			},
+			{ plugin: Plugins.responseHeaders },
+		];
 	}
 
 	public configSchema(): Joi.ObjectSchema {
