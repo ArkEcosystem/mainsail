@@ -1,14 +1,14 @@
 {
-	"address": "ark1234n0r605cplec5wrgkcm0qtu0w9yetd4mwt5a43zlftdkuqhc3s27aegz",
+	"address": "ark17k75c34fuwyl0ujganj7ezqxssp6chx238urxw24lu7gqe54cyqq0pagp0",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "5f95e921550195d62b2d8263cf835de2dd123fbc2acbd9731074b1749402391f",
-		"publicKey": "a7e046b0ba9a05e04b10069e5ff9376b2d33393a71b1b490dc1f5482e0c4350611cc9b5298f3adc472ab8c3736c299eb"
+		"privateKey": "29d453a86b3916fe2243c8d89c0f54ffb2371c1943935015a7351c1c60da1bee",
+		"publicKey": "a3f79bd85ce0073285d08afc28038ff2df656d06e63d5b98fce8a031483d6e2651a94ec021cc5e7d2a82574464175dff"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "88896a931a4b8628597a4d84f2cdb4ab1b7fcf01570c7acbbd7ed4a9a0df8fc9",
-		"publicKey": "546b378f4fa603fce28e1a2d8dbc0be3dc52656daedcba76b117d2b6db80be23"
+		"privateKey": "acc997a44f46e921d60671269e0ba1dbe1c96e829f7cda5dc995a1851129a2fa",
+		"publicKey": "f5bd4c46a9e389f7f248ece5ec88068403ac5cca89f8333955ff3c806695c100"
 	},
-	"passphrase": "lyrics borrow special police doctor install until tilt decade dust reflect remind sting truth become blanket knee coast gossip uniform access element total hold"
+	"passphrase": "tomato flower clap section stick stage drill vast ridge ship helmet symbol nerve expose border donkey jelly grace entry world hip front fortune involve"
 }

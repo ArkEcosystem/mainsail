@@ -25,6 +25,7 @@ async function run() {
 		network: "testnet",
 		symbol: "TѦ",
 		token: "ARK",
+		distribute: true,
 		address: {
 			...(flags.bech32mPrefix ? { bech32m: flags.bech32mPrefix } : {}),
 			...(flags.base58Prefix ? { base58: flags.base58Prefix } : {}),
