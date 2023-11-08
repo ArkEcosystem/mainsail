@@ -1,19 +1,18 @@
-import { describe, Sandbox } from "../../../test-framework";
-import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
-import { request } from "../../test/helpers/request";
 import cryptoJson from "../../../core/bin/config/testnet/mainsail/crypto.json";
-
-import transactionTypes from "../../test/fixtures/transactions_types.json";
-import transactions from "../../test/fixtures/transactions.json";
+import { describe, Sandbox } from "../../../test-framework";
 import nodeConfiguration from "../../test/fixtures/node_configuration.json";
 import nodeFees from "../../test/fixtures/node_fees.json";
+import transactions from "../../test/fixtures/transactions.json";
+import transactionTypes from "../../test/fixtures/transactions_types.json";
+import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { request } from "../../test/helpers/request";
 
 describe<{
 	sandbox: Sandbox;
 }>("Node", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
-	let options = {};
+	const options = {};
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
@@ -56,8 +55,8 @@ describe<{
 
 	it("/node/configuration", async () => {
 		await apiContext.configurationRepository.save({
-			id: 1,
 			cryptoConfiguration: cryptoJson,
+			id: 1,
 			version: "0.0.1",
 		});
 
@@ -68,8 +67,8 @@ describe<{
 
 	it("/node/configuration/crypto", async () => {
 		await apiContext.configurationRepository.save({
-			id: 1,
 			cryptoConfiguration: cryptoJson,
+			id: 1,
 			version: "0.0.1",
 		});
 
