@@ -13,7 +13,6 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 
 		this.data.type = MultiSignatureRegistrationTransaction.type;
 		this.data.typeGroup = MultiSignatureRegistrationTransaction.typeGroup;
-		this.data.version = 2;
 		this.data.fee = BigNumber.ZERO;
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
