@@ -103,7 +103,8 @@ export class Transaction {
 	public asset: Record<string, any> | undefined;
 
 	@Column({
-		nullable: false,
+		default: undefined,
+		nullable: true,
 		type: "varchar",
 	})
 	public readonly signature!: string;
