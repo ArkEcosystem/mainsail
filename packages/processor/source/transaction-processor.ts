@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
@@ -16,6 +16,10 @@ export class TransactionProcessor implements Contracts.BlockProcessor.Transactio
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
+
+		if (!(await transactionHandler.verify(walletRepository, transaction))) {
+			throw new Exceptions.InvalidSignatureError();
+		}
 
 		await transactionHandler.apply(walletRepository, transaction);
 
