@@ -151,13 +151,13 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-					validatorRound: {
-						...Utils.roundCalculator.calculateRound(header.height + 1, this.configuration),
-						validators: this.validatorSet
-							.getActiveValidators()
-							.map((validator) => validator.getWalletPublicKey()),
-					},
-				}
+						validatorRound: {
+							...Utils.roundCalculator.calculateRound(header.height + 1, this.configuration),
+							validators: this.validatorSet
+								.getActiveValidators()
+								.map((validator) => validator.getWalletPublicKey()),
+						},
+				  }
 				: {}),
 		};
 
@@ -302,12 +302,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 
 	async #resetDatabaseIfNecessary(): Promise<void> {
-		// To ensure consistency between LMDB and Postgres, we must ensure that the tables are in-sync 
+		// To ensure consistency between LMDB and Postgres, we must ensure that the tables are in-sync
 		// with the latest block found in the state.
-		// 
+		//
 		// However, state snapshots mean that not the entire block history is reprocessed on bootstrap
 		// which would be required to accurately rebuild the wallets table from scratch.
-		// 
+		//
 		// For now we simply reprocess all blocks if the `wallets` table is empty because a truncated
 		// `wallets` table will be the most common case where a full resync is needed.
 		const forcedTruncateDatabase = this.pluginConfiguration.getOptional<boolean>("truncateDatabase", false);
@@ -323,7 +323,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 			if (!forcedTruncateDatabase) {
 				const walletsInTable = await this.walletRepositoryFactory().count();
 
-				if (walletsInTable === 0 && ((lastBlock?.header.height ?? 0) === 0)) {
+				if (walletsInTable === 0 && (lastBlock?.header.height ?? 0) === 0) {
 					// Already empty on bootstrap
 					return;
 				}
@@ -340,14 +340,15 @@ export class Sync implements Contracts.ApiSync.ISync {
 			this.stateService.reset();
 
 			// Ensure all tables are truncated (already supposed to be idempotent, but it's cleaner)
-			await Promise.all([
-				blockRepository,
-				stateRepository,
-				transactionRepository,
-				validatorRoundRepository,
-				walletRepository
-			].map(repo => repo.clear()));
+			await Promise.all(
+				[
+					blockRepository,
+					stateRepository,
+					transactionRepository,
+					validatorRoundRepository,
+					walletRepository,
+				].map((repo) => repo.clear()),
+			);
 		});
 	}
-
 }

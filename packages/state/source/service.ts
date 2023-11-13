@@ -36,7 +36,7 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public reset(): void {
-		// Reset is only intended to be called after a state restore  
+		// Reset is only intended to be called after a state restore
 		// and before the first 'setLastBlock' call in case the API database has to be reset.
 		if (!this.#baseStateStore.isBootstrap()) {
 			throw new Error("state service can only be reset during bootstrap");
