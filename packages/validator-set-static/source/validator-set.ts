@@ -21,7 +21,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#buildActiveValidators();
 	}
 
-	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 

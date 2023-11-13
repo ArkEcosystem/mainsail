@@ -3,14 +3,14 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-export class ChainedVerifier implements Contracts.BlockProcessor.Handler {
+export class ChainedVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		if (unit.getBlock().data.height === 0) {
 			return true;
 		}

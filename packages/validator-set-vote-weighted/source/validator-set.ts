@@ -29,7 +29,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.buildValidatorRanking();
 	}
 
-	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {

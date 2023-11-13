@@ -4,14 +4,14 @@ import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
-export class NonceVerifier implements Contracts.BlockProcessor.Handler {
+export class NonceVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		const block = unit.getBlock();
 
 		const nonceBySender = {};

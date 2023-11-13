@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
+export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -15,7 +15,7 @@ export class VerifyBlockVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		const block = unit.getBlock();
 
 		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);

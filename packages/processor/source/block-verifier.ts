@@ -11,11 +11,11 @@ import {
 } from "./verifiers";
 
 @injectable()
-export class BlockVerifier implements Contracts.BlockProcessor.Verifier {
+export class BlockVerifier implements Contracts.Processor.Verifier {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	public async verify(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async verify(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		if (!(await this.app.resolve(ChainedVerifier).execute(unit))) {
 			return false;
 		}

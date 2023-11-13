@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utils";
-import { IProcessableUnit } from "../block-processor";
+import { IProcessableUnit } from "../processor";
 import { IAggregatedSignature } from "./signatures";
 import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
 
