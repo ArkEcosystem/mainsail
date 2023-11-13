@@ -14,7 +14,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.BlockProcessor)
-	private readonly processor!: Contracts.Processor.Processor;
+	private readonly processor!: Contracts.Processor.BlockProcessor;
 
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;

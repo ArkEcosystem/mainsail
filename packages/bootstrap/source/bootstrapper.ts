@@ -41,7 +41,7 @@ export class Bootstrapper {
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.BlockProcessor)
-	private readonly blockProcessor!: Contracts.Processor.Processor;
+	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
 	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
 	private readonly committedBlockStateFactory!: Contracts.Consensus.ICommittedBlockStateFactory;
