@@ -77,7 +77,7 @@ export class Bootstrapper {
 
 			this.stateVerifier.verifyWalletsConsistency();
 
-			await this.transactionPool.readTransactions();
+			await this.transactionPool.reAddTransactions();
 
 			void this.consensus.run();
 
