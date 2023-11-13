@@ -35,6 +35,19 @@ export class Service implements Contracts.State.Service {
 		this.#baseWalletRepository = this.walletRepositoryFactory();
 	}
 
+	public reset(): void {
+		// Reset is only intended to be called after a state restore  
+		// and before the first 'setLastBlock' call in case the API database has to be reset.
+		if (!this.#baseStateStore.isBootstrap()) {
+			throw new Error("state service can only be reset during bootstrap");
+		}
+
+		this.#baseStateStore.setAttribute("height", 0);
+		this.#baseStateStore.setAttribute("totalRound", 0);
+
+		this.#baseWalletRepository = this.walletRepositoryFactory();
+	}
+
 	public getStateStore(): Contracts.State.StateStore {
 		return this.#baseStateStore;
 	}

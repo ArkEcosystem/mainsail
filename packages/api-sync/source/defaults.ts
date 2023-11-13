@@ -25,4 +25,6 @@ export const defaults = {
 
 		username: process.env.CORE_DB_USERNAME || process.env.CORE_TOKEN, // TODO
 	},
+
+	truncateDatabase: process.env.CORE_API_SYNC_TRUNCATE_DATABASE || false,
 };
