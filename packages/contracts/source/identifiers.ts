@@ -110,7 +110,6 @@ export const Identifiers = {
 	},
 	LogManager: Symbol.for("Manager<Log>"),
 	LogService: Symbol.for("Service<Log>"),
-	TransactionProcessor: Symbol.for("Transaction<Processor>"),
 	MixinService: Symbol.for("Service<Mixin>"),
 	P2P: {
 		Server: Symbol.for("P2P<Server>"),
@@ -124,6 +123,7 @@ export const Identifiers = {
 	PeerCommunicator: Symbol.for("Peer<Communicator>"),
 	PeerConnector: Symbol.for("Peer<Connector>"),
 	PeerDiscoverer: Symbol.for("Peer<Discoverer>"),
+	TransactionProcessor: Symbol.for("Transaction<Processor>"),
 	PeerDisposer: Symbol.for("Peer<Disposer>"),
 	PeerFactory: Symbol.for("Factory<Peer>"),
 	PeerHeaderFactory: Symbol.for("Factory<PeerHeader>"),
