@@ -339,6 +339,12 @@ export class NotEnoughValidatorsError extends Exception {
 	}
 }
 
+export class InvalidSignatureError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because signature is invalid.`);
+	}
+}
+
 export class MultiSignatureAlreadyRegisteredError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because multi signature is already enabled.`);

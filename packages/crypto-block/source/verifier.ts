@@ -13,9 +13,6 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
 
-	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	private readonly transactionVerifier!: Contracts.Crypto.ITransactionVerifier;
-
 	public async verify(block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IBlockVerification> {
 		const blockData: Contracts.Crypto.IBlockData = block.data;
 		const result: Utils.Mutable<Contracts.Crypto.IBlockVerification> = {
@@ -51,24 +48,6 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 			const size: number = this.serializer.totalSize(blockData);
 			if (size > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
-			}
-
-			const invalidTransactions: Contracts.Crypto.ITransaction[] = [];
-
-			for (const transaction of block.transactions) {
-				if (!(await this.transactionVerifier.verifyHash(transaction.data))) {
-					invalidTransactions.push(transaction);
-				}
-			}
-
-			if (invalidTransactions.length > 0) {
-				result.errors.push("One or more transactions are not verified:");
-
-				for (const invalidTransaction of invalidTransactions) {
-					result.errors.push(`=> ${invalidTransaction.serialized.toString("hex")}`);
-				}
-
-				result.containsMultiSignatures = invalidTransactions.some((tx) => !!tx.data.signatures);
 			}
 
 			if (block.transactions.length !== blockData.numberOfTransactions) {
