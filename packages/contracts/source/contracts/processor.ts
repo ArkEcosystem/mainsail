@@ -16,7 +16,7 @@ export interface Handler {
 	execute(unit: IProcessableUnit): Promise<boolean>;
 }
 
-export interface Processor {
+export interface BlockProcessor {
 	process(unit: IProcessableUnit): Promise<boolean>;
 	commit(unit: IProcessableUnit): Promise<void>;
 }

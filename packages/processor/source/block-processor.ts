@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
-export class BlockProcessor implements Contracts.BlockProcessor.Processor {
+export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
@@ -18,7 +18,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.TransactionProcessor)
-	private readonly transactionProcessor!: Contracts.BlockProcessor.TransactionProcessor;
+	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
@@ -36,7 +36,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.BlockVerifier)
-	private readonly verifier!: Contracts.BlockProcessor.Verifier;
+	private readonly verifier!: Contracts.Processor.Verifier;
 
 	@multiInject(Identifiers.State.ValidatorMutator)
 	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
@@ -45,7 +45,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@optional()
 	private readonly apiSync: Contracts.ApiSync.ISync | undefined;
 
-	public async process(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async process(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		try {
 			if (!(await this.verifier.verify(unit))) {
 				return false;
@@ -65,7 +65,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return false;
 	}
 
-	public async commit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	public async commit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
 		if (this.apiSync) {
 			await this.apiSync.beforeCommit();
 		}
@@ -124,7 +124,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		handler.emitEvents(transaction, this.events);
 	}
 
-	async #applyBlockToForger(unit: Contracts.BlockProcessor.IProcessableUnit) {
+	async #applyBlockToForger(unit: Contracts.Processor.IProcessableUnit) {
 		const block = unit.getBlock();
 		const walletRepository = unit.getWalletRepository();
 

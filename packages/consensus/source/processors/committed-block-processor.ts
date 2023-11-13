@@ -10,7 +10,7 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.BlockProcessor)
-	private readonly processor!: Contracts.BlockProcessor.Processor;
+	private readonly processor!: Contracts.Processor.BlockProcessor;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;

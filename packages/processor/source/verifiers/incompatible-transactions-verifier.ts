@@ -2,8 +2,8 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 @injectable()
-export class IncompatibleTransactionsVerifier implements Contracts.BlockProcessor.Handler {
-	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+export class IncompatibleTransactionsVerifier implements Contracts.Processor.Handler {
+	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		const block = unit.getBlock();
 
 		for (let index = 1; index < block.transactions.length; index++) {

@@ -11,7 +11,7 @@ export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public async onCommit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {

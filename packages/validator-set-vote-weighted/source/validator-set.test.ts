@@ -123,14 +123,14 @@ describe<{
 
 		await validatorSet.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
-		} as Contracts.BlockProcessor.IProcessableUnit);
+		} as Contracts.Processor.IProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 
 		let currentHeight = 0;
 		for (let index = 0; index < activeValidators; index++) {
 			await validatorSet.onCommit({
 				getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
-			} as Contracts.BlockProcessor.IProcessableUnit);
+			} as Contracts.Processor.IProcessableUnit);
 
 			// Genesis block (= height 0) and the first block thereafter rebuild the ranking
 			assert.equal(buildValidatorRankingSpy.callCount, 2);
@@ -142,7 +142,7 @@ describe<{
 		assert.equal(currentHeight, 5);
 		await validatorSet.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
-		} as Contracts.BlockProcessor.IProcessableUnit);
+		} as Contracts.Processor.IProcessableUnit);
 		assert.equal(buildValidatorRankingSpy.callCount, 3);
 		currentHeight++;
 
@@ -152,7 +152,7 @@ describe<{
 		for (let index = 0; index < activeValidators - 1; index++) {
 			await validatorSet.onCommit({
 				getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
-			} as Contracts.BlockProcessor.IProcessableUnit);
+			} as Contracts.Processor.IProcessableUnit);
 			assert.true(buildValidatorRankingSpy.notCalled);
 			currentHeight++;
 		}
@@ -161,7 +161,7 @@ describe<{
 		assert.equal(currentHeight, 10);
 		await validatorSet.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
-		} as Contracts.BlockProcessor.IProcessableUnit);
+		} as Contracts.Processor.IProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});
 

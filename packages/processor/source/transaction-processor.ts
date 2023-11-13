@@ -4,7 +4,7 @@ import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
-export class TransactionProcessor implements Contracts.BlockProcessor.TransactionProcessor {
+export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
