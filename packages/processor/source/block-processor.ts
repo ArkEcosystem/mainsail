@@ -8,9 +8,6 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.BlockState)
-	private readonly blockState!: Contracts.State.BlockState;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
@@ -19,6 +16,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
+
+	@inject(Identifiers.TransactionProcessor)
+	private readonly transactionProcessor!: Contracts.BlockProcessor.TransactionProcessor;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
@@ -48,7 +48,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 				return false;
 			}
 
-			await this.blockState.applyBlock(unit.getWalletRepository(), unit.getBlock());
+			for (const transaction of unit.getBlock().transactions) {
+				await this.transactionProcessor.process(unit.getWalletRepository(), transaction);
+			}
 
 			return true;
 		} catch (error) {

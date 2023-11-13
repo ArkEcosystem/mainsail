@@ -111,6 +111,7 @@ export const Identifiers = {
 	},
 	LogManager: Symbol.for("Manager<Log>"),
 	LogService: Symbol.for("Service<Log>"),
+	TransactionProcessor: Symbol.for("Transaction<Processor>"),
 	MixinService: Symbol.for("Service<Mixin>"),
 	P2P: {
 		Server: Symbol.for("P2P<Server>"),
