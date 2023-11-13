@@ -72,7 +72,7 @@ export class Bootstrapper {
 				await this.#processGenesisBlock();
 			}
 
-			await this.#initState();
+			await this.validatorSet.initialize();
 
 			await this.#processBlocks();
 			this.#stateStore.setBootstrap(false);
@@ -111,15 +111,9 @@ export class Bootstrapper {
 
 	async #restoreState(): Promise<void> {
 		const lastBlock = await this.databaseService.getLastBlock();
-		await this.stateService.restore(lastBlock?.data?.height ?? 0);
-	}
-
-	async #initState(): Promise<void> {
-		const block = await this.databaseService.getBlockByHeight(this.#stateStore.getLastHeight());
-		Utils.assert.defined<Contracts.Crypto.IBlock>(block);
-		this.#stateStore.setLastBlock(block);
-
-		await this.validatorSet.initialize();
+		Utils.assert.defined<Contracts.Crypto.IBlock>(lastBlock);
+		await this.stateService.restore(lastBlock.data.height);
+		this.#stateStore.setLastBlock(lastBlock);
 	}
 
 	async #processBlocks(): Promise<void> {
