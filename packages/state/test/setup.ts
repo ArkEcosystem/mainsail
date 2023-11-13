@@ -25,7 +25,6 @@ import { ProposerSelector } from "../../proposer/source/proposer-selector";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
-import { BlockState } from "../source/block-state";
 import { StateStore } from "../source/state-store";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
@@ -53,7 +52,6 @@ export interface Setup {
 	walletRepo: WalletRepository;
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
 	factory: Factories.FactoryBuilder;
-	blockState: BlockState;
 	stateStore: StateStore;
 	spies: Spies;
 }
@@ -277,8 +275,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		"copy-on-write",
 	);
 
-	sandbox.app.bind(Identifiers.BlockState).to(BlockState);
-
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 	const blockFactory = {
@@ -294,8 +290,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	}
 
 	sandbox.app.bind(Identifiers.State.ValidatorMutator).to(MockValidatorMutator).inSingletonScope();
-
-	const blockState = sandbox.app.get<BlockState>(Identifiers.BlockState);
 
 	sandbox.app.bind(Identifiers.Proposer.Selector).to(ProposerSelector);
 
@@ -322,7 +316,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	return {
 		app: sandbox.app,
-		blockState,
 		factory,
 		sandbox,
 		spies: {

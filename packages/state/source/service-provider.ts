@@ -3,7 +3,6 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { AttributeRepository } from "./attributes";
-import { BlockState } from "./block-state";
 import { AttributeMutator } from "./mutators/attribute";
 import { BalanceMutator } from "./mutators/balance";
 import { Service } from "./service";
@@ -76,7 +75,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					container.resolve(StateStore).configure(originalStateStore),
 		);
 
-		this.app.bind(Identifiers.BlockState).to(BlockState);
 		this.app.bind(Identifiers.StateImporter).to(Importer);
 		this.app.bind(Identifiers.StateExporter).to(Exporter);
 
