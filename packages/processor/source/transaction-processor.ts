@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -10,30 +10,6 @@ export class TransactionProcessor implements Contracts.BlockProcessor.Transactio
 
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
-
-	@multiInject(Identifiers.State.ValidatorMutator)
-	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
-
-	// public async applyBlock(
-	// 	walletRepository: Contracts.State.WalletRepositoryClone,
-	// 	block: Contracts.Crypto.IBlock,
-	// ): Promise<void> {
-	// 	this.#walletRepository = walletRepository;
-
-	// 	const forgerWallet = await this.#walletRepository.findByPublicKey(block.data.generatorPublicKey);
-
-	// 	try {
-	// 		for (const transaction of block.transactions) {
-	// 			await this.#applyTransaction(transaction);
-	// 		}
-	// 		await this.#applyBlockToForger(forgerWallet, block.data);
-	// 	} catch (error) {
-	// 		this.logger.error(error.stack);
-	// 		this.logger.error("Failed to apply all transactions in block - reverting previous transactions");
-
-	// 		throw error;
-	// 	}
-	// }
 
 	async process(
 		walletRepository: Contracts.State.WalletRepositoryClone,
@@ -54,26 +30,13 @@ export class TransactionProcessor implements Contracts.BlockProcessor.Transactio
 			recipient = walletRepository.findByAddress(transaction.data.recipientId);
 		}
 
-		// @ts-ignore - Apply vote balance updates
 		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data);
-	}
-
-	// TODO: Use rewards package
-	// @ts-ignore
-	async #applyBlockToForger(
-		walletRepository: Contracts.State.WalletRepositoryClone,
-		forgerWallet: Contracts.State.Wallet,
-		blockData: Contracts.Crypto.IBlockData,
-	) {
-		for (const validatorMutator of this.validatorMutators) {
-			await validatorMutator.apply(walletRepository, forgerWallet, blockData);
-		}
 	}
 
 	async #updateVoteBalances(
 		walletRepository: Contracts.State.WalletRepositoryClone,
 		sender: Contracts.State.Wallet,
-		recipient: Contracts.State.Wallet,
+		recipient: Contracts.State.Wallet | undefined,
 		transaction: Contracts.Crypto.ITransactionData,
 	): Promise<void> {
 		if (
