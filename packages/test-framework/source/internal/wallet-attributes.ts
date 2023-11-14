@@ -21,5 +21,6 @@ export function getIndexSet(): Contracts.State.IndexSet {
 	indexSet.set(Contracts.State.WalletIndexes.Addresses);
 	indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
 	indexSet.set(Contracts.State.WalletIndexes.Usernames);
+	indexSet.set(Contracts.State.WalletIndexes.Validators);
 	return indexSet;
 }

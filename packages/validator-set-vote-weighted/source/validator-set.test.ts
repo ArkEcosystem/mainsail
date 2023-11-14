@@ -1,6 +1,7 @@
 import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { BigNumber } from "@mainsail/utils";
 import { spy } from "sinon";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
@@ -11,7 +12,6 @@ import { validatorWalletFactory, walletFactory } from "../../state/source/wallet
 import { describe, getAttributeRepository, getIndexSet, Sandbox } from "../../test-framework";
 import { buildValidatorAndVoteWallets } from "../test/build-validator-and-vote-balances";
 import { ValidatorSet } from "./validator-set";
-import { BigNumber } from "@mainsail/utils";
 
 describe<{
 	sandbox: Sandbox;
@@ -33,7 +33,7 @@ describe<{
 		context.cryptoConfiguration = {
 			get: (key) => {
 				if (key === "genesisBlock.block.totalAmount") {
-					return BigNumber.make(1000000).times(BigNumber.SATOSHI);
+					return BigNumber.make(1_000_000).times(BigNumber.SATOSHI);
 				}
 
 				return [milestone];
@@ -86,8 +86,8 @@ describe<{
 		context.walletRepository = context.sandbox.app.resolve(Wallets.WalletRepository);
 
 		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({
-			getWalletRepository: () => context.walletRepository,
 			getStateStore: () => context.stateStore,
+			getWalletRepository: () => context.walletRepository,
 		});
 
 		context.sandbox.app
