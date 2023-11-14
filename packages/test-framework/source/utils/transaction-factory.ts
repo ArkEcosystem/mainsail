@@ -74,12 +74,8 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public validatorRegistration(username?: string): TransactionFactory {
+	public validatorRegistration(): TransactionFactory {
 		const builder = new ValidatorRegistrationBuilder();
-
-		if (username) {
-			builder.usernameAsset(username);
-		}
 
 		this.builder = builder;
 
@@ -280,7 +276,7 @@ export class TransactionFactory {
 				// always remember the previous username instead generating a new one on each iteration
 				!this.builder.data.asset.validator.username
 			) {
-				this.builder = new ValidatorRegistrationBuilder().usernameAsset(this.#getRandomUsername());
+				this.builder = new ValidatorRegistrationBuilder();
 			}
 
 			if (this.#version) {
@@ -324,9 +320,5 @@ export class TransactionFactory {
 		}
 
 		return transactions;
-	}
-
-	#getRandomUsername(): string {
-		return Math.random().toString(36).toLowerCase();
 	}
 }
