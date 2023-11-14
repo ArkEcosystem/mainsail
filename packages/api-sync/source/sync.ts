@@ -80,7 +80,6 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 
 	public async bootstrap(): Promise<void> {
-
 		await this.#bootstrapConfiguration();
 		await this.#bootstrapState();
 		await this.#bootstrapTransactionTypes();
@@ -165,7 +164,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 
 	public async getLastSyncedBlockHeight(): Promise<number> {
-		return await this.blockRepositoryFactory().getLatestHeight() ?? 0;
+		return (await this.blockRepositoryFactory().getLatestHeight()) ?? 0;
 	}
 
 	async #bootstrapConfiguration(): Promise<void> {
