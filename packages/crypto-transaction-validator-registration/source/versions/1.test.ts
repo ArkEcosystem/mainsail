@@ -10,7 +10,6 @@ import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validati
 import cryptoJson from "../../../core/bin/config/testnet/mainsail/crypto.json";
 import { ServiceProvider as CryptoConsensusServiceProvider } from "../../../crypto-consensus-bls12-381";
 import { describe, Sandbox } from "../../../test-framework";
-import { schemas } from "../validation/schemas";
 import { ValidatorRegistrationTransaction } from "./1";
 
 describe<{
@@ -46,7 +45,6 @@ describe<{
 			...transactionSchemas,
 			...kayParSchemas,
 			...addressSchemas,
-			...schemas,
 		})) {
 			context.validator.addSchema(schema);
 		}
