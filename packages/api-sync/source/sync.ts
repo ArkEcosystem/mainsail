@@ -29,9 +29,6 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
-	@inject(Identifiers.Database.Service)
-	private readonly databaseService!: Contracts.Database.IDatabaseService;
-
 	@inject(ApiDatabaseIdentifiers.Migrations)
 	private readonly migrations!: ApiDatabaseContracts.IMigrations;
 
@@ -76,10 +73,13 @@ export class Sync implements Contracts.ApiSync.ISync {
 	private readonly createQueue!: Types.QueueFactory;
 	#queue!: Contracts.Kernel.Queue;
 
-	public async bootstrap(): Promise<void> {
+	public async prepareBootstrap(): Promise<void> {
 		await this.migrations.run();
 
 		await this.#resetDatabaseIfNecessary();
+	}
+
+	public async bootstrap(): Promise<void> {
 
 		await this.#bootstrapConfiguration();
 		await this.#bootstrapState();
@@ -162,6 +162,10 @@ export class Sync implements Contracts.ApiSync.ISync {
 		};
 
 		return this.#queueDeferredSync(deferredSync);
+	}
+
+	public async getLastSyncedBlockHeight(): Promise<number> {
+		return await this.blockRepositoryFactory().getLatestHeight() ?? 0;
 	}
 
 	async #bootstrapConfiguration(): Promise<void> {
@@ -302,16 +306,12 @@ export class Sync implements Contracts.ApiSync.ISync {
 	}
 
 	async #resetDatabaseIfNecessary(): Promise<void> {
-		// To ensure consistency between LMDB and Postgres, we must ensure that the tables are in-sync
-		// with the latest block found in the state.
-		//
-		// However, state snapshots mean that not the entire block history is reprocessed on bootstrap
-		// which would be required to accurately rebuild the wallets table from scratch.
-		//
-		// For now we simply reprocess all blocks if the `wallets` table is empty because a truncated
-		// `wallets` table will be the most common case where a full resync is needed.
 		const forcedTruncateDatabase = this.pluginConfiguration.getOptional<boolean>("truncateDatabase", false);
-		const lastBlock = await this.databaseService.getLastBlock();
+		if (!forcedTruncateDatabase) {
+			return;
+		}
+
+		this.logger.warning(`resetting API database and state to genesis block for full resync`);
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
@@ -319,25 +319,6 @@ export class Sync implements Contracts.ApiSync.ISync {
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
-
-			if (!forcedTruncateDatabase) {
-				const walletsInTable = await this.walletRepositoryFactory().count();
-
-				if (walletsInTable === 0 && (lastBlock?.header.height ?? 0) === 0) {
-					// Already empty on bootstrap
-					return;
-				}
-
-				if (walletsInTable > 0) {
-					// Don't truncate if wallets exist
-					return;
-				}
-			}
-
-			this.logger.warning(`resetting API database and state to genesis block for full resync`);
-
-			// Reset the restored state if any
-			this.stateService.reset();
 
 			// Ensure all tables are truncated (already supposed to be idempotent, but it's cleaner)
 			await Promise.all(

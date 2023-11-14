@@ -59,6 +59,10 @@ export class Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		try {
+			if (this.apiSync) {
+				await this.apiSync.prepareBootstrap();
+			}
+
 			await this.#setGenesisBlock();
 			await this.#storeGenesisBlock();
 
@@ -109,7 +113,12 @@ export class Bootstrapper {
 
 	async #restoreStateSnapshot(): Promise<void> {
 		const lastBlock = await this.databaseService.getLastBlock();
-		await this.stateService.restore(lastBlock?.data?.height ?? 0);
+		let restoreHeight = lastBlock?.data?.height ?? 0;
+		if (this.apiSync) {
+			restoreHeight = Math.min(await this.apiSync.getLastSyncedBlockHeight(), restoreHeight);
+		}
+
+		await this.stateService.restore(restoreHeight);
 	}
 
 	async #initState(): Promise<void> {

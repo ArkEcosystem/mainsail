@@ -8,5 +8,4 @@ export interface Service extends ICommitHandler {
 	createWalletRepositoryClone(): WalletRepositoryClone;
 	createWalletRepositoryCopyOnWrite(): WalletRepository;
 	restore(maxHeight: number): Promise<void>;
-	reset(): void;
 }
