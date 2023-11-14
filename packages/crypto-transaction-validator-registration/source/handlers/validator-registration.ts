@@ -105,13 +105,13 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		// AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
-		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.publicKey);
+		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset);
+		AppUtils.assert.defined<string>(transaction.data.asset.validatorPublicKey);
 
 		// sender.setAttribute<string>("validatorUsername", transaction.data.asset.validator.username);
 		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
-		sender.setAttribute("validatorConsensusPublicKey", transaction.data.asset.validator.publicKey);
+		sender.setAttribute("validatorConsensusPublicKey", transaction.data.asset.validatorPublicKey);
 		// walletRepository.setOnIndex(
 		// 	Contracts.State.WalletIndexes.Usernames,
 		// 	transaction.data.asset.validator.username,

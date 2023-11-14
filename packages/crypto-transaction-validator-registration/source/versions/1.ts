@@ -21,9 +21,9 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
-						publicKey: { $ref: "consensusPublicKey" },
+						validatorPublicKey: { $ref: "consensusPublicKey" },
 					},
-					required: ["publicKey"],
+					required: ["validatorPublicKey"],
 					type: "object",
 					unevaluatedProperties: false,
 				},
@@ -37,11 +37,11 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data, publicKeySize } = this;
 
-		Utils.assert.defined<Contracts.Crypto.ITransactionData>(data.asset);
-		Utils.assert.defined<{ publicKey: string }>(data.asset.validator);
+		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		Utils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const buff: ByteBuffer = ByteBuffer.fromSize(publicKeySize);
-		buff.writeBytes(Buffer.from(data.asset.validator.publicKey, "hex"));
+		buff.writeBytes(Buffer.from(data.asset.validatorPublicKey, "hex"));
 
 		return buff;
 	}
@@ -50,7 +50,7 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 		const { data, publicKeySize } = this;
 
 		data.asset = {
-			publicKey: buf.readBytes(publicKeySize).toString("hex"),
+			validatorPublicKey: buf.readBytes(publicKeySize).toString("hex"),
 		};
 	}
 }

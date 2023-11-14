@@ -26,10 +26,7 @@ export interface ITransactionAsset {
 	signature?: {
 		publicKey: string;
 	};
-	validator?: {
-		username: string;
-		publicKey: string;
-	};
+	validatorPublicKey?: string;
 	votes?: string[];
 	unvotes?: string[];
 	multiSignatureLegacy?: IMultiSignatureLegacyAsset;
