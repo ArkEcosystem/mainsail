@@ -49,11 +49,19 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 			}
 
 			if (bignum.isLessThan(minimum)) {
-				if (bignum.isZero() && schema.bypassGenesis && parentSchema.parentData?.id) {
-					return isGenesisTransaction(configuration, parentSchema.parentData.id);
-				} else {
-					return false;
+				if (bignum.isZero()) {
+
+					// This is set when for example building transactions for the genesis block itself.
+					if (configuration.getMilestone().allowZeroFeeTransactions) {
+						return true;
+					}
+
+					if (schema.bypassGenesis && parentSchema.parentData?.id) {
+						return isGenesisTransaction(configuration, parentSchema.parentData.id);
+					}
 				}
+
+				return false;
 			}
 
 			if (bignum.isGreaterThan(maximum)) {

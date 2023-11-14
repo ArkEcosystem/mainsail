@@ -10,6 +10,7 @@ export class MilestonesGenerator {
 			{
 				activeValidators: options.validators,
 				address: options.address,
+				allowZeroFeeTransactions: true,
 				block: {
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,

@@ -49,6 +49,7 @@ export type Milestone = {
 	vendorFieldLength: number;
 	stageTimeout: number;
 	stageTimeoutIncrease: number;
+	allowZeroFeeTransactions?: boolean;
 };
 
 export type MilestonePartial = Partial<Milestone> & {

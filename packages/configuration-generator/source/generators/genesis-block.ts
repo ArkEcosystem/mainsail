@@ -76,7 +76,7 @@ export class GenesisBlockGenerator extends Generator {
 				await this.app
 					.resolve(TransferBuilder)
 					.network(pubKeyHash)
-					.fee("10000000")
+					.fee("0")
 					.nonce(nonce.toFixed(0))
 					.recipientId(recipient.address)
 					.amount(amount)
@@ -112,11 +112,10 @@ export class GenesisBlockGenerator extends Generator {
 					await this.app
 						.resolve(ValidatorRegistrationBuilder)
 						.network(pubKeyHash)
-						.fee("2500000000")
+						.fee("0")
 						.nonce("1") // validator registration tx is always the first one from sender
 						.usernameAsset(`genesis_${index + 1}`)
 						.publicKeyAsset(sender.consensusKeys.publicKey)
-						.fee(`${25 * 1e8}`)
 						.sign(sender.passphrase)
 				).build(),
 				sender,
@@ -135,10 +134,9 @@ export class GenesisBlockGenerator extends Generator {
 					await this.app
 						.resolve(VoteBuilder)
 						.network(pubKeyHash)
-						.fee("100000000")
+						.fee("0")
 						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
 						.votesAsset([sender.keys.publicKey])
-						.fee(`${1 * 1e8}`)
 						.sign(sender.passphrase)
 				).build(),
 				sender,
@@ -152,17 +150,16 @@ export class GenesisBlockGenerator extends Generator {
 		transaction: Contracts.Crypto.ITransaction,
 		wallet: Wallet,
 	): Promise<Contracts.Crypto.ITransaction> {
-		Object.assign(transaction.data, {
-			fee: BigNumber.ZERO,
-			timestamp: 0,
-		});
+		// Object.assign(transaction.data, {
+		// 	timestamp: 0,
+		// });
 
-		transaction.data.signature = await this.app
-			.get<Contracts.Crypto.ITransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
-			.sign(transaction.data, wallet.keys);
-		transaction.data.id = await this.app
-			.get<Contracts.Crypto.ITransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
-			.getId(transaction.data);
+		// transaction.data.signature = await this.app
+		// 	.get<Contracts.Crypto.ITransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
+		// 	.sign(transaction.data, wallet.keys);
+		// transaction.data.id = await this.app
+		// 	.get<Contracts.Crypto.ITransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
+		// 	.getId(transaction.data);
 
 		return transaction;
 	}
