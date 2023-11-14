@@ -61,10 +61,10 @@ export class Service implements Contracts.TransactionPool.Service {
 		try {
 			switch (name) {
 				case Enums.StateEvent.BuilderFinished:
-					await this.readdTransactions();
+					await this.reAddTransactions();
 					break;
 				case Enums.CryptoEvent.MilestoneChanged:
-					await this.readdTransactions();
+					await this.reAddTransactions();
 					break;
 				case Enums.BlockEvent.Applied:
 					await this.cleanUp();
@@ -119,7 +119,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async readdTransactions(previouslyForgedTransactions: Contracts.Crypto.ITransaction[] = []): Promise<void> {
+	public async reAddTransactions(previouslyForgedTransactions: Contracts.Crypto.ITransaction[] = []): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;

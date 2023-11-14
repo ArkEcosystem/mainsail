@@ -3,9 +3,9 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Types, Utils } from "@mainsail/kernel";
+import { Providers, Types, Utils } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -65,13 +65,21 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.PluginConfiguration)
+	@tagged("plugin", "api-sync")
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.QueueFactory)
 	private readonly createQueue!: Types.QueueFactory;
 	#queue!: Contracts.Kernel.Queue;
 
-	public async bootstrap(): Promise<void> {
+	public async prepareBootstrap(): Promise<void> {
 		await this.migrations.run();
 
+		await this.#resetDatabaseIfNecessary();
+	}
+
+	public async bootstrap(): Promise<void> {
 		await this.#bootstrapConfiguration();
 		await this.#bootstrapState();
 		await this.#bootstrapTransactionTypes();
@@ -153,6 +161,10 @@ export class Sync implements Contracts.ApiSync.ISync {
 		};
 
 		return this.#queueDeferredSync(deferredSync);
+	}
+
+	public async getLastSyncedBlockHeight(): Promise<number> {
+		return (await this.blockRepositoryFactory().getLatestHeight()) ?? 0;
 	}
 
 	async #bootstrapConfiguration(): Promise<void> {
@@ -290,5 +302,33 @@ export class Sync implements Contracts.ApiSync.ISync {
 		const t1 = performance.now();
 
 		this.logger.debug(`synced committed block: ${deferred.block.height} in ${t1 - t0}ms`);
+	}
+
+	async #resetDatabaseIfNecessary(): Promise<void> {
+		const forcedTruncateDatabase = this.pluginConfiguration.getOptional<boolean>("truncateDatabase", false);
+		if (!forcedTruncateDatabase) {
+			return;
+		}
+
+		this.logger.warning(`resetting API database and state to genesis block for full resync`);
+
+		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
+			const blockRepository = this.blockRepositoryFactory(entityManager);
+			const stateRepository = this.stateRepositoryFactory(entityManager);
+			const transactionRepository = this.transactionRepositoryFactory(entityManager);
+			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
+			const walletRepository = this.walletRepositoryFactory(entityManager);
+
+			// Ensure all tables are truncated (already supposed to be idempotent, but it's cleaner)
+			await Promise.all(
+				[
+					blockRepository,
+					stateRepository,
+					transactionRepository,
+					validatorRoundRepository,
+					walletRepository,
+				].map((repo) => repo.clear()),
+			);
+		});
 	}
 }
