@@ -67,11 +67,8 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			.has();
 
 		if (hasSender) {
-			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-				transaction.data.senderPublicKey,
-			);
 			throw new Exceptions.PoolError(
-				`Validator resignation for "${wallet.getPublicKey()}" already in the pool`,
+				`Validator resignation for "${transaction.data.senderPublicKey}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
