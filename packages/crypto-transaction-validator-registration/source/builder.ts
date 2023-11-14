@@ -20,7 +20,7 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 	}
 
 	public publicKeyAsset(publicKey: string): ValidatorRegistrationBuilder {
-		if (this.data.asset && this.data.asset.validator) {
+		if (this.data.asset) {
 			this.data.asset.validatorPublicKey = publicKey;
 		}
 
