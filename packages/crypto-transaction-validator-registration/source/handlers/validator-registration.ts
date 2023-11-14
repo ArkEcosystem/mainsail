@@ -110,7 +110,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
-		sender.setAttribute("validatorConsensusPublicKey", data.asset.validatorPublicKey);
+		sender.setAttribute("validatorPublicKey", data.asset.validatorPublicKey);
 		walletRepository.setOnIndex(Contracts.State.WalletIndexes.Validators, data.asset.validatorPublicKey, sender);
 	}
 

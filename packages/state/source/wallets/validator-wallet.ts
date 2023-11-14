@@ -15,7 +15,7 @@ export class ValidatorWallet implements Contracts.State.IValidatorWallet {
 	}
 
 	public getConsensusPublicKey(): string {
-		return this.wallet.getAttribute<string>("validatorConsensusPublicKey");
+		return this.wallet.getAttribute<string>("validatorPublicKey");
 	}
 
 	public getVoteBalance(): Utils.BigNumber {
