@@ -22,7 +22,7 @@ export enum WalletIndexes {
 	PublicKeys = "publicKeys",
 	Usernames = "usernames",
 	Resignations = "resignations",
-	Locks = "locks",
+	Validators = "validators",
 }
 
 export interface Wallet {
@@ -96,7 +96,7 @@ export interface WalletRepository {
 
 	allByPublicKey(): ReadonlyArray<Wallet>;
 
-	allByUsername(): ReadonlyArray<Wallet>;
+	allValidators(): ReadonlyArray<Wallet>;
 
 	allByIndex(indexName: string): ReadonlyArray<Wallet>;
 

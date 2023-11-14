@@ -38,8 +38,8 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return this.allByIndex(Contracts.State.WalletIndexes.PublicKeys);
 	}
 
-	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
-		return this.allByIndex(Contracts.State.WalletIndexes.Usernames);
+	public allValidators(): ReadonlyArray<Contracts.State.Wallet> {
+		return this.allByIndex(Contracts.State.WalletIndexes.Validators);
 	}
 
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {

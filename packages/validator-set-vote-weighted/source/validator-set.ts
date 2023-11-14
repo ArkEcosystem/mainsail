@@ -80,7 +80,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
 
-		for (const wallet of this.#walletRepository.allByUsername()) {
+		for (const wallet of this.#walletRepository.allValidators()) {
 			const validator = this.validatorWalletFactory(wallet);
 			if (validator.isResigned()) {
 				validator.unsetRank();
