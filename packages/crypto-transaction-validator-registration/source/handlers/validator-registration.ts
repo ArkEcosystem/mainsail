@@ -61,36 +61,37 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+		const { data }: Contracts.Crypto.ITransaction = transaction;
+
+		AppUtils.assert.defined<string>(data.senderPublicKey);
+		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const hasSender: boolean = await this.poolQuery
-			.getAllBySender(transaction.data.senderPublicKey)
+			.getAllBySender(data.senderPublicKey)
 			.whereKind(transaction)
 			.has();
 
 		if (hasSender) {
 			throw new Exceptions.PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.ValidatorRegistration}' in the pool`,
+				`Sender ${data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.ValidatorRegistration}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
 
-		// AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
-		// const username: string = transaction.data.asset.validator.username;
-		// const hasUsername: boolean = await this.poolQuery
-		// 	.getAll()
-		// 	.whereKind(transaction)
-		// 	.wherePredicate(async (t) => t.data.asset?.validator?.username === username)
-		// 	.has();
+		const validatorPublicKey = data.asset.validatorPublicKey;
+		const hasPublicKey: boolean = await this.poolQuery
+			.getAll()
+			.whereKind(transaction)
+			.wherePredicate(async (t) => t.data.asset?.validatorPublicKey === validatorPublicKey)
+			.has();
 
-		// if (hasUsername) {
-		// 	throw new Exceptions.PoolError(
-		// 		`Validator registration for "${username}" already in the pool`,
-		// 		"ERR_PENDING",
-		// 	);
-		// }
-
-		// TODO: Check publicKey index
+		if (hasPublicKey) {
+			throw new Exceptions.PoolError(
+				`Validator registration for public key "${validatorPublicKey}" already in the pool`,
+				"ERR_PENDING",
+			);
+		}
 	}
 
 	public async applyToSender(
