@@ -71,7 +71,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 				transaction.data.senderPublicKey,
 			);
 			throw new Exceptions.PoolError(
-				`Validator resignation for "${wallet.getAttribute("validatorUsername")}" already in the pool`,
+				`Validator resignation for "${wallet.getPublicKey()}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
@@ -90,7 +90,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		senderWallet.setAttribute("validatorResigned", true);
 		walletRepository.setOnIndex(
 			Contracts.State.WalletIndexes.Resignations,
-			senderWallet.getAttribute("validatorUsername"),
+			senderWallet.getAttribute("validatorPublicKey"),
 			senderWallet,
 		);
 	}
