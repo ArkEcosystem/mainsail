@@ -2,7 +2,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class CommittedBlockState implements Contracts.BlockProcessor.IProcessableUnit {
+export class CommittedBlockState implements Contracts.Processor.IProcessableUnit {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 

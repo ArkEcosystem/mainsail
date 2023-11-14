@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class TimestampVerifier implements Contracts.BlockProcessor.Handler {
+export class TimestampVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -15,7 +15,7 @@ export class TimestampVerifier implements Contracts.BlockProcessor.Handler {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		if (unit.getBlock().data.height === 0) {
 			return true;
 		}

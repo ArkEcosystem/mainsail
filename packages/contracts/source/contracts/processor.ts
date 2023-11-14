@@ -1,4 +1,4 @@
-import { IBlock, ICommittedBlock } from "./crypto";
+import { IBlock, ICommittedBlock, ITransaction } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
 export interface IProcessableUnit {
@@ -16,9 +16,13 @@ export interface Handler {
 	execute(unit: IProcessableUnit): Promise<boolean>;
 }
 
-export interface Processor {
+export interface BlockProcessor {
 	process(unit: IProcessableUnit): Promise<boolean>;
 	commit(unit: IProcessableUnit): Promise<void>;
+}
+
+export interface TransactionProcessor {
+	process(walletRepository: WalletRepositoryClone, transaction: ITransaction): Promise<void>;
 }
 
 export interface Verifier {

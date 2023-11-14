@@ -1,5 +1,5 @@
-import { IProcessableUnit } from "../block-processor";
 import { IAggregatedSignature, ICommittedBlock, IPrecommit, IPrevote, IProposal } from "../crypto";
+import { IProcessableUnit } from "../processor";
 import { IValidatorWallet } from "../state";
 import { ProcessorResult, Step } from "./enums";
 

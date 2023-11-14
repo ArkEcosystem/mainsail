@@ -14,7 +14,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
 
 	@inject(Identifiers.BlockProcessor)
-	private readonly processor!: Contracts.BlockProcessor.Processor;
+	private readonly processor!: Contracts.Processor.BlockProcessor;
 
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
@@ -156,7 +156,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	// TODO: Check if can be joined with handle
-	async handleCommittedBlockState(committedBlockState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	async handleCommittedBlockState(committedBlockState: Contracts.Processor.IProcessableUnit): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
 			await this.onMajorityPrecommit(committedBlockState);
 		});
@@ -302,7 +302,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
 	}
 
-	protected async onMajorityPrecommit(roundState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	protected async onMajorityPrecommit(roundState: Contracts.Processor.IProcessableUnit): Promise<void> {
 		// TODO: Only height must match. Round can be any. Add tests
 		if (this.#didMajorityPrecommit || roundState.height !== this.#height) {
 			return;
@@ -338,7 +338,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		});
 	}
 
-	protected async onMinorityWithHigherRound(roundState: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.IProcessableUnit): Promise<void> {
 		if (roundState.height !== this.#height || roundState.round <= this.#round) {
 			return;
 		}
@@ -387,7 +387,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		});
 	}
 
-	#isInvalidRoundState(roundState: Contracts.BlockProcessor.IProcessableUnit): boolean {
+	#isInvalidRoundState(roundState: Contracts.Processor.IProcessableUnit): boolean {
 		if (roundState.height !== this.#height) {
 			return true;
 		}

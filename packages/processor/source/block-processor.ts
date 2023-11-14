@@ -1,15 +1,12 @@
-import { inject, injectable, optional } from "@mainsail/container";
+import { inject, injectable, multiInject, optional } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 // TODO: Move enums to contracts
 import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
-export class BlockProcessor implements Contracts.BlockProcessor.Processor {
+export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
-
-	@inject(Identifiers.BlockState)
-	private readonly blockState!: Contracts.State.BlockState;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
@@ -19,6 +16,9 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
+
+	@inject(Identifiers.TransactionProcessor)
+	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
@@ -36,19 +36,26 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	@inject(Identifiers.BlockVerifier)
-	private readonly verifier!: Contracts.BlockProcessor.Verifier;
+	private readonly verifier!: Contracts.Processor.Verifier;
+
+	@multiInject(Identifiers.State.ValidatorMutator)
+	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
 
 	@inject(Identifiers.ApiSync)
 	@optional()
 	private readonly apiSync: Contracts.ApiSync.ISync | undefined;
 
-	public async process(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async process(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		try {
 			if (!(await this.verifier.verify(unit))) {
 				return false;
 			}
 
-			await this.blockState.applyBlock(unit.getWalletRepository(), unit.getBlock());
+			for (const transaction of unit.getBlock().transactions) {
+				await this.transactionProcessor.process(unit.getWalletRepository(), transaction);
+			}
+
+			await this.#applyBlockToForger(unit);
 
 			return true;
 		} catch (error) {
@@ -58,7 +65,7 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		return false;
 	}
 
-	public async commit(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<void> {
+	public async commit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
 		if (this.apiSync) {
 			await this.apiSync.beforeCommit();
 		}
@@ -115,5 +122,16 @@ export class BlockProcessor implements Contracts.BlockProcessor.Processor {
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// TODO: ! no reason to pass this.emitter
 		handler.emitEvents(transaction, this.events);
+	}
+
+	async #applyBlockToForger(unit: Contracts.Processor.IProcessableUnit) {
+		const block = unit.getBlock();
+		const walletRepository = unit.getWalletRepository();
+
+		const forgerWallet = await walletRepository.findByPublicKey(unit.getBlock().data.generatorPublicKey);
+
+		for (const validatorMutator of this.validatorMutators) {
+			await validatorMutator.apply(walletRepository, forgerWallet, block.data);
+		}
 	}
 }

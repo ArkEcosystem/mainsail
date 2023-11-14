@@ -76,7 +76,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
-		} as Contracts.BlockProcessor.IProcessableUnit);
+		} as Contracts.Processor.IProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
@@ -94,7 +94,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
-		} as Contracts.BlockProcessor.IProcessableUnit);
+		} as Contracts.Processor.IProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
@@ -104,7 +104,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: activeValidators } } }),
-		} as Contracts.BlockProcessor.IProcessableUnit);
+		} as Contracts.Processor.IProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound2[index]);
@@ -121,7 +121,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
-		} as Contracts.BlockProcessor.IProcessableUnit);
+		} as Contracts.Processor.IProcessableUnit);
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}

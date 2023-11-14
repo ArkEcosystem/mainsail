@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-export class ForgedTransactionsVerifier implements Contracts.BlockProcessor.Handler {
+export class ForgedTransactionsVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -16,7 +16,7 @@ export class ForgedTransactionsVerifier implements Contracts.BlockProcessor.Hand
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public async execute(unit: Contracts.BlockProcessor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
 		if (this.stateService.getStateStore().isBootstrap()) {
 			return true;
 		}
