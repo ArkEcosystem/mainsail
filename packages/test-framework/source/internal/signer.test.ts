@@ -30,13 +30,12 @@ describe<{
 			fee: "5",
 			passphrase: passphrases[0],
 			publicKey: "a".repeat(96),
-			username: "dummy",
 		};
 
 		const entity = await signer.makeValidator(options);
 
 		assert.defined(entity.data.signature);
-		assert.equal(entity.data.asset?.validator?.username, "dummy");
+		assert.defined(entity.data.asset?.validatorPublicKey);
 	});
 
 	it("should make vote", async ({ signer }) => {

@@ -114,7 +114,6 @@ export class GenesisBlockGenerator extends Generator {
 						.network(pubKeyHash)
 						.fee("2500000000")
 						.nonce("1") // validator registration tx is always the first one from sender
-						.usernameAsset(`genesis_${index + 1}`)
 						.publicKeyAsset(sender.consensusKeys.publicKey)
 						.fee(`${25 * 1e8}`)
 						.sign(sender.passphrase)

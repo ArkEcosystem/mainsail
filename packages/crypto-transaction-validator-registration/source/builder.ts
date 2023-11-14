@@ -16,20 +16,12 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = "";
-		this.data.asset = { validator: {} } as Contracts.Crypto.ITransactionAsset;
-	}
-
-	public usernameAsset(username: string): ValidatorRegistrationBuilder {
-		if (this.data.asset && this.data.asset.validator) {
-			this.data.asset.validator.username = username;
-		}
-
-		return this;
+		this.data.asset = {} as Contracts.Crypto.ITransactionAsset;
 	}
 
 	public publicKeyAsset(publicKey: string): ValidatorRegistrationBuilder {
-		if (this.data.asset && this.data.asset.validator) {
-			this.data.asset.validator.publicKey = publicKey;
+		if (this.data.asset) {
+			this.data.asset.validatorPublicKey = publicKey;
 		}
 
 		return this;

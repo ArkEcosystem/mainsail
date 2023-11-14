@@ -21,6 +21,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		indexSet.set(Contracts.State.WalletIndexes.Addresses);
 		indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
 		indexSet.set(Contracts.State.WalletIndexes.Usernames);
+		indexSet.set(Contracts.State.WalletIndexes.Validators);
 		// TODO: remove resignations index
 		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
@@ -34,8 +35,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
-		walletAttributeRepository.set("validatorUsername", Contracts.State.AttributeType.String);
-		walletAttributeRepository.set("validatorConsensusPublicKey", Contracts.State.AttributeType.String);
+		walletAttributeRepository.set("validatorPublicKey", Contracts.State.AttributeType.String);
 		walletAttributeRepository.set("validatorRank", Contracts.State.AttributeType.Number);
 		walletAttributeRepository.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("validatorLastBlock", Contracts.State.AttributeType.Object);

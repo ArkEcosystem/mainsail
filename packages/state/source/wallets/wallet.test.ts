@@ -180,7 +180,7 @@ describe<{
 		const wallet = new Wallet(address, context.attributeMap, context.walletRepository);
 
 		assert.false(wallet.isValidator());
-		wallet.setAttribute("validatorUsername", "username");
+		wallet.setAttribute("validatorPublicKey", "username");
 		assert.true(wallet.isValidator());
 	});
 

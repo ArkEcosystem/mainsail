@@ -21,17 +21,9 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
-						validator: {
-							properties: {
-								publicKey: { $ref: "consensusPublicKey" },
-								username: { $ref: "validatorUsername" },
-							},
-							required: ["username", "publicKey"],
-							type: "object",
-							unevaluatedProperties: false,
-						},
+						validatorPublicKey: { $ref: "consensusPublicKey" },
 					},
-					required: ["validator"],
+					required: ["validatorPublicKey"],
 					type: "object",
 					unevaluatedProperties: false,
 				},
@@ -45,29 +37,20 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data, publicKeySize } = this;
 
-		Utils.assert.defined<Contracts.Crypto.ITransactionData>(data.asset);
-		Utils.assert.defined<{ username: string; publicKey: string }>(data.asset.validator);
+		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		Utils.assert.defined<string>(data.asset.validatorPublicKey);
 
-		const validatorBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
-		const buff: ByteBuffer = ByteBuffer.fromSize(validatorBytes.length + 1 + publicKeySize);
-
-		buff.writeUint8(validatorBytes.length);
-		buff.writeBytes(validatorBytes);
-		buff.writeBytes(Buffer.from(data.asset.validator.publicKey, "hex"));
+		const buff: ByteBuffer = ByteBuffer.fromSize(publicKeySize);
+		buff.writeBytes(Buffer.from(data.asset.validatorPublicKey, "hex"));
 
 		return buff;
 	}
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data, publicKeySize } = this;
-		const usernameLength = buf.readUint8();
 
 		data.asset = {
-			validator: {
-				username: buf.readBytes(usernameLength).toString("utf8"),
-				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-				publicKey: buf.readBytes(publicKeySize).toString("hex"),
-			},
+			validatorPublicKey: buf.readBytes(publicKeySize).toString("hex"),
 		};
 	}
 }

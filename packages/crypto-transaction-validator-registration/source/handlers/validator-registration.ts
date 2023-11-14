@@ -32,6 +32,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		const { data }: Contracts.Crypto.ITransaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
+		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
 
@@ -39,19 +41,13 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			throw new Exceptions.NotSupportedForMultiSignatureWalletError();
 		}
 
-		AppUtils.assert.defined<string>(data.asset?.validator?.username);
-
-		const username: string = data.asset.validator.username;
-
 		if (wallet.isValidator()) {
 			throw new Exceptions.WalletIsAlreadyValidatorError();
 		}
 
-		if (walletRepository.hasByUsername(username)) {
-			throw new Exceptions.WalletUsernameAlreadyRegisteredError(username);
+		if (walletRepository.hasByIndex(Contracts.State.WalletIndexes.Validators, data.asset.validatorPublicKey)) {
+			throw new Exceptions.ValidatorPublicKeyAlreadyRegisteredError(data.asset.validatorPublicKey);
 		}
-
-		// TODO: Check publicKey index
 
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
@@ -65,60 +61,57 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+		const { data }: Contracts.Crypto.ITransaction = transaction;
+
+		AppUtils.assert.defined<string>(data.senderPublicKey);
+		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const hasSender: boolean = await this.poolQuery
-			.getAllBySender(transaction.data.senderPublicKey)
+			.getAllBySender(data.senderPublicKey)
 			.whereKind(transaction)
 			.has();
 
 		if (hasSender) {
 			throw new Exceptions.PoolError(
-				`Sender ${transaction.data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.ValidatorRegistration}' in the pool`,
+				`Sender ${data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.ValidatorRegistration}' in the pool`,
 				"ERR_PENDING",
 			);
 		}
 
-		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
-		const username: string = transaction.data.asset.validator.username;
-		const hasUsername: boolean = await this.poolQuery
+		const validatorPublicKey = data.asset.validatorPublicKey;
+		const hasPublicKey: boolean = await this.poolQuery
 			.getAll()
 			.whereKind(transaction)
-			.wherePredicate(async (t) => t.data.asset?.validator?.username === username)
+			.wherePredicate(async (t) => t.data.asset?.validatorPublicKey === validatorPublicKey)
 			.has();
 
-		if (hasUsername) {
+		if (hasPublicKey) {
 			throw new Exceptions.PoolError(
-				`Validator registration for "${username}" already in the pool`,
+				`Validator registration for public key "${validatorPublicKey}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
-
-		// TODO: Check publicKey index
 	}
 
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {
+		const { data }: Contracts.Crypto.ITransaction = transaction;
+
+		AppUtils.assert.defined<string>(data.senderPublicKey);
+		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
+
 		await super.applyToSender(walletRepository, transaction);
 
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
-		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.username);
-		AppUtils.assert.defined<string>(transaction.data.asset?.validator?.publicKey);
-
-		sender.setAttribute<string>("validatorUsername", transaction.data.asset.validator.username);
 		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
-		sender.setAttribute("validatorConsensusPublicKey", transaction.data.asset.validator.publicKey);
-		walletRepository.setOnIndex(
-			Contracts.State.WalletIndexes.Usernames,
-			transaction.data.asset.validator.username,
-			sender,
-		);
+		sender.setAttribute("validatorPublicKey", data.asset.validatorPublicKey);
+		walletRepository.setOnIndex(Contracts.State.WalletIndexes.Validators, data.asset.validatorPublicKey, sender);
 	}
 
 	public async applyToRecipient(

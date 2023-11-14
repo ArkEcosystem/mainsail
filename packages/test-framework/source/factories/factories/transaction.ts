@@ -106,10 +106,7 @@ export const registerValidatorRegistrationFactory = (
 ): void => {
 	factory.set("ValidatorRegistration", async ({ options }: { options: ValidatorRegistrationOptions }) =>
 		applyModifiers(
-			app
-				.resolve(ValidatorRegistrationBuilder)
-				.usernameAsset(options.username || Math.random().toString(36).slice(8))
-				.publicKeyAsset(options.publicKey || "a".repeat(96)),
+			app.resolve(ValidatorRegistrationBuilder).publicKeyAsset(options.publicKey || "a".repeat(96)),
 			options,
 		),
 	);

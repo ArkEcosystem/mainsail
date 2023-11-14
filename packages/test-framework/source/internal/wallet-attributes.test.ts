@@ -10,7 +10,7 @@ describe("WalletAttributes", ({ it, assert }) => {
 		assert.true(attributes.has("publicKey"));
 		assert.true(attributes.has("validatorRank"));
 		assert.true(attributes.has("validatorResigned"));
-		assert.true(attributes.has("validatorUsername"));
+		assert.true(attributes.has("validatorPublicKey"));
 		assert.true(attributes.has("validatorVoteBalance"));
 		assert.true(attributes.has("multiSignature"));
 		assert.true(attributes.has("vote"));

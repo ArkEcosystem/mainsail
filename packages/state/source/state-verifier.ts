@@ -16,7 +16,7 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 	verifyWalletsConsistency(): void {
 		this.logger.info(
 			`Number of registered validators: ${Object.keys(
-				this.stateService.getWalletRepository().allByUsername(),
+				this.stateService.getWalletRepository().allValidators(),
 			).length.toLocaleString()}`,
 		);
 

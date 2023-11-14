@@ -22,7 +22,7 @@ export enum WalletIndexes {
 	PublicKeys = "publicKeys",
 	Usernames = "usernames",
 	Resignations = "resignations",
-	Locks = "locks",
+	Validators = "validators",
 }
 
 export interface Wallet {
@@ -66,7 +66,6 @@ export interface Wallet {
 export interface IValidatorWallet {
 	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
-	getUsername(): string;
 	getVoteBalance(): BigNumber;
 	getRank(): number;
 	setRank(rank: number): void;
@@ -97,7 +96,7 @@ export interface WalletRepository {
 
 	allByPublicKey(): ReadonlyArray<Wallet>;
 
-	allByUsername(): ReadonlyArray<Wallet>;
+	allValidators(): ReadonlyArray<Wallet>;
 
 	allByIndex(indexName: string): ReadonlyArray<Wallet>;
 

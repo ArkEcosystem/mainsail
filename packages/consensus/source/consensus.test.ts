@@ -124,7 +124,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.proposer = {
 			getConsensusPublicKey: () => "consensusPublicKey",
-			getUsername: () => "username",
+			getWalletPublicKey: () => "walletPublicKey",
 		};
 
 		context.roundState = {
@@ -238,7 +238,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetValidator.calledWith(proposer.getConsensusPublicKey());
 		spyGetRoundState.calledOnce();
 		spyGetRoundState.calledWith(2, 0);
-		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getUsername()}`);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getWalletPublicKey()}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
@@ -280,7 +280,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledWith(0, undefined, block);
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
-		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getUsername()}`);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${0} with proposer: ${proposer.getWalletPublicKey()}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
@@ -334,7 +334,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledWith(1, 0, block, lockProof);
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
-		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${1} with proposer: ${proposer.getUsername()}`);
+		spyLoggerInfo.calledWith(`>> Starting new round: ${2}/${1} with proposer: ${proposer.getWalletPublicKey()}`);
 		spyLoggerInfo.calledWith(`Proposing valid block ${2}/${1} from round ${0} with blockId: ${block.data.id}`);
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});

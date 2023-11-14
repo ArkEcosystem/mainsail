@@ -53,13 +53,13 @@ export class WalletRepositoryCopyOnWrite extends WalletRepository {
 		return true;
 	}
 
-	public allByUsername(): ReadonlyArray<Contracts.State.Wallet> {
-		for (const wallet of this.#blockchainWalletRepository.allByUsername()) {
+	public allValidators(): ReadonlyArray<Contracts.State.Wallet> {
+		for (const wallet of this.#blockchainWalletRepository.allValidators()) {
 			if (!super.hasByAddress(wallet.getAddress())) {
 				this.#cloneWallet(wallet.getAddress());
 			}
 		}
-		return super.allByUsername();
+		return super.allValidators();
 	}
 
 	#cloneWallet(address: string): Contracts.State.Wallet {

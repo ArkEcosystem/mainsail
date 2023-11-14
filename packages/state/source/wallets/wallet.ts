@@ -151,7 +151,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public isValidator(): boolean {
-		return this.hasAttribute("validatorUsername");
+		return this.hasAttribute("validatorPublicKey");
 	}
 
 	public hasVoted(): boolean {

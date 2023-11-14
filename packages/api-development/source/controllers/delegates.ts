@@ -9,7 +9,7 @@ import { Controller } from "./controller";
 @injectable()
 export class DelegatesController extends Controller {
 	public index(request: Hapi.Request) {
-		const wallets = this.getWalletRepository().allByUsername();
+		const wallets = this.getWalletRepository().allValidators();
 
 		const pagination = this.getQueryPagination(request.query);
 

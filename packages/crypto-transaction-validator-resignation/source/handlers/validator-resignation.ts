@@ -40,7 +40,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		// TODO: use validator count relative to proposed block height
 		const requiredValidatorsCount: number = this.configuration.getMilestone().activeValidators;
 		const currentValidatorsCount: number = walletRepository
-			.allByUsername()
+			.allValidators()
 			.filter((w) => w.hasAttribute("validatorResigned") === false).length;
 
 		if (currentValidatorsCount - 1 < requiredValidatorsCount) {
@@ -67,11 +67,8 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			.has();
 
 		if (hasSender) {
-			const wallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-				transaction.data.senderPublicKey,
-			);
 			throw new Exceptions.PoolError(
-				`Validator resignation for "${wallet.getAttribute("validatorUsername")}" already in the pool`,
+				`Validator resignation for "${transaction.data.senderPublicKey}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
@@ -90,7 +87,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		senderWallet.setAttribute("validatorResigned", true);
 		walletRepository.setOnIndex(
 			Contracts.State.WalletIndexes.Resignations,
-			senderWallet.getAttribute("validatorUsername"),
+			senderWallet.getAttribute("validatorPublicKey"),
 			senderWallet,
 		);
 	}
