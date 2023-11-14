@@ -8,15 +8,15 @@ async function run() {
 	const configCore = join(paths.config, "testnet");
 	console.log(paths, configCore);
 
-	const flags = {
-		address: "bech32m",
-		bech32mPrefix: "ark",
-	};
-
 	// const flags = {
-	// 	address: "base58",
-	// 	base58Prefix: 30,
-	// }
+	// 	address: "bech32m",
+	// 	bech32mPrefix: "ark",
+	// };
+
+	const flags = {
+		address: "base58",
+		base58Prefix: 30,
+	}
 
 	const app = await makeApplication(configCore, flags);
 	const generator = app.get(Identifiers.ConfigurationGenerator);
