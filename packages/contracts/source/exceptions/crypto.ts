@@ -274,6 +274,14 @@ export class WalletIsAlreadyValidatorError extends Exception {
 	}
 }
 
+export class ValidatorPublicKeyAlreadyRegisteredError extends Exception {
+	public constructor(validatorPublicKey: string) {
+		super(
+			`Failed to apply transaction, because the validator public key '${validatorPublicKey}' is already registered.`,
+		);
+	}
+}
+
 export class WalletUsernameAlreadyRegisteredError extends Exception {
 	public constructor(username: string) {
 		super(`Failed to apply transaction, because the username '${username}' is already registered.`);

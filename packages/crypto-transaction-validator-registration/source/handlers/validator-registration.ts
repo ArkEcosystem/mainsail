@@ -32,6 +32,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		const { data }: Contracts.Crypto.ITransaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
+		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
 
@@ -39,18 +41,13 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			throw new Exceptions.NotSupportedForMultiSignatureWalletError();
 		}
 
-		// AppUtils.assert.defined<string>(data.asset?.validator?.username);
-		// const username: string = data.asset.validator.username;
-
 		if (wallet.isValidator()) {
 			throw new Exceptions.WalletIsAlreadyValidatorError();
 		}
 
-		// if (walletRepository.hasByUsername(username)) {
-		// 	throw new Exceptions.WalletUsernameAlreadyRegisteredError(username);
-		// }
-
-		// TODO: Check publicKey index
+		if (walletRepository.hasByIndex(Contracts.State.WalletIndexes.Validators, data.asset.validatorPublicKey)) {
+			throw new Exceptions.ValidatorPublicKeyAlreadyRegisteredError(data.asset.validatorPublicKey);
+		}
 
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
@@ -100,13 +97,13 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {
-		await super.applyToSender(walletRepository, transaction);
-
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
 		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset);
 		AppUtils.assert.defined<string>(transaction.data.asset.validatorPublicKey);
+
+		await super.applyToSender(walletRepository, transaction);
+
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		// sender.setAttribute<string>("validatorUsername", transaction.data.asset.validator.username);
 		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
