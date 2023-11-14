@@ -98,28 +98,20 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.ITransaction,
 	): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.data.asset);
-		AppUtils.assert.defined<string>(transaction.data.asset.validatorPublicKey);
+		const { data }: Contracts.Crypto.ITransaction = transaction;
+
+		AppUtils.assert.defined<string>(data.senderPublicKey);
+		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		await super.applyToSender(walletRepository, transaction);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
 
-		// sender.setAttribute<string>("validatorUsername", transaction.data.asset.validator.username);
 		sender.setAttribute<BigNumber>("validatorVoteBalance", BigNumber.ZERO);
 
-		sender.setAttribute("validatorConsensusPublicKey", transaction.data.asset.validatorPublicKey);
-		walletRepository.setOnIndex(
-			Contracts.State.WalletIndexes.Validators,
-			transaction.data.asset.validatorPublicKey,
-			sender,
-		);
-		// walletRepository.setOnIndex(
-		// 	Contracts.State.WalletIndexes.Usernames,
-		// 	transaction.data.asset.validator.username,
-		// 	sender,
-		// );
+		sender.setAttribute("validatorConsensusPublicKey", data.asset.validatorPublicKey);
+		walletRepository.setOnIndex(Contracts.State.WalletIndexes.Validators, data.asset.validatorPublicKey, sender);
 	}
 
 	public async applyToRecipient(
