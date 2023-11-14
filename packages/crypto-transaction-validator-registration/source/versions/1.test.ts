@@ -55,10 +55,7 @@ describe<{
 	const transactionOriginal = {
 		amount: 0,
 		asset: {
-			validator: {
-				publicKey: "a".repeat(96),
-				username: "username",
-			},
+			validatorPublicKey: "a".repeat(96),
 		},
 		fee: 1,
 		nonce: 0,
@@ -119,68 +116,11 @@ describe<{
 			...transactionOriginal,
 			asset: {
 				test: "test",
-				validator: {
-					publicKey: "a".repeat(96),
-					username: "username",
-				},
+				validatorPublicKey: "a".repeat(96),
 			},
 		};
 
 		assert.true(validator.validate("validatorRegistration", transaction).error.includes("unevaluated properties"));
-	});
-
-	it("#getSchema - asset.validator should not contain unevaluated properties", ({ validator }) => {
-		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
-
-		const transaction = {
-			...transactionOriginal,
-			asset: {
-				validator: {
-					publicKey: "a".repeat(96),
-					test: "test",
-					username: "username",
-				},
-			},
-		};
-
-		assert.true(validator.validate("validatorRegistration", transaction).error.includes("unevaluated properties"));
-	});
-
-	it("#getSchema - asset.validator should be required object", ({ validator }) => {
-		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
-
-		const invalidValues = [1, BigNumber.ONE, "test", null, {}];
-
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				asset: {
-					validator: validator,
-				},
-			};
-
-			assert.true(validator.validate("validatorRegistration", transaction).error.includes("validator"));
-		}
-	});
-
-	it("#getSchema - username should be validatorUsername", ({ validator }) => {
-		validator.addSchema(ValidatorRegistrationTransaction.getSchema());
-
-		const invalidValues = [1, BigNumber.ONE, "", "a".repeat(21), null, undefined, {}];
-
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				asset: {
-					validator: {
-						publicKey: "a".repeat(96),
-						username: value,
-					},
-				},
-			};
-
-			assert.true(validator.validate("validatorRegistration", transaction).error.includes("username"));
-		}
 	});
 
 	it("#getSchema - publicKey should be consensusPublicKey", ({ validator }) => {
@@ -192,14 +132,11 @@ describe<{
 			const transaction = {
 				...transactionOriginal,
 				asset: {
-					validator: {
-						publicKey: value,
-						username: "username",
-					},
+					validatorPublicKey: value,
 				},
 			};
 
-			assert.true(validator.validate("validatorRegistration", transaction).error.includes("publicKey"));
+			assert.true(validator.validate("validatorRegistration", transaction).error.includes("validatorPublicKey"));
 		}
 	});
 
