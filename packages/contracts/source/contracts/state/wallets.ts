@@ -66,7 +66,6 @@ export interface Wallet {
 export interface IValidatorWallet {
 	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
-	getUsername(): string;
 	getVoteBalance(): BigNumber;
 	getRank(): number;
 	setRank(rank: number): void;

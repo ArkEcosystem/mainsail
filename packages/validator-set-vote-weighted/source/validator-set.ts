@@ -101,10 +101,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 				Utils.assert.defined<string>(b.getWalletPublicKey());
 
 				if (a.getWalletPublicKey() === b.getWalletPublicKey()) {
-					const username = a.getUsername();
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-							`Validator "${username}" appears twice in the list.`,
+							`Validator "${a.getWalletPublicKey()}" appears twice in the list.`,
 					);
 				}
 

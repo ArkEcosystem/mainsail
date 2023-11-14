@@ -29,7 +29,7 @@ export class ConsensusController extends Controller {
 		const nameLookup = new Map<string, string>();
 
 		for (const validator of validators) {
-			nameLookup.set(validator.getWalletPublicKey(), validator.getUsername());
+			nameLookup.set(validator.getWalletPublicKey(), validator.getWalletPublicKey());
 		}
 
 		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.IPrevote | Contracts.Crypto.IPrecommit>) => {
@@ -75,7 +75,6 @@ export class ConsensusController extends Controller {
 				validators: validators.map((v) => ({
 					consensusPublicKey: v.getConsensusPublicKey(),
 					index: this.validatorSet.getValidatorIndexByWalletPublicKey(v.getWalletPublicKey()),
-					name: v.getUsername(),
 					walletPublicKey: v.getWalletPublicKey(),
 				})),
 			},
