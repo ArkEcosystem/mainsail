@@ -1,14 +1,14 @@
 {
-    "address": "ark1u5kp32sq9qm05d29ejt954z448chh6u9whtz7tlvureapspf3adqjm0j9u",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "60f29462753128989a65325e1737f74e5a1ba38cc7b325be5d6c263aed7345a5",
-        "publicKey": "af2073fefa66be7d27096b534721eb0dd193325455fd87427db11cc92e31cd127a627d4b08d98e089fbd419e1ed09fc7"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "5e4da833afd947e875a4281a4d31c80dc015a662e710b883afbf6f644e1e149e",
-        "publicKey": "e52c18aa002836fa3545cc965a5455a9f17beb8575d62f2fece0f3d0c0298f5a"
-    },
-    "passphrase": "vacant winner attract train where tag dose like pulse setup ride snack pool antique frame owner first bottom student quit above hurdle major middle"
+	"address": "ark1u5kp32sq9qm05d29ejt954z448chh6u9whtz7tlvureapspf3adqjm0j9u",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "60f29462753128989a65325e1737f74e5a1ba38cc7b325be5d6c263aed7345a5",
+		"publicKey": "af2073fefa66be7d27096b534721eb0dd193325455fd87427db11cc92e31cd127a627d4b08d98e089fbd419e1ed09fc7"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "5e4da833afd947e875a4281a4d31c80dc015a662e710b883afbf6f644e1e149e",
+		"publicKey": "e52c18aa002836fa3545cc965a5455a9f17beb8575d62f2fece0f3d0c0298f5a"
+	},
+	"passphrase": "vacant winner attract train where tag dose like pulse setup ride snack pool antique frame owner first bottom student quit above hurdle major middle"
 }
