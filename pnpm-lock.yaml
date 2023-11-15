@@ -1929,6 +1929,46 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/crypto-transaction-username-resignation:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../crypto-address-bech32m
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/crypto-transaction-validator-registration:
     dependencies:
       '@mainsail/container':
