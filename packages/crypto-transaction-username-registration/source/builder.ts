@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 import { UsernameRegistrationTransaction } from "./versions/1";
 
 @injectable()
-export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRegistrationBuilder> {
+export class UsernameRegistrationBuilder extends TransactionBuilder<UsernameRegistrationBuilder> {
 	@postConstruct()
 	public postConstruct() {
 		this.initializeData();
@@ -19,9 +19,9 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		this.data.asset = {} as Contracts.Crypto.ITransactionAsset;
 	}
 
-	public publicKeyAsset(publicKey: string): ValidatorRegistrationBuilder {
+	public usernameAsset(username: string): UsernameRegistrationBuilder {
 		if (this.data.asset) {
-			this.data.asset.validatorPublicKey = publicKey;
+			this.data.asset.username = username;
 		}
 
 		return this;
@@ -35,7 +35,7 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		return struct;
 	}
 
-	protected instance(): ValidatorRegistrationBuilder {
+	protected instance(): UsernameRegistrationBuilder {
 		return this;
 	}
 }
