@@ -657,6 +657,9 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
@@ -876,9 +879,9 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
