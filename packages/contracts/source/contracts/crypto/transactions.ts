@@ -27,6 +27,7 @@ export interface ITransactionAsset {
 		publicKey: string;
 	};
 	validatorPublicKey?: string;
+	username?: string;
 	votes?: string[];
 	unvotes?: string[];
 	multiSignatureLegacy?: IMultiSignatureLegacyAsset;
