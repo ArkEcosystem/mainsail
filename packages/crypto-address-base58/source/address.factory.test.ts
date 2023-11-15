@@ -9,8 +9,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { describe } from "../../test-framework";
 import { AddressFactory } from "./address.factory";
 
-const mnemonic =
-	"this is a top secret passphrase";
+const mnemonic = "this is a top secret passphrase";
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {

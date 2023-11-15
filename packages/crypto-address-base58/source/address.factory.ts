@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { RIPEMD160, Hash256 } from "bcrypto";
+import { Hash256, RIPEMD160 } from "bcrypto";
 import { base58 } from "bstring";
 
 @injectable()
