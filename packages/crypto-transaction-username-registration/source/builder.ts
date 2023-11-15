@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { ValidatorRegistrationTransaction } from "./versions/1";
+import { UsernameRegistrationTransaction } from "./versions/1";
 
 @injectable()
 export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRegistrationBuilder> {
@@ -11,8 +11,8 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 	public postConstruct() {
 		this.initializeData();
 
-		this.data.type = ValidatorRegistrationTransaction.type;
-		this.data.typeGroup = ValidatorRegistrationTransaction.typeGroup;
+		this.data.type = UsernameRegistrationTransaction.type;
+		this.data.typeGroup = UsernameRegistrationTransaction.typeGroup;
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = "";

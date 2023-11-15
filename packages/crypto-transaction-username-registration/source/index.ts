@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 
 import { ValidatorRegistrationTransactionHandler } from "./handlers";
 import { schemas } from "./validation/schemas";
-import { ValidatorRegistrationTransaction } from "./versions/1";
+import { UsernameRegistrationTransaction } from "./versions/1";
 
 export * from "./builder";
 export * from "./handlers";
@@ -32,8 +32,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerFees(): void {
 		this.app.get<Contracts.Fee.IFeeRegistry>(Identifiers.Fee.Registry).set(
-			ValidatorRegistrationTransaction.key,
-			ValidatorRegistrationTransaction.version,
+			UsernameRegistrationTransaction.key,
+			UsernameRegistrationTransaction.version,
 			{
 				managed: BigNumber.make("400000"),
 				static: BigNumber.make("2500000000"),
@@ -44,7 +44,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerType(): void {
 		this.app
 			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-			.registerTransactionType(ValidatorRegistrationTransaction);
+			.registerTransactionType(UsernameRegistrationTransaction);
 	}
 
 	#registerHandler(): void {

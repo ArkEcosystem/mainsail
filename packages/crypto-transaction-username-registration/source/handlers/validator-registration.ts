@@ -5,7 +5,7 @@ import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 import { BigNumber } from "@mainsail/utils";
 
-import { ValidatorRegistrationTransaction } from "../versions";
+import { UsernameRegistrationTransaction } from "../versions";
 
 @injectable()
 export class ValidatorRegistrationTransactionHandler extends Handlers.TransactionHandler {
@@ -17,7 +17,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return ValidatorRegistrationTransaction;
+		return UsernameRegistrationTransaction;
 	}
 
 	public async isActivated(): Promise<boolean> {

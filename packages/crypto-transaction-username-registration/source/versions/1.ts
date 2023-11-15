@@ -5,25 +5,25 @@ import { Utils } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export abstract class ValidatorRegistrationTransaction extends Transaction {
+export abstract class UsernameRegistrationTransaction extends Transaction {
 	@inject(Identifiers.Cryptography.Size.PublicKey)
 	@tagged("type", "consensus")
 	private readonly publicKeySize!: number;
 
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.ValidatorRegistration;
-	public static key = "validatorRegistration";
+	public static key = "usernameRegistration";
 
 	public static getSchema(): Contracts.Crypto.ITransactionSchema {
 		return extendSchema(transactionBaseSchema, {
-			$id: "validatorRegistration",
+			$id: "usernameRegistration",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
-						validatorPublicKey: { $ref: "consensusPublicKey" },
+						username: { $ref: "username" },
 					},
-					required: ["validatorPublicKey"],
+					required: ["username"],
 					type: "object",
 					unevaluatedProperties: false,
 				},
