@@ -7,7 +7,7 @@ import { ByteBuffer } from "@mainsail/utils";
 @injectable()
 export abstract class UsernameRegistrationTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
-	public static type: number = Contracts.Crypto.TransactionType.ValidatorRegistration;
+	public static type: number = Contracts.Crypto.TransactionType.UsernameRegistration;
 	public static key = "usernameRegistration";
 
 	public static getSchema(): Contracts.Crypto.ITransactionSchema {
@@ -24,7 +24,7 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 					unevaluatedProperties: false,
 				},
 				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
-				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorRegistration },
+				type: { transactionType: Contracts.Crypto.TransactionType.UsernameRegistration },
 			},
 			required: ["asset"],
 		});
