@@ -4,7 +4,7 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { ValidatorRegistrationTransactionHandler } from "./handlers";
+import { UsernameRegistrationTransactionHandler } from "./handlers";
 import { schemas } from "./validation/schemas";
 import { UsernameRegistrationTransaction } from "./versions/1";
 
@@ -48,6 +48,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerHandler(): void {
-		this.app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);
+		this.app.bind(Identifiers.TransactionHandler).to(UsernameRegistrationTransactionHandler);
 	}
 }

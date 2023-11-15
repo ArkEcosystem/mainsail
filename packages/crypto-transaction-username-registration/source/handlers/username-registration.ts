@@ -8,7 +8,7 @@ import { BigNumber } from "@mainsail/utils";
 import { UsernameRegistrationTransaction } from "../versions";
 
 @injectable()
-export class ValidatorRegistrationTransactionHandler extends Handlers.TransactionHandler {
+export class UsernameRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
