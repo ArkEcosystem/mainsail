@@ -36,7 +36,7 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
 		Utils.assert.defined<string>(data.asset.username);
 
-		const usernameBytes: Buffer = Buffer.from(data.asset.validator.username, "utf8");
+		const usernameBytes: Buffer = Buffer.from(data.asset.username, "utf8");
 		const buff: ByteBuffer = ByteBuffer.fromSize(usernameBytes.length + 1);
 
 		buff.writeUint8(usernameBytes.length);
