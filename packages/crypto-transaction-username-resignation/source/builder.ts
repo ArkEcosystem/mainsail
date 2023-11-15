@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 import { UsernameResignationTransaction } from "./versions/1";
 
 @injectable()
-export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorResignationBuilder> {
+export class UsernameResignationBuilder extends TransactionBuilder<UsernameResignationBuilder> {
 	@postConstruct()
 	public postConstruct() {
 		this.initializeData();
@@ -23,7 +23,7 @@ export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorRes
 		return struct;
 	}
 
-	protected instance(): ValidatorResignationBuilder {
+	protected instance(): UsernameResignationBuilder {
 		return this;
 	}
 }
