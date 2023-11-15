@@ -5,7 +5,7 @@ import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { ValidatorResignationTransactionHandler } from "./handlers";
-import { ValidatorResignationTransaction } from "./versions/1";
+import { UsernameResignationTransaction } from "./versions/1";
 
 export * from "./builder";
 export * from "./versions";
@@ -22,8 +22,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerFees(): void {
 		this.app.get<Contracts.Fee.IFeeRegistry>(Identifiers.Fee.Registry).set(
-			ValidatorResignationTransaction.key,
-			ValidatorResignationTransaction.version,
+			UsernameResignationTransaction.key,
+			UsernameResignationTransaction.version,
 			{
 				managed: BigNumber.make("100"),
 				static: BigNumber.make("2500000000"),
@@ -34,7 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerType(): void {
 		this.app
 			.get<TransactionRegistry>(Identifiers.Cryptography.Transaction.Registry)
-			.registerTransactionType(ValidatorResignationTransaction);
+			.registerTransactionType(UsernameResignationTransaction);
 	}
 
 	#registerHandler(): void {

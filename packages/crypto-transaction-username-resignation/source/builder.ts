@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { ValidatorResignationTransaction } from "./versions/1";
+import { UsernameResignationTransaction } from "./versions/1";
 
 @injectable()
 export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorResignationBuilder> {
@@ -11,8 +11,8 @@ export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorRes
 	public postConstruct() {
 		this.initializeData();
 
-		this.data.type = ValidatorResignationTransaction.type;
-		this.data.typeGroup = ValidatorResignationTransaction.typeGroup;
+		this.data.type = UsernameResignationTransaction.type;
+		this.data.typeGroup = UsernameResignationTransaction.typeGroup;
 		this.data.amount = BigNumber.ZERO;
 		this.data.senderPublicKey = "";
 	}

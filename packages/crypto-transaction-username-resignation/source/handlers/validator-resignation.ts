@@ -5,7 +5,7 @@ import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transa
 import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
-import { ValidatorResignationTransaction } from "../versions";
+import { UsernameResignationTransaction } from "../versions";
 
 @injectable()
 export class ValidatorResignationTransactionHandler extends Handlers.TransactionHandler {
@@ -17,7 +17,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public getConstructor(): Transactions.TransactionConstructor {
-		return ValidatorResignationTransaction;
+		return UsernameResignationTransaction;
 	}
 
 	public async isActivated(): Promise<boolean> {

@@ -4,9 +4,9 @@ import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/cryp
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class ValidatorResignationTransaction extends Transaction {
+export class UsernameResignationTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
-	public static type: number = Contracts.Crypto.TransactionType.ValidatorResignation;
+	public static type: number = Contracts.Crypto.TransactionType.UsernameResignation;
 	public static key = "validatorResignation";
 
 	public static getSchema(): Contracts.Crypto.ITransactionSchema {
@@ -15,7 +15,7 @@ export class ValidatorResignationTransaction extends Transaction {
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				fee: { bignumber: { minimum: 1 } },
-				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorResignation },
+				type: { transactionType: Contracts.Crypto.TransactionType.UsernameResignation },
 			},
 		});
 	}
