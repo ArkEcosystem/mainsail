@@ -9,8 +9,7 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { describe } from "../../test-framework";
 import { AddressFactory } from "./address.factory";
 
-const mnemonic =
-	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
+const mnemonic = "this is a top secret passphrase";
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
@@ -20,7 +19,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 			milestones: [
 				{
 					address: {
-						base58: 23,
+						base58: 30,
 					},
 				},
 			],
@@ -34,7 +33,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8",
+			"D5jdQXLMgL2TumzdJ8B1zVAGtYWc43VQSx",
 		);
 	});
 
@@ -43,7 +42,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 
 		assert.is(
 			await context.app.resolve(AddressFactory).fromMnemonic(mnemonic),
-			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
+			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
 		);
 	});
 
@@ -54,7 +53,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 			await context.app
 				.resolve(AddressFactory)
 				.fromPublicKey("e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-			"AcYBXbtvzjYhRnNoJEC7E4ybnbkjrezbX8",
+			"DRuQRMywxznq9pMQUAXLcwt7C8ZLs8NDBv",
 		);
 	});
 
@@ -64,16 +63,15 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		assert.is(
 			await context.app
 				.resolve(AddressFactory)
-				.fromPublicKey("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
-			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
+				.fromPublicKey("034151a3ec46b5670a682b0a63394f863587d1bc97483b1b6c70eb58e7f0aed192"),
+			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
 		);
 	});
 
 	it("should validate addresses", async (context) => {
 		await context.app.resolve<ECDSA>(ECDSA).register();
 
-		assert.true(await context.app.resolve(AddressFactory).validate("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu"));
-		assert.true(await context.app.resolve(AddressFactory).validate("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu"));
+		assert.true(await context.app.resolve(AddressFactory).validate("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib"));
 		assert.false(
 			await context.app
 				.resolve(AddressFactory)
@@ -87,8 +85,8 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		const addressFactory = context.app.resolve(AddressFactory);
 
 		assert.equal(
-			await addressFactory.fromBuffer(await addressFactory.toBuffer("AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu")),
-			"AFsmMfUo2MrcwPnoF3Liqu36dSd3o8yYVu",
+			await addressFactory.fromBuffer(await addressFactory.toBuffer("D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib")),
+			"D61mfSggzbvQgTUe6JhYKH2doHaqJ3Dyib",
 		);
 	});
 });
