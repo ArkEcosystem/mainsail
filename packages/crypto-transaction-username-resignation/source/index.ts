@@ -4,7 +4,7 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { ValidatorResignationTransactionHandler } from "./handlers";
+import { UsernameResignationTransactionHandler } from "./handlers";
 import { UsernameResignationTransaction } from "./versions/1";
 
 export * from "./builder";
@@ -38,6 +38,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerHandler(): void {
-		this.app.bind(Identifiers.TransactionHandler).to(ValidatorResignationTransactionHandler);
+		this.app.bind(Identifiers.TransactionHandler).to(UsernameResignationTransactionHandler);
 	}
 }

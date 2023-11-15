@@ -8,7 +8,7 @@ import { Handlers } from "@mainsail/transactions";
 import { UsernameResignationTransaction } from "../versions";
 
 @injectable()
-export class ValidatorResignationTransactionHandler extends Handlers.TransactionHandler {
+export class UsernameResignationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
