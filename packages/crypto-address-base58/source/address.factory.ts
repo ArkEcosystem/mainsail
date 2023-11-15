@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { RIPEMD160, SHA256 } from "bcrypto";
+import { RIPEMD160, Hash256 } from "bcrypto";
 import { base58 } from "bstring";
 
 @injectable()
@@ -67,7 +67,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	}
 
 	#encodeCheck(buffer: Buffer): string {
-		const checksum: Buffer = SHA256.digest(buffer);
+		const checksum = Hash256.digest(buffer);
 
 		return base58.encode(Buffer.concat([buffer, checksum], buffer.length + 4));
 	}
@@ -75,7 +75,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	#decodeCheck(address: string): Buffer {
 		const buffer: Buffer = base58.decode(address);
 		const payload: Buffer = buffer.subarray(0, -4);
-		const checksum: Buffer = SHA256.digest(payload);
+		const checksum: Buffer = Hash256.digest(payload);
 
 		if (checksum.readUInt32LE(0) !== buffer.subarray(-4).readUInt32LE(0)) {
 			throw new Error("Invalid checksum for base58 string.");
