@@ -46,6 +46,9 @@
 			"package": "@mainsail/crypto-transaction-username-registration"
 		},
 		{
+			"package": "@mainsail/crypto-transaction-username-resignation"
+		},
+		{
 			"package": "@mainsail/crypto-transaction-validator-registration"
 		},
 		{
