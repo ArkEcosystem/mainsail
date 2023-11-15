@@ -7,11 +7,11 @@ import { ByteBuffer } from "@mainsail/utils";
 export class UsernameResignationTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.UsernameResignation;
-	public static key = "validatorResignation";
+	public static key = "usernameResignation";
 
 	public static getSchema(): Contracts.Crypto.ITransactionSchema {
 		return extendSchema(transactionBaseSchema, {
-			$id: "validatorResignation",
+			$id: "usernameResignation",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				fee: { bignumber: { minimum: 1 } },
