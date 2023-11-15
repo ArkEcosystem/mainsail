@@ -22,6 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-transaction-username-registration": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*"

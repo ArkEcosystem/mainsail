@@ -1940,6 +1940,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-username-registration':
+        specifier: workspace:*
+        version: link:../crypto-transaction-username-registration
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel

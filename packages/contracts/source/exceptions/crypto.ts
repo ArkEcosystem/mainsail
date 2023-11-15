@@ -288,6 +288,12 @@ export class WalletUsernameAlreadyRegisteredError extends Exception {
 	}
 }
 
+export class WalletUsernameNotRegisteredError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because the username is not registered.`);
+	}
+}
+
 export class NotSupportedForMultiSignatureWalletError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because multi signature is enabled.`);
