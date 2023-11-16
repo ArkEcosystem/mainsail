@@ -183,6 +183,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 
 	protected initializeData() {
 		this.data = {
+			fee: BigNumber.ZERO,
 			id: undefined,
 			nonce: BigNumber.ONE,
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
