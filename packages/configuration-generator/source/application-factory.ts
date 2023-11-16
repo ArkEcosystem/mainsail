@@ -11,6 +11,7 @@ import { ServiceProvider as CryptoMessages } from "@mainsail/crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
+import { ServiceProvider as CoreCryptoTransactionUsernameRegistration } from "@mainsail/crypto-transaction-username-registration";
 import { ServiceProvider as CoreCryptoTransactionValidatorRegistration } from "@mainsail/crypto-transaction-validator-registration";
 import { ServiceProvider as CoreCryptoTransactionVote } from "@mainsail/crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -74,6 +75,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreFeesStatic).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreCryptoTransactionValidatorRegistration).register();
+	await app.resolve(CoreCryptoTransactionUsernameRegistration).register();
 	await app.resolve(CoreCryptoTransactionTransfer).register();
 	await app.resolve(CoreCryptoTransactionVote).register();
 

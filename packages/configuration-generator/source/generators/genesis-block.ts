@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
+import { UsernameRegistrationBuilder } from "@mainsail/crypto-transaction-username-registration";
 import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
 import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { Utils } from "@mainsail/kernel";
@@ -52,6 +53,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		transactions = transactions.concat(
 			...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
+			...(await this.#buildUsernameTransactions(validators, options.pubKeyHash)),
 			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
 		);
 
@@ -125,6 +127,28 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
+	async #buildUsernameTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
+		const result: Contracts.Crypto.ITransaction[] = [];
+
+		for (const [index, sender] of senders.entries()) {
+			result[index] = await this.#formatGenesisTransaction(
+				await (
+					await this.app
+						.resolve(UsernameRegistrationBuilder)
+						.network(pubKeyHash)
+						.fee("2500000000")
+						.nonce("2") // validator registration tx is always the 2nd one from sender
+						.usernameAsset(`genesis_${index + 1}`)
+						.fee(`${25 * 1e8}`)
+						.sign(sender.passphrase)
+				).build(),
+				sender,
+			);
+		}
+
+		return result;
+	}
+
 	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
 		const result: Contracts.Crypto.ITransaction[] = [];
 
@@ -135,7 +159,7 @@ export class GenesisBlockGenerator extends Generator {
 						.resolve(VoteBuilder)
 						.network(pubKeyHash)
 						.fee("100000000")
-						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
+						.nonce("3") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
 						.votesAsset([sender.keys.publicKey])
 						.fee(`${1 * 1e8}`)
 						.sign(sender.passphrase)
