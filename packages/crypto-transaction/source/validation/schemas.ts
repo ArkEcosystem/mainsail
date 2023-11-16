@@ -22,7 +22,7 @@ export const transactionBaseSchema: SchemaObject = {
 		fee: { bignumber: { minimum: 0 } }, // Fee matcher checks the minimum fee
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
 		network: { $ref: "networkByte" },
-		nonce: { bignumber: { minimum: 1 } },
+		nonce: { bignumber: { minimum: 0 } },
 		senderPublicKey: { $ref: "publicKey" },
 		signature: { $ref: "alphanumeric" },
 		signatures: {
