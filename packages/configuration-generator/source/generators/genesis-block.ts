@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
+import { UsernameRegistrationBuilder } from "@mainsail/crypto-transaction-username-registration";
 import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
 import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { Utils } from "@mainsail/kernel";
@@ -50,10 +51,13 @@ export class GenesisBlockGenerator extends Generator {
 			);
 		}
 
-		transactions = transactions.concat(
+		const validatorTransactions = [
 			...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
+			...(await this.#buildUsernameTransactions(validators, options.pubKeyHash)),
 			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
-		);
+		];
+
+		transactions = [...transactions, ...validatorTransactions];
 
 		const genesis = await this.#createCommittedGenesisBlock(premineWallet.keys, transactions, options);
 
@@ -125,6 +129,28 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
+	async #buildUsernameTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
+		const result: Contracts.Crypto.ITransaction[] = [];
+
+		for (const [index, sender] of senders.entries()) {
+			result[index] = await this.#formatGenesisTransaction(
+				await (
+					await this.app
+						.resolve(UsernameRegistrationBuilder)
+						.network(pubKeyHash)
+						.fee("2500000000")
+						.nonce("2") // username registration tx is always the 2nd one from sender
+						.usernameAsset(`genesis_${index + 1}`)
+						.fee(`${25 * 1e8}`)
+						.sign(sender.passphrase)
+				).build(),
+				sender,
+			);
+		}
+
+		return result;
+	}
+
 	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
 		const result: Contracts.Crypto.ITransaction[] = [];
 
@@ -135,7 +161,7 @@ export class GenesisBlockGenerator extends Generator {
 						.resolve(VoteBuilder)
 						.network(pubKeyHash)
 						.fee("100000000")
-						.nonce("2") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
+						.nonce("3") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
 						.votesAsset([sender.keys.publicKey])
 						.fee(`${1 * 1e8}`)
 						.sign(sender.passphrase)
@@ -198,20 +224,12 @@ export class GenesisBlockGenerator extends Generator {
 
 		const payloadBuffers: Buffer[] = [];
 
-		const sortedTransactions = transactions.sort((a, b) => {
-			if (a.type === b.type) {
-				return a.data.amount.comparedTo(b.data.amount);
-			}
-
-			return a.type - b.type;
-		});
-
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
 
 		const transactionData: Contracts.Crypto.ITransactionData[] = [];
-		for (const { serialized, data } of sortedTransactions) {
+		for (const { serialized, data } of transactions) {
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
