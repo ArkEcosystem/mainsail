@@ -49,4 +49,12 @@ export class ValidatorWallet implements Contracts.State.IValidatorWallet {
 	public isResigned(): boolean {
 		return this.wallet.hasAttribute("validatorResigned");
 	}
+
+	public toString(): string {
+		if (this.wallet.hasAttribute("username")) {
+			return this.wallet.getAttribute<string>("username");
+		}
+
+		return this.getWalletPublicKey();
+	}
 }
