@@ -170,10 +170,6 @@ export class GenesisBlockGenerator extends Generator {
 		transaction: Contracts.Crypto.ITransaction,
 		wallet: Wallet,
 	): Promise<Contracts.Crypto.ITransaction> {
-		Object.assign(transaction.data, {
-			timestamp: 0,
-		});
-
 		transaction.data.signature = await this.app
 			.get<Contracts.Crypto.ITransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
 			.sign(transaction.data, wallet.keys);
