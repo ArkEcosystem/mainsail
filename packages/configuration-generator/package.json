@@ -34,6 +34,7 @@
 		"@mainsail/crypto-transaction-transfer": "workspace:*",
 		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
 		"@mainsail/crypto-transaction-vote": "workspace:*",
+		"@mainsail/crypto-transaction-username-registration": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/fees": "workspace:*",
