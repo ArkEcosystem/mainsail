@@ -74,6 +74,7 @@ export interface IValidatorWallet {
 	setApproval(approval: number): void;
 	unsetApproval(): void;
 	isResigned(): boolean;
+	toString(): string;
 }
 
 export type WalletFactory = (address: string, walletRepository: WalletRepository) => Wallet;
