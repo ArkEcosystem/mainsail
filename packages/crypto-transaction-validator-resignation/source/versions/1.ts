@@ -14,7 +14,6 @@ export class ValidatorResignationTransaction extends Transaction {
 			$id: "validatorResignation",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
-				fee: { bignumber: { minimum: 1 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorResignation },
 			},
 		});

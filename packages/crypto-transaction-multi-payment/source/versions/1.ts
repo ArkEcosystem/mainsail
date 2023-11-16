@@ -43,7 +43,6 @@ export class MultiPaymentTransaction extends Transaction {
 					type: "object",
 					unevaluatedProperties: false,
 				},
-				fee: { bignumber: { minimum: 1 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.MultiPayment },
 				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
 			},

@@ -14,7 +14,6 @@ export class UsernameResignationTransaction extends Transaction {
 			$id: "usernameResignation",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
-				fee: { bignumber: { minimum: 1 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.UsernameResignation },
 			},
 		});

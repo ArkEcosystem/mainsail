@@ -18,11 +18,11 @@ export const schemas = {
 
 export const transactionBaseSchema: SchemaObject = {
 	properties: {
-		amount: { bignumber: { bypassGenesis: true, minimum: 1 } },
-		fee: { bignumber: { bypassGenesis: true, minimum: 0 } },
+		amount: { bignumber: { minimum: 1 } },
+		fee: { bignumber: { minimum: 0 } },
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
 		network: { $ref: "networkByte" },
-		nonce: { bignumber: { minimum: 0 } },
+		nonce: { bignumber: { minimum: 1 } },
 		senderPublicKey: { $ref: "publicKey" },
 		signature: { $ref: "alphanumeric" },
 		signatures: {
