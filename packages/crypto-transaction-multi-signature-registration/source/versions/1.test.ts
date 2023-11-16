@@ -56,7 +56,7 @@ describe<{
 			},
 		},
 		fee: 1,
-		nonce: 0,
+		nonce: 1,
 		recipientId: "a".repeat(62),
 		senderPublicKey: "a".repeat(64),
 		signatures: ["a".repeat(130), "b".repeat(130)],
@@ -301,10 +301,10 @@ describe<{
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 0", ({ validator }) => {
 		validator.addSchema(MultiSignatureRegistrationTransaction.getSchema());
 
-		const validValues = [1, 100, BigNumber.ONE];
+		const validValues = [0, 1, 100, BigNumber.ZERO, BigNumber.ONE];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -314,7 +314,7 @@ describe<{
 			assert.undefined(validator.validate("multiSignature", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
+		const invalidValues = [-1, 1.1, "test", null, undefined, {}];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,

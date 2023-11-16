@@ -50,7 +50,7 @@ describe<{
 	const transactionOriginal = {
 		amount: 1,
 		fee: 1,
-		nonce: 0,
+		nonce: 1,
 		recipientId: "a".repeat(62),
 		senderPublicKey: "a".repeat(64),
 		type: 0,
@@ -87,10 +87,10 @@ describe<{
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 0", ({ validator }) => {
 		validator.addSchema(TransferTransaction.getSchema());
 
-		const validValues = [1, 100, BigNumber.ONE];
+		const validValues = [0, 1, 100, BigNumber.ZERO, BigNumber.ONE];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -100,7 +100,7 @@ describe<{
 			assert.undefined(validator.validate("transfer", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
+		const invalidValues = [-1, 1.1, "test", null, undefined, {}];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,

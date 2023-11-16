@@ -184,7 +184,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	protected initializeData() {
 		this.data = {
 			id: undefined,
-			nonce: BigNumber.ZERO,
+			nonce: BigNumber.ONE,
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 0x01,
 		} as Contracts.Crypto.ITransactionData;

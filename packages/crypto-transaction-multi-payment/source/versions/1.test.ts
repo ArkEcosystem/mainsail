@@ -8,8 +8,8 @@ import {
 	schemas as transactionSchemas,
 } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
-import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { BigNumber } from "@mainsail/utils";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/testnet/mainsail/crypto.json";
 import { describe, Sandbox } from "../../../test-framework";
@@ -68,7 +68,7 @@ describe<{
 			],
 		},
 		fee: 1,
-		nonce: 0,
+		nonce: 1,
 		senderPublicKey: "a".repeat(64),
 		type: Contracts.Crypto.TransactionType.MultiPayment,
 	};
@@ -305,10 +305,10 @@ describe<{
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 1", ({ validator }) => {
+	it("#getSchema - fee should be bigNumber, min 0", ({ validator }) => {
 		validator.addSchema(MultiPaymentTransaction.getSchema());
 
-		const validValues = [1, 100, BigNumber.ONE];
+		const validValues = [0, 1, 100, BigNumber.ZERO, BigNumber.ONE];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -318,7 +318,7 @@ describe<{
 			assert.undefined(validator.validate("multiPayment", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "test", null, undefined, {}];
+		const invalidValues = [-1, 1.1, "test", null, undefined, {}];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
