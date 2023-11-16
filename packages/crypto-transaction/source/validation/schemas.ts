@@ -19,7 +19,7 @@ export const schemas = {
 export const transactionBaseSchema: SchemaObject = {
 	properties: {
 		amount: { bignumber: { minimum: 1 } },
-		fee: { bignumber: { minimum: 0 } },
+		fee: { bignumber: { minimum: 0 } }, // Fee matcher checks the minimum fee
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
 		network: { $ref: "networkByte" },
 		nonce: { bignumber: { minimum: 1 } },
