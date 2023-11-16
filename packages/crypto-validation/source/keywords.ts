@@ -44,7 +44,6 @@ export const makeKeywords = () => {
 		keyword: "bignumber",
 		metaSchema: {
 			properties: {
-				block: { type: "boolean" },
 				maximum: { type: "integer" },
 				minimum: { type: "integer" },
 			},
