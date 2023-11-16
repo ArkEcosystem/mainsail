@@ -51,11 +51,13 @@ export class GenesisBlockGenerator extends Generator {
 			);
 		}
 
-		transactions = transactions.concat(
+		const validatorTransactions = [
 			...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
 			...(await this.#buildUsernameTransactions(validators, options.pubKeyHash)),
 			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
-		);
+		];
+
+		transactions = [...transactions, ...validatorTransactions];
 
 		const genesis = await this.#createCommittedGenesisBlock(premineWallet.keys, transactions, options);
 
@@ -137,7 +139,7 @@ export class GenesisBlockGenerator extends Generator {
 						.resolve(UsernameRegistrationBuilder)
 						.network(pubKeyHash)
 						.fee("2500000000")
-						.nonce("2") // validator registration tx is always the 2nd one from sender
+						.nonce("2") // username registration tx is always the 2nd one from sender
 						.usernameAsset(`genesis_${index + 1}`)
 						.fee(`${25 * 1e8}`)
 						.sign(sender.passphrase)
@@ -222,20 +224,12 @@ export class GenesisBlockGenerator extends Generator {
 
 		const payloadBuffers: Buffer[] = [];
 
-		const sortedTransactions = transactions.sort((a, b) => {
-			if (a.type === b.type) {
-				return a.data.amount.comparedTo(b.data.amount);
-			}
-
-			return a.type - b.type;
-		});
-
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
 
 		const transactionData: Contracts.Crypto.ITransactionData[] = [];
-		for (const { serialized, data } of sortedTransactions) {
+		for (const { serialized, data } of transactions) {
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
