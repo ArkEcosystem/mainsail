@@ -42,22 +42,6 @@ export const register = (server: Hapi.Server<any>): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.show(request),
-		method: "GET",
-		options: {
-			validate: {
-				params: Joi.object({
-					id: Joi.string().hex().length(64),
-				}),
-				query: Joi.object({
-					transform: Joi.bool().default(true),
-				}),
-			},
-		},
-		path: "/transactions/{id}",
-	});
-
-	server.route({
 		handler: (request: Hapi.Request) => controller.unconfirmed(request),
 		method: "GET",
 		options: {
