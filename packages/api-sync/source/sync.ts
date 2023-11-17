@@ -153,8 +153,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-					validatorRound: this.#createValidatorRound(header.height + 1),
-				}
+						validatorRound: this.#createValidatorRound(header.height + 1),
+				  }
 				: {}),
 		};
 
@@ -168,8 +168,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 			...Utils.roundCalculator.calculateRound(height, this.configuration),
 			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: Array.from({ length: activeValidators.length }, (_, index) =>
-				activeValidators[this.proposerSelector.getValidatorIndex(index)].getWalletPublicKey()
-			)
+				activeValidators[this.proposerSelector.getValidatorIndex(index)].getWalletPublicKey(),
+			),
 		};
 	}
 
