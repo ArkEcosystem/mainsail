@@ -26,6 +26,13 @@ export class BlocksController extends Controller {
 		const options = this.getListingOptions();
 
 		const blocks = await this.blockRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
+		if (blocks.results.length === 0) {
+			return this.toPagination(
+				blocks,
+				BlockResource,
+				request.query.transform,
+			)
+		}
 
 		const generatorPublicKeys = blocks.results.map(({ generatorPublicKey }) => generatorPublicKey);
 		const generators = await this.walletRepositoryFactory()
