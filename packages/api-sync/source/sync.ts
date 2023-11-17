@@ -59,6 +59,9 @@ export class Sync implements Contracts.ApiSync.ISync {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
+	@inject(Identifiers.Proposer.Selector)
+	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
+
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly transactionHandlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
 
@@ -150,17 +153,24 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-						validatorRound: {
-							...Utils.roundCalculator.calculateRound(header.height + 1, this.configuration),
-							validators: this.validatorSet
-								.getActiveValidators()
-								.map((validator) => validator.getWalletPublicKey()),
-						},
+						validatorRound: this.#createValidatorRound(header.height + 1),
 				  }
 				: {}),
 		};
 
 		return this.#queueDeferredSync(deferredSync);
+	}
+
+	#createValidatorRound(height: number): Models.ValidatorRound {
+		const activeValidators = this.validatorSet.getActiveValidators();
+
+		return {
+			...Utils.roundCalculator.calculateRound(height, this.configuration),
+			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
+			validators: Array.from({ length: activeValidators.length }, (_, index) =>
+				activeValidators[this.proposerSelector.getValidatorIndex(index)].getWalletPublicKey(),
+			),
+		};
 	}
 
 	public async getLastSyncedBlockHeight(): Promise<number> {

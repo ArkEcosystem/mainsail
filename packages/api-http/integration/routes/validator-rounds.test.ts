@@ -4,6 +4,7 @@ import { request } from "../../test/helpers/request";
 
 import validatorRounds from "../../test/fixtures/validator-rounds.json";
 import validatorRound from "../../test/fixtures/validator-round.json";
+import wallets from "../../test/fixtures/wallets.json";
 
 describe<{
 	sandbox: Sandbox;
@@ -24,6 +25,7 @@ describe<{
 
 	beforeEach(async (context) => {
 		await apiContext.reset();
+		await apiContext.walletRepository.save(wallets);
 	});
 
 	afterEach(async (context) => {
