@@ -40,8 +40,16 @@ jobs:
               run: cd packages/api && pnpm run test
             - name: Test api-common
               run: cd packages/api-common && pnpm run test
+            - name: Test api-database
+              run: cd packages/api-database && pnpm run test
             - name: Test api-development
               run: cd packages/api-development && pnpm run test
+            - name: Test api-http
+              run: cd packages/api-http && pnpm run test
+            - name: Test api-sync
+              run: cd packages/api-sync && pnpm run test
+            - name: Test api-transaction-pool
+              run: cd packages/api-transaction-pool && pnpm run test
             - name: Test bootstrap
               run: cd packages/bootstrap && pnpm run test
             - name: Test cli
@@ -96,6 +104,8 @@ jobs:
               run: cd packages/crypto-signature-ed25519 && pnpm run test
             - name: Test crypto-signature-schnorr
               run: cd packages/crypto-signature-schnorr && pnpm run test
+            - name: Test crypto-signature-schnorr-legacy
+              run: cd packages/crypto-signature-schnorr-legacy && pnpm run test
             - name: Test crypto-transaction
               run: cd packages/crypto-transaction && pnpm run test
             - name: Test crypto-transaction-multi-payment
@@ -105,6 +115,10 @@ jobs:
                   test
             - name: Test crypto-transaction-transfer
               run: cd packages/crypto-transaction-transfer && pnpm run test
+            - name: Test crypto-transaction-username-registration
+              run: cd packages/crypto-transaction-username-registration && pnpm run test
+            - name: Test crypto-transaction-username-resignation
+              run: cd packages/crypto-transaction-username-resignation && pnpm run test
             - name: Test crypto-transaction-validator-registration
               run: cd packages/crypto-transaction-validator-registration && pnpm run test
             - name: Test crypto-transaction-validator-resignation
@@ -139,6 +153,8 @@ jobs:
               run: cd packages/p2p && pnpm run test
             - name: Test processor
               run: cd packages/processor && pnpm run test
+            - name: Test proposer
+              run: cd packages/proposer && pnpm run test
             - name: Test serializer
               run: cd packages/serializer && pnpm run test
             - name: Test state
