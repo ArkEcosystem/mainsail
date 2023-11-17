@@ -13,7 +13,6 @@ import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreLmdb } from "@mainsail/storage-lmdb";
-import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -45,31 +44,6 @@ const generateBlocks = async (count: number): Promise<Contracts.Crypto.ICommitte
 	}
 
 	return blocks;
-};
-
-const assertTransactionData = (assert, transactionData1, transactionData2) => {
-	const transactionFields = ["id", "type", "senderPublicKey", "fee", "amount", "recipientId", "signature"];
-
-	for (const field of transactionFields) {
-		assert.equal(transactionData1[field].toString(), transactionData2[field].toString());
-	}
-};
-
-const makeWallets = async (count: number, round: number): Promise<Contracts.State.Wallet[]> => {
-	const wallets = [];
-
-	const walletFactory = await Factories.factory("Wallet", cryptoJson);
-
-	for (let index = 0; index < count; index++) {
-		const wallet = await walletFactory.make<Contracts.State.Wallet>();
-
-		wallet.setAttribute("validator.round", round);
-		wallet.setAttribute("validator.voteBalance", BigNumber.ONE);
-
-		wallets.push(wallet);
-	}
-
-	return wallets;
 };
 
 describe<{
@@ -119,10 +93,6 @@ describe<{
 			sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage),
 			"put",
 		);
-		const spyOnTransactionStoragePut = spy(
-			sandbox.app.get<lmdb.Database>(Identifiers.Database.TransactionStorage),
-			"put",
-		);
 
 		const block = await generateBlock();
 
@@ -130,21 +100,15 @@ describe<{
 
 		spyOnBlockStoreagePut.calledOnce();
 		spyOnBlockHeightStoreagePut.calledOnce();
-		spyOnTransactionStoragePut.calledTimes(2);
 
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage).getKeysCount(), 1);
-		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.TransactionStorage).getKeysCount(), 2);
 	});
 
 	it("#saveBlocks - should save a block only once", async ({ databaseService, sandbox }) => {
 		const spyOnBlockStoreagePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage), "put");
 		const spyOnBlockHeightStoreagePut = spy(
 			sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage),
-			"put",
-		);
-		const spyOnTransactionStoragePut = spy(
-			sandbox.app.get<lmdb.Database>(Identifiers.Database.TransactionStorage),
 			"put",
 		);
 
@@ -154,11 +118,9 @@ describe<{
 
 		spyOnBlockStoreagePut.calledTimes(1);
 		spyOnBlockHeightStoreagePut.calledTimes(1);
-		spyOnTransactionStoragePut.calledTimes(2);
 
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage).getKeysCount(), 1);
-		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.TransactionStorage).getKeysCount(), 2);
 	});
 
 	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {
@@ -250,21 +212,6 @@ describe<{
 		assert.equal(await databaseService.getLastBlock(), blocks[3].block);
 	});
 
-	it("#getTransaction - should return undefined if block is not found", async ({ databaseService }) => {
-		assert.undefined(await databaseService.getTransaction("transaction_id"));
-	});
-
-	it("#getLastBlock - should return last block", async ({ databaseService }) => {
-		const block = await generateBlock();
-		await databaseService.saveBlocks([block]);
-
-		assertTransactionData(
-			assert,
-			(await databaseService.getTransaction(block.block.transactions[0].id)).data,
-			block.block.transactions[0].data,
-		);
-	});
-
 	it("#findBlocksByIds - should return empty array if blocks are not found", async ({ databaseService }) => {
 		await databaseService.saveBlocks(await generateBlocks(3));
 
@@ -278,24 +225,6 @@ describe<{
 		assert.equal(
 			await databaseService.findBlocksByIds(blocks.map(({ block }) => block.data.id)),
 			blocks.map(({ block }) => block.data),
-		);
-	});
-
-	it("#getForgedTransactionsIds - should return empty array if transaction ids are not found", async ({
-		databaseService,
-	}) => {
-		assert.equal(await databaseService.getForgedTransactionsIds(["id_1", "id_2", "id_3"]), []);
-	});
-
-	it("#getForgedTransactionsIds - should return block data by ids", async ({ databaseService }) => {
-		const block = await generateBlock();
-		await databaseService.saveBlocks([block]);
-
-		assert.equal(
-			await databaseService.getForgedTransactionsIds(
-				block.block.transactions.map((transaction) => transaction.id),
-			),
-			block.block.transactions.map((transaction) => transaction.id),
 		);
 	});
 });
