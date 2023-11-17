@@ -91,7 +91,6 @@ export const Identifiers = {
 		ProposalStorage: Symbol.for("Database<ProposalStorage>"),
 		RootStorage: Symbol.for("Database<RootStorage>"),
 		Service: Symbol.for("Database<Service>"),
-		TransactionStorage: Symbol.for("Database<TransactionStorage>"),
 	},
 	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),
 	EventDispatcherService: Symbol.for("Service<EventDispatcher>"),

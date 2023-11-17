@@ -15,9 +15,6 @@ export class TransactionsController extends Controller {
 	@tagged("state", "null")
 	private readonly nullHandlerRegistry!: Handlers.Registry;
 
-	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.IDatabaseService;
-
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
@@ -36,30 +33,6 @@ export class TransactionsController extends Controller {
 			},
 			errors: result.errors,
 		};
-	}
-
-	public async show(request: Hapi.Request) {
-		console.log("ID:", request.params.id);
-
-		const transaction = await this.database.getTransaction(request.params.id);
-		if (!transaction) {
-			return notFound("Transaction not found");
-		}
-
-		// TODO: Include block
-		// if (request.query.transform) {
-		// 	const block = await this.database.getBlock(transaction.data.blockId);
-
-		// 	return this.respondWithResource(
-		// 		{ block: block.data, data: transaction.data },
-		// 		TransactionWithBlockResource,
-		// 		true,
-		// 	);
-		// } else {
-		// 	return this.respondWithResource(transaction.data, TransactionResource, false);
-		// }
-
-		return this.respondWithResource(transaction.data, TransactionResource, false);
 	}
 
 	public async unconfirmed(request: Hapi.Request) {
