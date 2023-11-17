@@ -31,7 +31,7 @@ export class BlocksController extends Controller {
 		const generators = await this.walletRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("public_key IN (:publicKeys)", { publicKeys: generatorPublicKeys })
+			.where("public_key IN (:...publicKeys)", { publicKeys: generatorPublicKeys })
 			.getMany();
 
 		return this.toPagination(

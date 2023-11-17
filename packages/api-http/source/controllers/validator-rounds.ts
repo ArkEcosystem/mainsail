@@ -45,9 +45,17 @@ export class ValidatorRoundsController extends Controller {
 			return Boom.notFound("Round not found");
 		}
 
+		const validatorWallets = await this.walletRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("public_key IN (:...publicKeys)", { publicKeys: round.validators })
+			.orderBy("balance", "DESC")
+			.orderBy("public_key", "ASC")
+			.getMany();
+
 		return this.respondWithCollection(
-			round.validators.map((validator) => ({
-				publicKey: validator,
+			validatorWallets.map((wallet) => ({
+				publicKey: wallet.publicKey,
 				votes: "0",
 			})),
 			RoundResource,
