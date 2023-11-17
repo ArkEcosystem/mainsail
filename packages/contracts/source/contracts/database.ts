@@ -18,6 +18,4 @@ export interface IDatabaseService {
 	getLastBlock(): Promise<IBlock | undefined>;
 
 	saveBlocks(blocks: ICommittedBlock[]): Promise<void>;
-
-	findBlocksByIds(ids: string[]): Promise<IBlockData[]>;
 }

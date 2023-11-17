@@ -108,15 +108,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		}
 	}
 
-	public async findBlocksByIds(ids: string[]): Promise<Contracts.Crypto.IBlockData[]> {
-		const blocks = await this.#map<Buffer | undefined>(ids, (id: string) => this.blockStorage.get(id));
-
-		return this.#map(
-			blocks.filter((block) => block !== undefined),
-			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block.data,
-		);
-	}
-
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
 		const result: T[] = [];
 
