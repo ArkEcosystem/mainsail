@@ -15,5 +15,5 @@ export interface IDatabaseService {
 
 	getLastBlock(): Promise<IBlock | undefined>;
 
-	saveBlocks(blocks: ICommittedBlock[]): Promise<void>;
+	saveBlock(block: ICommittedBlock): Promise<void>;
 }

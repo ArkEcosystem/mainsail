@@ -102,7 +102,7 @@ export class Bootstrapper {
 	async #storeGenesisBlock(): Promise<void> {
 		if (!(await this.databaseService.getLastBlock())) {
 			const genesisBlock = this.#stateStore.getGenesisBlock();
-			await this.databaseService.saveBlocks([genesisBlock]);
+			await this.databaseService.saveBlock(genesisBlock);
 		}
 	}
 
