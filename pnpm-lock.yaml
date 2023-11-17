@@ -885,6 +885,9 @@ importers:
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
+      '@mainsail/crypto-signature-schnorr-legacy':
+        specifier: workspace:*
+        version: link:../crypto-signature-schnorr-legacy
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
