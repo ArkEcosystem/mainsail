@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
 import { Database } from "lmdb";
 
 @injectable()
@@ -11,14 +10,8 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.Database.BlockHeightStorage)
 	private readonly blockStorageByHeight!: Database;
 
-	@inject(Identifiers.Database.TransactionStorage)
-	private readonly transactionStorage!: Database;
-
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
-
-	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
 	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
 		const bytes = this.blockStorage.get(id);
@@ -103,16 +96,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		}
 	}
 
-	public async getTransaction(id: string): Promise<Contracts.Crypto.ITransaction | undefined> {
-		const transaction = this.transactionStorage.get(id);
-
-		if (transaction) {
-			return this.transactionFactory.fromBytes(transaction);
-		}
-
-		return undefined;
-	}
-
 	public async saveBlocks(blocks: Contracts.Crypto.ICommittedBlock[]): Promise<void> {
 		for (const { serialized, block } of blocks) {
 			if (!this.blockStorage.doesExist(block.data.id)) {
@@ -121,11 +104,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 				await this.blockStorage.put(block.data.id, Buffer.from(serialized, "hex"));
 
 				await this.blockStorageByHeight.put(block.data.height, block.data.id);
-
-				for (const transaction of block.transactions) {
-					Utils.assert.defined<string>(transaction.data.id);
-					await this.transactionStorage.put(transaction.data.id, transaction.serialized);
-				}
 			}
 		}
 	}
@@ -137,20 +115,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 			blocks.filter((block) => block !== undefined),
 			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block.data,
 		);
-	}
-
-	public async getForgedTransactionsIds(ids: string[]): Promise<string[]> {
-		const result: string[] = [];
-
-		for (const id of ids) {
-			const transaction = this.transactionStorage.get(id);
-
-			if (transaction) {
-				result.push(id);
-			}
-		}
-
-		return result;
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {

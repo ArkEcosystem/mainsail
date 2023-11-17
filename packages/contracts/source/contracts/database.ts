@@ -1,4 +1,4 @@
-import { IBlock, IBlockData, ICommittedBlock, ITransaction } from "./crypto";
+import { IBlock, IBlockData, ICommittedBlock } from "./crypto";
 
 export interface IDatabaseService {
 	getBlock(id: string): Promise<IBlock | undefined>;
@@ -17,11 +17,7 @@ export interface IDatabaseService {
 
 	getLastBlock(): Promise<IBlock | undefined>;
 
-	getTransaction(id: string): Promise<ITransaction | undefined>;
-
 	saveBlocks(blocks: ICommittedBlock[]): Promise<void>;
 
 	findBlocksByIds(ids: string[]): Promise<IBlockData[]>;
-
-	getForgedTransactionsIds(ids: string[]): Promise<string[]>;
 }
