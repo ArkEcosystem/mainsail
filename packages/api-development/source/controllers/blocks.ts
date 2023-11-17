@@ -110,8 +110,6 @@ export class BlocksController extends Controller {
 			if (blocks.length > 0) {
 				block = blocks[0];
 			}
-		} else {
-			block = await this.database.getBlock(idOrHeight);
 		}
 
 		return block;
