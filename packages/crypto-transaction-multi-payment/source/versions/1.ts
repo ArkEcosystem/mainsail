@@ -20,7 +20,6 @@ export class MultiPaymentTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "multiPayment",
 			properties: {
-				amount: { bignumber: { minimum: 1 } },
 				asset: {
 					properties: {
 						payments: {
@@ -43,7 +42,6 @@ export class MultiPaymentTransaction extends Transaction {
 					type: "object",
 					unevaluatedProperties: false,
 				},
-				fee: { bignumber: { minimum: 1 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.MultiPayment },
 				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },
 			},

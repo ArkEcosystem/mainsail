@@ -48,7 +48,6 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 					type: "object",
 					unevaluatedProperties: false,
 				},
-				fee: { bignumber: { minimum: 1 } },
 				signatures: {
 					items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }] },
 					maxItems: { $data: "1/asset/multiSignature/publicKeys/length" },

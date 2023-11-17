@@ -17,7 +17,6 @@ export class TransferTransaction extends Transaction {
 			$id: "transfer",
 			properties: {
 				expiration: { minimum: 0, type: "integer" },
-				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
 				recipientId: { $ref: "address" },
 				type: { transactionType: Contracts.Crypto.TransactionType.Transfer },
 				vendorField: { anyOf: [{ type: "null" }, { format: "vendorField", type: "string" }] },

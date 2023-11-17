@@ -87,7 +87,7 @@ describe<{
 		fee: 1,
 		id: "1".repeat(64),
 		network: 30,
-		nonce: 0,
+		nonce: 1,
 		senderPublicKey: "a".repeat(64),
 		signature: "b".repeat(64),
 		type: 1,
@@ -234,7 +234,7 @@ describe<{
 	it("transactionBaseSchema - nonce should be big number min 0", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const validValues = [0, "0", BigNumber.ZERO, 100, "100", BigNumber.make(100)];
+		const validValues = [0, "0", BigNumber.ZERO, 1, "1", BigNumber.ONE, 100, "100", BigNumber.make(100)];
 
 		for (const value of validValues) {
 			const transaction = {

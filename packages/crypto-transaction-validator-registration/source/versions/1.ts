@@ -27,7 +27,6 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 					type: "object",
 					unevaluatedProperties: false,
 				},
-				fee: { bignumber: { bypassGenesis: true, minimum: 1 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorRegistration },
 			},
 			required: ["asset"],
