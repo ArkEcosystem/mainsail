@@ -135,7 +135,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 				recipientId: data.recipientId,
 				senderPublicKey: data.senderPublicKey,
 				sequence: data.sequence!,
-				signature: data.signature!,
+				signature: data.signature,
+				signatures: data.signatures,
 				timestamp: header.timestamp.toFixed(),
 				type: data.type,
 				typeGroup: data.typeGroup,
@@ -153,8 +154,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-						validatorRound: this.#createValidatorRound(header.height + 1),
-				  }
+					validatorRound: this.#createValidatorRound(header.height + 1),
+				}
 				: {}),
 		};
 

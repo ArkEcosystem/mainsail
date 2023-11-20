@@ -79,8 +79,16 @@ export class MempoolTransaction {
 	public asset!: Record<string, any> | undefined;
 
 	@Column({
-		nullable: false,
+		default: undefined,
+		nullable: true,
 		type: "varchar",
 	})
-	public readonly signature!: string;
+	public readonly signature: string | undefined;
+
+	@Column({
+		default: undefined,
+		nullable: true,
+		type: "jsonb",
+	})
+	public readonly signatures: string[] | undefined;
 }

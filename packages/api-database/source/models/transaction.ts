@@ -107,5 +107,12 @@ export class Transaction {
 		nullable: true,
 		type: "varchar",
 	})
-	public readonly signature!: string;
+	public readonly signature: string | undefined;
+
+	@Column({
+		default: undefined,
+		nullable: true,
+		type: "jsonb",
+	})
+	public readonly signatures: string[] | undefined;
 }
