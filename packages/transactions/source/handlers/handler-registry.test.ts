@@ -46,7 +46,7 @@ abstract class TestTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
@@ -64,7 +64,7 @@ abstract class TestDeactivatedTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "deactivated_test";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
@@ -82,7 +82,7 @@ abstract class TestWithDependencyTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test_with_dependency";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
@@ -116,9 +116,9 @@ class TestTransactionHandler extends TransactionHandler {
 		return true;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> { }
 }
 
 class TestDeactivatedTransactionHandler extends TransactionHandler {
@@ -142,9 +142,9 @@ class TestDeactivatedTransactionHandler extends TransactionHandler {
 		return false;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> { }
 }
 
 class TestWithDependencyTransactionHandler extends TransactionHandler {
@@ -168,9 +168,9 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 		return false;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> { }
 }
 
 describe<{
@@ -200,6 +200,8 @@ describe<{
 		app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
 		app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
 		app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
+		app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(32);
+		app.bind(Identifiers.Cryptography.Size.Signature).toConstantValue(64);
 
 		app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
 		app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);

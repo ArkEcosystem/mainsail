@@ -8,7 +8,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
 			.bind(Identifiers.Cryptography.Size.Signature)
-			.toConstantValue(65)
+			.toConstantValue(64)
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 
 		this.app

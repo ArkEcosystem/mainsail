@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
@@ -9,6 +9,14 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
+
+	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@tagged("type", "wallet")
+	private readonly publicKeySize!: number;
+
+	@inject(Identifiers.Cryptography.Size.Signature)
+	@tagged("type", "wallet")
+	private readonly signatureSize!: number;
 
 	public async getBytes(
 		transaction: Contracts.Crypto.ITransactionData,
@@ -23,13 +31,64 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		throw new Exceptions.TransactionVersionError(version);
 	}
 
+	public commonSize(transaction: Contracts.Crypto.ITransaction): number {
+		return (
+			1 + // magic byte
+			1 + // version
+			1 + // network
+			4 + // typeGroup
+			2 + // type
+			8 + // nonce
+			(transaction.data.senderPublicKey ? this.publicKeySize : 0) + // sender public key
+			8 // fee
+		);
+	}
+
+	public vendorFieldSize(transaction: Contracts.Crypto.ITransaction): number {
+		let vendorFieldSize = 1; // length byte
+
+		if (transaction.hasVendorField() && transaction.data.vendorField) {
+			const vf: Buffer = Buffer.from(transaction.data.vendorField, "utf8");
+			vendorFieldSize += vf.length;
+		}
+
+		return vendorFieldSize;
+	}
+
+	public signaturesSize(
+		transaction: Contracts.Crypto.ITransaction,
+		options: Contracts.Crypto.ISerializeOptions = {}
+	): number {
+		let size = 0;
+
+		const { data } = transaction;
+		if (data.signature && !options.excludeSignature) {
+			size += this.signatureSize;
+		}
+
+		if (data.signatures && !options.excludeMultiSignature) {
+			size += (data.signatures.length * (1 + this.signatureSize) /* 1 additional byte for index */);
+		}
+
+		return size;
+	}
+
+	public totalSize(transaction: Contracts.Crypto.ITransaction,
+		options: Contracts.Crypto.ISerializeOptions = {}): number {
+		return (
+			this.commonSize(transaction) +
+			this.vendorFieldSize(transaction) +
+			transaction.assetSize() +
+			this.signaturesSize(transaction, options)
+		);
+	}
+
 	public async serialize(
 		transaction: Contracts.Crypto.ITransaction,
 		options: Contracts.Crypto.ISerializeOptions = {},
 	): Promise<Buffer> {
-		const buff: ByteBuffer = ByteBuffer.fromSize(
-			this.configuration.getMilestone(this.configuration.getHeight()).block?.maxPayload ?? 8192,
-		);
+		const bufferSize = this.totalSize(transaction, options);
+		const buff: ByteBuffer = ByteBuffer.fromSize(bufferSize);
 
 		this.#serializeCommon(transaction.data, buff);
 		this.#serializeVendorField(transaction, buff);
@@ -45,6 +104,10 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		this.#serializeSignatures(transaction.data, buff, options);
 
 		const bufferBuffer = buff.getResult();
+		if (bufferBuffer.length !== bufferSize) {
+			throw new Exceptions.InvalidTransactionBytesError(`expected size ${bufferSize} actual size: ${bufferBuffer.length}`);
+		}
+
 		transaction.serialized = bufferBuffer;
 
 		return bufferBuffer;
@@ -61,10 +124,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		buff.writeUint8(transaction.network || this.configuration.get("network.pubKeyHash"));
 		buff.writeUint32(transaction.typeGroup);
 		buff.writeUint16(transaction.type);
-
-		if (transaction.nonce) {
-			buff.writeUint64(transaction.nonce.toBigInt());
-		}
+		buff.writeUint64(transaction.nonce.toBigInt());
 
 		if (transaction.senderPublicKey) {
 			buff.writeBytes(Buffer.from(transaction.senderPublicKey, "hex"));

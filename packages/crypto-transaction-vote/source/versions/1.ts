@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
@@ -8,6 +8,10 @@ import { ByteBuffer } from "@mainsail/utils";
 export class VoteTransaction extends Transaction {
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@tagged("type", "wallet")
+	public readonly publicKeySize!: number;
 
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.Vote;
@@ -45,12 +49,23 @@ export class VoteTransaction extends Transaction {
 		});
 	}
 
+	public assetSize(): number {
+		const { data } = this;
+		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
+
+		return (
+			1 + // number of votes
+			1 + // number of unvotes
+			(this.publicKeySize * data.asset.votes.length) +// size of votes
+			(this.publicKeySize * data.asset.unvotes.length)// size of unvotes
+		)
+	}
+
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
-		const publicKeySize = this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet");
 		const buff: ByteBuffer = ByteBuffer.fromSize(
-			1 + 1 + publicKeySize * data.asset.votes.length + publicKeySize * data.asset.unvotes.length,
+			1 + 1 + this.publicKeySize * data.asset.votes.length + this.publicKeySize * data.asset.unvotes.length,
 		);
 
 		// TODO: Check asset
@@ -67,18 +82,17 @@ export class VoteTransaction extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 		const asset: Contracts.Crypto.IVoteAsset = { unvotes: [], votes: [] };
-		const publicKeySize = this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet");
 
 		const votelength: number = buf.readUint8();
 		for (let index = 0; index < votelength; index++) {
-			const vote = buf.readBytes(publicKeySize).toString("hex");
+			const vote = buf.readBytes(this.publicKeySize).toString("hex");
 
 			asset.votes.push(vote);
 		}
 
 		const unvotelength: number = buf.readUint8();
 		for (let index = 0; index < unvotelength; index++) {
-			const unvote = buf.readBytes(publicKeySize).toString("hex");
+			const unvote = buf.readBytes(this.publicKeySize).toString("hex");
 
 			asset.unvotes.push(unvote);
 		}

@@ -19,6 +19,10 @@ export class UsernameResignationTransaction extends Transaction {
 		});
 	}
 
+	public assetSize(): number {
+		return 0;
+	}
+
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		return ByteBuffer.fromSize(0);
 	}

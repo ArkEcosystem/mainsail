@@ -12,6 +12,9 @@ export class MultiPaymentTransaction extends Transaction {
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
 	private readonly addressSerializer!: Contracts.Crypto.IAddressSerializer;
 
+	@inject(Identifiers.Cryptography.Size.Address)
+	private readonly addressSize!: number;
+
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.MultiPayment;
 	public static key = "multiPayment";
@@ -60,27 +63,38 @@ export class MultiPaymentTransaction extends Transaction {
 		return data;
 	}
 
+	public assetSize(): number {
+		const { data } = this;
+		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
+		const { payments } = data.asset;
+
+		return (
+			2 + // number of payments
+			(payments.length * 8) + // amounts
+			(payments.length * this.addressSize) // recipients
+		)
+	}
+
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 
-		if (data.asset && data.asset.payments) {
-			const buff: ByteBuffer = ByteBuffer.fromSize(
-				2 +
-					data.asset.payments.length * this.app.get<number>(Identifiers.Cryptography.Size.Address) +
-					data.asset.payments.length * 8,
-			);
-			buff.writeUint16(data.asset.payments.length);
+		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
+		const { payments } = data.asset;
 
-			for (const payment of data.asset.payments) {
-				buff.writeUint64(payment.amount.toBigInt());
+		const buff: ByteBuffer = ByteBuffer.fromSize(
+			2 +
+			payments.length * 8 +
+			payments.length * this.addressSize
+		);
 
-				buff.writeBytes(await this.addressFactory.toBuffer(payment.recipientId));
-			}
+		buff.writeUint16(payments.length);
 
-			return buff;
+		for (const payment of payments) {
+			buff.writeUint64(payment.amount.toBigInt());
+			buff.writeBytes(await this.addressFactory.toBuffer(payment.recipientId));
 		}
 
-		return undefined;
+		return buff;
 	}
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {

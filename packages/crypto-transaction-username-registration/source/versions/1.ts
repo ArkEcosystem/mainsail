@@ -29,6 +29,18 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 		});
 	}
 
+	public assetSize(): number {
+		const { data } = this;
+
+		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		Utils.assert.defined<string>(data.asset.username);
+
+		return (
+			1 + // length
+			Buffer.byteLength(data.asset.username, "utf-8")
+		)
+	}
+
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 

@@ -33,6 +33,12 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 		});
 	}
 
+	public assetSize(): number {
+		return (
+			this.publicKeySize
+		);
+	}
+
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data, publicKeySize } = this;
 
