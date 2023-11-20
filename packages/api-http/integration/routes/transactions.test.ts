@@ -102,6 +102,8 @@ describe<{
 				MultiSignature: 4,
 				MultiPayment: 6,
 				ValidatorResignation: 7,
+				UsernameRegistration: 8,
+				UsernameResignation: 9
 			},
 		});
 	});

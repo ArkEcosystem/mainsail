@@ -55,7 +55,7 @@ describe<{
 				result: delegate,
 			},
 			{
-				id: delegate.attributes.validatorUsername,
+				id: delegate.attributes.username,
 				result: delegate,
 			},
 		];

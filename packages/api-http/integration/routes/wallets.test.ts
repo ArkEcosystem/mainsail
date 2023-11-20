@@ -63,7 +63,7 @@ describe<{
 				result: wallet,
 			},
 			{
-				id: wallet.attributes.validatorUsername,
+				id: wallet.attributes.username,
 				result: wallet,
 			},
 		];

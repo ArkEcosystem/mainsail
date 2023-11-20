@@ -11,7 +11,7 @@
 			"publicKey": "180ce525730360ffdd05cd0195baa545fe0dc0243dc1362f856475f8c0429d71",
 			"validatorRank": 5,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_5",
+			"username": "genesis_5",
 			"validatorLastBlock": {
 				"id": "5bd4f034c96f29a1949bd6b6ee480c7dc45ed42ab7dccaa9d3a913895fdad843",
 				"height": 3,
@@ -37,7 +37,7 @@
 			"publicKey": "5f6c4fc52ee6ab5b36e142b4beba020871d260fd57ed137862b47bd2a4b11975",
 			"validatorRank": 40,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_40",
+			"username": "genesis_40",
 			"validatorLastBlock": {
 				"id": "fe7c2054daa234060a1836a9b0bdbeb0161f87c9562aae4161f30432b66c5766",
 				"height": 4,
@@ -63,7 +63,7 @@
 			"publicKey": "ba590a90b0842d779d49cc723d88563f86fdc695cf032c13b9cedb422605a88d",
 			"validatorRank": 17,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_17",
+			"username": "genesis_17",
 			"validatorLastBlock": {
 				"id": "79556e145193e87897f62ea1abdf877eef46348d4b6218823c639aba45df785e",
 				"height": 5,
@@ -89,7 +89,7 @@
 			"publicKey": "f9961c672bc1aae54ddc8b142b3adc4b3b9accb697fc6b069fa2070e62cd212a",
 			"validatorRank": 8,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_8",
+			"username": "genesis_8",
 			"validatorLastBlock": {
 				"id": "0b2da3465e02b14fb7938468092d0d9f32280bde73e3146f75f37a74a4dd13f3",
 				"height": 6,
@@ -115,7 +115,7 @@
 			"publicKey": "7bd457cec7b335daa194ecf9bed46836edfbab2799f570036ed79528cb97338e",
 			"validatorRank": 32,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_32",
+			"username": "genesis_32",
 			"validatorLastBlock": {
 				"id": "26f801416e5d48b8fdde57cedcf63d1b7d117193c100f8f07f3c71ffae69c5d7",
 				"height": 7,
@@ -141,7 +141,7 @@
 			"publicKey": "255992261ba64456467b4853cceb7fa8229d24a7f0ffec4d511e4c5577291b24",
 			"validatorRank": 53,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_53",
+			"username": "genesis_53",
 			"validatorLastBlock": {
 				"id": "2c59c4772e624a7ad8cbe98665defcee2c2f8944bf77508ce938912ad7e60665",
 				"height": 8,
@@ -167,7 +167,7 @@
 			"publicKey": "4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873",
 			"validatorRank": 31,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_31",
+			"username": "genesis_31",
 			"validatorLastBlock": {
 				"id": "c33ce54719c0db98742380be8afbe514ba1ee54feed75e028155f91896094fe9",
 				"height": 58,
@@ -193,7 +193,7 @@
 			"publicKey": "14e8632a31c155df268b259c539f58f1afe8791100d01e89d4c30942a904b4db",
 			"validatorRank": 45,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_45",
+			"username": "genesis_45",
 			"validatorLastBlock": {
 				"id": "5ee3e403805a8e3b1a7b795fcc0baf585d37772ffdf98aa24533aaed5c88dda7",
 				"height": 9,
@@ -219,7 +219,7 @@
 			"publicKey": "6b978893aed7093f81f03b7230e2d11e328bd6d60319f0b092a310ae8d99138a",
 			"validatorRank": 48,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_48",
+			"username": "genesis_48",
 			"validatorLastBlock": {
 				"id": "e4d9bb8d46231b8a7591e362621c8a197d2a72abf6f5a414e837a43ed650ec20",
 				"height": 10,
@@ -245,7 +245,7 @@
 			"publicKey": "be865af4bdd7bb7635a71671adb0b0603aa433506eee5c2c44a4005628e2ae8c",
 			"validatorRank": 14,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_14",
+			"username": "genesis_14",
 			"validatorLastBlock": {
 				"id": "ff27ae8a985677e17fc1f84cb78dc9b493ea8427ae6fe40673461be34eb53e7f",
 				"height": 11,
@@ -271,7 +271,7 @@
 			"publicKey": "e5ff34d16147b600775dcbaab7b5c0c7c6ed52f59b08b185821c4898e2172c78",
 			"validatorRank": 47,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_47",
+			"username": "genesis_47",
 			"validatorLastBlock": {
 				"id": "8299b9aad8a79f175841a6bb0f0796df838d01ec07c585e6f6955e3230c4a8cc",
 				"height": 12,
@@ -297,7 +297,7 @@
 			"publicKey": "d720501139a353dc5a79e6061d9aad804db5e1e8330d573fcb03a818132ff052",
 			"validatorRank": 20,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_20",
+			"username": "genesis_20",
 			"validatorLastBlock": {
 				"id": "9cd330f8c3d3be77527abc6d42f61119ede57922c8a61828e292fe37e23d00d5",
 				"height": 13,
@@ -323,7 +323,7 @@
 			"publicKey": "ab55719963f221179a4b527dc207ebe2dccb2cbcf20e0642e8bd87187554cede",
 			"validatorRank": 30,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_30",
+			"username": "genesis_30",
 			"validatorLastBlock": {
 				"id": "d0f275834a890c2980d55cd96ab5892a86e138e805444231a27e03e51ede4b62",
 				"height": 14,
@@ -349,7 +349,7 @@
 			"publicKey": "edbe95d3e5e271c6913a8b3ef4976798119289631edbac853fc4e7fb6df0a9fc",
 			"validatorRank": 7,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_7",
+			"username": "genesis_7",
 			"validatorLastBlock": {
 				"id": "6c099f45ecec2303b34a8d3e8333d7df67044820a3970748e038499045167c6b",
 				"height": 57,
@@ -375,7 +375,7 @@
 			"publicKey": "dfd62365840cee9e700771942074ecd44e603d95bb4f61c8a9638cb8faa00e39",
 			"validatorRank": 18,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_18",
+			"username": "genesis_18",
 			"validatorLastBlock": {
 				"id": "f59c4c1d661a2d8db25f37327fc545542daf909d2f794990aa686ce41e943519",
 				"height": 18,
@@ -401,7 +401,7 @@
 			"publicKey": "e2565f4c4682fbc3a579fcafaf422aab3c6f52cdff1394e02f4fed76774b94a4",
 			"validatorRank": 4,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_4",
+			"username": "genesis_4",
 			"validatorLastBlock": {
 				"id": "704cfd3f366394bb99c6138d9473b350f69a2fb270de5fb4b8a571813f906be3",
 				"height": 20,
@@ -427,7 +427,7 @@
 			"publicKey": "26561ffe5917e68298a9b1d17807ac5d89cfd4a958ca9cd36f9aaefe0cd3d094",
 			"validatorRank": 39,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_39",
+			"username": "genesis_39",
 			"validatorLastBlock": {
 				"id": "daa11d8413cfe296a72a2d289fa510e2d5bca0014fab669a7156c3b56815b934",
 				"height": 21,
@@ -453,7 +453,7 @@
 			"publicKey": "69e9d1433e7c12b136be147e39240669127f9e4c93985fb6f39cf53bece77224",
 			"validatorRank": 26,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_26",
+			"username": "genesis_26",
 			"validatorLastBlock": {
 				"id": "6a4a599165ca9bee81f95c66fcd28fd311544ab42d3dcbffe64f0895bce7b2b3",
 				"height": 22,
@@ -479,7 +479,7 @@
 			"publicKey": "4d3d5f9b8cf79e142808c24e14b1d41896a1b79b008a6fbdb493bb8f4461a143",
 			"validatorRank": 10,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_10",
+			"username": "genesis_10",
 			"validatorLastBlock": {
 				"id": "c41b23b47223925bb0e073f294ee092c38f3658cf6a339231686d36dbb505bc0",
 				"height": 23,
@@ -505,7 +505,7 @@
 			"publicKey": "7b422e9c41377c77f0c962b338122404cd0e3887052939a0832d32bfafaf6f8e",
 			"validatorRank": 21,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_21",
+			"username": "genesis_21",
 			"validatorLastBlock": {
 				"id": "43e12bf1d2cf81f5a33694f762ff003889c2d40d49b3256c5a9846c3d5cf03e9",
 				"height": 24,
@@ -531,7 +531,7 @@
 			"publicKey": "eef84ac334b9c0c50c04813c62f2536b3fa0bf834161af57f6bef30b1928ad23",
 			"validatorRank": 38,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_38",
+			"username": "genesis_38",
 			"validatorLastBlock": {
 				"id": "d9a15e1d5a08d8d009141dd765aed0845709768004f3b673e648bc35c0c3c199",
 				"height": 25,
@@ -557,7 +557,7 @@
 			"publicKey": "8018908d9fe6983438c1690595866ac62c7fb4218df4478d45a0f6c27d7407fc",
 			"validatorRank": 41,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_41",
+			"username": "genesis_41",
 			"validatorLastBlock": {
 				"id": "a9288fa9365fff917b521469af8dcbc35ba3e615c258c598f6ac13c84ad4d267",
 				"height": 26,
@@ -583,7 +583,7 @@
 			"publicKey": "ba69fee71b06b9f2af4693ee5d3ac3ebc92817d9bfd551b601c82157a33f06e9",
 			"validatorRank": 12,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_12",
+			"username": "genesis_12",
 			"validatorLastBlock": {
 				"id": "f5a9c8e90ab74311090e5a08528f3b78e2f6855efaaf60f179ea5f833da7d219",
 				"height": 27,
@@ -609,7 +609,7 @@
 			"publicKey": "ffecd8b223bc94a85b708a6f5f17db828081b446812dd1266981b61ea29290dd",
 			"validatorRank": 34,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_34",
+			"username": "genesis_34",
 			"validatorLastBlock": {
 				"id": "38260a51d813e0ea1ee6c9e0c8537126a53660ef84097534545b0ed652e951ce",
 				"height": 28,
@@ -635,7 +635,7 @@
 			"publicKey": "39501bb2b7d1f5b3bd33a7b2918d59bd8d876582b5f48c3a123c50ebc802d9c8",
 			"validatorRank": 11,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_11",
+			"username": "genesis_11",
 			"validatorLastBlock": {
 				"id": "897fe9334f952006ca5d1ecae00ef3904cb20b767c648db825e21009bb9744c1",
 				"height": 29,
@@ -661,7 +661,7 @@
 			"publicKey": "a9c0f3619dc0d72fe2077d28365daf63381f44cd43db3e58ff186746ef493e45",
 			"validatorRank": 44,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_44",
+			"username": "genesis_44",
 			"validatorLastBlock": {
 				"id": "a01e6dc6ca215967ec5965d97834c1dec1879566f857db109176f9b4f3c83097",
 				"height": 30,
@@ -687,7 +687,7 @@
 			"publicKey": "76666d13637ad717360e6bbc57331491afec55e058b21d3d2c405f0b5b091668",
 			"validatorRank": 46,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_46",
+			"username": "genesis_46",
 			"validatorLastBlock": {
 				"id": "398c80de55c8bf6559a48fb56e681a075d6f9685d9b336502eab6c602934cf4b",
 				"height": 31,
@@ -713,7 +713,7 @@
 			"publicKey": "d251cfa4d21665b185182609ba013e63ab61166d5bf06491fb77cd4536be3031",
 			"validatorRank": 51,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_51",
+			"username": "genesis_51",
 			"validatorLastBlock": {
 				"id": "d6707073d05f068e2ccc5668a3338bd5458a9cd9de7e691a06218bbde25293c8",
 				"height": 32,
@@ -739,7 +739,7 @@
 			"publicKey": "046fcea6925f1c45b3213b7333279ec600102508d9cd824aa5210a5b33c2dac8",
 			"validatorRank": 23,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_23",
+			"username": "genesis_23",
 			"validatorLastBlock": {
 				"id": "8c9dd20e4f02025902ef1f6809fd4ea8819f23cc5129651426b3cff315ad2151",
 				"height": 33,
@@ -765,7 +765,7 @@
 			"publicKey": "bf59ee2b4ca7999ead6f90e89f50f005114490e599574e9d740a4d07b15eabbc",
 			"validatorRank": 6,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_6",
+			"username": "genesis_6",
 			"validatorLastBlock": {
 				"id": "40f9b73b914247f1199b636a27954f9b35e63acb83b9e704723e9dc672b339b6",
 				"height": 34,
@@ -791,7 +791,7 @@
 			"publicKey": "c0fd72f29cc9c42b5d96d364db178c5b95b93adf94b8e2080a4af9491d487e64",
 			"validatorRank": 37,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_37",
+			"username": "genesis_37",
 			"validatorLastBlock": {
 				"id": "fbb4c1fe140c738d006695334fe0ba6ee6a43a75ce8383435a085e5d7122d161",
 				"height": 35,
@@ -817,7 +817,7 @@
 			"publicKey": "984d01a7b21d6032ee9d905356f816c055bb6d1dfb15c377d1d5c2d3aead5866",
 			"validatorRank": 9,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_9",
+			"username": "genesis_9",
 			"validatorLastBlock": {
 				"id": "8c70a751d675d90b2d8ce04cd63f3367b15e872495357e35cab9300914bef713",
 				"height": 36,
@@ -843,7 +843,7 @@
 			"publicKey": "e9dd69de6e77328e7bafae8cbb963b1c500e0e16b5792f18bffecd5d13f9d9c7",
 			"validatorRank": 22,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_22",
+			"username": "genesis_22",
 			"validatorLastBlock": {
 				"id": "57ff41744cfbe0678365a519147b3538f3c8b8773c0e3dd492bb5454d145a4cb",
 				"height": 37,
@@ -869,7 +869,7 @@
 			"publicKey": "afa86067a50ace97f9eba97ffc86a2c8452c0a81f477312050419c6a744a4aca",
 			"validatorRank": 27,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_27",
+			"username": "genesis_27",
 			"validatorLastBlock": {
 				"id": "2c60444b08d2e8ccfae4cb82d3b9a4ed3954e7fd2e0ecb8a255abaf3e19a3b6e",
 				"height": 38,
@@ -895,7 +895,7 @@
 			"publicKey": "8cc47dfb19894ebf898d8a5b45b6f010a2f80145dde9469da9ed13f6356b22b7",
 			"validatorRank": 19,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_19",
+			"username": "genesis_19",
 			"validatorLastBlock": {
 				"id": "806cc35e70cb8f176030fefe66c5b0ca504c903250707613647a1eac123e2e81",
 				"height": 39,
@@ -921,7 +921,7 @@
 			"publicKey": "eba64fc844dc201a778f1fcc47aba135debac3faa5e4e4f2fc2ca48e505a3b9d",
 			"validatorRank": 24,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_24",
+			"username": "genesis_24",
 			"validatorLastBlock": {
 				"id": "4d52b9b4226e3c89f870ffff52b6a34d89782c65d14e7b8527398b5fc307502f",
 				"height": 40,
@@ -947,7 +947,7 @@
 			"publicKey": "4a0bc3748f456c0ad23b7576e1d4c871f1156c5a0bc67e471dcd898725261a2a",
 			"validatorRank": 16,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_16",
+			"username": "genesis_16",
 			"validatorLastBlock": {
 				"id": "7b3a1f5b4a96128c731def519d14831bdaeb4db3cfa1eebd34f49d85ee19b66d",
 				"height": 41,
@@ -973,7 +973,7 @@
 			"publicKey": "f465afaea87d2c7dce82c41acd7e3b193c22abc4530199a5e1946bebc38bd137",
 			"validatorRank": 49,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_49",
+			"username": "genesis_49",
 			"validatorLastBlock": {
 				"id": "d60846f763b24ea0f54467ebb56c322cb2b83fa65e506ae3a03f104e88a10822",
 				"height": 42,
@@ -999,7 +999,7 @@
 			"publicKey": "18b4e22b65c7be2804f00e06d00931b87d50aae6efdf90743dc6a266e51e9adc",
 			"validatorRank": 2,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_2",
+			"username": "genesis_2",
 			"validatorLastBlock": {
 				"id": "7c3a053bb16154a52cbd47ff30618db2b976f5d7787232cd55f85b3b8c03c716",
 				"height": 43,
@@ -1025,7 +1025,7 @@
 			"publicKey": "b4a6f03e3b9aa69c59e6db271366713630f32ce0daeabe5c6a71d338a1cdfce8",
 			"validatorRank": 50,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_50",
+			"username": "genesis_50",
 			"validatorLastBlock": {
 				"id": "1a9dd47602a9de5862062249984ddbf4c1e19e0d47e291a76455d8976c448305",
 				"height": 44,
@@ -1051,7 +1051,7 @@
 			"publicKey": "7207ed206e18b075de267598a3b7acd18cc6625486c9839c91adde41d1d7b288",
 			"validatorRank": 33,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_33",
+			"username": "genesis_33",
 			"validatorLastBlock": {
 				"id": "8ed1c7cf9f042faea5bf288d08a4873d831e6ff05dd37b21e38e4e5ccb968c14",
 				"height": 45,
@@ -1077,7 +1077,7 @@
 			"publicKey": "bc8686be38237cd1a9bb5efa85743b0ba594c5d433cdd1e6bfd804de11d92924",
 			"validatorRank": 52,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_52",
+			"username": "genesis_52",
 			"validatorLastBlock": {
 				"id": "4a1458737a56a7476cb8b136ede3a7f42b164e7e9115a45071a1e450c84476f7",
 				"height": 46,
@@ -1103,7 +1103,7 @@
 			"publicKey": "fb9fa763b1eb4c27fe98574bea6af7a1ac92bc516c8b33a4b5661a2bd7e38ee1",
 			"validatorRank": 35,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_35",
+			"username": "genesis_35",
 			"validatorLastBlock": {
 				"id": "e1938a035ce8902883d31d3f1c1c748b29b03e2edab4062154011b5c9016c97e",
 				"height": 47,
@@ -1129,7 +1129,7 @@
 			"publicKey": "80fd71f634600288ee180689ed67a36477a936c749edc4b619bc6fe4b79c19a5",
 			"validatorRank": 36,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_36",
+			"username": "genesis_36",
 			"validatorLastBlock": {
 				"id": "657500f13c5d828775dc71b5b81a2ed9f7057770e8507f32fc5c2d6def8f1c5d",
 				"height": 48,
@@ -1155,7 +1155,7 @@
 			"publicKey": "7130c60de5d0277bf1ed028f23252b035176985eb71468f154982c4b55cc59d2",
 			"validatorRank": 43,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_43",
+			"username": "genesis_43",
 			"validatorLastBlock": {
 				"id": "52a6ce581b076df54ea847e6c6b0a9acdc903ee0983d896a3b91b50cdc6c4b16",
 				"height": 49,
@@ -1181,7 +1181,7 @@
 			"publicKey": "ec706992fb7e8ce67b786ba0dc412a8b2404c374e96cac3275540a237f6af1a6",
 			"validatorRank": 25,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_25",
+			"username": "genesis_25",
 			"validatorLastBlock": {
 				"id": "32aab0897994d8efe51b7f6d47220f2ba8bb2b1cd4b68e423c78c47aeedf0582",
 				"height": 50,
@@ -1207,7 +1207,7 @@
 			"publicKey": "054e1ffa7005461ad69de8e50d446ce5a7284754dffabf971f5044ef56189278",
 			"validatorRank": 3,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_3",
+			"username": "genesis_3",
 			"validatorLastBlock": {
 				"id": "63ae0e6774f5eeb1932d237d2fd1287739560f823eb49c0018752275507c6707",
 				"height": 52,
@@ -1233,7 +1233,7 @@
 			"publicKey": "81b7c2c0e8b5c176b824ab191a5d4d9090f87f494305f450e6862c217a5b62a0",
 			"validatorRank": 42,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_42",
+			"username": "genesis_42",
 			"validatorLastBlock": {
 				"id": "7902154dca9eeb9ebe3ea6835702fd15282e97c704c64cae3742a5894dda6769",
 				"height": 53,
@@ -1259,7 +1259,7 @@
 			"publicKey": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
 			"validatorRank": 13,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_13",
+			"username": "genesis_13",
 			"validatorLastBlock": {
 				"id": "ba456e32153484e1d3b09bb78660d2354e10fae26a13b57d295906699657962a",
 				"height": 54,
@@ -1285,7 +1285,7 @@
 			"publicKey": "103b4b5d4e20529f745c523cdef55dfc97e6cf553689c828c7944d5efb7544b5",
 			"validatorRank": 28,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_28",
+			"username": "genesis_28",
 			"validatorLastBlock": {
 				"id": "88195b2ea8eb6eac84d77eb52f37f44fdc08862f611495ad5898173e76dc01d4",
 				"height": 55,
@@ -1311,7 +1311,7 @@
 			"publicKey": "8d48722ead6bfcbc72e6d29a84be54c248c126b809178a694a2b4098874d57d6",
 			"validatorRank": 29,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_29",
+			"username": "genesis_29",
 			"validatorLastBlock": {
 				"id": "7e503d7946328c280dc9493dc3af344d467770742c2ef12b060332c0dff92db1",
 				"height": 56,
@@ -1337,7 +1337,7 @@
 			"publicKey": "862a584784d58774c886a61460393fa3e1826045e90ffa00aa257c9ccd07e9e3",
 			"validatorRank": 15,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_15",
+			"username": "genesis_15",
 			"validatorLastBlock": {
 				"id": "5faab393dbbd6c0b58aa46233acbd7b60a1240607cfe650fc8506f422caab501",
 				"height": 59,
@@ -1363,7 +1363,7 @@
 			"publicKey": "153be7647ebe062bb632bb71295c0dd5452934f73a60bcdf391ee2b60c18a9bb",
 			"validatorRank": 1,
 			"validatorApproval": 1.8867924528301887,
-			"validatorUsername": "genesis_1",
+			"username": "genesis_1",
 			"validatorLastBlock": {
 				"id": "fdb278d8aaa332135d60a52a37c73d6a5087b9711bfe52553b343d3f7d0fb98a",
 				"height": 60,

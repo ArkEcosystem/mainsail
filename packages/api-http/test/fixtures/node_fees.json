@@ -35,6 +35,18 @@
 			"max": "0",
 			"min": "0",
 			"sum": "0"
+		},
+		"usernameRegistration": {
+			"avg": "0",
+			"max": "0",
+			"min": "0",
+			"sum": "0"
+		},
+		"usernameResignation": {
+			"avg": "0",
+			"max": "0",
+			"min": "0",
+			"sum": "0"
 		}
 	}
 }

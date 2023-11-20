@@ -13,8 +13,7 @@
 			},
 			"fee": {
 				"bignumber": {
-					"minimum": 1,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"type": {
@@ -27,15 +26,16 @@
 			},
 			"amount": {
 				"bignumber": {
-					"minimum": 1,
-					"bypassGenesis": true
+					"minimum": 1
 				}
 			},
 			"network": {
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [1]
+				"enum": [
+					1
+				]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -97,8 +97,7 @@
 			},
 			"fee": {
 				"bignumber": {
-					"minimum": 1,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"type": {
@@ -106,20 +105,12 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": ["validator"],
+				"required": [
+					"validatorPublicKey"
+				],
 				"properties": {
-					"validator": {
-						"type": "object",
-						"required": ["username", "publicKey"],
-						"properties": {
-							"username": {
-								"$ref": "validatorUsername"
-							},
-							"publicKey": {
-								"$ref": "consensusPublicKey"
-							}
-						},
-						"unevaluatedProperties": false
+					"validatorPublicKey": {
+						"$ref": "consensusPublicKey"
 					}
 				},
 				"unevaluatedProperties": false
@@ -132,15 +123,16 @@
 			"amount": {
 				"bignumber": {
 					"maximum": 0,
-					"minimum": 0,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"network": {
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [1]
+				"enum": [
+					1
+				]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -184,8 +176,7 @@
 			},
 			"fee": {
 				"bignumber": {
-					"minimum": 1,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"type": {
@@ -193,7 +184,10 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": ["unvotes", "votes"],
+				"required": [
+					"unvotes",
+					"votes"
+				],
 				"properties": {
 					"votes": {
 						"type": "array",
@@ -223,15 +217,16 @@
 			"amount": {
 				"bignumber": {
 					"maximum": 0,
-					"minimum": 0,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"network": {
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [1]
+				"enum": [
+					1
+				]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -278,8 +273,7 @@
 			},
 			"fee": {
 				"bignumber": {
-					"minimum": 1,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"type": {
@@ -287,11 +281,16 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": ["multiSignature"],
+				"required": [
+					"multiSignature"
+				],
 				"properties": {
 					"multiSignature": {
 						"type": "object",
-						"required": ["min", "publicKeys"],
+						"required": [
+							"min",
+							"publicKeys"
+						],
 						"properties": {
 							"min": {
 								"type": "integer",
@@ -323,15 +322,16 @@
 			"amount": {
 				"bignumber": {
 					"maximum": 0,
-					"minimum": 0,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"network": {
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [1]
+				"enum": [
+					1
+				]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -386,8 +386,7 @@
 			},
 			"fee": {
 				"bignumber": {
-					"minimum": 1,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"type": {
@@ -395,13 +394,18 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": ["payments"],
+				"required": [
+					"payments"
+				],
 				"properties": {
 					"payments": {
 						"type": "array",
 						"items": {
 							"type": "object",
-							"required": ["amount", "recipientId"],
+							"required": [
+								"amount",
+								"recipientId"
+							],
 							"properties": {
 								"amount": {
 									"bignumber": {
@@ -428,16 +432,16 @@
 			},
 			"amount": {
 				"bignumber": {
-					"maximum": 0,
-					"minimum": 0,
-					"bypassGenesis": true
+					"minimum": 1
 				}
 			},
 			"network": {
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [1]
+				"enum": [
+					1
+				]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -492,8 +496,7 @@
 			},
 			"fee": {
 				"bignumber": {
-					"minimum": 1,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"type": {
@@ -507,15 +510,162 @@
 			"amount": {
 				"bignumber": {
 					"maximum": 0,
-					"minimum": 0,
-					"bypassGenesis": true
+					"minimum": 0
 				}
 			},
 			"network": {
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [1]
+				"enum": [
+					1
+				]
+			},
+			"signature": {
+				"$ref": "alphanumeric"
+			},
+			"typeGroup": {
+				"type": "integer",
+				"minimum": 0
+			},
+			"signatures": {
+				"type": "array",
+				"items": {
+					"type": "string",
+					"allOf": [
+						{
+							"maxLength": 130,
+							"minLength": 130
+						},
+						{
+							"$ref": "alphanumeric"
+						}
+					]
+				},
+				"maxItems": 16,
+				"minItems": 1,
+				"uniqueItems": true
+			},
+			"senderPublicKey": {
+				"$ref": "publicKey"
+			}
+		},
+		"8": {
+			"id": {
+				"anyOf": [
+					{
+						"$ref": "transactionId"
+					},
+					{
+						"type": "null"
+					}
+				]
+			},
+			"fee": {
+				"bignumber": {
+					"minimum": 0
+				}
+			},
+			"type": {
+				"transactionType": 8
+			},
+			"asset": {
+				"type": "object",
+				"required": [
+					"username"
+				],
+				"properties": {
+					"username": {
+						"$ref": "username"
+					}
+				},
+				"unevaluatedProperties": false
+			},
+			"nonce": {
+				"bignumber": {
+					"minimum": 0
+				}
+			},
+			"amount": {
+				"bignumber": {
+					"maximum": 0,
+					"minimum": 0
+				}
+			},
+			"network": {
+				"$ref": "networkByte"
+			},
+			"version": {
+				"enum": [
+					1
+				]
+			},
+			"signature": {
+				"$ref": "alphanumeric"
+			},
+			"typeGroup": {
+				"type": "integer",
+				"minimum": 0
+			},
+			"signatures": {
+				"type": "array",
+				"items": {
+					"type": "string",
+					"allOf": [
+						{
+							"maxLength": 130,
+							"minLength": 130
+						},
+						{
+							"$ref": "alphanumeric"
+						}
+					]
+				},
+				"maxItems": 16,
+				"minItems": 1,
+				"uniqueItems": true
+			},
+			"senderPublicKey": {
+				"$ref": "publicKey"
+			}
+		},
+		"9": {
+			"id": {
+				"anyOf": [
+					{
+						"$ref": "transactionId"
+					},
+					{
+						"type": "null"
+					}
+				]
+			},
+			"fee": {
+				"bignumber": {
+					"minimum": 0
+				}
+			},
+			"type": {
+				"transactionType": 9
+			},
+			"nonce": {
+				"bignumber": {
+					"minimum": 0
+				}
+			},
+			"amount": {
+				"bignumber": {
+					"maximum": 0,
+					"minimum": 0
+				}
+			},
+			"network": {
+				"$ref": "networkByte"
+			},
+			"version": {
+				"enum": [
+					1
+				]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
