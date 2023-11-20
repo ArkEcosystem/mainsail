@@ -3,7 +3,7 @@ import { IBlock, ICommittedBlock } from "./crypto";
 export interface IDatabaseService {
 	getBlock(height: number): Promise<IBlock | undefined>;
 
-	findCommittedBlocks(start: number, end: number): Promise<Buffer[]>;
+	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 
 	readCommittedBlocksByHeight(start: number, end: number): AsyncGenerator<ICommittedBlock>;
 

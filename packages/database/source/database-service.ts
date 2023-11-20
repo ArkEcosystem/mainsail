@@ -20,7 +20,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return undefined;
 	}
 
-	public async findCommittedBlocks(start: number, end: number): Promise<Buffer[]> {
+	public async findCommitBuffers(start: number, end: number): Promise<Buffer[]> {
 		const heights: number[] = [];
 
 		for (const height of this.#range(start, end)) {
@@ -40,7 +40,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 
 	public async findBlocksByHeightRange(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
 		return await this.#map<Contracts.Crypto.IBlock>(
-			await this.findCommittedBlocks(start, end),
+			await this.findCommitBuffers(start, end),
 			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
 		);
 	}

@@ -29,7 +29,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			return { blocks: [] };
 		}
 
-		const committedBlocks: Buffer[] = await this.database.findCommittedBlocks(
+		const committedBlocks: Buffer[] = await this.database.findCommitBuffers(
 			requestBlockHeight,
 			requestBlockHeight + requestBlockLimit - 1,
 		);
