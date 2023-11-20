@@ -1,7 +1,7 @@
 import { IBlock, ICommittedBlock } from "./crypto";
 
 export interface IDatabaseService {
-	getBlockByHeight(height: number): Promise<IBlock | undefined>;
+	getBlock(height: number): Promise<IBlock | undefined>;
 
 	findCommittedBlocks(start: number, end: number): Promise<Buffer[]>;
 

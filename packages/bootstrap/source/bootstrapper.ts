@@ -126,7 +126,7 @@ export class Bootstrapper {
 		if (this.#stateStore.getLastHeight() === 0) {
 			await this.#processGenesisBlock();
 		} else {
-			const block = await this.databaseService.getBlockByHeight(this.#stateStore.getLastHeight());
+			const block = await this.databaseService.getBlock(this.#stateStore.getLastHeight());
 			Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 			this.#stateStore.setLastBlock(block);
 		}
