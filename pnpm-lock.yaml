@@ -870,6 +870,12 @@ importers:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
+      '@mainsail/crypto-address-ss58':
+        specifier: workspace:*
+        version: link:../crypto-address-ss58
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
@@ -882,9 +888,21 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-hash-noble':
+        specifier: workspace:*
+        version: link:../crypto-hash-noble
+      '@mainsail/crypto-hash-wasm':
+        specifier: workspace:*
+        version: link:../crypto-hash-wasm
+      '@mainsail/crypto-key-pair-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-bls12-381
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-key-pair-ed25519':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ed25519
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
