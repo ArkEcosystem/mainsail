@@ -8,7 +8,7 @@ describe<{
 	controller: GetBlocksController;
 }>("GetBlocksController", ({ it, assert, beforeEach, spy, match, stub }) => {
 	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
-	const database = { findCommittedBlocks: () => {} };
+	const database = { findCommitBuffers: () => {} };
 	const stateStore = {
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
@@ -27,11 +27,11 @@ describe<{
 		context.controller = context.sandbox.app.resolve(GetBlocksController);
 	});
 
-	it("should use database.findCommittedBlocks to get the blocks according to the request params", async ({
+	it("should use database.findCommitBuffers to get the blocks according to the request params", async ({
 		controller,
 	}) => {
 		const mockBlocks = [Buffer.from("")];
-		const spyGetBlocksForDownload = stub(database, "findCommittedBlocks").returnValue(mockBlocks);
+		const spyGetBlocksForDownload = stub(database, "findCommitBuffers").returnValue(mockBlocks);
 
 		const payload = {
 			fromHeight: 1,
