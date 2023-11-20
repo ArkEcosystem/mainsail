@@ -33,9 +33,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -105,9 +103,7 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": [
-					"validatorPublicKey"
-				],
+				"required": ["validatorPublicKey"],
 				"properties": {
 					"validatorPublicKey": {
 						"$ref": "consensusPublicKey"
@@ -130,9 +126,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -184,10 +178,7 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": [
-					"unvotes",
-					"votes"
-				],
+				"required": ["unvotes", "votes"],
 				"properties": {
 					"votes": {
 						"type": "array",
@@ -224,9 +215,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -281,16 +270,11 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": [
-					"multiSignature"
-				],
+				"required": ["multiSignature"],
 				"properties": {
 					"multiSignature": {
 						"type": "object",
-						"required": [
-							"min",
-							"publicKeys"
-						],
+						"required": ["min", "publicKeys"],
 						"properties": {
 							"min": {
 								"type": "integer",
@@ -329,9 +313,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -394,18 +376,13 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": [
-					"payments"
-				],
+				"required": ["payments"],
 				"properties": {
 					"payments": {
 						"type": "array",
 						"items": {
 							"type": "object",
-							"required": [
-								"amount",
-								"recipientId"
-							],
+							"required": ["amount", "recipientId"],
 							"properties": {
 								"amount": {
 									"bignumber": {
@@ -439,9 +416,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -517,9 +492,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -571,9 +544,7 @@
 			},
 			"asset": {
 				"type": "object",
-				"required": [
-					"username"
-				],
+				"required": ["username"],
 				"properties": {
 					"username": {
 						"$ref": "username"
@@ -596,9 +567,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
@@ -663,9 +632,7 @@
 				"$ref": "networkByte"
 			},
 			"version": {
-				"enum": [
-					1
-				]
+				"enum": [1]
 			},
 			"signature": {
 				"$ref": "alphanumeric"
