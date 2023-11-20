@@ -136,7 +136,7 @@ export class Bootstrapper {
 		const lastBlock = await this.databaseService.getLastBlock();
 		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(lastBlock);
 
-		for await (const committedBlock of this.databaseService.readCommittedBlocksByHeight(
+		for await (const committedBlock of this.databaseService.readCommits(
 			this.#stateStore.getLastHeight() + 1,
 			lastBlock.data.height,
 		)) {

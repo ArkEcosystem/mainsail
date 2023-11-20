@@ -5,7 +5,7 @@ export interface IDatabaseService {
 
 	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 
-	readCommittedBlocksByHeight(start: number, end: number): AsyncGenerator<ICommittedBlock>;
+	readCommits(start: number, end: number): AsyncGenerator<ICommittedBlock>;
 
 	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
 

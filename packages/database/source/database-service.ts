@@ -54,10 +54,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		);
 	}
 
-	public async *readCommittedBlocksByHeight(
-		start: number,
-		end: number,
-	): AsyncGenerator<Contracts.Crypto.ICommittedBlock> {
+	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.ICommittedBlock> {
 		for (let height = start; height <= end; height++) {
 			const block = await this.blockFactory.fromCommittedBytes(this.blockStorage.get(height));
 			yield block;
