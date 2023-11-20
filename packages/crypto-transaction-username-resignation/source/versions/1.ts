@@ -23,7 +23,7 @@ export class UsernameResignationTransaction extends Transaction {
 		return 0;
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
 		return ByteBuffer.fromSize(0);
 	}
 

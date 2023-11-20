@@ -37,13 +37,13 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 		return this.publicKeySize;
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
-		const { data, publicKeySize } = this;
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+		const { data } = this;
 
 		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
 		Utils.assert.defined<string>(data.asset.validatorPublicKey);
 
-		const buff: ByteBuffer = ByteBuffer.fromSize(publicKeySize);
+		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 		buff.writeBytes(Buffer.from(data.asset.validatorPublicKey, "hex"));
 
 		return buff;

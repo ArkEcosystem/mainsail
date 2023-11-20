@@ -13,7 +13,7 @@ export interface ITransaction {
 	serialized: Buffer;
 
 	assetSize(): number;
-	serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined>;
+	serialize(options?: ISerializeOptions): Promise<ByteBuffer>;
 	deserialize(buf: ByteBuffer): Promise<void>;
 
 	hasVendorField(): boolean;

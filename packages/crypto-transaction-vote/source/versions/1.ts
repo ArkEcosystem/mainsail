@@ -61,12 +61,10 @@ export class VoteTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
-		const buff: ByteBuffer = ByteBuffer.fromSize(
-			1 + 1 + this.publicKeySize * data.asset.votes.length + this.publicKeySize * data.asset.unvotes.length,
-		);
+		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 
 		// TODO: Check asset
 

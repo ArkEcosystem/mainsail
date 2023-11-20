@@ -41,9 +41,9 @@ export class TransferTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
-		const buff: ByteBuffer = ByteBuffer.fromSize(64);
+		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 		buff.writeUint64(data.amount.toBigInt());
 		buff.writeUint32(data.expiration || 0);
 
