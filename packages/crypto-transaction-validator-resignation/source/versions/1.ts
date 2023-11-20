@@ -19,7 +19,6 @@ export class ValidatorResignationTransaction extends Transaction {
 		});
 	}
 
-
 	public assetSize(): number {
 		return 0;
 	}

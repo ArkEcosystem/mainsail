@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
-import { Utils } from "@mainsail/kernel";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
@@ -35,10 +35,10 @@ export class TransferTransaction extends Transaction {
 
 	public assetSize(): number {
 		return (
-			8 +  // amount
+			8 + // amount
 			4 + // expiration
 			this.addressSize // recipient
-		)
+		);
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {

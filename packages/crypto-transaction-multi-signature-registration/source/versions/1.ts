@@ -74,18 +74,14 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 			1 + // min
 			1 + // number of public keys
 			publicKeys.length * this.publicKeySize // public keys
-		)
+		);
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
 		const { data } = this;
 		Utils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
 		const { min, publicKeys } = data.asset.multiSignature;
-		const buff: ByteBuffer = ByteBuffer.fromSize(
-			2 +
-			publicKeys.length *
-			this.publicKeySize,
-		);
+		const buff: ByteBuffer = ByteBuffer.fromSize(2 + publicKeys.length * this.publicKeySize);
 
 		buff.writeUint8(min);
 		buff.writeUint8(publicKeys.length);

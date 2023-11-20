@@ -56,9 +56,9 @@ export class VoteTransaction extends Transaction {
 		return (
 			1 + // number of votes
 			1 + // number of unvotes
-			(this.publicKeySize * data.asset.votes.length) +// size of votes
-			(this.publicKeySize * data.asset.unvotes.length)// size of unvotes
-		)
+			this.publicKeySize * data.asset.votes.length + // size of votes
+			this.publicKeySize * data.asset.unvotes.length // size of unvotes
+		);
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {

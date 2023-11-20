@@ -57,7 +57,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 
 	public signaturesSize(
 		transaction: Contracts.Crypto.ITransaction,
-		options: Contracts.Crypto.ISerializeOptions = {}
+		options: Contracts.Crypto.ISerializeOptions = {},
 	): number {
 		let size = 0;
 
@@ -67,14 +67,16 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		}
 
 		if (data.signatures && !options.excludeMultiSignature) {
-			size += (data.signatures.length * (1 + this.signatureSize) /* 1 additional byte for index */);
+			size += data.signatures.length * (1 + this.signatureSize) /* 1 additional byte for index */;
 		}
 
 		return size;
 	}
 
-	public totalSize(transaction: Contracts.Crypto.ITransaction,
-		options: Contracts.Crypto.ISerializeOptions = {}): number {
+	public totalSize(
+		transaction: Contracts.Crypto.ITransaction,
+		options: Contracts.Crypto.ISerializeOptions = {},
+	): number {
 		return (
 			this.commonSize(transaction) +
 			this.vendorFieldSize(transaction) +
@@ -105,7 +107,9 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 
 		const bufferBuffer = buff.getResult();
 		if (bufferBuffer.length !== bufferSize) {
-			throw new Exceptions.InvalidTransactionBytesError(`expected size ${bufferSize} actual size: ${bufferBuffer.length}`);
+			throw new Exceptions.InvalidTransactionBytesError(
+				`expected size ${bufferSize} actual size: ${bufferBuffer.length}`,
+			);
 		}
 
 		transaction.serialized = bufferBuffer;

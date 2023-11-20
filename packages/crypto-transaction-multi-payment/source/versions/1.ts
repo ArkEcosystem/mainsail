@@ -70,9 +70,9 @@ export class MultiPaymentTransaction extends Transaction {
 
 		return (
 			2 + // number of payments
-			(payments.length * 8) + // amounts
-			(payments.length * this.addressSize) // recipients
-		)
+			payments.length * 8 + // amounts
+			payments.length * this.addressSize // recipients
+		);
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
@@ -81,11 +81,7 @@ export class MultiPaymentTransaction extends Transaction {
 		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
 		const { payments } = data.asset;
 
-		const buff: ByteBuffer = ByteBuffer.fromSize(
-			2 +
-			payments.length * 8 +
-			payments.length * this.addressSize
-		);
+		const buff: ByteBuffer = ByteBuffer.fromSize(2 + payments.length * 8 + payments.length * this.addressSize);
 
 		buff.writeUint16(payments.length);
 

@@ -38,7 +38,7 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 		return (
 			1 + // length
 			Buffer.byteLength(data.asset.username, "utf-8")
-		)
+		);
 	}
 
 	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
