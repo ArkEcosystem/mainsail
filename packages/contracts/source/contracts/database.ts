@@ -1,23 +1,15 @@
-import { IBlock, IBlockData, ICommittedBlock } from "./crypto";
+import { IBlock, ICommittedBlock } from "./crypto";
 
 export interface IDatabaseService {
-	getBlock(id: string): Promise<IBlock | undefined>;
+	getBlock(height: number): Promise<IBlock | undefined>;
 
-	getBlockByHeight(height: number): Promise<IBlock | undefined>;
+	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 
-	findCommittedBlocks(start: number, end: number): Promise<Buffer[]>;
+	readCommits(start: number, end: number): AsyncGenerator<ICommittedBlock>;
 
-	readCommittedBlocksByHeight(start: number, end: number): AsyncGenerator<ICommittedBlock>;
-
-	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
-
-	getBlocks(start: number, end: number): Promise<IBlockData[]>;
-
-	findBlockByHeights(heights: number[]): Promise<IBlock[]>;
+	findBlocks(start: number, end: number): Promise<IBlock[]>;
 
 	getLastBlock(): Promise<IBlock | undefined>;
 
-	saveBlocks(blocks: ICommittedBlock[]): Promise<void>;
-
-	findBlocksByIds(ids: string[]): Promise<IBlockData[]>;
+	saveCommit(block: ICommittedBlock): Promise<void>;
 }

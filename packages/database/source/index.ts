@@ -10,10 +10,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.Database.BlockStorage).toConstantValue(rootStorage.openDB({ name: "blocks" }));
 
-		this.app
-			.bind(Identifiers.Database.BlockHeightStorage)
-			.toConstantValue(rootStorage.openDB({ name: "blocks-by-height" }));
-
 		this.app.bind(Identifiers.Database.Service).to(DatabaseService).inSingletonScope();
 	}
 

@@ -102,7 +102,7 @@ export class Bootstrapper {
 	async #storeGenesisBlock(): Promise<void> {
 		if (!(await this.databaseService.getLastBlock())) {
 			const genesisBlock = this.#stateStore.getGenesisBlock();
-			await this.databaseService.saveBlocks([genesisBlock]);
+			await this.databaseService.saveCommit(genesisBlock);
 		}
 	}
 
@@ -126,7 +126,7 @@ export class Bootstrapper {
 		if (this.#stateStore.getLastHeight() === 0) {
 			await this.#processGenesisBlock();
 		} else {
-			const block = await this.databaseService.getBlockByHeight(this.#stateStore.getLastHeight());
+			const block = await this.databaseService.getBlock(this.#stateStore.getLastHeight());
 			Utils.assert.defined<Contracts.Crypto.IBlock>(block);
 			this.#stateStore.setLastBlock(block);
 		}
@@ -136,7 +136,7 @@ export class Bootstrapper {
 		const lastBlock = await this.databaseService.getLastBlock();
 		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(lastBlock);
 
-		for await (const committedBlock of this.databaseService.readCommittedBlocksByHeight(
+		for await (const committedBlock of this.databaseService.readCommits(
 			this.#stateStore.getLastHeight() + 1,
 			lastBlock.data.height,
 		)) {

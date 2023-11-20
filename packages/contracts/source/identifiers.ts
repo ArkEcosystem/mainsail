@@ -82,7 +82,6 @@ export const Identifiers = {
 		Validator: Symbol.for("Crypto<Validator>"),
 	},
 	Database: {
-		BlockHeightStorage: Symbol.for("Database<BlockHeightStorage>"),
 		BlockStorage: Symbol.for("Database<BlockStorage>"),
 		ConsensusStateStorage: Symbol.for("Database<ConsensusStateStorage>"),
 		ConsensusStorage: Symbol.for("Database<ConsensusStorage>"),

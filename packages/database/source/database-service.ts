@@ -7,14 +7,11 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	@inject(Identifiers.Database.BlockStorage)
 	private readonly blockStorage!: Database;
 
-	@inject(Identifiers.Database.BlockHeightStorage)
-	private readonly blockStorageByHeight!: Database;
-
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
-	public async getBlock(id: string): Promise<Contracts.Crypto.IBlock | undefined> {
-		const bytes = this.blockStorage.get(id);
+	public async getBlock(height: number): Promise<Contracts.Crypto.IBlock | undefined> {
+		const bytes = this.blockStorage.get(height);
 
 		if (bytes) {
 			return (await this.blockFactory.fromCommittedBytes(bytes)).block;
@@ -23,17 +20,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return undefined;
 	}
 
-	public async getBlockByHeight(height: number): Promise<Contracts.Crypto.IBlock | undefined> {
-		const id = this.blockStorageByHeight.get(height);
-
-		if (id) {
-			return this.getBlock(id);
-		}
-
-		return undefined;
-	}
-
-	public async findCommittedBlocks(start: number, end: number): Promise<Buffer[]> {
+	public async findCommitBuffers(start: number, end: number): Promise<Buffer[]> {
 		const heights: number[] = [];
 
 		for (const height of this.#range(start, end)) {
@@ -43,7 +30,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		return heights
 			.map((height: number) => {
 				try {
-					return this.blockStorage.get(this.blockStorageByHeight.get(height));
+					return this.blockStorage.get(height);
 				} catch {
 					return;
 				}
@@ -51,34 +38,16 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 			.filter(Boolean);
 	}
 
-	public async findBlocksByHeightRange(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
+	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
 		return await this.#map<Contracts.Crypto.IBlock>(
-			await this.findCommittedBlocks(start, end),
+			await this.findCommitBuffers(start, end),
 			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
 		);
 	}
 
-	public async getBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlockData[]> {
-		return (await this.findBlocksByHeightRange(start, end)).map(({ data }) => data);
-	}
-
-	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {
-		// TODO: this hits the disk twice for each height
-		const ids = await this.#map<string>(heights, (height: number) => this.blockStorageByHeight.get(height));
-
-		return this.#map<Contracts.Crypto.IBlock>(
-			ids.filter((id) => id !== undefined),
-			async (id: string) => (await this.blockFactory.fromCommittedBytes(this.blockStorage.get(id))).block,
-		);
-	}
-
-	public async *readCommittedBlocksByHeight(
-		start: number,
-		end: number,
-	): AsyncGenerator<Contracts.Crypto.ICommittedBlock> {
+	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.ICommittedBlock> {
 		for (let height = start; height <= end; height++) {
-			const id = this.blockStorageByHeight.get(height);
-			const block = await this.blockFactory.fromCommittedBytes(this.blockStorage.get(id));
+			const block = await this.blockFactory.fromCommittedBytes(this.blockStorage.get(height));
 			yield block;
 		}
 	}
@@ -86,7 +55,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	public async getLastBlock(): Promise<Contracts.Crypto.IBlock | undefined> {
 		try {
 			const lastCommittedBlock = await this.blockFactory.fromCommittedBytes(
-				this.blockStorage.get(this.blockStorageByHeight.getRange({ limit: 1, reverse: true }).asArray[0].value),
+				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
 			);
 
 			// TODO: return committed block or even have a dedicated storage for it?
@@ -96,25 +65,10 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		}
 	}
 
-	public async saveBlocks(blocks: Contracts.Crypto.ICommittedBlock[]): Promise<void> {
-		for (const { serialized, block } of blocks) {
-			if (!this.blockStorage.doesExist(block.data.id)) {
-				// TODO: store commits
-
-				await this.blockStorage.put(block.data.id, Buffer.from(serialized, "hex"));
-
-				await this.blockStorageByHeight.put(block.data.height, block.data.id);
-			}
+	public async saveCommit(block: Contracts.Crypto.ICommittedBlock): Promise<void> {
+		if (!this.blockStorage.doesExist(block.block.data.height)) {
+			await this.blockStorage.put(block.block.data.height, Buffer.from(block.serialized, "hex"));
 		}
-	}
-
-	public async findBlocksByIds(ids: string[]): Promise<Contracts.Crypto.IBlockData[]> {
-		const blocks = await this.#map<Buffer | undefined>(ids, (id: string) => this.blockStorage.get(id));
-
-		return this.#map(
-			blocks.filter((block) => block !== undefined),
-			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block.data,
-		);
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {

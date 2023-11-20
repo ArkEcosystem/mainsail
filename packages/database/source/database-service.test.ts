@@ -22,13 +22,13 @@ import { describe, Factories, Sandbox } from "../../test-framework";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
 
-const generateBlock = async (): Promise<Contracts.Crypto.ICommittedBlock> => {
+const generateCommit = async (): Promise<Contracts.Crypto.ICommittedBlock> => {
 	const blockFactory = await Factories.factory("Block", cryptoJson);
 
 	return blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.ICommittedBlock>();
 };
 
-const generateBlocks = async (count: number): Promise<Contracts.Crypto.ICommittedBlock[]> => {
+const generateCommits = async (count: number): Promise<Contracts.Crypto.ICommittedBlock[]> => {
 	const blocks: Contracts.Crypto.ICommittedBlock[] = [];
 
 	const blockFactory = await Factories.factory("Block", cryptoJson);
@@ -87,65 +87,56 @@ describe<{
 		context.databaseService = context.sandbox.app.get<DatabaseService>(Identifiers.Database.Service);
 	});
 
-	it("#saveBlocks - should save a block", async ({ databaseService, sandbox }) => {
-		const spyOnBlockStoreagePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage), "put");
-		const spyOnBlockHeightStoreagePut = spy(
-			sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage),
-			"put",
-		);
+	it("#saveCommit - should save a block", async ({ databaseService, sandbox }) => {
+		const spyOnBlockStoragePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage), "put");
 
-		const block = await generateBlock();
+		const commit = await generateCommit();
+		await databaseService.saveCommit(commit);
 
-		await databaseService.saveBlocks([block]);
-
-		spyOnBlockStoreagePut.calledOnce();
-		spyOnBlockHeightStoreagePut.calledOnce();
-
+		spyOnBlockStoragePut.calledOnce();
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
-		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage).getKeysCount(), 1);
 	});
 
 	it("#saveBlocks - should save a block only once", async ({ databaseService, sandbox }) => {
-		const spyOnBlockStoreagePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage), "put");
-		const spyOnBlockHeightStoreagePut = spy(
-			sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage),
-			"put",
-		);
+		const spyOnBlockStoragePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage), "put");
 
-		const block = await generateBlock();
+		const block = await generateCommit();
+		await databaseService.saveCommit(block);
+		await databaseService.saveCommit(block);
 
-		await databaseService.saveBlocks([block, block]);
-
-		spyOnBlockStoreagePut.calledTimes(1);
-		spyOnBlockHeightStoreagePut.calledTimes(1);
-
+		spyOnBlockStoragePut.calledTimes(1);
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
-		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockHeightStorage).getKeysCount(), 1);
 	});
 
 	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {
-		assert.undefined(await databaseService.getBlock("undefined"));
+		assert.undefined(await databaseService.getBlock(-1));
 	});
 
-	it("#getBlock - should return block by id", async ({ databaseService }) => {
+	it("#getBlock - should return block by height", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
 		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.ICommittedBlock>();
 
-		await databaseService.saveBlocks([block]);
+		await databaseService.saveCommit(block);
 
-		assert.equal(await databaseService.getBlock(block.block.data.id), block.block);
+		assert.equal(await databaseService.getBlock(block.block.data.height), block.block);
 	});
 
-	it("#findCommittedBlocks - should return empty array if blocks are not found", async ({ databaseService }) => {
-		await databaseService.saveBlocks(await generateBlocks(3));
+	it("#findCommitBuffers - should return empty array if blocks are not found", async ({ databaseService }) => {
+		const commits = await generateCommits(3);
+		for (const commit of commits) {
+			await databaseService.saveCommit(commit);
+		}
 
-		assert.equal(await databaseService.findCommittedBlocks(5, 10), []);
+		assert.equal(await databaseService.findCommitBuffers(5, 10), []);
 	});
 
-	it("#findCommittedBlocks - should return buffers", async ({ databaseService }) => {
-		await databaseService.saveBlocks(await generateBlocks(4));
+	it("#findCommitBuffers - should return buffers", async ({ databaseService }) => {
+		const commits = await generateCommits(4);
+		for (const commit of commits) {
+			await databaseService.saveCommit(commit);
+		}
 
-		const result = await databaseService.findCommittedBlocks(1, 4);
+		const result = await databaseService.findCommitBuffers(1, 4);
 		assert.equal(result.length, 4);
 		assert.instance(result[0], Buffer);
 		assert.instance(result[1], Buffer);
@@ -153,51 +144,24 @@ describe<{
 		assert.instance(result[3], Buffer);
 	});
 
-	it("#findBlocksByHeightRange - should return empty array if blocks are not found", async ({ databaseService }) => {
-		await databaseService.saveBlocks(await generateBlocks(3));
+	it("#findBlocks - should return empty array if blocks are not found", async ({ databaseService }) => {
+		const commits = await generateCommits(3);
+		for (const commit of commits) {
+			await databaseService.saveCommit(commit);
+		}
 
-		assert.equal(await databaseService.findBlocksByHeightRange(5, 10), []);
+		assert.equal(await databaseService.findBlocks(5, 10), []);
 	});
 
-	it("#findBlocksByHeightRange - should return blocks by height", async ({ databaseService }) => {
-		const blocks = await generateBlocks(4);
-		await databaseService.saveBlocks(blocks);
+	it("#findBlocks - should return blocks by height", async ({ databaseService }) => {
+		const commits = await generateCommits(4);
+		for (const commit of commits) {
+			await databaseService.saveCommit(commit);
+		}
 
 		assert.equal(
-			await databaseService.findBlocksByHeightRange(1, 4),
-			blocks.map(({ block }) => block),
-		);
-	});
-
-	it("#getBlocks - should return empty array if blocks are not found", async ({ databaseService }) => {
-		await databaseService.saveBlocks(await generateBlocks(3));
-
-		assert.equal(await databaseService.getBlocks(5, 10), []);
-	});
-
-	it("#getBlocks - should return block data by height", async ({ databaseService }) => {
-		const blocks = await generateBlocks(4);
-		await databaseService.saveBlocks(blocks);
-
-		assert.equal(
-			await databaseService.getBlocks(1, 4),
-			blocks.map((block) => block.block.data),
-		);
-	});
-
-	it("#findBlockByHeights - should return empty array if blocks are not found", async ({ databaseService }) => {
-		await databaseService.saveBlocks(await generateBlocks(3));
-
-		assert.equal(await databaseService.findBlockByHeights([6, 7, 8]), []);
-	});
-
-	it("#findBlockByHeights - should return block data by height", async ({ databaseService }) => {
-		const blocks = await generateBlocks(4);
-		await databaseService.saveBlocks(blocks);
-
-		assert.equal(
-			await databaseService.findBlockByHeights([1, 2, 3, 4]),
-			blocks.map(({ block }) => block),
+			await databaseService.findBlocks(1, 4),
+			commits.map(({ block }) => block),
 		);
 	});
 
@@ -206,25 +170,11 @@ describe<{
 	});
 
 	it("#getLastBlock - should return last block", async ({ databaseService }) => {
-		const blocks = await generateBlocks(4);
-		await databaseService.saveBlocks(blocks);
+		const commits = await generateCommits(4);
+		for (const commit of commits) {
+			await databaseService.saveCommit(commit);
+		}
 
-		assert.equal(await databaseService.getLastBlock(), blocks[3].block);
-	});
-
-	it("#findBlocksByIds - should return empty array if blocks are not found", async ({ databaseService }) => {
-		await databaseService.saveBlocks(await generateBlocks(3));
-
-		assert.equal(await databaseService.findBlocksByIds(["id_1", "id_2", "id_3"]), []);
-	});
-
-	it("#findBlockByHeights - should return block data by ids", async ({ databaseService }) => {
-		const blocks = await generateBlocks(4);
-		await databaseService.saveBlocks(blocks);
-
-		assert.equal(
-			await databaseService.findBlocksByIds(blocks.map(({ block }) => block.data.id)),
-			blocks.map(({ block }) => block.data),
-		);
+		assert.equal(await databaseService.getLastBlock(), commits[3].block);
 	});
 });
