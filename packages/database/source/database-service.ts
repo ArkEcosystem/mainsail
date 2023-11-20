@@ -45,15 +45,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		);
 	}
 
-	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {
-		const blocks = heights.map((height) => this.blockStorage.get(height));
-
-		return await this.#map<Contracts.Crypto.IBlock>(
-			blocks.filter(Boolean),
-			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
-		);
-	}
-
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.ICommittedBlock> {
 		for (let height = start; height <= end; height++) {
 			const block = await this.blockFactory.fromCommittedBytes(this.blockStorage.get(height));

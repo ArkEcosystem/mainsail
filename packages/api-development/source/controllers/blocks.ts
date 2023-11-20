@@ -101,17 +101,8 @@ export class BlocksController extends Controller {
 		);
 	}
 
+	// TODO: Support height only
 	private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.IBlock | undefined> {
-		let block: Contracts.Crypto.IBlock | undefined;
-
-		if (/^-?\d+$/.test(idOrHeight)) {
-			const blocks = await this.database.findBlockByHeights([Number.parseInt(idOrHeight)]);
-
-			if (blocks.length > 0) {
-				block = blocks[0];
-			}
-		}
-
-		return block;
+		return this.database.getBlock(Number.parseInt(idOrHeight));
 	}
 }
