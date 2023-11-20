@@ -154,8 +154,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-					validatorRound: this.#createValidatorRound(header.height + 1),
-				}
+						validatorRound: this.#createValidatorRound(header.height + 1),
+				  }
 				: {}),
 		};
 
