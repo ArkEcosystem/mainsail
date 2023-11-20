@@ -46,9 +46,7 @@ export class BlockWithTransactionsResource implements Resource {
 			generator: {
 				address: generator.getAddress(),
 				publicKey: generator.getPublicKey(),
-				username: generator.hasAttribute("validatorUsername")
-					? generator.getAttribute("validatorUsername")
-					: undefined,
+				username: generator.hasAttribute("username") ? generator.getAttribute("username") : undefined,
 			},
 			height: +blockData.height,
 			id: blockData.id,

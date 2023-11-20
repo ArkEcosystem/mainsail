@@ -26,7 +26,7 @@ export class BlockResource implements Contracts.Resource {
 			generator: {
 				address: resource.generator.address,
 				publicKey: resource.generator.publicKey,
-				username: resource.generator.attributes?.["validatorUsername"] ?? undefined,
+				username: resource.generator.attributes?.["username"] ?? undefined,
 			},
 			height: +resource.height,
 			id: resource.id,

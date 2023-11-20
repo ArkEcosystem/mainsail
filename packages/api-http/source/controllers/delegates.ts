@@ -111,7 +111,7 @@ export class DelegatesController extends Controller {
 			.select()
 			.where("address = :address", { address: walletId })
 			.orWhere("public_key = :publicKey", { publicKey: walletId })
-			.orWhere("attributes @> :validatorUsername", { validatorUsername: { validatorUsername: walletId } })
+			.orWhere("attributes @> :username", { username: { username: walletId } })
 			.getOne();
 	}
 }
