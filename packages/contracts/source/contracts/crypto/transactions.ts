@@ -12,7 +12,8 @@ export interface ITransaction {
 	data: ITransactionData;
 	serialized: Buffer;
 
-	serialize(options?: ISerializeOptions): Promise<ByteBuffer | undefined>;
+	assetSize(): number;
+	serialize(options?: ISerializeOptions): Promise<ByteBuffer>;
 	deserialize(buf: ByteBuffer): Promise<void>;
 
 	hasVendorField(): boolean;
@@ -114,6 +115,7 @@ export interface IVoteAsset {
 export interface ISerializeOptions {
 	excludeSignature?: boolean;
 	excludeMultiSignature?: boolean;
+	// TODO: consider passing pre-allocated buffer
 }
 
 export interface TransactionServiceProvider {

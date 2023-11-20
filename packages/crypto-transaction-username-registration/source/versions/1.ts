@@ -29,14 +29,26 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 		});
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public assetSize(): number {
+		const { data } = this;
+
+		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		Utils.assert.defined<string>(data.asset.username);
+
+		return (
+			1 + // length
+			Buffer.byteLength(data.asset.username, "utf-8")
+		);
+	}
+
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 
 		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
 		Utils.assert.defined<string>(data.asset.username);
 
 		const usernameBytes: Buffer = Buffer.from(data.asset.username, "utf8");
-		const buff: ByteBuffer = ByteBuffer.fromSize(usernameBytes.length + 1);
+		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 
 		buff.writeUint8(usernameBytes.length);
 		buff.writeBytes(usernameBytes);

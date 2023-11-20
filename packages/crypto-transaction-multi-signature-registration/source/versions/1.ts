@@ -13,6 +13,10 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	@tagged("type", "wallet")
 	private readonly publicKeySerializer!: Contracts.Crypto.IPublicKeySerializer;
 
+	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@tagged("type", "wallet")
+	private readonly publicKeySize!: number;
+
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
 	public static type: number = Contracts.Crypto.TransactionType.MultiSignature;
 	public static key = "multiSignature";
@@ -61,15 +65,23 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		});
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public assetSize(): number {
+		const { data } = this;
+		Utils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
+		const { publicKeys } = data.asset.multiSignature;
+
+		return (
+			1 + // min
+			1 + // number of public keys
+			publicKeys.length * this.publicKeySize // public keys
+		);
+	}
+
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 		Utils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
 		const { min, publicKeys } = data.asset.multiSignature;
-		const buff: ByteBuffer = ByteBuffer.fromSize(
-			2 +
-				publicKeys.length *
-					this.app.getTagged<number>(Identifiers.Cryptography.Size.PublicKey, "type", "wallet"),
-		);
+		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 
 		buff.writeUint8(min);
 		buff.writeUint8(publicKeys.length);

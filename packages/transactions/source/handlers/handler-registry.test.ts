@@ -200,6 +200,8 @@ describe<{
 		app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
 		app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
 		app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
+		app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(32);
+		app.bind(Identifiers.Cryptography.Size.Signature).toConstantValue(64);
 
 		app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
 		app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);

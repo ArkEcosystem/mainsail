@@ -19,7 +19,11 @@ export class ValidatorResignationTransaction extends Transaction {
 		});
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer | undefined> {
+	public assetSize(): number {
+		return 0;
+	}
+
+	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
 		return ByteBuffer.fromSize(0);
 	}
 
