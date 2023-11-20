@@ -38,7 +38,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 			.filter(Boolean);
 	}
 
-	public async findBlocksByHeightRange(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
+	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlock[]> {
 		return await this.#map<Contracts.Crypto.IBlock>(
 			await this.findCommitBuffers(start, end),
 			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,

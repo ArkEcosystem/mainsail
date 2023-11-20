@@ -7,7 +7,7 @@ export interface IDatabaseService {
 
 	readCommits(start: number, end: number): AsyncGenerator<ICommittedBlock>;
 
-	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
+	findBlocks(start: number, end: number): Promise<IBlock[]>;
 
 	getLastBlock(): Promise<IBlock | undefined>;
 
