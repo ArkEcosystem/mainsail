@@ -1,4 +1,4 @@
-import { IBlock, IBlockData, ICommittedBlock } from "./crypto";
+import { IBlock, ICommittedBlock } from "./crypto";
 
 export interface IDatabaseService {
 	getBlockByHeight(height: number): Promise<IBlock | undefined>;
@@ -8,8 +8,6 @@ export interface IDatabaseService {
 	readCommittedBlocksByHeight(start: number, end: number): AsyncGenerator<ICommittedBlock>;
 
 	findBlocksByHeightRange(start: number, end: number): Promise<IBlock[]>;
-
-	getBlocks(start: number, end: number): Promise<IBlockData[]>;
 
 	findBlockByHeights(heights: number[]): Promise<IBlock[]>;
 

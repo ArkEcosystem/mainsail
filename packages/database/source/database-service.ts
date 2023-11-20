@@ -49,10 +49,6 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		);
 	}
 
-	public async getBlocks(start: number, end: number): Promise<Contracts.Crypto.IBlockData[]> {
-		return (await this.findBlocksByHeightRange(start, end)).map(({ data }) => data);
-	}
-
 	public async findBlockByHeights(heights: number[]): Promise<Contracts.Crypto.IBlock[]> {
 		const blocks = heights.map((height) => this.blockStorage.get(height));
 
