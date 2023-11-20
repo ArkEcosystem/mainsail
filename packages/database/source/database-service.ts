@@ -65,7 +65,7 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		}
 	}
 
-	public async saveBlock(block: Contracts.Crypto.ICommittedBlock): Promise<void> {
+	public async saveCommit(block: Contracts.Crypto.ICommittedBlock): Promise<void> {
 		if (!this.blockStorage.doesExist(block.block.data.id)) {
 			await this.blockStorage.put(block.block.data.height, Buffer.from(block.serialized, "hex"));
 		}
