@@ -50,9 +50,17 @@ describe<{
 		const testCases = [
 			{
 				path: "/transactions?type=0",
-				result: [...transactions].sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+				result: [...transactions]
+					.filter((tx) => tx.type === 0)
+					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
 			},
 			{ path: "/transactions?type=1", result: [] },
+			{
+				path: "/transactions?type=4",
+				result: [...transactions]
+					.filter((tx) => tx.type === 4)
+					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			},
 		];
 
 		for (const { path, result } of testCases) {
