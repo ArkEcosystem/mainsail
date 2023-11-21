@@ -33,8 +33,9 @@ describe<{
 	it("username - should be ok", ({ validator }) => {
 		assert.undefined(validator.validate("username", "0".repeat(1)).error);
 		assert.undefined(validator.validate("username", "0".repeat(20)).error);
+		assert.undefined(validator.validate("username", "a_a").error);
 
-		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz_";
+		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 		for (const char of validChars) {
 			assert.undefined(validator.validate("username", char.repeat(20)).error);
@@ -48,6 +49,10 @@ describe<{
 		assert.defined(validator.validate("username", null).error);
 		assert.defined(validator.validate("username").error);
 		assert.defined(validator.validate("username", {}).error);
+
+		assert.defined(validator.validate("username", "_a").error);
+		assert.defined(validator.validate("username", "a_").error);
+		assert.defined(validator.validate("username", "a__a").error);
 
 		const invalidChars = "ABCDEFGHJKLMNPQRSTUVWXYZ+-?!@$&.";
 
