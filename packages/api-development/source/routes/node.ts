@@ -13,12 +13,6 @@ export const register = (server: Hapi.Server<any>): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.syncing(request),
-		method: "GET",
-		path: "/node/syncing",
-	});
-
-	server.route({
 		handler: (request: Hapi.Request) => controller.configurationNode(request),
 		method: "GET",
 		path: "/node/configuration",

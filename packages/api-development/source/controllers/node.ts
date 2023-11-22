@@ -18,24 +18,9 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				blocksCount: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
-				now: lastBlock ? lastBlock.data.height : 0,
-				synced: true, // TODO: Determine from p2p
-				// timestamp: Crypto.Slots.getTime(),
-			},
-		};
-	}
-
-	public async syncing(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.stateService.getStateStore().getLastBlock();
-		const networkHeight = this.p2pService.getNetworkHeight();
-
-		return {
-			data: {
-				blocks: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
-				height: lastBlock ? lastBlock.data.height : 0,
-				id: lastBlock?.data?.id,
-				syncing: true, // TODO: Determine from p2p
+				height: lastBlock.data.height + 1, // Use +1 to determine consensus state
+				networkHeight: networkHeight,
+				synced: lastBlock.data.height + 1 >= networkHeight,
 			},
 		};
 	}
