@@ -68,7 +68,7 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 
 	#deserializeSignatures(transaction: Contracts.Crypto.ITransactionData, buf: ByteBuffer): void {
 		// @TODO: take into account what the length of signatures is based on plugins
-		// Check the length of the reminder: if wonly one signature is left or if the length is not a multiple of multisignature length, it's a single signature
+		// Check the length of the reminder: if only one signature is left or if the length is not a multiple of multisignature length, it's a single signature
 		const canReadNonMultiSignature = () =>
 			buf.getRemainderLength() &&
 			(buf.getRemainderLength() % this.signatureSize === 0 ||
