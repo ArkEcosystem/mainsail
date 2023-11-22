@@ -10,7 +10,7 @@ import { Exporter } from "./snapshots/exporter";
 import { Importer } from "./snapshots/importer";
 import { StateStore } from "./state-store";
 import { StateVerifier } from "./state-verifier";
-import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryBySender } from "./wallets";
+import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 
 export class ServiceProvider extends Providers.ServiceProvider {
