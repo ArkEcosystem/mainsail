@@ -41,7 +41,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 		let senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
 		if (!senderMempool) {
-			senderMempool = await this.createSenderMempool(transaction.data.senderPublicKey);
+			senderMempool = await this.createSenderMempool.call(transaction.data.senderPublicKey);
 			this.#senderMempools.set(transaction.data.senderPublicKey, senderMempool);
 			this.logger.debug(
 				`${await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey)} state created`,
