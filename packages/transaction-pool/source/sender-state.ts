@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Services } from "@mainsail/kernel";
 
@@ -29,9 +29,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	#walletRepository!: Contracts.State.WalletRepository;
 	#corrupt = false;
 
-	@postConstruct()
-	public initialize(): void {
-		this.#walletRepository = this.stateService.createWalletRepositoryCopyOnWrite();
+	public async configure(publicKey): Promise<SenderState> {
+		this.#walletRepository = await this.stateService.createWalletRepositoryBySender(publicKey);
+		return this;
 	}
 
 	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {

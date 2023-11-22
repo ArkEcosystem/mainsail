@@ -17,6 +17,11 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 	readonly #transactions: Contracts.Crypto.ITransaction[] = [];
 
+	public async configure(publicKey: string): Promise<SenderMempool> {
+		await this.senderState.configure(publicKey);
+		return this;
+	}
+
 	public isDisposable(): boolean {
 		return this.#transactions.length === 0 && this.#concurrency === 0;
 	}
