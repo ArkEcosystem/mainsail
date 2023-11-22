@@ -64,8 +64,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.WalletRepositoryCopyOnWriteFactory).toFactory(
 			({ container }) =>
-				(walletRepository: WalletRepository) =>
-					container.resolve(WalletRepositoryBySender).configure(walletRepository),
+				async (walletRepository: WalletRepository, publicKey: string) =>
+					await container.resolve(WalletRepositoryBySender).configure(walletRepository, publicKey),
 		);
 
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);

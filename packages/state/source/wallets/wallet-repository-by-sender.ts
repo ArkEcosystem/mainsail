@@ -8,12 +8,18 @@ export class WalletRepositoryBySender extends WalletRepository {
 	#blockchainWalletRepository!: WalletRepository;
 	#senderWallet!: Contracts.State.Wallet;
 
-	public configure(blockchainWalletRepository: WalletRepository, senderAddress: string): WalletRepositoryBySender {
+	public async configure(
+		blockchainWalletRepository: WalletRepository,
+		publicKey: string,
+	): Promise<WalletRepositoryBySender> {
 		this.#blockchainWalletRepository = blockchainWalletRepository;
-		if (this.#blockchainWalletRepository.hasByAddress(senderAddress)) {
-			throw new Error(`Sender wallet ${senderAddress} not found in blockchain wallet repository`);
+
+		const address = await this.addressFactory.fromPublicKey(publicKey);
+		if (this.#blockchainWalletRepository.hasByAddress(address)) {
+			throw new Error(`Sender wallet ${address} not found in blockchain wallet repository`);
 		}
-		this.#senderWallet = this.#cloneWallet(senderAddress);
+		this.#senderWallet = this.#cloneWallet(address);
+		this.#senderWallet.setPublicKey(publicKey);
 
 		return this;
 	}

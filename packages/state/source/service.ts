@@ -18,7 +18,7 @@ export class Service implements Contracts.State.Service {
 	private readonly walletRepositoryCloneFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
 	@inject(Identifiers.WalletRepositoryCopyOnWriteFactory)
-	private readonly walletRepositoryCopyOnWriteFactory!: Contracts.State.WalletRepositoryCloneFactory;
+	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
 	@inject(Identifiers.StateExporter)
 	private readonly exporter!: Contracts.State.Exporter;
@@ -47,8 +47,8 @@ export class Service implements Contracts.State.Service {
 		return this.walletRepositoryCloneFactory(this.getWalletRepository());
 	}
 
-	public createWalletRepositoryCopyOnWrite(): Contracts.State.WalletRepository {
-		return this.walletRepositoryCopyOnWriteFactory(this.getWalletRepository());
+	public async createWalletRepositoryBySender(publicKey: string): Promise<Contracts.State.WalletRepository> {
+		return this.walletRepositoryBySenderFactory(this.getWalletRepository(), publicKey);
 	}
 
 	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
