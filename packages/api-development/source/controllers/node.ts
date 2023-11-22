@@ -18,10 +18,9 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				blocksCount: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
-				now: lastBlock ? lastBlock.data.height : 0,
-				synced: true, // TODO: Determine from p2p
-				// timestamp: Crypto.Slots.getTime(),
+				height: lastBlock.data.height,
+				networkHeight: networkHeight,
+				synced: lastBlock.data.height >= networkHeight - 1,
 			},
 		};
 	}
