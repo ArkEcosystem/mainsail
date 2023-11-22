@@ -3,15 +3,11 @@ import { Contracts } from "@mainsail/contracts";
 
 import { WalletRepository } from "./wallet-repository";
 
-// ! This isn't copy-on-write, but copy-on-read and with many asterisks.
-// ! It only covers current pool use-cases.
-// ! It should be replaced with proper implementation eventually.
-
 @injectable()
-export class WalletRepositoryCopyOnWrite extends WalletRepository {
+export class WalletRepositoryBySender extends WalletRepository {
 	#blockchainWalletRepository!: WalletRepository;
 
-	public configure(walletRepository: WalletRepository): WalletRepositoryCopyOnWrite {
+	public configure(walletRepository: WalletRepository): WalletRepositoryBySender {
 		this.#blockchainWalletRepository = walletRepository;
 
 		return this;
