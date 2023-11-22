@@ -26,20 +26,6 @@ export class NodeController extends Controller {
 		};
 	}
 
-	public async syncing(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.stateService.getStateStore().getLastBlock();
-		const networkHeight = this.p2pService.getNetworkHeight();
-
-		return {
-			data: {
-				blocks: networkHeight && lastBlock ? networkHeight - lastBlock.data.height : 0,
-				height: lastBlock ? lastBlock.data.height : 0,
-				id: lastBlock?.data?.id,
-				syncing: true, // TODO: Determine from p2p
-			},
-		};
-	}
-
 	public async configurationNode(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const network = this.configuration.all()!.network;
 
