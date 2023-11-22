@@ -76,13 +76,13 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 		}
 
 		if (buf.getRemainderLength()) {
-			if (buf.getRemainderLength() % this.signatureSize === 0) {
+			if (buf.getRemainderLength() % (this.signatureSize + 1) === 0) {
 				transaction.signatures = [];
 
-				const count: number = buf.getRemainderLength() / 65;
+				const count: number = buf.getRemainderLength() / (this.signatureSize + 1);
 				const publicKeyIndexes: { [index: number]: boolean } = {};
 				for (let index = 0; index < count; index++) {
-					const multiSignaturePart: string = buf.readBytes(65).toString("hex");
+					const multiSignaturePart: string = buf.readBytes(this.signatureSize + 1).toString("hex");
 					const publicKeyIndex: number = Number.parseInt(multiSignaturePart.slice(0, 2), 16);
 
 					if (!publicKeyIndexes[publicKeyIndex]) {
