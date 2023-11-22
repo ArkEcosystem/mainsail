@@ -6,7 +6,6 @@ import { Enums } from "@mainsail/kernel";
 import crypto from "../../core/bin/config/testnet/mainsail/crypto.json";
 import { describe } from "../../test-framework";
 import { SenderState } from ".";
-import { countReset } from "console";
 
 describe<{
 	configuration: any;
@@ -20,8 +19,9 @@ describe<{
 	blockSerializer: any;
 	walletRepository: any;
 	stateService: any;
-}>("SenderState", ({ it, assert, beforeEach, stub, spy }) => {
-	beforeEach((context) => {
+	senderState: SenderState;
+}>("SenderState", ({ it, assert, beforeEach, stub, spy, match }) => {
+	beforeEach(async (context) => {
 		context.configuration = {
 			get: () => {},
 			getOptional: () => {},
@@ -48,7 +48,7 @@ describe<{
 		context.walletRepository = {};
 
 		context.stateService = {
-			createWalletRepositoryCopyOnWrite: () => context.walletRepository,
+			createWalletRepositoryBySender: () => context.walletRepository,
 		};
 
 		context.container = new Container();
@@ -64,6 +64,9 @@ describe<{
 
 		context.config = context.container.get(Identifiers.Cryptography.Configuration);
 
+		context.senderState = context.container.resolve(SenderState);
+		await context.senderState.configure("sender's public key");
+
 		// @ts-ignore
 		context.transaction = {
 			data: { network: 30, senderPublicKey: "sender's public key" },
@@ -73,12 +76,14 @@ describe<{
 		} as Contracts.Crypto.ITransaction;
 	});
 
-	it("apply - should throw when transaction exceeds maximum byte size", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+	it("apply - should throw when transaction exceeds maximum byte size", async ({
+		senderState,
+		transaction,
+		configuration,
+	}) => {
+		stub(configuration, "getRequired").returnValueOnce(0); // maxTransactionByte;
 
-		stub(context.configuration, "getRequired").returnValueOnce(0); // maxTransactionByte;
-
-		const promise = senderState.apply(context.transaction);
+		const promise = senderState.apply(transaction);
 
 		await assert.rejects(() => promise);
 
@@ -88,19 +93,22 @@ describe<{
 		});
 	});
 
-	it("apply - should throw when transaction is from wrong network", async (context) => {
-		const senderState = context.container.resolve(SenderState);
-
-		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+	it("apply - should throw when transaction is from wrong network", async ({
+		senderState,
+		container,
+		configuration,
+		transaction,
+	}) => {
+		container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			...crypto,
 			network: {
 				pubKeyHash: 123,
 			},
 		} as unknown as Contracts.Crypto.NetworkConfig);
 
-		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
+		stub(configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
 
-		const promise = senderState.apply(context.transaction);
+		const promise = senderState.apply(transaction);
 
 		await assert.rejects(() => promise);
 
@@ -126,15 +134,19 @@ describe<{
 		});
 	});
 
-	it("apply - should throw when transaction expired", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+	it("apply - should throw when transaction expired", async ({
+		senderState,
+		configuration,
+		expirationService,
+		transaction,
+		emitter,
+	}) => {
+		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
+		stub(expirationService, "isExpired").returnValueOnce(true);
+		stub(expirationService, "getExpirationHeight").returnValueOnce(10);
+		const eventSpy = spy(emitter, "dispatch");
 
-		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.expirationService, "isExpired").returnValueOnce(true);
-		stub(context.expirationService, "getExpirationHeight").returnValueOnce(10);
-		const eventSpy = spy(context.emitter, "dispatch");
-
-		const promise = senderState.apply(context.transaction);
+		const promise = senderState.apply(transaction);
 
 		await assert.rejects(() => promise);
 
@@ -147,16 +159,23 @@ describe<{
 		eventSpy.calledWith(Enums.TransactionEvent.Expired);
 	});
 
-	it("apply - should throw when transaction fails to verify", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+	it("apply - should throw when transaction fails to verify", async ({
+		senderState,
+		configuration,
+		expirationService,
+		handlerRegistry,
+		triggers,
+		transaction,
+		walletRepository,
+	}) => {
 		const handler = {};
 
-		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.expirationService, "isExpired").returnValueOnce(false);
-		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
-		const triggersStub = stub(context.triggers, "call").resolvedValue(false); // verifyTransaction
+		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
+		stub(expirationService, "isExpired").returnValueOnce(false);
+		const handlerStub = stub(handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
+		const triggersStub = stub(triggers, "call").resolvedValue(false); // verifyTransaction
 
-		const promise = senderState.apply(context.transaction);
+		const promise = senderState.apply(transaction);
 
 		await assert.rejects(() => promise);
 
@@ -165,11 +184,11 @@ describe<{
 			assert.equal(error.type, "ERR_BAD_DATA");
 		});
 
-		handlerStub.calledWith(context.transaction.data);
+		handlerStub.calledWith(transaction.data);
 		triggersStub.calledWith("verifyTransaction", {
 			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
+			transaction: transaction,
+			walletRepository: walletRepository,
 		});
 	});
 
@@ -215,20 +234,27 @@ describe<{
 		});
 	});
 
-	it("apply - should throw when transaction fails to apply", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+	it("apply - should throw when transaction fails to apply", async ({
+		senderState,
+		configuration,
+		expirationService,
+		handlerRegistry,
+		triggers,
+		transaction,
+		walletRepository,
+	}) => {
 		const handler = {};
 
-		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.expirationService, "isExpired").returnValueOnce(false);
-		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
+		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
+		stub(expirationService, "isExpired").returnValueOnce(false);
+		const handlerStub = stub(handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 
-		const triggerStub = stub(context.triggers, "call");
+		const triggerStub = stub(triggers, "call");
 		triggerStub.resolvedValueNth(0, true); // verifyTransaction
-		triggerStub.resolvedValueNth(1); // throwIfCannotEnterPool
+		triggerStub.resolvedValueNth(1, true); // throwIfCannotEnterPool
 		triggerStub.rejectedValueNth(2, new Error("Some apply error")); // applyTransaction
 
-		const promise = senderState.apply(context.transaction);
+		const promise = senderState.apply(transaction);
 
 		await assert.rejects(() => promise);
 
@@ -237,54 +263,61 @@ describe<{
 			assert.equal(error.type, "ERR_APPLY");
 		});
 
-		handlerStub.calledWith(context.transaction.data);
+		handlerStub.calledWith(transaction.data);
 		triggerStub.calledNthWith(0, "verifyTransaction", {
 			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
+			transaction: transaction,
+			walletRepository: walletRepository,
 		});
 		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", {
 			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
+			transaction: transaction,
+			walletRepository: walletRepository,
 		});
 		triggerStub.calledNthWith(2, "applyTransaction", {
 			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
+			transaction: transaction,
+			walletRepository: walletRepository,
 		});
 	});
 
-	it("apply - should call handler to apply transaction", async (context) => {
-		const senderState = context.container.resolve(SenderState);
+	it("apply - should call handler to apply transaction", async ({
+		senderState,
+		configuration,
+		expirationService,
+		handlerRegistry,
+		triggers,
+		transaction,
+		walletRepository,
+	}) => {
 		const handler = {};
 
-		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.expirationService, "isExpired").returnValueOnce(false);
-		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
+		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
+		stub(expirationService, "isExpired").returnValueOnce(false);
+		const handlerStub = stub(handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
 
-		const triggerStub = stub(context.triggers, "call");
+		const triggerStub = stub(triggers, "call");
 		triggerStub.resolvedValueNth(0, true); // verifyTransaction
 		triggerStub.resolvedValueNth(1); // throwIfCannotEnterPool
 		triggerStub.resolvedValueNth(2); // applyTransaction
 
-		await senderState.apply(context.transaction);
+		await senderState.apply(transaction);
 
-		handlerStub.calledWith(context.transaction.data);
+		handlerStub.calledWith(transaction.data);
 		triggerStub.calledNthWith(0, "verifyTransaction", {
 			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
+			transaction: transaction,
+			walletRepository: walletRepository,
 		});
 		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", {
 			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
+			transaction: transaction,
+			walletRepository: walletRepository,
 		});
 		triggerStub.calledNthWith(2, "applyTransaction", {
 			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
+			transaction: transaction,
+			walletRepository: walletRepository,
 		});
 	});
 
