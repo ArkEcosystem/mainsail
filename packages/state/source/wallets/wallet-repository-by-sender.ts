@@ -72,15 +72,6 @@ export class WalletRepositoryBySender extends WalletRepository {
 
 	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {}
 
-	public allValidators(): ReadonlyArray<Contracts.State.Wallet> {
-		for (const wallet of this.#blockchainWalletRepository.allValidators()) {
-			if (!super.hasByAddress(wallet.getAddress())) {
-				this.#cloneWallet(wallet.getAddress());
-			}
-		}
-		return super.allValidators();
-	}
-
 	#cloneWallet(address: string): Contracts.State.Wallet {
 		return this.#blockchainWalletRepository.findByAddress(address).clone(this);
 	}
