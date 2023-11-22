@@ -68,21 +68,23 @@ export class Deserializer implements Contracts.Crypto.ITransactionDeserializer {
 
 	#deserializeSignatures(transaction: Contracts.Crypto.ITransactionData, buf: ByteBuffer): void {
 		// @TODO: take into account what the length of signatures is based on plugins
-		const canReadNonMultiSignature = () =>
-			buf.getRemainderLength() && (buf.getRemainderLength() % 64 === 0 || buf.getRemainderLength() % 65 !== 0);
-
-		if (canReadNonMultiSignature()) {
+		// Check the length of the reminder: if only one signature is left or if the length is not a multiple of multisignature length, it's a single signature
+		if (
+			buf.getRemainderLength() &&
+			(buf.getRemainderLength() % this.signatureSize === 0 ||
+				buf.getRemainderLength() % (this.signatureSize + 1) !== 0)
+		) {
 			transaction.signature = this.signatureSerializer.deserialize(buf).toString("hex");
 		}
 
 		if (buf.getRemainderLength()) {
-			if (buf.getRemainderLength() % this.signatureSize === 0) {
+			if (buf.getRemainderLength() % (this.signatureSize + 1) === 0) {
 				transaction.signatures = [];
 
-				const count: number = buf.getRemainderLength() / 65;
+				const count: number = buf.getRemainderLength() / (this.signatureSize + 1);
 				const publicKeyIndexes: { [index: number]: boolean } = {};
 				for (let index = 0; index < count; index++) {
-					const multiSignaturePart: string = buf.readBytes(65).toString("hex");
+					const multiSignaturePart: string = buf.readBytes(this.signatureSize + 1).toString("hex");
 					const publicKeyIndex: number = Number.parseInt(multiSignaturePart.slice(0, 2), 16);
 
 					if (!publicKeyIndexes[publicKeyIndex]) {
