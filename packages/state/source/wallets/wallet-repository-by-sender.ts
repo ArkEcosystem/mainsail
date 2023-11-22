@@ -6,48 +6,65 @@ import { WalletRepository } from "./wallet-repository";
 @injectable()
 export class WalletRepositoryBySender extends WalletRepository {
 	#blockchainWalletRepository!: WalletRepository;
+	#senderWallet!: Contracts.State.Wallet;
 
-	public configure(walletRepository: WalletRepository): WalletRepositoryBySender {
-		this.#blockchainWalletRepository = walletRepository;
+	public configure(blockchainWalletRepository: WalletRepository, senderAddress: string): WalletRepositoryBySender {
+		this.#blockchainWalletRepository = blockchainWalletRepository;
+		if (this.#blockchainWalletRepository.hasByAddress(senderAddress)) {
+			throw new Error(`Sender wallet ${senderAddress} not found in blockchain wallet repository`);
+		}
+		this.#senderWallet = this.#cloneWallet(senderAddress);
 
 		return this;
 	}
 
 	public async findByPublicKey(publicKey: string): Promise<Contracts.State.Wallet> {
-		if (super.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
-			return super.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
+		if (this.hasByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey)) {
+			return this.findByIndex(Contracts.State.WalletIndexes.PublicKeys, publicKey);
 		}
 
-		const wallet = this.findByAddress(await this.addressFactory.fromPublicKey(publicKey));
+		// Create empty wallet
+		const wallet = this.createWalletFactory(await this.addressFactory.fromPublicKey(publicKey), this);
 		wallet.setPublicKey(publicKey);
-		this.getIndex(Contracts.State.WalletIndexes.PublicKeys).set(publicKey, wallet);
 
 		return wallet;
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
-		const addressIndex = this.getIndex(Contracts.State.WalletIndexes.Addresses);
-		if (addressIndex.has(address)) {
-			return addressIndex.get(address)!;
+		if (this.hasByIndex(Contracts.State.WalletIndexes.Addresses, address)) {
+			return this.findByIndex(Contracts.State.WalletIndexes.Addresses, address);
 		}
 
-		if (this.#blockchainWalletRepository.hasByAddress(address)) {
-			return this.#cloneWallet(address);
+		// Create empty wallet
+		return this.createWalletFactory(address, this);
+	}
+
+	public findByIndex(index: string, key: string): Contracts.State.Wallet {
+		if (index === Contracts.State.WalletIndexes.Addresses && key === this.#senderWallet.getAddress()) {
+			return this.#senderWallet;
 		}
 
-		return this.findOrCreate(address);
+		if (index === Contracts.State.WalletIndexes.PublicKeys && key === this.#senderWallet.getPublicKey()) {
+			return this.#senderWallet;
+		}
+
+		const wallet = this.#blockchainWalletRepository.findByIndex(index, key);
+		return this.#cloneWallet(wallet.getAddress());
 	}
 
 	public hasByIndex(index: string, key: string): boolean {
-		if (super.hasByIndex(index, key)) {
+		if (index === Contracts.State.WalletIndexes.Addresses && key === this.#senderWallet.getAddress()) {
 			return true;
 		}
-		if (this.#blockchainWalletRepository.hasByIndex(index, key) === false) {
-			return false;
+
+		if (index === Contracts.State.WalletIndexes.PublicKeys && key === this.#senderWallet.getPublicKey()) {
+			return true;
 		}
 
-		return true;
+		return this.#blockchainWalletRepository.hasByIndex(index, key);
 	}
+
+	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {}
 
 	public allValidators(): ReadonlyArray<Contracts.State.Wallet> {
 		for (const wallet of this.#blockchainWalletRepository.allValidators()) {
@@ -59,8 +76,6 @@ export class WalletRepositoryBySender extends WalletRepository {
 	}
 
 	#cloneWallet(address: string): Contracts.State.Wallet {
-		const clone = this.#blockchainWalletRepository.findByAddress(address).clone(this);
-		this.getIndex(Contracts.State.WalletIndexes.Addresses).set(address, clone);
-		return clone;
+		return this.#blockchainWalletRepository.findByAddress(address).clone(this);
 	}
 }
