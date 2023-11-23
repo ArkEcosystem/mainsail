@@ -89,6 +89,8 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					}).required(),
 				}).required(),
 			}).required(),
-		}).unknown(true);
+		})
+			.required()
+			.unknown(true);
 	}
 }
