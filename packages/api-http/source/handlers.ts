@@ -1,4 +1,4 @@
-import { Contracts } from "@mainsail/api-common";
+import { Contracts } from "@mainsail/contracts";
 
 import * as Blockchain from "./routes/blockchain";
 import * as Blocks from "./routes/blocks";
@@ -12,7 +12,7 @@ import * as Wallets from "./routes/wallets";
 
 export = {
 	name: "Public API",
-	async register(server: Contracts.ApiServer): Promise<void> {
+	async register(server: Contracts.Api.ApiServer): Promise<void> {
 		const handlers = [Blocks, Blockchain, Delegates, Peers, Transactions, Node, ValidatorRounds, Votes, Wallets];
 
 		for (const handler of handlers) {

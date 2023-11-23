@@ -1,6 +1,5 @@
 import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
@@ -19,7 +18,7 @@ export class TransactionsController extends Controller {
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	public async unconfirmed(request: Hapi.Request) {
-		const pagination: ApiContracts.Pagination = super.getListingPage(request);
+		const pagination: Contracts.Api.Pagination = super.getListingPage(request);
 		const all: Contracts.Crypto.ITransaction[] = await this.poolQuery.getFromHighestPriority().all();
 		const transactions: Contracts.Crypto.ITransaction[] = all.slice(
 			pagination.offset,

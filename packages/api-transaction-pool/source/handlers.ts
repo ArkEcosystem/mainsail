@@ -1,10 +1,10 @@
-import { Contracts } from "@mainsail/api-common";
+import { Contracts } from "@mainsail/contracts";
 
 import * as TransactionPool from "./routes/transaction-pool";
 
 export = {
 	name: "Transaction Pool API",
-	async register(server: Contracts.ApiServer): Promise<void> {
+	async register(server: Contracts.Api.ApiServer): Promise<void> {
 		const handlers = [TransactionPool];
 
 		for (const handler of handlers) {

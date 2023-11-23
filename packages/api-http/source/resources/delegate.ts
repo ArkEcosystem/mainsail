@@ -1,9 +1,9 @@
-import { Contracts } from "@mainsail/api-common";
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
 @injectable()
-export class DelegateResource implements Contracts.Resource {
+export class DelegateResource implements Contracts.Api.Resource {
 	public raw(resource: Models.Wallet): object {
 		return resource;
 	}
