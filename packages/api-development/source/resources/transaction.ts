@@ -23,14 +23,9 @@ export class TransactionResource implements Resource {
 			amount: resource.amount.toFixed(),
 			asset: resource.asset,
 			blockId: resource.blockId,
-			confirmations: 0,
 			fee: resource.fee.toFixed(),
 			id: resource.id,
-			// ! resource.block ? lastBlock.data.height - resource.block.height + 1 : 0
-			// timestamp:
-			// 	typeof resource.timestamp !== "undefined" ? AppUtils.formatTimestamp(resource.timestamp) : undefined,
 			nonce: resource.nonce?.toFixed(),
-
 			recipient: resource.recipientId || sender,
 
 			sender,
@@ -40,6 +35,8 @@ export class TransactionResource implements Resource {
 			signature: resource.signature,
 
 			signatures: resource.signatures,
+
+			timestamp: resource.timestamp,
 
 			type: resource.type,
 

@@ -49,7 +49,7 @@ export class BlocksController extends Controller {
 		const block = this.stateService.getStateStore().getGenesisBlock();
 
 		if (request.query.transform) {
-			return this.respondWithResource(block, BlockWithTransactionsResource, true);
+			return this.respondWithResource(block.block, BlockWithTransactionsResource, true);
 		} else {
 			return this.respondWithResource(block.block.data, BlockResource, false);
 		}
@@ -57,7 +57,6 @@ export class BlocksController extends Controller {
 
 	public async last(request: Hapi.Request) {
 		const block = this.stateService.getStateStore().getLastBlock();
-
 		if (request.query.transform) {
 			return this.respondWithResource(block, BlockWithTransactionsResource, true);
 		} else {

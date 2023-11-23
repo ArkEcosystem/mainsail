@@ -9,10 +9,7 @@ export const pagination = Joi.object({
 	page: Joi.number().integer().positive().default(1),
 });
 
-export const blockId = Joi.alternatives().try(
-	Joi.string().min(1).max(20).regex(/^\d+$/, "decimal non-negative integer"),
-	Joi.string().length(64).hex(),
-);
+export const blockId = Joi.number().integer().min(0);
 
 export const orderBy = Joi.alternatives().try(
 	Joi.string().regex(/^[._a-z]{1,40}:(asc|desc)$/i),
