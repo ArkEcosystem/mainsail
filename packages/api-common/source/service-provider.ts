@@ -1,5 +1,5 @@
-import { Providers } from "@mainsail/kernel";
 import { Contracts } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { AbstractServer } from "./server";
