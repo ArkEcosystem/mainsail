@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { BlockResource, BlockWithTransactionsResource, TransactionResource } from "../resources";
+import { BlockResource, TransactionResource } from "../resources";
 import { Controller } from "./controller";
 
 @injectable()
@@ -29,7 +29,7 @@ export class BlocksController extends Controller {
 					results: blocks,
 					totalCount: lastBlock.data.height,
 				},
-				BlockWithTransactionsResource,
+				BlockResource,
 				true,
 			);
 		} else {
@@ -49,7 +49,7 @@ export class BlocksController extends Controller {
 		const block = this.stateService.getStateStore().getGenesisBlock();
 
 		if (request.query.transform) {
-			return this.respondWithResource(block.block, BlockWithTransactionsResource, true);
+			return this.respondWithResource(block.block, BlockResource, true);
 		} else {
 			return this.respondWithResource(block.block.data, BlockResource, false);
 		}
@@ -58,7 +58,7 @@ export class BlocksController extends Controller {
 	public async last(request: Hapi.Request) {
 		const block = this.stateService.getStateStore().getLastBlock();
 		if (request.query.transform) {
-			return this.respondWithResource(block, BlockWithTransactionsResource, true);
+			return this.respondWithResource(block, BlockResource, true);
 		} else {
 			return this.respondWithResource(block.data, BlockResource, false);
 		}
@@ -72,7 +72,7 @@ export class BlocksController extends Controller {
 		}
 
 		if (request.query.transform) {
-			return this.respondWithResource(block, BlockWithTransactionsResource, true);
+			return this.respondWithResource(block, BlockResource, true);
 		} else {
 			return this.respondWithResource(block.data, BlockResource, false);
 		}
