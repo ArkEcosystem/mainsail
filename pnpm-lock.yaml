@@ -308,6 +308,9 @@ importers:
       '@hapi/hoek':
         specifier: 11.0.2
         version: 11.0.2
+      '@mainsail/api-common':
+        specifier: workspace:*
+        version: link:../api-common
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container

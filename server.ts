@@ -9,11 +9,11 @@ import * as Schemas from "./schemas";
 @injectable()
 export class Server extends AbstractServer {
 	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "api-development")
+	@tagged("plugin", "api-http")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	protected baseName(): string {
-		return "Development API";
+		return "Public API";
 	}
 
 	protected pluginConfiguration(): Providers.PluginConfiguration {
