@@ -1,13 +1,5 @@
 export const defaults = {
 	plugins: {
-		cache: {
-			checkperiod: 120,
-			enabled: !!process.env.CORE_API_DEV_CACHE,
-			stdTTL: 8,
-		},
-		log: {
-			enabled: !!process.env.CORE_API_DEV_LOG,
-		},
 		pagination: {
 			limit: 100,
 		},
@@ -15,10 +7,10 @@ export const defaults = {
 			blacklist: process.env.CORE_API_DEV_RATE_LIMIT_BLACKLIST
 				? process.env.CORE_API_DEV_RATE_LIMIT_BLACKLIST.split(",")
 				: [],
-			duration: process.env.CORE_API_DEV_RATE_LIMIT_USER_EXPIRES || 60,
+			duration: process.env.CORE_API_DEV_RATE_LIMIT_USER_EXPIRES || 60, // Sec
 			enabled: !process.env.CORE_API_DEV_RATE_LIMIT_DISABLED,
 			points: process.env.CORE_API_DEV_RATE_LIMIT_USER_LIMIT || 100,
-			// Sec
+
 			whitelist: process.env.CORE_API_DEV_RATE_LIMIT_WHITELIST
 				? process.env.CORE_API_DEV_RATE_LIMIT_WHITELIST.split(",")
 				: [],
