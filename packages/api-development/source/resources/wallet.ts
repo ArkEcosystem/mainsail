@@ -16,10 +16,13 @@ export class WalletResource implements Resource {
 	private getWalletResource(wallet: Contracts.State.Wallet): Resources.WalletResource {
 		return {
 			address: wallet.getAddress(),
-			attributes: wallet.getAttributes(),
+			publicKey: wallet.getPublicKey(),
+			username: wallet.hasAttribute("username") ? wallet.getAttribute("username") : undefined,
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 			balance: wallet.getBalance(),
 			nonce: wallet.getNonce(),
-			publicKey: wallet.getPublicKey(),
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			attributes: wallet.getAttributes(),
 		};
 	}
 }

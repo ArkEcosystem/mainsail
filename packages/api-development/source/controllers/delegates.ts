@@ -38,10 +38,10 @@ export class DelegatesController extends Controller {
 			wallet = walletRepository.findByUsername(walletId);
 		}
 
-		if (!wallet || !wallet.hasAttribute("username")) {
+		if (!wallet || !wallet.isValidator()) {
 			return notFound("Wallet not found");
 		}
 
-		return this.toResource(wallet, WalletResource, false);
+		return this.toResource(wallet, WalletResource, true);
 	}
 }
