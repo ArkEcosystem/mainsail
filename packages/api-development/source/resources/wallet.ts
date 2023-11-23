@@ -1,10 +1,9 @@
+import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { Resource } from "../types";
-
 @injectable()
-export class WalletResource implements Resource {
+export class WalletResource implements ApiContracts.Resource {
 	public raw(resource: Contracts.State.Wallet): object {
 		return JSON.parse(JSON.stringify(resource));
 	}

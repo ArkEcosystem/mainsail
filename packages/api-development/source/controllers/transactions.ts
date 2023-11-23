@@ -6,7 +6,7 @@ import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { TransactionResource } from "../resources";
-import { Pagination } from "../types";
+import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { Controller } from "./controller";
 
 @injectable()
@@ -19,7 +19,7 @@ export class TransactionsController extends Controller {
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	public async unconfirmed(request: Hapi.Request) {
-		const pagination: Pagination = super.getListingPage(request);
+		const pagination: ApiContracts.Pagination = super.getListingPage(request);
 		const all: Contracts.Crypto.ITransaction[] = await this.poolQuery.getFromHighestPriority().all();
 		const transactions: Contracts.Crypto.ITransaction[] = all.slice(
 			pagination.offset,

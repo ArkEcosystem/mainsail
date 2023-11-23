@@ -1,11 +1,11 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { SchemaObject } from "../schemas";
-import { Options, Pagination, Resource, ResultsPage, Sorting } from "../types";
 
 @injectable()
 export class Controller {
@@ -23,7 +23,7 @@ export class Controller {
 		return this.stateService.getWalletRepository();
 	}
 
-	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
+	protected getQueryPagination(query: Hapi.RequestQuery): ApiContracts.Pagination {
 		return {
 			limit: query.limit,
 			offset: (query.page - 1) * query.limit || 0,
@@ -41,7 +41,7 @@ export class Controller {
 		return criteria;
 	}
 
-	protected getListingPage(request: Hapi.Request): Pagination {
+	protected getListingPage(request: Hapi.Request): ApiContracts.Pagination {
 		const pagination = {
 			limit: request.query.limit || 100,
 			offset: (request.query.page - 1) * request.query.limit || 0,
@@ -54,7 +54,7 @@ export class Controller {
 		return pagination;
 	}
 
-	protected getListingOrder(request: Hapi.Request): Sorting {
+	protected getListingOrder(request: Hapi.Request): ApiContracts.Sorting {
 		if (!request.query.orderBy) {
 			return [];
 		}
@@ -67,7 +67,7 @@ export class Controller {
 		}));
 	}
 
-	protected getListingOptions(): Options {
+	protected getListingOptions(): ApiContracts.Options {
 		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
 
 		return {
@@ -89,7 +89,7 @@ export class Controller {
 		};
 	}
 
-	protected async toResource<T, R extends Resource>(
+	protected async toResource<T, R extends ApiContracts.Resource>(
 		item: T,
 		transformer: new () => R,
 		transform = true,
@@ -103,7 +103,7 @@ export class Controller {
 		}
 	}
 
-	protected async toCollection<T, R extends Resource>(
+	protected async toCollection<T, R extends ApiContracts.Resource>(
 		items: T[],
 		transformer: new () => R,
 		transform = true,
@@ -111,11 +111,11 @@ export class Controller {
 		return Promise.all(items.map(async (item) => await this.toResource(item, transformer, transform)));
 	}
 
-	protected async toPagination<T, R extends Resource>(
-		resultsPage: ResultsPage<T>,
+	protected async toPagination<T, R extends ApiContracts.Resource>(
+		resultsPage: ApiContracts.ResultsPage<T>,
 		transformer: new () => R,
 		transform = true,
-	): Promise<ResultsPage<ReturnType<R["raw"]>> | ResultsPage<ReturnType<R["transform"]>>> {
+	): Promise<ApiContracts.ResultsPage<ReturnType<R["raw"]>> | ApiContracts.ResultsPage<ReturnType<R["transform"]>>> {
 		const items = await this.toCollection(resultsPage.results, transformer, transform);
 
 		return { ...resultsPage, results: items };
