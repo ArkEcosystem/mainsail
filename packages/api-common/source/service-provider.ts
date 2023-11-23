@@ -1,7 +1,7 @@
 import { Providers } from "@mainsail/kernel";
+import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { ServerType } from "./contracts";
 import { AbstractServer } from "./server";
 
 export type ServerConstructor<T extends AbstractServer> = new (...arguments_: any[]) => T;
@@ -14,11 +14,11 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 
 	public async register(): Promise<void> {
 		if (this.config().get("server.http.enabled")) {
-			await this.buildServer(ServerType.Http, this.httpIdentifier());
+			await this.buildServer(Contracts.Api.ServerType.Http, this.httpIdentifier());
 		}
 
 		if (this.config().get("server.https.enabled")) {
-			await this.buildServer(ServerType.Https, this.httpsIdentifier());
+			await this.buildServer(Contracts.Api.ServerType.Https, this.httpsIdentifier());
 		}
 	}
 
@@ -72,7 +72,7 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 		}).unknown(true);
 	}
 
-	protected async buildServer(type: ServerType, id: symbol): Promise<void> {
+	protected async buildServer(type: Contracts.Api.ServerType, id: symbol): Promise<void> {
 		this.app.bind<T>(id).to(this.getServerConstructor()).inSingletonScope();
 
 		const server = this.app.get<T>(id);

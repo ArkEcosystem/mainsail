@@ -4,8 +4,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
 
-import { ApiServer, ServerType } from "./contracts";
-
 @injectable()
 export abstract class AbstractServer {
 	@inject(Identifiers.Application)
@@ -14,10 +12,10 @@ export abstract class AbstractServer {
 	@inject(Identifiers.LogService)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	private server!: ApiServer;
+	private server!: Contracts.Api.ApiServer;
 
 	protected abstract baseName(): string;
-	private serverType!: ServerType;
+	private serverType!: Contracts.Api.ServerType;
 
 	public get prettyName(): string {
 		return `${this.baseName()} (${this.serverType})`;
@@ -27,7 +25,7 @@ export abstract class AbstractServer {
 		return this.server.info.uri;
 	}
 
-	public async initialize(type: ServerType, optionsServer: Contracts.Types.JsonObject): Promise<void> {
+	public async initialize(type: Contracts.Api.ServerType, optionsServer: Contracts.Types.JsonObject): Promise<void> {
 		this.server = new HapiServer(this.getServerOptions(optionsServer));
 
 		this.serverType = type;
