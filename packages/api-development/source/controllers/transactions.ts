@@ -18,23 +18,6 @@ export class TransactionsController extends Controller {
 	@inject(Identifiers.TransactionPoolQuery)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionPoolProcessor)
-	private readonly processor!: Contracts.TransactionPool.Processor;
-
-	public async store(request: Hapi.Request) {
-		// @ts-ignore
-		const result = await this.processor.process(request.payload.transactions);
-		return {
-			data: {
-				accept: result.accept,
-				broadcast: result.broadcast,
-				excess: result.excess,
-				invalid: result.invalid,
-			},
-			errors: result.errors,
-		};
-	}
-
 	public async unconfirmed(request: Hapi.Request) {
 		const pagination: Pagination = super.getListingPage(request);
 		const all: Contracts.Crypto.ITransaction[] = await this.poolQuery.getFromHighestPriority().all();
