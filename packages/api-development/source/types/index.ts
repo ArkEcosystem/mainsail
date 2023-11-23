@@ -1,5 +1,3 @@
-export * as Resources from "./resources";
-
 export type Sorting = {
 	property: string;
 	direction: "asc" | "desc";
@@ -22,6 +20,5 @@ export type ResultsPage<T> = {
 
 export interface Resource {
 	raw(resource): object;
-
 	transform(resource): object;
 }

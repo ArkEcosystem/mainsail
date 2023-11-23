@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { Resource, Resources } from "../types";
+import { Resource } from "../types";
 
 @injectable()
 export class WalletResource implements Resource {
@@ -13,7 +13,7 @@ export class WalletResource implements Resource {
 		return this.getWalletResource(resource);
 	}
 
-	private getWalletResource(wallet: Contracts.State.Wallet): Resources.WalletResource {
+	private getWalletResource(wallet: Contracts.State.Wallet): Object {
 		return {
 			address: wallet.getAddress(),
 			publicKey: wallet.getPublicKey(),
