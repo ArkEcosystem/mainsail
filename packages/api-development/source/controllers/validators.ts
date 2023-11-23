@@ -7,7 +7,7 @@ import { WalletResource } from "../resources";
 import { Controller } from "./controller";
 
 @injectable()
-export class DelegatesController extends Controller {
+export class ValidatorsController extends Controller {
 	public index(request: Hapi.Request) {
 		const wallets = this.getWalletRepository().allValidators();
 
