@@ -58,9 +58,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPoolProcessorFactory).toAutoFactory(Identifiers.TransactionPoolProcessor);
 		this.app.bind(Identifiers.TransactionPoolQuery).to(Query);
 		this.app.bind(Identifiers.TransactionPoolSenderMempool).to(SenderMempool);
-		this.app
-			.bind(Identifiers.TransactionPoolSenderMempoolFactory)
-			.toAutoFactory(Identifiers.TransactionPoolSenderMempool);
+		this.app.bind(Identifiers.TransactionPoolSenderMempoolFactory).toFactory(
+			({ container }) =>
+				async (publicKey: string) =>
+					await container.resolve(SenderMempool).configure(publicKey),
+		);
 		this.app.bind(Identifiers.TransactionPoolSenderState).to(SenderState);
 		this.app.bind(Identifiers.TransactionPoolService).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPoolStorage).to(Storage).inSingletonScope();

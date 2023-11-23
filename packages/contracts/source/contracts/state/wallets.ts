@@ -133,6 +133,10 @@ export interface WalletRepositoryClone extends WalletRepository {
 
 export type WalletRepositoryFactory = () => WalletRepository;
 export type WalletRepositoryCloneFactory = (originalWalletRepository: WalletRepository) => WalletRepositoryClone;
+export type WalletRepositoryBySenderFactory = (
+	originalWalletRepository: WalletRepository,
+	publicKey: string,
+) => Promise<WalletRepository>;
 
 export enum SearchScope {
 	Wallets,

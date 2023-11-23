@@ -6,6 +6,6 @@ export interface Service extends ICommitHandler {
 	getStateStore(): StateStore;
 	getWalletRepository(): WalletRepository;
 	createWalletRepositoryClone(): WalletRepositoryClone;
-	createWalletRepositoryCopyOnWrite(): WalletRepository;
+	createWalletRepositoryBySender(publicKey: string): Promise<WalletRepository>;
 	restore(maxHeight: number): Promise<void>;
 }

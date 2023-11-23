@@ -10,7 +10,7 @@ import { Exporter } from "./snapshots/exporter";
 import { Importer } from "./snapshots/importer";
 import { StateStore } from "./state-store";
 import { StateVerifier } from "./state-verifier";
-import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "./wallets";
+import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -64,8 +64,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.WalletRepositoryCopyOnWriteFactory).toFactory(
 			({ container }) =>
-				(walletRepository: WalletRepository) =>
-					container.resolve(WalletRepositoryCopyOnWrite).configure(walletRepository),
+				async (walletRepository: WalletRepository, publicKey: string) =>
+					await container.resolve(WalletRepositoryBySender).configure(walletRepository, publicKey),
 		);
 
 		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);

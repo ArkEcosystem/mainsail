@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { describeSkip } from "../../../test-framework";
+import { describeSkip } from "../../../test-framework/distribution";
 import { setUp } from "../../test/setup";
 import { Wallet, WalletRepository, WalletRepositoryCopyOnWrite } from ".";
 
