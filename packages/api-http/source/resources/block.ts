@@ -1,6 +1,6 @@
-import { Contracts } from "@mainsail/api-common";
 import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export interface BlockModel extends Models.Block {
@@ -9,7 +9,7 @@ export interface BlockModel extends Models.Block {
 }
 
 @injectable()
-export class BlockResource implements Contracts.Resource {
+export class BlockResource implements Contracts.Api.Resource {
 	public raw(resource: BlockModel): object {
 		return { ...resource, generator: undefined, state: undefined };
 	}

@@ -3,7 +3,6 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { Pagination, Resource, ResultsPage, Sorting } from "./contracts";
 import { SchemaObject } from "./schemas";
 
 @injectable()
@@ -11,7 +10,7 @@ export abstract class AbstractController {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	protected getQueryPagination(query: Hapi.RequestQuery): Pagination {
+	protected getQueryPagination(query: Hapi.RequestQuery): Contracts.Api.Pagination {
 		return {
 			limit: query.limit,
 			offset: (query.page - 1) * query.limit || 0,
@@ -29,7 +28,7 @@ export abstract class AbstractController {
 		return criteria;
 	}
 
-	protected getListingPage(request: Hapi.Request): Pagination {
+	protected getListingPage(request: Hapi.Request): Contracts.Api.Pagination {
 		const pagination = {
 			limit: request.query.limit || 100,
 			offset: (request.query.page - 1) * request.query.limit || 0,
@@ -42,7 +41,7 @@ export abstract class AbstractController {
 		return pagination;
 	}
 
-	protected getListingOrder(request: Hapi.Request): Sorting {
+	protected getListingOrder(request: Hapi.Request): Contracts.Api.Sorting {
 		if (!request.query.orderBy) {
 			return [];
 		}
@@ -69,7 +68,7 @@ export abstract class AbstractController {
 		};
 	}
 
-	protected async toResource<T, R extends Resource>(
+	protected async toResource<T, R extends Contracts.Api.Resource>(
 		item: T,
 		transformer: new () => R,
 		transform = true,
@@ -83,7 +82,7 @@ export abstract class AbstractController {
 		}
 	}
 
-	protected async toCollection<T, R extends Resource>(
+	protected async toCollection<T, R extends Contracts.Api.Resource>(
 		items: T[],
 		transformer: new () => R,
 		transform = true,
@@ -91,17 +90,19 @@ export abstract class AbstractController {
 		return Promise.all(items.map(async (item) => await this.toResource(item, transformer, transform)));
 	}
 
-	protected async toPagination<T, R extends Resource>(
-		resultsPage: ResultsPage<T>,
+	protected async toPagination<T, R extends Contracts.Api.Resource>(
+		resultsPage: Contracts.Api.ResultsPage<T>,
 		transformer: new () => R,
 		transform = true,
-	): Promise<ResultsPage<ReturnType<R["raw"]>> | ResultsPage<ReturnType<R["transform"]>>> {
+	): Promise<
+		Contracts.Api.ResultsPage<ReturnType<R["raw"]>> | Contracts.Api.ResultsPage<ReturnType<R["transform"]>>
+	> {
 		const items = await this.toCollection(resultsPage.results, transformer, transform);
 
 		return { ...resultsPage, results: items };
 	}
 
-	protected getEmptyPage(): ResultsPage<any> {
+	protected getEmptyPage(): Contracts.Api.ResultsPage<any> {
 		return { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 };
 	}
 }

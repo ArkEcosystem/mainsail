@@ -1,9 +1,8 @@
-import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class BlockResource implements ApiContracts.Resource {
+export class BlockResource implements Contracts.Api.Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 

@@ -1,10 +1,10 @@
 import Hapi from "@hapi/hapi";
-import { Contracts } from "@mainsail/api-common";
+import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { NodeController } from "../controllers/node";
 
-export const register = (server: Contracts.ApiServer): void => {
+export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(NodeController);
 	server.bind(controller);
 

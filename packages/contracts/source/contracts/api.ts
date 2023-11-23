@@ -1,5 +1,6 @@
 import Hapi from "@hapi/hapi";
-import { Contracts } from "@mainsail/contracts";
+
+import { Application } from "./kernel";
 
 export type ApiServer = Hapi.Server<ServerState>;
 
@@ -9,7 +10,7 @@ export enum ServerType {
 }
 
 export interface ServerState {
-	app: Contracts.Kernel.Application;
+	app: Application;
 	schemas: any;
 }
 
@@ -35,6 +36,5 @@ export type ResultsPage<T> = {
 
 export interface Resource {
 	raw(resource): object;
-
 	transform(resource): object;
 }

@@ -2,8 +2,6 @@ import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { Contracts } from "@mainsail/contracts";
 
-import { ApiServer } from "../contracts";
-
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
 		const blockRepositoryFactory = app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(
@@ -21,7 +19,7 @@ export const responseHeaders = {
 	},
 	name: "response-headers",
 
-	register(server: ApiServer): void {
+	register(server: Contracts.Api.ApiServer): void {
 		server.ext("onPreResponse", this.getOnPreResponseHandler(server.app.app));
 	},
 
