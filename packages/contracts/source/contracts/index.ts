@@ -1,3 +1,4 @@
+export * as Api from "./api";
 export * as ApiSync from "./api-sync";
 export * as Consensus from "./consensus";
 export * as Crypto from "./crypto";
