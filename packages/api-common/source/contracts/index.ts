@@ -30,7 +30,7 @@ export type Options = {
 export type ResultsPage<T> = {
 	results: T[];
 	totalCount: number;
-	meta: { totalCountIsEstimate: boolean };
+	meta?: { totalCountIsEstimate?: boolean };
 };
 
 export interface Resource {

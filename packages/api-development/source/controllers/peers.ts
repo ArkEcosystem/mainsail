@@ -78,7 +78,6 @@ export class PeersController extends Controller {
 		results = results.slice(offset, offset + limit);
 
 		const resultsPage = {
-			meta: { totalCountIsEstimate: false },
 			results,
 			totalCount,
 		};

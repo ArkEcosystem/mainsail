@@ -1,7 +1,4 @@
 export const defaults = {
-	options: {
-		estimateTotalCount: !process.env.CORE_API_DEV_NO_ESTIMATED_TOTAL_COUNT,
-	},
 	plugins: {
 		cache: {
 			checkperiod: 120,

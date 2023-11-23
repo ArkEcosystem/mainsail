@@ -27,7 +27,6 @@ export class TransactionsController extends Controller {
 		);
 		const results = transactions.map((t) => t.data);
 		const resultsPage = {
-			meta: { totalCountIsEstimate: false },
 			results,
 			totalCount: all.length,
 		};

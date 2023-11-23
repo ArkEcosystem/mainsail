@@ -25,7 +25,6 @@ export class BlocksController extends Controller {
 		if (request.query.transform) {
 			return this.toPagination(
 				{
-					meta: { totalCountIsEstimate: false },
 					results: blocks,
 					totalCount: lastBlock.data.height,
 				},
@@ -35,7 +34,6 @@ export class BlocksController extends Controller {
 		} else {
 			return this.toPagination(
 				{
-					meta: { totalCountIsEstimate: false },
 					results: blocks.map((block) => block.data),
 					totalCount: lastBlock.data.height,
 				},
@@ -91,7 +89,6 @@ export class BlocksController extends Controller {
 
 		return this.toPagination(
 			{
-				meta: { totalCountIsEstimate: false },
 				results: transactions.slice(pagination.offset, pagination.offset + pagination.limit),
 				totalCount: block.transactions.length,
 			},

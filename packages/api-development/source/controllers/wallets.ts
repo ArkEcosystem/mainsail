@@ -15,7 +15,6 @@ export class WalletsController extends Controller {
 
 		return this.toPagination(
 			{
-				meta: { totalCountIsEstimate: false },
 				results: wallets.slice(pagination.offset, pagination.offset + pagination.limit),
 				totalCount: wallets.length,
 			},

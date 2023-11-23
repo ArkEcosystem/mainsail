@@ -67,14 +67,6 @@ export class Controller {
 		}));
 	}
 
-	protected getListingOptions(): ApiContracts.Options {
-		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);
-
-		return {
-			estimateTotalCount,
-		};
-	}
-
 	protected async respondWithResource(data, transformer, transform = true): Promise<any> {
 		if (!data) {
 			return Boom.notFound();

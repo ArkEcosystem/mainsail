@@ -58,9 +58,6 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 
 	public configSchema(): Joi.ObjectSchema {
 		return Joi.object({
-			options: Joi.object({
-				estimateTotalCount: Joi.bool().required(),
-			}).required(),
 			plugins: Joi.object({
 				cache: Joi.object({
 					checkperiod: Joi.number().integer().min(0).required(),
