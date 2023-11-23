@@ -1,12 +1,12 @@
 import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { TransactionResource } from "../resources";
-import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { Controller } from "./controller";
 
 @injectable()
