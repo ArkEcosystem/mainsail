@@ -53,7 +53,7 @@ export class BlocksController extends Controller {
 		const block = await this.blockRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("height = :height", { height: 1 })
+			.where("height = :height", { height: 0 })
 			.getOne();
 
 		return this.respondEnrichedBlock(block, request);
