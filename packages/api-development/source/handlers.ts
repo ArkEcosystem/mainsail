@@ -5,7 +5,7 @@ import * as Blocks from "./routes/blocks";
 import * as Consensus from "./routes/consensus";
 import * as Node from "./routes/node";
 import * as Peers from "./routes/peers";
-import * as Rounds from "./routes/rounds";
+import * as Round from "./routes/round";
 import * as Transactions from "./routes/transactions";
 import * as Validators from "./routes/validators";
 import * as Wallets from "./routes/wallets";
@@ -13,7 +13,7 @@ import * as Wallets from "./routes/wallets";
 export = {
 	name: "Development API",
 	async register(server: Hapi.Server): Promise<void> {
-		const handlers = [Blockchain, Blocks, Consensus, Validators, Node, Peers, Rounds, Transactions, Wallets];
+		const handlers = [Blockchain, Blocks, Consensus, Validators, Node, Peers, Round, Transactions, Wallets];
 
 		for (const handler of handlers) {
 			handler.register(server);
