@@ -7,7 +7,7 @@ import { WalletResource } from "../resources";
 import { Controller } from "./controller";
 
 @injectable()
-export class DelegatesController extends Controller {
+export class ValidatorsController extends Controller {
 	public index(request: Hapi.Request) {
 		const wallets = this.getWalletRepository().allValidators();
 
@@ -15,7 +15,6 @@ export class DelegatesController extends Controller {
 
 		return this.toPagination(
 			{
-				meta: { totalCountIsEstimate: false },
 				results: wallets.slice(pagination.offset, pagination.offset + pagination.limit),
 				totalCount: wallets.length,
 			},
@@ -38,10 +37,10 @@ export class DelegatesController extends Controller {
 			wallet = walletRepository.findByUsername(walletId);
 		}
 
-		if (!wallet || !wallet.hasAttribute("username")) {
+		if (!wallet || !wallet.isValidator()) {
 			return notFound("Wallet not found");
 		}
 
-		return this.toResource(wallet, WalletResource, false);
+		return this.toResource(wallet, WalletResource, true);
 	}
 }

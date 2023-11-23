@@ -1,16 +1,5 @@
 export const defaults = {
-	options: {
-		estimateTotalCount: !process.env.CORE_API_DEV_NO_ESTIMATED_TOTAL_COUNT,
-	},
 	plugins: {
-		cache: {
-			checkperiod: 120,
-			enabled: !!process.env.CORE_API_DEV_CACHE,
-			stdTTL: 8,
-		},
-		log: {
-			enabled: !!process.env.CORE_API_DEV_LOG,
-		},
 		pagination: {
 			limit: 100,
 		},
@@ -18,10 +7,10 @@ export const defaults = {
 			blacklist: process.env.CORE_API_DEV_RATE_LIMIT_BLACKLIST
 				? process.env.CORE_API_DEV_RATE_LIMIT_BLACKLIST.split(",")
 				: [],
-			duration: process.env.CORE_API_DEV_RATE_LIMIT_USER_EXPIRES || 60,
+			duration: process.env.CORE_API_DEV_RATE_LIMIT_USER_EXPIRES || 60, // Sec
 			enabled: !process.env.CORE_API_DEV_RATE_LIMIT_DISABLED,
 			points: process.env.CORE_API_DEV_RATE_LIMIT_USER_LIMIT || 100,
-			// Sec
+
 			whitelist: process.env.CORE_API_DEV_RATE_LIMIT_WHITELIST
 				? process.env.CORE_API_DEV_RATE_LIMIT_WHITELIST.split(",")
 				: [],
@@ -32,14 +21,14 @@ export const defaults = {
 	},
 	server: {
 		http: {
-			enabled: !process.env.CORE_API_DEV_DISABLED,
-			host: process.env.CORE_API_DEV_HOST || "0.0.0.0",
+			enabled: !!process.env.CORE_API_DEV_ENABLED,
+			host: process.env.CORE_API_DEV_HOST || "127.0.0.1",
 			port: process.env.CORE_API_DEV_PORT || 4006,
 		},
 		// @see https://hapijs.com/api#-serveroptionstls
 		https: {
 			enabled: !!process.env.CORE_API_DEV_SSL,
-			host: process.env.CORE_API_DEV_SSL_HOST || "0.0.0.0",
+			host: process.env.CORE_API_DEV_SSL_HOST || "127.0.0.1",
 			port: process.env.CORE_API_DEV_SSL_PORT || 8446,
 			tls: {
 				cert: process.env.CORE_API_DEV_SSL_CERT,

@@ -18,8 +18,8 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				height: lastBlock.data.height + 1, // Use +1 to determine consensus state
-				networkHeight: networkHeight,
+				height: lastBlock.data.height,
+				networkHeight: networkHeight - 1, // Use -1 to determine last block state. Consensus state is provided.
 				synced: lastBlock.data.height + 1 >= networkHeight,
 			},
 		};
@@ -36,21 +36,9 @@ export class NodeController extends Controller {
 				},
 				explorer: network.client.explorer,
 				nethash: network.nethash,
-				// ports: super.toResource(this.configRepository, PortsResource),
 				slip44: network.slip44,
 				symbol: network.client.symbol,
 				token: network.client.token,
-				// transactionPool: {
-				// 	dynamicFees: dynamicFees.enabled ? dynamicFees : { enabled: false },
-				// 	maxTransactionAge: this.transactionPoolConfiguration.getRequired<number>("maxTransactionAge"),
-				// 	maxTransactionBytes: this.transactionPoolConfiguration.getRequired<number>("maxTransactionBytes"),
-				// 	maxTransactionsInPool:
-				// 		this.transactionPoolConfiguration.getRequired<number>("maxTransactionsInPool"),
-				// 	maxTransactionsPerRequest:
-				// 		this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerRequest"),
-				// 	maxTransactionsPerSender:
-				// 		this.transactionPoolConfiguration.getRequired<number>("maxTransactionsPerSender"),
-				// },
 				version: network.pubKeyHash,
 				wif: network.wif,
 			},

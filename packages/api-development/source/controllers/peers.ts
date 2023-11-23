@@ -57,7 +57,7 @@ export class PeersController extends Controller {
 				case "height": {
 					results = Utils.orderBy(
 						results,
-						(element) => element.state[orderByMapped[0]],
+						(element) => element.header[orderByMapped[0]],
 						orderByMapped[1] === "asc" ? "asc" : "desc", // ? why desc is default
 					);
 					break;
@@ -78,7 +78,6 @@ export class PeersController extends Controller {
 		results = results.slice(offset, offset + limit);
 
 		const resultsPage = {
-			meta: { totalCountIsEstimate: false },
 			results,
 			totalCount,
 		};

@@ -1,6 +1,4 @@
 import Hapi from "@hapi/hapi";
-import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions";
@@ -9,37 +7,6 @@ import { pagination } from "../schemas";
 export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(TransactionsController);
 	server.bind(controller);
-
-	server.route({
-		handler: (request: Hapi.Request) => controller.store(request),
-		method: "POST",
-		options: {
-			plugins: {
-				"hapi-ajv": {
-					payloadSchema: {
-						additionalProperties: false,
-						properties: {
-							transactions: {
-								$ref: "transactions",
-								//@ts-ignore
-								maxItems: server.app.app
-									.getTagged<Providers.PluginConfiguration>(
-										Identifiers.PluginConfiguration,
-										"plugin",
-										"transaction-pool",
-									)
-									.get<number>("maxTransactionsPerRequest"),
-								minItems: 1,
-							},
-						},
-						required: ["transactions"],
-						type: "object",
-					},
-				},
-			},
-		},
-		path: "/transactions",
-	});
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.unconfirmed(request),

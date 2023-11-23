@@ -1,10 +1,9 @@
+import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { Resource, Resources } from "../types";
-
 @injectable()
-export class WalletResource implements Resource {
+export class WalletResource implements ApiContracts.Resource {
 	public raw(resource: Contracts.State.Wallet): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
@@ -13,13 +12,16 @@ export class WalletResource implements Resource {
 		return this.getWalletResource(resource);
 	}
 
-	private getWalletResource(wallet: Contracts.State.Wallet): Resources.WalletResource {
+	private getWalletResource(wallet: Contracts.State.Wallet): Object {
 		return {
 			address: wallet.getAddress(),
-			attributes: wallet.getAttributes(),
+			publicKey: wallet.getPublicKey(),
+			username: wallet.hasAttribute("username") ? wallet.getAttribute("username") : undefined,
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 			balance: wallet.getBalance(),
 			nonce: wallet.getNonce(),
-			publicKey: wallet.getPublicKey(),
+			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+			attributes: wallet.getAttributes(),
 		};
 	}
 }

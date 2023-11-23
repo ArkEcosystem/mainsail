@@ -1,10 +1,10 @@
 import Hapi from "@hapi/hapi";
 
-import { DelegatesController } from "../controllers/delegates";
+import { ValidatorsController } from "../controllers/validators";
 import { pagination } from "../schemas";
 
 export const register = (server: Hapi.Server<any>): void => {
-	const controller = server.app.app.resolve(DelegatesController);
+	const controller = server.app.app.resolve(ValidatorsController);
 	server.bind(controller);
 
 	server.route({
@@ -18,12 +18,12 @@ export const register = (server: Hapi.Server<any>): void => {
 				query: pagination,
 			},
 		},
-		path: "/delegates",
+		path: "/validators",
 	});
 
 	server.route({
 		handler: (request: Hapi.Request) => controller.show(request),
 		method: "GET",
-		path: "/delegates/{id}",
+		path: "/validators/{id}",
 	});
 };

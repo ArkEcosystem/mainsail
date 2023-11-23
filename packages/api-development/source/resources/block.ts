@@ -1,15 +1,44 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
-
-import { Resource } from "../types";
+import { Contracts as ApiContracts } from "@mainsail/api-common";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class BlockResource implements Resource {
-	public raw(resource: Contracts.Crypto.IBlockData): object {
+export class BlockResource implements ApiContracts.Resource {
+	@inject(Identifiers.StateService)
+	private readonly stateService!: Contracts.State.Service;
+
+	public raw(resource: Contracts.Crypto.IBlock): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
-	public transform(resource: Contracts.Crypto.IBlockData): object {
-		throw new Error("Deprecated, use BlockWithTransactionsResources instead");
+	public async transform(block: Contracts.Crypto.IBlock): Promise<object> {
+		const blockData: Contracts.Crypto.IBlockData = block.data;
+		const generator: Contracts.State.Wallet = await this.stateService
+			.getWalletRepository()
+			.findByPublicKey(blockData.generatorPublicKey);
+
+		return {
+			forged: {
+				amount: blockData.totalAmount.toFixed(),
+				fee: blockData.totalFee.toFixed(),
+				reward: blockData.reward.toFixed(),
+				total: blockData.reward.plus(blockData.totalFee).toFixed(),
+			},
+			generator: {
+				address: generator.getAddress(),
+				publicKey: generator.getPublicKey(),
+				username: generator.hasAttribute("username") ? generator.getAttribute("username") : undefined,
+			},
+			height: +blockData.height,
+			id: blockData.id,
+			payload: {
+				hash: blockData.payloadHash,
+				length: blockData.payloadLength,
+			},
+			previous: blockData.previousBlock,
+			timestamp: blockData.timestamp,
+			transactions: blockData.numberOfTransactions,
+			version: blockData.version,
+		};
 	}
 }

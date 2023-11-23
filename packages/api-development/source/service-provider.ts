@@ -1,56 +1,64 @@
-import { Providers } from "@mainsail/kernel";
+import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import Joi from "joi";
 
 import Handlers from "./handlers";
-import { Identifiers } from "./identifiers";
-import { preparePlugins } from "./plugins";
+import { Identifiers as ApiIdentifiers } from "./identifiers";
 import { Server } from "./server";
 
-export class ServiceProvider extends Providers.ServiceProvider {
-	public async register(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.buildServer("http", Identifiers.HTTP);
-		}
-
-		if (this.config().get("server.https.enabled")) {
-			await this.buildServer("https", Identifiers.HTTPS);
-		}
+export class ServiceProvider extends AbstractServiceProvider<Server> {
+	protected httpIdentifier(): symbol {
+		return ApiIdentifiers.HTTP;
 	}
 
-	public async boot(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.app.get<Server>(Identifiers.HTTP).boot();
-		}
-
-		if (this.config().get("server.https.enabled")) {
-			await this.app.get<Server>(Identifiers.HTTPS).boot();
-		}
+	protected httpsIdentifier(): symbol {
+		return ApiIdentifiers.HTTPS;
 	}
 
-	public async dispose(): Promise<void> {
-		if (this.config().get("server.http.enabled")) {
-			await this.app.get<Server>(Identifiers.HTTP).dispose();
-		}
-
-		if (this.config().get("server.https.enabled")) {
-			await this.app.get<Server>(Identifiers.HTTPS).dispose();
-		}
+	protected getServerConstructor(): ServerConstructor<Server> {
+		return Server;
 	}
 
-	public configSchema(): object {
+	protected getHandlers(): any | any[] {
+		return Handlers;
+	}
+
+	protected getPlugins(): any[] {
+		const config = this.config().get<any>("plugins");
+
+		return [
+			{
+				options: {
+					trustProxy: config.trustProxy,
+					whitelist: config.whitelist,
+				},
+				plugin: Plugins.whitelist,
+			},
+			{ plugin: Plugins.hapiAjv },
+			{
+				options: {
+					...config.rateLimit,
+					trustProxy: config.trustProxy,
+				},
+				plugin: Plugins.rateLimit,
+			},
+			{ plugin: Plugins.commaArrayQuery },
+			{ plugin: Plugins.dotSeparatedQuery },
+			{
+				options: {
+					query: {
+						limit: {
+							default: config.pagination.limit,
+						},
+					},
+				},
+				plugin: Plugins.pagination,
+			},
+		];
+	}
+
+	public configSchema(): Joi.ObjectSchema {
 		return Joi.object({
-			options: Joi.object({
-				estimateTotalCount: Joi.bool().required(),
-			}).required(),
 			plugins: Joi.object({
-				cache: Joi.object({
-					checkperiod: Joi.number().integer().min(0).required(),
-					enabled: Joi.bool().required(),
-					stdTTL: Joi.number().integer().min(0).required(),
-				}).required(),
-				log: Joi.object({
-					enabled: Joi.bool().required(),
-				}).required(),
 				pagination: Joi.object({
 					limit: Joi.number().integer().min(0).required(),
 				}).required(),
@@ -81,27 +89,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					}).required(),
 				}).required(),
 			}).required(),
-		}).unknown(true);
-	}
-
-	private async buildServer(type: string, id: symbol): Promise<void> {
-		this.app.bind<Server>(id).to(Server).inSingletonScope();
-
-		const server: Server = this.app.get<Server>(id);
-
-		await server.initialize(`Development API (${type.toUpperCase()})`, {
-			...this.config().get(`server.${type}`),
-
-			routes: {
-				cors: true,
-			},
-		});
-
-		await server.register(preparePlugins(this.config().get("plugins")));
-
-		await server.register({
-			plugin: Handlers,
-			routes: { prefix: "/api" },
-		});
+		})
+			.required()
+			.unknown(true);
 	}
 }

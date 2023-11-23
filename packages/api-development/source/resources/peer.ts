@@ -1,10 +1,9 @@
+import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { Resource } from "../types";
-
 @injectable()
-export class PeerResource implements Resource {
+export class PeerResource implements ApiContracts.Resource {
 	public raw(resource: Contracts.P2P.Peer): object {
 		return resource;
 	}

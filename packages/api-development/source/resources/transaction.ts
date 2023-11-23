@@ -1,11 +1,10 @@
+import { Contracts as ApiContracts } from "@mainsail/api-common";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 
-import { Resource } from "../types";
-
 @injectable()
-export class TransactionResource implements Resource {
+export class TransactionResource implements ApiContracts.Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
@@ -23,14 +22,9 @@ export class TransactionResource implements Resource {
 			amount: resource.amount.toFixed(),
 			asset: resource.asset,
 			blockId: resource.blockId,
-			confirmations: 0,
 			fee: resource.fee.toFixed(),
 			id: resource.id,
-			// ! resource.block ? lastBlock.data.height - resource.block.height + 1 : 0
-			// timestamp:
-			// 	typeof resource.timestamp !== "undefined" ? AppUtils.formatTimestamp(resource.timestamp) : undefined,
 			nonce: resource.nonce?.toFixed(),
-
 			recipient: resource.recipientId || sender,
 
 			sender,
@@ -40,6 +34,8 @@ export class TransactionResource implements Resource {
 			signature: resource.signature,
 
 			signatures: resource.signatures,
+
+			timestamp: resource.timestamp,
 
 			type: resource.type,
 

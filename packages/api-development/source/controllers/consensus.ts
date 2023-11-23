@@ -26,15 +26,10 @@ export class ConsensusController extends Controller {
 		const prevotes = await this.storage.getPrevotes();
 
 		const validators = this.validatorSet.getActiveValidators();
-		const nameLookup = new Map<string, string>();
-
-		for (const validator of validators) {
-			nameLookup.set(validator.getWalletPublicKey(), validator.getWalletPublicKey());
-		}
 
 		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.IPrevote | Contracts.Crypto.IPrecommit>) => {
 			const collected = {
-				absent: validators.map((v) => nameLookup.get(v.getWalletPublicKey()!) ?? v.getWalletPublicKey()),
+				absent: validators.map((v) => v.toString()),
 			};
 
 			for (const message of messages) {
@@ -44,7 +39,7 @@ export class ConsensusController extends Controller {
 					collected[key] = {};
 				}
 
-				const name = nameLookup.get(validator.getWalletPublicKey()!) ?? validator.getWalletPublicKey();
+				const name = validator.toString();
 				collected[key][name] = message.signature;
 				collected.absent.splice(collected.absent.indexOf(name), 1);
 			}
@@ -55,8 +50,14 @@ export class ConsensusController extends Controller {
 		return {
 			data: {
 				height: state.height,
+				round: state.round,
+				step: state.step,
+				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 				lockedRound: state.lockedRound,
 				lockedValue: state.lockedValue ? state.lockedValue.getProposal()?.block.block.header.id : null,
+				validRound: state.validRound,
+				validValue: state.validValue ? state.validValue.getProposal()?.block.block.header.id : null,
+				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 				precommits: collectMessages(precommits.sort((a, b) => b.round - a.round)),
 				prevotes: collectMessages(prevotes.sort((a, b) => b.round - a.round)),
 				proposals: proposals
@@ -64,19 +65,13 @@ export class ConsensusController extends Controller {
 					.map((p) => ({
 						data: p.toData(),
 						lockProof: p.block.lockProof,
-						name:
-							nameLookup.get(validators[p.validatorIndex].getWalletPublicKey()!) ??
-							validators[p.validatorIndex].getWalletPublicKey(),
+						name: validators[p.validatorIndex].toString(),
 					})),
-				round: state.round,
-				step: state.step,
-				validRound: state.validRound,
-				validValue: state.validValue ? state.validValue.getProposal()?.block.block.header.id : null,
-				validators: validators.map((v) => ({
-					consensusPublicKey: v.getConsensusPublicKey(),
-					index: this.validatorSet.getValidatorIndexByWalletPublicKey(v.getWalletPublicKey()),
-					walletPublicKey: v.getWalletPublicKey(),
-				})),
+
+				// validators: validators.map((v) => ({
+				// 	index: this.validatorSet.getValidatorIndexByWalletPublicKey(v.getWalletPublicKey()),
+				// 	walletPublicKey: v.toString(),
+				// })),
 			},
 		};
 	}
