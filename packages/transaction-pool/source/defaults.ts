@@ -1,9 +1,10 @@
 import { Constants } from "@mainsail/contracts";
+import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	allowedSenders: [],
 
-	enabled: !process.env[Constants.Flags.CORE_TRANSACTION_POOL_DISABLED],
+	enabled: !Environment.isSet(Constants.Flags.CORE_TRANSACTION_POOL_DISABLED),
 
 	// Max transaction age in number of blocks produced since the transaction was created.
 	// If a transaction stays that long in the pool without being included in any block,
@@ -16,10 +17,9 @@ export const defaults = {
 	// only accepted if its fee is higher than the transaction with the lowest
 	// fee in the pool. In this case the transaction with the lowest fee is removed
 	// from the pool in order to accommodate the new one.
-	maxTransactionsInPool: process.env[Constants.Flags.CORE_MAX_TRANSACTIONS_IN_POOL] || 15_000,
+	maxTransactionsInPool: Environment.get(Constants.Flags.CORE_MAX_TRANSACTIONS_IN_POOL, 15_000),
+	maxTransactionsPerRequest: Environment.get(Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_REQUEST, 40),
+	maxTransactionsPerSender: Environment.get(Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_SENDER, 150),
 
-	maxTransactionsPerRequest: process.env[Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_REQUEST] || 40,
-
-	maxTransactionsPerSender: process.env[Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_SENDER] || 150,
-	storage: `${process.env[Constants.Flags.CORE_PATH_DATA]}/mainsail/transaction-pool.sqlite`,
+	storage: `${Environment.get(Constants.Flags.CORE_PATH_DATA)}/mainsail/transaction-pool.sqlite`,
 };
