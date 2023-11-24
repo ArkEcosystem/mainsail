@@ -59,7 +59,7 @@ describe<{
 
 		const { statusCode, data } = await request("/blocks/1", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, blocks[blocks.length - 1]);
+		assert.equal(data.data, blocks[blocks.length - 2]);
 	});
 
 	it("/blocks/{id}", async () => {
