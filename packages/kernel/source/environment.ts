@@ -1,13 +1,4 @@
-export const getBoolean = <T extends boolean | undefined>(
-	name: string,
-	defaultValue?: T,
-): T extends undefined ? boolean | undefined : boolean => {
-	if (["true", "false", undefined].includes(process.env[name])) {
-		return process.env[name] === "true";
-	}
-
-	return defaultValue as T extends undefined ? undefined : boolean;
-};
+export const isSet = (name: string): boolean => process.env[name] === "true";
 
 export const get = <T extends string | number | undefined>(
 	name: string,

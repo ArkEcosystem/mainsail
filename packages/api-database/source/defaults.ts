@@ -16,7 +16,7 @@ export const defaults = {
 
 		logger: "simple-console",
 
-		logging: Environment.getBoolean("CORE_DB_LOGGING_ENABLED", false),
+		logging: Environment.isSet("CORE_DB_LOGGING_ENABLED"),
 
 		password: Environment.get("CORE_DB_PASSWORD", "password"),
 
