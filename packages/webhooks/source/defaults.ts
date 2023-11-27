@@ -2,7 +2,7 @@ import { Constants } from "@mainsail/contracts";
 import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
-	enabled: Environment.isSet(Constants.Flags.CORE_WEBHOOKS_ENABLED),
+	enabled: Environment.isTrue(Constants.Flags.CORE_WEBHOOKS_ENABLED),
 	server: {
 		http: {
 			host: Environment.get(Constants.Flags.CORE_WEBHOOKS_HOST, "0.0.0.0"),

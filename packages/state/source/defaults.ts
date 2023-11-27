@@ -3,7 +3,7 @@ import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	export: {
-		enabled: !Environment.isSet(Constants.Flags.CORE_STATE_EXPORT_DISABLED), // Enabled by default
+		enabled: !Environment.isTrue(Constants.Flags.CORE_STATE_EXPORT_DISABLED), // Enabled by default
 		interval: Environment.get(Constants.Flags.CORE_STATE_EXPORT_INTERVAL, 1000), // Blocks
 		retainFiles: Environment.get(Constants.Flags.CORE_STATE_EXPORT_RETAIN_FILES, 2), // Files
 	},

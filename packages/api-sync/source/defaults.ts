@@ -30,5 +30,5 @@ export const defaults = {
 		username: Environment.get("CORE_DB_USERNAME") ?? Environment.get("CORE_TOKEN"), // TODO
 	},
 
-	truncateDatabase: Environment.isSet("CORE_API_SYNC_TRUNCATE_DATABASE"),
+	truncateDatabase: Environment.isTrue("CORE_API_SYNC_TRUNCATE_DATABASE"),
 };

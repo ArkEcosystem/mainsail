@@ -4,7 +4,7 @@ import { Environment } from "@mainsail/kernel";
 export const defaults = {
 	blacklist: [],
 	developmentMode: {
-		enabled: Environment.isSet(Constants.Flags.CORE_P2P_DEVELOPMENT_MODE_ENABLED),
+		enabled: Environment.isTrue(Constants.Flags.CORE_P2P_DEVELOPMENT_MODE_ENABLED),
 	},
 	getBlocksTimeout: 30_000,
 	maxPeerSequentialErrors: Environment.get(Constants.Flags.CORE_P2P_MAX_PEER_SEQUENTIAL_ERRORS, 3),

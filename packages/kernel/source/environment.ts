@@ -1,4 +1,4 @@
-export const isSet = (name: string): boolean => process.env[name] === "true";
+export const isTrue = (name: string): boolean => process.env[name] === "true";
 
 export const get = <T extends string | number | undefined>(
 	name: string,

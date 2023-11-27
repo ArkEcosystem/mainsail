@@ -4,7 +4,7 @@ import { Environment } from "@mainsail/kernel";
 export const defaults = {
 	allowedSenders: [],
 
-	enabled: !Environment.isSet(Constants.Flags.CORE_TRANSACTION_POOL_DISABLED),
+	enabled: !Environment.isTrue(Constants.Flags.CORE_TRANSACTION_POOL_DISABLED),
 
 	// Max transaction age in number of blocks produced since the transaction was created.
 	// If a transaction stays that long in the pool without being included in any block,
