@@ -1,7 +1,7 @@
 import { IAggregatedSignature, ICommittedBlock, IPrecommit, IPrevote, IProposal } from "../crypto";
 import { IProcessableUnit } from "../processor";
 import { IValidatorWallet } from "../state";
-import { ProcessorResult, Step } from "./enums";
+import { Step } from "./enums";
 
 export interface IRoundState extends IProcessableUnit {
 	readonly validators: string[];
@@ -97,20 +97,4 @@ export interface IScheduler {
 	scheduleTimeoutPrevote(height: number, round: number): void;
 	scheduleTimeoutPrecommit(height: number, round: number): void;
 	clear(): void;
-}
-
-export interface IProposalProcessor {
-	process(proposal: IProposal, broadcast?: boolean): Promise<ProcessorResult>;
-}
-
-export interface IPrevoteProcessor {
-	process(prevote: IPrevote, broadcast?: boolean): Promise<ProcessorResult>;
-}
-
-export interface IPrecommitProcessor {
-	process(prevote: IPrecommit, broadcast?: boolean): Promise<ProcessorResult>;
-}
-
-export interface ICommittedBlockProcessor {
-	process(committedBlock: ICommittedBlock, broadcast?: boolean): Promise<ProcessorResult>;
 }
