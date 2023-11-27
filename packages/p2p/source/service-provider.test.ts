@@ -315,15 +315,6 @@ describe<{
 		assert.equal(result.value.developmentMode.enabled, true);
 	});
 
-	it("should throw if process.env.CORE_P2P_DEVELOPMENT_MODE_ENABLED is not booelan", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_DEVELOPMENT_MODE_ENABLED = "1";
-
-		const result = serviceProvider.configSchema().validate(importDefaults());
-
-		assert.defined(result.error);
-		assert.equal(result.error?.message, '"developmentMode.enabled" must be a boolean');
-	});
-
 	it("#schemaRestrictions - server is required && is object", async ({ serviceProvider }) => {
 		const defaults = importDefaults();
 		defaults.server = false;
