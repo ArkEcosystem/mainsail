@@ -6,6 +6,7 @@ import {
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
 import { PeerResource } from "../resources/peer";
 import { Controller } from "./controller";
@@ -40,5 +41,11 @@ export class PeersController extends Controller {
 		}
 
 		return this.respondWithResource(peer, PeerResource, request.query.transform);
+	}
+
+	protected getListingOptions(): Contracts.Api.Options {
+		return {
+			estimateTotalCount: false
+		};
 	}
 }
