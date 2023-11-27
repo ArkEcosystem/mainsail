@@ -1,4 +1,4 @@
-export const isTrue = (name: string): boolean => process.env[name] === "true";
+export const isTrue = (name: string): boolean => process.env[name] === "true" || process.env[name] === "1";
 
 export const get = <T extends string | number | undefined>(
 	name: string,
