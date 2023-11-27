@@ -6,12 +6,12 @@ export const defaults = {
 			limit: 100,
 		},
 		rateLimit: {
-			blacklist: Environment.get("CORE_API_DEV_RATE_LIMIT_BLACKLIST", "").split(","),
+			blacklist: Environment.get<undefined>("CORE_API_DEV_RATE_LIMIT_BLACKLIST")?.split(",") ?? [],
 			duration: Environment.get("CORE_API_DEV_RATE_LIMIT_USER_EXPIRES", 60), // Sec
 			enabled: Environment.isSet("CORE_API_DEV_RATE_LIMIT_DISABLED"),
 			points: Environment.get("CORE_API_DEV_RATE_LIMIT_USER_LIMIT", 100),
 
-			whitelist: Environment.get("CORE_API_DEV_RATE_LIMIT_WHITELIST", "").split(","),
+			whitelist: Environment.get<undefined>("CORE_API_DEV_RATE_LIMIT_WHITELIST")?.split(",") ?? [],
 		},
 		socketTimeout: 5000,
 		trustProxy: Environment.isSet("CORE_API_DEV_TRUST_PROXY"),
