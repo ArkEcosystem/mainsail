@@ -45,7 +45,7 @@ export class PeersController extends Controller {
 
 	protected getListingOptions(): Contracts.Api.Options {
 		return {
-			estimateTotalCount: false
+			estimateTotalCount: false,
 		};
 	}
 }
