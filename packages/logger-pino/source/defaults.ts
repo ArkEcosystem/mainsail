@@ -1,11 +1,12 @@
 import { Constants } from "@mainsail/contracts";
+import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	fileRotator: {
 		interval: "1d",
 	},
 	levels: {
-		console: process.env[Constants.Flags.CORE_LOG_LEVEL] || "info",
-		file: process.env[Constants.Flags.CORE_LOG_LEVEL_FILE] || "debug",
+		console: Environment.get(Constants.Flags.CORE_LOG_LEVEL, "info"),
+		file: Environment.get(Constants.Flags.CORE_LOG_LEVEL_FILE, "debug"),
 	},
 };

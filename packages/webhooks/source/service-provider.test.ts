@@ -129,6 +129,15 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 		assert.equal(result.value.server.http.host, "127.0.0.1");
 	});
 
+	it("should return value of process.env.CORE_WEBHOOKS_PORT if number", async ({ serviceProvider }) => {
+		process.env.CORE_WEBHOOKS_PORT = "200";
+
+		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.server.http.port, 200);
+	});
+
 	it("should return value of process.env.CORE_WEBHOOKS_TIMEOUT if defined", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_TIMEOUT = "5000";
 
