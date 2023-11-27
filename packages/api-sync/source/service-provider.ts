@@ -1,4 +1,4 @@
-import { interfaces, postConstruct } from "@mainsail/container";
+import { interfaces } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
@@ -18,8 +18,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.#registerListeners();
 	}
 
-	@postConstruct()
-	public async initialize(): Promise<void> {
+	public async boot(): Promise<void> {
 		await this.#bootListeners();
 	}
 
