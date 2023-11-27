@@ -21,7 +21,7 @@ export const defaults = {
 
 		password: Environment.get("CORE_DB_PASSWORD", "password"),
 
-		port: Environment.get("CORE_DB_PORT" || 5432),
+		port: Environment.get("CORE_DB_PORT", 5432),
 
 		synchronize: true,
 

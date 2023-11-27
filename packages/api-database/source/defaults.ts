@@ -12,7 +12,7 @@ export const defaults = {
 			options: "-c statement_timeout=3000ms",
 		},
 
-		host: Environment.get("CORE_DB_HOST") || "localhost",
+		host: Environment.get("CORE_DB_HOST", "localhost"),
 
 		logger: "simple-console",
 
