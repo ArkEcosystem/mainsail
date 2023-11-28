@@ -34,7 +34,7 @@ describe<{
 			},
 			fromBytes: (bytes) => {
 				return {};
-			}
+			},
 		};
 
 		context.blockSerializer = {
