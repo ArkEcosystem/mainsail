@@ -145,6 +145,14 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return struct;
 	}
 
+	public async toSerializedHex(): Promise<string> {
+		if (!this.data.senderPublicKey || (!this.data.signature && !this.data.signatures)) {
+			throw new Exceptions.MissingTransactionSignatureError();
+		}
+
+		return (await this.utils.toBytes(this.data)).toString("hex");
+	}
+
 	async #signWithKeyPair(keys: Contracts.Crypto.IKeyPair): Promise<TBuilder> {
 		this.data.senderPublicKey = keys.publicKey;
 
