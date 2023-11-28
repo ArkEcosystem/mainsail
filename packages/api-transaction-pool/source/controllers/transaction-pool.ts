@@ -10,7 +10,7 @@ export class TransactionsController extends AbstractController {
 
 	public async store(request: Hapi.Request) {
 		// @ts-ignore
-		const result = await this.processor.process(request.payload.transactions);
+		const result = await this.processor.process(request.payload.transactions.map((transaction: string) => Buffer.from(transaction, "hex")));
 		return {
 			data: {
 				accept: result.accept,

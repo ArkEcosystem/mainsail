@@ -114,8 +114,6 @@ export interface IBlockFactory {
 
 	fromProposedBytes(buff: Buffer): Promise<IProposedBlock>;
 
-	fromProposedJson(json: IProposedBlockJson): Promise<IProposedBlock>;
-
 	fromCommittedBytes(buff: Buffer): Promise<ICommittedBlock>;
 
 	fromCommittedJson(json: ICommittedBlockJson): Promise<ICommittedBlock>;
