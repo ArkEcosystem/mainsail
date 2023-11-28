@@ -16,6 +16,6 @@ export const createPostTransactionsSchema = (app: Contracts.Kernel.Application):
 						"plugin",
 						"transaction-pool",
 					)
-					.getOptional<number>("maxTransactionsPerRequest", 40),
+					.getRequired<number>("maxTransactionsPerRequest"),
 			),
 	});

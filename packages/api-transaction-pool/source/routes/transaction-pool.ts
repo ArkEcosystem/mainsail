@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transaction-pool";
 
@@ -12,30 +13,21 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		handler: (request: Hapi.Request) => controller.store(request),
 		method: "POST",
 		options: {
-			plugins: {
-				"hapi-ajv": {
-					payloadSchema: {
-						additionalProperties: false,
-						properties: {
-							transactions: {
-								items: {
-									allOf: [{ $ref: "hex" }, { maxLength: 4096 /* arbitrary cap */ }],
-									maxItems: server.app.app
-										.getTagged<Providers.PluginConfiguration>(
-											Identifiers.PluginConfiguration,
-											"plugin",
-											"transaction-pool",
-										)
-										.get<number>("maxTransactionsPerRequest"),
-									minItems: 1,
-									type: "array",
-								},
-							},
-						},
-						required: ["transactions"],
-						type: "object",
-					},
-				},
+			validate: {
+				payload: Joi.object({
+					transactions: Joi.array()
+						.items(Joi.string().lowercase().hex().max(4096 /* arbitrary cap */))
+						.min(1)
+						.max(
+							server.app.app
+								.getTagged<Providers.PluginConfiguration>(
+									Identifiers.PluginConfiguration,
+									"plugin",
+									"transaction-pool",
+								)
+								.getRequired<number>("maxTransactionsPerRequest"),
+						),
+				}),
 			},
 		},
 		path: "/transaction-pool",
