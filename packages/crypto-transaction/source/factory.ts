@@ -53,7 +53,7 @@ export class TransactionFactory implements Contracts.Crypto.ITransactionFactory 
 	async #fromSerialized(serialized: string, strict = true): Promise<Contracts.Crypto.ITransaction> {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
-			transaction.data.id = await this.utils.getId(transaction.data);
+			transaction.data.id = await this.utils.getId(transaction);
 
 			const { error } = await this.verifier.verifySchema(transaction.data, strict);
 

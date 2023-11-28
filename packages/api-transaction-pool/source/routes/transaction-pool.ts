@@ -18,15 +18,18 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 						additionalProperties: false,
 						properties: {
 							transactions: {
-								$ref: "transactions",
-								maxItems: server.app.app
-									.getTagged<Providers.PluginConfiguration>(
-										Identifiers.PluginConfiguration,
-										"plugin",
-										"transaction-pool",
-									)
-									.get<number>("maxTransactionsPerRequest"),
-								minItems: 1,
+								items: {
+									allOf: [{ $ref: "hex" }, { maxLength: 4096 /* arbitrary cap */ }],
+									maxItems: server.app.app
+										.getTagged<Providers.PluginConfiguration>(
+											Identifiers.PluginConfiguration,
+											"plugin",
+											"transaction-pool",
+										)
+										.get<number>("maxTransactionsPerRequest"),
+									minItems: 1,
+									type: "array",
+								},
 							},
 						},
 						required: ["transactions"],

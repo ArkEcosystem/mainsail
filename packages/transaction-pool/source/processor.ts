@@ -1,6 +1,5 @@
 import { inject, injectable, multiInject, optional } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
@@ -21,12 +20,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
-	@inject(Identifiers.Cryptography.Transaction.Deserializer)
-	private readonly deserializer!: Contracts.Crypto.ITransactionDeserializer;
-
-	public async process(
-		data: Contracts.Crypto.ITransactionJson[] | Buffer[],
-	): Promise<Contracts.TransactionPool.ProcessorResult> {
+	public async process(data: Buffer[]): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: string[] = [];
 		const broadcast: string[] = [];
 		const invalid: string[] = [];
@@ -40,10 +34,8 @@ export class Processor implements Contracts.TransactionPool.Processor {
 				const entryId = String(index);
 
 				try {
-					const transaction =
-						transactionData instanceof Buffer
-							? await this.#getTransactionFromBuffer(transactionData)
-							: await this.#getTransactionFromJson(transactionData);
+					const transaction = await this.#getTransactionFromBuffer(transactionData);
+
 					await this.pool.addTransaction(transaction);
 					accept.push(entryId);
 
@@ -91,21 +83,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 
 	async #getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.ITransaction> {
 		try {
-			const transactionCommon = {} as Contracts.Crypto.ITransactionData;
-			const txByteBuffer = ByteBuffer.fromBuffer(transactionData);
-			this.deserializer.deserializeCommon(transactionCommon, txByteBuffer);
-
 			return this.transactionFactory.fromBytes(transactionData);
-		} catch (error) {
-			throw new Exceptions.InvalidTransactionDataError(error.message);
-		}
-	}
-
-	async #getTransactionFromJson(
-		transactionData: Contracts.Crypto.ITransactionJson,
-	): Promise<Contracts.Crypto.ITransaction> {
-		try {
-			return this.transactionFactory.fromJson(transactionData);
 		} catch (error) {
 			throw new Exceptions.InvalidTransactionDataError(error.message);
 		}
