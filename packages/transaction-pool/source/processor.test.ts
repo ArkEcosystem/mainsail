@@ -32,6 +32,9 @@ describe<{
 			fromJson: (tx) => {
 				return tx;
 			},
+			fromBytes: (bytes) => {
+				return {};
+			}
 		};
 
 		context.blockSerializer = {
