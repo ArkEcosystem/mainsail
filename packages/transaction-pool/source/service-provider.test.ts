@@ -125,7 +125,7 @@ describe<{
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
 
 		assert.undefined(result.error);
-		assert.equal(result.value.storage, "dummy/path/mainsail/transaction-pool.sqlite");
+		assert.equal(result.value.storage, "dummy/path/transaction-pool.sqlite");
 	});
 
 	it("should parse process.env.CORE_MAX_TRANSACTIONS_IN_POOL", async (context) => {
