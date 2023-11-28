@@ -24,13 +24,8 @@ export class Utils implements Contracts.Crypto.ITransactionUtils {
 	}
 
 	public async getId(
-		transaction: Contracts.Crypto.ITransactionData,
-		options: Contracts.Crypto.ISerializeOptions = {},
+		transaction: Contracts.Crypto.ITransaction,
 	): Promise<string> {
-		return (await this.toHash(transaction, options)).toString("hex");
-	}
-
-	public async getIdFromHex(serialized: string): Promise<string> {
-		return (await this.hashFactory.sha256(Buffer.from(serialized, "hex"))).toString("hex");
+		return (await this.hashFactory.sha256(transaction.serialized)).toString("hex");
 	}
 }

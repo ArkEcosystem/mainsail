@@ -128,7 +128,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 
 		const struct: Contracts.Crypto.ITransactionData = {
 			fee: this.data.fee,
-			id: await this.utils.getId(this.data),
+			id: await this.utils.getId(await this.build()),
 			network: this.data.network,
 			nonce: this.data.nonce,
 			senderPublicKey: this.data.senderPublicKey,

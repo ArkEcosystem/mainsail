@@ -175,7 +175,7 @@ export class GenesisBlockGenerator extends Generator {
 			.sign(transaction.data, wallet.keys);
 		transaction.data.id = await this.app
 			.get<Contracts.Crypto.ITransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
-			.getId(transaction.data);
+			.getId(transaction);
 
 		return transaction;
 	}

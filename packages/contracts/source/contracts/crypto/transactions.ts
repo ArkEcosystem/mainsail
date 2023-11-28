@@ -170,7 +170,5 @@ export interface ITransactionUtils {
 
 	toHash(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer>;
 
-	getId(transaction: ITransactionData, options?: ISerializeOptions): Promise<string>;
-
-	getIdFromHex(serialized: string): Promise<string>;
+	getId(transaction: ITransaction): Promise<string>;
 }
