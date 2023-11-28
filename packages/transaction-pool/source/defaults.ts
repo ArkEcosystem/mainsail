@@ -21,5 +21,5 @@ export const defaults = {
 	maxTransactionsPerRequest: Environment.get(Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_REQUEST, 40),
 	maxTransactionsPerSender: Environment.get(Constants.Flags.CORE_TRANSACTION_POOL_MAX_PER_SENDER, 150),
 
-	storage: `${Environment.get(Constants.Flags.CORE_PATH_DATA)}/mainsail/transaction-pool.sqlite`,
+	storage: `${Environment.get(Constants.Flags.CORE_PATH_DATA)}/transaction-pool.sqlite`,
 };
