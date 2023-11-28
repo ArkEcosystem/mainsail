@@ -18,7 +18,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 						additionalProperties: false,
 						properties: {
 							transactions: {
-								$ref: "transactions",
 								items: {
 									allOf: [{ $ref: "hex" }, { maxLength: 4096 /* arbitrary cap */ }],
 									maxItems: server.app.app
