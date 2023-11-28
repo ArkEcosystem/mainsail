@@ -32,7 +32,6 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.whitelist,
 			},
-			{ plugin: Plugins.hapiAjv },
 			{
 				options: {
 					...config.rateLimit,
