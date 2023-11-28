@@ -137,16 +137,6 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 	}
 
 	async #truncate(): Promise<void> {
-		try {
-			await this.makeEntityRepository(this.dataSource).clear();
-		} catch (error) {
-			if (error.code === "42P01") {
-				// ignore 'relation "xxx" does not exist' errors when
-				// starting with an empty database.
-				return;
-			}
-
-			throw error;
-		}
+		await this.makeEntityRepository(this.dataSource).clear();
 	}
 }
