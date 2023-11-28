@@ -25,7 +25,9 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 	private readonly committedBlockStateFactory!: Contracts.Consensus.ICommittedBlockStateFactory;
 
 	async process(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<Contracts.Consensus.ProcessorResult> {
-		return this.commitLock.runNonExclusive(async () => {
+		let promise: Promise<void> | undefined;
+
+		const result = await this.commitLock.runNonExclusive(async (): Promise<Contracts.Consensus.ProcessorResult> => {
 			if (!this.#hasValidHeight(committedBlock)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
@@ -44,10 +46,15 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 
 			committedBlockState.setProcessorResult(result);
 
-			void this.getConsensus().handleCommittedBlockState(committedBlockState);
+			promise = this.getConsensus().handleCommittedBlockState(committedBlockState);
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
+
+		// Execute outside the lock, to avoid deadlocks.
+		// We want to make sure that the block is handled before we return the result to block downloader. This is different from the other processors.
+		await promise;
+		return result;
 	}
 
 	#hasValidHeight(committedBlock: Contracts.Crypto.ICommittedBlock): boolean {
