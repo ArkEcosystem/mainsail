@@ -5,3 +5,9 @@ export interface EventListener extends Contracts.Kernel.EventListener {
 	boot(): Promise<void>;
 	dispose(): Promise<void>;
 }
+
+export interface Listeners {
+	register(): Promise<void>;
+	bootstrap(): Promise<void>;
+	dispose(): Promise<void>;
+}
