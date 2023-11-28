@@ -9,8 +9,8 @@ export class TransactionsController extends AbstractController {
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
 	public async store(request: Hapi.Request) {
-		// @ts-ignore
 		const result = await this.processor.process(
+			// @ts-ignore
 			request.payload.transactions.map((transaction: string) => Buffer.from(transaction, "hex")),
 		);
 		return {
