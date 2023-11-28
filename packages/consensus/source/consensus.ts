@@ -325,12 +325,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				await this.app.terminate("Failed to commit block", error);
 			}
 
+			await this.storage.clear();
+			this.roundStateRepository.clear();
+
 			this.#height++;
 			this.#lockedValue = undefined;
 			this.#validValue = undefined;
-
-			this.roundStateRepository.clear();
-			await this.storage.clear();
 
 			await this.startRound(0);
 		});
