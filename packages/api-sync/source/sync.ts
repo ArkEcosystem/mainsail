@@ -8,6 +8,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types, Utils } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
 import { performance } from "perf_hooks";
+
 import * as ApiSyncContracts from "./contracts";
 import { Identifiers as ApiSyncIdentifiers } from "./identifiers";
 
@@ -160,8 +161,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-					validatorRound: this.#createValidatorRound(header.height + 1),
-				}
+						validatorRound: this.#createValidatorRound(header.height + 1),
+				  }
 				: {}),
 		};
 
