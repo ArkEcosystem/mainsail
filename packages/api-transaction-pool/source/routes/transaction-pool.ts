@@ -21,7 +21,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 								$ref: "transactions",
 								items: {
 									allOf: [{ $ref: "hex" }, { maxLength: 4096 /* arbitrary cap */ }],
-									type: "array",
 									maxItems: server.app.app
 										.getTagged<Providers.PluginConfiguration>(
 											Identifiers.PluginConfiguration,
@@ -30,6 +29,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 										)
 										.get<number>("maxTransactionsPerRequest"),
 									minItems: 1,
+									type: "array",
 								},
 							},
 						},

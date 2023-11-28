@@ -110,7 +110,8 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 			const entityRepository = this.makeEntityRepository(entityManager);
 
 			this.logger.debug(
-				`syncing ${entityRepository.metadata.tableNameWithoutPrefix} to database (added: ${this.#addedEvents.size
+				`syncing ${entityRepository.metadata.tableNameWithoutPrefix} to database (added: ${
+					this.#addedEvents.size
 				} removed: ${this.#removedEvents.size}))`,
 			);
 
@@ -138,14 +139,14 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 	async #truncate(): Promise<void> {
 		try {
 			await this.makeEntityRepository(this.dataSource).clear();
-		} catch (ex) {
-			if (ex.code === '42P01') {
+		} catch (error) {
+			if (error.code === "42P01") {
 				// ignore 'relation "xxx" does not exist' errors when
 				// starting with an empty database.
 				return;
 			}
 
-			throw ex;
+			throw error;
 		}
 	}
 }

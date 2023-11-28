@@ -20,9 +20,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
 
-	public async process(
-		data: Buffer[],
-	): Promise<Contracts.TransactionPool.ProcessorResult> {
+	public async process(data: Buffer[]): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: string[] = [];
 		const broadcast: string[] = [];
 		const invalid: string[] = [];
@@ -45,7 +43,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 						await Promise.all(this.extensions.map((e) => e.throwIfCannotBroadcast(transaction)));
 						broadcastTransactions.push(transaction);
 						broadcast.push(entryId);
-					} catch { }
+					} catch {}
 				} catch (error) {
 					invalid.push(entryId);
 

@@ -30,9 +30,7 @@ export class Utils implements Contracts.Crypto.ITransactionUtils {
 		return (await this.toHash(transaction, options)).toString("hex");
 	}
 
-	public async getIdFromHex(
-		serialized: string,
-	): Promise<string> {
+	public async getIdFromHex(serialized: string): Promise<string> {
 		return (await this.hashFactory.sha256(Buffer.from(serialized, "hex"))).toString("hex");
 	}
 }
