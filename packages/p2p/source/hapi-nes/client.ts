@@ -10,6 +10,7 @@ import WebSocket from "ws";
 
 import { parseNesMessage, stringifyNesMessage } from "./utils";
 import { errorTypes } from "./constants";
+import { constants } from "../constants";
 
 /* eslint no-undef: 0 */
 const version = "2";
@@ -54,8 +55,6 @@ const errorCodes = {
 	1015: "TLS handshake",
 };
 
-const DEFAULT_MAX_PAYLOAD_CLIENT = 100 * 1024;
-
 // Client
 
 export class Client {
@@ -85,7 +84,7 @@ export class Client {
 		options.ws = options.ws || {};
 
 		options.ws = {
-			maxPayload: DEFAULT_MAX_PAYLOAD_CLIENT,
+			maxPayload: constants.DEFAULT_MAX_PAYLOAD_CLIENT,
 			...options.ws,
 			perMessageDeflate: false,
 		};
