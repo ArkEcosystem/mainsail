@@ -141,8 +141,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 			this.state.resetLastMessageTime();
 		} catch (error) {
-			this.peerDisposer.banPeer(job.peer.ip, error);
-
 			this.#handleJobError(job, error);
 			return;
 		}
@@ -175,6 +173,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				job.heightTo
 			} from ${job.peer.ip}. ${error.message}`,
 		);
+		this.peerDisposer.banPeer(job.peer.ip, error);
 
 		this.#replyJob(job);
 	}
