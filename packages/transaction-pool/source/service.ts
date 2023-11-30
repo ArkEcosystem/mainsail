@@ -119,7 +119,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async reAddTransactions(previouslyForgedTransactions: Contracts.Crypto.ITransaction[] = []): Promise<void> {
+	public async reAddTransactions(): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -127,56 +127,28 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			this.mempool.flush();
 
-			let previouslyForgedSuccesses = 0;
-			let previouslyForgedFailures = 0;
 			let previouslyStoredSuccesses = 0;
 			let previouslyStoredExpirations = 0;
 			let previouslyStoredFailures = 0;
-
-			const previouslyForgedStoredIds: string[] = [];
-
-			for (const { id, serialized } of previouslyForgedTransactions) {
-				try {
-					const previouslyForgedTransaction = await this.transactionFactory.fromBytes(serialized);
-
-					AppUtils.assert.defined<string>(previouslyForgedTransaction.id);
-					AppUtils.assert.defined<string>(previouslyForgedTransaction.data.senderPublicKey);
-
-					await this.#addTransactionToMempool(previouslyForgedTransaction);
-
-					this.storage.addTransaction({
-						height: this.stateService.getStateStore().getLastHeight(),
-						id: previouslyForgedTransaction.id,
-						senderPublicKey: previouslyForgedTransaction.data.senderPublicKey,
-						serialized: previouslyForgedTransaction.serialized,
-					});
-
-					previouslyForgedStoredIds.push(previouslyForgedTransaction.id);
-
-					previouslyForgedSuccesses++;
-				} catch (error) {
-					this.logger.debug(`Failed to re-add previously forged tx ${id}: ${error.message}`);
-					previouslyForgedFailures++;
-				}
-			}
 
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 			const lastHeight: number = this.stateService.getStateStore().getLastHeight();
 			const expiredHeight: number = lastHeight - maxTransactionAge;
 
 			for (const { height, id, serialized } of this.storage.getAllTransactions()) {
-				if (previouslyForgedStoredIds.includes(id)) {
-					continue;
-				}
-
 				if (height > expiredHeight) {
 					try {
 						const previouslyStoredTransaction = await this.transactionFactory.fromBytes(serialized);
 						await this.#addTransactionToMempool(previouslyStoredTransaction);
+
+						// eslint-disable-next-line @typescript-eslint/no-floating-promises
+						this.events.dispatch(Enums.TransactionEvent.AddedToPool, previouslyStoredTransaction.data);
+
 						previouslyStoredSuccesses++;
 					} catch (error) {
 						this.storage.removeTransaction(id);
 						this.logger.debug(`Failed to re-add previously stored tx ${id}: ${error.message}`);
+
 						previouslyStoredFailures++;
 					}
 				} else {
@@ -186,12 +158,6 @@ export class Service implements Contracts.TransactionPool.Service {
 				}
 			}
 
-			if (previouslyForgedSuccesses >= 1) {
-				this.logger.info(`${previouslyForgedSuccesses} previously forged transactions re-added`);
-			}
-			if (previouslyForgedFailures >= 1) {
-				this.logger.warning(`${previouslyForgedFailures} previously forged transactions failed re-adding`);
-			}
 			if (previouslyStoredSuccesses >= 1) {
 				this.logger.info(`${previouslyStoredSuccesses} previously stored transactions re-added`);
 			}
