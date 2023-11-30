@@ -11,6 +11,10 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	@tagged("type", "wallet")
 	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
 
+	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@tagged("type", "wallet")
+	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
+
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
 	}
@@ -23,15 +27,15 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	}
 
 	public async fromWIF(wif: string): Promise<string> {
-		return "";
+		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif));
 	}
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
-		return "";
+		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
 	}
 
 	public async fromPrivateKey(privateKey: Contracts.Crypto.IKeyPair): Promise<string> {
-		return "";
+		return this.fromPublicKey(privateKey.publicKey);
 	}
 
 	public async fromBuffer(buffer: Buffer): Promise<string> {
