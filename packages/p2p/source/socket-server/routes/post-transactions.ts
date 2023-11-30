@@ -13,7 +13,7 @@ export class PostTransactionsRoute extends Route {
 				codec: Codecs.postTransactions,
 				handler: controller.handle,
 				id: Routes.PostTransactions,
-				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
+				maxBytes: constants.DEFAULT_MAX_PAYLOAD_SERVER,
 				validation: createPostTransactionsSchema(this.app),
 			},
 		};

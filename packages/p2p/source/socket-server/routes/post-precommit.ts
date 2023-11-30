@@ -13,7 +13,7 @@ export class PostPrecommitRoute extends Route {
 				codec: Codecs.postPrecommit,
 				handler: controller.handle,
 				id: Routes.PostPrecommit,
-				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
+				maxBytes: constants.DEFAULT_MAX_PAYLOAD_SERVER,
 				validation: Schemas.postPrecommit(this.cryptoConfiguration),
 			},
 		};

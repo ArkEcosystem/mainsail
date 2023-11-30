@@ -13,7 +13,7 @@ export class PostProposalRoute extends Route {
 				codec: Codecs.postProposal,
 				handler: controller.handle,
 				id: Routes.PostProposal,
-				maxBytes: constants.DEFAULT_MAX_PAYLOAD,
+				maxBytes: constants.DEFAULT_MAX_PAYLOAD_SERVER,
 				validation: Schemas.postProposal(this.cryptoConfiguration),
 			},
 		};

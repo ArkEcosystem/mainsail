@@ -185,7 +185,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		const size = job.blocks.reduce((size, block) => size + block.length, 0);
 
 		// TODO: Take header size into account
-		if (size + configuration.block.maxPayload < constants.DEFAULT_MAX_PAYLOAD) {
+		if (size + configuration.block.maxPayload < constants.DEFAULT_MAX_PAYLOAD_SERVER) {
 			// Peer did't respond with all requested blocks and didn't exceed maxPayload
 			this.peerDisposer.banPeer(
 				job.peer.ip,
