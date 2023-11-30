@@ -13,7 +13,7 @@ export class PostPrevoteRoute extends Route {
 				codec: Codecs.postPrevote,
 				handler: controller.handle,
 				id: Routes.PostPrevote,
-				maxBytes: constants.DEFAULT_MAX_PAYLOAD_SERVER,
+				maxBytes: constants.MAX_PAYLOAD_SERVER,
 				validation: Schemas.postPrevote(this.cryptoConfiguration),
 			},
 		};

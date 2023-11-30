@@ -45,7 +45,7 @@ export class Server implements Contracts.P2P.Server {
 		this.server.app = this.app;
 		await this.server.register({
 			options: {
-				maxPayload: constants.DEFAULT_MAX_PAYLOAD_SERVER,
+				maxPayload: constants.MAX_PAYLOAD_SERVER,
 			},
 			plugin: hapiNesPlugin,
 		});
