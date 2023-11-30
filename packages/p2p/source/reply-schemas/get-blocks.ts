@@ -1,3 +1,4 @@
+import { constants } from "../constants";
 import { headers } from "./headers";
 
 export const getBlocks = {
@@ -6,7 +7,7 @@ export const getBlocks = {
 			items: {
 				buffer: {},
 			},
-			maxItems: 400,
+			maxItems: constants.MAX_DOWNLOAD_BLOCKS,
 			type: "array",
 		},
 		headers,
