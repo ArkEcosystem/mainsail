@@ -2,6 +2,7 @@ import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, Server
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { constants } from "../constants";
 import { plugin as hapiNesPlugin } from "../hapi-nes";
 import { AcceptPeerPlugin } from "./plugins/accept-peer";
 import { CodecPlugin } from "./plugins/codec";
@@ -44,7 +45,7 @@ export class Server implements Contracts.P2P.Server {
 		this.server.app = this.app;
 		await this.server.register({
 			options: {
-				maxPayload: 20_971_520, // 20 MB TODO to adjust
+				maxPayload: constants.DEFAULT_MAX_PAYLOAD_SERVER,
 			},
 			plugin: hapiNesPlugin,
 		});
