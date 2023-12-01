@@ -25,4 +25,5 @@ export const defaults = {
 	},
 	verifyTimeout: 60_000,
 	whitelist: ["*"],
+	apiNodes: Environment.get<undefined>(Constants.Flags.CORE_P2P_API_NODES)?.split(",") ?? [],
 };

@@ -12,6 +12,7 @@ export enum SocketErrors {
 }
 
 export enum Routes {
+	GetApiNodes = "getApiNodes",
 	GetBlocks = "getBlocks",
 	GetMessages = "getMessages",
 	GetProposal = "getProposal",

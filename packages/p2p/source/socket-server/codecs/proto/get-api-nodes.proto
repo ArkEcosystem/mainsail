@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package getApiNodes;
+
+message GetApiNodesRequest {
+    shared.Headers headers = 1;
+}
+
+message GetApiNodesResponse {
+    message ApiNode {
+        string ip = 1;
+        uint32 port = 2;
+    }
+
+	shared.Headers headers = 1;
+    repeated ApiNode apiNodes = 2;
+}

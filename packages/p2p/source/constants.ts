@@ -10,4 +10,5 @@ export const constants = {
 	MAX_PAYLOAD_SERVER: 3 * Constants.Units.MEGABYTE, // default maxPayload value on the  WS socket server
 
 	MAX_PEERS_GET_PEERS: 500,
+	MAX_PEERS_GET_API_NODES: 100,
 };

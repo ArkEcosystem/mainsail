@@ -53,6 +53,19 @@ export interface IGetProposalRequest extends Request {
 	};
 }
 
+export interface IGetApiNodesRequest extends Request {
+	payload: {
+		headers: IHeaderData;
+		fromHeight: number;
+		limit: number;
+	};
+}
+
+export interface IGetApiNodesResponse extends Response {
+	apiNodes: PeerBroadcast[];
+}
+
+
 export interface IGetProposalResponse extends Response {
 	proposal: Buffer;
 }

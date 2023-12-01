@@ -107,6 +107,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return this.emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
 	}
 
+	public async getApiNodes(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetApiNodesResponse> {
+		this.logger.debug(`Fetching API nodes from ${peer.url}`);
+		return this.emit(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
+	}
+
 	public async getStatus(
 		peer: Contracts.P2P.Peer,
 		options: Partial<Contracts.P2P.EmitOptions> = {},

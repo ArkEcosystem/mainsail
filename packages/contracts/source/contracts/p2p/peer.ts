@@ -11,6 +11,16 @@ export interface PeerPlugins {
 	[name: string]: { enabled: boolean; port: number; estimateTotalCount?: boolean };
 }
 
+export interface PeerApiNode {
+	readonly ip: string;
+	readonly port: number;
+
+	statusCode?: number;
+	latency?: number;
+}
+
+export type PeerApiNodes = PeerApiNode[];
+
 export interface Peer {
 	readonly url: string;
 	readonly port: number;
@@ -25,6 +35,7 @@ export interface Peer {
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;
+	apiNodes: PeerApiNodes;
 
 	recentlyPinged(): boolean;
 

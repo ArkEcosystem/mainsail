@@ -1,3 +1,4 @@
+export * from "./get-api-nodes";
 export * from "./get-blocks";
 export * from "./get-messages";
 export * from "./get-peers";
