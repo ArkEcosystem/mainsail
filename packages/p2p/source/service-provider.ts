@@ -50,6 +50,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
+			apiNodes: Joi.array().items(Joi.string()).default([]),
 			blacklist: Joi.array().items(Joi.string()).required(),
 			developmentMode: Joi.object({
 				enabled: Joi.bool().required(),
@@ -60,7 +61,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			maxPeerSequentialErrors: Joi.number().integer().min(0).required(),
 			maxPeersBroadcast: Joi.number().integer().min(0).required(),
 			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
-			apiNodes: Joi.array().items(Joi.string()).default([]),
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
