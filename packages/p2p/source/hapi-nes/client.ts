@@ -84,7 +84,7 @@ export class Client {
 		options.ws = options.ws || {};
 
 		options.ws = {
-			maxPayload: constants.MAX_PAYLOAD_CLIENT + 1024, // Add header margin
+			maxPayload: constants.MAX_PAYLOAD_CLIENT + 2048, // Add header margin
 			...options.ws,
 			perMessageDeflate: false,
 		};
