@@ -34,6 +34,11 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		}
 	}
 
+	// TODO: check whether to discover other peer's api nodes or not
+	// async discoverApiNodes(peer: Contracts.P2P.Peer): Promise<void> {
+	// 		{ apiNodes } = await this.communicator.getApiNodes(peer);
+	// }
+
 	async populateSeedPeers(): Promise<any> {
 		const peerList: Contracts.P2P.PeerData[] = this.app.config("peers").list;
 
@@ -47,7 +52,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 					});
 				}
 			}
-		} catch {}
+		} catch { }
 
 		if (!peerList || peerList.length === 0) {
 			await this.app.terminate("No seed peers defined in peers.json");

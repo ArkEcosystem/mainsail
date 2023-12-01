@@ -89,10 +89,33 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
 					}
-				} catch {}
+				} catch { }
 			}),
 		);
 	}
+
+	// TODO: check whether to discover other peer's api nodes or not
+	// public async pingApiNodes(peer: Contracts.P2P.Peer): Promise<void> {
+	// 	await Promise.all(
+	// 		peer.apiNodes
+	// 			.slice(0, constants.MAX_PEERS_GET_API_NODES)
+	// 			.map(async (apiNode) => {
+	// 				try {
+	// 					const t0 = Date.now();
+
+	// 					const { statusCode } = await Utils.http.head(`http://${apiNode.ip}:${apiNode.port}/`, { timeout: 5000 });
+
+	// 					const t1 = Date.now();
+	// 					apiNode.statusCode = statusCode;
+	// 					apiNode.latency = t1 - t0;
+
+	// 				} catch {
+	// 					apiNode.statusCode = undefined;
+	// 					apiNode.latency = undefined;
+	// 				}
+	// 			}),
+	// 	);
+	// }
 
 	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetMessagesResponse> {
 		return this.emit(peer, Routes.GetMessages, {}, { timeout: 5000 });
