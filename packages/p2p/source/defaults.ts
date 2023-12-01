@@ -9,9 +9,11 @@ export const defaults = {
 	getBlocksTimeout: 30_000,
 	maxPeerSequentialErrors: Environment.get(Constants.Flags.CORE_P2P_MAX_PEER_SEQUENTIAL_ERRORS, 3),
 	maxPeersBroadcast: 3,
+	apiNodes: Environment.get<undefined>(Constants.Flags.CORE_P2P_API_NODES)?.split(",") ?? [],
 	maxSameSubnetPeers: Environment.get(Constants.Flags.CORE_P2P_MAX_PEERS_SAME_SUBNET, 5),
 	minimumNetworkReach: Environment.get(Constants.Flags.CORE_P2P_MIN_NETWORK_REACH, 20),
 	minimumVersions: ["^0.0.1"],
+
 	peerBanTime: Environment.get(Constants.Flags.CORE_P2P_PEER_BAN_TIME, 0),
 
 	rateLimit: Environment.get(Constants.Flags.CORE_P2P_RATE_LIMIT, 150),
@@ -25,5 +27,4 @@ export const defaults = {
 	},
 	verifyTimeout: 60_000,
 	whitelist: ["*"],
-	apiNodes: Environment.get<undefined>(Constants.Flags.CORE_P2P_API_NODES)?.split(",") ?? [],
 };

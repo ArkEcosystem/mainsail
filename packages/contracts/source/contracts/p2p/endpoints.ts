@@ -65,7 +65,6 @@ export interface IGetApiNodesResponse extends Response {
 	apiNodes: PeerBroadcast[];
 }
 
-
 export interface IGetProposalResponse extends Response {
 	proposal: Buffer;
 }

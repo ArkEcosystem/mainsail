@@ -11,13 +11,13 @@ import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
 import { Peer } from "./peer";
+import { PeerApiNodeRepository } from "./peer-api-node-repository";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerDisposer } from "./peer-disposer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
-import { PeerApiNodeRepository } from "./peer-api-node-repository";
 import { PeerVerifier } from "./peer-verifier";
 import { Service } from "./service";
 import { Server } from "./socket-server/server";
@@ -60,6 +60,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			maxPeerSequentialErrors: Joi.number().integer().min(0).required(),
 			maxPeersBroadcast: Joi.number().integer().min(0).required(),
 			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
+			apiNodes: Joi.array().items(Joi.string()).default([]),
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
@@ -78,7 +79,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			skipDiscovery: Joi.bool(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
-			apiNodes: Joi.array().items(Joi.string()).default([]),
 		}).unknown(true);
 	}
 

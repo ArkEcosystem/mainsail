@@ -52,7 +52,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 					});
 				}
 			}
-		} catch { }
+		} catch {}
 
 		if (!peerList || peerList.length === 0) {
 			await this.app.terminate("No seed peers defined in peers.json");
