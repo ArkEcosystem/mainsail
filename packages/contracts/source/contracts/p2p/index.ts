@@ -11,6 +11,7 @@ export * from "./peer-connector";
 export * from "./peer-discoverer";
 export * from "./peer-disposer";
 export * from "./peer-processor";
+export * from "./peer-api-node-repository";
 export * from "./peer-repository";
 export * from "./peer-verifier";
 export * from "./server";

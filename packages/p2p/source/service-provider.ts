@@ -17,6 +17,7 @@ import { PeerDiscoverer } from "./peer-discoverer";
 import { PeerDisposer } from "./peer-disposer";
 import { PeerProcessor } from "./peer-processor";
 import { PeerRepository } from "./peer-repository";
+import { PeerApiNodeRepository } from "./peer-api-node-repository";
 import { PeerVerifier } from "./peer-verifier";
 import { Service } from "./service";
 import { Server } from "./socket-server/server";
@@ -77,6 +78,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			skipDiscovery: Joi.bool(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
+			apiNodes: Joi.array().items(Joi.string()).default([]),
 		}).unknown(true);
 	}
 
@@ -101,6 +103,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2PLogger).to(Logger).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerApiNodeRepository).to(PeerApiNodeRepository).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
 
