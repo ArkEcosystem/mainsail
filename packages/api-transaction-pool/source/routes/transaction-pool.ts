@@ -16,7 +16,20 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				payload: Joi.object({
 					transactions: Joi.array()
-						.items(Joi.string().lowercase().hex().max(4096 /* arbitrary cap */))
+						.items(
+							Joi.string()
+								.lowercase()
+								.hex()
+								.max(
+									server.app.app
+										.getTagged<Providers.PluginConfiguration>(
+											Identifiers.PluginConfiguration,
+											"plugin",
+											"transaction-pool",
+										)
+										.getRequired<number>("maxTransactionBytes"),
+								),
+						)
 						.min(1)
 						.max(
 							server.app.app

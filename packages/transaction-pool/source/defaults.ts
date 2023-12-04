@@ -11,7 +11,7 @@ export const defaults = {
 	// then it will be removed.
 	maxTransactionAge: 2700,
 
-	maxTransactionBytes: 2_000_000, // TODO think of a value that makes sense ?
+	maxTransactionBytes: 20_000, // TODO think of a value that makes sense ?
 
 	// When the pool contains that many transactions, then a new transaction is
 	// only accepted if its fee is higher than the transaction with the lowest
