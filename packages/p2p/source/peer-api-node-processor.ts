@@ -11,12 +11,14 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 
 	readonly #apiNodes: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
 
-
 	public getApiNodes(): Contracts.P2P.PeerApiNodes {
 		return [...this.#apiNodes.values()];
 	}
 
-	public async validateAndAcceptApiNode(apiNode: Contracts.P2P.PeerApiNode, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+	public async validateAndAcceptApiNode(
+		apiNode: Contracts.P2P.PeerApiNode,
+		options: Contracts.P2P.AcceptNewPeerOptions = {},
+	): Promise<void> {
 		if (this.repository.hasApiNode(apiNode) || this.repository.hasPendingApiNode(apiNode)) {
 			return;
 		}
@@ -24,7 +26,6 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 		this.repository.setPendingApiNode(apiNode);
 
 		if (await this.apiNodeVerifier.verify(apiNode)) {
-
 		}
 
 		this.repository.forgetPendingApiNode(apiNode);

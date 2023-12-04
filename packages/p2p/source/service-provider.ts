@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ValidateAndAcceptPeerAction, ValidateAndAcceptApiNodeAction } from "./actions";
+import { ValidateAndAcceptApiNodeAction, ValidateAndAcceptPeerAction } from "./actions";
 import { Broadcaster } from "./broadcaster";
 import { BlockDownloader } from "./downloader/block-downloader";
 import { MessageDownloader } from "./downloader/message-downloader";
@@ -11,6 +11,7 @@ import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
 import { Peer } from "./peer";
+import { PeerApiNodeProcessor } from "./peer-api-node-processor";
 import { PeerApiNodeRepository } from "./peer-api-node-repository";
 import { PeerApiNodeVerifier } from "./peer-api-node-verifier";
 import { PeerCommunicator } from "./peer-communicator";
@@ -25,7 +26,6 @@ import { Server } from "./socket-server/server";
 import { State } from "./state";
 import { Throttle } from "./throttle";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
-import { PeerApiNodeProcessor } from "./peer-api-node-processor";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

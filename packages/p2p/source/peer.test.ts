@@ -25,9 +25,15 @@ describe<{
 	each(
 		"#url - should infer protocol when port is 80 or 443",
 		({ context, dataset }) => {
-			assert.equal(context.sandbox.app.resolve(Peer).init(ip, dataset[0]).url, `${dataset[1]}://${ip}:${dataset[0]}`);
+			assert.equal(
+				context.sandbox.app.resolve(Peer).init(ip, dataset[0]).url,
+				`${dataset[1]}://${ip}:${dataset[0]}`,
+			);
 		},
-		[[80, "http"], [443, "https"]],
+		[
+			[80, "http"],
+			[443, "https"],
+		],
 	);
 
 	it("#recentlyPinged - should return true when lastPinged is less than 2 minutes ago", ({ peer }) => {

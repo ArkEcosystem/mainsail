@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { HttpResponse, http } from "@mainsail/utils";
+import { http, HttpResponse } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -14,7 +14,7 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 			apiNode.lastPinged = t0;
 
 			const response = await http.get(apiNode.url(), {
-				headers: {}
+				headers: {},
 			});
 
 			const t1 = dayjs();
@@ -24,7 +24,6 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 
 			this.#verifyStatusCode(response);
 			this.#verifyResponseBody(response);
-
 		} catch (error) {
 			this.logger.debugExtra(`API node ${apiNode.ip} verification failed: ${error.message}`);
 			return false;
