@@ -107,7 +107,7 @@ export namespace getApiNodes {
         headers?: (shared.IHeaders|null);
 
         /** GetApiNodesResponse apiNodes */
-        apiNodes?: (getApiNodes.GetApiNodesResponse.IApiNode[]|null);
+        apiNodes?: (shared.IPeerLike[]|null);
     }
 
     /** Represents a GetApiNodesResponse. */
@@ -123,7 +123,7 @@ export namespace getApiNodes {
         public headers?: (shared.IHeaders|null);
 
         /** GetApiNodesResponse apiNodes. */
-        public apiNodes: getApiNodes.GetApiNodesResponse.IApiNode[];
+        public apiNodes: shared.IPeerLike[];
 
         /**
          * Creates a new GetApiNodesResponse instance using the specified properties.
@@ -201,112 +201,6 @@ export namespace getApiNodes {
          * @returns The default type url
          */
         public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    namespace GetApiNodesResponse {
-
-        /** Properties of an ApiNode. */
-        interface IApiNode {
-
-            /** ApiNode ip */
-            ip?: (string|null);
-
-            /** ApiNode port */
-            port?: (number|null);
-        }
-
-        /** Represents an ApiNode. */
-        class ApiNode implements IApiNode {
-
-            /**
-             * Constructs a new ApiNode.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: getApiNodes.GetApiNodesResponse.IApiNode);
-
-            /** ApiNode ip. */
-            public ip: string;
-
-            /** ApiNode port. */
-            public port: number;
-
-            /**
-             * Creates a new ApiNode instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ApiNode instance
-             */
-            public static create(properties?: getApiNodes.GetApiNodesResponse.IApiNode): getApiNodes.GetApiNodesResponse.ApiNode;
-
-            /**
-             * Encodes the specified ApiNode message. Does not implicitly {@link getApiNodes.GetApiNodesResponse.ApiNode.verify|verify} messages.
-             * @param message ApiNode message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: getApiNodes.GetApiNodesResponse.IApiNode, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified ApiNode message, length delimited. Does not implicitly {@link getApiNodes.GetApiNodesResponse.ApiNode.verify|verify} messages.
-             * @param message ApiNode message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: getApiNodes.GetApiNodesResponse.IApiNode, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an ApiNode message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ApiNode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getApiNodes.GetApiNodesResponse.ApiNode;
-
-            /**
-             * Decodes an ApiNode message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns ApiNode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getApiNodes.GetApiNodesResponse.ApiNode;
-
-            /**
-             * Verifies an ApiNode message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates an ApiNode message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns ApiNode
-             */
-            public static fromObject(object: { [k: string]: any }): getApiNodes.GetApiNodesResponse.ApiNode;
-
-            /**
-             * Creates a plain object from an ApiNode message. Also converts values to other types if specified.
-             * @param message ApiNode
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: getApiNodes.GetApiNodesResponse.ApiNode, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this ApiNode to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for ApiNode
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
     }
 }
 
@@ -843,7 +737,7 @@ export namespace getPeers {
         headers?: (shared.IHeaders|null);
 
         /** GetPeersResponse peers */
-        peers?: (getPeers.GetPeersResponse.IPeer[]|null);
+        peers?: (shared.IPeerLike[]|null);
     }
 
     /** Represents a GetPeersResponse. */
@@ -859,7 +753,7 @@ export namespace getPeers {
         public headers?: (shared.IHeaders|null);
 
         /** GetPeersResponse peers. */
-        public peers: getPeers.GetPeersResponse.IPeer[];
+        public peers: shared.IPeerLike[];
 
         /**
          * Creates a new GetPeersResponse instance using the specified properties.
@@ -937,112 +831,6 @@ export namespace getPeers {
          * @returns The default type url
          */
         public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    namespace GetPeersResponse {
-
-        /** Properties of a Peer. */
-        interface IPeer {
-
-            /** Peer ip */
-            ip?: (string|null);
-
-            /** Peer port */
-            port?: (number|null);
-        }
-
-        /** Represents a Peer. */
-        class Peer implements IPeer {
-
-            /**
-             * Constructs a new Peer.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: getPeers.GetPeersResponse.IPeer);
-
-            /** Peer ip. */
-            public ip: string;
-
-            /** Peer port. */
-            public port: number;
-
-            /**
-             * Creates a new Peer instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Peer instance
-             */
-            public static create(properties?: getPeers.GetPeersResponse.IPeer): getPeers.GetPeersResponse.Peer;
-
-            /**
-             * Encodes the specified Peer message. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
-             * @param message Peer message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: getPeers.GetPeersResponse.IPeer, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Encodes the specified Peer message, length delimited. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
-             * @param message Peer message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encodeDelimited(message: getPeers.GetPeersResponse.IPeer, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getPeers.GetPeersResponse.Peer;
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer, length delimited.
-             * @param reader Reader or buffer to decode from
-             * @returns Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getPeers.GetPeersResponse.Peer;
-
-            /**
-             * Verifies a Peer message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-
-            /**
-             * Creates a Peer message from a plain object. Also converts values to their respective internal types.
-             * @param object Plain object
-             * @returns Peer
-             */
-            public static fromObject(object: { [k: string]: any }): getPeers.GetPeersResponse.Peer;
-
-            /**
-             * Creates a plain object from a Peer message. Also converts values to other types if specified.
-             * @param message Peer
-             * @param [options] Conversion options
-             * @returns Plain object
-             */
-            public static toObject(message: getPeers.GetPeersResponse.Peer, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-            /**
-             * Converts this Peer to JSON.
-             * @returns JSON object
-             */
-            public toJSON(): { [k: string]: any };
-
-            /**
-             * Gets the default type url for Peer
-             * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns The default type url
-             */
-            public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
     }
 }
 
@@ -3153,6 +2941,115 @@ export namespace shared {
 
         /**
          * Gets the default type url for Headers
+         * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns The default type url
+         */
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    /** Properties of a PeerLike. */
+    interface IPeerLike {
+
+        /** PeerLike ip */
+        ip?: (string|null);
+
+        /** PeerLike port */
+        port?: (number|null);
+
+        /** PeerLike protocol */
+        protocol?: (number|null);
+    }
+
+    /** Represents a PeerLike. */
+    class PeerLike implements IPeerLike {
+
+        /**
+         * Constructs a new PeerLike.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: shared.IPeerLike);
+
+        /** PeerLike ip. */
+        public ip: string;
+
+        /** PeerLike port. */
+        public port: number;
+
+        /** PeerLike protocol. */
+        public protocol: number;
+
+        /**
+         * Creates a new PeerLike instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns PeerLike instance
+         */
+        public static create(properties?: shared.IPeerLike): shared.PeerLike;
+
+        /**
+         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @param message PeerLike message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encode(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @param message PeerLike message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        public static encodeDelimited(message: shared.IPeerLike, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): shared.PeerLike;
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): shared.PeerLike;
+
+        /**
+         * Verifies a PeerLike message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        public static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns PeerLike
+         */
+        public static fromObject(object: { [k: string]: any }): shared.PeerLike;
+
+        /**
+         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
+         * @param message PeerLike
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        public static toObject(message: shared.PeerLike, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this PeerLike to JSON.
+         * @returns JSON object
+         */
+        public toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the default type url for PeerLike
          * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
          * @returns The default type url
          */

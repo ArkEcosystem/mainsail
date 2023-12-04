@@ -7,11 +7,6 @@ message GetPeersRequest {
 }
 
 message GetPeersResponse {
-    message Peer {
-        string ip = 1;
-        uint32 port = 2;
-    }
-
 	shared.Headers headers = 1;
-    repeated Peer peers = 2;
+    repeated shared.PeerLike peers = 2;
 }

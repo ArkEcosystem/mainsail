@@ -24,6 +24,11 @@ export const getPeers = {
 						minimum: 0,
 						type: "integer",
 					},
+					protocol: {
+						maximum: 1,
+						minimum: 0,
+						type: "integer",
+					},
 				},
 				required: ["ip", "port"],
 				type: "object",

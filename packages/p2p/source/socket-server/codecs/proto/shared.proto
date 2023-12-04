@@ -11,3 +11,9 @@ message Headers {
 	repeated bool validatorsSignedPrevote = 6;
 	repeated bool validatorsSignedPrecommit = 7;
 }
+
+message PeerLike {
+    string ip = 1;
+    uint32 port = 2;
+    uint32 protocol = 3;
+}

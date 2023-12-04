@@ -233,7 +233,7 @@ $root.getApiNodes = (function() {
          * @memberof getApiNodes
          * @interface IGetApiNodesResponse
          * @property {shared.IHeaders|null} [headers] GetApiNodesResponse headers
-         * @property {Array.<getApiNodes.GetApiNodesResponse.IApiNode>|null} [apiNodes] GetApiNodesResponse apiNodes
+         * @property {Array.<shared.IPeerLike>|null} [apiNodes] GetApiNodesResponse apiNodes
          */
 
         /**
@@ -262,7 +262,7 @@ $root.getApiNodes = (function() {
 
         /**
          * GetApiNodesResponse apiNodes.
-         * @member {Array.<getApiNodes.GetApiNodesResponse.IApiNode>} apiNodes
+         * @member {Array.<shared.IPeerLike>} apiNodes
          * @memberof getApiNodes.GetApiNodesResponse
          * @instance
          */
@@ -296,7 +296,7 @@ $root.getApiNodes = (function() {
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.apiNodes != null && message.apiNodes.length)
                 for (var i = 0; i < message.apiNodes.length; ++i)
-                    $root.getApiNodes.GetApiNodesResponse.ApiNode.encode(message.apiNodes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    $root.shared.PeerLike.encode(message.apiNodes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
@@ -338,7 +338,7 @@ $root.getApiNodes = (function() {
                 case 2: {
                         if (!(message.apiNodes && message.apiNodes.length))
                             message.apiNodes = [];
-                        message.apiNodes.push($root.getApiNodes.GetApiNodesResponse.ApiNode.decode(reader, reader.uint32()));
+                        message.apiNodes.push($root.shared.PeerLike.decode(reader, reader.uint32()));
                         break;
                     }
                 default:
@@ -385,7 +385,7 @@ $root.getApiNodes = (function() {
                 if (!Array.isArray(message.apiNodes))
                     return "apiNodes: array expected";
                 for (var i = 0; i < message.apiNodes.length; ++i) {
-                    var error = $root.getApiNodes.GetApiNodesResponse.ApiNode.verify(message.apiNodes[i]);
+                    var error = $root.shared.PeerLike.verify(message.apiNodes[i]);
                     if (error)
                         return "apiNodes." + error;
                 }
@@ -417,7 +417,7 @@ $root.getApiNodes = (function() {
                 for (var i = 0; i < object.apiNodes.length; ++i) {
                     if (typeof object.apiNodes[i] !== "object")
                         throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: object expected");
-                    message.apiNodes[i] = $root.getApiNodes.GetApiNodesResponse.ApiNode.fromObject(object.apiNodes[i]);
+                    message.apiNodes[i] = $root.shared.PeerLike.fromObject(object.apiNodes[i]);
                 }
             }
             return message;
@@ -445,7 +445,7 @@ $root.getApiNodes = (function() {
             if (message.apiNodes && message.apiNodes.length) {
                 object.apiNodes = [];
                 for (var j = 0; j < message.apiNodes.length; ++j)
-                    object.apiNodes[j] = $root.getApiNodes.GetApiNodesResponse.ApiNode.toObject(message.apiNodes[j], options);
+                    object.apiNodes[j] = $root.shared.PeerLike.toObject(message.apiNodes[j], options);
             }
             return object;
         };
@@ -475,233 +475,6 @@ $root.getApiNodes = (function() {
             }
             return typeUrlPrefix + "/getApiNodes.GetApiNodesResponse";
         };
-
-        GetApiNodesResponse.ApiNode = (function() {
-
-            /**
-             * Properties of an ApiNode.
-             * @memberof getApiNodes.GetApiNodesResponse
-             * @interface IApiNode
-             * @property {string|null} [ip] ApiNode ip
-             * @property {number|null} [port] ApiNode port
-             */
-
-            /**
-             * Constructs a new ApiNode.
-             * @memberof getApiNodes.GetApiNodesResponse
-             * @classdesc Represents an ApiNode.
-             * @implements IApiNode
-             * @constructor
-             * @param {getApiNodes.GetApiNodesResponse.IApiNode=} [properties] Properties to set
-             */
-            function ApiNode(properties) {
-                if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * ApiNode ip.
-             * @member {string} ip
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @instance
-             */
-            ApiNode.prototype.ip = "";
-
-            /**
-             * ApiNode port.
-             * @member {number} port
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @instance
-             */
-            ApiNode.prototype.port = 0;
-
-            /**
-             * Creates a new ApiNode instance using the specified properties.
-             * @function create
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {getApiNodes.GetApiNodesResponse.IApiNode=} [properties] Properties to set
-             * @returns {getApiNodes.GetApiNodesResponse.ApiNode} ApiNode instance
-             */
-            ApiNode.create = function create(properties) {
-                return new ApiNode(properties);
-            };
-
-            /**
-             * Encodes the specified ApiNode message. Does not implicitly {@link getApiNodes.GetApiNodesResponse.ApiNode.verify|verify} messages.
-             * @function encode
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {getApiNodes.GetApiNodesResponse.IApiNode} message ApiNode message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            ApiNode.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
-                if (message.port != null && Object.hasOwnProperty.call(message, "port"))
-                    writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
-                return writer;
-            };
-
-            /**
-             * Encodes the specified ApiNode message, length delimited. Does not implicitly {@link getApiNodes.GetApiNodesResponse.ApiNode.verify|verify} messages.
-             * @function encodeDelimited
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {getApiNodes.GetApiNodesResponse.IApiNode} message ApiNode message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            ApiNode.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
-            };
-
-            /**
-             * Decodes an ApiNode message from the specified reader or buffer.
-             * @function decode
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {getApiNodes.GetApiNodesResponse.ApiNode} ApiNode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            ApiNode.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getApiNodes.GetApiNodesResponse.ApiNode();
-                while (reader.pos < end) {
-                    var tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 1: {
-                            message.ip = reader.string();
-                            break;
-                        }
-                    case 2: {
-                            message.port = reader.uint32();
-                            break;
-                        }
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Decodes an ApiNode message from the specified reader or buffer, length delimited.
-             * @function decodeDelimited
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {getApiNodes.GetApiNodesResponse.ApiNode} ApiNode
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            ApiNode.decodeDelimited = function decodeDelimited(reader) {
-                if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
-                return this.decode(reader, reader.uint32());
-            };
-
-            /**
-             * Verifies an ApiNode message.
-             * @function verify
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            ApiNode.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.ip != null && message.hasOwnProperty("ip"))
-                    if (!$util.isString(message.ip))
-                        return "ip: string expected";
-                if (message.port != null && message.hasOwnProperty("port"))
-                    if (!$util.isInteger(message.port))
-                        return "port: integer expected";
-                return null;
-            };
-
-            /**
-             * Creates an ApiNode message from a plain object. Also converts values to their respective internal types.
-             * @function fromObject
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {Object.<string,*>} object Plain object
-             * @returns {getApiNodes.GetApiNodesResponse.ApiNode} ApiNode
-             */
-            ApiNode.fromObject = function fromObject(object) {
-                if (object instanceof $root.getApiNodes.GetApiNodesResponse.ApiNode)
-                    return object;
-                var message = new $root.getApiNodes.GetApiNodesResponse.ApiNode();
-                if (object.ip != null)
-                    message.ip = String(object.ip);
-                if (object.port != null)
-                    message.port = object.port >>> 0;
-                return message;
-            };
-
-            /**
-             * Creates a plain object from an ApiNode message. Also converts values to other types if specified.
-             * @function toObject
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {getApiNodes.GetApiNodesResponse.ApiNode} message ApiNode
-             * @param {$protobuf.IConversionOptions} [options] Conversion options
-             * @returns {Object.<string,*>} Plain object
-             */
-            ApiNode.toObject = function toObject(message, options) {
-                if (!options)
-                    options = {};
-                var object = {};
-                if (options.defaults) {
-                    object.ip = "";
-                    object.port = 0;
-                }
-                if (message.ip != null && message.hasOwnProperty("ip"))
-                    object.ip = message.ip;
-                if (message.port != null && message.hasOwnProperty("port"))
-                    object.port = message.port;
-                return object;
-            };
-
-            /**
-             * Converts this ApiNode to JSON.
-             * @function toJSON
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @instance
-             * @returns {Object.<string,*>} JSON object
-             */
-            ApiNode.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-            };
-
-            /**
-             * Gets the default type url for ApiNode
-             * @function getTypeUrl
-             * @memberof getApiNodes.GetApiNodesResponse.ApiNode
-             * @static
-             * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns {string} The default type url
-             */
-            ApiNode.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-                if (typeUrlPrefix === undefined) {
-                    typeUrlPrefix = "type.googleapis.com";
-                }
-                return typeUrlPrefix + "/getApiNodes.GetApiNodesResponse.ApiNode";
-            };
-
-            return ApiNode;
-        })();
 
         return GetApiNodesResponse;
     })();
@@ -1965,7 +1738,7 @@ $root.getPeers = (function() {
          * @memberof getPeers
          * @interface IGetPeersResponse
          * @property {shared.IHeaders|null} [headers] GetPeersResponse headers
-         * @property {Array.<getPeers.GetPeersResponse.IPeer>|null} [peers] GetPeersResponse peers
+         * @property {Array.<shared.IPeerLike>|null} [peers] GetPeersResponse peers
          */
 
         /**
@@ -1994,7 +1767,7 @@ $root.getPeers = (function() {
 
         /**
          * GetPeersResponse peers.
-         * @member {Array.<getPeers.GetPeersResponse.IPeer>} peers
+         * @member {Array.<shared.IPeerLike>} peers
          * @memberof getPeers.GetPeersResponse
          * @instance
          */
@@ -2028,7 +1801,7 @@ $root.getPeers = (function() {
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.peers != null && message.peers.length)
                 for (var i = 0; i < message.peers.length; ++i)
-                    $root.getPeers.GetPeersResponse.Peer.encode(message.peers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    $root.shared.PeerLike.encode(message.peers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
@@ -2070,7 +1843,7 @@ $root.getPeers = (function() {
                 case 2: {
                         if (!(message.peers && message.peers.length))
                             message.peers = [];
-                        message.peers.push($root.getPeers.GetPeersResponse.Peer.decode(reader, reader.uint32()));
+                        message.peers.push($root.shared.PeerLike.decode(reader, reader.uint32()));
                         break;
                     }
                 default:
@@ -2117,7 +1890,7 @@ $root.getPeers = (function() {
                 if (!Array.isArray(message.peers))
                     return "peers: array expected";
                 for (var i = 0; i < message.peers.length; ++i) {
-                    var error = $root.getPeers.GetPeersResponse.Peer.verify(message.peers[i]);
+                    var error = $root.shared.PeerLike.verify(message.peers[i]);
                     if (error)
                         return "peers." + error;
                 }
@@ -2149,7 +1922,7 @@ $root.getPeers = (function() {
                 for (var i = 0; i < object.peers.length; ++i) {
                     if (typeof object.peers[i] !== "object")
                         throw TypeError(".getPeers.GetPeersResponse.peers: object expected");
-                    message.peers[i] = $root.getPeers.GetPeersResponse.Peer.fromObject(object.peers[i]);
+                    message.peers[i] = $root.shared.PeerLike.fromObject(object.peers[i]);
                 }
             }
             return message;
@@ -2177,7 +1950,7 @@ $root.getPeers = (function() {
             if (message.peers && message.peers.length) {
                 object.peers = [];
                 for (var j = 0; j < message.peers.length; ++j)
-                    object.peers[j] = $root.getPeers.GetPeersResponse.Peer.toObject(message.peers[j], options);
+                    object.peers[j] = $root.shared.PeerLike.toObject(message.peers[j], options);
             }
             return object;
         };
@@ -2207,233 +1980,6 @@ $root.getPeers = (function() {
             }
             return typeUrlPrefix + "/getPeers.GetPeersResponse";
         };
-
-        GetPeersResponse.Peer = (function() {
-
-            /**
-             * Properties of a Peer.
-             * @memberof getPeers.GetPeersResponse
-             * @interface IPeer
-             * @property {string|null} [ip] Peer ip
-             * @property {number|null} [port] Peer port
-             */
-
-            /**
-             * Constructs a new Peer.
-             * @memberof getPeers.GetPeersResponse
-             * @classdesc Represents a Peer.
-             * @implements IPeer
-             * @constructor
-             * @param {getPeers.GetPeersResponse.IPeer=} [properties] Properties to set
-             */
-            function Peer(properties) {
-                if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * Peer ip.
-             * @member {string} ip
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @instance
-             */
-            Peer.prototype.ip = "";
-
-            /**
-             * Peer port.
-             * @member {number} port
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @instance
-             */
-            Peer.prototype.port = 0;
-
-            /**
-             * Creates a new Peer instance using the specified properties.
-             * @function create
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {getPeers.GetPeersResponse.IPeer=} [properties] Properties to set
-             * @returns {getPeers.GetPeersResponse.Peer} Peer instance
-             */
-            Peer.create = function create(properties) {
-                return new Peer(properties);
-            };
-
-            /**
-             * Encodes the specified Peer message. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
-             * @function encode
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {getPeers.GetPeersResponse.IPeer} message Peer message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            Peer.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
-                if (message.port != null && Object.hasOwnProperty.call(message, "port"))
-                    writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
-                return writer;
-            };
-
-            /**
-             * Encodes the specified Peer message, length delimited. Does not implicitly {@link getPeers.GetPeersResponse.Peer.verify|verify} messages.
-             * @function encodeDelimited
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {getPeers.GetPeersResponse.IPeer} message Peer message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            Peer.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
-            };
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer.
-             * @function decode
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {getPeers.GetPeersResponse.Peer} Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            Peer.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getPeers.GetPeersResponse.Peer();
-                while (reader.pos < end) {
-                    var tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 1: {
-                            message.ip = reader.string();
-                            break;
-                        }
-                    case 2: {
-                            message.port = reader.uint32();
-                            break;
-                        }
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Decodes a Peer message from the specified reader or buffer, length delimited.
-             * @function decodeDelimited
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @returns {getPeers.GetPeersResponse.Peer} Peer
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            Peer.decodeDelimited = function decodeDelimited(reader) {
-                if (!(reader instanceof $Reader))
-                    reader = new $Reader(reader);
-                return this.decode(reader, reader.uint32());
-            };
-
-            /**
-             * Verifies a Peer message.
-             * @function verify
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            Peer.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.ip != null && message.hasOwnProperty("ip"))
-                    if (!$util.isString(message.ip))
-                        return "ip: string expected";
-                if (message.port != null && message.hasOwnProperty("port"))
-                    if (!$util.isInteger(message.port))
-                        return "port: integer expected";
-                return null;
-            };
-
-            /**
-             * Creates a Peer message from a plain object. Also converts values to their respective internal types.
-             * @function fromObject
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {Object.<string,*>} object Plain object
-             * @returns {getPeers.GetPeersResponse.Peer} Peer
-             */
-            Peer.fromObject = function fromObject(object) {
-                if (object instanceof $root.getPeers.GetPeersResponse.Peer)
-                    return object;
-                var message = new $root.getPeers.GetPeersResponse.Peer();
-                if (object.ip != null)
-                    message.ip = String(object.ip);
-                if (object.port != null)
-                    message.port = object.port >>> 0;
-                return message;
-            };
-
-            /**
-             * Creates a plain object from a Peer message. Also converts values to other types if specified.
-             * @function toObject
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {getPeers.GetPeersResponse.Peer} message Peer
-             * @param {$protobuf.IConversionOptions} [options] Conversion options
-             * @returns {Object.<string,*>} Plain object
-             */
-            Peer.toObject = function toObject(message, options) {
-                if (!options)
-                    options = {};
-                var object = {};
-                if (options.defaults) {
-                    object.ip = "";
-                    object.port = 0;
-                }
-                if (message.ip != null && message.hasOwnProperty("ip"))
-                    object.ip = message.ip;
-                if (message.port != null && message.hasOwnProperty("port"))
-                    object.port = message.port;
-                return object;
-            };
-
-            /**
-             * Converts this Peer to JSON.
-             * @function toJSON
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @instance
-             * @returns {Object.<string,*>} JSON object
-             */
-            Peer.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-            };
-
-            /**
-             * Gets the default type url for Peer
-             * @function getTypeUrl
-             * @memberof getPeers.GetPeersResponse.Peer
-             * @static
-             * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-             * @returns {string} The default type url
-             */
-            Peer.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-                if (typeUrlPrefix === undefined) {
-                    typeUrlPrefix = "type.googleapis.com";
-                }
-                return typeUrlPrefix + "/getPeers.GetPeersResponse.Peer";
-            };
-
-            return Peer;
-        })();
 
         return GetPeersResponse;
     })();
@@ -7523,6 +7069,256 @@ $root.shared = (function() {
         };
 
         return Headers;
+    })();
+
+    shared.PeerLike = (function() {
+
+        /**
+         * Properties of a PeerLike.
+         * @memberof shared
+         * @interface IPeerLike
+         * @property {string|null} [ip] PeerLike ip
+         * @property {number|null} [port] PeerLike port
+         * @property {number|null} [protocol] PeerLike protocol
+         */
+
+        /**
+         * Constructs a new PeerLike.
+         * @memberof shared
+         * @classdesc Represents a PeerLike.
+         * @implements IPeerLike
+         * @constructor
+         * @param {shared.IPeerLike=} [properties] Properties to set
+         */
+        function PeerLike(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * PeerLike ip.
+         * @member {string} ip
+         * @memberof shared.PeerLike
+         * @instance
+         */
+        PeerLike.prototype.ip = "";
+
+        /**
+         * PeerLike port.
+         * @member {number} port
+         * @memberof shared.PeerLike
+         * @instance
+         */
+        PeerLike.prototype.port = 0;
+
+        /**
+         * PeerLike protocol.
+         * @member {number} protocol
+         * @memberof shared.PeerLike
+         * @instance
+         */
+        PeerLike.prototype.protocol = 0;
+
+        /**
+         * Creates a new PeerLike instance using the specified properties.
+         * @function create
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.IPeerLike=} [properties] Properties to set
+         * @returns {shared.PeerLike} PeerLike instance
+         */
+        PeerLike.create = function create(properties) {
+            return new PeerLike(properties);
+        };
+
+        /**
+         * Encodes the specified PeerLike message. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @function encode
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.IPeerLike} message PeerLike message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PeerLike.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
+            if (message.port != null && Object.hasOwnProperty.call(message, "port"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
+            if (message.protocol != null && Object.hasOwnProperty.call(message, "protocol"))
+                writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.protocol);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified PeerLike message, length delimited. Does not implicitly {@link shared.PeerLike.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.IPeerLike} message PeerLike message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        PeerLike.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer.
+         * @function decode
+         * @memberof shared.PeerLike
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {shared.PeerLike} PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PeerLike.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.shared.PeerLike();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.ip = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.port = reader.uint32();
+                        break;
+                    }
+                case 3: {
+                        message.protocol = reader.uint32();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a PeerLike message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof shared.PeerLike
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {shared.PeerLike} PeerLike
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        PeerLike.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a PeerLike message.
+         * @function verify
+         * @memberof shared.PeerLike
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        PeerLike.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.ip != null && message.hasOwnProperty("ip"))
+                if (!$util.isString(message.ip))
+                    return "ip: string expected";
+            if (message.port != null && message.hasOwnProperty("port"))
+                if (!$util.isInteger(message.port))
+                    return "port: integer expected";
+            if (message.protocol != null && message.hasOwnProperty("protocol"))
+                if (!$util.isInteger(message.protocol))
+                    return "protocol: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a PeerLike message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof shared.PeerLike
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {shared.PeerLike} PeerLike
+         */
+        PeerLike.fromObject = function fromObject(object) {
+            if (object instanceof $root.shared.PeerLike)
+                return object;
+            var message = new $root.shared.PeerLike();
+            if (object.ip != null)
+                message.ip = String(object.ip);
+            if (object.port != null)
+                message.port = object.port >>> 0;
+            if (object.protocol != null)
+                message.protocol = object.protocol >>> 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a PeerLike message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof shared.PeerLike
+         * @static
+         * @param {shared.PeerLike} message PeerLike
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        PeerLike.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults) {
+                object.ip = "";
+                object.port = 0;
+                object.protocol = 0;
+            }
+            if (message.ip != null && message.hasOwnProperty("ip"))
+                object.ip = message.ip;
+            if (message.port != null && message.hasOwnProperty("port"))
+                object.port = message.port;
+            if (message.protocol != null && message.hasOwnProperty("protocol"))
+                object.protocol = message.protocol;
+            return object;
+        };
+
+        /**
+         * Converts this PeerLike to JSON.
+         * @function toJSON
+         * @memberof shared.PeerLike
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        PeerLike.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for PeerLike
+         * @function getTypeUrl
+         * @memberof shared.PeerLike
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        PeerLike.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/shared.PeerLike";
+        };
+
+        return PeerLike;
     })();
 
     return shared;
