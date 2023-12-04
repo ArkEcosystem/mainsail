@@ -34,10 +34,19 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		}
 	}
 
-	// TODO: check whether to discover other peer's api nodes or not
-	// async discoverApiNodes(peer: Contracts.P2P.Peer): Promise<void> {
-	// 		{ apiNodes } = await this.communicator.getApiNodes(peer);
-	// }
+	async discoverApiNodes(peer: Contracts.P2P.Peer): Promise<void> {
+		try {
+			const { apiNodes } = await this.communicator.getApiNodes(peer);
+
+			for (const apiNode of apiNodes) {
+				await this.app
+					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.call("validateAndAcceptApiNode", { apiNode, options: {} });
+			}
+		} catch (error) {
+			this.logger.debug(`Failed to get api nodes from ${peer.ip}: ${error.message}`);
+		}
+	}
 
 	async populateSeedPeers(): Promise<any> {
 		const peerList: Contracts.P2P.PeerData[] = this.app.config("peers").list;

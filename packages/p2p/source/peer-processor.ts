@@ -106,6 +106,8 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			await this.peerCommunicator.pingPorts(peer);
 
 			await this.peerDiscoverer.discoverPeers(peer);
+
+			await this.peerDiscoverer.discoverApiNodes(peer);
 		}
 
 		this.repository.forgetPendingPeer(peer);

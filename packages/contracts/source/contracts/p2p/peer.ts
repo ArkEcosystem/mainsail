@@ -25,6 +25,7 @@ export interface PeerApiNode {
 
 	statusCode?: number;
 	latency?: number;
+	lastPinged?: Dayjs;
 }
 
 export type PeerApiNodes = PeerApiNode[];

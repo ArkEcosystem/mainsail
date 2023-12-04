@@ -21,6 +21,7 @@ export class PeerApiNodeRepository implements Contracts.P2P.PeerApiNodeRepositor
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	readonly #apiNodes: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
+	readonly #apiNodesPending: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
 
 	@postConstruct()
 	public postConstruct() {
@@ -39,11 +40,27 @@ export class PeerApiNodeRepository implements Contracts.P2P.PeerApiNodeRepositor
 		return [...this.#apiNodes.values()];
 	}
 
+	public hasApiNode(apiNode: Contracts.P2P.PeerApiNode): boolean {
+		return this.#apiNodes.has(apiNode.ip);
+	}
+
 	public setApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
 		this.#apiNodes.set(apiNode.ip, apiNode);
 	}
 
 	public forgetApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
 		this.#apiNodes.delete(apiNode.ip);
+	}
+
+	public setPendingApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
+		this.#apiNodesPending.set(apiNode.ip, apiNode);
+	}
+
+	public forgetPendingApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
+		this.#apiNodesPending.delete(apiNode.ip);
+	}
+
+	public hasPendingApiNode(apiNode: Contracts.P2P.PeerApiNode): boolean {
+		return this.#apiNodesPending.has(apiNode.ip);
 	}
 }

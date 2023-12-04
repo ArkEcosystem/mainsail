@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ValidateAndAcceptPeerAction } from "./actions";
+import { ValidateAndAcceptPeerAction, ValidateAndAcceptApiNodeAction } from "./actions";
 import { Broadcaster } from "./broadcaster";
 import { BlockDownloader } from "./downloader/block-downloader";
 import { MessageDownloader } from "./downloader/message-downloader";
@@ -12,6 +12,7 @@ import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
 import { Peer } from "./peer";
 import { PeerApiNodeRepository } from "./peer-api-node-repository";
+import { PeerApiNodeVerifier } from "./peer-api-node-verifier";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
@@ -24,6 +25,7 @@ import { Server } from "./socket-server/server";
 import { State } from "./state";
 import { Throttle } from "./throttle";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
+import { PeerApiNodeProcessor } from "./peer-api-node-processor";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -106,6 +108,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.PeerApiNodeRepository).to(PeerApiNodeRepository).inSingletonScope();
 
+		this.app.bind(Identifiers.PeerApiNodeVerifier).to(PeerApiNodeVerifier).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerApiNodeProcessor).to(PeerApiNodeProcessor).inSingletonScope();
+
 		this.app.bind(Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerCommunicator).to(PeerCommunicator).inSingletonScope();
@@ -147,6 +153,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
+
+		this.app
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.bind("validateAndAcceptApiNode", new ValidateAndAcceptApiNodeAction(this.app));
 	}
 
 	#registerValidation(): void {
