@@ -9,11 +9,8 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 	@inject(Identifiers.PeerApiNodeVerifier)
 	private readonly apiNodeVerifier!: Contracts.P2P.PeerApiNodeVerifier;
 
-	readonly #apiNodes: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
-
-	public getApiNodes(): Contracts.P2P.PeerApiNodes {
-		return [...this.#apiNodes.values()];
-	}
+	@inject(Identifiers.P2PLogger)
+	private readonly logger!: Contracts.P2P.Logger;
 
 	public async validateAndAcceptApiNode(
 		apiNode: Contracts.P2P.PeerApiNode,
@@ -26,6 +23,9 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 		this.repository.setPendingApiNode(apiNode);
 
 		if (await this.apiNodeVerifier.verify(apiNode)) {
+			this.logger.debugExtra(`Accepted new API node ${apiNode.ip}:${apiNode.port}`);
+
+			this.repository.setApiNode(apiNode);
 		}
 
 		this.repository.forgetPendingApiNode(apiNode);
