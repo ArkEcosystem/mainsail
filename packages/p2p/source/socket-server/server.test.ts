@@ -4,6 +4,7 @@ import rewiremock from "rewiremock";
 
 import { describe, Sandbox } from "../../../test-framework";
 import { defaults as transactionPoolDefaults } from "../../../transaction-pool/source/defaults";
+import { constants } from "../constants";
 import { defaults } from "../defaults";
 import { plugin } from "../hapi-nes";
 import { Server } from "./server";
@@ -32,10 +33,10 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 
 	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
 	const config = {
+		getMaxActiveValidators: () => 51,
 		getMilestone: () => ({
 			activeValidators: 51,
 		}),
-		getMaxActiveValidators: () => 51,
 	};
 
 	beforeEach((context) => {
@@ -77,7 +78,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 
 		spyHapiServerRegister.calledOnce();
 		spyHapiServerRegister.calledWith({
-			options: { maxPayload: 20_971_520 },
+			options: { maxPayload: constants.MAX_PAYLOAD_SERVER },
 			plugin: plugin,
 		});
 	});
