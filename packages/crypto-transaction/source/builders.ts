@@ -91,7 +91,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		const limit: number = this.configuration.getMilestone().vendorFieldLength;
 
 		if (vendorField) {
-			if (Buffer.from(vendorField).length > limit) {
+			if (Buffer.byteLength(vendorField, "utf8") > limit) {
 				throw new Exceptions.VendorFieldLengthExceededError(limit);
 			}
 

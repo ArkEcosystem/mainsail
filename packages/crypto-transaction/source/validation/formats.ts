@@ -6,7 +6,7 @@ export const makeFormats = (configuration: Contracts.Crypto.IConfiguration) => {
 		type: "string",
 		validate: (data) => {
 			try {
-				return Buffer.from(data, "utf8").length <= configuration.getMilestone().vendorFieldLength;
+				return Buffer.byteLength(data, "utf8") <= configuration.getMilestone().vendorFieldLength;
 			} catch {
 				return false;
 			}
