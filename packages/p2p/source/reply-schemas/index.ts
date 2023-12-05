@@ -1,5 +1,6 @@
 export * from "./get-blocks";
 export * from "./get-messages";
+export * from "./get-api-nodes";
 export * from "./get-peers";
 export * from "./get-proposal";
 export * from "./get-status";

@@ -21,8 +21,8 @@ describe<{
 		"../../utils": utils,
 	});
 
-	const logger = { debug: () => {}, warning: () => {} };
-	const configuration = { getRequired: () => {} };
+	const logger = { debug: () => { }, warning: () => { } };
+	const configuration = { getRequired: () => { } };
 
 	const responsePayload = { status: "ok" };
 	const mockRouteByPath = {
@@ -49,7 +49,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue({ validatePeerIp: () => true });
 		context.sandbox.app
 			.bind(Identifiers.PeerDisposer)
-			.toConstantValue({ banPeer: () => {}, disposePeer: () => {} });
+			.toConstantValue({ banPeer: () => { }, disposePeer: () => { } });
 
 		context.validatePlugin = context.sandbox.app.resolve(ValidatePluginProxy);
 	});
@@ -90,7 +90,7 @@ describe<{
 		assert.equal(responseInvalid.statusCode, 400);
 		assert.equal(responseInvalid.result, {
 			error: "Bad Request",
-			message: "Validation failed",
+			message: "Validation failed (bad payload)",
 			statusCode: 400,
 		});
 

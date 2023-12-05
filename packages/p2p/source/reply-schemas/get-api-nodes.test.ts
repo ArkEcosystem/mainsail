@@ -3,6 +3,7 @@ import { describe, Sandbox } from "../../../test-framework/distribution";
 import { headers } from "../../test/fixtures/responses/headers";
 import { getApiNodes } from "./get-api-nodes";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
+import { Contracts } from "@mainsail/contracts";
 
 type Context = {
 	sandbox: Sandbox;
@@ -15,6 +16,7 @@ describe<Context>("GetApiNodes Schema", ({ it, assert, beforeEach, each }) => {
 	beforeEach((context) => {
 		data = {
 			headers,
+			apiNodes: [{ ip: "127.0.0.1", port: 4003, protocol: Contracts.P2P.PeerProtocol.Http }],
 		};
 
 		context.sandbox = new Sandbox();

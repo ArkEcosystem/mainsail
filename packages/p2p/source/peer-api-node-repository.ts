@@ -1,14 +1,26 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
 import { getPeerUrl } from "./utils";
 
+@injectable()
 export class PeerApiNode implements Contracts.P2P.PeerApiNode {
+	public ip!: string;
+	public port!: number;
+	public protocol!: Contracts.P2P.PeerProtocol;
+
 	statusCode?: number;
 	latency?: number;
 
-	constructor(readonly ip: string, readonly port: number, readonly protocol: Contracts.P2P.PeerProtocol) {}
+	constructor() { }
+
+	public init(ip: string, port: number, protocol?: Contracts.P2P.PeerProtocol): PeerApiNode {
+		this.ip = ip;
+		this.port = port;
+		this.protocol = protocol ?? (port === 443 ? Contracts.P2P.PeerProtocol.Https : Contracts.P2P.PeerProtocol.Http);
+
+		return this;
+	}
 
 	url(): string {
 		return getPeerUrl(this);
@@ -17,31 +29,8 @@ export class PeerApiNode implements Contracts.P2P.PeerApiNode {
 
 @injectable()
 export class PeerApiNodeRepository implements Contracts.P2P.PeerApiNodeRepository {
-	@inject(Identifiers.PluginConfiguration)
-	@tagged("plugin", "p2p")
-	private readonly configuration!: Providers.PluginConfiguration;
-
 	readonly #apiNodes: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
 	readonly #apiNodesPending: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
-
-	@postConstruct()
-	public postConstruct() {
-		const apiNodes = this.configuration.getOptional<string[]>("apiNodes", []);
-
-		for (const item of apiNodes) {
-			const [ip, port] = item.split(":");
-			Utils.assert.defined<string>(ip);
-			Utils.assert.defined<string>(port);
-
-			this.setApiNode(
-				new PeerApiNode(
-					ip,
-					Number(port),
-					port === "443" ? Contracts.P2P.PeerProtocol.Https : Contracts.P2P.PeerProtocol.Http,
-				),
-			);
-		}
-	}
 
 	public getApiNodes(): Contracts.P2P.PeerApiNodes {
 		return [...this.#apiNodes.values()];

@@ -6,6 +6,7 @@ export * from "./header-service";
 export * from "./log";
 export * from "./nes";
 export * from "./peer";
+export * from "./peer-api-node-discoverer";
 export * from "./peer-api-node-processor";
 export * from "./peer-api-node-repository";
 export * from "./peer-api-node-verifier";

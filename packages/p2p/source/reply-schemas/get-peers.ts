@@ -30,7 +30,7 @@ export const getPeers = {
 						type: "integer",
 					},
 				},
-				required: ["ip", "port"],
+				required: ["ip", "port", "protocol"],
 				type: "object",
 			},
 			maxItems: constants.MAX_PEERS_GET_PEERS,

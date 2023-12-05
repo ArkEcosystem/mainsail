@@ -14,6 +14,7 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 			apiNode.lastPinged = t0;
 
 			const response = await http.get(apiNode.url(), {
+				timeout: 5000,
 				headers: {},
 			});
 
@@ -23,6 +24,7 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 			apiNode.latency = t1.valueOf() - t0.valueOf();
 
 			this.#verifyStatusCode(response);
+			this.#verifyHeaders(response);
 			this.#verifyResponseBody(response);
 		} catch (error) {
 			this.logger.debugExtra(`API node ${apiNode.ip} verification failed: ${error.message}`);
@@ -38,12 +40,20 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 		}
 	}
 
+	#verifyHeaders(response: HttpResponse): void {
+		const contentLength = Number(response.headers[response.headers.findIndex((h) => h === "content-length") + 1]);
+		if (contentLength !== helloWorldLength) {
+			throw new Error("invalid content length");
+		}
+	}
+
 	#verifyResponseBody(response: HttpResponse): void {
-		if (response.data !== helloWorld) {
+		if (response.data.data !== helloWorld.data) {
 			throw new Error("Invalid response body");
 		}
 	}
 }
 
 // The default API server "/" response
-const helloWorld = JSON.stringify({ data: "Hello World!" });
+const helloWorld = { data: "Hello World!" };
+const helloWorldLength = JSON.stringify(helloWorld).length;
