@@ -14,8 +14,8 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 			apiNode.lastPinged = t0;
 
 			const response = await http.get(apiNode.url(), {
-				timeout: 5000,
 				headers: {},
+				timeout: 5000,
 			});
 
 			const t1 = dayjs();
@@ -41,7 +41,7 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 	}
 
 	#verifyHeaders(response: HttpResponse): void {
-		const contentLength = Number(response.headers[response.headers.findIndex((h) => h === "content-length") + 1]);
+		const contentLength = Number(response.headers[response.headers.indexOf("content-length") + 1]);
 		if (contentLength !== helloWorldLength) {
 			throw new Error("invalid content length");
 		}

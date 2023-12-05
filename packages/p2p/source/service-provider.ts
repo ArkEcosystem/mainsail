@@ -11,8 +11,8 @@ import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
 import { Peer } from "./peer";
-import { PeerApiNodeProcessor } from "./peer-api-node-processor";
 import { PeerApiNodeDiscoverer } from "./peer-api-node-discoverer";
+import { PeerApiNodeProcessor } from "./peer-api-node-processor";
 import { PeerApiNode, PeerApiNodeRepository } from "./peer-api-node-repository";
 import { PeerApiNodeVerifier } from "./peer-api-node-verifier";
 import { PeerCommunicator } from "./peer-communicator";
@@ -93,11 +93,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
 		});
 
-		this.app.bind(Identifiers.PeerApiNodeFactory).toFactory<PeerApiNode>(() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
-			const sanitizedIp = sanitizeRemoteAddress(ip);
-			Utils.assert.defined<string>(sanitizedIp);
-			return this.app.resolve(PeerApiNode).init(sanitizedIp, Number(port), protocol);
-		});
+		this.app
+			.bind(Identifiers.PeerApiNodeFactory)
+			.toFactory<PeerApiNode>(
+				() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
+					const sanitizedIp = sanitizeRemoteAddress(ip);
+					Utils.assert.defined<string>(sanitizedIp);
+					return this.app.resolve(PeerApiNode).init(sanitizedIp, Number(port), protocol);
+				},
+			);
 
 		this.app
 			.bind(Identifiers.PeerHeaderFactory)

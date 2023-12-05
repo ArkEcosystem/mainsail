@@ -35,24 +35,39 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 	});
 
 	it("should not pass if peer.ip is missing", ({ validator }) => {
-		const result = validator.validate(getPeers, { ...data, peers: [{ port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }] });
+		const result = validator.validate(getPeers, {
+			...data,
+			peers: [{ port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+		});
 
 		assert.defined(result.error);
 	});
 
 	it("should pass if peer.ip is ipv4 or ipv6", ({ validator }) => {
-		let result = validator.validate(getPeers, { ...data, peers: [{ ip: "127.0.0.1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }] });
+		let result = validator.validate(getPeers, {
+			...data,
+			peers: [{ ip: "127.0.0.1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+		});
 		assert.undefined(result.error);
 
-		result = validator.validate(getPeers, { ...data, peers: [{ ip: "::1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }] });
+		result = validator.validate(getPeers, {
+			...data,
+			peers: [{ ip: "::1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+		});
 		assert.undefined(result.error);
 
-		result = validator.validate(getPeers, { ...data, peers: [{ ip: 1, port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }] });
+		result = validator.validate(getPeers, {
+			...data,
+			peers: [{ ip: 1, port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }],
+		});
 		assert.defined(result.error);
 	});
 
 	it("should not pass if peer.port is missing", ({ validator }) => {
-		const result = validator.validate(getPeers, { ...data, peers: [{ ip: "127.0.0.1", protocol: Contracts.P2P.PeerProtocol.Http }] });
+		const result = validator.validate(getPeers, {
+			...data,
+			peers: [{ ip: "127.0.0.1", protocol: Contracts.P2P.PeerProtocol.Http }],
+		});
 
 		assert.defined(result.error);
 	});
@@ -60,7 +75,11 @@ describe<Context>("GetPeers Schema", ({ it, assert, beforeEach, each }) => {
 	it("should not pass if peer.length > MAX_PEERS_GET_PEERS", ({ validator }) => {
 		const result = validator.validate(getPeers, {
 			...data,
-			peers: new Array(constants.MAX_PEERS_GET_PEERS + 1).fill({ ip: "127.0.0.1", port: 4000, protocol: Contracts.P2P.PeerProtocol.Http }),
+			peers: new Array(constants.MAX_PEERS_GET_PEERS + 1).fill({
+				ip: "127.0.0.1",
+				port: 4000,
+				protocol: Contracts.P2P.PeerProtocol.Http,
+			}),
 		});
 
 		assert.defined(result.error);

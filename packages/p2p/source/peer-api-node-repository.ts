@@ -12,7 +12,7 @@ export class PeerApiNode implements Contracts.P2P.PeerApiNode {
 	statusCode?: number;
 	latency?: number;
 
-	constructor() { }
+	constructor() {}
 
 	public init(ip: string, port: number, protocol?: Contracts.P2P.PeerProtocol): PeerApiNode {
 		this.ip = ip;

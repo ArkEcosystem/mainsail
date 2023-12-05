@@ -3,7 +3,6 @@ import { headers } from "./headers";
 
 export const getApiNodes = {
 	properties: {
-		headers,
 		apiNodes: {
 			items: {
 				properties: {
@@ -35,7 +34,8 @@ export const getApiNodes = {
 			},
 			maxItems: constants.MAX_PEERS_GET_PEERS,
 			type: "array",
-		}
+		},
+		headers,
 	},
 	required: ["headers", "apiNodes"],
 	type: "object",
