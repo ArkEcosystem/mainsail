@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ValidateAndAcceptPeerAction } from "./actions";
+import { ValidateAndAcceptApiNodeAction, ValidateAndAcceptPeerAction } from "./actions";
 import { Broadcaster } from "./broadcaster";
 import { BlockDownloader } from "./downloader/block-downloader";
 import { MessageDownloader } from "./downloader/message-downloader";
@@ -11,6 +11,10 @@ import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
 import { Peer } from "./peer";
+import { PeerApiNodeDiscoverer } from "./peer-api-node-discoverer";
+import { PeerApiNodeProcessor } from "./peer-api-node-processor";
+import { PeerApiNode, PeerApiNodeRepository } from "./peer-api-node-repository";
+import { PeerApiNodeVerifier } from "./peer-api-node-verifier";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
@@ -49,6 +53,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
+			apiNodes: Joi.array().items(Joi.string()).default([]),
 			blacklist: Joi.array().items(Joi.string()).required(),
 			developmentMode: Joi.object({
 				enabled: Joi.bool().required(),
@@ -89,6 +94,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		});
 
 		this.app
+			.bind(Identifiers.PeerApiNodeFactory)
+			.toFactory<PeerApiNode>(
+				() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
+					const sanitizedIp = sanitizeRemoteAddress(ip);
+					Utils.assert.defined<string>(sanitizedIp);
+					return this.app.resolve(PeerApiNode).init(sanitizedIp, Number(port), protocol);
+				},
+			);
+
+		this.app
 			.bind(Identifiers.PeerHeaderFactory)
 			.toFactory<Contracts.P2P.IHeader>(() => () => this.app.resolve(Header));
 	}
@@ -101,6 +116,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2PLogger).to(Logger).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerApiNodeRepository).to(PeerApiNodeRepository).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerApiNodeDiscoverer).to(PeerApiNodeDiscoverer).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerApiNodeVerifier).to(PeerApiNodeVerifier).inSingletonScope();
+
+		this.app.bind(Identifiers.PeerApiNodeProcessor).to(PeerApiNodeProcessor).inSingletonScope();
 
 		this.app.bind(Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
 
@@ -143,6 +166,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
+
+		this.app
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.bind("validateAndAcceptApiNode", new ValidateAndAcceptApiNodeAction(this.app));
 	}
 
 	#registerValidation(): void {

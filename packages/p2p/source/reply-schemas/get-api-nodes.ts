@@ -1,10 +1,9 @@
 import { constants } from "../constants";
 import { headers } from "./headers";
 
-export const getPeers = {
+export const getApiNodes = {
 	properties: {
-		headers,
-		peers: {
+		apiNodes: {
 			items: {
 				properties: {
 					ip: {
@@ -36,7 +35,8 @@ export const getPeers = {
 			maxItems: constants.MAX_PEERS_GET_PEERS,
 			type: "array",
 		},
+		headers,
 	},
-	required: ["headers", "peers"],
+	required: ["headers", "apiNodes"],
 	type: "object",
 };

@@ -3,6 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Types, Utils } from "@mainsail/kernel";
 import dayjs, { Dayjs } from "dayjs";
 
+import { getPeerUrl } from "./utils/get-peer-url";
+
 @injectable()
 export class Peer implements Contracts.P2P.Peer {
 	@inject(Identifiers.QueueFactory)
@@ -11,6 +13,8 @@ export class Peer implements Contracts.P2P.Peer {
 	public ip!: string;
 
 	public port!: number;
+
+	public protocol!: Contracts.P2P.PeerProtocol;
 
 	public readonly ports: Contracts.P2P.PeerPorts = {};
 
@@ -24,6 +28,8 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
 
+	public apiNodes: Contracts.P2P.PeerApiNodes = [];
+
 	#header: Contracts.P2P.IHeaderData | undefined;
 
 	#transactionsQueue!: Contracts.Kernel.Queue;
@@ -31,12 +37,13 @@ export class Peer implements Contracts.P2P.Peer {
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;
 		this.port = port;
+		this.protocol = Contracts.P2P.PeerProtocol.Http;
 
 		return this;
 	}
 
 	public get url(): string {
-		return `${this.port % 443 === 0 ? "https://" : "http://"}${this.ip}:${this.port}`;
+		return getPeerUrl(this);
 	}
 
 	public get header(): Contracts.P2P.IHeaderData {
@@ -58,6 +65,7 @@ export class Peer implements Contracts.P2P.Peer {
 		return {
 			ip: this.ip,
 			port: this.port,
+			protocol: this.protocol,
 		};
 	}
 

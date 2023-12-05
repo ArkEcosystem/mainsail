@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import {
+	GetApiNodesRoute,
 	GetBlocksRoute,
 	GetMessagesRoute,
 	GetPeersRoute,
@@ -36,6 +37,7 @@ export class CodecPlugin extends BasePlugin {
 			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetMessagesRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetApiNodesRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetProposalRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetStatusRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostPrecommitRoute).getRoutesConfigByPath(),

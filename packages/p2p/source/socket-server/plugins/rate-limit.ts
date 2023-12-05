@@ -6,6 +6,7 @@ import { Providers } from "@mainsail/kernel";
 import { RateLimiter } from "../../rate-limiter";
 import { buildRateLimiter } from "../../utils/build-rate-limiter";
 import {
+	GetApiNodesRoute,
 	GetBlocksRoute,
 	GetMessagesRoute,
 	GetPeersRoute,
@@ -44,6 +45,7 @@ export class RateLimitPlugin {
 			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetMessagesRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetApiNodesRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetProposalRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetStatusRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostPrecommitRoute).getRoutesConfigByPath(),

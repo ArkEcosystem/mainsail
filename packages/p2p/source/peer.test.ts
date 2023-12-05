@@ -23,11 +23,17 @@ describe<{
 	});
 
 	each(
-		"#url - should return https url when port is multiple of 443",
+		"#url - should infer protocol when port is 80 or 443",
 		({ context, dataset }) => {
-			assert.equal(context.sandbox.app.resolve(Peer).init(ip, dataset).url, `https://${ip}:${dataset}`);
+			assert.equal(
+				context.sandbox.app.resolve(Peer).init(ip, dataset[0]).url,
+				`${dataset[1]}://${ip}:${dataset[0]}`,
+			);
 		},
-		[443, 886],
+		[
+			[80, "http"],
+			[443, "https"],
+		],
 	);
 
 	it("#recentlyPinged - should return true when lastPinged is less than 2 minutes ago", ({ peer }) => {
@@ -49,6 +55,7 @@ describe<{
 		const expectedBroadcast: Contracts.P2P.PeerBroadcast = {
 			ip,
 			port: 4000,
+			protocol: Contracts.P2P.PeerProtocol.Http,
 		};
 
 		assert.equal(peer.toBroadcast(), expectedBroadcast);

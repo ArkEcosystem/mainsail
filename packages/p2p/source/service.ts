@@ -17,6 +17,9 @@ export class Service implements Contracts.P2P.Service {
 	@inject(Identifiers.PeerDiscoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
+	@inject(Identifiers.PeerApiNodeDiscoverer)
+	private readonly peerApiNodeDiscoverer!: Contracts.P2P.PeerApiNodeDiscoverer;
+
 	@inject(Identifiers.PeerVerifier)
 	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
 
@@ -37,6 +40,8 @@ export class Service implements Contracts.P2P.Service {
 
 			return;
 		}
+
+		await this.peerApiNodeDiscoverer.populateApiNodesFromConfiguration();
 
 		await this.peerDiscoverer.populateSeedPeers();
 

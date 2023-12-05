@@ -2,6 +2,7 @@ import { Constants } from "@mainsail/contracts";
 import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
+	apiNodes: Environment.get<undefined>(Constants.Flags.CORE_P2P_API_NODES)?.split(",") ?? [],
 	blacklist: [],
 	developmentMode: {
 		enabled: Environment.isTrue(Constants.Flags.CORE_P2P_DEVELOPMENT_MODE_ENABLED),
@@ -12,6 +13,7 @@ export const defaults = {
 	maxSameSubnetPeers: Environment.get(Constants.Flags.CORE_P2P_MAX_PEERS_SAME_SUBNET, 5),
 	minimumNetworkReach: Environment.get(Constants.Flags.CORE_P2P_MIN_NETWORK_REACH, 20),
 	minimumVersions: ["^0.0.1"],
+
 	peerBanTime: Environment.get(Constants.Flags.CORE_P2P_PEER_BAN_TIME, 0),
 
 	rateLimit: Environment.get(Constants.Flags.CORE_P2P_RATE_LIMIT, 150),

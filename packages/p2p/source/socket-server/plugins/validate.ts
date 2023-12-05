@@ -5,6 +5,7 @@ import { Providers } from "@mainsail/kernel";
 
 import { getPeerIp, isValidVersion } from "../../utils";
 import {
+	GetApiNodesRoute,
 	GetBlocksRoute,
 	GetMessagesRoute,
 	GetPeersRoute,
@@ -37,6 +38,7 @@ export class ValidatePlugin extends BasePlugin {
 		const allRoutesConfigByPath = {
 			...this.app.resolve(GetBlocksRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetMessagesRoute).getRoutesConfigByPath(),
+			...this.app.resolve(GetApiNodesRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetPeersRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetProposalRoute).getRoutesConfigByPath(),
 			...this.app.resolve(GetStatusRoute).getRoutesConfigByPath(),
@@ -49,7 +51,7 @@ export class ValidatePlugin extends BasePlugin {
 		server.ext({
 			method: async (request: Contracts.P2P.Request, h: ResponseToolkit) => {
 				if (!this.peerProcessor.validatePeerIp(getPeerIp(request))) {
-					return this.disposeAndReturnBadRequest(request, h, "Validation failed");
+					return this.disposeAndReturnBadRequest(request, h, "Validation failed (bad ip)");
 				}
 
 				const version = request.payload?.headers?.version;
@@ -59,7 +61,7 @@ export class ValidatePlugin extends BasePlugin {
 
 				const result = allRoutesConfigByPath[request.path]?.validation?.validate(request.payload);
 				if (result && result.error) {
-					return this.banAndReturnBadRequest(request, h, "Validation failed");
+					return this.banAndReturnBadRequest(request, h, "Validation failed (bad payload)");
 				}
 				return h.continue;
 			},

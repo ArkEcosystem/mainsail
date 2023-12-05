@@ -29,6 +29,9 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.PeerDiscoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
+	@inject(Identifiers.PeerApiNodeDiscoverer)
+	private readonly peerApiNodeDiscoverer!: Contracts.P2P.PeerApiNodeDiscoverer;
+
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -106,6 +109,8 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			await this.peerCommunicator.pingPorts(peer);
 
 			await this.peerDiscoverer.discoverPeers(peer);
+
+			await this.peerApiNodeDiscoverer.discoverApiNodes(peer);
 		}
 
 		this.repository.forgetPendingPeer(peer);

@@ -11,6 +11,7 @@ import { HeaderIncludePlugin } from "./plugins/header-include";
 import { RateLimitPlugin } from "./plugins/rate-limit";
 import { ValidatePlugin } from "./plugins/validate";
 import {
+	GetApiNodesRoute,
 	GetBlocksRoute,
 	GetMessagesRoute,
 	GetPeersRoute,
@@ -53,6 +54,7 @@ export class Server implements Contracts.P2P.Server {
 		this.app.resolve(GetBlocksRoute).register(this.server);
 		this.app.resolve(GetMessagesRoute).register(this.server);
 		this.app.resolve(GetPeersRoute).register(this.server);
+		this.app.resolve(GetApiNodesRoute).register(this.server);
 		this.app.resolve(GetProposalRoute).register(this.server);
 		this.app.resolve(GetStatusRoute).register(this.server);
 		this.app.resolve(PostPrecommitRoute).register(this.server);

@@ -1,3 +1,4 @@
+import { getApiNodes } from "./get-api-nodes";
 import { getBlocks } from "./get-blocks";
 import { getMessages } from "./get-messages";
 import { getPeers } from "./get-peers";
@@ -9,6 +10,7 @@ import { postProposal } from "./post-proposal";
 import { postTransactions } from "./post-transactions";
 
 export const Codecs = {
+	getApiNodes,
 	getBlocks,
 	getMessages,
 	getPeers,

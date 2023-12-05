@@ -1,4 +1,5 @@
 import {
+	IGetApiNodesResponse,
 	IGetBlocksResponse,
 	IGetMessagesResponse,
 	IGetPeersResponse,
@@ -20,6 +21,7 @@ export interface PeerCommunicator {
 	pingPorts(peer: Peer): Promise<void>;
 
 	getPeers(peer: Peer): Promise<IGetPeersResponse>;
+	getApiNodes(peer: Peer): Promise<IGetApiNodesResponse>;
 	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
 	getProposal(peer: Peer): Promise<IGetProposalResponse>;
 	getBlocks(

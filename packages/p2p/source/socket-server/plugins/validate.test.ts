@@ -90,7 +90,7 @@ describe<{
 		assert.equal(responseInvalid.statusCode, 400);
 		assert.equal(responseInvalid.result, {
 			error: "Bad Request",
-			message: "Validation failed",
+			message: "Validation failed (bad payload)",
 			statusCode: 400,
 		});
 

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package getApiNodes;
+
+message GetApiNodesRequest {
+    shared.Headers headers = 1;
+}
+
+message GetApiNodesResponse {
+	shared.Headers headers = 1;
+    repeated shared.PeerLike apiNodes = 2;
+}

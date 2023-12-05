@@ -11,9 +11,29 @@ export interface PeerPlugins {
 	[name: string]: { enabled: boolean; port: number; estimateTotalCount?: boolean };
 }
 
+export enum PeerProtocol {
+	Http = 0,
+	Https = 1,
+}
+
+export interface PeerApiNode {
+	readonly ip: string;
+	readonly port: number;
+	readonly protocol: PeerProtocol;
+
+	url(): string;
+
+	statusCode?: number;
+	latency?: number;
+	lastPinged?: Dayjs;
+}
+
+export type PeerApiNodes = PeerApiNode[];
+
 export interface Peer {
 	readonly url: string;
 	readonly port: number;
+	readonly protocol: PeerProtocol;
 
 	readonly ip: string;
 	readonly ports: PeerPorts;
@@ -25,6 +45,7 @@ export interface Peer {
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;
+	apiNodes: PeerApiNodes;
 
 	recentlyPinged(): boolean;
 
@@ -37,6 +58,7 @@ export interface Peer {
 export interface PeerBroadcast {
 	ip: string;
 	port: number;
+	protocol: PeerProtocol;
 }
 
 export interface PeerState {
