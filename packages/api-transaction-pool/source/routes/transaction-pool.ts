@@ -27,7 +27,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 											"plugin",
 											"transaction-pool",
 										)
-										.getRequired<number>("maxTransactionBytes"),
+										.getRequired<number>("maxTransactionBytes") * 2,
 								),
 						)
 						.min(1)
