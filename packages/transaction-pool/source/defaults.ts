@@ -11,7 +11,8 @@ export const defaults = {
 	// then it will be removed.
 	maxTransactionAge: 2700,
 
-	maxTransactionBytes: 32_000, // Based on a multipayment transaction with 256 recipients with some leeway
+	// Based on a multipayment transaction with 256 recipients, vendor field, 16 signatures plus some leeway
+	maxTransactionBytes: 18_000,
 
 	// When the pool contains that many transactions, then a new transaction is
 	// only accepted if its fee is higher than the transaction with the lowest
