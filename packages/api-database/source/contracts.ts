@@ -37,7 +37,15 @@ export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExten
 export type IConfigurationRepositoryExtension = {};
 export type IConfigurationRepository = ExtendedRepository<Configuration> & IConfigurationRepositoryExtension;
 
-export type IApiNodeRepositoryExtension = {};
+export type IApiNodeRepositoryExtension = {
+	findManyByCriteria(
+		apiNodeCriteria: Criteria.OrApiNodeCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<ApiNode>>;
+};
+
 export type IApiNodeRepository = ExtendedRepository<ApiNode> & IApiNodeRepositoryExtension;
 
 export type IPeerRepositoryExtension = {
