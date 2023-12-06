@@ -11,7 +11,7 @@ export interface IDatabaseService {
 
 	getLastBlock(): Promise<IBlock | undefined>;
 
-	addCommit(block: ICommittedBlock): Promise<void>;
+	addCommit(block: ICommittedBlock): void;
 
 	persist(): Promise<void>;
 }

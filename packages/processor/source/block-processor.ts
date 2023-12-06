@@ -76,8 +76,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const stateStore = this.stateService.getStateStore();
 		if (!stateStore.isBootstrap()) {
-			await this.databaseService.addCommit(committedBlock);
-			await this.databaseService.persist();
+			this.databaseService.addCommit(committedBlock);
+
+			if (unit.persist) {
+				await this.databaseService.persist();
+			}
 		}
 
 		stateStore.setTotalRound(stateStore.getTotalRound() + unit.round + 1);
