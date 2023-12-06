@@ -1,6 +1,7 @@
 import { type DataSource, EntityManager } from "typeorm";
 
 import {
+	ApiNode,
 	Block,
 	Configuration,
 	MempoolTransaction,
@@ -35,6 +36,17 @@ export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExten
 
 export type IConfigurationRepositoryExtension = {};
 export type IConfigurationRepository = ExtendedRepository<Configuration> & IConfigurationRepositoryExtension;
+
+export type IApiNodeRepositoryExtension = {
+	findManyByCriteria(
+		apiNodeCriteria: Criteria.OrApiNodeCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<ApiNode>>;
+};
+
+export type IApiNodeRepository = ExtendedRepository<ApiNode> & IApiNodeRepositoryExtension;
 
 export type IPeerRepositoryExtension = {
 	getMedianPeerHeight(): Promise<number>;
@@ -101,6 +113,7 @@ export type IWalletRepositoryExtension = {
 };
 export type IWalletRepository = ExtendedRepository<Wallet> & IWalletRepositoryExtension;
 
+export type IApiNodeRepositoryFactory = (customDataSource?: RepositoryDataSource) => IApiNodeRepository;
 export type IBlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => IBlockRepository;
 export type IConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => IConfigurationRepository;
 export type IPeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPeerRepository;

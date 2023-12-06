@@ -107,3 +107,10 @@ export type PeerCriteria = {
 };
 
 export type OrPeerCriteria = OrCriteria<PeerCriteria>;
+
+export type ApiNodeCriteria = {
+	ip?: OrEqualCriteria<string>;
+	version?: OrNumericCriteria<string>;
+};
+
+export type OrApiNodeCriteria = OrCriteria<ApiNodeCriteria>;
