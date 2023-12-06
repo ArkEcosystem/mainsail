@@ -1,4 +1,5 @@
 export const Identifiers = {
+	ApiNodeRepositoryFactory: Symbol.for("API<Factory.ApiNodeRepository>"),
 	BlockRepositoryFactory: Symbol.for("API<Factory.BlockRepository>"),
 	ConfigurationRepositoryFactory: Symbol.for("API<Factory.ConfigurationRepository>"),
 	DataSource: Symbol.for("API<DataSource>"),

@@ -5,6 +5,7 @@ import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
 import { Identifiers } from "./identifiers";
 import { Migrations } from "./migrations";
 import {
+	ApiNode,
 	Block,
 	Configuration,
 	MempoolTransaction,
@@ -17,6 +18,7 @@ import {
 } from "./models";
 import { Peer } from "./models/peer";
 import {
+	makeApiNodeRepository,
 	makeBlockRepository,
 	makeConfigurationRepository,
 	makeMempoolTransactionRepository,
@@ -56,6 +58,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				...options,
 				// TODO: allow entities to be extended by plugins
 				entities: [
+					ApiNode,
 					Block,
 					Configuration,
 					Peer,
@@ -81,6 +84,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.bind(Identifiers.Migrations).to(Migrations).inSingletonScope();
 
 			// Bind factories to allow creating repositories in a transaction context
+			this.app
+				.bind(Identifiers.ApiNodeRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeApiNodeRepository(customDataSource ?? dataSource),
+				);
 
 			this.app
 				.bind(Identifiers.BlockRepositoryFactory)

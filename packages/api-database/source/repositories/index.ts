@@ -1,3 +1,4 @@
+export { makeApiNodeRepository } from "./api-node-repository";
 export { makeBlockRepository } from "./block-repository";
 export { makeConfigurationRepository } from "./configuration-repository";
 export { makeMempoolTransactionRepository } from "./mempool-transaction-repository";
