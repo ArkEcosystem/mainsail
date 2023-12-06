@@ -14,10 +14,16 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {}
+	) { }
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
+	}
+
+	public get apiNodesRepository(): ApiDatabaseContracts.IApiNodeRepository {
+		return this.app.get<ApiDatabaseContracts.IApiNodeRepositoryFactory>(
+			ApiDatabaseIdentifiers.ApiNodeRepositoryFactory,
+		)();
 	}
 
 	public get blockRepository(): ApiDatabaseContracts.IBlockRepository {
