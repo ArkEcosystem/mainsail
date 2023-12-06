@@ -75,11 +75,11 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 	}
 
 	async persist(): Promise<void> {
-		for (const [height, block] of this.#cache.entries()) {
-			void this.blockStorage.put(height, block);
-		}
-
-		await this.blockStorage.flushed;
+		await this.blockStorage.transaction(async () => {
+			for (const [height, block] of this.#cache.entries()) {
+				await this.blockStorage.put(height, block);
+			}
+		});
 
 		this.#cache.clear();
 	}
