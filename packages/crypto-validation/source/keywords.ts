@@ -3,7 +3,7 @@ import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
 export const makeKeywords = () => {
 	const maxBytes: FuncKeywordDefinition = {
-		compile: (schema) => (data) => Buffer.from(data, "utf8").byteLength <= schema,
+		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
 		errors: false,
 		keyword: "maxBytes",
 		metaSchema: {
