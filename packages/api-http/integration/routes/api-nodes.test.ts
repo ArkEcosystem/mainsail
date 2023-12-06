@@ -5,38 +5,38 @@ import { request } from "../../test/helpers/request";
 import apiNodes from "../../test/fixtures/api-nodes.json";
 
 describe<{
-    sandbox: Sandbox;
+	sandbox: Sandbox;
 }>("ApiNodes", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
-    let apiContext: ApiContext;
+	let apiContext: ApiContext;
 
-    let options = {};
+	let options = {};
 
-    beforeAll(async (context) => {
-        nock.enableNetConnect();
-        apiContext = await prepareSandbox(context);
-    });
+	beforeAll(async (context) => {
+		nock.enableNetConnect();
+		apiContext = await prepareSandbox(context);
+	});
 
-    afterAll((context) => {
-        nock.disableNetConnect();
-        apiContext.dispose();
-    });
+	afterAll((context) => {
+		nock.disableNetConnect();
+		apiContext.dispose();
+	});
 
-    beforeEach(async (context) => {
-        await apiContext.reset();
-    });
+	beforeEach(async (context) => {
+		await apiContext.reset();
+	});
 
-    afterEach(async (context) => {
-        await apiContext.reset();
-    });
+	afterEach(async (context) => {
+		await apiContext.reset();
+	});
 
-    it("/api-nodes", async () => {
-        let { statusCode, data } = await request("/api-nodes", options);
-        assert.equal(statusCode, 200);
-        assert.empty(data.data);
+	it("/api-nodes", async () => {
+		let { statusCode, data } = await request("/api-nodes", options);
+		assert.equal(statusCode, 200);
+		assert.empty(data.data);
 
-        await apiContext.apiNodesRepository.save(apiNodes);
+		await apiContext.apiNodesRepository.save(apiNodes);
 
-        ({ statusCode, data } = await request("/api-nodes", options));
-        assert.equal(data.data, apiNodes);
-    });
+		({ statusCode, data } = await request("/api-nodes", options));
+		assert.equal(data.data, apiNodes);
+	});
 });

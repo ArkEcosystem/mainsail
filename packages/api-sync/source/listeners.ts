@@ -2,10 +2,10 @@ import { inject, injectable, interfaces } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import * as ApiSyncContracts from "./contracts";
+import { ApiNodes } from "./listeners/api-nodes";
 import { Mempool } from "./listeners/mempool";
 import { Peers } from "./listeners/peers";
 import { Plugins } from "./listeners/plugins";
-import { ApiNodes } from "./listeners/api-nodes";
 
 @injectable()
 export class Listeners implements ApiSyncContracts.Listeners {

@@ -14,7 +14,18 @@ import * as Wallets from "./routes/wallets";
 export = {
 	name: "Public API",
 	async register(server: Contracts.Api.ApiServer): Promise<void> {
-		const handlers = [ApiNodes, Blocks, Blockchain, Delegates, Peers, Transactions, Node, ValidatorRounds, Votes, Wallets];
+		const handlers = [
+			ApiNodes,
+			Blocks,
+			Blockchain,
+			Delegates,
+			Peers,
+			Transactions,
+			Node,
+			ValidatorRounds,
+			Votes,
+			Wallets,
+		];
 
 		for (const handler of handlers) {
 			handler.register(server);

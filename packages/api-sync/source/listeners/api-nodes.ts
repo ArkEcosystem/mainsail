@@ -33,12 +33,12 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.PeerApiNode, Models
 
 	protected mapEventToEntity(event: Contracts.P2P.PeerApiNode): Models.ApiNode {
 		return {
+			height: event.height,
 			ip: event.ip,
+			latency: event.latency,
 			port: event.port,
 			protocol: event.protocol,
-			height: event.height,
 			url: event.url(),
-			latency: event.latency,
 			version: event.version,
 		};
 	}
