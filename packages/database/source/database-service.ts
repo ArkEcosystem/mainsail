@@ -74,13 +74,9 @@ export class DatabaseService implements Contracts.Database.IDatabaseService {
 		if (!this.blockStorage.doesExist(block.block.data.height) || !this.#cache.has(block.block.data.height)) {
 			this.#cache.set(block.block.data.height, Buffer.from(block.serialized, "hex"));
 		}
-
-		if (block.block.data.height % 1 === 0) {
-			await this.#saveCached();
-		}
 	}
 
-	async #saveCached(): Promise<void> {
+	async persist(): Promise<void> {
 		for (const [height, block] of this.#cache.entries()) {
 			void this.blockStorage.put(height, block);
 		}
