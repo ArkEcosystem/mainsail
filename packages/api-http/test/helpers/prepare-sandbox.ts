@@ -20,6 +20,12 @@ export class ApiContext {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
 	}
 
+	public get apiNodesRepository(): ApiDatabaseContracts.IApiNodeRepository {
+		return this.app.get<ApiDatabaseContracts.IApiNodeRepositoryFactory>(
+			ApiDatabaseIdentifiers.ApiNodeRepositoryFactory,
+		)();
+	}
+
 	public get blockRepository(): ApiDatabaseContracts.IBlockRepository {
 		return this.app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(
 			ApiDatabaseIdentifiers.BlockRepositoryFactory,

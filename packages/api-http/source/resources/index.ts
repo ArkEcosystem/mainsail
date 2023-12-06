@@ -1,3 +1,4 @@
+export * from "./api-node";
 export * from "./block";
 export * from "./delegate";
 export * from "./peer";

@@ -45,6 +45,11 @@ export enum PeerEvent {
 	Removed = "peer.removed",
 }
 
+export enum ApiNodeEvent {
+	Added = "apiNode.added",
+	Removed = "apiNode.removed",
+}
+
 export enum StateEvent {
 	BuilderFinished = "state.builder.finished",
 	Started = "state.started",

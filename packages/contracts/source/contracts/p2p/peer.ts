@@ -26,6 +26,10 @@ export interface PeerApiNode {
 	statusCode?: number;
 	latency?: number;
 	lastPinged?: Dayjs;
+
+	// future proof
+	height?: number;
+	version?: string;
 }
 
 export type PeerApiNodes = PeerApiNode[];
