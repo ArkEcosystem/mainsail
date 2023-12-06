@@ -1,10 +1,11 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { existsSync, removeSync, writeFileSync } from "fs-extra";
+import { exit } from "node:process";
 import { join } from "path";
 
 import { Bootstrappers } from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
-import { KernelEvent } from "./enums";
+import { KernelEvent, ShutdownSignal } from "./enums";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
@@ -15,8 +16,7 @@ export class Application implements Contracts.Kernel.Application {
 	#booted = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
-		// @TODO enable this after solving the event emitter limit issues
-		// this.listenToShutdownSignals();
+		this.#listenToShutdownSignals();
 
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application).toConstantValue(this);
 
@@ -207,8 +207,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		await this.#disposeServiceProviders();
 
-		// eslint-disable-next-line unicorn/no-process-exit
-		process.exit(1);
+		exit(1);
 	}
 
 	public bind<T>(
@@ -308,14 +307,11 @@ export class Application implements Contracts.Kernel.Application {
 		this.rebind<string>(`path.${type}`).toConstantValue(path);
 	}
 
-	//
-	// #listenToShutdownSignals(): void {
-	//     for (const signal in ShutdownSignal) {
-	//         process.on(signal as any, async code => {
-	//             await this.terminate(signal);
-
-	//             process.exit(code || 1);
-	//         });
-	//     }
-	// }
+	#listenToShutdownSignals(): void {
+		for (const signal in ShutdownSignal) {
+			process.on(signal as any, async (code) => {
+				await this.terminate(signal);
+			});
+		}
+	}
 }
