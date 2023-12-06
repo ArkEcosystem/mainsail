@@ -21,7 +21,7 @@
 	"dependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"lmdb": "2.7.11"
+		"lmdb": "2.9.1"
 	},
 	"devDependencies": {
 		"@types/tmp": "0.2.1",
