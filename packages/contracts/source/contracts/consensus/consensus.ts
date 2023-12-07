@@ -68,6 +68,7 @@ export interface IConsensusService {
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
 	onTimeoutPrecommit(height: number, round: number): Promise<void>;
+	dispose(): Promise<void>;
 }
 
 export interface IConsensusState extends IConsensusStateData {
