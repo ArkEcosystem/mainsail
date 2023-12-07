@@ -3,6 +3,8 @@ import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	apiNodes: Environment.get<undefined>(Constants.Flags.CORE_P2P_API_NODES)?.split(",") ?? [],
+	// the accepted max content length (in bytes) when querying api nodes from other peers
+	apiNodesMaxContentLength: Environment.get(Constants.Flags.CORE_P2P_API_NODES_MAX_CONTENT_LENGTH, 25_000),
 	blacklist: [],
 	developmentMode: {
 		enabled: Environment.isTrue(Constants.Flags.CORE_P2P_DEVELOPMENT_MODE_ENABLED),

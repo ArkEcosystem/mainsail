@@ -315,6 +315,15 @@ describe<{
 		assert.equal(result.value.developmentMode.enabled, true);
 	});
 
+	it("should parse process.env.CORE_P2P_API_NODES_MAX_CONTENT_LENGTH", async ({ serviceProvider }) => {
+		process.env.CORE_P2P_API_NODES_MAX_CONTENT_LENGTH = "25000";
+
+		const result = serviceProvider.configSchema().validate(importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.apiNodesMaxContentLength, 25000);
+	});
+
 	it("#schemaRestrictions - server is required && is object", async ({ serviceProvider }) => {
 		const defaults = importDefaults();
 		defaults.server = false;
