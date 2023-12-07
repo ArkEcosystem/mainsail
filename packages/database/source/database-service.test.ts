@@ -87,24 +87,37 @@ describe<{
 		context.databaseService = context.sandbox.app.get<DatabaseService>(Identifiers.Database.Service);
 	});
 
-	it("#saveCommit - should save a block", async ({ databaseService, sandbox }) => {
-		const spyOnBlockStoragePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage), "put");
-
+	it("#addCommit - should add a commit, but not store it", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
-		await databaseService.saveCommit(commit);
+		assert.undefined(await databaseService.getBlock(commit.block.data.height));
 
-		spyOnBlockStoragePut.calledOnce();
+		databaseService.addCommit(commit);
+
+		assert.defined(await databaseService.getBlock(commit.block.data.height));
+		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 0);
+	});
+
+	it("#persist - should store a commit", async ({ databaseService, sandbox }) => {
+		const commit = await generateCommit();
+		assert.undefined(await databaseService.getBlock(commit.block.data.height));
+
+		databaseService.addCommit(commit);
+		await databaseService.persist();
+
+		assert.defined(await databaseService.getBlock(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
 	});
 
-	it("#saveBlocks - should save a block only once", async ({ databaseService, sandbox }) => {
-		const spyOnBlockStoragePut = spy(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage), "put");
+	it("#persist - should store a commit only once", async ({ databaseService, sandbox }) => {
+		const commit = await generateCommit();
+		assert.undefined(await databaseService.getBlock(commit.block.data.height));
 
-		const block = await generateCommit();
-		await databaseService.saveCommit(block);
-		await databaseService.saveCommit(block);
+		databaseService.addCommit(commit);
+		databaseService.addCommit(commit);
+		await databaseService.persist();
+		await databaseService.persist();
 
-		spyOnBlockStoragePut.calledTimes(1);
+		assert.defined(await databaseService.getBlock(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
 	});
 
@@ -116,49 +129,71 @@ describe<{
 		const blockFactory = await Factories.factory("Block", cryptoJson);
 		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.ICommittedBlock>();
 
-		await databaseService.saveCommit(block);
+		databaseService.addCommit(block);
+		assert.equal(await databaseService.getBlock(block.block.data.height), block.block);
 
+		await databaseService.persist();
 		assert.equal(await databaseService.getBlock(block.block.data.height), block.block);
 	});
 
 	it("#findCommitBuffers - should return empty array if blocks are not found", async ({ databaseService }) => {
 		const commits = await generateCommits(3);
 		for (const commit of commits) {
-			await databaseService.saveCommit(commit);
+			databaseService.addCommit(commit);
 		}
 
+		assert.equal(await databaseService.findCommitBuffers(5, 10), []);
+
+		await databaseService.persist();
 		assert.equal(await databaseService.findCommitBuffers(5, 10), []);
 	});
 
 	it("#findCommitBuffers - should return buffers", async ({ databaseService }) => {
 		const commits = await generateCommits(4);
 		for (const commit of commits) {
-			await databaseService.saveCommit(commit);
+			databaseService.addCommit(commit);
 		}
 
-		const result = await databaseService.findCommitBuffers(1, 4);
-		assert.equal(result.length, 4);
-		assert.instance(result[0], Buffer);
-		assert.instance(result[1], Buffer);
-		assert.instance(result[2], Buffer);
-		assert.instance(result[3], Buffer);
+		const verify = async () => {
+			const result = await databaseService.findCommitBuffers(1, 4);
+			assert.equal(result.length, 4);
+			assert.instance(result[0], Buffer);
+			assert.instance(result[1], Buffer);
+			assert.instance(result[2], Buffer);
+			assert.instance(result[3], Buffer);
+		};
+
+		await verify();
+
+		await databaseService.persist();
+
+		await verify();
 	});
 
 	it("#findBlocks - should return empty array if blocks are not found", async ({ databaseService }) => {
 		const commits = await generateCommits(3);
 		for (const commit of commits) {
-			await databaseService.saveCommit(commit);
+			databaseService.addCommit(commit);
 		}
 
+		assert.equal(await databaseService.findBlocks(5, 10), []);
+
+		await databaseService.persist();
 		assert.equal(await databaseService.findBlocks(5, 10), []);
 	});
 
 	it("#findBlocks - should return blocks by height", async ({ databaseService }) => {
 		const commits = await generateCommits(4);
 		for (const commit of commits) {
-			await databaseService.saveCommit(commit);
+			databaseService.addCommit(commit);
 		}
 
+		assert.equal(
+			await databaseService.findBlocks(1, 4),
+			commits.map(({ block }) => block),
+		);
+
+		await databaseService.persist();
 		assert.equal(
 			await databaseService.findBlocks(1, 4),
 			commits.map(({ block }) => block),
@@ -172,9 +207,12 @@ describe<{
 	it("#getLastBlock - should return last block", async ({ databaseService }) => {
 		const commits = await generateCommits(4);
 		for (const commit of commits) {
-			await databaseService.saveCommit(commit);
+			databaseService.addCommit(commit);
 		}
 
+		assert.equal(await databaseService.getLastBlock(), commits[3].block);
+
+		await databaseService.persist();
 		assert.equal(await databaseService.getLastBlock(), commits[3].block);
 	});
 });

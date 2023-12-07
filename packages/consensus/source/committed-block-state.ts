@@ -27,6 +27,10 @@ export class CommittedBlockState implements Contracts.Processor.IProcessableUnit
 		return this.#committedBlock.commit.round;
 	}
 
+	get persist(): boolean {
+		return false; // Block downloader will store block in database, to improve performance
+	}
+
 	get validators(): string[] {
 		return [...this.#validators.keys()];
 	}
