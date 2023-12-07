@@ -53,6 +53,9 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 	it("should dispose", async () => {
 		const sandbox = new Sandbox();
 
+		sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
+
 		await assert.resolves(() => sandbox.boot());
 		await assert.resolves(() => sandbox.dispose());
 	});
@@ -61,6 +64,9 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		const sandbox = new Sandbox();
 
 		const callback = spyFn();
+
+		sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+		sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
 
 		await assert.resolves(() => sandbox.boot());
 		await assert.resolves(() => sandbox.dispose(() => callback.call()));
