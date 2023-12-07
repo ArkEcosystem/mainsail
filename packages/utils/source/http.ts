@@ -23,12 +23,23 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 			options.timeout = 1500;
 		}
 
+		const maxContentLength = options.maxContentLength ?? Number.MAX_SAFE_INTEGER;
 		const request_: ClientRequest = request(options, (r: IncomingMessage): void => {
 			let accumulator = "";
+			let readBytes = 0;
 
 			r.setEncoding("utf8");
 
-			r.on("data", (chunk: string) => (accumulator += chunk));
+			r.on("data", (chunk: string) => {
+				readBytes += Buffer.byteLength(chunk, "utf-8");
+
+				if (readBytes > maxContentLength) {
+					r.destroy(new Error("response too large"));
+					return;
+				}
+
+				accumulator += chunk;
+			});
 
 			r.on("end", (): void => {
 				const response: HttpResponse = {
@@ -76,7 +87,7 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 		request_.end();
 	});
 
-export type HttpOptions = RequestOptions & { body?: Record<string, Primitive> };
+export type HttpOptions = RequestOptions & { maxContentLength?: number, body?: Record<string, Primitive> };
 
 export type HttpResponse = {
 	method: string | undefined;
