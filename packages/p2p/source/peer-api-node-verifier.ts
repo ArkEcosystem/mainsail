@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { http, HttpResponse } from "@mainsail/utils";
 import { Providers } from "@mainsail/kernel";
+import { http, HttpResponse } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -22,8 +22,8 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 
 			const response = await http.get(apiNode.url(), {
 				headers: {},
-				timeout: 5000,
 				maxContentLength: apiNodesMaxContentLength,
+				timeout: 5000,
 			});
 
 			const t1 = dayjs();

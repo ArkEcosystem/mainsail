@@ -87,7 +87,7 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 		request_.end();
 	});
 
-export type HttpOptions = RequestOptions & { maxContentLength?: number, body?: Record<string, Primitive> };
+export type HttpOptions = RequestOptions & { maxContentLength?: number; body?: Record<string, Primitive> };
 
 export type HttpResponse = {
 	method: string | undefined;

@@ -77,9 +77,8 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 
 		server.route({
 			handler: (_, h) => {
-				const payload = "a".repeat(h.request.query['size']);
-				return h.response(payload)
-					.code(200);
+				const payload = "a".repeat(h.request.query["size"]);
+				return h.response(payload).code(200);
 			},
 			method: "GET",
 			path: "/payload",
@@ -175,16 +174,19 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 
 	each(
 		"get - should respect maxContentLength",
-		async ({ dataset: { responseSize, maxContentLength, success } }: { dataset: { responseSize: number, maxContentLength?: number, success: boolean } }) => {
+		async ({
+			dataset: { responseSize, maxContentLength, success },
+		}: {
+			dataset: { responseSize: number; maxContentLength?: number; success: boolean };
+		}) => {
 			try {
 				const { statusCode, data } = await http.get(`${serverURL}/payload?size=${responseSize}`, {
-					maxContentLength
+					maxContentLength,
 				});
 
 				assert.true(success);
 				assert.equal(statusCode, 200);
 				assert.equal(data, "a".repeat(responseSize));
-
 			} catch (ex) {
 				assert.false(success);
 				assert.equal(ex.message, "response too large");
