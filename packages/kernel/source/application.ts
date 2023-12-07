@@ -190,7 +190,9 @@ export class Application implements Contracts.Kernel.Application {
 		this.#booted = false;
 
 		if (this.#terminating) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning("Force application termination.");
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+				"Force application termination. Graceful shutdown was interrupted.",
+			);
 			exit(1);
 		}
 		this.#terminating = true;
@@ -212,7 +214,15 @@ export class Application implements Contracts.Kernel.Application {
 			}
 		}
 
+		const timeout = setTimeout(() => {
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+				"Force application termination. Service providers did not dispose in time.",
+			);
+			exit(1);
+		}, 3000);
+
 		await this.#disposeServiceProviders();
+		clearTimeout(timeout);
 	}
 
 	public bind<T>(
