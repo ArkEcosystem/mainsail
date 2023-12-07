@@ -165,9 +165,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		});
 	}
 
-	// TODO: Check if can be joined with handle
 	async handleCommittedBlockState(committedBlockState: Contracts.Processor.IProcessableUnit): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			await this.onMajorityPrecommit(committedBlockState);
 		});
 	}
