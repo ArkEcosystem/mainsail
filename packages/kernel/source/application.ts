@@ -14,6 +14,7 @@ import { Constructor } from "./types/container";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
+	#terminating = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
 		this.#listenToShutdownSignals();
@@ -188,6 +189,12 @@ export class Application implements Contracts.Kernel.Application {
 	public async terminate(reason?: string, error?: Error): Promise<void> {
 		this.#booted = false;
 
+		if (this.#terminating) {
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning("Force application termination.");
+			exit(1);
+		}
+		this.#terminating = true;
+
 		if (reason) {
 			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(reason);
 		}
@@ -206,8 +213,6 @@ export class Application implements Contracts.Kernel.Application {
 		}
 
 		await this.#disposeServiceProviders();
-
-		exit(1);
 	}
 
 	public bind<T>(
