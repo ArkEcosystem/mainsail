@@ -20,6 +20,10 @@ export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepo
 		return this.#roundStates.get(key)!;
 	}
 
+	public getRoundStates(): Contracts.Consensus.IRoundState[] {
+		return [...this.#roundStates.values()];
+	}
+
 	public clear(): void {
 		this.#roundStates.clear();
 	}

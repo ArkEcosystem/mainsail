@@ -18,9 +18,6 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
 
-	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Contracts.Consensus.IConsensusStorage;
-
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
@@ -43,7 +40,6 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 			}
 
 			roundState.addPrecommit(precommit);
-			await this.storage.savePrecommit(precommit);
 
 			if (broadcast) {
 				void this.broadcaster.broadcastPrecommit(precommit);
