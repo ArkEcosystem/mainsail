@@ -38,9 +38,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
 
-	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Contracts.Consensus.IConsensusStorage;
-
 	@inject(Identifiers.Consensus.CommitLock)
 	private readonly commitLock!: Contracts.Kernel.ILock;
 
@@ -123,8 +120,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async dispose(): Promise<void> {
 		this.scheduler.clear();
 		this.#isDisposed = true;
-
-		await this.storage.saveState(this.getState());
 	}
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {

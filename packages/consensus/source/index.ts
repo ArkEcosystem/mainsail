@@ -53,6 +53,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Consensus>(Identifiers.Consensus.Service).dispose();
+		const consensus = this.app.get<Consensus>(Identifiers.Consensus.Service);
+		await consensus.dispose();
+
+		const storage = this.app.get<Storage>(Identifiers.Consensus.Storage);
+		await storage.saveState(consensus.getState());
 	}
 }
