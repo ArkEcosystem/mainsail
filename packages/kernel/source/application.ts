@@ -223,6 +223,13 @@ export class Application implements Contracts.Kernel.Application {
 
 		await this.#disposeServiceProviders();
 		clearTimeout(timeout);
+
+		// Await all async operations to finish
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is gracefully terminated.");
+
+		exit(1);
 	}
 
 	public bind<T>(
