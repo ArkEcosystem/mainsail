@@ -227,6 +227,8 @@ export class Application implements Contracts.Kernel.Application {
 		// Await all async operations to finish
 		await new Promise((resolve) => setTimeout(resolve, 0));
 
+		this.#logOpenHandlers();
+
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is gracefully terminated.");
 
 		exit(1);
@@ -309,6 +311,22 @@ export class Application implements Contracts.Kernel.Application {
 				await serviceProvider.dispose();
 			} catch {}
 		}
+	}
+
+	#logOpenHandlers(): void {
+		try {
+			// @ts-ignore
+			const resourcesInfo: string[] = process.getActiveResourcesInfo(); // Method is experimental
+
+			const timeouts = resourcesInfo.filter((resource) => resource.includes("Timeout"));
+			const fsRequests = resourcesInfo.filter((resource) => resource.includes("FSReqCallback"));
+
+			if (timeouts.length > 0 || fsRequests.length > 0) {
+				this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+					`There are ${timeouts.length} active timeouts and ${fsRequests.length} active file system requests.`,
+				);
+			}
+		} catch {}
 	}
 
 	#getPath(type: string): string {
