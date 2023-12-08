@@ -123,6 +123,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	public async dispose(): Promise<void> {
 		this.scheduler.clear();
 		this.#isDisposed = true;
+
+		await this.storage.saveState(this.getState());
 	}
 
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
@@ -182,7 +184,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#didMajorityPrecommit = false;
 
 		this.scheduler.clear();
-		await this.#saveState();
 
 		if (this.#isDisposed) {
 			return;
@@ -283,8 +284,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 			await this.#precommit(block.data.id);
 		} else {
 			this.#validValue = roundState;
-
-			await this.#saveState();
 		}
 	}
 
@@ -341,7 +340,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 				await this.app.terminate("Failed to commit block", error);
 			}
 
-			await this.storage.clear();
 			this.roundStateRepository.clear();
 
 			this.#height++;
@@ -458,8 +456,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			void this.prevoteProcessor.process(prevote);
 		}
-
-		await this.#saveState();
 	}
 
 	async #precommit(value?: string): Promise<void> {
@@ -477,18 +473,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 			void this.precommitProcessor.process(precommit);
 		}
-
-		await this.#saveState();
 	}
 
 	#getActiveValidators(): string[] {
 		const activeValidators = this.validatorSet.getActiveValidators();
 
 		return activeValidators.map((validator) => validator.getConsensusPublicKey());
-	}
-
-	async #saveState(): Promise<void> {
-		await this.storage.saveState(this.getState());
 	}
 
 	async #bootstrap(): Promise<void> {
@@ -509,7 +499,6 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 					}`,
 				);
 
-				await this.storage.clear();
 				this.roundStateRepository.clear();
 			}
 
