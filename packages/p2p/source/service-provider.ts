@@ -45,6 +45,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async dispose(): Promise<void> {
 		await this.app.get<Contracts.P2P.Server>(Identifiers.P2PServer).dispose();
+		await this.app.get<Contracts.P2P.Service>(Identifiers.P2P.Service).dispose();
 	}
 
 	public async required(): Promise<boolean> {

@@ -33,6 +33,8 @@ export class Service implements Contracts.P2P.Service {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
+	#disposed = false;
+	#mainLoopTimeout?: NodeJS.Timeout = undefined;
 
 	public async boot(): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
@@ -55,13 +57,17 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	public async mainLoop(): Promise<void> {
-		// eslint-disable-next-line no-constant-condition
-		while (true) {
-			await this.#checkMinPeers();
-			await this.#checkReceivedMessages();
+		await this.#checkMinPeers();
+		await this.#checkReceivedMessages();
 
-			await Utils.sleep(2000);
+		if (!this.#disposed) {
+			this.#mainLoopTimeout = setTimeout(() => this.mainLoop(), 2000);
 		}
+	}
+
+	public async dispose(): Promise<void> {
+		this.#disposed = true;
+		clearTimeout(this.#mainLoopTimeout);
 	}
 
 	async #checkMinPeers(): Promise<void> {
