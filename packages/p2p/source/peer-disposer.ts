@@ -63,6 +63,13 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		}
 	}
 
+	public async disposePeers(): Promise<void> {
+		await Promise.all(
+			this.repository.getPendingPeers().map(async (peer) => await this.connector.disconnect(peer.ip)),
+		);
+		await Promise.all(this.repository.getPeers().map(async (peer) => await this.connector.disconnect(peer.ip)));
+	}
+
 	public isBanned(peerIp: string): boolean {
 		const bannedUntil = this.#blacklist.get(peerIp);
 
