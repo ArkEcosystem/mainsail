@@ -14,6 +14,8 @@ describe<{
 	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {}, addKeyword: () => {} };
 	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
+	const service = { boot: async () => {}, dispose: async () => {} };
+	const peerDisposer = { disposePeers: async () => {} };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -45,11 +47,17 @@ describe<{
 
 	it("#dispose - should call the server dispose", async ({ sandbox, serviceProvider }) => {
 		const spyServerDispose = stub(server, "dispose");
+		const spyServiceDispose = stub(service, "dispose");
+		const spyPeerDispose = stub(peerDisposer, "disposePeers");
 		sandbox.app.bind(Identifiers.P2PServer).toConstantValue(server);
+		sandbox.app.bind(Identifiers.P2P.Service).toConstantValue(service);
+		sandbox.app.bind(Identifiers.PeerDisposer).toConstantValue(peerDisposer);
 
 		await serviceProvider.dispose();
 
 		spyServerDispose.calledOnce();
+		spyServiceDispose.calledOnce();
+		spyPeerDispose.calledOnce();
 	});
 
 	it("#required - should return true", async ({ serviceProvider }) => {

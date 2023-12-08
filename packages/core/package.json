@@ -17,7 +17,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"full:testnet": "cross-env CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail core:run -- --env=test --token=ark --network=testnet",
+		"full:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail core:run -- --env=test --token=ark --network=testnet",
 		"mainsail": "node ./bin/run",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",

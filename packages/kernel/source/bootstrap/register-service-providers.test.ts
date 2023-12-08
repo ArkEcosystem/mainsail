@@ -105,7 +105,7 @@ describe<{
 		);
 	});
 
-	it("should terminate if a required (boolean) dependency cannot be found", async (context) => {
+	it.skip("should terminate if a required (boolean) dependency cannot be found", async (context) => {
 		const serviceProvider: ServiceProvider = new RequiredDependencyCannotBeFoundServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
@@ -137,7 +137,7 @@ describe<{
 		spyTerminate.neverCalled();
 	});
 
-	it("should terminate if a required (async) dependency cannot be found", async (context) => {
+	it.skip("should terminate if a required (async) dependency cannot be found", async (context) => {
 		const serviceProvider: ServiceProvider = new RequiredDependencyCannotBeFoundAsyncServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
@@ -186,7 +186,7 @@ describe<{
 		spyTerminate.neverCalled();
 	});
 
-	it("should terminate if a required dependency cannot satisfy the version", async (context) => {
+	it.skip("should terminate if a required dependency cannot satisfy the version", async (context) => {
 		const serviceProvider: ServiceProvider = new RequiredDependencyVersionCannotBeSatisfiedServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));

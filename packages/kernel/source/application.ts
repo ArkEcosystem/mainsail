@@ -1,10 +1,11 @@
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { existsSync, removeSync, writeFileSync } from "fs-extra";
+import { exit } from "node:process";
 import { join } from "path";
 
 import { Bootstrappers } from "./bootstrap";
 import { Bootstrapper } from "./bootstrap/interfaces";
-import { KernelEvent } from "./enums";
+import { KernelEvent, ShutdownSignal } from "./enums";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
@@ -13,10 +14,10 @@ import { Constructor } from "./types/container";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
+	#terminating = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
-		// @TODO enable this after solving the event emitter limit issues
-		// this.listenToShutdownSignals();
+		this.#listenToShutdownSignals();
 
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application).toConstantValue(this);
 
@@ -188,6 +189,14 @@ export class Application implements Contracts.Kernel.Application {
 	public async terminate(reason?: string, error?: Error): Promise<void> {
 		this.#booted = false;
 
+		if (this.#terminating) {
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+				"Force application termination. Graceful shutdown was interrupted.",
+			);
+			exit(1);
+		}
+		this.#terminating = true;
+
 		if (reason) {
 			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(reason);
 		}
@@ -205,10 +214,24 @@ export class Application implements Contracts.Kernel.Application {
 			}
 		}
 
-		await this.#disposeServiceProviders();
+		const timeout = setTimeout(() => {
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+				"Force application termination. Service providers did not dispose in time.",
+			);
+			exit(1);
+		}, 3000);
 
-		// eslint-disable-next-line unicorn/no-process-exit
-		process.exit(1);
+		await this.#disposeServiceProviders();
+		clearTimeout(timeout);
+
+		// Await all async operations to finish
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		this.#logOpenHandlers();
+
+		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is gracefully terminated.");
+
+		exit(1);
 	}
 
 	public bind<T>(
@@ -290,6 +313,22 @@ export class Application implements Contracts.Kernel.Application {
 		}
 	}
 
+	#logOpenHandlers(): void {
+		try {
+			// @ts-ignore
+			const resourcesInfo: string[] = process.getActiveResourcesInfo(); // Method is experimental
+
+			const timeouts = resourcesInfo.filter((resource) => resource.includes("Timeout"));
+			const fsRequests = resourcesInfo.filter((resource) => resource.includes("FSReqCallback"));
+
+			if (timeouts.length > 0 || fsRequests.length > 0) {
+				this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+					`There are ${timeouts.length} active timeouts and ${fsRequests.length} active file system requests.`,
+				);
+			}
+		} catch {}
+	}
+
 	#getPath(type: string): string {
 		const path: string = this.get<string>(`path.${type}`);
 
@@ -308,14 +347,11 @@ export class Application implements Contracts.Kernel.Application {
 		this.rebind<string>(`path.${type}`).toConstantValue(path);
 	}
 
-	//
-	// #listenToShutdownSignals(): void {
-	//     for (const signal in ShutdownSignal) {
-	//         process.on(signal as any, async code => {
-	//             await this.terminate(signal);
-
-	//             process.exit(code || 1);
-	//         });
-	//     }
-	// }
+	#listenToShutdownSignals(): void {
+		for (const signal in ShutdownSignal) {
+			process.on(signal as any, async (code) => {
+				await this.terminate(signal);
+			});
+		}
+	}
 }

@@ -51,4 +51,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(this.app.resolve(Consensus));
 	}
+
+	public async dispose(): Promise<void> {
+		await this.app.get<Consensus>(Identifiers.Consensus.Service).dispose();
+	}
 }

@@ -58,6 +58,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
+	#isDisposed = false;
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Utils.Lock();
@@ -119,8 +120,17 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
+	public async dispose(): Promise<void> {
+		this.scheduler.clear();
+		this.#isDisposed = true;
+	}
+
 	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			if (!roundState.hasProcessorResult() && roundState.hasProposal()) {
 				const result = await this.processor.process(roundState);
 				roundState.setProcessorResult(result);
@@ -155,9 +165,12 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		});
 	}
 
-	// TODO: Check if can be joined with handle
 	async handleCommittedBlockState(committedBlockState: Contracts.Processor.IProcessableUnit): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			await this.onMajorityPrecommit(committedBlockState);
 		});
 	}
@@ -169,8 +182,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#didMajorityPrecommit = false;
 
 		this.scheduler.clear();
-
 		await this.#saveState();
+
+		if (this.#isDisposed) {
+			return;
+		}
 
 		this.scheduler.scheduleTimeoutStartRound();
 	}
