@@ -12,7 +12,6 @@ type Context = {
 	cryptoConfiguration: any;
 	state: any;
 	stateService: any;
-	storage: any;
 	prevoteProcessor: any;
 	precommitProcessor: any;
 	proposalProcessor: any;
@@ -63,18 +62,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			scheduleTimeoutPrevote: () => {},
 			scheduleTimeoutPropose: () => {},
 			scheduleTimeoutStartRound: () => {},
-		};
-
-		context.storage = {
-			clear: () => {},
-			getPrecommits: () => {},
-			getPrevotes: () => {},
-			getProposals: () => {},
-			getState: () => {},
-			savePrecommit: () => {},
-			savePrevote: () => {},
-			saveProposal: () => {},
-			saveState: () => {},
 		};
 
 		context.bootstrapper = {
@@ -158,7 +145,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue(context.proposalProcessor);
 		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
-		context.sandbox.app.bind(Identifiers.Consensus.Storage).toConstantValue(context.storage);
 		context.sandbox.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
 		+context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
@@ -203,19 +189,13 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		});
 	});
 
-	it("#startRound - should clear scheduler, scheduleTimeout & save state", async ({
-		consensus,
-		storage,
-		scheduler,
-	}) => {
-		const spyStorageSaveState = spy(storage, "saveState");
+	it("#startRound - should clear scheduler, scheduleTimeout", async ({ consensus, scheduler }) => {
 		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutStartRound = spy(scheduler, "scheduleTimeoutStartRound");
 
 		await consensus.startRound(1);
 
 		spyScheduleClear.calledOnce();
-		spyStorageSaveState.calledOnce();
 		spyScheduleTimeoutStartRound.calledOnce();
 	});
 
@@ -1111,20 +1091,18 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#onMajorityPrecommit - should commit, increase height & clear", async ({
+	it("#onMajorityPrecommit - should commit & increase height", async ({
 		consensus,
 		blockProcessor,
 		roundState,
 		roundStateRepository,
 		logger,
-		storage,
 		proposal,
 	}) => {
 		const fakeTimers = clock();
 
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
 		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
-		const spyStorageClear = stub(storage, "clear");
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
@@ -1141,7 +1119,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyConsensusStartRound.calledOnce();
 		spyConsensusStartRound.calledWith(0);
 		spyRoundStateRepositoryClear.calledOnce();
-		spyStorageClear.calledOnce();
 		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${2}/${0} blockId: ${proposal.block.block.data.id}`);
 		assert.equal(consensus.getHeight(), 3);
 	});
@@ -1179,7 +1156,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState,
 		logger,
 		block,
-		storage,
 		roundStateRepository,
 		proposal,
 	}) => {
@@ -1188,7 +1164,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
-		const spyStorageClear = stub(storage, "clear");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
 
@@ -1202,7 +1177,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
 		spyRoundStateRepositoryClear.neverCalled();
-		spyStorageClear.neverCalled();
 		spyLoggerInfo.calledWith(`Block ${block.data.id} on height ${2} received +2/3 precommits but is invalid`);
 		assert.equal(consensus.getHeight(), 2);
 	});

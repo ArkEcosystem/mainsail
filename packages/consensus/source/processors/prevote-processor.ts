@@ -18,9 +18,6 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
 
-	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Contracts.Consensus.IConsensusStorage;
-
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
@@ -40,7 +37,6 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 			}
 
 			roundState.addPrevote(prevote);
-			await this.storage.savePrevote(prevote);
 
 			if (broadcast) {
 				void this.broadcaster.broadcastPrevote(prevote);

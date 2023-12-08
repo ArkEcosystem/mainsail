@@ -27,9 +27,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
 
-	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Contracts.Consensus.IConsensusStorage;
-
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
@@ -67,7 +64,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			}
 
 			roundState.addProposal(proposal);
-			await this.storage.saveProposal(proposal);
 
 			if (broadcast) {
 				void this.broadcaster.broadcastProposal(proposal);

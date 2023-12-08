@@ -30,29 +30,40 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					context.container.resolve(CommittedBlockState).configure(committedBlock),
 			);
 
-		// Storage for uncommitted blocks
-		const consensusStorage = this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage);
-
-		this.app
-			.bind(Identifiers.Database.ProposalStorage)
-			.toConstantValue(consensusStorage.openDB({ name: "proposals" }));
-		this.app
-			.bind(Identifiers.Database.PrevoteStorage)
-			.toConstantValue(consensusStorage.openDB({ name: "prevotes" }));
-		this.app
-			.bind(Identifiers.Database.PrecommitStorage)
-			.toConstantValue(consensusStorage.openDB({ name: "precommits" }));
+		// Storage for prevotes, precommits and proposals
+		const storage = this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage);
+		this.app.bind(Identifiers.Database.ProposalStorage).toConstantValue(storage.openDB({ name: "proposals" }));
+		this.app.bind(Identifiers.Database.PrevoteStorage).toConstantValue(storage.openDB({ name: "prevotes" }));
+		this.app.bind(Identifiers.Database.PrecommitStorage).toConstantValue(storage.openDB({ name: "precommits" }));
 		this.app
 			.bind(Identifiers.Database.ConsensusStateStorage)
-			.toConstantValue(consensusStorage.openDB({ name: "consensus" }));
+			.toConstantValue(storage.openDB({ name: "consensus" }));
 		this.app.bind(Identifiers.Consensus.Storage).to(Storage).inSingletonScope();
 
 		this.app.bind(Identifiers.Consensus.Bootstrapper).to(Bootstrapper).inSingletonScope();
-
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(this.app.resolve(Consensus));
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Consensus>(Identifiers.Consensus.Service).dispose();
+		const consensus = this.app.get<Consensus>(Identifiers.Consensus.Service);
+		await consensus.dispose();
+
+		const storage = this.app.get<Storage>(Identifiers.Consensus.Storage);
+		await storage.saveState(consensus.getState());
+
+		const roundStates = this.app
+			.get<RoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
+			.getRoundStates();
+
+		const proposals = roundStates
+			.map((roundState) => roundState.getProposal())
+			.filter((proposal): proposal is Contracts.Crypto.IProposal => !!proposal);
+		await storage.saveProposals(proposals);
+
+		const prevotes = roundStates.flatMap((roundState) => roundState.getPrevotes());
+		await storage.savePrevotes(prevotes);
+
+		const precommits = roundStates.flatMap((roundState) => roundState.getPrecommits());
+		await storage.savePrecommits(precommits);
 	}
 }
