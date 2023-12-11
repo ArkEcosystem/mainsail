@@ -4,6 +4,8 @@ import { Providers } from "@mainsail/kernel";
 
 import { Signature } from "./signature";
 
+export * from "./signature";
+
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app

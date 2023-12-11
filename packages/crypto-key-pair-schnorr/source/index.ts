@@ -8,6 +8,7 @@ import { PublicKeyFactory } from "./public";
 import { schemas } from "./schemas";
 import { PublicKeySerializer } from "./serializer";
 
+export * from "./pair";
 export * from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {

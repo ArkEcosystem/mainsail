@@ -951,6 +951,9 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
+      '@mainsail/crypto-worker':
+        specifier: workspace:*
+        version: link:../crypto-worker
       '@mainsail/database':
         specifier: workspace:*
         version: link:../database
@@ -2211,6 +2214,43 @@ importers:
       '@types/wif':
         specifier: ^2.0.1
         version: 2.0.2
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/crypto-worker:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+    devDependencies:
+      '@types/chance':
+        specifier: 1.1.3
+        version: 1.1.3
+      '@types/fs-extra':
+        specifier: 8.1.0
+        version: 8.1.0
+      '@types/got':
+        specifier: 9.6.12
+        version: 9.6.12
+      '@types/lodash.clonedeep':
+        specifier: 4.5.0
+        version: 4.5.0
+      '@types/sinon':
+        specifier: ^10.0.14
+        version: 10.0.14
+      '@types/tmp':
+        specifier: 0.2.1
+        version: 0.2.1
+      joi:
+        specifier: 17.9.2
+        version: 17.9.2
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -11254,6 +11294,16 @@ packages:
       '@sideway/address': 4.1.4
       '@sideway/formula': 3.0.1
       '@sideway/pinpoint': 2.0.0
+
+  /joi@17.9.2:
+    resolution: {integrity: sha512-Itk/r+V4Dx0V3c7RLFdRh12IOjySm2/WGPMubBT92cQvRfYZhPM2W0hZlctjj72iES8jsRCwp7S/cRmWBnJ4nw==}
+    dependencies:
+      '@hapi/hoek': 9.2.0
+      '@hapi/topo': 5.1.0
+      '@sideway/address': 4.1.4
+      '@sideway/formula': 3.0.1
+      '@sideway/pinpoint': 2.0.0
+    dev: true
 
   /joycon@2.2.5:
     resolution: {integrity: sha512-YqvUxoOcVPnCp0VU1/56f+iKSdvIRJYPznH22BdXV3xMk75SFXhWeJkZ8C9XxUWt1b5x2X1SxuFygW1U0FmkEQ==}

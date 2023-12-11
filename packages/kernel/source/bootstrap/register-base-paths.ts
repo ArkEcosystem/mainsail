@@ -25,9 +25,15 @@ export class RegisterBasePaths implements Bootstrapper {
 
 			const processPath: string | undefined = process.env[configKey];
 
+			// 1. Check if a path is defined via process variables.
 			if (processPath) {
-				// 1. Check if a path is defined via process variables.
-				path = join(processPath, this.app.name());
+				if (!this.app.isWorker()) {
+					path = join(processPath, this.app.name());
+				} else {
+					// Path already correct, due to the env being inherited from the parent process.
+					path = processPath;
+				}
+
 			} else if (this.configRepository.has(`app.flags.paths.${type}`)) {
 				// 2. Check if a path is defined via configuration repository.
 				path = this.configRepository.get(`app.flags.paths.${type}`);

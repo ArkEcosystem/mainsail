@@ -9,6 +9,11 @@ import { Serializer } from "./serializer";
 import { Verifier } from "./verifier";
 
 export * from "./schemas";
+export * from "./factory";
+export * from "./id.factory";
+export * from "./serializer";
+export * from "./deserializer";
+export * from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

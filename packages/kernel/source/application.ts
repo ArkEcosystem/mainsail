@@ -52,14 +52,14 @@ export class Application implements Contracts.Kernel.Application {
 		await this.boot();
 	}
 
-	public config<T = any>(key: string, value?: T): T | undefined {
+	public config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined {
 		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.ConfigRepository);
 
 		if (value) {
 			config.set(key, value);
 		}
 
-		return config.get(key);
+		return config.get(key, defaultValue);
 	}
 
 	public dirPrefix(): string {
@@ -156,6 +156,10 @@ export class Application implements Contracts.Kernel.Application {
 
 	public isBooted(): boolean {
 		return this.#booted;
+	}
+
+	public isWorker(): boolean {
+		return this.config("worker", undefined, false) ?? false;
 	}
 
 	public enableMaintenance(): void {

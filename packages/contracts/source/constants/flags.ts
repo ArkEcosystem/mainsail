@@ -46,6 +46,9 @@ export const FlagNames = [
 	// Cli
 	"CORE_NPM_REGISTRY",
 
+	// Worker
+	"CORE_CRYPTO_WORKER_COUNT",
+
 	// Other
 	"CORE_NETWORK_NAME",
 	"CORE_TOKEN",
