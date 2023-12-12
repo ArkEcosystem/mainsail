@@ -8,7 +8,12 @@ import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
 import { Verifier } from "./verifier";
 
+export * from "./deserializer";
+export * from "./factory";
+export * from "./id.factory";
 export * from "./schemas";
+export * from "./serializer";
+export * from "./verifier";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

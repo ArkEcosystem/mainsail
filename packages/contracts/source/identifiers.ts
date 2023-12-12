@@ -106,6 +106,12 @@ export const Identifiers = {
 		Usernames: Symbol.for("Forger<Usernames>"),
 		Validators: Symbol.for("Forger<Validators>"),
 	},
+	Ipc: {
+		Worker: Symbol.for("Ipc<Worker>"),
+		WorkerFactory: Symbol.for("Ipc<WorkerFactory>"),
+		WorkerPool: Symbol.for("Ipc<WorkerPool>"),
+		WorkerSubprocessFactory: Symbol.for("Ipc<WorkerSubprocessFactory>"),
+	},
 	LogManager: Symbol.for("Manager<Log>"),
 	LogService: Symbol.for("Service<Log>"),
 	MixinService: Symbol.for("Service<Mixin>"),

@@ -1,6 +1,8 @@
 export { Application } from "./application";
 export * as Enums from "./enums";
 export * as Environment from "./environment";
+export * as Ipc from "./ipc";
+export * as IpcWorker from "./ipc-worker";
 export * as Providers from "./providers";
 export * as Services from "./services";
 export * as Support from "./support";
