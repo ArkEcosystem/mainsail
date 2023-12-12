@@ -179,8 +179,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			await this.database.persist();
 		}
 
-		await new Promise((resolve) => setTimeout(resolve, 10_000));
-
 		if (job.heightTo !== height - 1) {
 			this.#handleMissingBlocks(job);
 			return;
