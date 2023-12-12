@@ -15,4 +15,5 @@ export interface IPrecommitProcessor {
 
 export interface ICommittedBlockProcessor {
 	process(committedBlock: ICommittedBlock, broadcast?: boolean): Promise<ProcessorResult>;
+	hasValidSignature(committedBlock: ICommittedBlock): Promise<boolean>;
 }

@@ -152,6 +152,15 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					}
 				}
 
+				const hasValidSignatures = await Promise.all(
+					committedBlocks.map(
+						async (committedBlock) => await this.committedBlockProcessor.hasValidSignature(committedBlock),
+					),
+				);
+				if (hasValidSignatures.some((value) => !value)) {
+					throw new Error(`Received block has invalid signature`);
+				}
+
 				for (const committedBlock of committedBlocks) {
 					const response = await this.committedBlockProcessor.process(committedBlock);
 					if (response === Contracts.Consensus.ProcessorResult.Invalid) {

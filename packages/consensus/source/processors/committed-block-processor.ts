@@ -32,10 +32,6 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
-			if (!(await this.#hasValidCommit(committedBlock))) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
-			}
-
 			const committedBlockState = this.committedBlockStateFactory(committedBlock);
 
 			const result = await this.processor.process(committedBlockState);
@@ -57,11 +53,7 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 		return result;
 	}
 
-	#hasValidHeight(committedBlock: Contracts.Crypto.ICommittedBlock): boolean {
-		return committedBlock.block.data.height === this.getConsensus().getHeight();
-	}
-
-	async #hasValidCommit(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<boolean> {
+	async hasValidSignature(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<boolean> {
 		const { commit, block } = committedBlock;
 
 		const publicKeys: Buffer[] = [];
@@ -87,5 +79,9 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 		});
 
 		return this.aggregator.verify(commit, precommit, activeValidators);
+	}
+
+	#hasValidHeight(committedBlock: Contracts.Crypto.ICommittedBlock): boolean {
+		return committedBlock.block.data.height === this.getConsensus().getHeight();
 	}
 }
