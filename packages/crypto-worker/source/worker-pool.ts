@@ -19,6 +19,8 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	@inject(Identifiers.ConfigFlags)
 	private readonly flags!: Types.KeyValuePair;
 
+	#currentWorkerIndex = 0;
+
 	public async boot(): Promise<void> {
 		const workerCount = this.configuration.getRequired<number>("workerCount");
 
@@ -37,13 +39,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	}
 
 	public async getWorker(): Promise<IpcWorker.Worker> {
-		const worker = this.workers.reduce((previous, next) => {
-			if (previous.getQueueSize() < next.getQueueSize()) {
-				return previous;
-			} else {
-				return next;
-			}
-		});
+		const worker = this.workers[this.#currentWorkerIndex++ % this.workers.length];
 
 		await worker.boot(this.flags);
 
