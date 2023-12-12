@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { IpcWorker, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Aggregator implements Contracts.Consensus.IAggregator {
@@ -14,6 +14,9 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "consensus")
 	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
+
+	@inject(Identifiers.Ipc.WorkerPool)
+	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	public async aggregate(
 		majority: Map<number, { signature: string }>,
@@ -57,7 +60,10 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 
 		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys);
 
-		return this.signatureFactory.verify(
+		const worker = await this.workerPool.getWorker();
+
+		return await worker.consensusSignature(
+			"verify",
 			Buffer.from(signature.signature, "hex"),
 			data,
 			Buffer.from(aggregatedPublicKey, "hex"),
