@@ -33,7 +33,6 @@ export class RegisterBasePaths implements Bootstrapper {
 					// Path already correct, due to the env being inherited from the parent process.
 					path = processPath;
 				}
-
 			} else if (this.configRepository.has(`app.flags.paths.${type}`)) {
 				// 2. Check if a path is defined via configuration repository.
 				path = this.configRepository.get(`app.flags.paths.${type}`);

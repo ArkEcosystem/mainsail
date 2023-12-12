@@ -108,9 +108,9 @@ export const Identifiers = {
 	},
 	Ipc: {
 		Worker: Symbol.for("Ipc<Worker>"),
-		WorkerSubprocessFactory: Symbol.for("Ipc<WorkerSubprocessFactory>"),
 		WorkerFactory: Symbol.for("Ipc<WorkerFactory>"),
 		WorkerPool: Symbol.for("Ipc<WorkerPool>"),
+		WorkerSubprocessFactory: Symbol.for("Ipc<WorkerSubprocessFactory>"),
 	},
 	LogManager: Symbol.for("Manager<Log>"),
 	LogService: Symbol.for("Service<Log>"),

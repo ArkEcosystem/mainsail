@@ -55,7 +55,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				},
 				formatters: {
 					level(label, number) {
-						return { level: label, pid: process.pid, };
+						return { level: label, pid: process.pid };
 					},
 				},
 				level: "emergency",

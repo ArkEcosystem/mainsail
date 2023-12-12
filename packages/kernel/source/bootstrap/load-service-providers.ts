@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { readJSONSync } from "fs-extra";
 import glob from "glob";
 import { join } from "path";
+
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";
 import { assert } from "../utils";
