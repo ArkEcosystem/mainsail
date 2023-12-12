@@ -11,10 +11,6 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	@tagged("type", "consensus")
 	private readonly signatureFactory!: Contracts.Crypto.ISignature;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
-	@tagged("type", "consensus")
-	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
-
 	@inject(Identifiers.Ipc.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
@@ -58,9 +54,9 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 			return false;
 		}
 
-		const aggregatedPublicKey = await this.publicKeyFactory.aggregate(validatorPublicKeys);
-
 		const worker = await this.workerPool.getWorker();
+
+		const aggregatedPublicKey = await worker.publicKeyFactory("aggregate", validatorPublicKeys);
 
 		return await worker.consensusSignature(
 			"verify",
