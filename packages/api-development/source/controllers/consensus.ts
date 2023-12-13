@@ -1,29 +1,30 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
 
 import { Controller } from "./controller";
 
 @injectable()
 export class ConsensusController extends Controller {
-	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Contracts.Consensus.IConsensusStorage;
+	@inject(Identifiers.Consensus.Service)
+	private readonly consensus!: Contracts.Consensus.IConsensusService;
+
+	@inject(Identifiers.Consensus.RoundStateRepository)
+	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
 
 	public async state(request: Hapi.Request) {
-		const state = await this.storage.getState();
-		if (!state) {
-			return {};
-		}
+		const state = this.consensus.getState();
 
-		Utils.assert.defined<Contracts.Consensus.IConsensusState>(state);
+		const roundStates = this.roundStateRepository.getRoundStates();
 
-		const proposals = await this.storage.getProposals();
-		const precommits = await this.storage.getPrecommits();
-		const prevotes = await this.storage.getPrevotes();
+		const proposals = roundStates
+			.map((roundState) => roundState.getProposal())
+			.filter((proposal): proposal is Contracts.Crypto.IProposal => !!proposal);
+		const prevotes = roundStates.flatMap((roundState) => roundState.getPrevotes());
+		const precommits = roundStates.flatMap((roundState) => roundState.getPrecommits());
 
 		const validators = this.validatorSet.getActiveValidators();
 
