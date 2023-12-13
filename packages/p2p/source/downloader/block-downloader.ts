@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 import { constants } from "../constants";
 import { getRandomPeer } from "../utils";
@@ -124,21 +125,50 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		this.logger.debug(`Processing blocks ${job.heightFrom}-${job.heightTo} from ${job.peer.ip}`);
 
 		let height = job.heightFrom;
+		job.status = JobStatus.Processing;
+
 		try {
-			job.status = JobStatus.Processing;
-			for (const buff of job.blocks) {
-				const committedBlock = await this.blockFactory.fromCommittedBytes(buff);
+			const bytesForProcess = [...job.blocks];
 
-				if (committedBlock.block.data.height !== height) {
-					throw new Error(
-						`Received block height ${committedBlock.block.data.height} does not match expected height ${height}`,
-					);
+			while (bytesForProcess.length > 0) {
+				const roundInfo = Utils.roundCalculator.calculateRound(height, this.configuration);
+
+				// TODO: Check if can use workers
+				// Slice to the end of the round, to ensure validator set is the same
+				const committedBlocks = await Promise.all(
+					bytesForProcess
+						.splice(0, roundInfo.roundHeight + roundInfo.maxValidators - height)
+						.map(async (buff) => await this.blockFactory.fromCommittedBytes(buff)),
+				);
+
+				// Check heights
+				for (const [index, committedBlock] of committedBlocks.entries()) {
+					if (committedBlock.block.data.height !== height + index) {
+						throw new Error(
+							`Received block height ${committedBlock.block.data.height} does not match expected height ${
+								height + index
+							}`,
+						);
+					}
 				}
-				height++;
 
-				const response = await this.committedBlockProcessor.process(committedBlock);
-				if (response === Contracts.Consensus.ProcessorResult.Invalid) {
-					throw new Error(`Received block is invalid`);
+				const hasValidSignatures = await Promise.all(
+					committedBlocks.map(
+						async (committedBlock) => await this.committedBlockProcessor.hasValidSignature(committedBlock),
+					),
+				);
+
+				if (!hasValidSignatures.every((value) => value)) {
+					throw new Error(`Received block(s) with invalid signature(s)`);
+				}
+
+				for (const committedBlock of committedBlocks) {
+					const response = await this.committedBlockProcessor.process(committedBlock);
+					if (response === Contracts.Consensus.ProcessorResult.Invalid) {
+						throw new Error(`Received block is invalid`);
+					}
+
+					height++;
 				}
 			}
 

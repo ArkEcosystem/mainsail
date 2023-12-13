@@ -9,3 +9,4 @@ ipcHandler.handleRequest("walletSignature");
 ipcHandler.handleRequest("consensusSignature");
 ipcHandler.handleRequest("blockFactory");
 ipcHandler.handleRequest("transactionFactory");
+ipcHandler.handleRequest("publicKeyFactory");

@@ -62,9 +62,17 @@ class WorkerImpl {
 		method: K,
 		arguments_: Parameters<T[K]>,
 	): Promise<ReturnType<T[K]>> {
-		arguments_ = arguments_.map((argument) =>
-			argument?.type === "Buffer" ? Buffer.from(argument.data) : argument,
-		);
+		arguments_ = arguments_.map((argument) => {
+			if (argument?.type === "Buffer") {
+				return Buffer.from(argument.data);
+			}
+
+			if (Array.isArray(argument) && argument.length > 0 && argument[0]?.type === "Buffer") {
+				return argument.map((item) => Buffer.from(item.data));
+			}
+
+			return argument;
+		});
 
 		// @ts-ignore
 		return object[method](...arguments_);
