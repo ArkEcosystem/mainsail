@@ -35,7 +35,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 			this.workers.map((worker) =>
 				worker.boot({
 					...this.flags,
-					workerLoggingEnabled: this.configuration.getOptional<boolean>("workerLoggingEnabled", false),
+					workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
 				}),
 			),
 		);
@@ -47,10 +47,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 
 	public async getWorker(): Promise<IpcWorker.Worker> {
 		const worker = this.workers[this.#currentWorkerIndex];
-
 		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % this.workers.length;
-
-		await worker.boot(this.flags);
 
 		return worker;
 	}
