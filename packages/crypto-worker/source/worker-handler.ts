@@ -91,9 +91,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 		});
 
 		if (!flags.workerLoggingEnabled) {
-			app
-				.rebind(Identifiers.LogService)
-				.to(Services.Log.NullLogger);
+			app.rebind(Identifiers.LogService).to(Services.Log.NullLogger);
 		}
 
 		// eslint-disable-next-line @typescript-eslint/await-thenable

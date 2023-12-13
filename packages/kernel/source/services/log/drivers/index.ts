@@ -1,2 +1,2 @@
-export * from "./null";
 export * from "./memory";
+export * from "./null";

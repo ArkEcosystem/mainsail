@@ -29,10 +29,14 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 
 		this.logger.info(`Booting up ${this.workers.length} workers`);
 
-		await Promise.all(this.workers.map((worker) => worker.boot({
-			...this.flags,
-			workerLoggingEnabled: this.configuration.getOptional<boolean>("workerLoggingEnabled", false),
-		})));
+		await Promise.all(
+			this.workers.map((worker) =>
+				worker.boot({
+					...this.flags,
+					workerLoggingEnabled: this.configuration.getOptional<boolean>("workerLoggingEnabled", false),
+				}),
+			),
+		);
 	}
 
 	public async shutdown(signal?: number | NodeJS.Signals): Promise<void> {
@@ -40,14 +44,12 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	}
 
 	public async getWorker(): Promise<IpcWorker.Worker> {
-		const worker = this.workers.reduce((previous, next) => {
+		return this.workers.reduce((previous, next) => {
 			if (previous.getQueueSize() < next.getQueueSize()) {
 				return previous;
 			} else {
 				return next;
 			}
 		});
-
-		return worker;
 	}
 }

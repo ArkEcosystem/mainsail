@@ -202,7 +202,9 @@ export class Application implements Contracts.Kernel.Application {
 		this.#terminating = true;
 
 		if (error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(`reason: ${reason} error: ${error?.message}`);
+			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(
+				`reason: ${reason} error: ${error?.message}`,
+			);
 		}
 
 		if (error) {
