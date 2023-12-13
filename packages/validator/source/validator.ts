@@ -27,11 +27,11 @@ export class Validator implements Contracts.Validator.IValidator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.IDatabaseService;
-
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.IMessageFactory;
+
+	@inject(Identifiers.StateService)
+	protected readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -151,9 +151,7 @@ export class Validator implements Contracts.Validator.IValidator {
 			payloadLength += serialized.length;
 		}
 
-		const previousBlock = await this.database.getLastBlock();
-		Utils.assert.defined<Contracts.Crypto.IBlock>(previousBlock);
-
+		const previousBlock = this.stateService.getStateStore().getLastBlock();
 		const height = previousBlock.data.height + 1;
 
 		return this.blockFactory.make({
