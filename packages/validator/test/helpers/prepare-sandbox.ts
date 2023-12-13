@@ -15,7 +15,6 @@ import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
 import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/events";
 import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers";
 import { ServiceProvider as CoreSerializer } from "../../../serializer";
-import { ServiceProvider as CoreState } from "../../../state";
 import { Sandbox } from "../../../test-framework";
 import { ServiceProvider as CoreTransactions } from "../../../transactions";
 import { ServiceProvider as CoreValidation } from "../../../validation";
@@ -43,7 +42,6 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
 	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
-	await context.sandbox.app.resolve(CoreState).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 	await context.sandbox.app.resolve(CoreTransactions).register();
 	await context.sandbox.app.resolve(CoreCryptoBlock).register();
@@ -53,12 +51,15 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		getBlockCandidateTransactions: () => [],
 	});
 	context.sandbox.app.bind(Identifiers.TransactionPoolService).toConstantValue({});
-	context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({
-		getLastBlock: () => ({
-			data: {
-				height: 1,
-				id: "0000000000000000000000000000000000000000000000000000000000000000",
-			},
+
+	context.sandbox.app.bind(Identifiers.StateService).toConstantValue({
+		getStateStore: () => ({
+			getLastBlock: () => ({
+				data: {
+					height: 1,
+					id: "0000000000000000000000000000000000000000000000000000000000000000",
+				},
+			}),
 		}),
 	});
 

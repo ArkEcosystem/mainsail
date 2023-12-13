@@ -27,11 +27,11 @@ export class Validator implements Contracts.Validator.IValidator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
 
-	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.IDatabaseService;
-
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.IMessageFactory;
+
+	@inject(Identifiers.StateService)
+	protected readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -57,7 +57,7 @@ export class Validator implements Contracts.Validator.IValidator {
 	public async prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock> {
 		// TODO: use height/round ?
 		const transactions = await this.#getTransactionsForForging();
-		return this.#forge(transactions);
+		return this.#makeBlock(transactions);
 	}
 
 	public async propose(
@@ -128,7 +128,7 @@ export class Validator implements Contracts.Validator.IValidator {
 		return transactions;
 	}
 
-	async #forge(transactions: Contracts.Crypto.ITransaction[]): Promise<Contracts.Crypto.IBlock> {
+	async #makeBlock(transactions: Contracts.Crypto.ITransaction[]): Promise<Contracts.Crypto.IBlock> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -151,9 +151,7 @@ export class Validator implements Contracts.Validator.IValidator {
 			payloadLength += serialized.length;
 		}
 
-		const previousBlock = await this.database.getLastBlock();
-		Utils.assert.defined<Contracts.Crypto.IBlock>(previousBlock);
-
+		const previousBlock = this.stateService.getStateStore().getLastBlock();
 		const height = previousBlock.data.height + 1;
 
 		return this.blockFactory.make({
