@@ -1,6 +1,6 @@
 import { Container, inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application, Ipc, IpcWorker, Types } from "@mainsail/kernel";
+import { Application, Ipc, IpcWorker, Services } from "@mainsail/kernel";
 
 @injectable()
 class WorkerImpl {
@@ -78,7 +78,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 	// @ts-ignore
 	#impl: WorkerImpl;
 
-	public async boot(flags: Types.KeyValuePair): Promise<void> {
+	public async boot(flags: IpcWorker.WorkerFlags): Promise<void> {
 		const app: Contracts.Kernel.Application = new Application(new Container());
 
 		app.config("worker", true);
@@ -90,8 +90,13 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 			flags,
 		});
 
+		if (!flags.workerLoggingEnabled) {
+			app.rebind(Identifiers.LogService).to(Services.Log.NullLogger);
+		}
+
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		await app.boot();
+
 		this.#app = app;
 
 		this.#impl = app.resolve(WorkerImpl);

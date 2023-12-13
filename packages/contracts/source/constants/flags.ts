@@ -48,6 +48,7 @@ export const FlagNames = [
 
 	// Worker
 	"CORE_CRYPTO_WORKER_COUNT",
+	"CORE_CRYPTO_WORKER_LOGGING_ENABLED",
 
 	// Other
 	"CORE_NETWORK_NAME",
