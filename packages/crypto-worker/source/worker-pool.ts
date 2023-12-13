@@ -46,7 +46,9 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	}
 
 	public async getWorker(): Promise<IpcWorker.Worker> {
-		const worker = this.workers[this.#currentWorkerIndex++ % this.workers.length];
+		const worker = this.workers[this.#currentWorkerIndex];
+
+		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % this.workers.length;
 
 		await worker.boot(this.flags);
 
