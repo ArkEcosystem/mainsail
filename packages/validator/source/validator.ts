@@ -57,7 +57,7 @@ export class Validator implements Contracts.Validator.IValidator {
 	public async prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock> {
 		// TODO: use height/round ?
 		const transactions = await this.#getTransactionsForForging();
-		return this.#forge(transactions);
+		return this.#makeBlock(transactions);
 	}
 
 	public async propose(
@@ -128,7 +128,7 @@ export class Validator implements Contracts.Validator.IValidator {
 		return transactions;
 	}
 
-	async #forge(transactions: Contracts.Crypto.ITransaction[]): Promise<Contracts.Crypto.IBlock> {
+	async #makeBlock(transactions: Contracts.Crypto.ITransaction[]): Promise<Contracts.Crypto.IBlock> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
