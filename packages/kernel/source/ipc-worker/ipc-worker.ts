@@ -4,8 +4,12 @@ import { Requests } from "../ipc/handler";
 import { Subprocess } from "../ipc/sub-process";
 import { KeyValuePair } from "../types";
 
+export interface WorkerFlags extends KeyValuePair {
+	workerLoggingEnabled: boolean;
+}
+
 export interface WorkerScriptHandler {
-	boot(flags: KeyValuePair): Promise<void>;
+	boot(flags: WorkerFlags): Promise<void>;
 	consensusSignature<K extends Requests<Contracts.Crypto.ISignature>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.ISignature[K]>

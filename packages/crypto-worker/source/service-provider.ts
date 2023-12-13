@@ -35,6 +35,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			workerCount: Joi.number().integer().min(1).max(cpus().length).required(),
+			workerLoggingEnabled: Joi.bool().default(false),
 		}).unknown(true);
 	}
 }
