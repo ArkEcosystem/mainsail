@@ -1,23 +1,16 @@
 {
 	"namedInputs": {
-		"default": ["{projectRoot}/source/**/!(*.test).ts"],
+		"default": ["{projectRoot}/source/**/*.ts", "!{projectRoot}/**/*.test.ts"],
 		"production": ["default"]
-	},
-	"tasksRunnerOptions": {
-		"default": {
-			"runner": "nx/tasks-runners/default",
-			"options": {
-				"cacheableOperations": ["build"],
-				"cacheDirectory": "./.cache"
-			}
-		}
 	},
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
 			"inputs": ["default"],
-			"outputs": ["{projectRoot}/distribution"]
+			"outputs": ["{projectRoot}/distribution"],
+			"cache": true
 		}
 	},
-	"$schema": "./node_modules/nx/schemas/nx-schema.json"
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"cacheDirectory": "./.cache"
 }
