@@ -32,6 +32,7 @@
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@types/delay": "3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
