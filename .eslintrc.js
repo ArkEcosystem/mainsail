@@ -51,6 +51,8 @@ module.exports = {
 		"@typescript-eslint/require-await": "off",
 		"@typescript-eslint/restrict-plus-operands": "off",
 		"@typescript-eslint/restrict-template-expressions": "off",
+		"@typescript-eslint/no-unsafe-enum-comparison": "off",
+		"@typescript-eslint/no-base-to-string": "warn",
 		"arrow-body-style": ["warn", "as-needed"],
 		curly: "warn",
 		"import/default": "warn",
@@ -150,6 +152,10 @@ module.exports = {
 		"unicorn/prefer-add-event-listener": "warn",
 		"no-empty": "warn",
 		"sonarjs/no-nested-template-literals": "warn",
+		"sonarjs/prefer-single-boolean-return": "off",
 		"unicorn/require-number-to-fixed-digits-argument": "off",
+		"unicorn/prefer-logical-operator-over-ternary": "off",
+		"unicorn/no-thenable": "off",
+		"unicorn/prefer-event-target": "warn"
 	},
 };
