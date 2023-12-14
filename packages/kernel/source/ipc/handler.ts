@@ -4,13 +4,13 @@ export type Actions<T extends {}> = {
 
 export type Requests<T extends {}> = {
 	[K in keyof T]: T[K] extends (...arguments_: any[]) => any
-		? ReturnType<T[K]> extends Promise<any>
-			? K
-			: never
-		: never;
+	? ReturnType<T[K]> extends Promise<any>
+	? K
+	: never
+	: never;
 }[keyof T];
 
-export class Handler<T> {
+export class Handler<T extends {}> {
 	private readonly handler: T;
 
 	public constructor(handler: T) {

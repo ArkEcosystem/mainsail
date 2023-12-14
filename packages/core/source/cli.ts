@@ -17,7 +17,7 @@ import { join, resolve } from "path";
 export class CommandLineInterface {
 	#app!: CliContracts.Application;
 
-	public constructor(private readonly argv: string[]) {}
+	public constructor(private readonly argv: string[]) { }
 
 	public async execute(dirname = __dirname): Promise<void> {
 		// Set NODE_PATHS. Only required for plugins that uses @mainsail as peer dependencies.
@@ -39,7 +39,7 @@ export class CommandLineInterface {
 		const commands: CliContracts.CommandList = await this.#discoverCommands(dirname, flags);
 
 		// Figure out what command we should run and offer help if necessary
-		let commandSignature: string | undefined = args[0];
+		let commandSignature = args[0] as string | undefined;
 
 		if (!commandSignature) {
 			await commands.help.execute();
@@ -124,7 +124,7 @@ export class CommandLineInterface {
 					suffix: "core",
 				}).config,
 			);
-		} catch {}
+		} catch { }
 
 		return temporaryFlags;
 	}

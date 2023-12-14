@@ -7,7 +7,7 @@ export class InputParser {
 			{ count: ["v"] },
 		);
 
-		const argv: string[] = parsed._;
+		const argv = parsed._;
 
 		// @ts-ignore
 		delete parsed._;

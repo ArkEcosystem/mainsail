@@ -13,8 +13,8 @@ export class CronJob implements Job {
 
 	protected expression = "* * * * *";
 
-	public execute(callback: CronCommand): void {
-		const onCallback: CronCommand = () => {
+	public execute(callback: CronCommand<CronJob>): void {
+		const onCallback = () => {
 			const start = performance.now();
 			// @ts-ignore
 			callback();

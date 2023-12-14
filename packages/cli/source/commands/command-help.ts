@@ -71,7 +71,7 @@ ${flags}`;
 		return output.join("\n");
 	}
 
-	#buildProperties<T>(properties: T) {
+	#buildProperties<T extends {}>(properties: T) {
 		const options: string[] = [];
 		const descriptions: string[] = [];
 

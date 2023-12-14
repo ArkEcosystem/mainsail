@@ -1,5 +1,4 @@
 import { BigNumber } from "@mainsail/utils";
-import pluralize from "plur";
 
 import { ITransaction } from "../contracts/crypto";
 import { Exception } from "./base";
@@ -30,7 +29,7 @@ export class TransactionExceedsMaximumByteSizeError extends PoolError {
 
 	public constructor(transaction: ITransaction, maxSize: number) {
 		super(
-			`tx ${transaction.id} exceeds size limit of ${pluralize("byte", maxSize)}`,
+			`tx ${transaction.id} exceeds size limit of ${maxSize} byte(s)`,
 			"ERR_TOO_LARGE", // ! should be "ERR_TO_LARGE" instead of "ERR_TOO_LARGE"
 		);
 		this.maxSize = maxSize;
@@ -63,7 +62,7 @@ export class SenderExceededMaximumTransactionCountError extends PoolError {
 
 	public constructor(transaction: ITransaction, maxCount: number) {
 		super(
-			`tx ${transaction.id} exceeds sender's ${pluralize("transaction", maxCount)} count limit`,
+			`tx ${transaction.id} exceeds sender's ${maxCount} transaction(s) count limit`,
 			"ERR_EXCEEDS_MAX_COUNT",
 		);
 		this.maxCount = maxCount;
@@ -75,8 +74,7 @@ export class TransactionPoolFullError extends PoolError {
 
 	public constructor(transaction: ITransaction, required: BigNumber) {
 		super(
-			`tx ${
-				transaction.id
+			`tx ${transaction.id
 			} fee ${transaction.data.fee.toString()} is lower than ${required.toString()} already in pool`,
 			"ERR_POOL_FULL",
 		);

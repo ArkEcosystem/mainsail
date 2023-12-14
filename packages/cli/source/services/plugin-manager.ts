@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { existsSync, readJSONSync, removeSync } from "fs-extra";
-import glob from "glob";
+import { glob } from "glob";
 import { join } from "path";
 
 import * as Contracts from "../contracts";

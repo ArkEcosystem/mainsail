@@ -13,10 +13,10 @@ export class Storage implements Contracts.TransactionPool.Storage {
 	#database!: BetterSqlite3.Database;
 	#addTransactionStmt!: BetterSqlite3.Statement<Contracts.TransactionPool.StoredTransaction>;
 	#hasTransactionStmt!: BetterSqlite3.Statement<{ id: string }>;
-	#getAllTransactionsStmt!: BetterSqlite3.Statement<never[]>;
+	#getAllTransactionsStmt!: BetterSqlite3.Statement;
 	#getOldTransactionsStmt!: BetterSqlite3.Statement<{ height: number }>;
 	#removeTransactionStmt!: BetterSqlite3.Statement<{ id: string }>;
-	#flushStmt!: BetterSqlite3.Statement<never[]>;
+	#flushStmt!: BetterSqlite3.Statement;
 
 	public boot(): void {
 		const filename = this.configuration.getRequired<string>("storage");
@@ -74,11 +74,11 @@ export class Storage implements Contracts.TransactionPool.Storage {
 	}
 
 	public getAllTransactions(): Iterable<Contracts.TransactionPool.StoredTransaction> {
-		return this.#getAllTransactionsStmt.all();
+		return this.#getAllTransactionsStmt.all() as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 
 	public getOldTransactions(height: number): Iterable<Contracts.TransactionPool.StoredTransaction> {
-		return this.#getOldTransactionsStmt.all({ height });
+		return this.#getOldTransactionsStmt.all({ height }) as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 
 	public removeTransaction(id: string): void {

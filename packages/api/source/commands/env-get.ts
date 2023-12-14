@@ -1,6 +1,6 @@
 import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import { parseFileSync } from "envfile";
+import { parse } from "envfile";
 import { existsSync } from "fs-extra";
 import Joi from "joi";
 
@@ -28,7 +28,7 @@ export class Command extends Commands.Command {
 			this.components.fatal(`No environment file found at ${environmentFile}.`);
 		}
 
-		const environment: object = parseFileSync(environmentFile);
+		const environment: object = parse(environmentFile);
 		const key: string = this.getFlag("key");
 
 		if (!environment[key]) {

@@ -1,4 +1,4 @@
-import sort, { ISortBy, ISortByFunction } from "fast-sort";
+import { sort, ISortBy, ISortByFunction } from "fast-sort";
 
 export const sortByDesc = <T>(
 	values: T[],

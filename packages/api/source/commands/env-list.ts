@@ -1,7 +1,7 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import { parseFileSync } from "envfile";
+import { parse } from "envfile";
 import { existsSync } from "fs-extra";
 import Joi from "joi";
 
@@ -25,7 +25,7 @@ export class Command extends Commands.Command {
 		}
 
 		this.components.table(["Key", "Value"], (table) => {
-			const environment = parseFileSync(environmentFile);
+			const environment = parse(environmentFile);
 
 			for (const [key, value] of Object.entries(environment)) {
 				table.push([key, value]);

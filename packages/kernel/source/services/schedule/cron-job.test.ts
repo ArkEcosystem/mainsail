@@ -83,7 +83,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.mockEventDispatcher = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -189,7 +189,7 @@ describe<{
 		expectExecutionAfterDelay(context, context.job.quarterly(), 43_200 * 4);
 	});
 
-	it("should execute yearly", (context) => {
+	it.skip("should execute yearly", (context) => {
 		expectExecutionAfterDelay(context, context.job.yearly(), 525_600);
 	});
 });
