@@ -53,6 +53,7 @@ module.exports = {
 		"@typescript-eslint/restrict-template-expressions": "off",
 		"@typescript-eslint/no-unsafe-enum-comparison": "off",
 		"@typescript-eslint/no-base-to-string": "warn",
+		"@typescript-eslint/no-redundant-type-constituents": "warn",
 		"arrow-body-style": ["warn", "as-needed"],
 		curly: "warn",
 		"import/default": "warn",
