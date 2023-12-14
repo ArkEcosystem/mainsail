@@ -17,7 +17,7 @@ export class BlockchainController extends Controller {
 			data: {
 				block: block
 					? {
-							height: block.height,
+							height: +block.height,
 							id: block.id,
 					  }
 					: null,
