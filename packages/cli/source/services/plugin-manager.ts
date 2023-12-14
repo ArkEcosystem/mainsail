@@ -31,7 +31,7 @@ export class PluginManager implements Contracts.PluginManager {
 			});
 		}
 
-		return plugins;
+		return plugins.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	public async install(

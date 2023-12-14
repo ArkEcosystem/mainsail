@@ -2,7 +2,7 @@
 import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { parse } from "envfile";
-import { existsSync } from "fs-extra";
+import { existsSync, readFileSync } from "fs-extra";
 import Joi from "joi";
 
 @injectable()
@@ -25,7 +25,7 @@ export class Command extends Commands.Command {
 		}
 
 		this.components.table(["Key", "Value"], (table) => {
-			const environment = parse(environmentFile);
+			const environment: object = parse(readFileSync(environmentFile).toString("utf-8"));
 
 			for (const [key, value] of Object.entries(environment)) {
 				table.push([key, value]);

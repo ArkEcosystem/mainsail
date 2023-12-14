@@ -62,7 +62,7 @@ export class SenderExceededMaximumTransactionCountError extends PoolError {
 
 	public constructor(transaction: ITransaction, maxCount: number) {
 		super(
-			`tx ${transaction.id} exceeds sender's ${maxCount} transaction(s) count limit`,
+			`tx ${transaction.id} exceeds sender's transaction count limit of ${maxCount}`,
 			"ERR_EXCEEDS_MAX_COUNT",
 		);
 		this.maxCount = maxCount;

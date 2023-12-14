@@ -1,8 +1,8 @@
-import envfile from "envfile";
-import fs from "fs-extra";
+import fs, { ensureFileSync, removeSync } from "fs-extra";
 
 import { Console, describe } from "../../../test-framework";
 import { Environment } from "./environment";
+import { readFileSync } from "fs";
 
 describe<{
 	environment: Environment;
@@ -34,17 +34,16 @@ describe<{
 	});
 
 	it("should update the variables", async ({ environment }) => {
-		// Arrange
-		const existsSync = stub(fs, "existsSync").returnValue(true);
-		const parseFileSync = stub(envfile, "parseFileSync").returnValue({});
-		const writeFileSync = stub(fs, "writeFileSync");
+		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
 
-		// Act
-		environment.updateVariables("stub", { key: "value" });
+		removeSync(environmentFile);
+		ensureFileSync(environmentFile);
 
-		// Assert
-		existsSync.calledWith("stub");
-		parseFileSync.calledWith("stub");
-		writeFileSync.calledWith("stub", "key=value");
+		environment.updateVariables(environmentFile, { key: "value" });
+
+		assert.equal(
+			readFileSync(environmentFile).toString("utf8"),
+			"key=value"
+		);
 	});
 });

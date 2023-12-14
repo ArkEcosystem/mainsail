@@ -20,10 +20,11 @@ export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
 
 	public async fromWIF(wif: string): Promise<Contracts.Crypto.IKeyPair> {
 		const decoded = WIF.decode(wif, this.configuration.get("network.wif"));
+		const privateKey = Buffer.from(decoded.privateKey);
 
 		return {
 			compressed: decoded.compressed,
-			privateKey: decoded.privateKey.toString("hex"),
+			privateKey: privateKey.toString("hex"),
 			publicKey: Buffer.from(SecretKey.fromBytes(decoded.privateKey).toPublicKey().toBytes()).toString("hex"),
 		};
 	}

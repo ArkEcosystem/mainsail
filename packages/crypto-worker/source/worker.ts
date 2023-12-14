@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Ipc, IpcWorker, Utils } from "@mainsail/kernel";
 
@@ -12,12 +12,9 @@ export class Worker implements IpcWorker.Worker {
 	#booted = false;
 	#booting = false;
 
-	@postConstruct()
-	public async postConstruct(): Promise<void> {
-		this.ipcSubprocess = this.createWorkerSubprocess();
-	}
-
 	public async boot(flags: IpcWorker.WorkerFlags): Promise<void> {
+		this.ipcSubprocess = this.createWorkerSubprocess();
+
 		while (this.#booting) {
 			await Utils.sleep(50);
 		}
