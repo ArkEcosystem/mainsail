@@ -25,7 +25,7 @@ export class Command extends Commands.Command {
 		}
 
 		this.components.table(["Key", "Value"], (table) => {
-			const environment: object = parse(readFileSync(environmentFile).toString("utf-8"));
+			const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
 
 			for (const [key, value] of Object.entries(environment)) {
 				table.push([key, value]);

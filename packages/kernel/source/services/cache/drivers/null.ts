@@ -25,7 +25,7 @@ export class NullCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 
 	public async getMany(keys: K[]): Promise<Array<T | undefined>> {
 		// @ts-ignore
-		return new Array(keys.length).fill();
+		return Array.from({ length: keys.length }).fill();
 	}
 
 	public async put(key: K, value: T, seconds?: number): Promise<boolean> {
@@ -33,7 +33,7 @@ export class NullCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	}
 
 	public async putMany(values: Array<[K, T]>, seconds?: number): Promise<boolean[]> {
-		return new Array(values.length).fill(false);
+		return Array.from<boolean>({ length: values.length }).fill(false);
 	}
 
 	public async has(key: K): Promise<boolean> {
@@ -41,7 +41,7 @@ export class NullCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	}
 
 	public async hasMany(keys: K[]): Promise<boolean[]> {
-		return new Array(keys.length).fill(false);
+		return Array.from<boolean>({ length: keys.length }).fill(false);
 	}
 
 	public async missing(key: K): Promise<boolean> {
@@ -49,7 +49,7 @@ export class NullCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	}
 
 	public async missingMany(keys: K[]): Promise<boolean[]> {
-		return new Array(keys.length).fill(true);
+		return Array.from<boolean>({ length: keys.length }).fill(true);
 	}
 
 	public async forever(key: K, value: T): Promise<boolean> {
@@ -57,7 +57,7 @@ export class NullCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	}
 
 	public async foreverMany(values: Array<[K, T]>): Promise<boolean[]> {
-		return new Array(values.length).fill(false);
+		return Array.from<boolean>({ length: values.length }).fill(false);
 	}
 
 	public async forget(key: K): Promise<boolean> {
@@ -65,7 +65,7 @@ export class NullCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	}
 
 	public async forgetMany(keys: K[]): Promise<boolean[]> {
-		return new Array(keys.length).fill(false);
+		return Array.from<boolean>({ length: keys.length }).fill(false);
 	}
 
 	public async flush(): Promise<boolean> {

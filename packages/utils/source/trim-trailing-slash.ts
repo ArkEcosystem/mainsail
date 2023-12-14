@@ -1,1 +1,1 @@
-export const trimTrailingSlash = (value: string): string => value.replace(/\/+$/g, "");
+export const trimTrailingSlash = (value: string): string => value.replaceAll(/\/+$/g, "");

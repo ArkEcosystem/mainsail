@@ -10,7 +10,7 @@ export const truncate = (
 ): string => {
 	options = { length: 30, omission: "...", omissionPosition: "right", ...options };
 	// eslint-disable-next-line unicorn/explicit-length-check
-	if (!options.length || options.length < 0) {
+	if (!options.length) {
 		options.length = 30;
 	}
 

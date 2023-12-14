@@ -96,7 +96,7 @@ export class Server implements Contracts.P2P.Server {
 	}
 
 	// @todo: add proper types
-	public async register(plugins: any | any[]): Promise<void> {
+	public async register(plugins: any): Promise<void> {
 		await this.server.register(plugins);
 	}
 

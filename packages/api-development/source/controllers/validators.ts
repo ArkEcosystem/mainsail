@@ -1,4 +1,4 @@
-import { Boom, notFound } from "@hapi/boom";
+import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
@@ -23,7 +23,7 @@ export class ValidatorsController extends Controller {
 		);
 	}
 
-	public async show(request: Hapi.Request): Promise<any | Boom> {
+	public async show(request: Hapi.Request): Promise<any> {
 		const walletId = request.params.id as string;
 
 		let wallet: Contracts.State.Wallet | undefined;

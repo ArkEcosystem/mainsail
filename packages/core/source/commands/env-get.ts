@@ -28,7 +28,7 @@ export class Command extends Commands.Command {
 			this.components.fatal(`No environment file found at ${environmentFile}.`);
 		}
 
-		const environment: object = parse(readFileSync(environmentFile).toString("utf-8"));
+		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
 		const key: string = this.getFlag("key");
 
 		if (!environment[key]) {

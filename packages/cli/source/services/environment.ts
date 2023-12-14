@@ -37,7 +37,7 @@ export class Environment {
 			throw new Error(`No environment file found at ${environmentFile}.`);
 		}
 
-		const environment: object = parse(readFileSync(environmentFile).toString("utf-8"));
+		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
 		for (const [key, value] of Object.entries(variables)) {
 			environment[key] = value;
 		}

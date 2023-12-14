@@ -33,7 +33,7 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		type: number,
 		typeGroup?: number,
 		version?: number,
-	): Contracts.Crypto.TransactionConstructor | undefined {
+	): Contracts.Crypto.TransactionConstructor {
 		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
 			type,
 			typeGroup,
@@ -44,7 +44,7 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		}
 
 		// Either there is a match for the provided version or use the first available constructor as a fallback
-		const constructor: Contracts.Crypto.TransactionConstructor | undefined = this.#transactionTypes
+		const constructor: Contracts.Crypto.TransactionConstructor = this.#transactionTypes
 			.get(internalType)
 			?.get(version || 1);
 

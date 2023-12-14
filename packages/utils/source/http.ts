@@ -31,7 +31,7 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 			r.setEncoding("utf8");
 
 			r.on("data", (chunk: string) => {
-				readBytes += Buffer.byteLength(chunk, "utf-8");
+				readBytes += Buffer.byteLength(chunk, "utf8");
 
 				if (readBytes > maxContentLength) {
 					r.destroy(new Error("response too large"));
