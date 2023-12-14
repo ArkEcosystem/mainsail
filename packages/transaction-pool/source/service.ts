@@ -60,15 +60,18 @@ export class Service implements Contracts.TransactionPool.Service {
 	public async handle({ name }): Promise<void> {
 		try {
 			switch (name) {
-				case Enums.StateEvent.BuilderFinished:
+				case Enums.StateEvent.BuilderFinished: {
 					await this.reAddTransactions();
 					break;
-				case Enums.CryptoEvent.MilestoneChanged:
+				}
+				case Enums.CryptoEvent.MilestoneChanged: {
 					await this.reAddTransactions();
 					break;
-				case Enums.BlockEvent.Applied:
+				}
+				case Enums.BlockEvent.Applied: {
 					await this.cleanUp();
 					break;
+				}
 			}
 		} catch (error) {
 			this.logger.critical(error.stack);

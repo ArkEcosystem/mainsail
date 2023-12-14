@@ -13,7 +13,7 @@ export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => 
 					return false;
 				}
 
-				const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : activeValidators;
+				const minimum = schema.minimum !== undefined ? schema.minimum : activeValidators;
 
 				if (data.length < minimum || data.length > activeValidators) {
 					return false;

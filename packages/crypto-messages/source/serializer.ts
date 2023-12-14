@@ -46,7 +46,7 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 							signature: {
 								type: "consensusSignature",
 							},
-					  }
+						}
 					: {}),
 			},
 		});

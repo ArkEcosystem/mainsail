@@ -39,5 +39,5 @@ export const assert: Assert = {
 	symbol: (value: unknown): asserts value is symbol => assertType(typeof value === "symbol", "symbol"),
 	// transaction: (value: unknown): asserts value is ITransaction =>
 	// 	assertType(value instanceof ITransaction, "Crypto.Transactions.Transaction"),
-	undefined: (value: unknown): asserts value is undefined => assertType(typeof value === "undefined", "undefined"),
+	undefined: (value: unknown): asserts value is undefined => assertType(value === undefined, "undefined"),
 };

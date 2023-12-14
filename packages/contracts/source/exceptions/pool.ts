@@ -61,10 +61,7 @@ export class SenderExceededMaximumTransactionCountError extends PoolError {
 	public readonly maxCount: number;
 
 	public constructor(transaction: ITransaction, maxCount: number) {
-		super(
-			`tx ${transaction.id} exceeds sender's transaction count limit of ${maxCount}`,
-			"ERR_EXCEEDS_MAX_COUNT",
-		);
+		super(`tx ${transaction.id} exceeds sender's transaction count limit of ${maxCount}`, "ERR_EXCEEDS_MAX_COUNT");
 		this.maxCount = maxCount;
 	}
 }
@@ -74,7 +71,8 @@ export class TransactionPoolFullError extends PoolError {
 
 	public constructor(transaction: ITransaction, required: BigNumber) {
 		super(
-			`tx ${transaction.id
+			`tx ${
+				transaction.id
 			} fee ${transaction.data.fee.toString()} is lower than ${required.toString()} already in pool`,
 			"ERR_POOL_FULL",
 		);

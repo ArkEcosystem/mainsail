@@ -96,7 +96,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			return this.stateService.getStateStore().getLastHeight();
 		}
 
-		return this.#downloadJobs[this.#downloadJobs.length - 1].heightTo;
+		return this.#downloadJobs.at(-1).heightTo;
 	}
 
 	async #downloadBlocksFromPeer(job: DownloadJob): Promise<void> {

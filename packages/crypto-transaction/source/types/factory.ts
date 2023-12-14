@@ -29,11 +29,7 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 		return instance;
 	}
 
-	public get(
-		type: number,
-		typeGroup?: number,
-		version?: number,
-	): Contracts.Crypto.TransactionConstructor {
+	public get(type: number, typeGroup?: number, version?: number): Contracts.Crypto.TransactionConstructor {
 		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
 			type,
 			typeGroup,

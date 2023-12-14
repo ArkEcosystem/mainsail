@@ -83,7 +83,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.mockEventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.sandbox = new Sandbox();

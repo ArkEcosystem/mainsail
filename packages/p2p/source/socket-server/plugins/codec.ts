@@ -61,7 +61,7 @@ export class CodecPlugin extends BasePlugin {
 		server.ext({
 			method: async (request, h) => {
 				try {
-					if (typeof request.response.source !== "undefined") {
+					if (request.response.source !== undefined) {
 						request.response.source = allRoutesConfigByPath[request.path].codec.response.serialize(
 							request.response.source,
 						);

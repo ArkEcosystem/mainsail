@@ -15,8 +15,9 @@ export const getPeerUrl = (peer: shared.IPeerLike): string => {
 			protocol = Contracts.P2P.PeerProtocol.Https;
 			break;
 		}
-		default:
+		default: {
 			break;
+		}
 	}
 
 	switch (protocol) {

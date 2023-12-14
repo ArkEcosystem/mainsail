@@ -1,6 +1,10 @@
 import { FunctionReturning } from "./internal";
 
-export const reduceRightObject = <T extends {}, V>(iterable: T, iteratee: FunctionReturning, initialValue?: V): V | undefined => {
+export const reduceRightObject = <T extends {}, V>(
+	iterable: T,
+	iteratee: FunctionReturning,
+	initialValue?: V,
+): V | undefined => {
 	const keys: string[] = Object.keys(iterable);
 
 	let result: V | undefined = initialValue;

@@ -1,14 +1,13 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { getPublicKey } from "@noble/ed25519";
+// Fixes "etc.sha512Sync not set" (fix from https://github.com/paulmillr/noble-ed25519#usage)
+import { etc } from "@noble/ed25519";
 import { sha256 } from "@noble/hashes/sha256";
+import { sha512 } from "@noble/hashes/sha512";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import WIF from "wif";
-
-// Fixes "etc.sha512Sync not set" (fix from https://github.com/paulmillr/noble-ed25519#usage)
-import * as ed from "@noble/ed25519";
-import { sha512 } from "@noble/hashes/sha512";
-ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
+etc.sha512Sync = (...m) => sha512(etc.concatBytes(...m));
 
 @injectable()
 export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {

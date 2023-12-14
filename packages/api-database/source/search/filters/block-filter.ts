@@ -14,69 +14,82 @@ export class BlockFilter {
 	private static async handleBlockCriteria(criteria: Criteria.BlockCriteria): Promise<Expressions.Expression<Block>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "id":
+				case "id": {
 					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "id", value: c }));
-				case "version":
+				}
+				case "version": {
 					return handleOrCriteria(criteria.version, async (c) => ({
 						op: "equal",
 						property: "version",
 						value: c,
 					}));
-				case "timestamp":
+				}
+				case "timestamp": {
 					return handleOrCriteria(criteria.timestamp, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("timestamp", c),
 					);
-				case "previousBlock":
+				}
+				case "previousBlock": {
 					return handleOrCriteria(criteria.previousBlock, async (c) => ({
 						op: "equal",
 						property: "previousBlock",
 						value: c,
 					}));
-				case "height":
+				}
+				case "height": {
 					return handleOrCriteria(criteria.height, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("height", c),
 					);
-				case "numberOfTransactions":
+				}
+				case "numberOfTransactions": {
 					return handleOrCriteria(criteria.numberOfTransactions, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("numberOfTransactions", c),
 					);
-				case "totalAmount":
+				}
+				case "totalAmount": {
 					return handleOrCriteria(criteria.totalAmount, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("totalAmount", c),
 					);
-				case "totalFee":
+				}
+				case "totalFee": {
 					return handleOrCriteria(criteria.totalFee, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("totalFee", c),
 					);
-				case "reward":
+				}
+				case "reward": {
 					return handleOrCriteria(criteria.reward, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("reward", c),
 					);
-				case "payloadLength":
+				}
+				case "payloadLength": {
 					return handleOrCriteria(criteria.payloadLength, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("payloadLength", c),
 					);
-				case "payloadHash":
+				}
+				case "payloadHash": {
 					return handleOrCriteria(criteria.payloadHash, async (c) => ({
 						op: "equal",
 						property: "payloadHash",
 						value: c,
 					}));
-				case "generatorPublicKey":
+				}
+				case "generatorPublicKey": {
 					return handleOrCriteria(criteria.generatorPublicKey, async (c) => ({
 						op: "equal",
 						property: "generatorPublicKey",
 						value: c,
 					}));
-				default:
+				}
+				default: {
 					return { op: "true" };
+				}
 			}
 		});
 	}

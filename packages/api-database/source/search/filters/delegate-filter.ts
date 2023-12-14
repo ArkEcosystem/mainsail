@@ -23,50 +23,59 @@ export class DelegateFilter {
 	private static async handleDelegateCriteria(criteria: DelegateCriteria): Promise<Expression<Wallet>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "address":
+				case "address": {
 					return handleOrCriteria(criteria.address, async (c) => ({
 						op: "equal",
 						property: "address",
 						value: criteria,
 					}));
+				}
 
-				case "publicKey":
+				case "publicKey": {
 					return handleOrCriteria(criteria.publicKey, async (c) => ({
 						op: "equal",
 						property: "publicKey",
 						value: criteria,
 					}));
+				}
 
-				case "votes":
+				case "votes": {
 					return handleOrCriteria(criteria.votes, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("attributes", c, { fieldName: "validatorVoteBalance", operator: "->>" }),
 					);
-				case "rank":
+				}
+				case "rank": {
 					return handleOrCriteria(criteria.rank, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("attributes", c, { fieldName: "validatorRank", operator: "->>" }),
 					);
+				}
 
-				case "isResigned":
+				case "isResigned": {
 					return handleOrCriteria(criteria.isResigned, async (c) => ({
 						jsonFieldAccessor: { fieldName: "validatorResigned", operator: "->>" },
 						op: "equal",
 						property: "attributes",
 						value: c,
 					}));
+				}
 
-				case "forged":
+				case "forged": {
 					return this.handleForgedCriteria(criteria.forged);
+				}
 
-				case "production":
+				case "production": {
 					return this.handleProductionCriteria(criteria.production);
+				}
 
-				case "blocks":
+				case "blocks": {
 					return this.handleBlocksCriteria(criteria.blocks);
+				}
 
-				default:
+				default: {
 					return { op: "true" };
+				}
 			}
 		});
 	}

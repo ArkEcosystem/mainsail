@@ -41,9 +41,6 @@ describe<{
 
 		environment.updateVariables(environmentFile, { key: "value" });
 
-		assert.equal(
-			readFileSync(environmentFile).toString("utf8"),
-			"key=value"
-		);
+		assert.equal(readFileSync(environmentFile).toString("utf8"), "key=value");
 	});
 });

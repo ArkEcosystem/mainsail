@@ -39,8 +39,8 @@
 		"semver": "7.5.4"
 	},
 	"devDependencies": {
-		"@types/chalk": "^2.2.0",
 		"@types/capture-console": "1.0.5",
+		"@types/chalk": "^2.2.0",
 		"@types/cron": "2.0.1",
 		"@types/deepmerge": "2.2.0",
 		"@types/env-paths": "2.1.0",

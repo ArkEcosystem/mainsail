@@ -34,8 +34,8 @@
 	},
 	"devDependencies": {
 		"@mainsail/utils": "workspace:*",
-		"@types/chalk": "^2.2.0",
 		"@types/capture-console": "1.0.5",
+		"@types/chalk": "^2.2.0",
 		"@types/fs-extra": "11.0.4",
 		"@types/pino": "7.0.4",
 		"@types/pino-pretty": "5.0.0",

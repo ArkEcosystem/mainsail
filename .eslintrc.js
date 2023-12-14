@@ -160,6 +160,6 @@ module.exports = {
 		"unicorn/prefer-logical-operator-over-ternary": "off",
 		"unicorn/no-negated-condition": "off",
 		"unicorn/no-thenable": "off",
-		"unicorn/prefer-event-target": "warn"
+		"unicorn/prefer-event-target": "warn",
 	},
 };

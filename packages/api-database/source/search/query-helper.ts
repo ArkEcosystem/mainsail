@@ -118,8 +118,9 @@ export class QueryHelper<TEntity> {
 				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
 				return { parameters, query };
 			}
-			default:
+			default: {
 				throw new Error(`Unexpected expression`);
+			}
 		}
 	}
 }

@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 import chalk, { Chalk } from "chalk";
 import { error as console_error } from "console";
 import pino from "pino";
-import { PrettyOptions, prettyFactory } from "pino-pretty";
+import { prettyFactory, PrettyOptions } from "pino-pretty";
 import pump from "pump";
 import pumpify from "pumpify";
 import { Transform } from "readable-stream";
@@ -187,7 +187,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 							return callback(undefined, line.replace("USERLVL", formatLevel(json.level)));
 						}
 					}
-				} catch { }
+				} catch {}
 
 				return callback();
 			},
