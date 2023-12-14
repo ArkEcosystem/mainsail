@@ -90,7 +90,7 @@ export class TransactionFilter {
 				case "vendorField":
 					return handleOrCriteria(criteria.vendorField, async (c) =>
 						// @ts-ignore
-						({ op: "like", pattern: Buffer.from(c, "utf-8"), property: "vendorField" }),
+						({ op: "like", pattern: Buffer.from(c, "utf8"), property: "vendorField" }),
 					);
 				case "amount":
 					return handleOrCriteria(criteria.amount, async (c) =>

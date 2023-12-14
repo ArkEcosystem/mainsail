@@ -72,7 +72,7 @@ export class CodecPlugin extends BasePlugin {
 							request.response.output?.payload?.message ??
 							request.response.output?.payload?.error ??
 							"Error";
-						request.response.output.payload = Buffer.from(errorMessage, "utf-8");
+						request.response.output.payload = Buffer.from(errorMessage, "utf8");
 					}
 				} catch (error) {
 					request.response.statusCode = 500; // Internal server error (serializing failed)

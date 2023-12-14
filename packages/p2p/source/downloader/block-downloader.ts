@@ -158,7 +158,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					),
 				);
 
-				if (!hasValidSignatures.every((value) => value)) {
+				if (!hasValidSignatures.every(Boolean)) {
 					throw new Error(`Received block(s) with invalid signature(s)`);
 				}
 

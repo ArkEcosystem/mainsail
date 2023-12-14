@@ -44,10 +44,10 @@ export class Header implements Contracts.P2P.IHeader {
 	}
 
 	public getValidatorsSignedPrecommitCount(): number {
-		return this.validatorsSignedPrecommit.filter((signed) => signed).length;
+		return this.validatorsSignedPrecommit.filter(Boolean).length;
 	}
 
 	public getValidatorsSignedPrevoteCount(): number {
-		return this.validatorsSignedPrevote.filter((signed) => signed).length;
+		return this.validatorsSignedPrevote.filter(Boolean).length;
 	}
 }

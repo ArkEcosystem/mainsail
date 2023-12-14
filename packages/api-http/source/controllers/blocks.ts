@@ -7,6 +7,7 @@ import {
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
+import { Utils } from "@mainsail/kernel";
 
 import { BlockResource, TransactionResource } from "../resources";
 import { Controller } from "./controller";
@@ -40,7 +41,8 @@ export class BlocksController extends Controller {
 		return this.toPagination(
 			await this.enrichBlockResult(blocks, {
 				generators: generators.reduce((accumulator, current) => {
-					accumulator[current.publicKey!] = current;
+					Utils.assert.defined<string>(current.publicKey);
+					accumulator[current.publicKey] = current;
 					return accumulator;
 				}, {}),
 			}),

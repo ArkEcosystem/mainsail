@@ -169,7 +169,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const { activeValidators } = this.cryptoConfiguration.getMilestone(ourHeader.height);
 
-		if (Utils.isMinority(peerHeader.validatorsSignedPrevote.filter((value) => value).length, activeValidators)) {
+		if (Utils.isMinority(peerHeader.validatorsSignedPrevote.filter(Boolean).length, activeValidators)) {
 			return peerHeader.round;
 		}
 
