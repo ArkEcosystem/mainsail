@@ -23,7 +23,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@scure/base": "^1.0.0"
+		"@scure/base": "^1.1.5"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
@@ -31,7 +31,7 @@
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"bip39": "3.0.4",
+		"bip39": "3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

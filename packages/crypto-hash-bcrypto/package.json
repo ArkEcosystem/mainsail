@@ -22,7 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"bcrypto": "5.4.0"
+		"bcrypto": "5.5.2"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

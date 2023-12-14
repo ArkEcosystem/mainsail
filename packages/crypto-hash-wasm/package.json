@@ -22,7 +22,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"hash-wasm": "^4.9.0"
+		"hash-wasm": "^4.11.0"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

@@ -22,14 +22,12 @@
 		"@hapi/hapi": "21.3.2",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.12.0",
-		"dayjs": "1.10.7",
-		"inversify": "5.1.1",
-		"plur": "^4.0.0",
-		"reflect-metadata": "0.1.13",
-		"type-fest": "0.21.3"
+		"dayjs": "1.11.10",
+		"inversify": "6.0.2",
+		"reflect-metadata": "0.2.0",
+		"type-fest": "4.8.3"
 	},
 	"devDependencies": {
-		"@types/plur": "^3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
