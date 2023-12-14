@@ -114,6 +114,7 @@ tags
 
 # Lerna
 .cache
+.nx
 
 # Unit test artifacts
 :memory:
