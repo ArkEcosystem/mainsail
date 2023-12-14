@@ -41,9 +41,12 @@ describe<{
 			getWorker: () => {
 				return {
 					// @ts-ignore
-					consensusSignature: (method, message, privateKey) => context.sandbox.app.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")![method](message, privateKey)
-				}
-			}
+					consensusSignature: (method, message, privateKey) =>
+						context.sandbox.app
+							.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
+							[method](message, privateKey),
+				};
+			},
 		};
 
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
