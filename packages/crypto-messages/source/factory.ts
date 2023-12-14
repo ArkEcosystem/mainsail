@@ -1,5 +1,6 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { IpcWorker } from "@mainsail/kernel";
 
 import { Precommit } from "./precommit";
 import { Prevote } from "./prevote";
@@ -16,19 +17,20 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
 
-	@inject(Identifiers.Cryptography.Signature)
-	@tagged("type", "consensus")
-	private readonly signatureFactory!: Contracts.Crypto.ISignature;
-
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.IValidator;
+
+	@inject(Identifiers.Ipc.WorkerPool)
+	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	public async makeProposal(
 		data: Contracts.Crypto.IMakeProposalData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IProposal> {
+		const worker = await this.workerPool.getWorker();
+
 		const bytes = await this.serializer.serializeProposal(data, { includeSignature: false });
-		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
+		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 		const serialized = Buffer.concat([bytes, Buffer.from(signature, "hex")]);
 		return this.makeProposalFromBytes(serialized);
 	}
@@ -56,13 +58,15 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakePrevoteData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IPrevote> {
+		const worker = await this.workerPool.getWorker();
+
 		const bytes = await this.serializer.serializePrevoteForSignature({
 			blockId: data.blockId,
 			height: data.height,
 			round: data.round,
 			type: data.type,
 		});
-		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
+		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 		const serialized = await this.serializer.serializePrevote({ ...data, signature });
 		return this.makePrevoteFromBytes(serialized);
 	}
@@ -89,13 +93,15 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		data: Contracts.Crypto.IMakePrecommitData,
 		keyPair: Contracts.Crypto.IKeyPair,
 	): Promise<Contracts.Crypto.IPrecommit> {
+		const worker = await this.workerPool.getWorker();
+
 		const bytes = await this.serializer.serializePrecommitForSignature({
 			blockId: data.blockId,
 			height: data.height,
 			round: data.round,
 			type: data.type,
 		});
-		const signature: string = await this.signatureFactory.sign(bytes, Buffer.from(keyPair.privateKey, "hex"));
+		const signature = await worker.consensusSignature("sign", bytes, Buffer.from(keyPair.privateKey, "hex"));
 
 		const serialized = await this.serializer.serializePrecommit({ ...data, signature });
 		return this.makePrecommitFromBytes(serialized);

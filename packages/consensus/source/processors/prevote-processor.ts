@@ -1,5 +1,6 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { IpcWorker } from "@mainsail/kernel";
 
 import { AbstractProcessor } from "./abstract-processor";
 
@@ -7,10 +8,6 @@ import { AbstractProcessor } from "./abstract-processor";
 export class PrevoteProcessor extends AbstractProcessor implements Contracts.Consensus.IPrevoteProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
-
-	@inject(Identifiers.Cryptography.Signature)
-	@tagged("type", "consensus")
-	private readonly signature!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
@@ -20,6 +17,9 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
+
+	@inject(Identifiers.Ipc.WorkerPool)
+	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(prevote: Contracts.Crypto.IPrevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
@@ -49,7 +49,9 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	}
 
 	async #hasValidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
-		return this.signature.verify(
+		const worker = await this.workerPool.getWorker();
+		return worker.consensusSignature(
+			"verify",
 			Buffer.from(prevote.signature, "hex"),
 			await this.serializer.serializePrevoteForSignature(prevote),
 			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).getConsensusPublicKey(), "hex"),
