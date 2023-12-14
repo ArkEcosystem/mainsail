@@ -37,8 +37,18 @@ describe<{
 			getActiveValidators: () => [wallet],
 		};
 
+		const workerPool = {
+			getWorker: () => {
+				return {
+					// @ts-ignore
+					consensusSignature: (method, message, privateKey) => context.sandbox.app.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")![method](message, privateKey)
+				}
+			}
+		};
+
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
 		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);
 		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(
