@@ -1,5 +1,6 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { IpcWorker } from "@mainsail/kernel";
 
 import { AbstractProcessor } from "./abstract-processor";
 
@@ -7,10 +8,6 @@ import { AbstractProcessor } from "./abstract-processor";
 export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.IProposalProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
-
-	@inject(Identifiers.Cryptography.Signature)
-	@tagged("type", "consensus")
-	private readonly signature!: Contracts.Crypto.ISignature;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.IConfiguration;
@@ -32,6 +29,9 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.Ipc.WorkerPool)
+	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(
 		proposal: Contracts.Crypto.IProposal,
@@ -80,7 +80,9 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	}
 
 	async #hasValidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
-		return this.signature.verify(
+		const worker = await this.workerPool.getWorker();
+		return worker.consensusSignature(
+			"verify",
 			Buffer.from(proposal.signature, "hex"),
 			await this.messageSerializer.serializeProposal(proposal, { includeSignature: false }),
 			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),

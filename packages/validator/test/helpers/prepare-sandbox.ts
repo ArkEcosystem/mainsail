@@ -47,6 +47,19 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoBlock).register();
 	await context.sandbox.app.resolve(CoreCryptoMessages).register();
 
+	const workerPool = {
+		getWorker: () => {
+			return {
+				// @ts-ignore
+				consensusSignature: (method, message, privateKey) =>
+					context.sandbox.app
+						.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
+						[method](message, privateKey),
+			};
+		},
+	};
+	context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
+
 	context.sandbox.app.bind(Identifiers.TransactionPoolCollator).toConstantValue({
 		getBlockCandidateTransactions: () => [],
 	});
