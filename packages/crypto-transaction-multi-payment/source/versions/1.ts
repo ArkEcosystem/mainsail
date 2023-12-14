@@ -51,6 +51,10 @@ export class MultiPaymentTransaction extends Transaction {
 		});
 	}
 
+	public hasVendorField(): boolean {
+		return true;
+	}
+
 	public static getData(json: Contracts.Crypto.ITransactionJson): Contracts.Crypto.ITransactionData {
 		const data = Transaction.getData(json);
 
