@@ -75,8 +75,9 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 				await this.#handleRemovedEvent(data);
 				break;
 			}
-			default:
+			default: {
 				throw new Exceptions.NotImplemented("handle", name.toString());
+			}
 		}
 	}
 
@@ -110,9 +111,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 			const entityRepository = this.makeEntityRepository(entityManager);
 
 			this.logger.debug(
-				`syncing ${entityRepository.metadata.tableNameWithoutPrefix} to database (added: ${
-					this.#addedEvents.size
-				} removed: ${this.#removedEvents.size}))`,
+				`syncing ${entityRepository.metadata.tableNameWithoutPrefix} to database (added: ${this.#addedEvents.size} removed: ${this.#removedEvents.size}))`,
 			);
 
 			if (removedEvents.length > 0) {

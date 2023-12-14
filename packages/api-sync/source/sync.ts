@@ -137,11 +137,11 @@ export class Sync implements Contracts.ApiSync.ISync {
 				blockHeight: header.height.toFixed(),
 				blockId: header.id,
 				fee: data.fee.toFixed(),
-				id: data.id!,
+				id: data.id as unknown as string,
 				nonce: data.nonce.toFixed(),
 				recipientId: data.recipientId,
 				senderPublicKey: data.senderPublicKey,
-				sequence: data.sequence!,
+				sequence: data.sequence as unknown as number,
 				signature: data.signature,
 				signatures: data.signatures,
 				timestamp: header.timestamp.toFixed(),
@@ -162,7 +162,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
 						validatorRound: this.#createValidatorRound(header.height + 1),
-				  }
+					}
 				: {}),
 		};
 

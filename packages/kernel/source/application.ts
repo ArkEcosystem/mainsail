@@ -1,6 +1,7 @@
+import { exit } from "node:process";
+
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { existsSync, removeSync, writeFileSync } from "fs-extra";
-import { exit } from "node:process";
 import { join } from "path";
 
 import { Bootstrappers } from "./bootstrap";

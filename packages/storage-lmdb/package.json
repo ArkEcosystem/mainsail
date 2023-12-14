@@ -21,10 +21,10 @@
 	"dependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"lmdb": "2.9.1"
+		"lmdb": "2.9.2"
 	},
 	"devDependencies": {
-		"@types/tmp": "0.2.1",
+		"@types/tmp": "0.2.6",
 		"tmp": "0.2.1",
 		"uvu": "^0.5.6"
 	},

@@ -18,15 +18,18 @@ export class ApiNodeFilter {
 	): Promise<Expressions.Expression<ApiNode>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "ip":
+				case "ip": {
 					return handleOrCriteria(criteria.ip, async (c) => ({ op: "equal", property: "ip", value: c }));
-				case "version":
+				}
+				case "version": {
 					return handleOrCriteria(criteria.version, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("version", c),
 					);
-				default:
+				}
+				default: {
 					return { op: "true" };
+				}
 			}
 		});
 	}

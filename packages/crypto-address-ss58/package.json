@@ -23,8 +23,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@polkadot/util": "^8.4.1",
-		"@polkadot/util-crypto": "^8.4.1"
+		"@polkadot/util": "^12.6.1",
+		"@polkadot/util-crypto": "^12.6.1"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
@@ -32,7 +32,7 @@
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"bip39": "3.0.4",
+		"bip39": "3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

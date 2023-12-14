@@ -89,7 +89,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerFactories(): void {
-		this.app.bind(Identifiers.PeerFactory).toFactory<Peer>(() => (ip: string) => {
+		this.app.bind(Identifiers.PeerFactory).toFactory<Peer, [string]>(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
 			Utils.assert.defined<string>(sanitizedIp);
 
@@ -98,7 +98,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.PeerApiNodeFactory)
-			.toFactory<PeerApiNode>(
+			.toFactory<PeerApiNode, [string, string | number, Contracts.P2P.PeerProtocol?]>(
 				() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
 					const sanitizedIp = sanitizeRemoteAddress(ip);
 					Utils.assert.defined<string>(sanitizedIp);

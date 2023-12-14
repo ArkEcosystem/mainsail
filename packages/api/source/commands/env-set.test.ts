@@ -1,6 +1,6 @@
 import { Console, describe } from "@mainsail/test-framework";
-import envfile from "envfile";
-import { ensureFileSync, removeSync } from "fs-extra";
+import { parse } from "envfile";
+import { ensureFileSync, readFileSync, removeSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./env-set";
@@ -26,10 +26,10 @@ describe<{
 
 		await cli.withFlags({ key: "key1", value: "value" }).execute(Command);
 
-		assert.equal(envfile.parseFileSync(environmentFile), { key1: "value" });
+		assert.equal(parse(readFileSync(environmentFile, "utf8")), { key1: "value" });
 
 		await cli.withFlags({ key: "key2", value: "value" }).execute(Command);
 
-		assert.equal(envfile.parseFileSync(environmentFile), { key1: "value", key2: "value" });
+		assert.equal(parse(readFileSync(environmentFile, "utf8")), { key1: "value", key2: "value" });
 	});
 });

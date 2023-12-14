@@ -8,7 +8,7 @@ export interface Server {
 	initialize(name: string, optionsServer: { hostname: string; port: number }): Promise<void>;
 	boot(): Promise<void>;
 	dispose(): Promise<void>;
-	register(plugins: any | any[]): Promise<void>; // TODO: Add proper types
+	register(plugins: any): Promise<void>; // TODO: Add proper types
 	route(routes: ServerRoute | ServerRoute[]): Promise<void>;
 	inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse>;
 }

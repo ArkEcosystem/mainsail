@@ -17,7 +17,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Server;
 	}
 
-	protected getHandlers(): any | any[] {
+	protected getHandlers(): any {
 		return Handlers;
 	}
 

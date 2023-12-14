@@ -14,15 +14,15 @@ export type ErrorReply = {
 
 export type Reply = SuccessReply | ErrorReply;
 
-export type RequestCallback<T, K extends Requests<T>> = {
+export type RequestCallback<T extends {}, K extends Requests<T>> = {
 	// @ts-ignore
 	resolve: (result: ReturnType<T[K]>) => void;
 	reject: (error: Error) => void;
 };
 
-export type RequestCallbacks<T> = RequestCallback<T, Requests<T>>;
+export type RequestCallbacks<T extends {}> = RequestCallback<T, Requests<T>>;
 
-export class Subprocess<T> {
+export class Subprocess<T extends {}> {
 	private lastId = 1;
 	private readonly subprocess: ChildProcess;
 	private readonly callbacks = new Map<number, RequestCallbacks<T>>();

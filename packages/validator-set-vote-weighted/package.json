@@ -27,8 +27,9 @@
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
-		"@types/sinon": "^10.0.14",
-		"sinon": "^15.0.4",
+		"@types/delay": "3.1.0",
+		"@types/sinon": "^17.0.2",
+		"sinon": "^17.0.1",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

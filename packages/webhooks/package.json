@@ -24,15 +24,15 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"fs-extra": "8.1.0",
+		"fs-extra": "11.2.0",
 		"joi": "17.11.0",
 		"lowdb": "1.0.0",
-		"uuid": "8.3.2"
+		"uuid": "9.0.1"
 	},
 	"devDependencies": {
-		"@types/fs-extra": "8.1.2",
-		"@types/tmp": "0.2.1",
-		"@types/uuid": "8.3.1",
+		"@types/fs-extra": "11.0.4",
+		"@types/tmp": "0.2.6",
+		"@types/uuid": "9.0.7",
 		"import-fresh": "3.3.0",
 		"tmp": "0.2.1",
 		"uvu": "^0.5.6"

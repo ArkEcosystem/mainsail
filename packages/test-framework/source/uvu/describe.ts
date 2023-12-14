@@ -85,7 +85,7 @@ const runSuite = <T = Context>(suite: Test<T>, callback: CallbackFunction<T>, da
 			return result;
 		},
 		dataset,
-		each: each(suite),
+		each: each(suite as any),
 		it: suite,
 		loader,
 		match: sinon.match,

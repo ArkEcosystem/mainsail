@@ -13,7 +13,7 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	}
 
 	public async fromPublicKey(publicKey: string): Promise<string> {
-		return ethers.utils.computeAddress(`0x${publicKey}`);
+		return ethers.computeAddress(`0x${publicKey}`);
 	}
 
 	public async fromWIF(wif: string): Promise<string> {
@@ -37,6 +37,6 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 	}
 
 	public async validate(address: string): Promise<boolean> {
-		return ethers.utils.isAddress(address);
+		return ethers.isAddress(address);
 	}
 }

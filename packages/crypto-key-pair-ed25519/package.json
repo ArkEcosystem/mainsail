@@ -24,16 +24,16 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@noble/ed25519": "^1.6.0",
-		"@noble/hashes": "^1.0.0",
-		"@scure/bip39": "^1.0.0",
-		"wif": "^2.0.6"
+		"@noble/ed25519": "^2.0.0",
+		"@noble/hashes": "^1.3.3",
+		"@scure/bip39": "^1.2.1",
+		"wif": "^4.0.0"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@types/wif": "^2.0.2",
-		"bip39": "3.0.4",
+		"@types/wif": "^2.0.5",
+		"bip39": "3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

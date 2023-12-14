@@ -71,5 +71,5 @@ export interface ITransactionTypeFactory {
 
 	create(data: ITransactionData): ITransaction;
 
-	get(type: number, typeGroup?: number, version?: number): TransactionConstructor | undefined;
+	get(type: number, typeGroup?: number, version?: number): TransactionConstructor;
 }

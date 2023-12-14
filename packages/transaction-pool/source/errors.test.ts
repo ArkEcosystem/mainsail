@@ -47,7 +47,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_TOO_LARGE");
-		assert.equal(error.message, `tx ${context.transaction.id} exceeds size limit of bytes`);
+		assert.equal(error.message, `tx ${context.transaction.id} exceeds size limit of 1024 byte(s)`);
 	});
 
 	it("TransactionHasExpiredError", (context) => {
@@ -71,7 +71,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_EXCEEDS_MAX_COUNT");
-		assert.equal(error.message, `tx ${context.transaction.id} exceeds sender's transaction count limit`);
+		assert.equal(error.message, `tx ${context.transaction.id} exceeds sender's transaction count limit of 1`);
 	});
 
 	it("TransactionPoolFullError", (context) => {

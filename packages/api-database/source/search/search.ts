@@ -48,8 +48,9 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 			return expressions.length === 1 ? expressions[0] : { expressions, op: "or" };
 		}
 
-		default:
+		default: {
 			return expression;
+		}
 	}
 };
 
@@ -57,7 +58,7 @@ export const someOrCriteria = <TCriteria>(
 	criteria: OrCriteria<TCriteria>,
 	predicate: (c: TCriteria) => boolean,
 ): boolean => {
-	if (typeof criteria === "undefined") {
+	if (criteria === undefined) {
 		return false;
 	}
 	if (Array.isArray(criteria)) {
@@ -70,7 +71,7 @@ export const everyOrCriteria = <TCriteria>(
 	criteria: OrCriteria<TCriteria>,
 	predicate: (c: TCriteria) => boolean,
 ): boolean => {
-	if (typeof criteria === "undefined") {
+	if (criteria === undefined) {
 		return true;
 	}
 	if (Array.isArray(criteria)) {
@@ -82,12 +83,12 @@ export const everyOrCriteria = <TCriteria>(
 export const hasOrCriteria = <TCriteria>(criteria: OrCriteria<TCriteria>): boolean =>
 	someOrCriteria(criteria, () => true);
 
-export const handleAndCriteria = async <TEntity, TCriteria>(
+export const handleAndCriteria = async <TEntity, TCriteria extends {}>(
 	criteria: TCriteria,
 	callback: <K extends keyof TCriteria>(key: K) => Promise<Expression<TEntity>>,
 ): Promise<AndExpression<TEntity>> => {
 	const promises = Object.keys(criteria)
-		.filter((key) => typeof criteria[key] !== "undefined")
+		.filter((key) => criteria[key] !== undefined)
 		.map((key) => callback(key as keyof TCriteria));
 	const expressions = await Promise.all(promises);
 	return { expressions, op: "and" };

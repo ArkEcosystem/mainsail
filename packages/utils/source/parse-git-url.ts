@@ -31,7 +31,7 @@ export const parseGitUrl = (
 	}
 
 	const owner: string = getOwner(segments[0]);
-	const name: string = segments[1].replace(/^\W+|\.git$/g, "");
+	const name: string = segments[1].replaceAll(/^\W+|\.git$/g, "");
 
 	const result: { host: string; owner: string; name: string; repo: string; branch: string } = {
 		branch: (parsed.hash ? last(parsed.hash.split("#")) : segments[2]) || "master",

@@ -23,7 +23,7 @@ export class Input {
 
 	#definition!: InputDefinition;
 
-	#rawArgs: string[] = [];
+	#rawArgs: (string | number)[] = [];
 
 	#rawFlags: object = {};
 
@@ -38,7 +38,7 @@ export class Input {
 
 	public bind(): void {
 		const keys: string[] = Object.keys(this.#definition.getArguments());
-		const values: string[] = [...this.#rawArgs].slice(1);
+		const values: (string | number)[] = [...this.#rawArgs].slice(1);
 
 		for (const [index, key] of keys.entries()) {
 			this.args[key] = values[index];

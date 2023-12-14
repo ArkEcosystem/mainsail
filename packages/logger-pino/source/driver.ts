@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import chalk, { Chalk } from "chalk";
 import { error as console_error } from "console";
-import pino, { PrettyOptions } from "pino";
-import PinoPretty from "pino-pretty";
+import pino from "pino";
+import { prettyFactory, PrettyOptions } from "pino-pretty";
 import pump from "pump";
 import pumpify from "pumpify";
 import { Transform } from "readable-stream";
@@ -33,7 +33,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	#combinedFileStream?: Writable;
 
-	#logger!: pino.Logger;
+	#logger!: pino.Logger<"alert" | "critical" | "debug" | "emergency" | "error" | "info" | "notice" | "warning">;
 
 	#silentConsole = false;
 
@@ -42,7 +42,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		this.#logger = pino(
 			{
 				base: null,
-				// @ts-ignore
 				customLevels: {
 					alert: 1,
 					critical: 2,
@@ -167,7 +166,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
-		const pinoPretty = PinoPretty({
+		const pinoPretty = prettyFactory({
 			levelFirst: false,
 			translateTime: "yyyy-mm-dd HH:MM:ss.l",
 			...prettyOptions,

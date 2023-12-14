@@ -49,7 +49,7 @@ export class PluginConfiguration {
 	}
 
 	public get<T>(key: string, defaultValue?: T): T | undefined {
-		if (typeof defaultValue !== "undefined") {
+		if (defaultValue !== undefined) {
 			throw new TypeError(`DEPRECATED get(${key}, ${defaultValue}), use getOptional instead`);
 		}
 

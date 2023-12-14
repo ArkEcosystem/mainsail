@@ -63,8 +63,9 @@ export const makeApplication = async (configurationPath: string, options: Record
 			addressMilestone = { bech32m: options.bech32mPrefix };
 			break;
 		}
-		default:
+		default: {
 			throw new Exceptions.NotImplemented(options.addressFormat, "makeApplication");
+		}
 	}
 
 	await app.resolve(CryptoMessages).register();

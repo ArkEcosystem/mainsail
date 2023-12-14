@@ -92,11 +92,12 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#getLastRequestedBlockHeight(): number {
-		if (this.#downloadJobs.length === 0) {
+		const latestJob = this.#downloadJobs.at(-1);
+		if (latestJob === undefined) {
 			return this.stateService.getStateStore().getLastHeight();
 		}
 
-		return this.#downloadJobs[this.#downloadJobs.length - 1].heightTo;
+		return latestJob.heightTo;
 	}
 
 	async #downloadBlocksFromPeer(job: DownloadJob): Promise<void> {
@@ -158,7 +159,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					),
 				);
 
-				if (!hasValidSignatures.every((value) => value)) {
+				if (!hasValidSignatures.every(Boolean)) {
 					throw new Error(`Received block(s) with invalid signature(s)`);
 				}
 

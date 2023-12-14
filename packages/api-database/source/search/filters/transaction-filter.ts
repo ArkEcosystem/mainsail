@@ -30,85 +30,102 @@ export class TransactionFilter {
 	): Promise<Expression<Transaction>> {
 		const expression: Expression<Transaction> = await handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "address":
+				case "address": {
 					return handleOrCriteria(criteria.address, async (c) =>
 						// @ts-ignore
 						this.handleAddressCriteria(c, walletRepository),
 					);
-				case "senderId":
+				}
+				case "senderId": {
 					return handleOrCriteria(criteria.senderId, async (c) =>
 						// @ts-ignore
 						this.handleSenderIdCriteria(c, walletRepository),
 					);
-				case "recipientId":
+				}
+				case "recipientId": {
 					return handleOrCriteria(criteria.recipientId, async (c) =>
 						// @ts-ignore
 						this.handleRecipientIdCriteria(c),
 					);
-				case "id":
+				}
+				case "id": {
 					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "id", value: c }));
-				case "version":
+				}
+				case "version": {
 					return handleOrCriteria(criteria.version, async (c) => ({
 						op: "equal",
 						property: "version",
 						value: c,
 					}));
-				case "blockId":
+				}
+				case "blockId": {
 					return handleOrCriteria(criteria.blockId, async (c) => ({
 						op: "equal",
 						property: "blockId",
 						value: c,
 					}));
-				case "sequence":
+				}
+				case "sequence": {
 					return handleOrCriteria(criteria.sequence, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("sequence", c),
 					);
-				case "timestamp":
+				}
+				case "timestamp": {
 					return handleOrCriteria(criteria.timestamp, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("timestamp", c),
 					);
-				case "nonce":
+				}
+				case "nonce": {
 					return handleOrCriteria(criteria.nonce, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("nonce", c),
 					);
-				case "senderPublicKey":
+				}
+				case "senderPublicKey": {
 					return handleOrCriteria(criteria.senderPublicKey, async (c) =>
 						// @ts-ignore
 						this.handleSenderPublicKeyCriteria(c),
 					);
-				case "type":
+				}
+				case "type": {
 					return handleOrCriteria(criteria.type, async (c) => ({ op: "equal", property: "type", value: c }));
-				case "typeGroup":
+				}
+				case "typeGroup": {
 					return handleOrCriteria(criteria.typeGroup, async (c) => ({
 						op: "equal",
 						property: "typeGroup",
 						value: c,
 					}));
-				case "vendorField":
+				}
+				case "vendorField": {
 					return handleOrCriteria(criteria.vendorField, async (c) =>
 						// @ts-ignore
-						({ op: "like", pattern: Buffer.from(c, "utf-8"), property: "vendorField" }),
+						({ op: "like", pattern: Buffer.from(c, "utf8"), property: "vendorField" }),
 					);
-				case "amount":
+				}
+				case "amount": {
 					return handleOrCriteria(criteria.amount, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("amount", c),
 					);
-				case "fee":
+				}
+				case "fee": {
 					return handleOrCriteria(criteria.fee, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("fee", c),
 					);
-				case "asset":
+				}
+				case "asset": {
 					return handleOrCriteria(criteria.asset, async (c) =>
 						// @ts-ignore
 						this.handleAssetCriteria(c),
 					);
-				default:
+				}
+				default: {
 					return { op: "true" };
+				}
 			}
 		});
 

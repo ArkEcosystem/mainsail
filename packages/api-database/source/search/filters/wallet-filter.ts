@@ -15,33 +15,39 @@ export class WalletFilter {
 	private static async handleWalletCriteria(criteria: WalletCriteria): Promise<Expression<Wallet>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "address":
+				case "address": {
 					return handleOrCriteria(criteria.address, async (c) =>
 						// @ts-ignore
 						this.handleAddressCriteria(c),
 					);
-				case "publicKey":
+				}
+				case "publicKey": {
 					return handleOrCriteria(criteria.publicKey, async (c) =>
 						// @ts-ignore
 						this.handlePublicKeyCriteria(c),
 					);
-				case "balance":
+				}
+				case "balance": {
 					return handleOrCriteria(criteria.balance, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("nonce", c),
 					);
-				case "nonce":
+				}
+				case "nonce": {
 					return handleOrCriteria(criteria.nonce, async (c) =>
 						// @ts-ignore
 						handleNumericCriteria("nonce", c),
 					);
-				case "attributes":
+				}
+				case "attributes": {
 					return handleOrCriteria(criteria.attributes, async (c) =>
 						// @ts-ignore
 						this.handleAttributesCriteria(c),
 					);
-				default:
+				}
+				default: {
 					return { op: "true" };
+				}
 			}
 		});
 	}

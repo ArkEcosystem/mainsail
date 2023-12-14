@@ -81,7 +81,7 @@ export abstract class AbstractServer {
 	}
 
 	// @todo: add proper types
-	public async register(plugins: any | any[]): Promise<void> {
+	public async register(plugins: any): Promise<void> {
 		return this.server.register(plugins);
 	}
 

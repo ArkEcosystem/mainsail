@@ -1,5 +1,5 @@
 export const cloneArray = <T>(input: T[]): T[] => {
-	const sliced = new Array(input.length);
+	const sliced = Array.from<T>({ length: input.length });
 
 	for (const [index, element] of input.entries()) {
 		sliced[index] = element;

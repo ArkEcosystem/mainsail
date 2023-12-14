@@ -44,8 +44,8 @@ export const rateLimit = {
 
 		const rateLimiter = new RLWrapperBlackAndWhite({
 			blackList: options.blacklist || [],
-			isBlack: (ip: string) => isListed(ip, options.blacklist),
-			isWhite: (ip: string) => isListed(ip, options.whitelist),
+			isBlackListed: (ip: string) => isListed(ip, options.blacklist),
+			isWhiteListed: (ip: string) => isListed(ip, options.whitelist),
 			limiter: new RateLimiterMemory({ duration: options.duration, points: options.points }),
 			runActionAnyway: false,
 			whiteList: options.whitelist || ["*"],

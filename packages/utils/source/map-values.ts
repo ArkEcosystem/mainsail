@@ -1,6 +1,6 @@
 import { FunctionReturning } from "./internal";
 
-export const mapValues = <T>(iterable: T, iteratee: FunctionReturning): object => {
+export const mapValues = <T extends {}>(iterable: T, iteratee: FunctionReturning): object => {
 	const keys: string[] = Object.keys(iterable);
 	const result = {};
 

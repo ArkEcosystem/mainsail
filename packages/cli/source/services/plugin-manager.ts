@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { existsSync, readJSONSync, removeSync } from "fs-extra";
-import glob from "glob";
+import { glob } from "glob";
 import { join } from "path";
 
 import * as Contracts from "../contracts";
@@ -31,7 +31,7 @@ export class PluginManager implements Contracts.PluginManager {
 			});
 		}
 
-		return plugins;
+		return plugins.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	public async install(

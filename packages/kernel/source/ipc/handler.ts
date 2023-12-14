@@ -10,7 +10,7 @@ export type Requests<T extends {}> = {
 		: never;
 }[keyof T];
 
-export class Handler<T> {
+export class Handler<T extends {}> {
 	private readonly handler: T;
 
 	public constructor(handler: T) {

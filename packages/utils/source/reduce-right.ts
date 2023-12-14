@@ -3,7 +3,7 @@ import { isArray } from "./is-array";
 import { reduceRightArray } from "./reduce-right-array";
 import { reduceRightObject } from "./reduce-right-object";
 
-export const reduceRight = <T, V>(
+export const reduceRight = <T extends {}, V>(
 	iterable: T | T[],
 	iteratee: FunctionReturning,
 	initialValue: V,

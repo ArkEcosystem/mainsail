@@ -17,8 +17,8 @@ export const makeKeywords = () => {
 		// TODO: Check type
 		// @ts-ignore
 		compile: (schema) => (data, parentSchema: AnySchemaObject) => {
-			const minimum = typeof schema.minimum !== "undefined" ? schema.minimum : 0;
-			const maximum = typeof schema.maximum !== "undefined" ? schema.maximum : "9223372036854775807"; // 8 byte maximum
+			const minimum = schema.minimum !== undefined ? schema.minimum : 0;
+			const maximum = schema.maximum !== undefined ? schema.maximum : "9223372036854775807"; // 8 byte maximum
 
 			if (data !== 0 && !data) {
 				return false;

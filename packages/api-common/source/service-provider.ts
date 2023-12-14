@@ -9,7 +9,7 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 	protected abstract httpIdentifier(): symbol;
 	protected abstract httpsIdentifier(): symbol;
 	protected abstract getServerConstructor(): ServerConstructor<T>;
-	protected abstract getHandlers(): any | any[];
+	protected abstract getHandlers(): any;
 	protected abstract getPlugins(): any[];
 
 	public async register(): Promise<void> {

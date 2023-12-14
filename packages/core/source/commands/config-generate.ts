@@ -242,7 +242,7 @@ export class Command extends Commands.Command {
 							message: flag.description,
 							name: flag.name,
 							type: flag.promptType,
-						} as prompts.PromptObject<string>),
+						}) as prompts.PromptObject<string>,
 				)
 				.concat({
 					message: "Can you confirm?",

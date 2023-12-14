@@ -30,7 +30,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 	public registerTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
 		const { typeGroup, type } = constructor;
 
-		if (typeof type === "undefined" || typeof typeGroup === "undefined") {
+		if (type === undefined || typeGroup === undefined) {
 			throw new TypeError();
 		}
 
@@ -74,7 +74,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 	public deregisterTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
 		const { typeGroup, type, version } = constructor;
 
-		if (typeof type === "undefined" || typeof typeGroup === "undefined") {
+		if (type === undefined || typeGroup === undefined) {
 			throw new TypeError();
 		}
 

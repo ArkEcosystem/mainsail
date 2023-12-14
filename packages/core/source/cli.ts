@@ -39,7 +39,7 @@ export class CommandLineInterface {
 		const commands: CliContracts.CommandList = await this.#discoverCommands(dirname, flags);
 
 		// Figure out what command we should run and offer help if necessary
-		let commandSignature: string | undefined = args[0];
+		let commandSignature = args[0] as string | undefined;
 
 		if (!commandSignature) {
 			await commands.help.execute();

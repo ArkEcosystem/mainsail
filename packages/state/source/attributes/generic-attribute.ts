@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export abstract class GenericAttribute<T> implements Contracts.State.IAttribute<T> {
+export abstract class GenericAttribute<T extends {}> implements Contracts.State.IAttribute<T> {
 	protected value!: T;
 
 	constructor(value: unknown) {
