@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
+import dayjs from "dayjs";
 
 @injectable()
 export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor {
@@ -35,5 +36,25 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 		}
 
 		this.repository.forgetPendingApiNode(apiNode);
+	}
+
+	public async revalidateApiNode(
+		apiNode: Contracts.P2P.PeerApiNode,
+	): Promise<void> {
+		if (!this.repository.hasApiNode(apiNode)) {
+			return;
+		}
+
+		const lastPinged = apiNode.lastPinged ?? dayjs();
+		if (lastPinged.isBefore(dayjs().subtract(10, "minutes"))) {
+			return;
+		}
+
+		if (await this.apiNodeVerifier.verify(apiNode)) {
+			return;
+		}
+
+		this.repository.forgetApiNode(apiNode);
+		void this.events.dispatch(Enums.ApiNodeEvent.Removed, apiNode);
 	}
 }

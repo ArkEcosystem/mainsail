@@ -59,6 +59,7 @@ export class Service implements Contracts.P2P.Service {
 	public async mainLoop(): Promise<void> {
 		await this.#checkMinPeers();
 		await this.#checkReceivedMessages();
+		await this.#checkApiNodes();
 
 		if (!this.#disposed) {
 			this.#mainLoopTimeout = setTimeout(() => this.mainLoop(), 2000);
@@ -96,6 +97,14 @@ export class Service implements Contracts.P2P.Service {
 				peerCount: peersCount,
 			});
 		}
+	}
+
+
+	async #checkApiNodes(): Promise<void> {
+		await Promise.all([
+			this.peerApiNodeDiscoverer.discoverNewApiNodes(),
+			this.peerApiNodeDiscoverer.refreshApiNodes(),
+		]);
 	}
 
 	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
