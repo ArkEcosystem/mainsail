@@ -38,9 +38,7 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 		this.repository.forgetPendingApiNode(apiNode);
 	}
 
-	public async revalidateApiNode(
-		apiNode: Contracts.P2P.PeerApiNode,
-	): Promise<void> {
+	public async revalidateApiNode(apiNode: Contracts.P2P.PeerApiNode): Promise<void> {
 		if (!this.repository.hasApiNode(apiNode)) {
 			return;
 		}

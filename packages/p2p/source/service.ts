@@ -99,7 +99,6 @@ export class Service implements Contracts.P2P.Service {
 		}
 	}
 
-
 	async #checkApiNodes(): Promise<void> {
 		await Promise.all([
 			this.peerApiNodeDiscoverer.discoverNewApiNodes(),
