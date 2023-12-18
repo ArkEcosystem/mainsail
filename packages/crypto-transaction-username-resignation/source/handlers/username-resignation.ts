@@ -22,7 +22,7 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 
 	public async throwIfCannotBeApplied(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		if (!wallet.hasAttribute("username")) {
@@ -34,7 +34,7 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		await super.applyToSender(walletRepository, transaction);
 
@@ -46,7 +46,7 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
-	): Promise<void> {}
+	): Promise<void> { }
 }
