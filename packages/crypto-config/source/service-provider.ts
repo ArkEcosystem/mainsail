@@ -10,17 +10,17 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			const config: Contracts.Crypto.NetworkConfigPartial = this.#fromConfigRepository();
 
-			this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(config);
+			this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
 			this.app.bind<Contracts.Crypto.NetworkConfigPartial>(Identifiers.Crypto).toConstantValue(config);
-		} catch {}
+		} catch { }
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {
 		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.ConfigRepository);
 
 		return {
-			genesisBlock: configRepository.get<Contracts.Crypto.ICommittedBlockJson>("crypto.genesisBlock")!,
+			genesisBlock: configRepository.get<Contracts.Crypto.CommittedBlockJson>("crypto.genesisBlock")!,
 			milestones: configRepository.get<Contracts.Crypto.MilestonePartial[]>("crypto.milestones")!,
 			network: configRepository.get<Contracts.Crypto.Network>("crypto.network")!,
 		};
