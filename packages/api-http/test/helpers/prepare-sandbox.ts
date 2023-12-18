@@ -14,7 +14,7 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) { }
+	) {}
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
@@ -57,9 +57,7 @@ export class ApiContext {
 	}
 
 	public get peerRepository(): ApiDatabaseContracts.PeerRepository {
-		return this.app.get<ApiDatabaseContracts.PeerRepositoryFactory>(
-			ApiDatabaseIdentifiers.PeerRepositoryFactory,
-		)();
+		return this.app.get<ApiDatabaseContracts.PeerRepositoryFactory>(ApiDatabaseIdentifiers.PeerRepositoryFactory)();
 	}
 
 	public get stateRepository(): ApiDatabaseContracts.StateRepository {
