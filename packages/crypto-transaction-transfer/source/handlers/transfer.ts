@@ -9,7 +9,7 @@ import { TransferTransaction } from "../versions";
 @injectable()
 export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -29,7 +29,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 	public async throwIfCannotBeApplied(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
 		return super.throwIfCannotBeApplied(walletRepository, transaction, sender);
@@ -41,7 +41,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 		const recipientId: string = transaction.data.recipientId;
@@ -56,7 +56,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 

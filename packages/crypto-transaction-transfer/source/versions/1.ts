@@ -7,7 +7,7 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 @injectable()
 export class TransferTransaction extends Transaction {
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
-	private readonly addressSerializer!: Contracts.Crypto.IAddressSerializer;
+	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
 
 	@inject(Identifiers.Cryptography.Size.Address)
 	private readonly addressSize!: number;
@@ -16,7 +16,7 @@ export class TransferTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.Transfer;
 	public static key = "transfer";
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "transfer",
 			properties: {
@@ -41,7 +41,7 @@ export class TransferTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 		buff.writeUint64(data.amount.toBigInt());
