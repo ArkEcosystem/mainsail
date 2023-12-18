@@ -26,7 +26,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Consensus.CommittedBlockStateFactory)
 			.toFactory(
-				(context: interfaces.Context) => (committedBlock: Contracts.Crypto.ICommittedBlock) =>
+				(context: interfaces.Context) => (committedBlock: Contracts.Crypto.CommittedBlock) =>
 					context.container.resolve(CommittedBlockState).configure(committedBlock),
 			);
 
@@ -57,7 +57,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		const proposals = roundStates
 			.map((roundState) => roundState.getProposal())
-			.filter((proposal): proposal is Contracts.Crypto.IProposal => !!proposal);
+			.filter((proposal): proposal is Contracts.Crypto.Proposal => !!proposal);
 		await storage.saveProposals(proposals);
 
 		const prevotes = roundStates.flatMap((roundState) => roundState.getPrevotes());

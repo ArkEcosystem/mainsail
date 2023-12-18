@@ -5,26 +5,26 @@ import { Utils } from "@mainsail/kernel";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class CommittedBlockProcessor extends AbstractProcessor implements Contracts.Consensus.ICommittedBlockProcessor {
+export class CommittedBlockProcessor extends AbstractProcessor implements Contracts.Consensus.CommittedBlockProcessor {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
+	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
 	@inject(Identifiers.Consensus.Aggregator)
-	private readonly aggregator!: Contracts.Consensus.IAggregator;
+	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
 	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
-	private readonly committedBlockStateFactory!: Contracts.Consensus.ICommittedBlockStateFactory;
+	private readonly committedBlockStateFactory!: Contracts.Consensus.CommittedBlockStateFactory;
 
-	async process(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(committedBlock: Contracts.Crypto.CommittedBlock): Promise<Contracts.Consensus.ProcessorResult> {
 		let promise: Promise<void> | undefined;
 
 		const result = await this.commitLock.runNonExclusive(async (): Promise<Contracts.Consensus.ProcessorResult> => {
@@ -53,7 +53,7 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 		return result;
 	}
 
-	async hasValidSignature(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<boolean> {
+	async hasValidSignature(committedBlock: Contracts.Crypto.CommittedBlock): Promise<boolean> {
 		const { commit, block } = committedBlock;
 
 		const publicKeys: Buffer[] = [];
@@ -81,7 +81,7 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 		return this.aggregator.verify(commit, precommit, activeValidators);
 	}
 
-	#hasValidHeight(committedBlock: Contracts.Crypto.ICommittedBlock): boolean {
+	#hasValidHeight(committedBlock: Contracts.Crypto.CommittedBlock): boolean {
 		return committedBlock.block.data.height === this.getConsensus().getHeight();
 	}
 }

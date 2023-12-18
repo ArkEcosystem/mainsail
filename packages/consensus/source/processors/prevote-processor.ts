@@ -5,15 +5,15 @@ import { IpcWorker } from "@mainsail/kernel";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class PrevoteProcessor extends AbstractProcessor implements Contracts.Consensus.IPrevoteProcessor {
+export class PrevoteProcessor extends AbstractProcessor implements Contracts.Consensus.PrevoteProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
+	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
+	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
@@ -21,7 +21,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.Ipc.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
-	async process(prevote: Contracts.Crypto.IPrevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidHeightOrRound(prevote)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
@@ -48,7 +48,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 		});
 	}
 
-	async #hasValidSignature(prevote: Contracts.Crypto.IPrevote): Promise<boolean> {
+	async #hasValidSignature(prevote: Contracts.Crypto.Prevote): Promise<boolean> {
 		const worker = await this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",

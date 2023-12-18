@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Database, Key } from "lmdb";
 
 @injectable()
-export class Storage implements Contracts.Consensus.IConsensusStorage {
+export class Storage implements Contracts.Consensus.ConsensusStorage {
 	@inject(Identifiers.Database.ProposalStorage)
 	private readonly proposalStorage!: Database;
 
@@ -17,12 +17,12 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 	private readonly stateStorage!: Database;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messageFactory!: Contracts.Crypto.IMessageFactory;
+	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
-	public async getState(): Promise<Contracts.Consensus.IConsensusStateData | undefined> {
+	public async getState(): Promise<Contracts.Consensus.ConsensusStateData | undefined> {
 		if (!this.stateStorage.doesExist("consensus-state")) {
 			return undefined;
 		}
@@ -38,9 +38,9 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 		};
 	}
 
-	public async saveState(state: Contracts.Consensus.IConsensusState): Promise<void> {
+	public async saveState(state: Contracts.Consensus.ConsensusState): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
-		const data: Contracts.Consensus.IConsensusStateData = {
+		const data: Contracts.Consensus.ConsensusStateData = {
 			height: state.height,
 			lockedRound: state.lockedRound,
 			round: state.round,
@@ -51,7 +51,7 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 		await this.stateStorage.put("consensus-state", data);
 	}
 
-	public async saveProposals(proposals: Contracts.Crypto.IProposal[]): Promise<void> {
+	public async saveProposals(proposals: Contracts.Crypto.Proposal[]): Promise<void> {
 		await this.proposalStorage.transaction(async () => {
 			for (const proposal of proposals) {
 				const validator = this.validatorSet.getValidator(proposal.validatorIndex);
@@ -63,7 +63,7 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 		});
 	}
 
-	public async savePrevotes(prevotes: Contracts.Crypto.IPrevote[]): Promise<void> {
+	public async savePrevotes(prevotes: Contracts.Crypto.Prevote[]): Promise<void> {
 		await this.prevoteStorage.transaction(async () => {
 			for (const prevote of prevotes) {
 				const validator = this.validatorSet.getValidator(prevote.validatorIndex);
@@ -75,7 +75,7 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 		});
 	}
 
-	public async savePrecommits(precommits: Contracts.Crypto.IPrecommit[]): Promise<void> {
+	public async savePrecommits(precommits: Contracts.Crypto.Precommit[]): Promise<void> {
 		await this.precommitStorage.transaction(async () => {
 			for (const precommit of precommits) {
 				const validator = this.validatorSet.getValidator(precommit.validatorIndex);
@@ -87,17 +87,17 @@ export class Storage implements Contracts.Consensus.IConsensusStorage {
 		});
 	}
 
-	public async getProposals(): Promise<Contracts.Crypto.IProposal[]> {
+	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
 		const proposals = [...this.proposalStorage.getValues(undefined as unknown as Key)];
 		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromData(proposal)));
 	}
 
-	public async getPrevotes(): Promise<Contracts.Crypto.IPrevote[]> {
+	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
 		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as Key)];
 		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromData(prevote)));
 	}
 
-	public async getPrecommits(): Promise<Contracts.Crypto.IPrecommit[]> {
+	public async getPrecommits(): Promise<Contracts.Crypto.Precommit[]> {
 		const precommits = [...this.precommitStorage.getValues(undefined as unknown as Key)];
 		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromData(precommit)));
 	}
