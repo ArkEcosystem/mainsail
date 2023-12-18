@@ -8,7 +8,7 @@ export interface MilestoneSearchResult {
 }
 
 export const getMilestonesWhichAffectActiveValidatorCount = (
-	configuration: Contracts.Crypto.IConfiguration,
+	configuration: Contracts.Crypto.Configuration,
 ): Array<MilestoneSearchResult> => {
 	const milestones: Array<MilestoneSearchResult> = [
 		{

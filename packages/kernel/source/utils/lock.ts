@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class Lock implements Contracts.Kernel.ILock {
+export class Lock implements Contracts.Kernel.Lock {
 	#exclusivePromise?: Promise<unknown>;
 
 	readonly #nonExclusivePromises: Set<Promise<unknown>> = new Set<Promise<unknown>>();
@@ -9,7 +9,7 @@ export class Lock implements Contracts.Kernel.ILock {
 		while (this.#exclusivePromise) {
 			try {
 				await this.#exclusivePromise;
-			} catch {}
+			} catch { }
 		}
 
 		const nonExclusivePromise = callback();
@@ -26,7 +26,7 @@ export class Lock implements Contracts.Kernel.ILock {
 		while (this.#exclusivePromise) {
 			try {
 				await this.#exclusivePromise;
-			} catch {}
+			} catch { }
 		}
 
 		const exclusivePromise = (async () => {
@@ -34,7 +34,7 @@ export class Lock implements Contracts.Kernel.ILock {
 				[...this.#nonExclusivePromises].map(async (nonExclusivePromise) => {
 					try {
 						await nonExclusivePromise;
-					} catch {}
+					} catch { }
 				}),
 			);
 

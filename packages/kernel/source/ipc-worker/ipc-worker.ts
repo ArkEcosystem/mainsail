@@ -10,26 +10,26 @@ export interface WorkerFlags extends KeyValuePair {
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
-	consensusSignature<K extends Requests<Contracts.Crypto.ISignature>>(
+	consensusSignature<K extends Requests<Contracts.Crypto.Signature>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.ISignature[K]>
-	): Promise<ReturnType<Contracts.Crypto.ISignature[K]>>;
-	walletSignature<K extends Requests<Contracts.Crypto.ISignature>>(
+		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
+	): Promise<ReturnType<Contracts.Crypto.Signature[K]>>;
+	walletSignature<K extends Requests<Contracts.Crypto.Signature>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.ISignature[K]>
-	): Promise<ReturnType<Contracts.Crypto.ISignature[K]>>;
-	blockFactory<K extends Requests<Contracts.Crypto.IBlockFactory>>(
+		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
+	): Promise<ReturnType<Contracts.Crypto.Signature[K]>>;
+	blockFactory<K extends Requests<Contracts.Crypto.BlockFactory>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.IBlockFactory[K]>
-	): Promise<ReturnType<Contracts.Crypto.IBlockFactory[K]>>;
-	transactionFactory<K extends Requests<Contracts.Crypto.ITransactionFactory>>(
+		...arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>
+	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>>;
+	transactionFactory<K extends Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.ITransactionFactory[K]>
-	): Promise<ReturnType<Contracts.Crypto.ITransactionFactory[K]>>;
-	publicKeyFactory<K extends Requests<Contracts.Crypto.IPublicKeyFactory>>(
+		...arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>
+	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>>;
+	publicKeyFactory<K extends Requests<Contracts.Crypto.PublicKeyFactory>>(
 		method: K,
-		...arguments_: Parameters<Contracts.Crypto.IPublicKeyFactory[K]>
-	): Promise<ReturnType<Contracts.Crypto.IPublicKeyFactory[K]>>;
+		...arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>
+	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>>;
 }
 
 export type WorkerFactory = () => Worker;

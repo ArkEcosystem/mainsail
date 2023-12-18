@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-export const calculateSupply = (height: number, configuration: Contracts.Crypto.IConfiguration): BigNumber => {
+export const calculateSupply = (height: number, configuration: Contracts.Crypto.Configuration): BigNumber => {
 	const initialSupply = BigNumber.make(configuration.get("genesisBlock.block.totalAmount"));
 
 	const milestones = configuration.get("milestones");
