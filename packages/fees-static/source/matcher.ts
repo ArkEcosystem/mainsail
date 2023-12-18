@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -14,15 +14,15 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Fee.Registry)
 	private readonly feeRegistry!: FeeRegistry;
 
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		this.#throwIfCannot("pool", transaction);
 	}
 
-	public async throwIfCannotBroadcast(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotBroadcast(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		this.#throwIfCannot("broadcast", transaction);
 	}
 
-	#throwIfCannot(action: string, transaction: Contracts.Crypto.ITransaction): void {
+	#throwIfCannot(action: string, transaction: Contracts.Crypto.Transaction): void {
 		const feeString = this.#formatSatoshi(transaction.data.fee);
 
 		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);
