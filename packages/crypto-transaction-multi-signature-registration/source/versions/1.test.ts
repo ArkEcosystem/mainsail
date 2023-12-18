@@ -13,7 +13,7 @@ import { MultiSignatureRegistrationTransaction } from "./1";
 
 describe<{
 	sandbox: Sandbox;
-	validator: Contracts.Crypto.IValidator;
+	validator: Contracts.Crypto.Validator;
 }>("Schemas", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		context.sandbox = new Sandbox();
@@ -24,7 +24,7 @@ describe<{
 		await context.sandbox.app.resolve(ValidationServiceProvider).register();
 		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
 
-		context.validator = context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator);
+		context.validator = context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const [name, format] of Object.entries({
 			...makeFormats(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),

@@ -11,7 +11,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
 	@tagged("type", "wallet")
-	private readonly publicKeySerializer!: Contracts.Crypto.IPublicKeySerializer;
+	private readonly publicKeySerializer!: Contracts.Crypto.PublicKeySerializer;
 
 	@inject(Identifiers.Cryptography.Size.PublicKey)
 	@tagged("type", "wallet")
@@ -21,7 +21,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.MultiSignature;
 	public static key = "multiSignature";
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "multiSignature",
 			properties: {
@@ -67,7 +67,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 
 	public assetSize(): number {
 		const { data } = this;
-		Utils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
+		Utils.assert.defined<Contracts.Crypto.MultiSignatureAsset>(data.asset?.multiSignature);
 		const { publicKeys } = data.asset.multiSignature;
 
 		return (
@@ -77,9 +77,9 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
-		Utils.assert.defined<Contracts.Crypto.IMultiSignatureAsset>(data.asset?.multiSignature);
+		Utils.assert.defined<Contracts.Crypto.MultiSignatureAsset>(data.asset?.multiSignature);
 		const { min, publicKeys } = data.asset.multiSignature;
 		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 
@@ -96,7 +96,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
 
-		const multiSignature: Contracts.Crypto.IMultiSignatureAsset = { min: 0, publicKeys: [] };
+		const multiSignature: Contracts.Crypto.MultiSignatureAsset = { min: 0, publicKeys: [] };
 		multiSignature.min = buf.readUint8();
 
 		const count = buf.readUint8();
