@@ -12,7 +12,7 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 	public async apply(
 		walletRepository: Contracts.State.WalletRepository,
 		wallet: Contracts.State.Wallet,
-		block: Contracts.Crypto.IBlockData,
+		block: Contracts.Crypto.BlockData,
 	): Promise<void> {
 		const amount: BigNumber = this.#calculate(block);
 
@@ -30,7 +30,7 @@ export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
 		wallet.decreaseBalance(amount);
 	}
 
-	#calculate(block: Contracts.Crypto.IBlockData): BigNumber {
+	#calculate(block: Contracts.Crypto.BlockData): BigNumber {
 		const burnPercentage = this.pluginConfiguration.get<number>("percentage");
 		Utils.assert.defined<number>(burnPercentage);
 
