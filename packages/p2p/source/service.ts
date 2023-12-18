@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import { shuffle } from "@mainsail/utils";
+import { randomNumber, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -35,6 +35,7 @@ export class Service implements Contracts.P2P.Service {
 	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
 	#disposed = false;
 	#mainLoopTimeout?: NodeJS.Timeout = undefined;
+	#apiNodeCheckLoopTimeout?: NodeJS.Timeout = undefined;
 
 	public async boot(): Promise<void> {
 		if (process.env[Constants.Flags.CORE_ENV] === "test") {
@@ -54,6 +55,7 @@ export class Service implements Contracts.P2P.Service {
 		}
 
 		void this.mainLoop();
+		void this.#checkApiNodes();
 	}
 
 	public async mainLoop(): Promise<void> {
@@ -68,6 +70,7 @@ export class Service implements Contracts.P2P.Service {
 	public async dispose(): Promise<void> {
 		this.#disposed = true;
 		clearTimeout(this.#mainLoopTimeout);
+		clearTimeout(this.#apiNodeCheckLoopTimeout);
 	}
 
 	async #checkMinPeers(): Promise<void> {
@@ -95,6 +98,16 @@ export class Service implements Contracts.P2P.Service {
 				fast: true,
 				peerCount: peersCount,
 			});
+		}
+	}
+
+	async #checkApiNodes(): Promise<void> {
+		await this.peerApiNodeDiscoverer.discoverNewApiNodes();
+		await this.peerApiNodeDiscoverer.refreshApiNodes();
+
+		if (!this.#disposed) {
+			const nextTimeout = randomNumber(10, 20) * 60 * 1000;
+			this.#apiNodeCheckLoopTimeout = setTimeout(() => this.#checkApiNodes(), nextTimeout);
 		}
 	}
 

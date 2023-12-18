@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ValidateAndAcceptApiNodeAction, ValidateAndAcceptPeerAction } from "./actions";
+import { RevalidateApiNodeAction, ValidateAndAcceptApiNodeAction, ValidateAndAcceptPeerAction } from "./actions";
 import { Broadcaster } from "./broadcaster";
 import { BlockDownloader } from "./downloader/block-downloader";
 import { MessageDownloader } from "./downloader/message-downloader";
@@ -173,6 +173,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 			.bind("validateAndAcceptApiNode", new ValidateAndAcceptApiNodeAction(this.app));
+
+		this.app
+			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.bind("revalidateApiNode", new RevalidateApiNodeAction(this.app));
 	}
 
 	#registerValidation(): void {

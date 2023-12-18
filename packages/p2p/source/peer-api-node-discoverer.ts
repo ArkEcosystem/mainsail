@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
+import dayjs from "dayjs";
 
 @injectable()
 export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscoverer {
@@ -16,6 +17,12 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+
+	@inject(Identifiers.PeerApiNodeRepository)
+	private readonly apiNodeRepository!: Contracts.P2P.PeerApiNodeRepository;
+
+	@inject(Identifiers.PeerRepository)
+	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -49,6 +56,27 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
 					.call("validateAndAcceptApiNode", { apiNode, options: { seed: true } }),
 			),
+		);
+	}
+
+	async discoverNewApiNodes(): Promise<any> {
+		const peers = Utils.shuffle(this.peerRepository.getPeers()).slice(0, 5);
+		return Promise.all(peers.map((peer) => this.discoverApiNodes(peer)));
+	}
+
+	async refreshApiNodes(): Promise<any> {
+		return Promise.all(
+			this.apiNodeRepository
+				.getApiNodes()
+				.filter((apiNode) =>
+					// ignore nodes that were pinged recently
+					(apiNode.lastPinged ?? dayjs()).isAfter(dayjs().add(10, "minutes")),
+				)
+				.map((apiNode) =>
+					this.app
+						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+						.call("revalidateApiNode", { apiNode }),
+				),
 		);
 	}
 }
