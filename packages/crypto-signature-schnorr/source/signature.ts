@@ -4,7 +4,7 @@ import { ByteBuffer } from "@mainsail/utils";
 import { schnorr } from "bcrypto";
 
 @injectable()
-export class Signature implements Contracts.Crypto.ISignature {
+export class Signature implements Contracts.Crypto.Signature {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return schnorr.sign(message, privateKey).toString("hex");
 	}
