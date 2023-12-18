@@ -40,7 +40,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
 
 	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
-	context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 	await context.sandbox.app.resolve(CoreTransactions).register();
@@ -54,7 +54,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 				consensusSignature: (method, message, privateKey) =>
 					context.sandbox.app
 						.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
-						[method](message, privateKey),
+					[method](message, privateKey),
 			};
 		},
 	};

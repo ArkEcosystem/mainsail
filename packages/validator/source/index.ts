@@ -6,19 +6,19 @@ import { ValidatorRepository } from "./validator-repository";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const walletPublicKeyFactory = this.app.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+		const walletPublicKeyFactory = this.app.getTagged<Contracts.Crypto.PublicKeyFactory>(
 			Identifiers.Cryptography.Identity.PublicKeyFactory,
 			"type",
 			"wallet",
 		);
 
-		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.IKeyPairFactory>(
+		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
 			Identifiers.Cryptography.Identity.KeyPairFactory,
 			"type",
 			"consensus",
 		);
 
-		const validators: Contracts.Validator.IValidator[] = [];
+		const validators: Contracts.Validator.Validator[] = [];
 		const secrets = this.app.config("validators.secrets");
 		Utils.assert.defined<string[]>(secrets);
 
@@ -28,7 +28,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			validators.push(
 				this.app
-					.resolve<Contracts.Validator.IValidator>(Validator)
+					.resolve<Contracts.Validator.Validator>(Validator)
 					.configure(walletPublicKey, consensusKeyPair),
 			);
 		}
