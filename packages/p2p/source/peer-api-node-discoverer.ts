@@ -71,7 +71,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 				.getApiNodes()
 				.filter((apiNode) =>
 					// ignore nodes that were pinged recently
-					(apiNode.lastPinged ?? dayjs()).isAfter(dayjs().add(randomNumber(10, 20), "minutes")),
+					(apiNode.lastPinged ?? dayjs()).isAfter(dayjs().add(10, "minutes")),
 				)
 				.map((apiNode) =>
 					this.app
