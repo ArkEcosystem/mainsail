@@ -7,7 +7,7 @@ export class AttributeMutator implements Contracts.State.ValidatorMutator {
 	public async apply(
 		walletRepository: Contracts.State.WalletRepository,
 		wallet: Contracts.State.Wallet,
-		block: Contracts.Crypto.IBlockData,
+		block: Contracts.Crypto.BlockData,
 	): Promise<void> {
 		wallet.setAttribute("validatorLastBlock", {
 			height: block.height,

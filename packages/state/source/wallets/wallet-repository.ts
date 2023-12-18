@@ -12,7 +12,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	protected readonly addressFactory!: Contracts.Crypto.IAddressFactory;
+	protected readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};
 
@@ -95,7 +95,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		this.getIndex(index).forget(key);
 	}
 
-	public setDirtyWallet(wallet: Contracts.State.Wallet): void {}
+	public setDirtyWallet(wallet: Contracts.State.Wallet): void { }
 
 	protected findOrCreate(address: string): Contracts.State.Wallet {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);

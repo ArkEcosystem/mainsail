@@ -13,13 +13,13 @@ export class StateStore implements Contracts.State.StateStore {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.StateAttributes)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
-	#genesisBlock?: Contracts.Crypto.ICommittedBlock;
-	#lastBlock?: Contracts.Crypto.IBlock;
+	#genesisBlock?: Contracts.Crypto.CommittedBlock;
+	#lastBlock?: Contracts.Crypto.Block;
 	#isBootstrap = true;
 	#originalStateStore?: StateStore;
 
@@ -48,22 +48,22 @@ export class StateStore implements Contracts.State.StateStore {
 		this.#isBootstrap = value;
 	}
 
-	public getGenesisBlock(): Contracts.Crypto.ICommittedBlock {
-		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(this.#genesisBlock);
+	public getGenesisBlock(): Contracts.Crypto.CommittedBlock {
+		Utils.assert.defined<Contracts.Crypto.CommittedBlock>(this.#genesisBlock);
 
 		return this.#genesisBlock;
 	}
 
-	public setGenesisBlock(block: Contracts.Crypto.ICommittedBlock): void {
+	public setGenesisBlock(block: Contracts.Crypto.CommittedBlock): void {
 		this.#genesisBlock = block;
 	}
 
-	public getLastBlock(): Contracts.Crypto.IBlock {
-		Utils.assert.defined<Contracts.Crypto.IBlock>(this.#lastBlock);
+	public getLastBlock(): Contracts.Crypto.Block {
+		Utils.assert.defined<Contracts.Crypto.Block>(this.#lastBlock);
 		return this.#lastBlock;
 	}
 
-	public setLastBlock(block: Contracts.Crypto.IBlock): void {
+	public setLastBlock(block: Contracts.Crypto.Block): void {
 		this.#lastBlock = block;
 		this.setAttribute("height", block.data.height);
 

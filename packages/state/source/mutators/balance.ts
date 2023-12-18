@@ -7,7 +7,7 @@ export class BalanceMutator implements Contracts.State.ValidatorMutator {
 	public async apply(
 		walletRepository: Contracts.State.WalletRepository,
 		wallet: Contracts.State.Wallet,
-		block: Contracts.Crypto.IBlockData,
+		block: Contracts.Crypto.BlockData,
 	): Promise<void> {
 		const amount = block.reward.plus(block.totalFee);
 

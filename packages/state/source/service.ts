@@ -51,7 +51,7 @@ export class Service implements Contracts.State.Service {
 		return this.walletRepositoryBySenderFactory(this.getWalletRepository(), publicKey);
 	}
 
-	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (this.#baseStateStore.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
 			return;
 		}

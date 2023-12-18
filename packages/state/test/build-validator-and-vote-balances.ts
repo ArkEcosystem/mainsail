@@ -4,7 +4,7 @@ import { BigNumber } from "@mainsail/utils";
 import { Wallet, WalletRepository } from "../source/wallets";
 
 export const buildValidatorAndVoteWallets = async (
-	addressFactory: Contracts.Crypto.IAddressFactory,
+	addressFactory: Contracts.Crypto.AddressFactory,
 	numberDelegates: number,
 	walletRepo: WalletRepository,
 ): Promise<Wallet[]> => {

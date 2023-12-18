@@ -48,7 +48,7 @@ describeSkip<{
 		app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
 		app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
 		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		const configuration = app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration);
+		const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 		configuration.setConfig({
 			milestones: [
 				{
