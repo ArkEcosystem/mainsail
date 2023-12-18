@@ -3,20 +3,20 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
+export class ValidatorSet implements Contracts.ValidatorSet.ValidatorSet {
 	// TODO: Check which wallet repository should be used
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.ValidatorWalletFactory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
 	#walletRepository!: Contracts.State.WalletRepository;
 
-	#validators: Contracts.State.IValidatorWallet[] = [];
+	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
 	@postConstruct()
@@ -29,7 +29,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		this.buildValidatorRanking();
 	}
 
-	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
@@ -37,7 +37,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		}
 	}
 
-	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
+	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 
 		if (this.#validators.length < activeValidators) {
@@ -47,7 +47,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		return this.#validators.slice(0, activeValidators);
 	}
 
-	public getValidator(index: number): Contracts.State.IValidatorWallet {
+	public getValidator(index: number): Contracts.State.ValidatorWallet {
 		return this.#validators[index];
 	}
 
@@ -103,7 +103,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 				if (a.getWalletPublicKey() === b.getWalletPublicKey()) {
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-							`Validator "${a.getWalletPublicKey()}" appears twice in the list.`,
+						`Validator "${a.getWalletPublicKey()}" appears twice in the list.`,
 					);
 				}
 
