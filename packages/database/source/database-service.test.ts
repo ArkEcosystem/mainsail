@@ -22,24 +22,24 @@ import { describe, Factories, Sandbox } from "../../test-framework";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
 
-const generateCommit = async (): Promise<Contracts.Crypto.ICommittedBlock> => {
+const generateCommit = async (): Promise<Contracts.Crypto.CommittedBlock> => {
 	const blockFactory = await Factories.factory("Block", cryptoJson);
 
-	return blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.ICommittedBlock>();
+	return blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.CommittedBlock>();
 };
 
-const generateCommits = async (count: number): Promise<Contracts.Crypto.ICommittedBlock[]> => {
-	const blocks: Contracts.Crypto.ICommittedBlock[] = [];
+const generateCommits = async (count: number): Promise<Contracts.Crypto.CommittedBlock[]> => {
+	const blocks: Contracts.Crypto.CommittedBlock[] = [];
 
 	const blockFactory = await Factories.factory("Block", cryptoJson);
-	let previousBlock = await blockFactory.make<Contracts.Crypto.ICommittedBlock>();
+	let previousBlock = await blockFactory.make<Contracts.Crypto.CommittedBlock>();
 
 	blocks.push(previousBlock);
 
 	for (let index = 0; index < count - 1; index++) {
 		previousBlock = await blockFactory
 			.withOptions({ getPreviousBlock: () => previousBlock.block.data, transactionsCount: 2 })
-			.make<Contracts.Crypto.ICommittedBlock>();
+			.make<Contracts.Crypto.CommittedBlock>();
 		blocks.push(previousBlock);
 	}
 
@@ -60,7 +60,7 @@ describe<{
 		context.sandbox.app.useDataPath(dirSync().name);
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
-			info: () => {},
+			info: () => { },
 		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
@@ -81,7 +81,7 @@ describe<{
 		await context.sandbox.app.resolve(CoreDatabase).register();
 
 		context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.setConfig(cryptoJson);
 
 		context.databaseService = context.sandbox.app.get<DatabaseService>(Identifiers.Database.Service);
@@ -127,7 +127,7 @@ describe<{
 
 	it("#getBlock - should return block by height", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
-		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.ICommittedBlock>();
+		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.CommittedBlock>();
 
 		databaseService.addCommit(block);
 		assert.equal(await databaseService.getBlock(block.block.data.height), block.block);
