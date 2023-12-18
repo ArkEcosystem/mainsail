@@ -8,9 +8,9 @@ export class PostTransactionsController implements Contracts.P2P.Controller {
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
 	public async handle(
-		request: Contracts.P2P.IPostTransactionsRequest,
+		request: Contracts.P2P.PostTransactionsRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IPostTransactionsResponse> {
+	): Promise<Contracts.P2P.PostTransactionsResponse> {
 		const result = await this.processor.process(request.payload.transactions);
 		return {
 			accept: result.accept,

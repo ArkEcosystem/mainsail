@@ -8,13 +8,13 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async handle(
-		request: Contracts.P2P.IGetMessagesRequest,
+		request: Contracts.P2P.GetMessagesRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IGetMessagesResponse> {
+	): Promise<Contracts.P2P.GetMessagesResponse> {
 		const { height, round, validatorsSignedPrevote, validatorsSignedPrecommit } = request.payload.headers;
 
-		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
+		const consensus = this.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+		const roundStateRepo = this.app.get<Contracts.Consensus.RoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
 		);
 
@@ -47,7 +47,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 
 	private getPrevotes(
 		validatorsSignedPrevote: readonly boolean[],
-		roundState: Contracts.Consensus.IRoundState,
+		roundState: Contracts.Consensus.RoundState,
 	): Buffer[] {
 		const prevotes: Buffer[] = [];
 
@@ -68,7 +68,7 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 
 	private getPrecommits(
 		validatorsSignedPrecommit: readonly boolean[],
-		roundState: Contracts.Consensus.IRoundState,
+		roundState: Contracts.Consensus.RoundState,
 	): Buffer[] {
 		const precommits: Buffer[] = [];
 

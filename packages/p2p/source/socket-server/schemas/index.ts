@@ -11,7 +11,7 @@ import { postPrecommit } from "./post-precommit";
 import { postPrevote } from "./post-prevote";
 import { postProposal } from "./post-proposal";
 
-export const Schemas: Record<string, (configuration: Contracts.Crypto.IConfiguration) => Joi.ObjectSchema<any>> = {
+export const Schemas: Record<string, (configuration: Contracts.Crypto.Configuration) => Joi.ObjectSchema<any>> = {
 	getApiNodes,
 	getBlocks,
 	getMessages,

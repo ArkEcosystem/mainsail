@@ -108,7 +108,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.PeerHeaderFactory)
-			.toFactory<Contracts.P2P.IHeader>(() => () => this.app.resolve(Header));
+			.toFactory<Contracts.P2P.Header>(() => () => this.app.resolve(Header));
 	}
 
 	#registerServices(): void {
@@ -177,11 +177,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerValidation(): void {
 		for (const keyword of Object.values(makeKeywords())) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 		}
 
 		for (const [name, format] of Object.entries(makeFormats())) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}
 	}
 }

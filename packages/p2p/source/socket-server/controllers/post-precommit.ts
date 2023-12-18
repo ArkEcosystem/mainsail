@@ -7,10 +7,10 @@ import { getPeerIp } from "../../utils";
 @injectable()
 export class PostPrecommitController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Consensus.PrecommitProcessor)
-	private readonly precommitProcessor!: Contracts.Consensus.IPrecommitProcessor;
+	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
+	private readonly factory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
@@ -19,9 +19,9 @@ export class PostPrecommitController implements Contracts.P2P.Controller {
 	private readonly state!: Contracts.P2P.State;
 
 	public async handle(
-		request: Contracts.P2P.IPostPrecommitRequest,
+		request: Contracts.P2P.PostPrecommitRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IPostPrecommitResponse> {
+	): Promise<Contracts.P2P.PostPrecommitResponse> {
 		try {
 			const precommit = await this.factory.makePrecommitFromBytes(request.payload.precommit);
 			const result = await this.precommitProcessor.process(precommit);

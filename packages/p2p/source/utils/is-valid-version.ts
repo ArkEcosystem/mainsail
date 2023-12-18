@@ -12,7 +12,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, version: strin
 		return false;
 	}
 
-	const cryptoConfiguration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
+	const cryptoConfiguration: Contracts.Crypto.Configuration = app.get(Identifiers.Cryptography.Configuration);
 
 	let minimumVersions: string[];
 	const milestones: Record<string, any> = cryptoConfiguration.getMilestone();

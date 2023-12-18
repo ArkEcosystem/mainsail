@@ -23,7 +23,7 @@ type DownloadJob = {
 @injectable()
 export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.IDatabaseService;
+	private readonly database!: Contracts.Database.DatabaseService;
 
 	@inject(Identifiers.PeerCommunicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
@@ -35,7 +35,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
@@ -44,10 +44,10 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	private readonly state!: Contracts.P2P.State;
 
 	@inject(Identifiers.Consensus.CommittedBlockProcessor)
-	private readonly committedBlockProcessor!: Contracts.Consensus.ICommittedBlockProcessor;
+	private readonly committedBlockProcessor!: Contracts.Consensus.CommittedBlockProcessor;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -146,8 +146,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				for (const [index, committedBlock] of committedBlocks.entries()) {
 					if (committedBlock.block.data.height !== height + index) {
 						throw new Error(
-							`Received block height ${committedBlock.block.data.height} does not match expected height ${
-								height + index
+							`Received block height ${committedBlock.block.data.height} does not match expected height ${height + index
 							}`,
 						);
 					}
@@ -205,8 +204,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		this.logger.debug(
-			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
-				job.heightTo
+			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${job.heightTo
 			} from ${job.peer.ip}. ${error.message}`,
 		);
 		this.peerDisposer.banPeer(job.peer.ip, error);

@@ -4,13 +4,13 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { constants } from "./constants";
 
 @injectable()
-export class HeaderService implements Contracts.P2P.IHeaderService {
+export class HeaderService implements Contracts.P2P.HeaderService {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
 	#pending = new Set<Contracts.P2P.Peer>();
 
-	public async handle(peer: Contracts.P2P.Peer, peerHeader: Contracts.P2P.IHeaderData): Promise<void> {
+	public async handle(peer: Contracts.P2P.Peer, peerHeader: Contracts.P2P.HeaderData): Promise<void> {
 		peer.header = peerHeader;
 
 		if (this.#hasPendingCheck(peer)) {

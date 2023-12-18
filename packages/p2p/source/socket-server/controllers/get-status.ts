@@ -11,7 +11,7 @@ export class GetStatusController implements Contracts.P2P.Controller {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.IGetStatusResponse> {
+	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.GetStatusResponse> {
 		const lastBlock = this.stateService.getStateStore().getLastBlock();
 
 		return {

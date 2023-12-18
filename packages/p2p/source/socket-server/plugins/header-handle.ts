@@ -9,7 +9,7 @@ export class HeaderHandlePlugin {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PeerHeaderService)
-	private readonly headerService!: Contracts.P2P.IHeaderService;
+	private readonly headerService!: Contracts.P2P.HeaderService;
 
 	@inject(Identifiers.PeerRepository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;

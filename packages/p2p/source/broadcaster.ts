@@ -18,12 +18,12 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
-	private readonly serializer!: Contracts.Crypto.ITransactionSerializer;
+	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
 	@inject(Identifiers.P2PState)
 	private readonly state!: Contracts.P2P.State;
 
-	public async broadcastTransactions(transactions: Contracts.Crypto.ITransaction[]): Promise<void> {
+	public async broadcastTransactions(transactions: Contracts.Crypto.Transaction[]): Promise<void> {
 		if (transactions.length === 0) {
 			this.logger.warning("Broadcasting 0 transactions");
 			return;
@@ -48,7 +48,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	async broadcastProposal(proposal: Contracts.Crypto.IProposal): Promise<void> {
+	async broadcastProposal(proposal: Contracts.Crypto.Proposal): Promise<void> {
 		this.state.resetLastMessageTime();
 
 		const promises = this.#getPeersForBroadcast().map((peer) =>
@@ -58,7 +58,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	public async broadcastPrevote(prevote: Contracts.Crypto.IPrevote): Promise<void> {
+	public async broadcastPrevote(prevote: Contracts.Crypto.Prevote): Promise<void> {
 		this.state.resetLastMessageTime();
 
 		const promises = this.#getPeersForBroadcast().map((peer) =>
@@ -68,7 +68,7 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.IPrecommit): Promise<void> {
+	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit): Promise<void> {
 		this.state.resetLastMessageTime();
 
 		const promises = this.#getPeersForBroadcast().map((peer) =>

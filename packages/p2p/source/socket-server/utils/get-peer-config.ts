@@ -43,7 +43,7 @@ const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Applica
 	});
 
 export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.PeerConfig => {
-	const configuration: Contracts.Crypto.IConfiguration = app.get(Identifiers.Cryptography.Configuration);
+	const configuration: Contracts.Crypto.Configuration = app.get(Identifiers.Cryptography.Configuration);
 
 	return {
 		network: {
