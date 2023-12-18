@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class PublicKeySerializer implements Contracts.Crypto.IPublicKeySerializer {
+export class PublicKeySerializer implements Contracts.Crypto.PublicKeySerializer {
 	public serialize(buffer: ByteBuffer, publicKey: string): void {
 		buffer.writeBytes(Buffer.from(publicKey, "hex"));
 	}

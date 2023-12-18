@@ -4,9 +4,9 @@ import { numberToHex } from "@mainsail/utils";
 import { secp256k1 } from "bcrypto";
 
 @injectable()
-export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
+export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
-	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
@@ -16,8 +16,8 @@ export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
-	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
-		const { min, publicKeys }: Contracts.Crypto.IMultiSignatureAsset = asset;
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
+		const { min, publicKeys }: Contracts.Crypto.MultiSignatureAsset = asset;
 
 		for (const publicKey of publicKeys) {
 			if (!this.verify(publicKey)) {
