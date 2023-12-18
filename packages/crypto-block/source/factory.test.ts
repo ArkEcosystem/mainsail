@@ -17,7 +17,7 @@ import { schemas } from "./schemas";
 import { Serializer } from "./serializer";
 
 describe<{
-	expectBlock: ({ data }: { data: Contracts.Crypto.IBlockData }) => void;
+	expectBlock: ({ data }: { data: Contracts.Crypto.BlockData }) => void;
 	sandbox: Sandbox;
 	factory: BlockFactory;
 	serializer: Serializer;
@@ -25,8 +25,8 @@ describe<{
 	const blockDataOriginal = clone(blockData);
 	// Recalculated id
 	const blockDataWithTransactionsOriginal = clone(blockDataWithTransactions);
-	let blockDataClone: Utils.Mutable<Contracts.Crypto.IBlockData>;
-	let blockDataWithTransactionsClone: Utils.Mutable<Contracts.Crypto.IBlockData>;
+	let blockDataClone: Utils.Mutable<Contracts.Crypto.BlockData>;
+	let blockDataWithTransactionsClone: Utils.Mutable<Contracts.Crypto.BlockData>;
 
 	beforeEach(async (context) => {
 		blockDataClone = clone(blockDataOriginal);
@@ -35,7 +35,7 @@ describe<{
 		await prepareSandbox(context);
 
 		for (const schema of Object.values(schemas)) {
-			context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 
 		context.factory = context.sandbox.app.resolve(BlockFactory);
@@ -145,7 +145,7 @@ describe<{
 		const partialBlock = {
 			...blockDataClone,
 			generatorPublicKey: undefined,
-		} as unknown as Contracts.Crypto.IBlockData;
+		} as unknown as Contracts.Crypto.BlockData;
 
 		await assert.rejects(
 			() => factory.fromData(partialBlock),

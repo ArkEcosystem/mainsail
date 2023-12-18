@@ -4,12 +4,12 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 @injectable()
 export class IDFactory {
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
+	private readonly serializer!: Contracts.Crypto.BlockSerializer;
 
-	public async make(data: Contracts.Crypto.IBlockDataSerializable): Promise<string> {
+	public async make(data: Contracts.Crypto.BlockDataSerializable): Promise<string> {
 		return (await this.hashFactory.sha256(await this.serializer.serializeHeader(data))).toString("hex");
 	}
 }
