@@ -6,7 +6,7 @@ import { Utils } from "@mainsail/kernel";
 import { TransactionHandlerConstructor } from "./transaction";
 
 @injectable()
-export class TransactionHandlerProvider implements Contracts.Transactions.ITransactionHandlerProvider {
+export class TransactionHandlerProvider implements Contracts.Transactions.TransactionHandlerProvider {
 	@inject(Identifiers.WalletAttributes)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
@@ -14,7 +14,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 	private readonly handlerConstructors!: TransactionHandlerConstructor[];
 
 	@inject(Identifiers.Cryptography.Transaction.Registry)
-	private readonly transactionRegistry!: Contracts.Crypto.ITransactionRegistry;
+	private readonly transactionRegistry!: Contracts.Crypto.TransactionRegistry;
 
 	#registered = false;
 
@@ -65,7 +65,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.ITrans
 
 	#hasOtherHandlerHandling(
 		handlerConstructor: TransactionHandlerConstructor,
-		internalType: Contracts.Transactions.IInternalTransactionType,
+		internalType: Contracts.Transactions.InternalTransactionType,
 		version: number,
 	) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {

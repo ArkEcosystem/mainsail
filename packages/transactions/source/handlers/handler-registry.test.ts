@@ -46,13 +46,13 @@ abstract class TestTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
 	}
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "test",
 		});
@@ -64,13 +64,13 @@ abstract class TestDeactivatedTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "deactivated_test";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
 	}
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "test",
 		});
@@ -82,13 +82,13 @@ abstract class TestWithDependencyTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test_with_dependency";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
 	}
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "test_with_dependency",
 		});
@@ -116,9 +116,9 @@ class TestTransactionHandler extends TransactionHandler {
 		return true;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 }
 
 class TestDeactivatedTransactionHandler extends TransactionHandler {
@@ -142,9 +142,9 @@ class TestDeactivatedTransactionHandler extends TransactionHandler {
 		return false;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 }
 
 class TestWithDependencyTransactionHandler extends TransactionHandler {
@@ -168,9 +168,9 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 		return false;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.ITransaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 }
 
 describe<{
@@ -313,10 +313,10 @@ describe<{
 		);
 
 		const keys = await context.app
-			.get<Contracts.Crypto.IKeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.get<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
 			.fromMnemonic("secret");
 
-		const data: Contracts.Crypto.ITransactionData = {
+		const data: Contracts.Crypto.TransactionData = {
 			amount: BigNumber.make("200000000"),
 			asset: {
 				test: 256,

@@ -5,7 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 
 // @TODO revisit the implementation, container usage and arguments after database rework
 @injectable()
-export abstract class TransactionHandler implements Contracts.Transactions.ITransactionHandler {
+export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -13,14 +13,14 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 	protected readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier!: Contracts.Crypto.ITransactionVerifier;
+	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	public async verify(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -37,7 +37,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public async throwIfCannotBeApplied(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
 		const senderWallet: Contracts.State.Wallet = walletRepository.findByAddress(sender.getAddress());
@@ -96,7 +96,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public async apply(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		await this.applyToSender(walletRepository, transaction);
 		await this.applyToRecipient(walletRepository, transaction);
@@ -104,13 +104,13 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		const data: Contracts.Crypto.ITransactionData = transaction.data;
+		const data: Contracts.Crypto.TransactionData = transaction.data;
 
 		await this.throwIfCannotBeApplied(walletRepository, transaction, sender);
 
@@ -129,7 +129,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 		sender.setBalance(newBalance);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {}
+	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void { }
 
 	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
 		return [];
@@ -137,18 +137,18 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {}
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<void> { }
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,
-		transaction: Contracts.Crypto.ITransactionData,
-		multiSignature?: Contracts.Crypto.IMultiSignatureAsset,
+		transaction: Contracts.Crypto.TransactionData,
+		multiSignature?: Contracts.Crypto.MultiSignatureAsset,
 	): Promise<boolean> {
 		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
 	}
 
-	#verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.ITransaction): void {
+	#verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.Transaction): void {
 		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
 		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
@@ -156,7 +156,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 		}
 	}
 
-	protected allTransactions(transactions: Contracts.Crypto.ITransaction[]): Contracts.Crypto.ITransactionData[] {
+	protected allTransactions(transactions: Contracts.Crypto.Transaction[]): Contracts.Crypto.TransactionData[] {
 		return transactions
 			.filter(
 				({ data }) =>
@@ -173,7 +173,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.ITran
 
 	public abstract applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void>;
 }
 
