@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { RootDatabase } from "lmdb";
 
@@ -15,5 +15,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async required(): Promise<boolean> {
 		return true;
+	}
+
+	public async dispose(): Promise<void> {
+		await this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).persist();
 	}
 }
