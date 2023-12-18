@@ -39,7 +39,7 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 		return this;
 	}
 
-	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
+	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
 		if (
 			!this.data.asset ||
 			!this.data.asset.payments ||
@@ -49,7 +49,7 @@ export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder>
 			throw new Exceptions.MinimumPaymentCountSubceededError();
 		}
 
-		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
+		const struct: Contracts.Crypto.TransactionData = await super.getStruct();
 		struct.senderPublicKey = this.data.senderPublicKey;
 		struct.vendorField = this.data.vendorField;
 		struct.amount = this.data.amount;
