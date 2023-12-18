@@ -218,7 +218,7 @@
 // 						typeGroup: 1,
 // 						version: 1,
 // 					},
-// 				} as Contracts.Crypto.ITransaction,
+// 				} as Contracts.Crypto.Transaction,
 // 			],
 // 			verification: { containsMultiSignatures: true, errors: [], verified: true },
 // 			verify: () => true,
@@ -252,8 +252,8 @@
 // 		const block = {
 // 			...context.baseBlock,
 // 			transactions: [
-// 				{ data: { id: "1", version: 1 } } as Contracts.Crypto.ITransaction,
-// 				{ data: { id: "2", version: 2 } } as Contracts.Crypto.ITransaction,
+// 				{ data: { id: "1", version: 1 } } as Contracts.Crypto.Transaction,
+// 				{ data: { id: "2", version: 2 } } as Contracts.Crypto.Transaction,
 // 			],
 // 		};
 
@@ -268,14 +268,14 @@
 // 			nonce: BigNumber.make(2),
 // 			senderPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
 // 			version: 2,
-// 		} as Contracts.Crypto.ITransactionData;
+// 		} as Contracts.Crypto.TransactionData;
 // 		const block = {
 // 			...context.baseBlock,
 // 			transactions: [
-// 				{ data: { ...baseTransactionData } } as Contracts.Crypto.ITransaction,
+// 				{ data: { ...baseTransactionData } } as Contracts.Crypto.Transaction,
 // 				{
 // 					data: { ...baseTransactionData, id: "2", nonce: BigNumber.make(4) },
-// 				} as Contracts.Crypto.ITransaction,
+// 				} as Contracts.Crypto.Transaction,
 // 			],
 // 		};
 
@@ -291,12 +291,12 @@
 // 			id: "1",
 // 			senderPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
 // 			version: 1,
-// 		} as Contracts.Crypto.ITransactionData;
+// 		} as Contracts.Crypto.TransactionData;
 // 		const block = {
 // 			...context.baseBlock,
 // 			transactions: [
-// 				{ data: { ...baseTransactionData } } as Contracts.Crypto.ITransaction,
-// 				{ data: { ...baseTransactionData, id: "2" } } as Contracts.Crypto.ITransaction,
+// 				{ data: { ...baseTransactionData } } as Contracts.Crypto.Transaction,
+// 				{ data: { ...baseTransactionData, id: "2" } } as Contracts.Crypto.Transaction,
 // 			],
 // 		};
 
@@ -380,10 +380,10 @@
 // 			nonce: BigNumber.make(2),
 // 			senderPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
 // 			version: 2,
-// 		} as Contracts.Crypto.ITransactionData;
+// 		} as Contracts.Crypto.TransactionData;
 // 		const block = {
 // 			...context.chainedBlock,
-// 			transactions: [{ data: transactionData, id: transactionData.id } as Contracts.Crypto.ITransaction],
+// 			transactions: [{ data: transactionData, id: transactionData.id } as Contracts.Crypto.Transaction],
 // 		};
 // 		stub(context.walletRepository, "getNonce").returnValue(BigNumber.ONE);
 // 		stub(context.roundState, "getActiveDelegates").returnValue([]);
@@ -407,16 +407,16 @@
 // 			nonce: BigNumber.make(2),
 // 			senderPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
 // 			version: 2,
-// 		} as Contracts.Crypto.ITransactionData;
+// 		} as Contracts.Crypto.TransactionData;
 // 		const transactionData2 = {
 // 			id: "34821dfa9cbe59aad663b972326ff19265d788c4d4142747606aa29b19d6b1dac",
 // 			nonce: BigNumber.make(3),
 // 			senderPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
 // 			version: 2,
-// 		} as Contracts.Crypto.ITransactionData;
+// 		} as Contracts.Crypto.TransactionData;
 // 		const block = {
 // 			...context.chainedBlock,
-// 			transactions: [{ data: transactionData, id: transactionData.id } as Contracts.Crypto.ITransaction],
+// 			transactions: [{ data: transactionData, id: transactionData.id } as Contracts.Crypto.Transaction],
 // 		};
 
 // 		stub(context.walletRepository, "getNonce").returnValue(BigNumber.ONE);

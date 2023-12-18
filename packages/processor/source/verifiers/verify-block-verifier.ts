@@ -7,18 +7,18 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Block.Verifier)
-	private readonly blockVerifier!: Contracts.Crypto.IBlockVerifier;
+	private readonly blockVerifier!: Contracts.Crypto.BlockVerifier;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		const block = unit.getBlock();
 
-		let verification: Contracts.Crypto.IBlockVerification = await this.blockVerifier.verify(block);
+		let verification: Contracts.Crypto.BlockVerification = await this.blockVerifier.verify(block);
 
 		if (verification.containsMultiSignatures) {
 			try {
@@ -36,8 +36,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 
 		if (!verification.verified) {
 			this.logger.warning(
-				`Block ${block.data.height.toLocaleString()} (${
-					block.data.id
+				`Block ${block.data.height.toLocaleString()} (${block.data.id
 				}) disregarded because verification failed`,
 			);
 

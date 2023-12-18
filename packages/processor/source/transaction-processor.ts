@@ -9,11 +9,11 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	async process(
 		walletRepository: Contracts.State.WalletRepositoryClone,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
@@ -41,14 +41,14 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		walletRepository: Contracts.State.WalletRepositoryClone,
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet | undefined,
-		transaction: Contracts.Crypto.ITransactionData,
+		transaction: Contracts.Crypto.TransactionData,
 	): Promise<void> {
 		if (
 			transaction.type === Contracts.Crypto.TransactionType.Vote &&
 			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
 		) {
-			AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.asset?.votes);
-			AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(transaction.asset?.unvotes);
+			AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.votes);
+			AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.unvotes);
 
 			const senderValidatorAmount = sender
 				.getBalance()
@@ -91,7 +91,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 					transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
 					transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
 				) {
-					AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.asset?.payments);
+					AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
 
 					amount = transaction.asset.payments.reduce(
 						(previous, current) => previous.plus(current.amount),
@@ -111,7 +111,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
 				transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
 			) {
-				AppUtils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(transaction.asset?.payments);
+				AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
 
 				// go through all payments and update recipients validators vote balance
 				for (const { recipientId, amount } of transaction.asset.payments) {
