@@ -16,7 +16,7 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		this.data.amount = BigNumber.ZERO;
 		this.data.recipientId = undefined;
 		this.data.senderPublicKey = "";
-		this.data.asset = {} as Contracts.Crypto.ITransactionAsset;
+		this.data.asset = {} as Contracts.Crypto.TransactionAsset;
 	}
 
 	public publicKeyAsset(publicKey: string): ValidatorRegistrationBuilder {
@@ -27,8 +27,8 @@ export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRe
 		return this;
 	}
 
-	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
-		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
+		const struct: Contracts.Crypto.TransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;
