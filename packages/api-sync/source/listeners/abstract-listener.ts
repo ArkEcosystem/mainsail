@@ -14,7 +14,7 @@ export type ListenerEventMapping = { [key: Contracts.Kernel.EventName]: Listener
 @injectable()
 export abstract class AbstractListener<TEventData, TEntity extends { [key: string]: any }> implements EventListener {
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	protected readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;

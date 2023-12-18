@@ -10,9 +10,9 @@ import { Enums, Utils } from "@mainsail/kernel";
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener";
 
 @injectable()
-export class Mempool extends AbstractListener<Contracts.Crypto.ITransactionData, Models.MempoolTransaction> {
+export class Mempool extends AbstractListener<Contracts.Crypto.TransactionData, Models.MempoolTransaction> {
 	@inject(ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory)
-	private readonly mempoolTransactionRepositoryFactory!: ApiDatabaseContracts.IMempoolTransactionRepositoryFactory;
+	private readonly mempoolTransactionRepositoryFactory!: ApiDatabaseContracts.MempoolTransactionRepositoryFactory;
 
 	protected getEventMapping(): ListenerEventMapping {
 		return {
@@ -23,7 +23,7 @@ export class Mempool extends AbstractListener<Contracts.Crypto.ITransactionData,
 		};
 	}
 
-	protected getEventId(event: Contracts.Crypto.ITransactionData): string {
+	protected getEventId(event: Contracts.Crypto.TransactionData): string {
 		const id = event.id;
 		Utils.assert.defined<string>(id);
 		return id;
@@ -33,7 +33,7 @@ export class Mempool extends AbstractListener<Contracts.Crypto.ITransactionData,
 		return this.configuration.getMilestone().blockTime;
 	}
 
-	protected mapEventToEntity(event: Contracts.Crypto.ITransactionData): Models.MempoolTransaction {
+	protected mapEventToEntity(event: Contracts.Crypto.TransactionData): Models.MempoolTransaction {
 		return {
 			amount: event.amount.toFixed(),
 			asset: event.asset,

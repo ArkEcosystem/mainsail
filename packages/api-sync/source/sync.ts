@@ -22,51 +22,51 @@ interface DeferredSync {
 const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
 
 @injectable()
-export class Sync implements Contracts.ApiSync.ISync {
+export class Sync implements Contracts.ApiSync.Sync {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
 	@inject(ApiDatabaseIdentifiers.Migrations)
-	private readonly migrations!: ApiDatabaseContracts.IMigrations;
+	private readonly migrations!: ApiDatabaseContracts.Migrations;
 
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
-	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
+	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
-	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.IConfigurationRepositoryFactory;
+	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
-	private readonly stateRepositoryFactory!: ApiDatabaseContracts.IStateRepositoryFactory;
+	private readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
-	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
-	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.ITransactionTypeRepositoryFactory;
+	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.TransactionTypeRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
-	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
+	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
-	private readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
+	private readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private readonly transactionHandlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+	private readonly transactionHandlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -104,7 +104,7 @@ export class Sync implements Contracts.ApiSync.ISync {
 		}
 	}
 
-	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 
 		const {
@@ -161,8 +161,8 @@ export class Sync implements Contracts.ApiSync.ISync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-						validatorRound: this.#createValidatorRound(header.height + 1),
-					}
+					validatorRound: this.#createValidatorRound(header.height + 1),
+				}
 				: {}),
 		};
 
