@@ -17,7 +17,7 @@ export class VoteTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.Vote;
 	public static key = "vote";
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "vote",
 			properties: {
@@ -51,7 +51,7 @@ export class VoteTransaction extends Transaction {
 
 	public assetSize(): number {
 		const { data } = this;
-		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
+		Utils.assert.defined<Contracts.Crypto.VoteAsset>(data.asset);
 
 		return (
 			1 + // number of votes
@@ -61,9 +61,9 @@ export class VoteTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
-		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
+		Utils.assert.defined<Contracts.Crypto.VoteAsset>(data.asset);
 		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
 
 		// TODO: Check asset
@@ -79,7 +79,7 @@ export class VoteTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		const asset: Contracts.Crypto.IVoteAsset = { unvotes: [], votes: [] };
+		const asset: Contracts.Crypto.VoteAsset = { unvotes: [], votes: [] };
 
 		const votelength: number = buf.readUint8();
 		for (let index = 0; index < votelength; index++) {
