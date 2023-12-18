@@ -120,6 +120,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	public async dispose(): Promise<void> {
 		this.scheduler.clear();
 		this.#isDisposed = true;
+		await this.#handlerLock.runExclusive(async () => {});
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
