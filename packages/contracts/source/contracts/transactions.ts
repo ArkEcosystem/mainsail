@@ -1,30 +1,30 @@
-import { IMultiSignatureAsset, ITransaction, ITransactionData, TransactionConstructor } from "./crypto";
+import { MultiSignatureAsset, Transaction, TransactionData, TransactionConstructor } from "./crypto";
 import { EventDispatcher } from "./kernel";
 import { AttributeType, Wallet, WalletRepository } from "./state";
 
-export type TransactionHandlerConstructor = new () => ITransactionHandler;
+export type TransactionHandlerConstructor = new () => TransactionHandler;
 
-export interface ITransactionHandler {
-	verify(walletRepository: WalletRepository, transaction: ITransaction): Promise<boolean>;
+export interface TransactionHandler {
+	verify(walletRepository: WalletRepository, transaction: Transaction): Promise<boolean>;
 
 	throwIfCannotBeApplied(
 		walletRepository: WalletRepository,
-		transaction: ITransaction,
+		transaction: Transaction,
 		sender: Wallet,
 	): Promise<void>;
 
-	apply(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
+	apply(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 
-	applyToSender(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
+	applyToSender(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 
-	emitEvents(transaction: ITransaction, emitter: EventDispatcher): void;
+	emitEvents(transaction: Transaction, emitter: EventDispatcher): void;
 
-	throwIfCannotEnterPool(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
+	throwIfCannotEnterPool(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 
 	verifySignatures(
 		wallet: Wallet,
-		transaction: ITransactionData,
-		multiSignature?: IMultiSignatureAsset,
+		transaction: TransactionData,
+		multiSignature?: MultiSignatureAsset,
 	): Promise<boolean>;
 
 	// Abstract
@@ -36,40 +36,40 @@ export interface ITransactionHandler {
 
 	isActivated(): Promise<boolean>;
 
-	applyToRecipient(walletRepository: WalletRepository, transaction: ITransaction): Promise<void>;
+	applyToRecipient(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 }
 
-export interface ITransactionHandlerRegistry {
+export interface TransactionHandlerRegistry {
 	initialize(): void;
 
-	getRegisteredHandlers(): ITransactionHandler[];
+	getRegisteredHandlers(): TransactionHandler[];
 
-	getRegisteredHandlerByType(internalType: IInternalTransactionType, version?: number): ITransactionHandler;
+	getRegisteredHandlerByType(internalType: InternalTransactionType, version?: number): TransactionHandler;
 
-	getActivatedHandlers(): Promise<ITransactionHandler[]>;
+	getActivatedHandlers(): Promise<TransactionHandler[]>;
 
-	getActivatedHandlerByType(internalType: IInternalTransactionType, version?: number): Promise<ITransactionHandler>;
+	getActivatedHandlerByType(internalType: InternalTransactionType, version?: number): Promise<TransactionHandler>;
 
-	getActivatedHandlerForData(transactionData: ITransactionData): Promise<ITransactionHandler>;
+	getActivatedHandlerForData(transactionData: TransactionData): Promise<TransactionHandler>;
 }
 
-export interface ITransactionHandlerProvider {
+export interface TransactionHandlerProvider {
 	isRegistrationRequired(): boolean;
 
 	registerHandlers(): void;
 }
 
 // @TODO: move this out of contracts, it's an implementation
-export interface IInternalTransactionType {
+export interface InternalTransactionType {
 	// private constructor(public readonly type: number, public readonly typeGroup: number) {}
 
 	toString(): string;
 }
 
-export interface ITransactionTypeFactory {
-	initialize(transactionTypes: Map<IInternalTransactionType, Map<number, TransactionConstructor>>);
+export interface TransactionTypeFactory {
+	initialize(transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>>);
 
-	create(data: ITransactionData): ITransaction;
+	create(data: TransactionData): Transaction;
 
 	get(type: number, typeGroup?: number, version?: number): TransactionConstructor;
 }

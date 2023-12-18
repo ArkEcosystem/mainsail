@@ -1,4 +1,4 @@
-export interface IAggregatedSignature {
+export interface AggregatedSignature {
 	signature: string;
 	validators: boolean[];
 }

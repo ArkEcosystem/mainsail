@@ -1,27 +1,27 @@
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
-import { IKeyPair } from "./identities";
-import { ISchemaValidationResult } from "./validator";
+import { KeyPair } from "./identities";
+import { SchemaValidationResult } from "./validator";
 
-export interface ITransaction {
+export interface Transaction {
 	readonly id: string | undefined;
 	readonly typeGroup: number | undefined;
 	readonly type: number;
 	readonly key: string;
 
-	data: ITransactionData;
+	data: TransactionData;
 	serialized: Buffer;
 
 	assetSize(): number;
-	serialize(options?: ISerializeOptions): Promise<ByteBuffer>;
+	serialize(options?: SerializeOptions): Promise<ByteBuffer>;
 	deserialize(buf: ByteBuffer): Promise<void>;
 
 	hasVendorField(): boolean;
 }
 
-export type ITransactionSchema = Record<string, any>;
+export type TransactionSchema = Record<string, any>;
 
-export interface ITransactionAsset {
+export interface TransactionAsset {
 	[custom: string]: any;
 
 	signature?: {
@@ -31,12 +31,12 @@ export interface ITransactionAsset {
 	username?: string;
 	votes?: string[];
 	unvotes?: string[];
-	multiSignatureLegacy?: IMultiSignatureLegacyAsset;
-	multiSignature?: IMultiSignatureAsset;
-	payments?: IMultiPaymentItem[];
+	multiSignatureLegacy?: MultiSignatureLegacyAsset;
+	multiSignature?: MultiSignatureAsset;
+	payments?: MultiPaymentItem[];
 }
 
-export interface ITransactionData {
+export interface TransactionData {
 	version: number;
 	network?: number;
 
@@ -44,7 +44,7 @@ export interface ITransactionData {
 	type: number;
 	timestamp: number;
 	nonce: BigNumber;
-	senderPublicKey: string;
+	senderPubliKey: string;
 
 	fee: BigNumber;
 	amount: BigNumber;
@@ -52,7 +52,7 @@ export interface ITransactionData {
 	expiration?: number;
 	recipientId?: string;
 
-	asset?: ITransactionAsset;
+	asset?: TransactionAsset;
 	vendorField?: string;
 
 	id?: string;
@@ -64,7 +64,7 @@ export interface ITransactionData {
 	sequence?: number;
 }
 
-export interface ITransactionJson {
+export interface TransactionJson {
 	version?: number;
 	network?: number;
 
@@ -81,7 +81,7 @@ export interface ITransactionJson {
 	expiration?: number;
 	recipientId?: string;
 
-	asset?: ITransactionAsset;
+	asset?: TransactionAsset;
 	vendorField?: string | undefined;
 
 	id?: string;
@@ -91,28 +91,28 @@ export interface ITransactionJson {
 	blockId?: string;
 	sequence?: number;
 }
-export interface IMultiPaymentItem {
+export interface MultiPaymentItem {
 	amount: BigNumber;
 	recipientId: string;
 }
 
-export interface IMultiSignatureLegacyAsset {
+export interface MultiSignatureLegacyAsset {
 	min: number;
 	lifetime: number;
 	keysgroup: string[];
 }
 
-export interface IMultiSignatureAsset {
+export interface MultiSignatureAsset {
 	min: number;
 	publicKeys: string[];
 }
 
-export interface IVoteAsset {
+export interface VoteAsset {
 	votes: string[];
 	unvotes: string[];
 }
 
-export interface ISerializeOptions {
+export interface SerializeOptions {
 	excludeSignature?: boolean;
 	excludeMultiSignature?: boolean;
 	// TODO: consider passing pre-allocated buffer
@@ -122,53 +122,53 @@ export interface TransactionServiceProvider {
 	register(): Promise<void>;
 }
 
-export interface ITransactionVerifier {
-	verifySignatures(transaction: ITransactionData, multiSignature: IMultiSignatureAsset): Promise<boolean>;
+export interface TransactionVerifier {
+	verifySignatures(transaction: TransactionData, multiSignature: MultiSignatureAsset): Promise<boolean>;
 
-	verifyHash(data: ITransactionData): Promise<boolean>;
+	verifyHash(data: TransactionData): Promise<boolean>;
 
-	verifySchema(data: ITransactionData, strict?: boolean): Promise<ISchemaValidationResult>;
+	verifySchema(data: TransactionData, strict?: boolean): Promise<SchemaValidationResult>;
 }
 
-export interface ITransactionSigner {
-	sign(transaction: ITransactionData, keys: IKeyPair, options?: ISerializeOptions): Promise<string>;
-	multiSign(transaction: ITransactionData, keys: IKeyPair, index?: number): Promise<string>;
+export interface TransactionSigner {
+	sign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<string>;
+	multiSign(transaction: TransactionData, keys: KeyPair, index?: number): Promise<string>;
 }
 
-export interface ITransactionSerializer {
-	getBytes(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer>;
+export interface TransactionSerializer {
+	getBytes(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
 
-	serialize(transaction: ITransaction, options?: ISerializeOptions): Promise<Buffer>;
+	serialize(transaction: Transaction, options?: SerializeOptions): Promise<Buffer>;
 }
 
-export interface ITransactionDeserializer {
-	deserialize(serialized: string | Buffer): Promise<ITransaction>;
+export interface TransactionDeserializer {
+	deserialize(serialized: string | Buffer): Promise<Transaction>;
 
-	deserializeCommon(transaction: ITransactionData, buf: ByteBuffer): void;
+	deserializeCommon(transaction: TransactionData, buf: ByteBuffer): void;
 }
 
-export interface ITransactionFactory {
-	fromHex(hex: string): Promise<ITransaction>;
+export interface TransactionFactory {
+	fromHex(hex: string): Promise<Transaction>;
 
-	fromBytes(buff: Buffer, strict?: boolean): Promise<ITransaction>;
+	fromBytes(buff: Buffer, strict?: boolean): Promise<Transaction>;
 
-	fromJson(json: ITransactionJson): Promise<ITransaction>;
+	fromJson(json: TransactionJson): Promise<Transaction>;
 
-	fromData(data: ITransactionData, strict?: boolean): Promise<ITransaction>;
+	fromData(data: TransactionData, strict?: boolean): Promise<Transaction>;
 }
 
 export type TransactionConstructor = any;
 
-export interface ITransactionRegistry {
+export interface TransactionRegistry {
 	registerTransactionType(constructor: TransactionConstructor): void;
 
 	deregisterTransactionType(constructor: TransactionConstructor): void;
 }
 
-export interface ITransactionUtils {
-	toBytes(data: ITransactionData): Promise<Buffer>;
+export interface TransactionUtils {
+	toBytes(data: TransactionData): Promise<Buffer>;
 
-	toHash(transaction: ITransactionData, options?: ISerializeOptions): Promise<Buffer>;
+	toHash(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
 
-	getId(transaction: ITransaction): Promise<string>;
+	getId(transaction: Transaction): Promise<string>;
 }

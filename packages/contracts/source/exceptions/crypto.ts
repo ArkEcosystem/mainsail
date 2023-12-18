@@ -1,5 +1,5 @@
 import { Wallet } from "../contracts/state";
-import { IInternalTransactionType } from "../contracts/transactions";
+import { InternalTransactionType } from "../contracts/transactions";
 import { Exception } from "./base";
 
 export class Bip38CompressionError extends Exception {
@@ -150,8 +150,8 @@ export class PreviousBlockIdFormatError extends Exception {
 	public constructor(thisBlockHeight: number, previousBlockId: string) {
 		super(
 			`The config denotes that the block at height ${thisBlockHeight - 1} ` +
-				`must use full SHA256 block id, but the next block (at ${thisBlockHeight}) ` +
-				`contains previous block id "${previousBlockId}"`,
+			`must use full SHA256 block id, but the next block (at ${thisBlockHeight}) ` +
+			`contains previous block id "${previousBlockId}"`,
 		);
 	}
 }
@@ -181,25 +181,25 @@ export class DuplicateParticipantInMultiSignatureError extends Exception {
 }
 
 export class InvalidTransactionTypeError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} does not exist.`);
 	}
 }
 
 export class DeactivatedTransactionHandlerError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is deactivated.`);
 	}
 }
 
 export class UnsatisfiedDependencyError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is missing required dependencies`);
 	}
 }
 
 export class AlreadyRegisteredError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is already registered`);
 	}
 }
@@ -209,7 +209,7 @@ export class UnexpectedNonceError extends Exception {
 		const action: string = reversal ? "revert" : "apply";
 		super(
 			`Cannot ${action} a transaction with nonce ${txNonce.toFixed()}: the ` +
-				`sender ${sender.getPublicKey()} has nonce ${sender.getNonce().toFixed()}.`,
+			`sender ${sender.getPublicKey()} has nonce ${sender.getNonce().toFixed()}.`,
 		);
 	}
 }

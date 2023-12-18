@@ -1,4 +1,4 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 import { SenderMempool } from "./sender-mempool";
 
 export interface Mempool {
@@ -8,9 +8,9 @@ export interface Mempool {
 	getSenderMempool(senderPublicKey: string): SenderMempool;
 	getSenderMempools(): Iterable<SenderMempool>;
 
-	addTransaction(transaction: ITransaction): Promise<void>;
-	removeTransaction(senderPublicKey: string, id: string): Promise<ITransaction[]>;
-	removeForgedTransaction(senderPublicKey: string, id: string): Promise<ITransaction[]>;
+	addTransaction(transaction: Transaction): Promise<void>;
+	removeTransaction(senderPublicKey: string, id: string): Promise<Transaction[]>;
+	removeForgedTransaction(senderPublicKey: string, id: string): Promise<Transaction[]>;
 
 	flush(): void;
 }

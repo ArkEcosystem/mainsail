@@ -1,108 +1,108 @@
 import Hapi from "@hapi/hapi";
 
-import { IHeaderData } from "./header";
+import { HeaderData } from "./header";
 import { Socket } from "./nes";
 import { PeerBroadcast, PeerConfig, PeerState } from "./peer";
 
 export interface Request extends Hapi.Request {
 	socket?: Socket;
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 	};
 }
 
 export interface Response {
-	headers?: IHeaderData;
+	headers?: HeaderData;
 }
 
-export interface IGetBlocksRequest extends Request {
+export interface GetBlocksRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 		fromHeight: number;
 		limit: number;
 	};
 }
 
-export interface IGetBlocksResponse extends Response {
+export interface GetBlocksResponse extends Response {
 	blocks: Buffer[];
 }
 
-export interface IGetMessagesRequest extends Request {
+export interface GetMessagesRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 	};
 }
 
-export interface IGetMessagesResponse extends Response {
+export interface GetMessagesResponse extends Response {
 	precommits: Buffer[];
 	prevotes: Buffer[];
 }
 
-export interface IGetPeersResponse extends Response {
+export interface GetPeersResponse extends Response {
 	peers: PeerBroadcast[];
 }
 
-export interface IGetStatusResponse extends Response {
+export interface GetStatusResponse extends Response {
 	state: PeerState;
 	config: PeerConfig;
 }
 
-export interface IGetProposalRequest extends Request {
+export interface GetProposalRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 	};
 }
 
-export interface IGetApiNodesRequest extends Request {
+export interface GetApiNodesRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 		fromHeight: number;
 		limit: number;
 	};
 }
 
-export interface IGetApiNodesResponse extends Response {
+export interface GetApiNodesResponse extends Response {
 	apiNodes: PeerBroadcast[];
 }
 
-export interface IGetProposalResponse extends Response {
+export interface GetProposalResponse extends Response {
 	proposal: Buffer;
 }
 
-export interface IPostPrecommitRequest extends Request {
+export interface PostPrecommitRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 		precommit: Buffer;
 	};
 }
 
-export interface IPostPrecommitResponse extends Response {}
+export interface PostPrecommitResponse extends Response { }
 
-export interface IPostPrevoteRequest extends Request {
+export interface PostPrevoteRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 		prevote: Buffer;
 	};
 }
 
-export interface IPostPrevoteResponse extends Response {}
+export interface PostPrevoteResponse extends Response { }
 
-export interface IPostProposalRequest extends Request {
+export interface PostProposalRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 		proposal: Buffer;
 	};
 }
 
-export interface IPostProposalResponse extends Response {}
+export interface PostProposalResponse extends Response { }
 
-export interface IPostTransactionsRequest extends Request {
+export interface PostTransactionsRequest extends Request {
 	payload: {
-		headers: IHeaderData;
+		headers: HeaderData;
 		transactions: Buffer[];
 	};
 }
 
-export interface IPostTransactionsResponse extends Response {
+export interface PostTransactionsResponse extends Response {
 	accept: string[];
 }

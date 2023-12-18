@@ -1,19 +1,19 @@
-import { ICommittedBlock, IPrecommit, IPrevote, IProposal } from "../crypto";
+import { CommittedBlock, Precommit, Prevote, Proposal } from "../crypto";
 import { ProcessorResult } from "./enums";
 
-export interface IProposalProcessor {
-	process(proposal: IProposal, broadcast?: boolean): Promise<ProcessorResult>;
+export interface ProposalProcessor {
+	process(proposal: Proposal, broadcast?: boolean): Promise<ProcessorResult>;
 }
 
-export interface IPrevoteProcessor {
-	process(prevote: IPrevote, broadcast?: boolean): Promise<ProcessorResult>;
+export interface PrevoteProcessor {
+	process(prevote: Prevote, broadcast?: boolean): Promise<ProcessorResult>;
 }
 
-export interface IPrecommitProcessor {
-	process(prevote: IPrecommit, broadcast?: boolean): Promise<ProcessorResult>;
+export interface PrecommitProcessor {
+	process(prevote: Precommit, broadcast?: boolean): Promise<ProcessorResult>;
 }
 
-export interface ICommittedBlockProcessor {
-	process(committedBlock: ICommittedBlock, broadcast?: boolean): Promise<ProcessorResult>;
-	hasValidSignature(committedBlock: ICommittedBlock): Promise<boolean>;
+export interface CommittedBlockProcessor {
+	process(committedBlock: CommittedBlock, broadcast?: boolean): Promise<ProcessorResult>;
+	hasValidSignature(committedBlock: CommittedBlock): Promise<boolean>;
 }

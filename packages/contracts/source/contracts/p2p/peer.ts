@@ -1,7 +1,7 @@
 import { Dayjs } from "dayjs";
 
 import { Queue } from "../kernel";
-import { IHeaderData } from "./header";
+import { HeaderData } from "./header";
 
 export interface PeerPorts {
 	[name: string]: number;
@@ -45,7 +45,7 @@ export interface Peer {
 	version: string | undefined;
 	latency: number | undefined;
 
-	header: IHeaderData;
+	header: HeaderData;
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;

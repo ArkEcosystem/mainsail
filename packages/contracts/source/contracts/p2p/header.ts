@@ -1,6 +1,6 @@
 import { Contracts } from "../..";
 
-export type IHeaderData = {
+export type HeaderData = {
 	version: string;
 	height: number;
 	round: number;
@@ -10,16 +10,16 @@ export type IHeaderData = {
 	validatorsSignedPrecommit: readonly boolean[];
 };
 
-export interface IHeader {
+export interface Header {
 	height: number;
 	round: number;
-	proposal?: Contracts.Crypto.IProposal;
+	proposal?: Contracts.Crypto.Proposal;
 	validatorsSignedPrecommit: readonly boolean[];
 	validatorsSignedPrevote: readonly boolean[];
 
-	toData(): IHeaderData;
+	toData(): HeaderData;
 	getValidatorsSignedPrecommitCount(): number;
 	getValidatorsSignedPrevoteCount(): number;
 }
 
-export type HeaderFactory = () => IHeader;
+export type HeaderFactory = () => Header;

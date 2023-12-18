@@ -1,16 +1,16 @@
-import { IBlock, ICommittedBlock } from "../crypto";
+import { Block, CommittedBlock } from "../crypto";
 import { JsonObject } from "../types";
 
 export interface StateStore {
 	isBootstrap(): boolean;
 	setBootstrap(value: boolean): void;
 
-	getGenesisBlock(): ICommittedBlock;
-	setGenesisBlock(block: ICommittedBlock): void;
+	getGenesisBlock(): CommittedBlock;
+	setGenesisBlock(block: CommittedBlock): void;
 
 	getLastHeight(): number;
-	getLastBlock(): IBlock;
-	setLastBlock(block: IBlock): void;
+	getLastBlock(): Block;
+	setLastBlock(block: Block): void;
 
 	getTotalRound(): number;
 	setTotalRound(totalRound: number): void;

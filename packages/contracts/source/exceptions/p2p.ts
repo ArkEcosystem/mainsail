@@ -1,8 +1,8 @@
-import { IBlockData } from "../contracts/crypto";
+import { BlockData } from "../contracts/crypto";
 import { Exception } from "./base";
 
 export class TooManyTransactionsError extends Exception {
-	public constructor(block: IBlockData) {
+	public constructor(block: BlockData) {
 		super(
 			`Received block ${block.id} at height ${block.height} contained too many transactions (${block.numberOfTransactions}).`,
 		);

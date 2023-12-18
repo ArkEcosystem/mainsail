@@ -1,5 +1,5 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 
 export interface Collator {
-	getBlockCandidateTransactions(): Promise<ITransaction[]>;
+	getBlockCandidateTransactions(): Promise<Transaction[]>;
 }

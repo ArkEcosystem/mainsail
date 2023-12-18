@@ -1,6 +1,6 @@
-import { IHeaderData } from "./header";
+import { HeaderData } from "./header";
 import { Peer } from "./peer";
 
-export interface IHeaderService {
-	handle(peer: Peer, header: IHeaderData): Promise<void>;
+export interface HeaderService {
+	handle(peer: Peer, header: HeaderData): Promise<void>;
 }

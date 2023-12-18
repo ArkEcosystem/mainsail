@@ -1,7 +1,7 @@
-import { IBlock, ICommittedBlock, ITransaction } from "./crypto";
+import { Block, CommittedBlock, Transaction } from "./crypto";
 import { WalletRepositoryClone } from "./state";
 
-export interface IProcessableUnit {
+export interface ProcessableUnit {
 	readonly height: number;
 	readonly round: number;
 	readonly persist: boolean;
@@ -9,23 +9,23 @@ export interface IProcessableUnit {
 	hasProcessorResult(): boolean;
 	getProcessorResult(): boolean;
 	setProcessorResult(processorResult: boolean): void;
-	getBlock(): IBlock;
-	getCommittedBlock(): Promise<ICommittedBlock>;
+	getBlock(): Block;
+	getCommittedBlock(): Promise<CommittedBlock>;
 }
 
 export interface Handler {
-	execute(unit: IProcessableUnit): Promise<boolean>;
+	execute(unit: ProcessableUnit): Promise<boolean>;
 }
 
 export interface BlockProcessor {
-	process(unit: IProcessableUnit): Promise<boolean>;
-	commit(unit: IProcessableUnit): Promise<void>;
+	process(unit: ProcessableUnit): Promise<boolean>;
+	commit(unit: ProcessableUnit): Promise<void>;
 }
 
 export interface TransactionProcessor {
-	process(walletRepository: WalletRepositoryClone, transaction: ITransaction): Promise<void>;
+	process(walletRepository: WalletRepositoryClone, transaction: Transaction): Promise<void>;
 }
 
 export interface Verifier {
-	verify(unit: IProcessableUnit): Promise<boolean>;
+	verify(unit: ProcessableUnit): Promise<boolean>;
 }

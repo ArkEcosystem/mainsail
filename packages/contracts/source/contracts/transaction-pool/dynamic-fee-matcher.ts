@@ -1,6 +1,6 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 
 export interface FeeMatcher {
-	throwIfCannotEnterPool(transaction: ITransaction): Promise<void>;
-	throwIfCannotBroadcast(transaction: ITransaction): Promise<void>;
+	throwIfCannotEnterPool(transaction: Transaction): Promise<void>;
+	throwIfCannotBroadcast(transaction: Transaction): Promise<void>;
 }

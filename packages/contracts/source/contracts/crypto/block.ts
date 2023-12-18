@@ -1,26 +1,26 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { Mutable } from "../../utils";
-import { IProcessableUnit } from "../processor";
-import { IAggregatedSignature } from "./signatures";
-import { ITransaction, ITransactionData, ITransactionJson } from "./transactions";
+import { ProcessableUnit } from "../processor";
+import { AggregatedSignature } from "./signatures";
+import { Transaction, TransactionData, TransactionJson } from "./transactions";
 
-export interface IBlockVerification {
+export interface BlockVerification {
 	readonly verified: boolean;
 	readonly errors: string[];
 	readonly containsMultiSignatures: boolean;
 }
 
-export type IBlockHeader = Exclude<IBlockData, "transactions">;
+export type BlockHeader = Exclude<BlockData, "transactions">;
 
-export interface IBlock {
-	readonly data: IBlockData;
-	readonly header: IBlockHeader;
+export interface Block {
+	readonly data: BlockData;
+	readonly header: BlockHeader;
 	readonly serialized: string;
-	readonly transactions: ITransaction[];
+	readonly transactions: Transaction[];
 }
 
-export interface IBlockData {
+export interface BlockData {
 	readonly id: string;
 
 	readonly timestamp: number;
@@ -37,10 +37,10 @@ export interface IBlockData {
 
 	// TODO: transactions field is missing when retrieved from storage
 	// and numberOfTransactions = 0
-	readonly transactions: ITransactionData[];
+	readonly transactions: TransactionData[];
 }
 
-export interface IBlockJson {
+export interface BlockJson {
 	readonly id: string;
 
 	readonly timestamp: number;
@@ -56,10 +56,10 @@ export interface IBlockJson {
 	readonly generatorPublicKey: string;
 
 	readonly serialized?: string;
-	readonly transactions: ITransactionJson[];
+	readonly transactions: TransactionJson[];
 }
 
-export interface IBlockCommit {
+export interface BlockCommit {
 	readonly round: number;
 	readonly signature: string;
 	readonly validators: boolean[];
@@ -67,99 +67,99 @@ export interface IBlockCommit {
 
 // TODO: clean up interfaces so we do not store everything in a redundant manner
 
-export interface IProposedBlock {
-	readonly block: IBlock;
-	readonly lockProof?: IAggregatedSignature;
+export interface ProposedBlock {
+	readonly block: Block;
+	readonly lockProof?: AggregatedSignature;
 	readonly serialized: string;
 }
 
-export interface IProposedBlockJson {
-	readonly block: IBlockJson;
-	readonly lockProof?: IAggregatedSignature;
+export interface ProposedBlockJson {
+	readonly block: BlockJson;
+	readonly lockProof?: AggregatedSignature;
 	readonly serialized: string;
 }
 
-export interface ICommittedBlock {
-	readonly block: IBlock;
-	readonly commit: IBlockCommit;
+export interface CommittedBlock {
+	readonly block: Block;
+	readonly commit: BlockCommit;
 	readonly serialized: string;
 }
 
-export interface ICommittedBlockData {
-	readonly block: IBlockData;
-	readonly commit: IBlockCommit;
+export interface CommittedBlockData {
+	readonly block: BlockData;
+	readonly commit: BlockCommit;
 	readonly serialized: string;
 }
 
-export interface ICommittedBlockJson {
-	readonly block: IBlockJson;
-	readonly commit: IBlockCommit;
+export interface CommittedBlockJson {
+	readonly block: BlockJson;
+	readonly commit: BlockCommit;
 	readonly serialized: string;
 }
 
-export type IBlockDataSerializable = Omit<IBlockData, "id">;
-export type IProposedBlockSerializable = Omit<IProposedBlock, "serialized">;
-export type ICommittedBlockSerializable = Omit<ICommittedBlock, "serialized">;
+export type BlockDataSerializable = Omit<BlockData, "id">;
+export type ProposedBlockSerializable = Omit<ProposedBlock, "serialized">;
+export type CommittedBlockSerializable = Omit<CommittedBlock, "serialized">;
 
-export interface IBlockFactory {
-	make(data: Mutable<IBlockDataSerializable>): Promise<IBlock>;
+export interface BlockFactory {
+	make(data: Mutable<BlockDataSerializable>): Promise<Block>;
 
-	fromHex(hex: string): Promise<IBlock>;
+	fromHex(hex: string): Promise<Block>;
 
-	fromBytes(buff: Buffer): Promise<IBlock>;
+	fromBytes(buff: Buffer): Promise<Block>;
 
-	fromJson(json: IBlockJson): Promise<IBlock>;
+	fromJson(json: BlockJson): Promise<Block>;
 
-	fromData(data: IBlockData): Promise<IBlock>;
+	fromData(data: BlockData): Promise<Block>;
 
-	fromProposedBytes(buff: Buffer): Promise<IProposedBlock>;
+	fromProposedBytes(buff: Buffer): Promise<ProposedBlock>;
 
-	fromCommittedBytes(buff: Buffer): Promise<ICommittedBlock>;
+	fromCommittedBytes(buff: Buffer): Promise<CommittedBlock>;
 
-	fromCommittedJson(json: ICommittedBlockJson): Promise<ICommittedBlock>;
+	fromCommittedJson(json: CommittedBlockJson): Promise<CommittedBlock>;
 }
 
-export interface IBlockSerializer {
+export interface BlockSerializer {
 	headerSize(): number;
 
 	commitSize(): number;
 
 	lockProofSize(): number;
 
-	totalSize(block: IBlockDataSerializable): number;
+	totalSize(block: BlockDataSerializable): number;
 
-	serializeHeader(block: IBlockDataSerializable): Promise<Buffer>;
+	serializeHeader(block: BlockDataSerializable): Promise<Buffer>;
 
-	serializeWithTransactions(block: IBlockDataSerializable): Promise<Buffer>;
+	serializeWithTransactions(block: BlockDataSerializable): Promise<Buffer>;
 
-	serializeCommit(commit: IBlockCommit): Promise<Buffer>;
+	serializeCommit(commit: BlockCommit): Promise<Buffer>;
 
-	serializeLockProof(proof: IAggregatedSignature): Promise<Buffer>;
+	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
 
-	serializeProposed(proposedBlock: IProposedBlockSerializable): Promise<Buffer>;
+	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
 
-	serializeFull(committedBlock: ICommittedBlockSerializable): Promise<Buffer>;
+	serializeFull(committedBlock: CommittedBlockSerializable): Promise<Buffer>;
 }
 
-export interface IBlockWithTransactions {
-	data: IBlockData;
-	transactions: ITransaction[];
+export interface BlockWithTransactions {
+	data: BlockData;
+	transactions: Transaction[];
 }
 
-export interface IBlockDeserializer {
-	deserializeHeader(serialized: Buffer): Promise<IBlockHeader>;
+export interface BlockDeserializer {
+	deserializeHeader(serialized: Buffer): Promise<BlockHeader>;
 
-	deserializeWithTransactions(serialized: Buffer): Promise<IBlockWithTransactions>;
+	deserializeWithTransactions(serialized: Buffer): Promise<BlockWithTransactions>;
 
-	deserializeLockProof(serialized: Buffer): Promise<IAggregatedSignature>;
+	deserializeLockProof(serialized: Buffer): Promise<AggregatedSignature>;
 
-	deserializeCommit(serialized: Buffer): Promise<IBlockCommit>;
+	deserializeCommit(serialized: Buffer): Promise<BlockCommit>;
 }
 
-export interface IBlockVerifier {
-	verify(block: IBlock): Promise<IBlockVerification>;
+export interface BlockVerifier {
+	verify(block: Block): Promise<BlockVerification>;
 }
 
-export interface ICommitHandler {
-	onCommit(unit: IProcessableUnit): Promise<void>;
+export interface CommitHandler {
+	onCommit(unit: ProcessableUnit): Promise<void>;
 }

@@ -1,4 +1,4 @@
-export interface IDecryptResult {
+export interface DecryptResult {
 	privateKey: Buffer;
 	compressed: boolean;
 }

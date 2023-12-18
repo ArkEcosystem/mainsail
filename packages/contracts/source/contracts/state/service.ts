@@ -1,8 +1,8 @@
-import { ICommitHandler } from "../crypto";
+import { CommitHandler } from "../crypto";
 import { StateStore } from "./state-store";
 import { WalletRepository, WalletRepositoryClone } from "./wallets";
 
-export interface Service extends ICommitHandler {
+export interface Service extends CommitHandler {
 	getStateStore(): StateStore;
 	getWalletRepository(): WalletRepository;
 	createWalletRepositoryClone(): WalletRepositoryClone;

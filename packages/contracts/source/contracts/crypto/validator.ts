@@ -1,13 +1,13 @@
 import Ajv, { AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 
-export interface ISchemaValidationResult<T = any> {
+export interface SchemaValidationResult<T = any> {
 	value: T;
 	error: any;
 	errors?: ErrorObject[] | undefined;
 }
 
-export interface IValidator {
-	validate<T = any>(schemaKeyReference: string | Schema, data: T): ISchemaValidationResult<T>;
+export interface Validator {
+	validate<T = any>(schemaKeyReference: string | Schema, data: T): SchemaValidationResult<T>;
 
 	addFormat(name: string, format: FormatDefinition<string> | FormatDefinition<number>): void;
 
