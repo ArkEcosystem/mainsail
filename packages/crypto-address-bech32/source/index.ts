@@ -17,9 +17,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerSchemas(): void {
 		for (const schema of Object.values(
-			makeSchemas(this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)),
+			makeSchemas(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		)) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
 }
