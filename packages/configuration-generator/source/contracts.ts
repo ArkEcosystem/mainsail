@@ -9,7 +9,7 @@ export type EnviromentData = PartialRecord<Contracts.Flags.Flag, string | number
 export type Wallet = {
 	address: string;
 	passphrase: string;
-	keys: Contracts.Crypto.IKeyPair;
-	consensusKeys: Contracts.Crypto.IKeyPair;
+	keys: Contracts.Crypto.KeyPair;
+	consensusKeys: Contracts.Crypto.KeyPair;
 	username: string | undefined;
 };
