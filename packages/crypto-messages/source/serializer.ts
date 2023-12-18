@@ -3,9 +3,9 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class Serializer implements Contracts.Crypto.IMessageSerializer {
+export class Serializer implements Contracts.Crypto.MessageSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
-	private readonly serializer!: Contracts.Serializer.ISerializer;
+	private readonly serializer!: Contracts.Serializer.Serializer;
 
 	@inject(Identifiers.Cryptography.Size.Signature)
 	@tagged("type", "consensus")
@@ -15,10 +15,10 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 	private readonly hashSize!: number;
 
 	public async serializeProposal(
-		proposal: Contracts.Crypto.ISerializableProposalData,
+		proposal: Contracts.Crypto.SerializableProposalData,
 		options: Contracts.Crypto.SerializeProposalOptions,
 	): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.ISerializableProposalData>(proposal, {
+		return this.serializer.serialize<Contracts.Crypto.SerializableProposalData>(proposal, {
 			length:
 				4 + // round
 				(proposal.validRound === undefined ? 1 : 5) + // validRound
@@ -43,17 +43,17 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 				},
 				...(options.includeSignature
 					? {
-							signature: {
-								type: "consensusSignature",
-							},
-						}
+						signature: {
+							type: "consensusSignature",
+						},
+					}
 					: {}),
 			},
 		});
 	}
 
-	public async serializePrecommit(precommit: Contracts.Crypto.IPrecommitData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IPrecommitData>(precommit, {
+	public async serializePrecommit(precommit: Contracts.Crypto.PrecommitData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.PrecommitData>(precommit, {
 			length:
 				1 + // type
 				4 + // height
@@ -87,8 +87,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
-	public async serializePrecommitForSignature(precommit: Contracts.Crypto.ISignaturePrecommitData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.ISignaturePrecommitData>(precommit, {
+	public async serializePrecommitForSignature(precommit: Contracts.Crypto.SignaturePrecommitData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.SignaturePrecommitData>(precommit, {
 			length:
 				1 + // type
 				4 + // height
@@ -114,8 +114,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
-	public async serializePrevoteForSignature(prevote: Contracts.Crypto.ISignaturePrevoteData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.ISignaturePrevoteData>(prevote, {
+	public async serializePrevoteForSignature(prevote: Contracts.Crypto.SignaturePrevoteData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.SignaturePrevoteData>(prevote, {
 			length:
 				1 + // type
 				4 + // height
@@ -141,8 +141,8 @@ export class Serializer implements Contracts.Crypto.IMessageSerializer {
 		});
 	}
 
-	public async serializePrevote(prevote: Contracts.Crypto.IPrevoteData): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IPrevoteData>(prevote, {
+	public async serializePrevote(prevote: Contracts.Crypto.PrevoteData): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.PrevoteData>(prevote, {
 			length:
 				1 + // type
 				4 + // height

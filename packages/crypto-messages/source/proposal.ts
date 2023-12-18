@@ -1,9 +1,9 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class Proposal implements Contracts.Crypto.IProposal {
+export class Proposal implements Contracts.Crypto.Proposal {
 	#round: number;
 	#validRound?: number;
-	#block: Contracts.Crypto.IProposedBlock;
+	#block: Contracts.Crypto.ProposedBlock;
 	#validatorIndex: number;
 	#signature: string;
 	#serialized: Buffer;
@@ -15,7 +15,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.IProposalData & { block: Contracts.Crypto.IProposedBlock; serialized: Buffer }) {
+	}: Contracts.Crypto.ProposalData & { block: Contracts.Crypto.ProposedBlock; serialized: Buffer }) {
 		this.#round = round;
 		this.#validRound = validRound;
 		this.#block = block;
@@ -36,7 +36,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		return this.#validRound;
 	}
 
-	get block(): Contracts.Crypto.IProposedBlock {
+	get block(): Contracts.Crypto.ProposedBlock {
 		return this.#block;
 	}
 
@@ -61,7 +61,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		});
 	}
 
-	toSerializableData(): Contracts.Crypto.ISerializableProposalData {
+	toSerializableData(): Contracts.Crypto.SerializableProposalData {
 		return {
 			block: this.#block,
 			round: this.#round,
@@ -71,7 +71,7 @@ export class Proposal implements Contracts.Crypto.IProposal {
 		};
 	}
 
-	toData(): Contracts.Crypto.IProposalData {
+	toData(): Contracts.Crypto.ProposalData {
 		return {
 			block: { serialized: this.#block.serialized },
 			height: this.#block.block.header.height,

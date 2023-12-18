@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class Prevote implements Contracts.Crypto.IPrevote {
+export class Prevote implements Contracts.Crypto.Prevote {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;
@@ -15,7 +15,7 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 		validatorIndex,
 		signature,
 		serialized,
-	}: Contracts.Crypto.IPrevoteData & { serialized: Buffer }) {
+	}: Contracts.Crypto.PrevoteData & { serialized: Buffer }) {
 		this.#height = height;
 		this.#round = round;
 		this.#blockId = blockId;
@@ -62,7 +62,7 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 		});
 	}
 
-	toSignatureData(): Contracts.Crypto.ISignaturePrevoteData {
+	toSignatureData(): Contracts.Crypto.SignaturePrevoteData {
 		return {
 			blockId: this.#blockId,
 			height: this.#height,
@@ -71,7 +71,7 @@ export class Prevote implements Contracts.Crypto.IPrevote {
 		};
 	}
 
-	toData(): Contracts.Crypto.IPrevoteData {
+	toData(): Contracts.Crypto.PrevoteData {
 		return {
 			blockId: this.#blockId,
 			height: this.#height,

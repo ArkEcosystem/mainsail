@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
-export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
+export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	const limitToActiveValidators: FuncKeywordDefinition = {
 		// TODO: Check type (same as bignum)
 		// @ts-ignore

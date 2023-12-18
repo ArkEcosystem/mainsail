@@ -4,16 +4,16 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
+export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
-	private readonly serializer!: Contracts.Serializer.ISerializer;
+	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.IProposalData> {
-		const proposal = {} as Contracts.Crypto.IProposal;
+	public async deserializeProposal(serialized: Buffer): Promise<Contracts.Crypto.ProposalData> {
+		const proposal = {} as Contracts.Crypto.Proposal;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		await this.serializer.deserialize<Contracts.Crypto.IProposal>(buffer, proposal, {
+		await this.serializer.deserialize<Contracts.Crypto.Proposal>(buffer, proposal, {
 			schema: {
 				round: {
 					type: "uint32",
@@ -37,12 +37,12 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		return proposal;
 	}
 
-	public async deserializePrecommit(serialized: Buffer): Promise<Contracts.Crypto.IPrecommitData> {
-		const precommit = {} as Contracts.Crypto.IPrecommit;
+	public async deserializePrecommit(serialized: Buffer): Promise<Contracts.Crypto.PrecommitData> {
+		const precommit = {} as Contracts.Crypto.Precommit;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		await this.serializer.deserialize<Contracts.Crypto.IPrecommit>(buffer, precommit, {
+		await this.serializer.deserialize<Contracts.Crypto.Precommit>(buffer, precommit, {
 			schema: {
 				type: {
 					type: "uint8",
@@ -69,12 +69,12 @@ export class Deserializer implements Contracts.Crypto.IMessageDeserializer {
 		return precommit;
 	}
 
-	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.IPrevoteData> {
-		const prevote = {} as Contracts.Crypto.IPrevote;
+	public async deserializePrevote(serialized: Buffer): Promise<Contracts.Crypto.PrevoteData> {
+		const prevote = {} as Contracts.Crypto.Prevote;
 
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		await this.serializer.deserialize<Contracts.Crypto.IPrevote>(buffer, prevote, {
+		await this.serializer.deserialize<Contracts.Crypto.Prevote>(buffer, prevote, {
 			schema: {
 				type: {
 					type: "uint8",

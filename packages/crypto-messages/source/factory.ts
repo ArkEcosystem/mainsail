@@ -7,26 +7,26 @@ import { Prevote } from "./prevote";
 import { Proposal } from "./proposal";
 
 @injectable()
-export class MessageFactory implements Contracts.Crypto.IMessageFactory {
+export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
+	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
 	@inject(Identifiers.Cryptography.Message.Deserializer)
-	private readonly deserializer!: Contracts.Crypto.IMessageDeserializer;
+	private readonly deserializer!: Contracts.Crypto.MessageDeserializer;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator!: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.Validator;
 
 	@inject(Identifiers.Ipc.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	public async makeProposal(
-		data: Contracts.Crypto.IMakeProposalData,
-		keyPair: Contracts.Crypto.IKeyPair,
-	): Promise<Contracts.Crypto.IProposal> {
+		data: Contracts.Crypto.MakeProposalData,
+		keyPair: Contracts.Crypto.KeyPair,
+	): Promise<Contracts.Crypto.Proposal> {
 		const worker = await this.workerPool.getWorker();
 
 		const bytes = await this.serializer.serializeProposal(data, { includeSignature: false });
@@ -35,15 +35,15 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		return this.makeProposalFromBytes(serialized);
 	}
 
-	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IProposal> {
+	public async makeProposalFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Proposal> {
 		const data = await this.deserializer.deserializeProposal(bytes);
 		return this.makeProposalFromData(data, bytes);
 	}
 
 	public async makeProposalFromData(
-		data: Contracts.Crypto.IProposalData,
+		data: Contracts.Crypto.ProposalData,
 		serialized?: Buffer,
-	): Promise<Contracts.Crypto.IProposal> {
+	): Promise<Contracts.Crypto.Proposal> {
 		this.#applySchema("proposal", data);
 		const block = await this.blockFactory.fromProposedBytes(Buffer.from(data.block.serialized, "hex"));
 
@@ -55,9 +55,9 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	}
 
 	public async makePrevote(
-		data: Contracts.Crypto.IMakePrevoteData,
-		keyPair: Contracts.Crypto.IKeyPair,
-	): Promise<Contracts.Crypto.IPrevote> {
+		data: Contracts.Crypto.MakePrevoteData,
+		keyPair: Contracts.Crypto.KeyPair,
+	): Promise<Contracts.Crypto.Prevote> {
 		const worker = await this.workerPool.getWorker();
 
 		const bytes = await this.serializer.serializePrevoteForSignature({
@@ -71,15 +71,15 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		return this.makePrevoteFromBytes(serialized);
 	}
 
-	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
+	public async makePrevoteFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Precommit> {
 		const data = await this.deserializer.deserializePrevote(bytes);
 		return this.makePrevoteFromData(data, bytes);
 	}
 
 	public async makePrevoteFromData(
-		data: Contracts.Crypto.IPrevoteData,
+		data: Contracts.Crypto.PrevoteData,
 		serialized?: Buffer,
-	): Promise<Contracts.Crypto.IPrevote> {
+	): Promise<Contracts.Crypto.Prevote> {
 		this.#applySchema("prevote", data);
 
 		if (!serialized) {
@@ -90,9 +90,9 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 	}
 
 	public async makePrecommit(
-		data: Contracts.Crypto.IMakePrecommitData,
-		keyPair: Contracts.Crypto.IKeyPair,
-	): Promise<Contracts.Crypto.IPrecommit> {
+		data: Contracts.Crypto.MakePrecommitData,
+		keyPair: Contracts.Crypto.KeyPair,
+	): Promise<Contracts.Crypto.Precommit> {
 		const worker = await this.workerPool.getWorker();
 
 		const bytes = await this.serializer.serializePrecommitForSignature({
@@ -107,15 +107,15 @@ export class MessageFactory implements Contracts.Crypto.IMessageFactory {
 		return this.makePrecommitFromBytes(serialized);
 	}
 
-	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.IPrecommit> {
+	public async makePrecommitFromBytes(bytes: Buffer): Promise<Contracts.Crypto.Precommit> {
 		const data = await this.deserializer.deserializePrecommit(bytes);
 		return this.makePrecommitFromData(data, bytes);
 	}
 
 	public async makePrecommitFromData(
-		data: Contracts.Crypto.IPrecommitData,
+		data: Contracts.Crypto.PrecommitData,
 		serialized?: Buffer,
-	): Promise<Contracts.Crypto.IPrecommit> {
+	): Promise<Contracts.Crypto.Precommit> {
 		this.#applySchema("precommit", data);
 
 		if (!serialized) {

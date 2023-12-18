@@ -33,7 +33,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreValidation).register();
 	await context.sandbox.app.resolve(CoreCryptoConfig).register();
 
-	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => {} });
+	context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue({ dispatchSync: () => { } });
 	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
@@ -58,10 +58,10 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	for (const keyword of Object.values(
 		makeKeywords(context.sandbox.app.get(Identifiers.Cryptography.Configuration)),
 	)) {
-		context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+		context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 	}
 
 	for (const schema of Object.values(schemas)) {
-		context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 	}
 };
