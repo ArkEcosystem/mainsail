@@ -18,7 +18,7 @@ import { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
-export type IBlockRepositoryExtension = {
+export type BlockRepositoryExtension = {
 	getLatest(): Promise<Block | null>;
 	getLatestHeight(): Promise<number | undefined>;
 
@@ -32,12 +32,12 @@ export type IBlockRepositoryExtension = {
 	): Promise<ResultsPage<Block>>;
 };
 
-export type IBlockRepository = ExtendedRepository<Block> & IBlockRepositoryExtension;
+export type BlockRepository = ExtendedRepository<Block> & BlockRepositoryExtension;
 
-export type IConfigurationRepositoryExtension = {};
-export type IConfigurationRepository = ExtendedRepository<Configuration> & IConfigurationRepositoryExtension;
+export type ConfigurationRepositoryExtension = {};
+export type ConfigurationRepository = ExtendedRepository<Configuration> & ConfigurationRepositoryExtension;
 
-export type IApiNodeRepositoryExtension = {
+export type ApiNodeRepositoryExtension = {
 	findManyByCriteria(
 		apiNodeCriteria: Criteria.OrApiNodeCriteria,
 		sorting: Sorting,
@@ -46,9 +46,9 @@ export type IApiNodeRepositoryExtension = {
 	): Promise<ResultsPage<ApiNode>>;
 };
 
-export type IApiNodeRepository = ExtendedRepository<ApiNode> & IApiNodeRepositoryExtension;
+export type ApiNodeRepository = ExtendedRepository<ApiNode> & ApiNodeRepositoryExtension;
 
-export type IPeerRepositoryExtension = {
+export type PeerRepositoryExtension = {
 	getMedianPeerHeight(): Promise<number>;
 
 	findManyByCriteria(
@@ -59,13 +59,13 @@ export type IPeerRepositoryExtension = {
 	): Promise<ResultsPage<Peer>>;
 };
 
-export type IPeerRepository = ExtendedRepository<Peer> & IPeerRepositoryExtension;
-export type IMempoolTransactionRepositoryExtension = {};
-export type IMempoolTransactionRepository = ExtendedRepository<MempoolTransaction> &
-	IMempoolTransactionRepositoryExtension;
+export type PeerRepository = ExtendedRepository<Peer> & PeerRepositoryExtension;
+export type MempoolTransactionRepositoryExtension = {};
+export type MempoolTransactionRepository = ExtendedRepository<MempoolTransaction> &
+	MempoolTransactionRepositoryExtension;
 
-export type ITransactionTypeRepositoryExtension = {};
-export type ITransactionTypeRepository = ExtendedRepository<TransactionType> & ITransactionTypeRepositoryExtension;
+export type TransactionTypeRepositoryExtension = {};
+export type TransactionTypeRepository = ExtendedRepository<TransactionType> & TransactionTypeRepositoryExtension;
 
 export type FeeStatistics = {
 	type: number;
@@ -76,9 +76,9 @@ export type FeeStatistics = {
 	sum: string;
 };
 
-export type ITransactionRepositoryExtension = {
+export type TransactionRepositoryExtension = {
 	findManyByCritera(
-		walletRepository: IWalletRepository,
+		walletRepository: WalletRepository,
 		transactionCriteria: Criteria.OrTransactionCriteria,
 		sorting: Sorting,
 		pagination: Pagination,
@@ -87,16 +87,16 @@ export type ITransactionRepositoryExtension = {
 
 	getFeeStatistics(days?: number, minFee?: number): Promise<FeeStatistics[]>;
 };
-export type ITransactionRepository = ExtendedRepository<Transaction> & ITransactionRepositoryExtension;
+export type TransactionRepository = ExtendedRepository<Transaction> & TransactionRepositoryExtension;
 
-export type IValidatorRoundRepositoryExtension = {};
-export type IValidatorRoundRepository = ExtendedRepository<ValidatorRound> & IValidatorRoundRepositoryExtension;
-export type IPluginRepositoryExtension = {};
-export type IPluginRepository = ExtendedRepository<Plugin> & IPluginRepositoryExtension;
-export type IStateRepositoryExtension = {};
-export type IStateRepository = ExtendedRepository<State> & IStateRepositoryExtension;
+export type ValidatorRoundRepositoryExtension = {};
+export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
+export type PluginRepositoryExtension = {};
+export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
+export type StateRepositoryExtension = {};
+export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 
-export type IWalletRepositoryExtension = {
+export type WalletRepositoryExtension = {
 	findManyByCritera(
 		walletCriteria: Criteria.OrWalletCriteria,
 		sorting: Sorting,
@@ -111,25 +111,25 @@ export type IWalletRepositoryExtension = {
 		options?: Options,
 	): Promise<ResultsPage<Wallet>>;
 };
-export type IWalletRepository = ExtendedRepository<Wallet> & IWalletRepositoryExtension;
+export type WalletRepository = ExtendedRepository<Wallet> & WalletRepositoryExtension;
 
-export type IApiNodeRepositoryFactory = (customDataSource?: RepositoryDataSource) => IApiNodeRepository;
-export type IBlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => IBlockRepository;
-export type IConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => IConfigurationRepository;
-export type IPeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPeerRepository;
-export type ITransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionRepository;
-export type ITransactionTypeRepositoryFactory = (customDataSource?: RepositoryDataSource) => ITransactionTypeRepository;
-export type IMempoolTransactionRepositoryFactory = (
+export type ApiNodeRepositoryFactory = (customDataSource?: RepositoryDataSource) => ApiNodeRepository;
+export type BlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => BlockRepository;
+export type ConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => ConfigurationRepository;
+export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
+export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
+export type TransactionTypeRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionTypeRepository;
+export type MempoolTransactionRepositoryFactory = (
 	customDataSource?: RepositoryDataSource,
-) => IMempoolTransactionRepository;
-export type IValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => IValidatorRoundRepository;
-export type IPluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => IPluginRepository;
-export type IStateRepositoryFactory = (customDataSource?: RepositoryDataSource) => IStateRepository;
-export type IWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => IWalletRepository;
+) => MempoolTransactionRepository;
+export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;
+export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;
+export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) => StateRepository;
+export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 
 export { Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
 
-export interface IMigrations {
+export interface Migrations {
 	run(): Promise<void>;
 }

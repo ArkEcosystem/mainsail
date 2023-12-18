@@ -1,11 +1,11 @@
-import { IApiNodeRepository, IApiNodeRepositoryExtension, RepositoryDataSource } from "../contracts";
+import { ApiNodeRepository, ApiNodeRepositoryExtension, RepositoryDataSource } from "../contracts";
 import { ApiNode } from "../models/api-node";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { ApiNodeFilter } from "../search/filters";
 import { makeExtendedRepository } from "./repository-extension";
 
-export const makeApiNodeRepository = (dataSource: RepositoryDataSource): IApiNodeRepository =>
-	makeExtendedRepository<ApiNode, IApiNodeRepositoryExtension>(ApiNode, dataSource, {
+export const makeApiNodeRepository = (dataSource: RepositoryDataSource): ApiNodeRepository =>
+	makeExtendedRepository<ApiNode, ApiNodeRepositoryExtension>(ApiNode, dataSource, {
 		async findManyByCriteria(
 			peerCriteria: Criteria.OrPeerCriteria,
 			sorting: Sorting,

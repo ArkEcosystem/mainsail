@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { IWalletRepository } from "../../contracts";
+import { WalletRepository } from "../../contracts";
 import { Transaction } from "../../models";
 import { EqualCriteria, OrTransactionCriteria, TransactionCriteria } from "../criteria";
 import { ContainsExpression, EqualExpression, Expression } from "../expressions";
@@ -14,7 +14,7 @@ import {
 
 export class TransactionFilter {
 	public static async getExpression(
-		walletRepository: IWalletRepository,
+		walletRepository: WalletRepository,
 		...criteria: OrTransactionCriteria[]
 	): Promise<Expression<Transaction>> {
 		const expressions = await Promise.all(
@@ -134,7 +134,7 @@ export class TransactionFilter {
 
 	private static async handleAddressCriteria(
 		criteria: EqualCriteria<string>,
-		walletRepository: IWalletRepository,
+		walletRepository: WalletRepository,
 	): Promise<Expression<Transaction>> {
 		const expressions: Expression<Transaction>[] = await Promise.all([
 			this.handleSenderIdCriteria(criteria, walletRepository),
@@ -146,7 +146,7 @@ export class TransactionFilter {
 
 	private static async handleSenderIdCriteria(
 		criteria: EqualCriteria<string>,
-		walletRepository: IWalletRepository,
+		walletRepository: WalletRepository,
 	): Promise<Expression<Transaction>> {
 		const wallet = await walletRepository
 			.createQueryBuilder()
