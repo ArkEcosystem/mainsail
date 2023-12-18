@@ -3,25 +3,25 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
+export class ValidatorSet implements Contracts.ValidatorSet.ValidatorSet {
 	// TODO: Check which wallet repository is used here
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.ValidatorWalletFactory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
-	#validators: Contracts.State.IValidatorWallet[] = [];
+	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
 	public async initialize(): Promise<void> {
 		this.#buildActiveValidators();
 	}
 
-	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 
@@ -30,11 +30,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.IValidatorSet {
 		}
 	}
 
-	public getActiveValidators(): Contracts.State.IValidatorWallet[] {
+	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
 		return this.#validators;
 	}
 
-	public getValidator(index: number): Contracts.State.IValidatorWallet {
+	public getValidator(index: number): Contracts.State.ValidatorWallet {
 		return this.#validators[index];
 	}
 
