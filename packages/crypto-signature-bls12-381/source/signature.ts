@@ -4,7 +4,7 @@ import { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class Signature implements Contracts.Crypto.ISignature {
+export class Signature implements Contracts.Crypto.Signature {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return Buffer.from(SecretKey.fromBytes(privateKey).sign(message).toBytes()).toString("hex");
 	}
