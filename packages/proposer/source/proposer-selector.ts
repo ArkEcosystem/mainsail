@@ -6,12 +6,12 @@ import seedrandom from "seedrandom";
 @injectable()
 export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public async onCommit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const committedBlock = await unit.getCommittedBlock();
 		const { height } = committedBlock.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
