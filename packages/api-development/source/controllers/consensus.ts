@@ -7,13 +7,13 @@ import { Controller } from "./controller";
 @injectable()
 export class ConsensusController extends Controller {
 	@inject(Identifiers.Consensus.Service)
-	private readonly consensus!: Contracts.Consensus.IConsensusService;
+	private readonly consensus!: Contracts.Consensus.ConsensusService;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
+	private readonly roundStateRepository!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	public async state(request: Hapi.Request) {
 		const state = this.consensus.getState();
@@ -22,13 +22,13 @@ export class ConsensusController extends Controller {
 
 		const proposals = roundStates
 			.map((roundState) => roundState.getProposal())
-			.filter((proposal): proposal is Contracts.Crypto.IProposal => !!proposal);
+			.filter((proposal): proposal is Contracts.Crypto.Proposal => !!proposal);
 		const prevotes = roundStates.flatMap((roundState) => roundState.getPrevotes());
 		const precommits = roundStates.flatMap((roundState) => roundState.getPrecommits());
 
 		const validators = this.validatorSet.getActiveValidators();
 
-		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.IPrevote | Contracts.Crypto.IPrecommit>) => {
+		const collectMessages = (messages: ReadonlyArray<Contracts.Crypto.Prevote | Contracts.Crypto.Precommit>) => {
 			const collected = {
 				absent: validators.map((v) => v.toString()),
 			};

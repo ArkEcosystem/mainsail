@@ -10,7 +10,7 @@ export class NodeController extends Controller {
 	private readonly p2pService!: Contracts.P2P.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const lastBlock = this.stateService.getStateStore().getLastBlock();

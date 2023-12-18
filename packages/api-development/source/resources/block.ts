@@ -6,12 +6,12 @@ export class BlockResource implements Contracts.Api.Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public raw(resource: Contracts.Crypto.IBlock): object {
+	public raw(resource: Contracts.Crypto.Block): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
-	public async transform(block: Contracts.Crypto.IBlock): Promise<object> {
-		const blockData: Contracts.Crypto.IBlockData = block.data;
+	public async transform(block: Contracts.Crypto.Block): Promise<object> {
+		const blockData: Contracts.Crypto.BlockData = block.data;
 		const generator: Contracts.State.Wallet = await this.stateService
 			.getWalletRepository()
 			.findByPublicKey(blockData.generatorPublicKey);

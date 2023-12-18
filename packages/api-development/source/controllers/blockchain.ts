@@ -7,7 +7,7 @@ import { Controller } from "./controller";
 @injectable()
 export class BlockchainController extends Controller {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	public async index() {
 		const { data } = this.stateService.getStateStore().getLastBlock();

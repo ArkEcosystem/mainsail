@@ -9,7 +9,7 @@ import { Controller } from "./controller";
 @injectable()
 export class BlocksController extends Controller {
 	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.IDatabaseService;
+	private readonly database!: Contracts.Database.DatabaseService;
 
 	public async index(request: Hapi.Request) {
 		const lastBlock = this.stateService.getStateStore().getLastBlock();
@@ -98,7 +98,7 @@ export class BlocksController extends Controller {
 	}
 
 	// TODO: Support height only
-	private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.IBlock | undefined> {
+	private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.Block | undefined> {
 		return this.database.getBlock(Number.parseInt(idOrHeight));
 	}
 }
