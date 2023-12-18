@@ -44,7 +44,7 @@ export interface TransactionData {
 	type: number;
 	timestamp: number;
 	nonce: BigNumber;
-	senderPubliKey: string;
+	senderPublicKey: string;
 
 	fee: BigNumber;
 	amount: BigNumber;

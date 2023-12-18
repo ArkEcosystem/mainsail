@@ -7,32 +7,32 @@ import { TransactionFactory } from "./factory";
 @injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.IConfiguration;
+	protected readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	protected readonly factory!: TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	@tagged("type", "wallet")
-	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Signer)
-	protected readonly signer!: Contracts.Crypto.ITransactionSigner;
+	protected readonly signer!: Contracts.Crypto.TransactionSigner;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	protected readonly utils!: Contracts.Crypto.ITransactionUtils;
+	protected readonly utils!: Contracts.Crypto.TransactionUtils;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier!: Contracts.Crypto.ITransactionVerifier;
+	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
-	public data!: Contracts.Crypto.ITransactionData;
+	public data!: Contracts.Crypto.TransactionData;
 
 	protected signWithSenderAsRecipient = false;
 
-	public async build(data: Partial<Contracts.Crypto.ITransactionData> = {}): Promise<Contracts.Crypto.ITransaction> {
+	public async build(data: Partial<Contracts.Crypto.TransactionData> = {}): Promise<Contracts.Crypto.Transaction> {
 		return this.factory.fromData({ ...this.data, ...data }, false);
 	}
 
@@ -121,12 +121,12 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.verifier.verifyHash(this.data);
 	}
 
-	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
+	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
 		if (!this.data.senderPublicKey || (!this.data.signature && !this.data.signatures)) {
 			throw new Exceptions.MissingTransactionSignatureError();
 		}
 
-		const struct: Contracts.Crypto.ITransactionData = {
+		const struct: Contracts.Crypto.TransactionData = {
 			fee: this.data.fee,
 			id: await this.utils.getId(await this.build()),
 			network: this.data.network,
@@ -136,7 +136,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			type: this.data.type,
 			typeGroup: this.data.typeGroup,
 			version: this.data.version,
-		} as Contracts.Crypto.ITransactionData;
+		} as Contracts.Crypto.TransactionData;
 
 		if (Array.isArray(this.data.signatures)) {
 			struct.signatures = this.data.signatures;
@@ -145,7 +145,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return struct;
 	}
 
-	async #signWithKeyPair(keys: Contracts.Crypto.IKeyPair): Promise<TBuilder> {
+	async #signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
 		this.data.senderPublicKey = keys.publicKey;
 
 		if (this.signWithSenderAsRecipient) {
@@ -157,7 +157,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	async #multiSignWithKeyPair(index: number, keys: Contracts.Crypto.IKeyPair): Promise<TBuilder> {
+	async #multiSignWithKeyPair(index: number, keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
 		if (!this.data.signatures) {
 			this.data.signatures = [];
 		}
@@ -167,8 +167,8 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.instance();
 	}
 
-	#getSigningObject(): Contracts.Crypto.ITransactionData {
-		const data: Contracts.Crypto.ITransactionData = {
+	#getSigningObject(): Contracts.Crypto.TransactionData {
+		const data: Contracts.Crypto.TransactionData = {
 			...this.data,
 		};
 
@@ -188,7 +188,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			nonce: BigNumber.ONE,
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 0x01,
-		} as Contracts.Crypto.ITransactionData;
+		} as Contracts.Crypto.TransactionData;
 	}
 
 	protected abstract instance(): TBuilder;

@@ -8,19 +8,19 @@ import { signedSchema, strictSchema } from "./validation/utils";
 export type TransactionConstructor = typeof Transaction;
 
 @injectable()
-export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistry {
+export class TransactionRegistry implements Contracts.Crypto.TransactionRegistry {
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator!: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.Validator;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
 	readonly #transactionTypes: Map<
-		Contracts.Transactions.IInternalTransactionType,
+		Contracts.Transactions.InternalTransactionType,
 		Map<number, TransactionConstructor>
 	> = new Map();
 
-	readonly #transactionSchemas = new Map<string, Contracts.Crypto.ITransactionSchema>();
+	readonly #transactionSchemas = new Map<string, Contracts.Crypto.TransactionSchema>();
 
 	@postConstruct()
 	public postConstruct() {
@@ -34,7 +34,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
+		const internalType: Contracts.Transactions.InternalTransactionType = InternalTransactionType.from(
 			type,
 			typeGroup,
 		);
@@ -78,7 +78,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
+		const internalType: Contracts.Transactions.InternalTransactionType = InternalTransactionType.from(
 			type,
 			typeGroup,
 		);
@@ -100,7 +100,7 @@ export class TransactionRegistry implements Contracts.Crypto.ITransactionRegistr
 		}
 	}
 
-	#updateSchemas(schema: Contracts.Crypto.ITransactionSchema, remove?: boolean): void {
+	#updateSchemas(schema: Contracts.Crypto.TransactionSchema, remove?: boolean): void {
 		this.validator.extend((ajv) => {
 			if (ajv.getSchema(schema.$id)) {
 				remove = true;

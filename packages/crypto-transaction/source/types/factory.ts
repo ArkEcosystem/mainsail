@@ -7,20 +7,20 @@ import { Transaction } from "./transaction";
 type TransactionConstructor = typeof Transaction;
 
 @injectable()
-export class TransactionTypeFactory implements Contracts.Transactions.ITransactionTypeFactory {
+export class TransactionTypeFactory implements Contracts.Transactions.TransactionTypeFactory {
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 
-	#transactionTypes!: Map<Contracts.Transactions.IInternalTransactionType, Map<number, TransactionConstructor>>;
+	#transactionTypes!: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;
 
 	public initialize(
-		transactionTypes: Map<Contracts.Transactions.IInternalTransactionType, Map<number, TransactionConstructor>>,
+		transactionTypes: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>,
 	) {
 		this.#transactionTypes = transactionTypes;
 	}
 
-	public create(data: Contracts.Crypto.ITransactionData): Contracts.Crypto.ITransaction {
-		const instance: Contracts.Crypto.ITransaction = this.app.resolve(
+	public create(data: Contracts.Crypto.TransactionData): Contracts.Crypto.Transaction {
+		const instance: Contracts.Crypto.Transaction = this.app.resolve(
 			this.get(data.type, data.typeGroup, data.version),
 		);
 		instance.data = data;
@@ -30,7 +30,7 @@ export class TransactionTypeFactory implements Contracts.Transactions.ITransacti
 	}
 
 	public get(type: number, typeGroup?: number, version?: number): Contracts.Crypto.TransactionConstructor {
-		const internalType: Contracts.Transactions.IInternalTransactionType = InternalTransactionType.from(
+		const internalType: Contracts.Transactions.InternalTransactionType = InternalTransactionType.from(
 			type,
 			typeGroup,
 		);
