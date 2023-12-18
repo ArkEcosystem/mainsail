@@ -19,10 +19,7 @@ export class Validator implements Contracts.Crypto.Validator {
 		formats(this.#ajv);
 	}
 
-	public validate<T = any>(
-		schemaKeyReference: string | Schema,
-		data: T,
-	): Contracts.Crypto.SchemaValidationResult<T> {
+	public validate<T = any>(schemaKeyReference: string | Schema, data: T): Contracts.Crypto.SchemaValidationResult<T> {
 		try {
 			this.#ajv.validate(schemaKeyReference, data);
 

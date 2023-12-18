@@ -1,4 +1,4 @@
-import { WalletRepository, WalletRepositoryExtension, RepositoryDataSource } from "../contracts";
+import { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } from "../contracts";
 import { Wallet } from "../models/wallet";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { WalletFilter } from "../search/filters";

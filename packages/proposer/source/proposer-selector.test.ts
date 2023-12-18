@@ -20,11 +20,11 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		};
 
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		const milestone = {

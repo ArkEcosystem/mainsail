@@ -26,8 +26,8 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		const timeout = Math.max(
 			0,
 			this.stateService.getStateStore().getLastBlock().data.timestamp -
-			dayjs().valueOf() +
-			this.cryptoConfiguration.getMilestone().blockTime,
+				dayjs().valueOf() +
+				this.cryptoConfiguration.getMilestone().blockTime,
 		);
 
 		this.#timeoutStartRound = setTimeout(async () => {

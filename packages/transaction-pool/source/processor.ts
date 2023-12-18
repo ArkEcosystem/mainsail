@@ -43,7 +43,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 						await Promise.all(this.extensions.map((e) => e.throwIfCannotBroadcast(transaction)));
 						broadcastTransactions.push(transaction);
 						broadcast.push(entryId);
-					} catch { }
+					} catch {}
 				} catch (error) {
 					invalid.push(entryId);
 

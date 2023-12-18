@@ -1,4 +1,4 @@
-import { MultiSignatureAsset, Transaction, TransactionData, TransactionConstructor } from "./crypto";
+import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto";
 import { EventDispatcher } from "./kernel";
 import { AttributeType, Wallet, WalletRepository } from "./state";
 
@@ -7,11 +7,7 @@ export type TransactionHandlerConstructor = new () => TransactionHandler;
 export interface TransactionHandler {
 	verify(walletRepository: WalletRepository, transaction: Transaction): Promise<boolean>;
 
-	throwIfCannotBeApplied(
-		walletRepository: WalletRepository,
-		transaction: Transaction,
-		sender: Wallet,
-	): Promise<void>;
+	throwIfCannotBeApplied(walletRepository: WalletRepository, transaction: Transaction, sender: Wallet): Promise<void>;
 
 	apply(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 

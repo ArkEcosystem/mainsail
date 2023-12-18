@@ -1,4 +1,4 @@
-import { ValidatorRoundRepository, ValidatorRoundRepositoryExtension, RepositoryDataSource } from "../contracts";
+import { RepositoryDataSource, ValidatorRoundRepository, ValidatorRoundRepositoryExtension } from "../contracts";
 import { ValidatorRound } from "../models/validator-round";
 import { makeExtendedRepository } from "./repository-extension";
 

@@ -150,8 +150,8 @@ export class PreviousBlockIdFormatError extends Exception {
 	public constructor(thisBlockHeight: number, previousBlockId: string) {
 		super(
 			`The config denotes that the block at height ${thisBlockHeight - 1} ` +
-			`must use full SHA256 block id, but the next block (at ${thisBlockHeight}) ` +
-			`contains previous block id "${previousBlockId}"`,
+				`must use full SHA256 block id, but the next block (at ${thisBlockHeight}) ` +
+				`contains previous block id "${previousBlockId}"`,
 		);
 	}
 }
@@ -209,7 +209,7 @@ export class UnexpectedNonceError extends Exception {
 		const action: string = reversal ? "revert" : "apply";
 		super(
 			`Cannot ${action} a transaction with nonce ${txNonce.toFixed()}: the ` +
-			`sender ${sender.getPublicKey()} has nonce ${sender.getNonce().toFixed()}.`,
+				`sender ${sender.getPublicKey()} has nonce ${sender.getNonce().toFixed()}.`,
 		);
 	}
 }

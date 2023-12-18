@@ -48,5 +48,5 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
-	): Promise<void> { }
+	): Promise<void> {}
 }

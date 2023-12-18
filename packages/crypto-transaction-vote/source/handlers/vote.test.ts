@@ -57,7 +57,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.walletRepository = {
-			findByPublicKey: () => { },
+			findByPublicKey: () => {},
 		};
 
 		context.poolQuery = {
@@ -376,7 +376,7 @@ describe<{
 
 	it("emitEvents - should dispatch", ({ handler }) => {
 		const emitter: Partial<Contracts.Kernel.EventDispatcher> = {
-			dispatch: async () => { },
+			dispatch: async () => {},
 		};
 		const spyDispatch = stub(emitter, "dispatch");
 

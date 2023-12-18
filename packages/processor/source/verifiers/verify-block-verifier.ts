@@ -36,7 +36,8 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 
 		if (!verification.verified) {
 			this.logger.warning(
-				`Block ${block.data.height.toLocaleString()} (${block.data.id
+				`Block ${block.data.height.toLocaleString()} (${
+					block.data.id
 				}) disregarded because verification failed`,
 			);
 

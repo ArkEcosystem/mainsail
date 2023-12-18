@@ -71,7 +71,8 @@ export class TransactionPoolFullError extends PoolError {
 
 	public constructor(transaction: Transaction, required: BigNumber) {
 		super(
-			`tx ${transaction.id
+			`tx ${
+				transaction.id
 			} fee ${transaction.data.fee.toString()} is lower than ${required.toString()} already in pool`,
 			"ERR_POOL_FULL",
 		);

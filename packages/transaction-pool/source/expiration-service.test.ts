@@ -14,10 +14,10 @@ describe<{
 	config: Configuration;
 }>("ExpirationService", ({ it, assert, stub, beforeAll }) => {
 	beforeAll((context) => {
-		context.configuration = { getRequired: () => { } };
-		context.stateStore = { getLastHeight: () => { } };
+		context.configuration = { getRequired: () => {} };
+		context.stateStore = { getLastHeight: () => {} };
 		context.stateService = { getStateStore: () => context.stateStore };
-		context.app = { get: () => { } };
+		context.app = { get: () => {} };
 
 		context.container = new Container();
 		context.container.bind(Identifiers.Application).toConstantValue(context.app);

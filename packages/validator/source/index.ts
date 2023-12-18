@@ -27,9 +27,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const walletPublicKey = await walletPublicKeyFactory.fromMnemonic(secret);
 
 			validators.push(
-				this.app
-					.resolve<Contracts.Validator.Validator>(Validator)
-					.configure(walletPublicKey, consensusKeyPair),
+				this.app.resolve<Contracts.Validator.Validator>(Validator).configure(walletPublicKey, consensusKeyPair),
 			);
 		}
 

@@ -161,8 +161,8 @@ export class Sync implements Contracts.ApiSync.Sync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-					validatorRound: this.#createValidatorRound(header.height + 1),
-				}
+						validatorRound: this.#createValidatorRound(header.height + 1),
+					}
 				: {}),
 		};
 

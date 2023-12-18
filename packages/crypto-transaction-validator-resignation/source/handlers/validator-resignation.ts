@@ -96,5 +96,5 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
-	): Promise<void> { }
+	): Promise<void> {}
 }

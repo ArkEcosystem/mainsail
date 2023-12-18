@@ -77,9 +77,7 @@ export class Signer {
 		return transferBuilder.build();
 	}
 
-	public async makeMultiSignatureRegistration(
-		options: MultiSignatureOptions,
-	): Promise<Contracts.Crypto.Transaction> {
+	public async makeMultiSignatureRegistration(options: MultiSignatureOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };

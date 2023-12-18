@@ -6,7 +6,7 @@ export class InternalTransactionType implements Contracts.Transactions.InternalT
 	private constructor(
 		public readonly type: number,
 		public readonly typeGroup: number,
-	) { }
+	) {}
 
 	public static from(type: number, typeGroup?: number): InternalTransactionType {
 		if (typeGroup === undefined) {

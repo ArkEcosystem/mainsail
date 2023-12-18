@@ -9,7 +9,7 @@ export class Lock implements Contracts.Kernel.Lock {
 		while (this.#exclusivePromise) {
 			try {
 				await this.#exclusivePromise;
-			} catch { }
+			} catch {}
 		}
 
 		const nonExclusivePromise = callback();
@@ -26,7 +26,7 @@ export class Lock implements Contracts.Kernel.Lock {
 		while (this.#exclusivePromise) {
 			try {
 				await this.#exclusivePromise;
-			} catch { }
+			} catch {}
 		}
 
 		const exclusivePromise = (async () => {
@@ -34,7 +34,7 @@ export class Lock implements Contracts.Kernel.Lock {
 				[...this.#nonExclusivePromises].map(async (nonExclusivePromise) => {
 					try {
 						await nonExclusivePromise;
-					} catch { }
+					} catch {}
 				}),
 			);
 

@@ -1,4 +1,4 @@
-import { TransactionTypeRepository, TransactionTypeRepositoryExtension, RepositoryDataSource } from "../contracts";
+import { RepositoryDataSource, TransactionTypeRepository, TransactionTypeRepositoryExtension } from "../contracts";
 import { TransactionType } from "../models/transaction-type";
 import { makeExtendedRepository } from "./repository-extension";
 

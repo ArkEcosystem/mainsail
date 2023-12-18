@@ -117,5 +117,5 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> { }
+	): Promise<void> {}
 }

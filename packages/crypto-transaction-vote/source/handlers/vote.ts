@@ -143,7 +143,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> { }
+	): Promise<void> {}
 
 	#checkAsset(data: Contracts.Crypto.TransactionData) {
 		Utils.assert.defined<Contracts.Crypto.VoteAsset>(data.asset);

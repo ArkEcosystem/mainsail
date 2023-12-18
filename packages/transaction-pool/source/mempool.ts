@@ -76,10 +76,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeForgedTransaction(
-		senderPublicKey: string,
-		id: string,
-	): Promise<Contracts.Crypto.Transaction[]> {
+	public async removeForgedTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
 		const senderMempool = this.#senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];

@@ -76,7 +76,7 @@ export interface PostPrecommitRequest extends Request {
 	};
 }
 
-export interface PostPrecommitResponse extends Response { }
+export interface PostPrecommitResponse extends Response {}
 
 export interface PostPrevoteRequest extends Request {
 	payload: {
@@ -85,7 +85,7 @@ export interface PostPrevoteRequest extends Request {
 	};
 }
 
-export interface PostPrevoteResponse extends Response { }
+export interface PostPrevoteResponse extends Response {}
 
 export interface PostProposalRequest extends Request {
 	payload: {
@@ -94,7 +94,7 @@ export interface PostProposalRequest extends Request {
 	};
 }
 
-export interface PostProposalResponse extends Response { }
+export interface PostProposalResponse extends Response {}
 
 export interface PostTransactionsRequest extends Request {
 	payload: {

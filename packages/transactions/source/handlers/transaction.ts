@@ -129,7 +129,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		sender.setBalance(newBalance);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void { }
+	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {}
 
 	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
 		return [];
@@ -138,7 +138,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> { }
+	): Promise<void> {}
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,

@@ -5,7 +5,7 @@ import { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chain
 
 describe("", ({ assert, it, stub }) => {
 	const slots = {
-		getSlotNumber: () => { },
+		getSlotNumber: () => {},
 	};
 
 	it("isBlockChained should be ok", async () => {

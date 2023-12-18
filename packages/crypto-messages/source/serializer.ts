@@ -43,10 +43,10 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				},
 				...(options.includeSignature
 					? {
-						signature: {
-							type: "consensusSignature",
-						},
-					}
+							signature: {
+								type: "consensusSignature",
+							},
+						}
 					: {}),
 			},
 		});

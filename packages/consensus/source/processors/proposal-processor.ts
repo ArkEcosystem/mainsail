@@ -33,10 +33,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Ipc.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
-	async process(
-		proposal: Contracts.Crypto.Proposal,
-		broadcast = true,
-	): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(proposal: Contracts.Crypto.Proposal, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidHeightOrRound(proposal)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;

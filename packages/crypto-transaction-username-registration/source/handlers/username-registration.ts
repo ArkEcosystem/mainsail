@@ -85,5 +85,5 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> { }
+	): Promise<void> {}
 }
