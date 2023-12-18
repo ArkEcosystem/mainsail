@@ -12,7 +12,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	@tagged("type", "wallet")
-	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 
@@ -36,7 +36,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return this.#senderMempools.values();
 	}
 
-	public async addTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		let senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
@@ -60,7 +60,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 	}
 
-	public async removeTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.ITransaction[]> {
+	public async removeTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
 		const senderMempool = this.#senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];
@@ -79,7 +79,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	public async removeForgedTransaction(
 		senderPublicKey: string,
 		id: string,
-	): Promise<Contracts.Crypto.ITransaction[]> {
+	): Promise<Contracts.Crypto.Transaction[]> {
 		const senderMempool = this.#senderMempools.get(senderPublicKey);
 		if (!senderMempool) {
 			return [];

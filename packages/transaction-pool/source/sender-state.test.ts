@@ -14,7 +14,7 @@ describe<{
 	triggers: any;
 	emitter: any;
 	container: Container;
-	transaction: Contracts.Crypto.ITransaction;
+	transaction: Contracts.Crypto.Transaction;
 	config: Configuration;
 	blockSerializer: any;
 	walletRepository: any;
@@ -23,22 +23,22 @@ describe<{
 }>("SenderState", ({ it, assert, beforeEach, stub, spy, match }) => {
 	beforeEach(async (context) => {
 		context.configuration = {
-			get: () => {},
-			getOptional: () => {},
-			getRequired: () => {},
+			get: () => { },
+			getOptional: () => { },
+			getRequired: () => { },
 		};
 		context.handlerRegistry = {
-			getActivatedHandlerForData: () => {},
+			getActivatedHandlerForData: () => { },
 		};
 		context.expirationService = {
-			getExpirationHeight: () => {},
-			isExpired: () => {},
+			getExpirationHeight: () => { },
+			isExpired: () => { },
 		};
 		context.triggers = {
-			call: () => {},
+			call: () => { },
 		};
 		context.emitter = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		context.blockSerializer = {
@@ -73,7 +73,7 @@ describe<{
 			id: "tx1",
 			serialized: Buffer.alloc(10),
 			timestamp: 13_600,
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 	});
 
 	it("apply - should throw when transaction exceeds maximum byte size", async ({
@@ -209,7 +209,7 @@ describe<{
 		handlerStub.resolvedValueNth(1, handler);
 		triggerStub.resolvedValueNth(1, true); // verifyTransaction
 
-		await senderState.revert(context.transaction).catch(() => {});
+		await senderState.revert(context.transaction).catch(() => { });
 		const promise = senderState.apply(context.transaction);
 
 		await assert.rejects(() => promise);

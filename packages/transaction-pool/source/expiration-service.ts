@@ -10,11 +10,11 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public canExpire(transaction: Contracts.Crypto.ITransaction): boolean {
+	public canExpire(transaction: Contracts.Crypto.Transaction): boolean {
 		return !!transaction.data.expiration;
 	}
 
-	public async isExpired(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
+	public async isExpired(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		if (this.canExpire(transaction)) {
 			return (
 				(await this.getExpirationHeight(transaction)) <= this.stateService.getStateStore().getLastHeight() + 1
@@ -24,7 +24,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 		return false;
 	}
 
-	public async getExpirationHeight(transaction: Contracts.Crypto.ITransaction): Promise<number> {
+	public async getExpirationHeight(transaction: Contracts.Crypto.Transaction): Promise<number> {
 		Utils.assert.defined<number>(transaction.data.expiration);
 
 		return transaction.data.expiration;

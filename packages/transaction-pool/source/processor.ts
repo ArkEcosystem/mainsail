@@ -18,7 +18,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
 	public async process(data: Buffer[]): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: string[] = [];
@@ -27,7 +27,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		const excess: string[] = [];
 		let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
-		const broadcastTransactions: Contracts.Crypto.ITransaction[] = [];
+		const broadcastTransactions: Contracts.Crypto.Transaction[] = [];
 
 		try {
 			for (const [index, transactionData] of data.entries()) {
@@ -43,7 +43,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 						await Promise.all(this.extensions.map((e) => e.throwIfCannotBroadcast(transaction)));
 						broadcastTransactions.push(transaction);
 						broadcast.push(entryId);
-					} catch {}
+					} catch { }
 				} catch (error) {
 					invalid.push(entryId);
 
@@ -81,7 +81,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		};
 	}
 
-	async #getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.ITransaction> {
+	async #getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
 			return this.transactionFactory.fromBytes(transactionData);
 		} catch (error) {

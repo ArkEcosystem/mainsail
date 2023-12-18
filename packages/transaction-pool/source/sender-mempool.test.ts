@@ -9,17 +9,17 @@ describe<{
 	container: Container;
 	configuration: any;
 	senderState: any;
-	transactions: Contracts.Crypto.ITransaction[];
+	transactions: Contracts.Crypto.Transaction[];
 }>("SenderMempool.", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll(async (context) => {
 		context.configuration = {
-			getOptional: () => {},
-			getRequired: () => {},
+			getOptional: () => { },
+			getRequired: () => { },
 		};
 
 		context.senderState = {
-			apply: () => {},
-			revert: () => {},
+			apply: () => { },
+			revert: () => { },
 		};
 
 		context.container = new Container();
