@@ -25,12 +25,12 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 
 	public async throwIfCannotBeApplied(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.Transaction = transaction;
 
-		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.username);
 
 		if (walletRepository.hasByIndex(Contracts.State.WalletIndexes.Usernames, data.asset.username)) {
@@ -42,12 +42,12 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
-		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.username);
 
 		const username = data.asset.username;
@@ -67,11 +67,11 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.Transaction = transaction;
 
-		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.username);
 
 		await super.applyToSender(walletRepository, transaction);
@@ -84,6 +84,6 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
-	): Promise<void> {}
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<void> { }
 }

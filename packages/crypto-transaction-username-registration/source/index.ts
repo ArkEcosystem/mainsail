@@ -26,12 +26,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerSchemas(): void {
 		for (const schema of Object.values(schemas)) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
 
 	#registerFees(): void {
-		this.app.get<Contracts.Fee.IFeeRegistry>(Identifiers.Fee.Registry).set(
+		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			UsernameRegistrationTransaction.key,
 			UsernameRegistrationTransaction.version,
 			{

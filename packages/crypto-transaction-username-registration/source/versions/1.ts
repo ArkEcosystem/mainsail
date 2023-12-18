@@ -10,7 +10,7 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.UsernameRegistration;
 	public static key = "usernameRegistration";
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "usernameRegistration",
 			properties: {
@@ -32,7 +32,7 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 	public assetSize(): number {
 		const { data } = this;
 
-		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		Utils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		Utils.assert.defined<string>(data.asset.username);
 
 		return (
@@ -41,10 +41,10 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 
-		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		Utils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		Utils.assert.defined<string>(data.asset.username);
 
 		const usernameBytes: Buffer = Buffer.from(data.asset.username, "utf8");
