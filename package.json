@@ -58,7 +58,7 @@
 		"eslint-plugin-unicorn": "^49.0.0",
 		"eslint-plugin-unused-imports": "^3.0.0",
 		"husky": "^8.0.3",
-		"lerna": "^8.0.0",
+		"lerna": "^6.6.2",
 		"lint-staged": "^15.2.0",
 		"madge": "^6.1.0",
 		"npm-check-updates": "^16.14.12",
