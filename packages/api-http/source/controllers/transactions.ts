@@ -12,13 +12,13 @@ import { Controller } from "./controller";
 @injectable()
 export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
-	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
-	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.ITransactionTypeRepositoryFactory;
+	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.TransactionTypeRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory)
-	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.IMempoolTransactionRepositoryFactory;
+	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.MempoolTransactionRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = request.query;

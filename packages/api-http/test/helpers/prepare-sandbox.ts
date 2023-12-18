@@ -14,68 +14,68 @@ export class ApiContext {
 		private app: Application,
 		private readonly apiHttp: CoreApiHttp,
 		private readonly apiDatabase: CoreApiDatabase,
-	) {}
+	) { }
 
 	public get dataSource(): ApiDatabaseContracts.RepositoryDataSource {
 		return this.app.get<ApiDatabaseContracts.RepositoryDataSource>(ApiDatabaseIdentifiers.DataSource);
 	}
 
-	public get apiNodesRepository(): ApiDatabaseContracts.IApiNodeRepository {
-		return this.app.get<ApiDatabaseContracts.IApiNodeRepositoryFactory>(
+	public get apiNodesRepository(): ApiDatabaseContracts.ApiNodeRepository {
+		return this.app.get<ApiDatabaseContracts.ApiNodeRepositoryFactory>(
 			ApiDatabaseIdentifiers.ApiNodeRepositoryFactory,
 		)();
 	}
 
-	public get blockRepository(): ApiDatabaseContracts.IBlockRepository {
-		return this.app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(
+	public get blockRepository(): ApiDatabaseContracts.BlockRepository {
+		return this.app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
 			ApiDatabaseIdentifiers.BlockRepositoryFactory,
 		)();
 	}
 
-	public get transactionRepository(): ApiDatabaseContracts.ITransactionRepository {
-		return this.app.get<ApiDatabaseContracts.ITransactionRepositoryFactory>(
+	public get transactionRepository(): ApiDatabaseContracts.TransactionRepository {
+		return this.app.get<ApiDatabaseContracts.TransactionRepositoryFactory>(
 			ApiDatabaseIdentifiers.TransactionRepositoryFactory,
 		)();
 	}
 
-	public get transactionTypeRepository(): ApiDatabaseContracts.ITransactionTypeRepository {
-		return this.app.get<ApiDatabaseContracts.ITransactionTypeRepositoryFactory>(
+	public get transactionTypeRepository(): ApiDatabaseContracts.TransactionTypeRepository {
+		return this.app.get<ApiDatabaseContracts.TransactionTypeRepositoryFactory>(
 			ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory,
 		)();
 	}
 
-	public get mempoolTransactionRepository(): ApiDatabaseContracts.IMempoolTransactionRepository {
-		return this.app.get<ApiDatabaseContracts.IMempoolTransactionRepositoryFactory>(
+	public get mempoolTransactionRepository(): ApiDatabaseContracts.MempoolTransactionRepository {
+		return this.app.get<ApiDatabaseContracts.MempoolTransactionRepositoryFactory>(
 			ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory,
 		)();
 	}
 
-	public get walletRepository(): ApiDatabaseContracts.IWalletRepository {
-		return this.app.get<ApiDatabaseContracts.IWalletRepositoryFactory>(
+	public get walletRepository(): ApiDatabaseContracts.WalletRepository {
+		return this.app.get<ApiDatabaseContracts.WalletRepositoryFactory>(
 			ApiDatabaseIdentifiers.WalletRepositoryFactory,
 		)();
 	}
 
-	public get peerRepository(): ApiDatabaseContracts.IPeerRepository {
-		return this.app.get<ApiDatabaseContracts.IPeerRepositoryFactory>(
+	public get peerRepository(): ApiDatabaseContracts.PeerRepository {
+		return this.app.get<ApiDatabaseContracts.PeerRepositoryFactory>(
 			ApiDatabaseIdentifiers.PeerRepositoryFactory,
 		)();
 	}
 
-	public get stateRepository(): ApiDatabaseContracts.IStateRepository {
-		return this.app.get<ApiDatabaseContracts.IStateRepositoryFactory>(
+	public get stateRepository(): ApiDatabaseContracts.StateRepository {
+		return this.app.get<ApiDatabaseContracts.StateRepositoryFactory>(
 			ApiDatabaseIdentifiers.StateRepositoryFactory,
 		)();
 	}
 
-	public get configurationRepository(): ApiDatabaseContracts.IConfigurationRepository {
-		return this.app.get<ApiDatabaseContracts.IConfigurationRepositoryFactory>(
+	public get configurationRepository(): ApiDatabaseContracts.ConfigurationRepository {
+		return this.app.get<ApiDatabaseContracts.ConfigurationRepositoryFactory>(
 			ApiDatabaseIdentifiers.ConfigurationRepositoryFactory,
 		)();
 	}
 
-	public get validatorRoundRepository(): ApiDatabaseContracts.IValidatorRoundRepository {
-		return this.app.get<ApiDatabaseContracts.IValidatorRoundRepositoryFactory>(
+	public get validatorRoundRepository(): ApiDatabaseContracts.ValidatorRoundRepository {
+		return this.app.get<ApiDatabaseContracts.ValidatorRoundRepositoryFactory>(
 			ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory,
 		)();
 	}

@@ -18,10 +18,10 @@ export class Controller extends AbstractController {
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
-	protected readonly stateRepositoryFactory!: ApiDatabaseContracts.IStateRepositoryFactory;
+	protected readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
-	protected readonly walletRepositoryFactory!: ApiDatabaseContracts.IWalletRepositoryFactory;
+	protected readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
 	protected getListingOptions(): Contracts.Api.Options {
 		const estimateTotalCount = this.apiConfiguration.getOptional<boolean>("options.estimateTotalCount", true);

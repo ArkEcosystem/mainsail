@@ -13,7 +13,7 @@ import { Controller } from "./controller";
 @injectable()
 export class ApiNodesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ApiNodeRepositoryFactory)
-	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.IApiNodeRepositoryFactory;
+	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.ApiNodeRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);

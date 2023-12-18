@@ -14,7 +14,7 @@ import { Controller } from "./controller";
 @injectable()
 export class PeersController extends Controller {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
-	private readonly peerRepositoryFactory!: ApiDatabaseContracts.IPeerRepositoryFactory;
+	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);

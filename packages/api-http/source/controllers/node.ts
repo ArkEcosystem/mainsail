@@ -13,19 +13,19 @@ import { Controller } from "./controller";
 @injectable()
 export class NodeController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
-	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.IConfigurationRepositoryFactory;
+	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.PluginRepositoryFactory)
-	private readonly pluginRepositoryFactory!: ApiDatabaseContracts.IPluginRepositoryFactory;
+	private readonly pluginRepositoryFactory!: ApiDatabaseContracts.PluginRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
-	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
-	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.ITransactionTypeRepositoryFactory;
+	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.TransactionTypeRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
-	private readonly peerRepositoryFactory!: ApiDatabaseContracts.IPeerRepositoryFactory;
+	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
 	public async status(request: Hapi.Request) {
 		const state = await this.getState();

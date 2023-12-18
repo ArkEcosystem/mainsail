@@ -16,7 +16,7 @@ import { Controller } from "./controller";
 @injectable()
 export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
-	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.WalletCriteria = request.query;
