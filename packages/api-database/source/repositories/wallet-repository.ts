@@ -1,12 +1,12 @@
-import { IWalletRepository, IWalletRepositoryExtension, RepositoryDataSource } from "../contracts";
+import { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } from "../contracts";
 import { Wallet } from "../models/wallet";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { WalletFilter } from "../search/filters";
 import { DelegateFilter } from "../search/filters/delegate-filter";
 import { makeExtendedRepository } from "./repository-extension";
 
-export const makeWalletRepository = (dataSource: RepositoryDataSource): IWalletRepository =>
-	makeExtendedRepository<Wallet, IWalletRepositoryExtension>(Wallet, dataSource, {
+export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRepository =>
+	makeExtendedRepository<Wallet, WalletRepositoryExtension>(Wallet, dataSource, {
 		async findManyByCritera(
 			walletCriteria: Criteria.OrWalletCriteria,
 			sorting: Sorting,

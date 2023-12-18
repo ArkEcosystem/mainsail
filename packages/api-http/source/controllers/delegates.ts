@@ -15,7 +15,7 @@ import { Controller } from "./controller";
 @injectable()
 export class DelegatesController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
-	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
+	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);

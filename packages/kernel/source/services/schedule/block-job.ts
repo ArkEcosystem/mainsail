@@ -12,7 +12,7 @@ export class BlockJob implements Job {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	protected blockCount = 1;
 

@@ -4,29 +4,29 @@ import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class Serializer implements Contracts.Serializer.ISerializer {
+export class Serializer implements Contracts.Serializer.Serializer {
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
 	@tagged("type", "wallet")
-	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
 	@tagged("type", "wallet")
-	private readonly addressSerializer!: Contracts.Crypto.IAddressSerializer;
+	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
 	@tagged("type", "wallet")
-	private readonly publicKeySerializer!: Contracts.Crypto.IPublicKeySerializer;
+	private readonly publicKeySerializer!: Contracts.Crypto.PublicKeySerializer;
 
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "wallet")
-	private readonly signatureSerializer!: Contracts.Crypto.ISignature;
+	private readonly signatureSerializer!: Contracts.Crypto.Signature;
 
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "consensus")
-	private readonly consensusSignatureSerializer!: Contracts.Crypto.ISignature;
+	private readonly consensusSignatureSerializer!: Contracts.Crypto.Signature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly transactionUtils!: Contracts.Crypto.ITransactionUtils;
+	private readonly transactionUtils!: Contracts.Crypto.TransactionUtils;
 
 	@inject(Identifiers.Cryptography.Size.HASH256)
 	private readonly hashSize!: number;

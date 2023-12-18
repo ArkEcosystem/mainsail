@@ -7,7 +7,7 @@ import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandler } from "./transaction";
 
 @injectable()
-export class TransactionHandlerRegistry implements Contracts.Transactions.ITransactionHandlerRegistry {
+export class TransactionHandlerRegistry implements Contracts.Transactions.TransactionHandlerRegistry {
 	@inject(Identifiers.TransactionHandlerProvider)
 	private readonly provider!: TransactionHandlerProvider;
 
@@ -26,7 +26,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 	}
 
 	public getRegisteredHandlerByType(
-		internalType: Contracts.Transactions.IInternalTransactionType,
+		internalType: Contracts.Transactions.InternalTransactionType,
 		version = 1,
 	): TransactionHandler {
 		for (const handler of this.handlers) {
@@ -55,7 +55,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 	}
 
 	public async getActivatedHandlerByType(
-		internalType: Contracts.Transactions.IInternalTransactionType,
+		internalType: Contracts.Transactions.InternalTransactionType,
 		version = 1,
 	): Promise<TransactionHandler> {
 		const handler = this.getRegisteredHandlerByType(internalType, version);
@@ -66,7 +66,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.ITrans
 	}
 
 	public async getActivatedHandlerForData(
-		transactionData: Contracts.Crypto.ITransactionData,
+		transactionData: Contracts.Crypto.TransactionData,
 	): Promise<TransactionHandler> {
 		const internalType = InternalTransactionType.from(transactionData.type, transactionData.typeGroup);
 		return this.getActivatedHandlerByType(internalType, transactionData.version);

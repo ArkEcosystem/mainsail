@@ -6,37 +6,37 @@ import { sealBlock } from "./block";
 import { IDFactory } from "./id.factory";
 
 @injectable()
-export class BlockFactory implements Contracts.Crypto.IBlockFactory {
+export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
+	private readonly serializer!: Contracts.Crypto.BlockSerializer;
 
 	@inject(Identifiers.Cryptography.Block.Deserializer)
-	private readonly deserializer!: Contracts.Crypto.IBlockDeserializer;
+	private readonly deserializer!: Contracts.Crypto.BlockDeserializer;
 
 	@inject(Identifiers.Cryptography.Block.IDFactory)
 	private readonly idFactory!: IDFactory;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator!: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.Validator;
 
-	public async make(data: Utils.Mutable<Contracts.Crypto.IBlockDataSerializable>): Promise<Contracts.Crypto.IBlock> {
-		const block = data as Utils.Mutable<Contracts.Crypto.IBlockData>;
+	public async make(data: Utils.Mutable<Contracts.Crypto.BlockDataSerializable>): Promise<Contracts.Crypto.Block> {
+		const block = data as Utils.Mutable<Contracts.Crypto.BlockData>;
 		block.id = await this.idFactory.make(data);
 
 		return this.fromData(block);
 	}
 
-	public async fromHex(hex: string): Promise<Contracts.Crypto.IBlock> {
+	public async fromHex(hex: string): Promise<Contracts.Crypto.Block> {
 		return this.#fromSerialized(Buffer.from(hex, "hex"));
 	}
 
-	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.IBlock> {
+	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.Block> {
 		return this.#fromSerialized(buff);
 	}
 
-	public async fromJson(json: Contracts.Crypto.IBlockJson): Promise<Contracts.Crypto.IBlock> {
+	public async fromJson(json: Contracts.Crypto.BlockJson): Promise<Contracts.Crypto.Block> {
 		// @ts-ignore
-		const data: Utils.Mutable<Contracts.Crypto.IBlockData> = { ...json };
+		const data: Utils.Mutable<Contracts.Crypto.BlockData> = { ...json };
 		data.totalAmount = BigNumber.make(data.totalAmount);
 		data.totalFee = BigNumber.make(data.totalFee);
 		data.reward = BigNumber.make(data.reward);
@@ -53,11 +53,11 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	}
 
 	// TODO: separate factory ?
-	public async fromProposedBytes(buff: Buffer): Promise<Contracts.Crypto.IProposedBlock> {
+	public async fromProposedBytes(buff: Buffer): Promise<Contracts.Crypto.ProposedBlock> {
 		const buffer = ByteBuffer.fromBuffer(buff);
 
 		const lockProofLength = buffer.readUint8();
-		let lockProof: Contracts.Crypto.IAggregatedSignature | undefined;
+		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
 		if (lockProofLength > 0) {
 			const lockProofBuffer = buffer.readBytes(lockProofLength);
 			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
@@ -73,7 +73,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 	}
 
 	// TODO: separate factory ?
-	public async fromCommittedBytes(buff: Buffer): Promise<Contracts.Crypto.ICommittedBlock> {
+	public async fromCommittedBytes(buff: Buffer): Promise<Contracts.Crypto.CommittedBlock> {
 		const buffer = ByteBuffer.fromBuffer(buff);
 
 		const commitBuffer = buffer.readBytes(this.serializer.commitSize());
@@ -90,8 +90,8 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 
 	// TODO: separate factory ?
 	public async fromCommittedJson(
-		json: Contracts.Crypto.ICommittedBlockJson,
-	): Promise<Contracts.Crypto.ICommittedBlock> {
+		json: Contracts.Crypto.CommittedBlockJson,
+	): Promise<Contracts.Crypto.CommittedBlock> {
 		const block = await this.fromJson(json.block);
 		return {
 			block,
@@ -100,7 +100,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		};
 	}
 
-	public async fromData(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlock> {
+	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
 		await this.#applySchema(data);
 
 		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
@@ -111,10 +111,10 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		});
 	}
 
-	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.IBlock> {
+	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Block> {
 		const deserialized = await this.deserializer.deserializeWithTransactions(serialized);
 
-		const validated: Contracts.Crypto.IBlockData | undefined = await this.#applySchema(deserialized.data);
+		const validated: Contracts.Crypto.BlockData | undefined = await this.#applySchema(deserialized.data);
 
 		if (validated) {
 			deserialized.data = validated;
@@ -126,7 +126,7 @@ export class BlockFactory implements Contracts.Crypto.IBlockFactory {
 		});
 	}
 
-	async #applySchema(data: Contracts.Crypto.IBlockData): Promise<Contracts.Crypto.IBlockData> {
+	async #applySchema(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.BlockData> {
 		const result = this.validator.validate("block", data);
 
 		if (!result.error) {

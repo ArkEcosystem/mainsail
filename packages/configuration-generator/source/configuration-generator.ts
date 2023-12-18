@@ -133,7 +133,7 @@ export class ConfigurationGenerator {
 						.setReward(internalOptions.rewardHeight, internalOptions.rewardAmount)
 						.generate();
 
-					this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
+					this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 						// @ts-ignore
 						genesisBlock: {},
 						milestones,

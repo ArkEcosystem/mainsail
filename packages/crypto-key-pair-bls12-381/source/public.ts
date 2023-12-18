@@ -3,9 +3,9 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
+export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
-	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {
 		return (await this.keyPairFactory.fromMnemonic(mnemonic)).publicKey;
@@ -15,7 +15,7 @@ export class PublicKeyFactory implements Contracts.Crypto.IPublicKeyFactory {
 		return (await this.keyPairFactory.fromWIF(wif)).publicKey;
 	}
 
-	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
 		return Buffer.from(
 			aggregatePubkeys(asset.publicKeys.map((pub) => PublicKey.fromBytes(Buffer.from(pub, "hex")))).toBytes(),
 		).toString("hex");

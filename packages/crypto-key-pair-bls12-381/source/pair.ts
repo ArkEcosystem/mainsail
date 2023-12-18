@@ -6,19 +6,19 @@ import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import WIF from "wif";
 
 @injectable()
-export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
+export class KeyPairFactory implements Contracts.Crypto.KeyPairFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	public async fromMnemonic(mnemonic: string): Promise<Contracts.Crypto.IKeyPair> {
+	public async fromMnemonic(mnemonic: string): Promise<Contracts.Crypto.KeyPair> {
 		return this.#fromPrivateKey(deriveChild(deriveMaster(mnemonicToSeedSync(mnemonic)), 0));
 	}
 
-	public async fromPrivateKey(privateKey: Buffer): Promise<Contracts.Crypto.IKeyPair> {
+	public async fromPrivateKey(privateKey: Buffer): Promise<Contracts.Crypto.KeyPair> {
 		return this.#fromPrivateKey(privateKey);
 	}
 
-	public async fromWIF(wif: string): Promise<Contracts.Crypto.IKeyPair> {
+	public async fromWIF(wif: string): Promise<Contracts.Crypto.KeyPair> {
 		const decoded = WIF.decode(wif, this.configuration.get("network.wif"));
 		const privateKey = Buffer.from(decoded.privateKey);
 
@@ -29,7 +29,7 @@ export class KeyPairFactory implements Contracts.Crypto.IKeyPairFactory {
 		};
 	}
 
-	#fromPrivateKey(privateKey: Uint8Array): Contracts.Crypto.IKeyPair {
+	#fromPrivateKey(privateKey: Uint8Array): Contracts.Crypto.KeyPair {
 		const secretKey = SecretKey.fromBytes(privateKey);
 		return {
 			compressed: true,

@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export const addTransactionsToBlock = (txs: Contracts.Crypto.ITransaction[], block: Contracts.Crypto.IBlock) => {
+export const addTransactionsToBlock = (txs: Contracts.Crypto.Transaction[], block: Contracts.Crypto.Block) => {
 	const { data } = block;
 	data.transactions = [];
 	txs.forEach((tx) => data.transactions?.push(tx.data));

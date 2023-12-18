@@ -32,7 +32,7 @@ describe<{
 
 		context.config = context.container.get<Configuration>(Identifiers.Cryptography.Configuration);
 
-		const factory = context.container.get<Contracts.Crypto.IPublicKeyFactory>(
+		const factory = context.container.get<Contracts.Crypto.PublicKeyFactory>(
 			Identifiers.Cryptography.Identity.PublicKeyFactory,
 		);
 
@@ -61,12 +61,12 @@ describe<{
 		const transaction1 = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction1-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const transaction2 = {
 			data: { senderPublicKey: await context.createPublicKey("sender2") },
 			id: "transaction2-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const memory = context.container.resolve(Mempool);
 		await memory.addTransaction(transaction1);
@@ -87,7 +87,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const memory = context.container.resolve(Mempool);
 		await memory.addTransaction(transaction);
@@ -107,7 +107,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const memory = context.container.resolve(Mempool);
 		await memory.addTransaction(transaction);
@@ -127,7 +127,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const memory = context.container.resolve(Mempool);
 		await memory.addTransaction(transaction);
@@ -146,7 +146,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const key = await context.createPublicKey("not sender");
 
@@ -173,12 +173,12 @@ describe<{
 		const transaction1 = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction1-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const transaction2 = {
 			data: { senderPublicKey: await context.createPublicKey("sender2") },
 			id: "transaction2-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const memory = context.container.resolve(Mempool);
 		await memory.addTransaction(transaction1);
@@ -201,7 +201,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const loggerSpy = spy(context.logger, "debug");
 
@@ -227,7 +227,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const loggerSpy = spy(context.logger, "debug");
 
@@ -246,7 +246,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const memory = context.container.resolve(Mempool);
 		const removedTransactions = await memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
@@ -258,7 +258,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const senderMempool = {
 			addTransaction: () => {},
@@ -286,7 +286,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const senderMempool = {
 			addTransaction: () => {},
@@ -327,7 +327,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const senderMempool = {
 			addTransaction: () => {},
@@ -358,7 +358,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const senderMempool = {
 			addTransaction: () => {},
@@ -396,7 +396,7 @@ describe<{
 		const transaction = {
 			data: { senderPublicKey: await context.createPublicKey("sender1") },
 			id: "transaction-id",
-		} as Contracts.Crypto.ITransaction;
+		} as Contracts.Crypto.Transaction;
 
 		const memory = context.container.resolve(Mempool);
 		await memory.addTransaction(transaction);

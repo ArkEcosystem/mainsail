@@ -14,7 +14,7 @@ export class GetPeersController implements Contracts.P2P.Controller {
 	public async handle(
 		request: Contracts.P2P.Request,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IGetPeersResponse> {
+	): Promise<Contracts.P2P.GetPeersResponse> {
 		const peerIp = getPeerIp(request);
 
 		return {

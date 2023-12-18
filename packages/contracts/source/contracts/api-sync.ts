@@ -1,6 +1,6 @@
-import { ICommitHandler } from "./crypto";
+import { CommitHandler } from "./crypto";
 
-export interface ISync extends ICommitHandler {
+export interface Sync extends CommitHandler {
 	prepareBootstrap(): Promise<void>;
 	bootstrap(): Promise<void>;
 	beforeCommit(): Promise<void>;

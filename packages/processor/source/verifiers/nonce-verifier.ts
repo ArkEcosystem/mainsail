@@ -11,7 +11,7 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		const block = unit.getBlock();
 
 		const nonceBySender = {};

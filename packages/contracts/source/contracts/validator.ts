@@ -1,21 +1,21 @@
-import { IAggregatedSignature, IBlock, IKeyPair, IPrecommit, IPrevote, IProposal } from "./crypto";
+import { AggregatedSignature, Block, KeyPair, Precommit, Prevote, Proposal } from "./crypto";
 
-export interface IValidator {
-	configure(publicKey: string, keyPair: IKeyPair): IValidator;
+export interface Validator {
+	configure(publicKey: string, keyPair: KeyPair): Validator;
 	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
-	prepareBlock(height: number, round: number): Promise<IBlock>;
+	prepareBlock(height: number, round: number): Promise<Block>;
 	propose(
 		round: number,
 		validRound: number | undefined,
-		block: IBlock,
-		lockProof?: IAggregatedSignature,
-	): Promise<IProposal>;
-	prevote(height: number, round: number, blockId: string | undefined): Promise<IPrevote>;
-	precommit(height: number, round: number, blockId: string | undefined): Promise<IPrecommit>;
+		block: Block,
+		lockProof?: AggregatedSignature,
+	): Promise<Proposal>;
+	prevote(height: number, round: number, blockId: string | undefined): Promise<Prevote>;
+	precommit(height: number, round: number, blockId: string | undefined): Promise<Precommit>;
 }
 
-export interface IValidatorRepository {
-	getValidator(publicKey: string): IValidator | undefined;
-	getValidators(publicKeys: string[]): IValidator[];
+export interface ValidatorRepository {
+	getValidator(publicKey: string): Validator | undefined;
+	getValidators(publicKeys: string[]): Validator[];
 }

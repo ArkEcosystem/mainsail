@@ -7,7 +7,7 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -19,15 +19,15 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@tagged("plugin", "fees-managed")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		await this.#throwIfCannot("pool", transaction);
 	}
 
-	public async throwIfCannotBroadcast(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotBroadcast(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		await this.#throwIfCannot("broadcast", transaction);
 	}
 
-	async #throwIfCannot(action: string, transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	async #throwIfCannot(action: string, transaction: Contracts.Crypto.Transaction): Promise<void> {
 		const feeString = this.#formatSatoshi(transaction.data.fee);
 
 		const minFee = this.#calculateMinFee(transaction);
@@ -44,7 +44,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		throw new Exceptions.TransactionFeeToLowError(transaction);
 	}
 
-	#calculateMinFee(transaction: Contracts.Crypto.ITransaction): BigNumber {
+	#calculateMinFee(transaction: Contracts.Crypto.Transaction): BigNumber {
 		const addonBytes = this.feeRegistry.get(transaction.key, transaction.data.version) || BigNumber.ZERO;
 		const satoshiPerByte: number = this.pluginConfiguration.getOptional("satoshiPerByte", 0);
 

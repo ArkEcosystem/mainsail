@@ -19,16 +19,16 @@ export class Generator {
 			mnemonic = this.mnemonicGenerator.generate();
 		}
 
-		const keys: Contracts.Crypto.IKeyPair = await this.app
-			.getTagged<Contracts.Crypto.IKeyPairFactory>(
+		const keys: Contracts.Crypto.KeyPair = await this.app
+			.getTagged<Contracts.Crypto.KeyPairFactory>(
 				Identifiers.Cryptography.Identity.KeyPairFactory,
 				"type",
 				"wallet",
 			)
 			.fromMnemonic(mnemonic);
 
-		const consensusKeys: Contracts.Crypto.IKeyPair = await this.app
-			.getTagged<Contracts.Crypto.IKeyPairFactory>(
+		const consensusKeys: Contracts.Crypto.KeyPair = await this.app
+			.getTagged<Contracts.Crypto.KeyPairFactory>(
 				Identifiers.Cryptography.Identity.KeyPairFactory,
 				"type",
 				"consensus",
@@ -37,7 +37,7 @@ export class Generator {
 
 		return {
 			address: await this.app
-				.getTagged<Contracts.Crypto.IAddressFactory>(
+				.getTagged<Contracts.Crypto.AddressFactory>(
 					Identifiers.Cryptography.Identity.AddressFactory,
 					"type",
 					"wallet",

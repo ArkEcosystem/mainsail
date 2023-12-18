@@ -17,16 +17,16 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.IDatabaseService;
+	private readonly database!: Contracts.Database.DatabaseService;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
 	@inject(Identifiers.P2PLogger)
 	private readonly logger!: Contracts.P2P.Logger;
@@ -90,7 +90,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const blockToCompare =
 			block.data.height === heightToRequest ? block : await this.database.getBlock(heightToRequest);
 
-		Utils.assert.defined<Contracts.Crypto.IBlock>(blockToCompare);
+		Utils.assert.defined<Contracts.Crypto.Block>(blockToCompare);
 
 		if (receivedCommittedBlock.block.data.height !== blockToCompare.data.height) {
 			throw new Error("Received block does not match the requested height");

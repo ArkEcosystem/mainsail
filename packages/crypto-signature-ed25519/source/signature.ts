@@ -8,7 +8,7 @@ import { sha512 } from "@noble/hashes/sha512";
 etc.sha512Sync = (...m) => sha512(etc.concatBytes(...m));
 
 @injectable()
-export class Signature implements Contracts.Crypto.ISignature {
+export class Signature implements Contracts.Crypto.Signature {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return Buffer.from(await sign(message, privateKey)).toString("hex");
 	}

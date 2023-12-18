@@ -5,7 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class StateVerifier implements Contracts.State.StateVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.StateService)
 	private stateService!: Contracts.State.Service;

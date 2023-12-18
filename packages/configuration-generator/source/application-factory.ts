@@ -81,7 +81,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoTransactionVote).register();
 
 	// @ts-ignore
-	app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
+	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 		milestones: [{ address: addressMilestone, blockTime: 8000, height: 0 }],
 	});
 

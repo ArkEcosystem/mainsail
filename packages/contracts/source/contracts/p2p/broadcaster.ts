@@ -1,8 +1,8 @@
-import { IPrecommit, IPrevote, IProposal, ITransaction } from "../crypto";
+import { Precommit, Prevote, Proposal, Transaction } from "../crypto";
 
 export interface Broadcaster {
-	broadcastTransactions(transactions: ITransaction[]): Promise<void>;
-	broadcastProposal(proposal: IProposal): Promise<void>;
-	broadcastPrevote(prevote: IPrevote): Promise<void>;
-	broadcastPrecommit(precommit: IPrecommit): Promise<void>;
+	broadcastTransactions(transactions: Transaction[]): Promise<void>;
+	broadcastProposal(proposal: Proposal): Promise<void>;
+	broadcastPrevote(prevote: Prevote): Promise<void>;
+	broadcastPrecommit(precommit: Precommit): Promise<void>;
 }

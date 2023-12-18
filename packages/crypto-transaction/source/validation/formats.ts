@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { FormatDefinition } from "ajv";
 
-export const makeFormats = (configuration: Contracts.Crypto.IConfiguration) => {
+export const makeFormats = (configuration: Contracts.Crypto.Configuration) => {
 	const vendorField: FormatDefinition<string> = {
 		type: "string",
 		validate: (data) => {

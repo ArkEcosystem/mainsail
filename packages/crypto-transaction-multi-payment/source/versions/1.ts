@@ -10,7 +10,7 @@ export class MultiPaymentTransaction extends Transaction {
 	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
-	private readonly addressSerializer!: Contracts.Crypto.IAddressSerializer;
+	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
 
 	@inject(Identifiers.Cryptography.Size.Address)
 	private readonly addressSize!: number;
@@ -19,7 +19,7 @@ export class MultiPaymentTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.MultiPayment;
 	public static key = "multiPayment";
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "multiPayment",
 			properties: {
@@ -55,10 +55,10 @@ export class MultiPaymentTransaction extends Transaction {
 		return true;
 	}
 
-	public static getData(json: Contracts.Crypto.ITransactionJson): Contracts.Crypto.ITransactionData {
+	public static getData(json: Contracts.Crypto.TransactionJson): Contracts.Crypto.TransactionData {
 		const data = Transaction.getData(json);
 
-		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
+		Utils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(data.asset?.payments);
 
 		for (const payment of data.asset.payments) {
 			payment.amount = BigNumber.make(payment.amount);
@@ -69,7 +69,7 @@ export class MultiPaymentTransaction extends Transaction {
 
 	public assetSize(): number {
 		const { data } = this;
-		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
+		Utils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(data.asset?.payments);
 		const { payments } = data.asset;
 
 		return (
@@ -79,10 +79,10 @@ export class MultiPaymentTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 
-		Utils.assert.defined<Contracts.Crypto.IMultiPaymentItem[]>(data.asset?.payments);
+		Utils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(data.asset?.payments);
 		const { payments } = data.asset;
 
 		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
@@ -99,7 +99,7 @@ export class MultiPaymentTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		const payments: Contracts.Crypto.IMultiPaymentItem[] = [];
+		const payments: Contracts.Crypto.MultiPaymentItem[] = [];
 		const total: number = buf.readUint16();
 
 		let totalPaymentsAmount = BigNumber.ZERO;

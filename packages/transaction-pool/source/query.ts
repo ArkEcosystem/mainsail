@@ -2,11 +2,11 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
-	public transactions: Contracts.Crypto.ITransaction[];
+	public transactions: Contracts.Crypto.Transaction[];
 	public predicates: Contracts.TransactionPool.QueryPredicate[] = [];
 
 	public constructor(
-		transactions: Contracts.Crypto.ITransaction[],
+		transactions: Contracts.Crypto.Transaction[],
 		predicate?: Contracts.TransactionPool.QueryPredicate,
 	) {
 		this.transactions = transactions;
@@ -16,8 +16,8 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		}
 	}
 
-	public async all(): Promise<Contracts.Crypto.ITransaction[]> {
-		const transactions: Contracts.Crypto.ITransaction[] = [];
+	public async all(): Promise<Contracts.Crypto.Transaction[]> {
+		const transactions: Contracts.Crypto.Transaction[] = [];
 
 		for (const transaction of this.transactions) {
 			if (await this.#satisfiesPredicates(transaction)) {
@@ -28,7 +28,7 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return transactions;
 	}
 
-	public async first(): Promise<Contracts.Crypto.ITransaction> {
+	public async first(): Promise<Contracts.Crypto.Transaction> {
 		for (const transaction of await this.all()) {
 			return transaction;
 		}
@@ -62,11 +62,11 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return this.wherePredicate(async (t) => t.data.version === version);
 	}
 
-	public whereKind(transaction: Contracts.Crypto.ITransaction): QueryIterable {
+	public whereKind(transaction: Contracts.Crypto.Transaction): QueryIterable {
 		return this.wherePredicate(async (t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
 	}
 
-	async #satisfiesPredicates(transaction: Contracts.Crypto.ITransaction): Promise<boolean> {
+	async #satisfiesPredicates(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		if (this.predicates.length === 0) {
 			return true;
 		}
@@ -104,7 +104,7 @@ export class Query implements Contracts.TransactionPool.Query {
 		return new QueryIterable(
 			[...this.mempool.getSenderMempools()]
 				.flatMap((senderMempool) => [...senderMempool.getFromLatest()])
-				.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+				.sort((a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
 					a.data.fee.comparedTo(b.data.fee),
 				),
 		);
@@ -114,7 +114,7 @@ export class Query implements Contracts.TransactionPool.Query {
 		return new QueryIterable(
 			[...this.mempool.getSenderMempools()]
 				.flatMap((senderMempool) => [...senderMempool.getFromEarliest()])
-				.sort((a: Contracts.Crypto.ITransaction, b: Contracts.Crypto.ITransaction) =>
+				.sort((a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
 					b.data.fee.comparedTo(a.data.fee),
 				),
 		);

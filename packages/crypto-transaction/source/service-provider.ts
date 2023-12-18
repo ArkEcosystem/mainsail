@@ -27,19 +27,19 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerValidation(): void {
 		for (const [name, format] of Object.entries(
-			makeFormats(this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)),
+			makeFormats(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		)) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addFormat(name, format);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addFormat(name, format);
 		}
 
 		for (const keyword of Object.values(
-			makeKeywords(this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)),
+			makeKeywords(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		)) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 		}
 
 		for (const schema of Object.values(schemas)) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
 }

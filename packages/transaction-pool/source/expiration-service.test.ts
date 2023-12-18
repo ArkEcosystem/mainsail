@@ -29,7 +29,7 @@ describe<{
 	});
 
 	it("canExpire - should return false when checking v2 transaction with 0 expiration", (context) => {
-		const transaction = { data: { expiration: 0 } } as Contracts.Crypto.ITransaction;
+		const transaction = { data: { expiration: 0 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const result = expirationService.canExpire(transaction);
 
@@ -37,7 +37,7 @@ describe<{
 	});
 
 	it("canExpire - should return true when checking v2 transaction with expiration field", (context) => {
-		const transaction = { data: { expiration: 100 } } as Contracts.Crypto.ITransaction;
+		const transaction = { data: { expiration: 100 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const result = expirationService.canExpire(transaction);
 
@@ -45,7 +45,7 @@ describe<{
 	});
 
 	it("canExpire - should return false when checking v2 transaction without expiration field", (context) => {
-		const transaction = { data: {} } as Contracts.Crypto.ITransaction;
+		const transaction = { data: {} } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const result = expirationService.canExpire(transaction);
 
@@ -53,7 +53,7 @@ describe<{
 	});
 
 	it("isExpired - should always return false when checking v2 transaction without expiration field", async (context) => {
-		const transaction = { data: {} } as Contracts.Crypto.ITransaction;
+		const transaction = { data: {} } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expired = await expirationService.isExpired(transaction);
 
@@ -63,7 +63,7 @@ describe<{
 	it("isExpired - should return true if transaction expired when checking v2 transaction with expiration field", async (context) => {
 		stub(context.stateStore, "getLastHeight").returnValue(100);
 
-		const transaction = { data: { expiration: 50 } } as Contracts.Crypto.ITransaction;
+		const transaction = { data: { expiration: 50 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expired = await expirationService.isExpired(transaction);
 
@@ -73,7 +73,7 @@ describe<{
 	it("isExpired - should return false if transaction not expired when checking v2 transaction with expiration field", async (context) => {
 		stub(context.stateStore, "getLastHeight").returnValue(100);
 
-		const transaction = { data: { expiration: 150 } } as Contracts.Crypto.ITransaction;
+		const transaction = { data: { expiration: 150 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expired = await expirationService.isExpired(transaction);
 
@@ -83,7 +83,7 @@ describe<{
 	it("isExpired - should return true if transaction expires in next block when checking v2 transaciton with expiration field", async (context) => {
 		stub(context.stateStore, "getLastHeight").returnValue(100);
 
-		const transaction = { data: { expiration: 101 } } as Contracts.Crypto.ITransaction;
+		const transaction = { data: { expiration: 101 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expired = await expirationService.isExpired(transaction);
 
@@ -91,7 +91,7 @@ describe<{
 	});
 
 	it("getExpirationHeight - should throw when checking v2 transaction without expiration field", async (context) => {
-		const transaction = { data: {} } as Contracts.Crypto.ITransaction;
+		const transaction = { data: {} } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const check = async () => await expirationService.getExpirationHeight(transaction);
 
@@ -99,7 +99,7 @@ describe<{
 	});
 
 	it("getExpirationHeight - should return value stored in expiration field when checking v2 transaction with expiration field", async (context) => {
-		const transaction = { data: { expiration: 100 } } as Contracts.Crypto.ITransaction;
+		const transaction = { data: { expiration: 100 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
 		const expirationHeight = await expirationService.getExpirationHeight(transaction);
 

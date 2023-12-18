@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-export const makeHeaders = (configuration: Contracts.Crypto.IConfiguration) => {
+export const makeHeaders = (configuration: Contracts.Crypto.Configuration) => {
 	const activeValidators = configuration.getMaxActiveValidators();
 
 	return Joi.object({

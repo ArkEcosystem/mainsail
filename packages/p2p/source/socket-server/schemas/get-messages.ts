@@ -3,7 +3,7 @@ import Joi from "joi";
 
 import { makeHeaders } from "./shared";
 
-export const getMessages = (configuration: Contracts.Crypto.IConfiguration) =>
+export const getMessages = (configuration: Contracts.Crypto.Configuration) =>
 	Joi.object({
 		headers: makeHeaders(configuration),
 	});

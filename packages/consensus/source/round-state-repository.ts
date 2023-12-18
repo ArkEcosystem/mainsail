@@ -4,13 +4,13 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { RoundState } from "./round-state";
 
 @injectable()
-export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepository {
+export class RoundStateRepository implements Contracts.Consensus.RoundStateRepository {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	#roundStates = new Map<string, Contracts.Consensus.IRoundState>();
+	#roundStates = new Map<string, Contracts.Consensus.RoundState>();
 
-	public getRoundState(height: number, round: number): Contracts.Consensus.IRoundState {
+	public getRoundState(height: number, round: number): Contracts.Consensus.RoundState {
 		const key = `${height}-${round}`;
 
 		if (!this.#roundStates.has(key)) {
@@ -20,7 +20,7 @@ export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepo
 		return this.#roundStates.get(key)!;
 	}
 
-	public getRoundStates(): Contracts.Consensus.IRoundState[] {
+	public getRoundStates(): Contracts.Consensus.RoundState[] {
 		return [...this.#roundStates.values()];
 	}
 
@@ -28,7 +28,7 @@ export class RoundStateRepository implements Contracts.Consensus.IRoundStateRepo
 		this.#roundStates.clear();
 	}
 
-	#createRoundState(height: number, round: number): Contracts.Consensus.IRoundState {
+	#createRoundState(height: number, round: number): Contracts.Consensus.RoundState {
 		return this.app.resolve(RoundState).configure(height, round);
 	}
 }

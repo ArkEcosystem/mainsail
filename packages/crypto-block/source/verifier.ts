@@ -3,19 +3,19 @@ import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
-export class Verifier implements Contracts.Crypto.IBlockVerifier {
+export class Verifier implements Contracts.Crypto.BlockVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer!: Contracts.Crypto.IBlockSerializer;
+	private readonly serializer!: Contracts.Crypto.BlockSerializer;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
-	public async verify(block: Contracts.Crypto.IBlock): Promise<Contracts.Crypto.IBlockVerification> {
-		const blockData: Contracts.Crypto.IBlockData = block.data;
-		const result: Utils.Mutable<Contracts.Crypto.IBlockVerification> = {
+	public async verify(block: Contracts.Crypto.Block): Promise<Contracts.Crypto.BlockVerification> {
+		const blockData: Contracts.Crypto.BlockData = block.data;
+		const result: Utils.Mutable<Contracts.Crypto.BlockVerification> = {
 			containsMultiSignatures: false,
 			errors: [],
 			verified: false,
@@ -59,7 +59,7 @@ export class Verifier implements Contracts.Crypto.IBlockVerifier {
 			}
 
 			// Checking if transactions of the block adds up to block values.
-			const appliedTransactions: Record<string, Contracts.Crypto.ITransactionData> = {};
+			const appliedTransactions: Record<string, Contracts.Crypto.TransactionData> = {};
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;

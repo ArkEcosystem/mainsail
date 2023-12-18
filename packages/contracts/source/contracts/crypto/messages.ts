@@ -1,12 +1,12 @@
-import { IProposedBlock } from "./block";
-import { IKeyPair } from "./identities";
+import { ProposedBlock } from "./block";
+import { KeyPair } from "./identities";
 
 export enum MessageType {
 	Prevote = 1,
 	Precommit = 2,
 }
 
-export interface ISignatureMessageData {
+export interface SignatureMessageData {
 	readonly type: MessageType;
 	readonly height: number;
 	readonly round: number;
@@ -16,10 +16,10 @@ export interface ISignatureMessageData {
 export type HasBlockId = { blockId: string };
 export type WithoutBlockId<T> = Omit<T, "blockId">;
 export type WithOptionalBlockId<T extends HasBlockId> = WithoutBlockId<T> & Partial<Pick<T, "blockId">>;
-export interface ISignaturePrevoteData extends WithOptionalBlockId<ISignatureMessageData> {}
-export interface ISignaturePrecommitData extends WithOptionalBlockId<ISignatureMessageData> {}
+export interface SignaturePrevoteData extends WithOptionalBlockId<SignatureMessageData> {}
+export interface SignaturePrecommitData extends WithOptionalBlockId<SignatureMessageData> {}
 
-export interface IProposalData {
+export interface ProposalData {
 	readonly height: number;
 	readonly round: number;
 	readonly block: { serialized: string };
@@ -28,7 +28,7 @@ export interface IProposalData {
 	readonly signature: string;
 }
 
-export interface ISerializableProposalData {
+export interface SerializableProposalData {
 	readonly round: number;
 	readonly validRound?: number;
 	readonly block: { serialized: string };
@@ -36,16 +36,16 @@ export interface ISerializableProposalData {
 	readonly signature?: string;
 }
 
-export interface IProposal extends IProposalData {
-	readonly block: IProposedBlock;
+export interface Proposal extends ProposalData {
+	readonly block: ProposedBlock;
 	readonly serialized: Buffer;
 
-	toSerializableData(): ISerializableProposalData;
-	toData(): IProposalData;
+	toSerializableData(): SerializableProposalData;
+	toData(): ProposalData;
 	toString(): string;
 }
 
-export interface IPrevoteData {
+export interface PrevoteData {
 	readonly type: MessageType;
 	readonly height: number;
 	readonly round: number;
@@ -54,15 +54,15 @@ export interface IPrevoteData {
 	readonly signature: string;
 }
 
-export interface IPrevote extends IPrevoteData {
+export interface Prevote extends PrevoteData {
 	readonly serialized: Buffer;
 
-	toSignatureData(): ISignaturePrevoteData;
-	toData(): IPrevoteData;
+	toSignatureData(): SignaturePrevoteData;
+	toData(): PrevoteData;
 	toString(): string;
 }
 
-export interface IPrecommitData {
+export interface PrecommitData {
 	readonly type: MessageType;
 	readonly height: number;
 	readonly round: number;
@@ -71,11 +71,11 @@ export interface IPrecommitData {
 	readonly signature: string;
 }
 
-export interface IPrecommit extends IPrecommitData {
+export interface Precommit extends PrecommitData {
 	readonly serialized: Buffer;
 
-	toSignatureData(): ISignaturePrecommitData;
-	toData(): IPrecommitData;
+	toSignatureData(): SignaturePrecommitData;
+	toData(): PrecommitData;
 	toString(): string;
 }
 
@@ -86,37 +86,37 @@ export interface SerializeProposalOptions {
 export type HasSignature = { signature: string };
 export type WithoutSignature<T> = Omit<T, "signature">;
 export type OptionalSignature<T extends HasSignature> = WithoutSignature<T> & Partial<Pick<T, "signature">>;
-export type IMakeProposalData = WithoutSignature<ISerializableProposalData>;
-export type IMakePrevoteData = WithoutSignature<IPrevoteData>;
-export type IMakePrecommitData = WithoutSignature<IPrecommitData>;
+export type MakeProposalData = WithoutSignature<SerializableProposalData>;
+export type MakePrevoteData = WithoutSignature<PrevoteData>;
+export type MakePrecommitData = WithoutSignature<PrecommitData>;
 
-export interface IMessageFactory {
-	makeProposal(data: IMakeProposalData, keyPair: IKeyPair): Promise<IProposal>;
-	makeProposalFromBytes(data: Buffer): Promise<IProposal>;
-	makeProposalFromData(data: IProposalData): Promise<IProposal>;
-	makePrevote(data: IMakePrevoteData, keyPair: IKeyPair): Promise<IPrevote>;
-	makePrevoteFromBytes(data: Buffer): Promise<IPrevote>;
-	makePrevoteFromData(data: IPrevoteData): Promise<IPrevote>;
-	makePrecommit(data: IMakePrecommitData, keyPair: IKeyPair): Promise<IPrecommit>;
-	makePrecommitFromBytes(data: Buffer): Promise<IPrecommit>;
-	makePrecommitFromData(data: IPrecommitData): Promise<IPrecommit>;
+export interface MessageFactory {
+	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
+	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
+	makeProposalFromData(data: ProposalData): Promise<Proposal>;
+	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Prevote>;
+	makePrevoteFromBytes(data: Buffer): Promise<Prevote>;
+	makePrevoteFromData(data: PrevoteData): Promise<Prevote>;
+	makePrecommit(data: MakePrecommitData, keyPair: KeyPair): Promise<Precommit>;
+	makePrecommitFromBytes(data: Buffer): Promise<Precommit>;
+	makePrecommitFromData(data: PrecommitData): Promise<Precommit>;
 }
 
-export interface IMessageSerializer {
-	serializeProposal(proposal: ISerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
-	serializePrevote(prevote: IPrevoteData): Promise<Buffer>;
-	serializePrevoteForSignature(prevote: ISignaturePrevoteData): Promise<Buffer>;
-	serializePrecommit(precommit: IPrecommitData): Promise<Buffer>;
-	serializePrecommitForSignature(precommit: ISignaturePrecommitData): Promise<Buffer>;
+export interface MessageSerializer {
+	serializeProposal(proposal: SerializableProposalData, options: SerializeProposalOptions): Promise<Buffer>;
+	serializePrevote(prevote: PrevoteData): Promise<Buffer>;
+	serializePrevoteForSignature(prevote: SignaturePrevoteData): Promise<Buffer>;
+	serializePrecommit(precommit: PrecommitData): Promise<Buffer>;
+	serializePrecommitForSignature(precommit: SignaturePrecommitData): Promise<Buffer>;
 }
 
-export interface IMessageDeserializer {
-	deserializeProposal(serialized: Buffer): Promise<IProposalData>;
-	deserializePrevote(serialized: Buffer): Promise<IPrevoteData>;
-	deserializePrecommit(serialized: Buffer): Promise<IPrecommitData>;
+export interface MessageDeserializer {
+	deserializeProposal(serialized: Buffer): Promise<ProposalData>;
+	deserializePrevote(serialized: Buffer): Promise<PrevoteData>;
+	deserializePrecommit(serialized: Buffer): Promise<PrecommitData>;
 }
 
-export interface IMessageVerificationResult {
+export interface MessageVerificationResult {
 	readonly verified: boolean;
 	readonly errors: string[];
 }

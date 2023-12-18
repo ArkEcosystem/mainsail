@@ -12,7 +12,7 @@ import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstrac
 @injectable()
 export class ApiNodes extends AbstractListener<Contracts.P2P.PeerApiNode, Models.ApiNode> {
 	@inject(ApiDatabaseIdentifiers.ApiNodeRepositoryFactory)
-	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.IApiNodeRepositoryFactory;
+	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.ApiNodeRepositoryFactory;
 
 	protected getEventMapping(): ListenerEventMapping {
 		return {

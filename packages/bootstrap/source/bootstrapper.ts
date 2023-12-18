@@ -11,7 +11,7 @@ export class Bootstrapper {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.Service)
-	private readonly consensus!: Contracts.Consensus.IConsensusService;
+	private readonly consensus!: Contracts.Consensus.ConsensusService;
 
 	@inject(Identifiers.StateVerifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
@@ -26,29 +26,29 @@ export class Bootstrapper {
 	private readonly p2pService!: Contracts.P2P.Service;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService!: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.DatabaseService;
 
 	@inject(Identifiers.StateService)
 	private stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
 	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
-	private readonly committedBlockStateFactory!: Contracts.Consensus.ICommittedBlockStateFactory;
+	private readonly committedBlockStateFactory!: Contracts.Consensus.CommittedBlockStateFactory;
 
 	@inject(Identifiers.ApiSync)
 	@optional()
-	private readonly apiSync: Contracts.ApiSync.ISync | undefined;
+	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
 
 	#stateStore!: Contracts.State.StateStore;
 
@@ -128,14 +128,14 @@ export class Bootstrapper {
 			await this.#processGenesisBlock();
 		} else {
 			const block = await this.databaseService.getBlock(this.#stateStore.getLastHeight());
-			Utils.assert.defined<Contracts.Crypto.IBlock>(block);
+			Utils.assert.defined<Contracts.Crypto.Block>(block);
 			this.#stateStore.setLastBlock(block);
 		}
 	}
 
 	async #processBlocks(): Promise<void> {
 		const lastBlock = await this.databaseService.getLastBlock();
-		Utils.assert.defined<Contracts.Crypto.ICommittedBlock>(lastBlock);
+		Utils.assert.defined<Contracts.Crypto.CommittedBlock>(lastBlock);
 
 		for await (const committedBlock of this.databaseService.readCommits(
 			this.#stateStore.getLastHeight() + 1,
@@ -151,7 +151,7 @@ export class Bootstrapper {
 		}
 	}
 
-	async #processBlock(committedBlock: Contracts.Crypto.ICommittedBlock): Promise<void> {
+	async #processBlock(committedBlock: Contracts.Crypto.CommittedBlock): Promise<void> {
 		try {
 			const committedBlockState = this.committedBlockStateFactory(committedBlock);
 			const result = await this.blockProcessor.process(committedBlockState);

@@ -7,11 +7,11 @@ export class TransactionResource implements Contracts.Api.Resource {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public raw(resource: Contracts.Crypto.ITransactionData): object {
+	public raw(resource: Contracts.Crypto.TransactionData): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
-	public async transform(resource: Contracts.Crypto.ITransactionData): Promise<object> {
+	public async transform(resource: Contracts.Crypto.TransactionData): Promise<object> {
 		AppUtils.assert.defined<string>(resource.senderPublicKey);
 
 		const wallet = await this.stateService.getWalletRepository().findByPublicKey(resource.senderPublicKey);

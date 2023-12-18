@@ -7,7 +7,7 @@ import {
 	NetworkConfigPartial,
 } from "./networks";
 
-export interface IConfiguration {
+export interface Configuration {
 	setConfig(config: NetworkConfigPartial): void;
 
 	all(): NetworkConfig | undefined;

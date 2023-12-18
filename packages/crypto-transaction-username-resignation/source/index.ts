@@ -21,7 +21,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerFees(): void {
-		this.app.get<Contracts.Fee.IFeeRegistry>(Identifiers.Fee.Registry).set(
+		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			UsernameResignationTransaction.key,
 			UsernameResignationTransaction.version,
 			{

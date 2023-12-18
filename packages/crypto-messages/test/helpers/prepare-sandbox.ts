@@ -58,10 +58,10 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	for (const keyword of Object.values(
 		makeKeywords(context.sandbox.app.get(Identifiers.Cryptography.Configuration)),
 	)) {
-		context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+		context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 	}
 
 	for (const schema of Object.values(schemas)) {
-		context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 	}
 };

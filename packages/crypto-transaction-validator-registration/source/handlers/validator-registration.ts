@@ -26,13 +26,13 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 	public async throwIfCannotBeApplied(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
-		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
@@ -52,19 +52,19 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		emitter.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
-		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const hasSender: boolean = await this.poolQuery
@@ -96,12 +96,12 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
+		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
-		AppUtils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		await super.applyToSender(walletRepository, transaction);
@@ -116,6 +116,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {}
 }

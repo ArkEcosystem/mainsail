@@ -9,10 +9,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private readonly handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.StateService)
 	private stateService!: Contracts.State.Service;
@@ -34,7 +34,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		return this;
 	}
 
-	public async apply(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async apply(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {
 			throw new Exceptions.TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
@@ -54,7 +54,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			);
 		}
 
-		const handler: Contracts.Transactions.ITransactionHandler =
+		const handler: Contracts.Transactions.TransactionHandler =
 			await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		if (
@@ -87,7 +87,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		}
 	}
 
-	public async revert(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async revert(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		try {
 			// TODO: Implement transaction revert
 			// const handler: Contracts.Transactions.ITransactionHandler =

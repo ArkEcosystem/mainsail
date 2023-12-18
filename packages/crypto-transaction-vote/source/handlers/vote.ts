@@ -30,7 +30,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 	public async throwIfCannotBeApplied(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
@@ -78,7 +78,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
 
@@ -101,7 +101,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -120,7 +120,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		await super.applyToSender(walletRepository, transaction);
 
@@ -142,11 +142,11 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {}
 
-	#checkAsset(data: Contracts.Crypto.ITransactionData) {
-		Utils.assert.defined<Contracts.Crypto.IVoteAsset>(data.asset);
+	#checkAsset(data: Contracts.Crypto.TransactionData) {
+		Utils.assert.defined<Contracts.Crypto.VoteAsset>(data.asset);
 		if (data.asset.votes.length > 1) {
 			throw new Exceptions.MaxVotesExceeededError();
 		}

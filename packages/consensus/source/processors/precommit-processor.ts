@@ -5,15 +5,15 @@ import { IpcWorker } from "@mainsail/kernel";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.IPrecommitProcessor {
+export class PrecommitProcessor extends AbstractProcessor implements Contracts.Consensus.PrecommitProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly serializer!: Contracts.Crypto.IMessageSerializer;
+	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
+	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
@@ -22,7 +22,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(
-		precommit: Contracts.Crypto.IPrecommit,
+		precommit: Contracts.Crypto.Precommit,
 		broadcast = true,
 	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
@@ -51,7 +51,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 		});
 	}
 
-	async #hasValidSignature(precommit: Contracts.Crypto.IPrecommit): Promise<boolean> {
+	async #hasValidSignature(precommit: Contracts.Crypto.Precommit): Promise<boolean> {
 		const worker = await this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",

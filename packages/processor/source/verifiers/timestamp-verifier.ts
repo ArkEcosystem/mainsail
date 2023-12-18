@@ -10,12 +10,12 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		if (unit.getBlock().data.height === 0) {
 			return true;
 		}

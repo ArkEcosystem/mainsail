@@ -5,7 +5,7 @@ import { BigNumber, isEmpty } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
-export class Validator implements Contracts.Validator.IValidator {
+export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -16,30 +16,30 @@ export class Validator implements Contracts.Validator.IValidator {
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.IBlockFactory;
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
 
 	@inject(Identifiers.Cryptography.HashFactory)
-	private readonly hashFactory!: Contracts.Crypto.IHashFactory;
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messagesFactory!: Contracts.Crypto.IMessageFactory;
+	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.StateService)
 	protected readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
-	#keyPair!: Contracts.Crypto.IKeyPair;
+	#keyPair!: Contracts.Crypto.KeyPair;
 	#walletPublicKey!: string;
 
-	public configure(walletPublicKey: string, keyPair: Contracts.Crypto.IKeyPair): Contracts.Validator.IValidator {
+	public configure(walletPublicKey: string, keyPair: Contracts.Crypto.KeyPair): Contracts.Validator.Validator {
 		this.#walletPublicKey = walletPublicKey;
 		this.#keyPair = keyPair;
 
@@ -54,7 +54,7 @@ export class Validator implements Contracts.Validator.IValidator {
 		return this.#keyPair.publicKey;
 	}
 
-	public async prepareBlock(height: number, round: number): Promise<Contracts.Crypto.IBlock> {
+	public async prepareBlock(height: number, round: number): Promise<Contracts.Crypto.Block> {
 		// TODO: use height/round ?
 		const transactions = await this.#getTransactionsForForging();
 		return this.#makeBlock(transactions);
@@ -63,9 +63,9 @@ export class Validator implements Contracts.Validator.IValidator {
 	public async propose(
 		round: number,
 		validRound: number | undefined,
-		block: Contracts.Crypto.IBlock,
-		lockProof?: Contracts.Crypto.IAggregatedSignature,
-	): Promise<Contracts.Crypto.IProposal> {
+		block: Contracts.Crypto.Block,
+		lockProof?: Contracts.Crypto.AggregatedSignature,
+	): Promise<Contracts.Crypto.Proposal> {
 		const serializedProposedBlock = await this.blockSerializer.serializeProposed({ block, lockProof });
 		return this.messagesFactory.makeProposal(
 			{
@@ -82,7 +82,7 @@ export class Validator implements Contracts.Validator.IValidator {
 		height: number,
 		round: number,
 		blockId: string | undefined,
-	): Promise<Contracts.Crypto.IPrevote> {
+	): Promise<Contracts.Crypto.Prevote> {
 		return this.messagesFactory.makePrevote(
 			{
 				blockId,
@@ -99,7 +99,7 @@ export class Validator implements Contracts.Validator.IValidator {
 		height: number,
 		round: number,
 		blockId: string | undefined,
-	): Promise<Contracts.Crypto.IPrecommit> {
+	): Promise<Contracts.Crypto.Precommit> {
 		return this.messagesFactory.makePrecommit(
 			{
 				blockId,
@@ -112,8 +112,8 @@ export class Validator implements Contracts.Validator.IValidator {
 		);
 	}
 
-	async #getTransactionsForForging(): Promise<Contracts.Crypto.ITransaction[]> {
-		const transactions: Contracts.Crypto.ITransaction[] = await this.collator.getBlockCandidateTransactions();
+	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
+		const transactions: Contracts.Crypto.Transaction[] = await this.collator.getBlockCandidateTransactions();
 
 		if (isEmpty(transactions)) {
 			return [];
@@ -128,14 +128,14 @@ export class Validator implements Contracts.Validator.IValidator {
 		return transactions;
 	}
 
-	async #makeBlock(transactions: Contracts.Crypto.ITransaction[]): Promise<Contracts.Crypto.IBlock> {
+	async #makeBlock(transactions: Contracts.Crypto.Transaction[]): Promise<Contracts.Crypto.Block> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
 		};
 
 		const payloadBuffers: Buffer[] = [];
-		const transactionData: Contracts.Crypto.ITransactionData[] = [];
+		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.

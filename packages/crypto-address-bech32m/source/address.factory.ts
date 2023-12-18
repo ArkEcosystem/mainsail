@@ -3,17 +3,17 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { bech32m } from "@scure/base";
 
 @injectable()
-export class AddressFactory implements Contracts.Crypto.IAddressFactory {
+export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
 	@tagged("type", "wallet")
-	private readonly keyPairFactory!: Contracts.Crypto.IKeyPairFactory;
+	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "wallet")
-	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
 
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
@@ -30,11 +30,11 @@ export class AddressFactory implements Contracts.Crypto.IAddressFactory {
 		return this.fromPublicKey(await this.publicKeyFactory.fromWIF(wif));
 	}
 
-	public async fromMultiSignatureAsset(asset: Contracts.Crypto.IMultiSignatureAsset): Promise<string> {
+	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
 		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
 	}
 
-	public async fromPrivateKey(privateKey: Contracts.Crypto.IKeyPair): Promise<string> {
+	public async fromPrivateKey(privateKey: Contracts.Crypto.KeyPair): Promise<string> {
 		return this.fromPublicKey(privateKey.publicKey);
 	}
 

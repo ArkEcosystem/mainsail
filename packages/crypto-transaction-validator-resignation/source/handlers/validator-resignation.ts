@@ -26,7 +26,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 
 	public async throwIfCannotBeApplied(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		if (!wallet.isValidator()) {
@@ -50,14 +50,14 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.ITransaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		emitter.dispatch(AppEnums.ValidatorEvent.Resigned, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -76,7 +76,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 
 	public async applyToSender(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		await super.applyToSender(walletRepository, transaction);
 
@@ -94,7 +94,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 
 	public async applyToRecipient(
 		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}
 }

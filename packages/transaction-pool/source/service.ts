@@ -33,7 +33,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: Contracts.Crypto.ITransactionFactory;
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
 	readonly #lock: AppUtils.Lock = new AppUtils.Lock();
 
@@ -83,7 +83,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async addTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		await this.#lock.runNonExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -173,7 +173,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async removeTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async removeTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		await this.#lock.runNonExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -209,7 +209,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async removeForgedTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async removeForgedTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		await this.#lock.runNonExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -335,7 +335,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 	}
 
-	async #addTransactionToMempool(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	async #addTransactionToMempool(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");

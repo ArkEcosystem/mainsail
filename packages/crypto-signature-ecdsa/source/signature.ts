@@ -4,7 +4,7 @@ import { ByteBuffer } from "@mainsail/utils";
 import { secp256k1 } from "bcrypto";
 
 @injectable()
-export class Signature implements Contracts.Crypto.ISignature {
+export class Signature implements Contracts.Crypto.Signature {
 	@inject(Identifiers.Cryptography.Size.Signature)
 	private readonly signatureSize!: Function;
 

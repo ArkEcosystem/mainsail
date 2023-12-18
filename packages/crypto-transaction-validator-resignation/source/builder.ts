@@ -17,8 +17,8 @@ export class ValidatorResignationBuilder extends TransactionBuilder<ValidatorRes
 		this.data.senderPublicKey = "";
 	}
 
-	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
-		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
+		const struct: Contracts.Crypto.TransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		return struct;
 	}

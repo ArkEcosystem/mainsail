@@ -10,7 +10,7 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
-	public async execute(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		if (unit.getBlock().data.height === 0) {
 			return true;
 		}

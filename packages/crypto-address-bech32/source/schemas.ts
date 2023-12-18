@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export const makeSchemas = (configuration: Contracts.Crypto.IConfiguration) => {
+export const makeSchemas = (configuration: Contracts.Crypto.Configuration) => {
 	const address = {
 		$id: "address",
 		allOf: [

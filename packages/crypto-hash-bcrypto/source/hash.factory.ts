@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Hash256, RIPEMD160, SHA256 } from "bcrypto";
 
 @injectable()
-export class HashFactory implements Contracts.Crypto.IHashFactory {
+export class HashFactory implements Contracts.Crypto.HashFactory {
 	public async ripemd160(data: Contracts.Crypto.HashInput): Promise<Buffer> {
 		return RIPEMD160.digest(Array.isArray(data) ? Buffer.concat(data) : data);
 	}

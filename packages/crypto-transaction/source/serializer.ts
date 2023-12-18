@@ -3,12 +3,12 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class Serializer implements Contracts.Crypto.ITransactionSerializer {
+export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
 	@inject(Identifiers.Cryptography.Size.PublicKey)
 	@tagged("type", "wallet")
@@ -19,8 +19,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 	private readonly signatureSize!: number;
 
 	public async getBytes(
-		transaction: Contracts.Crypto.ITransactionData,
-		options: Contracts.Crypto.ISerializeOptions = {},
+		transaction: Contracts.Crypto.TransactionData,
+		options: Contracts.Crypto.SerializeOptions = {},
 	): Promise<Buffer> {
 		const version: number = transaction.version || 1;
 
@@ -31,7 +31,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		throw new Exceptions.TransactionVersionError(version);
 	}
 
-	public commonSize(transaction: Contracts.Crypto.ITransaction): number {
+	public commonSize(transaction: Contracts.Crypto.Transaction): number {
 		return (
 			1 + // magic byte
 			1 + // version
@@ -44,7 +44,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		);
 	}
 
-	public vendorFieldSize(transaction: Contracts.Crypto.ITransaction): number {
+	public vendorFieldSize(transaction: Contracts.Crypto.Transaction): number {
 		let vendorFieldSize = 1; // length byte
 
 		if (transaction.hasVendorField() && transaction.data.vendorField) {
@@ -56,8 +56,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 	}
 
 	public signaturesSize(
-		transaction: Contracts.Crypto.ITransaction,
-		options: Contracts.Crypto.ISerializeOptions = {},
+		transaction: Contracts.Crypto.Transaction,
+		options: Contracts.Crypto.SerializeOptions = {},
 	): number {
 		let size = 0;
 
@@ -74,8 +74,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 	}
 
 	public totalSize(
-		transaction: Contracts.Crypto.ITransaction,
-		options: Contracts.Crypto.ISerializeOptions = {},
+		transaction: Contracts.Crypto.Transaction,
+		options: Contracts.Crypto.SerializeOptions = {},
 	): number {
 		return (
 			this.commonSize(transaction) +
@@ -86,8 +86,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 	}
 
 	public async serialize(
-		transaction: Contracts.Crypto.ITransaction,
-		options: Contracts.Crypto.ISerializeOptions = {},
+		transaction: Contracts.Crypto.Transaction,
+		options: Contracts.Crypto.SerializeOptions = {},
 	): Promise<Buffer> {
 		const bufferSize = this.totalSize(transaction, options);
 		const buff: ByteBuffer = ByteBuffer.fromSize(bufferSize);
@@ -117,7 +117,7 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		return bufferBuffer;
 	}
 
-	#serializeCommon(transaction: Contracts.Crypto.ITransactionData, buff: ByteBuffer): void {
+	#serializeCommon(transaction: Contracts.Crypto.TransactionData, buff: ByteBuffer): void {
 		transaction.version = transaction.version || 0x01;
 		if (transaction.typeGroup === undefined) {
 			transaction.typeGroup = Contracts.Crypto.TransactionTypeGroup.Core;
@@ -137,8 +137,8 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 		buff.writeUint64(transaction.fee.toBigInt());
 	}
 
-	#serializeVendorField(transaction: Contracts.Crypto.ITransaction, buff: ByteBuffer): void {
-		const { data }: Contracts.Crypto.ITransaction = transaction;
+	#serializeVendorField(transaction: Contracts.Crypto.Transaction, buff: ByteBuffer): void {
+		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		if (transaction.hasVendorField() && data.vendorField) {
 			const vf: Buffer = Buffer.from(data.vendorField, "utf8");
@@ -150,9 +150,9 @@ export class Serializer implements Contracts.Crypto.ITransactionSerializer {
 	}
 
 	#serializeSignatures(
-		transaction: Contracts.Crypto.ITransactionData,
+		transaction: Contracts.Crypto.TransactionData,
 		buff: ByteBuffer,
-		options: Contracts.Crypto.ISerializeOptions = {},
+		options: Contracts.Crypto.SerializeOptions = {},
 	): void {
 		if (transaction.signature && !options.excludeSignature) {
 			buff.writeBytes(Buffer.from(transaction.signature, "hex"));

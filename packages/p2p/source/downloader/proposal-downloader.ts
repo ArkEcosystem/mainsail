@@ -5,7 +5,7 @@ import { getRandomPeer } from "../utils";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	peerHeader: Contracts.P2P.IHeaderData;
+	peerHeader: Contracts.P2P.HeaderData;
 	height: number;
 	round: number;
 };
@@ -27,10 +27,10 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
+	private readonly factory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.Consensus.ProposalProcessor)
-	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
+	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.P2PState)
 	private readonly state!: Contracts.P2P.State;
@@ -75,7 +75,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		return this.#downloadsByHeight.size > 0;
 	}
 
-	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData) {
+	#canDownload(ourHeader: Contracts.P2P.Header, peerHeader: Contracts.P2P.HeaderData) {
 		if (ourHeader.height !== peerHeader.height || ourHeader.round !== peerHeader.round) {
 			return false;
 		}

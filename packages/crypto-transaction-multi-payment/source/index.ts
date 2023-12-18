@@ -25,14 +25,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerKeywords(): void {
 		for (const keyword of Object.values(
-			makeKeywords(this.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)),
+			makeKeywords(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
 		)) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 		}
 	}
 
 	#registerFees(): void {
-		this.app.get<Contracts.Fee.IFeeRegistry>(Identifiers.Fee.Registry).set(
+		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			MultiPaymentTransaction.key,
 			MultiPaymentTransaction.version,
 			{

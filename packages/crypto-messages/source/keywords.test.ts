@@ -31,7 +31,7 @@ describe<{
 		context.validator.addSchema(schema);
 
 		const { activeValidators } = context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		let matrix = new Array(activeValidators).fill(true);
@@ -64,7 +64,7 @@ describe<{
 		context.validator.addSchema(schema);
 
 		const { activeValidators } = context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		let matrix = new Array(activeValidators).fill(true);
@@ -86,7 +86,7 @@ describe<{
 		context.validator.addSchema(schema);
 
 		const { activeValidators } = context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -114,7 +114,7 @@ describe<{
 		context.validator.addSchema(schema);
 
 		const { activeValidators } = context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -143,7 +143,7 @@ describe<{
 		context.validator.addSchema(schema);
 
 		let { activeValidators } = context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		const block1 = {
@@ -159,11 +159,11 @@ describe<{
 
 		// change milestone to 15 validators at height 15
 		context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestones()[1].height = 15;
 
 		context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestones()[1].activeValidators = 15;
 
 		const block2 = {

@@ -19,9 +19,9 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
 
-		context.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schemas.address);
+		context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schemas.address);
 
-		context.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
+		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			milestones: [
 				// @ts-ignore
 				{

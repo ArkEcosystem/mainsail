@@ -3,9 +3,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { IpcWorker, Utils } from "@mainsail/kernel";
 
 @injectable()
-export class Aggregator implements Contracts.Consensus.IAggregator {
+export class Aggregator implements Contracts.Consensus.Aggregator {
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.Ipc.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
@@ -13,7 +13,7 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	public async aggregate(
 		majority: Map<number, { signature: string }>,
 		activeValidators: number,
-	): Promise<Contracts.Crypto.IAggregatedSignature> {
+	): Promise<Contracts.Crypto.AggregatedSignature> {
 		if (!Utils.isMajority(majority.size, activeValidators)) {
 			throw new Error("Failed to aggregate signatures, because the majority is not reached.");
 		}
@@ -37,7 +37,7 @@ export class Aggregator implements Contracts.Consensus.IAggregator {
 	}
 
 	async verify(
-		signature: Contracts.Crypto.IAggregatedSignature,
+		signature: Contracts.Crypto.AggregatedSignature,
 		data: Buffer,
 		activeValidators: number,
 	): Promise<boolean> {

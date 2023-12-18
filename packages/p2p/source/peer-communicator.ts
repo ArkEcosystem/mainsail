@@ -27,13 +27,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
 	@inject(Identifiers.PeerHeaderService)
-	private readonly headerService!: Contracts.P2P.IHeaderService;
+	private readonly headerService!: Contracts.P2P.HeaderService;
 
 	@inject(Identifiers.P2PLogger)
 	private readonly logger!: Contracts.P2P.Logger;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator!: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.Validator;
 
 	@inject(Identifiers.PeerThrottleFactory)
 	private readonly throttleFactory!: () => Promise<Throttle>;
@@ -94,20 +94,20 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		);
 	}
 
-	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetMessagesResponse> {
+	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetMessagesResponse> {
 		return this.emit(peer, Routes.GetMessages, {}, { timeout: 5000 });
 	}
 
-	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetProposalResponse> {
+	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetProposalResponse> {
 		return this.emit(peer, Routes.GetProposal, {}, { timeout: 5000 });
 	}
 
-	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetPeersResponse> {
+	public async getPeers(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetPeersResponse> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`);
 		return this.emit(peer, Routes.GetPeers, {}, { timeout: 5000 });
 	}
 
-	public async getApiNodes(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.IGetApiNodesResponse> {
+	public async getApiNodes(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetApiNodesResponse> {
 		this.logger.debug(`Fetching API nodes from ${peer.url}`);
 		return this.emit(peer, Routes.GetApiNodes, {}, { timeout: 5000 });
 	}
@@ -115,16 +115,16 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getStatus(
 		peer: Contracts.P2P.Peer,
 		options: Partial<Contracts.P2P.EmitOptions> = {},
-	): Promise<Contracts.P2P.IGetStatusResponse> {
-		return this.emit<Contracts.P2P.IGetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
+	): Promise<Contracts.P2P.GetStatusResponse> {
+		return this.emit<Contracts.P2P.GetStatusResponse>(peer, Routes.GetStatus, {}, { timeout: 5000, ...options });
 	}
 
 	public async getBlocks(
 		peer: Contracts.P2P.Peer,
 		{ fromHeight, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromHeight: number; limit?: number },
 		options: Partial<Contracts.P2P.EmitOptions> = {},
-	): Promise<Contracts.P2P.IGetBlocksResponse> {
-		const result = await this.emit<Contracts.P2P.IGetBlocksResponse>(
+	): Promise<Contracts.P2P.GetBlocksResponse> {
+		const result = await this.emit<Contracts.P2P.GetBlocksResponse>(
 			peer,
 			Routes.GetBlocks,
 			{

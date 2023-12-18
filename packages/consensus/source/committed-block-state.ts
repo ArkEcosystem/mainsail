@@ -2,17 +2,17 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class CommittedBlockState implements Contracts.Processor.IProcessableUnit {
+export class CommittedBlockState implements Contracts.Processor.ProcessableUnit {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	#walletRepository!: Contracts.State.WalletRepositoryClone;
-	#committedBlock!: Contracts.Crypto.ICommittedBlock;
+	#committedBlock!: Contracts.Crypto.CommittedBlock;
 	#processorResult?: boolean;
-	#validators = new Map<string, Contracts.State.IValidatorWallet>();
+	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 
 	@postConstruct()
 	public initialize(): void {
@@ -35,7 +35,7 @@ export class CommittedBlockState implements Contracts.Processor.IProcessableUnit
 		return [...this.#validators.keys()];
 	}
 
-	public configure(committedBlock: Contracts.Crypto.ICommittedBlock): CommittedBlockState {
+	public configure(committedBlock: Contracts.Crypto.CommittedBlock): CommittedBlockState {
 		this.#committedBlock = committedBlock;
 
 		const validators = this.validatorSet.getActiveValidators();
@@ -51,7 +51,7 @@ export class CommittedBlockState implements Contracts.Processor.IProcessableUnit
 		return this.#walletRepository;
 	}
 
-	public getBlock(): Contracts.Crypto.IBlock {
+	public getBlock(): Contracts.Crypto.Block {
 		return this.#committedBlock.block;
 	}
 
@@ -71,7 +71,7 @@ export class CommittedBlockState implements Contracts.Processor.IProcessableUnit
 		return this.#processorResult;
 	}
 
-	public async getCommittedBlock(): Promise<Contracts.Crypto.ICommittedBlock> {
+	public async getCommittedBlock(): Promise<Contracts.Crypto.CommittedBlock> {
 		return this.#committedBlock;
 	}
 }

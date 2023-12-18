@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 @injectable()
-export class Scheduler implements Contracts.Consensus.IScheduler {
+export class Scheduler implements Contracts.Consensus.Scheduler {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -11,7 +11,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	#timeoutStartRound?: NodeJS.Timeout;
 	#timeoutPropose?: NodeJS.Timeout;
@@ -98,7 +98,7 @@ export class Scheduler implements Contracts.Consensus.IScheduler {
 		);
 	}
 
-	#getConsensus(): Contracts.Consensus.IConsensusService {
-		return this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
+	#getConsensus(): Contracts.Consensus.ConsensusService {
+		return this.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
 	}
 }

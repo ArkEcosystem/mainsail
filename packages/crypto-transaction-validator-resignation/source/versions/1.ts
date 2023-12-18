@@ -9,7 +9,7 @@ export class ValidatorResignationTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.ValidatorResignation;
 	public static key = "validatorResignation";
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "validatorResignation",
 			properties: {
@@ -23,7 +23,7 @@ export class ValidatorResignationTransaction extends Transaction {
 		return 0;
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		return ByteBuffer.fromSize(0);
 	}
 

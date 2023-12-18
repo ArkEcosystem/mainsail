@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 import { JsonObject } from "type-fest";
 
-import { IBlockData, IMultiSignatureAsset } from "../crypto";
+import { BlockData, MultiSignatureAsset } from "../crypto";
 
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
@@ -63,7 +63,7 @@ export interface Wallet {
 	fromJson(data: JsonObject): Wallet;
 }
 
-export interface IValidatorWallet {
+export interface ValidatorWallet {
 	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
 	getVoteBalance(): BigNumber;
@@ -79,18 +79,18 @@ export interface IValidatorWallet {
 
 export type WalletFactory = (address: string, walletRepository: WalletRepository) => Wallet;
 
-export type ValidatorWalletFactory = (wallet: Wallet) => IValidatorWallet;
+export type ValidatorWalletFactory = (wallet: Wallet) => ValidatorWallet;
 
 export interface WalletValidatorAttributes {
 	username: string;
 	voteBalance: BigNumber;
 	rank?: number;
-	lastBlock?: IBlockData;
+	lastBlock?: BlockData;
 	round?: number;
 	resigned?: boolean;
 }
 
-export type WalletMultiSignatureAttributes = IMultiSignatureAsset & { legacy?: boolean };
+export type WalletMultiSignatureAttributes = MultiSignatureAsset & { legacy?: boolean };
 
 export interface WalletRepository {
 	allByAddress(): ReadonlyArray<Wallet>;

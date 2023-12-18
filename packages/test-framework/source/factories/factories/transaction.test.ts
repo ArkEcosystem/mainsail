@@ -14,7 +14,7 @@ describe<{
 	});
 
 	it("Transfer - should create a builder", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Transfer").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("Transfer").make();
 		assert.undefined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
@@ -30,7 +30,7 @@ describe<{
 			version: 2,
 		};
 
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("Transfer")
 			.withOptions(options)
 			.withStates("vendorField")
@@ -44,7 +44,7 @@ describe<{
 	});
 
 	it("Transfer - should create a builder with vendor field", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("Transfer")
 			.withStates("vendorField")
 			.make();
@@ -55,7 +55,7 @@ describe<{
 	});
 
 	it("Transfer - should sign it with a single passphrase", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("Transfer")
 			.withStates("sign")
 			.make();
@@ -65,7 +65,7 @@ describe<{
 	});
 
 	it("Transfer - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("Transfer")
 			.withStates("sign", "multiSign")
 			.make();
@@ -75,14 +75,14 @@ describe<{
 	});
 
 	it("ValidatorRegistration - should create a signature builder", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("ValidatorRegistration").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("ValidatorRegistration").make();
 
 		assert.undefined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("ValidatorRegistration - should sign it with a single passphrase", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("ValidatorRegistration")
 			.withStates("sign")
 			.make();
@@ -92,14 +92,14 @@ describe<{
 	});
 
 	it("ValidatorResignation - should create a signature builder", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("ValidatorResignation").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("ValidatorResignation").make();
 
 		assert.undefined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("ValidatorResignation - should sign it with a single passphrase", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("ValidatorResignation")
 			.withStates("sign")
 			.make();
@@ -109,21 +109,21 @@ describe<{
 	});
 
 	it("Vote - should create a builder", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Vote").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("Vote").make();
 
 		assert.undefined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("Vote - should sign it with a single passphrase", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Vote").withStates("sign").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("Vote").withStates("sign").make();
 
 		assert.defined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("Vote - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("Vote")
 			.withStates("multiSign")
 			.make();
@@ -133,21 +133,21 @@ describe<{
 	});
 
 	it("Unvote - should create a builder", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Unvote").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("Unvote").make();
 
 		assert.undefined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("Unvote - should sign it with a single passphrase", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("Unvote").withStates("sign").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("Unvote").withStates("sign").make();
 
 		assert.defined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("Unvote - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("Unvote")
 			.withStates("multiSign")
 			.make();
@@ -157,14 +157,14 @@ describe<{
 	});
 
 	it("MultiSignature - should create a builder", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("MultiSignature").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("MultiSignature").make();
 
 		assert.undefined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("MultiSignature - should sign it with single passphrase", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("MultiSignature")
 			.withStates("sign")
 			.make();
@@ -174,7 +174,7 @@ describe<{
 	});
 
 	it("MultiSignature - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("MultiSignature")
 			.withStates("multiSign")
 			.make();
@@ -184,14 +184,14 @@ describe<{
 	});
 
 	it("MultiPayment - should create a builder", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder.get("MultiPayment").make();
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("MultiPayment").make();
 
 		assert.undefined(transaction.data.signature);
 		assert.undefined(transaction.data.signatures);
 	});
 
 	it("MultiPayment - should sign it with a single passphrase", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("MultiPayment")
 			.withStates("sign")
 			.make();
@@ -201,7 +201,7 @@ describe<{
 	});
 
 	it("MultiPayment - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.ITransaction = await factoryBuilder
+		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
 			.get("MultiPayment")
 			.withStates("multiSign")
 			.make();

@@ -6,8 +6,8 @@ export const makeVoteTransactions = async (
 	voteBuilder: VoteBuilder,
 	length: number,
 	voteAssets: string[],
-): Promise<Contracts.Crypto.ITransaction[]> => {
-	const txs: Contracts.Crypto.ITransaction[] = [];
+): Promise<Contracts.Crypto.Transaction[]> => {
+	const txs: Contracts.Crypto.Transaction[] = [];
 	for (let index = 0; index < length; index++) {
 		txs[index] = await (await voteBuilder.votesAsset(voteAssets).sign(Math.random().toString(36))).build();
 	}

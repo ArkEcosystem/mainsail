@@ -7,7 +7,7 @@ import { Controller } from "./controller";
 @injectable()
 export class BlockchainController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
-	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
+	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const block = await this.blockRepositoryFactory().getLatest();

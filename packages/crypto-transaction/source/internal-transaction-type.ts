@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class InternalTransactionType implements Contracts.Transactions.IInternalTransactionType {
+export class InternalTransactionType implements Contracts.Transactions.InternalTransactionType {
 	static #types: Map<string, InternalTransactionType> = new Map();
 
 	private constructor(

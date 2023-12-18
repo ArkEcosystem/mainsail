@@ -1,10 +1,10 @@
 import {
-	IGetApiNodesResponse,
-	IGetBlocksResponse,
-	IGetMessagesResponse,
-	IGetPeersResponse,
-	IGetProposalResponse,
-	IGetStatusResponse,
+	GetApiNodesResponse,
+	GetBlocksResponse,
+	GetMessagesResponse,
+	GetPeersResponse,
+	GetProposalResponse,
+	GetStatusResponse,
 } from "./endpoints";
 import { Peer } from "./peer";
 
@@ -20,14 +20,14 @@ export interface PeerCommunicator {
 
 	pingPorts(peer: Peer): Promise<void>;
 
-	getPeers(peer: Peer): Promise<IGetPeersResponse>;
-	getApiNodes(peer: Peer): Promise<IGetApiNodesResponse>;
-	getMessages(peer: Peer): Promise<IGetMessagesResponse>;
-	getProposal(peer: Peer): Promise<IGetProposalResponse>;
+	getPeers(peer: Peer): Promise<GetPeersResponse>;
+	getApiNodes(peer: Peer): Promise<GetApiNodesResponse>;
+	getMessages(peer: Peer): Promise<GetMessagesResponse>;
+	getProposal(peer: Peer): Promise<GetProposalResponse>;
 	getBlocks(
 		peer: Peer,
 		{ fromHeight, limit }: { fromHeight: number; limit?: number },
 		options?: Partial<EmitOptions>,
-	): Promise<IGetBlocksResponse>;
-	getStatus(peer: Peer, options?: Partial<EmitOptions>): Promise<IGetStatusResponse>;
+	): Promise<GetBlocksResponse>;
+	getStatus(peer: Peer, options?: Partial<EmitOptions>): Promise<GetStatusResponse>;
 }

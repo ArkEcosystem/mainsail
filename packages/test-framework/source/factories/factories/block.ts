@@ -17,21 +17,21 @@ export const registerBlockFactory = async (
 		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/mainsail/crypto.json")),
 	);
 
-	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.ICommittedBlock> => {
-		const previousBlock: Contracts.Crypto.IBlockData = options.getPreviousBlock
+	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.CommittedBlock> => {
+		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
 			: await app
-					.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+					.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 					.get("genesisBlock.block");
 
 		const { reward } = app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone(previousBlock.height);
 
-		const transactions: Contracts.Crypto.ITransaction[] = options.transactions || [];
+		const transactions: Contracts.Crypto.Transaction[] = options.transactions || [];
 		if (options.transactionsCount) {
 			const signer = new Signer(
-				app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).all()!,
+				app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).all()!,
 				options.nonce,
 			);
 
@@ -56,7 +56,7 @@ export const registerBlockFactory = async (
 			fee: BigNumber.ZERO,
 		};
 		const payloadBuffers: Buffer[] = [];
-		const transactionData: Contracts.Crypto.ITransactionData[] = [];
+		const transactionData: Contracts.Crypto.TransactionData[] = [];
 		let payloadLength = transactions.length * 4;
 
 		for (const { data, serialized } of transactions) {
@@ -73,9 +73,9 @@ export const registerBlockFactory = async (
 		const passphrase = options.passphrase || secrets[0];
 
 		const blockCommit = {
-			block: await app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
+			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make({
 				generatorPublicKey: await app
-					.getTagged<Contracts.Crypto.IPublicKeyFactory>(
+					.getTagged<Contracts.Crypto.PublicKeyFactory>(
 						Identifiers.Cryptography.Identity.PublicKeyFactory,
 						"type",
 						"wallet",
@@ -85,7 +85,7 @@ export const registerBlockFactory = async (
 				numberOfTransactions: transactions.length,
 				payloadHash: (
 					await app
-						.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.HashFactory)
 						.sha256(payloadBuffers)
 				).toString("hex"),
 				payloadLength,
@@ -166,7 +166,7 @@ export const registerBlockFactory = async (
 			...blockCommit,
 			serialized: (
 				await app
-					.get<Contracts.Crypto.IBlockSerializer>(Identifiers.Cryptography.Block.Serializer)
+					.get<Contracts.Crypto.BlockSerializer>(Identifiers.Cryptography.Block.Serializer)
 					.serializeFull(blockCommit)
 			).toString("hex"),
 		};

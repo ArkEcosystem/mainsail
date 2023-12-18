@@ -26,7 +26,7 @@ import { MessageFactory } from "./factory";
 describe<{
 	sandbox: Sandbox;
 	factory: MessageFactory;
-	blockFactory: Contracts.Crypto.IBlockFactory;
+	blockFactory: Contracts.Crypto.BlockFactory;
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
@@ -54,7 +54,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);
-		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.IBlockFactory>(
+		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.BlockFactory>(
 			Identifiers.Cryptography.Block.Factory,
 		);
 
@@ -71,7 +71,7 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity }) => {
-		const block: Contracts.Crypto.IProposedBlock = {
+		const block: Contracts.Crypto.ProposedBlock = {
 			block: await blockFactory.fromData(blockData),
 			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
 		};
@@ -94,7 +94,7 @@ describe<{
 		factory,
 		identity,
 	}) => {
-		const block: Contracts.Crypto.IProposedBlock = {
+		const block: Contracts.Crypto.ProposedBlock = {
 			block: await blockFactory.fromData(blockData),
 			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
 		};

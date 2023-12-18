@@ -13,7 +13,7 @@ export class GetApiNodesController implements Contracts.P2P.Controller {
 	public async handle(
 		request: Contracts.P2P.Request,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IGetApiNodesResponse> {
+	): Promise<Contracts.P2P.GetApiNodesResponse> {
 		return {
 			apiNodes: this.peerApiNodeRepository
 				.getApiNodes()

@@ -83,7 +83,7 @@ describeSkip<{
 		const spyRepositoryGetPeers = stub(repository, "getPeers").returnValue(peers);
 		const spySerialzierSerialzie = stub(serializer, "serialize").returnValue(Buffer.from(""));
 
-		await broadcaster.broadcastTransactions(transactions as Contracts.Crypto.ITransaction[]);
+		await broadcaster.broadcastTransactions(transactions as Contracts.Crypto.Transaction[]);
 
 		spyLoggerWarning.neverCalled();
 		spyLoggerDebug.calledWith("Broadcasting 1 transaction to 3 peers");

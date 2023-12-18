@@ -3,7 +3,7 @@ import { Contracts, Exceptions } from "@mainsail/contracts";
 import { assert } from "./assert";
 import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 
-export const isNewRound = (height: number, configuration: Contracts.Crypto.IConfiguration): boolean => {
+export const isNewRound = (height: number, configuration: Contracts.Crypto.Configuration): boolean => {
 	const milestones = configuration.get("milestones");
 
 	// Since milestones are merged, find the first milestone to introduce the validator count.
@@ -26,7 +26,7 @@ export const isNewRound = (height: number, configuration: Contracts.Crypto.IConf
 
 export const calculateRound = (
 	height: number,
-	configuration: Contracts.Crypto.IConfiguration,
+	configuration: Contracts.Crypto.Configuration,
 ): Contracts.Shared.RoundInfo => {
 	let nextMilestone = configuration.getNextMilestoneWithNewKey(0, "activeValidators");
 	let activeValidators = configuration.getMilestone(0).activeValidators;

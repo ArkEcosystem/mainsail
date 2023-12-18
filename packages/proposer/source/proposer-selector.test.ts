@@ -71,12 +71,12 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 
 	it("#getValidatorIndex - should return validator index for round", async ({ proposerSelector, sandbox }) => {
 		const { activeValidators } = sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
-		} as Contracts.Processor.IProcessableUnit);
+		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
@@ -89,12 +89,12 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		stateStore,
 	}) => {
 		const { activeValidators } = sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
-		} as Contracts.Processor.IProcessableUnit);
+		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
@@ -104,7 +104,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: activeValidators } } }),
-		} as Contracts.Processor.IProcessableUnit);
+		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound2[index]);
@@ -116,12 +116,12 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		sandbox,
 	}) => {
 		const { activeValidators } = sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		await proposerSelector.onCommit({
 			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
-		} as Contracts.Processor.IProcessableUnit);
+		} as Contracts.Processor.ProcessableUnit);
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}

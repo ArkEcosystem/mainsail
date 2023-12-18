@@ -10,7 +10,7 @@ import { Controller } from "./controller";
 @injectable()
 export class ValidatorRoundsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
-	private readonly validatorRoundepositoryFactory!: ApiDatabaseContracts.IValidatorRoundRepositoryFactory;
+	private readonly validatorRoundepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);

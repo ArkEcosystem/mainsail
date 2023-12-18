@@ -1,15 +1,15 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 
 export interface SenderMempool {
 	isDisposable(): boolean;
 	getSize(): number;
 
-	getFromEarliest(): Iterable<ITransaction>;
-	getFromLatest(): Iterable<ITransaction>;
+	getFromEarliest(): Iterable<Transaction>;
+	getFromLatest(): Iterable<Transaction>;
 
-	addTransaction(transaction: ITransaction): Promise<void>;
-	removeTransaction(id: string): Promise<ITransaction[]>;
-	removeForgedTransaction(id: string): Promise<ITransaction[]>;
+	addTransaction(transaction: Transaction): Promise<void>;
+	removeTransaction(id: string): Promise<Transaction[]>;
+	removeForgedTransaction(id: string): Promise<Transaction[]>;
 }
 
 export type SenderMempoolFactory = (publicKey: string) => Promise<SenderMempool>;

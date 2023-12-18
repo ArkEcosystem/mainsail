@@ -5,7 +5,7 @@ import formats from "ajv-formats";
 import keywords from "ajv-keywords";
 
 @injectable()
-export class Validator implements Contracts.Crypto.IValidator {
+export class Validator implements Contracts.Crypto.Validator {
 	#ajv!: Ajv;
 
 	@postConstruct()
@@ -19,10 +19,7 @@ export class Validator implements Contracts.Crypto.IValidator {
 		formats(this.#ajv);
 	}
 
-	public validate<T = any>(
-		schemaKeyReference: string | Schema,
-		data: T,
-	): Contracts.Crypto.ISchemaValidationResult<T> {
+	public validate<T = any>(schemaKeyReference: string | Schema, data: T): Contracts.Crypto.SchemaValidationResult<T> {
 		try {
 			this.#ajv.validate(schemaKeyReference, data);
 

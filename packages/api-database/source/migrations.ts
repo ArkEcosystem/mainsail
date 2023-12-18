@@ -2,11 +2,11 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { DataSource, QueryFailedError } from "typeorm";
 
-import { IMigrations } from "./contracts";
+import { Migrations as ApiDatabaseContracts_Migrations } from "./contracts";
 import { Identifiers as ApiDatabaseIdentifiers } from "./identifiers";
 
 @injectable()
-export class Migrations implements IMigrations {
+export class Migrations implements ApiDatabaseContracts_Migrations {
 	@inject(Identifiers.Application)
 	public readonly app!: Contracts.Kernel.Application;
 

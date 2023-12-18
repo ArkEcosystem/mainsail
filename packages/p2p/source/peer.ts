@@ -30,7 +30,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public apiNodes: Contracts.P2P.PeerApiNodes = [];
 
-	#header: Contracts.P2P.IHeaderData | undefined;
+	#header: Contracts.P2P.HeaderData | undefined;
 
 	#transactionsQueue!: Contracts.Kernel.Queue;
 
@@ -46,14 +46,14 @@ export class Peer implements Contracts.P2P.Peer {
 		return getPeerUrl(this);
 	}
 
-	public get header(): Contracts.P2P.IHeaderData {
+	public get header(): Contracts.P2P.HeaderData {
 		// State can be undefined when the peer is not yet verified.
-		Utils.assert.defined<Contracts.P2P.IHeaderData>(this.#header);
+		Utils.assert.defined<Contracts.P2P.HeaderData>(this.#header);
 
 		return this.#header;
 	}
 
-	public set header(header: Contracts.P2P.IHeaderData) {
+	public set header(header: Contracts.P2P.HeaderData) {
 		this.#header = header;
 	}
 

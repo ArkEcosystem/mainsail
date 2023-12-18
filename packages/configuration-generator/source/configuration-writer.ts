@@ -51,7 +51,7 @@ export class ConfigurationWriter {
 	}
 
 	writeCrypto(
-		genesisBlock: Contracts.Crypto.ICommittedBlockData,
+		genesisBlock: Contracts.Crypto.CommittedBlockData,
 		milestones: Partial<Contracts.Crypto.Milestone>[],
 		network: Contracts.Crypto.Network,
 	): void {

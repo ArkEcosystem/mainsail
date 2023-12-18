@@ -1,12 +1,12 @@
 import { Contracts } from "@mainsail/contracts";
 
 interface BlockArguments {
-	data: Contracts.Crypto.IBlockData;
+	data: Contracts.Crypto.BlockData;
 	serialized: string;
-	transactions: Contracts.Crypto.ITransaction[];
+	transactions: Contracts.Crypto.Transaction[];
 }
 
-export const sealBlock = ({ data, serialized, transactions }: BlockArguments): Contracts.Crypto.IBlock =>
+export const sealBlock = ({ data, serialized, transactions }: BlockArguments): Contracts.Crypto.Block =>
 	Object.seal({
 		data,
 		header: data,

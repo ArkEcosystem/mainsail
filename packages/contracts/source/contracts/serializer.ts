@@ -37,7 +37,7 @@ export interface DeserializationConfiguration {
 	skip?: number;
 }
 
-export interface ISerializer {
+export interface Serializer {
 	serialize<T>(data: T, configuration: SerializationConfiguration): Promise<Buffer>;
 
 	deserialize<T>(source: ByteBuffer, target: T, configuration: DeserializationConfiguration): Promise<T>;

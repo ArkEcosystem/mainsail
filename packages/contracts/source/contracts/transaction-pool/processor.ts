@@ -1,4 +1,4 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 
 export type ProcessorError = {
 	type: string;
@@ -14,7 +14,7 @@ export type ProcessorResult = {
 };
 
 export interface ProcessorExtension {
-	throwIfCannotBroadcast(transaction: ITransaction): Promise<void>;
+	throwIfCannotBroadcast(transaction: Transaction): Promise<void>;
 }
 
 export interface Processor {

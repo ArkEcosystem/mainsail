@@ -2,30 +2,30 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class Verifier implements Contracts.Crypto.ITransactionVerifier {
+export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "wallet")
-	private readonly signatureFactory!: Contracts.Crypto.ISignature;
+	private readonly signatureFactory!: Contracts.Crypto.Signature;
 
 	@inject(Identifiers.Cryptography.Validator)
-	private readonly validator!: Contracts.Crypto.IValidator;
+	private readonly validator!: Contracts.Crypto.Validator;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.ITransactionUtils;
+	private readonly utils!: Contracts.Crypto.TransactionUtils;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.ITransactionTypeFactory;
+	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
 	public async verifySignatures(
-		transaction: Contracts.Crypto.ITransactionData,
-		multiSignature: Contracts.Crypto.IMultiSignatureAsset,
+		transaction: Contracts.Crypto.TransactionData,
+		multiSignature: Contracts.Crypto.MultiSignatureAsset,
 	): Promise<boolean> {
 		if (!multiSignature) {
 			throw new Exceptions.InvalidMultiSignatureAssetError();
 		}
 
-		const { publicKeys, min }: Contracts.Crypto.IMultiSignatureAsset = multiSignature;
-		const { signatures }: Contracts.Crypto.ITransactionData = transaction;
+		const { publicKeys, min }: Contracts.Crypto.MultiSignatureAsset = multiSignature;
+		const { signatures }: Contracts.Crypto.TransactionData = transaction;
 
 		const hash: Buffer = await this.utils.toHash(transaction, {
 			excludeMultiSignature: true,
@@ -72,7 +72,7 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 		return verified;
 	}
 
-	public async verifyHash(data: Contracts.Crypto.ITransactionData): Promise<boolean> {
+	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
 		const { signature, senderPublicKey } = data;
 
 		if (!signature || !senderPublicKey) {
@@ -87,9 +87,9 @@ export class Verifier implements Contracts.Crypto.ITransactionVerifier {
 	}
 
 	public async verifySchema(
-		data: Contracts.Crypto.ITransactionData,
+		data: Contracts.Crypto.TransactionData,
 		strict: boolean,
-	): Promise<Contracts.Crypto.ISchemaValidationResult> {
+	): Promise<Contracts.Crypto.SchemaValidationResult> {
 		const transactionType = this.transactionTypeFactory.get(data.type, data.typeGroup, data.version);
 
 		if (!transactionType) {

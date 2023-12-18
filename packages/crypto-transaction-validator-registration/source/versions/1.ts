@@ -14,7 +14,7 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 	public static type: number = Contracts.Crypto.TransactionType.ValidatorRegistration;
 	public static key = "validatorRegistration";
 
-	public static getSchema(): Contracts.Crypto.ITransactionSchema {
+	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "validatorRegistration",
 			properties: {
@@ -37,10 +37,10 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 		return this.publicKeySize;
 	}
 
-	public async serialize(options?: Contracts.Crypto.ISerializeOptions): Promise<ByteBuffer> {
+	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 
-		Utils.assert.defined<Contracts.Crypto.ITransactionAsset>(data.asset);
+		Utils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		Utils.assert.defined<string>(data.asset.validatorPublicKey);
 
 		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());

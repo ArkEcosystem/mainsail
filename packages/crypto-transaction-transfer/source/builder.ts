@@ -25,8 +25,8 @@ export class TransferBuilder extends TransactionBuilder<TransferBuilder> {
 		return this.instance();
 	}
 
-	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
-		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
+		const struct: Contracts.Crypto.TransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;

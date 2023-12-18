@@ -1,49 +1,49 @@
-import { IAggregatedSignature, ICommittedBlock, IPrecommit, IPrevote, IProposal } from "../crypto";
-import { IProcessableUnit } from "../processor";
-import { IValidatorWallet } from "../state";
+import { AggregatedSignature, CommittedBlock, Precommit, Prevote, Proposal } from "../crypto";
+import { ProcessableUnit } from "../processor";
+import { ValidatorWallet } from "../state";
 import { Step } from "./enums";
 
-export interface IRoundState extends IProcessableUnit {
+export interface RoundState extends ProcessableUnit {
 	readonly validators: string[];
-	readonly proposer: IValidatorWallet;
-	getProposal(): IProposal | undefined;
+	readonly proposer: ValidatorWallet;
+	getProposal(): Proposal | undefined;
 	hasProposal(): boolean;
 	hasPrevote(validatorIndex: number): boolean;
 	hasPrecommit(validatorIndex: number): boolean;
-	addProposal(proposal: IProposal): void;
-	addPrevote(prevote: IPrevote): void;
-	addPrecommit(precommit: IPrecommit): void;
+	addProposal(proposal: Proposal): void;
+	addPrevote(prevote: Prevote): void;
+	addPrecommit(precommit: Precommit): void;
 	hasMajorityPrevotes(): boolean;
 	hasMajorityPrevotesAny(): boolean;
 	hasMajorityPrevotesNull(): boolean;
 	hasMajorityPrecommits(): boolean;
 	hasMajorityPrecommitsAny(): boolean;
 	hasMinorityPrevotesOrPrecommits(): boolean;
-	getPrevote(validatorIndex: number): IPrevote | undefined;
-	getPrecommit(validatorIndex: number): IPrecommit | undefined;
-	getPrevotes(): IPrevote[];
-	getPrecommits(): IPrecommit[];
-	getValidator(consensusPublicKey: string): IValidatorWallet;
+	getPrevote(validatorIndex: number): Prevote | undefined;
+	getPrecommit(validatorIndex: number): Precommit | undefined;
+	getPrevotes(): Prevote[];
+	getPrecommits(): Precommit[];
+	getValidator(consensusPublicKey: string): ValidatorWallet;
 	getValidatorsSignedPrevote(): readonly boolean[];
 	getValidatorsSignedPrecommit(): readonly boolean[];
-	aggregatePrevotes(): Promise<IAggregatedSignature>;
-	aggregatePrecommits(): Promise<IAggregatedSignature>;
+	aggregatePrevotes(): Promise<AggregatedSignature>;
+	aggregatePrecommits(): Promise<AggregatedSignature>;
 	logPrevotes(): void;
 	logPrecommits(): void;
 }
 
-export type ICommittedBlockStateFactory = (committedBlock: ICommittedBlock) => IProcessableUnit;
+export type CommittedBlockStateFactory = (committedBlock: CommittedBlock) => ProcessableUnit;
 
-export interface IAggregator {
-	aggregate(signatures: Map<number, { signature: string }>, activeValidators: number): Promise<IAggregatedSignature>;
-	verify(signature: IAggregatedSignature, data: Buffer, activeValidators: number): Promise<boolean>;
+export interface Aggregator {
+	aggregate(signatures: Map<number, { signature: string }>, activeValidators: number): Promise<AggregatedSignature>;
+	verify(signature: AggregatedSignature, data: Buffer, activeValidators: number): Promise<boolean>;
 }
 
-export interface IVerifier {
-	hasValidProposalLockProof(roundState: IRoundState): Promise<boolean>;
+export interface Verifier {
+	hasValidProposalLockProof(roundState: RoundState): Promise<boolean>;
 }
 
-export interface IConsensusStateData {
+export interface ConsensusStateData {
 	readonly height: number;
 	readonly round: number;
 	readonly step: Step;
@@ -51,20 +51,20 @@ export interface IConsensusStateData {
 	readonly lockedRound?: number;
 }
 
-export interface IRoundStateRepository {
-	getRoundState(height: number, round: number): IRoundState;
-	getRoundStates(): IRoundState[];
+export interface RoundStateRepository {
+	getRoundState(height: number, round: number): RoundState;
+	getRoundStates(): RoundState[];
 	clear(): void;
 }
 
-export interface IConsensusService {
+export interface ConsensusService {
 	run(): Promise<void>;
 	getHeight(): number;
 	getRound(): number;
 	getStep(): Step;
-	getState(): IConsensusState;
-	handle(roundState: IRoundState): Promise<void>;
-	handleCommittedBlockState(committedBlockState: IProcessableUnit): Promise<void>;
+	getState(): ConsensusState;
+	handle(roundState: RoundState): Promise<void>;
+	handleCommittedBlockState(committedBlockState: ProcessableUnit): Promise<void>;
 	onTimeoutStartRound(): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;
@@ -72,28 +72,28 @@ export interface IConsensusService {
 	dispose(): Promise<void>;
 }
 
-export interface IConsensusState extends IConsensusStateData {
-	readonly lockedValue?: IRoundState;
-	readonly validValue?: IRoundState;
+export interface ConsensusState extends ConsensusStateData {
+	readonly lockedValue?: RoundState;
+	readonly validValue?: RoundState;
 }
 
-export interface IConsensusStorage {
-	getState(): Promise<IConsensusStateData | undefined>;
-	saveState(state: IConsensusState): Promise<void>;
-	saveProposals(proposal: IProposal[]): Promise<void>;
-	savePrevotes(prevotes: IPrevote[]): Promise<void>;
-	savePrecommits(precommits: IPrecommit[]): Promise<void>;
-	getProposals(): Promise<IProposal[]>;
-	getPrevotes(): Promise<IPrevote[]>;
-	getPrecommits(): Promise<IPrecommit[]>;
+export interface ConsensusStorage {
+	getState(): Promise<ConsensusStateData | undefined>;
+	saveState(state: ConsensusState): Promise<void>;
+	saveProposals(proposal: Proposal[]): Promise<void>;
+	savePrevotes(prevotes: Prevote[]): Promise<void>;
+	savePrecommits(precommits: Precommit[]): Promise<void>;
+	getProposals(): Promise<Proposal[]>;
+	getPrevotes(): Promise<Prevote[]>;
+	getPrecommits(): Promise<Precommit[]>;
 	clear(): Promise<void>;
 }
 
-export interface IBootstrapper {
-	run(): Promise<IConsensusState | undefined>;
+export interface Bootstrapper {
+	run(): Promise<ConsensusState | undefined>;
 }
 
-export interface IScheduler {
+export interface Scheduler {
 	scheduleTimeoutStartRound(): void;
 	scheduleTimeoutPropose(height: number, round: number): void;
 	scheduleTimeoutPrevote(height: number, round: number): void;

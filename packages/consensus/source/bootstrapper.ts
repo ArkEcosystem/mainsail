@@ -2,17 +2,17 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 
 @injectable()
-export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
+export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
+	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.Consensus.Storage)
-	private readonly storage!: Contracts.Consensus.IConsensusStorage;
+	private readonly storage!: Contracts.Consensus.ConsensusStorage;
 
-	public async run(): Promise<Contracts.Consensus.IConsensusState | undefined> {
+	public async run(): Promise<Contracts.Consensus.ConsensusState | undefined> {
 		const proposals = await this.storage.getProposals();
 
 		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`);
@@ -38,7 +38,7 @@ export class Bootstrapper implements Contracts.Consensus.IBootstrapper {
 			await roundState.addPrecommit(precommit);
 		}
 
-		const state = (await this.storage.getState()) as Utils.Mutable<Contracts.Consensus.IConsensusState> | undefined;
+		const state = (await this.storage.getState()) as Utils.Mutable<Contracts.Consensus.ConsensusState> | undefined;
 		if (!state) {
 			return undefined;
 		}

@@ -15,12 +15,12 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Database.Service)
-	private readonly database!: Contracts.Database.IDatabaseService;
+	private readonly database!: Contracts.Database.DatabaseService;
 
 	public async handle(
-		request: Contracts.P2P.IGetBlocksRequest,
+		request: Contracts.P2P.GetBlocksRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IGetBlocksResponse> {
+	): Promise<Contracts.P2P.GetBlocksResponse> {
 		const requestBlockHeight: number = request.payload.fromHeight;
 		const requestBlockLimit: number = request.payload.limit;
 

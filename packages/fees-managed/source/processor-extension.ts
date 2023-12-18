@@ -6,7 +6,7 @@ export class ProcessorExtension implements Contracts.TransactionPool.ProcessorEx
 	@inject(Identifiers.Fee.Matcher)
 	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
 
-	public async throwIfCannotBroadcast(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async throwIfCannotBroadcast(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		await this.feeMatcher.throwIfCannotBroadcast(transaction);
 	}
 }

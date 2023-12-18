@@ -22,7 +22,7 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 
 	public participant(publicKey: string): MultiSignatureBuilder {
 		if (this.data.asset && this.data.asset.multiSignature) {
-			const { publicKeys }: Contracts.Crypto.IMultiSignatureAsset = this.data.asset.multiSignature;
+			const { publicKeys }: Contracts.Crypto.MultiSignatureAsset = this.data.asset.multiSignature;
 
 			if (publicKeys.length <= 16) {
 				publicKeys.push(publicKey);
@@ -40,7 +40,7 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 		return this;
 	}
 
-	public multiSignatureAsset(multiSignature: Contracts.Crypto.IMultiSignatureAsset): MultiSignatureBuilder {
+	public multiSignatureAsset(multiSignature: Contracts.Crypto.MultiSignatureAsset): MultiSignatureBuilder {
 		if (this.data.asset && this.data.asset.multiSignature) {
 			this.data.asset.multiSignature = multiSignature;
 		}
@@ -48,8 +48,8 @@ export class MultiSignatureBuilder extends TransactionBuilder<MultiSignatureBuil
 		return this;
 	}
 
-	public async getStruct(): Promise<Contracts.Crypto.ITransactionData> {
-		const struct: Contracts.Crypto.ITransactionData = await super.getStruct();
+	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
+		const struct: Contracts.Crypto.TransactionData = await super.getStruct();
 		struct.amount = this.data.amount;
 		struct.recipientId = this.data.recipientId;
 		struct.asset = this.data.asset;

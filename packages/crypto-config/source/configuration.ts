@@ -6,7 +6,7 @@ import clone from "lodash.clone";
 import get from "lodash.get";
 import set from "lodash.set";
 @injectable()
-export class Configuration implements Contracts.Crypto.IConfiguration {
+export class Configuration implements Contracts.Crypto.Configuration {
 	#config: Contracts.Crypto.NetworkConfig | undefined;
 	#milestone: { data: Contracts.Crypto.Milestone; index: number } | undefined;
 	#milestones: Contracts.Crypto.Milestone[] | undefined;

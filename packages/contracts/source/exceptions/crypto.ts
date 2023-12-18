@@ -1,5 +1,5 @@
 import { Wallet } from "../contracts/state";
-import { IInternalTransactionType } from "../contracts/transactions";
+import { InternalTransactionType } from "../contracts/transactions";
 import { Exception } from "./base";
 
 export class Bip38CompressionError extends Exception {
@@ -181,25 +181,25 @@ export class DuplicateParticipantInMultiSignatureError extends Exception {
 }
 
 export class InvalidTransactionTypeError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} does not exist.`);
 	}
 }
 
 export class DeactivatedTransactionHandlerError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is deactivated.`);
 	}
 }
 
 export class UnsatisfiedDependencyError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is missing required dependencies`);
 	}
 }
 
 export class AlreadyRegisteredError extends Exception {
-	public constructor(type: IInternalTransactionType) {
+	public constructor(type: InternalTransactionType) {
 		super(`Transaction type ${type.toString()} is already registered`);
 	}
 }

@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 import { BigNumber, get, set } from "@mainsail/utils";
 
 @injectable()
-export class FeeRegistry implements Contracts.Fee.IFeeRegistry {
+export class FeeRegistry implements Contracts.Fee.FeeRegistry {
 	readonly #registry: Record<number, BigNumber> = {};
 
 	public get(transaction: string, version: number): BigNumber {

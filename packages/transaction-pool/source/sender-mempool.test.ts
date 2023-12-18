@@ -9,7 +9,7 @@ describe<{
 	container: Container;
 	configuration: any;
 	senderState: any;
-	transactions: Contracts.Crypto.ITransaction[];
+	transactions: Contracts.Crypto.Transaction[];
 }>("SenderMempool.", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll(async (context) => {
 		context.configuration = {

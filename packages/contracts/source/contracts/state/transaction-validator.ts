@@ -1,7 +1,7 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 
 export interface TransactionValidator {
-	validate(transaction: ITransaction): Promise<void>;
+	validate(transaction: Transaction): Promise<void>;
 }
 
 export type TransactionValidatorFactory = () => TransactionValidator;

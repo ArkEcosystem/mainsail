@@ -15,10 +15,10 @@ import { Controller } from "./controller";
 @injectable()
 export class BlocksController extends Controller {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
-	private readonly blockRepositoryFactory!: ApiDatabaseContracts.IBlockRepositoryFactory;
+	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
-	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.ITransactionRepositoryFactory;
+	private readonly transactionRepositoryFactory!: ApiDatabaseContracts.TransactionRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.BlockCriteria = request.query;

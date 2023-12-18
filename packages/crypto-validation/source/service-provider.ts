@@ -13,13 +13,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	async #registerKeywords(): Promise<void> {
 		for (const keyword of Object.values(makeKeywords())) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 		}
 	}
 
 	async #registerSchemas(): Promise<void> {
 		for (const schema of Object.values(schemas)) {
-			this.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator).addSchema(schema);
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
 }

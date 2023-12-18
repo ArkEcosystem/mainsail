@@ -4,7 +4,7 @@ import { Contracts } from "@mainsail/contracts";
 
 export const responseHeaders = {
 	getOnPreResponseHandler(app: Contracts.Kernel.Application) {
-		const blockRepositoryFactory = app.get<ApiDatabaseContracts.IBlockRepositoryFactory>(
+		const blockRepositoryFactory = app.get<ApiDatabaseContracts.BlockRepositoryFactory>(
 			ApiDatabaseIdentifiers.BlockRepositoryFactory,
 		);
 

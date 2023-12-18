@@ -5,24 +5,24 @@ import { IpcWorker } from "@mainsail/kernel";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.IProposalProcessor {
+export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.ProposalProcessor {
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly messageSerializer!: Contracts.Crypto.IMessageSerializer;
+	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Consensus.Aggregator)
-	private readonly aggregator!: Contracts.Consensus.IAggregator;
+	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
 	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.IRoundStateRepository;
+	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
@@ -33,10 +33,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Ipc.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
-	async process(
-		proposal: Contracts.Crypto.IProposal,
-		broadcast = true,
-	): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(proposal: Contracts.Crypto.Proposal, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
 			if (!this.hasValidHeightOrRound(proposal)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
@@ -75,11 +72,11 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		});
 	}
 
-	#hasValidProposer(proposal: Contracts.Crypto.IProposal): boolean {
+	#hasValidProposer(proposal: Contracts.Crypto.Proposal): boolean {
 		return proposal.validatorIndex === this.proposerSelector.getValidatorIndex(proposal.round);
 	}
 
-	async #hasValidSignature(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
+	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
 		const worker = await this.workerPool.getWorker();
 		return worker.consensusSignature(
 			"verify",
@@ -89,7 +86,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		);
 	}
 
-	async #hasValidLockProof(proposal: Contracts.Crypto.IProposal): Promise<boolean> {
+	async #hasValidLockProof(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
 		if (proposal.validRound === undefined) {
 			return true;
 		}
@@ -125,7 +122,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		return verified;
 	}
 
-	#hasValidBlockGenerator(proposal: Contracts.Crypto.IProposal): boolean {
+	#hasValidBlockGenerator(proposal: Contracts.Crypto.Proposal): boolean {
 		if (proposal.validRound !== undefined) {
 			// We assume that this check passed when block was proposed first time, so we don't need to check it again.
 			// The check also cannot be repeated because we don't hold the value when the block was proposed first time.

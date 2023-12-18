@@ -7,10 +7,10 @@ import { getPeerIp } from "../../utils";
 @injectable()
 export class PostProposalController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Consensus.ProposalProcessor)
-	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
+	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
+	private readonly factory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
@@ -19,9 +19,9 @@ export class PostProposalController implements Contracts.P2P.Controller {
 	private readonly state!: Contracts.P2P.State;
 
 	public async handle(
-		request: Contracts.P2P.IPostProposalRequest,
+		request: Contracts.P2P.PostProposalRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IPostProposalResponse> {
+	): Promise<Contracts.P2P.PostProposalResponse> {
 		try {
 			const proposal = await this.factory.makeProposalFromBytes(request.payload.proposal);
 			const result = await this.proposalProcessor.process(proposal);

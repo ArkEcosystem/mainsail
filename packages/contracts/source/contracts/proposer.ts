@@ -1,5 +1,5 @@
-import { ICommitHandler } from "./crypto";
+import { CommitHandler } from "./crypto";
 
-export interface ProposerSelector extends ICommitHandler {
+export interface ProposerSelector extends CommitHandler {
 	getValidatorIndex(round: number): number;
 }

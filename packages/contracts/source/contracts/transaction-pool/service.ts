@@ -1,12 +1,12 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 
 export interface Service {
 	getPoolSize(): number;
 
-	addTransaction(transaction: ITransaction): Promise<void>;
+	addTransaction(transaction: Transaction): Promise<void>;
 	reAddTransactions(): Promise<void>;
-	removeTransaction(transaction: ITransaction): Promise<void>;
-	removeForgedTransaction(transaction: ITransaction): Promise<void>;
+	removeTransaction(transaction: Transaction): Promise<void>;
+	removeForgedTransaction(transaction: Transaction): Promise<void>;
 	cleanUp(): Promise<void>;
 	flush(): Promise<void>;
 }

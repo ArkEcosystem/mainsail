@@ -1,11 +1,11 @@
-import { IPeerRepository, IPeerRepositoryExtension, RepositoryDataSource } from "../contracts";
+import { PeerRepository, PeerRepositoryExtension, RepositoryDataSource } from "../contracts";
 import { Peer } from "../models/peer";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { PeerFilter } from "../search/filters";
 import { makeExtendedRepository } from "./repository-extension";
 
-export const makePeerRepository = (dataSource: RepositoryDataSource): IPeerRepository =>
-	makeExtendedRepository<Peer, IPeerRepositoryExtension>(Peer, dataSource, {
+export const makePeerRepository = (dataSource: RepositoryDataSource): PeerRepository =>
+	makeExtendedRepository<Peer, PeerRepositoryExtension>(Peer, dataSource, {
 		async findManyByCriteria(
 			peerCriteria: Criteria.OrPeerCriteria,
 			sorting: Sorting,

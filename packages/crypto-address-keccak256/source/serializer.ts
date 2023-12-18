@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class AddressSerializer implements Contracts.Crypto.IAddressSerializer {
+export class AddressSerializer implements Contracts.Crypto.AddressSerializer {
 	public serialize(buffer: ByteBuffer, address: Buffer): void {
 		buffer.writeBytes(address);
 	}

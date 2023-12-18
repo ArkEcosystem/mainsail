@@ -9,10 +9,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Database.Service)
-	private readonly databaseService!: Contracts.Database.IDatabaseService;
+	private readonly databaseService!: Contracts.Database.DatabaseService;
 
 	@inject(Identifiers.TransactionPoolService)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
@@ -21,7 +21,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
 	@inject(Identifiers.TransactionHandlerRegistry)
-	private handlerRegistry!: Contracts.Transactions.ITransactionHandlerRegistry;
+	private handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
@@ -33,7 +33,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.BlockVerifier)
 	private readonly verifier!: Contracts.Processor.Verifier;
@@ -43,9 +43,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.ApiSync)
 	@optional()
-	private readonly apiSync: Contracts.ApiSync.ISync | undefined;
+	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
 
-	public async process(unit: Contracts.Processor.IProcessableUnit): Promise<boolean> {
+	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		try {
 			if (!(await this.verifier.verify(unit))) {
 				return false;
@@ -65,7 +65,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		return false;
 	}
 
-	public async commit(unit: Contracts.Processor.IProcessableUnit): Promise<void> {
+	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (this.apiSync) {
 			await this.apiSync.beforeCommit();
 		}
@@ -121,14 +121,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		void this.events.dispatch(Enums.BlockEvent.Applied, committedBlock);
 	}
 
-	async #emitTransactionEvents(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	async #emitTransactionEvents(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		void this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// TODO: ! no reason to pass this.emitter
 		handler.emitEvents(transaction, this.events);
 	}
 
-	async #applyBlockToForger(unit: Contracts.Processor.IProcessableUnit) {
+	async #applyBlockToForger(unit: Contracts.Processor.ProcessableUnit) {
 		const block = unit.getBlock();
 		const walletRepository = unit.getWalletRepository();
 

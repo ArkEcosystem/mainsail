@@ -10,8 +10,8 @@ describe<{}>("Block", ({ it, assert }) => {
 	it("#sealBlock - should seal block", async () => {
 		const transactionFactory = await Factories.factory("Transfer", crypto);
 
-		const transaction1 = await transactionFactory.withStates("sign").make<Contracts.Crypto.ITransaction>();
-		const transaction2 = await transactionFactory.withStates("sign").make<Contracts.Crypto.ITransaction>();
+		const transaction1 = await transactionFactory.withStates("sign").make<Contracts.Crypto.Transaction>();
+		const transaction2 = await transactionFactory.withStates("sign").make<Contracts.Crypto.Transaction>();
 
 		const indexedTransaction1 = clone(transaction1);
 		indexedTransaction1.data.sequence = 1;

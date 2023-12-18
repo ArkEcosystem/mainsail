@@ -23,10 +23,10 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.setConfig(cryptoJson);
 
-		context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration).setConfig({
+		context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 			milestones: [
 				// @ts-ignore
 				{
@@ -44,7 +44,7 @@ describe<{
 		for (const schema of Object.values({
 			...baseSchemas,
 			...makeSchemas(
-				context.sandbox.app.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration),
+				context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration),
 			),
 		})) {
 			context.validator.addSchema(schema);

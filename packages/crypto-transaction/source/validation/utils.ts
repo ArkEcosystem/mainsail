@@ -5,7 +5,7 @@ const strictTransaction = {
 	unevaluatedProperties: false,
 };
 
-export const extendSchema = (parent, properties): Contracts.Crypto.ITransactionSchema =>
+export const extendSchema = (parent, properties): Contracts.Crypto.TransactionSchema =>
 	merge(parent, properties, {
 		arrayMerge(target, source, options) {
 			const result = source;
@@ -20,7 +20,7 @@ export const extendSchema = (parent, properties): Contracts.Crypto.ITransactionS
 		},
 	});
 
-export const signedSchema = (schema: Contracts.Crypto.ITransactionSchema): Contracts.Crypto.ITransactionSchema => {
+export const signedSchema = (schema: Contracts.Crypto.TransactionSchema): Contracts.Crypto.TransactionSchema => {
 	const schemaToExtend = {
 		properties: schema.properties,
 		required: schema.required,
@@ -37,7 +37,7 @@ export const signedSchema = (schema: Contracts.Crypto.ITransactionSchema): Contr
 	};
 };
 
-export const strictSchema = (schema: Contracts.Crypto.ITransactionSchema): Contracts.Crypto.ITransactionSchema => {
+export const strictSchema = (schema: Contracts.Crypto.TransactionSchema): Contracts.Crypto.TransactionSchema => {
 	const signed = signedSchema(schema);
 	const strict = extendSchema(signed, strictTransaction);
 	strict.$id = `${schema.$id}Strict`;

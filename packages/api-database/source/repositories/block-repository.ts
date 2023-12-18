@@ -1,11 +1,11 @@
-import { IBlockRepository, IBlockRepositoryExtension, RepositoryDataSource } from "../contracts";
+import { BlockRepository, BlockRepositoryExtension, RepositoryDataSource } from "../contracts";
 import { Block } from "../models/block";
 import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
 import { BlockFilter } from "../search/filters";
 import { makeExtendedRepository } from "./repository-extension";
 
-export const makeBlockRepository = (dataSource: RepositoryDataSource): IBlockRepository =>
-	makeExtendedRepository<Block, IBlockRepositoryExtension>(Block, dataSource, {
+export const makeBlockRepository = (dataSource: RepositoryDataSource): BlockRepository =>
+	makeExtendedRepository<Block, BlockRepositoryExtension>(Block, dataSource, {
 		async findManyByCriteria(
 			blockCriteria: Criteria.OrBlockCriteria,
 			sorting: Sorting,

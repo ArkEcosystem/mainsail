@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-export const blockData: Contracts.Crypto.IBlockData = {
+export const blockData: Contracts.Crypto.BlockData = {
 	version: 1,
 	timestamp: 1690944882035,
 	height: 2,
@@ -17,7 +17,7 @@ export const blockData: Contracts.Crypto.IBlockData = {
 	id: "0c38900ec7e12857796cb061b34fa7ee835acab7a7f1949b23b1085a34354cdd",
 };
 
-export const blockDataJson: Contracts.Crypto.IBlockJson = {
+export const blockDataJson: Contracts.Crypto.BlockJson = {
 	version: 1,
 	timestamp: 1690944882035,
 	height: 2,
@@ -36,7 +36,7 @@ export const blockDataJson: Contracts.Crypto.IBlockJson = {
 export const serialized =
 	"0173452bb489010200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b8552a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d";
 
-export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
+export const blockDataWithTransactions: Contracts.Crypto.BlockData = {
 	id: "b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0",
 	version: 1,
 	timestamp: 1690944882035,
@@ -87,7 +87,7 @@ export const blockDataWithTransactions: Contracts.Crypto.IBlockData = {
 	],
 };
 
-export const blockDataWithTransactionsJson: Contracts.Crypto.IBlockJson = {
+export const blockDataWithTransactionsJson: Contracts.Crypto.BlockJson = {
 	id: "b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0",
 	version: 1,
 	timestamp: 1690944882035,

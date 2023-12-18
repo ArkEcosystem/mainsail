@@ -30,7 +30,7 @@ describe<{
 	});
 
 	it("shoudl serialize and deserialize transaction", async ({ sandbox }) => {
-		const datas: Partial<Contracts.Crypto.ITransactionData>[] = [
+		const datas: Partial<Contracts.Crypto.TransactionData>[] = [
 			{
 				asset: {
 					unvotes: [],
@@ -71,13 +71,13 @@ describe<{
 
 		for (const data of datas) {
 			const transaction = sandbox.app.resolve(VoteTransaction);
-			transaction.data = data as Contracts.Crypto.ITransactionData;
+			transaction.data = data as Contracts.Crypto.TransactionData;
 
 			const serialized = await transaction.serialize();
 
 			assert.instance(serialized, ByteBuffer);
 
-			transaction.data = {} as Contracts.Crypto.ITransactionData;
+			transaction.data = {} as Contracts.Crypto.TransactionData;
 			serialized.reset();
 
 			await transaction.deserialize(serialized);
@@ -89,7 +89,7 @@ describe<{
 
 describe<{
 	sandbox: Sandbox;
-	validator: Contracts.Crypto.IValidator;
+	validator: Contracts.Crypto.Validator;
 }>("Schemas", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		context.sandbox = new Sandbox();
@@ -100,7 +100,7 @@ describe<{
 		await context.sandbox.app.resolve(ValidationServiceProvider).register();
 		await context.sandbox.app.resolve(CryptoValidationServiceProvider).register();
 
-		context.validator = context.sandbox.app.get<Contracts.Crypto.IValidator>(Identifiers.Cryptography.Validator);
+		context.validator = context.sandbox.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
 
 		for (const [name, format] of Object.entries({
 			...makeFormats(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration)),

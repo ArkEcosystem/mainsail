@@ -3,10 +3,10 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class Serializer implements Contracts.Crypto.IBlockSerializer {
+export class Serializer implements Contracts.Crypto.BlockSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	@tagged("type", "wallet")
-	private readonly serializer!: Contracts.Serializer.ISerializer;
+	private readonly serializer!: Contracts.Serializer.Serializer;
 
 	@inject(Identifiers.Cryptography.Size.SHA256)
 	private readonly hashByteLength!: number;
@@ -50,12 +50,12 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		);
 	}
 
-	public totalSize(block: Contracts.Crypto.IBlockDataSerializable): number {
+	public totalSize(block: Contracts.Crypto.BlockDataSerializable): number {
 		return this.headerSize() + block.payloadLength;
 	}
 
-	public async serializeHeader(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
+	public async serializeHeader(block: Contracts.Crypto.BlockDataSerializable): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.BlockDataSerializable>(block, {
 			length: this.headerSize(),
 			skip: 0,
 			schema: {
@@ -96,8 +96,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		});
 	}
 
-	public async serializeWithTransactions(block: Contracts.Crypto.IBlockDataSerializable): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IBlockDataSerializable>(block, {
+	public async serializeWithTransactions(block: Contracts.Crypto.BlockDataSerializable): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.BlockDataSerializable>(block, {
 			length: this.totalSize(block),
 			skip: 0,
 			schema: {
@@ -141,8 +141,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		});
 	}
 
-	public async serializeLockProof(lockProof: Contracts.Crypto.IAggregatedSignature): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IAggregatedSignature>(lockProof, {
+	public async serializeLockProof(lockProof: Contracts.Crypto.AggregatedSignature): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.AggregatedSignature>(lockProof, {
 			length: this.lockProofSize(),
 			skip: 0,
 			schema: {
@@ -156,7 +156,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		});
 	}
 
-	public async serializeProposed(proposedBlock: Contracts.Crypto.IProposedBlockSerializable): Promise<Buffer> {
+	public async serializeProposed(proposedBlock: Contracts.Crypto.ProposedBlockSerializable): Promise<Buffer> {
 		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
 
 		// NOTE: The lock proof is undefined most of the time, hence we can safe a lot of bytes
@@ -170,8 +170,8 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		return Buffer.concat([Buffer.of(0), serializedBlock]);
 	}
 
-	public async serializeCommit(commit: Contracts.Crypto.IBlockCommit): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.IBlockCommit>(commit, {
+	public async serializeCommit(commit: Contracts.Crypto.BlockCommit): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.BlockCommit>(commit, {
 			length: this.commitSize(),
 			skip: 0,
 			schema: {
@@ -188,7 +188,7 @@ export class Serializer implements Contracts.Crypto.IBlockSerializer {
 		});
 	}
 
-	public async serializeFull(committedBlock: Contracts.Crypto.ICommittedBlockSerializable): Promise<Buffer> {
+	public async serializeFull(committedBlock: Contracts.Crypto.CommittedBlockSerializable): Promise<Buffer> {
 		const serializedCommit = await this.serializeCommit(committedBlock.commit);
 		const serializedBlock = Buffer.from(committedBlock.block.serialized, "hex");
 		return Buffer.concat([serializedCommit, serializedBlock]);

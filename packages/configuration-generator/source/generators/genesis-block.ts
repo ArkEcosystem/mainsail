@@ -14,13 +14,13 @@ import { Generator } from "./generator";
 @injectable()
 export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
 
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<Contracts.Crypto.ICommittedBlockData> {
+	): Promise<Contracts.Crypto.CommittedBlockData> {
 		const premineWallet = await this.createWallet();
 
 		const genesisWallet = await this.createWallet(genesisMnemonic);
@@ -29,7 +29,7 @@ export class GenesisBlockGenerator extends Generator {
 			validatorsMnemonics.map(async (mnemonic) => await this.createWallet(mnemonic)),
 		);
 
-		let transactions: Contracts.Crypto.ITransaction[] = [];
+		let transactions: Contracts.Crypto.Transaction[] = [];
 
 		if (options.distribute) {
 			transactions = transactions.concat(
@@ -74,7 +74,7 @@ export class GenesisBlockGenerator extends Generator {
 		amount: string,
 		pubKeyHash: number,
 		nonce = 1,
-	): Promise<Contracts.Crypto.ITransaction> {
+	): Promise<Contracts.Crypto.Transaction> {
 		return this.#formatGenesisTransaction(
 			await (
 				await this.app
@@ -94,10 +94,10 @@ export class GenesisBlockGenerator extends Generator {
 		recipients: Wallet[],
 		totalPremine: string,
 		pubKeyHash: number,
-	): Promise<Contracts.Crypto.ITransaction[]> {
+	): Promise<Contracts.Crypto.Transaction[]> {
 		const amount: string = BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
 
-		const result: Contracts.Crypto.ITransaction[] = [];
+		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, recipient] of recipients.entries()) {
 			result.push(await this.#createTransferTransaction(sender, recipient, amount, pubKeyHash, index + 1));
@@ -106,8 +106,8 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
-	async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
-		const result: Contracts.Crypto.ITransaction[] = [];
+	async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
 			result[index] = await this.#formatGenesisTransaction(
@@ -126,8 +126,8 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
-	async #buildUsernameTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
-		const result: Contracts.Crypto.ITransaction[] = [];
+	async #buildUsernameTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
 			result[index] = await this.#formatGenesisTransaction(
@@ -146,8 +146,8 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
-	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.ITransaction[]> {
-		const result: Contracts.Crypto.ITransaction[] = [];
+	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
 			result[index] = await this.#formatGenesisTransaction(
@@ -167,27 +167,27 @@ export class GenesisBlockGenerator extends Generator {
 	}
 
 	async #formatGenesisTransaction(
-		transaction: Contracts.Crypto.ITransaction,
+		transaction: Contracts.Crypto.Transaction,
 		wallet: Wallet,
-	): Promise<Contracts.Crypto.ITransaction> {
+	): Promise<Contracts.Crypto.Transaction> {
 		transaction.data.signature = await this.app
-			.get<Contracts.Crypto.ITransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
+			.get<Contracts.Crypto.TransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
 			.sign(transaction.data, wallet.keys);
 		transaction.data.id = await this.app
-			.get<Contracts.Crypto.ITransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
+			.get<Contracts.Crypto.TransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
 			.getId(transaction);
 
 		return transaction;
 	}
 
 	async #createCommittedGenesisBlock(
-		premineKeys: Contracts.Crypto.IKeyPair,
-		transactions: Contracts.Crypto.ITransaction[],
+		premineKeys: Contracts.Crypto.KeyPair,
+		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<Contracts.Crypto.ICommittedBlock> {
+	): Promise<Contracts.Crypto.CommittedBlock> {
 		const genesisBlock = await this.#createGenesisBlock(premineKeys, transactions, options);
 
-		const commitBlock: Contracts.Crypto.ICommittedBlockSerializable = {
+		const commitBlock: Contracts.Crypto.CommittedBlockSerializable = {
 			block: genesisBlock.block,
 			commit: { round: 0, signature: "", validators: [] },
 		};
@@ -201,10 +201,10 @@ export class GenesisBlockGenerator extends Generator {
 	}
 
 	async #createGenesisBlock(
-		keys: Contracts.Crypto.IKeyPair,
-		transactions: Contracts.Crypto.ITransaction[],
+		keys: Contracts.Crypto.KeyPair,
+		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<{ block: Contracts.Crypto.IBlock; transactions: Contracts.Crypto.ITransactionData[] }> {
+	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -216,7 +216,7 @@ export class GenesisBlockGenerator extends Generator {
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
 
-		const transactionData: Contracts.Crypto.ITransactionData[] = [];
+		const transactionData: Contracts.Crypto.TransactionData[] = [];
 		for (const { serialized, data } of transactions) {
 			Utils.assert.defined<string>(data.id);
 
@@ -229,13 +229,13 @@ export class GenesisBlockGenerator extends Generator {
 		}
 
 		return {
-			block: await this.app.get<Contracts.Crypto.IBlockFactory>(Identifiers.Cryptography.Block.Factory).make({
+			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make({
 				generatorPublicKey: keys.publicKey,
 				height: 0,
 				numberOfTransactions: transactions.length,
 				payloadHash: (
 					await this.app
-						.get<Contracts.Crypto.IHashFactory>(Identifiers.Cryptography.HashFactory)
+						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.HashFactory)
 						.sha256(payloadBuffers)
 				).toString("hex"),
 				payloadLength,

@@ -15,7 +15,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 	readonly #lock: AppUtils.Lock = new AppUtils.Lock();
 
-	readonly #transactions: Contracts.Crypto.ITransaction[] = [];
+	readonly #transactions: Contracts.Crypto.Transaction[] = [];
 
 	public async configure(publicKey: string): Promise<SenderMempool> {
 		await this.senderState.configure(publicKey);
@@ -30,15 +30,15 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		return this.#transactions.length;
 	}
 
-	public getFromEarliest(): Iterable<Contracts.Crypto.ITransaction> {
+	public getFromEarliest(): Iterable<Contracts.Crypto.Transaction> {
 		return [...this.#transactions];
 	}
 
-	public getFromLatest(): Iterable<Contracts.Crypto.ITransaction> {
+	public getFromLatest(): Iterable<Contracts.Crypto.Transaction> {
 		return [...this.#transactions].reverse();
 	}
 
-	public async addTransaction(transaction: Contracts.Crypto.ITransaction): Promise<void> {
+	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		try {
 			this.#concurrency++;
 
@@ -65,7 +65,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 	}
 
-	public async removeTransaction(id: string): Promise<Contracts.Crypto.ITransaction[]> {
+	public async removeTransaction(id: string): Promise<Contracts.Crypto.Transaction[]> {
 		try {
 			this.#concurrency++;
 
@@ -75,7 +75,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 					return [];
 				}
 
-				const removedTransactions: Contracts.Crypto.ITransaction[] = this.#transactions
+				const removedTransactions: Contracts.Crypto.Transaction[] = this.#transactions
 					.splice(index, this.#transactions.length - index)
 					.reverse();
 
@@ -94,7 +94,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 	}
 
-	public async removeForgedTransaction(id: string): Promise<Contracts.Crypto.ITransaction[]> {
+	public async removeForgedTransaction(id: string): Promise<Contracts.Crypto.Transaction[]> {
 		try {
 			this.#concurrency++;
 

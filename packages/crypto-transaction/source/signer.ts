@@ -6,15 +6,15 @@ import { numberToHex } from "@mainsail/utils";
 export class Signer {
 	@inject(Identifiers.Cryptography.Signature)
 	@tagged("type", "wallet")
-	private readonly signatureFactory!: Contracts.Crypto.ISignature;
+	private readonly signatureFactory!: Contracts.Crypto.Signature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
-	private readonly utils!: Contracts.Crypto.ITransactionUtils;
+	private readonly utils!: Contracts.Crypto.TransactionUtils;
 
 	public async sign(
-		transaction: Contracts.Crypto.ITransactionData,
-		keys: Contracts.Crypto.IKeyPair,
-		options?: Contracts.Crypto.ISerializeOptions,
+		transaction: Contracts.Crypto.TransactionData,
+		keys: Contracts.Crypto.KeyPair,
+		options?: Contracts.Crypto.SerializeOptions,
 	): Promise<string> {
 		if (!options || options.excludeSignature === undefined) {
 			options = { excludeSignature: true, ...options };
@@ -31,8 +31,8 @@ export class Signer {
 	}
 
 	public async multiSign(
-		transaction: Contracts.Crypto.ITransactionData,
-		keys: Contracts.Crypto.IKeyPair,
+		transaction: Contracts.Crypto.TransactionData,
+		keys: Contracts.Crypto.KeyPair,
 		index = -1,
 	): Promise<string> {
 		if (!transaction.signatures) {

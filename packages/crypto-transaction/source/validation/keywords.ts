@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { FuncKeywordDefinition } from "ajv";
 
-export const makeKeywords = (configuration: Contracts.Crypto.IConfiguration) => {
+export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	const transactionType: FuncKeywordDefinition = {
 		compile(schema) {
 			return (data) => data === schema;

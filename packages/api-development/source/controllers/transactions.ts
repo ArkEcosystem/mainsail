@@ -19,8 +19,8 @@ export class TransactionsController extends Controller {
 
 	public async unconfirmed(request: Hapi.Request) {
 		const pagination: Contracts.Api.Pagination = super.getListingPage(request);
-		const all: Contracts.Crypto.ITransaction[] = await this.poolQuery.getFromHighestPriority().all();
-		const transactions: Contracts.Crypto.ITransaction[] = all.slice(
+		const all: Contracts.Crypto.Transaction[] = await this.poolQuery.getFromHighestPriority().all();
+		const transactions: Contracts.Crypto.Transaction[] = all.slice(
 			pagination.offset,
 			pagination.offset + pagination.limit,
 		);
@@ -42,7 +42,7 @@ export class TransactionsController extends Controller {
 			return notFound("Transaction not found");
 		}
 
-		const transaction: Contracts.Crypto.ITransaction = await transactionQuery.first();
+		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
 
 		return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
 	}

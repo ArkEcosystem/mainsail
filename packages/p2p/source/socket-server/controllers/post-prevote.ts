@@ -7,10 +7,10 @@ import { getPeerIp } from "../../utils";
 @injectable()
 export class PostPrevoteController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Consensus.PrevoteProcessor)
-	private readonly prevoteProcessor!: Contracts.Consensus.IPrevoteProcessor;
+	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
+	private readonly factory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.PeerDisposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
@@ -19,9 +19,9 @@ export class PostPrevoteController implements Contracts.P2P.Controller {
 	private readonly state!: Contracts.P2P.State;
 
 	public async handle(
-		request: Contracts.P2P.IPostPrevoteRequest,
+		request: Contracts.P2P.PostPrevoteRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IPostPrevoteResponse> {
+	): Promise<Contracts.P2P.PostPrevoteResponse> {
 		try {
 			const prevote = await this.factory.makePrevoteFromBytes(request.payload.prevote);
 

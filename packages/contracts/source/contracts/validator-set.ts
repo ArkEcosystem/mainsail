@@ -1,9 +1,9 @@
-import { ICommitHandler } from "./crypto";
-import { IValidatorWallet } from "./state";
+import { CommitHandler } from "./crypto";
+import { ValidatorWallet } from "./state";
 
-export interface IValidatorSet extends ICommitHandler {
+export interface ValidatorSet extends CommitHandler {
 	initialize(): Promise<void>;
-	getActiveValidators(): IValidatorWallet[];
-	getValidator(validatorIndex: number): IValidatorWallet;
+	getActiveValidators(): ValidatorWallet[];
+	getValidator(validatorIndex: number): ValidatorWallet;
 	getValidatorIndexByWalletPublicKey(walletPublicKey: string): number;
 }

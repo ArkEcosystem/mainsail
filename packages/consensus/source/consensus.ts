@@ -3,15 +3,15 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-export class Consensus implements Contracts.Consensus.IConsensusService {
+export class Consensus implements Contracts.Consensus.ConsensusService {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Bootstrapper)
-	private readonly bootstrapper!: Contracts.Consensus.IBootstrapper;
+	private readonly bootstrapper!: Contracts.Consensus.Bootstrapper;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
@@ -20,29 +20,29 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Consensus.ProposalProcessor)
-	private readonly proposalProcessor!: Contracts.Consensus.IProposalProcessor;
+	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.Consensus.PrevoteProcessor)
-	private readonly prevoteProcessor!: Contracts.Consensus.IPrevoteProcessor;
+	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
 
 	@inject(Identifiers.Consensus.PrecommitProcessor)
-	private readonly precommitProcessor!: Contracts.Consensus.IPrecommitProcessor;
+	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
 
 	@inject(Identifiers.Consensus.Scheduler)
-	private readonly scheduler!: Contracts.Consensus.IScheduler;
+	private readonly scheduler!: Contracts.Consensus.Scheduler;
 
 	// TODO: Rename identifier
 	@inject(Identifiers.Consensus.ValidatorRepository)
-	private readonly validatorsRepository!: Contracts.Validator.IValidatorRepository;
+	private readonly validatorsRepository!: Contracts.Validator.ValidatorRepository;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepository!: Contracts.Consensus.IRoundStateRepository;
+	private readonly roundStateRepository!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.Consensus.CommitLock)
-	private readonly commitLock!: Contracts.Kernel.ILock;
+	private readonly commitLock!: Contracts.Kernel.Lock;
 
 	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.IValidatorSet;
+	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -50,8 +50,8 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	#height = 2;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
-	#lockedValue?: Contracts.Consensus.IRoundState;
-	#validValue?: Contracts.Consensus.IRoundState;
+	#lockedValue?: Contracts.Consensus.RoundState;
+	#validValue?: Contracts.Consensus.RoundState;
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
@@ -91,11 +91,11 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 	}
 
 	// TODO: Only for testing
-	public setValidRound(round: Contracts.Consensus.IRoundState): void {
+	public setValidRound(round: Contracts.Consensus.RoundState): void {
 		this.#validValue = round;
 	}
 
-	public getState(): Contracts.Consensus.IConsensusState {
+	public getState(): Contracts.Consensus.ConsensusState {
 		return {
 			height: this.#height,
 			lockedRound: this.getLockedRound(),
@@ -122,7 +122,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.#isDisposed = true;
 	}
 
-	async handle(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
 			if (this.#isDisposed) {
 				return;
@@ -162,7 +162,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		});
 	}
 
-	async handleCommittedBlockState(committedBlockState: Contracts.Processor.IProcessableUnit): Promise<void> {
+	async handleCommittedBlockState(committedBlockState: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
 			if (this.#isDisposed) {
 				return;
@@ -204,7 +204,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	protected async onProposal(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	protected async onProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
 		if (
@@ -224,7 +224,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#prevote(roundState.getProcessorResult() ? block.data.id : undefined);
 	}
 
-	protected async onProposalLocked(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 		if (
 			this.#step !== Contracts.Consensus.Step.Propose ||
@@ -252,7 +252,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	protected async onMajorityPrevote(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	protected async onMajorityPrevote(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
 		if (
@@ -282,7 +282,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		}
 	}
 
-	protected async onMajorityPrevoteAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	protected async onMajorityPrevoteAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		if (this.#step !== Contracts.Consensus.Step.Prevote || this.#isInvalidRoundState(roundState)) {
 			return;
 		}
@@ -290,7 +290,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
 	}
 
-	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		if (this.#step !== Contracts.Consensus.Step.Prevote || this.#isInvalidRoundState(roundState)) {
 			return;
 		}
@@ -302,7 +302,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		await this.#precommit();
 	}
 
-	protected async onMajorityPrecommitAny(roundState: Contracts.Consensus.IRoundState): Promise<void> {
+	protected async onMajorityPrecommitAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		if (this.#isInvalidRoundState(roundState)) {
 			return;
 		}
@@ -310,7 +310,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
 	}
 
-	protected async onMajorityPrecommit(roundState: Contracts.Processor.IProcessableUnit): Promise<void> {
+	protected async onMajorityPrecommit(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
 		// TODO: Only height must match. Round can be any. Add tests
 		if (this.#didMajorityPrecommit || roundState.height !== this.#height) {
 			return;
@@ -345,7 +345,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		});
 	}
 
-	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.IProcessableUnit): Promise<void> {
+	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (roundState.height !== this.#height || roundState.round <= this.#round) {
 			return;
 		}
@@ -394,7 +394,7 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		});
 	}
 
-	#isInvalidRoundState(roundState: Contracts.Processor.IProcessableUnit): boolean {
+	#isInvalidRoundState(roundState: Contracts.Processor.ProcessableUnit): boolean {
 		if (roundState.height !== this.#height) {
 			return true;
 		}
@@ -406,13 +406,13 @@ export class Consensus implements Contracts.Consensus.IConsensusService {
 		return false;
 	}
 
-	async #propose(proposer: Contracts.Validator.IValidator): Promise<void> {
+	async #propose(proposer: Contracts.Validator.Validator): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		if (roundState.hasProposal()) {
 			return;
 		}
 
-		let proposal: Contracts.Crypto.IProposal | undefined;
+		let proposal: Contracts.Crypto.Proposal | undefined;
 
 		if (this.#validValue) {
 			const block = this.#validValue.getBlock();

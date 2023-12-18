@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-export class Precommit implements Contracts.Crypto.IPrecommit {
+export class Precommit implements Contracts.Crypto.Precommit {
 	#height: number;
 	#round: number;
 	#blockId: string | undefined;
@@ -15,7 +15,7 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 		validatorIndex,
 		signature,
 		serialized,
-	}: Contracts.Crypto.IPrecommitData & { serialized: Buffer }) {
+	}: Contracts.Crypto.PrecommitData & { serialized: Buffer }) {
 		this.#height = height;
 		this.#round = round;
 		this.#blockId = blockId;
@@ -62,7 +62,7 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 		});
 	}
 
-	toSignatureData(): Contracts.Crypto.ISignaturePrecommitData {
+	toSignatureData(): Contracts.Crypto.SignaturePrecommitData {
 		return {
 			blockId: this.#blockId,
 			height: this.#height,
@@ -71,7 +71,7 @@ export class Precommit implements Contracts.Crypto.IPrecommit {
 		};
 	}
 
-	toData(): Contracts.Crypto.IPrecommitData {
+	toData(): Contracts.Crypto.PrecommitData {
 		return {
 			blockId: this.#blockId,
 			height: this.#height,

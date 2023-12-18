@@ -1,7 +1,7 @@
-import { ITransaction } from "../crypto";
+import { Transaction } from "../crypto";
 
 export interface DynamicFeeContext {
-	transaction: ITransaction;
+	transaction: Transaction;
 	addonBytes: number;
 	satoshiPerByte: number;
 	height: number;

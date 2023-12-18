@@ -12,8 +12,8 @@ type DownloadsByRound = {
 type DownloadJob = {
 	isFullDownload: boolean;
 	peer: Contracts.P2P.Peer;
-	peerHeader: Contracts.P2P.IHeaderData;
-	ourHeader: Contracts.P2P.IHeader;
+	peerHeader: Contracts.P2P.HeaderData;
+	ourHeader: Contracts.P2P.Header;
 	prevoteIndexes: number[];
 	precommitIndexes: number[];
 	round: number;
@@ -43,16 +43,16 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Consensus.PrevoteProcessor)
-	private readonly prevoteProcessor!: Contracts.Consensus.IPrevoteProcessor;
+	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
 
 	@inject(Identifiers.Consensus.PrecommitProcessor)
-	private readonly precommitProcessor!: Contracts.Consensus.IPrecommitProcessor;
+	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly factory!: Contracts.Crypto.IMessageFactory;
+	private readonly factory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.IConfiguration;
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.EventDispatcherService)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -140,7 +140,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return this.#downloadsByHeight.size > 0 || this.#fullDownloadsByHeight.size > 0;
 	}
 
-	#canDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData): boolean {
+	#canDownload(ourHeader: Contracts.P2P.Header, peerHeader: Contracts.P2P.HeaderData): boolean {
 		if (ourHeader.height !== peerHeader.height || ourHeader.round > peerHeader.round) {
 			return false;
 		}
@@ -162,7 +162,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return this.#canDownloadFullRound(peerHeader.height, round);
 	}
 
-	#getHighestRoundToDownload(ourHeader: Contracts.P2P.IHeader, peerHeader: Contracts.P2P.IHeaderData): number {
+	#getHighestRoundToDownload(ourHeader: Contracts.P2P.Header, peerHeader: Contracts.P2P.HeaderData): number {
 		if (peerHeader.round <= ourHeader.round) {
 			return peerHeader.round;
 		}
@@ -220,8 +220,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkMessage(
-		message: Contracts.Crypto.IPrecommit | Contracts.Crypto.IPrevote,
-		firstMessage: Contracts.Crypto.IPrecommit | Contracts.Crypto.IPrevote,
+		message: Contracts.Crypto.Precommit | Contracts.Crypto.Prevote,
+		firstMessage: Contracts.Crypto.Precommit | Contracts.Crypto.Prevote,
 		job: DownloadJob,
 	): void {
 		if (message.height !== firstMessage.height || message.round !== firstMessage.round) {
@@ -240,8 +240,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkResponse(
-		prevotes: Map<number, Contracts.Crypto.IPrevote>,
-		precommits: Map<number, Contracts.Crypto.IPrecommit>,
+		prevotes: Map<number, Contracts.Crypto.Prevote>,
+		precommits: Map<number, Contracts.Crypto.Precommit>,
 		job: DownloadJob,
 	) {
 		// ALlow response to be empty
@@ -263,8 +263,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkFullRoundResponse(
-		prevotes: Map<number, Contracts.Crypto.IPrevote>,
-		precommits: Map<number, Contracts.Crypto.IPrecommit>,
+		prevotes: Map<number, Contracts.Crypto.Prevote>,
+		precommits: Map<number, Contracts.Crypto.Precommit>,
 		job: DownloadJob,
 	) {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone(job.height);
@@ -279,8 +279,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#checkPartialRoundResponse(
-		prevotes: Map<number, Contracts.Crypto.IPrevote>,
-		precommits: Map<number, Contracts.Crypto.IPrecommit>,
+		prevotes: Map<number, Contracts.Crypto.Prevote>,
+		precommits: Map<number, Contracts.Crypto.Precommit>,
 		job: DownloadJob,
 	) {
 		// Check if received all the requested data
@@ -303,8 +303,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		try {
 			const result = await this.communicator.getMessages(job.peer);
 
-			let firstPrevote: Contracts.Crypto.IPrevote | undefined;
-			const prevotes: Map<number, Contracts.Crypto.IPrevote> = new Map();
+			let firstPrevote: Contracts.Crypto.Prevote | undefined;
+			const prevotes: Map<number, Contracts.Crypto.Prevote> = new Map();
 			for (const buffer of result.prevotes) {
 				const prevote = await this.factory.makePrevoteFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
@@ -321,8 +321,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 			}
 
-			let firstPrecommit: Contracts.Crypto.IPrevote | undefined;
-			const precommits: Map<number, Contracts.Crypto.IPrecommit> = new Map();
+			let firstPrecommit: Contracts.Crypto.Prevote | undefined;
+			const precommits: Map<number, Contracts.Crypto.Precommit> = new Map();
 			for (const buffer of result.precommits) {
 				const precommit = await this.factory.makePrecommitFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
@@ -413,8 +413,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#getPrevoteIndexesToDownload(
-		ourHeader: Contracts.P2P.IHeader,
-		peerHeader: Contracts.P2P.IHeaderData,
+		ourHeader: Contracts.P2P.Header,
+		peerHeader: Contracts.P2P.HeaderData,
 		prevotes: boolean[],
 	): number[] {
 		return this.#getIndexesToDownload(
@@ -425,8 +425,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#getPrecommitIndexesToDownload(
-		ourHeader: Contracts.P2P.IHeader,
-		peerHeader: Contracts.P2P.IHeaderData,
+		ourHeader: Contracts.P2P.Header,
+		peerHeader: Contracts.P2P.HeaderData,
 		precommits: boolean[],
 	): number[] {
 		return this.#getIndexesToDownload(

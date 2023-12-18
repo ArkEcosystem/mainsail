@@ -8,17 +8,17 @@ export class GetProposalController implements Contracts.P2P.Controller {
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async handle(
-		request: Contracts.P2P.IGetProposalRequest,
+		request: Contracts.P2P.GetProposalRequest,
 		h: Hapi.ResponseToolkit,
-	): Promise<Contracts.P2P.IGetProposalResponse> {
+	): Promise<Contracts.P2P.GetProposalResponse> {
 		const result = {
 			proposal: Buffer.alloc(0),
 		};
 
 		const { height, round } = request.payload.headers;
 
-		const consensus = this.app.get<Contracts.Consensus.IConsensusService>(Identifiers.Consensus.Service);
-		const roundStateRepo = this.app.get<Contracts.Consensus.IRoundStateRepository>(
+		const consensus = this.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+		const roundStateRepo = this.app.get<Contracts.Consensus.RoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
 		);
 

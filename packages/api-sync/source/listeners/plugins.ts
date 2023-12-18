@@ -14,7 +14,7 @@ type Event = { name: string };
 @injectable()
 export class Plugins extends AbstractListener<Event, Models.Plugin> {
 	@inject(ApiDatabaseIdentifiers.PluginRepositoryFactory)
-	private readonly pluginRepositoryFactory!: ApiDatabaseContracts.IPluginRepositoryFactory;
+	private readonly pluginRepositoryFactory!: ApiDatabaseContracts.PluginRepositoryFactory;
 
 	@inject(Identifiers.ServiceProviderRepository)
 	protected readonly serviceProviderRepository!: Providers.ServiceProviderRepository;

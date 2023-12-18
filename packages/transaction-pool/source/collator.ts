@@ -19,19 +19,19 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.IBlockSerializer;
+	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
 
-	public async getBlockCandidateTransactions(): Promise<Contracts.Crypto.ITransaction[]> {
+	public async getBlockCandidateTransactions(): Promise<Contracts.Crypto.Transaction[]> {
 		const milestone = this.configuration.getMilestone();
 
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 
-		const candidateTransactions: Contracts.Crypto.ITransaction[] = [];
+		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
-		const failedTransactions: Contracts.Crypto.ITransaction[] = [];
+		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
 		for (const transaction of await this.poolQuery.getFromHighestPriority().all()) {
 			if (candidateTransactions.length === milestone.block.maxTransactions) {
