@@ -46,7 +46,7 @@ export type MultiPaymentOptions = TransactionOptions & {
 };
 
 export interface Identity {
-	keys: Contracts.Crypto.IKeyPair;
+	keys: Contracts.Crypto.KeyPair;
 	publicKey: string;
 	privateKey: string;
 	address: string;

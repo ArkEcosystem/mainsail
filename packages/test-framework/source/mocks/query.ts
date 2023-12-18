@@ -1,19 +1,19 @@
 import { Contracts } from "@mainsail/contracts";
 
-let mockTransactions: Partial<Contracts.Crypto.ITransaction>[] = [];
+let mockTransactions: Partial<Contracts.Crypto.Transaction>[] = [];
 
-export const setTransactions = (transactions: Partial<Contracts.Crypto.ITransaction>[]) => {
+export const setTransactions = (transactions: Partial<Contracts.Crypto.Transaction>[]) => {
 	mockTransactions = transactions;
 };
 
 export class CustomQueryIterable implements Partial<Contracts.TransactionPool.QueryIterable> {
-	public transactions: Contracts.Crypto.ITransaction[];
+	public transactions: Contracts.Crypto.Transaction[];
 
 	public constructor(items) {
 		this.transactions = items;
 	}
 
-	public *[Symbol.iterator](): Iterator<Contracts.Crypto.ITransaction> {
+	public *[Symbol.iterator](): Iterator<Contracts.Crypto.Transaction> {
 		for (const transaction of this.transactions) {
 			yield transaction;
 		}
@@ -27,7 +27,7 @@ export class CustomQueryIterable implements Partial<Contracts.TransactionPool.Qu
 		return this.transactions.length > 0;
 	}
 
-	public async first(): Promise<Contracts.Crypto.ITransaction> {
+	public async first(): Promise<Contracts.Crypto.Transaction> {
 		return this.transactions[0];
 	}
 }

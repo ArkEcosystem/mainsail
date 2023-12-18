@@ -5,7 +5,7 @@ import cloneDeep from "lodash.clonedeep";
 export const injectMilestone = (
 	index: number,
 	milestone: Record<string, any>,
-	configuration: Contracts.Crypto.IConfiguration,
+	configuration: Contracts.Crypto.Configuration,
 ): void =>
 	(configuration as any).milestones.splice(index, 0, {
 		...cloneDeep(configuration.getMilestone()),

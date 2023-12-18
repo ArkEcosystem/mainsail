@@ -57,7 +57,7 @@ export class Sandbox {
 
 		if (this.app.isBound(Identifiers.Cryptography.Configuration)) {
 			this.app
-				.get<Contracts.Crypto.IConfiguration>(Identifiers.Cryptography.Configuration)
+				.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 				.setConfig(readJSONSync(join(this.#configurationOptions.configPath ?? "", "crypto.json")));
 		}
 

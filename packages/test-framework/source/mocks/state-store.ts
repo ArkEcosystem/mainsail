@@ -1,9 +1,9 @@
 import { Contracts } from "@mainsail/contracts";
 
-let mockBlock: Partial<Contracts.Crypto.IBlock> | undefined;
+let mockBlock: Partial<Contracts.Crypto.Block> | undefined;
 let lastHeight = 0;
 
-export const setBlock = (block: Partial<Contracts.Crypto.IBlock> | undefined) => {
+export const setBlock = (block: Partial<Contracts.Crypto.Block> | undefined) => {
 	mockBlock = block;
 };
 
@@ -12,12 +12,12 @@ export const setLastHeight = (height: number) => {
 };
 
 class StateStoreMocks implements Partial<Contracts.State.StateStore> {
-	public getLastBlock(): Contracts.Crypto.IBlock {
-		return mockBlock as Contracts.Crypto.IBlock;
+	public getLastBlock(): Contracts.Crypto.Block {
+		return mockBlock as Contracts.Crypto.Block;
 	}
 
-	public getGenesisBlock(): Contracts.Crypto.ICommittedBlock {
-		return mockBlock as Contracts.Crypto.ICommittedBlock;
+	public getGenesisBlock(): Contracts.Crypto.CommittedBlock {
+		return mockBlock as Contracts.Crypto.CommittedBlock;
 	}
 
 	public getLastHeight(): number {

@@ -21,14 +21,14 @@ interface IPassphrasePair {
 // @TODO replace this by the use of real factories
 export class TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.IConfiguration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)
-	private readonly addressFactory!: Contracts.Crypto.IAddressFactory;
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
 	@tagged("type", "wallet")
-	private readonly publicKeyFactory!: Contracts.Crypto.IPublicKeyFactory;
+	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
 
 	protected builder: any;
 	protected app: Contracts.Kernel.Application;
@@ -216,16 +216,16 @@ export class TransactionFactory {
 		return this;
 	}
 
-	public async create(quantity = 1): Promise<Contracts.Crypto.ITransactionData[]> {
-		return this.#make<Contracts.Crypto.ITransactionData>(quantity, "getStruct");
+	public async create(quantity = 1): Promise<Contracts.Crypto.TransactionData[]> {
+		return this.#make<Contracts.Crypto.TransactionData>(quantity, "getStruct");
 	}
 
-	public async createOne(): Promise<Contracts.Crypto.ITransactionData> {
+	public async createOne(): Promise<Contracts.Crypto.TransactionData> {
 		return (await this.create(1))[0];
 	}
 
-	public async build(quantity = 1): Promise<Contracts.Crypto.ITransaction[]> {
-		return this.#make<Contracts.Crypto.ITransaction>(quantity, "build");
+	public async build(quantity = 1): Promise<Contracts.Crypto.Transaction[]> {
+		return this.#make<Contracts.Crypto.Transaction>(quantity, "build");
 	}
 
 	public async getNonce(): Promise<BigNumber> {

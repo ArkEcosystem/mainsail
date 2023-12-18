@@ -26,7 +26,7 @@ export class Signer {
 		this.#factoryBuilder = new FactoryBuilder();
 	}
 
-	public async makeTransfer(options: TransferOptions): Promise<Contracts.Crypto.ITransaction> {
+	public async makeTransfer(options: TransferOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -47,7 +47,7 @@ export class Signer {
 		return transferBuilder.build();
 	}
 
-	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.ITransaction> {
+	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -62,7 +62,7 @@ export class Signer {
 		return await transferBuilder.build();
 	}
 
-	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.ITransaction> {
+	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -79,7 +79,7 @@ export class Signer {
 
 	public async makeMultiSignatureRegistration(
 		options: MultiSignatureOptions,
-	): Promise<Contracts.Crypto.ITransaction> {
+	): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
@@ -94,7 +94,7 @@ export class Signer {
 		return transferBuilder.build();
 	}
 
-	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.ITransaction> {
+	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
