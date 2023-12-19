@@ -8,6 +8,7 @@ import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consens
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CryptoMessages } from "@mainsail/crypto-messages";
+import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
@@ -69,6 +70,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	}
 
 	await app.resolve(CryptoMessages).register();
+	await app.resolve(CryptoCommit).register();
 	await app.resolve(CoreCryptoConsensus).register();
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();

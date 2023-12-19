@@ -28,6 +28,8 @@
 	"devDependencies": {
 		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-messages": "workspace:*",
+		"@mainsail/crypto-commit": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",

@@ -1,6 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBeach32m } from "@mainsail/crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
+import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
+import { ServiceProvider as CoreCryptoCommit } from "@mainsail/crypto-commit";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
@@ -60,7 +62,7 @@ describe<{
 		context.sandbox.app.useDataPath(dirSync().name);
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
-			info: () => {},
+			info: () => { },
 		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
@@ -77,6 +79,8 @@ describe<{
 		await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 		await context.sandbox.app.resolve(CoreCryptoTransactionTransfer).register();
 		await context.sandbox.app.resolve(CoreCryptoBlock).register();
+		await context.sandbox.app.resolve(CoreCryptoMessages).register();
+		await context.sandbox.app.resolve(CoreCryptoCommit).register();
 		await context.sandbox.app.resolve(CoreLmdb).register();
 		await context.sandbox.app.resolve(CoreDatabase).register();
 
