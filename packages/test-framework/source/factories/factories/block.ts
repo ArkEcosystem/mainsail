@@ -166,7 +166,7 @@ export const registerBlockFactory = async (
 			...blockCommit,
 			serialized: (
 				await app
-					.get<Contracts.Crypto.BlockSerializer>(Identifiers.Cryptography.Block.Serializer)
+					.get<Contracts.Crypto.CommitBlockSerializer>(Identifiers.Cryptography.Commit.Serializer)
 					.serializeFull(blockCommit)
 			).toString("hex"),
 		};

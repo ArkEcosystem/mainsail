@@ -1,5 +1,6 @@
-import { ProposedBlock } from "./block";
+import { Block, BlockJson } from "./block";
 import { KeyPair } from "./identities";
+import { AggregatedSignature } from "./signatures";
 
 export enum MessageType {
 	Prevote = 1,
@@ -79,6 +80,20 @@ export interface Precommit extends PrecommitData {
 	toString(): string;
 }
 
+export interface ProposedBlock {
+	readonly block: Block;
+	readonly lockProof?: AggregatedSignature;
+	readonly serialized: string;
+}
+
+export interface ProposedBlockJson {
+	readonly block: BlockJson;
+	readonly lockProof?: AggregatedSignature;
+	readonly serialized: string;
+}
+
+export type ProposedBlockSerializable = Omit<ProposedBlock, "serialized">;
+
 export interface SerializeProposalOptions {
 	includeSignature?: boolean;
 }
@@ -108,12 +123,17 @@ export interface MessageSerializer {
 	serializePrevoteForSignature(prevote: SignaturePrevoteData): Promise<Buffer>;
 	serializePrecommit(precommit: PrecommitData): Promise<Buffer>;
 	serializePrecommitForSignature(precommit: SignaturePrecommitData): Promise<Buffer>;
+	serializeProposed(proposedBlock: ProposedBlockSerializable): Promise<Buffer>;
+	serializeLockProof(proof: AggregatedSignature): Promise<Buffer>;
+
+	lockProofSize(): number;
 }
 
 export interface MessageDeserializer {
 	deserializeProposal(serialized: Buffer): Promise<ProposalData>;
 	deserializePrevote(serialized: Buffer): Promise<PrevoteData>;
 	deserializePrecommit(serialized: Buffer): Promise<PrecommitData>;
+	deserializeLockProof(serialized: Buffer): Promise<AggregatedSignature>;
 }
 
 export interface MessageVerificationResult {

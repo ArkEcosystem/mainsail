@@ -25,8 +25,8 @@ export class Bootstrapper {
 	@inject(Identifiers.P2P.Service)
 	private readonly p2pService!: Contracts.P2P.Service;
 
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+	@inject(Identifiers.Cryptography.Commit.Factory)
+	private readonly blockFactory!: Contracts.Crypto.CommitBlockFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -94,7 +94,7 @@ export class Bootstrapper {
 
 	async #setGenesisBlock(): Promise<void> {
 		const genesisBlockJson = this.configuration.get("genesisBlock");
-		const genesisBlock = await this.blockFactory.fromCommittedJson(genesisBlockJson);
+		const genesisBlock = await this.blockFactory.fromJson(genesisBlockJson);
 
 		this.#stateStore.setGenesisBlock(genesisBlock);
 	}

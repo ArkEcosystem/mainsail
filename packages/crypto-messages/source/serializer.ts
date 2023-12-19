@@ -14,6 +14,14 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 	@inject(Identifiers.Cryptography.Size.SHA256)
 	private readonly hashSize!: number;
 
+	public lockProofSize(): number {
+		return (
+			this.signatureSize + // signature
+			1 +
+			8 // validator set bitmap
+		);
+	}
+
 	public async serializeProposal(
 		proposal: Contracts.Crypto.SerializableProposalData,
 		options: Contracts.Crypto.SerializeProposalOptions,
@@ -174,5 +182,34 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				},
 			},
 		});
+	}
+
+	public async serializeLockProof(lockProof: Contracts.Crypto.AggregatedSignature): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.AggregatedSignature>(lockProof, {
+			length: this.lockProofSize(),
+			skip: 0,
+			schema: {
+				signature: {
+					type: "consensusSignature",
+				},
+				validators: {
+					type: "validatorSet",
+				},
+			},
+		});
+	}
+
+	public async serializeProposed(proposedBlock: Contracts.Crypto.ProposedBlockSerializable): Promise<Buffer> {
+		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
+
+		// NOTE: The lock proof is undefined most of the time, hence we can safe a lot of bytes
+		// here by explicitly storing it's length instead of padding it with zero bytes.
+		if (proposedBlock.lockProof) {
+			const serializedLockProof = await this.serializeLockProof(proposedBlock.lockProof);
+			const proofLength = Buffer.of(serializedLockProof.length);
+			return Buffer.concat([proofLength, serializedLockProof, serializedBlock]);
+		}
+
+		return Buffer.concat([Buffer.of(0), serializedBlock]);
 	}
 }

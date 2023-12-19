@@ -13,8 +13,8 @@ import { Generator } from "./generator";
 
 @injectable()
 export class GenesisBlockGenerator extends Generator {
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+	@inject(Identifiers.Cryptography.Commit.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.CommitBlockSerializer;
 
 	async generate(
 		genesisMnemonic: string,

@@ -1,13 +1,13 @@
 {
-	"name": "@mainsail/crypto-messages",
+	"name": "@mainsail/crypto-commit",
 	"version": "0.0.1",
-	"description": "Crypto messages for the Mainsail Blockchain",
+	"description": "Crypto commit for the Mainsail Blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
-		"distribution"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
@@ -23,16 +23,13 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.12.0",
-		"delay": "5.0.0"
+		"ajv": "8.12.0"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@types/delay": "3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

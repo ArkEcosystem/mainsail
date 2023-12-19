@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys-fix/sort-keys-fix */
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer } from "@mainsail/utils";
@@ -15,7 +15,6 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	private readonly transactionFactory!: TransactionFactory;
 
 	@inject(Identifiers.Cryptography.Serializer)
-	@tagged("type", "wallet")
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)
@@ -45,49 +44,6 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		block.id = await this.idFactory.make(block);
 
 		return { data: block, transactions };
-	}
-
-	public async deserializeLockProof(serialized: Buffer): Promise<Contracts.Crypto.AggregatedSignature> {
-		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
-
-		const commit = {} as Contracts.Crypto.AggregatedSignature;
-
-		await this.serializer.deserialize<Contracts.Crypto.AggregatedSignature>(buffer, commit, {
-			length: this.blockSerializer.lockProofSize(),
-			schema: {
-				signature: {
-					type: "consensusSignature",
-				},
-				validators: {
-					type: "validatorSet",
-				},
-			},
-		});
-
-		return commit;
-	}
-
-	public async deserializeCommit(serialized: Buffer): Promise<Contracts.Crypto.BlockCommit> {
-		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
-
-		const commit = {} as Contracts.Crypto.BlockCommit;
-
-		await this.serializer.deserialize<Contracts.Crypto.BlockCommit>(buffer, commit, {
-			length: this.blockSerializer.commitSize(),
-			schema: {
-				round: {
-					type: "uint32",
-				},
-				signature: {
-					type: "consensusSignature",
-				},
-				validators: {
-					type: "validatorSet",
-				},
-			},
-		});
-
-		return commit;
 	}
 
 	async #deserializeBufferHeader(buffer: ByteBuffer): Promise<Contracts.Crypto.BlockHeader> {

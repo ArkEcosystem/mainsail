@@ -1,4 +1,5 @@
-import { Block, CommittedBlock } from "../crypto";
+import { Block } from "../crypto";
+import { CommittedBlock } from "../crypto/commit";
 import { JsonObject } from "../types";
 
 export interface StateStore {

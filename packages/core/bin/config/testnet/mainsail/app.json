@@ -91,6 +91,9 @@
 			"package": "@mainsail/crypto-messages"
 		},
 		{
+			"package": "@mainsail/crypto-commit"
+		},
+		{
 			"package": "@mainsail/p2p"
 		},
 		{

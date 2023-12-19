@@ -46,8 +46,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Consensus.CommittedBlockProcessor)
 	private readonly committedBlockProcessor!: Contracts.Consensus.CommittedBlockProcessor;
 
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+	@inject(Identifiers.Cryptography.Commit.Factory)
+	private readonly blockFactory!: Contracts.Crypto.CommitBlockFactory;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -139,7 +139,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				const committedBlocks = await Promise.all(
 					bytesForProcess
 						.splice(0, roundInfo.roundHeight + roundInfo.maxValidators - height)
-						.map(async (buff) => await this.blockFactory.fromCommittedBytes(buff)),
+						.map(async (buff) => await this.blockFactory.fromBytes(buff)),
 				);
 
 				// Check heights

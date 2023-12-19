@@ -1,4 +1,4 @@
-import { CommittedBlockJson } from "./block";
+import { CommittedBlockJson } from "./commit";
 
 export type NetworkConfig = {
 	genesisBlock: CommittedBlockJson;

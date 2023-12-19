@@ -1,4 +1,5 @@
 export * from "./block";
+export * from "./commit";
 export * from "./config";
 export * from "./crypto";
 export * from "./enums";

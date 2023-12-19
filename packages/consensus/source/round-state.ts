@@ -19,8 +19,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+	@inject(Identifiers.Cryptography.Commit.Serializer)
+	private readonly commitSerializer!: Contracts.Crypto.CommitBlockSerializer;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -143,7 +143,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 				},
 			};
 
-			const serialized = await this.blockSerializer.serializeFull(commitBlock);
+			const serialized = await this.commitSerializer.serializeFull(commitBlock);
 
 			this.#committedBlock = {
 				...commitBlock,

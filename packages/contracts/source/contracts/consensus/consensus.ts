@@ -1,4 +1,5 @@
-import { AggregatedSignature, CommittedBlock, Precommit, Prevote, Proposal } from "../crypto";
+import { AggregatedSignature, Precommit, Prevote, Proposal } from "../crypto";
+import { CommittedBlock } from "../crypto/commit";
 import { ProcessableUnit } from "../processor";
 import { ValidatorWallet } from "../state";
 import { Step } from "./enums";
