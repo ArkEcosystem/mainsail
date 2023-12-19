@@ -62,7 +62,7 @@ describe<{
 		context.sandbox.app.useDataPath(dirSync().name);
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
-			info: () => { },
+			info: () => {},
 		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();

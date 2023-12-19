@@ -44,9 +44,9 @@ export const Identifiers = {
 			Verifier: Symbol.for("Crypto<Block.Verifier>"),
 		},
 		Commit: {
-			Serializer: Symbol.for("Crypto<Commit.Serializer>"),
 			Deserializer: Symbol.for("Crypto<Commit.Deserializer>"),
 			Factory: Symbol.for("Crypto<Commit.Factory>"),
+			Serializer: Symbol.for("Crypto<Commit.Serializer>"),
 		},
 		Configuration: Symbol.for("Crypto<Configuration>"),
 		HashFactory: Symbol.for("Crypto<HashFactory>"),

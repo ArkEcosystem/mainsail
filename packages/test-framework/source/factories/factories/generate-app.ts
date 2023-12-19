@@ -3,11 +3,11 @@ import { Configuration } from "@mainsail/crypto-config";
 
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../../crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block";
-import { ServiceProvider as CoreCryptoMessages } from "../../../../crypto-messages";
 import { ServiceProvider as CoreCryptoCommit } from "../../../../crypto-commit";
 import { ServiceProvider as CoreCryptoConsensus } from "../../../../crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "../../../../crypto-key-pair-schnorr";
+import { ServiceProvider as CoreCryptoMessages } from "../../../../crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "../../../../crypto-transaction";
 import { ServiceProvider as CoreMultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment";

@@ -97,7 +97,7 @@ jobs:
             - name: Test crypto-messages
               run: cd packages/crypto-messages && pnpm run test
             - name: Test crypto-commit
-              run: cd packages/crypto-commit && pnpm run test              
+              run: cd packages/crypto-commit && pnpm run test
             - name: Test crypto-signature-bls12-381
               run: cd packages/crypto-signature-bls12-381 && pnpm run test
             - name: Test crypto-signature-ecdsa

@@ -146,7 +146,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				for (const [index, committedBlock] of committedBlocks.entries()) {
 					if (committedBlock.block.data.height !== height + index) {
 						throw new Error(
-							`Received block height ${committedBlock.block.data.height} does not match expected height ${height + index
+							`Received block height ${committedBlock.block.data.height} does not match expected height ${
+								height + index
 							}`,
 						);
 					}
@@ -204,7 +205,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		this.logger.debug(
-			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${job.heightTo
+			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
+				job.heightTo
 			} from ${job.peer.ip}. ${error.message}`,
 		);
 		this.peerDisposer.banPeer(job.peer.ip, error);

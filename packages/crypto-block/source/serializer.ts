@@ -121,5 +121,4 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 			},
 		});
 	}
-
 }

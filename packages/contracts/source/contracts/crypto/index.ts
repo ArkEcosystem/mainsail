@@ -1,6 +1,6 @@
 export * from "./block";
-export * from "./config";
 export * from "./commit";
+export * from "./config";
 export * from "./crypto";
 export * from "./enums";
 export * from "./hash";

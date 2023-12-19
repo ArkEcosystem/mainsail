@@ -120,7 +120,8 @@ export class Validator implements Contracts.Validator.Validator {
 		}
 
 		this.logger.debug(
-			`Received ${transactions.length
+			`Received ${
+				transactions.length
 			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 

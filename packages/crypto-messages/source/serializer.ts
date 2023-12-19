@@ -51,10 +51,10 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 				},
 				...(options.includeSignature
 					? {
-						signature: {
-							type: "consensusSignature",
-						},
-					}
+							signature: {
+								type: "consensusSignature",
+							},
+						}
 					: {}),
 			},
 		});
@@ -212,5 +212,4 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 
 		return Buffer.concat([Buffer.of(0), serializedBlock]);
 	}
-
 }
