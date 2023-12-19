@@ -49,6 +49,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await consensus.dispose();
 
 		const storage = this.app.get<Storage>(Identifiers.Consensus.Storage);
+		await storage.clear();
 		await storage.saveState(consensus.getState());
 
 		const roundStates = this.app
