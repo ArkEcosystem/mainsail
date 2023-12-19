@@ -1,4 +1,5 @@
-import { CommittedBlock, Precommit, Prevote, Proposal } from "../crypto";
+import { Precommit, Prevote, Proposal } from "../crypto";
+import { CommittedBlock } from "../crypto/commit";
 import { ProcessorResult } from "./enums";
 
 export interface ProposalProcessor {

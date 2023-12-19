@@ -1,4 +1,5 @@
-import { Block, CommittedBlock, Transaction } from "./crypto";
+import { Block, Transaction } from "./crypto";
+import { CommittedBlock } from "./crypto/commit";
 import { WalletRepositoryClone } from "./state";
 
 export interface ProcessableUnit {

@@ -15,10 +15,6 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 	@tagged("type", "wallet")
 	private readonly generatorPublicKeyByteLength!: number;
 
-	@inject(Identifiers.Cryptography.Size.Signature)
-	@tagged("type", "consensus")
-	private readonly consensusSignatureByteLength!: number;
-
 	public headerSize(): number {
 		return (
 			1 + // version
@@ -32,21 +28,6 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 			4 + // payloadLength
 			this.hashByteLength + // payloadHash
 			this.generatorPublicKeyByteLength
-		);
-	}
-
-	public commitSize(): number {
-		return (
-			4 + // round
-			+this.lockProofSize()
-		);
-	}
-
-	public lockProofSize(): number {
-		return (
-			this.consensusSignatureByteLength + // signature
-			1 +
-			8 // validator set bitmap
 		);
 	}
 
@@ -141,56 +122,4 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 		});
 	}
 
-	public async serializeLockProof(lockProof: Contracts.Crypto.AggregatedSignature): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.AggregatedSignature>(lockProof, {
-			length: this.lockProofSize(),
-			skip: 0,
-			schema: {
-				signature: {
-					type: "consensusSignature",
-				},
-				validators: {
-					type: "validatorSet",
-				},
-			},
-		});
-	}
-
-	public async serializeProposed(proposedBlock: Contracts.Crypto.ProposedBlockSerializable): Promise<Buffer> {
-		const serializedBlock = Buffer.from(proposedBlock.block.serialized, "hex");
-
-		// NOTE: The lock proof is undefined most of the time, hence we can safe a lot of bytes
-		// here by explicitly storing it's length instead of padding it with zero bytes.
-		if (proposedBlock.lockProof) {
-			const serializedLockProof = await this.serializeLockProof(proposedBlock.lockProof);
-			const proofLength = Buffer.of(serializedLockProof.length);
-			return Buffer.concat([proofLength, serializedLockProof, serializedBlock]);
-		}
-
-		return Buffer.concat([Buffer.of(0), serializedBlock]);
-	}
-
-	public async serializeCommit(commit: Contracts.Crypto.BlockCommit): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.BlockCommit>(commit, {
-			length: this.commitSize(),
-			skip: 0,
-			schema: {
-				round: {
-					type: "uint32",
-				},
-				signature: {
-					type: "consensusSignature",
-				},
-				validators: {
-					type: "validatorSet",
-				},
-			},
-		});
-	}
-
-	public async serializeFull(committedBlock: Contracts.Crypto.CommittedBlockSerializable): Promise<Buffer> {
-		const serializedCommit = await this.serializeCommit(committedBlock.commit);
-		const serializedBlock = Buffer.from(committedBlock.block.serialized, "hex");
-		return Buffer.concat([serializedCommit, serializedBlock]);
-	}
 }

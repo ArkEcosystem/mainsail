@@ -46,8 +46,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Consensus.CommittedBlockProcessor)
 	private readonly committedBlockProcessor!: Contracts.Consensus.CommittedBlockProcessor;
 
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+	@inject(Identifiers.Cryptography.Commit.Factory)
+	private readonly blockFactory!: Contracts.Crypto.CommitBlockFactory;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -139,15 +139,14 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				const committedBlocks = await Promise.all(
 					bytesForProcess
 						.splice(0, roundInfo.roundHeight + roundInfo.maxValidators - height)
-						.map(async (buff) => await this.blockFactory.fromCommittedBytes(buff)),
+						.map(async (buff) => await this.blockFactory.fromBytes(buff)),
 				);
 
 				// Check heights
 				for (const [index, committedBlock] of committedBlocks.entries()) {
 					if (committedBlock.block.data.height !== height + index) {
 						throw new Error(
-							`Received block height ${committedBlock.block.data.height} does not match expected height ${
-								height + index
+							`Received block height ${committedBlock.block.data.height} does not match expected height ${height + index
 							}`,
 						);
 					}
@@ -205,8 +204,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		this.logger.debug(
-			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
-				job.heightTo
+			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${job.heightTo
 			} from ${job.peer.ip}. ${error.message}`,
 		);
 		this.peerDisposer.banPeer(job.peer.ip, error);

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
-import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
 
 import { sealBlock } from "./block";
 import { IDFactory } from "./id.factory";
@@ -50,54 +50,6 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 		}
 
 		return this.fromData(data);
-	}
-
-	// TODO: separate factory ?
-	public async fromProposedBytes(buff: Buffer): Promise<Contracts.Crypto.ProposedBlock> {
-		const buffer = ByteBuffer.fromBuffer(buff);
-
-		const lockProofLength = buffer.readUint8();
-		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
-		if (lockProofLength > 0) {
-			const lockProofBuffer = buffer.readBytes(lockProofLength);
-			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
-		}
-
-		const block = await this.#fromSerialized(buffer.getRemainder());
-
-		return {
-			block,
-			lockProof,
-			serialized: buff.toString("hex"),
-		};
-	}
-
-	// TODO: separate factory ?
-	public async fromCommittedBytes(buff: Buffer): Promise<Contracts.Crypto.CommittedBlock> {
-		const buffer = ByteBuffer.fromBuffer(buff);
-
-		const commitBuffer = buffer.readBytes(this.serializer.commitSize());
-		const commit = await this.deserializer.deserializeCommit(commitBuffer);
-
-		const block = await this.#fromSerialized(buffer.getRemainder());
-
-		return {
-			block,
-			commit,
-			serialized: buff.toString("hex"),
-		};
-	}
-
-	// TODO: separate factory ?
-	public async fromCommittedJson(
-		json: Contracts.Crypto.CommittedBlockJson,
-	): Promise<Contracts.Crypto.CommittedBlock> {
-		const block = await this.fromJson(json.block);
-		return {
-			block,
-			commit: json.commit,
-			serialized: json.serialized,
-		};
 	}
 
 	public async fromData(data: Contracts.Crypto.BlockData): Promise<Contracts.Crypto.Block> {
@@ -155,7 +107,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 				throw new Exceptions.BlockSchemaError(
 					data.height,
 					`Invalid data${error.instancePath ? " at " + error.instancePath : ""}: ` +
-						`${error.message}: ${JSON.stringify(error.data)}`,
+					`${error.message}: ${JSON.stringify(error.data)}`,
 				);
 			}
 		}

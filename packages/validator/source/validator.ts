@@ -18,8 +18,8 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+	@inject(Identifiers.Cryptography.Message.Serializer)
+	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
 	@inject(Identifiers.Cryptography.HashFactory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
@@ -66,7 +66,7 @@ export class Validator implements Contracts.Validator.Validator {
 		block: Contracts.Crypto.Block,
 		lockProof?: Contracts.Crypto.AggregatedSignature,
 	): Promise<Contracts.Crypto.Proposal> {
-		const serializedProposedBlock = await this.blockSerializer.serializeProposed({ block, lockProof });
+		const serializedProposedBlock = await this.messageSerializer.serializeProposed({ block, lockProof });
 		return this.messagesFactory.makeProposal(
 			{
 				block: { serialized: serializedProposedBlock.toString("hex") },
@@ -120,8 +120,7 @@ export class Validator implements Contracts.Validator.Validator {
 		}
 
 		this.logger.debug(
-			`Received ${
-				transactions.length
+			`Received ${transactions.length
 			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 

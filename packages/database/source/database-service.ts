@@ -7,8 +7,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.BlockStorage)
 	private readonly blockStorage!: Database;
 
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+	@inject(Identifiers.Cryptography.Commit.Factory)
+	private readonly blockFactory!: Contracts.Crypto.CommitBlockFactory;
 
 	#cache = new Map<number, Buffer>();
 
@@ -16,7 +16,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const bytes = this.#get(height);
 
 		if (bytes) {
-			return (await this.blockFactory.fromCommittedBytes(bytes)).block;
+			return (await this.blockFactory.fromBytes(bytes)).block;
 		}
 
 		return undefined;
@@ -43,24 +43,24 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
 		return await this.#map<Contracts.Crypto.Block>(
 			await this.findCommitBuffers(start, end),
-			async (block: Buffer) => (await this.blockFactory.fromCommittedBytes(block)).block,
+			async (block: Buffer) => (await this.blockFactory.fromBytes(block)).block,
 		);
 	}
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.CommittedBlock> {
 		for (let height = start; height <= end; height++) {
-			const block = await this.blockFactory.fromCommittedBytes(this.#get(height));
+			const block = await this.blockFactory.fromBytes(this.#get(height));
 			yield block;
 		}
 	}
 
 	public async getLastBlock(): Promise<Contracts.Crypto.Block | undefined> {
 		if (this.#cache.size > 0) {
-			return (await this.blockFactory.fromCommittedBytes([...this.#cache.values()].pop()!)).block;
+			return (await this.blockFactory.fromBytes([...this.#cache.values()].pop()!)).block;
 		}
 
 		try {
-			const lastCommittedBlock = await this.blockFactory.fromCommittedBytes(
+			const lastCommittedBlock = await this.blockFactory.fromBytes(
 				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
 			);
 

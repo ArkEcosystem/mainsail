@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { IpcWorker } from "@mainsail/kernel";
+import { ByteBuffer } from "@mainsail/utils";
 
 import { Precommit } from "./precommit";
 import { Prevote } from "./prevote";
@@ -45,7 +46,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Proposal> {
 		this.#applySchema("proposal", data);
-		const block = await this.blockFactory.fromProposedBytes(Buffer.from(data.block.serialized, "hex"));
+		const block = await this.#makeProposedBlockFromBytes(Buffer.from(data.block.serialized, "hex"));
 
 		if (!serialized) {
 			serialized = await this.serializer.serializeProposal(data, { includeSignature: true });
@@ -123,6 +124,25 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		}
 
 		return new Precommit({ ...data, serialized });
+	}
+
+	async #makeProposedBlockFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedBlock> {
+		const buffer = ByteBuffer.fromBuffer(bytes);
+
+		const lockProofLength = buffer.readUint8();
+		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
+		if (lockProofLength > 0) {
+			const lockProofBuffer = buffer.readBytes(lockProofLength);
+			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
+		}
+
+		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
+
+		return {
+			block,
+			lockProof,
+			serialized: bytes.toString("hex"),
+		};
 	}
 
 	#applySchema<T>(schema: string, data: T): T {

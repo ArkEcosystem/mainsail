@@ -21,8 +21,8 @@ export const registerBlockFactory = async (
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
 			: await app
-					.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-					.get("genesisBlock.block");
+				.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+				.get("genesisBlock.block");
 
 		const { reward } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
@@ -166,7 +166,7 @@ export const registerBlockFactory = async (
 			...blockCommit,
 			serialized: (
 				await app
-					.get<Contracts.Crypto.BlockSerializer>(Identifiers.Cryptography.Block.Serializer)
+					.get<Contracts.Crypto.CommitBlockSerializer>(Identifiers.Cryptography.Commit.Serializer)
 					.serializeFull(blockCommit)
 			).toString("hex"),
 		};
