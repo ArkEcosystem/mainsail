@@ -30,6 +30,10 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
+			if (!this.isRoundInBounds(precommit)) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
+
 			if (!(await this.#hasValidSignature(precommit))) {
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}

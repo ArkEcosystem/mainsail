@@ -39,6 +39,10 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
+			if (!this.isRoundInBounds(proposal)) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
+
 			if (!this.#hasValidProposer(proposal)) {
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}

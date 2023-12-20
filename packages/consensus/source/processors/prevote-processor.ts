@@ -27,6 +27,10 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
+			if (!this.isRoundInBounds(prevote)) {
+				return Contracts.Consensus.ProcessorResult.Invalid;
+			}
+
 			if (!(await this.#hasValidSignature(prevote))) {
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
