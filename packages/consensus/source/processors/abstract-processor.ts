@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 @injectable()
@@ -21,26 +22,11 @@ export class AbstractProcessor {
 	}
 
 	protected isRoundInBounds(message: { round: number }): boolean {
-		// Hard limit to prevent overflow
-		if (message.round > 100_000) {
-			return false;
-		}
-
-		const milestone = this.cryptoConfiguration.getMilestone();
-		const lastBlockTimestamp = this.stateService.getStateStore().getLastBlock().data.timestamp;
-
-		// Skip stageTimeoutIncrease for first round.
-		const round = Math.max(0, message.round - 1);
-
-		const earliestTime =
-			// Last block time
-			lastBlockTimestamp +
-			// Append block time
-			milestone.blockTime +
-			// Round timeout without increase
-			message.round * milestone.stageTimeout +
-			// Add increase for each round. Using arithmetic progression formula
-			0.5 * round * (2 * milestone.stageTimeoutIncrease + (round - 1) * milestone.stageTimeoutIncrease);
+		const earliestTime = Utils.timestampCalculator.calculateMinimalTimestamp(
+			this.stateService.getStateStore().getLastBlock(),
+			message.round,
+			this.cryptoConfiguration,
+		);
 
 		return dayjs().isAfter(dayjs(earliestTime));
 	}
