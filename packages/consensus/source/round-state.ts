@@ -96,11 +96,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public hasProposal(): boolean {
-		if (this.#proposal) {
-			return true;
-		}
-
-		return false;
+		return !!this.#proposal;
 	}
 
 	public addProposal(proposal: Contracts.Crypto.Proposal): void {
