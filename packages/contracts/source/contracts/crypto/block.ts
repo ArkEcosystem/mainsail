@@ -57,7 +57,6 @@ export interface BlockJson {
 	readonly transactions: TransactionJson[];
 }
 
-
 export type BlockDataSerializable = Omit<BlockData, "id">;
 
 export interface BlockFactory {

@@ -20,11 +20,11 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		};
 
 		context.validatorSet = {
-			getActiveValidators: () => { },
+			getActiveValidators: () => {},
 		};
 
 		context.logger = {
-			info: () => { },
+			info: () => {},
 		};
 
 		const milestone = {
@@ -111,10 +111,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		}
 	});
 
-	it("#handleCommit - should repeat the indexed on prolonged rounds", async ({
-		proposerSelector,
-		sandbox,
-	}) => {
+	it("#handleCommit - should repeat the indexed on prolonged rounds", async ({ proposerSelector, sandbox }) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();

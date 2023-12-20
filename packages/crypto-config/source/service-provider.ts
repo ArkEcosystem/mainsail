@@ -13,7 +13,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
 
 			this.app.bind<Contracts.Crypto.NetworkConfigPartial>(Identifiers.Crypto).toConstantValue(config);
-		} catch { }
+		} catch {}
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {

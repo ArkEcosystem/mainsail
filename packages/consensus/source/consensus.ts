@@ -120,7 +120,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	public async dispose(): Promise<void> {
 		this.scheduler.clear();
 		this.#isDisposed = true;
-		await this.#handlerLock.runExclusive(async () => { });
+		await this.#handlerLock.runExclusive(async () => {});
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -420,7 +420,8 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
 			this.logger.info(
-				`Proposing valid block ${this.#height}/${this.#round
+				`Proposing valid block ${this.#height}/${
+					this.#round
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
 
@@ -489,7 +490,8 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		} else {
 			if (state) {
 				this.logger.warning(
-					`Skipping state restore, because stored height is ${state.height}, but should be ${stateStore.getLastBlock().data.height + 1
+					`Skipping state restore, because stored height is ${state.height}, but should be ${
+						stateStore.getLastBlock().data.height + 1
 					}`,
 				);
 
@@ -502,7 +504,8 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 		if (this.#height !== this.configuration.getHeight()) {
 			throw new Error(
-				`bootstrapped height ${this.#height
+				`bootstrapped height ${
+					this.#height
 				} does not match configuration height ${this.configuration.getHeight()}`,
 			);
 		}

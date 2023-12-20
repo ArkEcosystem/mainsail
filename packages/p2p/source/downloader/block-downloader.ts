@@ -146,16 +146,15 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				for (const [index, commit] of commits.entries()) {
 					if (commit.block.data.height !== height + index) {
 						throw new Error(
-							`Received block height ${commit.block.data.height} does not match expected height ${height + index
+							`Received block height ${commit.block.data.height} does not match expected height ${
+								height + index
 							}`,
 						);
 					}
 				}
 
 				const hasValidSignatures = await Promise.all(
-					commits.map(
-						async (commit) => await this.commitProcessor.hasValidSignature(commit),
-					),
+					commits.map(async (commit) => await this.commitProcessor.hasValidSignature(commit)),
 				);
 
 				if (!hasValidSignatures.every(Boolean)) {
@@ -204,7 +203,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		this.logger.debug(
-			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${job.heightTo
+			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
+				job.heightTo
 			} from ${job.peer.ip}. ${error.message}`,
 		);
 		this.peerDisposer.banPeer(job.peer.ip, error);
