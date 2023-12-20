@@ -59,7 +59,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		transactions = [...transactions, ...validatorTransactions];
 
-		const genesis = await this.#createCommittedGenesisBlock(premineWallet.keys, transactions, options);
+		const genesis = await this.#createGenesisCommit(premineWallet.keys, transactions, options);
 
 		return {
 			block: genesis.block.data,
@@ -180,7 +180,7 @@ export class GenesisBlockGenerator extends Generator {
 		return transaction;
 	}
 
-	async #createCommittedGenesisBlock(
+	async #createGenesisCommit(
 		premineKeys: Contracts.Crypto.KeyPair,
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
