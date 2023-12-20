@@ -29,7 +29,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			return { blocks: [] };
 		}
 
-		const committedBlocks: Buffer[] = await this.database.findCommitBuffers(
+		const commits: Buffer[] = await this.database.findCommitBuffers(
 			requestBlockHeight,
 			requestBlockHeight + requestBlockLimit - 1,
 		);
@@ -39,13 +39,13 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		const maxPayload = constants.MAX_PAYLOAD_CLIENT;
 		let totalSize = 0;
 
-		for (const committedBlock of committedBlocks) {
-			totalSize += committedBlock.length;
+		for (const commit of commits) {
+			totalSize += commit.length;
 			if (totalSize > maxPayload) {
 				break;
 			}
 
-			blocksToReturn.push(committedBlock);
+			blocksToReturn.push(commit);
 		}
 
 		this.logger.info(

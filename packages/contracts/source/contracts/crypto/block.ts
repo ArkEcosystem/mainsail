@@ -57,11 +57,6 @@ export interface BlockJson {
 	readonly transactions: TransactionJson[];
 }
 
-export interface BlockCommit {
-	readonly round: number;
-	readonly signature: string;
-	readonly validators: boolean[];
-}
 
 export type BlockDataSerializable = Omit<BlockData, "id">;
 

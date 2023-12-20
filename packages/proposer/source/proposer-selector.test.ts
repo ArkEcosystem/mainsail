@@ -20,11 +20,11 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		};
 
 		context.validatorSet = {
-			getActiveValidators: () => {},
+			getActiveValidators: () => { },
 		};
 
 		context.logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		const milestone = {
@@ -75,7 +75,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		await proposerSelector.onCommit({
-			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
+			getCommit: async () => ({ block: { header: { height: 0 } } }),
 		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -83,7 +83,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		}
 	});
 
-	it("#handleCommittedBlock - builds validator matrix based on round height", async ({
+	it("#handleCommit - builds validator matrix based on round height", async ({
 		proposerSelector,
 		sandbox,
 		stateStore,
@@ -93,7 +93,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		await proposerSelector.onCommit({
-			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
+			getCommit: async () => ({ block: { header: { height: 0 } } }),
 		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -103,7 +103,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		stateStore.setTotalRound(53);
 
 		await proposerSelector.onCommit({
-			getCommittedBlock: async () => ({ block: { header: { height: activeValidators } } }),
+			getCommit: async () => ({ block: { header: { height: activeValidators } } }),
 		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -111,7 +111,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		}
 	});
 
-	it("#handleCommittedBlock - should repeat the indexed on prolonged rounds", async ({
+	it("#handleCommit - should repeat the indexed on prolonged rounds", async ({
 		proposerSelector,
 		sandbox,
 	}) => {
@@ -120,7 +120,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		await proposerSelector.onCommit({
-			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
+			getCommit: async () => ({ block: { header: { height: 0 } } }),
 		} as Contracts.Processor.ProcessableUnit);
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);

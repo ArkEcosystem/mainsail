@@ -43,11 +43,11 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2PState)
 	private readonly state!: Contracts.P2P.State;
 
-	@inject(Identifiers.Consensus.CommittedBlockProcessor)
-	private readonly committedBlockProcessor!: Contracts.Consensus.CommittedBlockProcessor;
+	@inject(Identifiers.Consensus.CommitProcessor)
+	private readonly commitProcessor!: Contracts.Consensus.CommitProcessor;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
-	private readonly blockFactory!: Contracts.Crypto.CommitBlockFactory;
+	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -136,26 +136,25 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 				// TODO: Check if can use workers
 				// Slice to the end of the round, to ensure validator set is the same
-				const committedBlocks = await Promise.all(
+				const commits = await Promise.all(
 					bytesForProcess
 						.splice(0, roundInfo.roundHeight + roundInfo.maxValidators - height)
-						.map(async (buff) => await this.blockFactory.fromBytes(buff)),
+						.map(async (buff) => await this.commitFactory.fromBytes(buff)),
 				);
 
 				// Check heights
-				for (const [index, committedBlock] of committedBlocks.entries()) {
-					if (committedBlock.block.data.height !== height + index) {
+				for (const [index, commit] of commits.entries()) {
+					if (commit.block.data.height !== height + index) {
 						throw new Error(
-							`Received block height ${committedBlock.block.data.height} does not match expected height ${
-								height + index
+							`Received block height ${commit.block.data.height} does not match expected height ${height + index
 							}`,
 						);
 					}
 				}
 
 				const hasValidSignatures = await Promise.all(
-					committedBlocks.map(
-						async (committedBlock) => await this.committedBlockProcessor.hasValidSignature(committedBlock),
+					commits.map(
+						async (commit) => await this.commitProcessor.hasValidSignature(commit),
 					),
 				);
 
@@ -163,8 +162,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					throw new Error(`Received block(s) with invalid signature(s)`);
 				}
 
-				for (const committedBlock of committedBlocks) {
-					const response = await this.committedBlockProcessor.process(committedBlock);
+				for (const commit of commits) {
+					const response = await this.commitProcessor.process(commit);
 					if (response === Contracts.Consensus.ProcessorResult.Invalid) {
 						throw new Error(`Received block is invalid`);
 					}
@@ -205,8 +204,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		this.logger.debug(
-			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${
-				job.heightTo
+			`Error ${job.status === JobStatus.Downloading ? "downloading" : "processing"} blocks ${job.heightFrom}-${job.heightTo
 			} from ${job.peer.ip}. ${error.message}`,
 		);
 		this.peerDisposer.banPeer(job.peer.ip, error);

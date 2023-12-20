@@ -22,8 +22,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.ValidatorSet {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const committedBlock = await unit.getCommittedBlock();
-		const { height } = committedBlock.block.header;
+		const commit = await unit.getCommit();
+		const { height } = commit.block.header;
 
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
 			this.#buildActiveValidators();

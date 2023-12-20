@@ -116,20 +116,20 @@ describe<{
 		}
 	});
 
-	it("handleCommitBlock - should update ranking every full round", async ({ cryptoConfiguration, validatorSet }) => {
+	it("onCommit - should update ranking every full round", async ({ cryptoConfiguration, validatorSet }) => {
 		const buildValidatorRankingSpy = spy(validatorSet, "buildValidatorRanking");
 
 		const { activeValidators } = cryptoConfiguration.getMilestone();
 
 		await validatorSet.onCommit({
-			getCommittedBlock: async () => ({ block: { header: { height: 0 } } }),
+			getCommit: async () => ({ block: { header: { height: 0 } } }),
 		} as Contracts.Processor.IProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 
 		let currentHeight = 0;
 		for (let index = 0; index < activeValidators; index++) {
 			await validatorSet.onCommit({
-				getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
+				getCommit: async () => ({ block: { header: { height: currentHeight } } }),
 			} as Contracts.Processor.IProcessableUnit);
 
 			// Genesis block (= height 0) and the first block thereafter rebuild the ranking
@@ -141,7 +141,7 @@ describe<{
 		// The ranking now got updated thrice
 		assert.equal(currentHeight, 5);
 		await validatorSet.onCommit({
-			getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
+			getCommit: async () => ({ block: { header: { height: currentHeight } } }),
 		} as Contracts.Processor.IProcessableUnit);
 		assert.equal(buildValidatorRankingSpy.callCount, 3);
 		currentHeight++;
@@ -151,7 +151,7 @@ describe<{
 		// Simulate another round
 		for (let index = 0; index < activeValidators - 1; index++) {
 			await validatorSet.onCommit({
-				getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
+				getCommit: async () => ({ block: { header: { height: currentHeight } } }),
 			} as Contracts.Processor.IProcessableUnit);
 			assert.true(buildValidatorRankingSpy.notCalled);
 			currentHeight++;
@@ -160,7 +160,7 @@ describe<{
 		// Called again after another round
 		assert.equal(currentHeight, 10);
 		await validatorSet.onCommit({
-			getCommittedBlock: async () => ({ block: { header: { height: currentHeight } } }),
+			getCommit: async () => ({ block: { header: { height: currentHeight } } }),
 		} as Contracts.Processor.IProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
 	});

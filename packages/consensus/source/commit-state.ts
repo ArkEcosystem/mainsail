@@ -2,7 +2,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class CommittedBlockState implements Contracts.Processor.ProcessableUnit {
+export class CommitState implements Contracts.Processor.ProcessableUnit {
 	@inject(Identifiers.StateService)
 	private readonly stateService!: Contracts.State.Service;
 
@@ -10,7 +10,7 @@ export class CommittedBlockState implements Contracts.Processor.ProcessableUnit 
 	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
 	#walletRepository!: Contracts.State.WalletRepositoryClone;
-	#committedBlock!: Contracts.Crypto.CommittedBlock;
+	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: boolean;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 
@@ -20,11 +20,11 @@ export class CommittedBlockState implements Contracts.Processor.ProcessableUnit 
 	}
 
 	get height(): number {
-		return this.#committedBlock.block.data.height;
+		return this.#commit.block.data.height;
 	}
 
 	get round(): number {
-		return this.#committedBlock.commit.round;
+		return this.#commit.proof.round;
 	}
 
 	get persist(): boolean {
@@ -35,8 +35,8 @@ export class CommittedBlockState implements Contracts.Processor.ProcessableUnit 
 		return [...this.#validators.keys()];
 	}
 
-	public configure(committedBlock: Contracts.Crypto.CommittedBlock): CommittedBlockState {
-		this.#committedBlock = committedBlock;
+	public configure(commit: Contracts.Crypto.Commit): CommitState {
+		this.#commit = commit;
 
 		const validators = this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
@@ -52,7 +52,7 @@ export class CommittedBlockState implements Contracts.Processor.ProcessableUnit 
 	}
 
 	public getBlock(): Contracts.Crypto.Block {
-		return this.#committedBlock.block;
+		return this.#commit.block;
 	}
 
 	public setProcessorResult(processorResult: boolean): void {
@@ -71,7 +71,7 @@ export class CommittedBlockState implements Contracts.Processor.ProcessableUnit 
 		return this.#processorResult;
 	}
 
-	public async getCommittedBlock(): Promise<Contracts.Crypto.CommittedBlock> {
-		return this.#committedBlock;
+	public async getCommit(): Promise<Contracts.Crypto.Commit> {
+		return this.#commit;
 	}
 }

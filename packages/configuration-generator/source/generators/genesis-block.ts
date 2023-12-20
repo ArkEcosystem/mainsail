@@ -14,13 +14,13 @@ import { Generator } from "./generator";
 @injectable()
 export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Commit.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.CommitBlockSerializer;
+	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<Contracts.Crypto.CommittedBlockData> {
+	): Promise<Contracts.Crypto.CommitData> {
 		const premineWallet = await this.createWallet();
 
 		const genesisWallet = await this.createWallet(genesisMnemonic);
@@ -63,7 +63,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		return {
 			block: genesis.block.data,
-			commit: genesis.commit,
+			proof: genesis.proof,
 			serialized: genesis.serialized,
 		};
 	}
@@ -184,18 +184,18 @@ export class GenesisBlockGenerator extends Generator {
 		premineKeys: Contracts.Crypto.KeyPair,
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
-	): Promise<Contracts.Crypto.CommittedBlock> {
+	): Promise<Contracts.Crypto.Commit> {
 		const genesisBlock = await this.#createGenesisBlock(premineKeys, transactions, options);
 
-		const commitBlock: Contracts.Crypto.CommittedBlockSerializable = {
+		const commit: Contracts.Crypto.CommitSerializable = {
 			block: genesisBlock.block,
-			commit: { round: 0, signature: "", validators: [] },
+			proof: { round: 0, signature: "", validators: [] },
 		};
 
-		const serialized = await this.blockSerializer.serializeFull(commitBlock);
+		const serialized = await this.commitSerializer.serializeCommit(commit);
 
 		return {
-			...commitBlock,
+			...commit,
 			serialized: serialized.toString("hex"),
 		};
 	}

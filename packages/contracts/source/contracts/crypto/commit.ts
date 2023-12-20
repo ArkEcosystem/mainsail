@@ -1,41 +1,47 @@
 import { ProcessableUnit } from "../processor";
-import { Block, BlockCommit, BlockData, BlockJson } from "./block";
+import { Block, BlockData, BlockJson } from "./block";
 
-export interface CommittedBlockJson {
+export interface CommitJson {
 	readonly block: BlockJson;
-	readonly commit: BlockCommit;
+	readonly proof: CommitProof;
 	readonly serialized: string;
 }
 
-export interface CommittedBlock {
+export interface Commit {
 	readonly block: Block;
-	readonly commit: BlockCommit;
+	readonly proof: CommitProof;
 	readonly serialized: string;
 }
 
-export interface CommittedBlockData {
+export interface CommitData {
 	readonly block: BlockData;
-	readonly commit: BlockCommit;
+	readonly proof: CommitProof;
 	readonly serialized: string;
 }
-export type CommittedBlockSerializable = Omit<CommittedBlock, "serialized">;
+export type CommitSerializable = Omit<Commit, "serialized">;
 
-export interface CommitBlockFactory {
-	fromBytes(buff: Buffer): Promise<CommittedBlock>;
+export interface CommitFactory {
+	fromBytes(buff: Buffer): Promise<Commit>;
 
-	fromJson(json: CommittedBlockJson): Promise<CommittedBlock>;
+	fromJson(json: CommitJson): Promise<Commit>;
 }
 
-export interface CommitBlockSerializer {
-	commitSize(): number;
-
-	serializeCommit(commit: BlockCommit): Promise<Buffer>;
-
-	serializeFull(committedBlock: CommittedBlockSerializable): Promise<Buffer>;
+export interface CommitProof {
+	readonly round: number;
+	readonly signature: string;
+	readonly validators: boolean[];
 }
 
-export interface CommitBlockDeserializer {
-	deserializeCommit(serialized: Buffer): Promise<BlockCommit>;
+export interface CommitSerializer {
+	proofSize(): number;
+
+	serializeCommitProof(proof: CommitProof): Promise<Buffer>;
+
+	serializeCommit(commit: CommitSerializable): Promise<Buffer>;
+}
+
+export interface CommitDeserializer {
+	deserializeCommitProof(serialized: Buffer): Promise<CommitProof>;
 }
 
 export interface CommitHandler {

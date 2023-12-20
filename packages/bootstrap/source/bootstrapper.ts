@@ -26,7 +26,7 @@ export class Bootstrapper {
 	private readonly p2pService!: Contracts.P2P.Service;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
-	private readonly blockFactory!: Contracts.Crypto.CommitBlockFactory;
+	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -43,8 +43,8 @@ export class Bootstrapper {
 	@inject(Identifiers.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
-	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
-	private readonly committedBlockStateFactory!: Contracts.Consensus.CommittedBlockStateFactory;
+	@inject(Identifiers.Consensus.CommitStateFactory)
+	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
 	@inject(Identifiers.ApiSync)
 	@optional()
@@ -94,7 +94,7 @@ export class Bootstrapper {
 
 	async #setGenesisBlock(): Promise<void> {
 		const genesisBlockJson = this.configuration.get("genesisBlock");
-		const genesisBlock = await this.blockFactory.fromJson(genesisBlockJson);
+		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
 		this.#stateStore.setGenesisBlock(genesisBlock);
 	}
@@ -109,7 +109,7 @@ export class Bootstrapper {
 
 	async #processGenesisBlock(): Promise<void> {
 		const genesisBlock = this.#stateStore.getGenesisBlock();
-		await this.#processBlock(genesisBlock);
+		await this.#processCommit(genesisBlock);
 	}
 
 	async #restoreStateSnapshot(): Promise<void> {
@@ -135,33 +135,33 @@ export class Bootstrapper {
 
 	async #processBlocks(): Promise<void> {
 		const lastBlock = await this.databaseService.getLastBlock();
-		Utils.assert.defined<Contracts.Crypto.CommittedBlock>(lastBlock);
+		Utils.assert.defined<Contracts.Crypto.Commit>(lastBlock);
 
-		for await (const committedBlock of this.databaseService.readCommits(
+		for await (const commit of this.databaseService.readCommits(
 			this.#stateStore.getLastHeight() + 1,
 			lastBlock.data.height,
 		)) {
-			await this.#processBlock(committedBlock);
+			await this.#processCommit(commit);
 
-			if (committedBlock.block.data.height % 10_000 === 0) {
-				this.logger.info(`Processed blocks: ${committedBlock.block.data.height.toLocaleString()} `);
+			if (commit.block.data.height % 10_000 === 0) {
+				this.logger.info(`Processed blocks: ${commit.block.data.height.toLocaleString()} `);
 
 				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
 			}
 		}
 	}
 
-	async #processBlock(committedBlock: Contracts.Crypto.CommittedBlock): Promise<void> {
+	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
 		try {
-			const committedBlockState = this.committedBlockStateFactory(committedBlock);
-			const result = await this.blockProcessor.process(committedBlockState);
+			const commitState = this.commitStateFactory(commit);
+			const result = await this.blockProcessor.process(commitState);
 			if (result === false) {
 				throw new Error(`Cannot process block`);
 			}
-			await this.blockProcessor.commit(committedBlockState);
+			await this.blockProcessor.commit(commitState);
 		} catch (error) {
 			await this.app.terminate(
-				`Failed to process block at height ${committedBlock.block.data.height}: ${error.message}`,
+				`Failed to process block at height ${commit.block.data.height}: ${error.message}`,
 			);
 		}
 	}

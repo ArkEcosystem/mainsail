@@ -1,5 +1,5 @@
 import { AggregatedSignature, Precommit, Prevote, Proposal } from "../crypto";
-import { CommittedBlock } from "../crypto/commit";
+import { Commit } from "../crypto/commit";
 import { ProcessableUnit } from "../processor";
 import { ValidatorWallet } from "../state";
 import { Step } from "./enums";
@@ -33,7 +33,7 @@ export interface RoundState extends ProcessableUnit {
 	logPrecommits(): void;
 }
 
-export type CommittedBlockStateFactory = (committedBlock: CommittedBlock) => ProcessableUnit;
+export type CommitStateFactory = (commit: Commit) => ProcessableUnit;
 
 export interface Aggregator {
 	aggregate(signatures: Map<number, { signature: string }>, activeValidators: number): Promise<AggregatedSignature>;
@@ -65,7 +65,7 @@ export interface ConsensusService {
 	getStep(): Step;
 	getState(): ConsensusState;
 	handle(roundState: RoundState): Promise<void>;
-	handleCommittedBlockState(committedBlockState: ProcessableUnit): Promise<void>;
+	handleCommitState(commitState: ProcessableUnit): Promise<void>;
 	onTimeoutStartRound(): Promise<void>;
 	onTimeoutPropose(height: number, round: number): Promise<void>;
 	onTimeoutPrevote(height: number, round: number): Promise<void>;

@@ -12,8 +12,8 @@ export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 	private readonly stateService!: Contracts.State.Service;
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const committedBlock = await unit.getCommittedBlock();
-		const { height } = committedBlock.block.header;
+		const commit = await unit.getCommit();
+		const { height } = commit.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
 			const { activeValidators } = this.configuration.getMilestone();
 			this.#updateValidatorMatrix(activeValidators);

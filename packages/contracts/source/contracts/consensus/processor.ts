@@ -1,5 +1,5 @@
 import { Precommit, Prevote, Proposal } from "../crypto";
-import { CommittedBlock } from "../crypto/commit";
+import { Commit } from "../crypto/commit";
 import { ProcessorResult } from "./enums";
 
 export interface ProposalProcessor {
@@ -14,7 +14,7 @@ export interface PrecommitProcessor {
 	process(prevote: Precommit, broadcast?: boolean): Promise<ProcessorResult>;
 }
 
-export interface CommittedBlockProcessor {
-	process(committedBlock: CommittedBlock, broadcast?: boolean): Promise<ProcessorResult>;
-	hasValidSignature(committedBlock: CommittedBlock): Promise<boolean>;
+export interface CommitProcessor {
+	process(commit: Commit, broadcast?: boolean): Promise<ProcessorResult>;
+	hasValidSignature(commit: Commit): Promise<boolean>;
 }

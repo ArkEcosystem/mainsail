@@ -5,9 +5,9 @@ import { RootDatabase } from "lmdb";
 
 import { Aggregator } from "./aggregator";
 import { Bootstrapper } from "./bootstrapper";
-import { CommittedBlockState } from "./committed-block-state";
+import { CommitState } from "./commit-state";
 import { Consensus } from "./consensus";
-import { CommittedBlockProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors";
+import { CommitProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors";
 import { RoundStateRepository } from "./round-state-repository";
 import { Scheduler } from "./scheduler";
 import { Storage } from "./storage";
@@ -20,14 +20,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.ProposalProcessor).to(ProposalProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.PrevoteProcessor).to(PrevoteProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.CommittedBlockProcessor).to(CommittedBlockProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.CommitProcessor).to(CommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
 
 		this.app
-			.bind(Identifiers.Consensus.CommittedBlockStateFactory)
+			.bind(Identifiers.Consensus.CommitStateFactory)
 			.toFactory(
-				(context: interfaces.Context) => (committedBlock: Contracts.Crypto.CommittedBlock) =>
-					context.container.resolve(CommittedBlockState).configure(committedBlock),
+				(context: interfaces.Context) => (commit: Contracts.Crypto.Commit) =>
+					context.container.resolve(CommitState).configure(commit),
 			);
 
 		// Storage for prevotes, precommits and proposals

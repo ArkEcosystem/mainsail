@@ -5,7 +5,7 @@ import { Utils } from "@mainsail/kernel";
 import { AbstractProcessor } from "./abstract-processor";
 
 @injectable()
-export class CommittedBlockProcessor extends AbstractProcessor implements Contracts.Consensus.CommittedBlockProcessor {
+export class CommitProcessor extends AbstractProcessor implements Contracts.Consensus.CommitProcessor {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -21,28 +21,28 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
-	@inject(Identifiers.Consensus.CommittedBlockStateFactory)
-	private readonly committedBlockStateFactory!: Contracts.Consensus.CommittedBlockStateFactory;
+	@inject(Identifiers.Consensus.CommitStateFactory)
+	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
-	async process(committedBlock: Contracts.Crypto.CommittedBlock): Promise<Contracts.Consensus.ProcessorResult> {
+	async process(commit: Contracts.Crypto.Commit): Promise<Contracts.Consensus.ProcessorResult> {
 		let promise: Promise<void> | undefined;
 
 		const result = await this.commitLock.runNonExclusive(async (): Promise<Contracts.Consensus.ProcessorResult> => {
-			if (!this.#hasValidHeight(committedBlock)) {
+			if (!this.#hasValidHeight(commit)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
-			const committedBlockState = this.committedBlockStateFactory(committedBlock);
+			const commitState = this.commitStateFactory(commit);
 
-			const result = await this.processor.process(committedBlockState);
+			const result = await this.processor.process(commitState);
 
 			if (result === false) {
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			committedBlockState.setProcessorResult(result);
+			commitState.setProcessorResult(result);
 
-			promise = this.getConsensus().handleCommittedBlockState(committedBlockState);
+			promise = this.getConsensus().handleCommitState(commitState);
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
@@ -53,11 +53,11 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 		return result;
 	}
 
-	async hasValidSignature(committedBlock: Contracts.Crypto.CommittedBlock): Promise<boolean> {
-		const { commit, block } = committedBlock;
+	async hasValidSignature(commit: Contracts.Crypto.Commit): Promise<boolean> {
+		const { proof, block } = commit;
 
 		const publicKeys: Buffer[] = [];
-		for (const [index, validator] of commit.validators.entries()) {
+		for (const [index, validator] of proof.validators.entries()) {
 			if (!validator) {
 				continue;
 			}
@@ -74,14 +74,14 @@ export class CommittedBlockProcessor extends AbstractProcessor implements Contra
 		const precommit = await this.serializer.serializePrecommitForSignature({
 			blockId: block.data.id,
 			height: block.data.height,
-			round: commit.round,
+			round: proof.round,
 			type: Contracts.Crypto.MessageType.Precommit,
 		});
 
-		return this.aggregator.verify(commit, precommit, activeValidators);
+		return this.aggregator.verify(proof, precommit, activeValidators);
 	}
 
-	#hasValidHeight(committedBlock: Contracts.Crypto.CommittedBlock): boolean {
-		return committedBlock.block.data.height === this.getConsensus().getHeight();
+	#hasValidHeight(commit: Contracts.Crypto.Commit): boolean {
+		return commit.block.data.height === this.getConsensus().getHeight();
 	}
 }

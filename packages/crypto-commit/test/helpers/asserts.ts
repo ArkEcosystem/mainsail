@@ -1,4 +1,4 @@
-export const assertCommitData = (assert, commitData1, commitData2) => {
+export const assertCommitProofData = (assert, commitData1, commitData2) => {
 	const fields = ["round", "signature", "validators"];
 
 	for (const field of fields) {
