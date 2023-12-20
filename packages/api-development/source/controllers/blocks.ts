@@ -44,12 +44,12 @@ export class BlocksController extends Controller {
 	}
 
 	public async first(request: Hapi.Request) {
-		const block = this.stateService.getStateStore().getGenesisBlock();
+		const commit = this.stateService.getStateStore().getGenesisCommit();
 
 		if (request.query.transform) {
-			return this.respondWithResource(block.block, BlockResource, true);
+			return this.respondWithResource(commit.block, BlockResource, true);
 		} else {
-			return this.respondWithResource(block.block.data, BlockResource, false);
+			return this.respondWithResource(commit.block.data, BlockResource, false);
 		}
 	}
 

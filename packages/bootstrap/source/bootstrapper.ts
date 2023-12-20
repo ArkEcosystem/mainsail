@@ -96,19 +96,19 @@ export class Bootstrapper {
 		const genesisBlockJson = this.configuration.get("genesisBlock");
 		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
-		this.#stateStore.setGenesisBlock(genesisBlock);
+		this.#stateStore.setGenesisCommit(genesisBlock);
 	}
 
 	async #storeGenesisBlock(): Promise<void> {
 		if (!(await this.databaseService.getLastBlock())) {
-			const genesisBlock = this.#stateStore.getGenesisBlock();
+			const genesisBlock = this.#stateStore.getGenesisCommit();
 			this.databaseService.addCommit(genesisBlock);
 			await this.databaseService.persist();
 		}
 	}
 
 	async #processGenesisBlock(): Promise<void> {
-		const genesisBlock = this.#stateStore.getGenesisBlock();
+		const genesisBlock = this.#stateStore.getGenesisCommit();
 		await this.#processCommit(genesisBlock);
 	}
 

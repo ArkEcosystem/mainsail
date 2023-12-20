@@ -197,7 +197,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 	}
 
 	async #bootstrapState(): Promise<void> {
-		const genesisBlock = this.stateService.getStateStore().getGenesisBlock();
+		const genesisCommit = this.stateService.getStateStore().getGenesisCommit();
 		await this.stateRepositoryFactory()
 			.createQueryBuilder()
 			.insert()
@@ -205,7 +205,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 			.values({
 				height: "0",
 				id: 1,
-				supply: genesisBlock.block.data.totalAmount.toFixed(),
+				supply: genesisCommit.block.data.totalAmount.toFixed(),
 			})
 			.execute();
 	}

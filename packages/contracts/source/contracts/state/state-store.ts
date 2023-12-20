@@ -6,8 +6,8 @@ export interface StateStore {
 	isBootstrap(): boolean;
 	setBootstrap(value: boolean): void;
 
-	getGenesisBlock(): Commit;
-	setGenesisBlock(block: Commit): void;
+	getGenesisCommit(): Commit;
+	setGenesisCommit(block: Commit): void;
 
 	getLastHeight(): number;
 	getLastBlock(): Block;

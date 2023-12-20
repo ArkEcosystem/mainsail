@@ -48,13 +48,13 @@ export class StateStore implements Contracts.State.StateStore {
 		this.#isBootstrap = value;
 	}
 
-	public getGenesisBlock(): Contracts.Crypto.Commit {
+	public getGenesisCommit(): Contracts.Crypto.Commit {
 		Utils.assert.defined<Contracts.Crypto.Commit>(this.#genesisBlock);
 
 		return this.#genesisBlock;
 	}
 
-	public setGenesisBlock(block: Contracts.Crypto.Commit): void {
+	public setGenesisCommit(block: Contracts.Crypto.Commit): void {
 		this.#genesisBlock = block;
 	}
 
