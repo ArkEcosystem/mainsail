@@ -21,6 +21,11 @@ export class AbstractProcessor {
 	}
 
 	protected isRoundInBounds(message: { round: number }): boolean {
+		// Hard limit to prevent overflow
+		if (message.round > 100_000) {
+			return false;
+		}
+
 		const milestone = this.cryptoConfiguration.getMilestone();
 		const lastBlockTimestamp = this.stateService.getStateStore().getLastBlock().data.timestamp;
 
