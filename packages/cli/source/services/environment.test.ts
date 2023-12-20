@@ -27,6 +27,8 @@ describe<{
 		process.env.CORE_PATH_CONFIG = "something";
 
 		assert.true(environment.getPaths("ark", "testnet", "mainsail").config.endsWith("/something/mainsail"));
+
+		delete process.env.CORE_PATH_CONFIG;
 	});
 
 	it("should fail to update the variables if the file doesn't exist", async ({ environment }) => {
