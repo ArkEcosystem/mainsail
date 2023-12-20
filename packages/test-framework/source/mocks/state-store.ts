@@ -16,8 +16,8 @@ class StateStoreMocks implements Partial<Contracts.State.StateStore> {
 		return mockBlock as Contracts.Crypto.Block;
 	}
 
-	public getGenesisBlock(): Contracts.Crypto.CommittedBlock {
-		return mockBlock as Contracts.Crypto.CommittedBlock;
+	public getGenesisCommit(): Contracts.Crypto.Commit {
+		return mockBlock as Contracts.Crypto.Commit;
 	}
 
 	public getLastHeight(): number {

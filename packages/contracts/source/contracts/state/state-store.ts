@@ -1,13 +1,13 @@
 import { Block } from "../crypto";
-import { CommittedBlock } from "../crypto/commit";
+import { Commit } from "../crypto/commit";
 import { JsonObject } from "../types";
 
 export interface StateStore {
 	isBootstrap(): boolean;
 	setBootstrap(value: boolean): void;
 
-	getGenesisBlock(): CommittedBlock;
-	setGenesisBlock(block: CommittedBlock): void;
+	getGenesisCommit(): Commit;
+	setGenesisCommit(block: Commit): void;
 
 	getLastHeight(): number;
 	getLastBlock(): Block;

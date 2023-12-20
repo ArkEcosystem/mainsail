@@ -17,7 +17,7 @@ export const registerBlockFactory = async (
 		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/mainsail/crypto.json")),
 	);
 
-	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.CommittedBlock> => {
+	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.Commit> => {
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
 			: await app
@@ -72,7 +72,7 @@ export const registerBlockFactory = async (
 
 		const passphrase = options.passphrase || secrets[0];
 
-		const blockCommit = {
+		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make({
 				generatorPublicKey: await app
 					.getTagged<Contracts.Crypto.PublicKeyFactory>(
@@ -98,7 +98,7 @@ export const registerBlockFactory = async (
 				version: 1,
 			}),
 			// TODO: dont hardcode
-			commit: {
+			proof: {
 				blockId: "365dbc2f380b65737b439f98ce9ef0318b00d5bbdda57daabea8341f91ce39e7",
 				height: 1,
 				round: 1,
@@ -163,11 +163,11 @@ export const registerBlockFactory = async (
 		// const serializedCommit = "365dbc2f380b65737b439f98ce9ef0318b00d5bbdda57daabea8341f91ce39e7010000000100000097a16d3e938a1bc6866701b946e703cfa502d57a226e540f270c16585405378e93086dfb3b32ab2039aa2c197177c66b0fec074df5bfac037efd3dc41d98d50455a69ff1934d503ef69dffa08429f75e5677efca4f2de36d46f8258635e32a9533010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101";
 
 		return {
-			...blockCommit,
+			...commit,
 			serialized: (
 				await app
-					.get<Contracts.Crypto.CommitBlockSerializer>(Identifiers.Cryptography.Commit.Serializer)
-					.serializeFull(blockCommit)
+					.get<Contracts.Crypto.CommitSerializer>(Identifiers.Cryptography.Commit.Serializer)
+					.serializeCommit(commit)
 			).toString("hex"),
 		};
 	});

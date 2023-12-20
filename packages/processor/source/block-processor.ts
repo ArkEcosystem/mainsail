@@ -72,11 +72,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		unit.getWalletRepository().commitChanges();
 
-		const committedBlock = await unit.getCommittedBlock();
+		const commit = await unit.getCommit();
 
 		const stateStore = this.stateService.getStateStore();
 		if (!stateStore.isBootstrap()) {
-			this.databaseService.addCommit(committedBlock);
+			this.databaseService.addCommit(commit);
 
 			if (unit.persist) {
 				await this.databaseService.persist();
@@ -84,7 +84,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		stateStore.setTotalRound(stateStore.getTotalRound() + unit.round + 1);
-		stateStore.setLastBlock(committedBlock.block);
+		stateStore.setLastBlock(commit.block);
 
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
@@ -96,13 +96,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		if (!stateStore.isBootstrap()) {
 			this.logger.info(
-				`Block ${committedBlock.block.header.height.toLocaleString()} with ${committedBlock.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
+				`Block ${commit.block.header.height.toLocaleString()} with ${commit.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
 			);
 		}
 
-		if (Utils.roundCalculator.isNewRound(committedBlock.block.header.height + 1, this.cryptoConfiguration)) {
+		if (Utils.roundCalculator.isNewRound(commit.block.header.height + 1, this.cryptoConfiguration)) {
 			const roundInfo = Utils.roundCalculator.calculateRound(
-				committedBlock.block.header.height + 1,
+				commit.block.header.height + 1,
 				this.cryptoConfiguration,
 			);
 
@@ -113,12 +113,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
-		for (const transaction of committedBlock.block.transactions) {
+		for (const transaction of commit.block.transactions) {
 			await this.transactionPool.removeForgedTransaction(transaction);
 			await this.#emitTransactionEvents(transaction);
 		}
 
-		void this.events.dispatch(Enums.BlockEvent.Applied, committedBlock);
+		void this.events.dispatch(Enums.BlockEvent.Applied, commit);
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.Transaction): Promise<void> {

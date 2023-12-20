@@ -18,7 +18,7 @@ export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.StateAttributes)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
-	#genesisBlock?: Contracts.Crypto.CommittedBlock;
+	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#isBootstrap = true;
 	#originalStateStore?: StateStore;
@@ -48,13 +48,13 @@ export class StateStore implements Contracts.State.StateStore {
 		this.#isBootstrap = value;
 	}
 
-	public getGenesisBlock(): Contracts.Crypto.CommittedBlock {
-		Utils.assert.defined<Contracts.Crypto.CommittedBlock>(this.#genesisBlock);
+	public getGenesisCommit(): Contracts.Crypto.Commit {
+		Utils.assert.defined<Contracts.Crypto.Commit>(this.#genesisBlock);
 
 		return this.#genesisBlock;
 	}
 
-	public setGenesisBlock(block: Contracts.Crypto.CommittedBlock): void {
+	public setGenesisCommit(block: Contracts.Crypto.Commit): void {
 		this.#genesisBlock = block;
 	}
 

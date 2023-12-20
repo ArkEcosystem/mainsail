@@ -175,7 +175,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	});
 	sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
 		getActiveValidators: () => {},
-		handleCommitBlock: () => {},
 		initialize: () => {},
 	});
 	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});

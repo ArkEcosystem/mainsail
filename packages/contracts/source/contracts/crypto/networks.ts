@@ -1,13 +1,13 @@
-import { CommittedBlockJson } from "./commit";
+import { CommitJson } from "./commit";
 
 export type NetworkConfig = {
-	genesisBlock: CommittedBlockJson;
+	genesisBlock: CommitJson;
 	milestones: Milestone[];
 	network: Network;
 };
 
 export type NetworkConfigPartial = {
-	genesisBlock: CommittedBlockJson;
+	genesisBlock: CommitJson;
 	milestones: MilestonePartial[];
 	network: Network;
 };

@@ -2,23 +2,23 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class Serializer implements Contracts.Crypto.CommitBlockSerializer {
+export class Serializer implements Contracts.Crypto.CommitSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
-	public commitSize(): number {
+	public proofSize(): number {
 		return (
 			4 + // round
 			+this.messageSerializer.lockProofSize()
 		);
 	}
 
-	public async serializeCommit(commit: Contracts.Crypto.BlockCommit): Promise<Buffer> {
-		return this.serializer.serialize<Contracts.Crypto.BlockCommit>(commit, {
-			length: this.commitSize(),
+	public async serializeCommitProof(commit: Contracts.Crypto.CommitProof): Promise<Buffer> {
+		return this.serializer.serialize<Contracts.Crypto.CommitProof>(commit, {
+			length: this.proofSize(),
 			schema: {
 				round: {
 					type: "uint32",
@@ -34,9 +34,9 @@ export class Serializer implements Contracts.Crypto.CommitBlockSerializer {
 		});
 	}
 
-	public async serializeFull(committedBlock: Contracts.Crypto.CommittedBlockSerializable): Promise<Buffer> {
-		const serializedCommit = await this.serializeCommit(committedBlock.commit);
-		const serializedBlock = Buffer.from(committedBlock.block.serialized, "hex");
-		return Buffer.concat([serializedCommit, serializedBlock]);
+	public async serializeCommit(commit: Contracts.Crypto.CommitSerializable): Promise<Buffer> {
+		const serializedProof = await this.serializeCommitProof(commit.proof);
+		const serializedBlock = Buffer.from(commit.block.serialized, "hex");
+		return Buffer.concat([serializedProof, serializedBlock]);
 	}
 }

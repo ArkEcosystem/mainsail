@@ -20,7 +20,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
 	@inject(Identifiers.Cryptography.Commit.Serializer)
-	private readonly commitSerializer!: Contracts.Crypto.CommitBlockSerializer;
+	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -38,7 +38,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#validatorsSignedPrecommit: boolean[] = [];
 	#proposer!: Contracts.State.ValidatorWallet;
 
-	#committedBlock: Contracts.Crypto.CommittedBlock | undefined;
+	#commit: Contracts.Crypto.Commit | undefined;
 	#walletRepository!: Contracts.State.WalletRepositoryClone;
 
 	@postConstruct()
@@ -119,8 +119,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		throw new Error("Block is not available, because proposal is not set");
 	}
 
-	public async getCommittedBlock(): Promise<Contracts.Crypto.CommittedBlock> {
-		if (!this.#committedBlock) {
+	public async getCommit(): Promise<Contracts.Crypto.Commit> {
+		if (!this.#commit) {
 			const majority = await this.aggregatePrecommits();
 
 			const proposal = this.getProposal();
@@ -131,23 +131,23 @@ export class RoundState implements Contracts.Consensus.RoundState {
 				block: { block },
 			} = proposal;
 
-			const commitBlock: Contracts.Crypto.CommittedBlockSerializable = {
+			const commit: Contracts.Crypto.CommitSerializable = {
 				block,
-				commit: {
+				proof: {
 					round,
 					...majority,
 				},
 			};
 
-			const serialized = await this.commitSerializer.serializeFull(commitBlock);
+			const serialized = await this.commitSerializer.serializeCommit(commit);
 
-			this.#committedBlock = {
-				...commitBlock,
+			this.#commit = {
+				...commit,
 				serialized: serialized.toString("hex"),
 			};
 		}
 
-		return this.#committedBlock;
+		return this.#commit;
 	}
 
 	public setProcessorResult(processorResult: boolean): void {

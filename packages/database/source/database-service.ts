@@ -8,7 +8,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	private readonly blockStorage!: Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
-	private readonly blockFactory!: Contracts.Crypto.CommitBlockFactory;
+	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
 	#cache = new Map<number, Buffer>();
 
@@ -16,7 +16,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const bytes = this.#get(height);
 
 		if (bytes) {
-			return (await this.blockFactory.fromBytes(bytes)).block;
+			return (await this.commitFactory.fromBytes(bytes)).block;
 		}
 
 		return undefined;
@@ -43,35 +43,35 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
 		return await this.#map<Contracts.Crypto.Block>(
 			await this.findCommitBuffers(start, end),
-			async (block: Buffer) => (await this.blockFactory.fromBytes(block)).block,
+			async (block: Buffer) => (await this.commitFactory.fromBytes(block)).block,
 		);
 	}
 
-	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.CommittedBlock> {
+	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
-			const block = await this.blockFactory.fromBytes(this.#get(height));
-			yield block;
+			const commit = await this.commitFactory.fromBytes(this.#get(height));
+			yield commit;
 		}
 	}
 
 	public async getLastBlock(): Promise<Contracts.Crypto.Block | undefined> {
 		if (this.#cache.size > 0) {
-			return (await this.blockFactory.fromBytes([...this.#cache.values()].pop()!)).block;
+			return (await this.commitFactory.fromBytes([...this.#cache.values()].pop()!)).block;
 		}
 
 		try {
-			const lastCommittedBlock = await this.blockFactory.fromBytes(
+			const lastCommit = await this.commitFactory.fromBytes(
 				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
 			);
 
-			return lastCommittedBlock.block;
+			return lastCommit.block;
 		} catch {
 			return undefined;
 		}
 	}
 
-	public addCommit(block: Contracts.Crypto.CommittedBlock): void {
-		this.#cache.set(block.block.data.height, Buffer.from(block.serialized, "hex"));
+	public addCommit(commit: Contracts.Crypto.Commit): void {
+		this.#cache.set(commit.block.data.height, Buffer.from(commit.serialized, "hex"));
 	}
 
 	async persist(): Promise<void> {

@@ -16,7 +16,7 @@ describe<{
 	});
 
 	it("should create a single block", async ({ factoryBuilder }) => {
-		const entity = await factoryBuilder.get("Block").make<Contracts.Crypto.CommittedBlock>();
+		const entity = await factoryBuilder.get("Block").make<Contracts.Crypto.Commit>();
 
 		assert.string(entity.block.data.generatorPublicKey);
 		assert.number(entity.block.data.height);
@@ -35,7 +35,7 @@ describe<{
 	});
 
 	it("should create a single block with previous block in options", async ({ factoryBuilder }) => {
-		const previousBlock = await factoryBuilder.get("Block").make<Contracts.Crypto.CommittedBlock>();
+		const previousBlock = await factoryBuilder.get("Block").make<Contracts.Crypto.Commit>();
 
 		const options = {
 			getPreviousBlock(): Contracts.Crypto.BlockData {
@@ -43,7 +43,7 @@ describe<{
 			},
 		};
 
-		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.CommittedBlock>();
+		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.Commit>();
 
 		assert.string(entity.block.data.generatorPublicKey);
 		assert.number(entity.block.data.height);
@@ -66,7 +66,7 @@ describe<{
 			transactionsCount: 1,
 		};
 
-		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.CommittedBlock>();
+		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.Commit>();
 
 		assert.string(entity.block.data.generatorPublicKey);
 		assert.number(entity.block.data.height);

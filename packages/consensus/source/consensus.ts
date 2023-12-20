@@ -163,13 +163,13 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		});
 	}
 
-	async handleCommittedBlockState(committedBlockState: Contracts.Processor.ProcessableUnit): Promise<void> {
+	async handleCommitState(commitState: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
 			if (this.#isDisposed) {
 				return;
 			}
 
-			await this.onMajorityPrecommit(committedBlockState);
+			await this.onMajorityPrecommit(commitState);
 		});
 	}
 

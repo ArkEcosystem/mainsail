@@ -105,12 +105,12 @@ export class Sync implements Contracts.ApiSync.Sync {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const committedBlock = await unit.getCommittedBlock();
+		const commit = await unit.getCommit();
 
 		const {
 			block: { header, transactions },
-			commit,
-		} = committedBlock;
+			proof,
+		} = commit;
 
 		const dirtyWallets = [...unit.getWalletRepository().getDirtyWallets()];
 
@@ -124,7 +124,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 				payloadLength: header.payloadLength,
 				previousBlock: header.previousBlock,
 				reward: header.reward.toFixed(),
-				signature: commit.signature,
+				signature: proof.signature,
 				timestamp: header.timestamp.toFixed(),
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
@@ -197,7 +197,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 	}
 
 	async #bootstrapState(): Promise<void> {
-		const genesisBlock = this.stateService.getStateStore().getGenesisBlock();
+		const genesisCommit = this.stateService.getStateStore().getGenesisCommit();
 		await this.stateRepositoryFactory()
 			.createQueryBuilder()
 			.insert()
@@ -205,7 +205,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 			.values({
 				height: "0",
 				id: 1,
-				supply: genesisBlock.block.data.totalAmount.toFixed(),
+				supply: genesisCommit.block.data.totalAmount.toFixed(),
 			})
 			.execute();
 	}
@@ -319,7 +319,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 
 		const t1 = performance.now();
 
-		this.logger.debug(`synced committed block: ${deferred.block.height} in ${t1 - t0}ms`);
+		this.logger.debug(`synced commit: ${deferred.block.height} in ${t1 - t0}ms`);
 	}
 
 	async #resetDatabaseIfNecessary(): Promise<void> {

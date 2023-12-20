@@ -20,7 +20,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.ConfigRepository);
 
 		return {
-			genesisBlock: configRepository.get<Contracts.Crypto.CommittedBlockJson>("crypto.genesisBlock")!,
+			genesisBlock: configRepository.get<Contracts.Crypto.CommitJson>("crypto.genesisBlock")!,
 			milestones: configRepository.get<Contracts.Crypto.MilestonePartial[]>("crypto.milestones")!,
 			network: configRepository.get<Contracts.Crypto.Network>("crypto.network")!,
 		};

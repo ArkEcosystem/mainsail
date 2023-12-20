@@ -3,20 +3,20 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
-export class Deserializer implements Contracts.Crypto.CommitBlockDeserializer {
+export class Deserializer implements Contracts.Crypto.CommitDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
 	@inject(Identifiers.Cryptography.Commit.Serializer)
-	private readonly commitSerializer!: Contracts.Crypto.CommitBlockSerializer;
+	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
-	public async deserializeCommit(serialized: Buffer): Promise<Contracts.Crypto.BlockCommit> {
+	public async deserializeCommitProof(serialized: Buffer): Promise<Contracts.Crypto.CommitProof> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
 
-		const commit = {} as Contracts.Crypto.BlockCommit;
+		const proof = {} as Contracts.Crypto.CommitProof;
 
-		await this.serializer.deserialize<Contracts.Crypto.BlockCommit>(buffer, commit, {
-			length: this.commitSerializer.commitSize(),
+		await this.serializer.deserialize<Contracts.Crypto.CommitProof>(buffer, proof, {
+			length: this.commitSerializer.proofSize(),
 			schema: {
 				round: {
 					type: "uint32",
@@ -30,6 +30,6 @@ export class Deserializer implements Contracts.Crypto.CommitBlockDeserializer {
 			},
 		});
 
-		return commit;
+		return proof;
 	}
 }

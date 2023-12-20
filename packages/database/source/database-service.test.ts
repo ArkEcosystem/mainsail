@@ -24,24 +24,24 @@ import { describe, Factories, Sandbox } from "../../test-framework";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
 
-const generateCommit = async (): Promise<Contracts.Crypto.CommittedBlock> => {
+const generateCommit = async (): Promise<Contracts.Crypto.Commit> => {
 	const blockFactory = await Factories.factory("Block", cryptoJson);
 
-	return blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.CommittedBlock>();
+	return blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.Commit>();
 };
 
-const generateCommits = async (count: number): Promise<Contracts.Crypto.CommittedBlock[]> => {
-	const blocks: Contracts.Crypto.CommittedBlock[] = [];
+const generateCommits = async (count: number): Promise<Contracts.Crypto.Commit[]> => {
+	const blocks: Contracts.Crypto.Commit[] = [];
 
 	const blockFactory = await Factories.factory("Block", cryptoJson);
-	let previousBlock = await blockFactory.make<Contracts.Crypto.CommittedBlock>();
+	let previousBlock = await blockFactory.make<Contracts.Crypto.Commit>();
 
 	blocks.push(previousBlock);
 
 	for (let index = 0; index < count - 1; index++) {
 		previousBlock = await blockFactory
 			.withOptions({ getPreviousBlock: () => previousBlock.block.data, transactionsCount: 2 })
-			.make<Contracts.Crypto.CommittedBlock>();
+			.make<Contracts.Crypto.Commit>();
 		blocks.push(previousBlock);
 	}
 
@@ -131,7 +131,7 @@ describe<{
 
 	it("#getBlock - should return block by height", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
-		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.CommittedBlock>();
+		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.Commit>();
 
 		databaseService.addCommit(block);
 		assert.equal(await databaseService.getBlock(block.block.data.height), block.block);

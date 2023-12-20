@@ -215,7 +215,7 @@ describe<{
 
 		stateStore.setTotalRound(2);
 		stateStore.setBootstrap(false);
-		stateStore.setGenesisBlock(genesisBlock as any);
+		stateStore.setGenesisCommit(genesisBlock as any);
 		stateStore.setLastBlock(block as any);
 
 		const stateStoreClone = sandbox.app.resolve(StateStore).configure(stateStore);
@@ -235,15 +235,15 @@ describe<{
 		assert.false(stateStoreClone.isBootstrap());
 	});
 
-	it("#setGenesisBlock - should be set only on clone", ({ stateStore, stateStoreClone }) => {
-		assert.throws(() => stateStore.getGenesisBlock());
-		assert.throws(() => stateStoreClone.getGenesisBlock());
+	it("#setGenesisCommit - should be set only on clone", ({ stateStore, stateStoreClone }) => {
+		assert.throws(() => stateStore.getGenesisCommit());
+		assert.throws(() => stateStoreClone.getGenesisCommit());
 
 		const genesisBlock = { block: { data: { height: 0 } } };
-		stateStoreClone.setGenesisBlock(genesisBlock as any);
+		stateStoreClone.setGenesisCommit(genesisBlock as any);
 
-		assert.throws(() => stateStore.getGenesisBlock());
-		assert.equal(stateStoreClone.getGenesisBlock(), genesisBlock);
+		assert.throws(() => stateStore.getGenesisCommit());
+		assert.equal(stateStoreClone.getGenesisCommit(), genesisBlock);
 	});
 
 	it("#setLastBlock - should be set only on clone", ({ stateStore, stateStoreClone }) => {
@@ -314,7 +314,7 @@ describe<{
 		assert.equal(stateStore.getAttribute("totalRound"), 0);
 		assert.false(stateStore.hasAttribute("customAttribute"));
 		assert.true(stateStore.isBootstrap());
-		assert.throws(() => stateStore.getGenesisBlock());
+		assert.throws(() => stateStore.getGenesisCommit());
 		assert.throws(() => stateStore.getLastBlock());
 
 		const genesisBlock = { block: { data: { height: 0 } } };
@@ -322,7 +322,7 @@ describe<{
 
 		stateStoreClone.setTotalRound(2);
 		stateStoreClone.setBootstrap(false);
-		stateStoreClone.setGenesisBlock(genesisBlock as any);
+		stateStoreClone.setGenesisCommit(genesisBlock as any);
 		stateStoreClone.setLastBlock(block as any);
 		stateStoreClone.setAttribute("customAttribute", 1);
 
@@ -332,7 +332,7 @@ describe<{
 		assert.equal(stateStore.getAttribute("totalRound"), 2);
 		assert.equal(stateStore.getAttribute("customAttribute"), 1);
 		assert.false(stateStore.isBootstrap());
-		assert.equal(stateStore.getGenesisBlock(), genesisBlock);
+		assert.equal(stateStore.getGenesisCommit(), genesisBlock);
 		assert.equal(stateStore.getLastBlock(), block);
 	});
 });
