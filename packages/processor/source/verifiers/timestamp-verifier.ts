@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class TimestampVerifier implements Contracts.Processor.Handler {
@@ -20,16 +21,21 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 			return true;
 		}
 
-		const result =
-			this.stateService.getStateStore().getLastBlock().data.timestamp <
-			unit.getBlock().data.timestamp + this.configuration.getMilestone().blockTime;
-
-		if (!result) {
+		if (
+			unit.getBlock().data.timestamp <
+			Utils.timestampCalculator.calculateMinimalTimestamp(
+				this.stateService.getStateStore().getLastBlock(),
+				unit.getBlock().data.round,
+				this.configuration,
+			)
+		) {
 			this.logger.error(
 				`Block ${unit.getBlock().data.height.toLocaleString()} disregarded, because it's timestamp is too low`,
 			);
+
+			return false;
 		}
 
-		return result;
+		return true;
 	}
 }
