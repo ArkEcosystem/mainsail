@@ -16,6 +16,12 @@ export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Commit.Serializer)
 	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
+	@inject(Identifiers.Cryptography.Block.Verifier)
+	private readonly blockVerifier!: Contracts.Crypto.BlockVerifier;
+
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
+	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
+
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
@@ -75,18 +81,15 @@ export class GenesisBlockGenerator extends Generator {
 		pubKeyHash: number,
 		nonce = 1,
 	): Promise<Contracts.Crypto.Transaction> {
-		return this.#formatGenesisTransaction(
-			await (
-				await this.app
-					.resolve(TransferBuilder)
-					.network(pubKeyHash)
-					.nonce(nonce.toFixed(0))
-					.recipientId(recipient.address)
-					.amount(amount)
-					.sign(sender.passphrase)
-			).build(),
-			sender,
-		);
+		return await (
+			await this.app
+				.resolve(TransferBuilder)
+				.network(pubKeyHash)
+				.nonce(nonce.toFixed(0))
+				.recipientId(recipient.address)
+				.amount(amount)
+				.sign(sender.passphrase)
+		).build();
 	}
 
 	async #createTransferTransactions(
@@ -110,17 +113,14 @@ export class GenesisBlockGenerator extends Generator {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
-			result[index] = await this.#formatGenesisTransaction(
-				await (
-					await this.app
-						.resolve(ValidatorRegistrationBuilder)
-						.network(pubKeyHash)
-						.nonce("1") // validator registration tx is always the first one from sender
-						.publicKeyAsset(sender.consensusKeys.publicKey)
-						.sign(sender.passphrase)
-				).build(),
-				sender,
-			);
+			result[index] = await (
+				await this.app
+					.resolve(ValidatorRegistrationBuilder)
+					.network(pubKeyHash)
+					.nonce("1") // validator registration tx is always the first one from sender
+					.publicKeyAsset(sender.consensusKeys.publicKey)
+					.sign(sender.passphrase)
+			).build();
 		}
 
 		return result;
@@ -130,17 +130,14 @@ export class GenesisBlockGenerator extends Generator {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
-			result[index] = await this.#formatGenesisTransaction(
-				await (
-					await this.app
-						.resolve(UsernameRegistrationBuilder)
-						.network(pubKeyHash)
-						.nonce("2") // username registration tx is always the 2nd one from sender
-						.usernameAsset(`genesis_${index + 1}`)
-						.sign(sender.passphrase)
-				).build(),
-				sender,
-			);
+			result[index] = await (
+				await this.app
+					.resolve(UsernameRegistrationBuilder)
+					.network(pubKeyHash)
+					.nonce("2") // username registration tx is always the 2nd one from sender
+					.usernameAsset(`genesis_${index + 1}`)
+					.sign(sender.passphrase)
+			).build();
 		}
 
 		return result;
@@ -150,34 +147,17 @@ export class GenesisBlockGenerator extends Generator {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
-			result[index] = await this.#formatGenesisTransaction(
-				await (
-					await this.app
-						.resolve(VoteBuilder)
-						.network(pubKeyHash)
-						.nonce("3") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
-						.votesAsset([sender.keys.publicKey])
-						.sign(sender.passphrase)
-				).build(),
-				sender,
-			);
+			result[index] = await (
+				await this.app
+					.resolve(VoteBuilder)
+					.network(pubKeyHash)
+					.nonce("3") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
+					.votesAsset([sender.keys.publicKey])
+					.sign(sender.passphrase)
+			).build();
 		}
 
 		return result;
-	}
-
-	async #formatGenesisTransaction(
-		transaction: Contracts.Crypto.Transaction,
-		wallet: Wallet,
-	): Promise<Contracts.Crypto.Transaction> {
-		transaction.data.signature = await this.app
-			.get<Contracts.Crypto.TransactionSigner>(Identifiers.Cryptography.Transaction.Signer)
-			.sign(transaction.data, wallet.keys);
-		transaction.data.id = await this.app
-			.get<Contracts.Crypto.TransactionUtils>(Identifiers.Cryptography.Transaction.Utils)
-			.getId(transaction);
-
-		return transaction;
 	}
 
 	async #createGenesisCommit(
@@ -194,10 +174,14 @@ export class GenesisBlockGenerator extends Generator {
 
 		const serialized = await this.commitSerializer.serializeCommit(commit);
 
-		return {
+		const genesis = {
 			...commit,
 			serialized: serialized.toString("hex"),
 		};
+
+		await this.#ensureValidGenesisBlock(genesis);
+
+		return genesis;
 	}
 
 	async #createGenesisBlock(
@@ -241,6 +225,7 @@ export class GenesisBlockGenerator extends Generator {
 				payloadLength,
 				previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 				reward: BigNumber.ZERO,
+				round: 0,
 				timestamp: dayjs(options.epoch).valueOf(),
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
@@ -249,5 +234,21 @@ export class GenesisBlockGenerator extends Generator {
 			}),
 			transactions: transactionData,
 		};
+	}
+
+	async #ensureValidGenesisBlock(genesis: Contracts.Crypto.Commit): Promise<void> {
+		if (
+			!(await Promise.all(
+				genesis.block.transactions.map((transaction) => this.transactionVerifier.verifyHash(transaction.data)),
+			))
+		) {
+			throw new Error("genesis block contains invalid transactions");
+		}
+
+		const verified = await this.blockVerifier.verify(genesis.block);
+		if (!verified.verified) {
+			console.log(verified);
+			throw new Error("failed to generate genesis block");
+		}
 	}
 }
