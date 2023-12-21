@@ -14,7 +14,15 @@ describe<{
 
 		// @ts-ignore
 		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig({
-			milestones: [{ reward: "0", address: { bech32m: "ark", }, block: { version: 1, maxPayload: 2097152, maxTransactions: 150 }, blockTime: 8000, height: 0 }],
+			milestones: [
+				{
+					reward: "0",
+					address: { bech32m: "ark" },
+					block: { version: 1, maxPayload: 2097152, maxTransactions: 150 },
+					blockTime: 8000,
+					height: 0,
+				},
+			],
 		});
 
 		context.generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);

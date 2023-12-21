@@ -236,7 +236,11 @@ export class GenesisBlockGenerator extends Generator {
 	}
 
 	async #ensureValidGenesisBlock(genesis: Contracts.Crypto.Commit): Promise<void> {
-		if (!await Promise.all(genesis.block.transactions.map(transaction => this.transactionVerifier.verifyHash(transaction.data)))) {
+		if (
+			!(await Promise.all(
+				genesis.block.transactions.map((transaction) => this.transactionVerifier.verifyHash(transaction.data)),
+			))
+		) {
 			throw new Error("genesis block contains invalid transactions");
 		}
 
