@@ -21,8 +21,8 @@ export const registerBlockFactory = async (
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
 			? options.getPreviousBlock()
 			: await app
-					.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-					.get("genesisBlock.block");
+				.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+				.get("genesisBlock.block");
 
 		const { reward } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
@@ -82,6 +82,7 @@ export const registerBlockFactory = async (
 					)
 					.fromMnemonic(passphrase),
 				height: previousBlock.height + 1,
+				round: 0,
 				numberOfTransactions: transactions.length,
 				payloadHash: (
 					await app

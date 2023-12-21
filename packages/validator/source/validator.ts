@@ -55,9 +55,8 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	public async prepareBlock(height: number, round: number): Promise<Contracts.Crypto.Block> {
-		// TODO: use height/round ?
 		const transactions = await this.#getTransactionsForForging();
-		return this.#makeBlock(transactions);
+		return this.#makeBlock(round, transactions);
 	}
 
 	public async propose(
@@ -120,15 +119,14 @@ export class Validator implements Contracts.Validator.Validator {
 		}
 
 		this.logger.debug(
-			`Received ${
-				transactions.length
+			`Received ${transactions.length
 			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 
 		return transactions;
 	}
 
-	async #makeBlock(transactions: Contracts.Crypto.Transaction[]): Promise<Contracts.Crypto.Block> {
+	async #makeBlock(round: number, transactions: Contracts.Crypto.Transaction[]): Promise<Contracts.Crypto.Block> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -156,7 +154,8 @@ export class Validator implements Contracts.Validator.Validator {
 
 		return this.blockFactory.make({
 			generatorPublicKey: this.#walletPublicKey,
-			height: height,
+			height,
+			round,
 			numberOfTransactions: transactions.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,

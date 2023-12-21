@@ -20,6 +20,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 			1 + // version
 			6 + // timestamp
 			4 + // height
+			4 + // round
 			this.hashByteLength + // previousBlock
 			4 + // numberOfTransactions
 			8 + // totalAmount
@@ -49,11 +50,14 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				height: {
 					type: "uint32",
 				},
+				round: {
+					type: "uint32",
+				},
 				previousBlock: {
 					type: "hash",
 				},
 				numberOfTransactions: {
-					type: "uint32",
+					type: "uint32", // TODO
 				},
 				totalAmount: {
 					type: "bigint",
@@ -91,11 +95,14 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 				height: {
 					type: "uint32",
 				},
+				round: {
+					type: "uint32",
+				},
 				previousBlock: {
 					type: "hash",
 				},
 				numberOfTransactions: {
-					type: "uint32",
+					type: "uint32", // TODO
 				},
 				totalAmount: {
 					type: "bigint",

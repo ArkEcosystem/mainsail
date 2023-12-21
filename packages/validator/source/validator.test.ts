@@ -7,14 +7,14 @@ import { Validator } from "./validator";
 
 describe<{
 	sandbox: Sandbox;
-	validator: Contracts.Validator.IValidator;
+	validator: Contracts.Validator.Validator;
 }>("Validator", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
 		const { consensusKeyPair, walletPublicKey } = validatorKeys[0];
 		context.validator = context.sandbox.app
-			.resolve<Contracts.Validator.IValidator>(Validator)
+			.resolve<Contracts.Validator.Validator>(Validator)
 			.configure(walletPublicKey, consensusKeyPair);
 	});
 

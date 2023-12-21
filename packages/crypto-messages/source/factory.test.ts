@@ -44,7 +44,7 @@ describe<{
 					consensusSignature: (method, message, privateKey) =>
 						context.sandbox.app
 							.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
-							[method](message, privateKey),
+						[method](message, privateKey),
 				};
 			},
 		};
@@ -85,7 +85,7 @@ describe<{
 		);
 		assert.equal(
 			proposal.signature,
-			"8b4db95de1a65f70ae05cbfce0013f4ad3a5545b32206288751517661d59633dd289a743c5ab0892c5be4e1a91547692030d1120248fefba361e276e1364ced22d5b00348efadc27e8d3ffd7080686c9d4ae22596c255725e0b4dad712389c29",
+			"981b80dc7ec4266fd77e65c67d290fbe6eb2143706a7cd430e714a1783b5d4e860b17e2a0ae7a38d2a4448600d06430a0f12c6b403a2e00db6660ae6833c39b393ed55b7f172fdb7544b943de05221438ee96127e4642445d7fb1d4f1e9398ee",
 		);
 	});
 
@@ -111,7 +111,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"a363e8a7cbea147f5f711a6042ac0185594b1cfbd96fb8eae6d52f77b00ef33c9028e5a60a6a897f28e33a6a2ba17bb206bdf91e25eb9acdab46b857422b7caa3bd07387253c6976362bd1ab36aa681b0c90a40e3b0b20ea1c0c884fda0b3cce",
+			"aeaeb0078b92dd38957f527bcd073fc0bd69a377a628a640520f48e7243ed866cdd75aa5b01d0d952bafa818a75ec22b0ac8e9e9e100fe10b8f69751626a04bbf92b37e85860e578a01abe9dc5475e160e1c82f2123217f60ba32ae4e1e658df",
 		);
 	});
 
