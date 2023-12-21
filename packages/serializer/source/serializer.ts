@@ -134,7 +134,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				for (const transaction of value) {
 					const serialized: Buffer = await this.transactionUtils.toBytes(transaction);
 
-					result.writeUint32(serialized.length);
+					result.writeUint16(serialized.length);
 					result.writeBytes(serialized);
 				}
 				continue;
@@ -242,7 +242,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				target[property] = [];
 
 				for (let index = 0; index < (target as any).numberOfTransactions; index++) {
-					target[property].push(source.readBytes(source.readUint32()));
+					target[property].push(source.readBytes(source.readUint16()));
 				}
 				continue;
 			}

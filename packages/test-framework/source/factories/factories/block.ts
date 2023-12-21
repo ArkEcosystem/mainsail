@@ -91,6 +91,7 @@ export const registerBlockFactory = async (
 				payloadLength,
 				previousBlock: previousBlock.id,
 				reward: options.reward || reward,
+				round: 0,
 				timestamp: options.timestamp || dayjs().valueOf(),
 				totalAmount: totals.amount,
 				totalFee: totals.fee,

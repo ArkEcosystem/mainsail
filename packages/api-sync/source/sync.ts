@@ -124,6 +124,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 				payloadLength: header.payloadLength,
 				previousBlock: header.previousBlock,
 				reward: header.reward.toFixed(),
+				round: header.round,
 				signature: proof.signature,
 				timestamp: header.timestamp.toFixed(),
 				totalAmount: header.totalAmount.toFixed(),

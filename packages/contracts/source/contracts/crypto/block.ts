@@ -24,6 +24,7 @@ export interface BlockData {
 	readonly timestamp: number;
 	readonly version: number;
 	readonly height: number;
+	readonly round: number;
 	readonly previousBlock: string;
 	readonly numberOfTransactions: number;
 	readonly totalAmount: BigNumber;
@@ -44,6 +45,7 @@ export interface BlockJson {
 	readonly timestamp: number;
 	readonly version: number;
 	readonly height: number;
+	readonly round: number;
 	readonly previousBlock: string;
 	readonly numberOfTransactions: number;
 	readonly totalAmount: string;

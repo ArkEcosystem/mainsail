@@ -5,7 +5,7 @@
 			"maxPayload": 2097152,
 			"maxTransactions": 150
 		},
-		"epoch": "2023-11-16T00:00:00.000Z",
+		"epoch": "2023-12-21T00:00:00.000Z",
 		"height": 0,
 		"reward": "0",
 		"address": {
@@ -26,7 +26,7 @@
 		"version": "0.0.1"
 	},
 	"explorer": "",
-	"nethash": "c5583e06105f2190744afab9bf83c8031c0beeae365ca64344dfd17582907529",
+	"nethash": "b780c3dfd55c665a05abee8b6f4e9f882c58ea7542832883588a79e596fccfb3",
 	"ports": {},
 	"slip44": 1,
 	"symbol": "TѦ",

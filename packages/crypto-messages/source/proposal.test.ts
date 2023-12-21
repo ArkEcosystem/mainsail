@@ -55,7 +55,7 @@ describe<{
 	it("#toString", () => {
 		assert.equal(
 			proposal.toString(),
-			`{"block":"b99502ed7b675fad3f023a3b2d103be43a84941307663d3ccfb23b87d96f18a0","height":2,"round":1,"validatorIndex":0}`,
+			`{"block":"3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19","height":2,"round":1,"validatorIndex":0}`,
 		);
 	});
 
