@@ -39,6 +39,12 @@ export class Block {
 		nullable: false,
 		type: "integer",
 	})
+	public readonly round!: number;
+
+	@Column({
+		nullable: false,
+		type: "integer",
+	})
 	public readonly numberOfTransactions!: number;
 
 	@Column({
