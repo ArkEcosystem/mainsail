@@ -44,7 +44,7 @@ describe<{
 					consensusSignature: (method, message, privateKey) =>
 						context.sandbox.app
 							.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
-						[method](message, privateKey),
+							[method](message, privateKey),
 				};
 			},
 		};

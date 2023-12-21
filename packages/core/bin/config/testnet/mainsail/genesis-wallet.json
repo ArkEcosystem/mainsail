@@ -1,14 +1,14 @@
 {
-    "address": "ark1h3u5rqa4rq6nhu7dlx7l0c3hu62fmykf9nryx09h05un862xdmdstejlnz",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "34254d577e6328ac622c3970b601923d2ca216ff7322746fc694f6ad016ef4b0",
-        "publicKey": "af80511ec9c5036ab9b25f07ba9b5f3d0e4e1b5d5943c91b32358335c4e57bbe68b038d6203d9761b3cec8a9926fc9bc"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "7332112ec527866df9075662100d67d24895ea26b1501d6185620cfade93883d",
-        "publicKey": "bc794183b518353bf3cdf9bdf7e237e6949d92c92cc6433cb77d3933e9466edb"
-    },
-    "passphrase": "blouse ignore digital history keen exercise remember slush you rich crumble dwarf ready moon increase account blue phrase fire figure hire science baby water"
+	"address": "ark1h3u5rqa4rq6nhu7dlx7l0c3hu62fmykf9nryx09h05un862xdmdstejlnz",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "34254d577e6328ac622c3970b601923d2ca216ff7322746fc694f6ad016ef4b0",
+		"publicKey": "af80511ec9c5036ab9b25f07ba9b5f3d0e4e1b5d5943c91b32358335c4e57bbe68b038d6203d9761b3cec8a9926fc9bc"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "7332112ec527866df9075662100d67d24895ea26b1501d6185620cfade93883d",
+		"publicKey": "bc794183b518353bf3cdf9bdf7e237e6949d92c92cc6433cb77d3933e9466edb"
+	},
+	"passphrase": "blouse ignore digital history keen exercise remember slush you rich crumble dwarf ready moon increase account blue phrase fire figure hire science baby water"
 }

@@ -119,7 +119,8 @@ export class Validator implements Contracts.Validator.Validator {
 		}
 
 		this.logger.debug(
-			`Received ${transactions.length
+			`Received ${
+				transactions.length
 			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
 		);
 
@@ -155,12 +156,12 @@ export class Validator implements Contracts.Validator.Validator {
 		return this.blockFactory.make({
 			generatorPublicKey: this.#walletPublicKey,
 			height,
-			round,
 			numberOfTransactions: transactions.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,
 			previousBlock: previousBlock.data.id,
 			reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
+			round,
 			timestamp: dayjs().valueOf(),
 			totalAmount: totals.amount,
 			totalFee: totals.fee,

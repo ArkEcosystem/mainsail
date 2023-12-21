@@ -216,7 +216,6 @@ export class GenesisBlockGenerator extends Generator {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make({
 				generatorPublicKey: keys.publicKey,
 				height: 0,
-				round: 0,
 				numberOfTransactions: transactions.length,
 				payloadHash: (
 					await this.app
@@ -226,6 +225,7 @@ export class GenesisBlockGenerator extends Generator {
 				payloadLength,
 				previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 				reward: BigNumber.ZERO,
+				round: 0,
 				timestamp: dayjs(options.epoch).valueOf(),
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
