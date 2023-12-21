@@ -73,8 +73,9 @@ describe<{
 	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity }) => {
 		const block: Contracts.Crypto.ProposedBlock = {
 			block: await blockFactory.fromData(blockData),
-			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
+			serialized: serializedBlock,
 		};
+
 		const proposal = await factory.makeProposal(
 			{
 				block,
@@ -85,7 +86,7 @@ describe<{
 		);
 		assert.equal(
 			proposal.signature,
-			"981b80dc7ec4266fd77e65c67d290fbe6eb2143706a7cd430e714a1783b5d4e860b17e2a0ae7a38d2a4448600d06430a0f12c6b403a2e00db6660ae6833c39b393ed55b7f172fdb7544b943de05221438ee96127e4642445d7fb1d4f1e9398ee",
+			"b25fd16693a2246d3e9dff3d7ae3da1473c1b24f6ef8b33c69e38e21e32c9ca307ae5f7d4573e2679ec48ecc2f1ff89d16115d8e7f6ffcba72cc9a746bcc40cdd0f9120d87c20addb55baceea2cb8cdb75faaf036e6a4221d28dc8f6558d8cc1",
 		);
 	});
 
@@ -96,7 +97,7 @@ describe<{
 	}) => {
 		const block: Contracts.Crypto.ProposedBlock = {
 			block: await blockFactory.fromData(blockData),
-			serialized: Buffer.concat([Buffer.of(0), Buffer.from(serializedBlock, "hex")]).toString("hex"),
+			serialized: serializedBlock,
 		};
 
 		const proposal = await factory.makeProposal(
@@ -111,7 +112,7 @@ describe<{
 
 		assert.equal(
 			proposal.signature,
-			"aeaeb0078b92dd38957f527bcd073fc0bd69a377a628a640520f48e7243ed866cdd75aa5b01d0d952bafa818a75ec22b0ac8e9e9e100fe10b8f69751626a04bbf92b37e85860e578a01abe9dc5475e160e1c82f2123217f60ba32ae4e1e658df",
+			"88276dd41eb9fc2b5cde4320b1c6dfc12bf5d71de1d82b79b8d6d00e78d2abfe6f242a823502edfe34ada370e38be22d093f974a720e01cbe21e867f1fd93d0fbb234f75a5d4a42a54516d616917fed46d2d5c2088665d3207b352360c167b34",
 		);
 	});
 
@@ -163,13 +164,13 @@ describe<{
 		);
 	});
 
-	it.skip("#makeProposalFromBytes - should be ok", async ({ factory }) => {
+	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
 		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposal, "hex"));
 
 		assert.equal(proposal.toData(), proposalData);
 	});
 
-	it.skip("#makeProposalFromBytes - should be ok, with validRound", async ({ factory }) => {
+	it("#makeProposalFromBytes - should be ok, with validRound", async ({ factory }) => {
 		const proposal = await factory.makeProposalFromBytes(Buffer.from(serializedProposalDataWithValidRound, "hex"));
 
 		assert.equal(proposal.toData(), proposalDataWithValidRound);
