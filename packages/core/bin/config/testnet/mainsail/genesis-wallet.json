@@ -1,14 +1,14 @@
 {
-    "address": "ark1m22g682le8uzttkg3nxsrv08v53z5gzk9qn4j8fp3e3600wxnefsqphf4d",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "68677f92fda397fcf0110f927e591713a7c9d923631e745f75ee632c1637e3fd",
-        "publicKey": "a08058db53e2665c84a40f5152e76dd2b652125a6079130d4c315e728bcf4dd1dfb44ac26e82302331d61977d3141118"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "fde322b64f45c256eadeac2087d76440805bf7f3ae2fed7fa1ae63ecdc44a5b9",
-        "publicKey": "da948d1d5fc9f825aec88ccd01b1e765222a20562827591d218e63a7bdc69e53"
-    },
-    "passphrase": "damp manual option end drill energy bless clinic bleak veteran syrup repair total proud chest evil speed utility west canvas spider border wage cabin"
+	"address": "ark1m22g682le8uzttkg3nxsrv08v53z5gzk9qn4j8fp3e3600wxnefsqphf4d",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "68677f92fda397fcf0110f927e591713a7c9d923631e745f75ee632c1637e3fd",
+		"publicKey": "a08058db53e2665c84a40f5152e76dd2b652125a6079130d4c315e728bcf4dd1dfb44ac26e82302331d61977d3141118"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "fde322b64f45c256eadeac2087d76440805bf7f3ae2fed7fa1ae63ecdc44a5b9",
+		"publicKey": "da948d1d5fc9f825aec88ccd01b1e765222a20562827591d218e63a7bdc69e53"
+	},
+	"passphrase": "damp manual option end drill energy bless clinic bleak veteran syrup repair total proud chest evil speed utility west canvas spider border wage cabin"
 }
