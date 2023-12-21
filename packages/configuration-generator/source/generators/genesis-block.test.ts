@@ -1,3 +1,4 @@
+import { Contracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import { describe } from "../../../test-framework";
 import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
@@ -10,6 +11,11 @@ describe<{
 }>("GenesisBlockGenerator", ({ it, assert, beforeEach }) => {
 	beforeEach(async (context) => {
 		const app = await makeApplication();
+
+		// @ts-ignore
+		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig({
+			milestones: [{ reward: "0", address: { bech32m: "ark", }, block: { version: 1, maxPayload: 2097152, maxTransactions: 150 }, blockTime: 8000, height: 0 }],
+		});
 
 		context.generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
 		context.mnemonicGenerator = app.get<MnemonicGenerator>(Identifiers.Generator.Mnemonic);
