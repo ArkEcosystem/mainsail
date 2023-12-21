@@ -173,7 +173,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		};
 
 		for (const key of Object.keys(data)) {
-			if (["model", "network", "id"].includes(key)) {
+			if (["model", "id"].includes(key)) {
 				delete data[key];
 			}
 		}
