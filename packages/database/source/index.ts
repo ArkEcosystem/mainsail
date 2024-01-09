@@ -1,8 +1,9 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { Database, RootDatabase, open } from "lmdb";
-import { DatabaseService } from "./database-service";
+import { Database, open, RootDatabase } from "lmdb";
 import { join } from "path";
+
+import { DatabaseService } from "./database-service";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
