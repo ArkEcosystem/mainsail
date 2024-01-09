@@ -47,7 +47,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#height = 2;
+	#height = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
 	#lockedValue?: Contracts.Consensus.RoundState;
