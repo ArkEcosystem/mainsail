@@ -6,12 +6,6 @@ import { ValidatorRepository } from "./validator-repository";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const walletPublicKeyFactory = this.app.getTagged<Contracts.Crypto.PublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKeyFactory,
-			"type",
-			"wallet",
-		);
-
 		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
 			Identifiers.Cryptography.Identity.KeyPairFactory,
 			"type",
@@ -24,11 +18,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		for (const secret of secrets.values()) {
 			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(secret);
-			const walletPublicKey = await walletPublicKeyFactory.fromMnemonic(secret);
 
-			validators.push(
-				this.app.resolve<Contracts.Validator.Validator>(Validator).configure(walletPublicKey, consensusKeyPair),
-			);
+			validators.push(this.app.resolve<Contracts.Validator.Validator>(Validator).configure(consensusKeyPair));
 		}
 
 		this.app
