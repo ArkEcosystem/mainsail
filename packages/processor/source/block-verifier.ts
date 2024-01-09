@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import {
 	ChainedVerifier,
+	GeneratorVerifier,
 	IncompatibleTransactionsVerifier,
 	NonceVerifier,
 	TimestampVerifier,
@@ -19,11 +20,15 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 			return false;
 		}
 
-		if (!(await this.app.resolve(VerifyBlockVerifier).execute(unit))) {
+		if (!(await this.app.resolve(TimestampVerifier).execute(unit))) {
 			return false;
 		}
 
-		if (!(await this.app.resolve(TimestampVerifier).execute(unit))) {
+		if (!(await this.app.resolve(GeneratorVerifier).execute(unit))) {
+			return false;
+		}
+
+		if (!(await this.app.resolve(VerifyBlockVerifier).execute(unit))) {
 			return false;
 		}
 
