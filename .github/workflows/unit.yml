@@ -161,8 +161,6 @@ jobs:
               run: cd packages/serializer && pnpm run test
             - name: Test state
               run: cd packages/state && pnpm run test
-            - name: Test storage-lmdb
-              run: cd packages/storage-lmdb && pnpm run test
             - name: Test test-framework
               run: cd packages/test-framework && pnpm run test
             - name: Test transaction-pool

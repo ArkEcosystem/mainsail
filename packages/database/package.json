@@ -41,7 +41,6 @@
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
-		"@mainsail/storage-lmdb": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
 		"tmp": "0.2.1",

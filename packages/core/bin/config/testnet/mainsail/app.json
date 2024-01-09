@@ -76,9 +76,6 @@
 			"package": "@mainsail/state"
 		},
 		{
-			"package": "@mainsail/storage-lmdb"
-		},
-		{
 			"package": "@mainsail/database"
 		},
 		{

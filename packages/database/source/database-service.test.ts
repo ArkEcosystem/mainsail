@@ -14,7 +14,6 @@ import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-valida
 import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreLmdb } from "@mainsail/storage-lmdb";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -62,7 +61,7 @@ describe<{
 		context.sandbox.app.useDataPath(dirSync().name);
 
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
-			info: () => {},
+			info: () => { },
 		});
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
@@ -81,7 +80,6 @@ describe<{
 		await context.sandbox.app.resolve(CoreCryptoBlock).register();
 		await context.sandbox.app.resolve(CoreCryptoMessages).register();
 		await context.sandbox.app.resolve(CoreCryptoCommit).register();
-		await context.sandbox.app.resolve(CoreLmdb).register();
 		await context.sandbox.app.resolve(CoreDatabase).register();
 
 		context.sandbox.app
