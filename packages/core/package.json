@@ -79,7 +79,6 @@
 		"@mainsail/proposer": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/state": "workspace:*",
-		"@mainsail/storage-lmdb": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/transaction-pool": "workspace:*",
 		"@mainsail/transactions": "workspace:*",

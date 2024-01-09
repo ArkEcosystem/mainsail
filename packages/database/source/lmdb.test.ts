@@ -7,7 +7,7 @@ import { ServiceProvider } from "./index";
 
 describe<{
 	sandbox: Sandbox;
-}>("ServiceProvider", ({ beforeEach, beforeAll, it, assert }) => {
+}>("Lmdb", ({ beforeEach, beforeAll, it, assert }) => {
 	beforeAll(() => {
 		setGracefulCleanup();
 	});
