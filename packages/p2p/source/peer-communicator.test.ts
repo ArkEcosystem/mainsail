@@ -56,7 +56,7 @@ describeSkip<{
 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(eventDispatcher);
 		context.sandbox.app.bind(Identifiers.PeerConnector).toConstantValue(connector);
-		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue(createQueue);
+		context.sandbox.app.bind(Identifiers.Kernel.Queue.Factory).toConstantValue(createQueue);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(cryptoConfig);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(serializer);
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(transactionFactory);

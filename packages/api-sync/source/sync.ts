@@ -75,7 +75,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 	@tagged("plugin", "api-sync")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.QueueFactory)
+	@inject(Identifiers.Kernel.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
 	#queue!: Contracts.Kernel.Queue;
 

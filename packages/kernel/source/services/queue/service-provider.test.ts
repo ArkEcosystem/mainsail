@@ -17,16 +17,16 @@ describe<{
 	});
 
 	it("should register the service", async (context) => {
-		assert.false(context.app.isBound(Identifiers.QueueFactory));
+		assert.false(context.app.isBound(Identifiers.Kernel.Queue.Factory));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.QueueFactory));
+		assert.true(context.app.isBound(Identifiers.Kernel.Queue.Factory));
 	});
 
 	it("should create an instance of the MemoryQueue", async (context) => {
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.instance(await context.app.get<QueueFactory>(Identifiers.QueueFactory)(), MemoryQueue);
+		assert.instance(await context.app.get<QueueFactory>(Identifiers.Kernel.Queue.Factory)(), MemoryQueue);
 	});
 });

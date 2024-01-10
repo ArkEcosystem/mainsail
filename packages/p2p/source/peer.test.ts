@@ -13,7 +13,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Kernel.Queue.Factory).toConstantValue({});
 
 		context.peer = context.sandbox.app.resolve(Peer).init(ip, port);
 	});

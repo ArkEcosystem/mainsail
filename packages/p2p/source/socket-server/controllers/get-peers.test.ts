@@ -14,7 +14,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(peerRepository);
-		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Kernel.Queue.Factory).toConstantValue({});
 
 		context.controller = context.sandbox.app.resolve(GetPeersController);
 	});

@@ -6,12 +6,14 @@ import { QueueManager } from "./manager";
 
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind<QueueManager>(Identifiers.QueueManager).to(QueueManager).inSingletonScope();
+		this.app.bind<QueueManager>(Identifiers.Kernel.Queue.Manager).to(QueueManager).inSingletonScope();
 
-		this.app.bind(Identifiers.QueueFactory).toFactory(
+		this.app.bind(Identifiers.Kernel.Queue.Factory).toFactory(
 			(context: interfaces.Context) =>
 				async <K, T>(name?: string): Promise<Contracts.Kernel.Queue> =>
-					context.container.get<QueueManager>(Identifiers.QueueManager).driver<Contracts.Kernel.Queue>(name),
+					context.container
+						.get<QueueManager>(Identifiers.Kernel.Queue.Manager)
+						.driver<Contracts.Kernel.Queue>(name),
 		);
 	}
 }

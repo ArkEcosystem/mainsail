@@ -28,7 +28,7 @@ describeSkip<{
 		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
-		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Kernel.Queue.Factory).toConstantValue({});
 
 		context.broadcaster = context.sandbox.app.resolve(Broadcaster);
 

@@ -6,8 +6,12 @@ export const Identifiers = {
 			Manager: Symbol.for("Kernel<Cache.Manager>"),
 		},
 		EventDispatcher: {
-			Manager: Symbol.for("EventDispatcher<Manager>"),
-			Service: Symbol.for("EventDispatcher<Service>"),
+			Manager: Symbol.for("Kernel<EventDispatcher.Manager>"),
+			Service: Symbol.for("Kernel<EventDispatcher.Service>"),
+		},
+		Queue: {
+			Factory: Symbol.for("Kernel<Queue.Factory>"),
+			Manager: Symbol.for("Kernel<Queue.Manager>"),
 		},
 	},
 	Application: Symbol.for("Application<Instance>"),
@@ -158,9 +162,7 @@ export const Identifiers = {
 	Proposer: {
 		Selector: Symbol.for("Proposer<Selector>"),
 	},
-	QueueFactory: Symbol.for("Factory<Queue>"),
-	QueueManager: Symbol.for("Manager<Queue>"),
-	QueueService: Symbol.for("Service<Queue>"),
+
 	ScheduleService: Symbol.for("Service<Schedule>"),
 	ServiceProviderRepository: Symbol.for("Repository<ServiceProvider>"),
 	SnapshotService: Symbol.for("Service<Snapshot>"),

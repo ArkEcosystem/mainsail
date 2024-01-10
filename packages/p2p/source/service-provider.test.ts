@@ -68,7 +68,7 @@ describe<{
 		sandbox,
 		serviceProvider,
 	}) => {
-		sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+		sandbox.app.bind(Identifiers.Kernel.Queue.Factory).toConstantValue({});
 		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
 		serviceProvider.setConfig(config);
 		await serviceProvider.register();
