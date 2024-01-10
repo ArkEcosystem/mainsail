@@ -119,7 +119,6 @@ describe<{
 
 		assert.array(result.value.blacklist);
 		assert.number(result.value.getBlocksTimeout);
-		assert.number(result.value.maxPeerSequentialErrors);
 		assert.number(result.value.maxPeersBroadcast);
 		assert.number(result.value.maxSameSubnetPeers);
 		assert.number(result.value.minimumNetworkReach);
@@ -240,22 +239,22 @@ describe<{
 		assert.equal(result.error?.message, '"maxSameSubnetPeers" must be a number');
 	});
 
-	it("should parse process.env.CORE_P2P_MAX_PEER_SEQUENTIAL_ERRORS", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MAX_PEER_SEQUENTIAL_ERRORS = "5000";
+	it("should parse process.env.CORE_P2P_MAX_PEERS_BROADCAST", async ({ serviceProvider }) => {
+		process.env.CORE_P2P_MAX_PEERS_BROADCAST = "10";
 
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
 		assert.undefined(result.error);
-		assert.equal(result.value.maxPeerSequentialErrors, 5000);
+		assert.equal(result.value.maxPeersBroadcast, 10);
 	});
 
-	it("should throw if process.env.CORE_P2P_MAX_PEER_SEQUENTIAL_ERRORS is not number", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_MAX_PEER_SEQUENTIAL_ERRORS = "false";
+	it("should throw if process.env.CORE_P2P_MAX_PEERS_BROADCAST is not number", async ({ serviceProvider }) => {
+		process.env.CORE_P2P_MAX_PEERS_BROADCAST = "false";
 
 		const result = serviceProvider.configSchema().validate(importDefaults());
 
 		assert.defined(result.error);
-		assert.equal(result.error?.message, '"maxPeerSequentialErrors" must be a number');
+		assert.equal(result.error?.message, '"maxPeersBroadcast" must be a number');
 	});
 
 	it("should parse process.env.CORE_P2P_RATE_LIMIT", async ({ serviceProvider }) => {
@@ -554,31 +553,6 @@ describe<{
 		result = serviceProvider.configSchema().validate(defaults);
 
 		assert.equal(result.error?.message, '"maxSameSubnetPeers" is required');
-	});
-
-	it("#schemaRestrictions - maxPeerSequentialErrors is required && is integer && >= 0", async ({
-		serviceProvider,
-	}) => {
-		const defaults = importDefaults();
-		defaults.maxPeerSequentialErrors = false;
-		let result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"maxPeerSequentialErrors" must be a number');
-
-		defaults.maxPeerSequentialErrors = 1.12;
-		result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"maxPeerSequentialErrors" must be an integer');
-
-		defaults.maxPeerSequentialErrors = -1;
-		result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"maxPeerSequentialErrors" must be greater than or equal to 0');
-
-		delete defaults.maxPeerSequentialErrors;
-		result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"maxPeerSequentialErrors" is required');
 	});
 
 	it("#schemaRestrictions - whitelist is required && is array && contains strings", async ({ serviceProvider }) => {
