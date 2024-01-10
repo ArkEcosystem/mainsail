@@ -10,7 +10,6 @@ export const defaults = {
 		enabled: Environment.isTrue(Constants.Flags.CORE_P2P_DEVELOPMENT_MODE_ENABLED),
 	},
 	getBlocksTimeout: 30_000,
-	maxPeerSequentialErrors: Environment.get(Constants.Flags.CORE_P2P_MAX_PEER_SEQUENTIAL_ERRORS, 3),
 	maxPeersBroadcast: 3,
 	maxSameSubnetPeers: Environment.get(Constants.Flags.CORE_P2P_MAX_PEERS_SAME_SUBNET, 5),
 	minimumNetworkReach: Environment.get(Constants.Flags.CORE_P2P_MIN_NETWORK_REACH, 20),
