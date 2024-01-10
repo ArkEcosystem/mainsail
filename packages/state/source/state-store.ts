@@ -6,7 +6,7 @@ import { factory, jsonFactory } from "./attributes";
 
 @injectable()
 export class StateStore implements Contracts.State.StateStore {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Log.Service)

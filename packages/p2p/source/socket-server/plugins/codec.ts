@@ -18,7 +18,7 @@ import { BasePlugin } from "./base-plugin";
 
 @injectable()
 export class CodecPlugin extends BasePlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Log.Service)

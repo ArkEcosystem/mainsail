@@ -41,7 +41,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	options = { address: "bech32m", bech32mPrefix: "ark", name: "mainsail", ...options };
 
 	const app = new Application(new Container());
-	app.bind(Identifiers.ApplicationName).toConstantValue(options.name);
+	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();

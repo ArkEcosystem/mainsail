@@ -23,7 +23,7 @@ const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve
 
 @injectable()
 export class Sync implements Contracts.ApiSync.Sync {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Configuration)

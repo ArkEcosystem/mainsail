@@ -20,7 +20,7 @@ export class Application implements Contracts.Kernel.Application {
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
 		this.#listenToShutdownSignals();
 
-		this.bind<Contracts.Kernel.Application>(Identifiers.Application).toConstantValue(this);
+		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
 		this.bind<ConfigRepository>(Identifiers.Kernel.Config.Repository).to(ConfigRepository).inSingletonScope();
 
@@ -64,31 +64,31 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public dirPrefix(): string {
-		return this.get(Identifiers.ApplicationDirPrefix);
+		return this.get(Identifiers.Application.DirPrefix);
 	}
 
 	public namespace(): string {
-		return this.get(Identifiers.ApplicationNamespace);
+		return this.get(Identifiers.Application.Namespace);
 	}
 
 	public version(): string {
-		return this.get(Identifiers.ApplicationVersion);
+		return this.get(Identifiers.Application.Version);
 	}
 
 	public token(): string {
-		return this.get(Identifiers.ApplicationToken);
+		return this.get(Identifiers.Application.Token);
 	}
 
 	public network(): string {
-		return this.get(Identifiers.ApplicationNetwork);
+		return this.get(Identifiers.Application.Network);
 	}
 
 	public name(): string {
-		return this.get(Identifiers.ApplicationName);
+		return this.get(Identifiers.Application.Name);
 	}
 
 	public useNetwork(value: string): void {
-		this.rebind<string>(Identifiers.ApplicationNetwork).toConstantValue(value);
+		this.rebind<string>(Identifiers.Application.Network).toConstantValue(value);
 	}
 
 	public dataPath(path = ""): string {
@@ -136,11 +136,11 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public environment(): string {
-		return this.get(Identifiers.ApplicationEnvironment);
+		return this.get(Identifiers.Application.Environment);
 	}
 
 	public useEnvironment(value: string): void {
-		this.rebind<string>(Identifiers.ApplicationEnvironment).toConstantValue(value);
+		this.rebind<string>(Identifiers.Application.Environment).toConstantValue(value);
 	}
 
 	public isProduction(): boolean {

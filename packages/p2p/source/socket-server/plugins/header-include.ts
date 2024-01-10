@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class HeaderIncludePlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PeerHeaderFactory)

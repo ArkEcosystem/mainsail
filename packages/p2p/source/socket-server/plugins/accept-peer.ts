@@ -5,7 +5,7 @@ import { getPeerIp } from "../../utils";
 
 @injectable()
 export class AcceptPeerPlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PeerProcessor)

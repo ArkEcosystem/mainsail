@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class GeneratorVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Proposer.Selector)

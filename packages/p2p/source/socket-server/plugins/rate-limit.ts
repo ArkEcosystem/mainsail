@@ -20,7 +20,7 @@ import {
 
 @injectable()
 export class RateLimitPlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)

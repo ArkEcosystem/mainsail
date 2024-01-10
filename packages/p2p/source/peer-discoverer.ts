@@ -4,7 +4,7 @@ import { Services, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PeerFactory)

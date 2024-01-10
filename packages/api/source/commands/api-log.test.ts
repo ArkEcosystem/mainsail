@@ -14,7 +14,7 @@ describe<{
 		context.cli = new Console();
 
 		context.cli.app.rebind(Identifiers.ProcessFactory).toFactory(() => () => process);
-		context.cli.app.rebind(Identifiers.ApplicationName).toConstantValue("mainsail-api");
+		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("mainsail-api");
 	});
 
 	it("should call process log", async ({ cli }) => {

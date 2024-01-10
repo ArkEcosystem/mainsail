@@ -5,7 +5,7 @@ import { constants } from "./constants";
 
 @injectable()
 export class HeaderService implements Contracts.P2P.HeaderService {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	#pending = new Set<Contracts.P2P.Peer>();

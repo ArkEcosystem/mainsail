@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 
 @injectable()
 export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscoverer {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)

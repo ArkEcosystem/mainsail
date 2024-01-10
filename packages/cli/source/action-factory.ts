@@ -16,7 +16,7 @@ import { Identifiers } from "./ioc";
 
 @injectable()
 export class ActionFactory {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
 	public abortErroredProcess(processName: string): void {

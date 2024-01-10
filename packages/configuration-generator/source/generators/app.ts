@@ -10,13 +10,13 @@ interface PluginEntry {
 
 @injectable()
 export class AppGenerator {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private app!: Contracts.Kernel.Application;
 
 	generateDefault(packageName = "core"): Contracts.Types.JsonObject {
 		packageName = packageName.replace("@mainsail/", "");
 
-		const applicationName = this.app.get<string>(Identifiers.ApplicationName);
+		const applicationName = this.app.get<string>(Identifiers.Application.Name);
 		return readJSONSync(
 			resolve(__dirname, `../../../${packageName}/bin/config/testnet/${applicationName}/app.json`),
 		);

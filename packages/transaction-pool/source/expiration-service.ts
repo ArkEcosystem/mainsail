@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.StateService)

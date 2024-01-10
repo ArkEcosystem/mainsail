@@ -17,7 +17,7 @@ export type WebhookServer = HapiServer<WebhookAppState>;
 
 @injectable()
 export class Server {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(InternalIdentifiers.Database)

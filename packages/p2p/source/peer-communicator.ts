@@ -13,7 +13,7 @@ import { Throttle } from "./throttle";
 // @TODO review the implementation
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)

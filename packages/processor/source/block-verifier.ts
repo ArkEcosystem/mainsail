@@ -12,7 +12,7 @@ import {
 
 @injectable()
 export class BlockVerifier implements Contracts.Processor.Verifier {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public async verify(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {

@@ -12,7 +12,7 @@ import { ConfigRepository } from "../repository";
 
 @injectable()
 export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Config.Repository)

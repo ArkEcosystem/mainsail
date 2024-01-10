@@ -22,7 +22,7 @@ interface Plugin {
 
 @injectable()
 export class LoadServiceProviders implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Config.Repository)

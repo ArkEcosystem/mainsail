@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class GetMessagesController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async handle(

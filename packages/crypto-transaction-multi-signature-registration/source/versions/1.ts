@@ -6,7 +6,7 @@ import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class MultiSignatureRegistrationTransaction extends Transaction {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)

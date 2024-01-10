@@ -31,7 +31,7 @@ export class Exporter implements Contracts.State.Exporter {
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.WalletRepositoryIndexSet)

@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Log.Service)

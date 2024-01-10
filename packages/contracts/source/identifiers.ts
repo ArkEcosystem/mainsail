@@ -1,13 +1,15 @@
 export const Identifiers = {
 	ApiSync: Symbol.for("ApiSync<Sync>"),
-	Application: Symbol.for("Application<Instance>"),
-	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
-	ApplicationEnvironment: Symbol.for("Application<Environment>"),
-	ApplicationName: Symbol.for("Application<Name>"),
-	ApplicationNamespace: Symbol.for("Application<Namespace>"),
-	ApplicationNetwork: Symbol.for("Application<Network>"),
-	ApplicationToken: Symbol.for("Application<Token>"),
-	ApplicationVersion: Symbol.for("Application<Version>"),
+	Application: {
+		DirPrefix: Symbol.for("Application<DirPrefix>"),
+		Environment: Symbol.for("Application<Environment>"),
+		Instance: Symbol.for("Application<Instance>"),
+		Name: Symbol.for("Application<Name>"),
+		Namespace: Symbol.for("Application<Namespace>"),
+		Network: Symbol.for("Application<Network>"),
+		Token: Symbol.for("Application<Token>"),
+		Version: Symbol.for("Application<Version>"),
+	},
 	BlockProcessor: Symbol.for("Block<Processor>"),
 	BlockVerifier: Symbol.for("Block<Verifier>"),
 	Consensus: {
@@ -25,42 +27,7 @@ export const Identifiers = {
 		Storage: Symbol.for("Storage<Consensus>"),
 		ValidatorRepository: Symbol.for("Repository<Consensus.Validator>"),
 	},
-	Kernel: {
-		Cache: {
-			Factory: Symbol.for("Kernel<Cache.Factory>"),
-			Manager: Symbol.for("Kernel<Cache.Manager>"),
-		},
-		EventDispatcher: {
-			Manager: Symbol.for("Kernel<EventDispatcher.Manager>"),
-			Service: Symbol.for("Kernel<EventDispatcher.Service>"),
-		},
-		Queue: {
-			Factory: Symbol.for("Kernel<Queue.Factory>"),
-			Manager: Symbol.for("Kernel<Queue.Manager>"),
-		},
-		Validation: {
-			Manager: Symbol.for("Kernel<Validation.Manager>"),
-			Service: Symbol.for("Kernel<Validation.Service>"),
-		},
-		Filesystem: {
-			Manager: Symbol.for("Kernel<Filesystem.Manager>"),
-			Service: Symbol.for("Kernel<Filesystem.Service>"),
-		},
-		Log: {
-			Manager: Symbol.for("Kernel<Log.Manager>"),
-			Service: Symbol.for("Kernel<Log.Service>"),
-		},
-		Config: {
-			Flags: Symbol.for("Kernel<Config.Flags>"),
-			Manager: Symbol.for("Kernel<Config.Manager>"),
-			Plugins: Symbol.for("Kernel<Config.Plugins>"),
-			Repository: Symbol.for("Kernel<Config.Repository>"),
-		},
-		ProcessActions: {
-			Manager: Symbol.for("Kernel<ProcessActions.Manager>"),
-			Service: Symbol.for("Kernel<ProcessActions.Service>"),
-		},
-	},
+
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {
 		Block: {
@@ -128,18 +95,54 @@ export const Identifiers = {
 		Registry: Symbol.for("Fee<Registry>"),
 		Type: Symbol.for("Fee<Type>"),
 	},
-
 	Forger: {
 		Service: Symbol.for("Forger<Service>"),
 		Tracker: Symbol.for("Forger<Tracker>"),
 		Usernames: Symbol.for("Forger<Usernames>"),
 		Validators: Symbol.for("Forger<Validators>"),
 	},
+
 	Ipc: {
 		Worker: Symbol.for("Ipc<Worker>"),
 		WorkerFactory: Symbol.for("Ipc<WorkerFactory>"),
 		WorkerPool: Symbol.for("Ipc<WorkerPool>"),
 		WorkerSubprocessFactory: Symbol.for("Ipc<WorkerSubprocessFactory>"),
+	},
+	Kernel: {
+		Cache: {
+			Factory: Symbol.for("Kernel<Cache.Factory>"),
+			Manager: Symbol.for("Kernel<Cache.Manager>"),
+		},
+		Config: {
+			Flags: Symbol.for("Kernel<Config.Flags>"),
+			Manager: Symbol.for("Kernel<Config.Manager>"),
+			Plugins: Symbol.for("Kernel<Config.Plugins>"),
+			Repository: Symbol.for("Kernel<Config.Repository>"),
+		},
+		EventDispatcher: {
+			Manager: Symbol.for("Kernel<EventDispatcher.Manager>"),
+			Service: Symbol.for("Kernel<EventDispatcher.Service>"),
+		},
+		Filesystem: {
+			Manager: Symbol.for("Kernel<Filesystem.Manager>"),
+			Service: Symbol.for("Kernel<Filesystem.Service>"),
+		},
+		Log: {
+			Manager: Symbol.for("Kernel<Log.Manager>"),
+			Service: Symbol.for("Kernel<Log.Service>"),
+		},
+		ProcessActions: {
+			Manager: Symbol.for("Kernel<ProcessActions.Manager>"),
+			Service: Symbol.for("Kernel<ProcessActions.Service>"),
+		},
+		Queue: {
+			Factory: Symbol.for("Kernel<Queue.Factory>"),
+			Manager: Symbol.for("Kernel<Queue.Manager>"),
+		},
+		Validation: {
+			Manager: Symbol.for("Kernel<Validation.Manager>"),
+			Service: Symbol.for("Kernel<Validation.Service>"),
+		},
 	},
 	MixinService: Symbol.for("Service<Mixin>"),
 	P2P: {

@@ -5,7 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.TransactionHandlerRegistry)

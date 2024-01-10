@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 // @TODO revisit the implementation, container usage and arguments after database rework
 @injectable()
 export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Log.Service)

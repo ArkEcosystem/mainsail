@@ -9,7 +9,7 @@ import { Webhook } from "./interfaces";
 
 @injectable()
 export class Database {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	#database: lowdb.LowdbSync<any>;

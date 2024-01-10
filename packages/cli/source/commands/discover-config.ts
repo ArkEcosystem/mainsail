@@ -15,11 +15,11 @@ interface Config {
 
 @injectable()
 export class DiscoverConfig {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	public async discover(token = "", network = ""): Promise<Config | undefined> {
-		const applicationName = this.app.get<string>(Identifiers.ApplicationName);
+		const applicationName = this.app.get<string>(Identifiers.Application.Name);
 		Utils.assert.defined<string>(applicationName);
 
 		try {

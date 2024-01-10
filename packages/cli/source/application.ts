@@ -8,7 +8,7 @@ import { Identifiers } from "./ioc";
 
 export class Application {
 	public constructor(private readonly container: interfaces.Container) {
-		this.container.bind(Identifiers.Application).toConstantValue(this);
+		this.container.bind(Identifiers.Application.Instance).toConstantValue(this);
 	}
 
 	public bind<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): interfaces.BindingToSyntax<T> {

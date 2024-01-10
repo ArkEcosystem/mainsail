@@ -258,7 +258,7 @@ export class Command extends Commands.Command {
 			packageName: this.app.get<AppContracts.Types.PackageJson>(CliIdentifiers.Package).name,
 		};
 
-		const path = this.#getConfigurationPath(options, configurationApp.get(CliIdentifiers.ApplicationName));
+		const path = this.#getConfigurationPath(options, configurationApp.get(CliIdentifiers.Application.Name));
 		configurationApp.rebind(Identifiers.ConfigurationPath).toConstantValue(path);
 
 		if (!response.confirm) {

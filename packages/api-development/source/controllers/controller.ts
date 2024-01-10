@@ -8,7 +8,7 @@ import { SchemaObject } from "../schemas";
 
 @injectable()
 export class Controller {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PluginConfiguration)

@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.ConsensusService {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Bootstrapper)

@@ -9,7 +9,7 @@ import { Identifiers } from "../ioc";
 
 @injectable()
 export class SuggestCommand {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	public async execute(context: Contracts.Types.JsonObject): Promise<string | undefined> {

@@ -36,7 +36,7 @@ import { Identifiers } from "./ioc";
 
 @injectable()
 export class ComponentFactory {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
 	public appHeader(): string {

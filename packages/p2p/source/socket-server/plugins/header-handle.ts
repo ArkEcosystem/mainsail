@@ -5,7 +5,7 @@ import { getPeerIp } from "../../utils/get-peer-ip";
 
 @injectable()
 export class HeaderHandlePlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.PeerHeaderService)

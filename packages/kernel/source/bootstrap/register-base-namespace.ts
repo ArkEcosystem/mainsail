@@ -5,7 +5,7 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBaseNamespace implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
@@ -17,7 +17,7 @@ export class RegisterBaseNamespace implements Bootstrapper {
 			throw new Exceptions.NetworkCannotBeDetermined();
 		}
 
-		this.app.bind<string>(Identifiers.ApplicationNamespace).toConstantValue(`${token}-${network}`);
-		this.app.bind<string>(Identifiers.ApplicationDirPrefix).toConstantValue(`${token}/${network}/${name}`);
+		this.app.bind<string>(Identifiers.Application.Namespace).toConstantValue(`${token}-${network}`);
+		this.app.bind<string>(Identifiers.Application.DirPrefix).toConstantValue(`${token}/${network}/${name}`);
 	}
 }

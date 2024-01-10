@@ -180,7 +180,7 @@ describe<{
 		const app = new Application(new Container());
 
 		app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
-		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
+		app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 
 		app.bind<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes).toConstantValue(

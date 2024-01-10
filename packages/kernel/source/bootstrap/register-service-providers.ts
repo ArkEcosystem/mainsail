@@ -11,7 +11,7 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterServiceProviders implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Log.Service)

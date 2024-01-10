@@ -12,7 +12,7 @@ import { AbortUnknownProcess } from "./abort-unknown-process";
 
 @injectable()
 export class DaemonizeProcess {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.ProcessManager)

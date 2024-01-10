@@ -28,7 +28,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
-		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("token-network");
+		context.app.bind(Identifiers.Application.Namespace).toConstantValue("token-network");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		await assert.resolves(() => context.serviceProvider.register());
@@ -44,7 +44,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
-		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("token-network");
+		context.app.bind(Identifiers.Application.Namespace).toConstantValue("token-network");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.app

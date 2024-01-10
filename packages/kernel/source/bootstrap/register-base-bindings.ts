@@ -7,7 +7,7 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
@@ -16,11 +16,11 @@ export class RegisterBaseBindings implements Bootstrapper {
 
 		assert.defined<Record<string, string>>(flags);
 
-		this.app.bind<string>(Identifiers.ApplicationEnvironment).toConstantValue(flags.env);
-		this.app.bind<string>(Identifiers.ApplicationToken).toConstantValue(flags.token);
-		this.app.bind<string>(Identifiers.ApplicationNetwork).toConstantValue(flags.network);
-		this.app.bind<string>(Identifiers.ApplicationName).toConstantValue(flags.name);
-		this.app.bind<string>(Identifiers.ApplicationVersion).toConstantValue(version);
+		this.app.bind<string>(Identifiers.Application.Environment).toConstantValue(flags.env);
+		this.app.bind<string>(Identifiers.Application.Token).toConstantValue(flags.token);
+		this.app.bind<string>(Identifiers.Application.Network).toConstantValue(flags.network);
+		this.app.bind<string>(Identifiers.Application.Name).toConstantValue(flags.name);
+		this.app.bind<string>(Identifiers.Application.Version).toConstantValue(version);
 
 		// @@TODO implement a getter/setter that sets vars locally and in the process.env variables
 		process.env[Constants.Flags.CORE_ENV] = flags.env;

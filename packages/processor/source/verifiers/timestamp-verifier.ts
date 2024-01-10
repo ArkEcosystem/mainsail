@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class TimestampVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.StateService)

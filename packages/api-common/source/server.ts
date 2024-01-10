@@ -6,7 +6,7 @@ import { readFileSync } from "fs";
 
 @injectable()
 export abstract class AbstractServer {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Log.Service)

@@ -20,7 +20,7 @@ describe<{
 		context.app = { get: () => {} };
 
 		context.container = new Container();
-		context.container.bind(Identifiers.Application).toConstantValue(context.app);
+		context.container.bind(Identifiers.Application.Instance).toConstantValue(context.app);
 		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 		context.container.bind(Identifiers.StateService).toConstantValue(context.stateService);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();

@@ -7,7 +7,7 @@ import { Identifiers } from "../ioc";
 
 @injectable()
 export class Config {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	#file!: string;

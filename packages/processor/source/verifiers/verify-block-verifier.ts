@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class VerifyBlockVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Block.Verifier)

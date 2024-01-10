@@ -6,7 +6,7 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class LoadConfiguration implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {

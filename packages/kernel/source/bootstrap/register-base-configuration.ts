@@ -7,7 +7,7 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBaseConfiguration implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Kernel.Config.Repository)

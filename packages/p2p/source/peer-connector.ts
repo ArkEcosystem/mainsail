@@ -9,7 +9,7 @@ const TEN_SECONDS_IN_MILLISECONDS = 10_000;
 
 @injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
