@@ -56,6 +56,10 @@ export const Identifiers = {
 			Plugins: Symbol.for("Kernel<Config.Plugins>"),
 			Repository: Symbol.for("Kernel<Config.Repository>"),
 		},
+		ProcessActions: {
+			Manager: Symbol.for("Kernel<ProcessActions.Manager>"),
+			Service: Symbol.for("Kernel<ProcessActions.Service>"),
+		},
 	},
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
 	Cryptography: {
@@ -168,8 +172,6 @@ export const Identifiers = {
 	PipelineFactory: Symbol.for("Factory<Pipeline>"),
 	PipelineService: Symbol.for("Service<Pipeline>"),
 	PluginConfiguration: Symbol.for("PluginConfiguration"),
-	ProcessActionsManager: Symbol.for("Manager<ProcessAction>"),
-	ProcessActionsService: Symbol.for("Service<ProcessActions>"),
 	Proposer: {
 		Selector: Symbol.for("Proposer<Selector>"),
 	},

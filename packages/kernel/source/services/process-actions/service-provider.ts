@@ -7,16 +7,16 @@ import { ProcessActionsManager } from "./manager";
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
 		this.app
-			.bind<ProcessActionsManager>(Identifiers.ProcessActionsManager)
+			.bind<ProcessActionsManager>(Identifiers.Kernel.ProcessActions.Manager)
 			.to(ProcessActionsManager)
 			.inSingletonScope();
 
-		await this.app.get<ProcessActionsManager>(Identifiers.ProcessActionsManager).boot();
+		await this.app.get<ProcessActionsManager>(Identifiers.Kernel.ProcessActions.Manager).boot();
 
 		this.app
-			.bind(Identifiers.ProcessActionsService)
+			.bind(Identifiers.Kernel.ProcessActions.Service)
 			.toDynamicValue((context: interfaces.Context) =>
-				context.container.get<ProcessActionsManager>(Identifiers.ProcessActionsManager).driver(),
+				context.container.get<ProcessActionsManager>(Identifiers.Kernel.ProcessActions.Manager).driver(),
 			);
 	}
 }

@@ -14,11 +14,11 @@ describe<{
 	});
 
 	it(".register", async (context) => {
-		assert.false(context.app.isBound(Identifiers.ProcessActionsService));
+		assert.false(context.app.isBound(Identifiers.Kernel.ProcessActions.Service));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.ProcessActionsService));
-		assert.instance(context.app.get(Identifiers.ProcessActionsService), Pm2ProcessActionsService);
+		assert.true(context.app.isBound(Identifiers.Kernel.ProcessActions.Service));
+		assert.instance(context.app.get(Identifiers.Kernel.ProcessActions.Service), Pm2ProcessActionsService);
 	});
 });
