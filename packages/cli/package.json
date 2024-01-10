@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/cli",
 	"version": "0.0.1",
-	"description": "Core of the Mainsail Blockchain",
+	"description": "CLI utilities for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

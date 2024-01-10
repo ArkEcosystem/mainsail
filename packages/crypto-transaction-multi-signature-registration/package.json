@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-transaction-multi-signature-registration",
 	"version": "0.0.1",
-	"description": "Crypto utilities for the Mainsail Blockchain",
+	"description": "Multi signature registration transaction for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

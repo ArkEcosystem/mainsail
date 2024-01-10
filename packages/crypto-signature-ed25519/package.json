@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-signature-ed25519",
 	"version": "0.0.1",
-	"description": "Elliptic Curve Cryptography (ed25519)",
+	"description": "Elliptic Curve Cryptography (ed25519) signatures for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

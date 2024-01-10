@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-transaction-username-resignation",
 	"version": "0.0.1",
-	"description": "Username resignation transaction for the Mainsail Blockchain",
+	"description": "Username resignation transaction for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-address-keccak256",
 	"version": "0.0.1",
-	"description": "keccak256 Address Derivation",
+	"description": "Keccak256 address derivation for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

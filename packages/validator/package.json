@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/validator",
 	"version": "0.0.1",
-	"description": "Validator for the Mainsail Blockchain",
+	"description": "Local validator utils for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

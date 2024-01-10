@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/fees-static",
 	"version": "0.0.1",
-	"description": "Transaction Pool Manager for Mainsail",
+	"description": "Static fee strategy for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

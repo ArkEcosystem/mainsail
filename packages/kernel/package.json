@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/kernel",
 	"version": "0.0.1",
-	"description": "Kernel of Mainsail",
+	"description": "Kernel for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

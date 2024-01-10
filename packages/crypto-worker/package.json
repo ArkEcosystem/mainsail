@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-worker",
 	"version": "0.0.1",
-	"description": "Crypto Worker for Mainsail",
+	"description": "Crypto worker based on node child processes for Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

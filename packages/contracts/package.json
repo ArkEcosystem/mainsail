@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/contracts",
 	"version": "0.0.1",
-	"description": "Contracts of Mainsail",
+	"description": "Contracts for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

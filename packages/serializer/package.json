@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/serializer",
 	"version": "0.0.1",
-	"description": "Transaction Pool Manager for Mainsail",
+	"description": "Serializer and deserializer for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

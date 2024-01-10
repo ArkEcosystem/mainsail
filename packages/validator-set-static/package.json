@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/validator-set-static",
 	"version": "0.0.1",
-	"description": "A static validator set for the Mainsail Blockchain",
+	"description": "Static validator set strategy for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

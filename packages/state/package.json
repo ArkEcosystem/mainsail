@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/state",
 	"version": "0.0.1",
-	"description": "State Management for Mainsail",
+	"description": "State management for Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

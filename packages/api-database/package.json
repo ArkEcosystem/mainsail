@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/api-database",
 	"version": "0.0.1",
-	"description": "API database for Mainsail",
+	"description": "API database for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

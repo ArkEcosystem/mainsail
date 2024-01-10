@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-hash-noble",
 	"version": "0.0.1",
-	"description": "Hashing powered by @noble/hashes",
+	"description": "Hashing powered by @noble/hashes for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

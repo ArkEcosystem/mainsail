@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-key-pair-schnorr",
 	"version": "0.0.1",
-	"description": "Schnorr Key Derivation",
+	"description": "Schnorr key derivation for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

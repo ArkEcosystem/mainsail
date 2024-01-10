@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/api-common",
 	"version": "0.0.1",
-	"description": "Common API building blocks for Mainsail",
+	"description": "Common API building blocks for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
