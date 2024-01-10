@@ -1,5 +1,11 @@
 export const Identifiers = {
 	ApiSync: Symbol.for("ApiSync<Sync>"),
+	Kernel: {
+		Cache: {
+			Factory: Symbol.for("Kernel<Cache.Factory>"),
+			Manager: Symbol.for("Kernel<Cache.Manager>"),
+		},
+	},
 	Application: Symbol.for("Application<Instance>"),
 	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
 	ApplicationEnvironment: Symbol.for("Application<Environment>"),
@@ -10,9 +16,6 @@ export const Identifiers = {
 	ApplicationVersion: Symbol.for("Application<Version>"),
 	BlockProcessor: Symbol.for("Block<Processor>"),
 	BlockVerifier: Symbol.for("Block<Verifier>"),
-	CacheFactory: Symbol.for("Factory<Cache>"),
-	CacheManager: Symbol.for("Manager<Cache>"),
-	CacheService: Symbol.for("Service<Cache>"),
 	ConfigFlags: Symbol.for("Config<Flags>"),
 	ConfigManager: Symbol.for("Manager<Config>"),
 	ConfigPlugins: Symbol.for("Config<Plugins>"),

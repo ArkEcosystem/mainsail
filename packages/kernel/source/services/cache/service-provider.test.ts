@@ -17,18 +17,18 @@ describe<{
 	});
 
 	it("should register the service", async (context) => {
-		assert.false(context.app.isBound(Identifiers.CacheFactory));
+		assert.false(context.app.isBound(Identifiers.Kernel.Cache.Factory));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.CacheFactory));
+		assert.true(context.app.isBound(Identifiers.Kernel.Cache.Factory));
 	});
 
 	it("should create an instance of the MemoryCacheStore", async (context) => {
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
 		assert.instance(
-			await context.app.get<CacheFactory<string, string>>(Identifiers.CacheFactory)(),
+			await context.app.get<CacheFactory<string, string>>(Identifiers.Kernel.Cache.Factory)(),
 			MemoryCacheStore,
 		);
 	});
