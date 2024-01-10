@@ -19,7 +19,7 @@ describe<{
 		context.app.bind(Identifiers.ConfigFlags).toConstantValue({});
 		context.app.bind(Identifiers.ConfigPlugins).toConstantValue({});
 
-		context.app.bind(Identifiers.ValidationService).to(JoiValidator);
+		context.app.bind(Identifiers.Kernel.Validation.Service).to(JoiValidator);
 
 		context.configLoader = context.app.resolve<LocalConfigLoader>(LocalConfigLoader);
 	});

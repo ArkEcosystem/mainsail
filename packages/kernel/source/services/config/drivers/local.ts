@@ -18,7 +18,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.ConfigRepository)
 	private readonly configRepository!: ConfigRepository;
 
-	@inject(Identifiers.ValidationService)
+	@inject(Identifiers.Kernel.Validation.Service)
 	private readonly validationService!: Contracts.Kernel.Validator;
 
 	@inject(Identifiers.ConfigFlags)

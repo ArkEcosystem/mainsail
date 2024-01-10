@@ -57,7 +57,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 			const config: PluginConfiguration = serviceProvider.config();
 
 			const validator: Contracts.Kernel.Validator | undefined = this.app
-				.get<ValidationManager>(Identifiers.ValidationManager)
+				.get<ValidationManager>(Identifiers.Kernel.Validation.Manager)
 				.driver();
 
 			assert.defined<Contracts.Kernel.Validator>(validator);

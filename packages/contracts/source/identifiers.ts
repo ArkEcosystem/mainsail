@@ -13,6 +13,10 @@ export const Identifiers = {
 			Factory: Symbol.for("Kernel<Queue.Factory>"),
 			Manager: Symbol.for("Kernel<Queue.Manager>"),
 		},
+		Validation: {
+			Manager: Symbol.for("Kernel<Validation.Manager>"),
+			Service: Symbol.for("Kernel<Validation.Service>"),
+		},
 	},
 	Application: Symbol.for("Application<Instance>"),
 	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
@@ -162,7 +166,6 @@ export const Identifiers = {
 	Proposer: {
 		Selector: Symbol.for("Proposer<Selector>"),
 	},
-
 	ScheduleService: Symbol.for("Service<Schedule>"),
 	ServiceProviderRepository: Symbol.for("Repository<ServiceProvider>"),
 	SnapshotService: Symbol.for("Service<Snapshot>"),
@@ -199,8 +202,6 @@ export const Identifiers = {
 	TransactionValidator: Symbol.for("State<TransactionValidator>"),
 	TransactionValidatorFactory: Symbol.for("State<TransactionValidatorFactory>"),
 	TriggerService: Symbol.for("Service<Actions>"),
-	ValidationManager: Symbol.for("Manager<Validation>"),
-	ValidationService: Symbol.for("Service<Validation>"),
 	ValidatorSet: Symbol.for("Set<ValidatorSet>"),
 	ValidatorWalletFactory: Symbol.for("State<ValidatorWalletFactory>"),
 	WalletAttributes: Symbol.for("Attributes<Wallet>"),
