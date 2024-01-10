@@ -8,7 +8,6 @@ export const Identifiers = {
 	ApplicationNetwork: Symbol.for("Application<Network>"),
 	ApplicationToken: Symbol.for("Application<Token>"),
 	ApplicationVersion: Symbol.for("Application<Version>"),
-	BlockHistoryService: Symbol.for("Service<BlockHistory>"),
 	BlockProcessor: Symbol.for("Block<Processor>"),
 	BlockVerifier: Symbol.for("Block<Verifier>"),
 	CacheFactory: Symbol.for("Factory<Cache>"),
@@ -18,7 +17,6 @@ export const Identifiers = {
 	ConfigManager: Symbol.for("Manager<Config>"),
 	ConfigPlugins: Symbol.for("Config<Plugins>"),
 	ConfigRepository: Symbol.for("Repository<Config>"),
-	ConfigService: Symbol.for("Service<Config>"),
 	Consensus: {
 		Aggregator: Symbol.for("Aggregator<Consensus>"),
 		Bootstrapper: Symbol.for("Bootstrapper<Consensus>"),
@@ -204,6 +202,4 @@ export const Identifiers = {
 	WalletRepositoryCopyOnWriteFactory: Symbol.for("Factory<Repository<CopyOnWrite<Wallet>>>"),
 	WalletRepositoryFactory: Symbol.for("Factory<Repository<Wallet>>"),
 	WalletRepositoryIndexSet: Symbol.for("IndexSet<Repository<Wallet>>"),
-	WatcherDatabaseService: Symbol.for("Watcher<DatabaseService>"),
-	WatcherEventListener: Symbol.for("Watcher<EventListener>"),
 };

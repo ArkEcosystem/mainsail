@@ -29,7 +29,6 @@ const init = (context: Context) => {
 	app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
 	app.bind(Identifiers.TransactionPoolProcessorFactory).toConstantValue({});
 	app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
-	app.bind(Identifiers.BlockHistoryService).toConstantValue({});
 	app.bind(Identifiers.TransactionHistoryService).toConstantValue({});
 	app.bind(Identifiers.TransactionHandlerRegistry).toConstantValue({});
 	app.bind(Identifiers.StandardCriteriaService).toConstantValue({});
