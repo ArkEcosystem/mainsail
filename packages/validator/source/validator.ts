@@ -33,33 +33,25 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.StateService)
 	protected readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
-
 	#keyPair!: Contracts.Crypto.KeyPair;
-	#walletPublicKey!: string;
 
-	public configure(walletPublicKey: string, keyPair: Contracts.Crypto.KeyPair): Contracts.Validator.Validator {
-		this.#walletPublicKey = walletPublicKey;
+	public configure(keyPair: Contracts.Crypto.KeyPair): Contracts.Validator.Validator {
 		this.#keyPair = keyPair;
 
 		return this;
-	}
-
-	public getWalletPublicKey(): string {
-		return this.#walletPublicKey;
 	}
 
 	public getConsensusPublicKey(): string {
 		return this.#keyPair.publicKey;
 	}
 
-	public async prepareBlock(height: number, round: number): Promise<Contracts.Crypto.Block> {
+	public async prepareBlock(generatorPublicKey: string, round: number): Promise<Contracts.Crypto.Block> {
 		const transactions = await this.#getTransactionsForForging();
-		return this.#makeBlock(round, transactions);
+		return this.#makeBlock(round, generatorPublicKey, transactions);
 	}
 
 	public async propose(
+		validatorIndex: number,
 		round: number,
 		validRound: number | undefined,
 		block: Contracts.Crypto.Block,
@@ -71,13 +63,14 @@ export class Validator implements Contracts.Validator.Validator {
 				block: { serialized: serializedProposedBlock.toString("hex") },
 				round,
 				validRound,
-				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
+				validatorIndex,
 			},
 			this.#keyPair,
 		);
 	}
 
 	public async prevote(
+		validatorIndex: number,
 		height: number,
 		round: number,
 		blockId: string | undefined,
@@ -88,13 +81,14 @@ export class Validator implements Contracts.Validator.Validator {
 				height,
 				round,
 				type: Contracts.Crypto.MessageType.Prevote,
-				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
+				validatorIndex,
 			},
 			this.#keyPair,
 		);
 	}
 
 	public async precommit(
+		validatorIndex: number,
 		height: number,
 		round: number,
 		blockId: string | undefined,
@@ -105,7 +99,7 @@ export class Validator implements Contracts.Validator.Validator {
 				height,
 				round,
 				type: Contracts.Crypto.MessageType.Precommit,
-				validatorIndex: this.validatorSet.getValidatorIndexByWalletPublicKey(this.#walletPublicKey),
+				validatorIndex,
 			},
 			this.#keyPair,
 		);
@@ -127,7 +121,11 @@ export class Validator implements Contracts.Validator.Validator {
 		return transactions;
 	}
 
-	async #makeBlock(round: number, transactions: Contracts.Crypto.Transaction[]): Promise<Contracts.Crypto.Block> {
+	async #makeBlock(
+		round: number,
+		generatorPublicKey: string,
+		transactions: Contracts.Crypto.Transaction[],
+	): Promise<Contracts.Crypto.Block> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -154,7 +152,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const height = previousBlock.data.height + 1;
 
 		return this.blockFactory.make({
-			generatorPublicKey: this.#walletPublicKey,
+			generatorPublicKey,
 			height,
 			numberOfTransactions: transactions.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),

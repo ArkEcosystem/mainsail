@@ -8,7 +8,6 @@ export const validatorKeys = [
 		},
 		mnemonic:
 			"endless deposit bright clip school doctor later surround strategy blouse damage drink diesel erase scrap inside over pledge talent blood bus luggage glad whale",
-		walletPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 	},
 	{
 		consensusKeyPair: {
@@ -19,6 +18,5 @@ export const validatorKeys = [
 		},
 		mnemonic:
 			"endless deposit bright clip school doctor later surround strategy blouse damage drink diesel erase scrap inside over pledge talent blood bus luggage glad whale",
-		walletPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 	},
 ];

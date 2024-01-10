@@ -14,11 +14,9 @@ describe<{
 		await prepareSandbox(context);
 
 		const validators: Contracts.Consensus.IValidator[] = [];
-		for (const { consensusKeyPair, walletPublicKey } of validatorKeys) {
+		for (const { consensusKeyPair } of validatorKeys) {
 			validators.push(
-				context.sandbox.app
-					.resolve<Contracts.Consensus.IValidator>(Validator)
-					.configure(walletPublicKey, consensusKeyPair),
+				context.sandbox.app.resolve<Contracts.Consensus.IValidator>(Validator).configure(consensusKeyPair),
 			);
 		}
 
@@ -31,21 +29,5 @@ describe<{
 
 	it("#getValidator - should return existing validator", async ({ validatorRepository }) => {
 		assert.defined(validatorRepository.getValidator(validatorKeys[0].consensusKeyPair.publicKey));
-	});
-
-	it("#getValidators - should known validators", async ({ validatorRepository }) => {
-		assert.empty(validatorRepository.getValidators(["abc"]));
-		assert.length(
-			validatorRepository.getValidators(validatorKeys.map(({ consensusKeyPair: { publicKey } }) => publicKey)),
-			validatorKeys.length,
-		);
-		assert.length(
-			validatorRepository.getValidators([
-				...validatorKeys.map(({ consensusKeyPair: { publicKey } }) => publicKey),
-				"abc",
-				"def",
-			]),
-			validatorKeys.length,
-		);
 	});
 });

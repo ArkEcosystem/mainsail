@@ -47,7 +47,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	@inject(Identifiers.LogService)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#height = 2;
+	#height = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Contracts.Consensus.Step.Propose;
 	#lockedValue?: Contracts.Consensus.RoundState;
@@ -190,19 +190,11 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 	public async onTimeoutStartRound(): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
-
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer}`);
 
-		const proposer = this.validatorsRepository.getValidator(roundState.proposer.getConsensusPublicKey());
-		if (proposer) {
-			this.logger.info(`Found registered proposer: ${roundState.proposer}`);
+		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
-			// TODO: Error handling
-			await this.#propose(proposer);
-		} else {
-			// TODO: Can we call this even even proposer is known?
-			this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
-		}
+		await this.#propose(roundState);
 	}
 
 	protected async onProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -407,14 +399,28 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		return false;
 	}
 
-	async #propose(proposer: Contracts.Validator.Validator): Promise<void> {
-		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
+	async #propose(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		if (roundState.hasProposal()) {
 			return;
 		}
 
-		let proposal: Contracts.Crypto.Proposal | undefined;
+		const registeredProposer = this.validatorsRepository.getValidator(roundState.proposer.getConsensusPublicKey());
 
+		if (registeredProposer === undefined) {
+			return;
+		}
+
+		this.logger.info(`Found registered proposer: ${roundState.proposer}`);
+
+		const proposal = await this.#makeProposal(roundState, registeredProposer);
+
+		void this.proposalProcessor.process(proposal);
+	}
+
+	async #makeProposal(
+		roundState: Contracts.Consensus.RoundState,
+		registeredProposer: Contracts.Validator.Validator,
+	): Promise<Contracts.Crypto.Proposal> {
 		if (this.#validValue) {
 			const block = this.#validValue.getBlock();
 			const lockProof = await this.#validValue.aggregatePrevotes();
@@ -425,30 +431,40 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 				} from round ${this.getValidRound()} with blockId: ${block.data.id}`,
 			);
 
-			proposal = await proposer.propose(this.#round, this.#validValue.round, block, lockProof);
-		} else {
-			const block = await proposer.prepareBlock(this.#height, this.#round);
-
-			this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
-			proposal = await proposer.propose(this.#round, undefined, block);
+			return await registeredProposer.propose(
+				this.validatorSet.getValidatorIndexByWalletPublicKey(roundState.proposer.getWalletPublicKey()),
+				this.#round,
+				this.#validValue.round,
+				block,
+				lockProof,
+			);
 		}
 
-		Utils.assert.defined(proposal);
-		void this.proposalProcessor.process(proposal);
+		const block = await registeredProposer.prepareBlock(roundState.proposer.getWalletPublicKey(), this.#round);
+		this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
+
+		return registeredProposer.propose(
+			this.validatorSet.getValidatorIndexByWalletPublicKey(roundState.proposer.getWalletPublicKey()),
+			this.#round,
+			undefined,
+			block,
+		);
 	}
 
 	async #prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
-		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (
-				roundState.hasPrevote(
-					this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()),
-				)
-			) {
+		for (const validator of this.validatorSet.getActiveValidators()) {
+			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
+			if (localValidator === undefined) {
 				continue;
 			}
 
-			const prevote = await validator.prevote(this.#height, this.#round, value);
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey());
+			if (roundState.hasPrevote(validatorIndex)) {
+				continue;
+			}
+
+			const prevote = await localValidator.prevote(validatorIndex, this.#height, this.#round, value);
 
 			void this.prevoteProcessor.process(prevote);
 		}
@@ -456,25 +472,21 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 	async #precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
-		for (const validator of this.validatorsRepository.getValidators(this.#getActiveValidators())) {
-			if (
-				roundState.hasPrecommit(
-					this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey()),
-				)
-			) {
+		for (const validator of this.validatorSet.getActiveValidators()) {
+			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
+			if (localValidator === undefined) {
 				continue;
 			}
 
-			const precommit = await validator.precommit(this.#height, this.#round, value);
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletPublicKey(validator.getWalletPublicKey());
+			if (roundState.hasPrecommit(validatorIndex)) {
+				continue;
+			}
+
+			const precommit = await localValidator.precommit(validatorIndex, this.#height, this.#round, value);
 
 			void this.precommitProcessor.process(precommit);
 		}
-	}
-
-	#getActiveValidators(): string[] {
-		const activeValidators = this.validatorSet.getActiveValidators();
-
-		return activeValidators.map((validator) => validator.getConsensusPublicKey());
 	}
 
 	async #bootstrap(): Promise<void> {
