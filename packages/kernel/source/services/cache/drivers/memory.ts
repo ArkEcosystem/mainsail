@@ -5,7 +5,7 @@ import { CacheEvent } from "../../../enums";
 
 @injectable()
 export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	readonly #store: Map<K, T> = new Map<K, T>();

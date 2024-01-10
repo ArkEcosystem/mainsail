@@ -15,7 +15,7 @@ describe<{
 }>("LocalConfigLoader", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.EventDispatcherService).toConstantValue(new MemoryEventDispatcher());
+		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
 		context.app.bind(Identifiers.ConfigFlags).toConstantValue({});
 		context.app.bind(Identifiers.ConfigPlugins).toConstantValue({});
 

@@ -5,6 +5,10 @@ export const Identifiers = {
 			Factory: Symbol.for("Kernel<Cache.Factory>"),
 			Manager: Symbol.for("Kernel<Cache.Manager>"),
 		},
+		EventDispatcher: {
+			Manager: Symbol.for("EventDispatcher<Manager>"),
+			Service: Symbol.for("EventDispatcher<Service>"),
+		},
 	},
 	Application: Symbol.for("Application<Instance>"),
 	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
@@ -97,8 +101,6 @@ export const Identifiers = {
 		RootStorage: Symbol.for("Database<RootStorage>"),
 		Service: Symbol.for("Database<Service>"),
 	},
-	EventDispatcherManager: Symbol.for("Manager<EventDispatcher>"),
-	EventDispatcherService: Symbol.for("Service<EventDispatcher>"),
 	Fee: {
 		Matcher: Symbol.for("Fee<Matcher>"),
 		Registry: Symbol.for("Fee<Registry>"),

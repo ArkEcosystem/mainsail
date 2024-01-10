@@ -11,7 +11,7 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 	@inject(Identifiers.PeerApiNodeVerifier)
 	private readonly apiNodeVerifier!: Contracts.P2P.PeerApiNodeVerifier;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.P2PLogger)

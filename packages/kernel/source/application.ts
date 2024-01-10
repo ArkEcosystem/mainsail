@@ -169,7 +169,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service).dispatch(
 			"kernel.maintenance",
 			true,
 		);
@@ -181,7 +181,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service).dispatch(
 			"kernel.maintenance",
 			false,
 		);
@@ -290,7 +290,7 @@ export class Application implements Contracts.Kernel.Application {
 
 	async #bootstrapWith(type: string): Promise<void> {
 		const bootstrappers: Constructor<Bootstrapper>[] = Object.values(Bootstrappers[type]);
-		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
+		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Kernel.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
 			await events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });

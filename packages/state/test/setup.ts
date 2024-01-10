@@ -237,7 +237,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	sandbox.app.container.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
+	sandbox.app.container.bind(Identifiers.Kernel.EventDispatcher.Service).to(MockEventDispatcher);
 
 	sandbox.app
 		.bind(Identifiers.WalletRepository)

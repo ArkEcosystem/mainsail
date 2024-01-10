@@ -9,7 +9,7 @@ decorateInjectable(EventEmitter);
 
 @injectable()
 export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue {
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)

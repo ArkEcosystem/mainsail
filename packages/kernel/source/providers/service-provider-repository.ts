@@ -10,7 +10,7 @@ export class ServiceProviderRepository {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	readonly #serviceProviders: Map<string, ServiceProvider> = new Map<string, ServiceProvider>();

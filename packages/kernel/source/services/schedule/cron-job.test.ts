@@ -88,7 +88,9 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.mockEventDispatcher);
+		context.sandbox.app
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
+			.toConstantValue(context.mockEventDispatcher);
 
 		context.job = context.sandbox.app.resolve<CronJob>(CronJob);
 	});

@@ -7,16 +7,16 @@ import { EventDispatcherManager } from "./manager";
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
 		this.app
-			.bind<EventDispatcherManager>(Identifiers.EventDispatcherManager)
+			.bind<EventDispatcherManager>(Identifiers.Kernel.EventDispatcher.Manager)
 			.to(EventDispatcherManager)
 			.inSingletonScope();
 
-		await this.app.get<EventDispatcherManager>(Identifiers.EventDispatcherManager).boot();
+		await this.app.get<EventDispatcherManager>(Identifiers.Kernel.EventDispatcher.Manager).boot();
 
 		this.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
 			.toDynamicValue((context: interfaces.Context) =>
-				context.container.get<EventDispatcherManager>(Identifiers.EventDispatcherManager).driver(),
+				context.container.get<EventDispatcherManager>(Identifiers.Kernel.EventDispatcher.Manager).driver(),
 			);
 	}
 }

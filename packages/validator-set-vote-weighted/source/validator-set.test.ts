@@ -61,7 +61,7 @@ describe<{
 			}
 		}
 
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
+		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).to(MockEventDispatcher);
 
 		context.sandbox.app.bind(Identifiers.WalletRepositoryIndexSet).toConstantValue(getIndexSet());
 

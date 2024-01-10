@@ -28,7 +28,7 @@ describe<{
 		};
 
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.EventDispatcherService).to(MemoryEventDispatcher).inSingletonScope();
+		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
 
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
@@ -95,7 +95,9 @@ describe<{
 		context.serviceProviderRepository.fail("stub");
 
 		await assert.resolves(() =>
-			context.app.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService).dispatch(BlockEvent.Applied),
+			context.app
+				.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
+				.dispatch(BlockEvent.Applied),
 		);
 
 		spyBoot.neverCalled();
@@ -116,7 +118,9 @@ describe<{
 
 		process.env.DEFFERED_ENABLE = "true";
 
-		await context.app.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService).dispatch(BlockEvent.Applied);
+		await context.app
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
+			.dispatch(BlockEvent.Applied);
 
 		spyBoot.calledOnce();
 	});
@@ -136,7 +140,7 @@ describe<{
 		process.env.DEFFERED_ENABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyBoot.calledOnce();
@@ -159,7 +163,7 @@ describe<{
 		process.env.DEFFERED_ENABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "stub" });
 
 		spyBoot.neverCalled();
@@ -182,7 +186,7 @@ describe<{
 		process.env.DEFFERED_ENABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "expected-stub" });
 
 		spyBoot.calledOnce();
@@ -203,7 +207,7 @@ describe<{
 		process.env.DEFFERED_ENABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyBoot.neverCalled();
@@ -222,7 +226,9 @@ describe<{
 
 		process.env.DEFFERED_DISABLE = "true";
 
-		await context.app.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService).dispatch(BlockEvent.Applied);
+		await context.app
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
+			.dispatch(BlockEvent.Applied);
 
 		spyDispose.calledOnce();
 	});
@@ -241,7 +247,7 @@ describe<{
 		process.env.DEFFERED_DISABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyDispose.calledOnce();
@@ -261,7 +267,7 @@ describe<{
 		process.env.DEFFERED_ENABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "stub" });
 
 		spyDispose.neverCalled();
@@ -283,7 +289,7 @@ describe<{
 		process.env.DEFFERED_DISABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "expected-stub" });
 
 		spyDispose.calledOnce();
@@ -303,7 +309,7 @@ describe<{
 		process.env.DEFFERED_ENABLE = "true";
 
 		await context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyDispose.neverCalled();

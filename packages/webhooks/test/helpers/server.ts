@@ -21,7 +21,10 @@ const initApp = (context: Context) => {
 	};
 
 	context.app = new Application(new Container());
-	context.app.bind(Identifiers.EventDispatcherService).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
+	context.app
+		.bind(Identifiers.Kernel.EventDispatcher.Service)
+		.to(Services.Events.MemoryEventDispatcher)
+		.inSingletonScope();
 	context.app.bind(Identifiers.LogService).toConstantValue(logger);
 	context.app.bind("path.cache").toConstantValue(dirSync().name);
 	context.app.bind<Database>(WebhookIdentifiers.Database).to(Database).inSingletonScope();

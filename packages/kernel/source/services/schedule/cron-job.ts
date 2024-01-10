@@ -8,7 +8,7 @@ import { Job } from "./interfaces";
 
 @injectable()
 export class CronJob implements Job {
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	protected expression = "* * * * *";

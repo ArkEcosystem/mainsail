@@ -73,7 +73,7 @@ export class StateStore implements Contracts.State.StateStore {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
 			void this.app
-				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)
+				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
 				.dispatch(Enums.CryptoEvent.MilestoneChanged);
 		}
 	}

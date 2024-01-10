@@ -12,7 +12,7 @@ describe<{
 }>("QueueServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.EventDispatcherService).toConstantValue({});
+		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue({});
 		context.app.bind(Identifiers.LogService).toConstantValue({});
 	});
 

@@ -19,7 +19,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	protected readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	protected readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)

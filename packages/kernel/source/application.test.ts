@@ -96,7 +96,7 @@ describe<{
 	it("should boot the application", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
@@ -123,7 +123,7 @@ describe<{
 	it.skip("should reboot the application", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
@@ -379,7 +379,7 @@ describe<{
 
 	it("should enable and disable maintenance mode", (context) => {
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		context.app.bind("path.temp").toConstantValue(dirSync().name);
@@ -398,7 +398,7 @@ describe<{
 	it.skip("should terminate the application", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
@@ -422,7 +422,7 @@ describe<{
 	it.skip("should terminate the application with a reason", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
@@ -447,7 +447,7 @@ describe<{
 	it.skip("should terminate the application with an error", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Kernel.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(

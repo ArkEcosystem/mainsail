@@ -23,7 +23,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.TriggerService)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	#walletRepository!: Contracts.State.WalletRepository;

@@ -44,7 +44,7 @@ describe<{
 		const app = new Application(new Container());
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
-		app.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
+		app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(eventDispatcher);
 		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
 
 		app.bind(Identifiers.LogService).toConstantValue(logger);

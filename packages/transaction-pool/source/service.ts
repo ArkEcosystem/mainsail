@@ -26,7 +26,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.TransactionPoolExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.LogService)

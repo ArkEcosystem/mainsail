@@ -13,7 +13,7 @@ describe<{
 }>("CacheServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.EventDispatcherService).to(MemoryEventDispatcher).inSingletonScope();
+		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 	});
 
 	it("should register the service", async (context) => {
