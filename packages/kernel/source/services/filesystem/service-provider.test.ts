@@ -14,13 +14,13 @@ describe<{
 	});
 
 	it(".register", async (context) => {
-		assert.false(context.app.isBound(Identifiers.FilesystemManager));
-		assert.false(context.app.isBound(Identifiers.FilesystemService));
+		assert.false(context.app.isBound(Identifiers.Kernel.Filesystem.Manager));
+		assert.false(context.app.isBound(Identifiers.Kernel.Filesystem.Service));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.FilesystemManager));
-		assert.true(context.app.isBound(Identifiers.FilesystemService));
-		assert.instance(context.app.get(Identifiers.FilesystemService), LocalFilesystem);
+		assert.true(context.app.isBound(Identifiers.Kernel.Filesystem.Manager));
+		assert.true(context.app.isBound(Identifiers.Kernel.Filesystem.Service));
+		assert.instance(context.app.get(Identifiers.Kernel.Filesystem.Service), LocalFilesystem);
 	});
 });

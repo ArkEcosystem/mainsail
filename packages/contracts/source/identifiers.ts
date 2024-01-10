@@ -17,6 +17,10 @@ export const Identifiers = {
 			Manager: Symbol.for("Kernel<Validation.Manager>"),
 			Service: Symbol.for("Kernel<Validation.Service>"),
 		},
+		Filesystem: {
+			Manager: Symbol.for("Kernel<Filesystem.Manager>"),
+			Service: Symbol.for("Kernel<Filesystem.Service>"),
+		},
 	},
 	Application: Symbol.for("Application<Instance>"),
 	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
@@ -114,8 +118,7 @@ export const Identifiers = {
 		Registry: Symbol.for("Fee<Registry>"),
 		Type: Symbol.for("Fee<Type>"),
 	},
-	FilesystemManager: Symbol.for("Manager<Filesystem>"),
-	FilesystemService: Symbol.for("Service<Filesystem>"),
+
 	Forger: {
 		Service: Symbol.for("Forger<Service>"),
 		Tracker: Symbol.for("Forger<Tracker>"),
