@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/processor",
 	"version": "0.0.1",
-	"description": "Blockchain block processor for Mainsail",
+	"description": "Block processor for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-consensus-bls12-381",
 	"version": "0.0.1",
-	"description": "Consensus crypto for the Mainsail Blockchain",
+	"description": "Combined BLS12-381 utilities for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

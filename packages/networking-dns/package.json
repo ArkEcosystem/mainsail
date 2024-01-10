@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/networking-dns",
 	"version": "0.0.1",
-	"description": "P2P API for Mainsail",
+	"description": "DNS networking tools for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

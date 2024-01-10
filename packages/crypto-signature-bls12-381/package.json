@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-signature-bls12-381",
 	"version": "0.0.1",
-	"description": "BLS12-381 Signatures",
+	"description": "BLS12-381 signatures for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

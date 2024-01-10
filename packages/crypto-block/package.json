@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-block",
 	"version": "0.0.1",
-	"description": "Crypto utilities for the Mainsail Blockchain",
+	"description": "Block utilities for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

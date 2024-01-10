@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-hash-wasm",
 	"version": "0.0.1",
-	"description": "Hashing powered by WASM",
+	"description": "Hashing powered by WASM for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

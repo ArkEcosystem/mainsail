@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-key-pair-bls12-381",
 	"version": "0.0.1",
-	"description": "BLS12-381 Key Derivation",
+	"description": "BLS12-381 key derivation for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

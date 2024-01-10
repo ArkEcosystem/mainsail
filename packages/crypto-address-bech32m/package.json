@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-address-bech32m",
 	"version": "0.0.1",
-	"description": "bech32 Address Derivation",
+	"description": "Bech32 address derivation for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

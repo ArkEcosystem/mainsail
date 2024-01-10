@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-messages",
 	"version": "0.0.1",
-	"description": "Crypto messages for the Mainsail Blockchain",
+	"description": "Crypto messages utilities for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

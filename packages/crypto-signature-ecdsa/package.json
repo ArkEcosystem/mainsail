@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-signature-ecdsa",
 	"version": "0.0.1",
-	"description": "Elliptic Curve Cryptography (ECDSA)",
+	"description": "Elliptic Curve Cryptography (ECDSA) signatures for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

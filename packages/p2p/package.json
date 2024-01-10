@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/p2p",
 	"version": "0.0.1",
-	"description": "P2P API for Mainsail",
+	"description": "P2P for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

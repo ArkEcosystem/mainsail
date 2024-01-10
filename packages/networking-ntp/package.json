@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/networking-ntp",
 	"version": "0.0.1",
-	"description": "P2P API for Mainsail",
+	"description": "NTP networking tools for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

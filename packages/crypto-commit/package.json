@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-commit",
 	"version": "0.0.1",
-	"description": "Crypto commit for the Mainsail Blockchain",
+	"description": "Commit utilities for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

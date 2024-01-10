@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/api-sync",
 	"version": "0.0.1",
-	"description": "API Sync for Mainsail",
+	"description": "API database sync for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

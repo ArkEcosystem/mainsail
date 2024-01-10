@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/proposer",
 	"version": "0.0.1",
-	"description": "Proposer utils for Mainsail",
+	"description": "Proposer utils for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

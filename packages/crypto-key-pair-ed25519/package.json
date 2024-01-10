@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-key-pair-ed25519",
 	"version": "0.0.1",
-	"description": "ed25519 Key Derivation",
+	"description": "Ed25519 key derivation for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

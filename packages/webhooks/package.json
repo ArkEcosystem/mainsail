@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/webhooks",
 	"version": "0.0.1",
-	"description": "Webhooks for Mainsail",
+	"description": "Webhooks service for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/validator-set-vote-weighted",
 	"version": "0.0.1",
-	"description": "A vote weighted validator set for the Mainsail Blockchain",
+	"description": "Vote weighted validator strategy set for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

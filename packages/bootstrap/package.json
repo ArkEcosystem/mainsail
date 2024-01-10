@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/bootstrap",
 	"version": "0.0.1",
-	"description": "Bootstrap Manager for Mainsail",
+	"description": "Bootstrap manager for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",

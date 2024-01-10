@@ -1,7 +1,7 @@
 {
 	"name": "@mainsail/crypto-validation",
 	"version": "0.0.1",
-	"description": "Crypto utilities for the Mainsail Blockchain",
+	"description": "Crypto validation utilities for the Mainsail blockchain",
 	"license": "MIT",
 	"contributors": [],
 	"main": "distribution/index.js",
