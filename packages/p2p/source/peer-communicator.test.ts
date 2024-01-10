@@ -53,7 +53,7 @@ describeSkip<{
 			.whenTargetTagged("plugin", "p2p");
 
 		context.sandbox.app.bind(Identifiers.ApplicationVersion).toConstantValue("0.0.1");
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(eventDispatcher);
 		context.sandbox.app.bind(Identifiers.PeerConnector).toConstantValue(connector);
 		context.sandbox.app.bind(Identifiers.Kernel.Queue.Factory).toConstantValue(createQueue);

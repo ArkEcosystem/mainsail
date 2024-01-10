@@ -20,7 +20,7 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
 		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(stateService);
 

@@ -37,7 +37,7 @@ export class Exporter implements Contracts.State.Exporter {
 	@inject(Identifiers.WalletRepositoryIndexSet)
 	protected readonly indexSet!: Contracts.State.IndexSet;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async export(

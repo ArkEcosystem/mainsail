@@ -47,7 +47,7 @@ describe<{
 		app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(eventDispatcher);
 		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
 
-		app.bind(Identifiers.LogService).toConstantValue(logger);
+		app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 
 		context.database = app.get<Database>(InternalIdentifiers.Database);
 		context.database.boot();

@@ -60,7 +60,7 @@ describe<{
 
 		context.sandbox.app.useDataPath(dirSync().name);
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
+		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({
 			info: () => {},
 		});
 

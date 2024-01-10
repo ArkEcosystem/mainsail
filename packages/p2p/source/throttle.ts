@@ -18,7 +18,7 @@ export class Throttle {
 	@inject(Identifiers.Kernel.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#queue!: Contracts.Kernel.Queue;

@@ -21,6 +21,10 @@ export const Identifiers = {
 			Manager: Symbol.for("Kernel<Filesystem.Manager>"),
 			Service: Symbol.for("Kernel<Filesystem.Service>"),
 		},
+		Log: {
+			Manager: Symbol.for("Kernel<Log.Manager>"),
+			Service: Symbol.for("Kernel<Log.Service>"),
+		},
 	},
 	Application: Symbol.for("Application<Instance>"),
 	ApplicationDirPrefix: Symbol.for("Application<DirPrefix>"),
@@ -131,8 +135,6 @@ export const Identifiers = {
 		WorkerPool: Symbol.for("Ipc<WorkerPool>"),
 		WorkerSubprocessFactory: Symbol.for("Ipc<WorkerSubprocessFactory>"),
 	},
-	LogManager: Symbol.for("Manager<Log>"),
-	LogService: Symbol.for("Service<Log>"),
 	MixinService: Symbol.for("Service<Mixin>"),
 	P2P: {
 		Server: Symbol.for("P2P<Server>"),

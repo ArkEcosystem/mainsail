@@ -110,7 +110,7 @@
 
 // 		context.sandbox = new Sandbox();
 
-// 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logService);
+// 		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logService);
 // 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 // 		context.sandbox.app
 // 			.bind(Identifiers.Database.TransactionStorage)

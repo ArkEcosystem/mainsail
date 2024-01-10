@@ -96,7 +96,7 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 
 	context.sandbox.app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 
-	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({
+	context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({
 		info: (msg) => console.log(msg),
 		notice: (msg) => console.log(msg),
 		error: (msg) => console.log(msg),

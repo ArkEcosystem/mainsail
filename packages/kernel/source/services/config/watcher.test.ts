@@ -16,7 +16,7 @@ describe<{
 }>("Watcher", ({ afterAll, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.LogService).toConstantValue({});
+		context.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
 		context.app.bind("path.config").toConstantValue(configPath);
 

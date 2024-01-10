@@ -15,7 +15,7 @@ describe<{
 	beforeEach((context) => {
 		const app = new Application(new Container());
 		app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
-		app.bind(Identifiers.LogService).toConstantValue({});
+		app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
 		context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);

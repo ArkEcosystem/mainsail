@@ -4,7 +4,7 @@ import { Providers, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Broadcaster implements Contracts.P2P.Broadcaster {
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.PluginConfiguration)

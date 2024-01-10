@@ -166,7 +166,9 @@ export class Application implements Contracts.Kernel.Application {
 	public enableMaintenance(): void {
 		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).notice(
+			"Application is now in maintenance mode.",
+		);
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service).dispatch(
@@ -178,7 +180,7 @@ export class Application implements Contracts.Kernel.Application {
 	public disableMaintenance(): void {
 		removeSync(this.tempPath("maintenance"));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).notice("Application is now live.");
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service).dispatch(
@@ -195,7 +197,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#booted = false;
 
 		if (this.#terminating) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).warning(
 				"Force application termination. Graceful shutdown was interrupted.",
 			);
 			exit(1);
@@ -204,7 +206,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		const message = `reason: ${reason} error: ${error?.message}`;
 		if (reason || error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService)[error ? "error" : "warning"](message);
+			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service)[error ? "error" : "warning"](message);
 		}
 
 		if (error) {
@@ -216,12 +218,12 @@ export class Application implements Contracts.Kernel.Application {
 			}
 
 			for (const error of errors) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack ?? error.message);
+				this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).error(error.stack ?? error.message);
 			}
 		}
 
 		const timeout = setTimeout(() => {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).warning(
 				"Force application termination. Service providers did not dispose in time.",
 			);
 			exit(1);
@@ -235,7 +237,9 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.#logOpenHandlers();
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is gracefully terminated.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).notice(
+			"Application is gracefully terminated.",
+		);
 
 		exit(1);
 	}
@@ -311,7 +315,9 @@ export class Application implements Contracts.Kernel.Application {
 		).allLoadedProviders();
 
 		for (const serviceProvider of serviceProviders.reverse()) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).debug(`Disposing ${serviceProvider.name()}...`);
+			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).debug(
+				`Disposing ${serviceProvider.name()}...`,
+			);
 
 			try {
 				await serviceProvider.dispose();
@@ -328,7 +334,7 @@ export class Application implements Contracts.Kernel.Application {
 			const fsRequests = resourcesInfo.filter((resource) => resource.includes("FSReqCallback"));
 
 			if (timeouts.length > 0 || fsRequests.length > 0) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+				this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).warning(
 					`There are ${timeouts.length} active timeouts and ${fsRequests.length} active file system requests.`,
 				);
 			}

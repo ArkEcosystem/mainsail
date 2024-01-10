@@ -10,7 +10,7 @@ export class Checker {
 	@tagged("plugin", "networking-dns")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(): Promise<void> {

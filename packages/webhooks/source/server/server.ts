@@ -23,7 +23,7 @@ export class Server {
 	@inject(InternalIdentifiers.Database)
 	private readonly database!: Database;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#server!: WebhookServer;

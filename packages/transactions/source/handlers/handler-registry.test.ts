@@ -181,7 +181,7 @@ describe<{
 
 		app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Identifiers.ApplicationNamespace).toConstantValue("ark-unitnet");
-		app.bind(Identifiers.LogService).toConstantValue({});
+		app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 
 		app.bind<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes).toConstantValue(
 			getAttributeRepository(),

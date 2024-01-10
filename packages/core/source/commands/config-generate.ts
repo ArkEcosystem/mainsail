@@ -1,7 +1,7 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts as AppContracts } from "@mainsail/contracts";
+import { Contracts as AppContracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
 import path from "path";
@@ -224,7 +224,7 @@ export class Command extends Commands.Command {
 		};
 
 		const configurationApp = await makeApplication(this.#getConfigurationPath(options), options);
-		configurationApp.bind(Identifiers.LogService).toConstantValue(this.logger);
+		configurationApp.bind(AppIdentifiers.Kernel.Log.Service).toConstantValue(this.logger);
 
 		if (flags.force || allFlagsSet) {
 			return configurationApp

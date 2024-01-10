@@ -25,7 +25,7 @@ const initApp = (context: Context) => {
 		.bind(Identifiers.Kernel.EventDispatcher.Service)
 		.to(Services.Events.MemoryEventDispatcher)
 		.inSingletonScope();
-	context.app.bind(Identifiers.LogService).toConstantValue(logger);
+	context.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 	context.app.bind("path.cache").toConstantValue(dirSync().name);
 	context.app.bind<Database>(WebhookIdentifiers.Database).to(Database).inSingletonScope();
 	context.app.get<Database>(WebhookIdentifiers.Database).boot();

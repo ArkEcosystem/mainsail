@@ -29,7 +29,7 @@ describe<{
 
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
-		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
 
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProviderRepository,

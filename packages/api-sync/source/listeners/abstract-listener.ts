@@ -22,7 +22,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 	@inject(Identifiers.Kernel.EventDispatcher.Service)
 	protected readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
 	#syncInterval?: NodeJS.Timeout;

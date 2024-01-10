@@ -40,7 +40,7 @@ describeSkip<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 
 		context.peerConnector = context.sandbox.app.resolve(PeerConnectorProxy);
 	});

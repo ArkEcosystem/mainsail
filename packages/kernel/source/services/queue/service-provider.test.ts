@@ -13,7 +13,7 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue({});
-		context.app.bind(Identifiers.LogService).toConstantValue({});
+		context.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 	});
 
 	it("should register the service", async (context) => {

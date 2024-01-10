@@ -33,7 +33,7 @@ const init = (context: Context) => {
 	app.bind(Identifiers.TransactionHandlerRegistry).toConstantValue({});
 	app.bind(Identifiers.StandardCriteriaService).toConstantValue({});
 	app.bind(Identifiers.Kernel.EventDispatcher.Service).to(NullEventDispatcher);
-	app.bind(Identifiers.LogService).toConstantValue(logger);
+	app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);

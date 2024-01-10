@@ -42,7 +42,7 @@ describe<{
 			notice: () => {},
 		};
 
-		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
 	});
 
 	afterEach(() => {

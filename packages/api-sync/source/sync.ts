@@ -68,7 +68,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 	@inject(Identifiers.TransactionHandlerRegistry)
 	private readonly transactionHandlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.PluginConfiguration)

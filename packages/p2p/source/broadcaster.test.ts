@@ -22,7 +22,7 @@ describeSkip<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(repository);
 		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);

@@ -8,7 +8,7 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {

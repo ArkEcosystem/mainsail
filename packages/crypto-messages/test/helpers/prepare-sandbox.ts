@@ -34,7 +34,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoConfig).register();
 
 	context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
-	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+	context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 	await context.sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();

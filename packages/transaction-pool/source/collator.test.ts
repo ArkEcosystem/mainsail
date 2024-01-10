@@ -46,7 +46,7 @@ describe<{
 		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
 		context.container.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
 		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
-		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 

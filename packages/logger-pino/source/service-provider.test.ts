@@ -20,11 +20,11 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 	it("should register", async (context) => {
 		context.app
-			.bind<Services.Log.LogManager>(Identifiers.LogManager)
+			.bind<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager)
 			.to(Services.Log.LogManager)
 			.inSingletonScope();
 
-		await context.app.get<Services.Log.LogManager>(Identifiers.LogManager).boot();
+		await context.app.get<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager).boot();
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
@@ -36,11 +36,11 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 	it("should be disposable", async (context) => {
 		context.app
-			.bind<Services.Log.LogManager>(Identifiers.LogManager)
+			.bind<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager)
 			.to(Services.Log.LogManager)
 			.inSingletonScope();
 
-		await context.app.get<Services.Log.LogManager>(Identifiers.LogManager).boot();
+		await context.app.get<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager).boot();
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
@@ -48,9 +48,9 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.app
-			.bind(Identifiers.LogService)
+			.bind(Identifiers.Kernel.Log.Service)
 			.toDynamicValue((context: Container.interfaces.Context) =>
-				context.container.get<Services.Log.LogManager>(Identifiers.LogManager).driver(),
+				context.container.get<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager).driver(),
 			);
 
 		await assert.resolves(() => context.serviceProvider.register());

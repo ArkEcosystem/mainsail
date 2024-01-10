@@ -8,7 +8,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	@tagged("plugin", "crypto-worker")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Ipc.WorkerFactory)

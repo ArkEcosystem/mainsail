@@ -14,18 +14,18 @@ describe<{
 	});
 
 	it("should register the service", async (context) => {
-		assert.false(context.app.isBound(Identifiers.LogManager));
-		assert.false(context.app.isBound(Identifiers.LogService));
+		assert.false(context.app.isBound(Identifiers.Kernel.Log.Manager));
+		assert.false(context.app.isBound(Identifiers.Kernel.Log.Service));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.LogManager));
-		assert.true(context.app.isBound(Identifiers.LogService));
+		assert.true(context.app.isBound(Identifiers.Kernel.Log.Manager));
+		assert.true(context.app.isBound(Identifiers.Kernel.Log.Service));
 	});
 
 	it("should create an instance of the MemoryPipeline", async (context) => {
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.instance(context.app.get<Contracts.Kernel.Logger>(Identifiers.LogService), MemoryLogger);
+		assert.instance(context.app.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service), MemoryLogger);
 	});
 });

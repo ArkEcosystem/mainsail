@@ -85,7 +85,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		warning: spy(),
 	};
 
-	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 
 	sandbox.app.bind(Identifiers.WalletRepositoryIndexSet).to(IndexSet).inSingletonScope();
 	sandbox.app

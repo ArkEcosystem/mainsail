@@ -69,7 +69,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
