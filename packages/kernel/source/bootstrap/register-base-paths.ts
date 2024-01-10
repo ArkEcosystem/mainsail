@@ -14,7 +14,7 @@ export class RegisterBasePaths implements Bootstrapper {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.ConfigRepository)
+	@inject(Identifiers.Kernel.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
 	public async bootstrap(): Promise<void> {

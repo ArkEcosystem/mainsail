@@ -16,7 +16,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 
 	private workers: IpcWorker.Worker[] = [];
 
-	@inject(Identifiers.ConfigFlags)
+	@inject(Identifiers.Kernel.Config.Flags)
 	private readonly flags!: Types.KeyValuePair;
 
 	#currentWorkerIndex = 0;

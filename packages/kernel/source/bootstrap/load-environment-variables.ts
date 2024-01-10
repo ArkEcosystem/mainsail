@@ -10,10 +10,10 @@ export class LoadEnvironmentVariables implements Bootstrapper {
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
-		const configRepository: ConfigRepository = this.app.get<ConfigRepository>(Identifiers.ConfigRepository);
+		const configRepository: ConfigRepository = this.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository);
 
 		await this.app
-			.get<ConfigManager>(Identifiers.ConfigManager)
+			.get<ConfigManager>(Identifiers.Kernel.Config.Manager)
 			.driver(configRepository.get<string>("configLoader", "local"))
 			.loadEnvironmentVariables();
 	}

@@ -148,7 +148,7 @@ describe<{
 	});
 
 	it("should get and set the given configuration value", (context) => {
-		context.app.get<ConfigRepository>(Identifiers.ConfigRepository).merge({ key: "Hello World" });
+		context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).merge({ key: "Hello World" });
 
 		assert.is(context.app.config("key"), "Hello World");
 

@@ -13,7 +13,7 @@ const loadDefaults = () => importFresh("./defaults").defaults;
 describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.ConfigFlags).toConstantValue("core");
+		context.app.bind(Identifiers.Kernel.Config.Flags).toConstantValue("core");
 
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});

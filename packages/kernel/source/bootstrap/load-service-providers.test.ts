@@ -22,7 +22,7 @@ describe<{
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 
-		context.configRepository = context.app.get<ConfigRepository>(Identifiers.ConfigRepository);
+		context.configRepository = context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository);
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProviderRepository,
 		);

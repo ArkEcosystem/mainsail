@@ -58,7 +58,7 @@ export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.
 		},
 		plugins: transformPlugins(
 			getPluginsConfig(
-				app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("app.plugins"),
+				app.get<Services.Config.ConfigRepository>(Identifiers.Kernel.Config.Repository).get("app.plugins"),
 				app,
 			),
 		),

@@ -25,7 +25,7 @@ export class LoadServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.ConfigRepository)
+	@inject(Identifiers.Kernel.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
 	@inject(Identifiers.ServiceProviderRepository)

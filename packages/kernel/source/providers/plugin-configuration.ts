@@ -9,7 +9,7 @@ import { ConfigRepository } from "../services/config";
 
 @injectable()
 export class PluginConfiguration {
-	@inject(Identifiers.ConfigRepository)
+	@inject(Identifiers.Kernel.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
 	#items: Contracts.Types.JsonObject = {};
