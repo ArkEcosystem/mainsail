@@ -166,8 +166,6 @@ export const Identifiers = {
 	PipelineFactory: Symbol.for("Factory<Pipeline>"),
 	PipelineService: Symbol.for("Service<Pipeline>"),
 	PluginConfiguration: Symbol.for("PluginConfiguration"),
-	ProcessActionsManager: Symbol.for("Manager<ProcessAction>"),
-	ProcessActionsService: Symbol.for("Service<ProcessActions>"),
 	Proposer: {
 		Selector: Symbol.for("Proposer<Selector>"),
 	},
