@@ -65,6 +65,7 @@ export const blockCriteriaSchemas = {
 	blockSignature: orEqualCriteria(Joi.string().hex()),
 	generatorPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
 	height: orNumericCriteria(Joi.number().integer().min(0)),
+	round: orNumericCriteria(Joi.number().integer().min(0)),
 	id: orEqualCriteria(blockId),
 	numberOfTransactions: orNumericCriteria(Joi.number().integer().min(0)),
 	payloadHash: orEqualCriteria(Joi.string().hex()),
