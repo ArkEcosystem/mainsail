@@ -3,6 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import * as ApiNodes from "./routes/api-nodes";
 import * as Blockchain from "./routes/blockchain";
 import * as Blocks from "./routes/blocks";
+import * as Commits from "./routes/commits";
 import * as Delegates from "./routes/delegates";
 import * as Node from "./routes/node";
 import * as Peers from "./routes/peers";
@@ -18,6 +19,7 @@ export = {
 			ApiNodes,
 			Blocks,
 			Blockchain,
+			Commits,
 			Delegates,
 			Peers,
 			Transactions,
