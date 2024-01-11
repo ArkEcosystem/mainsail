@@ -23,7 +23,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "b17da79a16b43ba4e12adafb700a6125ce44359c111c8d5dda71fda385bb0d5205e8816de28bcfa21c66c36229dddbaf"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1guj9spfeugkau5kj2le788n04xg3vkwaescm3v5hrd0dyrssapesptz84v",
@@ -49,7 +50,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "ae1e968eab8da5afe443b71941fd132b542c774abad190586ab78827bdb8d816ac914e6e15f14d962e3399d4147c08e6"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1rqxw2ftnqds0lhg9e5qetw49ghlqmspy8hqnvtu9v36l3szzn4csvfx6zn",
@@ -75,7 +77,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "9283a37556aa42aa7e2ee363fdd63adb8e91d2a97fe61c55a298075f4075471762371209f190d6d1f674b882e039b78b"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1takyl3fwu644kdhpg26tawszppcayc8a2lk3x7rzk3aa9f93r96szr907f",
@@ -101,7 +104,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "9429b3ab3d55edc1169dbcee25d070075b5fd2b372bb8b4f67bf82d7d9a37ca7f874a8fb54a200b6bc539f786952122c"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1hfvs4y9ssskh082fe3ermzzk87r0m354eupjcyaeemd5yfs94zxsx4776m",
@@ -127,7 +131,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8b305af5825449c9a6a9a7468386a4c033b0db5b12d53aa0baa3b6809c82413d08305b23e707bd93063749109c2a521a"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1lxtpceetcx4w2nwu3v2zkwkufvae4n9kjl7xkp5l5grsuckdyy4qmnuguf",
@@ -153,7 +158,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8190ec14239cca612ae08b095876fdf2e7dc01c794c0d9182a7ad9b896eace7c50adf66bcec19c3dbc67c3ff0be4e004"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark100290nk8kv6a4gv5anuma4rgxmklh2e8n86hqqmw672j3juhxw8q6lny66",
@@ -179,7 +185,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "a48fa3df67f833f33082fa72ef25bacd0a87b46bf70287139e388e4607de7e9eebc8d3084d7c742fc51104b655ce3a9b"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1y4veyfsm5ez9v3nmfpfue6ml4q3f6f987rl7cn23rex92aefrvjq059h9n",
@@ -205,6 +212,7 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "b06f94ebadefd0bfb2aa41e27c3159aa4f9717adccda775978a01330833dc03bfeea8e3b3e7f64fb66a909a8188ff7b1"
-		}
+		},
+		"updated_at": "0"
 	}
 ]
