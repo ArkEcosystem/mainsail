@@ -186,5 +186,6 @@ export * from "./uniq-by";
 export * from "./unset";
 export * from "./upper-case";
 export * from "./upper-first";
+export * from "./validator-set-pack";
 export * from "./words";
 export * from "./zip-object";
