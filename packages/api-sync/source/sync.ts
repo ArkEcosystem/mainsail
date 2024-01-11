@@ -158,6 +158,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 				balance: wallet.getBalance().toFixed(),
 				nonce: wallet.getNonce().toFixed(),
 				publicKey: wallet.getPublicKey()!,
+				updated_at: header.height.toFixed(),
 			})),
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
