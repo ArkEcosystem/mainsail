@@ -6,8 +6,7 @@ import {
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types, Utils } from "@mainsail/kernel";
-import { validatorSetPack } from "@mainsail/utils";
-import { sleep } from "@mainsail/utils";
+import { sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import * as ApiSyncContracts from "./contracts";
@@ -166,8 +165,8 @@ export class Sync implements Contracts.ApiSync.Sync {
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
-					validatorRound: this.#createValidatorRound(header.height + 1),
-				}
+						validatorRound: this.#createValidatorRound(header.height + 1),
+					}
 				: {}),
 		};
 

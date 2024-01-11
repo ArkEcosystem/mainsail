@@ -8,35 +8,35 @@ import wallets from "../../test/fixtures/wallets.json";
 import validatorRounds from "../../test/fixtures/validator-rounds.json";
 
 describe<{
-    sandbox: Sandbox;
+	sandbox: Sandbox;
 }>("Commits", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
-    let apiContext: ApiContext;
+	let apiContext: ApiContext;
 
-    beforeAll(async (context) => {
-        nock.enableNetConnect();
-        apiContext = await prepareSandbox(context);
-    });
+	beforeAll(async (context) => {
+		nock.enableNetConnect();
+		apiContext = await prepareSandbox(context);
+	});
 
-    afterAll((context) => {
-        nock.disableNetConnect();
-        apiContext.dispose();
-    });
+	afterAll((context) => {
+		nock.disableNetConnect();
+		apiContext.dispose();
+	});
 
-    beforeEach(async (context) => {
-        await apiContext.reset();
-        await apiContext.walletRepository.save(wallets);
-    });
+	beforeEach(async (context) => {
+		await apiContext.reset();
+		await apiContext.walletRepository.save(wallets);
+	});
 
-    afterEach(async (context) => {
-        await apiContext.reset();
-    });
+	afterEach(async (context) => {
+		await apiContext.reset();
+	});
 
-    it("/commits/{id}", async () => {
-        await apiContext.blockRepository.save(blocks);
-        await apiContext.validatorRoundRepository.save(validatorRounds);
+	it("/commits/{id}", async () => {
+		await apiContext.blockRepository.save(blocks);
+		await apiContext.validatorRoundRepository.save(validatorRounds);
 
-        const { statusCode, data } = await request("/commits/1");
-        assert.equal(statusCode, 200);
-        assert.equal(data.data, commit);
-    });
+		const { statusCode, data } = await request("/commits/1");
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, commit);
+	});
 });
