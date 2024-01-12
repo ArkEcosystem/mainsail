@@ -81,14 +81,18 @@ export const Identifiers = {
 		Validator: Symbol.for("Crypto<Validator>"),
 	},
 	Database: {
-		BlockStorage: Symbol.for("Database<BlockStorage>"),
-		ConsensusStateStorage: Symbol.for("Database<ConsensusStateStorage>"),
-		ConsensusStorage: Symbol.for("Database<ConsensusStorage>"),
-		PrecommitStorage: Symbol.for("Database<PrecommitStorage>"),
-		PrevoteStorage: Symbol.for("Database<PrevoteStorage>"),
-		ProposalStorage: Symbol.for("Database<ProposalStorage>"),
-		RootStorage: Symbol.for("Database<RootStorage>"),
+		Instance: {
+			Consensus: Symbol.for("Database<Instance.Root>"),
+			Root: Symbol.for("Database<Instance.Root>"),
+		},
 		Service: Symbol.for("Database<Service>"),
+		Storage: {
+			Block: Symbol.for("Database<Storage.Block>"),
+			ConsensusState: Symbol.for("Database<Storage.ConsensusState>"),
+			Precommit: Symbol.for("Database<Storage.Precommit>"),
+			Prevote: Symbol.for("Database<Storage.Prevote>"),
+			Proposal: Symbol.for("Database<Storage.Proposal>"),
+		},
 	},
 	Fee: {
 		Matcher: Symbol.for("Fee<Matcher>"),

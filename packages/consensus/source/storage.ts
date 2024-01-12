@@ -4,16 +4,16 @@ import { Database, Key } from "lmdb";
 
 @injectable()
 export class Storage implements Contracts.Consensus.ConsensusStorage {
-	@inject(Identifiers.Database.ProposalStorage)
+	@inject(Identifiers.Database.Storage.Proposal)
 	private readonly proposalStorage!: Database;
 
-	@inject(Identifiers.Database.PrevoteStorage)
+	@inject(Identifiers.Database.Storage.Prevote)
 	private readonly prevoteStorage!: Database;
 
-	@inject(Identifiers.Database.PrecommitStorage)
+	@inject(Identifiers.Database.Storage.Precommit)
 	private readonly precommitStorage!: Database;
 
-	@inject(Identifiers.Database.ConsensusStateStorage)
+	@inject(Identifiers.Database.Storage.ConsensusState)
 	private readonly stateStorage!: Database;
 
 	@inject(Identifiers.ValidatorSet)

@@ -96,7 +96,7 @@ describe<{
 		databaseService.addCommit(commit);
 
 		assert.defined(await databaseService.getBlock(commit.block.data.height));
-		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 0);
+		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 0);
 	});
 
 	it("#persist - should store a commit", async ({ databaseService, sandbox }) => {
@@ -107,7 +107,7 @@ describe<{
 		await databaseService.persist();
 
 		assert.defined(await databaseService.getBlock(commit.block.data.height));
-		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
+		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 1);
 	});
 
 	it("#persist - should store a commit only once", async ({ databaseService, sandbox }) => {
@@ -120,7 +120,7 @@ describe<{
 		await databaseService.persist();
 
 		assert.defined(await databaseService.getBlock(commit.block.data.height));
-		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.BlockStorage).getKeysCount(), 1);
+		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 1);
 	});
 
 	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {

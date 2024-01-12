@@ -168,7 +168,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
 	sandbox.app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
-	sandbox.app.bind(Identifiers.Database.BlockStorage).toConstantValue({
+	sandbox.app.bind(Identifiers.Database.Storage.Block).toConstantValue({
 		deleteBlocks: () => {},
 		deleteTopBlocks: () => {},
 		saveBlocks: () => {},

@@ -4,7 +4,7 @@ import { Database } from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
-	@inject(Identifiers.Database.BlockStorage)
+	@inject(Identifiers.Database.Storage.Block)
 	private readonly blockStorage!: Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
