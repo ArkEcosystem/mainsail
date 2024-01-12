@@ -43,12 +43,12 @@ describe<{
 	it("should register, boot and dispose", async (context) => {
 		await assert.resolves(() => context.serviceProvider.register());
 
-		context.app.rebind(Identifiers.TransactionPoolStorage).toConstantValue({
+		context.app.rebind(Identifiers.TransactionPool.Storage).toConstantValue({
 			boot: () => {},
 			dispose: () => {},
 		});
 
-		context.app.rebind(Identifiers.TransactionPoolService).toConstantValue({
+		context.app.rebind(Identifiers.TransactionPool.Service).toConstantValue({
 			boot: () => {},
 			dispose: () => {},
 		});

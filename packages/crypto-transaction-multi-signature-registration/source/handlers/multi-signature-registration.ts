@@ -8,7 +8,7 @@ import { MultiSignatureRegistrationTransaction } from "../versions";
 
 @injectable()
 export class MultiSignatureRegistrationTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)

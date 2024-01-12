@@ -56,7 +56,7 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app.bind(Identifiers.PeerApiNodeRepository).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue({});

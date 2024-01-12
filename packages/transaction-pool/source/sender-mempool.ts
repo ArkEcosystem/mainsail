@@ -8,7 +8,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.TransactionPoolSenderState)
+	@inject(Identifiers.TransactionPool.SenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
 	#concurrency = 0;

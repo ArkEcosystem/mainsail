@@ -16,7 +16,7 @@ export class Bootstrapper {
 	@inject(Identifiers.StateVerifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.P2PServer)

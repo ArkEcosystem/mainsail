@@ -6,13 +6,13 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	@inject(Identifiers.TransactionValidatorFactory)
 	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	@inject(Identifiers.Kernel.Log.Service)

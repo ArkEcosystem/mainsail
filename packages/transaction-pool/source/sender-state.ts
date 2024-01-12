@@ -17,7 +17,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.StateService)
 	private stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
 	@inject(Identifiers.TriggerService)

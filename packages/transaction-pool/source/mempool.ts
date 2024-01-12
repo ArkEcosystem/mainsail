@@ -7,7 +7,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.TransactionPoolSenderMempoolFactory)
+	@inject(Identifiers.TransactionPool.SenderMempoolFactory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
 	@inject(Identifiers.Cryptography.Identity.AddressFactory)

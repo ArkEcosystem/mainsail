@@ -14,7 +14,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.TransactionProcessor)

@@ -9,10 +9,10 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.TransactionPoolCollator)
+	@inject(Identifiers.TransactionPool.Collator)
 	private readonly collator!: Contracts.TransactionPool.Collator;
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.Cryptography.Block.Factory)

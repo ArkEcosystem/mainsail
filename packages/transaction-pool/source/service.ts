@@ -14,16 +14,16 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.Fee.Matcher)
 	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
 
-	@inject(Identifiers.TransactionPoolStorage)
+	@inject(Identifiers.TransactionPool.Storage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
 
-	@inject(Identifiers.TransactionPoolMempool)
+	@inject(Identifiers.TransactionPool.Mempool)
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
-	@inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
 	@inject(Identifiers.Kernel.EventDispatcher.Service)

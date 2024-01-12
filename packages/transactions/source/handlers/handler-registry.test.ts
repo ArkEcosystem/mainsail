@@ -187,7 +187,7 @@ describe<{
 			getAttributeRepository(),
 		);
 		app.bind(Identifiers.StateService).toConstantValue({});
-		app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
+		app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
 		app.bind(Identifiers.Cryptography.Validator).to(Validator);

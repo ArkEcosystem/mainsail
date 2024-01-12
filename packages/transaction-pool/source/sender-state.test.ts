@@ -55,7 +55,9 @@ describe<{
 		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
 		context.container.bind(Identifiers.TransactionHandlerRegistry).toConstantValue(context.handlerRegistry);
 		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
-		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
+		context.container
+			.bind(Identifiers.TransactionPool.ExpirationService)
+			.toConstantValue(context.expirationService);
 		context.container.bind(Identifiers.TriggerService).toConstantValue(context.triggers);
 		context.container.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(context.emitter);
 		context.container.bind(Identifiers.StateService).toConstantValue(context.stateService);

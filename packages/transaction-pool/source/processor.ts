@@ -3,11 +3,11 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
-	@multiInject(Identifiers.TransactionPoolProcessorExtension)
+	@multiInject(Identifiers.TransactionPool.ProcessorExtension)
 	@optional()
 	private readonly extensions: Contracts.TransactionPool.ProcessorExtension[] = [];
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.PeerBroadcaster)

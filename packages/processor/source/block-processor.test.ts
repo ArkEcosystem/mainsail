@@ -124,7 +124,7 @@
 // 			.bind(Identifiers.TransactionHandlerRegistry)
 // 			.toConstantValue(context.transactionHandlerRegistry);
 // 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
-// 		context.sandbox.app.bind(Identifiers.TransactionPoolService).toConstantValue({});
+// 		context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Verifier).toConstantValue(context.blockVerifier);

@@ -21,13 +21,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		this.app.get<Storage>(Identifiers.TransactionPoolStorage).boot();
-		await this.app.get<Service>(Identifiers.TransactionPoolService).boot();
+		this.app.get<Storage>(Identifiers.TransactionPool.Storage).boot();
+		await this.app.get<Service>(Identifiers.TransactionPool.Service).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		this.app.get<Service>(Identifiers.TransactionPoolService).dispose();
-		this.app.get<Storage>(Identifiers.TransactionPoolStorage).dispose();
+		this.app.get<Service>(Identifiers.TransactionPool.Service).dispose();
+		this.app.get<Storage>(Identifiers.TransactionPool.Storage).dispose();
 	}
 
 	public async required(): Promise<boolean> {
@@ -51,21 +51,22 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
 		this.app.bind(Identifiers.TransactionValidatorFactory).toAutoFactory(Identifiers.TransactionValidator);
 
-		this.app.bind(Identifiers.TransactionPoolCollator).to(Collator);
-		this.app.bind(Identifiers.TransactionPoolExpirationService).to(ExpirationService);
-		this.app.bind(Identifiers.TransactionPoolMempool).to(Mempool).inSingletonScope();
-		this.app.bind(Identifiers.TransactionPoolProcessor).to(Processor);
-		this.app.bind(Identifiers.TransactionPoolProcessorFactory).toAutoFactory(Identifiers.TransactionPoolProcessor);
-		this.app.bind(Identifiers.TransactionPoolQuery).to(Query);
-		this.app.bind(Identifiers.TransactionPoolSenderMempool).to(SenderMempool);
-		this.app.bind(Identifiers.TransactionPoolSenderMempoolFactory).toFactory(
+		this.app.bind(Identifiers.TransactionPool.Collator).to(Collator);
+		this.app.bind(Identifiers.TransactionPool.ExpirationService).to(ExpirationService);
+		this.app.bind(Identifiers.TransactionPool.Mempool).to(Mempool).inSingletonScope();
+		this.app.bind(Identifiers.TransactionPool.Processor).to(Processor);
+		this.app
+			.bind(Identifiers.TransactionPool.ProcessorFactory)
+			.toAutoFactory(Identifiers.TransactionPool.Processor);
+		this.app.bind(Identifiers.TransactionPool.Query).to(Query);
+		this.app.bind(Identifiers.TransactionPool.SenderMempoolFactory).toFactory(
 			({ container }) =>
 				async (publicKey: string) =>
 					await container.resolve(SenderMempool).configure(publicKey),
 		);
-		this.app.bind(Identifiers.TransactionPoolSenderState).to(SenderState);
-		this.app.bind(Identifiers.TransactionPoolService).to(Service).inSingletonScope();
-		this.app.bind(Identifiers.TransactionPoolStorage).to(Storage).inSingletonScope();
+		this.app.bind(Identifiers.TransactionPool.SenderState).to(SenderState);
+		this.app.bind(Identifiers.TransactionPool.Service).to(Service).inSingletonScope();
+		this.app.bind(Identifiers.TransactionPool.Storage).to(Storage).inSingletonScope();
 	}
 
 	#registerActions(): void {

@@ -332,7 +332,7 @@ describe<{
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
 		await context.app
-			.get<Mempool>(Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPool.Mempool)
 			.addTransaction(context.multiSignatureTransaction);
 
 		await assert.rejects(
@@ -357,7 +357,7 @@ describe<{
 			.build();
 
 		await context.app
-			.get<Mempool>(Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPool.Mempool)
 			.addTransaction(context.multiSignatureTransaction);
 
 		await assert.rejects(

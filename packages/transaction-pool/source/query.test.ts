@@ -21,7 +21,7 @@ describe<{
 		};
 
 		context.container = new Container();
-		context.container.bind(Identifiers.TransactionPoolMempool).toConstantValue(context.mempool);
+		context.container.bind(Identifiers.TransactionPool.Mempool).toConstantValue(context.mempool);
 	});
 
 	beforeEach((context) => {

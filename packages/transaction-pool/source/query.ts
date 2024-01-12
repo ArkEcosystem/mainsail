@@ -83,7 +83,7 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 
 @injectable()
 export class Query implements Contracts.TransactionPool.Query {
-	@inject(Identifiers.TransactionPoolMempool)
+	@inject(Identifiers.TransactionPool.Mempool)
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
 	public getAll(): QueryIterable {

@@ -60,10 +60,10 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	};
 	context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
 
-	context.sandbox.app.bind(Identifiers.TransactionPoolCollator).toConstantValue({
+	context.sandbox.app.bind(Identifiers.TransactionPool.Collator).toConstantValue({
 		getBlockCandidateTransactions: () => [],
 	});
-	context.sandbox.app.bind(Identifiers.TransactionPoolService).toConstantValue({});
+	context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
 
 	context.sandbox.app.bind(Identifiers.StateService).toConstantValue({
 		getStateStore: () => ({
