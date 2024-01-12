@@ -129,9 +129,9 @@
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Verifier).toConstantValue(context.blockVerifier);
 
-// 		context.sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+// 		context.sandbox.app.bind(Identifiers.Kernel.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 // 		context.sandbox.app
-// 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+// 			.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
 // 			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
 
 // 		context.baseBlock = {

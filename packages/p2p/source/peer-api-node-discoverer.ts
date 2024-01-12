@@ -33,7 +33,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 
 			for (const apiNode of apiNodes) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
 					.call("validateAndAcceptApiNode", { apiNode, options: {} });
 			}
 		} catch (error) {
@@ -53,7 +53,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 		return Promise.all(
 			Object.values(apiNodes).map((apiNode: Contracts.P2P.PeerApiNode) =>
 				this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
 					.call("validateAndAcceptApiNode", { apiNode, options: { seed: true } }),
 			),
 		);
@@ -74,7 +74,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 				)
 				.map((apiNode) =>
 					this.app
-						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+						.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
 						.call("revalidateApiNode", { apiNode }),
 				),
 		);

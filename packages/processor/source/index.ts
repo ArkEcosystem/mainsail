@@ -21,7 +21,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerActions(): void {
 		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
 			.bind("processBlock", new ProcessBlockAction());
 	}
 }

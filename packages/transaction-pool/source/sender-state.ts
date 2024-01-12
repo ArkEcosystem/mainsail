@@ -20,7 +20,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@inject(Identifiers.TriggerService)
+	@inject(Identifiers.Kernel.Trigger.Service)
 	private readonly triggers!: Services.Triggers.Triggers;
 
 	@inject(Identifiers.Kernel.EventDispatcher.Service)

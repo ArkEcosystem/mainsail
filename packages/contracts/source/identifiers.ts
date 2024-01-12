@@ -146,6 +146,9 @@ export const Identifiers = {
 		Schedule: {
 			Service: Symbol("Kernel<Schedule.Service>"),
 		},
+		Trigger: {
+			Service: Symbol("Kernel<Trigger.Service>"),
+		},
 		Validation: {
 			Manager: Symbol("Kernel<Validation.Manager>"),
 			Service: Symbol("Kernel<Validation.Service>"),
@@ -235,6 +238,5 @@ export const Identifiers = {
 	TransactionProcessor: Symbol("Transaction<Processor>"),
 	TransactionValidator: Symbol("State<TransactionValidator>"),
 	TransactionValidatorFactory: Symbol("State<TransactionValidatorFactory>"),
-	TriggerService: Symbol("Service<Actions>"),
 	ValidatorSet: Symbol("Set<ValidatorSet>"),
 };

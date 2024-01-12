@@ -43,7 +43,7 @@ describeSkip<{
 		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(emitter);
 		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(repository);
-		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+		context.sandbox.app.bind(Identifiers.Kernel.Trigger.Service).toConstantValue(triggerService);
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
 		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");

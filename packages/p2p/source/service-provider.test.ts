@@ -20,7 +20,7 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+		context.sandbox.app.bind(Identifiers.Kernel.Trigger.Service).toConstantValue(triggerService);
 		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 
 		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
@@ -94,7 +94,7 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.TriggerService).toConstantValue(triggerService);
+		context.sandbox.app.bind(Identifiers.Kernel.Trigger.Service).toConstantValue(triggerService);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getMilestone: () => ({
 				activeValidators: 2,

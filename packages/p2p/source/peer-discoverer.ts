@@ -25,7 +25,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 			for (const peer of peers) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
 					.call("validateAndAcceptPeer", { ip: peer.ip, options: {} });
 			}
 		} catch (error) {
@@ -62,7 +62,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		return Promise.all(
 			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
 				this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
 					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } }),
 			),
 		);

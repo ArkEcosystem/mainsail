@@ -14,7 +14,7 @@ describe<{
 }>("ServiceProvider", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
 		const app = new Application(new Container());
-		app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		app.bind(Identifiers.Kernel.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 		app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 

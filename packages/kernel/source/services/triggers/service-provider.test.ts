@@ -12,11 +12,11 @@ describe<{
 		context.app = new Application(new Container());
 	});
 	it(".register", async (context) => {
-		assert.false(context.app.isBound(Identifiers.TriggerService));
+		assert.false(context.app.isBound(Identifiers.Kernel.Trigger.Service));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.TriggerService));
-		assert.instance(context.app.get(Identifiers.TriggerService), Triggers);
+		assert.true(context.app.isBound(Identifiers.Kernel.Trigger.Service));
+		assert.instance(context.app.get(Identifiers.Kernel.Trigger.Service), Triggers);
 	});
 });
