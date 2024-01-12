@@ -31,7 +31,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
-		context.sandbox.app.bind(Identifiers.State.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
+		context.sandbox.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 
 		context.validatorSet = context.sandbox.app.resolve(ValidatorSet);

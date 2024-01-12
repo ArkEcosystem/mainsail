@@ -81,7 +81,7 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.State.Wallet.Factory)
 			.toFactory(() => walletFactory(context.sandbox.app.get(Identifiers.State.Wallet.Attributes)));
-		context.sandbox.app.bind(Identifiers.State.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
+		context.sandbox.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 
 		context.walletRepository = context.sandbox.app.resolve(Wallets.WalletRepository);
 

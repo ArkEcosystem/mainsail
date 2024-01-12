@@ -11,7 +11,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.ValidatorSet {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.State.ValidatorWalletFactory)
+	@inject(Identifiers.State.ValidatorWallet.Factory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
 	#validators: Contracts.State.ValidatorWallet[] = [];

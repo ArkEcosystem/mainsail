@@ -187,9 +187,13 @@ export const Identifiers = {
 		Exporter: Symbol.for("State<Exporter>"),
 		Importer: Symbol.for("State<Importer>"),
 		Service: Symbol.for("State<Service>"),
-		StoreFactory: Symbol.for("State<Factory<StateStore>"),
+		Store: {
+			Factory: Symbol.for("State<Store<Factory>>"),
+		},
 		ValidatorMutator: Symbol.for("State<ValidatorMutator>"),
-		ValidatorWalletFactory: Symbol.for("State<ValidatorWalletFactory>"),
+		ValidatorWallet: {
+			Factory: Symbol.for("State<ValidatorWallet<Factory>>"),
+		},
 		Verifier: Symbol.for("State<Verifier>"),
 		Wallet: {
 			Attributes: Symbol.for("State<Wallet<Attributes>>"),

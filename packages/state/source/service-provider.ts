@@ -68,9 +68,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					await container.resolve(WalletRepositoryBySender).configure(walletRepository, publicKey),
 		);
 
-		this.app.bind(Identifiers.State.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
+		this.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 
-		this.app.bind(Identifiers.State.StoreFactory).toFactory(
+		this.app.bind(Identifiers.State.Store.Factory).toFactory(
 			({ container }) =>
 				(originalStateStore?: StateStore) =>
 					container.resolve(StateStore).configure(originalStateStore),

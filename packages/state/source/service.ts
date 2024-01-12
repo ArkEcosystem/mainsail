@@ -8,7 +8,7 @@ export class Service implements Contracts.State.Service {
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.State.StoreFactory)
+	@inject(Identifiers.State.Store.Factory)
 	private readonly stateStoreFactory!: Contracts.State.StateStoreFactory;
 
 	@inject(Identifiers.State.WalletRepository.Base.Factory)
