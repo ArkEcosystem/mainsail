@@ -5,6 +5,6 @@ import { MixinService } from "./mixins";
 
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind<MixinService>(Identifiers.MixinService).to(MixinService).inSingletonScope();
+		this.app.bind<MixinService>(Identifiers.Kernel.Mixin.Service).to(MixinService).inSingletonScope();
 	}
 }

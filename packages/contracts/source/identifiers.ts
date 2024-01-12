@@ -95,12 +95,6 @@ export const Identifiers = {
 		Registry: Symbol.for("Fee<Registry>"),
 		Type: Symbol.for("Fee<Type>"),
 	},
-	Forger: {
-		Service: Symbol.for("Forger<Service>"),
-		Tracker: Symbol.for("Forger<Tracker>"),
-		Usernames: Symbol.for("Forger<Usernames>"),
-		Validators: Symbol.for("Forger<Validators>"),
-	},
 
 	Ipc: {
 		Worker: Symbol.for("Ipc<Worker>"),
@@ -131,6 +125,9 @@ export const Identifiers = {
 			Manager: Symbol.for("Kernel<Log.Manager>"),
 			Service: Symbol.for("Kernel<Log.Service>"),
 		},
+		Mixin: {
+			Service: Symbol.for("Kernel<Mixin.Service>"),
+		},
 		ProcessActions: {
 			Manager: Symbol.for("Kernel<ProcessActions.Manager>"),
 			Service: Symbol.for("Kernel<ProcessActions.Service>"),
@@ -144,7 +141,6 @@ export const Identifiers = {
 			Service: Symbol.for("Kernel<Validation.Service>"),
 		},
 	},
-	MixinService: Symbol.for("Service<Mixin>"),
 	P2P: {
 		Server: Symbol.for("P2P<Server>"),
 		Service: Symbol.for("P2P<Service>"),
