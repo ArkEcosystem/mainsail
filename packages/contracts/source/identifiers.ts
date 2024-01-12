@@ -128,6 +128,9 @@ export const Identifiers = {
 		Mixin: {
 			Service: Symbol.for("Kernel<Mixin.Service>"),
 		},
+		Pipeline: {
+			Factory: Symbol.for("Kernel<Pipeline.Factory>"),
+		},
 		ProcessActions: {
 			Manager: Symbol.for("Kernel<ProcessActions.Manager>"),
 			Service: Symbol.for("Kernel<ProcessActions.Service>"),
@@ -168,8 +171,7 @@ export const Identifiers = {
 	PeerRepository: Symbol.for("Peer<Repository>"),
 	PeerThrottleFactory: Symbol.for("Peer<Throttle.Factory>"),
 	PeerVerifier: Symbol.for("Peer<Verifier>"),
-	PipelineFactory: Symbol.for("Factory<Pipeline>"),
-	PipelineService: Symbol.for("Service<Pipeline>"),
+
 	PluginConfiguration: Symbol.for("PluginConfiguration"),
 	Proposer: {
 		Selector: Symbol.for("Proposer<Selector>"),
