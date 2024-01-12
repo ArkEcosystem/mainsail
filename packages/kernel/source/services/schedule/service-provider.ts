@@ -5,6 +5,6 @@ import { Schedule } from "./schedule";
 
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind<Schedule>(Identifiers.ScheduleService).to(Schedule).inSingletonScope();
+		this.app.bind<Schedule>(Identifiers.Kernel.Schedule.Service).to(Schedule).inSingletonScope();
 	}
 }

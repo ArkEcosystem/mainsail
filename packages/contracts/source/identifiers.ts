@@ -139,6 +139,9 @@ export const Identifiers = {
 			Factory: Symbol.for("Kernel<Queue.Factory>"),
 			Manager: Symbol.for("Kernel<Queue.Manager>"),
 		},
+		Schedule: {
+			Service: Symbol.for("Kernel<Schedule.Service>"),
+		},
 		Validation: {
 			Manager: Symbol.for("Kernel<Validation.Manager>"),
 			Service: Symbol.for("Kernel<Validation.Service>"),
@@ -176,7 +179,6 @@ export const Identifiers = {
 	Proposer: {
 		Selector: Symbol.for("Proposer<Selector>"),
 	},
-	ScheduleService: Symbol.for("Service<Schedule>"),
 	ServiceProviderRepository: Symbol.for("Repository<ServiceProvider>"),
 	SnapshotService: Symbol.for("Service<Snapshot>"),
 	StandardCriteriaService: Symbol.for("Service<StandardCriteriaService>"),
