@@ -184,8 +184,6 @@ export const Identifiers = {
 		Selector: Symbol("Proposer<Selector>"),
 	},
 	ServiceProviderRepository: Symbol("Repository<ServiceProvider>"),
-	SnapshotService: Symbol("Service<Snapshot>"),
-	StandardCriteriaService: Symbol("Service<StandardCriteriaService>"),
 	State: {
 		AttributeRepository: Symbol("State<AttributeRepository>"),
 		Exporter: Symbol("State<Exporter>"),
