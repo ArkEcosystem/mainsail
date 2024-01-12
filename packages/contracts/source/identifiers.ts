@@ -29,6 +29,12 @@ export const Identifiers = {
 	},
 
 	Crypto: Symbol.for("Crypto<NetworkConfig>"),
+	CryptoWorker: {
+		Worker: Symbol.for("Ipc<Worker>"),
+		WorkerFactory: Symbol.for("Ipc<WorkerFactory>"),
+		WorkerPool: Symbol.for("Ipc<WorkerPool>"),
+		WorkerSubprocessFactory: Symbol.for("Ipc<WorkerSubprocessFactory>"),
+	},
 	Cryptography: {
 		Block: {
 			Deserializer: Symbol.for("Crypto<Block.Deserializer>"),
@@ -94,17 +100,11 @@ export const Identifiers = {
 			Proposal: Symbol.for("Database<Storage.Proposal>"),
 		},
 	},
+
 	Fee: {
 		Matcher: Symbol.for("Fee<Matcher>"),
 		Registry: Symbol.for("Fee<Registry>"),
 		Type: Symbol.for("Fee<Type>"),
-	},
-
-	Ipc: {
-		Worker: Symbol.for("Ipc<Worker>"),
-		WorkerFactory: Symbol.for("Ipc<WorkerFactory>"),
-		WorkerPool: Symbol.for("Ipc<WorkerPool>"),
-		WorkerSubprocessFactory: Symbol.for("Ipc<WorkerSubprocessFactory>"),
 	},
 	Kernel: {
 		Cache: {

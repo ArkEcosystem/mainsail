@@ -18,7 +18,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(

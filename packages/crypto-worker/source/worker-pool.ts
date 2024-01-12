@@ -11,7 +11,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Ipc.WorkerFactory)
+	@inject(Identifiers.CryptoWorker.WorkerFactory)
 	private readonly createWorker!: IpcWorker.WorkerFactory;
 
 	private workers: IpcWorker.Worker[] = [];

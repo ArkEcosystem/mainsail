@@ -4,7 +4,7 @@ import { Ipc, IpcWorker, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Worker implements IpcWorker.Worker {
-	@inject(Identifiers.Ipc.WorkerSubprocessFactory)
+	@inject(Identifiers.CryptoWorker.WorkerSubprocessFactory)
 	private readonly createWorkerSubprocess!: IpcWorker.WorkerSubprocessFactory;
 
 	private ipcSubprocess!: Ipc.Subprocess<IpcWorker.WorkerScriptHandler>;

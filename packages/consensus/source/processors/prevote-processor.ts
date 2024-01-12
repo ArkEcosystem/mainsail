@@ -18,7 +18,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.PeerBroadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {

@@ -7,7 +7,7 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	public async aggregate(

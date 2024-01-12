@@ -58,7 +58,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 			};
 		},
 	};
-	context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
+	context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 	context.sandbox.app.bind(Identifiers.TransactionPool.Collator).toConstantValue({
 		getBlockCandidateTransactions: () => [],

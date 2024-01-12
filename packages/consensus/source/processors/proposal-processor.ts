@@ -30,7 +30,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(proposal: Contracts.Crypto.Proposal, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
