@@ -30,7 +30,7 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
 	#keyPair!: Contracts.Crypto.KeyPair;

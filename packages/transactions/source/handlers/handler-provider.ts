@@ -7,7 +7,7 @@ import { TransactionHandlerConstructor } from "./transaction";
 
 @injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.TransactionHandlerProvider {
-	@inject(Identifiers.WalletAttributes)
+	@inject(Identifiers.State.WalletAttributes)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
 	@inject(Identifiers.TransactionHandlerConstructors)

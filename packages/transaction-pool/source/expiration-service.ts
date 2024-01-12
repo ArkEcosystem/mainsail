@@ -7,7 +7,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	public canExpire(transaction: Contracts.Crypto.Transaction): boolean {

@@ -38,19 +38,19 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		};
 
 		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
-		context.sandbox.app.bind(Identifiers.StateAttributes).to(Attributes.AttributeRepository).inSingletonScope();
+		context.sandbox.app.bind(Identifiers.State.Attributes).to(Attributes.AttributeRepository).inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
 			.set("validatorMatrix", Contracts.State.AttributeType.String);
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();

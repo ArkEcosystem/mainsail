@@ -21,7 +21,7 @@ describeSkip<{
 	beforeEach(async (context) => {
 		context.wallet = new Wallets.Wallet(
 			"address",
-			context.app.get(Identifiers.WalletAttributes),
+			context.app.get(Identifiers.State.WalletAttributes),
 			context.app.getTagged(Identifiers.WalletRepository, "state", "blockchain"),
 		);
 
@@ -60,7 +60,7 @@ describeSkip<{
 	it("set - should override key with new wallet", async (context) => {
 		const anotherWallet = new Wallets.Wallet(
 			"address2",
-			context.app.get(Identifiers.WalletAttributes),
+			context.app.get(Identifiers.State.WalletAttributes),
 			context.app.getTagged(Identifiers.WalletRepository, "state", "blockchain"),
 		);
 

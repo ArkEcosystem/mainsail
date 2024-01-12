@@ -8,7 +8,7 @@ export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {

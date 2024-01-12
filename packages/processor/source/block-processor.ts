@@ -5,7 +5,7 @@ import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)

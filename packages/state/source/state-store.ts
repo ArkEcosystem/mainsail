@@ -15,7 +15,7 @@ export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.StateAttributes)
+	@inject(Identifiers.State.Attributes)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
 	#genesisBlock?: Contracts.Crypto.Commit;

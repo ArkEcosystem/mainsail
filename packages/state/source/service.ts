@@ -8,22 +8,22 @@ export class Service implements Contracts.State.Service {
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.StateStoreFactory)
+	@inject(Identifiers.State.StoreFactory)
 	private readonly stateStoreFactory!: Contracts.State.StateStoreFactory;
 
-	@inject(Identifiers.WalletRepositoryFactory)
+	@inject(Identifiers.State.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
 
-	@inject(Identifiers.WalletRepositoryCloneFactory)
+	@inject(Identifiers.State.WalletRepositoryCloneFactory)
 	private readonly walletRepositoryCloneFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
-	@inject(Identifiers.WalletRepositoryCopyOnWriteFactory)
+	@inject(Identifiers.State.WalletRepositoryCopyOnWriteFactory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
-	@inject(Identifiers.StateExporter)
+	@inject(Identifiers.State.Exporter)
 	private readonly exporter!: Contracts.State.Exporter;
 
-	@inject(Identifiers.StateImporter)
+	@inject(Identifiers.State.Importer)
 	private readonly importer!: Contracts.State.Importer;
 
 	#baseStateStore!: Contracts.State.StateStore;

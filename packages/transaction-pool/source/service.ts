@@ -8,7 +8,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	@tagged("plugin", "transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Fee.Matcher)

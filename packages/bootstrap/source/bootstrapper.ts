@@ -13,7 +13,7 @@ export class Bootstrapper {
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.ConsensusService;
 
-	@inject(Identifiers.StateVerifier)
+	@inject(Identifiers.State.Verifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
 
 	@inject(Identifiers.TransactionPool.Service)
@@ -34,7 +34,7 @@ export class Bootstrapper {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.ValidatorSet)

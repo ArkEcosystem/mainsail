@@ -42,7 +42,7 @@ describe<{
 		context.container
 			.bind(Identifiers.TransactionValidatorFactory)
 			.toConstantValue(context.createTransactionValidator);
-		context.container.bind(Identifiers.StateService).toConstantValue(context.stateService);
+		context.container.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
 		context.container.bind(Identifiers.TransactionPool.Query).toConstantValue(context.poolQuery);
 		context.container

@@ -16,7 +16,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	@inject(Identifiers.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Consensus.ProposalProcessor)

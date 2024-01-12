@@ -22,7 +22,7 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(stateService);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(stateService);
 
 		context.controller = context.sandbox.app.resolve(GetBlocksController);
 	});

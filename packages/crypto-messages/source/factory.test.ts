@@ -50,7 +50,7 @@ describe<{
 		};
 
 		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);

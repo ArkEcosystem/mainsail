@@ -5,13 +5,13 @@ import { Utils } from "@mainsail/kernel";
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.ValidatorSet {
 	// TODO: Check which wallet repository is used here
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.ValidatorWalletFactory)
+	@inject(Identifiers.State.ValidatorWalletFactory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
 	#validators: Contracts.State.ValidatorWallet[] = [];
