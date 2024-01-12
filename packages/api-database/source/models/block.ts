@@ -85,6 +85,18 @@ export class Block {
 
 	@Column({
 		nullable: false,
+		type: "integer",
+	})
+	public readonly validatorRound!: number;
+
+	@Column({
+		nullable: false,
+		type: "bigint",
+	})
+	public readonly validatorSet!: string;
+
+	@Column({
+		nullable: false,
 		type: "varchar",
 	})
 	public readonly signature!: string;

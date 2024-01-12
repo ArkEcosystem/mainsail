@@ -71,6 +71,7 @@ export const blockCriteriaSchemas = {
 	payloadLength: orNumericCriteria(Joi.number().integer().min(0)),
 	previousBlock: orEqualCriteria(blockId),
 	reward: orNumericCriteria(Joi.number().integer().min(0)),
+	round: orNumericCriteria(Joi.number().integer().min(0)),
 	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
 	totalAmount: orNumericCriteria(Joi.number().integer().min(0)),
 	totalFee: orNumericCriteria(Joi.number().integer().min(0)),

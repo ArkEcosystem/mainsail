@@ -6,7 +6,7 @@ import {
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types, Utils } from "@mainsail/kernel";
-import { sleep } from "@mainsail/utils";
+import { sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import * as ApiSyncContracts from "./contracts";
@@ -129,6 +129,8 @@ export class Sync implements Contracts.ApiSync.Sync {
 				timestamp: header.timestamp.toFixed(),
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
+				validatorRound: Utils.roundCalculator.calculateRound(header.height, this.configuration).round,
+				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,
 			},
 
