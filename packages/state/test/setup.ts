@@ -87,64 +87,64 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 
-	sandbox.app.bind(Identifiers.State.WalletRepositoryIndexSet).to(IndexSet).inSingletonScope();
+	sandbox.app.bind(Identifiers.State.WalletRepository.IndexSet).to(IndexSet).inSingletonScope();
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.Addresses);
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.PublicKeys);
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.Usernames);
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.Resignations);
 
-	sandbox.app.bind(Identifiers.State.Attributes).to(AttributeRepository).inSingletonScope();
+	sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 		.set("height", Contracts.State.AttributeType.Number);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 		.set("totalRound", Contracts.State.AttributeType.Number);
 
-	sandbox.app.bind(Identifiers.State.WalletAttributes).to(AttributeRepository).inSingletonScope();
+	sandbox.app.bind(Identifiers.State.Wallet.Attributes).to(AttributeRepository).inSingletonScope();
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("nonce", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("balance", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("publicKey", Contracts.State.AttributeType.String);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorProducedBlocks", Contracts.State.AttributeType.Number);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorForgedTotal", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorForgedFees", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorForgedRewards", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorApproval", Contracts.State.AttributeType.Number);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("vote", Contracts.State.AttributeType.String);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorResigned", Contracts.State.AttributeType.Boolean);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorRank", Contracts.State.AttributeType.Number);
 
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
@@ -246,8 +246,8 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 	sandbox.app
-		.bind(Identifiers.State.WalletFactory)
-		.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.WalletAttributes)));
+		.bind(Identifiers.State.Wallet.Factory)
+		.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)));
 
 	sandbox.app
 		.bind(Identifiers.WalletRepository)
@@ -255,7 +255,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.inRequestScope()
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
-	sandbox.app.bind(Identifiers.State.WalletRepositoryCloneFactory).toFactory(
+	sandbox.app.bind(Identifiers.State.WalletRepository.CopyOnWriteFactory).toFactory(
 		({ container }) =>
 			() =>
 				container

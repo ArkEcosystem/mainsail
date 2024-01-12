@@ -11,13 +11,13 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.StoreFactory)
 	private readonly stateStoreFactory!: Contracts.State.StateStoreFactory;
 
-	@inject(Identifiers.State.WalletRepositoryFactory)
+	@inject(Identifiers.State.WalletRepository.Base.Factory)
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
 
-	@inject(Identifiers.State.WalletRepositoryCloneFactory)
+	@inject(Identifiers.State.WalletRepository.Clone.Factory)
 	private readonly walletRepositoryCloneFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
-	@inject(Identifiers.State.WalletRepositoryCopyOnWriteFactory)
+	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
 	@inject(Identifiers.State.Exporter)

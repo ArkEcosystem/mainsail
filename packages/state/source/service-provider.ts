@@ -16,8 +16,8 @@ import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		// Register indexes
-		this.app.bind(Identifiers.State.WalletRepositoryIndexSet).to(IndexSet).inSingletonScope();
-		const indexSet = this.app.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepositoryIndexSet);
+		this.app.bind(Identifiers.State.WalletRepository.IndexSet).to(IndexSet).inSingletonScope();
+		const indexSet = this.app.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet);
 		indexSet.set(Contracts.State.WalletIndexes.Addresses);
 		indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
 		indexSet.set(Contracts.State.WalletIndexes.Usernames);
@@ -25,13 +25,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// TODO: remove resignations index
 		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
-		this.app.bind(Identifiers.State.Attributes).to(AttributeRepository).inSingletonScope();
-		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.State.Attributes);
+		this.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.State.AttributeRepository);
 		stateAttributeRepository.set("height", Contracts.State.AttributeType.Number);
 		stateAttributeRepository.set("totalRound", Contracts.State.AttributeType.Number);
 
-		this.app.bind(Identifiers.State.WalletAttributes).to(AttributeRepository).inSingletonScope();
-		const walletAttributeRepository = this.app.get<AttributeRepository>(Identifiers.State.WalletAttributes);
+		this.app.bind(Identifiers.State.Wallet.Attributes).to(AttributeRepository).inSingletonScope();
+		const walletAttributeRepository = this.app.get<AttributeRepository>(Identifiers.State.Wallet.Attributes);
 		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
@@ -47,22 +47,22 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("validatorApproval", Contracts.State.AttributeType.Number);
 
 		this.app
-			.bind(Identifiers.State.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.WalletAttributes)));
+			.bind(Identifiers.State.Wallet.Factory)
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)));
 
-		this.app.bind(Identifiers.State.WalletRepositoryFactory).toFactory(
+		this.app.bind(Identifiers.State.WalletRepository.Base.Factory).toFactory(
 			({ container }) =>
 				() =>
 					container.resolve(WalletRepository),
 		);
 
-		this.app.bind(Identifiers.State.WalletRepositoryCloneFactory).toFactory(
+		this.app.bind(Identifiers.State.WalletRepository.Clone.Factory).toFactory(
 			({ container }) =>
 				(walletRepository: WalletRepository) =>
 					container.resolve(WalletRepositoryClone).configure(walletRepository),
 		);
 
-		this.app.bind(Identifiers.State.WalletRepositoryCopyOnWriteFactory).toFactory(
+		this.app.bind(Identifiers.State.WalletRepository.BySender.Factory).toFactory(
 			({ container }) =>
 				async (walletRepository: WalletRepository, publicKey: string) =>
 					await container.resolve(WalletRepositoryBySender).configure(walletRepository, publicKey),

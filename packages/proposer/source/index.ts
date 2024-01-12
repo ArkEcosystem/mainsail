@@ -9,7 +9,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		// TODO: Replace string with better structure
 		this.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("validatorMatrix", Contracts.State.AttributeType.String);
 	}
 }

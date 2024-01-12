@@ -30,18 +30,18 @@ describeSkip<{
 		const sandbox = new Sandbox();
 		const app = sandbox.app;
 
-		sandbox.app.bind(Identifiers.State.WalletAttributes).to(AttributeRepository).inSingletonScope();
+		sandbox.app.bind(Identifiers.State.Wallet.Attributes).to(AttributeRepository).inSingletonScope();
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("nonce", Contracts.State.AttributeType.BigNumber);
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("balance", Contracts.State.AttributeType.BigNumber);
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("publicKey", Contracts.State.AttributeType.String);
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.WalletAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("validatorUsername", Contracts.State.AttributeType.String);
 
 		app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
@@ -77,12 +77,12 @@ describeSkip<{
 			name: Contracts.State.WalletIndexes.Usernames,
 		});
 
-		app.bind(Identifiers.State.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.WalletAttributes)))
+		app.bind(Identifiers.State.Wallet.Factory)
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
-		app.bind(Identifiers.State.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.WalletAttributes)))
+		app.bind(Identifiers.State.Wallet.Factory)
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "clone"));
 
 		app.bind(Identifiers.WalletRepository)

@@ -183,20 +183,30 @@ export const Identifiers = {
 	SnapshotService: Symbol.for("Service<Snapshot>"),
 	StandardCriteriaService: Symbol.for("Service<StandardCriteriaService>"),
 	State: {
-		Attributes: Symbol.for("State<Attributes>"),
+		AttributeRepository: Symbol.for("State<AttributeRepository>"),
 		Exporter: Symbol.for("State<Exporter>"),
 		Importer: Symbol.for("State<Importer>"),
 		Service: Symbol.for("State<Service>"),
 		StoreFactory: Symbol.for("State<Factory<StateStore>"),
 		ValidatorMutator: Symbol.for("State<ValidatorMutator>"),
-		Verifier: Symbol.for("State<Verifier>"),
 		ValidatorWalletFactory: Symbol.for("State<ValidatorWalletFactory>"),
-		WalletAttributes: Symbol.for("Attributes<Wallet>"),
-		WalletFactory: Symbol.for("State<WalletFactory>"),
-		WalletRepositoryCloneFactory: Symbol.for("Factory<Repository<Clone<Wallet>>>"),
-		WalletRepositoryCopyOnWriteFactory: Symbol.for("Factory<Repository<CopyOnWrite<Wallet>>>"),
-		WalletRepositoryFactory: Symbol.for("Factory<Repository<Wallet>>"),
-		WalletRepositoryIndexSet: Symbol.for("IndexSet<Repository<Wallet>>"),
+		Verifier: Symbol.for("State<Verifier>"),
+		Wallet: {
+			Attributes: Symbol.for("State<Wallet<Attributes>>"),
+			Factory: Symbol.for("State<Wallet<Factory>>"),
+		},
+		WalletRepository: {
+			Base: {
+				Factory: Symbol.for("State<WalletRepository<Base<Factory>>>"),
+			},
+			BySender: {
+				Factory: Symbol.for("State<WalletRepository<BySender<Factory>>>"),
+			},
+			Clone: {
+				Factory: Symbol.for("State<WalletRepository<Clone<Factory>>>"),
+			},
+			IndexSet: Symbol.for("State<WalletRepository<IndexSet>>"),
+		},
 	},
 	TransactionHandler: Symbol.for("TransactionHandler"),
 	TransactionHandlerConstructors: Symbol.for("TransactionHandlerConstructors"),

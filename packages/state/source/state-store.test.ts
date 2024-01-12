@@ -33,18 +33,20 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.State.Attributes).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
-		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(Identifiers.State.Attributes);
+		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(
+			Identifiers.State.AttributeRepository,
+		);
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 	});
@@ -188,18 +190,20 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.State.Attributes).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Attributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
-		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(Identifiers.State.Attributes);
+		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(
+			Identifiers.State.AttributeRepository,
+		);
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 
