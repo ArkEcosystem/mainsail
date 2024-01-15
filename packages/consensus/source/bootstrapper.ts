@@ -19,7 +19,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 
 		for (const proposal of proposals) {
 			const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
-			await roundState.addProposal(proposal);
+			roundState.addProposal(proposal);
 		}
 
 		const prevotes = await this.storage.getPrevotes();
@@ -27,7 +27,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		this.logger.info(`Consensus Bootstrap - Prevotes: ${prevotes.length}`);
 		for (const prevote of prevotes) {
 			const roundState = this.roundStateRepo.getRoundState(prevote.height, prevote.round);
-			await roundState.addPrevote(prevote);
+			roundState.addPrevote(prevote);
 		}
 
 		const precommits = await this.storage.getPrecommits();
@@ -35,7 +35,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		this.logger.info(`Consensus Bootstrap - Precommits: ${precommits.length}`);
 		for (const precommit of precommits) {
 			const roundState = this.roundStateRepo.getRoundState(precommit.height, precommit.round);
-			await roundState.addPrecommit(precommit);
+			roundState.addPrecommit(precommit);
 		}
 
 		const state = (await this.storage.getState()) as Utils.Mutable<Contracts.Consensus.ConsensusState> | undefined;
