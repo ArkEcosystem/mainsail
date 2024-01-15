@@ -28,7 +28,6 @@ export const Identifiers = {
 		Storage: Symbol("Storage<Consensus>"),
 		ValidatorRepository: Symbol("Repository<Consensus.Validator>"),
 	},
-	Crypto: Symbol("Crypto<NetworkConfig>"),
 
 	CryptoWorker: {
 		Worker: Symbol("Ipc<Worker>"),
