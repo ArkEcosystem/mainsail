@@ -76,7 +76,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		}),
 	});
 
-	context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
+	context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
 		getValidatorIndexByWalletPublicKey: () => 0,
 	});
 };

@@ -37,8 +37,8 @@ export class Bootstrapper {
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;

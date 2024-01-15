@@ -6,8 +6,8 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	#walletRepository!: Contracts.State.WalletRepositoryClone;
 	#commit!: Contracts.Crypto.Commit;

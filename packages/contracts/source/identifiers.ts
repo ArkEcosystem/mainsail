@@ -249,5 +249,7 @@ export const Identifiers = {
 			Instance: Symbol("TransactionPool<TransactionValidator.Instance>"),
 		},
 	},
-	ValidatorSet: Symbol("Set<ValidatorSet>"),
+	ValidatorSet: {
+		Service: Symbol("ValidatorSet<Service>"),
+	},
 };

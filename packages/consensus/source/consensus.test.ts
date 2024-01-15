@@ -149,7 +149,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		+context.sandbox.app
 			.bind(Identifiers.Consensus.ValidatorRepository)
 			.toConstantValue(context.validatorsRepository);
-		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(context.validatorSet);
+		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.RoundStateRepository)

@@ -12,8 +12,8 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;

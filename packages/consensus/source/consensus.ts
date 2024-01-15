@@ -41,8 +41,8 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	@inject(Identifiers.Consensus.CommitLock)
 	private readonly commitLock!: Contracts.Kernel.Lock;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Kernel.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

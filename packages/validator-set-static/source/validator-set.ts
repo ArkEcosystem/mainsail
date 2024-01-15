@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-export class ValidatorSet implements Contracts.ValidatorSet.ValidatorSet {
+export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	// TODO: Check which wallet repository is used here
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;

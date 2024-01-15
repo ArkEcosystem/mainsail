@@ -13,8 +13,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;

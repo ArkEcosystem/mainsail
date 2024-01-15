@@ -49,7 +49,7 @@ describe<{
 			},
 		};
 
-		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
+		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 

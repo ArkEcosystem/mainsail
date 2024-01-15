@@ -12,8 +12,8 @@ export class ConsensusController extends Controller {
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepository!: Contracts.Consensus.RoundStateRepository;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	public async state(request: Hapi.Request) {
 		const state = this.consensus.getState();

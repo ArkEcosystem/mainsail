@@ -173,7 +173,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		deleteTopBlocks: () => {},
 		saveBlocks: () => {},
 	});
-	sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
+	sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
 		getActiveValidators: () => {},
 		initialize: () => {},
 	});

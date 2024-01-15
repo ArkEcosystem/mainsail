@@ -9,8 +9,8 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		if (unit.getBlock().data.height === 0) {
