@@ -19,7 +19,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 
 		for (const [name, serviceProvider] of serviceProviders.all()) {
@@ -78,7 +78,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 
 	async #satisfiesDependencies(serviceProvider: ServiceProvider): Promise<boolean> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 
 		for (const dependency of serviceProvider.dependencies()) {

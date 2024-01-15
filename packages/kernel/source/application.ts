@@ -24,7 +24,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.bind<ConfigRepository>(Identifiers.Services.Config.Repository).to(ConfigRepository).inSingletonScope();
 
-		this.bind<ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
+		this.bind<ServiceProviderRepository>(Identifiers.Providers.ServiceProviderRepository)
 			.to(ServiceProviderRepository)
 			.inSingletonScope();
 	}
@@ -311,7 +311,7 @@ export class Application implements Contracts.Kernel.Application {
 
 	async #disposeServiceProviders(): Promise<void> {
 		const serviceProviders: ServiceProvider[] = this.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		).allLoadedProviders();
 
 		for (const serviceProvider of serviceProviders.reverse()) {

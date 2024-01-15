@@ -6,7 +6,7 @@ import { ServiceProvider, ServiceProviderRepository } from "../providers";
 
 @injectable()
 export class ChangeServiceProviderState implements Contracts.Kernel.EventListener {
-	@inject(Identifiers.ServiceProviderRepository)
+	@inject(Identifiers.Providers.ServiceProviderRepository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
 	#name!: string;

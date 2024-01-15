@@ -32,7 +32,7 @@ describe<{
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 	});
 

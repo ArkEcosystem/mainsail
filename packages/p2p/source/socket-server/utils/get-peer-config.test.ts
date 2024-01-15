@@ -71,7 +71,7 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 		const appGet = {
 			[Identifiers.Cryptography.Configuration]: configuration,
 			[Identifiers.Services.Config.Repository]: configRepository,
-			[Identifiers.ServiceProviderRepository]: serviceProviderRepository,
+			[Identifiers.Providers.ServiceProviderRepository]: serviceProviderRepository,
 		};
 
 		app = {

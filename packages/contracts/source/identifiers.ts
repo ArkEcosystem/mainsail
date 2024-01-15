@@ -153,7 +153,9 @@ export const Identifiers = {
 	Proposer: {
 		Selector: Symbol("Proposer<Selector>"),
 	},
-	ServiceProviderRepository: Symbol("Repository<ServiceProvider>"),
+	Providers: {
+		ServiceProviderRepository: Symbol("Repository<ServiceProvider>"),
+	},
 	Services: {
 		Cache: {
 			Factory: Symbol("Kernel<Cache.Factory>"),

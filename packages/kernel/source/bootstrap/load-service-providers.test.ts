@@ -24,7 +24,7 @@ describe<{
 
 		context.configRepository = context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository);
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 	});
 

@@ -114,7 +114,7 @@ export class Sandbox {
 		serviceProvider.setConfig(this.app.resolve(Providers.PluginConfiguration).discover(name, path));
 
 		this.app
-			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
+			.get<Providers.ServiceProviderRepository>(Identifiers.Providers.ServiceProviderRepository)
 			.set(name, serviceProvider);
 
 		await serviceProvider.register();

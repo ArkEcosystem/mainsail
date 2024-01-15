@@ -100,7 +100,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -127,7 +127,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -402,7 +402,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -426,7 +426,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -451,7 +451,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.Providers.ServiceProviderRepository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
