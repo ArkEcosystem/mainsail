@@ -301,7 +301,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 		// sandbox.app
 		// 	.get<Configuration>(Identifiers.Cryptography.Configuration)
-		// 	.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto"));
+		// 	.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Config.Repository).get("crypto"));
 		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 	}
 

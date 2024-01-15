@@ -13,6 +13,12 @@ export const Identifiers = {
 		Token: Symbol("Application<Token>"),
 		Version: Symbol("Application<Version>"),
 	},
+	Config: {
+		Flags: Symbol("Config<Flags>"),
+		Plugins: Symbol("Config<Plugins>"),
+		Repository: Symbol("Config<Repository>"),
+	},
+
 	Consensus: {
 		Aggregator: Symbol("Aggregator<Consensus>"),
 		Bootstrapper: Symbol("Bootstrapper<Consensus>"),
@@ -28,7 +34,6 @@ export const Identifiers = {
 		Storage: Symbol("Storage<Consensus>"),
 		ValidatorRepository: Symbol("Repository<Consensus.Validator>"),
 	},
-
 	CryptoWorker: {
 		Worker: Symbol("Ipc<Worker>"),
 		WorkerFactory: Symbol("Ipc<WorkerFactory>"),
@@ -105,7 +110,6 @@ export const Identifiers = {
 		Registry: Symbol("Fee<Registry>"),
 		Type: Symbol("Fee<Type>"),
 	},
-
 	P2P: {
 		ApiNode: {
 			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),
@@ -142,6 +146,7 @@ export const Identifiers = {
 			Factory: Symbol("P2P<Throttle.Factory>"),
 		},
 	},
+
 	PluginConfiguration: Symbol("PluginConfiguration"),
 
 	Processor: {
@@ -149,7 +154,6 @@ export const Identifiers = {
 		BlockVerifier: Symbol("Processor<Block.Verifier>"),
 		TransactionProcessor: Symbol("Processor<Transaction.Processor>"),
 	},
-
 	Proposer: {
 		Selector: Symbol("Proposer<Selector>"),
 	},
@@ -162,10 +166,7 @@ export const Identifiers = {
 			Manager: Symbol("Kernel<Cache.Manager>"),
 		},
 		Config: {
-			Flags: Symbol("Kernel<Config.Flags>"),
 			Manager: Symbol("Kernel<Config.Manager>"),
-			Plugins: Symbol("Kernel<Config.Plugins>"),
-			Repository: Symbol("Kernel<Config.Repository>"),
 		},
 		EventDispatcher: {
 			Manager: Symbol("Kernel<EventDispatcher.Manager>"),

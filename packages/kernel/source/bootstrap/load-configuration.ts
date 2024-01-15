@@ -12,11 +12,7 @@ export class LoadConfiguration implements Bootstrapper {
 	public async bootstrap(): Promise<void> {
 		await this.app
 			.get<ConfigManager>(Identifiers.Services.Config.Manager)
-			.driver(
-				this.app
-					.get<ConfigRepository>(Identifiers.Services.Config.Repository)
-					.get<string>("configLoader", "local"),
-			)
+			.driver(this.app.get<ConfigRepository>(Identifiers.Config.Repository).get<string>("configLoader", "local"))
 			.loadConfiguration();
 	}
 }

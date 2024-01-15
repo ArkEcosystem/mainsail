@@ -10,7 +10,7 @@ export class RegisterBaseConfiguration implements Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Services.Config.Repository)
+	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
 	public async bootstrap(): Promise<void> {
@@ -18,8 +18,8 @@ export class RegisterBaseConfiguration implements Bootstrapper {
 
 		await this.app.get<ConfigManager>(Identifiers.Services.Config.Manager).boot();
 
-		this.configRepository.set("app.flags", this.app.get<KeyValuePair>(Identifiers.Services.Config.Flags));
+		this.configRepository.set("app.flags", this.app.get<KeyValuePair>(Identifiers.Config.Flags));
 		// @@TODO better name for storing pluginOptions
-		this.configRepository.set("app.pluginOptions", this.app.get<KeyValuePair>(Identifiers.Services.Config.Plugins));
+		this.configRepository.set("app.pluginOptions", this.app.get<KeyValuePair>(Identifiers.Config.Plugins));
 	}
 }

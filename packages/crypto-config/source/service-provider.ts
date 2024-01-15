@@ -15,7 +15,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {
-		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.Services.Config.Repository);
+		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository);
 
 		return {
 			genesisBlock: configRepository.get<Contracts.Crypto.CommitJson>("crypto.genesisBlock")!,

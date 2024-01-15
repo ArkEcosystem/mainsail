@@ -22,7 +22,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
-		this.bind<ConfigRepository>(Identifiers.Services.Config.Repository).to(ConfigRepository).inSingletonScope();
+		this.bind<ConfigRepository>(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
 
 		this.bind<ServiceProviderRepository>(Identifiers.Providers.ServiceProviderRepository)
 			.to(ServiceProviderRepository)
@@ -33,8 +33,8 @@ export class Application implements Contracts.Kernel.Application {
 		flags: Contracts.Types.JsonObject;
 		plugins?: Contracts.Types.JsonObject;
 	}): Promise<void> {
-		this.bind<KeyValuePair>(Identifiers.Services.Config.Flags).toConstantValue(options.flags);
-		this.bind<KeyValuePair>(Identifiers.Services.Config.Plugins).toConstantValue(options.plugins || {});
+		this.bind<KeyValuePair>(Identifiers.Config.Flags).toConstantValue(options.flags);
+		this.bind<KeyValuePair>(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
 
 		await this.#registerEventDispatcher();
 
@@ -54,7 +54,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined {
-		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Services.Config.Repository);
+		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Config.Repository);
 
 		if (value) {
 			config.set(key, value);
