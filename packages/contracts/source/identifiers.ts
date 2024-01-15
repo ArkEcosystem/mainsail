@@ -154,9 +154,6 @@ export const Identifiers = {
 	Proposer: {
 		Selector: Symbol("Proposer<Selector>"),
 	},
-	Providers: {
-		ServiceProviderRepository: Symbol("Repository<ServiceProvider>"),
-	},
 	ServiceProvider: {
 		Configuration: Symbol("ServiceProvider<Configuration>"),
 		Repository: Symbol("ServiceProvider<Repository>"),
