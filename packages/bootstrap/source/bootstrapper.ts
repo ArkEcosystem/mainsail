@@ -43,7 +43,7 @@ export class Bootstrapper {
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
-	@inject(Identifiers.Consensus.CommitStateFactory)
+	@inject(Identifiers.Consensus.CommitState.Factory)
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
 	@inject(Identifiers.ApiSync.Service)

@@ -6,7 +6,7 @@ import { getPeerIp } from "../../utils";
 
 @injectable()
 export class PostPrecommitController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Consensus.PrecommitProcessor)
+	@inject(Identifiers.Consensus.Processor.PreCommit)
 	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)

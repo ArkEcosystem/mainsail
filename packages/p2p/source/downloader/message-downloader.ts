@@ -42,10 +42,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.Consensus.PrevoteProcessor)
+	@inject(Identifiers.Consensus.Processor.PreVote)
 	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
 
-	@inject(Identifiers.Consensus.PrecommitProcessor)
+	@inject(Identifiers.Consensus.Processor.PreCommit)
 	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)

@@ -29,7 +29,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.Consensus.ProposalProcessor)
+	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.P2P.State)

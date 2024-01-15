@@ -17,14 +17,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Aggregator).to(Aggregator).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.ProposalProcessor).to(ProposalProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.PrevoteProcessor).to(PrevoteProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.CommitProcessor).to(CommitProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.Proposal).to(ProposalProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.PreVote).to(PrevoteProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.PreCommit).to(PrecommitProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.Commit).to(CommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
 
 		this.app
-			.bind(Identifiers.Consensus.CommitStateFactory)
+			.bind(Identifiers.Consensus.CommitState.Factory)
 			.toFactory(
 				(context: interfaces.Context) => (commit: Contracts.Crypto.Commit) =>
 					context.container.resolve(CommitState).configure(commit),

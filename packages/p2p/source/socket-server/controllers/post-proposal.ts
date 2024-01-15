@@ -6,7 +6,7 @@ import { getPeerIp } from "../../utils";
 
 @injectable()
 export class PostProposalController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Consensus.ProposalProcessor)
+	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)

@@ -6,7 +6,7 @@ import { getPeerIp } from "../../utils";
 
 @injectable()
 export class PostPrevoteController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Consensus.PrevoteProcessor)
+	@inject(Identifiers.Consensus.Processor.PreVote)
 	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)

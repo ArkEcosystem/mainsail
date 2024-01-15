@@ -21,7 +21,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
-	@inject(Identifiers.Consensus.CommitStateFactory)
+	@inject(Identifiers.Consensus.CommitState.Factory)
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
 	async process(commit: Contracts.Crypto.Commit): Promise<Contracts.Consensus.ProcessorResult> {

@@ -43,7 +43,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
-	@inject(Identifiers.Consensus.CommitProcessor)
+	@inject(Identifiers.Consensus.Processor.Commit)
 	private readonly commitProcessor!: Contracts.Consensus.CommitProcessor;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
