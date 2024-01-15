@@ -35,7 +35,6 @@ export const Identifiers = {
 		Scheduler: Symbol("Consensus<Scheduler>"),
 		Service: Symbol("Consensus<Service>"),
 		Storage: Symbol("Consensus<Storage>"),
-		ValidatorRepository: Symbol("Consensus<ValidatorRepository>"),
 	},
 	CryptoWorker: {
 		Worker: {
@@ -282,6 +281,9 @@ export const Identifiers = {
 			Factory: Symbol("TransactionPool<TransactionValidator.Factory>"),
 			Instance: Symbol("TransactionPool<TransactionValidator.Instance>"),
 		},
+	},
+	Validator: {
+		Repository: Symbol("Validator<Repository>"),
 	},
 	ValidatorSet: {
 		Service: Symbol("ValidatorSet<Service>"),

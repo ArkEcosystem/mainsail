@@ -23,7 +23,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		this.app
-			.bind(Identifiers.Consensus.ValidatorRepository)
+			.bind(Identifiers.Validator.Repository)
 			.toConstantValue(this.app.resolve(ValidatorRepository).configure(validators));
 	}
 }
