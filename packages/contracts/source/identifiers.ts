@@ -124,8 +124,8 @@ export const Identifiers = {
 		Storage: {
 			Block: Symbol("Database<Storage.Block>"),
 			ConsensusState: Symbol("Database<Storage.ConsensusState>"),
-			Precommit: Symbol("Database<Storage.Precommit>"),
-			Prevote: Symbol("Database<Storage.Prevote>"),
+			PreCommit: Symbol("Database<Storage.PreCommit>"),
+			PreVote: Symbol("Database<Storage.PreVote>"),
 			Proposal: Symbol("Database<Storage.Proposal>"),
 		},
 	},

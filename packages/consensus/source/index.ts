@@ -33,8 +33,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// Storage for prevotes, precommits and proposals
 		const storage = this.app.get<RootDatabase>(Identifiers.Database.Instance.Consensus);
 		this.app.bind(Identifiers.Database.Storage.Proposal).toConstantValue(storage.openDB({ name: "proposals" }));
-		this.app.bind(Identifiers.Database.Storage.Prevote).toConstantValue(storage.openDB({ name: "prevotes" }));
-		this.app.bind(Identifiers.Database.Storage.Precommit).toConstantValue(storage.openDB({ name: "precommits" }));
+		this.app.bind(Identifiers.Database.Storage.PreVote).toConstantValue(storage.openDB({ name: "prevotes" }));
+		this.app.bind(Identifiers.Database.Storage.PreCommit).toConstantValue(storage.openDB({ name: "precommits" }));
 		this.app
 			.bind(Identifiers.Database.Storage.ConsensusState)
 			.toConstantValue(storage.openDB({ name: "consensus" }));

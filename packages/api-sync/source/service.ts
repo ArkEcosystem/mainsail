@@ -62,7 +62,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
+	private readonly proposerSelector!: Contracts.Proposer.Selector;
 
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly transactionHandlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;

@@ -14,7 +14,7 @@ export class RoundController extends Controller {
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
+	private readonly proposerSelector!: Contracts.Proposer.Selector;
 
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const activeValidators = this.validatorSet.getActiveValidators();

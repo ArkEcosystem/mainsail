@@ -7,10 +7,10 @@ export class Storage implements Contracts.Consensus.ConsensusStorage {
 	@inject(Identifiers.Database.Storage.Proposal)
 	private readonly proposalStorage!: Database;
 
-	@inject(Identifiers.Database.Storage.Prevote)
+	@inject(Identifiers.Database.Storage.PreVote)
 	private readonly prevoteStorage!: Database;
 
-	@inject(Identifiers.Database.Storage.Precommit)
+	@inject(Identifiers.Database.Storage.PreCommit)
 	private readonly precommitStorage!: Database;
 
 	@inject(Identifiers.Database.Storage.ConsensusState)
