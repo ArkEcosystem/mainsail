@@ -94,7 +94,10 @@ export class ApiContext {
 export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<ApiContext> => {
 	context.sandbox = new Sandbox();
 
-	context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
+	context.sandbox.app
+		.bind(Identifiers.ServiceProvider.Configuration)
+		.to(Providers.PluginConfiguration)
+		.inSingletonScope();
 
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		info: (msg) => console.log(msg),
