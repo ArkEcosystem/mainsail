@@ -201,7 +201,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	sandbox.app.bind(Identifiers.TransactionHandlerRegistry).to(MockHandler);
+	sandbox.app.bind(Identifiers.Transaction.Handler.Registry).to(MockHandler);
 
 	const getBlockRewardsSpy = spy();
 

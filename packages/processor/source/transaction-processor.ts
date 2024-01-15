@@ -8,7 +8,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	async process(

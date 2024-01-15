@@ -10,7 +10,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 	@inject(Identifiers.State.Wallet.Attributes)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
-	@inject(Identifiers.TransactionHandlerConstructors)
+	@inject(Identifiers.Transaction.Handler.Constructors)
 	private readonly handlerConstructors!: TransactionHandlerConstructor[];
 
 	@inject(Identifiers.Cryptography.Transaction.Registry)

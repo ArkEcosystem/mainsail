@@ -121,7 +121,7 @@
 // 		context.sandbox.app.bind(Identifiers.DatabaseInterceptor).toConstantValue(context.databaseInterceptor);
 // 		context.sandbox.app.bind(Identifiers.RoundState).toConstantValue(context.roundState);
 // 		context.sandbox.app
-// 			.bind(Identifiers.TransactionHandlerRegistry)
+// 			.bind(Identifiers.Transaction.Handler.Registry)
 // 			.toConstantValue(context.transactionHandlerRegistry);
 // 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
 // 		context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});

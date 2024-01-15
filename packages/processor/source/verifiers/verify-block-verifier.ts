@@ -9,7 +9,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Cryptography.Block.Verifier)
 	private readonly blockVerifier!: Contracts.Crypto.BlockVerifier;
 
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.Kernel.Log.Service)

@@ -162,10 +162,6 @@ export const Identifiers = {
 	P2PLogger: Symbol("Logger<P2P>"),
 	P2PServer: Symbol("Server<P2P>"),
 	P2PState: Symbol("State<P2P>"),
-	Processor: {
-		BlockProcessor: Symbol("Processor<Block.Processor>"),
-		BlockVerifier: Symbol("Processor<Block.Verifier>"),
-	},
 	PeerApiNodeDiscoverer: Symbol("Peer<Discoverer.ApiNodes>"),
 	PeerApiNodeFactory: Symbol("Peer<Factory.ApiNodes>"),
 	PeerApiNodeProcessor: Symbol("Peer<Processor.ApiNodes>"),
@@ -186,8 +182,12 @@ export const Identifiers = {
 	PeerRepository: Symbol("Peer<Repository>"),
 	PeerThrottleFactory: Symbol("Peer<Throttle.Factory>"),
 	PeerVerifier: Symbol("Peer<Verifier>"),
-
 	PluginConfiguration: Symbol("PluginConfiguration"),
+
+	Processor: {
+		BlockProcessor: Symbol("Processor<Block.Processor>"),
+		BlockVerifier: Symbol("Processor<Block.Verifier>"),
+	},
 	Proposer: {
 		Selector: Symbol("Proposer<Selector>"),
 	},
@@ -222,11 +222,14 @@ export const Identifiers = {
 			IndexSet: Symbol("State<WalletRepository<IndexSet>>"),
 		},
 	},
-	TransactionHandler: Symbol("TransactionHandler"),
-	TransactionHandlerConstructors: Symbol("TransactionHandlerConstructors"),
-	TransactionHandlerProvider: Symbol("Provider<TransactionHandler>"),
-	TransactionHandlerRegistry: Symbol("Registry<TransactionHandler>"),
-	TransactionHistoryService: Symbol("Service<TransactionHistory>"),
+	Transaction: {
+		Handler: {
+			Constructors: Symbol("Transaction<Handler.Constructors>"),
+			Instances: Symbol("Transaction<Handler.Instances>"),
+			Provider: Symbol("Transaction<Handler.Provider>"),
+			Registry: Symbol("Transaction<Handler.Registry>"),
+		},
+	},
 	TransactionPool: {
 		Collator: Symbol("TransactionPool<Collator>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),

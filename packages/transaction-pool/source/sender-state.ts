@@ -11,7 +11,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.State.Service)

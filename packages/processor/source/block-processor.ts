@@ -20,7 +20,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.TransactionProcessor)
 	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.Proposer.Selector)

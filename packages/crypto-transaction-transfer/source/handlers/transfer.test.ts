@@ -51,7 +51,7 @@
 //
 // 		context.pubKeyHash = Managers.configManager.get("network.pubKeyHash");
 // 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-// 			Identifiers.TransactionHandlerRegistry,
+// 			Identifiers.Transaction.Handler.Registry,
 // 		);
 // 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 // 			Transactions.InternalTransactionType.from(Enums.TransactionType.Transfer, Enums.TransactionTypeGroup.Core),

@@ -179,7 +179,6 @@ describe<{
 	beforeEach((context) => {
 		const app = new Application(new Container());
 
-		app.bind(Identifiers.TransactionHistoryService).toConstantValue(null);
 		app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
 
@@ -203,16 +202,16 @@ describe<{
 		app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(32);
 		app.bind(Identifiers.Cryptography.Size.Signature).toConstantValue(64);
 
-		app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(ValidatorRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(VoteTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(MultiSignatureRegistrationTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(MultiPaymentTransactionHandler);
-		app.bind(Identifiers.TransactionHandler).to(ValidatorResignationTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(TransferTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorRegistrationTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(VoteTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(MultiSignatureRegistrationTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(MultiPaymentTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorResignationTransactionHandler);
 
-		app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
-		app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry).inSingletonScope();
-		app.bind(Identifiers.TransactionHandlerConstructors).toDynamicValue(
+		app.bind(Identifiers.Transaction.Handler.Provider).to(TransactionHandlerProvider).inSingletonScope();
+		app.bind(Identifiers.Transaction.Handler.Registry).to(TransactionHandlerRegistry).inSingletonScope();
+		app.bind(Identifiers.Transaction.Handler.Constructors).toDynamicValue(
 			ServiceProvider.getTransactionHandlerConstructorsBinding(),
 		);
 
@@ -225,7 +224,7 @@ describe<{
 
 	it("should register core transaction types", async (context) => {
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		await assert.resolves(() =>
@@ -272,44 +271,44 @@ describe<{
 
 	it("should skip handler registration if provider handlerProvider is already registered", async (context) => {
 		const transactionHandlerProvider = context.app.get<TransactionHandlerProvider>(
-			Identifiers.TransactionHandlerProvider,
+			Identifiers.Transaction.Handler.Provider,
 		);
 
 		stub(transactionHandlerProvider, "isRegistrationRequired").returnValue(false);
 		const registerHandlersSpy = spy(transactionHandlerProvider, "registerHandlers");
 
-		await context.app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
+		await context.app.get<TransactionHandlerRegistry>(Identifiers.Transaction.Handler.Registry);
 
 		registerHandlersSpy.neverCalled();
 	});
 
 	it("should register a custom type", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
 
 		assert.not.throws(() => {
-			context.app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
+			context.app.get<TransactionHandlerRegistry>(Identifiers.Transaction.Handler.Registry);
 		});
 	});
 
 	it("should register a custom type with dependency", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		context.app.bind(Identifiers.TransactionHandler).to(TestWithDependencyTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestWithDependencyTransactionHandler);
 
 		assert.not.throws(() => {
-			context.app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
+			context.app.get<TransactionHandlerRegistry>(Identifiers.Transaction.Handler.Registry);
 		});
 	});
 
 	it("should register a custom type with missing dependency", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestWithDependencyTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestWithDependencyTransactionHandler);
 
-		assert.throws(() => context.app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry));
+		assert.throws(() => context.app.get<TransactionHandlerRegistry>(Identifiers.Transaction.Handler.Registry));
 	});
 
 	it("should be able to return handler by data", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		const keys = await context.app
@@ -335,26 +334,26 @@ describe<{
 	});
 
 	it("should throw when registering the same key twice", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
 
 		assert.throws(() => {
-			context.app.get<TransactionHandlerRegistry>(Identifiers.TransactionHandlerRegistry);
+			context.app.get<TransactionHandlerRegistry>(Identifiers.Transaction.Handler.Registry);
 		});
 	});
 
 	it("should return all registered core handlers", async (context) => {
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		assert.length(transactionHandlerRegistry.getRegisteredHandlers(), NUMBER_OF_REGISTERED_CORE_HANDLERS);
 	});
 
 	it("should return all registered core and custom handlers", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		assert.length(transactionHandlerRegistry.getRegisteredHandlers(), NUMBER_OF_REGISTERED_CORE_HANDLERS + 1);
@@ -362,25 +361,25 @@ describe<{
 
 	it("should return all active core handlers", async (context) => {
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		assert.length(await transactionHandlerRegistry.getActivatedHandlers(), NUMBER_OF_ACTIVE_CORE_HANDLERS);
 	});
 
 	it("should return all active core and custom handlers", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		assert.length(await transactionHandlerRegistry.getActivatedHandlers(), NUMBER_OF_ACTIVE_CORE_HANDLERS + 1);
 	});
 
 	it("should return a registered custom handler", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		const internalTransactionType = InternalTransactionType.from(
@@ -403,9 +402,9 @@ describe<{
 	});
 
 	it("should return an activated custom handler", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestTransactionHandler);
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 
 		const internalTransactionType = InternalTransactionType.from(
@@ -428,10 +427,10 @@ describe<{
 	});
 
 	it("should not return deactivated custom handler", async (context) => {
-		context.app.bind(Identifiers.TransactionHandler).to(TestDeactivatedTransactionHandler);
+		context.app.bind(Identifiers.Transaction.Handler.Instances).to(TestDeactivatedTransactionHandler);
 
 		const transactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 		const internalTransactionType = InternalTransactionType.from(
 			TEST_DEACTIVATED_TRANSACTION_TYPE,

@@ -10,7 +10,7 @@ import { Controller } from "./controller";
 
 @injectable()
 export class TransactionsController extends Controller {
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	@tagged("state", "null")
 	private readonly nullHandlerRegistry!: Handlers.Registry;
 
