@@ -21,7 +21,7 @@ interface DeferredSync {
 const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
 
 @injectable()
-export class Sync implements Contracts.ApiSync.Sync {
+export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

@@ -43,7 +43,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
-	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
+	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		try {

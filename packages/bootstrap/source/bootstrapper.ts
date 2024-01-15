@@ -48,7 +48,7 @@ export class Bootstrapper {
 
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
-	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
+	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	#stateStore!: Contracts.State.StateStore;
 
