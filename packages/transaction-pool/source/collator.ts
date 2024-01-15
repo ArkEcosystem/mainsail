@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Collator implements Contracts.TransactionPool.Collator {
-	@inject(Identifiers.TransactionValidatorFactory)
+	@inject(Identifiers.TransactionPool.TransactionValidator.Factory)
 	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
 
 	@inject(Identifiers.TransactionPool.Service)

@@ -40,7 +40,7 @@ describe<{
 		context.container = new Container();
 		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
 		context.container
-			.bind(Identifiers.TransactionValidatorFactory)
+			.bind(Identifiers.TransactionPool.TransactionValidator.Factory)
 			.toConstantValue(context.createTransactionValidator);
 		context.container.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);

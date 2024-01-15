@@ -242,9 +242,11 @@ export const Identifiers = {
 		SenderState: Symbol("TransactionPool<SenderState>"),
 		Service: Symbol("TransactionPool<Service>"),
 		Storage: Symbol("TransactionPool<Storage>"),
+		TransactionValidator: {
+			Factory: Symbol("TransactionPool<TransactionValidator.Factory>"),
+			Instance: Symbol("TransactionPool<TransactionValidator.Instance>"),
+		},
 	},
 	TransactionProcessor: Symbol("Transaction<Processor>"),
-	TransactionValidator: Symbol("State<TransactionValidator>"),
-	TransactionValidatorFactory: Symbol("State<TransactionValidatorFactory>"),
 	ValidatorSet: Symbol("Set<ValidatorSet>"),
 };

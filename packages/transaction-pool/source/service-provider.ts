@@ -48,8 +48,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerServices(): void {
-		this.app.bind(Identifiers.TransactionValidator).to(TransactionValidator);
-		this.app.bind(Identifiers.TransactionValidatorFactory).toAutoFactory(Identifiers.TransactionValidator);
+		this.app.bind(Identifiers.TransactionPool.TransactionValidator.Instance).to(TransactionValidator);
+		this.app
+			.bind(Identifiers.TransactionPool.TransactionValidator.Factory)
+			.toAutoFactory(Identifiers.TransactionPool.TransactionValidator.Instance);
 
 		this.app.bind(Identifiers.TransactionPool.Collator).to(Collator);
 		this.app.bind(Identifiers.TransactionPool.ExpirationService).to(ExpirationService);
