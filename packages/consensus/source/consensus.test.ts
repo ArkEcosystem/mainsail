@@ -154,7 +154,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox.app
 			.bind(Identifiers.Consensus.RoundStateRepository)
 			.toConstantValue(context.roundStateRepository);
-		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.consensus = context.sandbox.app.resolve(Consensus);
 	});

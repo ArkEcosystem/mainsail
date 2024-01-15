@@ -55,7 +55,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#startListeners(): void {
 		this.app
-			.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
+			.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
 			.listen("*", this.app.resolve(Listener));
 	}
 }

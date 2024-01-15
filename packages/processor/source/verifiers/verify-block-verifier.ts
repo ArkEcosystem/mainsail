@@ -12,7 +12,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {

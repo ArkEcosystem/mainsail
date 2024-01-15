@@ -16,7 +16,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	async discoverPeers(peer: Contracts.P2P.Peer): Promise<void> {
@@ -25,7 +25,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 			for (const peer of peers) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptPeer", { ip: peer.ip, options: {} });
 			}
 		} catch (error) {
@@ -62,7 +62,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		return Promise.all(
 			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
 				this.app
-					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } }),
 			),
 		);

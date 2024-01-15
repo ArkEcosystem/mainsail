@@ -7,7 +7,7 @@ import { getPeerUrl } from "./utils/get-peer-url";
 
 @injectable()
 export class Peer implements Contracts.P2P.Peer {
-	@inject(Identifiers.Kernel.Queue.Factory)
+	@inject(Identifiers.Services.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
 
 	public ip!: string;

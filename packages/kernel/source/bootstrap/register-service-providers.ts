@@ -14,7 +14,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
@@ -57,7 +57,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 			const config: PluginConfiguration = serviceProvider.config();
 
 			const validator: Contracts.Kernel.Validator | undefined = this.app
-				.get<ValidationManager>(Identifiers.Kernel.Validation.Manager)
+				.get<ValidationManager>(Identifiers.Services.Validation.Manager)
 				.driver();
 
 			assert.defined<Contracts.Kernel.Validator>(validator);

@@ -13,7 +13,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {

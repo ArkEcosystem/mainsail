@@ -49,7 +49,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#downloadJobs: DownloadJob[] = [];

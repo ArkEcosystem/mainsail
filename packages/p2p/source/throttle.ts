@@ -15,10 +15,10 @@ export class Throttle {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Kernel.Queue.Factory)
+	@inject(Identifiers.Services.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#queue!: Contracts.Kernel.Queue;

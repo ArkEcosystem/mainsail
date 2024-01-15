@@ -58,8 +58,8 @@ describe<{
 		context.container
 			.bind(Identifiers.TransactionPool.ExpirationService)
 			.toConstantValue(context.expirationService);
-		context.container.bind(Identifiers.Kernel.Trigger.Service).toConstantValue(context.triggers);
-		context.container.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(context.emitter);
+		context.container.bind(Identifiers.Services.Trigger.Service).toConstantValue(context.triggers);
+		context.container.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.emitter);
 		context.container.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);

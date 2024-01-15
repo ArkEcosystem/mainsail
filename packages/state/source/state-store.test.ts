@@ -30,9 +30,9 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
@@ -187,9 +187,9 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)

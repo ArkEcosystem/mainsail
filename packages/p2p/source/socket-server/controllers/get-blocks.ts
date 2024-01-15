@@ -8,7 +8,7 @@ import { mapAddr } from "../utils/map-addr";
 
 @injectable()
 export class GetBlocksController implements Contracts.P2P.Controller {
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.State.Service)

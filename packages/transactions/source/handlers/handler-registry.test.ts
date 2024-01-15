@@ -180,7 +180,7 @@ describe<{
 		const app = new Application(new Container());
 
 		app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
-		app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
+		app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
 		app.bind<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
 			getAttributeRepository(),

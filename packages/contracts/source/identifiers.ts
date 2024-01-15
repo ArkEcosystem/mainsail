@@ -107,7 +107,55 @@ export const Identifiers = {
 		Type: Symbol("Fee<Type>"),
 	},
 
-	Kernel: {
+	P2P: {
+		ApiNode: {
+			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),
+			Factory: Symbol("P2P<ApiNode.Factory>"),
+			Processor: Symbol("P2P<ApiNode.Processor>"),
+			Repository: Symbol("P2P<ApiNode.Repository>"),
+			Verifier: Symbol("P2P<ApiNode.Verifier>"),
+		},
+		Broadcaster: Symbol("P2P<Broadcaster>"),
+		Downloader: {
+			Block: Symbol("P2P<Downloader.Block>"),
+			Message: Symbol("P2P<Downloader.Message>"),
+			Proposal: Symbol("P2P<Downloader.Proposal>"),
+		},
+		Header: {
+			Factory: Symbol("P2P<Header.Factory>"),
+			Service: Symbol("P2P<Header.Service>"),
+		},
+		Logger: Symbol("P2P<Logger>"),
+		Peer: {
+			Communicator: Symbol("P2P<Communicator>"),
+			Connector: Symbol("P2P<Connector>"),
+			Discoverer: Symbol("P2P<Peer.Discoverer>"),
+			Disposer: Symbol("P2P<Peer.Disposer>"),
+			Factory: Symbol("P2P<Peer.Factory>"),
+			Processor: Symbol("P2P<Processor>"),
+			Repository: Symbol("P2P<Peer.Repository>"),
+			Verifier: Symbol("P2P<Verifier>"),
+		},
+		Server: Symbol("P2P<Server>"),
+		Service: Symbol("P2P<Service>"),
+		State: Symbol("P2P<State>"),
+		Throttle: {
+			Factory: Symbol("P2P<Throttle.Factory>"),
+		},
+	},
+	PluginConfiguration: Symbol("PluginConfiguration"),
+
+	Processor: {
+		BlockProcessor: Symbol("Processor<Block.Processor>"),
+		BlockVerifier: Symbol("Processor<Block.Verifier>"),
+		TransactionProcessor: Symbol("Processor<Transaction.Processor>"),
+	},
+
+	Proposer: {
+		Selector: Symbol("Proposer<Selector>"),
+	},
+	ServiceProviderRepository: Symbol("Repository<ServiceProvider>"),
+	Services: {
 		Cache: {
 			Factory: Symbol("Kernel<Cache.Factory>"),
 			Manager: Symbol("Kernel<Cache.Manager>"),
@@ -155,54 +203,6 @@ export const Identifiers = {
 			Service: Symbol("Kernel<Validation.Service>"),
 		},
 	},
-	P2P: {
-		ApiNode: {
-			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),
-			Factory: Symbol("P2P<ApiNode.Factory>"),
-			Processor: Symbol("P2P<ApiNode.Processor>"),
-			Repository: Symbol("P2P<ApiNode.Repository>"),
-			Verifier: Symbol("P2P<ApiNode.Verifier>"),
-		},
-		Broadcaster: Symbol("P2P<Broadcaster>"),
-		Downloader: {
-			Block: Symbol("P2P<Downloader.Block>"),
-			Message: Symbol("P2P<Downloader.Message>"),
-			Proposal: Symbol("P2P<Downloader.Proposal>"),
-		},
-		Header: {
-			Factory: Symbol("P2P<Header.Factory>"),
-			Service: Symbol("P2P<Header.Service>"),
-		},
-		Logger: Symbol("P2P<Logger>"),
-		Peer: {
-			Communicator: Symbol("P2P<Communicator>"),
-			Connector: Symbol("P2P<Connector>"),
-			Discoverer: Symbol("P2P<Peer.Discoverer>"),
-			Disposer: Symbol("P2P<Peer.Disposer>"),
-			Factory: Symbol("P2P<Peer.Factory>"),
-			Processor: Symbol("P2P<Processor>"),
-			Repository: Symbol("P2P<Peer.Repository>"),
-			Verifier: Symbol("P2P<Verifier>"),
-		},
-		Server: Symbol("P2P<Server>"),
-		Service: Symbol("P2P<Service>"),
-		State: Symbol("P2P<State>"),
-		Throttle: {
-			Factory: Symbol("P2P<Throttle.Factory>"),
-		},
-	},
-
-	PluginConfiguration: Symbol("PluginConfiguration"),
-
-	Processor: {
-		BlockProcessor: Symbol("Processor<Block.Processor>"),
-		BlockVerifier: Symbol("Processor<Block.Verifier>"),
-		TransactionProcessor: Symbol("Processor<Transaction.Processor>"),
-	},
-	Proposer: {
-		Selector: Symbol("Proposer<Selector>"),
-	},
-	ServiceProviderRepository: Symbol("Repository<ServiceProvider>"),
 	State: {
 		AttributeRepository: Symbol("State<AttributeRepository>"),
 		Exporter: Symbol("State<Exporter>"),

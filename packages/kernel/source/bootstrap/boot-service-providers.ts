@@ -17,10 +17,10 @@ export class BootServiceProviders implements Bootstrapper {
 	@inject(Identifiers.ServiceProviderRepository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
-	@inject(Identifiers.Kernel.EventDispatcher.Service)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {

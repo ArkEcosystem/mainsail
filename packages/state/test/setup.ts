@@ -85,7 +85,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		warning: spy(),
 	};
 
-	sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 
 	sandbox.app.bind(Identifiers.State.WalletRepository.IndexSet).to(IndexSet).inSingletonScope();
 	sandbox.app
@@ -150,7 +150,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
-	sandbox.app.bind(Identifiers.Kernel.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
+	sandbox.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
 
@@ -237,7 +237,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	sandbox.app.container.bind(Identifiers.Kernel.EventDispatcher.Service).to(MockEventDispatcher);
+	sandbox.app.container.bind(Identifiers.Services.EventDispatcher.Service).to(MockEventDispatcher);
 
 	sandbox.app
 		.bind(Identifiers.WalletRepository)
@@ -301,7 +301,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 		// sandbox.app
 		// 	.get<Configuration>(Identifiers.Cryptography.Configuration)
-		// 	.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto"));
+		// 	.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto"));
 		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 	}
 

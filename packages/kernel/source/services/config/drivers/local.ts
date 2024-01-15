@@ -15,13 +15,13 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Kernel.Config.Repository)
+	@inject(Identifiers.Services.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
-	@inject(Identifiers.Kernel.Validation.Service)
+	@inject(Identifiers.Services.Validation.Service)
 	private readonly validationService!: Contracts.Kernel.Validator;
 
-	@inject(Identifiers.Kernel.Config.Flags)
+	@inject(Identifiers.Services.Config.Flags)
 	private readonly configFlags!: KeyValuePair;
 
 	public async loadEnvironmentVariables(): Promise<void> {
@@ -69,7 +69,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		}
 
 		this.configRepository.set("app.flags", {
-			...this.app.get<Contracts.Types.JsonObject>(Identifiers.Kernel.Config.Flags),
+			...this.app.get<Contracts.Types.JsonObject>(Identifiers.Services.Config.Flags),
 			...get(this.validationService.valid(), "flags", {}),
 		});
 

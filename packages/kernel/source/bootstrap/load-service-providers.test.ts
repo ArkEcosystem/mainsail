@@ -20,9 +20,9 @@ describe<{
 }>("LoadServiceProviders", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 
-		context.configRepository = context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository);
+		context.configRepository = context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository);
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProviderRepository,
 		);

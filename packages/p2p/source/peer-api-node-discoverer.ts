@@ -24,7 +24,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	async discoverApiNodes(peer: Contracts.P2P.Peer): Promise<void> {
@@ -33,7 +33,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 
 			for (const apiNode of apiNodes) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptApiNode", { apiNode, options: {} });
 			}
 		} catch (error) {
@@ -53,7 +53,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 		return Promise.all(
 			Object.values(apiNodes).map((apiNode: Contracts.P2P.PeerApiNode) =>
 				this.app
-					.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptApiNode", { apiNode, options: { seed: true } }),
 			),
 		);
@@ -74,7 +74,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 				)
 				.map((apiNode) =>
 					this.app
-						.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+						.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 						.call("revalidateApiNode", { apiNode }),
 				),
 		);

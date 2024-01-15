@@ -29,8 +29,8 @@ const init = (context: Context) => {
 	app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
 	app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
 	app.bind(Identifiers.Transaction.Handler.Registry).toConstantValue({});
-	app.bind(Identifiers.Kernel.EventDispatcher.Service).to(NullEventDispatcher);
-	app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
+	app.bind(Identifiers.Services.EventDispatcher.Service).to(NullEventDispatcher);
+	app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);

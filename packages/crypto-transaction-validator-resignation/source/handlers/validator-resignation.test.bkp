@@ -134,7 +134,7 @@ describe<{
 
 	it("emitEvents should dispatch", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Identifiers.Kernel.EventDispatcher.Service,
+			Identifiers.Services.EventDispatcher.Service,
 		);
 
 		const mock = spy(emitter, "dispatch");

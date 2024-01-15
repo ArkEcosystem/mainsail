@@ -14,13 +14,13 @@ describe<{
 	});
 
 	it(".register", async (context) => {
-		assert.false(context.app.isBound(Identifiers.Kernel.Validation.Manager));
-		assert.false(context.app.isBound(Identifiers.Kernel.Validation.Service));
+		assert.false(context.app.isBound(Identifiers.Services.Validation.Manager));
+		assert.false(context.app.isBound(Identifiers.Services.Validation.Service));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.Kernel.Validation.Manager));
-		assert.true(context.app.isBound(Identifiers.Kernel.Validation.Service));
-		assert.instance(context.app.get(Identifiers.Kernel.Validation.Service), JoiValidator);
+		assert.true(context.app.isBound(Identifiers.Services.Validation.Manager));
+		assert.true(context.app.isBound(Identifiers.Services.Validation.Service));
+		assert.instance(context.app.get(Identifiers.Services.Validation.Service), JoiValidator);
 	});
 });

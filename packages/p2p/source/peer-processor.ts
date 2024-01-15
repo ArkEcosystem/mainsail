@@ -32,7 +32,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.P2P.ApiNode.Discoverer)
 	private readonly peerApiNodeDiscoverer!: Contracts.P2P.PeerApiNodeDiscoverer;
 
-	@inject(Identifiers.Kernel.EventDispatcher.Service)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.P2P.Logger)

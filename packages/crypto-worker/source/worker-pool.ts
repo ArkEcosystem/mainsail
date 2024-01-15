@@ -8,7 +8,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	@tagged("plugin", "crypto-worker")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.CryptoWorker.WorkerFactory)
@@ -16,7 +16,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 
 	private workers: IpcWorker.Worker[] = [];
 
-	@inject(Identifiers.Kernel.Config.Flags)
+	@inject(Identifiers.Services.Config.Flags)
 	private readonly flags!: Types.KeyValuePair;
 
 	#currentWorkerIndex = 0;

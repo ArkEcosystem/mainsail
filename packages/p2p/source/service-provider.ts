@@ -166,15 +166,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerActions(): void {
 		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
 
 		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("validateAndAcceptApiNode", new ValidateAndAcceptApiNodeAction(this.app));
 
 		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Kernel.Trigger.Service)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("revalidateApiNode", new RevalidateApiNodeAction(this.app));
 	}
 

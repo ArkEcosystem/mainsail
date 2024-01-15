@@ -3,7 +3,7 @@ import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Logger implements Contracts.P2P.Logger {
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	emergency(message: any): void {

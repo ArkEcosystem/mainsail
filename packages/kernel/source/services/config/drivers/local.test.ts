@@ -15,11 +15,11 @@ describe<{
 }>("LocalConfigLoader", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
-		context.app.bind(Identifiers.Kernel.Config.Flags).toConstantValue({});
-		context.app.bind(Identifiers.Kernel.Config.Plugins).toConstantValue({});
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
+		context.app.bind(Identifiers.Services.Config.Flags).toConstantValue({});
+		context.app.bind(Identifiers.Services.Config.Plugins).toConstantValue({});
 
-		context.app.bind(Identifiers.Kernel.Validation.Service).to(JoiValidator);
+		context.app.bind(Identifiers.Services.Validation.Service).to(JoiValidator);
 
 		context.configLoader = context.app.resolve<LocalConfigLoader>(LocalConfigLoader);
 	});
@@ -82,16 +82,16 @@ describe<{
 		await context.configLoader.loadConfiguration();
 
 		await assert.rejects(() =>
-			context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto.genesisBlock"),
+			context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto.genesisBlock"),
 		);
 		await assert.rejects(() =>
-			context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto.exceptions"),
+			context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto.exceptions"),
 		);
 		await assert.rejects(() =>
-			context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto.milestones"),
+			context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto.milestones"),
 		);
 		await assert.rejects(() =>
-			context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto.network"),
+			context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto.network"),
 		);
 	});
 
@@ -103,11 +103,11 @@ describe<{
 		await context.configLoader.loadConfiguration();
 
 		assert.defined(
-			context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto.genesisBlock"),
+			context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto.genesisBlock"),
 		);
 		assert.defined(
-			context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto.milestones"),
+			context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto.milestones"),
 		);
-		assert.defined(context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).get("crypto.network"));
+		assert.defined(context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).get("crypto.network"));
 	});
 });

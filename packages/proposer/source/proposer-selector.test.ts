@@ -40,7 +40,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		context.sandbox = new Sandbox();
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
-		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 		context.sandbox.app
 			.bind(Identifiers.State.AttributeRepository)

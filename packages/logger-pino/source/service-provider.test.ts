@@ -13,18 +13,18 @@ const loadDefaults = () => importFresh("./defaults").defaults;
 describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.Kernel.Config.Flags).toConstantValue("core");
+		context.app.bind(Identifiers.Services.Config.Flags).toConstantValue("core");
 
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
 
 	it("should register", async (context) => {
 		context.app
-			.bind<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager)
+			.bind<Services.Log.LogManager>(Identifiers.Services.Log.Manager)
 			.to(Services.Log.LogManager)
 			.inSingletonScope();
 
-		await context.app.get<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager).boot();
+		await context.app.get<Services.Log.LogManager>(Identifiers.Services.Log.Manager).boot();
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
@@ -36,11 +36,11 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 	it("should be disposable", async (context) => {
 		context.app
-			.bind<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager)
+			.bind<Services.Log.LogManager>(Identifiers.Services.Log.Manager)
 			.to(Services.Log.LogManager)
 			.inSingletonScope();
 
-		await context.app.get<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager).boot();
+		await context.app.get<Services.Log.LogManager>(Identifiers.Services.Log.Manager).boot();
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
@@ -48,9 +48,9 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.app
-			.bind(Identifiers.Kernel.Log.Service)
+			.bind(Identifiers.Services.Log.Service)
 			.toDynamicValue((context: Container.interfaces.Context) =>
-				context.container.get<Services.Log.LogManager>(Identifiers.Kernel.Log.Manager).driver(),
+				context.container.get<Services.Log.LogManager>(Identifiers.Services.Log.Manager).driver(),
 			);
 
 		await assert.resolves(() => context.serviceProvider.register());

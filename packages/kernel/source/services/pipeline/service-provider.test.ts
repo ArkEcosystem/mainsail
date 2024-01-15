@@ -14,16 +14,16 @@ describe<{
 		context.app = new Application(new Container());
 	});
 	it("should register the service", async (context) => {
-		assert.false(context.app.isBound(Identifiers.Kernel.Pipeline.Factory));
+		assert.false(context.app.isBound(Identifiers.Services.Pipeline.Factory));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.Kernel.Pipeline.Factory));
+		assert.true(context.app.isBound(Identifiers.Services.Pipeline.Factory));
 	});
 
 	it("should create an instance of the MemoryPipeline", async (context) => {
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.instance(context.app.get<PipelineFactory>(Identifiers.Kernel.Pipeline.Factory)(), MemoryPipeline);
+		assert.instance(context.app.get<PipelineFactory>(Identifiers.Services.Pipeline.Factory)(), MemoryPipeline);
 	});
 });

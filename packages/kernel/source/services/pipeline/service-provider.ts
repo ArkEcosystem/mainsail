@@ -7,7 +7,7 @@ import { MemoryPipeline } from "./drivers/memory";
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
 		this.app
-			.bind(Identifiers.Kernel.Pipeline.Factory)
+			.bind(Identifiers.Services.Pipeline.Factory)
 			.toFactory(
 				(context: interfaces.Context) => (): Contracts.Kernel.Pipeline =>
 					context.container.resolve<Contracts.Kernel.Pipeline>(MemoryPipeline),

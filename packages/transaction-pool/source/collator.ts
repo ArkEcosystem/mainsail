@@ -15,7 +15,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)

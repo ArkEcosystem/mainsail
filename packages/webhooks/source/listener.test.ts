@@ -44,10 +44,10 @@ describe<{
 		const app = new Application(new Container());
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
-		app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
 
-		app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
+		app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 
 		context.database = app.get<Database>(InternalIdentifiers.Database);
 		context.database.boot();

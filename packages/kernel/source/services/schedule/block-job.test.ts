@@ -30,7 +30,7 @@ describe<{
 		context.sandbox = new Sandbox();
 		context.eventDispatcher = context.sandbox.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher);
 
-		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);

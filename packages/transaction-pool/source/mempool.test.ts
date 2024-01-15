@@ -24,7 +24,7 @@ describe<{
 		context.container
 			.bind(Identifiers.TransactionPool.SenderMempool.Factory)
 			.toConstantValue(context.createSenderMempool);
-		context.container.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
+		context.container.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
 		context.container.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory);
 		context.container.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory);

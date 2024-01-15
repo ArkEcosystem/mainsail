@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.TransactionPool.Collator)

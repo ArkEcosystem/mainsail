@@ -14,7 +14,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	@optional()
 	private readonly broadcaster!: Contracts.P2P.Broadcaster | undefined;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)

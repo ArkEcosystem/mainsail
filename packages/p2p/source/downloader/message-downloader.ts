@@ -54,7 +54,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Kernel.EventDispatcher.Service)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.State.Service)

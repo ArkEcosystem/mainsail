@@ -27,7 +27,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 
 	beforeEach(async (context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.Kernel.Config.Flags).toConstantValue("core");
+		context.app.bind(Identifiers.Services.Config.Flags).toConstantValue("core");
 		context.app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
@@ -159,7 +159,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 
 	it("should rotate the log 3 times", async (context) => {
 		const app = new Application(new Container());
-		app.bind(Identifiers.Kernel.Config.Flags).toConstantValue("core");
+		app.bind(Identifiers.Services.Config.Flags).toConstantValue("core");
 		app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
 		app.useLogPath(dirSync().name);
 

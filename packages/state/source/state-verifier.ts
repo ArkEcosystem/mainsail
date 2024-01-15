@@ -10,7 +10,7 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private logger!: Contracts.Kernel.Logger;
 
 	verifyWalletsConsistency(): void {

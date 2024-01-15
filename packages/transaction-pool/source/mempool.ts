@@ -4,7 +4,7 @@ import { Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.TransactionPool.SenderMempool.Factory)

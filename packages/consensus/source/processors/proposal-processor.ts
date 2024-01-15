@@ -27,7 +27,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.CryptoWorker.WorkerPool)

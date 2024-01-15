@@ -67,14 +67,14 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly transactionHandlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.PluginConfiguration)
 	@tagged("plugin", "api-sync")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.Kernel.Queue.Factory)
+	@inject(Identifiers.Services.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
 	#queue!: Contracts.Kernel.Queue;
 

@@ -3,7 +3,7 @@ import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 
 @injectable()
 export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)

@@ -25,7 +25,7 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application(new Container());
 
-		context.app.bind(Identifiers.Kernel.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 
 		context.store = context.app.resolve(MemoryCacheStore);
 	});

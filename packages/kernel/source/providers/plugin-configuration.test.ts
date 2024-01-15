@@ -17,7 +17,7 @@ describe<{
 	});
 
 	it("should create an instance from a name and defaults", (context) => {
-		context.app.get<ConfigRepository>(Identifiers.Kernel.Config.Repository).set("app.pluginOptions", {
+		context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).set("app.pluginOptions", {
 			dummy: { key: "value" },
 		});
 

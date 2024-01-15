@@ -20,10 +20,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@inject(Identifiers.Kernel.Trigger.Service)
+	@inject(Identifiers.Services.Trigger.Service)
 	private readonly triggers!: Services.Triggers.Triggers;
 
-	@inject(Identifiers.Kernel.EventDispatcher.Service)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	#walletRepository!: Contracts.State.WalletRepository;

@@ -29,7 +29,7 @@ export const generateApp = async (
 ): Promise<Contracts.Kernel.Application> => {
 	const sandbox = new Sandbox();
 
-	sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue({});
+	sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 	sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);

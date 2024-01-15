@@ -22,7 +22,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
-		this.bind<ConfigRepository>(Identifiers.Kernel.Config.Repository).to(ConfigRepository).inSingletonScope();
+		this.bind<ConfigRepository>(Identifiers.Services.Config.Repository).to(ConfigRepository).inSingletonScope();
 
 		this.bind<ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
 			.to(ServiceProviderRepository)
@@ -33,8 +33,8 @@ export class Application implements Contracts.Kernel.Application {
 		flags: Contracts.Types.JsonObject;
 		plugins?: Contracts.Types.JsonObject;
 	}): Promise<void> {
-		this.bind<KeyValuePair>(Identifiers.Kernel.Config.Flags).toConstantValue(options.flags);
-		this.bind<KeyValuePair>(Identifiers.Kernel.Config.Plugins).toConstantValue(options.plugins || {});
+		this.bind<KeyValuePair>(Identifiers.Services.Config.Flags).toConstantValue(options.flags);
+		this.bind<KeyValuePair>(Identifiers.Services.Config.Plugins).toConstantValue(options.plugins || {});
 
 		await this.#registerEventDispatcher();
 
@@ -54,7 +54,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined {
-		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Kernel.Config.Repository);
+		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Services.Config.Repository);
 
 		if (value) {
 			config.set(key, value);
@@ -166,12 +166,12 @@ export class Application implements Contracts.Kernel.Application {
 	public enableMaintenance(): void {
 		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).notice(
+		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
 			"Application is now in maintenance mode.",
 		);
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service).dispatch(
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
 			"kernel.maintenance",
 			true,
 		);
@@ -180,10 +180,10 @@ export class Application implements Contracts.Kernel.Application {
 	public disableMaintenance(): void {
 		removeSync(this.tempPath("maintenance"));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).notice("Application is now live.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice("Application is now live.");
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service).dispatch(
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
 			"kernel.maintenance",
 			false,
 		);
@@ -197,7 +197,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#booted = false;
 
 		if (this.#terminating) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).warning(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
 				"Force application termination. Graceful shutdown was interrupted.",
 			);
 			exit(1);
@@ -206,7 +206,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		const message = `reason: ${reason} error: ${error?.message}`;
 		if (reason || error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service)[error ? "error" : "warning"](message);
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warning"](message);
 		}
 
 		if (error) {
@@ -218,12 +218,12 @@ export class Application implements Contracts.Kernel.Application {
 			}
 
 			for (const error of errors) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).error(error.stack ?? error.message);
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).error(error.stack ?? error.message);
 			}
 		}
 
 		const timeout = setTimeout(() => {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).warning(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
 				"Force application termination. Service providers did not dispose in time.",
 			);
 			exit(1);
@@ -237,7 +237,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.#logOpenHandlers();
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).notice(
+		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
 			"Application is gracefully terminated.",
 		);
 
@@ -294,7 +294,7 @@ export class Application implements Contracts.Kernel.Application {
 
 	async #bootstrapWith(type: string): Promise<void> {
 		const bootstrappers: Constructor<Bootstrapper>[] = Object.values(Bootstrappers[type]);
-		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Kernel.EventDispatcher.Service);
+		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
 			await events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
@@ -315,7 +315,7 @@ export class Application implements Contracts.Kernel.Application {
 		).allLoadedProviders();
 
 		for (const serviceProvider of serviceProviders.reverse()) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).debug(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).debug(
 				`Disposing ${serviceProvider.name()}...`,
 			);
 
@@ -334,7 +334,7 @@ export class Application implements Contracts.Kernel.Application {
 			const fsRequests = resourcesInfo.filter((resource) => resource.includes("FSReqCallback"));
 
 			if (timeouts.length > 0 || fsRequests.length > 0) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.Kernel.Log.Service).warning(
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
 					`There are ${timeouts.length} active timeouts and ${fsRequests.length} active file system requests.`,
 				);
 			}

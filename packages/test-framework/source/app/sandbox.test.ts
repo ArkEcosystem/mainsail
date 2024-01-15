@@ -53,8 +53,8 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 	it("should dispose", async () => {
 		const sandbox = new Sandbox();
 
-		sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
-		sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue({});
+		sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+		sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
 		await assert.resolves(() => sandbox.boot());
 		await assert.resolves(() => sandbox.dispose());
@@ -65,8 +65,8 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 
 		const callback = spyFn();
 
-		sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue({});
-		sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue({});
+		sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+		sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
 		await assert.resolves(() => sandbox.boot());
 		await assert.resolves(() => sandbox.dispose(() => callback.call()));
@@ -94,7 +94,7 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 	it("should register service provider", async () => {
 		const sandbox = new Sandbox();
 
-		sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue({});
+		sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
 		const serviceProviderOptions = {
 			klass: require("@mainsail/validation").ServiceProvider,

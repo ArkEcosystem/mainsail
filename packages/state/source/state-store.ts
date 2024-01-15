@@ -9,7 +9,7 @@ export class StateStore implements Contracts.State.StateStore {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
@@ -73,7 +73,7 @@ export class StateStore implements Contracts.State.StateStore {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
 			void this.app
-				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Kernel.EventDispatcher.Service)
+				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
 				.dispatch(Enums.CryptoEvent.MilestoneChanged);
 		}
 	}

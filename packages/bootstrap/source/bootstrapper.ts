@@ -7,7 +7,7 @@ export class Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Kernel.Log.Service)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.Service)
