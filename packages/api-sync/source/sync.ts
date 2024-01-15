@@ -116,11 +116,11 @@ export class Sync implements Contracts.ApiSync.Sync {
 
 		const deferredSync: DeferredSync = {
 			block: {
+				commitRound: proof.round,
 				generatorPublicKey: header.generatorPublicKey,
 				height: header.height.toFixed(),
 				id: header.id,
 				numberOfTransactions: header.numberOfTransactions,
-				commitRound: proof.round,
 				payloadHash: header.payloadHash,
 				payloadLength: header.payloadLength,
 				previousBlock: header.previousBlock,
