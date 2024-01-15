@@ -34,10 +34,14 @@ export const Identifiers = {
 		ValidatorRepository: Symbol("Repository<Consensus.Validator>"),
 	},
 	CryptoWorker: {
-		Worker: Symbol("Ipc<Worker>"),
-		WorkerFactory: Symbol("Ipc<WorkerFactory>"),
+		Worker: {
+			Factory: Symbol("CryptoWorker<Worker.Factory>"),
+			Instance: Symbol("CryptoWorker<Worker.Instance>"),
+		},
 		WorkerPool: Symbol("Ipc<WorkerPool>"),
-		WorkerSubprocessFactory: Symbol("Ipc<WorkerSubprocessFactory>"),
+		WorkerSubprocess: {
+			Factory: Symbol("CryptoWorker<WorkerSubprocess.Factory>"),
+		},
 	},
 	Cryptography: {
 		Block: {

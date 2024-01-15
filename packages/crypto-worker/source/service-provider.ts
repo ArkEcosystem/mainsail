@@ -9,15 +9,15 @@ import { WorkerPool } from "./worker-pool";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.CryptoWorker.Worker).to(Worker);
+		this.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker);
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
-		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocessFactory).toFactory(() => () => {
+		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
 			const subprocess = fork(`${__dirname}/worker-script.js`, {});
 			return new Ipc.Subprocess(subprocess);
 		});
 
-		this.app.bind(Identifiers.CryptoWorker.WorkerFactory).toAutoFactory(Identifiers.CryptoWorker.Worker);
+		this.app.bind(Identifiers.CryptoWorker.Worker.Factory).toAutoFactory(Identifiers.CryptoWorker.Worker.Instance);
 	}
 
 	public async boot(): Promise<void> {
