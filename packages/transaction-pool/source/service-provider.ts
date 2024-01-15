@@ -58,7 +58,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.Mempool).to(Mempool).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Processor).to(Processor);
 		this.app.bind(Identifiers.TransactionPool.Query).to(Query);
-		this.app.bind(Identifiers.TransactionPool.SenderMempoolFactory).toFactory(
+		this.app.bind(Identifiers.TransactionPool.SenderMempool.Factory).toFactory(
 			({ container }) =>
 				async (publicKey: string) =>
 					await container.resolve(SenderMempool).configure(publicKey),

@@ -22,7 +22,7 @@ describe<{
 
 		context.container = new Container();
 		context.container
-			.bind(Identifiers.TransactionPool.SenderMempoolFactory)
+			.bind(Identifiers.TransactionPool.SenderMempool.Factory)
 			.toConstantValue(context.createSenderMempool);
 		context.container.bind(Identifiers.Kernel.Log.Service).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
