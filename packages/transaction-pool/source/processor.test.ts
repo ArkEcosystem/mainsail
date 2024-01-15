@@ -51,7 +51,7 @@ describe<{
 		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
 		context.container.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.factory);
 		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
-		context.container.bind(Identifiers.PeerBroadcaster).toConstantValue(context.transactionBroadcaster);
+		context.container.bind(Identifiers.P2P.Broadcaster).toConstantValue(context.transactionBroadcaster);
 		context.container.bind(Identifiers.Kernel.Log.Service).toConstantValue({
 			error: () => {},
 		});

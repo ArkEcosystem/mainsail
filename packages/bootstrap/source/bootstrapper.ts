@@ -19,7 +19,7 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.P2PServer)
+	@inject(Identifiers.P2P.Server)
 	private readonly p2pServer!: Contracts.P2P.Server;
 
 	@inject(Identifiers.P2P.Service)

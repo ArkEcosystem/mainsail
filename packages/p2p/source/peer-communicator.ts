@@ -20,22 +20,22 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerConnector)
+	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@inject(Identifiers.PeerHeaderFactory)
+	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
-	@inject(Identifiers.PeerHeaderService)
+	@inject(Identifiers.P2P.Header.Service)
 	private readonly headerService!: Contracts.P2P.HeaderService;
 
-	@inject(Identifiers.P2PLogger)
+	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
-	@inject(Identifiers.PeerThrottleFactory)
+	@inject(Identifiers.P2P.Throttle.Factory)
 	private readonly throttleFactory!: () => Promise<Throttle>;
 
 	#throttle?: Throttle;
@@ -210,7 +210,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	}
 
 	private handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
-		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).banPeer(peer.ip, error);
+		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
 	}
 
 	async #getThrottle(): Promise<Throttle> {

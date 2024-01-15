@@ -27,7 +27,7 @@ export class ValidatePlugin extends BasePlugin {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerProcessor)
+	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server) {

@@ -11,16 +11,16 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
-	@inject(Identifiers.P2PState)
+	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
 	public async broadcastTransactions(transactions: Contracts.Crypto.Transaction[]): Promise<void> {

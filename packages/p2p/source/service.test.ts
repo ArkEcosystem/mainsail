@@ -41,8 +41,8 @@ describeSkip<{
 		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.PeerNetworkMonitor).to(Service);
 		context.sandbox.app.bind(Identifiers.Kernel.EventDispatcher.Service).toConstantValue(emitter);
-		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
-		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(repository);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
 		context.sandbox.app.bind(Identifiers.Kernel.Trigger.Service).toConstantValue(triggerService);
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 

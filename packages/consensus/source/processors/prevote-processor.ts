@@ -15,7 +15,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
-	@inject(Identifiers.PeerBroadcaster)
+	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
 	@inject(Identifiers.CryptoWorker.WorkerPool)

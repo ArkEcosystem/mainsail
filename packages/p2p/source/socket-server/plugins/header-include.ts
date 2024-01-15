@@ -7,7 +7,7 @@ export class HeaderIncludePlugin {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerHeaderFactory)
+	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
 	public register(server) {

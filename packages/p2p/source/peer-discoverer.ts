@@ -7,13 +7,13 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerFactory)
+	@inject(Identifiers.P2P.Peer.Factory)
 	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@inject(Identifiers.PeerDisposer)
+	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Kernel.Log.Service)

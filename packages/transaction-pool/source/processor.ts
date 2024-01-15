@@ -10,7 +10,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.PeerBroadcaster)
+	@inject(Identifiers.P2P.Broadcaster)
 	@optional()
 	private readonly broadcaster!: Contracts.P2P.Broadcaster | undefined;
 

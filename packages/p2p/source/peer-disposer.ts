@@ -11,10 +11,10 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerConnector)
+	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.Kernel.EventDispatcher.Service)

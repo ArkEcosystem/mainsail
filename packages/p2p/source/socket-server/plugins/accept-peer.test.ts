@@ -26,9 +26,9 @@ describe<{
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
 			.whenTargetTagged("plugin", "transaction-pool");
 		context.sandbox.app.bind(Identifiers.Kernel.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue(peerProcessor);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});

@@ -34,7 +34,7 @@ describe<{
 		const spyServerInitialize = stub(server, "initialize");
 		const spyServerBoot = stub(server, "boot");
 
-		sandbox.app.bind(Identifiers.P2PServer).toConstantValue(server);
+		sandbox.app.bind(Identifiers.P2P.Server).toConstantValue(server);
 
 		const config = sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
 		serviceProvider.setConfig(config);
@@ -49,9 +49,9 @@ describe<{
 		const spyServerDispose = stub(server, "dispose");
 		const spyServiceDispose = stub(service, "dispose");
 		const spyPeerDispose = stub(peerDisposer, "disposePeers");
-		sandbox.app.bind(Identifiers.P2PServer).toConstantValue(server);
+		sandbox.app.bind(Identifiers.P2P.Server).toConstantValue(server);
 		sandbox.app.bind(Identifiers.P2P.Service).toConstantValue(service);
-		sandbox.app.bind(Identifiers.PeerDisposer).toConstantValue(peerDisposer);
+		sandbox.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(peerDisposer);
 
 		await serviceProvider.dispose();
 
@@ -74,7 +74,7 @@ describe<{
 		await serviceProvider.register();
 
 		const ip = "188.133.1.2";
-		const peer = sandbox.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(ip);
+		const peer = sandbox.app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
 
 		assert.instance(peer, Peer);
 		assert.number(peer.port);

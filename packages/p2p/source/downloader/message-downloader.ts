@@ -27,19 +27,19 @@ type DownloadJob = {
 
 @injectable()
 export class MessageDownloader implements Contracts.P2P.Downloader {
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerHeaderFactory)
+	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
-	@inject(Identifiers.PeerBlockDownloader)
+	@inject(Identifiers.P2P.Downloader.Block)
 	private readonly blockDownloader!: Contracts.P2P.Downloader;
 
-	@inject(Identifiers.PeerDisposer)
+	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.Consensus.PrevoteProcessor)
@@ -60,7 +60,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.P2PState)
+	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
 	#fullDownloadsByHeight: Map<number, Set<number>> = new Map();

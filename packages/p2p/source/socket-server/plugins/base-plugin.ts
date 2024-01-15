@@ -6,7 +6,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { getPeerIp } from "../../utils";
 @injectable()
 export class BasePlugin {
-	@inject(Identifiers.PeerDisposer)
+	@inject(Identifiers.P2P.Peer.Disposer)
 	protected readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	protected disposeAndReturnBadRequest = (request: Contracts.P2P.Request, h: ResponseToolkit, error: string) => {

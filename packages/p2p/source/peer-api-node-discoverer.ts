@@ -12,16 +12,16 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerApiNodeFactory)
+	@inject(Identifiers.P2P.ApiNode.Factory)
 	private readonly peerApiNodeFactory!: Contracts.P2P.PeerApiNodeFactory;
 
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@inject(Identifiers.PeerApiNodeRepository)
+	@inject(Identifiers.P2P.ApiNode.Repository)
 	private readonly apiNodeRepository!: Contracts.P2P.PeerApiNodeRepository;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	@inject(Identifiers.Kernel.Log.Service)
