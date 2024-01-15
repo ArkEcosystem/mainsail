@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 import seedrandom from "seedrandom";
 
 @injectable()
-export class ProposerSelector implements Contracts.Proposer.ProposerSelector {
+export class Selector implements Contracts.Proposer.Selector {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 

@@ -145,7 +145,6 @@ export const Identifiers = {
 			Factory: Symbol("P2P<Throttle.Factory>"),
 		},
 	},
-
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),
 		BlockVerifier: Symbol("Processor<Block.Verifier>"),

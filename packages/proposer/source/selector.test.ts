@@ -1,8 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { Attributes, StateStore } from "../../state";
-import { ProposerSelector } from "./proposer-selector";
+import { Attributes, StateStore } from "../../state/distribution";
+import { Selector } from "./selector";
 
 type Context = {
 	sandbox: Sandbox;
@@ -13,7 +13,7 @@ type Context = {
 	logger: any;
 };
 
-describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
+describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.stateService = {
 			getStateStore: () => context.stateStore,
@@ -58,7 +58,7 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 
-		context.proposerSelector = context.sandbox.app.resolve(ProposerSelector);
+		context.proposerSelector = context.sandbox.app.resolve(Selector);
 	});
 
 	// Calculated indexes seeded from height 1 for the first 51 validators
