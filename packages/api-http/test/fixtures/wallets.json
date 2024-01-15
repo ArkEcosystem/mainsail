@@ -23,7 +23,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "9283a37556aa42aa7e2ee363fdd63adb8e91d2a97fe61c55a298075f4075471762371209f190d6d1f674b882e039b78b"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1takyl3fwu644kdhpg26tawszppcayc8a2lk3x7rzk3aa9f93r96szr907f",
@@ -49,7 +50,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "9429b3ab3d55edc1169dbcee25d070075b5fd2b372bb8b4f67bf82d7d9a37ca7f874a8fb54a200b6bc539f786952122c"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1hfvs4y9ssskh082fe3ermzzk87r0m354eupjcyaeemd5yfs94zxsx4776m",
@@ -75,7 +77,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8b305af5825449c9a6a9a7468386a4c033b0db5b12d53aa0baa3b6809c82413d08305b23e707bd93063749109c2a521a"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1lxtpceetcx4w2nwu3v2zkwkufvae4n9kjl7xkp5l5grsuckdyy4qmnuguf",
@@ -101,7 +104,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8190ec14239cca612ae08b095876fdf2e7dc01c794c0d9182a7ad9b896eace7c50adf66bcec19c3dbc67c3ff0be4e004"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark100290nk8kv6a4gv5anuma4rgxmklh2e8n86hqqmw672j3juhxw8q6lny66",
@@ -127,7 +131,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "a48fa3df67f833f33082fa72ef25bacd0a87b46bf70287139e388e4607de7e9eebc8d3084d7c742fc51104b655ce3a9b"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1y4veyfsm5ez9v3nmfpfue6ml4q3f6f987rl7cn23rex92aefrvjq059h9n",
@@ -153,7 +158,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "b06f94ebadefd0bfb2aa41e27c3159aa4f9717adccda775978a01330833dc03bfeea8e3b3e7f64fb66a909a8188ff7b1"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1guj9spfeugkau5kj2le788n04xg3vkwaescm3v5hrd0dyrssapesptz84v",
@@ -179,7 +185,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "ae1e968eab8da5afe443b71941fd132b542c774abad190586ab78827bdb8d816ac914e6e15f14d962e3399d4147c08e6"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1zn5xx233c92a7f5tykw9886c7xh7s7g3qrgpazw5cvy592gyknds4ad843",
@@ -205,7 +212,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "971b1abee0b05f94650d49eef026982d20fc474e1082514d9e60180999a388635dd0c773eeaebd78afe1e96143cc5ea9"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1dwtc3yaw6uynlq0s8derpck3rcegh4kkqvvlpvyj5vg2arvezw9q2m4e33",
@@ -231,7 +239,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8b97294b34dfed7df6dbb516128bbd8ff325d7c50a4948bf8a95601b592a9cd36b8194c3dc239bb6f48e899724adba0f"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1h6r94a9a67ahvdd8zec6mv9svqa2gv6sdmh9ctzy5sq9v28z46xqj3hhen",
@@ -257,7 +266,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "816e8b384278346f5ce08bc8b736e426624ee28f4dc06d993b8d4452fa5ff70f96d83c0e6d3a9a95ab5f73c6eb7a8f72"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1uhlnf5tpg7mqqa6aew4t0dwqclrw65h4nvytrpvzr3yf3csh93uqv209sg",
@@ -283,7 +293,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "85d77d1951f78cc4df295f1650494ab524c63b8deab8b6ecc59d83bdddb260a9fecd7db3335a0371a88c91dd2af346cc"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark16us9qyfe5dfackneucrpmx4dspxmtc0gxvx4w07tqw5psye07pfqnlcx9a",
@@ -309,7 +320,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8d3873707565985a5789fefe5578ea7495dcbea5024ba106758db91341b66fd258a7f22a8a08e9428dc4d488d3802f34"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark14d2hrxtr7gs30xjt2f7uypltutwvkt9u7g8qvshghkr3sa25em0q8rvlug",
@@ -335,7 +347,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "98486d675c5052ec13770ffc09de2917ab42ec5d75de60552ac8b67f733fc47184ae658910ff1a6118aa0c3d249fd510"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1aklft5l9ufcudyf63vl0f9m8nqge9ztrrmd6epflcnnlkm0s487qhtfka5",
@@ -361,7 +374,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "94817fa952ee0f6880bb0ce6fe40b6ce01c9458422ef445ae5ede7a054cea8405ff61ba2cc0c7fa2c5ff89a61810c495"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1mltzxevypnhfuuq8wx2zqa8v638xq0v4hd8krj9fvwxt374qpcusln7ajk",
@@ -387,7 +401,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "aadb0ad6ccfd412181b325cdaf4adde47c5eab84c9002e509af48f892ecdd37cd828524baef016fa976de071ff6faa10"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1uft97nzxstau8fteljh67s324v7x75kdlufefcp0flkhva6tjjjqdjy3vd",
@@ -413,7 +428,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "af21644f4b00142c3fcb9a9366657dad58502b93396ee5017113465ca06c16bedadff5f5eac30fa08dd5e0669b465671"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1yetplljezlng9x9fk8ghspavtkyul49ftr9fe5m0n2h0urxn6z2qr4ef3a",
@@ -439,7 +455,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "ae3fdfe59b1bacece511266cdf84cf6f8fd0d1f690a7394daf9fe58e8b582e663c818f8491d30e4eb7f2ca87a102f4bd"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1d85azse70sftzd47z3lrjfqxdyf8l8jvjwv9ldhnnn6nhm88wgjqqx9j26",
@@ -465,7 +482,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "a8a23e59184ccc73445540b4bd912606153916ec795c2d81d29b6175008317da1f9e16ae34dd95ece4f1a228a45005b4"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1f574lxuv770pg2qgcf8pfvw5rzt2rdumqz9xl0d5jwac73rp59pshgu4l2",
@@ -491,7 +509,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "96dfeed2acd07c12ab5115c32001eacf9e6c3ace034e733941425c702a94190f647b221b2d6776b4241c845a8ff5536d"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark10dpza8zpxa780uxfv2ensy3yqnxsuwy8q55nngyr95etlta0d78qpdkmct",
@@ -517,7 +536,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "83238b635e1419cfccb808b69839e6622fa8e0b42cc2991aabb34bd521707a27a396e1839dff1288e737c4da265c731c"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1amuy4se5h8qv2rqysy7x9ujndvl6p0urg9s674lkhmeskxfg453s2u8lyk",
@@ -543,7 +563,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "943f80cf0a3d0e24bba13e13337238b9bf619a9ef06fdf9a37c6403f2d060e1e132f926fae7ae081a124dabea16f047e"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1sqvfprvlu6vrgwxpdyzetpn2cck8ldpp3h6y0r295rmvylt5ql7qjxngf4",
@@ -569,7 +590,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "87fd9049f835d4a33fdd84e902818618a1f63deb1ba39c1213fb303750280728db56b707aaac332cbaa0b0cd14205513"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1hf5laecmq6ul9t6xj0h96wkra0yjs97ehl24rdspeqs40gelqm5s8h3tm5",
@@ -595,7 +617,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8043750db3cdebc5fd48e441c19eafa4a7f773c31b8d86e45fa2721d1be2f01b17118590afadad996d7912316216c0dd"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1llkd3v3rhj22skms3fh4797ms2qgrdzxsykazfnfsxmpag5jjrws3wrwv8",
@@ -621,7 +644,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "a340d5843d96f7c62bee7001bf8ad65036504628a17b83083e8566dac0b5a003137776da58b220e1b289361054f68247"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark189gphv4h686m80fn57efrr2ehkxcwevzkh6gcwsj83gwhjqzm8yqg9frsk",
@@ -647,7 +671,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "89b3d4f4a8443a9aebf8a80658c95a1b8bc03082d37dc1f4f8c467da51306d5d776f0ad372f8c7fb16be4e4162669a92"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark148q0xcvacrtjlcs8055rvhd0vvup73xdg0dnuk8lrpn5dm6f8ezsfxfp8v",
@@ -673,7 +698,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8b058ddee2cd0a506e5936fd5015db54633643524971b39db2505d4224f363e850dfeab5af46175faf0bfcb9ee591c74"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1wenx6ymr0tt3wdswdw79wvc5jxh7c40qtzep60fvgp0skkcfze5qhy5kt4",
@@ -699,7 +725,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8a904777de440cb084ed3edd0ed1739334aaaa76a524693abfdfe286a6e5519056b732da7dd403eee5339d4d9690fd43"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark16fgulfxjzejmrpgcycym5qf7vw4kz9ndt0cxfy0mwlx52d47xqcsqu6k59",
@@ -725,7 +752,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "811c8e33bb6bf58779a819ca27a14e1063bf02cc3bd8b665a552f58cbe3385ff2cddf60f1e32cd9f2bf7b2b8c0c0c575"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1q3huaf5jtuwytvep8denxfu7ccqpqfggm8xcyj49yy99kv7zmtyqrvqyyp",
@@ -751,7 +779,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "aab67ba60645f8a7f084d4a5728034ad92f39d3444d05808999d7da87c97aabc6ff7dc2de38d5538e764f0e8e762b829"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1hav7u26v57veatt0jr5f758sq5g5fy89n9t5a8t5pfxs0v274w7qk0nmw3",
@@ -777,7 +806,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8bb4f34f5945f39bbdbf27d810c345ec65ae35e0fee55acd75d4f50957a49103ddd65db1914fe635cecab75a009ff6a6"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1cr7h9u5ue8zzkhvk6djdk9uvtw2mjwkljjuwyzq2ftu5j82g0ejq05wqmf",
@@ -803,7 +833,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "90ccb380b56e08e35991b2ee505bada1c353daf8ab032a88782ee07246c870c860ecf84d0e0524a73364fdbb0ad3c37a"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1npxsrfajr4sr9m5ajpf4d7qkcp2mkmgalv2uxa736hpd8t4dtpnqaj4ylr",
@@ -829,7 +860,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "94e3820f66505af8202241fcc6f1886782c5048a67821ff4e8345786cfc22162877cc28d0c1bb1c126a31790189aa6ad"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1a8wknhnwwuegu7a046xth93mr3gqurskk4uj7x9llmx46ylem8rsrnhny8",
@@ -855,7 +887,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "acc8a8bf90da648d9c783f4b5a5c0bb76177e0a0e452af192bf1f3e80b6540e953252b799091ef47bf0153a91f39eb16"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1475xqea9pt8f070t49llep4zepzjcz5p73mnzgzsgxwx5az2ft9q9x0392",
@@ -881,7 +914,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "838383ba9a7de491bd07a72fa3f984ae9731a5cd2203af70a1be36d325064d84fc02c1d1b0983d64ac1f5e18c0144d2b"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark13nz8m7ce398tlzvd3fd5tdhszz30sq29mh55d8dfa5flvdtty2mshch6c7",
@@ -907,7 +941,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "b5c0321c0644a955dab39a3fe8a53e5865604cd6eed6165f348348a502463cecb53f1245d5aff1f3144b022d03b22000"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1awnyljzymssp5au0rlxy02apxh0t4sl65hjwfuhu9jjgu5z68wws8yvxxc",
@@ -933,7 +968,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8d66b08722834eb97357df8cdaff81939fb539cebe78449231115cd0ddd494d9faf58c35ae820306848473295b44c3dc"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1fg9uxay0g4kq453mw4mwr4xgw8c32mz6p0r8u3caekycwffxrg4qvt2f7y",
@@ -959,7 +995,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "9905a0c939db80e4796521b446ce87b4c0435df268a3a797749447e74661b0a2423af26422c3cf702d157d8461578880"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark173j6lt4g05k8mn5zcsdv6l3mry7z927y2vqenf0pj347hsut6yms2nc5qj",
@@ -985,7 +1022,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "b6257b4cebfc494c2f0287dad68c60d7d2d18652cdd4f11df330cc3b6cedc41bb2a637ee7953d6ce698260f883aaf4c7"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1rz6wy2m9c7lzsp8spcrdqzf3hp74p2hxal0eqapac63xdeg7ntwqfufhwv",
@@ -1011,7 +1049,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "b65edf7f05d20e92997630b2c946fafc75a969b2d13e5d3f7e333771113a81aa2804e2d8d0d06197f91d3720777aafba"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1kjn0q03mn2nfck0xmvn3xen3xcc0xt8qmt4tuhr2w8fn3gwdln5qyt43sf",
@@ -1037,7 +1076,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "b6b2ff0404f9ddccf7486664a91abef4b1887b0af6b33043e705baa0cb2b5f7d82b8293e0868fb33b13fa654c4789a6b"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1wgr76grwrzc8th3xwkv28dav6xxvvcj5smyc88y34h0yr5whk2yqkfgvjg",
@@ -1063,7 +1103,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "832e7f7fd32015d89e888e1d210b7b39280d7762357837182029f0ab1facff8be4da93d87138547b5b923b22ac12c56a"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1hjrgd03cyd7dr2dmtmag2apmpwjef3w5x0xare4lmqzduywe9yjqzzrd6f",
@@ -1089,7 +1130,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "9071101510853cfafd9be138aad3de8c83d77b76ed32f3044201f0f9e3aa69ff165d41a5828a8516f8e6b9e99761fd85"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1lw06wca3adxz0l5c2a9756hh5xkf90z3dj9n8f94vcdzh4lr3mssv3t5cz",
@@ -1115,7 +1157,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "866c904686a020c725bafde34c6a36f50d0ebf7bd3869c7622ebd9ea079bd09c233c81d31d4a025bcc5a4db7ab1082c0"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1sr7hra35vqpg3mscq6y76earv3m6jdk8f8kufdseh3h7fduurxjsatl08q",
@@ -1141,7 +1184,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "ad75660474e5054d4aba9a99ae46a0f064c33cc4f37fa34951bae28e00d8c20b5651dada97d45d46cc9d1e4638c62996"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1wycvvr096qnhhu0dq28jxfftqdghdxz7ku2x3u25nqkyk4wvt8fqxt2q5f",
@@ -1167,7 +1211,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "a418cd50c3245cd7a28c6c9bd6cef1ab6fae91b87794ba5861961e4739625e7452653f4cd54fbc9427b3c05508cdc186"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1a3cxnyhm06xwv7mcdwsdcsf23vjqfsm5a9k2cvn42s9zxlm27xnqr67gtu",
@@ -1193,7 +1238,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "99a9e3282f3a5893ad993979d6a4fee266c8db355588501f84bfa5929a87c7ed2729d7524e5fe0a80162197f8d623d4e"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1q48pl7nsq4rp445aarjs63rvuknjs365mlatl9cl2pzw74scjfuqfsj96w",
@@ -1219,7 +1265,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "969befe63c7ffd3e5f290b16ca41f8ed77fde58e84a71c8ebfdeebf080ed7571f24be46a84126f26cc913716db379e4f"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1sxmu9s8gkhqhdwpy4vv35h2djzg0sl6fgvzlg58xsckzz7jmv2sq9hzfzy",
@@ -1245,7 +1292,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 1,
 			"validatorConsensusPublicKey": "8ba3c51505cb2d3605fb652fd61a524f2ab6efb5c21697d90ab3fda8a3a8745f3283ec968d870d7f302c659a16070ac9"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1n33nkzx96wecfld5ak4rpfh42v3pvw27pt6avgt3tm35z7ca342qv5x34l",
@@ -1271,7 +1319,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "b17da79a16b43ba4e12adafb700a6125ce44359c111c8d5dda71fda385bb0d5205e8816de28bcfa21c66c36229dddbaf"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1zqa5kh2wypff7azu2g7daa2aljt7dn64x6yus2x8j3x4a7m4gj6scx3qsu",
@@ -1297,7 +1346,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "a0434aac83269e406f40d0f137f9ae0cf0f641a23424eb704c477cdc96440f0765a21978bde00312e2dfd7a4b2dbdb82"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark134y8yt4dd07tcuhx62dgf0j5cfyvzf4cpytc56229dqf3p6d2ltqs5qreu",
@@ -1323,7 +1373,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "a04d0fc952acb96898b6d60213e9bb13e8a98e1ce24adad91777abc62d394f33aed45791e31298e18434c0b9a79d0bcc"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1sc49s3uy6krhfjyx5c2xqwfl50scycz9ay8l5q92y47feng8a83srrltwr",
@@ -1349,7 +1400,8 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "87419293f6e0e50d352e06ca015d7bde0241267334c1484d3c29a458c76525b6eeba59e4e118ad03043b320b6d3dffbf"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1z5a7wer7hcrzhd3jhdcjjhqd64zjjd8h8fsteheerm3tvrqc4xas4v00dw",
@@ -1375,13 +1427,15 @@
 			"validatorForgedRewards": "0",
 			"validatorProducedBlocks": 2,
 			"validatorConsensusPublicKey": "a0468313c14d110536e82e454757e0865618bfae27671c37ffcffeb32493787cfc7f7352949f60fb13ed802aee892cad"
-		}
+		},
+		"updated_at": "0"
 	},
 	{
 		"address": "ark1x5a7wer7hcrzhd3jhdcjjhqd64zjjd8h8fsteheerm3tvrqc4xas4v00dw",
 		"publicKey": "a73861139978abdbb77cc9bf387578da220c55f9714dc7315c4e59b2b385b2f3",
 		"balance": "0",
 		"nonce": "0",
-		"attributes": {}
+		"attributes": {},
+		"updated_at": "0"
 	}
 ]

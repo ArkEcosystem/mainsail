@@ -43,6 +43,14 @@ export class BlockFilter {
 						handleNumericCriteria("height", c),
 					);
 				}
+
+				case "round": {
+					return handleOrCriteria(criteria.round, async (c) =>
+						// @ts-ignore
+						handleNumericCriteria("round", c),
+					);
+				}
+
 				case "numberOfTransactions": {
 					return handleOrCriteria(criteria.numberOfTransactions, async (c) =>
 						// @ts-ignore

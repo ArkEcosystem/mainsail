@@ -43,6 +43,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX blocks_total_amount ON blocks(total_amount);
             CREATE INDEX blocks_total_fee ON blocks(total_fee);
             CREATE INDEX blocks_version ON blocks(version);
+            CREATE INDEX blocks_validator_round ON blocks(validator_round);
         `);
 	}
 
@@ -88,6 +89,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX blocks_total_amount;
             DROP INDEX blocks_total_fee;
             DROP INDEX blocks_version;
+            DROP INDEX blocks_validator_round;
         `);
 	}
 }

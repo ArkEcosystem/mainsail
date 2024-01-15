@@ -18,6 +18,7 @@ export type BlockCriteria = {
 	timestamp?: OrNumericCriteria<number>;
 	previousBlock?: OrEqualCriteria<string>;
 	height?: OrNumericCriteria<number | string>;
+	round?: OrEqualCriteria<number>;
 	numberOfTransactions?: OrNumericCriteria<number>;
 	totalAmount?: OrNumericCriteria<number | string>;
 	totalFee?: OrNumericCriteria<number | string>;

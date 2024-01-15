@@ -38,4 +38,10 @@ export class Wallet {
 		type: "jsonb",
 	})
 	public attributes!: Record<string, any> | undefined;
+
+	@Column({
+		nullable: false,
+		type: "bigint",
+	})
+	public readonly updated_at!: string;
 }
