@@ -57,9 +57,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.ExpirationService).to(ExpirationService);
 		this.app.bind(Identifiers.TransactionPool.Mempool).to(Mempool).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Processor).to(Processor);
-		this.app
-			.bind(Identifiers.TransactionPool.ProcessorFactory)
-			.toAutoFactory(Identifiers.TransactionPool.Processor);
 		this.app.bind(Identifiers.TransactionPool.Query).to(Query);
 		this.app.bind(Identifiers.TransactionPool.SenderMempoolFactory).toFactory(
 			({ container }) =>

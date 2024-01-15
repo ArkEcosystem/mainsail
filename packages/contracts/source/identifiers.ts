@@ -237,7 +237,6 @@ export const Identifiers = {
 		Mempool: Symbol("TransactionPool<Mempool>"),
 		Processor: Symbol("TransactionPool<Processor>"),
 		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
-		ProcessorFactory: Symbol("TransactionPool<ProcessorFactory>"),
 		Query: Symbol("TransactionPool<Query>"),
 		SenderMempoolFactory: Symbol("TransactionPool<SenderMempoolFactory>"),
 		SenderState: Symbol("TransactionPool<SenderState>"),

@@ -27,7 +27,6 @@ const init = (context: Context) => {
 	app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.PeerRepository).toConstantValue({});
 	app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
-	app.bind(Identifiers.TransactionPool.ProcessorFactory).toConstantValue({});
 	app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
 	app.bind(Identifiers.Transaction.Handler.Registry).toConstantValue({});
 	app.bind(Identifiers.Kernel.EventDispatcher.Service).to(NullEventDispatcher);
