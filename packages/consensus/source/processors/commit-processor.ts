@@ -9,7 +9,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.BlockProcessor)
+	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
 
 	@inject(Identifiers.ValidatorSet)

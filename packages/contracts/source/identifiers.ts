@@ -13,8 +13,6 @@ export const Identifiers = {
 		Token: Symbol("Application<Token>"),
 		Version: Symbol("Application<Version>"),
 	},
-	BlockProcessor: Symbol("Block<Processor>"),
-	BlockVerifier: Symbol("Block<Verifier>"),
 	Consensus: {
 		Aggregator: Symbol("Aggregator<Consensus>"),
 		Bootstrapper: Symbol("Bootstrapper<Consensus>"),
@@ -30,8 +28,8 @@ export const Identifiers = {
 		Storage: Symbol("Storage<Consensus>"),
 		ValidatorRepository: Symbol("Repository<Consensus.Validator>"),
 	},
-
 	Crypto: Symbol("Crypto<NetworkConfig>"),
+
 	CryptoWorker: {
 		Worker: Symbol("Ipc<Worker>"),
 		WorkerFactory: Symbol("Ipc<WorkerFactory>"),
@@ -103,12 +101,12 @@ export const Identifiers = {
 			Proposal: Symbol("Database<Storage.Proposal>"),
 		},
 	},
-
 	Fee: {
 		Matcher: Symbol("Fee<Matcher>"),
 		Registry: Symbol("Fee<Registry>"),
 		Type: Symbol("Fee<Type>"),
 	},
+
 	Kernel: {
 		Cache: {
 			Factory: Symbol("Kernel<Cache.Factory>"),
@@ -164,6 +162,10 @@ export const Identifiers = {
 	P2PLogger: Symbol("Logger<P2P>"),
 	P2PServer: Symbol("Server<P2P>"),
 	P2PState: Symbol("State<P2P>"),
+	Processor: {
+		BlockProcessor: Symbol("Processor<Block.Processor>"),
+		BlockVerifier: Symbol("Processor<Block.Verifier>"),
+	},
 	PeerApiNodeDiscoverer: Symbol("Peer<Discoverer.ApiNodes>"),
 	PeerApiNodeFactory: Symbol("Peer<Factory.ApiNodes>"),
 	PeerApiNodeProcessor: Symbol("Peer<Processor.ApiNodes>"),

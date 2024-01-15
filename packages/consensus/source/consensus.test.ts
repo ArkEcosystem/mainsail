@@ -138,7 +138,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(context.blockProcessor);
+		context.sandbox.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(context.prevoteProcessor);
 		context.sandbox.app.bind(Identifiers.Consensus.PrecommitProcessor).toConstantValue(context.precommitProcessor);

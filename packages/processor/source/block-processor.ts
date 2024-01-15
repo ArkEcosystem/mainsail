@@ -35,7 +35,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.ValidatorSet)
 	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
 
-	@inject(Identifiers.BlockVerifier)
+	@inject(Identifiers.Processor.BlockVerifier)
 	private readonly verifier!: Contracts.Processor.Verifier;
 
 	@multiInject(Identifiers.State.ValidatorMutator)

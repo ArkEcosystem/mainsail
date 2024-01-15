@@ -8,8 +8,8 @@ import { TransactionProcessor } from "./transaction-processor";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.BlockVerifier).to(BlockVerifier).inSingletonScope();
-		this.app.bind(Identifiers.BlockProcessor).to(BlockProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Processor.BlockVerifier).to(BlockVerifier).inSingletonScope();
+		this.app.bind(Identifiers.Processor.BlockProcessor).to(BlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.TransactionProcessor).to(TransactionProcessor).inSingletonScope();
 
 		this.#registerActions();
