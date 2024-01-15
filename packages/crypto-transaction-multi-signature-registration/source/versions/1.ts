@@ -9,11 +9,11 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Serializer)
 	@tagged("type", "wallet")
 	private readonly publicKeySerializer!: Contracts.Crypto.PublicKeySerializer;
 
-	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Size)
 	@tagged("type", "wallet")
 	private readonly publicKeySize!: number;
 

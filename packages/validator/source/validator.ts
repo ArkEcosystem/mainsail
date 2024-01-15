@@ -21,7 +21,7 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
-	@inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)

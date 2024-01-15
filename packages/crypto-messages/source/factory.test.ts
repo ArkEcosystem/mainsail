@@ -43,7 +43,7 @@ describe<{
 					// @ts-ignore
 					consensusSignature: (method, message, privateKey) =>
 						context.sandbox.app
-							.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
+							.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
 							[method](message, privateKey),
 				};
 			},

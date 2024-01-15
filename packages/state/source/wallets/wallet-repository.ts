@@ -11,7 +11,7 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 	@inject(Identifiers.State.Wallet.Factory)
 	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
 
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	protected readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};

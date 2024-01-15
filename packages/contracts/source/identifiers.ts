@@ -61,15 +61,34 @@ export const Identifiers = {
 			Serializer: Symbol("Crypto<Commit.Serializer>"),
 		},
 		Configuration: Symbol("Crypto<Configuration>"),
-		HashFactory: Symbol("Crypto<HashFactory>"),
+		Hash: {
+			Factory: Symbol("Crypto<Hash.Factory>"),
+			Size: {
+				HASH256: Symbol("Crypto<Hash.Size.HASH256>"),
+				RIPEMD160: Symbol("Crypto<Hash.Size.RIPEMD160>"),
+				SHA256: Symbol("Crypto<Hash.Size.SHA256>"),
+			},
+		},
 		Identity: {
-			AddressFactory: Symbol("Crypto<Identity.AddressFactory>"),
-			AddressSerializer: Symbol("Crypto<Identity.AddressSerializer>"),
-			KeyPairFactory: Symbol("Crypto<Identity.KeyPairFactory>"),
-			PrivateKeyFactory: Symbol("Crypto<Identity.PrivateKeyFactory>"),
-			PublicKeyFactory: Symbol("Crypto<Identity.PublicKeyFactory>"),
-			PublicKeySerializer: Symbol("Crypto<Identity.PublicKeySerializer>"),
-			WifFactory: Symbol("Crypto<Identity.WifFactory>"),
+			Address: {
+				Factory: Symbol("Crypto<Identity.Address.Factory>"),
+				Serializer: Symbol("Crypto<Identity.Address.Serializer>"),
+				Size: Symbol("Crypto<Identity.Address.Size>"),
+			},
+			KeyPair: {
+				Factory: Symbol("Crypto<Identity.KeyPair.Factory>"),
+			},
+			PrivateKey: {
+				Factory: Symbol("Crypto<Identity.PrivateKey.Factory>"),
+			},
+			PublicKey: {
+				Factory: Symbol("Crypto<Identity.PublicKey.Factory>"),
+				Serializer: Symbol("Crypto<Identity.PublicKey.Serializer>"),
+				Size: Symbol("Crypto<Identity.PublicKey.Size>"),
+			},
+			Wif: {
+				Factory: Symbol("Crypto<Identity.Wif.Factory>"),
+			},
 		},
 		Message: {
 			Deserializer: Symbol("Crypto<Message.Deserializer>"),
@@ -77,13 +96,11 @@ export const Identifiers = {
 			Serializer: Symbol("Crypto<Message.Serializer>"),
 		},
 		Serializer: Symbol("Crypto<Serializer>"),
-		Signature: Symbol("Crypto<Signature>"),
+		Signature: {
+			Instance: Symbol("Crypto<Signature.Instance>"),
+			Size: Symbol("Crypto<Signature.Size>"),
+		},
 		Size: {
-			Address: Symbol("Crypto<Size.Address>"),
-			HASH256: Symbol("Crypto<Size.HASH256>"),
-			PublicKey: Symbol("Crypto<Size.PublicKey>"),
-			RIPEMD160: Symbol("Crypto<Size.RIPEMD160>"),
-			SHA256: Symbol("Crypto<Size.SHA256>"),
 			Signature: Symbol("Crypto<Size.Signature>"),
 		},
 		Transaction: {

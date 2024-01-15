@@ -154,19 +154,19 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
-	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
-	sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
-	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeySerializer).to(PublicKeySerializer).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.Address.Factory).to(AddressFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKey.Factory).to(PublicKeyFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKey.Serializer).to(PublicKeySerializer).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
 	sandbox.app.bind(Identifiers.Cryptography.Validator).to(Validator);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.TypeFactory).to(TransactionTypeFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
-	sandbox.app.bind(Identifiers.Cryptography.Signature).to(Signature);
+	sandbox.app.bind(Identifiers.Cryptography.Signature.Instance).to(Signature);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
-	sandbox.app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
+	sandbox.app.bind(Identifiers.Cryptography.Hash.Factory).to(HashFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
 	sandbox.app.bind(Identifiers.Database.Storage.Block).toConstantValue({
 		deleteBlocks: () => {},

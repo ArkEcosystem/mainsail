@@ -23,10 +23,10 @@ export class TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
 	@tagged("type", "wallet")
 	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
 

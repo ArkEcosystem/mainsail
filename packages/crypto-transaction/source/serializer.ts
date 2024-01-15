@@ -10,11 +10,11 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
-	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Size)
 	@tagged("type", "wallet")
 	private readonly publicKeySize!: number;
 
-	@inject(Identifiers.Cryptography.Size.Signature)
+	@inject(Identifiers.Cryptography.Signature.Size)
 	@tagged("type", "wallet")
 	private readonly signatureSize!: number;
 

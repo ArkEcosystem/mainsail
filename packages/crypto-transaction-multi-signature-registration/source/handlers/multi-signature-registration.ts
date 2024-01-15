@@ -11,10 +11,10 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
 	@tagged("type", "wallet")
 	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
 

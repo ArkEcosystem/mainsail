@@ -8,10 +8,10 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 	@tagged("type", "wallet")
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	@inject(Identifiers.Cryptography.Size.SHA256)
+	@inject(Identifiers.Cryptography.Hash.Size.SHA256)
 	private readonly hashByteLength!: number;
 
-	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Size)
 	@tagged("type", "wallet")
 	private readonly generatorPublicKeyByteLength!: number;
 

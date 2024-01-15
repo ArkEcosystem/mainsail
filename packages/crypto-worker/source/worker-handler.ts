@@ -10,15 +10,15 @@ class WorkerImpl {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "consensus")
 	private readonly consensusSignature!: Contracts.Crypto.Signature;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
 	@tagged("type", "consensus")
 	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
 
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
 	private readonly walletSignature!: Contracts.Crypto.Signature;
 

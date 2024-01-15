@@ -195,12 +195,12 @@ describe<{
 		app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory);
 		app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory);
 		app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
-		app.bind(Identifiers.Cryptography.Signature).to(Signature);
+		app.bind(Identifiers.Cryptography.Signature.Instance).to(Signature);
 		app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
 		app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
 		app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
 		app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(32);
-		app.bind(Identifiers.Cryptography.Size.Signature).toConstantValue(64);
+		app.bind(Identifiers.Cryptography.Signature.Size).toConstantValue(64);
 
 		app.bind(Identifiers.Transaction.Handler.Instances).to(TransferTransactionHandler);
 		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorRegistrationTransactionHandler);

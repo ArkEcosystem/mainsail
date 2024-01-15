@@ -8,7 +8,7 @@ import { TransferTransaction } from "../versions";
 
 @injectable()
 export class TransferTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {

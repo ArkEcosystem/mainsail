@@ -6,7 +6,7 @@ export class Utils implements Contracts.Crypto.TransactionUtils {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
-	@inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)

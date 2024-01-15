@@ -9,7 +9,7 @@ export class VoteTransaction extends Transaction {
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Size)
 	@tagged("type", "wallet")
 	public readonly publicKeySize!: number;
 

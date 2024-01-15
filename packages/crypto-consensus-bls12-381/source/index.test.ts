@@ -25,12 +25,12 @@ describe<{
 
 		[
 			Identifiers.Cryptography.Size.PublicKey,
-			Identifiers.Cryptography.Size.Signature,
+			Identifiers.Cryptography.Signature.Size,
 			Identifiers.Cryptography.Identity.KeyPairFactory,
 			Identifiers.Cryptography.Identity.PrivateKeyFactory,
 			Identifiers.Cryptography.Identity.PublicKeyFactory,
 			Identifiers.Cryptography.Identity.PublicKeySerializer,
-			Identifiers.Cryptography.Signature,
+			Identifiers.Cryptography.Signature.Instance,
 		].forEach((identifier) => assert.true(sandbox.app.isBoundTagged(identifier, "type", "consensus")));
 
 		spyAddSchema.calledTimes(2);

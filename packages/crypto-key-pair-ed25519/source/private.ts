@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class PrivateKeyFactory implements Contracts.Crypto.PrivateKeyFactory {
-	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
 	public async fromMnemonic(mnemonic: string): Promise<string> {

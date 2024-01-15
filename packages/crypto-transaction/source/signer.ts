@@ -4,7 +4,7 @@ import { numberToHex } from "@mainsail/utils";
 
 @injectable()
 export class Signer {
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
 	private readonly signatureFactory!: Contracts.Crypto.Signature;
 

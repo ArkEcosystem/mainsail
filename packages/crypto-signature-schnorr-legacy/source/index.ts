@@ -7,12 +7,12 @@ import { Signature } from "./signature";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
-			.bind(Identifiers.Cryptography.Size.Signature)
+			.bind(Identifiers.Cryptography.Signature.Size)
 			.toConstantValue(64)
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 
 		this.app
-			.bind(Identifiers.Cryptography.Signature)
+			.bind(Identifiers.Cryptography.Signature.Instance)
 			.to(Signature)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));

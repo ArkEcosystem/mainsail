@@ -6,7 +6,7 @@ import { TransactionFactory } from "./factory";
 
 @injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
@@ -15,7 +15,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	protected readonly factory!: TransactionFactory;
 
-	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
 	@tagged("type", "wallet")
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 

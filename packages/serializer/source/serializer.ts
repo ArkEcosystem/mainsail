@@ -5,30 +5,30 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Serializer implements Contracts.Serializer.Serializer {
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	@tagged("type", "wallet")
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
-	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
+	@inject(Identifiers.Cryptography.Identity.Address.Serializer)
 	@tagged("type", "wallet")
 	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Serializer)
 	@tagged("type", "wallet")
 	private readonly publicKeySerializer!: Contracts.Crypto.PublicKeySerializer;
 
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
 	private readonly signatureSerializer!: Contracts.Crypto.Signature;
 
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "consensus")
 	private readonly consensusSignatureSerializer!: Contracts.Crypto.Signature;
 
 	@inject(Identifiers.Cryptography.Transaction.Utils)
 	private readonly transactionUtils!: Contracts.Crypto.TransactionUtils;
 
-	@inject(Identifiers.Cryptography.Size.HASH256)
+	@inject(Identifiers.Cryptography.Hash.Size.HASH256)
 	private readonly hashSize!: number;
 
 	public async serialize<T>(

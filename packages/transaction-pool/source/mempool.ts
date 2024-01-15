@@ -10,7 +10,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	@inject(Identifiers.TransactionPool.SenderMempool.Factory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	@tagged("type", "wallet")
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
