@@ -45,7 +45,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue({ validatePeerIp: () => true });
 		context.sandbox.app
 			.bind(Identifiers.P2P.Peer.Disposer)

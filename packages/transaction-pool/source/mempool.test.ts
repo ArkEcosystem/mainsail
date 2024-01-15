@@ -25,15 +25,15 @@ describe<{
 			.bind(Identifiers.TransactionPool.SenderMempool.Factory)
 			.toConstantValue(context.createSenderMempool);
 		context.container.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.container.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory);
-		context.container.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory);
-		context.container.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory);
+		context.container.bind(Identifiers.Cryptography.Identity.Address.Factory).to(AddressFactory);
+		context.container.bind(Identifiers.Cryptography.Identity.PublicKey.Factory).to(PublicKeyFactory);
+		context.container.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
 		context.config = context.container.get<Configuration>(Identifiers.Cryptography.Configuration);
 
 		const factory = context.container.get<Contracts.Crypto.PublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKeyFactory,
+			Identifiers.Cryptography.Identity.PublicKey.Factory,
 		);
 
 		context.createPublicKey = async (mnemonic: string) => await factory.fromMnemonic(mnemonic);

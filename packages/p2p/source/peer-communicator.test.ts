@@ -48,7 +48,7 @@ describeSkip<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
 

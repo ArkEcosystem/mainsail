@@ -35,7 +35,7 @@ describe<{
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.Providers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 	});
 

@@ -23,7 +23,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
-		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue(processor);
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(processor);
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.State).toConstantValue(state);

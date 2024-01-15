@@ -28,7 +28,7 @@ describeSkip<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.resolve(Providers.PluginConfiguration).from("", defaults);
@@ -41,7 +41,11 @@ describeSkip<{
 			.bind(Identifiers.P2P.Peer.Factory)
 			.toFactory<Peer>(() => (ip: string) => new Peer(ip, 4002));
 
-		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
+		context.configuration = context.sandbox.app.getTagged(
+			Identifiers.ServiceProvider.Configuration,
+			"plugin",
+			"p2p",
+		);
 
 		context.peerProcessor = context.sandbox.app.resolve(PeerProcessor);
 	});

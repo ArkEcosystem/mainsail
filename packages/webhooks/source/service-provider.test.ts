@@ -24,7 +24,7 @@ const init = (context: Context) => {
 	};
 
 	const app = new Application(new Container());
-	app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
+	app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
 	app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
 	app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
@@ -34,7 +34,7 @@ const init = (context: Context) => {
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
-	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration);
+	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration);
 	context.serviceProvider.setConfig(context.pluginConfiguration.from("webhooks", defaults));
 };
 

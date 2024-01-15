@@ -24,12 +24,12 @@ describe<{
 		await serviceProvider.register();
 
 		[
-			Identifiers.Cryptography.Size.PublicKey,
+			Identifiers.Cryptography.Identity.PublicKey.Size,
 			Identifiers.Cryptography.Signature.Size,
-			Identifiers.Cryptography.Identity.KeyPairFactory,
-			Identifiers.Cryptography.Identity.PrivateKeyFactory,
-			Identifiers.Cryptography.Identity.PublicKeyFactory,
-			Identifiers.Cryptography.Identity.PublicKeySerializer,
+			Identifiers.Cryptography.Identity.KeyPair.Factory,
+			Identifiers.Cryptography.Identity.PrivateKey.Factory,
+			Identifiers.Cryptography.Identity.PublicKey.Factory,
+			Identifiers.Cryptography.Identity.PublicKey.Serializer,
 			Identifiers.Cryptography.Signature.Instance,
 		].forEach((identifier) => assert.true(sandbox.app.isBoundTagged(identifier, "type", "consensus")));
 

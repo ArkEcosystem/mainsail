@@ -21,7 +21,7 @@ import {
 	Utils,
 	Verifier,
 } from "../../crypto-transaction";
-import { ProposerSelector } from "../../proposer/source/proposer-selector";
+import { Selector } from "../../proposer/source/selector";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
@@ -287,7 +287,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.State.ValidatorMutator).to(MockValidatorMutator).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.Proposer.Selector).to(ProposerSelector);
+	sandbox.app.bind(Identifiers.Proposer.Selector).to(Selector);
 
 	if (!skipBoot) {
 		try {

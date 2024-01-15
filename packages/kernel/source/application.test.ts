@@ -100,7 +100,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.Providers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -127,7 +127,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.Providers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -148,7 +148,7 @@ describe<{
 	});
 
 	it("should get and set the given configuration value", (context) => {
-		context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository).merge({ key: "Hello World" });
+		context.app.get<ConfigRepository>(Identifiers.Config.Repository).merge({ key: "Hello World" });
 
 		assert.is(context.app.config("key"), "Hello World");
 
@@ -402,7 +402,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.Providers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -426,7 +426,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.Providers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -451,7 +451,7 @@ describe<{
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.Providers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);

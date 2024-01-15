@@ -43,11 +43,11 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
 			.whenTargetTagged("plugin", "transaction-pool");
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
@@ -59,9 +59,9 @@ describe<{ sandbox: Sandbox; server: Server }>("Server", ({ it, assert, beforeEa
 		context.sandbox.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Consensus.PrecommitProcessor).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.PreVote).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.PreCommit).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Message.Serializer).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.Header.Service).toConstantValue({});

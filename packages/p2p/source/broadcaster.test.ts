@@ -23,7 +23,7 @@ describeSkip<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);

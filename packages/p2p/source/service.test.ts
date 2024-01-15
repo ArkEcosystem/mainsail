@@ -34,7 +34,7 @@ describeSkip<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", importFresh("./defaults").defaults))
 			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.bind(Identifiers.Application.Version).toConstantValue("0.0.1");
@@ -46,7 +46,11 @@ describeSkip<{
 		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
 
-		context.configuration = context.sandbox.app.getTagged(Identifiers.PluginConfiguration, "plugin", "p2p");
+		context.configuration = context.sandbox.app.getTagged(
+			Identifiers.ServiceProvider.Configuration,
+			"plugin",
+			"p2p",
+		);
 		context.networkMonitor = context.sandbox.app.resolve(Service);
 	});
 

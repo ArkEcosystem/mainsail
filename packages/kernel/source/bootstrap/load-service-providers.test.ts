@@ -22,9 +22,9 @@ describe<{
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 
-		context.configRepository = context.app.get<ConfigRepository>(Identifiers.Services.Config.Repository);
+		context.configRepository = context.app.get<ConfigRepository>(Identifiers.Config.Repository);
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.Providers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 	});
 

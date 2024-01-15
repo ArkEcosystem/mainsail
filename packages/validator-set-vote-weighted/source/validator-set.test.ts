@@ -67,15 +67,15 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.AddressFactory)
+			.bind(Identifiers.Cryptography.Identity.Address.Factory)
 			.to(AddressFactory)
 			.inSingletonScope();
 		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
 			.to(KeyPairFactory)
 			.inSingletonScope();
 		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.PublicKeyFactory)
+			.bind(Identifiers.Cryptography.Identity.PublicKey.Factory)
 			.to(PublicKeyFactory)
 			.inSingletonScope();
 		context.sandbox.app
