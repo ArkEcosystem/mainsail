@@ -41,7 +41,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@multiInject(Identifiers.State.ValidatorMutator)
 	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
 
-	@inject(Identifiers.ApiSync)
+	@inject(Identifiers.ApiSync.Service)
 	@optional()
 	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
 

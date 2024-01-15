@@ -46,7 +46,7 @@ export class Bootstrapper {
 	@inject(Identifiers.Consensus.CommitStateFactory)
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
-	@inject(Identifiers.ApiSync)
+	@inject(Identifiers.ApiSync.Service)
 	@optional()
 	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
 

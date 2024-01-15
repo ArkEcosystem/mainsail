@@ -1,5 +1,8 @@
 export const Identifiers = {
-	ApiSync: Symbol("ApiSync<Sync>"),
+	ApiSync: {
+		Listener: Symbol("ApiSync<Listener>"),
+		Service: Symbol("ApiSync<Service>"),
+	},
 	Application: {
 		DirPrefix: Symbol("Application<DirPrefix>"),
 		Environment: Symbol("Application<Environment>"),

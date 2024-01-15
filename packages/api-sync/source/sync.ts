@@ -10,7 +10,6 @@ import { sleep } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import * as ApiSyncContracts from "./contracts";
-import { Identifiers as ApiSyncIdentifiers } from "./identifiers";
 
 interface DeferredSync {
 	block: Models.Block;
@@ -79,7 +78,7 @@ export class Sync implements Contracts.ApiSync.Sync {
 	private readonly createQueue!: Types.QueueFactory;
 	#queue!: Contracts.Kernel.Queue;
 
-	@inject(ApiSyncIdentifiers.Listeners)
+	@inject(Identifiers.ApiSync.Listener)
 	private readonly listeners!: ApiSyncContracts.Listeners;
 
 	public async prepareBootstrap(): Promise<void> {
