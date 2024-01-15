@@ -187,6 +187,7 @@ export const Identifiers = {
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),
 		BlockVerifier: Symbol("Processor<Block.Verifier>"),
+		TransactionProcessor: Symbol("Processor<Transaction.Processor>"),
 	},
 	Proposer: {
 		Selector: Symbol("Proposer<Selector>"),
@@ -247,6 +248,5 @@ export const Identifiers = {
 			Instance: Symbol("TransactionPool<TransactionValidator.Instance>"),
 		},
 	},
-	TransactionProcessor: Symbol("Transaction<Processor>"),
 	ValidatorSet: Symbol("Set<ValidatorSet>"),
 };
