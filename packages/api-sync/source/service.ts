@@ -70,7 +70,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 

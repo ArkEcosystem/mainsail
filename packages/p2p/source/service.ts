@@ -7,7 +7,7 @@ import delay from "delay";
 
 @injectable()
 export class Service implements Contracts.P2P.Service {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 

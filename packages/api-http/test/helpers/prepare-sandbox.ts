@@ -94,7 +94,7 @@ export class ApiContext {
 export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<ApiContext> => {
 	context.sandbox = new Sandbox();
 
-	context.sandbox.app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
+	context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
 
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		info: (msg) => console.log(msg),
@@ -110,7 +110,7 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 
 const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 	const pluginConfiguration = app
-		.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration)
+		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
 		.discover("@mainsail/api-database", "@mainsail/api-database")
 		.merge({
 			database: {
@@ -132,7 +132,7 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 
 const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 	const pluginConfiguration = app
-		.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration)
+		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
 		.discover("@mainsail/api-http", "@mainsail/api-http")
 		.merge({
 			server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },

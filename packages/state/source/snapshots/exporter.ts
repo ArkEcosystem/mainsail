@@ -27,7 +27,7 @@ class Iterator {
 
 @injectable()
 export class Exporter implements Contracts.State.Exporter {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 

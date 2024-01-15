@@ -224,7 +224,7 @@ export class Command extends Commands.Command {
 		};
 
 		const configurationApp = await makeApplication(this.#getConfigurationPath(options), options);
-		configurationApp.bind(AppIdentifiers.Kernel.Log.Service).toConstantValue(this.logger);
+		configurationApp.bind(AppIdentifiers.Services.Log.Service).toConstantValue(this.logger);
 
 		if (flags.force || allFlagsSet) {
 			return configurationApp

@@ -5,7 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class BurnFeeMutator implements Contracts.State.ValidatorMutator {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "fees-managed")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 

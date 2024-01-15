@@ -18,7 +18,6 @@ export const Identifiers = {
 		Plugins: Symbol("Config<Plugins>"),
 		Repository: Symbol("Config<Repository>"),
 	},
-
 	Consensus: {
 		Aggregator: Symbol("Aggregator<Consensus>"),
 		Bootstrapper: Symbol("Bootstrapper<Consensus>"),
@@ -147,8 +146,6 @@ export const Identifiers = {
 		},
 	},
 
-	PluginConfiguration: Symbol("PluginConfiguration"),
-
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),
 		BlockVerifier: Symbol("Processor<Block.Verifier>"),
@@ -159,6 +156,10 @@ export const Identifiers = {
 	},
 	Providers: {
 		ServiceProviderRepository: Symbol("Repository<ServiceProvider>"),
+	},
+	ServiceProvider: {
+		Configuration: Symbol("ServiceProvider<Configuration>"),
+		Repository: Symbol("ServiceProvider<Repository>"),
 	},
 	Services: {
 		Cache: {

@@ -14,7 +14,7 @@ export class BootServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Providers.ServiceProviderRepository)
+	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)

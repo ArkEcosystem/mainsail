@@ -10,11 +10,19 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	const maxTransactionsPerRequest = server.app.app
-		.getTagged<Providers.PluginConfiguration>(Identifiers.PluginConfiguration, "plugin", "transaction-pool")
+		.getTagged<Providers.PluginConfiguration>(
+			Identifiers.ServiceProvider.Configuration,
+			"plugin",
+			"transaction-pool",
+		)
 		.getRequired<number>("maxTransactionsPerRequest");
 
 	const maxTransactionBytes = server.app.app
-		.getTagged<Providers.PluginConfiguration>(Identifiers.PluginConfiguration, "plugin", "transaction-pool")
+		.getTagged<Providers.PluginConfiguration>(
+			Identifiers.ServiceProvider.Configuration,
+			"plugin",
+			"transaction-pool",
+		)
 		.getRequired<number>("maxTransactionBytes");
 
 	server.route({

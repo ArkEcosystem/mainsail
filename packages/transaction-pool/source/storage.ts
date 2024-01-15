@@ -6,7 +6,7 @@ import { ensureFileSync } from "fs-extra";
 
 @injectable()
 export class Storage implements Contracts.TransactionPool.Storage {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 

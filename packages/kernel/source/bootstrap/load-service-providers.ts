@@ -28,7 +28,7 @@ export class LoadServiceProviders implements Bootstrapper {
 	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
-	@inject(Identifiers.Providers.ServiceProviderRepository)
+	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviderRepository!: ServiceProviderRepository;
 
 	public async bootstrap(): Promise<void> {

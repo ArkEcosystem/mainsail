@@ -15,7 +15,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Fee.Registry)
 	private readonly feeRegistry!: FeeRegistry;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "fees-managed")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 

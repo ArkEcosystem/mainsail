@@ -5,7 +5,7 @@ import { Providers, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Checker {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "networking-dns")
 	private readonly configuration!: Providers.PluginConfiguration;
 

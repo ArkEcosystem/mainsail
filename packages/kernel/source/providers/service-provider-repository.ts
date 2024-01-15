@@ -89,7 +89,7 @@ export class ServiceProviderRepository {
 		const serviceProvider = this.get(name);
 
 		this.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(serviceProvider.config())
 			.whenTargetTagged("plugin", name.split("/")[1]);
 

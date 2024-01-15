@@ -11,7 +11,7 @@ export class Controller {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-development")
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 

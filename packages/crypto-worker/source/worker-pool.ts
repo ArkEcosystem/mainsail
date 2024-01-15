@@ -4,7 +4,7 @@ import { IpcWorker, Providers, Types } from "@mainsail/kernel";
 
 @injectable()
 export class WorkerPool implements IpcWorker.WorkerPool {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "crypto-worker")
 	private readonly configuration!: Providers.PluginConfiguration;
 

@@ -4,7 +4,7 @@ import { Providers } from "@mainsail/kernel";
 
 @injectable()
 export class Service implements Contracts.State.Service {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 

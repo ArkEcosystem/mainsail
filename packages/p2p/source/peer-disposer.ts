@@ -7,7 +7,7 @@ import { errorTypes } from "./hapi-nes";
 
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
