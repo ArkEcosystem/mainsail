@@ -39,7 +39,7 @@
 // 	databaseService: any;
 // 	logService: any;
 // 	roundState: any;
-// 	stateStore: any;
+// 	store: any;
 // 	transactionHandlerRegistry: any;
 // 	transactionRepository: any;
 // 	walletRepository: any;
@@ -89,7 +89,7 @@
 // 		context.roundState = {
 // 			getActiveDelegates: () => {},
 // 		};
-// 		context.stateStore = {
+// 		context.store = {
 // 			getLastBlock: () => {},
 // 			getLastBlocks: () => {},
 // 			getLastDownloadedBlock: () => {},
@@ -123,7 +123,7 @@
 // 		context.sandbox.app
 // 			.bind(Identifiers.Transaction.Handler.Registry)
 // 			.toConstantValue(context.transactionHandlerRegistry);
-// 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
+// 		context.sandbox.app.bind(Identifiers.store).toConstantValue(context.store);
 // 		context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
@@ -392,16 +392,16 @@
 // 			getAttribute: () => "generatorusername",
 // 		});
 // 		stub(context.transactionRepository, "getForgedTransactionsIds").returnValue([transactionData.id]);
-// 		stub(context.stateStore, "getLastBlock").returnValue(context.baseBlock);
-// 		stub(context.stateStore, "getLastStoredBlockHeight").returnValue(context.baseBlock.data.height);
-// 		stub(context.stateStore, "getLastBlocks").returnValue([]);
+// 		stub(context.store, "getLastBlock").returnValue(context.baseBlock);
+// 		stub(context.store, "getLastStoredBlockHeight").returnValue(context.baseBlock.data.height);
+// 		stub(context.store, "getLastBlocks").returnValue([]);
 
 // 		await context.blockProcessor.process(block);
 
 // 		context.alreadyForgedHandlerSpy.calledOnce();
 // 	});
 
-// 	it("should execute AlreadyForgedHandler when block has already forged transactions in stateStore", async (context) => {
+// 	it("should execute AlreadyForgedHandler when block has already forged transactions in store", async (context) => {
 // 		const transactionData = {
 // 			id: "34821dfa9cbe59aad663b972326ff19265d788c4d4142747606aa29b19d6b1dab",
 // 			nonce: BigNumber.make(2),
@@ -426,11 +426,11 @@
 // 			getAttribute: () => "generatorusername",
 // 		});
 // 		stub(context.transactionRepository, "getForgedTransactionsIds").returnValue([]);
-// 		stub(context.stateStore, "getLastBlock").returnValue({ data: { height: 2 } });
-// 		stub(context.stateStore, "getLastBlocks").returnValue([
+// 		stub(context.store, "getLastBlock").returnValue({ data: { height: 2 } });
+// 		stub(context.store, "getLastBlocks").returnValue([
 // 			{ data: { height: 2 }, transactions: [transactionData, transactionData2] },
 // 		]);
-// 		stub(context.stateStore, "getLastStoredBlockHeight").returnValue(1);
+// 		stub(context.store, "getLastStoredBlockHeight").returnValue(1);
 
 // 		await context.blockProcessor.process(block);
 

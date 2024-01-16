@@ -31,12 +31,12 @@ describe<{
 		}),
 	};
 
-	const stateStore = {
+	const store = {
 		getLastBlock: () => {},
 	};
 
 	const stateService = {
-		getStore: () => stateStore,
+		getStore: () => store,
 	};
 
 	beforeEach((context) => {
@@ -56,7 +56,7 @@ describe<{
 	it("#scheduleTimeoutStartRound - should call onTimeoutStartRound ", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
-		const spyOnGetLatBlock = stub(stateStore, "getLastBlock").returnValue({
+		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
 			data: {
 				timestamp: 0,
 			},
@@ -75,7 +75,7 @@ describe<{
 	it("#scheduleTimeoutPropose - should call onTimeoutStartRound only once", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
-		const spyOnGetLatBlock = stub(stateStore, "getLastBlock").returnValue({
+		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
 			data: {
 				timestamp: 0,
 			},

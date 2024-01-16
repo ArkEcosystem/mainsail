@@ -25,7 +25,7 @@ import { Selector } from "../../proposer/source/selector";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
-import { StateStore } from "../source/state-store";
+import { store } from "../source/state-store";
 import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
 
@@ -52,7 +52,7 @@ export interface Setup {
 	walletRepo: WalletRepository;
 	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
 	factory: Factories.FactoryBuilder;
-	stateStore: StateStore;
+	store: store;
 	spies: Spies;
 }
 
@@ -152,7 +152,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
 	sandbox.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
+	sandbox.app.bind(Identifiers.store).to(store).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Cryptography.Identity.Address.Factory).to(AddressFactory).inSingletonScope();
 	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKey.Factory).to(PublicKeyFactory).inSingletonScope();
@@ -179,7 +179,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	});
 	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 
-	const stateStore: StateStore = sandbox.app.get(Identifiers.StateStore);
+	const store: store = sandbox.app.get(Identifiers.store);
 
 	const applySpy: SinonSpy = spy();
 	const revertSpy: SinonSpy = spy();
@@ -324,7 +324,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 			logger,
 			revertSpy,
 		},
-		stateStore,
+		store,
 		walletRepo,
 		walletRepoCopyOnWrite,
 	};

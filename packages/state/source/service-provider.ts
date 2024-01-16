@@ -72,8 +72,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.State.Store.Factory).toFactory(
 			({ container }) =>
-				(originalStateStore?: Store) =>
-					container.resolve(Store).configure(originalStateStore),
+				(originalstore?: Store) =>
+					container.resolve(Store).configure(originalstore),
 		);
 
 		this.app.bind(Identifiers.State.Importer).to(Importer);

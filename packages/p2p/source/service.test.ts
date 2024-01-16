@@ -26,7 +26,7 @@ describeSkip<{
 	const repository = { forgetPeer: () => {}, getPeers: () => [] };
 
 	const triggerService = { call: () => {} }; // validateAndAcceptPeer
-	const stateStore = { getLastBlock: () => {} };
+	const store = { getLastBlock: () => {} };
 	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
 	const slots = { getSlotNumber: () => 0 };
 
@@ -44,7 +44,7 @@ describeSkip<{
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
 		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
-		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(stateStore);
+		context.sandbox.app.bind(Identifiers.store).toConstantValue(store);
 
 		context.configuration = context.sandbox.app.getTagged(
 			Identifiers.ServiceProvider.Configuration,
@@ -600,7 +600,7 @@ describeSkip<{
 		];
 
 		stub(repository, "getPeers").returnValue(peers);
-		stub(stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(store, "getLastBlock").returnValue(lastBlock);
 
 		peers[0].verificationResult = new PeerVerificationResult(103, 90, 90);
 		peers[1].verificationResult = new PeerVerificationResult(103, 90, 90);
@@ -641,7 +641,7 @@ describeSkip<{
 		];
 
 		stub(repository, "getPeers").returnValue(peers);
-		stub(stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(store, "getLastBlock").returnValue(lastBlock);
 
 		peers[0].verificationResult = new PeerVerificationResult(103, 100, 100);
 		peers[1].verificationResult = new PeerVerificationResult(103, 100, 100);
@@ -681,7 +681,7 @@ describeSkip<{
 		];
 
 		stub(repository, "getPeers").returnValue(peers);
-		stub(stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(store, "getLastBlock").returnValue(lastBlock);
 
 		peers[0].verificationResult = new PeerVerificationResult(43, 47, 12);
 

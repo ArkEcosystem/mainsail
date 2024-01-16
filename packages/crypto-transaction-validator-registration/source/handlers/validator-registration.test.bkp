@@ -28,7 +28,7 @@ describe<{
 }>("DelegateRegistrationTransaction", ({ assert, afterEach, beforeEach, it, spy, spyFn, stub }) => {
 	beforeEach((context) => {
 		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
-		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
+		context.store = stub(Stores.store.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 
 		context.delegateRegistrationTransaction = Transactions.BuilderFactory.delegateRegistration()
 			.usernameAsset("dummy")

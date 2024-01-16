@@ -7,8 +7,8 @@ describe("getHeaders", ({ it, assert }) => {
 	let port = 4007;
 	const version = "3.0.9";
 	const height = 387;
-	const stateStore = { getLastHeight: () => height, isStarted: () => true };
-	const stateService = { getStore: () => stateStore };
+	const store = { getLastHeight: () => height, isStarted: () => true };
+	const stateService = { getStore: () => store };
 	const appGet = {
 		[Identifiers.State.Service]: stateService,
 	};
@@ -27,7 +27,7 @@ describe("getHeaders", ({ it, assert }) => {
 	it("should return port as an integer (when it is set in config as a string)", () => {
 		port = "4005";
 
-		stateStore.isStarted = () => false;
+		store.isStarted = () => false;
 		const headers = getHeaders(app as any);
 
 		const portNumberAsString = app.getTagged().get();

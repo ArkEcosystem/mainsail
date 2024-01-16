@@ -1,12 +1,12 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { Attributes, StateStore } from "../../state/distribution";
+import { Attributes, store } from "../../state/distribution";
 import { Selector } from "./selector";
 
 type Context = {
 	sandbox: Sandbox;
-	stateStore: Contracts.State.Store;
+	store: Contracts.State.Store;
 	stateService: any;
 	validatorSet: any;
 	proposerSelector;
@@ -16,7 +16,7 @@ type Context = {
 describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.stateService = {
-			getStore: () => context.stateStore,
+			getStore: () => context.store,
 		};
 
 		context.validatorSet = {
@@ -56,7 +56,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("validatorMatrix", Contracts.State.AttributeType.String);
 
-		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
+		context.store = context.sandbox.app.resolve(store).configure();
 
 		context.proposerSelector = context.sandbox.app.resolve(Selector);
 	});
@@ -89,7 +89,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 	it("#handleCommit - builds validator matrix based on round height", async ({
 		proposerSelector,
 		sandbox,
-		stateStore,
+		store,
 	}) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
@@ -103,7 +103,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}
 
-		stateStore.setTotalRound(53);
+		store.setTotalRound(53);
 
 		await proposerSelector.onCommit({
 			getCommit: async () => ({ block: { header: { height: activeValidators } } }),

@@ -7,7 +7,7 @@ import { Store } from "./store";
 
 describe<{
 	sandbox: Sandbox;
-	stateStore: Store;
+	store: Store;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
@@ -48,50 +48,45 @@ describe<{
 			Identifiers.State.AttributeRepository,
 		);
 
-		context.stateStore = context.sandbox.app.resolve(Store).configure();
+		context.store = context.sandbox.app.resolve(Store).configure();
 	});
 
-	it("#initialize - should set height and totalRound", ({ stateStore }) => {
-		assert.equal(stateStore.getAttribute("height"), 0);
-		assert.equal(stateStore.getAttribute("totalRound"), 0);
+	it("#initialize - should set height and totalRound", ({ store }) => {
+		assert.equal(store.getAttribute("height"), 0);
+		assert.equal(store.getAttribute("totalRound"), 0);
 	});
 
-	it("#isBootstrap - should return true by default", ({ stateStore }) => {
-		assert.true(stateStore.isBootstrap());
+	it("#isBootstrap - should return true by default", ({ store }) => {
+		assert.true(store.isBootstrap());
 	});
 
-	it("#setBootstrap - should set bootstrap", ({ stateStore }) => {
-		stateStore.setBootstrap(false);
-		assert.false(stateStore.isBootstrap());
+	it("#setBootstrap - should set bootstrap", ({ store }) => {
+		store.setBootstrap(false);
+		assert.false(store.isBootstrap());
 	});
 
-	it("#getLastBlock - should throw if not set", ({ stateStore }) => {
-		assert.throws(() => stateStore.getLastBlock());
+	it("#getLastBlock - should throw if not set", ({ store }) => {
+		assert.throws(() => store.getLastBlock());
 	});
 
-	it("#setLastBlock - should set heigh attribute and configuration height", ({ stateStore, cryptoConfiguration }) => {
+	it("#setLastBlock - should set heigh attribute and configuration height", ({ store, cryptoConfiguration }) => {
 		const spyOnSetHeight = spy(cryptoConfiguration, "setHeight");
 
-		assert.equal(stateStore.getAttribute("height"), 0);
+		assert.equal(store.getAttribute("height"), 0);
 
 		const block = {
 			data: {
 				height: 1,
 			},
 		};
-		stateStore.setLastBlock(block as any);
+		store.setLastBlock(block as any);
 
-		assert.equal(stateStore.getAttribute("height"), 1);
+		assert.equal(store.getAttribute("height"), 1);
 		spyOnSetHeight.calledOnce();
 		spyOnSetHeight.calledWith(block.data.height + 1); // always next height to propose
 	});
 
-	it("#setLastBlock - should emit milestone changed", ({
-		stateStore,
-		logger,
-		eventDispatcher,
-		cryptoConfiguration,
-	}) => {
+	it("#setLastBlock - should emit milestone changed", ({ store, logger, eventDispatcher, cryptoConfiguration }) => {
 		const spyNotice = spy(logger, "notice");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 		const spyIsNewMilestone = stub(cryptoConfiguration, "isNewMilestone").returnValue(true);
@@ -101,7 +96,7 @@ describe<{
 				height: 1,
 			},
 		};
-		stateStore.setLastBlock(block as any);
+		store.setLastBlock(block as any);
 
 		spyIsNewMilestone.calledOnce();
 		spyNotice.calledOnce();
@@ -110,67 +105,64 @@ describe<{
 		spyDispatch.calledWith(Enums.CryptoEvent.MilestoneChanged);
 	});
 
-	it("#getLastHeight - should return height", ({ stateStore }) => {
-		assert.equal(stateStore.getLastHeight(), 0);
+	it("#getLastHeight - should return height", ({ store }) => {
+		assert.equal(store.getLastHeight(), 0);
 
 		const block = {
 			data: {
 				height: 1,
 			},
 		};
-		stateStore.setLastBlock(block as any);
-		assert.equal(stateStore.getLastHeight(), 1);
+		store.setLastBlock(block as any);
+		assert.equal(store.getLastHeight(), 1);
 	});
 
-	it("#getTotalRound - should return totalRound", ({ stateStore }) => {
-		assert.equal(stateStore.getTotalRound(), 0);
+	it("#getTotalRound - should return totalRound", ({ store }) => {
+		assert.equal(store.getTotalRound(), 0);
 	});
 
-	it("#setTotalRound - should set totalRound", ({ stateStore }) => {
-		stateStore.setTotalRound(1);
-		assert.equal(stateStore.getTotalRound(), 1);
+	it("#setTotalRound - should set totalRound", ({ store }) => {
+		store.setTotalRound(1);
+		assert.equal(store.getTotalRound(), 1);
 	});
 
-	it("#hasAttribute - should return true if attribute is set", ({ stateStore }) => {
-		assert.true(stateStore.hasAttribute("height"));
-		assert.false(stateStore.hasAttribute("customAttribute"));
-		assert.false(stateStore.hasAttribute("unknownAttribute"));
+	it("#hasAttribute - should return true if attribute is set", ({ store }) => {
+		assert.true(store.hasAttribute("height"));
+		assert.false(store.hasAttribute("customAttribute"));
+		assert.false(store.hasAttribute("unknownAttribute"));
 	});
 
-	it("#setAttribute - should set attribute", ({ stateStore }) => {
-		stateStore.setAttribute("customAttribute", 1);
-		assert.equal(stateStore.getAttribute("customAttribute"), 1);
+	it("#setAttribute - should set attribute", ({ store }) => {
+		store.setAttribute("customAttribute", 1);
+		assert.equal(store.getAttribute("customAttribute"), 1);
 	});
 
-	it("#setAttribute - should throw if attribute is not registered", ({ stateStore }) => {
-		assert.throws(
-			() => stateStore.setAttribute("unknownAttribute", 1),
-			'Attribute "unknownAttribute" is not defined.',
-		);
+	it("#setAttribute - should throw if attribute is not registered", ({ store }) => {
+		assert.throws(() => store.setAttribute("unknownAttribute", 1), 'Attribute "unknownAttribute" is not defined.');
 	});
 
-	it("#getAttribute - should throw if attribute is not set", ({ stateStore }) => {
-		assert.throws(() => stateStore.getAttribute("customAttribute"), 'Attribute "customAttribute" is not set.');
+	it("#getAttribute - should throw if attribute is not set", ({ store }) => {
+		assert.throws(() => store.getAttribute("customAttribute"), 'Attribute "customAttribute" is not set.');
 	});
 
-	it("#getAttribute - should throw if attribute is not registered", ({ stateStore }) => {
-		assert.throws(() => stateStore.getAttribute("unknownAttribute"), 'Attribute "unknownAttribute" is not set.');
+	it("#getAttribute - should throw if attribute is not registered", ({ store }) => {
+		assert.throws(() => store.getAttribute("unknownAttribute"), 'Attribute "unknownAttribute" is not set.');
 	});
 
-	it("#commitChanges - should pass", ({ stateStore }) => {
-		stateStore.commitChanges();
+	it("#commitChanges - should pass", ({ store }) => {
+		store.commitChanges();
 	});
 });
 
 describe<{
 	sandbox: Sandbox;
-	stateStore: Store;
-	stateStoreClone: Store;
+	store: Store;
+	storeClone: Store;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
 	eventDispatcher: any;
-}>("StateStore - Clone", ({ it, beforeEach, assert, spy, stub }) => {
+}>("store - Clone", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
 			notice: () => {},
@@ -205,138 +197,138 @@ describe<{
 			Identifiers.State.AttributeRepository,
 		);
 
-		context.stateStore = context.sandbox.app.resolve(Store).configure();
+		context.store = context.sandbox.app.resolve(Store).configure();
 
-		context.stateStoreClone = context.sandbox.app.resolve(Store).configure(context.stateStore);
+		context.storeClone = context.sandbox.app.resolve(Store).configure(context.store);
 	});
 
 	it("#initialize - should return original height and totalRound, isBootstrap, lastBlock and genesisBlock", ({
-		stateStore,
+		store,
 		sandbox,
 	}) => {
 		const genesisBlock = { block: { data: { height: 0 } } };
 		const block = { data: { height: 1 } };
 
-		stateStore.setTotalRound(2);
-		stateStore.setBootstrap(false);
-		stateStore.setGenesisCommit(genesisBlock as any);
-		stateStore.setLastBlock(block as any);
+		store.setTotalRound(2);
+		store.setBootstrap(false);
+		store.setGenesisCommit(genesisBlock as any);
+		store.setLastBlock(block as any);
 
-		const stateStoreClone = sandbox.app.resolve(Store).configure(stateStore);
+		const storeClone = sandbox.app.resolve(Store).configure(store);
 
-		assert.equal(stateStoreClone.getTotalRound(), 2);
-		assert.equal(stateStoreClone.getLastHeight(), 1);
-		assert.false(stateStoreClone.isBootstrap());
+		assert.equal(storeClone.getTotalRound(), 2);
+		assert.equal(storeClone.getLastHeight(), 1);
+		assert.false(storeClone.isBootstrap());
 	});
 
-	it("#setBootstrap - should be set only on clone", ({ stateStore, stateStoreClone }) => {
-		assert.true(stateStore.isBootstrap());
-		assert.true(stateStoreClone.isBootstrap());
+	it("#setBootstrap - should be set only on clone", ({ store, storeClone }) => {
+		assert.true(store.isBootstrap());
+		assert.true(storeClone.isBootstrap());
 
-		stateStoreClone.setBootstrap(false);
+		storeClone.setBootstrap(false);
 
-		assert.true(stateStore.isBootstrap());
-		assert.false(stateStoreClone.isBootstrap());
+		assert.true(store.isBootstrap());
+		assert.false(storeClone.isBootstrap());
 	});
 
-	it("#setGenesisCommit - should be set only on clone", ({ stateStore, stateStoreClone }) => {
-		assert.throws(() => stateStore.getGenesisCommit());
-		assert.throws(() => stateStoreClone.getGenesisCommit());
+	it("#setGenesisCommit - should be set only on clone", ({ store, storeClone }) => {
+		assert.throws(() => store.getGenesisCommit());
+		assert.throws(() => storeClone.getGenesisCommit());
 
 		const genesisBlock = { block: { data: { height: 0 } } };
-		stateStoreClone.setGenesisCommit(genesisBlock as any);
+		storeClone.setGenesisCommit(genesisBlock as any);
 
-		assert.throws(() => stateStore.getGenesisCommit());
-		assert.equal(stateStoreClone.getGenesisCommit(), genesisBlock);
+		assert.throws(() => store.getGenesisCommit());
+		assert.equal(storeClone.getGenesisCommit(), genesisBlock);
 	});
 
-	it("#setLastBlock - should be set only on clone", ({ stateStore, stateStoreClone }) => {
-		assert.throws(() => stateStore.getLastBlock());
-		assert.throws(() => stateStoreClone.getLastBlock());
+	it("#setLastBlock - should be set only on clone", ({ store, storeClone }) => {
+		assert.throws(() => store.getLastBlock());
+		assert.throws(() => storeClone.getLastBlock());
 
 		const block = { data: { height: 1 } };
-		stateStoreClone.setLastBlock(block as any);
+		storeClone.setLastBlock(block as any);
 
-		assert.throws(() => stateStore.getLastBlock());
-		assert.equal(stateStoreClone.getLastBlock(), block);
-		assert.equal(stateStore.getLastHeight(), 0);
-		assert.equal(stateStoreClone.getLastHeight(), 1);
+		assert.throws(() => store.getLastBlock());
+		assert.equal(storeClone.getLastBlock(), block);
+		assert.equal(store.getLastHeight(), 0);
+		assert.equal(storeClone.getLastHeight(), 1);
 	});
 
-	it("#setTotalRound - should be set only on clone", ({ stateStore, stateStoreClone }) => {
-		assert.equal(stateStore.getTotalRound(), 0);
-		assert.equal(stateStoreClone.getTotalRound(), 0);
+	it("#setTotalRound - should be set only on clone", ({ store, storeClone }) => {
+		assert.equal(store.getTotalRound(), 0);
+		assert.equal(storeClone.getTotalRound(), 0);
 
-		stateStoreClone.setTotalRound(1);
+		storeClone.setTotalRound(1);
 
-		assert.equal(stateStore.getTotalRound(), 0);
-		assert.equal(stateStoreClone.getTotalRound(), 1);
+		assert.equal(store.getTotalRound(), 0);
+		assert.equal(storeClone.getTotalRound(), 1);
 	});
 
-	it("#setAttribute - should be set only on clone", ({ stateStore, stateStoreClone }) => {
-		assert.throws(() => stateStore.getAttribute("customAttribute"));
-		assert.throws(() => stateStoreClone.getAttribute("customAttribute"));
+	it("#setAttribute - should be set only on clone", ({ store, storeClone }) => {
+		assert.throws(() => store.getAttribute("customAttribute"));
+		assert.throws(() => storeClone.getAttribute("customAttribute"));
 
-		stateStoreClone.setAttribute("customAttribute", 1);
+		storeClone.setAttribute("customAttribute", 1);
 
-		assert.throws(() => stateStore.getAttribute("customAttribute"));
-		assert.equal(stateStoreClone.getAttribute("customAttribute"), 1);
+		assert.throws(() => store.getAttribute("customAttribute"));
+		assert.equal(storeClone.getAttribute("customAttribute"), 1);
 	});
 
-	it("hasAttribute - should be true only on clone", ({ stateStore, stateStoreClone }) => {
-		assert.false(stateStore.hasAttribute("customAttribute"));
-		assert.false(stateStoreClone.hasAttribute("customAttribute"));
+	it("hasAttribute - should be true only on clone", ({ store, storeClone }) => {
+		assert.false(store.hasAttribute("customAttribute"));
+		assert.false(storeClone.hasAttribute("customAttribute"));
 
-		stateStoreClone.setAttribute("customAttribute", 1);
+		storeClone.setAttribute("customAttribute", 1);
 
-		assert.false(stateStore.hasAttribute("customAttribute"));
-		assert.true(stateStoreClone.hasAttribute("customAttribute"));
+		assert.false(store.hasAttribute("customAttribute"));
+		assert.true(storeClone.hasAttribute("customAttribute"));
 	});
 
-	it("#geAttribute - should return if set on original", ({ stateStore, stateStoreClone }) => {
-		assert.throws(() => stateStore.getAttribute("customAttribute"));
-		assert.throws(() => stateStoreClone.getAttribute("customAttribute"));
+	it("#geAttribute - should return if set on original", ({ store, storeClone }) => {
+		assert.throws(() => store.getAttribute("customAttribute"));
+		assert.throws(() => storeClone.getAttribute("customAttribute"));
 
-		stateStore.setAttribute("customAttribute", 1);
+		store.setAttribute("customAttribute", 1);
 
-		assert.equal(stateStore.getAttribute("customAttribute"), 1);
-		assert.equal(stateStoreClone.getAttribute("customAttribute"), 1);
+		assert.equal(store.getAttribute("customAttribute"), 1);
+		assert.equal(storeClone.getAttribute("customAttribute"), 1);
 	});
 
-	it("#geAttribute - should return if set on clone", ({ stateStore, stateStoreClone }) => {
-		assert.throws(() => stateStore.getAttribute("customAttribute"));
-		assert.throws(() => stateStoreClone.getAttribute("customAttribute"));
+	it("#geAttribute - should return if set on clone", ({ store, storeClone }) => {
+		assert.throws(() => store.getAttribute("customAttribute"));
+		assert.throws(() => storeClone.getAttribute("customAttribute"));
 
-		stateStoreClone.setAttribute("customAttribute", 1);
+		storeClone.setAttribute("customAttribute", 1);
 
-		assert.throws(() => stateStore.getAttribute("customAttribute"));
-		assert.equal(stateStoreClone.getAttribute("customAttribute"), 1);
+		assert.throws(() => store.getAttribute("customAttribute"));
+		assert.equal(storeClone.getAttribute("customAttribute"), 1);
 	});
 
-	it("#commitChanges - should copy changes back to original", ({ stateStore, stateStoreClone }) => {
-		assert.equal(stateStore.getAttribute("height"), 0);
-		assert.equal(stateStore.getAttribute("totalRound"), 0);
-		assert.false(stateStore.hasAttribute("customAttribute"));
-		assert.true(stateStore.isBootstrap());
-		assert.throws(() => stateStore.getGenesisCommit());
-		assert.throws(() => stateStore.getLastBlock());
+	it("#commitChanges - should copy changes back to original", ({ store, storeClone }) => {
+		assert.equal(store.getAttribute("height"), 0);
+		assert.equal(store.getAttribute("totalRound"), 0);
+		assert.false(store.hasAttribute("customAttribute"));
+		assert.true(store.isBootstrap());
+		assert.throws(() => store.getGenesisCommit());
+		assert.throws(() => store.getLastBlock());
 
 		const genesisBlock = { block: { data: { height: 0 } } };
 		const block = { data: { height: 1 } };
 
-		stateStoreClone.setTotalRound(2);
-		stateStoreClone.setBootstrap(false);
-		stateStoreClone.setGenesisCommit(genesisBlock as any);
-		stateStoreClone.setLastBlock(block as any);
-		stateStoreClone.setAttribute("customAttribute", 1);
+		storeClone.setTotalRound(2);
+		storeClone.setBootstrap(false);
+		storeClone.setGenesisCommit(genesisBlock as any);
+		storeClone.setLastBlock(block as any);
+		storeClone.setAttribute("customAttribute", 1);
 
-		stateStoreClone.commitChanges();
+		storeClone.commitChanges();
 
-		assert.equal(stateStore.getAttribute("height"), 1);
-		assert.equal(stateStore.getAttribute("totalRound"), 2);
-		assert.equal(stateStore.getAttribute("customAttribute"), 1);
-		assert.false(stateStore.isBootstrap());
-		assert.equal(stateStore.getGenesisCommit(), genesisBlock);
-		assert.equal(stateStore.getLastBlock(), block);
+		assert.equal(store.getAttribute("height"), 1);
+		assert.equal(store.getAttribute("totalRound"), 2);
+		assert.equal(store.getAttribute("customAttribute"), 1);
+		assert.false(store.isBootstrap());
+		assert.equal(store.getGenesisCommit(), genesisBlock);
+		assert.equal(store.getLastBlock(), block);
 	});
 });

@@ -9,12 +9,12 @@ describe<{
 }>("GetBlocksController", ({ it, assert, beforeEach, spy, match, stub }) => {
 	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
 	const database = { findCommitBuffers: () => {} };
-	const stateStore = {
+	const store = {
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
 	};
 	const stateService = {
-		getStore: () => stateStore,
+		getStore: () => store,
 	};
 
 	beforeEach((context) => {

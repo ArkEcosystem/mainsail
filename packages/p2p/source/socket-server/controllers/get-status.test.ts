@@ -16,8 +16,8 @@ describe<{
 		},
 	});
 
-	const stateStore = { getLastBlock: () => {} };
-	const stateService = { getStore: () => stateStore };
+	const store = { getLastBlock: () => {} };
+	const stateService = { getStore: () => store };
 	const slots = { getSlotInfo: () => {} };
 
 	beforeEach((context) => {
@@ -36,7 +36,7 @@ describe<{
 			header,
 		};
 
-		stub(stateStore, "getLastBlock").returnValue(lastBlock);
+		stub(store, "getLastBlock").returnValue(lastBlock);
 		const slotInfo = {
 			blockTime: 8000,
 			endTime: 99_000,
