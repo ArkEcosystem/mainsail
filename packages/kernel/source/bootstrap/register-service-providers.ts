@@ -11,15 +11,15 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterServiceProviders implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		for (const [name, serviceProvider] of serviceProviders.all()) {
@@ -57,7 +57,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 			const config: PluginConfiguration = serviceProvider.config();
 
 			const validator: Contracts.Kernel.Validator | undefined = this.app
-				.get<ValidationManager>(Identifiers.ValidationManager)
+				.get<ValidationManager>(Identifiers.Services.Validation.Manager)
 				.driver();
 
 			assert.defined<Contracts.Kernel.Validator>(validator);
@@ -78,7 +78,7 @@ export class RegisterServiceProviders implements Bootstrapper {
 
 	async #satisfiesDependencies(serviceProvider: ServiceProvider): Promise<boolean> {
 		const serviceProviders: ServiceProviderRepository = this.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		for (const dependency of serviceProvider.dependencies()) {

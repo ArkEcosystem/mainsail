@@ -4,10 +4,10 @@ import { IpcWorker, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Aggregator implements Contracts.Consensus.Aggregator {
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	public async aggregate(

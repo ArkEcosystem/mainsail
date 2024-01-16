@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class IDFactory {
-	@inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Block.Serializer)

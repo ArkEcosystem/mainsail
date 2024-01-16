@@ -17,13 +17,13 @@ export type WebhookServer = HapiServer<WebhookAppState>;
 
 @injectable()
 export class Server {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(InternalIdentifiers.Database)
 	private readonly database!: Database;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#server!: WebhookServer;

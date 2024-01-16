@@ -8,7 +8,7 @@ import { Controller } from "./controller";
 
 @injectable()
 export class ApiNodesController extends Controller {
-	@inject(Identifiers.PeerApiNodeRepository)
+	@inject(Identifiers.P2P.ApiNode.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerApiNodeRepository;
 
 	public async index(request: Hapi.Request) {

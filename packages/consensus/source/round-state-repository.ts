@@ -5,7 +5,7 @@ import { RoundState } from "./round-state";
 
 @injectable()
 export class RoundStateRepository implements Contracts.Consensus.RoundStateRepository {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	#roundStates = new Map<string, Contracts.Consensus.RoundState>();

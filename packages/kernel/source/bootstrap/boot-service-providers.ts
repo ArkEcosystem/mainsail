@@ -11,16 +11,16 @@ import { ChangeServiceProviderState } from "./listeners";
 
 @injectable()
 export class BootServiceProviders implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.ServiceProviderRepository)
+	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviders!: ServiceProviderRepository;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {

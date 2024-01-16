@@ -138,23 +138,21 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.BlockProcessor).toConstantValue(context.blockProcessor);
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
-		context.sandbox.app.bind(Identifiers.Consensus.PrevoteProcessor).toConstantValue(context.prevoteProcessor);
-		context.sandbox.app.bind(Identifiers.Consensus.PrecommitProcessor).toConstantValue(context.precommitProcessor);
-		context.sandbox.app.bind(Identifiers.Consensus.ProposalProcessor).toConstantValue(context.proposalProcessor);
+		context.sandbox.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.PreVote).toConstantValue(context.prevoteProcessor);
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.PreCommit).toConstantValue(context.precommitProcessor);
+		context.sandbox.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(context.proposalProcessor);
 		context.sandbox.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.sandbox.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.sandbox.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
-		+context.sandbox.app
-			.bind(Identifiers.Consensus.ValidatorRepository)
-			.toConstantValue(context.validatorsRepository);
-		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(context.validatorSet);
+		+context.sandbox.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
+		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app
 			.bind(Identifiers.Consensus.RoundStateRepository)
 			.toConstantValue(context.roundStateRepository);
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.consensus = context.sandbox.app.resolve(Consensus);
 	});

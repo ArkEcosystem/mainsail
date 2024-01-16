@@ -29,7 +29,7 @@ const transformPlugins = (plugins: PluginConfig[]): Contracts.P2P.PeerPlugins =>
 const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Application) =>
 	plugins.map((plugin) => {
 		const serviceProvider: Providers.ServiceProvider = app
-			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
+			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProvider.Repository)
 			.get(plugin.package);
 
 		const serviceProviderName: string | undefined = serviceProvider.name();
@@ -58,7 +58,7 @@ export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.
 		},
 		plugins: transformPlugins(
 			getPluginsConfig(
-				app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("app.plugins"),
+				app.get<Services.Config.ConfigRepository>(Identifiers.Config.Repository).get("app.plugins"),
 				app,
 			),
 		),

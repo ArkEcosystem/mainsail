@@ -10,15 +10,15 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeySerializer)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Serializer)
 	@tagged("type", "wallet")
 	private readonly publicKeySerializer!: Contracts.Crypto.PublicKeySerializer;
 
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
 	private readonly signatureSerializer!: Contracts.Crypto.Signature;
 
-	@inject(Identifiers.Cryptography.Size.Signature)
+	@inject(Identifiers.Cryptography.Signature.Size)
 	@tagged("type", "wallet")
 	private readonly signatureSize!: number;
 

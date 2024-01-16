@@ -6,7 +6,7 @@ import { cidr } from "ip";
 // @TODO review the implementation
 @injectable()
 export class PeerRepository implements Contracts.P2P.PeerRepository {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 

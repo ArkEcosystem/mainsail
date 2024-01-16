@@ -42,7 +42,7 @@ describe<{
 			notice: () => {},
 		};
 
-		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 	});
 
 	afterEach(() => {
@@ -96,11 +96,11 @@ describe<{
 	it("should boot the application", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Services.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -123,11 +123,11 @@ describe<{
 	it.skip("should reboot the application", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Services.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -148,7 +148,7 @@ describe<{
 	});
 
 	it("should get and set the given configuration value", (context) => {
-		context.app.get<ConfigRepository>(Identifiers.ConfigRepository).merge({ key: "Hello World" });
+		context.app.get<ConfigRepository>(Identifiers.Config.Repository).merge({ key: "Hello World" });
 
 		assert.is(context.app.config("key"), "Hello World");
 
@@ -156,31 +156,31 @@ describe<{
 	});
 
 	it("should return the directory prefix", (context) => {
-		context.app.bind(Identifiers.ApplicationDirPrefix).toConstantValue("Hello World");
+		context.app.bind(Identifiers.Application.DirPrefix).toConstantValue("Hello World");
 
 		assert.is(context.app.dirPrefix(), "Hello World");
 	});
 
 	it("should return the namespace", (context) => {
-		context.app.bind(Identifiers.ApplicationNamespace).toConstantValue("Hello World");
+		context.app.bind(Identifiers.Application.Namespace).toConstantValue("Hello World");
 
 		assert.is(context.app.namespace(), "Hello World");
 	});
 
 	it("should return the version", (context) => {
-		context.app.bind(Identifiers.ApplicationVersion).toConstantValue("Hello World");
+		context.app.bind(Identifiers.Application.Version).toConstantValue("Hello World");
 
 		assert.is(context.app.version(), "Hello World");
 	});
 
 	it("should return the token", (context) => {
-		context.app.bind(Identifiers.ApplicationToken).toConstantValue("Hello World");
+		context.app.bind(Identifiers.Application.Token).toConstantValue("Hello World");
 
 		assert.is(context.app.token(), "Hello World");
 	});
 
 	it("should return the network", (context) => {
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("Hello World");
+		context.app.bind(Identifiers.Application.Network).toConstantValue("Hello World");
 
 		assert.is(context.app.network(), "Hello World");
 	});
@@ -296,7 +296,7 @@ describe<{
 	});
 
 	it("should set and get the environment", (context) => {
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("development");
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("development");
 
 		assert.is(context.app.environment(), "development");
 
@@ -306,80 +306,80 @@ describe<{
 	});
 
 	it("should determine if the application is in production (by environment)", (context) => {
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("devnet");
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("development");
+		context.app.bind(Identifiers.Application.Network).toConstantValue("devnet");
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("development");
 
 		assert.false(context.app.isProduction());
 
-		context.app.unbind(Identifiers.ApplicationEnvironment);
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("production");
+		context.app.unbind(Identifiers.Application.Environment);
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
 
 		assert.true(context.app.isProduction());
 	});
 
 	it("should determine if the application is in production (by network)", (context) => {
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("devnet");
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("development");
+		context.app.bind(Identifiers.Application.Network).toConstantValue("devnet");
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("development");
 
 		assert.false(context.app.isProduction());
 
-		context.app.unbind(Identifiers.ApplicationNetwork);
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("mainnet");
+		context.app.unbind(Identifiers.Application.Network);
+		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
 
 		assert.true(context.app.isProduction());
 	});
 
 	it("should determine if the application is in development (by environment)", (context) => {
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("mainnet");
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("production");
+		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
 
 		assert.false(context.app.isDevelopment());
 
-		context.app.unbind(Identifiers.ApplicationEnvironment);
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("development");
+		context.app.unbind(Identifiers.Application.Environment);
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("development");
 
 		assert.true(context.app.isDevelopment());
 	});
 
 	it("should determine if the application is in development (by network)", (context) => {
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("mainnet");
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("production");
+		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
 
 		assert.false(context.app.isDevelopment());
 
-		context.app.unbind(Identifiers.ApplicationNetwork);
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("devnet");
+		context.app.unbind(Identifiers.Application.Network);
+		context.app.bind(Identifiers.Application.Network).toConstantValue("devnet");
 
 		assert.true(context.app.isDevelopment());
 	});
 
 	it("should determine if the application is in tests (by environment)", (context) => {
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("mainnet");
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("production");
+		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
 
 		assert.false(context.app.runningTests());
 
-		context.app.unbind(Identifiers.ApplicationEnvironment);
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("test");
+		context.app.unbind(Identifiers.Application.Environment);
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("test");
 
 		assert.true(context.app.runningTests());
 	});
 
 	it("should determine if the application is in tests (by network)", (context) => {
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("mainnet");
-		context.app.bind(Identifiers.ApplicationEnvironment).toConstantValue("production");
+		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
+		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
 
 		assert.false(context.app.runningTests());
 
-		context.app.unbind(Identifiers.ApplicationNetwork);
-		context.app.bind(Identifiers.ApplicationNetwork).toConstantValue("testnet");
+		context.app.unbind(Identifiers.Application.Network);
+		context.app.bind(Identifiers.Application.Network).toConstantValue("testnet");
 
 		assert.true(context.app.runningTests());
 	});
 
 	it("should enable and disable maintenance mode", (context) => {
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Services.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		context.app.bind("path.temp").toConstantValue(dirSync().name);
@@ -398,11 +398,11 @@ describe<{
 	it.skip("should terminate the application", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Services.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -422,11 +422,11 @@ describe<{
 	it.skip("should terminate the application with a reason", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Services.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);
@@ -447,11 +447,11 @@ describe<{
 	it.skip("should terminate the application with an error", async (context) => {
 		// Arrange
 		context.app
-			.bind(Identifiers.EventDispatcherService)
+			.bind(Identifiers.Services.EventDispatcher.Service)
 			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
 
 		const serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 
 		const serviceProvider = context.app.resolve(StubServiceProvider);

@@ -9,16 +9,16 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
-	@inject(Identifiers.PeerBroadcaster)
+	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {

@@ -6,7 +6,7 @@ import { CronJob } from "./cron-job";
 
 @injectable()
 export class Schedule {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	public cron(): CronJob {

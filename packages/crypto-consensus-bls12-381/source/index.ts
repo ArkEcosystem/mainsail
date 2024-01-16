@@ -15,41 +15,41 @@ export * from "./schemas";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
-			.bind(Identifiers.Cryptography.Size.PublicKey)
+			.bind(Identifiers.Cryptography.Identity.PublicKey.Size)
 			.toConstantValue(48)
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
 		this.app
-			.bind(Identifiers.Cryptography.Size.Signature)
+			.bind(Identifiers.Cryptography.Signature.Size)
 			.toConstantValue(96)
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
 		this.app
-			.bind(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
 			.to(KeyPairFactory)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
 		this.app
-			.bind(Identifiers.Cryptography.Identity.PrivateKeyFactory)
+			.bind(Identifiers.Cryptography.Identity.PrivateKey.Factory)
 			.to(PrivateKeyFactory)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
 		this.app
-			.bind(Identifiers.Cryptography.Identity.PublicKeyFactory)
+			.bind(Identifiers.Cryptography.Identity.PublicKey.Factory)
 			.to(PublicKeyFactory)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
 		this.app
-			.bind(Identifiers.Cryptography.Identity.PublicKeySerializer)
+			.bind(Identifiers.Cryptography.Identity.PublicKey.Serializer)
 			.to(PublicKeySerializer)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));
 
 		this.app
-			.bind(Identifiers.Cryptography.Signature)
+			.bind(Identifiers.Cryptography.Signature.Instance)
 			.to(Signature)
 			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "consensus"));

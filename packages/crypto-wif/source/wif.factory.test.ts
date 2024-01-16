@@ -24,7 +24,7 @@ describe<{
 		});
 
 		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
 			.to(KeyPairFactory)
 			.inSingletonScope();
 
@@ -39,7 +39,7 @@ describe<{
 		assert.equal(
 			await factory.fromKeys(
 				await sandbox.app
-					.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPairFactory)
+					.get<KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory)
 					.fromMnemonic(mnemonic),
 			),
 			wif,

@@ -10,7 +10,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer!: Contracts.Crypto.BlockSerializer;
 
-	@inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	public async verify(block: Contracts.Crypto.Block): Promise<Contracts.Crypto.BlockVerification> {

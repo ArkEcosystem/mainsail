@@ -10,7 +10,7 @@ describe("getHeaders", ({ it, assert }) => {
 	const stateStore = { getLastHeight: () => height, isStarted: () => true };
 	const stateService = { getStateStore: () => stateStore };
 	const appGet = {
-		[Identifiers.StateService]: stateService,
+		[Identifiers.State.Service]: stateService,
 	};
 	const app = {
 		get: (key) => appGet[key],

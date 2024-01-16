@@ -1,8 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { Attributes, StateStore } from "../../state";
-import { ProposerSelector } from "./proposer-selector";
+import { Attributes, StateStore } from "../../state/distribution";
+import { Selector } from "./selector";
 
 type Context = {
 	sandbox: Sandbox;
@@ -13,7 +13,7 @@ type Context = {
 	logger: any;
 };
 
-describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
+describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.stateService = {
 			getStateStore: () => context.stateStore,
@@ -38,24 +38,27 @@ describe<Context>("ProposerSelector", ({ it, beforeEach, assert, stub }) => {
 		};
 
 		context.sandbox = new Sandbox();
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(context.stateService);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
-		context.sandbox.app.bind(Identifiers.StateAttributes).to(Attributes.AttributeRepository).inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.bind(Identifiers.State.AttributeRepository)
+			.to(Attributes.AttributeRepository)
+			.inSingletonScope();
+		context.sandbox.app
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("validatorMatrix", Contracts.State.AttributeType.String);
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 
-		context.proposerSelector = context.sandbox.app.resolve(ProposerSelector);
+		context.proposerSelector = context.sandbox.app.resolve(Selector);
 	});
 
 	// Calculated indexes seeded from height 1 for the first 51 validators

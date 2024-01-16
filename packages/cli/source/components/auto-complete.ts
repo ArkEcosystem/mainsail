@@ -6,7 +6,7 @@ import { Prompt } from "./prompt";
 
 @injectable()
 export class AutoComplete {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	public async render(message: string, choices: any[], options: object = {}): Promise<string> {

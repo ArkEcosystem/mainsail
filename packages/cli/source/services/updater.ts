@@ -15,7 +15,7 @@ const ONE_DAY = 1000 * 60 * 60 * 24;
 
 @injectable()
 export class Updater implements Contracts_Updater {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.Config)

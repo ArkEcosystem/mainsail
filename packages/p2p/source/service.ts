@@ -7,29 +7,29 @@ import delay from "delay";
 
 @injectable()
 export class Service implements Contracts.P2P.Service {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.P2PState)
+	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
-	@inject(Identifiers.PeerDiscoverer)
+	@inject(Identifiers.P2P.Peer.Discoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
-	@inject(Identifiers.PeerApiNodeDiscoverer)
+	@inject(Identifiers.P2P.ApiNode.Discoverer)
 	private readonly peerApiNodeDiscoverer!: Contracts.P2P.PeerApiNodeDiscoverer;
 
-	@inject(Identifiers.PeerVerifier)
+	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerDisposer)
+	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#lastMinPeerCheck: dayjs.Dayjs = dayjs();

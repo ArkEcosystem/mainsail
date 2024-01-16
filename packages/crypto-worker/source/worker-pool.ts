@@ -4,19 +4,19 @@ import { IpcWorker, Providers, Types } from "@mainsail/kernel";
 
 @injectable()
 export class WorkerPool implements IpcWorker.WorkerPool {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "crypto-worker")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Ipc.WorkerFactory)
+	@inject(Identifiers.CryptoWorker.Worker.Factory)
 	private readonly createWorker!: IpcWorker.WorkerFactory;
 
 	private workers: IpcWorker.Worker[] = [];
 
-	@inject(Identifiers.ConfigFlags)
+	@inject(Identifiers.Config.Flags)
 	private readonly flags!: Types.KeyValuePair;
 
 	#currentWorkerIndex = 0;

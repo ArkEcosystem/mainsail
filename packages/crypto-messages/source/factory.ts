@@ -21,7 +21,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	public async makeProposal(

@@ -44,7 +44,7 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(stateService);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(stateService);
 
 		context.scheduler = context.sandbox.app.resolve(SchedulerProxy);
 	});

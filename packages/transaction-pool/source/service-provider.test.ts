@@ -27,7 +27,7 @@ describe<{
 }>("ServiceProvider", ({ it, assert, beforeEach, afterEach, stub }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+		context.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 
 		context.txPoolEnv = process.env.CORE_TRANSACTION_POOL;
 		context.maxTxPoolEnv = process.env.CORE_MAX_TRANSACTIONS_IN_POOL;
@@ -43,12 +43,12 @@ describe<{
 	it("should register, boot and dispose", async (context) => {
 		await assert.resolves(() => context.serviceProvider.register());
 
-		context.app.rebind(Identifiers.TransactionPoolStorage).toConstantValue({
+		context.app.rebind(Identifiers.TransactionPool.Storage).toConstantValue({
 			boot: () => {},
 			dispose: () => {},
 		});
 
-		context.app.rebind(Identifiers.TransactionPoolService).toConstantValue({
+		context.app.rebind(Identifiers.TransactionPool.Service).toConstantValue({
 			boot: () => {},
 			dispose: () => {},
 		});

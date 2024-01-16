@@ -30,21 +30,23 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
-		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(Identifiers.StateAttributes);
+		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(
+			Identifiers.State.AttributeRepository,
+		);
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 	});
@@ -185,21 +187,23 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
-		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(Identifiers.StateAttributes);
+		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(
+			Identifiers.State.AttributeRepository,
+		);
 
 		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
 

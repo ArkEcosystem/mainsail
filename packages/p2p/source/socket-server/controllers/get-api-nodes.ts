@@ -7,7 +7,7 @@ import { constants } from "../../constants";
 
 @injectable()
 export class GetApiNodesController implements Contracts.P2P.Controller {
-	@inject(Identifiers.PeerApiNodeRepository)
+	@inject(Identifiers.P2P.ApiNode.Repository)
 	private readonly peerApiNodeRepository!: Contracts.P2P.PeerApiNodeRepository;
 
 	public async handle(

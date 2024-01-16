@@ -13,13 +13,13 @@ describe<{
 		context.app = new Application(new Container());
 	});
 	it(".register", async (context) => {
-		assert.false(context.app.isBound(Identifiers.EventDispatcherManager));
-		assert.false(context.app.isBound(Identifiers.EventDispatcherService));
+		assert.false(context.app.isBound(Identifiers.Services.EventDispatcher.Manager));
+		assert.false(context.app.isBound(Identifiers.Services.EventDispatcher.Service));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.EventDispatcherManager));
-		assert.true(context.app.isBound(Identifiers.EventDispatcherService));
-		assert.instance(context.app.get(Identifiers.EventDispatcherService), MemoryEventDispatcher);
+		assert.true(context.app.isBound(Identifiers.Services.EventDispatcher.Manager));
+		assert.true(context.app.isBound(Identifiers.Services.EventDispatcher.Service));
+		assert.instance(context.app.get(Identifiers.Services.EventDispatcher.Service), MemoryEventDispatcher);
 	});
 });

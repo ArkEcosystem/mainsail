@@ -13,7 +13,7 @@ describe<{
 }>("PluginManifest", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.ConfigRepository).to(ConfigRepository).inSingletonScope();
+		context.app.bind(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
 
 		context.pluginManifest = context.app.resolve<PluginManifest>(PluginManifest);
 	});

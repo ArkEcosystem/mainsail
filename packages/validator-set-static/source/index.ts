@@ -5,6 +5,6 @@ import { ValidatorSet } from "./validator-set";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.ValidatorSet).to(ValidatorSet).inSingletonScope();
+		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 	}
 }

@@ -11,10 +11,10 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class RegisterBasePaths implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.ConfigRepository)
+	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
 	public async bootstrap(): Promise<void> {

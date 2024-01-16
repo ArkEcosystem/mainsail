@@ -4,26 +4,26 @@ import { Providers } from "@mainsail/kernel";
 
 @injectable()
 export class Service implements Contracts.State.Service {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.StateStoreFactory)
+	@inject(Identifiers.State.Store.Factory)
 	private readonly stateStoreFactory!: Contracts.State.StateStoreFactory;
 
-	@inject(Identifiers.WalletRepositoryFactory)
+	@inject(Identifiers.State.WalletRepository.Base.Factory)
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
 
-	@inject(Identifiers.WalletRepositoryCloneFactory)
+	@inject(Identifiers.State.WalletRepository.Clone.Factory)
 	private readonly walletRepositoryCloneFactory!: Contracts.State.WalletRepositoryCloneFactory;
 
-	@inject(Identifiers.WalletRepositoryCopyOnWriteFactory)
+	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
-	@inject(Identifiers.StateExporter)
+	@inject(Identifiers.State.Exporter)
 	private readonly exporter!: Contracts.State.Exporter;
 
-	@inject(Identifiers.StateImporter)
+	@inject(Identifiers.State.Importer)
 	private readonly importer!: Contracts.State.Importer;
 
 	#baseStateStore!: Contracts.State.StateStore;

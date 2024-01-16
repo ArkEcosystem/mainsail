@@ -9,11 +9,11 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.BlockProcessor)
+	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;
@@ -21,7 +21,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
-	@inject(Identifiers.Consensus.CommitStateFactory)
+	@inject(Identifiers.Consensus.CommitState.Factory)
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
 	async process(commit: Contracts.Crypto.Commit): Promise<Contracts.Consensus.ProcessorResult> {

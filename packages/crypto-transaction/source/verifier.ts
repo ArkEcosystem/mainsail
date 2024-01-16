@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Verifier implements Contracts.Crypto.TransactionVerifier {
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
 	private readonly signatureFactory!: Contracts.Crypto.Signature;
 

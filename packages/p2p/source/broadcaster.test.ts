@@ -22,13 +22,13 @@ describeSkip<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue(configuration);
-		context.sandbox.app.bind(Identifiers.PeerRepository).toConstantValue(repository);
-		context.sandbox.app.bind(Identifiers.PeerCommunicator).toConstantValue(communicator);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);
 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
-		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 
 		context.broadcaster = context.sandbox.app.resolve(Broadcaster);
 

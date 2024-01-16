@@ -8,10 +8,10 @@ import { TransactionHandler } from "./transaction";
 
 @injectable()
 export class TransactionHandlerRegistry implements Contracts.Transactions.TransactionHandlerRegistry {
-	@inject(Identifiers.TransactionHandlerProvider)
+	@inject(Identifiers.Transaction.Handler.Provider)
 	private readonly provider!: TransactionHandlerProvider;
 
-	@multiInject(Identifiers.TransactionHandler)
+	@multiInject(Identifiers.Transaction.Handler.Instances)
 	private readonly handlers!: TransactionHandler[];
 
 	@postConstruct()

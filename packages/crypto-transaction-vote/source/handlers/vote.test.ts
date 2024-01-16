@@ -68,11 +68,11 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
+		context.sandbox.app.bind(Identifiers.TransactionPool.Query).toConstantValue(context.poolQuery);
 
 		context.handler = context.sandbox.app.resolve(VoteTransactionHandler);
 

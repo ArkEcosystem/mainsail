@@ -66,7 +66,7 @@ export class ApplicationFactory {
 		const applicationName = Object.keys(package_.bin)[0];
 		Utils.assert.defined<string>(applicationName);
 
-		app.bind(Identifiers.ApplicationName).toConstantValue(applicationName);
+		app.bind(Identifiers.Application.Name).toConstantValue(applicationName);
 
 		// Factories
 		app.bind(Identifiers.ActionFactory).to(ActionFactory).inSingletonScope();

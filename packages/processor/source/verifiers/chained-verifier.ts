@@ -4,10 +4,10 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ChainedVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {

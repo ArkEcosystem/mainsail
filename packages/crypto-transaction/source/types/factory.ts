@@ -8,7 +8,7 @@ type TransactionConstructor = typeof Transaction;
 
 @injectable()
 export class TransactionTypeFactory implements Contracts.Transactions.TransactionTypeFactory {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
 	#transactionTypes!: Map<Contracts.Transactions.InternalTransactionType, Map<number, TransactionConstructor>>;

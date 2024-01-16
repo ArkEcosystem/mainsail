@@ -4,22 +4,22 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.ConsensusService;
 
-	@inject(Identifiers.StateVerifier)
+	@inject(Identifiers.State.Verifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.P2PServer)
+	@inject(Identifiers.P2P.Server)
 	private readonly p2pServer!: Contracts.P2P.Server;
 
 	@inject(Identifiers.P2P.Service)
@@ -34,21 +34,21 @@ export class Bootstrapper {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.BlockProcessor)
+	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
-	@inject(Identifiers.Consensus.CommitStateFactory)
+	@inject(Identifiers.Consensus.CommitState.Factory)
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
-	@inject(Identifiers.ApiSync)
+	@inject(Identifiers.ApiSync.Service)
 	@optional()
-	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
+	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	#stateStore!: Contracts.State.StateStore;
 

@@ -10,7 +10,7 @@ import { Controller } from "./controller";
 
 @injectable()
 export class PeersController extends Controller {
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public async index(request: Hapi.Request) {

@@ -13,7 +13,7 @@ describe<{
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.ApplicationName).toConstantValue("mainsail-api");
+		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("mainsail-api");
 	});
 
 	afterAll(() => setGracefulCleanup());

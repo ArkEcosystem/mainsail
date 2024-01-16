@@ -4,19 +4,19 @@ import { Services, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerFactory)
+	@inject(Identifiers.P2P.Peer.Factory)
 	private readonly peerFactory!: Contracts.P2P.PeerFactory;
 
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@inject(Identifiers.PeerDisposer)
+	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	async discoverPeers(peer: Contracts.P2P.Peer): Promise<void> {
@@ -25,7 +25,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 
 			for (const peer of peers) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptPeer", { ip: peer.ip, options: {} });
 			}
 		} catch (error) {
@@ -62,7 +62,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		return Promise.all(
 			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
 				this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptPeer", { ip: peer.ip, options: { seed: true } }),
 			),
 		);

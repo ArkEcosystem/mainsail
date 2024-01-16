@@ -9,7 +9,7 @@ import { ValidatorResignationTransaction } from "../versions";
 
 @injectable()
 export class ValidatorResignationTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {

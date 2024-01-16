@@ -6,13 +6,13 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class MultiPaymentTransaction extends Transaction {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Identity.AddressSerializer)
+	@inject(Identifiers.Cryptography.Identity.Address.Serializer)
 	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
 
-	@inject(Identifiers.Cryptography.Size.Address)
+	@inject(Identifiers.Cryptography.Identity.Address.Size)
 	private readonly addressSize!: number;
 
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;

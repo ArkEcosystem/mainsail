@@ -5,7 +5,7 @@ import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
@@ -14,36 +14,36 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.TransactionProcessor)
+	@inject(Identifiers.Processor.TransactionProcessor)
 	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
+	private readonly proposerSelector!: Contracts.Proposer.Selector;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.BlockVerifier)
+	@inject(Identifiers.Processor.BlockVerifier)
 	private readonly verifier!: Contracts.Processor.Verifier;
 
 	@multiInject(Identifiers.State.ValidatorMutator)
 	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
 
-	@inject(Identifiers.ApiSync)
+	@inject(Identifiers.ApiSync.Service)
 	@optional()
-	private readonly apiSync: Contracts.ApiSync.Sync | undefined;
+	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		try {

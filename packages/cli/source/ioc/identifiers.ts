@@ -8,8 +8,10 @@ export const Identifiers = {
 	AbortUnknownProcess: Symbol.for("Action<AbortUnknownProcess>"),
 	ActionFactory: Symbol.for("Factory<Action>"),
 	AppHeader: Symbol.for("Component<AppHeader>"),
-	Application: ID.Application,
-	ApplicationName: ID.ApplicationName,
+	Application: {
+		Instance: ID.Application.Instance,
+		Name: ID.Application.Name,
+	},
 	ApplicationPaths: Symbol.for("Paths<Application>"),
 	Ask: Symbol.for("Component<Ask>"),
 	AskDate: Symbol.for("Component<AskDate>"),

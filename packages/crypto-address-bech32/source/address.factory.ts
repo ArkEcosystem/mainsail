@@ -7,7 +7,7 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
 	@tagged("type", "wallet")
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 

@@ -9,7 +9,7 @@ const TEN_SECONDS_IN_MILLISECONDS = 10_000;
 
 @injectable()
 export class PeerConnector implements Contracts.P2P.PeerConnector {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	private readonly connections: Map<string, Client> = new Map<string, Client>();
@@ -57,7 +57,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		this.#lastConnectionCreate.set(peer.ip, Date.now());
 
 		connection.onError = (error) => {
-			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).banPeer(peer.ip, error);
+			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
 		};
 
 		await connection.connect({ reconnect: false });

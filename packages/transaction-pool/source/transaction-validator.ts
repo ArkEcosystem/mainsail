@@ -4,10 +4,10 @@ import { strictEqual } from "assert";
 
 @injectable()
 export class TransactionValidator implements Contracts.State.TransactionValidator {
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)

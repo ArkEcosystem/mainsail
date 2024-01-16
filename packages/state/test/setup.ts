@@ -21,7 +21,7 @@ import {
 	Utils,
 	Verifier,
 } from "../../crypto-transaction";
-import { ProposerSelector } from "../../proposer/source/proposer-selector";
+import { Selector } from "../../proposer/source/selector";
 import { Factories, Sandbox } from "../../test-framework";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
@@ -85,95 +85,95 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		warning: spy(),
 	};
 
-	sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+	sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 
-	sandbox.app.bind(Identifiers.WalletRepositoryIndexSet).to(IndexSet).inSingletonScope();
+	sandbox.app.bind(Identifiers.State.WalletRepository.IndexSet).to(IndexSet).inSingletonScope();
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.Addresses);
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.PublicKeys);
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.Usernames);
 	sandbox.app
-		.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet)
+		.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet)
 		.set(Contracts.State.WalletIndexes.Resignations);
 
-	sandbox.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
+	sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 		.set("height", Contracts.State.AttributeType.Number);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.StateAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 		.set("totalRound", Contracts.State.AttributeType.Number);
 
-	sandbox.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
+	sandbox.app.bind(Identifiers.State.Wallet.Attributes).to(AttributeRepository).inSingletonScope();
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("nonce", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("balance", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("publicKey", Contracts.State.AttributeType.String);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorProducedBlocks", Contracts.State.AttributeType.Number);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorForgedTotal", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorForgedFees", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorForgedRewards", Contracts.State.AttributeType.BigNumber);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorApproval", Contracts.State.AttributeType.Number);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("vote", Contracts.State.AttributeType.String);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorResigned", Contracts.State.AttributeType.Boolean);
 	sandbox.app
-		.get<Contracts.State.IAttributeRepository>(Identifiers.WalletAttributes)
+		.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
 		.set("validatorRank", Contracts.State.AttributeType.Number);
 
 	sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
-	sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+	sandbox.app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
+	sandbox.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.StateStore).to(StateStore).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
-	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeyFactory).to(PublicKeyFactory).inSingletonScope();
-	sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
-	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKeySerializer).to(PublicKeySerializer).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.Address.Factory).to(AddressFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKey.Factory).to(PublicKeyFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
+	sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKey.Serializer).to(PublicKeySerializer).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
 	sandbox.app.bind(Identifiers.Cryptography.Validator).to(Validator);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.TypeFactory).to(TransactionTypeFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
-	sandbox.app.bind(Identifiers.Cryptography.Signature).to(Signature);
+	sandbox.app.bind(Identifiers.Cryptography.Signature.Instance).to(Signature);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Utils).to(Utils);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Serializer).to(Serializer);
-	sandbox.app.bind(Identifiers.Cryptography.HashFactory).to(HashFactory);
+	sandbox.app.bind(Identifiers.Cryptography.Hash.Factory).to(HashFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
-	sandbox.app.bind(Identifiers.Database.BlockStorage).toConstantValue({
+	sandbox.app.bind(Identifiers.Database.Storage.Block).toConstantValue({
 		deleteBlocks: () => {},
 		deleteTopBlocks: () => {},
 		saveBlocks: () => {},
 	});
-	sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
+	sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
 		getActiveValidators: () => {},
 		initialize: () => {},
 	});
@@ -201,7 +201,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	sandbox.app.bind(Identifiers.TransactionHandlerRegistry).to(MockHandler);
+	sandbox.app.bind(Identifiers.Transaction.Handler.Registry).to(MockHandler);
 
 	const getBlockRewardsSpy = spy();
 
@@ -237,7 +237,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		}
 	}
 
-	sandbox.app.container.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
+	sandbox.app.container.bind(Identifiers.Services.EventDispatcher.Service).to(MockEventDispatcher);
 
 	sandbox.app
 		.bind(Identifiers.WalletRepository)
@@ -246,8 +246,8 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 	sandbox.app
-		.bind(Identifiers.WalletFactory)
-		.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)));
+		.bind(Identifiers.State.Wallet.Factory)
+		.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)));
 
 	sandbox.app
 		.bind(Identifiers.WalletRepository)
@@ -255,7 +255,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 		.inRequestScope()
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
-	sandbox.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
+	sandbox.app.bind(Identifiers.State.WalletRepository.CopyOnWriteFactory).toFactory(
 		({ container }) =>
 			() =>
 				container
@@ -287,7 +287,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.State.ValidatorMutator).to(MockValidatorMutator).inSingletonScope();
 
-	sandbox.app.bind(Identifiers.Proposer.Selector).to(ProposerSelector);
+	sandbox.app.bind(Identifiers.Proposer.Selector).to(Selector);
 
 	if (!skipBoot) {
 		try {
@@ -301,7 +301,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 		// sandbox.app
 		// 	.get<Configuration>(Identifiers.Cryptography.Configuration)
-		// 	.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.ConfigRepository).get("crypto"));
+		// 	.setConfig(sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Config.Repository).get("crypto"));
 		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 	}
 

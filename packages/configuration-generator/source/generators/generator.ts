@@ -21,7 +21,7 @@ export class Generator {
 
 		const keys: Contracts.Crypto.KeyPair = await this.app
 			.getTagged<Contracts.Crypto.KeyPairFactory>(
-				Identifiers.Cryptography.Identity.KeyPairFactory,
+				Identifiers.Cryptography.Identity.KeyPair.Factory,
 				"type",
 				"wallet",
 			)
@@ -29,7 +29,7 @@ export class Generator {
 
 		const consensusKeys: Contracts.Crypto.KeyPair = await this.app
 			.getTagged<Contracts.Crypto.KeyPairFactory>(
-				Identifiers.Cryptography.Identity.KeyPairFactory,
+				Identifiers.Cryptography.Identity.KeyPair.Factory,
 				"type",
 				"consensus",
 			)
@@ -38,7 +38,7 @@ export class Generator {
 		return {
 			address: await this.app
 				.getTagged<Contracts.Crypto.AddressFactory>(
-					Identifiers.Cryptography.Identity.AddressFactory,
+					Identifiers.Cryptography.Identity.Address.Factory,
 					"type",
 					"wallet",
 				)

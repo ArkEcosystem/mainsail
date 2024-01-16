@@ -9,7 +9,7 @@ import { Plugins } from "./listeners/plugins";
 
 @injectable()
 export class Listeners implements ApiSyncContracts.Listeners {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	#listeners: ApiSyncContracts.EventListener[] = [];

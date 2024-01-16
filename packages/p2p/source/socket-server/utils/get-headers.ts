@@ -10,13 +10,13 @@ export const getHeaders = (app: Contracts.Kernel.Application) => {
 		height: undefined,
 		port: Number(
 			app
-				.getTagged<Providers.PluginConfiguration>(Identifiers.PluginConfiguration, "plugin", "p2p")
+				.getTagged<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration, "plugin", "p2p")
 				.get<number>("port"),
 		),
 		version: app.version(),
 	};
 
-	headers.height = app.get<Contracts.State.Service>(Identifiers.StateService).getStateStore().getLastHeight();
+	headers.height = app.get<Contracts.State.Service>(Identifiers.State.Service).getStateStore().getLastHeight();
 
 	return headers;
 };

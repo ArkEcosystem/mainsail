@@ -48,15 +48,15 @@ describeSkip<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
 
-		context.sandbox.app.bind(Identifiers.ApplicationVersion).toConstantValue("0.0.1");
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(eventDispatcher);
-		context.sandbox.app.bind(Identifiers.PeerConnector).toConstantValue(connector);
-		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue(createQueue);
+		context.sandbox.app.bind(Identifiers.Application.Version).toConstantValue("0.0.1");
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Connector).toConstantValue(connector);
+		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue(createQueue);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(cryptoConfig);
 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(serializer);
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(transactionFactory);

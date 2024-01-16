@@ -7,20 +7,20 @@ import { errorTypes } from "./hapi-nes";
 
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerConnector)
+	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#blacklist = new Map<string, dayjs.Dayjs>();

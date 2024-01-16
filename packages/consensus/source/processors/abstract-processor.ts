@@ -5,13 +5,13 @@ import dayjs from "dayjs";
 
 @injectable()
 export class AbstractProcessor {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.CommitLock)
 	protected readonly commitLock!: Contracts.Kernel.Lock;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)

@@ -4,7 +4,7 @@ import nsfw, { ActionType, NSFW } from "nsfw";
 
 @injectable()
 export class Watcher {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	#watcher!: NSFW;

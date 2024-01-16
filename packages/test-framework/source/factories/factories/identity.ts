@@ -20,7 +20,7 @@ export const registerIdentityFactory = async (
 
 		const keys = await application
 			.getTagged<Contracts.Crypto.KeyPairFactory>(
-				Identifiers.Cryptography.Identity.KeyPairFactory,
+				Identifiers.Cryptography.Identity.KeyPair.Factory,
 				"type",
 				keyType,
 			)
@@ -28,14 +28,14 @@ export const registerIdentityFactory = async (
 
 		return {
 			address: await application
-				.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+				.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 				.fromMnemonic(passphrase),
 			keys,
 			passphrase,
 			privateKey: keys.privateKey,
 			publicKey: keys.publicKey,
 			wif: await application
-				.get<Contracts.Crypto.WIFFactory>(Identifiers.Cryptography.Identity.WifFactory)
+				.get<Contracts.Crypto.WIFFactory>(Identifiers.Cryptography.Identity.Wif.Factory)
 				.fromMnemonic(passphrase),
 		};
 	});

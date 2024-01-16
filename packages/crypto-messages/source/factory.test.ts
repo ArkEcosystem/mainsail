@@ -43,15 +43,15 @@ describe<{
 					// @ts-ignore
 					consensusSignature: (method, message, privateKey) =>
 						context.sandbox.app
-							.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
+							.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
 							[method](message, privateKey),
 				};
 			},
 		};
 
-		context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue(validatorSet);
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
+		context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(validatorSet);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 		context.factory = context.sandbox.app.resolve(MessageFactory);
 		context.blockFactory = context.sandbox.app.get<Contracts.Crypto.BlockFactory>(

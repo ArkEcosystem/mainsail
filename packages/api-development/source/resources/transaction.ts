@@ -4,7 +4,7 @@ import { Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class TransactionResource implements Contracts.Api.Resource {
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	public raw(resource: Contracts.Crypto.TransactionData): object {

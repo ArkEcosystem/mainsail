@@ -6,7 +6,7 @@ import { ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export abstract class ValidatorRegistrationTransaction extends Transaction {
-	@inject(Identifiers.Cryptography.Size.PublicKey)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Size)
 	@tagged("type", "consensus")
 	private readonly publicKeySize!: number;
 

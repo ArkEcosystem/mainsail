@@ -20,14 +20,14 @@ import { BasePlugin } from "./base-plugin";
 
 @injectable()
 export class ValidatePlugin extends BasePlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerProcessor)
+	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server) {

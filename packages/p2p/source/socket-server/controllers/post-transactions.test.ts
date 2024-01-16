@@ -12,7 +12,7 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.TransactionPoolProcessor).toConstantValue(processor);
+		context.sandbox.app.bind(Identifiers.TransactionPool.Processor).toConstantValue(processor);
 
 		context.controller = context.sandbox.app.resolve(PostTransactionsController);
 	});

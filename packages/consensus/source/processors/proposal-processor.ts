@@ -16,21 +16,21 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
 	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
+	private readonly proposerSelector!: Contracts.Proposer.Selector;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
-	@inject(Identifiers.PeerBroadcaster)
+	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Ipc.WorkerPool)
+	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: IpcWorker.WorkerPool;
 
 	async process(proposal: Contracts.Crypto.Proposal, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {

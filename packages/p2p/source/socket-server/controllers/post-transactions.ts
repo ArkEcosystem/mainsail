@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class PostTransactionsController implements Contracts.P2P.Controller {
-	@inject(Identifiers.TransactionPoolProcessor)
+	@inject(Identifiers.TransactionPool.Processor)
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
 	public async handle(

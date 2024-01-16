@@ -110,7 +110,7 @@
 
 // 		context.sandbox = new Sandbox();
 
-// 		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logService);
+// 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logService);
 // 		context.sandbox.app.bind(Identifiers.BlockchainService).toConstantValue(context.blockchain);
 // 		context.sandbox.app
 // 			.bind(Identifiers.Database.TransactionStorage)
@@ -121,17 +121,17 @@
 // 		context.sandbox.app.bind(Identifiers.DatabaseInterceptor).toConstantValue(context.databaseInterceptor);
 // 		context.sandbox.app.bind(Identifiers.RoundState).toConstantValue(context.roundState);
 // 		context.sandbox.app
-// 			.bind(Identifiers.TransactionHandlerRegistry)
+// 			.bind(Identifiers.Transaction.Handler.Registry)
 // 			.toConstantValue(context.transactionHandlerRegistry);
 // 		context.sandbox.app.bind(Identifiers.StateStore).toConstantValue(context.stateStore);
-// 		context.sandbox.app.bind(Identifiers.TransactionPoolService).toConstantValue({});
+// 		context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Time.Slots).toConstantValue({});
 // 		context.sandbox.app.bind(Identifiers.Cryptography.Block.Verifier).toConstantValue(context.blockVerifier);
 
-// 		context.sandbox.app.bind(Identifiers.TriggerService).to(Services.Triggers.Triggers).inSingletonScope();
+// 		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).to(Services.Triggers.Triggers).inSingletonScope();
 // 		context.sandbox.app
-// 			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+// 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 // 			.bind("getActiveDelegates", new Actions.GetActiveValidatorsAction(context.sandbox.app));
 
 // 		context.baseBlock = {

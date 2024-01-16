@@ -23,8 +23,8 @@ describe<{
 		};
 
 		context.container = new Container();
-		context.container.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
-		context.container.bind(Identifiers.TransactionPoolSenderState).toConstantValue(context.senderState);
+		context.container.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);
+		context.container.bind(Identifiers.TransactionPool.SenderState).toConstantValue(context.senderState);
 
 		const tx1 = {
 			data: {

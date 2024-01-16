@@ -8,7 +8,7 @@ import { Identifiers } from "../ioc";
 
 @injectable()
 export class CommandHelp {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
 	@inject(Identifiers.Package)

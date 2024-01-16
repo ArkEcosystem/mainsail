@@ -21,7 +21,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTargetTagged("plugin", "p2p");
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);

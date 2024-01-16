@@ -46,13 +46,13 @@ describe<{
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
-		context.container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[0]);
-		context.container.bind(Identifiers.TransactionPoolProcessorExtension).toConstantValue(context.extensions[1]);
-		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
+		context.container.bind(Identifiers.TransactionPool.ProcessorExtension).toConstantValue(context.extensions[0]);
+		context.container.bind(Identifiers.TransactionPool.ProcessorExtension).toConstantValue(context.extensions[1]);
+		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
 		context.container.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.factory);
 		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
-		context.container.bind(Identifiers.PeerBroadcaster).toConstantValue(context.transactionBroadcaster);
-		context.container.bind(Identifiers.LogService).toConstantValue({
+		context.container.bind(Identifiers.P2P.Broadcaster).toConstantValue(context.transactionBroadcaster);
+		context.container.bind(Identifiers.Services.Log.Service).toConstantValue({
 			error: () => {},
 		});
 

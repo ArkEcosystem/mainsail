@@ -6,16 +6,16 @@ import { factory, jsonFactory } from "./attributes";
 
 @injectable()
 export class StateStore implements Contracts.State.StateStore {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.StateAttributes)
+	@inject(Identifiers.State.AttributeRepository)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
 	#genesisBlock?: Contracts.Crypto.Commit;
@@ -73,7 +73,7 @@ export class StateStore implements Contracts.State.StateStore {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
 			void this.app
-				.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService)
+				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
 				.dispatch(Enums.CryptoEvent.MilestoneChanged);
 		}
 	}

@@ -219,7 +219,7 @@ export class GenesisBlockGenerator extends Generator {
 				numberOfTransactions: transactions.length,
 				payloadHash: (
 					await this.app
-						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.HashFactory)
+						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
 						.sha256(payloadBuffers)
 				).toString("hex"),
 				payloadLength,

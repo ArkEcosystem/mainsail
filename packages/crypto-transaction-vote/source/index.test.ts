@@ -75,14 +75,14 @@ describe<{
 	});
 
 	it("#register - should register handler", async ({ serviceProvider, sandbox }) => {
-		assert.false(sandbox.app.isBound(Identifiers.TransactionHandler));
+		assert.false(sandbox.app.isBound(Identifiers.Transaction.Handler.Instances));
 
 		await assert.resolves(() => serviceProvider.register());
 
-		assert.true(sandbox.app.isBound(Identifiers.TransactionHandler));
+		assert.true(sandbox.app.isBound(Identifiers.Transaction.Handler.Instances));
 
 		const bindingDictionary = sandbox.app.container["_bindingDictionary"];
-		const handlerBindings = bindingDictionary.getMap().get(Identifiers.TransactionHandler) ?? [];
+		const handlerBindings = bindingDictionary.getMap().get(Identifiers.Transaction.Handler.Instances) ?? [];
 		assert.equal(handlerBindings[0].implementationType, VoteTransactionHandler);
 	});
 });

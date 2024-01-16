@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { Database, open, RootDatabase } from "lmdb";
+import { open, RootDatabase } from "lmdb";
 import { join } from "path";
 
 import { DatabaseService } from "./database-service";
@@ -19,9 +19,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async dispose(): Promise<void> {
 		await this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).persist();
 
-		await this.app.get<Database>(Identifiers.Database.BlockStorage).close();
-		await this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage).close();
-		await this.app.get<RootDatabase>(Identifiers.Database.RootStorage).close();
+		await this.app.get<RootDatabase>(Identifiers.Database.Instance.Consensus).close();
+		await this.app.get<RootDatabase>(Identifiers.Database.Instance.Root).close();
 	}
 
 	#registerStorage() {
@@ -30,14 +29,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			name: "core",
 			path: join(this.app.dataPath(), "ledger.mdb"),
 		});
-		this.app.bind(Identifiers.Database.RootStorage).toConstantValue(rootStorage);
-		this.app.bind(Identifiers.Database.BlockStorage).toConstantValue(rootStorage.openDB({ name: "blocks" }));
+		this.app.bind(Identifiers.Database.Instance.Root).toConstantValue(rootStorage);
+		this.app.bind(Identifiers.Database.Storage.Block).toConstantValue(rootStorage.openDB({ name: "blocks" }));
 
 		const consensusStorage = open({
 			compression: true,
 			name: "consensus",
 			path: join(this.app.dataPath(), "consensus.mdb"),
 		});
-		this.app.bind(Identifiers.Database.ConsensusStorage).toConstantValue(consensusStorage);
+		this.app.bind(Identifiers.Database.Instance.Consensus).toConstantValue(consensusStorage);
 	}
 }

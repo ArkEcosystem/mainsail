@@ -83,7 +83,7 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 				.recipientId(
 					options.recipientId ||
 						(await app
-							.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+							.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 							.fromMnemonic(secrets[0])),
 				),
 			options,
@@ -135,7 +135,7 @@ export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kern
 					options.publicKey ||
 						(await app
 							.getTagged<Contracts.Crypto.PublicKeyFactory>(
-								Identifiers.Cryptography.Identity.PublicKeyFactory,
+								Identifiers.Cryptography.Identity.PublicKey.Factory,
 								"type",
 								"wallet",
 							)
@@ -160,7 +160,7 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 					options.publicKey ||
 						(await app
 							.getTagged<Contracts.Crypto.PublicKeyFactory>(
-								Identifiers.Cryptography.Identity.PublicKeyFactory,
+								Identifiers.Cryptography.Identity.PublicKey.Factory,
 								"type",
 								"wallet",
 							)
@@ -179,7 +179,7 @@ export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Ke
 export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
 	factory.set("MultiSignature", async ({ options }: { options: MultiSignatureOptions }) => {
 		const publicKeyFactory = app.getTagged<Contracts.Crypto.PublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKeyFactory,
+			Identifiers.Cryptography.Identity.PublicKey.Factory,
 			"type",
 			"wallet",
 		);
@@ -216,13 +216,13 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contra
 			{
 				amount: AMOUNT.toString(),
 				recipientId: await app
-					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 					.fromMnemonic(secrets[0]),
 			},
 			{
 				amount: AMOUNT.toString(),
 				recipientId: await app
-					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.AddressFactory)
+					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 					.fromMnemonic(secrets[1]),
 			},
 		];

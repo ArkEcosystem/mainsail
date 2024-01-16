@@ -9,13 +9,13 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Fee.Registry)
 	private readonly feeRegistry!: FeeRegistry;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "fees-managed")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 

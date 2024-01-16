@@ -1,5 +1,5 @@
 import { CommitHandler } from "./crypto";
 
-export interface ProposerSelector extends CommitHandler {
+export interface Selector extends CommitHandler {
 	getValidatorIndex(round: number): number;
 }

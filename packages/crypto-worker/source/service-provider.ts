@@ -9,23 +9,23 @@ import { WorkerPool } from "./worker-pool";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Ipc.Worker).to(Worker);
-		this.app.bind(Identifiers.Ipc.WorkerPool).to(WorkerPool).inSingletonScope();
+		this.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker);
+		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
-		this.app.bind(Identifiers.Ipc.WorkerSubprocessFactory).toFactory(() => () => {
+		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
 			const subprocess = fork(`${__dirname}/worker-script.js`, {});
 			return new Ipc.Subprocess(subprocess);
 		});
 
-		this.app.bind(Identifiers.Ipc.WorkerFactory).toAutoFactory(Identifiers.Ipc.Worker);
+		this.app.bind(Identifiers.CryptoWorker.Worker.Factory).toAutoFactory(Identifiers.CryptoWorker.Worker.Instance);
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.get<IpcWorker.WorkerPool>(Identifiers.Ipc.WorkerPool).boot();
+		await this.app.get<IpcWorker.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<IpcWorker.WorkerPool>(Identifiers.Ipc.WorkerPool).shutdown();
+		await this.app.get<IpcWorker.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).shutdown();
 	}
 
 	public async required(): Promise<boolean> {

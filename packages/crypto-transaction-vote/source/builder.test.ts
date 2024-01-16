@@ -11,10 +11,10 @@ describe<{
 	beforeEach((contex) => {
 		const sandbox = new Sandbox();
 
-		sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).toConstantValue({});
+		sandbox.app.bind(Identifiers.Cryptography.Identity.Address.Factory).toConstantValue({});
 		sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue({});
-		sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPairFactory).toConstantValue({});
+		sandbox.app.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).toConstantValue({});
 		sandbox.app.bind(Identifiers.Cryptography.Transaction.Signer).toConstantValue({});
 		sandbox.app.bind(Identifiers.Cryptography.Transaction.Utils).toConstantValue({});
 		sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});

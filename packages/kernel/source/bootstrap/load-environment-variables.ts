@@ -6,14 +6,14 @@ import { Bootstrapper } from "./interfaces";
 
 @injectable()
 export class LoadEnvironmentVariables implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	public async bootstrap(): Promise<void> {
-		const configRepository: ConfigRepository = this.app.get<ConfigRepository>(Identifiers.ConfigRepository);
+		const configRepository: ConfigRepository = this.app.get<ConfigRepository>(Identifiers.Config.Repository);
 
 		await this.app
-			.get<ConfigManager>(Identifiers.ConfigManager)
+			.get<ConfigManager>(Identifiers.Services.Config.Manager)
 			.driver(configRepository.get<string>("configLoader", "local"))
 			.loadEnvironmentVariables();
 	}
