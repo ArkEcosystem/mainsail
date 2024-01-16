@@ -23,7 +23,7 @@ describe<{
 		context.validator = { validate: () => {} };
 		context.createTransactionValidator = () => context.validator;
 		context.stateStore = { getLastBlock: () => {} };
-		context.stateService = { getStateStore: () => context.stateStore };
+		context.stateService = { getStore: () => context.stateStore };
 		context.pool = { removeTransaction: () => {} };
 		context.expirationService = { isExpired: () => {} };
 		context.poolQuery = {

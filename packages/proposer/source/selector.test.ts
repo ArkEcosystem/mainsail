@@ -16,7 +16,7 @@ type Context = {
 describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
 		context.stateService = {
-			getStateStore: () => context.stateStore,
+			getStore: () => context.stateStore,
 		};
 
 		context.validatorSet = {

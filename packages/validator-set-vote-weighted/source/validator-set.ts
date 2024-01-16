@@ -113,7 +113,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			return diff;
 		});
 
-		const lastBlock = this.stateService.getStateStore().getLastBlock();
+		const lastBlock = this.stateService.getStore().getLastBlock();
 		const totalSupply = Utils.supplyCalculator.calculateSupply(lastBlock.header.height, this.cryptoConfiguration);
 
 		for (let index = 0; index < this.#validators.length; index++) {

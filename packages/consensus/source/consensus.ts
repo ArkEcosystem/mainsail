@@ -491,7 +491,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 	async #bootstrap(): Promise<void> {
 		const state = await this.bootstrapper.run();
-		const stateStore = this.stateService.getStateStore();
+		const stateStore = this.stateService.getStore();
 
 		if (state && state.height === stateStore.getLastBlock().data.height + 1) {
 			this.#step = state.step;

@@ -35,7 +35,7 @@ export class Service implements Contracts.State.Service {
 		this.#baseWalletRepository = this.walletRepositoryFactory();
 	}
 
-	public getStateStore(): Contracts.State.Store {
+	public getStore(): Contracts.State.Store {
 		return this.#baseStateStore;
 	}
 

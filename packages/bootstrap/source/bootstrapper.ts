@@ -54,7 +54,7 @@ export class Bootstrapper {
 
 	@postConstruct()
 	public initialize(): void {
-		this.#stateStore = this.stateService.getStateStore();
+		this.#stateStore = this.stateService.getStore();
 	}
 
 	public async bootstrap(): Promise<void> {

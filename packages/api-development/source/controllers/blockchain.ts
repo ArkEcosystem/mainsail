@@ -10,7 +10,7 @@ export class BlockchainController extends Controller {
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	public async index() {
-		const { data } = this.stateService.getStateStore().getLastBlock();
+		const { data } = this.stateService.getStore().getLastBlock();
 
 		return {
 			data: {

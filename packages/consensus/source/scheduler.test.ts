@@ -36,7 +36,7 @@ describe<{
 	};
 
 	const stateService = {
-		getStateStore: () => stateStore,
+		getStore: () => stateStore,
 	};
 
 	beforeEach((context) => {

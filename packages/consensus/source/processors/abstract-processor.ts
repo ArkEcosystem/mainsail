@@ -24,7 +24,7 @@ export class AbstractProcessor {
 	protected isRoundInBounds(message: { round: number }): boolean {
 		const earliestTime =
 			Utils.timestampCalculator.calculateMinimalTimestamp(
-				this.stateService.getStateStore().getLastBlock(),
+				this.stateService.getStore().getLastBlock(),
 				message.round,
 				this.cryptoConfiguration,
 			) - 500; // Allow time drift between nodes

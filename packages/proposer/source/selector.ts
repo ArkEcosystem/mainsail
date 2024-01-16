@@ -23,8 +23,8 @@ export class Selector implements Contracts.Proposer.Selector {
 	public getValidatorIndex(round: number): number {
 		const { activeValidators } = this.configuration.getMilestone();
 
-		const offset = (this.stateService.getStateStore().getTotalRound() + round) % activeValidators;
-		const result = JSON.parse(this.stateService.getStateStore().getAttribute("validatorMatrix"))[
+		const offset = (this.stateService.getStore().getTotalRound() + round) % activeValidators;
+		const result = JSON.parse(this.stateService.getStore().getAttribute("validatorMatrix"))[
 			offset % activeValidators
 		];
 		Utils.assert.defined<number>(result);
@@ -43,11 +43,11 @@ export class Selector implements Contracts.Proposer.Selector {
 			[matrix[index], matrix[index_]] = [matrix[index_], matrix[index]];
 		}
 
-		this.stateService.getStateStore().setAttribute<string>("validatorMatrix", JSON.stringify(matrix));
+		this.stateService.getStore().setAttribute<string>("validatorMatrix", JSON.stringify(matrix));
 	}
 
 	#calculateSeed(): string {
-		const totalRound = this.stateService.getStateStore().getTotalRound();
+		const totalRound = this.stateService.getStore().getTotalRound();
 
 		// TODO: take block id into account
 

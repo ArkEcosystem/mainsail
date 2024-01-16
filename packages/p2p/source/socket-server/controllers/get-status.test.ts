@@ -17,7 +17,7 @@ describe<{
 	});
 
 	const stateStore = { getLastBlock: () => {} };
-	const stateService = { getStateStore: () => stateStore };
+	const stateService = { getStore: () => stateStore };
 	const slots = { getSlotInfo: () => {} };
 
 	beforeEach((context) => {

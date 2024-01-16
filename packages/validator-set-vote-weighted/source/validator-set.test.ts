@@ -86,7 +86,7 @@ describe<{
 		context.walletRepository = context.sandbox.app.resolve(Wallets.WalletRepository);
 
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
-			getStateStore: () => context.stateStore,
+			getStore: () => context.stateStore,
 			getWalletRepository: () => context.walletRepository,
 		});
 

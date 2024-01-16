@@ -201,7 +201,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	async #bootstrapState(): Promise<void> {
-		const genesisCommit = this.stateService.getStateStore().getGenesisCommit();
+		const genesisCommit = this.stateService.getStore().getGenesisCommit();
 		await this.stateRepositoryFactory()
 			.createQueryBuilder()
 			.insert()

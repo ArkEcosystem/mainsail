@@ -16,7 +16,7 @@ describe<{
 	beforeAll((context) => {
 		context.configuration = { getRequired: () => {} };
 		context.stateStore = { getLastHeight: () => {} };
-		context.stateService = { getStateStore: () => context.stateStore };
+		context.stateService = { getStore: () => context.stateStore };
 		context.app = { get: () => {} };
 
 		context.container = new Container();

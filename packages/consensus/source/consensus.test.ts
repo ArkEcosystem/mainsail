@@ -132,7 +132,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		} as unknown as Contracts.Consensus.IRoundState;
 
 		context.stateService = {
-			getStateStore: () => context.state,
+			getStore: () => context.state,
 		};
 
 		context.sandbox = new Sandbox();

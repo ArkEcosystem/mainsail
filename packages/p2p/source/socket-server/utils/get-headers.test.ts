@@ -8,7 +8,7 @@ describe("getHeaders", ({ it, assert }) => {
 	const version = "3.0.9";
 	const height = 387;
 	const stateStore = { getLastHeight: () => height, isStarted: () => true };
-	const stateService = { getStateStore: () => stateStore };
+	const stateService = { getStore: () => stateStore };
 	const appGet = {
 		[Identifiers.State.Service]: stateService,
 	};
