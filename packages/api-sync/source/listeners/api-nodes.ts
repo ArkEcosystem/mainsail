@@ -10,7 +10,7 @@ import { Enums, Utils } from "@mainsail/kernel";
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener";
 
 @injectable()
-export class ApiNodes extends AbstractListener<Contracts.P2P.PeerApiNode, Models.ApiNode> {
+export class ApiNodes extends AbstractListener<Contracts.P2P.ApiNode, Models.ApiNode> {
 	@inject(ApiDatabaseIdentifiers.ApiNodeRepositoryFactory)
 	private readonly apiNodeRepositoryFactory!: ApiDatabaseContracts.ApiNodeRepositoryFactory;
 
@@ -21,7 +21,7 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.PeerApiNode, Models
 		};
 	}
 
-	protected getEventId(event: Contracts.P2P.PeerApiNode): string {
+	protected getEventId(event: Contracts.P2P.ApiNode): string {
 		const ip = event.ip;
 		Utils.assert.defined<string>(ip);
 		return ip;
@@ -31,7 +31,7 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.PeerApiNode, Models
 		return this.configuration.getMilestone().blockTime;
 	}
 
-	protected mapEventToEntity(event: Contracts.P2P.PeerApiNode): Models.ApiNode {
+	protected mapEventToEntity(event: Contracts.P2P.ApiNode): Models.ApiNode {
 		return {
 			height: event.height,
 			ip: event.ip,

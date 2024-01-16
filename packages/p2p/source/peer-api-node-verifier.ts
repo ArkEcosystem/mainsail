@@ -5,7 +5,7 @@ import { http, HttpResponse } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 @injectable()
-export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
+export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
@@ -13,7 +13,7 @@ export class PeerApiNodeVerifier implements Contracts.P2P.PeerApiNodeVerifier {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	public async verify(apiNode: Contracts.P2P.PeerApiNode): Promise<boolean> {
+	public async verify(apiNode: Contracts.P2P.ApiNode): Promise<boolean> {
 		try {
 			const apiNodesMaxContentLength = this.configuration.getRequired<number>("apiNodesMaxContentLength");
 

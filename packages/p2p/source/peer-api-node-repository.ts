@@ -4,7 +4,7 @@ import { Contracts } from "@mainsail/contracts";
 import { getPeerUrl } from "./utils";
 
 @injectable()
-export class PeerApiNode implements Contracts.P2P.PeerApiNode {
+export class ApiNode implements Contracts.P2P.ApiNode {
 	public ip!: string;
 	public port!: number;
 	public protocol!: Contracts.P2P.PeerProtocol;
@@ -14,7 +14,7 @@ export class PeerApiNode implements Contracts.P2P.PeerApiNode {
 
 	constructor() {}
 
-	public init(ip: string, port: number, protocol?: Contracts.P2P.PeerProtocol): PeerApiNode {
+	public init(ip: string, port: number, protocol?: Contracts.P2P.PeerProtocol): ApiNode {
 		this.ip = ip;
 		this.port = port;
 		this.protocol = protocol ?? (port === 443 ? Contracts.P2P.PeerProtocol.Https : Contracts.P2P.PeerProtocol.Http);
@@ -28,35 +28,35 @@ export class PeerApiNode implements Contracts.P2P.PeerApiNode {
 }
 
 @injectable()
-export class PeerApiNodeRepository implements Contracts.P2P.PeerApiNodeRepository {
-	readonly #apiNodes: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
-	readonly #apiNodesPending: Map<string, Contracts.P2P.PeerApiNode> = new Map<string, Contracts.P2P.PeerApiNode>();
+export class ApiNodeRepository implements Contracts.P2P.ApiNodeRepository {
+	readonly #apiNodes: Map<string, Contracts.P2P.ApiNode> = new Map<string, Contracts.P2P.ApiNode>();
+	readonly #apiNodesPending: Map<string, Contracts.P2P.ApiNode> = new Map<string, Contracts.P2P.ApiNode>();
 
-	public getApiNodes(): Contracts.P2P.PeerApiNodes {
+	public getApiNodes(): Contracts.P2P.ApiNodes {
 		return [...this.#apiNodes.values()];
 	}
 
-	public hasApiNode(apiNode: Contracts.P2P.PeerApiNode): boolean {
+	public hasApiNode(apiNode: Contracts.P2P.ApiNode): boolean {
 		return this.#apiNodes.has(apiNode.ip);
 	}
 
-	public setApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
+	public setApiNode(apiNode: Contracts.P2P.ApiNode): void {
 		this.#apiNodes.set(apiNode.ip, apiNode);
 	}
 
-	public forgetApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
+	public forgetApiNode(apiNode: Contracts.P2P.ApiNode): void {
 		this.#apiNodes.delete(apiNode.ip);
 	}
 
-	public setPendingApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
+	public setPendingApiNode(apiNode: Contracts.P2P.ApiNode): void {
 		this.#apiNodesPending.set(apiNode.ip, apiNode);
 	}
 
-	public forgetPendingApiNode(apiNode: Contracts.P2P.PeerApiNode): void {
+	public forgetPendingApiNode(apiNode: Contracts.P2P.ApiNode): void {
 		this.#apiNodesPending.delete(apiNode.ip);
 	}
 
-	public hasPendingApiNode(apiNode: Contracts.P2P.PeerApiNode): boolean {
+	public hasPendingApiNode(apiNode: Contracts.P2P.ApiNode): boolean {
 		return this.#apiNodesPending.has(apiNode.ip);
 	}
 }

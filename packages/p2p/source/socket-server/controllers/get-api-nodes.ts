@@ -8,15 +8,14 @@ import { constants } from "../../constants";
 @injectable()
 export class GetApiNodesController implements Contracts.P2P.Controller {
 	@inject(Identifiers.P2P.ApiNode.Repository)
-	private readonly peerApiNodeRepository!: Contracts.P2P.PeerApiNodeRepository;
+	private readonly ApiNodeRepository!: Contracts.P2P.ApiNodeRepository;
 
 	public async handle(
 		request: Contracts.P2P.Request,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.GetApiNodesResponse> {
 		return {
-			apiNodes: this.peerApiNodeRepository
-				.getApiNodes()
+			apiNodes: this.ApiNodeRepository.getApiNodes()
 				.filter((node) => !!node.latency)
 				.filter((node) => node.statusCode === 200)
 				.sort((a, b) => {

@@ -16,7 +16,7 @@ export enum PeerProtocol {
 	Https = 1,
 }
 
-export interface PeerApiNode {
+export interface ApiNode {
 	readonly ip: string;
 	readonly port: number;
 	readonly protocol: PeerProtocol;
@@ -32,7 +32,7 @@ export interface PeerApiNode {
 	version?: string;
 }
 
-export type PeerApiNodes = PeerApiNode[];
+export type ApiNodes = ApiNode[];
 
 export interface Peer {
 	readonly url: string;
@@ -49,7 +49,7 @@ export interface Peer {
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;
-	apiNodes: PeerApiNodes;
+	apiNodes: ApiNodes;
 
 	recentlyPinged(): boolean;
 
