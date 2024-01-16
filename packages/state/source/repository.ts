@@ -3,7 +3,7 @@ import { Utils } from "@mainsail/kernel";
 
 import { factory, jsonFactory } from "./attributes";
 
-export class Repository {
+export class Repository implements Contracts.State.Repository {
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
 	readonly #originalRepository?: Repository;
@@ -12,10 +12,14 @@ export class Repository {
 
 	public constructor(
 		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
-		readonly originalRepository?: Repository,
+		originalRepository?: Repository,
 	) {
 		this.attributeRepository = attributeRepository;
 		this.#originalRepository = originalRepository;
+	}
+
+	public isClone(): boolean {
+		return !!this.#originalRepository;
 	}
 
 	public isChanged(): boolean {
@@ -101,7 +105,7 @@ export class Repository {
 		return result;
 	}
 
-	public fromJson(data: Contracts.Types.JsonObject): void {
+	public fromJson(data: Contracts.Types.JsonObject): Repository {
 		if (this.isChanged()) {
 			throw new Error("Cannot restore to a changed repository.");
 		}
@@ -112,6 +116,8 @@ export class Repository {
 			const attribute = jsonFactory(this.attributeRepository.getAttributeType(key), value);
 			this.attributes.set(key, attribute);
 		}
+
+		return this;
 	}
 
 	protected getAttributeHolder<T>(key: string): Contracts.State.IAttribute<T> {

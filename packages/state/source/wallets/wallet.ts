@@ -78,6 +78,7 @@ export class Wallet implements Contracts.State.Wallet {
 		this.setNonce(this.getNonce().minus(BigNumber.ONE));
 	}
 
+	// TODO: Remove
 	public getAttributes(): Record<string, any> {
 		const result = {};
 
