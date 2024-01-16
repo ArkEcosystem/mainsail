@@ -4,13 +4,13 @@ import { Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.TransactionPoolSenderMempoolFactory)
+	@inject(Identifiers.TransactionPool.SenderMempool.Factory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
 
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	@tagged("type", "wallet")
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 

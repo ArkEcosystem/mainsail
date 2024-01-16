@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.ConsensusService {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Bootstrapper)
@@ -13,26 +13,26 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.BlockProcessor)
+	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.Consensus.ProposalProcessor)
+	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
-	@inject(Identifiers.Consensus.PrevoteProcessor)
+	@inject(Identifiers.Consensus.Processor.PreVote)
 	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
 
-	@inject(Identifiers.Consensus.PrecommitProcessor)
+	@inject(Identifiers.Consensus.Processor.PreCommit)
 	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
 
 	@inject(Identifiers.Consensus.Scheduler)
 	private readonly scheduler!: Contracts.Consensus.Scheduler;
 
 	// TODO: Rename identifier
-	@inject(Identifiers.Consensus.ValidatorRepository)
+	@inject(Identifiers.Validator.Repository)
 	private readonly validatorsRepository!: Contracts.Validator.ValidatorRepository;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
@@ -41,10 +41,10 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	@inject(Identifiers.Consensus.CommitLock)
 	private readonly commitLock!: Contracts.Kernel.Lock;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#height = 1;

@@ -45,8 +45,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async dispose(): Promise<void> {
 		await this.app.get<Contracts.P2P.Service>(Identifiers.P2P.Service).dispose();
-		await this.app.get<Contracts.P2P.Server>(Identifiers.P2PServer).dispose();
-		await this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.PeerDisposer).disposePeers();
+		await this.app.get<Contracts.P2P.Server>(Identifiers.P2P.Server).dispose();
+		await this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).disposePeers();
 	}
 
 	public async required(): Promise<boolean> {
@@ -88,7 +88,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerFactories(): void {
-		this.app.bind(Identifiers.PeerFactory).toFactory<Peer, [string]>(() => (ip: string) => {
+		this.app.bind(Identifiers.P2P.Peer.Factory).toFactory<Peer, [string]>(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
 			Utils.assert.defined<string>(sanitizedIp);
 
@@ -96,7 +96,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		});
 
 		this.app
-			.bind(Identifiers.PeerApiNodeFactory)
+			.bind(Identifiers.P2P.ApiNode.Factory)
 			.toFactory<PeerApiNode, [string, string | number, Contracts.P2P.PeerProtocol?]>(
 				() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
 					const sanitizedIp = sanitizeRemoteAddress(ip);
@@ -106,58 +106,58 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			);
 
 		this.app
-			.bind(Identifiers.PeerHeaderFactory)
+			.bind(Identifiers.P2P.Header.Factory)
 			.toFactory<Contracts.P2P.Header>(() => () => this.app.resolve(Header));
 	}
 
 	#registerServices(): void {
 		this.app
-			.bind(Identifiers.PeerThrottleFactory)
+			.bind(Identifiers.P2P.Throttle.Factory)
 			.toFactory(() => async () => await this.app.resolve(Throttle).initialize());
 
-		this.app.bind(Identifiers.P2PLogger).to(Logger).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Logger).to(Logger).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerRepository).to(PeerRepository).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerApiNodeRepository).to(PeerApiNodeRepository).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Repository).to(PeerApiNodeRepository).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerApiNodeDiscoverer).to(PeerApiNodeDiscoverer).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Discoverer).to(PeerApiNodeDiscoverer).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerApiNodeVerifier).to(PeerApiNodeVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Verifier).to(PeerApiNodeVerifier).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerApiNodeProcessor).to(PeerApiNodeProcessor).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Processor).to(PeerApiNodeProcessor).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerConnector).to(PeerConnector).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Connector).to(PeerConnector).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerCommunicator).to(PeerCommunicator).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerProcessor).to(PeerProcessor).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerDisposer).to(PeerDisposer).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Disposer).to(PeerDisposer).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerVerifier).to(PeerVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerHeaderService).to(HeaderService).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerDiscoverer).to(PeerDiscoverer).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerBlockDownloader).to(BlockDownloader).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Block).to(BlockDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerProposalDownloader).to(ProposalDownloader).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Proposal).to(ProposalDownloader).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerMessageDownloader).to(MessageDownloader).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Message).to(MessageDownloader).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Service).to(Service).inSingletonScope();
 
-		this.app.bind(Identifiers.PeerBroadcaster).to(Broadcaster).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Broadcaster).to(Broadcaster).inSingletonScope();
 
-		this.app.bind(Identifiers.P2PServer).to(Server).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Server).to(Server).inSingletonScope();
 
-		this.app.bind(Identifiers.P2PState).to(State).inSingletonScope();
+		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
 	}
 
 	async #buildServer(): Promise<void> {
-		const server = this.app.get<Contracts.P2P.Server>(Identifiers.P2PServer);
+		const server = this.app.get<Contracts.P2P.Server>(Identifiers.P2P.Server);
 		const serverConfig = this.config().getRequired<{ hostname: string; port: number }>("server");
 		Utils.assert.defined(serverConfig);
 
@@ -166,15 +166,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerActions(): void {
 		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
 
 		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("validateAndAcceptApiNode", new ValidateAndAcceptApiNodeAction(this.app));
 
 		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("revalidateApiNode", new RevalidateApiNodeAction(this.app));
 	}
 

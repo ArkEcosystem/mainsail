@@ -4,32 +4,32 @@ import { Enums, Providers, Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Fee.Matcher)
 	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
 
-	@inject(Identifiers.TransactionPoolStorage)
+	@inject(Identifiers.TransactionPool.Storage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
 
-	@inject(Identifiers.TransactionPoolMempool)
+	@inject(Identifiers.TransactionPool.Mempool)
 	private readonly mempool!: Contracts.TransactionPool.Mempool;
 
-	@inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionPoolExpirationService)
+	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)

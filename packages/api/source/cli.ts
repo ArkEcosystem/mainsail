@@ -138,7 +138,7 @@ export class CommandLineInterface {
 		if (temporaryFlags.network) {
 			const plugins = await this.#app
 				.get<CliContracts.PluginManager>(Identifiers.PluginManager)
-				.list(temporaryFlags.token, temporaryFlags.network, this.#app.get(Identifiers.ApplicationName));
+				.list(temporaryFlags.token, temporaryFlags.network, this.#app.get(Identifiers.Application.Name));
 
 			const commandsFromPlugins = commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
 

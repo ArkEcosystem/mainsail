@@ -24,9 +24,9 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.Cryptography.Identity.AddressFactory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Cryptography.Identity.Address.Factory).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.Cryptography.Size.PublicKey).toConstantValue(PUBLIC_KEY_SIZE);
+		context.sandbox.app.bind(Identifiers.Cryptography.Identity.PublicKey.Size).toConstantValue(PUBLIC_KEY_SIZE);
 	});
 
 	it("shoudl serialize and deserialize transaction", async ({ sandbox }) => {

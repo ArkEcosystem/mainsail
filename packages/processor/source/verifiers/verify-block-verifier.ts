@@ -3,16 +3,16 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class VerifyBlockVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Block.Verifier)
 	private readonly blockVerifier!: Contracts.Crypto.BlockVerifier;
 
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {

@@ -9,7 +9,7 @@ import { InputValidator } from "./validator";
 
 @injectable()
 export class Input {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
 	@inject(Identifiers.InputValidator)

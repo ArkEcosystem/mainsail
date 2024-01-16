@@ -13,11 +13,11 @@ describe<{
 		context.app = new Application(new Container());
 	});
 	it(".register", async (context) => {
-		assert.false(context.app.isBound(Identifiers.MixinService));
+		assert.false(context.app.isBound(Identifiers.Services.Mixin.Service));
 
 		await context.app.resolve<ServiceProvider>(ServiceProvider).register();
 
-		assert.true(context.app.isBound(Identifiers.MixinService));
-		assert.instance(context.app.get(Identifiers.MixinService), MixinService);
+		assert.true(context.app.isBound(Identifiers.Services.Mixin.Service));
+		assert.instance(context.app.get(Identifiers.Services.Mixin.Service), MixinService);
 	});
 });

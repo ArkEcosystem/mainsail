@@ -17,7 +17,7 @@ import { DiscoverNetwork } from "./discover-network";
 
 @injectable()
 export abstract class Command {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Application;
 
 	@inject(Identifiers.Environment)
@@ -97,7 +97,7 @@ export abstract class Command {
 						this.env.getPaths(
 							this.input.getFlag("token"),
 							this.input.getFlag("network"),
-							this.app.get(Identifiers.ApplicationName),
+							this.app.get(Identifiers.Application.Name),
 						),
 					);
 			}

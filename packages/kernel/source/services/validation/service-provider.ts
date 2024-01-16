@@ -6,14 +6,17 @@ import { ValidationManager } from "./manager";
 
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind<ValidationManager>(Identifiers.ValidationManager).to(ValidationManager).inSingletonScope();
+		this.app
+			.bind<ValidationManager>(Identifiers.Services.Validation.Manager)
+			.to(ValidationManager)
+			.inSingletonScope();
 
-		await this.app.get<ValidationManager>(Identifiers.ValidationManager).boot();
+		await this.app.get<ValidationManager>(Identifiers.Services.Validation.Manager).boot();
 
 		this.app
-			.bind(Identifiers.ValidationService)
+			.bind(Identifiers.Services.Validation.Service)
 			.toDynamicValue((context: interfaces.Context) =>
-				context.container.get<ValidationManager>(Identifiers.ValidationManager).driver(),
+				context.container.get<ValidationManager>(Identifiers.Services.Validation.Manager).driver(),
 			);
 	}
 }

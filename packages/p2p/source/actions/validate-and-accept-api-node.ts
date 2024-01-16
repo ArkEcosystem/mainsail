@@ -16,7 +16,7 @@ export class ValidateAndAcceptApiNodeAction extends Services.Triggers.Action {
 		const options: Contracts.P2P.AcceptNewPeerOptions = arguments_.options;
 
 		return this.#app
-			.get<PeerApiNodeProcessor>(Identifiers.PeerApiNodeProcessor)
+			.get<PeerApiNodeProcessor>(Identifiers.P2P.ApiNode.Processor)
 			.validateAndAcceptApiNode(apiNode, options);
 	}
 }

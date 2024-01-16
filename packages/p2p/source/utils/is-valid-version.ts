@@ -23,7 +23,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, version: strin
 		minimumVersions = p2p.minimumVersions;
 	} else {
 		const configuration = app.getTagged<Providers.PluginConfiguration>(
-			Identifiers.PluginConfiguration,
+			Identifiers.ServiceProvider.Configuration,
 			"plugin",
 			"p2p",
 		);

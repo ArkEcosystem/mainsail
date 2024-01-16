@@ -8,7 +8,7 @@ import { getPeerIp } from "../../utils/get-peer-ip";
 
 @injectable()
 export class GetPeersController implements Contracts.P2P.Controller {
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public async handle(

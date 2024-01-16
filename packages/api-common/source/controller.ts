@@ -7,7 +7,7 @@ import { SchemaObject } from "./schemas";
 
 @injectable()
 export abstract class AbstractController {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	protected getQueryPagination(query: Hapi.RequestQuery): Contracts.Api.Pagination {

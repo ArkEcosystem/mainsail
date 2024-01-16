@@ -22,13 +22,13 @@ interface Plugin {
 
 @injectable()
 export class LoadServiceProviders implements Bootstrapper {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.ConfigRepository)
+	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
-	@inject(Identifiers.ServiceProviderRepository)
+	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviderRepository!: ServiceProviderRepository;
 
 	public async bootstrap(): Promise<void> {

@@ -5,7 +5,7 @@ import { pascalCase } from "../utils";
 
 @injectable()
 export abstract class InstanceManager<T> {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	#defaultDriver: string;

@@ -15,7 +15,7 @@ import { inspect } from "util";
 
 @injectable()
 export class PinoLogger implements Contracts.Kernel.Logger {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	readonly #levelStyles: Record<string, Chalk> = {

@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Header implements Contracts.P2P.Header {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Service)

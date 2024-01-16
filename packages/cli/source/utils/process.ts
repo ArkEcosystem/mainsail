@@ -14,7 +14,7 @@ import { ProcessManager } from "../services";
 
 @injectable()
 export class Process {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	@inject(Identifiers.ProcessManager)

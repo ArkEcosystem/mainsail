@@ -24,21 +24,17 @@ const init = (context: Context) => {
 	};
 
 	const app = new Application(new Container());
-	app.bind(Identifiers.PluginConfiguration).to(Providers.PluginConfiguration).inSingletonScope();
-	app.bind(Identifiers.PeerRepository).toConstantValue({});
-	app.bind(Identifiers.TransactionPoolQuery).toConstantValue({});
-	app.bind(Identifiers.TransactionPoolProcessorFactory).toConstantValue({});
-	app.bind(Identifiers.TransactionPoolProcessor).toConstantValue({});
-	app.bind(Identifiers.BlockHistoryService).toConstantValue({});
-	app.bind(Identifiers.TransactionHistoryService).toConstantValue({});
-	app.bind(Identifiers.TransactionHandlerRegistry).toConstantValue({});
-	app.bind(Identifiers.StandardCriteriaService).toConstantValue({});
-	app.bind(Identifiers.EventDispatcherService).to(NullEventDispatcher);
-	app.bind(Identifiers.LogService).toConstantValue(logger);
+	app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
+	app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
+	app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
+	app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
+	app.bind(Identifiers.Transaction.Handler.Registry).toConstantValue({});
+	app.bind(Identifiers.Services.EventDispatcher.Service).to(NullEventDispatcher);
+	app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
-	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Identifiers.PluginConfiguration);
+	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration);
 	context.serviceProvider.setConfig(context.pluginConfiguration.from("webhooks", defaults));
 };
 

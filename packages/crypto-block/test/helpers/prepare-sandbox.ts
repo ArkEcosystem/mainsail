@@ -24,7 +24,7 @@ import { Serializer } from "../../source/serializer";
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
 
-	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.ConfigRepository).set("crypto", crypto);
+	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 
 	await context.sandbox.app.resolve(CoreSerializer).register();
 	await context.sandbox.app.resolve(CoreValidation).register();

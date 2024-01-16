@@ -8,17 +8,17 @@ import { buildRateLimiter } from "./utils";
 
 @injectable()
 export class Throttle {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.QueueFactory)
+	@inject(Identifiers.Services.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#queue!: Contracts.Kernel.Queue;

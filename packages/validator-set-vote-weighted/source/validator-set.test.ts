@@ -47,7 +47,7 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.WalletAttributes).toConstantValue(getAttributeRepository());
+		context.sandbox.app.bind(Identifiers.State.Wallet.Attributes).toConstantValue(getAttributeRepository());
 
 		// @ts-ignore
 		@injectable()
@@ -61,38 +61,38 @@ describe<{
 			}
 		}
 
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).to(MockEventDispatcher);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).to(MockEventDispatcher);
 
-		context.sandbox.app.bind(Identifiers.WalletRepositoryIndexSet).toConstantValue(getIndexSet());
+		context.sandbox.app.bind(Identifiers.State.WalletRepository.IndexSet).toConstantValue(getIndexSet());
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.AddressFactory)
+			.bind(Identifiers.Cryptography.Identity.Address.Factory)
 			.to(AddressFactory)
 			.inSingletonScope();
 		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.KeyPairFactory)
+			.bind(Identifiers.Cryptography.Identity.KeyPair.Factory)
 			.to(KeyPairFactory)
 			.inSingletonScope();
 		context.sandbox.app
-			.bind(Identifiers.Cryptography.Identity.PublicKeyFactory)
+			.bind(Identifiers.Cryptography.Identity.PublicKey.Factory)
 			.to(PublicKeyFactory)
 			.inSingletonScope();
 		context.sandbox.app
-			.bind(Identifiers.WalletFactory)
-			.toFactory(() => walletFactory(context.sandbox.app.get(Identifiers.WalletAttributes)));
-		context.sandbox.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
+			.bind(Identifiers.State.Wallet.Factory)
+			.toFactory(() => walletFactory(context.sandbox.app.get(Identifiers.State.Wallet.Attributes)));
+		context.sandbox.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 
 		context.walletRepository = context.sandbox.app.resolve(Wallets.WalletRepository);
 
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue({
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
 			getStateStore: () => context.stateStore,
 			getWalletRepository: () => context.walletRepository,
 		});
 
 		context.sandbox.app
-			.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)))
+			.bind(Identifiers.State.Wallet.Factory)
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)))
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "blockchain"));
 
 		context.validatorSet = context.sandbox.app.resolve(ValidatorSet);

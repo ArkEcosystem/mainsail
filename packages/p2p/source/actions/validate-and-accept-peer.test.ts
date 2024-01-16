@@ -12,7 +12,7 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.PeerProcessor).toConstantValue(peerProcessor);
+		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
 
 		context.action = new ValidateAndAcceptPeerAction(context.sandbox.app);
 	});

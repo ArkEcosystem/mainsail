@@ -20,9 +20,9 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(logger);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
-		context.sandbox.app.bind(Identifiers.StateService).toConstantValue(stateService);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(stateService);
 
 		context.controller = context.sandbox.app.resolve(GetBlocksController);
 	});

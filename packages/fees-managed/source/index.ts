@@ -9,7 +9,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Fee.Type).toConstantValue("managed");
 		this.app.bind(Identifiers.Fee.Matcher).to(FeeMatcher).inSingletonScope();
-		this.app.bind(Identifiers.TransactionPoolProcessorExtension).to(ProcessorExtension);
+		this.app.bind(Identifiers.TransactionPool.ProcessorExtension).to(ProcessorExtension);
 	}
 
 	public configSchema(): object {

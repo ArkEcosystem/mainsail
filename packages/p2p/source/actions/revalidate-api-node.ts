@@ -14,6 +14,6 @@ export class RevalidateApiNodeAction extends Services.Triggers.Action {
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {
 		const apiNode: Contracts.P2P.PeerApiNode = arguments_.apiNode;
 
-		return this.#app.get<PeerApiNodeProcessor>(Identifiers.PeerApiNodeProcessor).revalidateApiNode(apiNode);
+		return this.#app.get<PeerApiNodeProcessor>(Identifiers.P2P.ApiNode.Processor).revalidateApiNode(apiNode);
 	}
 }

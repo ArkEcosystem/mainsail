@@ -4,7 +4,7 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export abstract class Transaction implements Contracts.Crypto.Transaction {
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	protected readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)

@@ -4,10 +4,10 @@ import dayjs from "dayjs";
 
 @injectable()
 export class Scheduler implements Contracts.Consensus.Scheduler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)

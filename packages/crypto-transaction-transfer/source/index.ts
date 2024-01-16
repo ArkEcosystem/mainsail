@@ -38,6 +38,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerHandler(): void {
-		this.app.bind(Identifiers.TransactionHandler).to(TransferTransactionHandler);
+		this.app.bind(Identifiers.Transaction.Handler.Instances).to(TransferTransactionHandler);
 	}
 }

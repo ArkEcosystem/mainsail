@@ -8,7 +8,7 @@ import * as Schemas from "./schemas";
 
 @injectable()
 export class Server extends AbstractServer {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-http")
 	private readonly configuration!: Providers.PluginConfiguration;
 

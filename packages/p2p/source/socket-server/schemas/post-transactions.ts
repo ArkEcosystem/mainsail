@@ -12,7 +12,7 @@ export const createPostTransactionsSchema = (app: Contracts.Kernel.Application):
 			.max(
 				app
 					.getTagged<Providers.PluginConfiguration>(
-						Identifiers.PluginConfiguration,
+						Identifiers.ServiceProvider.Configuration,
 						"plugin",
 						"transaction-pool",
 					)

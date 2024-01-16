@@ -22,7 +22,7 @@ export class Command extends Commands.Command {
 		return await this.pluginManager.update(
 			this.getFlag("token"),
 			this.getFlag("network"),
-			this.app.get(Identifiers.ApplicationName),
+			this.app.get(Identifiers.Application.Name),
 			this.getArgument("package"),
 		);
 	}

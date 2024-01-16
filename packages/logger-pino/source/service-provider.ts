@@ -6,7 +6,9 @@ import { PinoLogger } from "./driver";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const logManager: Services.Log.LogManager = this.app.get<Services.Log.LogManager>(Identifiers.LogManager);
+		const logManager: Services.Log.LogManager = this.app.get<Services.Log.LogManager>(
+			Identifiers.Services.Log.Manager,
+		);
 
 		await logManager.extend("pino", async () =>
 			this.app.resolve<Contracts.Kernel.Logger>(PinoLogger).make(this.config().all()),
@@ -16,7 +18,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.Kernel.Logger>(Identifiers.LogService).dispose();
+		await this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).dispose();
 	}
 
 	public configSchema(): object {

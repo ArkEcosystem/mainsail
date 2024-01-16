@@ -9,10 +9,10 @@ import { createGunzip } from "zlib";
 
 @injectable()
 export class Importer implements Contracts.State.Importer {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	async import(

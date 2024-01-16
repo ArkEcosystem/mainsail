@@ -6,14 +6,17 @@ import { FilesystemManager } from "./manager";
 
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind<FilesystemManager>(Identifiers.FilesystemManager).to(FilesystemManager).inSingletonScope();
+		this.app
+			.bind<FilesystemManager>(Identifiers.Services.Filesystem.Manager)
+			.to(FilesystemManager)
+			.inSingletonScope();
 
-		await this.app.get<FilesystemManager>(Identifiers.FilesystemManager).boot();
+		await this.app.get<FilesystemManager>(Identifiers.Services.Filesystem.Manager).boot();
 
 		this.app
-			.bind(Identifiers.FilesystemService)
+			.bind(Identifiers.Services.Filesystem.Service)
 			.toDynamicValue((context: interfaces.Context) =>
-				context.container.get<FilesystemManager>(Identifiers.FilesystemManager).driver(),
+				context.container.get<FilesystemManager>(Identifiers.Services.Filesystem.Manager).driver(),
 			);
 	}
 }

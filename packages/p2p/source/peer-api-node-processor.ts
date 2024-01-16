@@ -5,16 +5,16 @@ import dayjs from "dayjs";
 
 @injectable()
 export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor {
-	@inject(Identifiers.PeerApiNodeRepository)
+	@inject(Identifiers.P2P.ApiNode.Repository)
 	private readonly repository!: Contracts.P2P.PeerApiNodeRepository;
 
-	@inject(Identifiers.PeerApiNodeVerifier)
+	@inject(Identifiers.P2P.ApiNode.Verifier)
 	private readonly apiNodeVerifier!: Contracts.P2P.PeerApiNodeVerifier;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.P2PLogger)
+	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
 	public async validateAndAcceptApiNode(

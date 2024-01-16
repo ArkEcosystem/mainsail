@@ -17,26 +17,26 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Consensus.Aggregator).to(Aggregator).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.RoundStateRepository).to(RoundStateRepository).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Scheduler).to(Scheduler).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.ProposalProcessor).to(ProposalProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.PrevoteProcessor).to(PrevoteProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.PrecommitProcessor).to(PrecommitProcessor).inSingletonScope();
-		this.app.bind(Identifiers.Consensus.CommitProcessor).to(CommitProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.Proposal).to(ProposalProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.PreVote).to(PrevoteProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.PreCommit).to(PrecommitProcessor).inSingletonScope();
+		this.app.bind(Identifiers.Consensus.Processor.Commit).to(CommitProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Utils.Lock());
 
 		this.app
-			.bind(Identifiers.Consensus.CommitStateFactory)
+			.bind(Identifiers.Consensus.CommitState.Factory)
 			.toFactory(
 				(context: interfaces.Context) => (commit: Contracts.Crypto.Commit) =>
 					context.container.resolve(CommitState).configure(commit),
 			);
 
 		// Storage for prevotes, precommits and proposals
-		const storage = this.app.get<RootDatabase>(Identifiers.Database.ConsensusStorage);
-		this.app.bind(Identifiers.Database.ProposalStorage).toConstantValue(storage.openDB({ name: "proposals" }));
-		this.app.bind(Identifiers.Database.PrevoteStorage).toConstantValue(storage.openDB({ name: "prevotes" }));
-		this.app.bind(Identifiers.Database.PrecommitStorage).toConstantValue(storage.openDB({ name: "precommits" }));
+		const storage = this.app.get<RootDatabase>(Identifiers.Database.Instance.Consensus);
+		this.app.bind(Identifiers.Database.Storage.Proposal).toConstantValue(storage.openDB({ name: "proposals" }));
+		this.app.bind(Identifiers.Database.Storage.PreVote).toConstantValue(storage.openDB({ name: "prevotes" }));
+		this.app.bind(Identifiers.Database.Storage.PreCommit).toConstantValue(storage.openDB({ name: "precommits" }));
 		this.app
-			.bind(Identifiers.Database.ConsensusStateStorage)
+			.bind(Identifiers.Database.Storage.ConsensusState)
 			.toConstantValue(storage.openDB({ name: "consensus" }));
 		this.app.bind(Identifiers.Consensus.Storage).to(Storage).inSingletonScope();
 

@@ -9,10 +9,10 @@ export * from "./schemas";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Cryptography.Size.Address).toConstantValue(52);
+		this.app.bind(Identifiers.Cryptography.Identity.Address.Size).toConstantValue(52);
 
-		this.app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();
-		this.app.bind(Identifiers.Cryptography.Identity.AddressSerializer).to(AddressSerializer).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Identity.Address.Factory).to(AddressFactory).inSingletonScope();
+		this.app.bind(Identifiers.Cryptography.Identity.Address.Serializer).to(AddressSerializer).inSingletonScope();
 
 		this.#registerSchemas();
 	}

@@ -18,7 +18,7 @@ describe<{
 		context.configuration = { getRequired: () => {} };
 
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.PluginConfiguration).toConstantValue(context.configuration);
+		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);
 
 		context.ensureFileSync = stub(fs, "ensureFileSync").callsFake(() => {});
 	});

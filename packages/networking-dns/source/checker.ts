@@ -6,11 +6,11 @@ import util from "util";
 
 @injectable()
 export class Checker {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "networking-dns")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async execute(): Promise<void> {

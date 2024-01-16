@@ -39,7 +39,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
 
-	context.sandbox.app.bind(Identifiers.LogService).toConstantValue({});
+	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
@@ -53,19 +53,19 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 				// @ts-ignore
 				consensusSignature: (method, message, privateKey) =>
 					context.sandbox.app
-						.getTagged(Identifiers.Cryptography.Signature, "type", "consensus")!
+						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
 						[method](message, privateKey),
 			};
 		},
 	};
-	context.sandbox.app.bind(Identifiers.Ipc.WorkerPool).toConstantValue(workerPool);
+	context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
-	context.sandbox.app.bind(Identifiers.TransactionPoolCollator).toConstantValue({
+	context.sandbox.app.bind(Identifiers.TransactionPool.Collator).toConstantValue({
 		getBlockCandidateTransactions: () => [],
 	});
-	context.sandbox.app.bind(Identifiers.TransactionPoolService).toConstantValue({});
+	context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
 
-	context.sandbox.app.bind(Identifiers.StateService).toConstantValue({
+	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
 		getStateStore: () => ({
 			getLastBlock: () => ({
 				data: {
@@ -76,7 +76,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		}),
 	});
 
-	context.sandbox.app.bind(Identifiers.ValidatorSet).toConstantValue({
+	context.sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
 		getValidatorIndexByWalletPublicKey: () => 0,
 	});
 };

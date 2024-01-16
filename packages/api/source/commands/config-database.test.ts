@@ -15,7 +15,7 @@ describe<{
 		context.envFile = `${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`;
 
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.ApplicationName).toConstantValue("mainsail-api");
+		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("mainsail-api");
 	});
 
 	afterAll(() => setGracefulCleanup());

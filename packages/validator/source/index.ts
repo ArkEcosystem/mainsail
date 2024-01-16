@@ -7,7 +7,7 @@ import { ValidatorRepository } from "./validator-repository";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPairFactory,
+			Identifiers.Cryptography.Identity.KeyPair.Factory,
 			"type",
 			"consensus",
 		);
@@ -23,7 +23,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		this.app
-			.bind(Identifiers.Consensus.ValidatorRepository)
+			.bind(Identifiers.Validator.Repository)
 			.toConstantValue(this.app.resolve(ValidatorRepository).configure(validators));
 	}
 }

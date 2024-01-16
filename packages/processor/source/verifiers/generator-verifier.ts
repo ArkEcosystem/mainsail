@@ -3,14 +3,14 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class GeneratorVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
+	private readonly proposerSelector!: Contracts.Proposer.Selector;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		if (unit.getBlock().data.height === 0) {

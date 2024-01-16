@@ -20,11 +20,11 @@ export class Application implements Contracts.Kernel.Application {
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
 		this.#listenToShutdownSignals();
 
-		this.bind<Contracts.Kernel.Application>(Identifiers.Application).toConstantValue(this);
+		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
-		this.bind<ConfigRepository>(Identifiers.ConfigRepository).to(ConfigRepository).inSingletonScope();
+		this.bind<ConfigRepository>(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
 
-		this.bind<ServiceProviderRepository>(Identifiers.ServiceProviderRepository)
+		this.bind<ServiceProviderRepository>(Identifiers.ServiceProvider.Repository)
 			.to(ServiceProviderRepository)
 			.inSingletonScope();
 	}
@@ -33,8 +33,8 @@ export class Application implements Contracts.Kernel.Application {
 		flags: Contracts.Types.JsonObject;
 		plugins?: Contracts.Types.JsonObject;
 	}): Promise<void> {
-		this.bind<KeyValuePair>(Identifiers.ConfigFlags).toConstantValue(options.flags);
-		this.bind<KeyValuePair>(Identifiers.ConfigPlugins).toConstantValue(options.plugins || {});
+		this.bind<KeyValuePair>(Identifiers.Config.Flags).toConstantValue(options.flags);
+		this.bind<KeyValuePair>(Identifiers.Config.Plugins).toConstantValue(options.plugins || {});
 
 		await this.#registerEventDispatcher();
 
@@ -54,7 +54,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined {
-		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.ConfigRepository);
+		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Config.Repository);
 
 		if (value) {
 			config.set(key, value);
@@ -64,31 +64,31 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public dirPrefix(): string {
-		return this.get(Identifiers.ApplicationDirPrefix);
+		return this.get(Identifiers.Application.DirPrefix);
 	}
 
 	public namespace(): string {
-		return this.get(Identifiers.ApplicationNamespace);
+		return this.get(Identifiers.Application.Namespace);
 	}
 
 	public version(): string {
-		return this.get(Identifiers.ApplicationVersion);
+		return this.get(Identifiers.Application.Version);
 	}
 
 	public token(): string {
-		return this.get(Identifiers.ApplicationToken);
+		return this.get(Identifiers.Application.Token);
 	}
 
 	public network(): string {
-		return this.get(Identifiers.ApplicationNetwork);
+		return this.get(Identifiers.Application.Network);
 	}
 
 	public name(): string {
-		return this.get(Identifiers.ApplicationName);
+		return this.get(Identifiers.Application.Name);
 	}
 
 	public useNetwork(value: string): void {
-		this.rebind<string>(Identifiers.ApplicationNetwork).toConstantValue(value);
+		this.rebind<string>(Identifiers.Application.Network).toConstantValue(value);
 	}
 
 	public dataPath(path = ""): string {
@@ -136,11 +136,11 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public environment(): string {
-		return this.get(Identifiers.ApplicationEnvironment);
+		return this.get(Identifiers.Application.Environment);
 	}
 
 	public useEnvironment(value: string): void {
-		this.rebind<string>(Identifiers.ApplicationEnvironment).toConstantValue(value);
+		this.rebind<string>(Identifiers.Application.Environment).toConstantValue(value);
 	}
 
 	public isProduction(): boolean {
@@ -166,10 +166,12 @@ export class Application implements Contracts.Kernel.Application {
 	public enableMaintenance(): void {
 		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now in maintenance mode.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
+			"Application is now in maintenance mode.",
+		);
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
 			"kernel.maintenance",
 			true,
 		);
@@ -178,10 +180,10 @@ export class Application implements Contracts.Kernel.Application {
 	public disableMaintenance(): void {
 		removeSync(this.tempPath("maintenance"));
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is now live.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice("Application is now live.");
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.EventDispatcherService).dispatch(
+		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
 			"kernel.maintenance",
 			false,
 		);
@@ -195,7 +197,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#booted = false;
 
 		if (this.#terminating) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
 				"Force application termination. Graceful shutdown was interrupted.",
 			);
 			exit(1);
@@ -204,7 +206,7 @@ export class Application implements Contracts.Kernel.Application {
 
 		const message = `reason: ${reason} error: ${error?.message}`;
 		if (reason || error) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService)[error ? "error" : "warning"](message);
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warning"](message);
 		}
 
 		if (error) {
@@ -216,12 +218,12 @@ export class Application implements Contracts.Kernel.Application {
 			}
 
 			for (const error of errors) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.LogService).error(error.stack ?? error.message);
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).error(error.stack ?? error.message);
 			}
 		}
 
 		const timeout = setTimeout(() => {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
 				"Force application termination. Service providers did not dispose in time.",
 			);
 			exit(1);
@@ -235,7 +237,9 @@ export class Application implements Contracts.Kernel.Application {
 
 		this.#logOpenHandlers();
 
-		this.get<Contracts.Kernel.Logger>(Identifiers.LogService).notice("Application is gracefully terminated.");
+		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
+			"Application is gracefully terminated.",
+		);
 
 		exit(1);
 	}
@@ -290,7 +294,7 @@ export class Application implements Contracts.Kernel.Application {
 
 	async #bootstrapWith(type: string): Promise<void> {
 		const bootstrappers: Constructor<Bootstrapper>[] = Object.values(Bootstrappers[type]);
-		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.EventDispatcherService);
+		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
 			await events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
@@ -307,11 +311,13 @@ export class Application implements Contracts.Kernel.Application {
 
 	async #disposeServiceProviders(): Promise<void> {
 		const serviceProviders: ServiceProvider[] = this.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		).allLoadedProviders();
 
 		for (const serviceProvider of serviceProviders.reverse()) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.LogService).debug(`Disposing ${serviceProvider.name()}...`);
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).debug(
+				`Disposing ${serviceProvider.name()}...`,
+			);
 
 			try {
 				await serviceProvider.dispose();
@@ -328,7 +334,7 @@ export class Application implements Contracts.Kernel.Application {
 			const fsRequests = resourcesInfo.filter((resource) => resource.includes("FSReqCallback"));
 
 			if (timeouts.length > 0 || fsRequests.length > 0) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.LogService).warning(
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
 					`There are ${timeouts.length} active timeouts and ${fsRequests.length} active file system requests.`,
 				);
 			}

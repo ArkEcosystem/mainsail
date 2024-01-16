@@ -6,13 +6,13 @@ import dayjs from "dayjs";
 
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.TransactionPoolCollator)
+	@inject(Identifiers.TransactionPool.Collator)
 	private readonly collator!: Contracts.TransactionPool.Collator;
 
-	@inject(Identifiers.TransactionPoolService)
+	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
@@ -21,7 +21,7 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
-	@inject(Identifiers.Cryptography.HashFactory)
+	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
@@ -30,7 +30,7 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
 	#keyPair!: Contracts.Crypto.KeyPair;

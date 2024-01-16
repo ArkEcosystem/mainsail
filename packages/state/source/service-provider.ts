@@ -16,8 +16,8 @@ import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		// Register indexes
-		this.app.bind(Identifiers.WalletRepositoryIndexSet).to(IndexSet).inSingletonScope();
-		const indexSet = this.app.get<Contracts.State.IndexSet>(Identifiers.WalletRepositoryIndexSet);
+		this.app.bind(Identifiers.State.WalletRepository.IndexSet).to(IndexSet).inSingletonScope();
+		const indexSet = this.app.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet);
 		indexSet.set(Contracts.State.WalletIndexes.Addresses);
 		indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
 		indexSet.set(Contracts.State.WalletIndexes.Usernames);
@@ -25,13 +25,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// TODO: remove resignations index
 		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
-		this.app.bind(Identifiers.StateAttributes).to(AttributeRepository).inSingletonScope();
-		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.StateAttributes);
+		this.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		const stateAttributeRepository = this.app.get<AttributeRepository>(Identifiers.State.AttributeRepository);
 		stateAttributeRepository.set("height", Contracts.State.AttributeType.Number);
 		stateAttributeRepository.set("totalRound", Contracts.State.AttributeType.Number);
 
-		this.app.bind(Identifiers.WalletAttributes).to(AttributeRepository).inSingletonScope();
-		const walletAttributeRepository = this.app.get<AttributeRepository>(Identifiers.WalletAttributes);
+		this.app.bind(Identifiers.State.Wallet.Attributes).to(AttributeRepository).inSingletonScope();
+		const walletAttributeRepository = this.app.get<AttributeRepository>(Identifiers.State.Wallet.Attributes);
 		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
 		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
@@ -47,40 +47,40 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("validatorApproval", Contracts.State.AttributeType.Number);
 
 		this.app
-			.bind(Identifiers.WalletFactory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.WalletAttributes)));
+			.bind(Identifiers.State.Wallet.Factory)
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)));
 
-		this.app.bind(Identifiers.WalletRepositoryFactory).toFactory(
+		this.app.bind(Identifiers.State.WalletRepository.Base.Factory).toFactory(
 			({ container }) =>
 				() =>
 					container.resolve(WalletRepository),
 		);
 
-		this.app.bind(Identifiers.WalletRepositoryCloneFactory).toFactory(
+		this.app.bind(Identifiers.State.WalletRepository.Clone.Factory).toFactory(
 			({ container }) =>
 				(walletRepository: WalletRepository) =>
 					container.resolve(WalletRepositoryClone).configure(walletRepository),
 		);
 
-		this.app.bind(Identifiers.WalletRepositoryCopyOnWriteFactory).toFactory(
+		this.app.bind(Identifiers.State.WalletRepository.BySender.Factory).toFactory(
 			({ container }) =>
 				async (walletRepository: WalletRepository, publicKey: string) =>
 					await container.resolve(WalletRepositoryBySender).configure(walletRepository, publicKey),
 		);
 
-		this.app.bind(Identifiers.ValidatorWalletFactory).toFactory(() => validatorWalletFactory);
+		this.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 
-		this.app.bind(Identifiers.StateStoreFactory).toFactory(
+		this.app.bind(Identifiers.State.Store.Factory).toFactory(
 			({ container }) =>
 				(originalStateStore?: StateStore) =>
 					container.resolve(StateStore).configure(originalStateStore),
 		);
 
-		this.app.bind(Identifiers.StateImporter).to(Importer);
-		this.app.bind(Identifiers.StateExporter).to(Exporter);
+		this.app.bind(Identifiers.State.Importer).to(Importer);
+		this.app.bind(Identifiers.State.Exporter).to(Exporter);
 
-		this.app.bind(Identifiers.StateService).to(Service).inSingletonScope();
-		this.app.bind(Identifiers.StateVerifier).to(StateVerifier);
+		this.app.bind(Identifiers.State.Service).to(Service).inSingletonScope();
+		this.app.bind(Identifiers.State.Verifier).to(StateVerifier);
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
 		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);

@@ -5,7 +5,7 @@ import { secp256k1 } from "bcrypto";
 
 @injectable()
 export class Signature implements Contracts.Crypto.Signature {
-	@inject(Identifiers.Cryptography.Size.Signature)
+	@inject(Identifiers.Cryptography.Signature.Size)
 	private readonly signatureSize!: Function;
 
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {

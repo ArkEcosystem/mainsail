@@ -7,10 +7,10 @@ import { Identifiers as ApiDatabaseIdentifiers } from "./identifiers";
 
 @injectable()
 export class Migrations implements ApiDatabaseContracts_Migrations {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(ApiDatabaseIdentifiers.DataSource)

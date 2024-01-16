@@ -27,17 +27,17 @@ class Iterator {
 
 @injectable()
 export class Exporter implements Contracts.State.Exporter {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.WalletRepositoryIndexSet)
+	@inject(Identifiers.State.WalletRepository.IndexSet)
 	protected readonly indexSet!: Contracts.State.IndexSet;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async export(

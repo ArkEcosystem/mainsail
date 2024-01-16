@@ -4,11 +4,11 @@ import { Providers, Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.TransactionPoolSenderState)
+	@inject(Identifiers.TransactionPool.SenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
 	#concurrency = 0;

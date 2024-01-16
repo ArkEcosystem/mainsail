@@ -11,8 +11,8 @@ describe<{
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.QueueFactory).toConstantValue({});
-		context.sandbox.app.bind(Identifiers.PluginConfiguration).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({});
 
 		context.peerRepository = context.sandbox.app.resolve(PeerRepository);
 	});

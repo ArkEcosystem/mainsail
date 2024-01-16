@@ -10,7 +10,6 @@ import { sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import * as ApiSyncContracts from "./contracts";
-import { Identifiers as ApiSyncIdentifiers } from "./identifiers";
 
 interface DeferredSync {
 	block: Models.Block;
@@ -22,8 +21,8 @@ interface DeferredSync {
 const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
 
 @injectable()
-export class Sync implements Contracts.ApiSync.Sync {
-	@inject(Identifiers.Application)
+export class Sync implements Contracts.ApiSync.Service {
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Cryptography.Configuration)
@@ -56,30 +55,30 @@ export class Sync implements Contracts.ApiSync.Sync {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.ValidatorSet)
-	private readonly validatorSet!: Contracts.ValidatorSet.ValidatorSet;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.ProposerSelector;
+	private readonly proposerSelector!: Contracts.Proposer.Selector;
 
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly transactionHandlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-sync")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.QueueFactory)
+	@inject(Identifiers.Services.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
 	#queue!: Contracts.Kernel.Queue;
 
-	@inject(ApiSyncIdentifiers.Listeners)
+	@inject(Identifiers.ApiSync.Listener)
 	private readonly listeners!: ApiSyncContracts.Listeners;
 
 	public async prepareBootstrap(): Promise<void> {

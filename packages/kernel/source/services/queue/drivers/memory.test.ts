@@ -35,8 +35,8 @@ describe<{
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.EventDispatcherService).toConstantValue(context.eventDispatcher);
-		context.sandbox.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.driver = context.sandbox.app.resolve<MemoryQueue>(MemoryQueue);
 	});
 

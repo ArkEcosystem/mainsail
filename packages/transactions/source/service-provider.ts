@@ -16,7 +16,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 			do {
 				const bindingDictionary = container["_bindingDictionary"] as BindingDictionary;
-				const handlerBindings = bindingDictionary.getMap().get(Identifiers.TransactionHandler) ?? [];
+				const handlerBindings = bindingDictionary.getMap().get(Identifiers.Transaction.Handler.Instances) ?? [];
 
 				for (const handlerBinding of handlerBindings) {
 					if (handlerBinding.implementationType) {
@@ -32,13 +32,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.TransactionHandlerProvider).to(TransactionHandlerProvider).inSingletonScope();
+		this.app.bind(Identifiers.Transaction.Handler.Provider).to(TransactionHandlerProvider).inSingletonScope();
 
 		this.app
-			.bind(Identifiers.TransactionHandlerConstructors)
+			.bind(Identifiers.Transaction.Handler.Constructors)
 			.toDynamicValue(ServiceProvider.getTransactionHandlerConstructorsBinding());
 
-		this.app.bind(Identifiers.TransactionHandlerRegistry).to(TransactionHandlerRegistry);
+		this.app.bind(Identifiers.Transaction.Handler.Registry).to(TransactionHandlerRegistry);
 	}
 
 	public async required(): Promise<boolean> {

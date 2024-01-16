@@ -11,13 +11,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const config: Contracts.Crypto.NetworkConfigPartial = this.#fromConfigRepository();
 
 			this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(config);
-
-			this.app.bind<Contracts.Crypto.NetworkConfigPartial>(Identifiers.Crypto).toConstantValue(config);
 		} catch {}
 	}
 
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {
-		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.ConfigRepository);
+		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository);
 
 		return {
 			genesisBlock: configRepository.get<Contracts.Crypto.CommitJson>("crypto.genesisBlock")!,

@@ -6,7 +6,7 @@ import { PluginManifest } from "./plugin-manifest";
 
 @injectable()
 export abstract class ServiceProvider {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
 	#packageConfiguration!: PluginConfiguration;

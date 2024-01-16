@@ -32,10 +32,10 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application(new Container());
 
-		context.app.bind(Identifiers.EventDispatcherService).to(MemoryEventDispatcher).inSingletonScope();
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 	});
 
@@ -128,7 +128,7 @@ describe<{
 
 		const fired = spyFn();
 		context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
 			.listenOnce(KernelEvent.ServiceProviderRegistered, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.register("stub");
@@ -144,7 +144,7 @@ describe<{
 
 		const fired = spyFn();
 		context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
 			.listenOnce(KernelEvent.ServiceProviderBooted, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.boot("stub");
@@ -163,7 +163,7 @@ describe<{
 
 		const fired = spyFn();
 		context.app
-			.get<MemoryEventDispatcher>(Identifiers.EventDispatcherService)
+			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
 			.listenOnce(KernelEvent.ServiceProviderDisposed, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.dispose("stub");

@@ -5,7 +5,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class TransactionsController extends AbstractController {
-	@inject(Identifiers.TransactionPoolProcessor)
+	@inject(Identifiers.TransactionPool.Processor)
 	private readonly processor!: Contracts.TransactionPool.Processor;
 
 	public async store(request: Hapi.Request) {

@@ -7,35 +7,35 @@ import { isValidPeerIp } from "./validation";
 
 @injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerVerifier)
+	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
 
-	@inject(Identifiers.PeerDisposer)
+	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly peerCommunicator!: Contracts.P2P.PeerCommunicator;
 
-	@inject(Identifiers.PeerDiscoverer)
+	@inject(Identifiers.P2P.Peer.Discoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
-	@inject(Identifiers.PeerApiNodeDiscoverer)
+	@inject(Identifiers.P2P.ApiNode.Discoverer)
 	private readonly peerApiNodeDiscoverer!: Contracts.P2P.PeerApiNodeDiscoverer;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.P2PLogger)
+	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
 	@postConstruct()
@@ -95,7 +95,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	}
 
 	async #acceptNewPeer(ip: string): Promise<void> {
-		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.PeerFactory)(ip);
+		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
 
 		this.repository.setPendingPeer(peer);
 

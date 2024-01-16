@@ -10,11 +10,11 @@ import { Controller } from "./controller";
 
 @injectable()
 export class TransactionsController extends Controller {
-	@inject(Identifiers.TransactionHandlerRegistry)
+	@inject(Identifiers.Transaction.Handler.Registry)
 	@tagged("state", "null")
 	private readonly nullHandlerRegistry!: Handlers.Registry;
 
-	@inject(Identifiers.TransactionPoolQuery)
+	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
 	public async unconfirmed(request: Hapi.Request) {

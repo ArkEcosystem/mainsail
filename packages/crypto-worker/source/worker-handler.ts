@@ -10,15 +10,15 @@ class WorkerImpl {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "consensus")
 	private readonly consensusSignature!: Contracts.Crypto.Signature;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKeyFactory)
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
 	@tagged("type", "consensus")
 	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
 
-	@inject(Identifiers.Cryptography.Signature)
+	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
 	private readonly walletSignature!: Contracts.Crypto.Signature;
 
@@ -99,7 +99,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 		});
 
 		if (!flags.workerLoggingEnabled) {
-			app.rebind(Identifiers.LogService).to(Services.Log.NullLogger);
+			app.rebind(Identifiers.Services.Log.Service).to(Services.Log.NullLogger);
 		}
 
 		// eslint-disable-next-line @typescript-eslint/await-thenable

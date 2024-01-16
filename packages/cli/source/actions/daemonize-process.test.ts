@@ -44,7 +44,7 @@ describe<{
 
 	beforeEach((context) => {
 		const app = new Container();
-		app.bind(Identifiers.Application).toConstantValue(app);
+		app.bind(Identifiers.Application.Instance).toConstantValue(app);
 		app.bind(Identifiers.ProcessManager).toConstantValue(processManager);
 		app.bind(Identifiers.AbortUnknownProcess).toConstantValue(abortUnknownProcess);
 		app.bind(Identifiers.AbortRunningProcess).toConstantValue(abortRunningProcess);

@@ -7,7 +7,7 @@ import { Command } from "./command";
 
 @injectable()
 export class DiscoverCommands {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
 	public within(path: string): CommandList {

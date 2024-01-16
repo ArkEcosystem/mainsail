@@ -34,11 +34,11 @@ describe<{
 		};
 
 		context.app = new Application(new Container());
-		context.app.bind(Identifiers.EventDispatcherService).toConstantValue(new MemoryEventDispatcher());
-		context.app.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
-			Identifiers.ServiceProviderRepository,
+			Identifiers.ServiceProvider.Repository,
 		);
 	});
 

@@ -7,11 +7,11 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	@inject(Identifiers.Cryptography.Size.Signature)
+	@inject(Identifiers.Cryptography.Signature.Size)
 	@tagged("type", "consensus")
 	private readonly signatureSize!: number;
 
-	@inject(Identifiers.Cryptography.Size.SHA256)
+	@inject(Identifiers.Cryptography.Hash.Size.SHA256)
 	private readonly hashSize!: number;
 
 	public lockProofSize(): number {

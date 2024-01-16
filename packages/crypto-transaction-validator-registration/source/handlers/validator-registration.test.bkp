@@ -63,7 +63,7 @@ describe<{
 		context.walletRepository.index(context.recipientWallet);
 
 		const transactionHandlerRegistry: TransactionHandlerRegistry = context.app.get<TransactionHandlerRegistry>(
-			Identifiers.TransactionHandlerRegistry,
+			Identifiers.Transaction.Handler.Registry,
 		);
 		context.handler = transactionHandlerRegistry.getRegisteredHandlerByType(
 			Transactions.InternalTransactionType.from(
@@ -220,7 +220,7 @@ describe<{
 
 	it("emitEvents should dispatch", async (context) => {
 		const emitter: Contracts.Kernel.EventDispatcher = context.app.get<Contracts.Kernel.EventDispatcher>(
-			Identifiers.EventDispatcherService,
+			Identifiers.Services.EventDispatcher.Service,
 		);
 
 		const mock = spy(emitter, "dispatch");
@@ -349,7 +349,7 @@ describe<{
 
 	it("throwIfCannotEnterPool should throw if transaction by sender already in pool", async (context) => {
 		await context.app
-			.get<Mempool>(Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPool.Mempool)
 			.addTransaction(context.delegateRegistrationTransaction);
 
 		await assert.rejects(
@@ -378,7 +378,7 @@ describe<{
 			.build();
 
 		await context.app
-			.get<Mempool>(Identifiers.TransactionPoolMempool)
+			.get<Mempool>(Identifiers.TransactionPool.Mempool)
 			.addTransaction(anotherDelegateRegistrationTransaction);
 
 		await assert.rejects(

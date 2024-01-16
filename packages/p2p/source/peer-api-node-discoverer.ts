@@ -5,26 +5,26 @@ import dayjs from "dayjs";
 
 @injectable()
 export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscoverer {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.PeerApiNodeFactory)
+	@inject(Identifiers.P2P.ApiNode.Factory)
 	private readonly peerApiNodeFactory!: Contracts.P2P.PeerApiNodeFactory;
 
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@inject(Identifiers.PeerApiNodeRepository)
+	@inject(Identifiers.P2P.ApiNode.Repository)
 	private readonly apiNodeRepository!: Contracts.P2P.PeerApiNodeRepository;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.LogService)
+	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	async discoverApiNodes(peer: Contracts.P2P.Peer): Promise<void> {
@@ -33,7 +33,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 
 			for (const apiNode of apiNodes) {
 				await this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptApiNode", { apiNode, options: {} });
 			}
 		} catch (error) {
@@ -53,7 +53,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 		return Promise.all(
 			Object.values(apiNodes).map((apiNode: Contracts.P2P.PeerApiNode) =>
 				this.app
-					.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptApiNode", { apiNode, options: { seed: true } }),
 			),
 		);
@@ -74,7 +74,7 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 				)
 				.map((apiNode) =>
 					this.app
-						.get<Services.Triggers.Triggers>(Identifiers.TriggerService)
+						.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 						.call("revalidateApiNode", { apiNode }),
 				),
 		);

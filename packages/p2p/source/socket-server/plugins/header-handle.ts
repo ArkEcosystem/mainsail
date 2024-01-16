@@ -5,13 +5,13 @@ import { getPeerIp } from "../../utils/get-peer-ip";
 
 @injectable()
 export class HeaderHandlePlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerHeaderService)
+	@inject(Identifiers.P2P.Header.Service)
 	private readonly headerService!: Contracts.P2P.HeaderService;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public register(server) {

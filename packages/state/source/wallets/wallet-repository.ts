@@ -5,13 +5,13 @@ import { WalletIndex } from "./wallet-index";
 
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
-	@inject(Identifiers.WalletRepositoryIndexSet)
+	@inject(Identifiers.State.WalletRepository.IndexSet)
 	protected readonly indexSet!: Contracts.State.IndexSet;
 
-	@inject(Identifiers.WalletFactory)
+	@inject(Identifiers.State.Wallet.Factory)
 	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
 
-	@inject(Identifiers.Cryptography.Identity.AddressFactory)
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	protected readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	protected readonly indexes: Record<string, Contracts.State.WalletIndex> = {};

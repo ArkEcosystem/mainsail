@@ -40,13 +40,15 @@ describe<{
 		context.container = new Container();
 		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
 		context.container
-			.bind(Identifiers.TransactionValidatorFactory)
+			.bind(Identifiers.TransactionPool.TransactionValidator.Factory)
 			.toConstantValue(context.createTransactionValidator);
-		context.container.bind(Identifiers.StateService).toConstantValue(context.stateService);
-		context.container.bind(Identifiers.TransactionPoolService).toConstantValue(context.pool);
-		context.container.bind(Identifiers.TransactionPoolQuery).toConstantValue(context.poolQuery);
-		context.container.bind(Identifiers.TransactionPoolExpirationService).toConstantValue(context.expirationService);
-		context.container.bind(Identifiers.LogService).toConstantValue(context.logger);
+		context.container.bind(Identifiers.State.Service).toConstantValue(context.stateService);
+		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
+		context.container.bind(Identifiers.TransactionPool.Query).toConstantValue(context.poolQuery);
+		context.container
+			.bind(Identifiers.TransactionPool.ExpirationService)
+			.toConstantValue(context.expirationService);
+		context.container.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 

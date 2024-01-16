@@ -47,6 +47,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerHandler(): void {
-		this.app.bind(Identifiers.TransactionHandler).to(VoteTransactionHandler);
+		this.app.bind(Identifiers.Transaction.Handler.Instances).to(VoteTransactionHandler);
 	}
 }

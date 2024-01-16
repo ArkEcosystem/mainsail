@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 
 @injectable()
 export class AddressFactory implements Contracts.Crypto.AddressFactory {
-	@inject(Identifiers.Cryptography.Identity.KeyPairFactory)
+	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
 	@tagged("type", "wallet")
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 

@@ -15,6 +15,6 @@ export class ValidateAndAcceptPeerAction extends Services.Triggers.Action {
 		const ip: string = arguments_.ip;
 		const options: Contracts.P2P.AcceptNewPeerOptions = arguments_.options;
 
-		return this.#app.get<PeerProcessor>(Identifiers.PeerProcessor).validateAndAcceptPeer(ip, options);
+		return this.#app.get<PeerProcessor>(Identifiers.P2P.Peer.Processor).validateAndAcceptPeer(ip, options);
 	}
 }

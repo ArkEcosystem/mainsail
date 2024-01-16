@@ -13,7 +13,7 @@ describe<{ container: Container.Container }>("PrivateKeyFactory", ({ assert, bef
 	beforeEach((context) => {
 		context.container = new Container();
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.bind(Identifiers.Cryptography.Identity.KeyPairFactory).to(KeyPairFactory).inSingletonScope();
+		context.container.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory).inSingletonScope();
 	});
 
 	it("should derive from an mnemonic", async (context) => {

@@ -27,25 +27,25 @@ type DownloadJob = {
 
 @injectable()
 export class MessageDownloader implements Contracts.P2P.Downloader {
-	@inject(Identifiers.PeerCommunicator)
+	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
-	@inject(Identifiers.PeerRepository)
+	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.PeerHeaderFactory)
+	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
-	@inject(Identifiers.PeerBlockDownloader)
+	@inject(Identifiers.P2P.Downloader.Block)
 	private readonly blockDownloader!: Contracts.P2P.Downloader;
 
-	@inject(Identifiers.PeerDisposer)
+	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.Consensus.PrevoteProcessor)
+	@inject(Identifiers.Consensus.Processor.PreVote)
 	private readonly prevoteProcessor!: Contracts.Consensus.PrevoteProcessor;
 
-	@inject(Identifiers.Consensus.PrecommitProcessor)
+	@inject(Identifiers.Consensus.Processor.PreCommit)
 	private readonly precommitProcessor!: Contracts.Consensus.PrecommitProcessor;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
@@ -54,13 +54,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.StateService)
+	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.P2PState)
+	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
 	#fullDownloadsByHeight: Map<number, Set<number>> = new Map();

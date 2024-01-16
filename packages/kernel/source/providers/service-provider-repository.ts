@@ -7,10 +7,10 @@ import { ServiceProvider } from "./service-provider";
 
 @injectable()
 export class ServiceProviderRepository {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.EventDispatcherService)
+	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	readonly #serviceProviders: Map<string, ServiceProvider> = new Map<string, ServiceProvider>();
@@ -89,7 +89,7 @@ export class ServiceProviderRepository {
 		const serviceProvider = this.get(name);
 
 		this.app
-			.bind(Identifiers.PluginConfiguration)
+			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(serviceProvider.config())
 			.whenTargetTagged("plugin", name.split("/")[1]);
 

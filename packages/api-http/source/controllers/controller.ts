@@ -13,7 +13,7 @@ import { BlockModel } from "../resources";
 
 @injectable()
 export class Controller extends AbstractController {
-	@inject(Identifiers.PluginConfiguration)
+	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "api-http")
 	protected readonly apiConfiguration!: Providers.PluginConfiguration;
 

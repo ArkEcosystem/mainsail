@@ -56,13 +56,13 @@ export class Command extends Commands.Command {
 		this.app
 			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(
-				this.environment.getPaths(flags.token, flags.network, this.app.get(Identifiers.ApplicationName)),
+				this.environment.getPaths(flags.token, flags.network, this.app.get(Identifiers.Application.Name)),
 			);
 
 		const configDestination = this.app.getCorePath("config");
 		const configSource = resolve(
 			__dirname,
-			`../../bin/config/${flags.network}/${this.app.get(Identifiers.ApplicationName)}`,
+			`../../bin/config/${flags.network}/${this.app.get(Identifiers.Application.Name)}`,
 		);
 
 		await this.components.taskList([

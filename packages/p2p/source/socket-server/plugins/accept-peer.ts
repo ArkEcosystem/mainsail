@@ -5,10 +5,10 @@ import { getPeerIp } from "../../utils";
 
 @injectable()
 export class AcceptPeerPlugin {
-	@inject(Identifiers.Application)
+	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.PeerProcessor)
+	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server) {
