@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Types } from "@mainsail/kernel";
 
-import { PeerApiNodeProcessor } from "../peer-api-node-processor";
+import { ApiNodeProcessor } from "../api-node-processor";
 
 export class RevalidateApiNodeAction extends Services.Triggers.Action {
 	#app: Contracts.Kernel.Application;
@@ -12,8 +12,8 @@ export class RevalidateApiNodeAction extends Services.Triggers.Action {
 	}
 
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {
-		const apiNode: Contracts.P2P.PeerApiNode = arguments_.apiNode;
+		const apiNode: Contracts.P2P.ApiNode = arguments_.apiNode;
 
-		return this.#app.get<PeerApiNodeProcessor>(Identifiers.P2P.ApiNode.Processor).revalidateApiNode(apiNode);
+		return this.#app.get<ApiNodeProcessor>(Identifiers.P2P.ApiNode.Processor).revalidateApiNode(apiNode);
 	}
 }

@@ -4,12 +4,12 @@ import { Enums } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 @injectable()
-export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor {
+export class ApiNodeProcessor implements Contracts.P2P.ApiNodeProcessor {
 	@inject(Identifiers.P2P.ApiNode.Repository)
-	private readonly repository!: Contracts.P2P.PeerApiNodeRepository;
+	private readonly repository!: Contracts.P2P.ApiNodeRepository;
 
 	@inject(Identifiers.P2P.ApiNode.Verifier)
-	private readonly apiNodeVerifier!: Contracts.P2P.PeerApiNodeVerifier;
+	private readonly apiNodeVerifier!: Contracts.P2P.ApiNodeVerifier;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -18,7 +18,7 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 	private readonly logger!: Contracts.P2P.Logger;
 
 	public async validateAndAcceptApiNode(
-		apiNode: Contracts.P2P.PeerApiNode,
+		apiNode: Contracts.P2P.ApiNode,
 		options: Contracts.P2P.AcceptNewPeerOptions = {},
 	): Promise<void> {
 		if (this.repository.hasApiNode(apiNode) || this.repository.hasPendingApiNode(apiNode)) {
@@ -38,7 +38,7 @@ export class PeerApiNodeProcessor implements Contracts.P2P.PeerApiNodeProcessor 
 		this.repository.forgetPendingApiNode(apiNode);
 	}
 
-	public async revalidateApiNode(apiNode: Contracts.P2P.PeerApiNode): Promise<void> {
+	public async revalidateApiNode(apiNode: Contracts.P2P.ApiNode): Promise<void> {
 		if (!this.repository.hasApiNode(apiNode)) {
 			return;
 		}

@@ -9,10 +9,10 @@ import { Controller } from "./controller";
 @injectable()
 export class ApiNodesController extends Controller {
 	@inject(Identifiers.P2P.ApiNode.Repository)
-	private readonly peerRepository!: Contracts.P2P.PeerApiNodeRepository;
+	private readonly peerRepository!: Contracts.P2P.ApiNodeRepository;
 
 	public async index(request: Hapi.Request) {
-		const allPeers: Contracts.P2P.PeerApiNode[] = [...this.peerRepository.getApiNodes()];
+		const allPeers: Contracts.P2P.ApiNode[] = [...this.peerRepository.getApiNodes()];
 
 		let results = allPeers;
 

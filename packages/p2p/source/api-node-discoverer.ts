@@ -4,7 +4,7 @@ import { Providers, Services, Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 @injectable()
-export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscoverer {
+export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -13,13 +13,13 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.P2P.ApiNode.Factory)
-	private readonly peerApiNodeFactory!: Contracts.P2P.PeerApiNodeFactory;
+	private readonly ApiNodeFactory!: Contracts.P2P.ApiNodeFactory;
 
 	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2P.PeerCommunicator;
 
 	@inject(Identifiers.P2P.ApiNode.Repository)
-	private readonly apiNodeRepository!: Contracts.P2P.PeerApiNodeRepository;
+	private readonly apiNodeRepository!: Contracts.P2P.ApiNodeRepository;
 
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
@@ -47,11 +47,11 @@ export class PeerApiNodeDiscoverer implements Contracts.P2P.PeerApiNodeDiscovere
 			Utils.assert.defined<string>(ip);
 			Utils.assert.defined<string>(port);
 
-			return this.peerApiNodeFactory(ip, port);
+			return this.ApiNodeFactory(ip, port);
 		});
 
 		return Promise.all(
-			Object.values(apiNodes).map((apiNode: Contracts.P2P.PeerApiNode) =>
+			Object.values(apiNodes).map((apiNode: Contracts.P2P.ApiNode) =>
 				this.app
 					.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 					.call("validateAndAcceptApiNode", { apiNode, options: { seed: true } }),

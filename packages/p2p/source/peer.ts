@@ -28,7 +28,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
 
-	public apiNodes: Contracts.P2P.PeerApiNodes = [];
+	public apiNodes: Contracts.P2P.ApiNode[] = [];
 
 	#header: Contracts.P2P.HeaderData | undefined;
 

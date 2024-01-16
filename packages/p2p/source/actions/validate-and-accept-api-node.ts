@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Types } from "@mainsail/kernel";
 
-import { PeerApiNodeProcessor } from "../peer-api-node-processor";
+import { ApiNodeProcessor } from "../api-node-processor";
 
 export class ValidateAndAcceptApiNodeAction extends Services.Triggers.Action {
 	#app: Contracts.Kernel.Application;
@@ -12,11 +12,11 @@ export class ValidateAndAcceptApiNodeAction extends Services.Triggers.Action {
 	}
 
 	public async execute(arguments_: Types.ActionArguments): Promise<void> {
-		const apiNode: Contracts.P2P.PeerApiNode = arguments_.apiNode;
+		const apiNode: Contracts.P2P.ApiNode = arguments_.apiNode;
 		const options: Contracts.P2P.AcceptNewPeerOptions = arguments_.options;
 
 		return this.#app
-			.get<PeerApiNodeProcessor>(Identifiers.P2P.ApiNode.Processor)
+			.get<ApiNodeProcessor>(Identifiers.P2P.ApiNode.Processor)
 			.validateAndAcceptApiNode(apiNode, options);
 	}
 }

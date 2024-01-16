@@ -1,6 +1,8 @@
 import { Dayjs } from "dayjs";
 
 import { Queue } from "../kernel";
+import { ApiNode } from "./api-node";
+import { PeerProtocol } from "./enums";
 import { HeaderData } from "./header";
 
 export interface PeerPorts {
@@ -10,29 +12,6 @@ export interface PeerPorts {
 export interface PeerPlugins {
 	[name: string]: { enabled: boolean; port: number; estimateTotalCount?: boolean };
 }
-
-export enum PeerProtocol {
-	Http = 0,
-	Https = 1,
-}
-
-export interface PeerApiNode {
-	readonly ip: string;
-	readonly port: number;
-	readonly protocol: PeerProtocol;
-
-	url(): string;
-
-	statusCode?: number;
-	latency?: number;
-	lastPinged?: Dayjs;
-
-	// future proof
-	height?: number;
-	version?: string;
-}
-
-export type PeerApiNodes = PeerApiNode[];
 
 export interface Peer {
 	readonly url: string;
@@ -49,7 +28,7 @@ export interface Peer {
 	plugins: PeerPlugins;
 	lastPinged: Dayjs | undefined;
 	sequentialErrorCounter: number;
-	apiNodes: PeerApiNodes;
+	apiNodes: ApiNode[];
 
 	recentlyPinged(): boolean;
 

@@ -3,6 +3,10 @@ import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { RevalidateApiNodeAction, ValidateAndAcceptApiNodeAction, ValidateAndAcceptPeerAction } from "./actions";
+import { ApiNodeDiscoverer } from "./api-node-discoverer";
+import { ApiNodeProcessor } from "./api-node-processor";
+import { ApiNode, ApiNodeRepository } from "./api-node-repository";
+import { ApiNodeVerifier } from "./api-node-verifier";
 import { Broadcaster } from "./broadcaster";
 import { BlockDownloader } from "./downloader/block-downloader";
 import { MessageDownloader } from "./downloader/message-downloader";
@@ -11,10 +15,6 @@ import { Header } from "./header";
 import { HeaderService } from "./header-service";
 import { Logger } from "./logger";
 import { Peer } from "./peer";
-import { PeerApiNodeDiscoverer } from "./peer-api-node-discoverer";
-import { PeerApiNodeProcessor } from "./peer-api-node-processor";
-import { PeerApiNode, PeerApiNodeRepository } from "./peer-api-node-repository";
-import { PeerApiNodeVerifier } from "./peer-api-node-verifier";
 import { PeerCommunicator } from "./peer-communicator";
 import { PeerConnector } from "./peer-connector";
 import { PeerDiscoverer } from "./peer-discoverer";
@@ -97,11 +97,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.P2P.ApiNode.Factory)
-			.toFactory<PeerApiNode, [string, string | number, Contracts.P2P.PeerProtocol?]>(
+			.toFactory<ApiNode, [string, string | number, Contracts.P2P.PeerProtocol?]>(
 				() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
 					const sanitizedIp = sanitizeRemoteAddress(ip);
 					Utils.assert.defined<string>(sanitizedIp);
-					return this.app.resolve(PeerApiNode).init(sanitizedIp, Number(port), protocol);
+					return this.app.resolve(ApiNode).init(sanitizedIp, Number(port), protocol);
 				},
 			);
 
@@ -119,13 +119,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
 
-		this.app.bind(Identifiers.P2P.ApiNode.Repository).to(PeerApiNodeRepository).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Repository).to(ApiNodeRepository).inSingletonScope();
 
-		this.app.bind(Identifiers.P2P.ApiNode.Discoverer).to(PeerApiNodeDiscoverer).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Discoverer).to(ApiNodeDiscoverer).inSingletonScope();
 
-		this.app.bind(Identifiers.P2P.ApiNode.Verifier).to(PeerApiNodeVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Verifier).to(ApiNodeVerifier).inSingletonScope();
 
-		this.app.bind(Identifiers.P2P.ApiNode.Processor).to(PeerApiNodeProcessor).inSingletonScope();
+		this.app.bind(Identifiers.P2P.ApiNode.Processor).to(ApiNodeProcessor).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Peer.Connector).to(PeerConnector).inSingletonScope();
 

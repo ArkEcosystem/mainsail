@@ -18,7 +18,7 @@ export class Service implements Contracts.P2P.Service {
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
 	@inject(Identifiers.P2P.ApiNode.Discoverer)
-	private readonly peerApiNodeDiscoverer!: Contracts.P2P.PeerApiNodeDiscoverer;
+	private readonly ApiNodeDiscoverer!: Contracts.P2P.ApiNodeDiscoverer;
 
 	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
@@ -44,7 +44,7 @@ export class Service implements Contracts.P2P.Service {
 			return;
 		}
 
-		await this.peerApiNodeDiscoverer.populateApiNodesFromConfiguration();
+		await this.ApiNodeDiscoverer.populateApiNodesFromConfiguration();
 
 		await this.peerDiscoverer.populateSeedPeers();
 
@@ -102,8 +102,8 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	async #checkApiNodes(): Promise<void> {
-		await this.peerApiNodeDiscoverer.discoverNewApiNodes();
-		await this.peerApiNodeDiscoverer.refreshApiNodes();
+		await this.ApiNodeDiscoverer.discoverNewApiNodes();
+		await this.ApiNodeDiscoverer.refreshApiNodes();
 
 		if (!this.#disposed) {
 			const nextTimeout = randomNumber(10, 20) * 60 * 1000;
