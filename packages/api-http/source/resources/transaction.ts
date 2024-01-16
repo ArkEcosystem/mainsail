@@ -13,7 +13,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 		// const wallet = await this.walletRepository.findByPublicKey(transactionData.senderPublicKey);
 		// const sender: string = wallet.getAddress();
 		const recipient = resource.recipientId; // ?? sender;
-		// const confirmations: number = this.stateStore.getLastHeight() - blockData.height + 1;
+		// const confirmations: number = this.store.getLastHeight() - blockData.height + 1;
 
 		return {
 			amount: resource.amount,

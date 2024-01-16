@@ -17,7 +17,7 @@ export class Importer implements Contracts.State.Importer {
 
 	async import(
 		maxHeight: number,
-		stateStore: Contracts.State.StateStore,
+		store: Contracts.State.Store,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		// ...
@@ -29,7 +29,7 @@ export class Importer implements Contracts.State.Importer {
 
 		this.logger.info(`Importing state snapshot: ${fileName}`);
 
-		await this.#readFile(fileName, stateStore, walletRepository);
+		await this.#readFile(fileName, store, walletRepository);
 	}
 
 	async #findImportFile(maxHeigh: number): Promise<string | undefined> {
@@ -51,7 +51,7 @@ export class Importer implements Contracts.State.Importer {
 
 	async #readFile(
 		fileName: string,
-		stateStore: Contracts.State.StateStore,
+		store: Contracts.State.Store,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		const readStream = createReadStream(this.app.dataPath(join("state-export", fileName)));
@@ -62,7 +62,7 @@ export class Importer implements Contracts.State.Importer {
 		});
 
 		await this.#readVersion(reader);
-		await this.#readState(reader, stateStore);
+		await this.#readState(reader, store);
 		await this.#readWallets(reader, walletRepository);
 		await this.#readIndexes(reader, walletRepository);
 	}
@@ -77,11 +77,11 @@ export class Importer implements Contracts.State.Importer {
 		await reader[Symbol.asyncIterator]().next(); // Empty Line
 	}
 
-	async #readState(reader: Interface, stateStore: Contracts.State.StateStore): Promise<void> {
+	async #readState(reader: Interface, store: Contracts.State.Store): Promise<void> {
 		const state = (await reader[Symbol.asyncIterator]().next()).value; // State height
 		await reader[Symbol.asyncIterator]().next(); // Empty Line
 
-		stateStore.fromJson(JSON.parse(state));
+		store.fromJson(JSON.parse(state));
 	}
 
 	async #readWallets(reader: Interface, walletRepository: Contracts.State.WalletRepository): Promise<void> {

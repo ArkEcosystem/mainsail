@@ -148,7 +148,7 @@ export class Validator implements Contracts.Validator.Validator {
 			payloadLength += serialized.length;
 		}
 
-		const previousBlock = this.stateService.getStateStore().getLastBlock();
+		const previousBlock = this.stateService.getStore().getLastBlock();
 		const height = previousBlock.data.height + 1;
 
 		return this.blockFactory.make({

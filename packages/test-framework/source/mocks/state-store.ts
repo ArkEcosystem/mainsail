@@ -11,7 +11,7 @@ export const setLastHeight = (height: number) => {
 	lastHeight = height;
 };
 
-class StateStoreMocks implements Partial<Contracts.State.StateStore> {
+class storeMocks implements Partial<Contracts.State.Store> {
 	public getLastBlock(): Contracts.Crypto.Block {
 		return mockBlock as Contracts.Crypto.Block;
 	}
@@ -25,4 +25,4 @@ class StateStoreMocks implements Partial<Contracts.State.StateStore> {
 	}
 }
 
-export const instance = new StateStoreMocks();
+export const instance = new storeMocks();

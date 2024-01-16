@@ -17,7 +17,7 @@ describe<{
 	sandbox: Sandbox;
 	validatorSet: ValidatorSet;
 	walletRepository: any;
-	stateStore: any;
+	store: any;
 	stateService: any;
 	cryptoConfiguration: any;
 }>("ValidatorSet", ({ it, assert, beforeEach }) => {
@@ -41,7 +41,7 @@ describe<{
 			getMilestone: () => milestone,
 		};
 
-		context.stateStore = {
+		context.store = {
 			getLastBlock: () => ({ header: { height: BigNumber.ZERO } }),
 		};
 
@@ -86,7 +86,7 @@ describe<{
 		context.walletRepository = context.sandbox.app.resolve(Wallets.WalletRepository);
 
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
-			getStateStore: () => context.stateStore,
+			getStore: () => context.store,
 			getWalletRepository: () => context.walletRepository,
 		});
 

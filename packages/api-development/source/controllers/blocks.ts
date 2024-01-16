@@ -12,7 +12,7 @@ export class BlocksController extends Controller {
 	private readonly database!: Contracts.Database.DatabaseService;
 
 	public async index(request: Hapi.Request) {
-		const lastBlock = this.stateService.getStateStore().getLastBlock();
+		const lastBlock = this.stateService.getStore().getLastBlock();
 
 		const pagination = this.getQueryPagination(request.query);
 
@@ -44,7 +44,7 @@ export class BlocksController extends Controller {
 	}
 
 	public async first(request: Hapi.Request) {
-		const commit = this.stateService.getStateStore().getGenesisCommit();
+		const commit = this.stateService.getStore().getGenesisCommit();
 
 		if (request.query.transform) {
 			return this.respondWithResource(commit.block, BlockResource, true);
@@ -54,7 +54,7 @@ export class BlocksController extends Controller {
 	}
 
 	public async last(request: Hapi.Request) {
-		const block = this.stateService.getStateStore().getLastBlock();
+		const block = this.stateService.getStore().getLastBlock();
 		if (request.query.transform) {
 			return this.respondWithResource(block, BlockResource, true);
 		} else {

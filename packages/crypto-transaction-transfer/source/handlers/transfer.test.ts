@@ -28,7 +28,7 @@
 // }>("TransferTransaction", ({ assert, afterEach, beforeEach, it, stub }) => {
 // 	beforeEach(async (context) => {
 // 		const mockLastBlockData: Partial<Crypto.IBlockData> = { height: 4, timestamp: Crypto.Slots.getTime() };
-// 		context.store = stub(Stores.StateStore.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
+// 		context.store = stub(Stores.store.prototype, "getLastBlock").returnValue({ data: mockLastBlockData });
 //
 // 		Managers.configManager.setConfig(Generators.generateCryptoConfigRaw());
 //

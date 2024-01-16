@@ -24,7 +24,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 		if (
 			unit.getBlock().data.timestamp <
 			Utils.timestampCalculator.calculateMinimalTimestamp(
-				this.stateService.getStateStore().getLastBlock(),
+				this.stateService.getStore().getLastBlock(),
 				unit.getBlock().data.round,
 				this.configuration,
 			)

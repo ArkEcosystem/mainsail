@@ -50,11 +50,11 @@ export class Bootstrapper {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
-	#stateStore!: Contracts.State.StateStore;
+	#store!: Contracts.State.Store;
 
 	@postConstruct()
 	public initialize(): void {
-		this.#stateStore = this.stateService.getStateStore();
+		this.#store = this.stateService.getStore();
 	}
 
 	public async bootstrap(): Promise<void> {
@@ -77,7 +77,7 @@ export class Bootstrapper {
 			await this.validatorSet.initialize();
 
 			await this.#processBlocks();
-			this.#stateStore.setBootstrap(false);
+			this.#store.setBootstrap(false);
 
 			this.stateVerifier.verifyWalletsConsistency();
 
@@ -96,19 +96,19 @@ export class Bootstrapper {
 		const genesisBlockJson = this.configuration.get("genesisBlock");
 		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
-		this.#stateStore.setGenesisCommit(genesisBlock);
+		this.#store.setGenesisCommit(genesisBlock);
 	}
 
 	async #storeGenesisCommit(): Promise<void> {
 		if (!(await this.databaseService.getLastBlock())) {
-			const genesisBlock = this.#stateStore.getGenesisCommit();
+			const genesisBlock = this.#store.getGenesisCommit();
 			this.databaseService.addCommit(genesisBlock);
 			await this.databaseService.persist();
 		}
 	}
 
 	async #processGenesisBlock(): Promise<void> {
-		const genesisBlock = this.#stateStore.getGenesisCommit();
+		const genesisBlock = this.#store.getGenesisCommit();
 		await this.#processCommit(genesisBlock);
 	}
 
@@ -124,12 +124,12 @@ export class Bootstrapper {
 
 	async #initState(): Promise<void> {
 		// The initial height is > 0 when restoring a snapshot.
-		if (this.#stateStore.getLastHeight() === 0) {
+		if (this.#store.getLastHeight() === 0) {
 			await this.#processGenesisBlock();
 		} else {
-			const block = await this.databaseService.getBlock(this.#stateStore.getLastHeight());
+			const block = await this.databaseService.getBlock(this.#store.getLastHeight());
 			Utils.assert.defined<Contracts.Crypto.Block>(block);
-			this.#stateStore.setLastBlock(block);
+			this.#store.setLastBlock(block);
 		}
 	}
 
@@ -138,7 +138,7 @@ export class Bootstrapper {
 		Utils.assert.defined<Contracts.Crypto.Commit>(lastBlock);
 
 		for await (const commit of this.databaseService.readCommits(
-			this.#stateStore.getLastHeight() + 1,
+			this.#store.getLastHeight() + 1,
 			lastBlock.data.height,
 		)) {
 			await this.#processCommit(commit);

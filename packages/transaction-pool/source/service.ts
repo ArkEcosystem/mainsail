@@ -97,7 +97,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			this.storage.addTransaction({
-				height: this.stateService.getStateStore().getLastHeight(),
+				height: this.stateService.getStore().getLastHeight(),
 				id: transaction.id,
 				senderPublicKey: transaction.data.senderPublicKey,
 				serialized: transaction.serialized,
@@ -135,7 +135,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			let previouslyStoredFailures = 0;
 
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-			const lastHeight: number = this.stateService.getStateStore().getLastHeight();
+			const lastHeight: number = this.stateService.getStore().getLastHeight();
 			const expiredHeight: number = lastHeight - maxTransactionAge;
 
 			for (const { height, id, serialized } of this.storage.getAllTransactions()) {
@@ -265,7 +265,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	async #removeOldTransactions(): Promise<void> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-		const lastHeight: number = this.stateService.getStateStore().getLastHeight();
+		const lastHeight: number = this.stateService.getStore().getLastHeight();
 		const expiredHeight: number = lastHeight - maxTransactionAge;
 
 		for (const { senderPublicKey, id } of this.storage.getOldTransactions(expiredHeight)) {

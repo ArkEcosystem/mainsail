@@ -12,7 +12,7 @@ export class GetStatusController implements Contracts.P2P.Controller {
 	private readonly stateService!: Contracts.State.Service;
 
 	public async handle(request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Contracts.P2P.GetStatusResponse> {
-		const lastBlock = this.stateService.getStateStore().getLastBlock();
+		const lastBlock = this.stateService.getStore().getLastBlock();
 
 		return {
 			config: getPeerConfig(this.app),

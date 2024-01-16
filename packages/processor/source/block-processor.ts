@@ -74,8 +74,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const commit = await unit.getCommit();
 
-		const stateStore = this.stateService.getStateStore();
-		if (!stateStore.isBootstrap()) {
+		const store = this.stateService.getStore();
+		if (!store.isBootstrap()) {
 			this.databaseService.addCommit(commit);
 
 			if (unit.persist) {
@@ -83,8 +83,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
-		stateStore.setTotalRound(stateStore.getTotalRound() + unit.round + 1);
-		stateStore.setLastBlock(commit.block);
+		store.setTotalRound(store.getTotalRound() + unit.round + 1);
+		store.setLastBlock(commit.block);
 
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
@@ -94,7 +94,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.apiSync.onCommit(unit);
 		}
 
-		if (!stateStore.isBootstrap()) {
+		if (!store.isBootstrap()) {
 			this.logger.info(
 				`Block ${commit.block.header.height.toLocaleString()} with ${commit.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
 			);
@@ -106,7 +106,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				this.cryptoConfiguration,
 			);
 
-			if (!stateStore.isBootstrap()) {
+			if (!store.isBootstrap()) {
 				this.logger.debug(
 					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
 				);

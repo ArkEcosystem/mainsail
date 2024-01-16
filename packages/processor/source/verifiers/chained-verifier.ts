@@ -15,6 +15,6 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 			return true;
 		}
 
-		return Utils.isBlockChained(this.stateService.getStateStore().getLastBlock().data, unit.getBlock().data);
+		return Utils.isBlockChained(this.stateService.getStore().getLastBlock().data, unit.getBlock().data);
 	}
 }

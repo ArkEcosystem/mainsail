@@ -66,7 +66,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
 
 	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
-		getStateStore: () => ({
+		getStore: () => ({
 			getLastBlock: () => ({
 				data: {
 					height: 1,

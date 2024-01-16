@@ -5,7 +5,7 @@ import { Enums, Utils } from "@mainsail/kernel";
 import { factory, jsonFactory } from "./attributes";
 
 @injectable()
-export class StateStore implements Contracts.State.StateStore {
+export class Store implements Contracts.State.Store {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -21,17 +21,17 @@ export class StateStore implements Contracts.State.StateStore {
 	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#isBootstrap = true;
-	#originalStateStore?: StateStore;
+	#originalStore?: Store;
 
 	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
 
-	configure(stateStore?: StateStore): StateStore {
-		this.#originalStateStore = stateStore;
+	configure(store?: Store): Store {
+		this.#originalStore = store;
 
-		if (stateStore) {
-			this.#genesisBlock = stateStore.#genesisBlock;
-			this.#lastBlock = stateStore.#lastBlock;
-			this.#isBootstrap = stateStore.#isBootstrap;
+		if (store) {
+			this.#genesisBlock = store.#genesisBlock;
+			this.#lastBlock = store.#lastBlock;
+			this.#isBootstrap = store.#isBootstrap;
 		} else {
 			this.setAttribute("height", 0);
 			this.setAttribute("totalRound", 0);
@@ -95,8 +95,8 @@ export class StateStore implements Contracts.State.StateStore {
 			return true;
 		}
 
-		if (this.#originalStateStore) {
-			return this.#originalStateStore.hasAttribute(key);
+		if (this.#originalStore) {
+			return this.#originalStore.hasAttribute(key);
 		}
 
 		return false;
@@ -122,13 +122,13 @@ export class StateStore implements Contracts.State.StateStore {
 	}
 
 	public commitChanges(): void {
-		if (this.#originalStateStore) {
-			this.#originalStateStore.#lastBlock = this.#lastBlock;
-			this.#originalStateStore.#genesisBlock = this.#genesisBlock;
-			this.#originalStateStore.#isBootstrap = this.#isBootstrap;
+		if (this.#originalStore) {
+			this.#originalStore.#lastBlock = this.#lastBlock;
+			this.#originalStore.#genesisBlock = this.#genesisBlock;
+			this.#originalStore.#isBootstrap = this.#isBootstrap;
 
 			for (const [key, attribute] of this.attributes.entries()) {
-				this.#originalStateStore.setAttribute(key, attribute.get());
+				this.#originalStore.setAttribute(key, attribute.get());
 			}
 		}
 	}
@@ -163,7 +163,7 @@ export class StateStore implements Contracts.State.StateStore {
 			return attribute;
 		}
 
-		Utils.assert.defined<StateStore>(this.#originalStateStore);
-		return this.#originalStateStore?.getAttributeHolder<T>(key);
+		Utils.assert.defined<Store>(this.#originalStore);
+		return this.#originalStore?.getAttributeHolder<T>(key);
 	}
 }
