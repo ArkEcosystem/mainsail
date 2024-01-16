@@ -13,9 +13,15 @@ export class Repository implements Contracts.State.Repository {
 	public constructor(
 		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
 		originalRepository?: Repository,
+		initialData: Record<string, unknown> = {},
 	) {
 		this.attributeRepository = attributeRepository;
 		this.#originalRepository = originalRepository;
+
+		for (const [key, value] of Object.entries(initialData)) {
+			const attribute = factory(this.attributeRepository.getAttributeType(key), value);
+			this.attributes.set(key, attribute);
+		}
 	}
 
 	public isClone(): boolean {
@@ -50,6 +56,18 @@ export class Repository implements Contracts.State.Repository {
 		throw new Error(`Attribute "${key}" is not set.`);
 	}
 
+	public getAttributes(): Record<string, any> {
+		const result = {};
+
+		for (const name of this.attributeRepository.getAttributeNames()) {
+			if (this.hasAttribute(name)) {
+				result[name] = this.getAttribute(name);
+			}
+		}
+
+		return result;
+	}
+
 	public setAttribute<T>(key: string, value: T): void {
 		const attribute = this.attributes.get(key);
 
@@ -82,14 +100,14 @@ export class Repository implements Contracts.State.Repository {
 	}
 
 	public commitChanges(): void {
-		Utils.assert.defined<Repository>(this.#originalRepository);
+		if (this.#originalRepository) {
+			for (const attributeName of this.#forgetAttributes) {
+				this.#originalRepository.forgetAttribute(attributeName);
+			}
 
-		for (const attributeName of this.#forgetAttributes) {
-			this.#originalRepository.forgetAttribute(attributeName);
-		}
-
-		for (const attributeName of this.#setAttributes) {
-			this.#originalRepository.setAttribute(attributeName, this.attributes.get(attributeName)!.get());
+			for (const attributeName of this.#setAttributes) {
+				this.#originalRepository.setAttribute(attributeName, this.attributes.get(attributeName)!.get());
+			}
 		}
 	}
 
@@ -111,8 +129,6 @@ export class Repository implements Contracts.State.Repository {
 		}
 
 		for (const [key, value] of Object.entries(data)) {
-			Utils.assert.defined<Contracts.Types.JsonValue>(value);
-
 			const attribute = jsonFactory(this.attributeRepository.getAttributeType(key), value);
 			this.attributes.set(key, attribute);
 		}

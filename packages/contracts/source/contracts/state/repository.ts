@@ -5,6 +5,7 @@ export interface Repository {
 
 	hasAttribute(key: string): boolean;
 	getAttribute<T = any>(key: string, defaultValue?: T): T;
+	getAttributes(): Record<string, any>;
 	setAttribute<T = any>(key: string, value: T): void;
 	forgetAttribute(key: string): void;
 
