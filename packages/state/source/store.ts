@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
-import { factory, jsonFactory } from "./attributes";
+import { Repository } from "./repository";
 
 @injectable()
 export class Store implements Contracts.State.Store {
@@ -23,18 +23,21 @@ export class Store implements Contracts.State.Store {
 	#isBootstrap = true;
 	#originalStore?: Store;
 
-	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
+	#repository!: Repository;
 
 	configure(store?: Store): Store {
-		this.#originalStore = store;
-
 		if (store) {
+			this.#originalStore = store;
 			this.#genesisBlock = store.#genesisBlock;
 			this.#lastBlock = store.#lastBlock;
 			this.#isBootstrap = store.#isBootstrap;
+
+			this.#repository = new Repository(this.attributeRepository, store.#repository);
 		} else {
-			this.setAttribute("height", 0);
-			this.setAttribute("totalRound", 0);
+			this.#repository = new Repository(this.attributeRepository, undefined, {
+				height: 0,
+				totalRound: 0,
+			});
 		}
 
 		return this;
@@ -91,34 +94,15 @@ export class Store implements Contracts.State.Store {
 	}
 
 	public hasAttribute(key: string): boolean {
-		if (this.attributes.has(key)) {
-			return true;
-		}
-
-		if (this.#originalStore) {
-			return this.#originalStore.hasAttribute(key);
-		}
-
-		return false;
+		return this.#repository.hasAttribute(key);
 	}
 
 	public setAttribute<T>(key: string, value: T): void {
-		let attribute = this.attributes.get(key);
-
-		if (!attribute) {
-			attribute = factory(this.attributeRepository.getAttributeType(key), value);
-			this.attributes.set(key, attribute);
-		} else {
-			attribute.set(value);
-		}
+		this.#repository.setAttribute(key, value);
 	}
 
 	public getAttribute<T>(key: string): T {
-		if (!this.hasAttribute(key)) {
-			throw new Error(`Attribute "${key}" is not set.`);
-		}
-
-		return this.getAttributeHolder<T>(key).get();
+		return this.#repository.getAttribute(key);
 	}
 
 	public commitChanges(): void {
@@ -127,43 +111,15 @@ export class Store implements Contracts.State.Store {
 			this.#originalStore.#genesisBlock = this.#genesisBlock;
 			this.#originalStore.#isBootstrap = this.#isBootstrap;
 
-			for (const [key, attribute] of this.attributes.entries()) {
-				this.#originalStore.setAttribute(key, attribute.get());
-			}
+			this.#repository.commitChanges();
 		}
 	}
 
 	public toJson(): Contracts.Types.JsonObject {
-		const result = {};
-
-		for (const name of this.attributeRepository.getAttributeNames()) {
-			if (this.hasAttribute(name)) {
-				result[name] = this.getAttributeHolder(name).toJson();
-			}
-		}
-
-		return result;
+		return this.#repository.toJson();
 	}
 
 	public fromJson(data: Contracts.Types.JsonObject): void {
-		this.attributes.clear();
-
-		for (const [key, value] of Object.entries(data)) {
-			Utils.assert.defined<Contracts.Types.JsonValue>(value);
-
-			const attribute = jsonFactory(this.attributeRepository.getAttributeType(key), value);
-			this.attributes.set(key, attribute);
-		}
-	}
-
-	protected getAttributeHolder<T>(key: string): Contracts.State.IAttribute<T> {
-		const attribute = this.attributes.get(key) as Contracts.State.IAttribute<T>;
-
-		if (attribute) {
-			return attribute;
-		}
-
-		Utils.assert.defined<Store>(this.#originalStore);
-		return this.#originalStore?.getAttributeHolder<T>(key);
+		this.#repository.fromJson(data);
 	}
 }
