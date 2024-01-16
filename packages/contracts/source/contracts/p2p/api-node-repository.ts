@@ -1,7 +1,7 @@
-import { ApiNode, ApiNodes } from "./peer";
+import { ApiNode } from "./api-node";
 
 export interface ApiNodeRepository {
-	getApiNodes(): ApiNodes;
+	getApiNodes(): ApiNode[];
 	hasApiNode(apiNode: ApiNode): boolean;
 	setApiNode(apiNode: ApiNode): void;
 	forgetApiNode(apiNode: ApiNode): void;

@@ -32,7 +32,7 @@ export class ApiNodeRepository implements Contracts.P2P.ApiNodeRepository {
 	readonly #apiNodes: Map<string, Contracts.P2P.ApiNode> = new Map<string, Contracts.P2P.ApiNode>();
 	readonly #apiNodesPending: Map<string, Contracts.P2P.ApiNode> = new Map<string, Contracts.P2P.ApiNode>();
 
-	public getApiNodes(): Contracts.P2P.ApiNodes {
+	public getApiNodes(): Contracts.P2P.ApiNode[] {
 		return [...this.#apiNodes.values()];
 	}
 

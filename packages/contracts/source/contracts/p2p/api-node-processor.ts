@@ -1,4 +1,4 @@
-import { ApiNode } from "./peer";
+import { ApiNode } from "./api-node";
 
 export interface AcceptNewApiNodeOptions {
 	seed?: boolean;
