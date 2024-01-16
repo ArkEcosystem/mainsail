@@ -3,24 +3,24 @@ import { Enums } from "@mainsail/kernel";
 
 import { describe, Sandbox } from "../../test-framework/distribution";
 import { AttributeRepository } from "./attributes";
-import { StateStore } from "./state-store";
+import { Store } from "./store";
 
 describe<{
 	sandbox: Sandbox;
-	stateStore: StateStore;
+	stateStore: Store;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
 	eventDispatcher: any;
-}>("StateStore", ({ it, beforeEach, assert, spy, stub }) => {
+}>("Store", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
 			notice: () => {},
 		};
 
 		context.cryptoConfiguration = {
-			isNewMilestone: () => false,
 			getMilestoneDiff: () => ({}),
+			isNewMilestone: () => false,
 			setHeight: () => {},
 		};
 
@@ -48,7 +48,7 @@ describe<{
 			Identifiers.State.AttributeRepository,
 		);
 
-		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
+		context.stateStore = context.sandbox.app.resolve(Store).configure();
 	});
 
 	it("#initialize - should set height and totalRound", ({ stateStore }) => {
@@ -164,8 +164,8 @@ describe<{
 
 describe<{
 	sandbox: Sandbox;
-	stateStore: StateStore;
-	stateStoreClone: StateStore;
+	stateStore: Store;
+	stateStoreClone: Store;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
@@ -205,9 +205,9 @@ describe<{
 			Identifiers.State.AttributeRepository,
 		);
 
-		context.stateStore = context.sandbox.app.resolve(StateStore).configure();
+		context.stateStore = context.sandbox.app.resolve(Store).configure();
 
-		context.stateStoreClone = context.sandbox.app.resolve(StateStore).configure(context.stateStore);
+		context.stateStoreClone = context.sandbox.app.resolve(Store).configure(context.stateStore);
 	});
 
 	it("#initialize - should return original height and totalRound, isBootstrap, lastBlock and genesisBlock", ({
@@ -222,7 +222,7 @@ describe<{
 		stateStore.setGenesisCommit(genesisBlock as any);
 		stateStore.setLastBlock(block as any);
 
-		const stateStoreClone = sandbox.app.resolve(StateStore).configure(stateStore);
+		const stateStoreClone = sandbox.app.resolve(Store).configure(stateStore);
 
 		assert.equal(stateStoreClone.getTotalRound(), 2);
 		assert.equal(stateStoreClone.getLastHeight(), 1);

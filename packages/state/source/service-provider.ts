@@ -8,7 +8,7 @@ import { BalanceMutator } from "./mutators/balance";
 import { Service } from "./service";
 import { Exporter } from "./snapshots/exporter";
 import { Importer } from "./snapshots/importer";
-import { StateStore } from "./state-store";
+import { Store } from "./store";
 import { StateVerifier } from "./state-verifier";
 import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
@@ -72,8 +72,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.State.Store.Factory).toFactory(
 			({ container }) =>
-				(originalStateStore?: StateStore) =>
-					container.resolve(StateStore).configure(originalStateStore),
+				(originalStateStore?: Store) =>
+					container.resolve(Store).configure(originalStateStore),
 		);
 
 		this.app.bind(Identifiers.State.Importer).to(Importer);
