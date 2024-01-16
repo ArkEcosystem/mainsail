@@ -8,8 +8,8 @@ import { BalanceMutator } from "./mutators/balance";
 import { Service } from "./service";
 import { Exporter } from "./snapshots/exporter";
 import { Importer } from "./snapshots/importer";
-import { Store } from "./store";
 import { StateVerifier } from "./state-verifier";
+import { Store } from "./store";
 import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory";
 
