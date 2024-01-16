@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Types } from "@mainsail/kernel";
 
-import { ApiNodeProcessor } from "../peer-api-node-processor";
+import { ApiNodeProcessor } from "../api-node-processor";
 
 export class ValidateAndAcceptApiNodeAction extends Services.Triggers.Action {
 	#app: Contracts.Kernel.Application;

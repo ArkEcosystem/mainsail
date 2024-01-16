@@ -4,6 +4,10 @@ import { Providers } from "@mainsail/kernel";
 import { http, HttpResponse } from "@mainsail/utils";
 import dayjs from "dayjs";
 
+// The default API server "/" response
+const helloWorld = { data: "Hello World!" };
+const helloWorldLength = JSON.stringify(helloWorld).length;
+
 @injectable()
 export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 	@inject(Identifiers.P2P.Logger)
@@ -61,7 +65,3 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 		}
 	}
 }
-
-// The default API server "/" response
-const helloWorld = { data: "Hello World!" };
-const helloWorldLength = JSON.stringify(helloWorld).length;
