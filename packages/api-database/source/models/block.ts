@@ -39,12 +39,6 @@ export class Block {
 		nullable: false,
 		type: "integer",
 	})
-	public readonly round!: number;
-
-	@Column({
-		nullable: false,
-		type: "integer",
-	})
 	public readonly numberOfTransactions!: number;
 
 	@Column({
@@ -82,6 +76,18 @@ export class Block {
 		type: "varchar",
 	})
 	public readonly generatorPublicKey!: string;
+
+	@Column({
+		nullable: false,
+		type: "integer",
+	})
+	public readonly round!: number;
+
+	@Column({
+		nullable: false,
+		type: "integer",
+	})
+	public readonly commitRound!: number;
 
 	@Column({
 		nullable: false,
