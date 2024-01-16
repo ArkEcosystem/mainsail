@@ -2,7 +2,7 @@ import { Block } from "../crypto";
 import { Commit } from "../crypto/commit";
 import { JsonObject } from "../types";
 
-export interface StateStore {
+export interface Store {
 	isBootstrap(): boolean;
 	setBootstrap(value: boolean): void;
 
@@ -24,4 +24,4 @@ export interface StateStore {
 	fromJson(data: JsonObject): void;
 }
 
-export type StateStoreFactory = (originalStateStore?: StateStore) => StateStore;
+export type StoreFactory = (originalStore?: Store) => Store;

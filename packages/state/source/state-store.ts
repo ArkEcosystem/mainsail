@@ -5,7 +5,7 @@ import { Enums, Utils } from "@mainsail/kernel";
 import { factory, jsonFactory } from "./attributes";
 
 @injectable()
-export class StateStore implements Contracts.State.StateStore {
+export class StateStore implements Contracts.State.Store {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

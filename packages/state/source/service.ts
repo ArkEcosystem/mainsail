@@ -9,7 +9,7 @@ export class Service implements Contracts.State.Service {
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	@inject(Identifiers.State.Store.Factory)
-	private readonly stateStoreFactory!: Contracts.State.StateStoreFactory;
+	private readonly stateStoreFactory!: Contracts.State.StoreFactory;
 
 	@inject(Identifiers.State.WalletRepository.Base.Factory)
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
@@ -26,7 +26,7 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.Importer)
 	private readonly importer!: Contracts.State.Importer;
 
-	#baseStateStore!: Contracts.State.StateStore;
+	#baseStateStore!: Contracts.State.Store;
 	#baseWalletRepository!: Contracts.State.WalletRepository;
 
 	@postConstruct()
@@ -35,7 +35,7 @@ export class Service implements Contracts.State.Service {
 		this.#baseWalletRepository = this.walletRepositoryFactory();
 	}
 
-	public getStateStore(): Contracts.State.StateStore {
+	public getStateStore(): Contracts.State.Store {
 		return this.#baseStateStore;
 	}
 

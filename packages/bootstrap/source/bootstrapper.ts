@@ -50,7 +50,7 @@ export class Bootstrapper {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
-	#stateStore!: Contracts.State.StateStore;
+	#stateStore!: Contracts.State.Store;
 
 	@postConstruct()
 	public initialize(): void {

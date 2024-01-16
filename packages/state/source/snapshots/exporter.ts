@@ -41,7 +41,7 @@ export class Exporter implements Contracts.State.Exporter {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async export(
-		stateStore: Contracts.State.StateStore,
+		stateStore: Contracts.State.Store,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		const height = stateStore.getLastHeight();
@@ -63,7 +63,7 @@ export class Exporter implements Contracts.State.Exporter {
 
 	async #export(
 		temporaryPath: string,
-		stateStore: Contracts.State.StateStore,
+		stateStore: Contracts.State.Store,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		return new Promise(async (resolve, reject) => {
@@ -94,7 +94,7 @@ export class Exporter implements Contracts.State.Exporter {
 		stream.write("\n");
 	}
 
-	async #exportStateStore(stream: Writable, stateStore: Contracts.State.StateStore): Promise<void> {
+	async #exportStateStore(stream: Writable, stateStore: Contracts.State.Store): Promise<void> {
 		stream.write(`${JSON.stringify(stateStore.toJson())}\n`);
 		stream.write("\n");
 	}

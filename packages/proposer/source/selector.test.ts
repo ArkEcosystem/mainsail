@@ -6,7 +6,7 @@ import { Selector } from "./selector";
 
 type Context = {
 	sandbox: Sandbox;
-	stateStore: Contracts.State.StateStore;
+	stateStore: Contracts.State.Store;
 	stateService: any;
 	validatorSet: any;
 	proposerSelector;

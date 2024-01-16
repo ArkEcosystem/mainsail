@@ -1,9 +1,9 @@
 import { CommitHandler } from "../crypto";
-import { StateStore } from "./state-store";
+import { Store } from "./store";
 import { WalletRepository, WalletRepositoryClone } from "./wallets";
 
 export interface Service extends CommitHandler {
-	getStateStore(): StateStore;
+	getStateStore(): Store;
 	getWalletRepository(): WalletRepository;
 	createWalletRepositoryClone(): WalletRepositoryClone;
 	createWalletRepositoryBySender(publicKey: string): Promise<WalletRepository>;
