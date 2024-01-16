@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { Attributes, store } from "../../state/distribution";
+import { Attributes, Store } from "../../state/distribution";
 import { Selector } from "./selector";
 
 type Context = {
@@ -56,7 +56,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("validatorMatrix", Contracts.State.AttributeType.String);
 
-		context.store = context.sandbox.app.resolve(store).configure();
+		context.store = context.sandbox.app.resolve(Store).configure();
 
 		context.proposerSelector = context.sandbox.app.resolve(Selector);
 	});
