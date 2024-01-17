@@ -109,8 +109,7 @@ export interface WalletRepository {
 	commitChanges(): void;
 }
 
-export type WalletRepositoryFactory = () => WalletRepository;
-export type WalletRepositoryCloneFactory = (originalWalletRepository: WalletRepository) => WalletRepository;
+export type WalletRepositoryFactory = (originalWalletRepository?: WalletRepository) => WalletRepository;
 export type WalletRepositoryBySenderFactory = (
 	originalWalletRepository: WalletRepository,
 	publicKey: string,

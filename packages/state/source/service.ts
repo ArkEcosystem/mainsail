@@ -15,7 +15,7 @@ export class Service implements Contracts.State.Service {
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
 
 	@inject(Identifiers.State.WalletRepository.Clone.Factory)
-	private readonly walletRepositoryCloneFactory!: Contracts.State.WalletRepositoryCloneFactory;
+	private readonly walletRepositoryCloneFactory!: Contracts.State.WalletRepositoryFactory;
 
 	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
