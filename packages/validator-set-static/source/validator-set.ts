@@ -14,7 +14,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (Utils.roundCalculator.isNewRound(unit.getBlock().data.height + 1, this.cryptoConfiguration)) {
+		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.cryptoConfiguration)) {
 			this.#buildActiveValidators(unit.store);
 		}
 	}
@@ -38,10 +38,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	#buildActiveValidators(store: Contracts.State.Store): void {
-		if (this.cryptoConfiguration.getHeight() === 0) {
-			return;
-		}
-
 		this.#validators = [];
 		this.#indexByWalletPublicKey = new Map();
 

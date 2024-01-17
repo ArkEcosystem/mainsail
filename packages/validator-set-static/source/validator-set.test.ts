@@ -47,11 +47,7 @@ describe<{
 		const spyAllValidators = stub(walletRepository, "allValidators").returnValue([wallet, wallet]);
 
 		await validatorSet.onCommit({
-			getBlock: () => ({
-				data: {
-					height: 0,
-				},
-			}),
+			height: 0,
 			store: {
 				walletRepository,
 			},

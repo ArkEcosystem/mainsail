@@ -103,7 +103,7 @@ describe<{
 		store,
 	}) => {
 		await validatorSet.onCommit({
-			getBlock: () => ({ header: { height: 0 } }),
+			height: 0,
 			store,
 		} as Contracts.Processor.ProcessableUnit);
 
@@ -124,7 +124,7 @@ describe<{
 		const { activeValidators } = cryptoConfiguration.getMilestone();
 
 		await validatorSet.onCommit({
-			getBlock: () => ({ header: { height: 0 } }),
+			height: 0,
 			store,
 		} as Contracts.Processor.ProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);
@@ -132,7 +132,7 @@ describe<{
 		let currentHeight = 0;
 		for (let index = 0; index < activeValidators; index++) {
 			await validatorSet.onCommit({
-				getBlock: () => ({ header: { height: currentHeight } }),
+				height: currentHeight,
 				store,
 			} as Contracts.Processor.ProcessableUnit);
 
@@ -145,7 +145,7 @@ describe<{
 		// The ranking now got updated thrice
 		assert.equal(currentHeight, 5);
 		await validatorSet.onCommit({
-			getBlock: () => ({ header: { height: currentHeight } }),
+			height: currentHeight,
 			store,
 		} as Contracts.Processor.ProcessableUnit);
 		assert.equal(buildValidatorRankingSpy.callCount, 3);
@@ -156,7 +156,7 @@ describe<{
 		// Simulate another round
 		for (let index = 0; index < activeValidators - 1; index++) {
 			await validatorSet.onCommit({
-				getBlock: () => ({ header: { height: currentHeight } }),
+				height: currentHeight,
 				store,
 			} as Contracts.Processor.ProcessableUnit);
 			assert.true(buildValidatorRankingSpy.notCalled);
@@ -166,7 +166,7 @@ describe<{
 		// Called again after another round
 		assert.equal(currentHeight, 10);
 		await validatorSet.onCommit({
-			getBlock: () => ({ header: { height: currentHeight } }),
+			height: currentHeight,
 			store,
 		} as Contracts.Processor.ProcessableUnit);
 		assert.true(buildValidatorRankingSpy.calledOnce);

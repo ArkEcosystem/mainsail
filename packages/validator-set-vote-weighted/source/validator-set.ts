@@ -14,8 +14,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#indexByPublicKey: Map<string, number> = new Map();
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { height } = unit.getBlock().header;
-		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
+		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.cryptoConfiguration)) {
 			this.buildValidatorRanking(unit.store);
 		}
 	}
