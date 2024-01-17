@@ -36,7 +36,9 @@ export class Service implements Contracts.State.Service {
 		return this.#baseStore;
 	}
 
-	// TODO: Add comment explaining why this is needed
+	// Store clone is needed so processor can process transactions and make state changes independently of the base store
+	// Many clone states can exists at the same time, if different blocks are proposed
+	// The base store is only updated when a block is committed in onCommit method
 	public createStoreClone(): Contracts.State.Store {
 		return this.storeFactory(this.#baseStore);
 	}

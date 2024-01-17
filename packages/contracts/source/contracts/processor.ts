@@ -24,7 +24,6 @@ export interface BlockProcessor {
 }
 
 export interface TransactionProcessor {
-	// TODO: Use state instead of walletRepository
 	process(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 }
 
