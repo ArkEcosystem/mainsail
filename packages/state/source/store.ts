@@ -99,10 +99,6 @@ export class Store implements Contracts.State.Store {
 		return this.getAttribute("totalRound");
 	}
 
-	public setTotalRound(totalRound: number): void {
-		this.setAttribute("totalRound", totalRound);
-	}
-
 	public hasAttribute(key: string): boolean {
 		return this.#repository.hasAttribute(key);
 	}
@@ -121,7 +117,7 @@ export class Store implements Contracts.State.Store {
 
 	public commitChanges(unit: Contracts.Processor.ProcessableUnit): void {
 		this.setLastBlock(unit.getBlock());
-		this.setTotalRound(this.getTotalRound() + unit.round + 1);
+		this.setAttribute("totalRound", this.getTotalRound() + unit.round + 1);
 
 		if (this.#originalStore) {
 			this.#originalStore.#lastBlock = this.#lastBlock;

@@ -133,11 +133,6 @@ describeSkip<{
 		assert.equal(store.getTotalRound(), 0);
 	});
 
-	it("#setTotalRound - should set totalRound", ({ store }) => {
-		store.setTotalRound(1);
-		assert.equal(store.getTotalRound(), 1);
-	});
-
 	it("#hasAttribute - should return true if attribute is set", ({ store }) => {
 		assert.true(store.hasAttribute("height"));
 		assert.false(store.hasAttribute("customAttribute"));
@@ -237,7 +232,7 @@ describe<{
 		const genesisBlock = { block: { data: { height: 0 } } };
 		const block = { data: { height: 1 } };
 
-		store.setTotalRound(2);
+		store.setAttribute("totalRound", 2);
 		store.setBootstrap(false);
 		store.setGenesisCommit(genesisBlock as any);
 		store.setLastBlock(block as any);
@@ -285,16 +280,6 @@ describe<{
 		assert.equal(storeClone.getLastBlock(), block);
 		assert.equal(store.getLastHeight(), 0);
 		assert.equal(storeClone.getLastHeight(), 1);
-	});
-
-	it("#setTotalRound - should be set only on clone", ({ store, storeClone }) => {
-		assert.equal(store.getTotalRound(), 0);
-		assert.equal(storeClone.getTotalRound(), 0);
-
-		storeClone.setTotalRound(1);
-
-		assert.equal(store.getTotalRound(), 0);
-		assert.equal(storeClone.getTotalRound(), 1);
 	});
 
 	it("#setAttribute - should be set only on clone", ({ store, storeClone }) => {

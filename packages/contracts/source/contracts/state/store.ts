@@ -18,7 +18,6 @@ export interface Store {
 	setLastBlock(block: Block): void;
 
 	getTotalRound(): number;
-	setTotalRound(totalRound: number): void;
 
 	hasAttribute(key: string): boolean;
 	getAttribute<T>(key: string): T;
