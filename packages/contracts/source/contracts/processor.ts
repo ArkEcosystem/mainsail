@@ -1,12 +1,12 @@
 import { Block, Transaction } from "./crypto";
 import { Commit } from "./crypto/commit";
-import { WalletRepository } from "./state";
+import { Store, WalletRepository } from "./state";
 
 export interface ProcessableUnit {
 	readonly height: number;
 	readonly round: number;
 	readonly persist: boolean;
-	getWalletRepository(): WalletRepository;
+	readonly store: Store;
 	hasProcessorResult(): boolean;
 	getProcessorResult(): boolean;
 	setProcessorResult(processorResult: boolean): void;
@@ -24,6 +24,7 @@ export interface BlockProcessor {
 }
 
 export interface TransactionProcessor {
+	// TODO: Use state instead of walletRepository
 	process(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 }
 

@@ -49,6 +49,10 @@ export class Store implements Contracts.State.Store {
 		return this;
 	}
 
+	public get walletRepository(): Contracts.State.WalletRepository {
+		return this.#walletRepository;
+	}
+
 	public isBootstrap(): boolean {
 		return this.#isBootstrap;
 	}

@@ -24,7 +24,7 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 			const sender: string = data.senderPublicKey;
 
 			if (nonceBySender[sender] === undefined) {
-				const wallet = await unit.getWalletRepository().findByPublicKey(sender);
+				const wallet = await unit.store.walletRepository.findByPublicKey(sender);
 				nonceBySender[sender] = wallet.getNonce();
 			}
 

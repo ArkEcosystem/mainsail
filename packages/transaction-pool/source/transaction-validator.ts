@@ -17,7 +17,7 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 
 	@postConstruct()
 	public initialize(): void {
-		this.#walletRepository = this.stateService.createWalletRepositoryClone();
+		this.#walletRepository = this.stateService.createStoreClone().walletRepository;
 	}
 
 	public async validate(transaction: Contracts.Crypto.Transaction): Promise<void> {

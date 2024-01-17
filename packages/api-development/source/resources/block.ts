@@ -13,8 +13,8 @@ export class BlockResource implements Contracts.Api.Resource {
 	public async transform(block: Contracts.Crypto.Block): Promise<object> {
 		const blockData: Contracts.Crypto.BlockData = block.data;
 		const generator: Contracts.State.Wallet = await this.stateService
-			.getWalletRepository()
-			.findByPublicKey(blockData.generatorPublicKey);
+			.getStore()
+			.walletRepository.findByPublicKey(blockData.generatorPublicKey);
 
 		return {
 			forged: {

@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -14,26 +14,20 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.State.ValidatorWallet.Factory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
-	#walletRepository!: Contracts.State.WalletRepository;
-
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
-	@postConstruct()
-	public init(): void {
-		this.#walletRepository = this.stateService.getWalletRepository();
-	}
-
+	// TODO: Check if this is needed
 	public async initialize(): Promise<void> {
-		await this.buildVoteBalances();
-		this.buildValidatorRanking();
+		await this.buildVoteBalances(this.stateService.getStore().walletRepository);
+		this.buildValidatorRanking(this.stateService.getStore().walletRepository);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const commit = await unit.getCommit();
 		const { height } = commit.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
-			this.buildValidatorRanking();
+			this.buildValidatorRanking(unit.store.walletRepository);
 		}
 	}
 
@@ -61,11 +55,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
+	// TODO: Check this method
 	// NOTE: only public for tests
-	public async buildVoteBalances(): Promise<void> {
-		for (const voter of this.#walletRepository.allByPublicKey()) {
+	public async buildVoteBalances(walletRepository: Contracts.State.WalletRepository): Promise<void> {
+		for (const voter of walletRepository.allByPublicKey()) {
 			if (voter.hasVoted()) {
-				const validator: Contracts.State.Wallet = await this.#walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 					voter.getAttribute("vote"),
 				);
 
@@ -76,11 +71,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		}
 	}
 
-	public buildValidatorRanking(): void {
+	public buildValidatorRanking(walletRepository: Contracts.State.WalletRepository): void {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
 
-		for (const wallet of this.#walletRepository.allValidators()) {
+		for (const wallet of walletRepository.allValidators()) {
 			const validator = this.validatorWalletFactory(wallet);
 			if (validator.isResigned()) {
 				validator.unsetRank();

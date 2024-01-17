@@ -17,8 +17,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
+	// TODO: Check if this is needed
 	public async initialize(): Promise<void> {
-		this.#buildActiveValidators();
+		this.#buildActiveValidators(this.stateService.getStore());
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -26,7 +27,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { height } = commit.block.header;
 
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
-			this.#buildActiveValidators();
+			this.#buildActiveValidators(unit.store);
 		}
 	}
 
@@ -48,7 +49,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
-	#buildActiveValidators(): void {
+	#buildActiveValidators(store: Contracts.State.Store): void {
 		if (this.cryptoConfiguration.getHeight() === 0) {
 			return;
 		}
@@ -57,7 +58,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		this.#indexByWalletPublicKey = new Map();
 
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
-		const validators = this.stateService.getWalletRepository().allValidators();
+		const validators = store.walletRepository.allValidators();
 
 		for (let index = 0; index < activeValidators; index++) {
 			const validator = this.validatorWalletFactory(validators[index]);

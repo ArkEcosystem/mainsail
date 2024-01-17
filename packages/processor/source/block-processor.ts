@@ -52,7 +52,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 
 			for (const transaction of unit.getBlock().transactions) {
-				await this.transactionProcessor.process(unit.getWalletRepository(), transaction);
+				await this.transactionProcessor.process(unit.store.walletRepository, transaction);
 			}
 
 			await this.#applyBlockToForger(unit);
@@ -70,7 +70,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.apiSync.beforeCommit();
 		}
 
-		unit.getWalletRepository().commitChanges();
+		// TODO: Move to the end of the commit process
+		unit.store.walletRepository.commitChanges();
 
 		const commit = await unit.getCommit();
 
@@ -130,7 +131,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	async #applyBlockToForger(unit: Contracts.Processor.ProcessableUnit) {
 		const block = unit.getBlock();
-		const walletRepository = unit.getWalletRepository();
+		const walletRepository = unit.store.walletRepository;
 
 		const forgerWallet = await walletRepository.findByPublicKey(unit.getBlock().data.generatorPublicKey);
 

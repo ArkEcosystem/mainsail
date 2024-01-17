@@ -4,6 +4,8 @@ import { JsonObject } from "../types";
 import { WalletRepository } from "./wallets";
 
 export interface Store {
+	readonly walletRepository: WalletRepository;
+
 	isBootstrap(): boolean;
 	setBootstrap(value: boolean): void;
 
@@ -21,7 +23,6 @@ export interface Store {
 	getAttribute<T>(key: string): T;
 	setAttribute<T>(key: string, value: T): void;
 
-	getWalletRepository(): WalletRepository;
 	commitChanges(): void;
 
 	toJson(): JsonObject;

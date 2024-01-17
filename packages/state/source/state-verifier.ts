@@ -16,7 +16,7 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 	verifyWalletsConsistency(): void {
 		this.logger.info(
 			`Number of registered validators: ${Object.keys(
-				this.stateService.getWalletRepository().allValidators(),
+				this.stateService.getStore().walletRepository.allValidators(),
 			).length.toLocaleString()}`,
 		);
 
@@ -27,7 +27,7 @@ export class StateVerifier implements Contracts.State.StateVerifier {
 			this.configuration.get("genesisBlock.block.transactions").map((current) => [current.senderPublicKey, true]),
 		);
 
-		for (const wallet of this.stateService.getWalletRepository().allByAddress()) {
+		for (const wallet of this.stateService.getStore().walletRepository.allByAddress()) {
 			if (wallet.getBalance().isLessThan(0) && !genesisPublicKeys[wallet.getPublicKey()!]) {
 				logNegativeBalance(wallet, "balance", wallet.getBalance());
 
