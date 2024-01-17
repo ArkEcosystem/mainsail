@@ -39,6 +39,11 @@ export class Service implements Contracts.State.Service {
 		return this.#baseStore;
 	}
 
+	// TODO: Add comment explaining why this is needed
+	public getStoreClone(): Contracts.State.Store {
+		return this.storeFactory(this.#baseStore);
+	}
+
 	public getWalletRepository(): Contracts.State.WalletRepository {
 		return this.#baseWalletRepository;
 	}
