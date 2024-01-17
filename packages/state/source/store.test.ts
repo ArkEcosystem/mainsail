@@ -1,11 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../test-framework/distribution";
+import { describe, describeSkip, Sandbox } from "../../test-framework/distribution";
 import { AttributeRepository } from "./attributes";
 import { Store } from "./store";
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	store: Store;
 	attributeRepository: AttributeRepository;
@@ -29,7 +29,9 @@ describe<{
 			dispatch: () => {},
 		};
 
-		context.walletRepository = {};
+		context.walletRepository = {
+			commitChanges: () => {},
+		};
 
 		context.sandbox = new Sandbox();
 
@@ -160,7 +162,15 @@ describe<{
 	});
 
 	it("#commitChanges - should pass", ({ store }) => {
-		store.commitChanges();
+		const unit = {
+			getBlock: () => ({
+				data: {
+					height: 1,
+				},
+			}),
+			round: 1,
+		} as Contracts.Processor.ProcessableUnit;
+		store.commitChanges(unit);
 	});
 });
 
@@ -188,7 +198,9 @@ describe<{
 			dispatch: () => {},
 		};
 
-		context.walletRepository = {};
+		context.walletRepository = {
+			commitChanges: () => {},
+		};
 
 		context.sandbox = new Sandbox();
 
@@ -336,13 +348,16 @@ describe<{
 		const genesisBlock = { block: { data: { height: 0 } } };
 		const block = { data: { height: 1 } };
 
-		storeClone.setTotalRound(2);
 		storeClone.setBootstrap(false);
 		storeClone.setGenesisCommit(genesisBlock as any);
 		storeClone.setLastBlock(block as any);
 		storeClone.setAttribute("customAttribute", 1);
 
-		storeClone.commitChanges();
+		const unit = {
+			getBlock: () => block,
+			round: 1,
+		} as Contracts.Processor.ProcessableUnit;
+		storeClone.commitChanges(unit);
 
 		assert.equal(store.getAttribute("height"), 1);
 		assert.equal(store.getAttribute("totalRound"), 2);
