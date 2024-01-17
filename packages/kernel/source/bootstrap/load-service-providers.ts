@@ -41,12 +41,19 @@ export class LoadServiceProviders implements Bootstrapper {
 		const pluginPath: string | undefined = this.app.config<string>("pluginPath", undefined, "");
 		assert.string(pluginPath);
 
+		const isWorker = this.app.config("worker", undefined, false);
+
 		for (const plugin of plugins) {
 			const installedPlugin = installedPlugins.find((installedPlugin) => installedPlugin.name === plugin.package);
 			const packageId = installedPlugin ? installedPlugin.path : plugin.package;
 
 			const packageModule = join(pluginPath, packageId);
 			const serviceProvider: ServiceProvider = this.app.resolve(require(packageModule).ServiceProvider);
+
+			if (isWorker && !serviceProvider.requiredByWorker()) {
+				continue;
+			}
+
 			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule));
 			serviceProvider.setConfig(this.#discoverConfiguration(serviceProvider, plugin.options, packageModule));
 

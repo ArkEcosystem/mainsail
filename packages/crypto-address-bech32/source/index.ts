@@ -15,6 +15,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerSchemas();
 	}
 
+	public requiredByWorker(): boolean { return true }
+
 	#registerSchemas(): void {
 		for (const schema of Object.values(
 			makeSchemas(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),

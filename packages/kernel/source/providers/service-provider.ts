@@ -93,5 +93,9 @@ export abstract class ServiceProvider {
 		return false;
 	}
 
+	public requiredByWorker(): boolean {
+		return false;
+	}
+
 	public abstract register(): Promise<void>;
 }

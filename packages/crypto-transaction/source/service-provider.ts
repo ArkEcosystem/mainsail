@@ -25,6 +25,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerValidation();
 	}
 
+	public requiredByWorker(): boolean { return true }
+
 	#registerValidation(): void {
 		for (const [name, format] of Object.entries(
 			makeFormats(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),

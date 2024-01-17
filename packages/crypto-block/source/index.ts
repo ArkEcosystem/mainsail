@@ -27,4 +27,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
 		}
 	}
+
+	public requiredByWorker(): boolean { return true }
 }
