@@ -126,6 +126,7 @@ export class Store implements Contracts.State.Store {
 			this.#originalStore.#isBootstrap = this.#isBootstrap;
 
 			this.#repository.commitChanges();
+			this.#walletRepository.commitChanges();
 		}
 	}
 
