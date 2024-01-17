@@ -4,10 +4,6 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
-	// TODO: Check which wallet repository should be used
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
@@ -17,17 +13,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
-	// TODO: Check if this is needed
-	public async initialize(): Promise<void> {
-		await this.buildVoteBalances(this.stateService.getStore().walletRepository);
-		this.buildValidatorRanking(this.stateService.getStore().walletRepository);
-	}
-
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const commit = await unit.getCommit();
 		const { height } = commit.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
-			this.buildValidatorRanking(unit.store.walletRepository);
+			this.buildValidatorRanking(unit.store);
 		}
 	}
 
@@ -57,10 +47,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	// TODO: Check this method
 	// NOTE: only public for tests
-	public async buildVoteBalances(walletRepository: Contracts.State.WalletRepository): Promise<void> {
-		for (const voter of walletRepository.allByPublicKey()) {
+	public async buildVoteBalances(store: Contracts.State.Store): Promise<void> {
+		for (const voter of store.walletRepository.allByPublicKey()) {
 			if (voter.hasVoted()) {
-				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+				const validator: Contracts.State.Wallet = await store.walletRepository.findByPublicKey(
 					voter.getAttribute("vote"),
 				);
 
@@ -71,11 +61,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		}
 	}
 
-	public buildValidatorRanking(walletRepository: Contracts.State.WalletRepository): void {
+	public buildValidatorRanking(store: Contracts.State.Store): void {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
 
-		for (const wallet of walletRepository.allValidators()) {
+		for (const wallet of store.walletRepository.allValidators()) {
 			const validator = this.validatorWalletFactory(wallet);
 			if (validator.isResigned()) {
 				validator.unsetRank();
@@ -108,8 +98,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			return diff;
 		});
 
-		const lastBlock = this.stateService.getStore().getLastBlock();
-		const totalSupply = Utils.supplyCalculator.calculateSupply(lastBlock.header.height, this.cryptoConfiguration);
+		const totalSupply = Utils.supplyCalculator.calculateSupply(
+			store.getLastBlock().header.height,
+			this.cryptoConfiguration,
+		);
 
 		for (let index = 0; index < this.#validators.length; index++) {
 			const validator = this.#validators[index];

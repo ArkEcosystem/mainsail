@@ -4,10 +4,6 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
-	// TODO: Check which wallet repository is used here
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
@@ -16,11 +12,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
-
-	// TODO: Check if this is needed
-	public async initialize(): Promise<void> {
-		this.#buildActiveValidators(this.stateService.getStore());
-	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const commit = await unit.getCommit();
