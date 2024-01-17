@@ -1,5 +1,6 @@
 import { Block } from "../crypto";
 import { Commit } from "../crypto/commit";
+import { ProcessableUnit } from "../processor";
 import { JsonObject } from "../types";
 import { WalletRepository } from "./wallets";
 
@@ -23,7 +24,7 @@ export interface Store {
 	getAttribute<T>(key: string): T;
 	setAttribute<T>(key: string, value: T): void;
 
-	commitChanges(): void;
+	commitChanges(unit: ProcessableUnit): void;
 
 	toJson(): JsonObject;
 	fromJson(data: JsonObject): void;

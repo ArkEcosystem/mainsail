@@ -78,7 +78,6 @@ export class Store implements Contracts.State.Store {
 
 	public setLastBlock(block: Contracts.Crypto.Block): void {
 		this.#lastBlock = block;
-		this.setAttribute("height", block.data.height);
 
 		// NOTE: The configuration is always set to the next height that will be proposed.
 		this.configuration.setHeight(block.data.height + 1);
@@ -119,7 +118,11 @@ export class Store implements Contracts.State.Store {
 		return this.#walletRepository;
 	}
 
-	public commitChanges(): void {
+	public commitChanges(unit: Contracts.Processor.ProcessableUnit): void {
+		this.setLastBlock(unit.getBlock());
+		this.setAttribute("height", unit.height);
+		this.setTotalRound(this.getTotalRound() + unit.round + 1);
+
 		if (this.#originalStore) {
 			this.#originalStore.#lastBlock = this.#lastBlock;
 			this.#originalStore.#genesisBlock = this.#genesisBlock;

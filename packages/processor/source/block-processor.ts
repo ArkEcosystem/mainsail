@@ -70,9 +70,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.apiSync.beforeCommit();
 		}
 
-		// TODO: Move to the end of the commit process
-		unit.store.walletRepository.commitChanges();
-
 		const commit = await unit.getCommit();
 
 		const store = this.stateService.getStore();
@@ -84,9 +81,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
-		store.setTotalRound(store.getTotalRound() + unit.round + 1);
-		store.setLastBlock(commit.block);
-
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
@@ -95,7 +89,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.apiSync.onCommit(unit);
 		}
 
-		for (const transaction of commit.block.transactions) {
+		for (const transaction of unit.getBlock().transactions) {
 			await this.transactionPool.removeForgedTransaction(transaction);
 			await this.#emitTransactionEvents(transaction);
 		}
@@ -111,11 +105,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const height = block.data.height;
 		const totalTransactions = block.data.numberOfTransactions;
 
-		if (!unit.store.isBootstrap()) {
-			this.logger.info(
-				`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`,
-			);
-		}
+		// if (!unit.store.isBootstrap()) {
+		this.logger.info(`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`);
+		// }
 	}
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
