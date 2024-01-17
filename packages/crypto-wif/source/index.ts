@@ -8,5 +8,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Identity.Wif.Factory).to(WIFFactory).inSingletonScope();
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 }

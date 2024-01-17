@@ -17,7 +17,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		logManager.setDefaultDriver("pino");
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 
 	public async dispose(): Promise<void> {
 		await this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).dispose();

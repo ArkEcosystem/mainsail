@@ -8,5 +8,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Cryptography.Validator).to(Validator).inSingletonScope();
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 }

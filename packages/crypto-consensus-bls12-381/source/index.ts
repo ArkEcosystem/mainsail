@@ -59,5 +59,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 }

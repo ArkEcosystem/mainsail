@@ -20,7 +20,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerHandler();
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 
 	#registerFees(): void {
 		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(

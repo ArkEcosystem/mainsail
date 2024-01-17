@@ -42,7 +42,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerSchemas();
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 
 	#registerSchemas(): void {
 		for (const schema of Object.values(schemas)) {

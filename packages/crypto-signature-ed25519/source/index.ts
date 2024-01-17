@@ -18,5 +18,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 }

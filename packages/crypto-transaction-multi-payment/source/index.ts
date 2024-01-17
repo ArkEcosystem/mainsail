@@ -23,7 +23,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerHandler();
 	}
 
-	public requiredByWorker(): boolean { return true }
+	public requiredByWorker(): boolean {
+		return true;
+	}
 
 	#registerKeywords(): void {
 		for (const keyword of Object.values(
