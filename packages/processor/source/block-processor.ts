@@ -105,9 +105,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const height = block.data.height;
 		const totalTransactions = block.data.numberOfTransactions;
 
-		// if (!unit.store.isBootstrap()) {
-		this.logger.info(`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`);
-		// }
+		if (!unit.store.isBootstrap()) {
+			this.logger.info(
+				`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`,
+			);
+		}
 	}
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
