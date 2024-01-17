@@ -45,22 +45,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
-	// TODO: Check this method
-	// NOTE: only public for tests
-	public async buildVoteBalances(store: Contracts.State.Store): Promise<void> {
-		for (const voter of store.walletRepository.allByPublicKey()) {
-			if (voter.hasVoted()) {
-				const validator: Contracts.State.Wallet = await store.walletRepository.findByPublicKey(
-					voter.getAttribute("vote"),
-				);
-
-				const voteBalance: Utils.BigNumber = validator.getAttribute("validatorVoteBalance");
-
-				validator.setAttribute("validatorVoteBalance", voteBalance.plus(voter.getBalance()));
-			}
-		}
-	}
-
 	public buildValidatorRanking(store: Contracts.State.Store): void {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
