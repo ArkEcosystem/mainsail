@@ -104,7 +104,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}
 
-		store.setTotalRound(53);
+		store.setAttribute("totalRound", 53);
 
 		await proposerSelector.onCommit({
 			getCommit: async () => ({ block: { header: { height: activeValidators } } }),
