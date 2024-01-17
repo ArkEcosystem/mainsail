@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { validatorWalletFactory } from "../../state/source/wallets/factory";
 import { describe, Sandbox } from "../../test-framework";
@@ -8,7 +8,6 @@ describe<{
 	sandbox: Sandbox;
 	validatorSet: ValidatorSet;
 	walletRepository: any;
-	stateService: any;
 	validatorWalletFactory: any;
 	cryptoConfiguration: any;
 }>("ValidatorSet", ({ it, assert, beforeEach, stub }) => {
@@ -17,20 +16,22 @@ describe<{
 			allValidators: () => {},
 		};
 
-		context.stateService = {
-			getWalletRepository: () => context.walletRepository,
-		};
-
 		context.cryptoConfiguration = {
+			get: () => [
+				{
+					activeValidators: 2,
+					height: 1,
+				},
+			],
 			getHeight: () => 1,
 			getMilestone: () => ({
 				activeValidators: 2,
+				height: 1,
 			}),
 		};
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
 		context.sandbox.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 
@@ -45,7 +46,16 @@ describe<{
 
 		const spyAllValidators = stub(walletRepository, "allValidators").returnValue([wallet, wallet]);
 
-		await validatorSet.initialize();
+		await validatorSet.onCommit({
+			getBlock: () => ({
+				data: {
+					height: 0,
+				},
+			}),
+			store: {
+				walletRepository,
+			},
+		} as Contracts.Processor.ProcessableUnit);
 		const validators = validatorSet.getActiveValidators();
 		assert.equal(validators.length, 2);
 
