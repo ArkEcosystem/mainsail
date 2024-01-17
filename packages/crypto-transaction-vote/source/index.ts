@@ -23,6 +23,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerHandler();
 	}
 
+	public requiredByWorker(): boolean {
+		return true;
+	}
+
 	#registerKeywords(): void {
 		for (const keyword of Object.values(makeKeywords())) {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
