@@ -12,6 +12,7 @@ describe<{
 	logger: any;
 	cryptoConfiguration: any;
 	eventDispatcher: any;
+	walletRepository: any;
 }>("Store", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
@@ -28,12 +29,17 @@ describe<{
 			dispatch: () => {},
 		};
 
+		context.walletRepository = {};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.State.WalletRepository.Base.Factory)
+			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
@@ -54,6 +60,10 @@ describe<{
 	it("#initialize - should set height and totalRound", ({ store }) => {
 		assert.equal(store.getAttribute("height"), 0);
 		assert.equal(store.getAttribute("totalRound"), 0);
+	});
+
+	it("#walletRepository - should return walletRepository", ({ store, walletRepository }) => {
+		assert.equal(store.walletRepository, walletRepository);
 	});
 
 	it("#isBootstrap - should return true by default", ({ store }) => {
@@ -162,7 +172,8 @@ describe<{
 	logger: any;
 	cryptoConfiguration: any;
 	eventDispatcher: any;
-}>("store - Clone", ({ it, beforeEach, assert, spy, stub }) => {
+	walletRepository: any;
+}>("store - Clone", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		context.logger = {
 			notice: () => {},
@@ -177,12 +188,17 @@ describe<{
 			dispatch: () => {},
 		};
 
+		context.walletRepository = {};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.State.WalletRepository.Base.Factory)
+			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
@@ -219,6 +235,10 @@ describe<{
 		assert.equal(storeClone.getTotalRound(), 2);
 		assert.equal(storeClone.getLastHeight(), 1);
 		assert.false(storeClone.isBootstrap());
+	});
+
+	it("#walletRepository - should return walletRepository", ({ store, walletRepository }) => {
+		assert.equal(store.walletRepository, walletRepository);
 	});
 
 	it("#setBootstrap - should be set only on clone", ({ store, storeClone }) => {
