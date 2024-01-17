@@ -2,6 +2,7 @@ import { BigNumber } from "@mainsail/utils";
 import { JsonObject } from "type-fest";
 
 import { BlockData, MultiSignatureAsset } from "../crypto";
+import { Repository } from "./repository";
 
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
@@ -25,7 +26,8 @@ export enum WalletIndexes {
 	Validators = "validators",
 }
 
-export interface Wallet {
+export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges"> {
+	// TODO: Use one form set / increase
 	getAddress(): string;
 
 	getPublicKey(): string | undefined;
@@ -41,26 +43,15 @@ export interface Wallet {
 	increaseNonce(): void;
 	decreaseNonce(): void;
 
-	hasAttribute(key: string): boolean;
-	getAttribute<T = any>(key: string, defaultValue?: T): T;
-	setAttribute<T = any>(key: string, value: T): boolean;
-	forgetAttribute(key: string): boolean;
-	getAttributes(): Record<string, any>;
-
-	isChanged(): boolean;
-
 	isValidator(): boolean;
 	hasVoted(): boolean;
 	hasMultiSignature(): boolean;
 
 	clone(walletRepository: WalletRepository): Wallet;
-	isClone(): boolean;
 	getOriginal(): Wallet;
 
-	commitChanges(walletRepository: WalletRepository): void;
-
-	toJson(): JsonObject;
 	fromJson(data: JsonObject): Wallet;
+	commitChanges(walletRepository: WalletRepository): void;
 }
 
 export interface ValidatorWallet {
