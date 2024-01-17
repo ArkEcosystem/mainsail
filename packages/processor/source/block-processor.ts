@@ -95,31 +95,40 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.apiSync.onCommit(unit);
 		}
 
-		if (!store.isBootstrap()) {
-			this.logger.info(
-				`Block ${commit.block.header.height.toLocaleString()} with ${commit.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
-			);
-		}
-
-		if (Utils.roundCalculator.isNewRound(commit.block.header.height + 1, this.cryptoConfiguration)) {
-			const roundInfo = Utils.roundCalculator.calculateRound(
-				commit.block.header.height + 1,
-				this.cryptoConfiguration,
-			);
-
-			if (!store.isBootstrap()) {
-				this.logger.debug(
-					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
-				);
-			}
-		}
-
 		for (const transaction of commit.block.transactions) {
 			await this.transactionPool.removeForgedTransaction(transaction);
 			await this.#emitTransactionEvents(transaction);
 		}
 
+		this.#logBlockCommitted(unit);
+		this.#logNewRound(unit);
+
 		void this.events.dispatch(Enums.BlockEvent.Applied, commit);
+	}
+
+	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
+		const block = unit.getBlock();
+		const height = block.data.height;
+		const totalTransactions = block.data.numberOfTransactions;
+
+		if (!unit.store.isBootstrap()) {
+			this.logger.info(
+				`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`,
+			);
+		}
+	}
+
+	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
+		const height = unit.getBlock().data.height;
+		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
+			const roundInfo = Utils.roundCalculator.calculateRound(height + 1, this.cryptoConfiguration);
+
+			if (!unit.store.isBootstrap()) {
+				this.logger.debug(
+					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
+				);
+			}
+		}
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.Transaction): Promise<void> {
