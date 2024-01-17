@@ -9,7 +9,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	#walletRepository!: Contracts.State.WalletRepositoryClone;
+	#walletRepository!: Contracts.State.WalletRepository;
 	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: boolean;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
@@ -47,7 +47,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 		return this;
 	}
 
-	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
+	public getWalletRepository(): Contracts.State.WalletRepository {
 		return this.#walletRepository;
 	}
 

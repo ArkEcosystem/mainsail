@@ -39,7 +39,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#proposer!: Contracts.State.ValidatorWallet;
 
 	#commit: Contracts.Crypto.Commit | undefined;
-	#walletRepository!: Contracts.State.WalletRepositoryClone;
+	#walletRepository!: Contracts.State.WalletRepository;
 
 	@postConstruct()
 	public initialize(): void {
@@ -91,7 +91,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return validator;
 	}
 
-	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
+	public getWalletRepository(): Contracts.State.WalletRepository {
 		return this.#walletRepository;
 	}
 

@@ -97,6 +97,12 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public setDirtyWallet(wallet: Contracts.State.Wallet): void {}
 
+	public getDirtyWallets(): IterableIterator<Contracts.State.Wallet> {
+		return [].values();
+	}
+
+	public commitChanges(): void {}
+
 	protected findOrCreate(address: string): Contracts.State.Wallet {
 		const index = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 		if (!index.has(address)) {

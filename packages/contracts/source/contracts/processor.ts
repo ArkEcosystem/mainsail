@@ -1,12 +1,12 @@
 import { Block, Transaction } from "./crypto";
 import { Commit } from "./crypto/commit";
-import { WalletRepositoryClone } from "./state";
+import { WalletRepository } from "./state";
 
 export interface ProcessableUnit {
 	readonly height: number;
 	readonly round: number;
 	readonly persist: boolean;
-	getWalletRepository(): WalletRepositoryClone;
+	getWalletRepository(): WalletRepository;
 	hasProcessorResult(): boolean;
 	getProcessorResult(): boolean;
 	setProcessorResult(processorResult: boolean): void;
@@ -24,7 +24,7 @@ export interface BlockProcessor {
 }
 
 export interface TransactionProcessor {
-	process(walletRepository: WalletRepositoryClone, transaction: Transaction): Promise<void>;
+	process(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 }
 
 export interface Verifier {

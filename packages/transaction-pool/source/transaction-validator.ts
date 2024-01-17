@@ -13,7 +13,7 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
-	#walletRepository!: Contracts.State.WalletRepositoryClone;
+	#walletRepository!: Contracts.State.WalletRepository;
 
 	@postConstruct()
 	public initialize(): void {

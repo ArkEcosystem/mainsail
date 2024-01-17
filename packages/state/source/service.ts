@@ -43,7 +43,7 @@ export class Service implements Contracts.State.Service {
 		return this.#baseWalletRepository;
 	}
 
-	public createWalletRepositoryClone(): Contracts.State.WalletRepositoryClone {
+	public createWalletRepositoryClone(): Contracts.State.WalletRepository {
 		return this.walletRepositoryCloneFactory(this.getWalletRepository());
 	}
 
