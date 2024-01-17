@@ -1,6 +1,7 @@
 import { Block } from "../crypto";
 import { Commit } from "../crypto/commit";
 import { JsonObject } from "../types";
+import { WalletRepository } from "./wallets";
 
 export interface Store {
 	isBootstrap(): boolean;
@@ -19,6 +20,9 @@ export interface Store {
 	hasAttribute(key: string): boolean;
 	getAttribute<T>(key: string): T;
 	setAttribute<T>(key: string, value: T): void;
+
+	getWalletRepository(): WalletRepository;
+	commitChanges(): void;
 
 	toJson(): JsonObject;
 	fromJson(data: JsonObject): void;

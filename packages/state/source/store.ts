@@ -18,12 +18,16 @@ export class Store implements Contracts.State.Store {
 	@inject(Identifiers.State.AttributeRepository)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
+	@inject(Identifiers.State.WalletRepository.Base.Factory)
+	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
+
 	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#isBootstrap = true;
 	#originalStore?: Store;
 
 	#repository!: Repository;
+	#walletRepository!: Contracts.State.WalletRepository;
 
 	configure(store?: Store): Store {
 		if (store) {
@@ -33,11 +37,13 @@ export class Store implements Contracts.State.Store {
 			this.#isBootstrap = store.#isBootstrap;
 
 			this.#repository = new Repository(this.attributeRepository, store.#repository);
+			this.#walletRepository = this.walletRepositoryFactory(store.#walletRepository);
 		} else {
 			this.#repository = new Repository(this.attributeRepository, undefined, {
 				height: 0,
 				totalRound: 0,
 			});
+			this.#walletRepository = this.walletRepositoryFactory();
 		}
 
 		return this;
@@ -103,6 +109,10 @@ export class Store implements Contracts.State.Store {
 
 	public getAttribute<T>(key: string): T {
 		return this.#repository.getAttribute(key);
+	}
+
+	public getWalletRepository(): Contracts.State.WalletRepository {
+		return this.#walletRepository;
 	}
 
 	public commitChanges(): void {
