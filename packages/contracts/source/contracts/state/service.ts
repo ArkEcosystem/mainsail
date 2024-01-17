@@ -4,7 +4,7 @@ import { WalletRepository } from "./wallets";
 
 export interface Service extends CommitHandler {
 	getStore(): Store;
-	getStoreClone(): Store;
+	createStoreClone(): Store;
 	getWalletRepository(): WalletRepository;
 	createWalletRepositoryClone(): WalletRepository;
 	createWalletRepositoryBySender(publicKey: string): Promise<WalletRepository>;

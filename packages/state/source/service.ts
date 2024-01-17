@@ -37,7 +37,7 @@ export class Service implements Contracts.State.Service {
 	}
 
 	// TODO: Add comment explaining why this is needed
-	public getStoreClone(): Contracts.State.Store {
+	public createStoreClone(): Contracts.State.Store {
 		return this.storeFactory(this.#baseStore);
 	}
 
