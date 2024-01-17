@@ -26,17 +26,17 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.Importer)
 	private readonly importer!: Contracts.State.Importer;
 
-	#basestore!: Contracts.State.Store;
+	#baseStore!: Contracts.State.Store;
 	#baseWalletRepository!: Contracts.State.WalletRepository;
 
 	@postConstruct()
 	public initialize(): void {
-		this.#basestore = this.storeFactory();
+		this.#baseStore = this.storeFactory();
 		this.#baseWalletRepository = this.walletRepositoryFactory();
 	}
 
 	public getStore(): Contracts.State.Store {
-		return this.#basestore;
+		return this.#baseStore;
 	}
 
 	public getWalletRepository(): Contracts.State.WalletRepository {
@@ -52,16 +52,16 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (this.#basestore.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
+		if (this.#baseStore.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
 			return;
 		}
 
 		if (unit.height % this.configuration.getRequired<number>("export.interval") === 0) {
-			await this.exporter.export(this.#basestore, this.#baseWalletRepository);
+			await this.exporter.export(this.#baseStore, this.#baseWalletRepository);
 		}
 	}
 
 	public async restore(maxHeight: number): Promise<void> {
-		await this.importer.import(maxHeight, this.#basestore, this.#baseWalletRepository);
+		await this.importer.import(maxHeight, this.#baseStore, this.#baseWalletRepository);
 	}
 }
