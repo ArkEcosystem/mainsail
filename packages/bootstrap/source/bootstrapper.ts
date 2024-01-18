@@ -129,7 +129,7 @@ export class Bootstrapper {
 			Utils.assert.defined<Contracts.Crypto.Block>(block);
 			this.#store.setLastBlock(block);
 
-			this.validatorSet.restore();
+			this.validatorSet.restore(this.#store);
 		}
 	}
 
@@ -160,7 +160,7 @@ export class Bootstrapper {
 			}
 			await this.blockProcessor.commit(commitState);
 		} catch (error) {
-			await this.app.terminate(`Failed to process block at height ${commit.block.data.height}: ${error.message}`);
+			await this.app.terminate(`Failed to process block at height ${commit.block.data.height}`, error);
 		}
 	}
 }
