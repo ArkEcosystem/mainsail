@@ -10,14 +10,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.State.ValidatorWallet.Factory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
-	public restore(): void {
-		this.#buildActiveValidators(this.stateService.getStore());
+	public restore(store: Contracts.State.Store): void {
+		this.#buildActiveValidators(store);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {

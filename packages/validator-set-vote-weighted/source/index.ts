@@ -7,7 +7,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
-			.set("active-validators", Contracts.State.AttributeType.Object);
+			.set("active-validators", Contracts.State.AttributeType.String);
 
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 	}

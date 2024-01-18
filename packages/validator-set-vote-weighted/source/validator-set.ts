@@ -13,7 +13,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
-	public restore(): void {}
+	public restore(store: Contracts.State.Store): void {
+		const activeValidators = store.getAttribute<string>("activeValidators").split(",");
+
+		this.#validators = activeValidators.map((publicKey) =>
+			this.validatorWalletFactory(store.walletRepository.findByAddress(publicKey)!),
+		);
+	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.cryptoConfiguration)) {
@@ -24,7 +30,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 
-		if (this.#validators.length < activeValidators) {
+		if (this.#validators.length !== activeValidators) {
 			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
 		}
 
@@ -97,5 +103,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			Utils.assert.defined<string>(walletPublicKey);
 			this.#indexByPublicKey.set(walletPublicKey, index);
 		}
+
+		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
 	}
 }
