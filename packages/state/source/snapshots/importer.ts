@@ -15,11 +15,7 @@ export class Importer implements Contracts.State.Importer {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async import(
-		maxHeight: number,
-		store: Contracts.State.Store,
-		walletRepository: Contracts.State.WalletRepository,
-	): Promise<void> {
+	async import(maxHeight: number, store: Contracts.State.Store): Promise<void> {
 		// ...
 		const fileName = await this.#findImportFile(maxHeight);
 		if (!fileName) {
@@ -29,7 +25,7 @@ export class Importer implements Contracts.State.Importer {
 
 		this.logger.info(`Importing state snapshot: ${fileName}`);
 
-		await this.#readFile(fileName, store, walletRepository);
+		await this.#readFile(fileName, store);
 	}
 
 	async #findImportFile(maxHeigh: number): Promise<string | undefined> {
@@ -49,11 +45,7 @@ export class Importer implements Contracts.State.Importer {
 		return undefined;
 	}
 
-	async #readFile(
-		fileName: string,
-		store: Contracts.State.Store,
-		walletRepository: Contracts.State.WalletRepository,
-	): Promise<void> {
+	async #readFile(fileName: string, store: Contracts.State.Store): Promise<void> {
 		const readStream = createReadStream(this.app.dataPath(join("state-export", fileName)));
 		const importStream = new Pumpify(readStream, createGunzip());
 		const reader = readline.createInterface({
@@ -63,8 +55,8 @@ export class Importer implements Contracts.State.Importer {
 
 		await this.#readVersion(reader);
 		await this.#readState(reader, store);
-		await this.#readWallets(reader, walletRepository);
-		await this.#readIndexes(reader, walletRepository);
+		await this.#readWallets(reader, store.walletRepository);
+		await this.#readIndexes(reader, store.walletRepository);
 	}
 
 	async #readVersion(reader: Interface): Promise<void> {
