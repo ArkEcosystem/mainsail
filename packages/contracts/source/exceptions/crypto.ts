@@ -270,7 +270,7 @@ export class WalletNotAValidatorError extends Exception {
 
 export class WalletIsAlreadyValidatorError extends Exception {
 	public constructor() {
-		super(`Failed to apply transaction, because the wallet already has a registered username.`);
+		super(`Failed to apply transaction, because the wallet is already a validator.`);
 	}
 }
 
