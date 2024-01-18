@@ -47,7 +47,8 @@ export class Service implements Contracts.State.Service {
 		}
 
 		if (unit.height % this.configuration.getRequired<number>("export.interval") === 0) {
-			await this.#baseStore.export();
+			// Don't wait for export to finish
+			void this.#baseStore.export();
 		}
 	}
 
