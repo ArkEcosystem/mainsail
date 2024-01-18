@@ -21,7 +21,6 @@ export class Service implements Contracts.State.Service {
 	private readonly importer!: Contracts.State.Importer;
 
 	#baseStore!: Contracts.State.Store;
-	#baseWalletRepository!: Contracts.State.WalletRepository;
 
 	@postConstruct()
 	public initialize(): void {
@@ -56,6 +55,6 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public async restore(maxHeight: number): Promise<void> {
-		await this.importer.import(maxHeight, this.#baseStore, this.#baseWalletRepository);
+		await this.importer.import(maxHeight, this.#baseStore);
 	}
 }
