@@ -10,11 +10,19 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.State.ValidatorWallet.Factory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
 
+	@inject(Identifiers.State.Service)
+	private readonly stateService!: Contracts.State.Service;
+
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
+	public restore(): void {
+		this.#buildActiveValidators(this.stateService.getStore());
+	}
+
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.cryptoConfiguration)) {
+			// No need store validators, because they will result in the same set
 			this.#buildActiveValidators(unit.store);
 		}
 	}

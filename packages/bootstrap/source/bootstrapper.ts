@@ -34,6 +34,9 @@ export class Bootstrapper {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
+
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
@@ -125,6 +128,8 @@ export class Bootstrapper {
 			const block = await this.databaseService.getBlock(this.#store.getLastHeight());
 			Utils.assert.defined<Contracts.Crypto.Block>(block);
 			this.#store.setLastBlock(block);
+
+			this.validatorSet.restore();
 		}
 	}
 
