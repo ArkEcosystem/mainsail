@@ -14,9 +14,6 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
-	@inject(Identifiers.State.Exporter)
-	private readonly exporter!: Contracts.State.Exporter;
-
 	@inject(Identifiers.State.Importer)
 	private readonly importer!: Contracts.State.Importer;
 
@@ -50,7 +47,7 @@ export class Service implements Contracts.State.Service {
 		}
 
 		if (unit.height % this.configuration.getRequired<number>("export.interval") === 0) {
-			await this.exporter.export(this.#baseStore);
+			await this.#baseStore.export();
 		}
 	}
 

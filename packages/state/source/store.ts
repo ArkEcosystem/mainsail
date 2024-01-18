@@ -21,6 +21,9 @@ export class Store implements Contracts.State.Store {
 	@inject(Identifiers.State.WalletRepository.Base.Factory)
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
 
+	@inject(Identifiers.State.Exporter)
+	private readonly exporter!: Contracts.State.Exporter;
+
 	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#isBootstrap = true;
@@ -47,6 +50,22 @@ export class Store implements Contracts.State.Store {
 		}
 
 		return this;
+	}
+
+	public async export(): Promise<void> {
+		const mainRepository = this.#repository;
+		const mainWalletRepository = this.#walletRepository;
+
+		this.#repository = new Repository(this.attributeRepository, mainRepository);
+		this.#walletRepository = this.walletRepositoryFactory(mainWalletRepository);
+
+		await this.exporter.export(this.getLastHeight(), this.#repository, this.#walletRepository);
+
+		this.#repository.commitChanges();
+		this.#walletRepository.commitChanges();
+
+		this.#repository = mainRepository;
+		this.#walletRepository = mainWalletRepository;
 	}
 
 	public get walletRepository(): Contracts.State.WalletRepository {

@@ -25,7 +25,7 @@ export interface Store {
 
 	commitChanges(unit: ProcessableUnit): void;
 
-	toJson(): JsonObject;
+	export(): Promise<void>;
 	fromJson(data: JsonObject): void;
 }
 
