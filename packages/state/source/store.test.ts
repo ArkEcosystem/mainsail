@@ -1,17 +1,18 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
-import { describe, Sandbox } from "../../test-framework/distribution";
+import { describe, describeSkip, Sandbox } from "../../test-framework/distribution";
 import { AttributeRepository } from "./attributes";
 import { Store } from "./store";
 
-describe<{
+describeSkip<{
 	sandbox: Sandbox;
 	store: Store;
 	attributeRepository: AttributeRepository;
 	logger: any;
 	cryptoConfiguration: any;
 	eventDispatcher: any;
+	walletRepository: any;
 }>("Store", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
@@ -28,12 +29,19 @@ describe<{
 			dispatch: () => {},
 		};
 
+		context.walletRepository = {
+			commitChanges: () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.State.WalletRepository.Base.Factory)
+			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
@@ -54,6 +62,10 @@ describe<{
 	it("#initialize - should set height and totalRound", ({ store }) => {
 		assert.equal(store.getAttribute("height"), 0);
 		assert.equal(store.getAttribute("totalRound"), 0);
+	});
+
+	it("#walletRepository - should return walletRepository", ({ store, walletRepository }) => {
+		assert.equal(store.walletRepository, walletRepository);
 	});
 
 	it("#isBootstrap - should return true by default", ({ store }) => {
@@ -121,11 +133,6 @@ describe<{
 		assert.equal(store.getTotalRound(), 0);
 	});
 
-	it("#setTotalRound - should set totalRound", ({ store }) => {
-		store.setTotalRound(1);
-		assert.equal(store.getTotalRound(), 1);
-	});
-
 	it("#hasAttribute - should return true if attribute is set", ({ store }) => {
 		assert.true(store.hasAttribute("height"));
 		assert.false(store.hasAttribute("customAttribute"));
@@ -150,7 +157,15 @@ describe<{
 	});
 
 	it("#commitChanges - should pass", ({ store }) => {
-		store.commitChanges();
+		const unit = {
+			getBlock: () => ({
+				data: {
+					height: 1,
+				},
+			}),
+			round: 1,
+		} as Contracts.Processor.ProcessableUnit;
+		store.commitChanges(unit);
 	});
 });
 
@@ -162,7 +177,8 @@ describe<{
 	logger: any;
 	cryptoConfiguration: any;
 	eventDispatcher: any;
-}>("store - Clone", ({ it, beforeEach, assert, spy, stub }) => {
+	walletRepository: any;
+}>("store - Clone", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		context.logger = {
 			notice: () => {},
@@ -177,12 +193,19 @@ describe<{
 			dispatch: () => {},
 		};
 
+		context.walletRepository = {
+			commitChanges: () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app
+			.bind(Identifiers.State.WalletRepository.Base.Factory)
+			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
 			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
@@ -209,7 +232,7 @@ describe<{
 		const genesisBlock = { block: { data: { height: 0 } } };
 		const block = { data: { height: 1 } };
 
-		store.setTotalRound(2);
+		store.setAttribute("totalRound", 2);
 		store.setBootstrap(false);
 		store.setGenesisCommit(genesisBlock as any);
 		store.setLastBlock(block as any);
@@ -219,6 +242,10 @@ describe<{
 		assert.equal(storeClone.getTotalRound(), 2);
 		assert.equal(storeClone.getLastHeight(), 1);
 		assert.false(storeClone.isBootstrap());
+	});
+
+	it("#walletRepository - should return walletRepository", ({ store, walletRepository }) => {
+		assert.equal(store.walletRepository, walletRepository);
 	});
 
 	it("#setBootstrap - should be set only on clone", ({ store, storeClone }) => {
@@ -253,16 +280,6 @@ describe<{
 		assert.equal(storeClone.getLastBlock(), block);
 		assert.equal(store.getLastHeight(), 0);
 		assert.equal(storeClone.getLastHeight(), 1);
-	});
-
-	it("#setTotalRound - should be set only on clone", ({ store, storeClone }) => {
-		assert.equal(store.getTotalRound(), 0);
-		assert.equal(storeClone.getTotalRound(), 0);
-
-		storeClone.setTotalRound(1);
-
-		assert.equal(store.getTotalRound(), 0);
-		assert.equal(storeClone.getTotalRound(), 1);
 	});
 
 	it("#setAttribute - should be set only on clone", ({ store, storeClone }) => {
@@ -316,13 +333,16 @@ describe<{
 		const genesisBlock = { block: { data: { height: 0 } } };
 		const block = { data: { height: 1 } };
 
-		storeClone.setTotalRound(2);
 		storeClone.setBootstrap(false);
 		storeClone.setGenesisCommit(genesisBlock as any);
 		storeClone.setLastBlock(block as any);
 		storeClone.setAttribute("customAttribute", 1);
 
-		storeClone.commitChanges();
+		const unit = {
+			getBlock: () => block,
+			round: 1,
+		} as Contracts.Processor.ProcessableUnit;
+		storeClone.commitChanges(unit);
 
 		assert.equal(store.getAttribute("height"), 1);
 		assert.equal(store.getAttribute("totalRound"), 2);

@@ -19,6 +19,6 @@ export const getWalletNonce = async (app: Contracts.Kernel.Application, publicKe
 	(
 		await app
 			.get<Contracts.State.Service>(Identifiers.State.Service)
-			.getWalletRepository()
-			.findByPublicKey(publicKey)
+			.getStore()
+			.walletRepository.findByPublicKey(publicKey)
 	).getNonce();

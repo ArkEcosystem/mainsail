@@ -14,7 +14,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 	public async transform(resource: Contracts.Crypto.TransactionData): Promise<object> {
 		AppUtils.assert.defined<string>(resource.senderPublicKey);
 
-		const wallet = await this.stateService.getWalletRepository().findByPublicKey(resource.senderPublicKey);
+		const wallet = await this.stateService.getStore().walletRepository.findByPublicKey(resource.senderPublicKey);
 		const sender: string = wallet.getAddress();
 
 		return {

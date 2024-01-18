@@ -39,6 +39,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 
 		context.sandbox = new Sandbox();
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
+		context.sandbox.app.bind(Identifiers.State.WalletRepository.Base.Factory).toConstantValue(() => {});
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
@@ -103,7 +104,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
 		}
 
-		store.setTotalRound(53);
+		store.setAttribute("totalRound", 53);
 
 		await proposerSelector.onCommit({
 			getCommit: async () => ({ block: { header: { height: activeValidators } } }),

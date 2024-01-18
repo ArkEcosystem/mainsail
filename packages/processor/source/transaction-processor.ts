@@ -12,7 +12,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	async process(
-		walletRepository: Contracts.State.WalletRepositoryClone,
+		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
@@ -38,7 +38,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	}
 
 	async #updateVoteBalances(
-		walletRepository: Contracts.State.WalletRepositoryClone,
+		walletRepository: Contracts.State.WalletRepository,
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet | undefined,
 		transaction: Contracts.Crypto.TransactionData,

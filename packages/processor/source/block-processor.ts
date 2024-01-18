@@ -52,7 +52,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 
 			for (const transaction of unit.getBlock().transactions) {
-				await this.transactionProcessor.process(unit.getWalletRepository(), transaction);
+				await this.transactionProcessor.process(unit.store.walletRepository, transaction);
 			}
 
 			await this.#applyBlockToForger(unit);
@@ -70,8 +70,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.apiSync.beforeCommit();
 		}
 
-		unit.getWalletRepository().commitChanges();
-
 		const commit = await unit.getCommit();
 
 		const store = this.stateService.getStore();
@@ -83,9 +81,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
-		store.setTotalRound(store.getTotalRound() + unit.round + 1);
-		store.setLastBlock(commit.block);
-
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
@@ -94,31 +89,40 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.apiSync.onCommit(unit);
 		}
 
-		if (!store.isBootstrap()) {
-			this.logger.info(
-				`Block ${commit.block.header.height.toLocaleString()} with ${commit.block.header.numberOfTransactions.toLocaleString()} tx(s) committed`,
-			);
+		for (const transaction of unit.getBlock().transactions) {
+			await this.transactionPool.removeForgedTransaction(transaction);
+			await this.#emitTransactionEvents(transaction);
 		}
 
-		if (Utils.roundCalculator.isNewRound(commit.block.header.height + 1, this.cryptoConfiguration)) {
-			const roundInfo = Utils.roundCalculator.calculateRound(
-				commit.block.header.height + 1,
-				this.cryptoConfiguration,
-			);
+		this.#logBlockCommitted(unit);
+		this.#logNewRound(unit);
 
-			if (!store.isBootstrap()) {
+		void this.events.dispatch(Enums.BlockEvent.Applied, commit);
+	}
+
+	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
+		const block = unit.getBlock();
+		const height = block.data.height;
+		const totalTransactions = block.data.numberOfTransactions;
+
+		if (!unit.store.isBootstrap()) {
+			this.logger.info(
+				`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`,
+			);
+		}
+	}
+
+	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
+		const height = unit.getBlock().data.height;
+		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
+			const roundInfo = Utils.roundCalculator.calculateRound(height + 1, this.cryptoConfiguration);
+
+			if (!unit.store.isBootstrap()) {
 				this.logger.debug(
 					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
 				);
 			}
 		}
-
-		for (const transaction of commit.block.transactions) {
-			await this.transactionPool.removeForgedTransaction(transaction);
-			await this.#emitTransactionEvents(transaction);
-		}
-
-		void this.events.dispatch(Enums.BlockEvent.Applied, commit);
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.Transaction): Promise<void> {
@@ -130,7 +134,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	async #applyBlockToForger(unit: Contracts.Processor.ProcessableUnit) {
 		const block = unit.getBlock();
-		const walletRepository = unit.getWalletRepository();
+		const walletRepository = unit.store.walletRepository;
 
 		const forgerWallet = await walletRepository.findByPublicKey(unit.getBlock().data.generatorPublicKey);
 

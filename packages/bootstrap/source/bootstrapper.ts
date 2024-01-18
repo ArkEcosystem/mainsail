@@ -37,9 +37,6 @@ export class Bootstrapper {
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.ValidatorSet.Service)
-	private readonly validatorSet!: Contracts.ValidatorSet.Service;
-
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
@@ -73,8 +70,6 @@ export class Bootstrapper {
 			}
 
 			await this.#initState();
-
-			await this.validatorSet.initialize();
 
 			await this.#processBlocks();
 			this.#store.setBootstrap(false);

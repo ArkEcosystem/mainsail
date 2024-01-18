@@ -13,11 +13,11 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
-	#walletRepository!: Contracts.State.WalletRepositoryClone;
+	#walletRepository!: Contracts.State.WalletRepository;
 
 	@postConstruct()
 	public initialize(): void {
-		this.#walletRepository = this.stateService.createWalletRepositoryClone();
+		this.#walletRepository = this.stateService.createStoreClone().walletRepository;
 	}
 
 	public async validate(transaction: Contracts.Crypto.Transaction): Promise<void> {

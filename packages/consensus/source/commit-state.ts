@@ -9,30 +9,34 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	#walletRepository!: Contracts.State.WalletRepositoryClone;
+	#store!: Contracts.State.Store;
 	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: boolean;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 
 	@postConstruct()
 	public initialize(): void {
-		this.#walletRepository = this.stateService.createWalletRepositoryClone();
+		this.#store = this.stateService.createStoreClone();
 	}
 
-	get height(): number {
+	public get height(): number {
 		return this.#commit.block.data.height;
 	}
 
-	get round(): number {
+	public get round(): number {
 		return this.#commit.proof.round;
 	}
 
-	get persist(): boolean {
+	public get persist(): boolean {
 		return false; // Block downloader will store block in database, to improve performance
 	}
 
-	get validators(): string[] {
+	public get validators(): string[] {
 		return [...this.#validators.keys()];
+	}
+
+	public get store(): Contracts.State.Store {
+		return this.#store;
 	}
 
 	public configure(commit: Contracts.Crypto.Commit): CommitState {
@@ -45,10 +49,6 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 		}
 
 		return this;
-	}
-
-	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
-		return this.#walletRepository;
 	}
 
 	public getBlock(): Contracts.Crypto.Block {

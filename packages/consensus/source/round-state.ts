@@ -39,31 +39,35 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#proposer!: Contracts.State.ValidatorWallet;
 
 	#commit: Contracts.Crypto.Commit | undefined;
-	#walletRepository!: Contracts.State.WalletRepositoryClone;
+	#store!: Contracts.State.Store;
 
 	@postConstruct()
 	public initialize(): void {
-		this.#walletRepository = this.stateService.createWalletRepositoryClone();
+		this.#store = this.stateService.createStoreClone();
 	}
 
-	get height(): number {
+	public get height(): number {
 		return this.#height;
 	}
 
-	get round(): number {
+	public get round(): number {
 		return this.#round;
 	}
 
-	get persist(): boolean {
+	public get persist(): boolean {
 		return true; // Store block in database every time
 	}
 
-	get validators(): string[] {
+	public get validators(): string[] {
 		return [...this.#validators.keys()];
 	}
 
-	get proposer(): Contracts.State.ValidatorWallet {
+	public get proposer(): Contracts.State.ValidatorWallet {
 		return this.#proposer;
+	}
+
+	public get store(): Contracts.State.Store {
+		return this.#store;
 	}
 
 	public configure(height: number, round: number): RoundState {
@@ -89,10 +93,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		const validator = this.#validators.get(consensusPublicKey);
 		Utils.assert.defined<Contracts.State.ValidatorWallet>(validator);
 		return validator;
-	}
-
-	public getWalletRepository(): Contracts.State.WalletRepositoryClone {
-		return this.#walletRepository;
 	}
 
 	public hasProposal(): boolean {

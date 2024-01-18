@@ -250,9 +250,6 @@ export const Identifiers = {
 			BySender: {
 				Factory: Symbol("State<WalletRepository<BySender<Factory>>>"),
 			},
-			Clone: {
-				Factory: Symbol("State<WalletRepository<Clone<Factory>>>"),
-			},
 			IndexSet: Symbol("State<WalletRepository<IndexSet>>"),
 		},
 	},

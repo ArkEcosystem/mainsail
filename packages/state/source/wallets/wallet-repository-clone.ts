@@ -4,7 +4,7 @@ import { Contracts, Exceptions } from "@mainsail/contracts";
 import { WalletRepository } from "./wallet-repository";
 
 @injectable()
-export class WalletRepositoryClone extends WalletRepository implements Contracts.State.WalletRepositoryClone {
+export class WalletRepositoryClone extends WalletRepository implements Contracts.State.WalletRepository {
 	#originalWalletRepository!: WalletRepository;
 
 	readonly #forgetIndexes: Record<string, Set<string>> = {};

@@ -18,12 +18,16 @@ export class Store implements Contracts.State.Store {
 	@inject(Identifiers.State.AttributeRepository)
 	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
 
+	@inject(Identifiers.State.WalletRepository.Base.Factory)
+	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
+
 	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#isBootstrap = true;
 	#originalStore?: Store;
 
 	#repository!: Repository;
+	#walletRepository!: Contracts.State.WalletRepository;
 
 	configure(store?: Store): Store {
 		if (store) {
@@ -33,14 +37,20 @@ export class Store implements Contracts.State.Store {
 			this.#isBootstrap = store.#isBootstrap;
 
 			this.#repository = new Repository(this.attributeRepository, store.#repository);
+			this.#walletRepository = this.walletRepositoryFactory(store.#walletRepository);
 		} else {
 			this.#repository = new Repository(this.attributeRepository, undefined, {
 				height: 0,
 				totalRound: 0,
 			});
+			this.#walletRepository = this.walletRepositoryFactory();
 		}
 
 		return this;
+	}
+
+	public get walletRepository(): Contracts.State.WalletRepository {
+		return this.#walletRepository;
 	}
 
 	public isBootstrap(): boolean {
@@ -89,10 +99,6 @@ export class Store implements Contracts.State.Store {
 		return this.getAttribute("totalRound");
 	}
 
-	public setTotalRound(totalRound: number): void {
-		this.setAttribute("totalRound", totalRound);
-	}
-
 	public hasAttribute(key: string): boolean {
 		return this.#repository.hasAttribute(key);
 	}
@@ -105,13 +111,21 @@ export class Store implements Contracts.State.Store {
 		return this.#repository.getAttribute(key);
 	}
 
-	public commitChanges(): void {
+	public getWalletRepository(): Contracts.State.WalletRepository {
+		return this.#walletRepository;
+	}
+
+	public commitChanges(unit: Contracts.Processor.ProcessableUnit): void {
+		this.setLastBlock(unit.getBlock());
+		this.setAttribute("totalRound", this.getTotalRound() + unit.round + 1);
+
 		if (this.#originalStore) {
 			this.#originalStore.#lastBlock = this.#lastBlock;
 			this.#originalStore.#genesisBlock = this.#genesisBlock;
 			this.#originalStore.#isBootstrap = this.#isBootstrap;
 
 			this.#repository.commitChanges();
+			this.#walletRepository.commitChanges();
 		}
 	}
 

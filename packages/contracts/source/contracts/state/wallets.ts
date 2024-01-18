@@ -85,45 +85,31 @@ export type WalletMultiSignatureAttributes = MultiSignatureAsset & { legacy?: bo
 
 export interface WalletRepository {
 	allByAddress(): ReadonlyArray<Wallet>;
-
 	allByPublicKey(): ReadonlyArray<Wallet>;
-
 	allValidators(): ReadonlyArray<Wallet>;
-
 	allByIndex(indexName: string): ReadonlyArray<Wallet>;
 
 	findByAddress(address: string): Wallet;
-
 	findByPublicKey(publicKey: string): Promise<Wallet>;
-
 	findByUsername(username: string): Wallet;
-
 	findByIndex(index: string, key: string): Wallet;
 
 	hasByAddress(address: string): boolean;
-
 	hasByPublicKey(publicKey: string): boolean;
-
 	hasByUsername(username: string): boolean;
-
 	hasByIndex(indexName: string, key: string): boolean;
 
 	getIndex(name: string): WalletIndex;
-
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
-
 	forgetOnIndex(index: string, key: string): void;
 
 	setDirtyWallet(wallet: Wallet): void;
-}
-
-export interface WalletRepositoryClone extends WalletRepository {
 	getDirtyWallets(): IterableIterator<Wallet>;
+
 	commitChanges(): void;
 }
 
-export type WalletRepositoryFactory = () => WalletRepository;
-export type WalletRepositoryCloneFactory = (originalWalletRepository: WalletRepository) => WalletRepositoryClone;
+export type WalletRepositoryFactory = (originalWalletRepository?: WalletRepository) => WalletRepository;
 export type WalletRepositoryBySenderFactory = (
 	originalWalletRepository: WalletRepository,
 	publicKey: string,

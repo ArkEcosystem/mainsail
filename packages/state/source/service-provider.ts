@@ -52,14 +52,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.State.WalletRepository.Base.Factory).toFactory(
 			({ container }) =>
-				() =>
-					container.resolve(WalletRepository),
-		);
-
-		this.app.bind(Identifiers.State.WalletRepository.Clone.Factory).toFactory(
-			({ container }) =>
 				(walletRepository: WalletRepository) =>
-					container.resolve(WalletRepositoryClone).configure(walletRepository),
+					walletRepository
+						? container.resolve(WalletRepositoryClone).configure(walletRepository)
+						: container.resolve(WalletRepository),
 		);
 
 		this.app.bind(Identifiers.State.WalletRepository.BySender.Factory).toFactory(
