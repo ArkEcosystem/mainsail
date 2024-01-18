@@ -148,10 +148,6 @@ export class Store implements Contracts.State.Store {
 		}
 	}
 
-	public toJson(): Contracts.Types.JsonObject {
-		return this.#repository.toJson();
-	}
-
 	public fromJson(data: Contracts.Types.JsonObject): void {
 		this.#repository.fromJson(data);
 	}
