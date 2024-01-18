@@ -11,9 +11,6 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.Store.Factory)
 	private readonly storeFactory!: Contracts.State.StoreFactory;
 
-	@inject(Identifiers.State.WalletRepository.Base.Factory)
-	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
-
 	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
@@ -29,7 +26,6 @@ export class Service implements Contracts.State.Service {
 	@postConstruct()
 	public initialize(): void {
 		this.#baseStore = this.storeFactory();
-		this.#baseWalletRepository = this.walletRepositoryFactory();
 	}
 
 	public getStore(): Contracts.State.Store {
@@ -43,16 +39,8 @@ export class Service implements Contracts.State.Service {
 		return this.storeFactory(this.#baseStore);
 	}
 
-	public getWalletRepository(): Contracts.State.WalletRepository {
-		return this.#baseWalletRepository;
-	}
-
-	public createWalletRepositoryClone(): Contracts.State.WalletRepository {
-		return this.walletRepositoryFactory(this.getWalletRepository());
-	}
-
 	public async createWalletRepositoryBySender(publicKey: string): Promise<Contracts.State.WalletRepository> {
-		return this.walletRepositoryBySenderFactory(this.getWalletRepository(), publicKey);
+		return this.walletRepositoryBySenderFactory(this.#baseStore.walletRepository, publicKey);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -63,7 +51,7 @@ export class Service implements Contracts.State.Service {
 		}
 
 		if (unit.height % this.configuration.getRequired<number>("export.interval") === 0) {
-			await this.exporter.export(this.#baseStore, this.#baseWalletRepository);
+			await this.exporter.export(this.#baseStore);
 		}
 	}
 

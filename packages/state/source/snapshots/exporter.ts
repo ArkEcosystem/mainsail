@@ -40,10 +40,7 @@ export class Exporter implements Contracts.State.Exporter {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async export(
-		store: Contracts.State.Store,
-		walletRepository: Contracts.State.WalletRepository,
-	): Promise<void> {
+	public async export(store: Contracts.State.Store): Promise<void> {
 		const height = store.getLastHeight();
 
 		ensureDirSync(this.app.tempPath("state-export"));
@@ -51,7 +48,7 @@ export class Exporter implements Contracts.State.Exporter {
 
 		this.logger.info(`Exporting state at height ${height}`);
 
-		await this.#export(temporaryPath, store, walletRepository);
+		await this.#export(temporaryPath, store);
 
 		ensureDirSync(this.app.dataPath("state-export"));
 		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${height}.gz`)));
@@ -61,19 +58,15 @@ export class Exporter implements Contracts.State.Exporter {
 		this.logger.info(`State export done for height ${height}`);
 	}
 
-	async #export(
-		temporaryPath: string,
-		store: Contracts.State.Store,
-		walletRepository: Contracts.State.WalletRepository,
-	): Promise<void> {
+	async #export(temporaryPath: string, store: Contracts.State.Store): Promise<void> {
 		return new Promise(async (resolve, reject) => {
 			const writeStream = createWriteStream(temporaryPath);
 			const exportStream = new Pumpify(createGzip(), writeStream);
 
 			await this.#exportVersion(exportStream);
-			await this.#exportstore(exportStream, store);
-			await this.#exportWallets(exportStream, walletRepository);
-			await this.#exportIndexes(exportStream, walletRepository);
+			await this.#exportStore(exportStream, store);
+			await this.#exportWallets(exportStream, store.walletRepository);
+			await this.#exportIndexes(exportStream, store.walletRepository);
 
 			exportStream.end();
 
@@ -94,7 +87,7 @@ export class Exporter implements Contracts.State.Exporter {
 		stream.write("\n");
 	}
 
-	async #exportstore(stream: Writable, store: Contracts.State.Store): Promise<void> {
+	async #exportStore(stream: Writable, store: Contracts.State.Store): Promise<void> {
 		stream.write(`${JSON.stringify(store.toJson())}\n`);
 		stream.write("\n");
 	}
