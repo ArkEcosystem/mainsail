@@ -31,6 +31,7 @@ export class Store implements Contracts.State.Store {
 
 	#repository!: Repository;
 	#walletRepository!: Contracts.State.WalletRepository;
+	#isExporting = false;
 
 	configure(store?: Store): Store {
 		if (store) {
@@ -53,6 +54,12 @@ export class Store implements Contracts.State.Store {
 	}
 
 	public async export(): Promise<void> {
+		if (this.#isExporting) {
+			return;
+		}
+
+		this.#isExporting = true;
+
 		const mainRepository = this.#repository;
 		const mainWalletRepository = this.#walletRepository;
 
@@ -63,6 +70,8 @@ export class Store implements Contracts.State.Store {
 
 		this.#repository.commitChanges();
 		this.#walletRepository.commitChanges();
+
+		this.#isExporting = false;
 
 		this.#repository = mainRepository;
 		this.#walletRepository = mainWalletRepository;
