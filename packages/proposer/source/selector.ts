@@ -15,13 +15,17 @@ export class Selector implements Contracts.Proposer.Selector {
 		const commit = await unit.getCommit();
 		const { height } = commit.block.header;
 		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
-			const { activeValidators } = this.configuration.getMilestone();
+			const { activeValidators } = this.configuration.getMilestone(
+				Math.max(this.configuration.getHeight(), 1)
+			);
 			this.#updateValidatorMatrix(activeValidators);
 		}
 	}
 
 	public getValidatorIndex(round: number): number {
-		const { activeValidators } = this.configuration.getMilestone();
+		const { activeValidators } = this.configuration.getMilestone(
+			Math.max(this.configuration.getHeight(), 1)
+		);
 
 		const offset = (this.stateService.getStore().getTotalRound() + round) % activeValidators;
 		const result = JSON.parse(this.stateService.getStore().getAttribute("validatorMatrix"))[
