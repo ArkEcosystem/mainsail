@@ -43,13 +43,13 @@ describeSkip<{
 			.bind(Identifiers.State.WalletRepository.Base.Factory)
 			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
 		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(
@@ -207,13 +207,13 @@ describe<{
 			.bind(Identifiers.State.WalletRepository.Base.Factory)
 			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
 		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(

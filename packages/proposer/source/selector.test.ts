@@ -48,13 +48,13 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			.to(Attributes.AttributeRepository)
 			.inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("validatorMatrix", Contracts.State.AttributeType.String);
 
 		context.store = context.sandbox.app.resolve(Store).configure();

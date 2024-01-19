@@ -182,7 +182,7 @@ describe<{
 		app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-		app.bind<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
+		app.bind<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
 			getAttributeRepository(),
 		);
 		app.bind(Identifiers.State.Service).toConstantValue({});

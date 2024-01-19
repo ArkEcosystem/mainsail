@@ -3,7 +3,7 @@ import { cloneDeep } from "@mainsail/utils";
 
 import { GenericAttribute } from "./generic-attribute";
 
-export class ObjectAttribute extends GenericAttribute<object> implements Contracts.State.IAttribute<object> {
+export class ObjectAttribute extends GenericAttribute<object> implements Contracts.State.Attribute<object> {
 	public clone(): ObjectAttribute {
 		return new ObjectAttribute(cloneDeep(this.get()));
 	}

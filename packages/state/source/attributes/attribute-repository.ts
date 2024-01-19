@@ -2,7 +2,7 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 @injectable()
-export class AttributeRepository implements Contracts.State.IAttributeRepository {
+export class AttributeRepository implements Contracts.State.AttributeRepository {
 	#attributes: Map<string, Contracts.State.AttributeType> = new Map();
 
 	public set(name: string, type: Contracts.State.AttributeType): void {

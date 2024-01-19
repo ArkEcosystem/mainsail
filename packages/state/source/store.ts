@@ -16,7 +16,7 @@ export class Store implements Contracts.State.Store {
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.State.AttributeRepository)
-	private readonly attributeRepository!: Contracts.State.IAttributeRepository;
+	private readonly attributeRepository!: Contracts.State.AttributeRepository;
 
 	@inject(Identifiers.State.WalletRepository.Base.Factory)
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
