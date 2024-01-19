@@ -72,7 +72,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 51,
+						activeValidators: 0,
 						address: match.object,
 						block: match.object,
 						blockTime: 9000,
@@ -82,6 +82,10 @@ describe<{
 						reward: "0",
 						satoshi: match.object,
 						vendorFieldLength: 255,
+					}),
+					match({
+						height: 1,
+						activeValidators: 51,
 					}),
 					match({
 						height: 23_000,
@@ -363,7 +367,7 @@ describe<{
 				},
 				milestones: [
 					match({
-						activeValidators: 47,
+						activeValidators: 0,
 						address: match.object,
 						block: match.object,
 						blockTime: 9000,
@@ -373,6 +377,10 @@ describe<{
 						reward: "0", // TODO: Check
 						satoshi: match.object,
 						vendorFieldLength: 64,
+					}),
+					match({
+						height: 1,
+						activeValidators: 47,
 					}),
 					match({
 						height: 23_000,

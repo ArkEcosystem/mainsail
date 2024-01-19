@@ -8,7 +8,7 @@ export class MilestonesGenerator {
 	setInitial(options: Contracts.NetworkGenerator.MilestoneOptions): MilestonesGenerator {
 		this.#data = [
 			{
-				activeValidators: options.validators,
+				activeValidators: 0,
 				address: options.address,
 				block: {
 					maxPayload: options.maxBlockPayload,
@@ -27,7 +27,10 @@ export class MilestonesGenerator {
 				stageTimeout: 2000,
 				stageTimeoutIncrease: 2000,
 				vendorFieldLength: options.vendorFieldLength,
-			},
+			}, {
+				activeValidators: options.validators,
+				height: 1,
+			}
 		];
 
 		return this;
