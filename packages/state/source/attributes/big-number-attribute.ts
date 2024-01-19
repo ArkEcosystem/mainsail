@@ -3,7 +3,7 @@ import { BigNumber } from "@mainsail/utils";
 
 import { GenericAttribute } from "./generic-attribute";
 
-export class BigNumberAttribute extends GenericAttribute<BigNumber> implements Contracts.State.IAttribute<BigNumber> {
+export class BigNumberAttribute extends GenericAttribute<BigNumber> implements Contracts.State.Attribute<BigNumber> {
 	public clone(): BigNumberAttribute {
 		return new BigNumberAttribute(new BigNumber(this.get()));
 	}
@@ -16,7 +16,7 @@ export class BigNumberAttribute extends GenericAttribute<BigNumber> implements C
 		return this.value.toString();
 	}
 
-	public fromJson(value: Contracts.Types.JsonValue): Contracts.State.IAttribute<BigNumber> {
+	public fromJson(value: Contracts.Types.JsonValue): Contracts.State.Attribute<BigNumber> {
 		if (typeof value !== "string") {
 			throw new TypeError(`Value ${value} is not valid for attribute [${this.constructor.name}].`);
 		}

@@ -32,16 +32,16 @@ describeSkip<{
 
 		sandbox.app.bind(Identifiers.State.Wallet.Attributes).to(AttributeRepository).inSingletonScope();
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("nonce", Contracts.State.AttributeType.BigNumber);
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("balance", Contracts.State.AttributeType.BigNumber);
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("publicKey", Contracts.State.AttributeType.String);
 		sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes)
 			.set("validatorUsername", Contracts.State.AttributeType.String);
 
 		app.bind(Identifiers.Cryptography.Identity.AddressFactory).to(AddressFactory).inSingletonScope();

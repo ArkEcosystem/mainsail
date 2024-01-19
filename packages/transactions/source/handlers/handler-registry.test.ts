@@ -46,7 +46,7 @@ abstract class TestTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
@@ -64,7 +64,7 @@ abstract class TestDeactivatedTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "deactivated_test";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
@@ -82,7 +82,7 @@ abstract class TestWithDependencyTransaction extends Transaction {
 	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Test;
 	public static key = "test_with_dependency";
 
-	async deserialize(buf: ByteBuffer): Promise<void> {}
+	async deserialize(buf: ByteBuffer): Promise<void> { }
 
 	async serialize(): Promise<ByteBuffer | undefined> {
 		return undefined;
@@ -116,9 +116,9 @@ class TestTransactionHandler extends TransactionHandler {
 		return true;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 }
 
 class TestDeactivatedTransactionHandler extends TransactionHandler {
@@ -142,9 +142,9 @@ class TestDeactivatedTransactionHandler extends TransactionHandler {
 		return false;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 }
 
 class TestWithDependencyTransactionHandler extends TransactionHandler {
@@ -168,9 +168,9 @@ class TestWithDependencyTransactionHandler extends TransactionHandler {
 		return false;
 	}
 
-	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> {}
+	async applyToRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 
-	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> {}
+	async revertForRecipient(transaction: Contracts.Crypto.Transaction): Promise<void> { }
 }
 
 describe<{
@@ -182,7 +182,7 @@ describe<{
 		app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-		app.bind<Contracts.State.IAttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
+		app.bind<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
 			getAttributeRepository(),
 		);
 		app.bind(Identifiers.State.Service).toConstantValue({});

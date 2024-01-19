@@ -20,11 +20,11 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 		};
 
 		context.validatorSet = {
-			getActiveValidators: () => {},
+			getActiveValidators: () => { },
 		};
 
 		context.logger = {
-			info: () => {},
+			info: () => { },
 		};
 
 		const milestone = {
@@ -39,7 +39,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 
 		context.sandbox = new Sandbox();
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
-		context.sandbox.app.bind(Identifiers.State.WalletRepository.Base.Factory).toConstantValue(() => {});
+		context.sandbox.app.bind(Identifiers.State.WalletRepository.Base.Factory).toConstantValue(() => { });
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
@@ -48,13 +48,13 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			.to(Attributes.AttributeRepository)
 			.inSingletonScope();
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("validatorMatrix", Contracts.State.AttributeType.String);
 
 		context.store = context.sandbox.app.resolve(Store).configure();

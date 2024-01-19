@@ -1,18 +1,18 @@
 import { JsonValue } from "../types";
 
-export interface IAttributeRepository {
+export interface AttributeRepository {
 	set(name: string, type: AttributeType): void;
 	has(name: string): boolean;
 	getAttributeNames(): IterableIterator<string>;
 	getAttributeType<T>(name: string): AttributeType;
 }
 
-export interface IAttribute<T> {
+export interface Attribute<T> {
 	get(): T;
 	set(value: T): void;
-	clone(): IAttribute<T>;
+	clone(): Attribute<T>;
 	toJson(): JsonValue;
-	fromJson(value: JsonValue): IAttribute<T>;
+	fromJson(value: JsonValue): Attribute<T>;
 }
 
 export enum AttributeType {

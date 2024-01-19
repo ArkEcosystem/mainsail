@@ -16,21 +16,21 @@ describeSkip<{
 }>("Store", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => {},
+			notice: () => { },
 		};
 
 		context.cryptoConfiguration = {
 			getMilestoneDiff: () => ({}),
 			isNewMilestone: () => false,
-			setHeight: () => {},
+			setHeight: () => { },
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		context.walletRepository = {
-			commitChanges: () => {},
+			commitChanges: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -43,13 +43,13 @@ describeSkip<{
 			.bind(Identifiers.State.WalletRepository.Base.Factory)
 			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
 		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(
@@ -181,20 +181,20 @@ describe<{
 }>("store - Clone", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => {},
+			notice: () => { },
 		};
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
-			setHeight: () => {},
+			setHeight: () => { },
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => {},
+			dispatch: () => { },
 		};
 
 		context.walletRepository = {
-			commitChanges: () => {},
+			commitChanges: () => { },
 		};
 
 		context.sandbox = new Sandbox();
@@ -207,13 +207,13 @@ describe<{
 			.bind(Identifiers.State.WalletRepository.Base.Factory)
 			.toConstantValue(() => context.walletRepository);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("height", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("totalRound", Contracts.State.AttributeType.Number);
 		context.sandbox.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("customAttribute", Contracts.State.AttributeType.Number);
 
 		context.attributeRepository = context.sandbox.app.get<AttributeRepository>(
