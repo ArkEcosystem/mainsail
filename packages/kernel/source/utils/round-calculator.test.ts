@@ -23,7 +23,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	beforeEach(setup);
 
 	it("static delegate count - should calculate the round when nextRound is the same", ({ configuration }) => {
-		const { activeValidators } = configuration.getMilestone();
+		const { activeValidators } = configuration.getMilestone(1);
 
 		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
 			const { round, nextRound } = calculateRound(height - 1, configuration);
@@ -33,7 +33,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	});
 
 	it("static delegate count - should calculate the round when nextRound is not the same", ({ configuration }) => {
-		const { activeValidators } = configuration.getMilestone();
+		const { activeValidators } = configuration.getMilestone(1);
 
 		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
 			const { round, nextRound } = calculateRound(height, configuration);
@@ -43,7 +43,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 	});
 
 	it("static delegate count - should calculate the correct round", ({ configuration }) => {
-		const { activeValidators } = configuration.getMilestone();
+		const { activeValidators } = configuration.getMilestone(1);
 
 		for (let index = 0; index < 1000; index++) {
 			const { round, nextRound } = calculateRound(index + 1, configuration);
@@ -180,8 +180,9 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 
 	it("dynamic delegate count - should throw if active delegates is not changed on new round", ({ configuration }) => {
 		const milestones = [
-			{ activeValidators: 3, height: 0 },
-			// { activeValidators: 4, height: 3 }, // Next milestone should be 4
+			{ activeValidators: 0, height: 0 },
+			{ activeValidators: 3, height: 1 },
+			{ activeValidators: 4, height: 4 },
 		];
 
 		const config = { ...crypto, milestones };
@@ -190,20 +191,40 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		const stubGetNextMilestoneWithKey = stub(configuration, "getNextMilestoneWithNewKey")
 			// nextMilestone
 			.returnValueNth(0, {
-				data: 4,
+				data: 3,
 				found: true,
-				height: 3,
+				height: 1,
 			})
 			// getMilestones
 			.returnValueNth(1, {
-				data: 4,
+				data: 3,
 				found: true,
-				height: 3,
+				height: 1,
 			})
 			.returnValueNth(2, {
+				data: 4,
+				found: true,
+				height: 4,
+			})
+			.returnValueNth(3, {
+				data: 4,
+				found: true,
+				height: 4,
+			})
+			.returnValueNth(4, {
 				data: undefined,
 				found: false,
-				height: 1,
+				height: 8,
+			})
+			.returnValueNth(5, {
+				data: 4,
+				found: true,
+				height: 4,
+			})
+			.returnValueNth(6, {
+				data: undefined,
+				found: false,
+				height: 5,
 			});
 
 		calculateRound(1, configuration);
@@ -212,10 +233,11 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		calculateRound(2, configuration);
 
 		stubGetNextMilestoneWithKey.reset();
+
 		assert.throws(
-			() => calculateRound(3, configuration),
+			() => calculateRound(5, configuration),
 			new Exceptions.InvalidMilestoneConfigurationError(
-				"Bad milestone at height: 3. The number of validators can only be changed at the beginning of a new round.",
+				"Bad milestone at height: 5. The number of validators can only be changed at the beginning of a new round.",
 			),
 		);
 	});

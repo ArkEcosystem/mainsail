@@ -52,13 +52,13 @@ export const calculateRound = (
 		}
 
 		const spanHeight = nextMilestone.height - milestoneHeight - 1;
-		if (spanHeight % activeValidators !== 0) {
+		if (milestoneHeight > 0 && (spanHeight % activeValidators !== 0)) {
 			throw new Exceptions.InvalidMilestoneConfigurationError(
 				`Bad milestone at height: ${height}. The number of validators can only be changed at the beginning of a new round.`,
 			);
 		}
 
-		result.round += spanHeight / activeValidators;
+		result.round += spanHeight / Math.max(1, activeValidators);
 		result.roundHeight = nextMilestone.height;
 		assert.defined<number>(nextMilestone.data);
 		result.maxValidators = nextMilestone.data;
@@ -69,14 +69,15 @@ export const calculateRound = (
 		nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
 	}
 
+	const minActiveValidators = Math.max(1, activeValidators);
 	const heightFromLastSpan = height - milestoneHeight - 1;
-	const roundIncrease = Math.floor(heightFromLastSpan / activeValidators);
-	const nextRoundIncrease = (heightFromLastSpan + 1) % activeValidators === 0 ? 1 : 0;
+	const roundIncrease = Math.floor(heightFromLastSpan / minActiveValidators);
+	const nextRoundIncrease = (heightFromLastSpan + 1) % minActiveValidators === 0 ? 1 : 0;
 
 	result.round += roundIncrease;
-	result.roundHeight += roundIncrease * activeValidators;
+	result.roundHeight += roundIncrease * minActiveValidators;
 	result.nextRound = result.round + nextRoundIncrease;
-	result.maxValidators = activeValidators;
+	result.maxValidators = minActiveValidators;
 
 	return result;
 };
