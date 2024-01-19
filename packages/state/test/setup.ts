@@ -169,13 +169,13 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Hash.Factory).to(HashFactory);
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Factory).to(TransactionFactory);
 	sandbox.app.bind(Identifiers.Database.Storage.Block).toConstantValue({
-		deleteBlocks: () => { },
-		deleteTopBlocks: () => { },
-		saveBlocks: () => { },
+		deleteBlocks: () => {},
+		deleteTopBlocks: () => {},
+		saveBlocks: () => {},
 	});
 	sandbox.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
-		getActiveValidators: () => { },
-		initialize: () => { },
+		getActiveValidators: () => {},
+		initialize: () => {},
 	});
 	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 
@@ -274,7 +274,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 	sandbox.app.bind(Identifiers.Cryptography.Transaction.Deserializer).to(TransactionDeserializer).inSingletonScope();
 	// sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer).inSingletonScope();
 	const blockFactory = {
-		fromData: () => { },
+		fromData: () => {},
 	};
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);

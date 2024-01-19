@@ -16,21 +16,21 @@ describeSkip<{
 }>("Store", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => { },
+			notice: () => {},
 		};
 
 		context.cryptoConfiguration = {
 			getMilestoneDiff: () => ({}),
 			isNewMilestone: () => false,
-			setHeight: () => { },
+			setHeight: () => {},
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.walletRepository = {
-			commitChanges: () => { },
+			commitChanges: () => {},
 		};
 
 		context.sandbox = new Sandbox();
@@ -181,20 +181,20 @@ describe<{
 }>("store - Clone", ({ it, beforeEach, assert }) => {
 	beforeEach(async (context) => {
 		context.logger = {
-			notice: () => { },
+			notice: () => {},
 		};
 
 		context.cryptoConfiguration = {
 			isNewMilestone: () => false,
-			setHeight: () => { },
+			setHeight: () => {},
 		};
 
 		context.eventDispatcher = {
-			dispatch: () => { },
+			dispatch: () => {},
 		};
 
 		context.walletRepository = {
-			commitChanges: () => { },
+			commitChanges: () => {},
 		};
 
 		context.sandbox = new Sandbox();

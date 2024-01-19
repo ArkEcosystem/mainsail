@@ -12,7 +12,7 @@ describe<{
 	beforeEach((context) => {
 		context.attributeMap = getAttributeRepository();
 		context.walletRepository = {
-			setDirtyWallet: () => { },
+			setDirtyWallet: () => {},
 		};
 	});
 
@@ -222,7 +222,7 @@ describeSkip<{
 }>("Original", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.events = {
-			dispatchSync: () => { },
+			dispatchSync: () => {},
 		};
 
 		context.wallet = new Wallet("Abcde", getAttributeRepository());
@@ -243,7 +243,7 @@ describeSkip<{
 }>("Clone", ({ beforeEach }) => {
 	beforeEach(async (context) => {
 		context.events = {
-			dispatchSync: () => { },
+			dispatchSync: () => {},
 		};
 
 		const wallet = new Wallet("Abcde", getAttributeRepository(), context.events);
