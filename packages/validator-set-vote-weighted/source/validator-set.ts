@@ -88,10 +88,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			return diff;
 		});
 
-		const totalSupply = Utils.supplyCalculator.calculateSupply(
-			store.getLastBlock().header.height,
-			this.cryptoConfiguration,
-		);
+		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.cryptoConfiguration);
 
 		for (let index = 0; index < this.#validators.length; index++) {
 			const validator = this.#validators[index];
