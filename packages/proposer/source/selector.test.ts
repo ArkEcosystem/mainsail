@@ -74,13 +74,14 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 		31, 3, 34, 13, 49, 17, 48, 2, 20, 21, 8, 46, 25, 1, 36, 9, 45, 18, 15, 33, 24, 37, 19, 41,
 	];
 
-	it("#getValidatorIndex - should return validator index for round", async ({ proposerSelector, sandbox }) => {
+	it("#getValidatorIndex - should return validator index for round", async ({ proposerSelector, sandbox, store }) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		await proposerSelector.onCommit({
-			getCommit: async () => ({ block: { header: { height: 0 } } }),
+			height: 0,
+			store,
 		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -98,7 +99,8 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 			.getMilestone();
 
 		await proposerSelector.onCommit({
-			getCommit: async () => ({ block: { header: { height: 0 } } }),
+			height: 0,
+			store,
 		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -108,7 +110,8 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 		store.setAttribute("totalRound", 53);
 
 		await proposerSelector.onCommit({
-			getCommit: async () => ({ block: { header: { height: activeValidators } } }),
+			height: activeValidators,
+			store,
 		} as Contracts.Processor.ProcessableUnit);
 
 		for (let index = 0; index < activeValidators; index++) {
@@ -116,13 +119,18 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 		}
 	});
 
-	it("#handleCommit - should repeat the indexed on prolonged rounds", async ({ proposerSelector, sandbox }) => {
+	it("#handleCommit - should repeat the indexed on prolonged rounds", async ({
+		proposerSelector,
+		sandbox,
+		store,
+	}) => {
 		const { activeValidators } = sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone();
 
 		await proposerSelector.onCommit({
-			getCommit: async () => ({ block: { header: { height: 0 } } }),
+			height: 0,
+			store,
 		} as Contracts.Processor.ProcessableUnit);
 		for (let index = 0; index < activeValidators; index++) {
 			assert.equal(proposerSelector.getValidatorIndex(index), expectedIndexesRound1[index]);
