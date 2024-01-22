@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 export class ValidatorWallet implements Contracts.State.ValidatorWallet {
 	constructor(private readonly wallet: Contracts.State.Wallet) {}
 
-	public get getWallet(): Contracts.State.Wallet {
+	public getWallet(): Contracts.State.Wallet {
 		return this.wallet;
 	}
 

@@ -36,12 +36,14 @@ describe<{
 
 				return [milestone];
 			},
-			getMilestone: () => milestone,
 			getHeight: () => 0,
+			getMilestone: () => milestone,
 		};
 
 		context.store = {
 			getLastBlock: () => ({ header: { height: BigNumber.ZERO } }),
+			getLastHeight: () => 0,
+			setAttribute: () => {},
 		};
 
 		context.sandbox = new Sandbox();

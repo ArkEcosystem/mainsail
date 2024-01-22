@@ -13,6 +13,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
+	public restore(store: Contracts.State.Store): void {
+		this.#buildActiveValidators(store);
+	}
+
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			this.#buildActiveValidators(unit.store);

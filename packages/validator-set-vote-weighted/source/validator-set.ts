@@ -13,6 +13,16 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
+	public restore(store: Contracts.State.Store): void {
+		const activeValidators = store.getAttribute<string>("activeValidators").split(",");
+
+		this.#validators = activeValidators.map((address, index) => {
+			const wallet = this.validatorWalletFactory(store.walletRepository.findByAddress(address)!);
+			this.#indexByPublicKey.set(wallet.getWalletPublicKey(), index);
+			return wallet;
+		});
+	}
+
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.cryptoConfiguration)) {
 			this.buildValidatorRanking(unit.store);
@@ -22,7 +32,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone();
 
-		if (this.#validators.length < activeValidators) {
+		if (this.#validators.length !== activeValidators) {
 			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
 		}
 
@@ -80,10 +90,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			return diff;
 		});
 
-		const totalSupply = Utils.supplyCalculator.calculateSupply(
-			store.getLastBlock().header.height,
-			this.cryptoConfiguration,
-		);
+		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.cryptoConfiguration);
 
 		for (let index = 0; index < this.#validators.length; index++) {
 			const validator = this.#validators[index];
@@ -95,5 +102,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			Utils.assert.defined<string>(walletPublicKey);
 			this.#indexByPublicKey.set(walletPublicKey, index);
 		}
+
+		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
 	}
 }

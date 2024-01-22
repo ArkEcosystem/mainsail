@@ -55,6 +55,7 @@ export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges"> {
 }
 
 export interface ValidatorWallet {
+	getWallet(): Wallet;
 	getWalletPublicKey(): string;
 	getConsensusPublicKey(): string;
 	getVoteBalance(): BigNumber;
