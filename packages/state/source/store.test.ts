@@ -1,11 +1,11 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 
-import { describe, describeSkip, Sandbox } from "../../test-framework/distribution";
+import { describe, Sandbox } from "../../test-framework/distribution";
 import { AttributeRepository } from "./attributes";
 import { Store } from "./store";
 
-describeSkip<{
+describe<{
 	sandbox: Sandbox;
 	store: Store;
 	attributeRepository: AttributeRepository;
@@ -81,52 +81,13 @@ describeSkip<{
 		assert.throws(() => store.getLastBlock());
 	});
 
-	it("#setLastBlock - should set heigh attribute and configuration height", ({ store, cryptoConfiguration }) => {
-		const spyOnSetHeight = spy(cryptoConfiguration, "setHeight");
-
-		assert.equal(store.getAttribute("height"), 0);
-
+	it("#setLastBlock - should be ok", ({ store, cryptoConfiguration }) => {
 		const block = {
 			data: {
 				height: 1,
 			},
 		};
 		store.setLastBlock(block as any);
-
-		assert.equal(store.getAttribute("height"), 1);
-		spyOnSetHeight.calledOnce();
-		spyOnSetHeight.calledWith(block.data.height + 1); // always next height to propose
-	});
-
-	it("#setLastBlock - should emit milestone changed", ({ store, logger, eventDispatcher, cryptoConfiguration }) => {
-		const spyNotice = spy(logger, "notice");
-		const spyDispatch = spy(eventDispatcher, "dispatch");
-		const spyIsNewMilestone = stub(cryptoConfiguration, "isNewMilestone").returnValue(true);
-
-		const block = {
-			data: {
-				height: 1,
-			},
-		};
-		store.setLastBlock(block as any);
-
-		spyIsNewMilestone.calledOnce();
-		spyNotice.calledOnce();
-		spyNotice.calledWith("Milestone change: {}");
-		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.CryptoEvent.MilestoneChanged);
-	});
-
-	it("#getLastHeight - should return height", ({ store }) => {
-		assert.equal(store.getLastHeight(), 0);
-
-		const block = {
-			data: {
-				height: 1,
-			},
-		};
-		store.setLastBlock(block as any);
-		assert.equal(store.getLastHeight(), 1);
 	});
 
 	it("#getTotalRound - should return totalRound", ({ store }) => {
@@ -240,7 +201,6 @@ describe<{
 		const storeClone = sandbox.app.resolve(Store).configure(store);
 
 		assert.equal(storeClone.getTotalRound(), 2);
-		assert.equal(storeClone.getLastHeight(), 1);
 		assert.false(storeClone.isBootstrap());
 	});
 
@@ -278,8 +238,6 @@ describe<{
 
 		assert.throws(() => store.getLastBlock());
 		assert.equal(storeClone.getLastBlock(), block);
-		assert.equal(store.getLastHeight(), 0);
-		assert.equal(storeClone.getLastHeight(), 1);
 	});
 
 	it("#setAttribute - should be set only on clone", ({ store, storeClone }) => {
@@ -323,8 +281,6 @@ describe<{
 	});
 
 	it("#commitChanges - should copy changes back to original", ({ store, storeClone }) => {
-		assert.equal(store.getAttribute("height"), 0);
-		assert.equal(store.getAttribute("totalRound"), 0);
 		assert.false(store.hasAttribute("customAttribute"));
 		assert.true(store.isBootstrap());
 		assert.throws(() => store.getGenesisCommit());
@@ -344,8 +300,6 @@ describe<{
 		} as Contracts.Processor.ProcessableUnit;
 		storeClone.commitChanges(unit);
 
-		assert.equal(store.getAttribute("height"), 1);
-		assert.equal(store.getAttribute("totalRound"), 2);
 		assert.equal(store.getAttribute("customAttribute"), 1);
 		assert.false(store.isBootstrap());
 		assert.equal(store.getGenesisCommit(), genesisBlock);
