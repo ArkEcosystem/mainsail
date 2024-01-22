@@ -8,6 +8,7 @@ import { BalanceMutator } from "./mutators/balance";
 import { Service } from "./service";
 import { Exporter } from "./snapshots/exporter";
 import { Importer } from "./snapshots/importer";
+import { State } from "./state";
 import { StateVerifier } from "./state-verifier";
 import { Store } from "./store";
 import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets";
@@ -80,6 +81,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.State.Exporter).to(Exporter);
 
 		this.app.bind(Identifiers.State.Service).to(Service).inSingletonScope();
+		this.app.bind(Identifiers.State.State).to(State).inSingletonScope();
 		this.app.bind(Identifiers.State.Verifier).to(StateVerifier);
 
 		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
