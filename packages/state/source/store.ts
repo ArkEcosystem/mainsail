@@ -69,7 +69,6 @@ export class Store implements Contracts.State.Store {
 
 	public setLastBlock(block: Contracts.Crypto.Block): void {
 		this.#lastBlock = block;
-		this.setAttribute("height", block.data.height);
 	}
 
 	public getLastHeight(): number {
@@ -96,10 +95,13 @@ export class Store implements Contracts.State.Store {
 		return this.#walletRepository;
 	}
 
-	public commitChanges(unit: Contracts.Processor.ProcessableUnit): void {
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		this.setLastBlock(unit.getBlock());
+		this.setAttribute("height", unit.height);
 		this.setAttribute("totalRound", this.getTotalRound() + unit.round + 1);
+	}
 
+	public commitChanges(): void {
 		if (this.#originalStore) {
 			this.#originalStore.#lastBlock = this.#lastBlock;
 			this.#originalStore.#genesisBlock = this.#genesisBlock;
