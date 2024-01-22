@@ -37,6 +37,7 @@ describe<{
 				return [milestone];
 			},
 			getMilestone: () => milestone,
+			getHeight: () => 0,
 		};
 
 		context.store = {

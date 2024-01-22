@@ -35,11 +35,12 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 		const config = {
 			get: () => [milestone],
 			getMilestone: () => milestone,
+			getHeight: () => 0,
 		};
 
 		context.sandbox = new Sandbox();
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.stateService);
-		context.sandbox.app.bind(Identifiers.State.WalletRepository.Base.Factory).toConstantValue(() => {});
+		context.sandbox.app.bind(Identifiers.State.WalletRepository.Base.Factory).toConstantValue(() => { });
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
