@@ -12,9 +12,7 @@ export class Selector implements Contracts.Proposer.Selector {
 	private readonly stateService!: Contracts.State.Service;
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const commit = await unit.getCommit();
-		const { height } = commit.block.header;
-		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
+		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			const { activeValidators } = this.configuration.getMilestone();
 			this.#updateValidatorMatrix(activeValidators);
 		}
