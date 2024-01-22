@@ -16,9 +16,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	public restore(store: Contracts.State.Store): void {
 		const activeValidators = store.getAttribute<string>("activeValidators").split(",");
 
-		this.#validators = activeValidators.map((publicKey) =>
-			this.validatorWalletFactory(store.walletRepository.findByAddress(publicKey)!),
-		);
+		this.#validators = activeValidators.map((address, index) => {
+			const wallet = this.validatorWalletFactory(store.walletRepository.findByAddress(address)!);
+			this.#indexByPublicKey.set(wallet.getWalletPublicKey(), index);
+			return wallet;
+		});
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
