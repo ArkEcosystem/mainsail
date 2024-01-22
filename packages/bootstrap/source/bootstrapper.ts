@@ -128,6 +128,7 @@ export class Bootstrapper {
 			const block = await this.databaseService.getBlock(this.#store.getLastHeight());
 			Utils.assert.defined<Contracts.Crypto.Block>(block);
 			this.#store.setLastBlock(block);
+			this.configuration.setHeight(block.data.height + 1);
 
 			this.validatorSet.restore(this.#store);
 		}
