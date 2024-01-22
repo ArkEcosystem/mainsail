@@ -217,7 +217,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 
 		for (let index = 0; index < validatorMilestones.length; index++) {
 			const current = validatorMilestones[index];
-			if (current.activeValidators === 0) {
+			if (current.height > 0 && current.activeValidators === 0) {
 				throw new Exceptions.InvalidNumberOfActiveValidatorsError(
 					`Bad milestone at height: ${current.height}. The number of validators must be greater than 0.`,
 				);
@@ -230,6 +230,10 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			const previous = validatorMilestones[index - 1];
 
 			if (previous.activeValidators === current.activeValidators) {
+				continue;
+			}
+
+			if (previous.height === 0 && previous.activeValidators === 0) {
 				continue;
 			}
 

@@ -4,7 +4,7 @@ import { ValidatorWallet } from "./validator-wallet";
 import { Wallet } from "./wallet";
 
 export const walletFactory =
-	(attributeRepository: Contracts.State.IAttributeRepository) =>
+	(attributeRepository: Contracts.State.AttributeRepository) =>
 	(address: string, walletRepository: Contracts.State.WalletRepository) =>
 		new Wallet(address, attributeRepository, walletRepository);
 

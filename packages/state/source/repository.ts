@@ -4,14 +4,14 @@ import { Utils } from "@mainsail/kernel";
 import { factory, jsonFactory } from "./attributes";
 
 export class Repository implements Contracts.State.Repository {
-	protected readonly attributes = new Map<string, Contracts.State.IAttribute<unknown>>();
+	protected readonly attributes = new Map<string, Contracts.State.Attribute<unknown>>();
 
 	readonly #originalRepository?: Repository;
 	readonly #setAttributes = new Set<string>();
 	readonly #forgetAttributes = new Set<string>();
 
 	public constructor(
-		protected readonly attributeRepository: Contracts.State.IAttributeRepository,
+		protected readonly attributeRepository: Contracts.State.AttributeRepository,
 		originalRepository?: Repository,
 		initialData: Record<string, unknown> = {},
 	) {
@@ -136,8 +136,8 @@ export class Repository implements Contracts.State.Repository {
 		return this;
 	}
 
-	protected getAttributeHolder<T>(key: string): Contracts.State.IAttribute<T> {
-		const attribute = this.attributes.get(key) as Contracts.State.IAttribute<T>;
+	protected getAttributeHolder<T>(key: string): Contracts.State.Attribute<T> {
+		const attribute = this.attributes.get(key) as Contracts.State.Attribute<T>;
 
 		if (attribute) {
 			return attribute;

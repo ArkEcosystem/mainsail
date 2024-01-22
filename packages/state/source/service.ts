@@ -43,7 +43,7 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		unit.store.commitChanges(unit);
+		unit.store.commitChanges();
 
 		if (this.#baseStore.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
 			return;

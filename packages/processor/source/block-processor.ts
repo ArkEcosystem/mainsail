@@ -5,11 +5,14 @@ import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
@@ -59,6 +62,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			return true;
 		} catch (error) {
+			console.log(error);
 			this.logger.error(`Cannot process block, because: ${error.message}`);
 		}
 
@@ -81,6 +85,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
+		this.#setConfigurationHeight(unit);
+		await unit.store.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
@@ -114,14 +120,27 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
 		const height = unit.getBlock().data.height;
-		if (Utils.roundCalculator.isNewRound(height + 1, this.cryptoConfiguration)) {
-			const roundInfo = Utils.roundCalculator.calculateRound(height + 1, this.cryptoConfiguration);
+		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
+			const roundInfo = Utils.roundCalculator.calculateRound(height + 1, this.configuration);
 
 			if (!unit.store.isBootstrap()) {
 				this.logger.debug(
 					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
 				);
 			}
+		}
+	}
+
+	#setConfigurationHeight(unit: Contracts.Processor.ProcessableUnit): void {
+		// NOTE: The configuration is always set to the next height. To height which is going to be proposed.
+		this.configuration.setHeight(unit.height + 1);
+
+		if (this.configuration.isNewMilestone()) {
+			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
+
+			void this.app
+				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
+				.dispatch(Enums.CryptoEvent.MilestoneChanged);
 		}
 	}
 

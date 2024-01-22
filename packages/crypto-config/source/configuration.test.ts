@@ -34,12 +34,26 @@ describe<{
 	it("should build milestones", ({ configManager }) => {
 		assert.equal(configManager.getMilestones(), [
 			{
-				activeValidators: 53,
+				activeValidators: 0,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
 				height: 0,
+				multiPaymentLimit: 256,
+				reward: "0",
+				satoshi: { decimals: 8, denomination: 100_000_000 },
+				stageTimeout: 2000,
+				stageTimeoutIncrease: 2000,
+				vendorFieldLength: 255,
+			},
+			{
+				activeValidators: 53,
+				address: { bech32m: "ark" },
+				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				blockTime: 8000,
+				epoch: cryptoJson.milestones[0].epoch,
+				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: { decimals: 8, denomination: 100_000_000 },
@@ -65,8 +79,8 @@ describe<{
 	});
 
 	it("should get milestone for height", ({ configManager }) => {
-		assert.equal(configManager.getMilestone(1).reward, cryptoJson.milestones[0].reward);
-		assert.equal(configManager.getMilestone(75_600).reward, cryptoJson.milestones[1].reward);
+		assert.equal(configManager.getMilestone(0).reward, cryptoJson.milestones[0].reward);
+		assert.equal(configManager.getMilestone(75_600).reward, cryptoJson.milestones[2].reward);
 	});
 
 	it("should get milestone for this.height if height is not provided as parameter", ({ configManager }) => {
@@ -74,7 +88,7 @@ describe<{
 
 		configManager.setHeight(75_600);
 
-		assert.equal(configManager.getMilestone().reward, cryptoJson.milestones[1].reward);
+		assert.equal(configManager.getMilestone().reward, cryptoJson.milestones[2].reward);
 	});
 
 	it("should set the height", ({ configManager }) => {
@@ -105,18 +119,30 @@ describe<{
 	});
 
 	it("getNextMilestoneByKey - should throw an error if activeValidators is 0", ({ configManager }) => {
+		assert.not.throws(() =>
+			configManager.setConfig({
+				...cryptoJson,
+				milestones: [
+					{
+						height: 0,
+						activeValidators: 0,
+					},
+				],
+			}),
+		);
+
 		assert.throws(
 			() =>
 				configManager.setConfig({
 					...cryptoJson,
 					milestones: [
 						{
-							height: 0,
+							height: 1,
 							activeValidators: 0,
 						},
 					],
 				}),
-			`Bad milestone at height: 0. The number of validators must be greater than 0.`,
+			`Bad milestone at height: 1. The number of validators must be greater than 0.`,
 		);
 
 		assert.throws(

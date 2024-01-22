@@ -5,7 +5,7 @@ import { Utils } from "@mainsail/kernel";
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.State.ValidatorWallet.Factory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
@@ -18,8 +18,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.cryptoConfiguration)) {
-			// No need store validators, because they will result in the same set
+		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			this.#buildActiveValidators(unit.store);
 		}
 	}
@@ -46,7 +45,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		this.#validators = [];
 		this.#indexByWalletPublicKey = new Map();
 
-		const { activeValidators } = this.cryptoConfiguration.getMilestone();
+		const { activeValidators } = this.configuration.getMilestone();
+
 		const validators = store.walletRepository.allValidators();
 
 		for (let index = 0; index < activeValidators; index++) {

@@ -23,7 +23,7 @@ describe<{
 					height: 1,
 				},
 			],
-			getHeight: () => 1,
+			getHeight: () => 0,
 			getMilestone: () => ({
 				activeValidators: 2,
 				height: 1,

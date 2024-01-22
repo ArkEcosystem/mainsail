@@ -12,11 +12,8 @@ export class Selector implements Contracts.Proposer.Selector {
 	private readonly stateService!: Contracts.State.Service;
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const commit = await unit.getCommit();
-		const { height } = commit.block.header;
-		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
-			const { activeValidators } = this.configuration.getMilestone();
-			this.#updateValidatorMatrix(activeValidators);
+		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
+			this.#updateValidatorMatrix(unit);
 		}
 	}
 
@@ -31,10 +28,11 @@ export class Selector implements Contracts.Proposer.Selector {
 		return result;
 	}
 
-	#updateValidatorMatrix(activeValidators: number): void {
-		const seed = this.#calculateSeed();
+	#updateValidatorMatrix(unit: Contracts.Processor.ProcessableUnit): void {
+		const seed = this.#calculateSeed(unit.store);
 		const rng = seedrandom(seed);
 
+		const { activeValidators } = this.configuration.getMilestone();
 		const matrix = [...Array.from({ length: activeValidators }).keys()];
 
 		// Based on https://stackoverflow.com/a/12646864
@@ -43,11 +41,11 @@ export class Selector implements Contracts.Proposer.Selector {
 			[matrix[index], matrix[index_]] = [matrix[index_], matrix[index]];
 		}
 
-		this.stateService.getStore().setAttribute<string>("validatorMatrix", JSON.stringify(matrix));
+		unit.store.setAttribute<string>("validatorMatrix", JSON.stringify(matrix));
 	}
 
-	#calculateSeed(): string {
-		const totalRound = this.stateService.getStore().getTotalRound();
+	#calculateSeed(store: Contracts.State.Store): string {
+		const totalRound = store.getTotalRound();
 
 		// TODO: take block id into account
 

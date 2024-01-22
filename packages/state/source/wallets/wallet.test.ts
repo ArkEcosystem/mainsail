@@ -6,7 +6,7 @@ import { describe, describeSkip, getAttributeRepository } from "../../../test-fr
 import { Wallet } from ".";
 
 describe<{
-	attributeMap: Contracts.State.IAttributeRepository;
+	attributeMap: Contracts.State.AttributeRepository;
 	walletRepository: any;
 }>("Models - Wallet", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
