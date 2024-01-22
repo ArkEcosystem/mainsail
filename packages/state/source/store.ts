@@ -1,20 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 
 import { Repository } from "./repository";
 
 @injectable()
 export class Store implements Contracts.State.Store {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.State.AttributeRepository)
 	private readonly attributeRepository!: Contracts.State.AttributeRepository;
 
@@ -79,16 +70,6 @@ export class Store implements Contracts.State.Store {
 	public setLastBlock(block: Contracts.Crypto.Block): void {
 		this.#lastBlock = block;
 		this.setAttribute("height", block.data.height);
-
-		// NOTE: The configuration is always set to the next height that will be proposed.
-		this.configuration.setHeight(block.data.height + 1);
-		if (this.configuration.isNewMilestone()) {
-			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
-
-			void this.app
-				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-				.dispatch(Enums.CryptoEvent.MilestoneChanged);
-		}
 	}
 
 	public getLastHeight(): number {
