@@ -7,12 +7,12 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 		// @ts-ignore
 		compile(schema) {
 			return (data, parentSchema: AnySchemaObject) => {
-				const height = parseHeight(parentSchema);
-				const { activeValidators } = configuration.getMilestone(height);
 				if (!Array.isArray(data)) {
 					return false;
 				}
 
+				const height = parseHeight(parentSchema);
+				const { activeValidators } = configuration.getMilestone(height ?? 1);
 				const minimum = schema.minimum !== undefined ? schema.minimum : activeValidators;
 
 				if (data.length < minimum || data.length > activeValidators) {
@@ -38,7 +38,7 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 		compile() {
 			return (data, parentSchema: AnySchemaObject) => {
 				const height = parseHeight(parentSchema);
-				const { activeValidators } = configuration.getMilestone(height);
+				const { activeValidators } = configuration.getMilestone(height ?? 1);
 
 				if (!Number.isInteger(data)) {
 					return false;

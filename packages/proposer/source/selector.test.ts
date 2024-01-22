@@ -35,6 +35,7 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 		const config = {
 			get: () => [milestone],
 			getMilestone: () => milestone,
+			getHeight: () => 0,
 		};
 
 		context.sandbox = new Sandbox();

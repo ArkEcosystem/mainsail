@@ -32,7 +32,7 @@ describe<{
 
 		const { activeValidators } = context.sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestone();
+			.getMilestone(1);
 
 		let matrix = new Array(activeValidators).fill(true);
 		assert.undefined(context.validator.validate("test", matrix).error);
@@ -47,7 +47,7 @@ describe<{
 		assert.defined(context.validator.validate("test", matrix).error);
 
 		assert.defined(context.validator.validate("test", {}).error);
-		assert.defined(context.validator.validate("test").error);
+		assert.defined(context.validator.validate("test", undefined).error);
 		assert.defined(context.validator.validate("test", null).error);
 		assert.defined(context.validator.validate("test", "12134354").error);
 		assert.defined(context.validator.validate("test", []).error);
@@ -65,7 +65,7 @@ describe<{
 
 		const { activeValidators } = context.sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestone();
+			.getMilestone(1);
 
 		let matrix = new Array(activeValidators).fill(true);
 		assert.undefined(context.validator.validate("test", matrix).error);
@@ -87,7 +87,7 @@ describe<{
 
 		const { activeValidators } = context.sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestone();
+			.getMilestone(1);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.undefined(context.validator.validate("test", index).error);
@@ -97,7 +97,7 @@ describe<{
 		assert.defined(context.validator.validate("test", activeValidators).error);
 		assert.defined(context.validator.validate("test", activeValidators + 1).error);
 		assert.defined(context.validator.validate("test", "a").error);
-		assert.defined(context.validator.validate("test").error);
+		assert.defined(context.validator.validate("test", undefined).error);
 	});
 
 	it("keyword isValidatorIndex - should be ok for parent height", (context) => {
@@ -115,7 +115,7 @@ describe<{
 
 		const { activeValidators } = context.sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestone();
+			.getMilestone(1);
 
 		for (let index = 0; index < activeValidators; index++) {
 			assert.undefined(context.validator.validate("test", { height: 1, validatorIndex: index }).error);
@@ -144,7 +144,7 @@ describe<{
 
 		let { activeValidators } = context.sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestone();
+			.getMilestone(1);
 
 		const block1 = {
 			// height=2
@@ -160,11 +160,11 @@ describe<{
 		// change milestone to 15 validators at height 15
 		context.sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestones()[1].height = 15;
+			.getMilestones()[2].height = 15;
 
 		context.sandbox.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestones()[1].activeValidators = 15;
+			.getMilestones()[2].activeValidators = 15;
 
 		const block2 = {
 			// height=15

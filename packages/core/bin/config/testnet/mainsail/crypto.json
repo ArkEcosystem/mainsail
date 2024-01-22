@@ -3418,7 +3418,7 @@
 	},
 	"milestones": [
 		{
-			"activeValidators": 53,
+			"activeValidators": 0,
 			"address": {
 				"bech32m": "ark"
 			},
@@ -3439,6 +3439,10 @@
 			"stageTimeout": 2000,
 			"stageTimeoutIncrease": 2000,
 			"vendorFieldLength": 255
+		},
+		{
+			"height": 1,
+			"activeValidators": 53
 		},
 		{
 			"height": 75600,

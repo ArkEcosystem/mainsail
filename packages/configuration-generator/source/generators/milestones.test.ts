@@ -32,7 +32,7 @@ describe<{
 				.generate(),
 			[
 				{
-					activeValidators: 53,
+					activeValidators: 0,
 					address: {
 						bech32m: "ark",
 					},
@@ -53,6 +53,10 @@ describe<{
 					stageTimeout: 2000,
 					stageTimeoutIncrease: 2000,
 					vendorFieldLength: 255,
+				},
+				{
+					activeValidators: 53,
+					height: 1,
 				},
 			],
 		);
