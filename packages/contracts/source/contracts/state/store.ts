@@ -6,9 +6,6 @@ import { WalletRepository } from "./wallets";
 export interface Store extends CommitHandler {
 	readonly walletRepository: WalletRepository;
 
-	isBootstrap(): boolean;
-	setBootstrap(value: boolean): void;
-
 	getGenesisCommit(): Commit;
 	setGenesisCommit(block: Commit): void;
 
