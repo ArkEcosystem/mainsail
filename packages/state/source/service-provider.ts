@@ -26,14 +26,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		indexSet.set(Contracts.State.WalletIndexes.Resignations);
 
 		this.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
-		const stateAttributeRepository = this.app.get<Contracts.State.IAttributeRepository>(
+		const stateAttributeRepository = this.app.get<Contracts.State.AttributeRepository>(
 			Identifiers.State.AttributeRepository,
 		);
 		stateAttributeRepository.set("height", Contracts.State.AttributeType.Number);
 		stateAttributeRepository.set("totalRound", Contracts.State.AttributeType.Number);
 
 		this.app.bind(Identifiers.State.Wallet.Attributes).to(AttributeRepository).inSingletonScope();
-		const walletAttributeRepository = this.app.get<Contracts.State.IAttributeRepository>(
+		const walletAttributeRepository = this.app.get<Contracts.State.AttributeRepository>(
 			Identifiers.State.Wallet.Attributes,
 		);
 		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);

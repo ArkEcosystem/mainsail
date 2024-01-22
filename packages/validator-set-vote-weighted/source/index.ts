@@ -6,7 +6,7 @@ import { ValidatorSet } from "./validator-set";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
-			.get<Contracts.State.IAttributeRepository>(Identifiers.State.AttributeRepository)
+			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
 			.set("activeValidators", Contracts.State.AttributeType.String);
 
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
