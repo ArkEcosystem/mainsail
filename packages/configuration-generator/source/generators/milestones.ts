@@ -27,10 +27,11 @@ export class MilestonesGenerator {
 				stageTimeout: 2000,
 				stageTimeoutIncrease: 2000,
 				vendorFieldLength: options.vendorFieldLength,
-			}, {
+			},
+			{
 				activeValidators: options.validators,
 				height: 1,
-			}
+			},
 		];
 
 		return this;

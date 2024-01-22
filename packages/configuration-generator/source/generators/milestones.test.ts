@@ -57,7 +57,7 @@ describe<{
 				{
 					activeValidators: 53,
 					height: 1,
-				}
+				},
 			],
 		);
 	});

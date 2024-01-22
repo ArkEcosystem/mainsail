@@ -119,17 +119,16 @@ describe<{
 	});
 
 	it("getNextMilestoneByKey - should throw an error if activeValidators is 0", ({ configManager }) => {
-		assert.not.throws(
-			() =>
-				configManager.setConfig({
-					...cryptoJson,
-					milestones: [
-						{
-							height: 0,
-							activeValidators: 0,
-						},
-					],
-				}),
+		assert.not.throws(() =>
+			configManager.setConfig({
+				...cryptoJson,
+				milestones: [
+					{
+						height: 0,
+						activeValidators: 0,
+					},
+				],
+			}),
 		);
 
 		assert.throws(

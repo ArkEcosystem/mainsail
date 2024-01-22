@@ -18,7 +18,7 @@ const setup = (context: Context) => {
 	context.configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
 
 	const cloned = JSON.parse(JSON.stringify(crypto));
-	cloned.milestones = cloned.milestones.filter(m => m.height !== 75600);
+	cloned.milestones = cloned.milestones.filter((m) => m.height !== 75600);
 	cloned.milestones[0].reward = blockReward(2).toFixed();
 
 	context.configuration.setConfig(cloned);

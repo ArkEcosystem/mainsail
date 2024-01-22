@@ -21,7 +21,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone(
-			Math.max(this.cryptoConfiguration.getHeight(), 1)
+			Math.max(this.cryptoConfiguration.getHeight(), 1),
 		);
 
 		if (this.#validators.length < activeValidators) {

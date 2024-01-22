@@ -52,7 +52,7 @@ export const calculateRound = (
 		}
 
 		const spanHeight = nextMilestone.height - milestoneHeight - 1;
-		if (milestoneHeight > 0 && (spanHeight % activeValidators !== 0)) {
+		if (milestoneHeight > 0 && spanHeight % activeValidators !== 0) {
 			throw new Exceptions.InvalidMilestoneConfigurationError(
 				`Bad milestone at height: ${height}. The number of validators can only be changed at the beginning of a new round.`,
 			);

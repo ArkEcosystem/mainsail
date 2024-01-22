@@ -42,7 +42,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		this.#indexByWalletPublicKey = new Map();
 
 		const { activeValidators } = this.cryptoConfiguration.getMilestone(
-			Math.max(this.cryptoConfiguration.getHeight(), 1)
+			Math.max(this.cryptoConfiguration.getHeight(), 1),
 		);
 
 		const validators = store.walletRepository.allValidators();
