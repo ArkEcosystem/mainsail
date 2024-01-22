@@ -25,8 +25,21 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	}
 
 	public allByIndex(indexName: string): ReadonlyArray<Contracts.State.Wallet> {
-		this.#cloneAllByIndex(indexName);
-		return this.getIndex(indexName).values();
+		const result: Contracts.State.Wallet[] = [];
+
+		for (const [key, wallet] of this.getIndex(indexName).entries()) {
+			if (!this.#getForgetSet(indexName).has(key)) {
+				result.push(wallet);
+			}
+		}
+
+		for (const [key, wallet] of this.#originalWalletRepository.getIndex(indexName).entries()) {
+			if (!this.#getForgetSet(indexName).has(key) && !this.getIndex(indexName).has(key)) {
+				result.push(this.findByAddress(wallet.getAddress()));
+			}
+		}
+
+		return result;
 	}
 
 	public findByAddress(address: string): Contracts.State.Wallet {
@@ -139,11 +152,5 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 			throw new Exceptions.WalletIndexNotFoundError(name);
 		}
 		return this.#forgetIndexes[name];
-	}
-
-	#cloneAllByIndex(indexName: string) {
-		for (const wallet of this.#originalWalletRepository.getIndex(indexName).values()) {
-			this.findByAddress(wallet.getAddress());
-		}
 	}
 }
