@@ -42,10 +42,12 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	public configure(commit: Contracts.Crypto.Commit): CommitState {
 		this.#commit = commit;
 
-		const validators = this.validatorSet.getActiveValidators();
-		for (const validator of validators) {
-			const consensusPublicKey = validator.getConsensusPublicKey();
-			this.#validators.set(consensusPublicKey, validator);
+		if (commit.block.header.height > 0) {
+			const validators = this.validatorSet.getActiveValidators();
+			for (const validator of validators) {
+				const consensusPublicKey = validator.getConsensusPublicKey();
+				this.#validators.set(consensusPublicKey, validator);
+			}
 		}
 
 		return this;
