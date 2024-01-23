@@ -2,7 +2,7 @@
 	"name": "@mainsail/validator",
 	"version": "0.0.1",
 	"description": "Local validator utils for the Mainsail blockchain",
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",

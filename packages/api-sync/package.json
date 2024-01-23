@@ -2,7 +2,7 @@
 	"name": "@mainsail/api-sync",
 	"version": "0.0.1",
 	"description": "API database sync for the Mainsail blockchain",
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",

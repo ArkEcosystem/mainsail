@@ -11,7 +11,7 @@ export const versionLatest = {
 			name: "@mainsail/core",
 			version: "2.5.24",
 			description: "Core of the Mainsail Blockchain",
-			license: "MIT",
+			license: "GPL-3.0-only",
 			contributors: [
 				{
 					name: "François-Xavier Thoorens",
@@ -196,7 +196,7 @@ export const versionNext = {
 			name: "@mainsail/core",
 			version: "2.5.0-next.10",
 			description: "Core of the Mainsail Blockchain",
-			license: "MIT",
+			license: "GPL-3.0-only",
 			contributors: [
 				{
 					name: "François-Xavier Thoorens",
