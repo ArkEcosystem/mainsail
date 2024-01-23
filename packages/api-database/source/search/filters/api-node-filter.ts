@@ -4,9 +4,7 @@ import { Expression } from "../expressions";
 import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
 
 export class ApiNodeFilter {
-	public static async getExpression(
-		...criteria: OrApiNodeCriteria[]
-	): Promise<Expression<ApiNode>> {
+	public static async getExpression(...criteria: OrApiNodeCriteria[]): Promise<Expression<ApiNode>> {
 		const expressions = await Promise.all(
 			criteria.map((c) => handleOrCriteria(c, (c) => this.handleApiNodeCriteria(c))),
 		);
@@ -14,9 +12,7 @@ export class ApiNodeFilter {
 		return optimizeExpression({ expressions, op: "and" });
 	}
 
-	private static async handleApiNodeCriteria(
-		criteria: ApiNodeCriteria,
-	): Promise<Expression<ApiNode>> {
+	private static async handleApiNodeCriteria(criteria: ApiNodeCriteria): Promise<Expression<ApiNode>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
 				case "ip": {
