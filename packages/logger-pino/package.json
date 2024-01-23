@@ -2,7 +2,7 @@
 	"name": "@mainsail/logger-pino",
 	"version": "0.0.1",
 	"description": "Pino logger implementation for the Mainsail blockchain",
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"files": [
