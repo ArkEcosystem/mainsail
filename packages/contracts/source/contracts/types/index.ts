@@ -1,4 +1,4 @@
-import { CacheStore, Pipeline, Queue } from "../kernel";
+import type { CacheStore, Pipeline, Queue } from "../kernel";
 
 export type { Class, JsonObject, JsonValue, PackageJson, Primitive } from "type-fest";
 

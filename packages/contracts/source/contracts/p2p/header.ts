@@ -1,4 +1,4 @@
-import { Contracts } from "../..";
+import { Proposal } from "../crypto";
 
 export type HeaderData = {
 	version: string;
@@ -13,7 +13,7 @@ export type HeaderData = {
 export interface Header {
 	height: number;
 	round: number;
-	proposal?: Contracts.Crypto.Proposal;
+	proposal?: Proposal;
 	validatorsSignedPrecommit: readonly boolean[];
 	validatorsSignedPrevote: readonly boolean[];
 
