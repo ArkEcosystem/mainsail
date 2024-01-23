@@ -16,7 +16,8 @@
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "uvu -r tsm source",
+		"release": "pnpm publish --access public"
 	},
 	"dependencies": {
 		"@mainsail/contracts": "workspace:*",
