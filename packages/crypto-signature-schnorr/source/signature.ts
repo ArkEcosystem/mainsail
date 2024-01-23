@@ -6,11 +6,11 @@ import { secp256k1 } from "bcrypto";
 @injectable()
 export class Signature implements Contracts.Crypto.Signature {
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
-		return secp256k1.sign(message, privateKey).toString("hex");
+		return secp256k1.schnorrSign(message, privateKey).toString("hex");
 	}
 
 	public async verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
-		return secp256k1.verify(message, signature, publicKey);
+		return secp256k1.schnorrVerify(message, signature, publicKey);
 	}
 
 	public serialize(buffer: ByteBuffer, signature: string): void {
