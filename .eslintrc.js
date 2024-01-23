@@ -66,7 +66,7 @@ module.exports = {
 		"import/namespace": "warn",
 		"import/no-absolute-path": "warn",
 		"import/no-anonymous-default-export": "warn",
-		"import/no-cycle": "warn",
+		"import/no-cycle": "error",
 		"import/no-deprecated": "warn",
 		"import/no-duplicates": "warn",
 		"import/no-dynamic-require": "off",

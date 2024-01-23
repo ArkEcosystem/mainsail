@@ -1,5 +1,5 @@
-import { ProcessableUnit } from "../processor";
-import { Block, BlockData, BlockJson } from "./block";
+import type { ProcessableUnit } from "../processor";
+import type { Block, BlockData, BlockJson } from "./block";
 
 export interface CommitJson {
 	readonly block: BlockJson;

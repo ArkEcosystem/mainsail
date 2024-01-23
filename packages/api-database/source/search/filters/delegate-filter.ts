@@ -1,4 +1,3 @@
-import { Search } from "../..";
 import { Wallet } from "../../models";
 import {
 	DelegateBlocks,
@@ -7,6 +6,7 @@ import {
 	DelegateProduction,
 	DelegateResourceLastBlock,
 	OrDelegateCriteria,
+	OrNumericCriteria,
 } from "../criteria";
 import { Expression, JsonFieldCastType } from "../expressions";
 import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
@@ -86,7 +86,7 @@ export class DelegateFilter {
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string>, fieldName: string) =>
+		const addExpression = (criteria: OrNumericCriteria<string>, fieldName: string) =>
 			expressions.push(
 				handleOrCriteria(criteria, async (c) =>
 					// @ts-ignore
@@ -117,7 +117,7 @@ export class DelegateFilter {
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string | number>, fieldName: string) =>
+		const addExpression = (criteria: OrNumericCriteria<string | number>, fieldName: string) =>
 			expressions.push(
 				handleOrCriteria(criteria, async (c) =>
 					// @ts-ignore
@@ -145,7 +145,7 @@ export class DelegateFilter {
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
 		const addExpression = (
-			criteria: Search.Criteria.OrNumericCriteria<string | number>,
+			criteria: OrNumericCriteria<string | number>,
 			fieldName: string,
 			cast?: JsonFieldCastType,
 		) =>
@@ -175,7 +175,7 @@ export class DelegateFilter {
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (criteria: Search.Criteria.OrNumericCriteria<string | number>, fieldName: string) =>
+		const addExpression = (criteria: OrNumericCriteria<string | number>, fieldName: string) =>
 			expressions.push(
 				handleOrCriteria(criteria, async (c) =>
 					// @ts-ignore

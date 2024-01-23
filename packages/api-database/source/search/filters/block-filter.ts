@@ -1,9 +1,10 @@
 import { Block } from "../../models/block";
-import { Criteria, Expressions } from "..";
+import { BlockCriteria, OrBlockCriteria } from "../criteria";
+import { Expression } from "../expressions";
 import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
 
 export class BlockFilter {
-	public static async getExpression(...criteria: Criteria.OrBlockCriteria[]): Promise<Expressions.Expression<Block>> {
+	public static async getExpression(...criteria: OrBlockCriteria[]): Promise<Expression<Block>> {
 		const expressions = await Promise.all(
 			criteria.map((c) => handleOrCriteria(c, (c) => this.handleBlockCriteria(c))),
 		);
@@ -11,7 +12,7 @@ export class BlockFilter {
 		return optimizeExpression({ expressions, op: "and" });
 	}
 
-	private static async handleBlockCriteria(criteria: Criteria.BlockCriteria): Promise<Expressions.Expression<Block>> {
+	private static async handleBlockCriteria(criteria: BlockCriteria): Promise<Expression<Block>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
 				case "id": {
