@@ -8,6 +8,9 @@ export class Service implements Contracts.State.Service {
 	@tagged("plugin", "state")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.State.State)
+	private readonly state!: Contracts.State.State;
+
 	@inject(Identifiers.State.Store.Factory)
 	private readonly storeFactory!: Contracts.State.StoreFactory;
 
@@ -45,7 +48,7 @@ export class Service implements Contracts.State.Service {
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		unit.store.commitChanges();
 
-		if (this.#baseStore.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
+		if (this.state.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
 			return;
 		}
 

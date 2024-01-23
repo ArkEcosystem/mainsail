@@ -1,5 +1,4 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
 
 import { describe, Sandbox } from "../../test-framework/distribution";
 import { AttributeRepository } from "./attributes";
@@ -66,15 +65,6 @@ describe<{
 
 	it("#walletRepository - should return walletRepository", ({ store, walletRepository }) => {
 		assert.equal(store.walletRepository, walletRepository);
-	});
-
-	it("#isBootstrap - should return true by default", ({ store }) => {
-		assert.true(store.isBootstrap());
-	});
-
-	it("#setBootstrap - should set bootstrap", ({ store }) => {
-		store.setBootstrap(false);
-		assert.false(store.isBootstrap());
 	});
 
 	it("#getLastBlock - should throw if not set", ({ store }) => {
@@ -186,7 +176,7 @@ describe<{
 		context.storeClone = context.sandbox.app.resolve(Store).configure(context.store);
 	});
 
-	it("#initialize - should return original height and totalRound, isBootstrap, lastBlock and genesisBlock", ({
+	it("#initialize - should return original height and totalRound, lastBlock and genesisBlock", ({
 		store,
 		sandbox,
 	}) => {
@@ -194,28 +184,16 @@ describe<{
 		const block = { data: { height: 1 } };
 
 		store.setAttribute("totalRound", 2);
-		store.setBootstrap(false);
 		store.setGenesisCommit(genesisBlock as any);
 		store.setLastBlock(block as any);
 
 		const storeClone = sandbox.app.resolve(Store).configure(store);
 
 		assert.equal(storeClone.getTotalRound(), 2);
-		assert.false(storeClone.isBootstrap());
 	});
 
 	it("#walletRepository - should return walletRepository", ({ store, walletRepository }) => {
 		assert.equal(store.walletRepository, walletRepository);
-	});
-
-	it("#setBootstrap - should be set only on clone", ({ store, storeClone }) => {
-		assert.true(store.isBootstrap());
-		assert.true(storeClone.isBootstrap());
-
-		storeClone.setBootstrap(false);
-
-		assert.true(store.isBootstrap());
-		assert.false(storeClone.isBootstrap());
 	});
 
 	it("#setGenesisCommit - should be set only on clone", ({ store, storeClone }) => {
@@ -282,26 +260,19 @@ describe<{
 
 	it("#commitChanges - should copy changes back to original", ({ store, storeClone }) => {
 		assert.false(store.hasAttribute("customAttribute"));
-		assert.true(store.isBootstrap());
 		assert.throws(() => store.getGenesisCommit());
 		assert.throws(() => store.getLastBlock());
 
 		const genesisBlock = { block: { data: { height: 0 } } };
 		const block = { data: { height: 1 } };
 
-		storeClone.setBootstrap(false);
 		storeClone.setGenesisCommit(genesisBlock as any);
 		storeClone.setLastBlock(block as any);
 		storeClone.setAttribute("customAttribute", 1);
 
-		const unit = {
-			getBlock: () => block,
-			round: 1,
-		} as Contracts.Processor.ProcessableUnit;
-		storeClone.commitChanges(unit);
+		storeClone.commitChanges();
 
 		assert.equal(store.getAttribute("customAttribute"), 1);
-		assert.false(store.isBootstrap());
 		assert.equal(store.getGenesisCommit(), genesisBlock);
 		assert.equal(store.getLastBlock(), block);
 	});

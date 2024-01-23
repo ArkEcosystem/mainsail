@@ -231,6 +231,7 @@ export const Identifiers = {
 		Exporter: Symbol("State<Exporter>"),
 		Importer: Symbol("State<Importer>"),
 		Service: Symbol("State<Service>"),
+		State: Symbol("State<State>"),
 		Store: {
 			Factory: Symbol("State<Store<Factory>>"),
 		},
