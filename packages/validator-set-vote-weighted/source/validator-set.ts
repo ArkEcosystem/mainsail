@@ -5,7 +5,7 @@ import { Utils } from "@mainsail/kernel";
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.State.ValidatorWallet.Factory)
 	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
@@ -24,13 +24,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.cryptoConfiguration)) {
+		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			this.buildValidatorRanking(unit.store);
 		}
 	}
 
 	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
-		const { activeValidators } = this.cryptoConfiguration.getMilestone();
+		const { activeValidators } = this.configuration.getMilestone();
 
 		if (this.#validators.length !== activeValidators) {
 			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
@@ -90,7 +90,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			return diff;
 		});
 
-		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.cryptoConfiguration);
+		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
 
 		for (let index = 0; index < this.#validators.length; index++) {
 			const validator = this.#validators[index];

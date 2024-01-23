@@ -1017,9 +1017,9 @@ importers:
       '@mainsail/validator':
         specifier: workspace:*
         version: link:../validator
-      '@mainsail/validator-set-static':
+      '@mainsail/validator-set-vote-weighted':
         specifier: workspace:*
-        version: link:../validator-set-static
+        version: link:../validator-set-vote-weighted
       '@mainsail/webhooks':
         specifier: workspace:*
         version: link:../webhooks

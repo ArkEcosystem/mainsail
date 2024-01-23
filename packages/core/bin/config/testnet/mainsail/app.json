@@ -106,7 +106,7 @@
 			"package": "@mainsail/processor"
 		},
 		{
-			"package": "@mainsail/validator-set-static"
+			"package": "@mainsail/validator-set-vote-weighted"
 		},
 		{
 			"package": "@mainsail/validator"

@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
@@ -24,6 +24,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
+		const { activeValidators } = this.configuration.getMilestone();
+
+		if (this.#validators.length !== activeValidators) {
+			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
+		}
+
 		return this.#validators;
 	}
 
