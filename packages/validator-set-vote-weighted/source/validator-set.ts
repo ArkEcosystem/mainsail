@@ -80,7 +80,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 				if (a.getWalletPublicKey() === b.getWalletPublicKey()) {
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-						`Validator "${a.getWalletPublicKey()}" appears twice in the list.`,
+							`Validator "${a.getWalletPublicKey()}" appears twice in the list.`,
 					);
 				}
 
