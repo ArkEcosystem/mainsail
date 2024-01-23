@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import boxen from "boxen";
 
 import { Identifiers } from "../ioc";
-import { Logger } from "../services";
+import type { Logger } from "../services";
 
 @injectable()
 export class Box {

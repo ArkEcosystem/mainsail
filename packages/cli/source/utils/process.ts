@@ -5,12 +5,12 @@ import dayjs from "dayjs";
 import Tail from "nodejs-tail";
 import readLastLines from "read-last-lines";
 
-import { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } from "../actions";
+import type { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } from "../actions";
 import { Application } from "../application";
 import { Clear, Spinner, Table } from "../components";
 import { ProcessDescription } from "../contracts";
 import { Identifiers } from "../ioc";
-import { ProcessManager } from "../services";
+import type { ProcessManager } from "../services";
 
 @injectable()
 export class Process {

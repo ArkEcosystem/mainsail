@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { yellow } from "kleur";
 
 import { Identifiers } from "../ioc";
-import { Logger } from "../services";
+import type { Logger } from "../services";
 
 @injectable()
 export class Title {

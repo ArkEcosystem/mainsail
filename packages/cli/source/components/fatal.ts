@@ -3,7 +3,7 @@ import { white } from "kleur";
 
 import { Runtime } from "../exceptions";
 import { Identifiers } from "../ioc";
-import { Logger } from "../services";
+import type { Logger } from "../services";
 
 @injectable()
 export class Fatal {
