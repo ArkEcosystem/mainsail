@@ -26,7 +26,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
 		const { activeValidators } = this.configuration.getMilestone();
 
-		if (this.#validators.length < activeValidators) {
+		if (this.#validators.length !== activeValidators) {
 			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
 		}
 
