@@ -13,6 +13,9 @@ export class Bootstrapper {
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.ConsensusService;
 
+	@inject(Identifiers.State.State)
+	private readonly state!: Contracts.State.State;
+
 	@inject(Identifiers.State.Verifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
 
@@ -75,7 +78,7 @@ export class Bootstrapper {
 			await this.#initState();
 
 			await this.#processBlocks();
-			this.#store.setBootstrap(false);
+			this.state.setBootstrap(false);
 
 			this.stateVerifier.verifyWalletsConsistency();
 

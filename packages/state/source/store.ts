@@ -14,7 +14,6 @@ export class Store implements Contracts.State.Store {
 
 	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
-	#isBootstrap = true;
 	#originalStore?: Store;
 
 	#repository!: Repository;
@@ -25,7 +24,6 @@ export class Store implements Contracts.State.Store {
 			this.#originalStore = store;
 			this.#genesisBlock = store.#genesisBlock;
 			this.#lastBlock = store.#lastBlock;
-			this.#isBootstrap = store.#isBootstrap;
 
 			this.#repository = new Repository(this.attributeRepository, store.#repository);
 			this.#walletRepository = this.walletRepositoryFactory(store.#walletRepository);
@@ -42,14 +40,6 @@ export class Store implements Contracts.State.Store {
 
 	public get walletRepository(): Contracts.State.WalletRepository {
 		return this.#walletRepository;
-	}
-
-	public isBootstrap(): boolean {
-		return this.#isBootstrap;
-	}
-
-	public setBootstrap(value: boolean): void {
-		this.#isBootstrap = value;
 	}
 
 	public getGenesisCommit(): Contracts.Crypto.Commit {
@@ -105,7 +95,6 @@ export class Store implements Contracts.State.Store {
 		if (this.#originalStore) {
 			this.#originalStore.#lastBlock = this.#lastBlock;
 			this.#originalStore.#genesisBlock = this.#genesisBlock;
-			this.#originalStore.#isBootstrap = this.#isBootstrap;
 
 			this.#repository.commitChanges();
 			this.#walletRepository.commitChanges();

@@ -11,6 +11,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.State.State)
+	private readonly state!: Contracts.State.State;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -76,8 +79,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const commit = await unit.getCommit();
 
-		const store = this.stateService.getStore();
-		if (!store.isBootstrap()) {
+		if (!this.state.isBootstrap()) {
 			this.databaseService.addCommit(commit);
 
 			if (unit.persist) {
@@ -111,7 +113,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const height = block.data.height;
 		const totalTransactions = block.data.numberOfTransactions;
 
-		if (!unit.store.isBootstrap()) {
+		if (!this.state.isBootstrap()) {
 			this.logger.info(
 				`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`,
 			);
@@ -123,7 +125,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
 			const roundInfo = Utils.roundCalculator.calculateRound(height + 1, this.configuration);
 
-			if (!unit.store.isBootstrap()) {
+			if (!this.state.isBootstrap()) {
 				this.logger.debug(
 					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
 				);

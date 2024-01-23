@@ -2,7 +2,7 @@
 	"name": "@mainsail/crypto-transaction-username-registration",
 	"version": "0.0.1",
 	"description": "Username transaction for the Mainsail blockchain",
-	"license": "MIT",
+	"license": "GPL-3.0-only",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
