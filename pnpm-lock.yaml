@@ -681,9 +681,9 @@ importers:
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-signature-schnorr-legacy':
+      '@mainsail/crypto-signature-schnorr-secp256k1':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr-legacy
+        version: link:../crypto-signature-schnorr-secp256k1
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -924,9 +924,9 @@ importers:
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-signature-schnorr-legacy':
+      '@mainsail/crypto-signature-schnorr-secp256k1':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr-legacy
+        version: link:../crypto-signature-schnorr-secp256k1
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1814,7 +1814,7 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/crypto-signature-schnorr-legacy:
+  packages/crypto-signature-schnorr-secp256k1:
     dependencies:
       '@mainsail/container':
         specifier: workspace:*
