@@ -78,6 +78,10 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
 
+		if (sender.hasAttribute("username")) {
+			walletRepository.forgetOnIndex(Contracts.State.WalletIndexes.Usernames, sender.getAttribute("username"));
+		}
+
 		sender.setAttribute("username", data.asset.username);
 		walletRepository.setOnIndex(Contracts.State.WalletIndexes.Usernames, data.asset.username, sender);
 	}
