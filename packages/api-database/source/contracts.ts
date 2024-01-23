@@ -13,8 +13,8 @@ import {
 	ValidatorRound,
 	Wallet,
 } from "./models";
-import { ExtendedRepository } from "./repositories/repository-extension";
-import { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
+import type { ExtendedRepository } from "./repositories/repository-extension";
+import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 

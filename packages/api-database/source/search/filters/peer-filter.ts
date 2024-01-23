@@ -1,9 +1,10 @@
 import { Peer } from "../../models/peer";
-import { Criteria, Expressions } from "..";
+import { OrPeerCriteria, PeerCriteria } from "../criteria";
+import { Expression } from "../expressions";
 import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
 
 export class PeerFilter {
-	public static async getExpression(...criteria: Criteria.OrPeerCriteria[]): Promise<Expressions.Expression<Peer>> {
+	public static async getExpression(...criteria: OrPeerCriteria[]): Promise<Expression<Peer>> {
 		const expressions = await Promise.all(
 			criteria.map((c) => handleOrCriteria(c, (c) => this.handlePeerCriteria(c))),
 		);
@@ -11,7 +12,7 @@ export class PeerFilter {
 		return optimizeExpression({ expressions, op: "and" });
 	}
 
-	private static async handlePeerCriteria(criteria: Criteria.PeerCriteria): Promise<Expressions.Expression<Peer>> {
+	private static async handlePeerCriteria(criteria: PeerCriteria): Promise<Expression<Peer>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
 				case "ip": {
