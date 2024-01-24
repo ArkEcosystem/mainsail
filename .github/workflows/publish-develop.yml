@@ -49,7 +49,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=develop
+                  pnpm run release -- --publish-branch=develop --tag=alpha
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         strategy:
