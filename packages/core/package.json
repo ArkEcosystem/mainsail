@@ -19,11 +19,11 @@
 		"clean": "del distribution",
 		"full:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail core:run -- --env=test --token=ark --network=testnet",
 		"mainsail": "node ./bin/run",
+		"release": "pnpm publish --access public",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source",
-		"release": "pnpm publish --access public"
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"@mainsail/api-common": "workspace:*",

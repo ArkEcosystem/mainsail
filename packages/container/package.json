@@ -13,11 +13,11 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
+		"release": "pnpm publish --access public",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source",
-		"release": "pnpm publish --access public"
+		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
 		"inversify": "6.0.2",

@@ -13,13 +13,13 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
+		"release": "pnpm publish --access public",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "uvu -r tsm source",
 		"test:integration": "uvu -r tsm integration .test.ts",
-		"test:integration:file": "uvu -r tsm integration",
-		"release": "pnpm publish --access public"
+		"test:integration:file": "uvu -r tsm integration"
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
