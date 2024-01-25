@@ -1,9 +1,11 @@
 name: Publish (Develop)
 
 on:
-    push:
-        branches:
-            - "fix/release"
+    pull_request:
+        types:
+            - ready_for_review
+            - synchronize
+            - opened
 
 permissions:
     contents: read
