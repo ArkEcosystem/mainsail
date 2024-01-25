@@ -22,7 +22,7 @@
 		"madge:circular": "node ./scripts/circular.js",
 		"madge:graph": "./node_modules/madge/bin/cli.js --image circular-graph.svg --extensions ts ./packages/**/source",
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\" \"./.github/**/*.{json,yml,yaml}\"",
-		"release": "lerna run release",
+		"release": "lerna run release --concurrency=1",
 		"setup": "pnpm install && pnpm run build",
 		"sort": "sort-package-json \"package.json\" \"packages/*/package.json\"",
 		"test:integration": "lerna run test:integration --parallel",
