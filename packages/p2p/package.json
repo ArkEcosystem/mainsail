@@ -16,7 +16,7 @@
 		"clean": "del distribution",
 		"pbjs": "pbjs -t static-module -w commonjs source/socket-server/codecs/proto/*.proto -o source/socket-server/codecs/proto/protos.js",
 		"pbts": "pbts source/socket-server/codecs/proto/protos.js -o source/socket-server/codecs/proto/protos.d.ts",
-		"release": "pnpm publish --access public",
+		"release": "npm publish --access public",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
