@@ -7,7 +7,6 @@
 		"plugins/*"
 	],
 	"scripts": {
-		"isset": "bash isset.sh",
 		"build": "lerna run build",
 		"clean": "lerna run clean --parallel",
 		"clean:all": "pnpm run clean && pnpm run clean:node_modules && rm -r .cache",
@@ -18,6 +17,7 @@
 		"deps:unused": "node ./scripts/deps/unused.js",
 		"docker": "node ./scripts/docker/generate-docker.js",
 		"format": "pnpm run lint && pnpm run prettier",
+		"isset": "bash isset.sh",
 		"lint": "eslint packages/*/source --ext .ts --ignore-pattern *.test.ts --fix",
 		"lint:test": "eslint packages/ --ext .test.ts --fix",
 		"madge:circular": "node ./scripts/circular.js",
