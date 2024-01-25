@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/bootstrap",
-	"version": "0.0.1-alpha.1",
+	"version": "0.0.1-alpha.2",
 	"description": "Bootstrap manager for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
