@@ -13,6 +13,12 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            - name: IsSet
+              run: |
+                  bash isset.sh
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
             - uses: actions/checkout@v3
               with:
                   ref: ${{ github.head_ref }}
