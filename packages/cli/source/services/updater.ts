@@ -34,14 +34,14 @@ export class Updater implements Contracts_Updater {
 
 	#latestVersion: string | undefined;
 
-	public async check(): Promise<boolean> {
+	public async check(force?: boolean): Promise<boolean> {
 		this.#latestVersion = this.config.get("latestVersion");
 
 		if (this.#latestVersion) {
 			this.config.forget("latestVersion"); // ? shouldn't it be moved after lastUpdateCheck
 		}
 
-		if (Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval) {
+		if (!force && Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval) {
 			return false;
 		}
 
