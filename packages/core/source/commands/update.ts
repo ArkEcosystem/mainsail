@@ -24,7 +24,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const hasNewVersion: boolean = await this.updater.check();
+		const hasNewVersion: boolean = await this.updater.check(true);
 
 		if (hasNewVersion) {
 			await this.updater.update(this.getFlag("updateProcessManager"), this.getFlag("force"));
