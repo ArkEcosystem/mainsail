@@ -17,7 +17,7 @@ export class Command extends Commands.Command {
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("channel", "The NPM registry channel that should be used.", Joi.string().valid("next", "latest"));
+			.setFlag("channel", "The NPM registry channel that should be used.", Joi.string().valid("alpha", "next", "latest"));
 	}
 
 	public async execute(): Promise<void> {
