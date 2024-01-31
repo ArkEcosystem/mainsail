@@ -32,7 +32,7 @@ export const headers = {
 			type: "array",
 		},
 		version: {
-			pattern: "^\\d+\\.\\d+\\.\\d+$",
+			pattern: "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.-]+\\.\\d+)?$",
 			type: "string",
 		},
 	},
