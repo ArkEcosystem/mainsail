@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";
-import { eq, lte } from "semver";
+import { lt, lte } from "semver";
 
 import { Application } from "../application";
 import { Confirm, Spinner, Warning } from "../components";
@@ -33,28 +33,21 @@ export class Updater implements Contracts_Updater {
 	#updateCheckInterval: number = ONE_HOUR;
 
 	#latestVersion: string | undefined;
-	#lastSeenVersion: string | undefined;
 
 	public async check(force?: boolean): Promise<boolean> {
 		this.#latestVersion = this.config.get("latestVersion");
 
-		if (this.#latestVersion) {
-			this.config.forget("latestVersion"); // ? shouldn't it be moved after lastUpdateCheck
-		}
-
 		if (this.#latestVersion && !force && Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval) {
-			// No update
-			if (this.#lastSeenVersion && eq(this.#latestVersion, this.#lastSeenVersion)) {
-				return false;
-			}
+			// Update is available if last seen is greater than latest.
+			return lt(this.#packageVersion, this.#latestVersion);
 		}
 
 		const latestVersion: string | undefined = await this.getLatestVersion();
-		this.#lastSeenVersion = latestVersion;
 
 		this.config.set("lastUpdateCheck", Date.now());
 
 		if (latestVersion === undefined) {
+			this.config.forget("latestVersion");
 			return false;
 		}
 
