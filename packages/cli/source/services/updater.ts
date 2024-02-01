@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";
-import { lte } from "semver";
+import { lt, lte } from "semver";
 
 import { Application } from "../application";
 import { Confirm, Spinner, Warning } from "../components";
@@ -11,7 +11,7 @@ import { Identifiers } from "../ioc";
 import { Installer } from "./installer";
 import { ProcessManager } from "./process-manager";
 
-const ONE_DAY = 1000 * 60 * 60 * 24;
+const ONE_HOUR = 1000 * 60 * 60;
 
 @injectable()
 export class Updater implements Contracts_Updater {
@@ -30,19 +30,20 @@ export class Updater implements Contracts_Updater {
 	@inject(Identifiers.ProcessManager)
 	private readonly processManager!: ProcessManager;
 
-	#updateCheckInterval: any = ONE_DAY;
+	#updateCheckInterval: number = ONE_HOUR;
 
 	#latestVersion: string | undefined;
 
-	public async check(): Promise<boolean> {
+	public async check(force?: boolean): Promise<boolean> {
 		this.#latestVersion = this.config.get("latestVersion");
 
-		if (this.#latestVersion) {
-			this.config.forget("latestVersion"); // ? shouldn't it be moved after lastUpdateCheck
-		}
-
-		if (Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval) {
-			return false;
+		if (
+			this.#latestVersion &&
+			!force &&
+			Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval
+		) {
+			// Update is available if last seen is greater than latest.
+			return lt(this.#packageVersion, this.#latestVersion);
 		}
 
 		const latestVersion: string | undefined = await this.getLatestVersion();
@@ -50,6 +51,7 @@ export class Updater implements Contracts_Updater {
 		this.config.set("lastUpdateCheck", Date.now());
 
 		if (latestVersion === undefined) {
+			this.config.forget("latestVersion");
 			return false;
 		}
 
