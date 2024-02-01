@@ -1,5 +1,6 @@
 import { Commands, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
+import { Constants } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
@@ -20,7 +21,7 @@ export class Command extends Commands.Command {
 			.setFlag(
 				"channel",
 				"The NPM registry channel that should be used.",
-				Joi.string().valid("alpha", "next", "latest"),
+				Joi.string().valid(...Constants.Channels),
 			);
 	}
 
