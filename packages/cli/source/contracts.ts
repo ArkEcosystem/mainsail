@@ -40,6 +40,8 @@ export interface Config {
 }
 
 export interface Updater {
+	logStatus(): Promise<void>;
+
 	check(force?: boolean): Promise<boolean>;
 
 	update(updateProcessManager?: boolean, force?: boolean): Promise<boolean>;

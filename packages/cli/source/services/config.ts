@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { Constants, Contracts } from "@mainsail/contracts";
 import { ensureFileSync, readJsonSync, writeJsonSync } from "fs-extra";
 
 import { Application } from "../contracts";
@@ -87,10 +87,8 @@ export class Config {
 	}
 
 	#getRegistryChannel(version: string): string {
-		const channels: string[] = ["next"];
-
 		let channel = "latest";
-		for (const item of channels) {
+		for (const item of Constants.Channels) {
 			if (version.includes(`-${item}`)) {
 				channel = item;
 			}

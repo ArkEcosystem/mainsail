@@ -34,32 +34,40 @@ export class Updater implements Contracts_Updater {
 
 	#latestVersion: string | undefined;
 
+	public async logStatus(): Promise<void> {
+		if (await this.check()) {
+			this.app
+				.get<Warning>(Identifiers.Warning)
+				.render(
+					`${reset(" An update is available")} ${dim(this.#packageVersion)} ${reset(" → ")} ${green(
+						this.#latestVersion || "",
+					)}. Run ${green("mainsail update")} to update to the latest version.`,
+				);
+		}
+	}
+
 	public async check(force?: boolean): Promise<boolean> {
 		this.#latestVersion = this.config.get("latestVersion");
 
 		if (
-			this.#latestVersion &&
-			!force &&
-			Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval
+			!this.#latestVersion ||
+			force ||
+			Date.now() - this.config.get<number>("lastUpdateCheck") > this.#updateCheckInterval
 		) {
-			// Update is available if last seen is greater than latest.
-			return lt(this.#packageVersion, this.#latestVersion);
+			const latestVersion: string | undefined = await this.getLatestVersion();
+
+			this.config.set("lastUpdateCheck", Date.now());
+
+			if (latestVersion === undefined) {
+				this.config.forget("latestVersion");
+				return false;
+			}
+
+			this.#latestVersion = latestVersion;
+			this.config.set("latestVersion", latestVersion);
 		}
 
-		const latestVersion: string | undefined = await this.getLatestVersion();
-
-		this.config.set("lastUpdateCheck", Date.now());
-
-		if (latestVersion === undefined) {
-			this.config.forget("latestVersion");
-			return false;
-		}
-
-		this.config.set("latestVersion", latestVersion);
-
-		this.#latestVersion = latestVersion;
-
-		return true;
+		return lt(this.#packageVersion, this.#latestVersion);
 	}
 
 	public async update(updateProcessManager = false, force = false): Promise<boolean> {

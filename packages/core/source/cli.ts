@@ -29,8 +29,8 @@ export class CommandLineInterface {
 		// Create the application we will work with
 		this.#app = ApplicationFactory.make(new Container(), package_);
 
-		// Check for updates
-		await this.#app.get<CliContracts.Updater>(Identifiers.Updater).check();
+		// Check for updates and log status
+		await this.#app.get<CliContracts.Updater>(Identifiers.Updater).logStatus();
 
 		// Parse arguments and flags
 		const { args, flags } = InputParser.parseArgv(this.argv);
