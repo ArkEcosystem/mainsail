@@ -37,7 +37,11 @@ export class Updater implements Contracts_Updater {
 	public async check(force?: boolean): Promise<boolean> {
 		this.#latestVersion = this.config.get("latestVersion");
 
-		if (this.#latestVersion && !force && Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval) {
+		if (
+			this.#latestVersion &&
+			!force &&
+			Date.now() - this.config.get<number>("lastUpdateCheck") < this.#updateCheckInterval
+		) {
 			// Update is available if last seen is greater than latest.
 			return lt(this.#packageVersion, this.#latestVersion);
 		}
