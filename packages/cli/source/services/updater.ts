@@ -34,6 +34,18 @@ export class Updater implements Contracts_Updater {
 
 	#latestVersion: string | undefined;
 
+	public async logStatus(): Promise<void> {
+		if (await this.check()) {
+			this.app
+				.get<Warning>(Identifiers.Warning)
+				.render(
+					`An update is available ${dim(this.#packageVersion)} ${reset(" → ")} ${green(
+						this.#latestVersion || "",
+					)}. Run ${green("mainsail update")} to update to the latest version.`,
+				);
+		}
+	}
+
 	public async check(force?: boolean): Promise<boolean> {
 		this.#latestVersion = this.config.get("latestVersion");
 
