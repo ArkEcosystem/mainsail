@@ -39,7 +39,7 @@ export class Updater implements Contracts_Updater {
 			this.app
 				.get<Warning>(Identifiers.Warning)
 				.render(
-					`An update is available ${dim(this.#packageVersion)} ${reset(" → ")} ${green(
+					`${reset(" An update is available")} ${dim(this.#packageVersion)} ${reset(" → ")} ${green(
 						this.#latestVersion || "",
 					)}. Run ${green("mainsail update")} to update to the latest version.`,
 				);
