@@ -3,6 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@mainsail/crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
+import { ServiceProvider as CoreCryptoBip38 } from "@mainsail/crypto-bip38";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
@@ -73,6 +74,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CryptoCommit).register();
 	await app.resolve(CoreCryptoConsensus).register();
 	await app.resolve(CoreCryptoWif).register();
+	await app.resolve(CoreCryptoBip38).register();
 	await app.resolve(CoreCryptoBlock).register();
 	await app.resolve(CoreFees).register();
 	await app.resolve(CoreFeesStatic).register();

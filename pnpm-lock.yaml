@@ -654,6 +654,9 @@ importers:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
+      '@mainsail/crypto-bip38':
+        specifier: workspace:*
+        version: link:../crypto-bip38
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block

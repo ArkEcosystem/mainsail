@@ -25,6 +25,9 @@
 			"package": "@mainsail/crypto-address-bech32m"
 		},
 		{
+			"package": "@mainsail/crypto-bip38"
+		},
+		{
 			"package": "@mainsail/crypto-wif"
 		},
 		{
