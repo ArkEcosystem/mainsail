@@ -1,8 +1,9 @@
-import { Commands, Contracts } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
-import { validateMnemonic } from "bip39";
-import { writeJSONSync } from "fs-extra";
+import { Commands } from "@mainsail/cli";
+import { injectable, interfaces } from "@mainsail/container";
 import Joi from "joi";
+
+import { Command as BIP38Command } from "./config-forger-bip38";
+import { Command as BIP39Command } from "./config-forger-bip39";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -10,64 +11,61 @@ export class Command extends Commands.Command {
 
 	public description = "Configure the forging validator.";
 
-	public isHidden = true;
-
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
+			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
+			.setFlag(
+				"method",
+				"The configuration method to use (BIP38 or BIP39).",
+				Joi.string().valid(...["bip38", "bip39"]),
+			)
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
-		if (this.hasFlag("bip39")) {
-			return this.performConfiguration(this.getFlags());
+		let method = this.getFlag("method");
+		if (!method) {
+			let response = await this.components.prompt([
+				{
+					type: "select",
+					name: "method",
+					message: "Please select how you wish to store your delegate passphrase?",
+					choices: [
+						{ title: "Encrypted BIP38 (Recommended)", value: "bip38" },
+						{ title: "Plain BIP39", value: "bip39" },
+					],
+				},
+			]);
+
+			method = response.method;
+			if (!method) {
+				this.components.fatal("Please enter valid data and try again!");
+			}
 		}
 
-		const response = await this.components.prompt([
-			{
-				message: "Please enter your validator plain text passphrase. Referred to as BIP39.",
-				name: "bip39",
-				type: "password",
-				validate: (value) =>
-					!validateMnemonic(value) && !this.getFlag("skipValidation")
-						? `Failed to verify the given passphrase as BIP39 compliant.`
-						: true,
-			},
-			{
-				message: "Can you confirm?",
-				name: "confirm",
-				type: "confirm",
-			},
-		]);
+		if (method === "bip38") {
+			return this.initializeAndExecute(BIP38Command);
+		}
 
-		if (response.confirm) {
-			return this.performConfiguration({ ...this.getFlags(), ...response });
+		if (method === "bip39") {
+			return this.initializeAndExecute(BIP39Command);
 		}
 	}
 
-	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
-		await this.components.taskList([
-			{
-				task: () => {
-					if (!flags.bip39 || (!validateMnemonic(flags.bip39) && !flags.skipValidation)) {
-						throw new Error(`Failed to verify the given passphrase as BIP39 compliant.`);
-					}
-				},
-				title: "Validating passphrase is BIP39 compliant.",
-			},
-			{
-				task: () => {
-					const validatorsConfig = this.app.getCorePath("config", "validators.json");
+	private async initializeAndExecute(commandSignature: interfaces.Newable<Commands.Command>): Promise<void> {
+		const cmd = this.app.resolve(commandSignature);
 
-					const validators: Record<string, string | string[]> = require(validatorsConfig);
-					validators.secrets = [flags.bip39];
+		const flags = this.getFlags();
+		cmd.configure();
+		cmd.register([]);
 
-					writeJSONSync(validatorsConfig, validators);
-				},
-				title: "Writing BIP39 passphrase to configuration.",
-			},
-		]);
+		for (const flag in flags) {
+			cmd.setFlag(flag, flags[flag]);
+		}
+
+		return await cmd.run();
 	}
 }
