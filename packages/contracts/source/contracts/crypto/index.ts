@@ -1,3 +1,4 @@
+export * from "./bip38";
 export * from "./block";
 export * from "./commit";
 export * from "./config";

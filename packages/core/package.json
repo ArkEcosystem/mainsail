@@ -42,6 +42,7 @@
 		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-address-ss58": "workspace:*",
+		"@mainsail/crypto-bip38": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-commit": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",

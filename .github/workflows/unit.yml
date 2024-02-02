@@ -74,6 +74,8 @@ jobs:
               run: cd packages/crypto-address-keccak256 && pnpm run test
             - name: Test crypto-address-ss58
               run: cd packages/crypto-address-ss58 && pnpm run test
+            - name: Test crypto-bip38
+              run: cd packages/crypto-bip38 && pnpm run test              
             - name: Test crypto-block
               run: cd packages/crypto-block && pnpm run test
             - name: Test crypto-config

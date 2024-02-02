@@ -47,6 +47,7 @@ export const Identifiers = {
 		},
 	},
 	Cryptography: {
+		BIP38: Symbol("Crypto<BIP38>"),
 		Block: {
 			Deserializer: Symbol("Crypto<Block.Deserializer>"),
 			Factory: Symbol("Crypto<Block.Factory>"),
