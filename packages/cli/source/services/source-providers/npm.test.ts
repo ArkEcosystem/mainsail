@@ -137,7 +137,7 @@ describe<{
 		moveSync.calledWith(`${tempPath}/package`, pathPlugin);
 		removeSync.calledWith(pathPlugin);
 		removeSync.calledWith(`${tempPath}/${packageName}.tgz`);
-		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {
+		spyOnExeca.calledWith(`pnpm`, ["install", "--production"], {
 			cwd: join(dataPath, packageName),
 		});
 	});

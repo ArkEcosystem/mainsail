@@ -46,7 +46,7 @@ describe<{
 		removeSync.calledWith(targetPath);
 		removeSync.calledWith(join(tempPath, "package"));
 		spyOnExeca.calledWith(`git`, ["clone", repository, join(tempPath, "package")]);
-		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {
+		spyOnExeca.calledWith(`pnpm`, ["install", "--production"], {
 			cwd: join(dataPath, packageName),
 		});
 	});
@@ -62,7 +62,7 @@ describe<{
 		// Assert
 		spyOnExeca.calledWith(`git`, ["reset", "--hard"], { cwd: join(dataPath, packageName) });
 		spyOnExeca.calledWith(`git`, ["pull"], { cwd: join(dataPath, packageName) });
-		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {
+		spyOnExeca.calledWith(`pnpm`, ["install", "--production"], {
 			cwd: join(dataPath, packageName),
 		});
 	});

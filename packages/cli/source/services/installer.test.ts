@@ -25,7 +25,7 @@ describe<{
 
 		installer.install("@mainsail/core");
 
-		spySync.calledWith("yarn global add @mainsail/core@latest --force", { shell: true });
+		spySync.calledWith("pnpm install -g @mainsail/core@latest", { shell: true });
 	});
 
 	it("#install - should install specific package when tag is provided", ({ installer }) => {
@@ -38,7 +38,7 @@ describe<{
 
 		installer.install("@mainsail/core", "3.0.0");
 
-		spySync.calledWith("yarn global add @mainsail/core@3.0.0 --force", { shell: true });
+		spySync.calledWith("pnpm install -g @mainsail/core@3.0.0", { shell: true });
 	});
 
 	it("#install - should throw when exit code isn't 0", ({ installer }) => {
@@ -51,20 +51,25 @@ describe<{
 
 		assert.throws(() => installer.install("@mainsail/core"), "stderr");
 
-		spySync.calledWith("yarn global add @mainsail/core@latest --force", { shell: true });
+		spySync.calledWith("pnpm install -g @mainsail/core@latest", { shell: true });
 	});
 
 	it("#installPeerDependencies - should install each peer dependency", ({ installer }) => {
 		const spyInstallRangeLatest = stub(installer, "installRangeLatest");
 
-		const spySync = stub(execa, "sync").returnValue({
-			exitCode: 0,
-			stdout: JSON.stringify({ data: { pm2: "4.5.0", somepkg: "^1.0.0" } }),
-		});
+		const spySync = stub(execa, "sync")
+			.returnValueOnce({
+				exitCode: 0,
+				stdout: JSON.stringify({ pm2: "4.5.0", somepkg: "^1.0.0" }),
+			})
+			.returnValue({
+				exitCode: 0,
+				stdout: "",
+			});
 
 		installer.installPeerDependencies("@mainsail/core", "3.0.0");
 
-		spySync.calledWith("yarn info @mainsail/core@3.0.0 peerDependencies --json", {
+		spySync.calledWith("pnpm info @mainsail/core@3.0.0 peerDependencies --json", {
 			shell: true,
 		});
 
@@ -77,12 +82,12 @@ describe<{
 
 		const spySync = stub(execa, "sync").returnValue({
 			exitCode: 0,
-			stdout: JSON.stringify({}),
+			stdout: "",
 		});
 
 		installer.installPeerDependencies("@mainsail/core", "3.0.0");
 
-		spySync.calledWith("yarn info @mainsail/core@3.0.0 peerDependencies --json", {
+		spySync.calledWith("pnpm info @mainsail/core@3.0.0 peerDependencies --json", {
 			shell: true,
 		});
 
@@ -97,7 +102,7 @@ describe<{
 
 		assert.throws(() => installer.installPeerDependencies("@mainsail/core"), "stderr");
 
-		spySync.calledWith("yarn info @mainsail/core@latest peerDependencies --json", {
+		spySync.calledWith("pnpm info @mainsail/core@latest peerDependencies --json", {
 			shell: true,
 		});
 	});
@@ -107,12 +112,12 @@ describe<{
 
 		const spySync = stub(execa, "sync").returnValue({
 			exitCode: 0,
-			stdout: JSON.stringify({ data: ["3.0.0", "3.1.0", "3.0.0-next.9"] }),
+			stdout: JSON.stringify(["3.0.0", "3.1.0", "3.0.0-next.9"]),
 		});
 
 		installer.installRangeLatest("@mainsail/core", "^3.0.0 <3.4.0");
 
-		spySync.calledWith("yarn info @mainsail/core versions --json", {
+		spySync.calledWith("pnpm info @mainsail/core versions --json", {
 			shell: true,
 		});
 
@@ -127,7 +132,7 @@ describe<{
 
 		assert.throws(() => installer.installRangeLatest("@mainsail/core", "^3.0.0 <3.4.0"), "stderr");
 
-		spySync.calledWith("yarn info @mainsail/core versions --json", {
+		spySync.calledWith("pnpm info @mainsail/core versions --json", {
 			shell: true,
 		});
 	});
@@ -137,7 +142,7 @@ describe<{
 	}) => {
 		const spySync = stub(execa, "sync").returnValue({
 			exitCode: 0,
-			stdout: JSON.stringify({ data: ["3.0.0", "3.0.0-next.9"] }),
+			stdout: JSON.stringify(["3.0.0", "3.0.0-next.9"]),
 		});
 
 		assert.throws(
@@ -145,7 +150,7 @@ describe<{
 			"No @mainsail/core version to satisfy ^4.0.0 <4.4.0".replace(/[\s#$()*+,.?[\\\]^{|}-]/g, "\\$&"),
 		);
 
-		spySync.calledWith("yarn info @mainsail/core versions --json", {
+		spySync.calledWith("pnpm info @mainsail/core versions --json", {
 			shell: true,
 		});
 	});
