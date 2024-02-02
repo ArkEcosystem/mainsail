@@ -20,7 +20,7 @@ export class Command extends Commands.Command {
 			.setFlag(
 				"method",
 				"The configuration method to use (BIP38 or BIP39).",
-				Joi.string().valid(...["bip38", "bip39"]),
+				Joi.string().valid("bip38", "bip39"),
 			)
 			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
 	}
@@ -28,15 +28,15 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		let method = this.getFlag("method");
 		if (!method) {
-			let response = await this.components.prompt([
+			const response = await this.components.prompt([
 				{
-					type: "select",
-					name: "method",
-					message: "Please select how you wish to store your delegate passphrase?",
 					choices: [
 						{ title: "Encrypted BIP38 (Recommended)", value: "bip38" },
 						{ title: "Plain BIP39", value: "bip39" },
 					],
+					message: "Please select how you wish to store your delegate passphrase?",
+					name: "method",
+					type: "select",
 				},
 			]);
 
