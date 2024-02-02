@@ -43,7 +43,7 @@ describe<{
 		const packageName = "@arkecosystem/utils";
 		removeSync.calledWith(join(dataPath, packageName));
 		removeSync.calledWith(join(temporaryPath, "package"));
-		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {
+		spyOnExeca.calledWith(`pnpm`, ["install", "--production"], {
 			cwd: join(dataPath, packageName),
 		});
 	});
@@ -78,7 +78,7 @@ describe<{
 		const packageName = "@arkecosystem/utils";
 		removeSync.calledWith(join(dataPath, packageName));
 		removeSync.calledWith(join(temporaryPath, "package"));
-		spyOnExeca.calledWith(`yarn`, ["install", "--production"], {
+		spyOnExeca.calledWith(`pnpm`, ["install", "--production"], {
 			cwd: join(dataPath, packageName),
 		});
 	});
