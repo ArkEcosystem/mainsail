@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-transaction",
-	"version": "0.0.1-alpha.3",
+	"version": "0.0.1-alpha.4",
 	"description": "Crypto transaction utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
