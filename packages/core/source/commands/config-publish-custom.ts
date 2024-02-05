@@ -1,9 +1,25 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import { http } from "@mainsail/utils";
-import { copySync, ensureDirSync, existsSync, removeSync, writeFileSync } from "fs-extra";
+import { ensureDirSync, existsSync, removeSync, writeFileSync } from "fs-extra";
 import Joi from "joi";
-import { join, resolve } from "path";
+import { join } from "path";
+
+const ENV = `CORE_LOG_LEVEL=info
+CORE_LOG_LEVEL_FILE=debug`;
+
+const PEERS = {
+	list: [
+		{
+			ip: "127.0.0.1",
+			port: 4000,
+		},
+	],
+};
+
+const VALIDATORS = {
+	secrets: [],
+};
 
 @injectable()
 export class Command extends Commands.Command {
@@ -21,6 +37,7 @@ export class Command extends Commands.Command {
 			.setFlag("token", "The name of the token.", Joi.string().required())
 			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri().required())
+			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri())
 			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri().required())
 			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
 	}
@@ -37,10 +54,6 @@ export class Command extends Commands.Command {
 			);
 
 		const configDestination = this.app.getCorePath("config");
-		const configSource = resolve(
-			__dirname,
-			`../../bin/config/testnet/${this.app.get(Identifiers.Application.Name)}`,
-		);
 
 		await this.components.taskList([
 			{
@@ -53,32 +66,37 @@ export class Command extends Commands.Command {
 						this.components.fatal("Please use the --reset flag if you wish to reset your configuration.");
 					}
 
-					if (!existsSync(configSource)) {
-						this.components.fatal(`Couldn't find the core configuration files at ${configSource}.`);
-					}
-
 					ensureDirSync(configDestination);
 				},
 				title: "Prepare directories",
 			},
 			{
-				task: () => {
-					if (!existsSync(`${configSource}/.env`)) {
-						this.components.fatal(`Couldn't find the environment file at ${configSource}/.env.`);
+				task: () => writeFileSync(`${configDestination}/.env`, ENV),
+				title: "Publish environment (.env)",
+			},
+			{
+				task: () =>
+					writeFileSync(`${configDestination}/validators.json`, JSON.stringify(VALIDATORS, undefined, 4)),
+				title: "Publish validators (validators.json)",
+			},
+			{
+				task: async () => {
+					if (flags.peers) {
+						writeFileSync(`${configDestination}/peers.json`, await this.#getFile(flags.peers));
+					} else {
+						writeFileSync(`${configDestination}/peers.json`, JSON.stringify(PEERS, undefined, 4));
 					}
-
-					copySync(`${configSource}/.env`, `${configDestination}/.env`);
 				},
-				title: "Publish environment",
+				title: "Publish peers (peers.json)",
 			},
 			{
 				task: async () => writeFileSync(join(configDestination, "app.json"), await this.#getFile(flags.app)),
-				title: "Publish app.json",
+				title: "Publish app (app.json)",
 			},
 			{
 				task: async () =>
 					writeFileSync(join(configDestination, "crypto.json"), await this.#getFile(flags.crypto)),
-				title: "Publish crypto.json",
+				title: "Publish crypto (crypto.json)",
 			},
 		]);
 	}
