@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-wif",
-	"version": "0.0.1-alpha.2",
+	"version": "0.0.1-alpha.3",
 	"description": "Standalone version of identity interactions for the Mainsail blockchain.",
 	"license": "GPL-3.0-only",
 	"contributors": [],
