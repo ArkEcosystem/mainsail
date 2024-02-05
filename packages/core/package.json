@@ -86,6 +86,7 @@
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/validator": "workspace:*",
+		"@mainsail/validator-set-static": "workspace:*",
 		"@mainsail/validator-set-vote-weighted": "workspace:*",
 		"@mainsail/webhooks": "workspace:*",
 		"bip39": "3.1.0",
