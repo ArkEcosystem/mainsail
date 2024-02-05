@@ -12,7 +12,7 @@ export class Command extends Commands.Command {
 
 	public signature = "config:publish:custom";
 
-	public description = "Publish the configuration.";
+	public description = "Publish the configuration from online sources.";
 
 	public requiresNetwork = false;
 
@@ -71,10 +71,6 @@ export class Command extends Commands.Command {
 				},
 				title: "Publish environment",
 			},
-			// {
-			// 	task: async () => copySync("test", join(configDestination, "app.json")),
-			// 	title: "Publish app.json",
-			// },
 			{
 				task: async () => writeFileSync(join(configDestination, "app.json"), await this.#getFile(flags.app)),
 				title: "Publish app.json",
