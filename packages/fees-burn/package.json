@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/fees-burn",
-	"version": "0.0.1-alpha.3",
+	"version": "0.0.1-alpha.4",
 	"description": "Burn fee strategy for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

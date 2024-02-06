@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/utils",
-	"version": "0.0.1-alpha.3",
+	"version": "0.0.1-alpha.4",
 	"description": "Performance oriented implementations of commonly used functions in TypeScript.",
 	"license": "GPL-3.0-only",
 	"contributors": [],
