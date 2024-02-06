@@ -5,18 +5,13 @@ const { Identifiers } = require("../distribution/identifiers");
 
 async function run() {
 	const paths = envPaths("ark", { suffix: "core" });
-	const configCore = join(paths.config, "testnet");
+	const configCore = join(paths.config, "testnet", "mainsail");
 	console.log(paths, configCore);
 
 	const flags = {
-		address: "bech32m",
-		bech32mPrefix: "ark",
-	};
-
-	// const flags = {
-	// 	address: "base58",
-	// 	base58Prefix: 30,
-	// }
+		address: "base58",
+		base58Prefix: 30,
+	}
 
 	const app = await makeApplication(configCore, flags);
 	const generator = app.get(Identifiers.ConfigurationGenerator);
