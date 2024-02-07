@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@types/chalk':
-        specifier: ^2.2.0
-        version: 2.2.0
       '@types/madge':
         specifier: ^5.0.3
         version: 5.0.3
@@ -26,9 +23,6 @@ importers:
       c8:
         specifier: ^8.0.1
         version: 8.0.1
-      chalk:
-        specifier: ^4.1.2
-        version: 4.1.2
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3

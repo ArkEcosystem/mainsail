@@ -30,13 +30,11 @@
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
-		"@types/chalk": "^2.2.0",
 		"@types/madge": "^5.0.3",
 		"@types/node": "20.10.4",
 		"@typescript-eslint/eslint-plugin": "^6.14",
 		"@typescript-eslint/parser": "^6.21.0",
 		"c8": "^8.0.1",
-		"chalk": "^4.1.2",
 		"cross-env": "^7.0.3",
 		"del-cli": "^5.1.0",
 		"depcheck": "^1.4.7",
