@@ -47,6 +47,7 @@ module.exports = {
 		"@typescript-eslint/no-unsafe-member-access": "off",
 		"@typescript-eslint/no-unsafe-return": "off",
 		"@typescript-eslint/no-unused-vars": "off",
+		"@typescript-eslint/no-unnecessary-type-assertion": "off",
 		"@typescript-eslint/no-var-requires": "off",
 		"@typescript-eslint/require-await": "off",
 		"@typescript-eslint/restrict-plus-operands": "off",
