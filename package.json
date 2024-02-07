@@ -63,7 +63,7 @@
 		"lint-staged": "^15.2.0",
 		"madge": "^6.1.0",
 		"npm-check-updates": "^16.14.12",
-		"prettier": "^3.1.1",
+		"prettier": "^3.2.5",
 		"sort-package-json": "^2.6.0",
 		"tsm": "^2.3.0",
 		"typedoc": "^0.25.4",
