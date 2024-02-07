@@ -8,9 +8,6 @@ importers:
 
   .:
     devDependencies:
-      '@types/madge':
-        specifier: ^5.0.3
-        version: 5.0.3
       '@types/node':
         specifier: 20.10.4
         version: 20.10.4
@@ -5320,12 +5317,6 @@ packages:
 
   /@types/luxon@3.3.7:
     resolution: {integrity: sha512-gKc9P2d4g5uYwmy4s/MO/yOVPmvHyvzka1YH6i5dM03UrFofHSmgc0D0ymbDRStFWHusk6cwwF6nhLm/ckBbbQ==}
-
-  /@types/madge@5.0.3:
-    resolution: {integrity: sha512-NlQJd0qRAoyu+pawTDhLxkW940QT2dqASfwd2g/xEZu2F4Xjwa7TVRSPdbmZwUF1ygvAh0/nepeN7JjwEuOXCA==}
-    dependencies:
-      '@types/node': 20.10.4
-    dev: true
 
   /@types/markdown-it@12.2.3:
     resolution: {integrity: sha512-GKMHFfv3458yYy+v/N8gjufHO6MSZKCOXpZc5GXIWWy8uldwfmPn98vp81gZ5f9SVw8YYBctgfJ22a2d7AOMeQ==}

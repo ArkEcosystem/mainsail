@@ -30,7 +30,6 @@
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {
-		"@types/madge": "^5.0.3",
 		"@types/node": "20.10.4",
 		"@typescript-eslint/eslint-plugin": "^6.14",
 		"@typescript-eslint/parser": "^6.21.0",
