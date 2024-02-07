@@ -97,13 +97,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.P2P.ApiNode.Factory)
-			.toFactory<ApiNode, [string, string | number, Contracts.P2P.PeerProtocol?]>(
-				() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
-					const sanitizedIp = sanitizeRemoteAddress(ip);
-					Utils.assert.defined<string>(sanitizedIp);
-					return this.app.resolve(ApiNode).init(sanitizedIp, Number(port), protocol);
-				},
-			);
+			.toFactory<
+				ApiNode,
+				[string, string | number, Contracts.P2P.PeerProtocol?]
+			>(() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
+				const sanitizedIp = sanitizeRemoteAddress(ip);
+				Utils.assert.defined<string>(sanitizedIp);
+				return this.app.resolve(ApiNode).init(sanitizedIp, Number(port), protocol);
+			});
 
 		this.app
 			.bind(Identifiers.P2P.Header.Factory)
