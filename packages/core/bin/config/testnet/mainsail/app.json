@@ -94,12 +94,6 @@
 			"package": "@mainsail/p2p"
 		},
 		{
-			"package": "@mainsail/api-database"
-		},
-		{
-			"package": "@mainsail/api-sync"
-		},
-		{
 			"package": "@mainsail/api-transaction-pool"
 		},
 		{
