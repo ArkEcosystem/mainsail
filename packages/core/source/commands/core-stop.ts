@@ -9,9 +9,7 @@ export class Command extends Commands.Command {
 	public description = "Stop the Core process.";
 
 	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("daemon", "Stop the Core process or daemon.", Joi.boolean());
+		this.definition.setFlag("daemon", "Stop the Core process or daemon.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
