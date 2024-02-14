@@ -44,7 +44,10 @@ export class Service implements Contracts.TransactionPool.Service {
 		this.events.listen(Enums.CryptoEvent.MilestoneChanged, this);
 		this.events.listen(Enums.BlockEvent.Applied, this);
 
-		if (process.env[Constants.Flags.CORE_RESET_DATABASE] || process.env[Constants.Flags.CORE_RESET_POOL]) {
+		if (
+			process.env[Constants.EnvironmentVariables.CORE_RESET_DATABASE] ||
+			process.env[Constants.EnvironmentVariables.CORE_RESET_POOL]
+		) {
 			await this.flush();
 		}
 	}

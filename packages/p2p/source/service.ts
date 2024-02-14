@@ -38,7 +38,7 @@ export class Service implements Contracts.P2P.Service {
 	#apiNodeCheckLoopTimeout?: NodeJS.Timeout = undefined;
 
 	public async boot(): Promise<void> {
-		if (process.env[Constants.Flags.CORE_ENV] === "test") {
+		if (process.env[Constants.EnvironmentVariables.CORE_ENV] === "test") {
 			this.logger.info("Skipping P2P service boot, because test environment is used");
 
 			return;

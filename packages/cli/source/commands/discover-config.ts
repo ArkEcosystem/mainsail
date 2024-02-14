@@ -24,7 +24,11 @@ export class DiscoverConfig {
 
 		try {
 			return await readJSON(
-				path.join(process.env[Constants.Flags.CORE_PATH_CONFIG]!, applicationName, "config.json"),
+				path.join(
+					process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]!,
+					applicationName,
+					"config.json",
+				),
 			);
 		} catch {}
 

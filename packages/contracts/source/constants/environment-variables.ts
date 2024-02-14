@@ -1,6 +1,6 @@
-type Flag = (typeof FlagNames)[number];
+type EnvironmentVariable = (typeof EnvironmentVariableNames)[number];
 
-export const FlagNames = [
+export const EnvironmentVariableNames = [
 	// Log
 	"CORE_LOG_LEVEL_FILE",
 	"CORE_LOG_LEVEL",
@@ -64,7 +64,7 @@ export const FlagNames = [
 
 // TODO: DisconnectInvalidPeers
 
-export const Flags = FlagNames.reduce((item, flagName) => {
+export const EnvironmentVariables = EnvironmentVariableNames.reduce((item, flagName) => {
 	item[flagName] = flagName;
 	return item;
-}, {}) as Record<Flag, string>;
+}, {}) as Record<EnvironmentVariable, string>;
