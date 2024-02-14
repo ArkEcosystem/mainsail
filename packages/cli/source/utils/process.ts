@@ -8,12 +8,12 @@ import readLastLines from "read-last-lines";
 import type { AbortMissingProcess, AbortStoppedProcess, AbortUnknownProcess } from "../actions";
 import { Application } from "../application";
 import { Clear, Spinner, Table } from "../components";
-import { ProcessDescription } from "../contracts";
+import { Process as IProcess, ProcessDescription } from "../contracts";
 import { Identifiers } from "../ioc";
 import type { ProcessManager } from "../services";
 
 @injectable()
-export class Process {
+export class Process implements IProcess {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
