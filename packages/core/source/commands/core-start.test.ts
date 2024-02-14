@@ -33,11 +33,11 @@ describe<{
 					CORE_ENV: "production",
 					NODE_ENV: "production",
 				},
-				name: "ark-core",
+				name: "mainsail",
 				node_args: undefined,
 				script: resolve(__dirname, "../../../../packages/core/bin/run"),
 			},
-			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-core" },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail" },
 		);
 	});
 });
