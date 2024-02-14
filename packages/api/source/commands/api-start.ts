@@ -26,7 +26,7 @@ export class Command extends Commands.Command {
 		await this.actions.daemonizeProcess(
 			{
 				args: `core:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
-				name: `${flags.token}-api`,
+				name: `mainsail-api`,
 				script: resolve(__dirname, "../../bin/run"),
 			},
 			flags,
