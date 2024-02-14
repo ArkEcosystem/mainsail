@@ -20,7 +20,7 @@ export class EnvironmentGenerator {
 		return this;
 	}
 
-	addRecord(key: Contracts.EnvironmentVariables.EnvironmentVariable, value: string | number): EnvironmentGenerator {
+	addRecord(key: Contracts.Kernel.EnvironmentVariable, value: string | number): EnvironmentGenerator {
 		this.#data[key] = value;
 
 		return this;
@@ -28,7 +28,7 @@ export class EnvironmentGenerator {
 
 	addRecords(data: EnvironmentData): EnvironmentGenerator {
 		for (const [key, value] of Object.entries(data)) {
-			this.addRecord(key as Contracts.EnvironmentVariables.EnvironmentVariable, value);
+			this.addRecord(key as Contracts.Kernel.EnvironmentVariable, value);
 		}
 
 		return this;

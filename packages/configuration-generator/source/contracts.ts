@@ -4,7 +4,7 @@ type PartialRecord<K extends keyof any, T> = {
 	[P in K]?: T;
 };
 
-export type EnvironmentData = PartialRecord<Contracts.EnvironmentVariables.EnvironmentVariable, string | number>;
+export type EnvironmentData = PartialRecord<Contracts.Kernel.EnvironmentVariable, string | number>;
 
 export type Wallet = {
 	address: string;

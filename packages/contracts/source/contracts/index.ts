@@ -3,7 +3,6 @@ export * as ApiSync from "./api-sync";
 export * as Consensus from "./consensus";
 export * as Crypto from "./crypto";
 export * as Database from "./database";
-export * as EnvironmentVariables from "./environment-variables";
 export * as Fee from "./fees";
 export * as Kernel from "./kernel";
 export * as NetworkGenerator from "./network-generator";
