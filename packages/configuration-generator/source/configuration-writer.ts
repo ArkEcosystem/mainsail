@@ -4,7 +4,7 @@ import { stringify } from "envfile";
 import { writeFileSync, writeJSONSync } from "fs-extra";
 import path from "path";
 
-import { EnviromentData, Wallet } from "./contracts";
+import { EnvironmentData, Wallet } from "./contracts";
 import { Identifiers } from "./identifiers";
 
 @injectable()
@@ -18,7 +18,7 @@ export class ConfigurationWriter {
 		});
 	}
 
-	writeEnvironment(environment: EnviromentData): void {
+	writeEnvironment(environment: EnvironmentData): void {
 		writeFileSync(path.join(this.configurationPath, ".env"), stringify(environment));
 	}
 

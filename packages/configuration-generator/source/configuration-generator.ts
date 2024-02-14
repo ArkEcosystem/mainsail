@@ -4,7 +4,7 @@ import { Application } from "@mainsail/kernel";
 import { ensureDirSync, existsSync } from "fs-extra";
 
 import { ConfigurationWriter } from "./configuration-writer";
-import { EnviromentData } from "./contracts";
+import { EnvironmentData } from "./contracts";
 import {
 	AppGenerator,
 	EnvironmentGenerator,
@@ -210,8 +210,8 @@ export class ConfigurationGenerator {
 		logger?.info(`Configuration generated on location: ${this.configurationPath}`);
 	}
 
-	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions): EnviromentData {
-		const data: EnviromentData = {
+	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.EnvironmentOptions): EnvironmentData {
+		const data: EnvironmentData = {
 			// CORE_DB_HOST: options.coreDBHost,
 			// CORE_DB_PORT: options.coreDBPort,
 			CORE_P2P_PORT: options.coreP2PPort,

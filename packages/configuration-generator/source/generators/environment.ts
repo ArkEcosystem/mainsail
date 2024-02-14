@@ -1,11 +1,11 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { EnviromentData } from "../contracts";
+import { EnvironmentData } from "../contracts";
 
 @injectable()
 export class EnvironmentGenerator {
-	#data: EnviromentData = {};
+	#data: EnvironmentData = {};
 
 	addInitialRecords(): EnvironmentGenerator {
 		this.#data = {
@@ -20,21 +20,21 @@ export class EnvironmentGenerator {
 		return this;
 	}
 
-	addRecord(key: Contracts.Flags.Flag, value: string | number): EnvironmentGenerator {
+	addRecord(key: Contracts.EnvironmentVariables.EnvironmentVariable, value: string | number): EnvironmentGenerator {
 		this.#data[key] = value;
 
 		return this;
 	}
 
-	addRecords(data: EnviromentData): EnvironmentGenerator {
+	addRecords(data: EnvironmentData): EnvironmentGenerator {
 		for (const [key, value] of Object.entries(data)) {
-			this.addRecord(key as Contracts.Flags.Flag, value);
+			this.addRecord(key as Contracts.EnvironmentVariables.EnvironmentVariable, value);
 		}
 
 		return this;
 	}
 
-	generate(): EnviromentData {
+	generate(): EnvironmentData {
 		return this.#data;
 	}
 }
