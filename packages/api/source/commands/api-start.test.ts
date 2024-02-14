@@ -30,11 +30,11 @@ describe<{
 					CORE_ENV: "production",
 					NODE_ENV: "production",
 				},
-				name: "ark-api",
+				name: "mainsail-api",
 				node_args: undefined,
 				script: resolve(__dirname, "../../../../packages/api/bin/run"),
 			},
-			{ "kill-timeout": 30_000, "max-restarts": 5, name: "ark-api" },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail-api" },
 		);
 	});
 });
