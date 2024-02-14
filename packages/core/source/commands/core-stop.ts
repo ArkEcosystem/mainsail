@@ -15,6 +15,6 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "core").stop(this.getFlag("daemon"));
+		this.app.get<any>(Identifiers.ProcessFactory)("mainsail").stop(this.getFlag("daemon"));
 	}
 }

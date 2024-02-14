@@ -13,6 +13,6 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		this.app.get<any>(Identifiers.ProcessFactory)(this.getFlag("token"), "api").restart();
+		this.app.get<any>(Identifiers.ProcessFactory)("mainsail-api").restart();
 	}
 }

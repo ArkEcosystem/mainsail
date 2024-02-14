@@ -22,8 +22,8 @@ export class Process {
 
 	#processName!: string;
 
-	public initialize(token: string, suffix: string): void {
-		this.#processName = `${token}-${suffix}`;
+	public initialize(processName: string): void {
+		this.#processName = processName;
 	}
 
 	public stop(daemon: boolean): void {
