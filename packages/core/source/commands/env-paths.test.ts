@@ -1,3 +1,4 @@
+// eslint-disable-next-line unicorn/prevent-abbreviations
 import { Console, describe } from "@mainsail/test-framework";
 import envPaths, { Paths } from "env-paths";
 
@@ -17,7 +18,7 @@ describe<{
 
 		await cli.execute(Command);
 
-		const paths: Paths = envPaths("ark", { suffix: "core" });
+		const paths: Paths = envPaths("mainsail", { suffix: "" });
 
 		assert.true(message.includes(paths.cache));
 		assert.true(message.includes(paths.config));
