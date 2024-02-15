@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { parse } from "envfile";
@@ -11,14 +12,11 @@ export class Command extends Commands.Command {
 	public description = "Get the value of an environment variable.";
 
 	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string())
-			.setFlag(
-				"key",
-				"The name of the environment variable that you wish to get the value of.",
-				Joi.string().required(),
-			);
+		this.definition.setFlag(
+			"key",
+			"The name of the environment variable that you wish to get the value of.",
+			Joi.string().required(),
+		);
 	}
 
 	public async execute(): Promise<void> {

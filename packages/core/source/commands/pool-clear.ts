@@ -1,7 +1,6 @@
 import { Commands } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { removeSync } from "fs-extra";
-import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -9,16 +8,8 @@ export class Command extends Commands.Command {
 
 	public description = "Clear the transaction pool.";
 
-	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string());
-	}
-
 	public async execute(): Promise<void> {
-		this.actions.abortRunningProcess(`${this.getFlag("token")}-core`);
-		this.actions.abortRunningProcess(`${this.getFlag("token")}-forger`);
-		this.actions.abortRunningProcess(`${this.getFlag("token")}-relay`);
+		this.actions.abortRunningProcess(`mainsail`);
 
 		if (this.getFlag("false")) {
 			return this.#removeFiles();

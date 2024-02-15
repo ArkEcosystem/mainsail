@@ -15,8 +15,6 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag("host", "The host address of the database.", Joi.string())
 			.setFlag("port", "The port of the database.", Joi.number())
 			.setFlag("database", "The name of the database.", Joi.string())
@@ -50,13 +48,13 @@ export class Command extends Commands.Command {
 					value < 1 || value > 65_535 ? `The port must be in the range of 1-65535.` : true,
 			},
 			{
-				initial: `${this.getFlag("token")}_${this.getFlag("network")}`,
+				initial: `mainsail-db`,
 				message: "What database do you want to use?",
 				name: "database",
 				type: "text",
 			},
 			{
-				initial: this.getFlag("token"),
+				initial: `mainsail`,
 				message: "What username do you want to use?",
 				name: "username",
 				type: "text",

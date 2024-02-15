@@ -46,8 +46,6 @@ export class Command extends Commands.Command {
 
 		spinner.succeed();
 
-		await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-core`);
-		await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-relay`);
-		await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-forger`);
+		await this.actions.restartRunningProcessWithPrompt(`mainsail`);
 	}
 }

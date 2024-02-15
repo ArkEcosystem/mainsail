@@ -12,10 +12,7 @@ export class Command extends Commands.Command {
 	public description = "Removes a package and any packages that it depends on.";
 
 	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string())
-			.setArgument("package", "The name of the package.", Joi.string().required());
+		this.definition.setArgument("package", "The name of the package.", Joi.string().required());
 	}
 
 	public async execute(): Promise<void> {

@@ -34,8 +34,6 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().required())
-			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri().required())
 			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri())
 			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri().required())
