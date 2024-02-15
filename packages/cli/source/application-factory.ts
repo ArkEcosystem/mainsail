@@ -174,6 +174,10 @@ export class ApplicationFactory {
 
 		app.bind(Identifiers.Warning).to(Warning).inSingletonScope();
 
+		app.rebind(Identifiers.ApplicationPaths).toConstantValue(
+			app.get<Environment>(Identifiers.Environment).getPaths(applicationName),
+		);
+
 		return app;
 	}
 }
