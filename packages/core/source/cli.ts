@@ -8,7 +8,6 @@ import {
 } from "@mainsail/cli";
 import { Container, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import envPaths from "env-paths";
 import { existsSync } from "fs-extra";
 import { platform } from "os";
 import { join, resolve } from "path";
@@ -100,51 +99,18 @@ export class CommandLineInterface {
 		require("module").Module._initPaths();
 	}
 
-	async #detectNetworkAndToken(flags: any): Promise<{ token: string; network?: string }> {
-		const temporaryFlags = {
-			token: "ark",
-			...flags,
-		};
-
-		if (temporaryFlags.token && temporaryFlags.network) {
-			return temporaryFlags;
-		}
-
-		const config = await this.#app.resolve(Commands.DiscoverConfig).discover();
-		if (config) {
-			return {
-				network: config.network,
-				token: config.token,
-			};
-		}
-
-		try {
-			temporaryFlags.network = await this.#app.resolve(Commands.DiscoverNetwork).discover(
-				envPaths(temporaryFlags.token, {
-					suffix: "core",
-				}).config,
-			);
-		} catch {}
-
-		return temporaryFlags;
-	}
-
 	async #discoverCommands(dirname: string, flags: any): Promise<CliContracts.CommandList> {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
 		const commands: CliContracts.CommandList = commandsDiscoverer.within(resolve(dirname, "./commands"));
 
-		const temporaryFlags = await this.#detectNetworkAndToken(flags);
+		const plugins = await this.#app
+			.get<CliContracts.PluginManager>(Identifiers.PluginManager)
+			.list(this.#app.get(Identifiers.Application.Name));
 
-		if (temporaryFlags.network) {
-			const plugins = await this.#app
-				.get<CliContracts.PluginManager>(Identifiers.PluginManager)
-				.list(this.#app.get(Identifiers.Application.Name));
+		const commandsFromPlugins = commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
 
-			const commandsFromPlugins = commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
-
-			for (const [key, value] of Object.entries(commandsFromPlugins)) {
-				commands[key] = value;
-			}
+		for (const [key, value] of Object.entries(commandsFromPlugins)) {
+			commands[key] = value;
 		}
 
 		this.#app.bind(Identifiers.Commands).toConstantValue(commands);
