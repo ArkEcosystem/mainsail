@@ -30,8 +30,6 @@ export class Command extends Commands.Command {
 
 	public description = "Publish the configuration from online sources.";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
 		this.definition
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri().required())

@@ -13,8 +13,6 @@ export class Command extends Commands.Command {
 
 	public description = "Publish the configuration.";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())

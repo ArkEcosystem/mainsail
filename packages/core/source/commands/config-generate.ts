@@ -33,8 +33,6 @@ export class Command extends Commands.Command {
 
 	public description = "Generate a new configuration.";
 
-	public requiresNetwork = false;
-
 	/*eslint-disable */
 	#flagSettings: Flag[] = [
 		{

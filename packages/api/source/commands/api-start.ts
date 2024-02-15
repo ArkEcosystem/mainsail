@@ -19,7 +19,7 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
-		this.actions.abortRunningProcess(`${flags.token}-api`);
+		this.actions.abortRunningProcess(`mainsail-api`);
 
 		await this.actions.daemonizeProcess(
 			{

@@ -15,8 +15,6 @@ export class Command extends Commands.Command {
 
 	public description = "Reinstall the Core installation";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
 		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean());
 	}

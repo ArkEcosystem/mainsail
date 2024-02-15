@@ -13,8 +13,6 @@ export class Command extends Commands.Command {
 
 	public description = "Update the CLI configuration.";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
 		this.definition.setFlag(
 			"channel",

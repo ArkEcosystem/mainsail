@@ -12,8 +12,6 @@ export class Command extends Commands.Command {
 
 	public description = "List all Core daemons.";
 
-	public requiresNetwork = false;
-
 	public async execute(): Promise<void> {
 		const processes: Contracts.ProcessDescription[] = (this.processManager.list() || []).filter(
 			(p: Contracts.ProcessDescription) => p.name.startsWith("mainsail"),
