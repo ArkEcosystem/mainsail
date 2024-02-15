@@ -8,8 +8,6 @@ describe<{
 	pluginManager: Services.PluginManager;
 }>("PluginRemoveCommand", ({ beforeEach, it, assert, stub }) => {
 	const packageName = "dummyPackageName";
-	const token = "ark";
-	const network = "testnet";
 	const applicationName = "mainsail";
 
 	beforeEach((context) => {
@@ -30,8 +28,8 @@ describe<{
 		const spyOnRemove = stub(pluginManager, "remove");
 		stub(cli.app, "getCorePath").returnValueOnce(null);
 
-		await assert.resolves(() => cli.withArgs([packageName]).withFlags({ network, token }).execute(Command));
+		await assert.resolves(() => cli.withArgs([packageName]).execute(Command));
 
-		spyOnRemove.calledWith(token, network, applicationName, packageName);
+		spyOnRemove.calledWith(applicationName, packageName);
 	});
 });
