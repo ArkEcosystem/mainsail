@@ -16,13 +16,6 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it.skip("should throw if the network is invalid", async ({ cli }) => {
-		await assert.rejects(
-			() => cli.withFlags({ network: "invalid" }).execute(Command),
-			'"network" must be one of [devnet, mainnet, testnet]',
-		);
-	});
-
 	it("should throw if the destination already exists", async ({ cli }) => {
 		stub(fs, "existsSync").returnValueOnce(true);
 

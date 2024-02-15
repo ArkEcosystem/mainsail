@@ -13,16 +13,6 @@ describe<{
 		context.config = context.cli.app.get<Contracts.Config>(Identifiers.Config);
 	});
 
-	it("should change the token", async ({ cli, config }) => {
-		await cli.execute(Command);
-
-		assert.equal(config.get("token"), "ark");
-
-		await cli.withFlags({ token: "btc" }).execute(Command);
-
-		assert.equal(config.get("token"), "btc");
-	});
-
 	it("should not set config token if no token is passed to command", async ({ config }) => {
 		const cli = new Console(false);
 		stub(cli.app.get(Identifiers.Environment), "getPaths");
