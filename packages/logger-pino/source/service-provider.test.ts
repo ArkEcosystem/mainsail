@@ -14,6 +14,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Config.Flags).toConstantValue("core");
+		context.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});
@@ -28,7 +29,6 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
-		context.app.bind(Identifiers.Application.Namespace).toConstantValue("token-network");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		await assert.resolves(() => context.serviceProvider.register());
@@ -44,7 +44,6 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 
 		context.serviceProvider.setConfig(context.app.resolve(Providers.PluginConfiguration).merge(loadDefaults()));
 
-		context.app.bind(Identifiers.Application.Namespace).toConstantValue("token-network");
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.app
