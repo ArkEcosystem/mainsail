@@ -179,7 +179,6 @@ describe<{
 	beforeEach((context) => {
 		const app = new Application(new Container());
 
-		app.bind(Identifiers.Application.Namespace).toConstantValue("ark-unitnet");
 		app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
 		app.bind<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
