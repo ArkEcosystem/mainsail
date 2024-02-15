@@ -12,17 +12,9 @@ export interface Application {
 
 	config<T = any>(key: string, value?: T, defaultValue?: T): T | undefined;
 
-	namespace(): string;
-
 	version(): string;
 
-	token(): string;
-
-	network(): string;
-
 	name(): string;
-
-	useNetwork(value: string): void;
 
 	dataPath(path?: string): string;
 
@@ -49,12 +41,6 @@ export interface Application {
 	environment(): string;
 
 	useEnvironment(value: string): void;
-
-	isProduction(): boolean;
-
-	isDevelopment(): boolean;
-
-	runningTests(): boolean;
 
 	isBooted(): boolean;
 

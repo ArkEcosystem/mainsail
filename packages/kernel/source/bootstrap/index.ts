@@ -3,7 +3,6 @@ import { RegisterBaseServiceProviders } from "./register-base-service-providers"
 import { RegisterErrorHandler } from "./register-error-handler";
 import { RegisterBaseConfiguration } from "./register-base-configuration";
 import { RegisterBaseBindings } from "./register-base-bindings";
-import { RegisterBaseNamespace } from "./register-base-namespace";
 import { RegisterBasePaths } from "./register-base-paths";
 import { LoadEnvironmentVariables } from "./load-environment-variables";
 import { LoadConfiguration } from "./load-configuration";
@@ -18,7 +17,6 @@ export const Bootstrappers = {
 		RegisterErrorHandler,
 		RegisterBaseConfiguration,
 		RegisterBaseBindings,
-		RegisterBaseNamespace,
 		RegisterBasePaths,
 		LoadEnvironmentVariables,
 		LoadConfiguration,

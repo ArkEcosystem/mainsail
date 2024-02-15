@@ -4,13 +4,9 @@ export const Identifiers = {
 		Service: Symbol("ApiSync<Service>"),
 	},
 	Application: {
-		DirPrefix: Symbol("Application<DirPrefix>"),
 		Environment: Symbol("Application<Environment>"),
 		Instance: Symbol("Application<Instance>"),
 		Name: Symbol("Application<Name>"),
-		Namespace: Symbol("Application<Namespace>"),
-		Network: Symbol("Application<Network>"),
-		Token: Symbol("Application<Token>"),
 		Version: Symbol("Application<Version>"),
 	},
 	Config: {

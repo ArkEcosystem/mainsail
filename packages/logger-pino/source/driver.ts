@@ -198,7 +198,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		return createStream(
 			(time: number | Date, index?: number): string => {
 				if (!time) {
-					return `${this.app.namespace()}-current.log`;
+					return `${this.app.name()}-current.log`;
 				}
 
 				if (typeof time === "number") {
@@ -211,7 +211,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 					filename += `.${index}`;
 				}
 
-				return `${this.app.namespace()}-${filename}.log.gz`;
+				return `${this.app.name()}-${filename}.log.gz`;
 			},
 			{
 				compress: "gzip",

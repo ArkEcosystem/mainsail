@@ -110,7 +110,7 @@ export class CommandLineInterface {
 			return temporaryFlags;
 		}
 
-		const config = await this.#app.resolve(Commands.DiscoverConfig).discover(temporaryFlags.token);
+		const config = await this.#app.resolve(Commands.DiscoverConfig).discover();
 		if (config) {
 			return {
 				network: config.network,
