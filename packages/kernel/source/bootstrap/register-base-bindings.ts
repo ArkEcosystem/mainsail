@@ -23,10 +23,10 @@ export class RegisterBaseBindings implements Bootstrapper {
 		this.app.bind<string>(Identifiers.Application.Version).toConstantValue(version);
 
 		// @@TODO implement a getter/setter that sets vars locally and in the process.env variables
-		process.env[Constants.Flags.CORE_ENV] = flags.env;
-		// process.env[Constants.Flags.CORE_ENV] = process.env.CORE_ENV;
-		process.env[Constants.Flags.CORE_TOKEN] = flags.token;
-		process.env[Constants.Flags.CORE_NETWORK_NAME] = flags.network;
-		process.env[Constants.Flags.CORE_VERSION] = version;
+		process.env[Constants.EnvironmentVariables.CORE_ENV] = flags.env;
+		// process.env[Constants.EnvironmentVariables.CORE_ENV] = process.env.CORE_ENV;
+		process.env[Constants.EnvironmentVariables.CORE_TOKEN] = flags.token;
+		process.env[Constants.EnvironmentVariables.CORE_NETWORK_NAME] = flags.network;
+		process.env[Constants.EnvironmentVariables.CORE_VERSION] = version;
 	}
 }

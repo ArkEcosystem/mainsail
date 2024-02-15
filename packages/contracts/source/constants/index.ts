@@ -1,3 +1,3 @@
 export * from "./channels";
-export * from "./flags";
+export * from "./environment-variables";
 export * from "./units";

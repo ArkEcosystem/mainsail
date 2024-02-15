@@ -32,7 +32,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	private readonly logger!: Contracts.P2P.Logger;
 
 	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
-		if (process.env[Constants.Flags.CORE_SKIP_PEER_STATE_VERIFICATION] === "true") {
+		if (process.env[Constants.EnvironmentVariables.CORE_SKIP_PEER_STATE_VERIFICATION] === "true") {
 			return true;
 		}
 
