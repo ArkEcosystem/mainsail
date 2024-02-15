@@ -8,8 +8,6 @@ describe<{
 	pluginManager: Services.PluginManager;
 }>("PluginUpdateCommand", ({ beforeEach, it, assert, stub }) => {
 	const packageName = "dummyPackageName";
-	const token = "ark";
-	const network = "testnet";
 	const applicationName = "mainsail";
 
 	beforeEach((context) => {
@@ -29,8 +27,8 @@ describe<{
 	it("should call update", async ({ cli, pluginManager }) => {
 		const spyOnUpdate = stub(pluginManager, "update");
 
-		await assert.resolves(() => cli.withArgs([packageName]).withFlags({ network, token }).execute(Command));
+		await assert.resolves(() => cli.withArgs([packageName]).execute(Command));
 
-		spyOnUpdate.calledWith(token, network, applicationName, packageName);
+		spyOnUpdate.calledWith(applicationName, packageName);
 	});
 });
