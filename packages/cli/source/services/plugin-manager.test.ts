@@ -61,7 +61,7 @@ describe<{
 		const spyFileInstall = stub(File.prototype, "install");
 
 		const errorMessage = `The given package [${packageName}] is neither a git nor a npm package.`;
-		await assert.rejects(() => pluginManager.install(applicationName, packageName), errorMessage);
+		await assert.rejects(() => pluginManager.install(packageName), errorMessage);
 
 		spyNpmExists.calledWith(packageName);
 		spyGitExists.calledWith(packageName);
@@ -81,7 +81,7 @@ describe<{
 		const spyGitInstall = stub(Git.prototype, "install");
 		const spyFileInstall = stub(File.prototype, "install");
 
-		await assert.resolves(() => pluginManager.install(applicationName, packageName));
+		await assert.resolves(() => pluginManager.install(packageName));
 
 		spyNpmExists.calledWith(packageName);
 		spyGitExists.calledWith(packageName);
@@ -102,7 +102,7 @@ describe<{
 		const spyFileInstall = stub(File.prototype, "install");
 
 		const version = "3.0.0";
-		await assert.resolves(() => pluginManager.install(applicationName, packageName, version));
+		await assert.resolves(() => pluginManager.install(packageName, version));
 
 		spyNpmExists.calledWith(packageName, version);
 		spyGitExists.calledWith(packageName, version);
@@ -122,7 +122,7 @@ describe<{
 		const spyGitInstall = stub(Git.prototype, "install");
 		const spyFileInstall = stub(File.prototype, "install");
 
-		await assert.resolves(() => pluginManager.install(applicationName, packageName));
+		await assert.resolves(() => pluginManager.install(packageName));
 
 		spyNpmExists.neverCalled();
 		spyGitExists.calledWith(packageName);
@@ -142,7 +142,7 @@ describe<{
 		const spyGitInstall = stub(Git.prototype, "install");
 		const spyFileInstall = stub(File.prototype, "install");
 
-		await assert.resolves(() => pluginManager.install(applicationName, packageName));
+		await assert.resolves(() => pluginManager.install(packageName));
 
 		spyNpmExists.neverCalled();
 		spyGitExists.neverCalled();
@@ -154,17 +154,14 @@ describe<{
 	});
 
 	it("#update - should throw when the plugin doesn't exist", async ({ pluginManager }) => {
-		await assert.rejects(
-			() => pluginManager.update(applicationName, packageName),
-			`The package [${packageName}] does not exist.`,
-		);
+		await assert.rejects(() => pluginManager.update(packageName), `The package [${packageName}] does not exist.`);
 	});
 
 	it("#update - if the plugin is a git directory, it should be updated", async ({ pluginManager }) => {
 		const spyGitUpdate = stub(Git.prototype, "update");
 		stub(fs, "existsSync").returnValue(true);
 
-		await assert.resolves(() => pluginManager.update(applicationName, packageName));
+		await assert.resolves(() => pluginManager.update(packageName));
 
 		spyGitUpdate.calledOnce();
 	});
@@ -173,23 +170,20 @@ describe<{
 		const spyNpmUpdate = stub(NPM.prototype, "update");
 		stub(fs, "existsSync").returnValueOnce(true).returnValue(false);
 
-		await assert.resolves(() => pluginManager.update(applicationName, packageName));
+		await assert.resolves(() => pluginManager.update(packageName));
 
 		spyNpmUpdate.calledOnce();
 	});
 
 	it("#remove - should throw when the plugin doesn't exist", async ({ pluginManager }) => {
-		await assert.rejects(
-			() => pluginManager.remove(applicationName, packageName),
-			`The package [${packageName}] does not exist.`,
-		);
+		await assert.rejects(() => pluginManager.remove(packageName), `The package [${packageName}] does not exist.`);
 	});
 
 	it("#remove - remove plugin if exist", async ({ pluginManager }) => {
 		stub(fs, "existsSync").returnValue(true);
 		const removeSync = stub(fs, "removeSync");
 
-		await assert.resolves(() => pluginManager.remove(applicationName, packageName));
+		await assert.resolves(() => pluginManager.remove(packageName));
 		removeSync.calledOnce();
 	});
 });
