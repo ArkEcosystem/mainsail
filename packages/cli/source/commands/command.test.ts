@@ -5,8 +5,6 @@ import { Console, describe } from "../../../test-framework";
 import { Identifiers } from "../ioc";
 import { Output } from "../output";
 import { Command } from "./command";
-import { DiscoverConfig } from "./discover-config";
-import { DiscoverNetwork } from "./discover-network";
 
 @injectable()
 class StubCommand extends Command {
@@ -103,37 +101,13 @@ describe<{
 		await cmd.interact();
 	});
 
-	it("#run - should run the command with the given token and network", async ({ cmd }) => {
+	it("#run - should run the command", async ({ cmd }) => {
 		cmd.setFlag("token", "ark");
 		cmd.setFlag("network", "testnet");
 
 		await cmd.run();
 
 		spyOnExecute.calledOnce();
-	});
-
-	it("#run - should run the command without a network", async ({ cmd }) => {
-		cmd.requiresNetwork = false;
-
-		await cmd.run();
-
-		spyOnExecute.calledOnce();
-	});
-
-	it("#run - should run the command without a network and token if network is detected from config", async ({
-		cmd,
-	}) => {
-		const spyOnDiscover = stub(DiscoverConfig.prototype, "discover").resolvedValue({
-			network: "testnet",
-			token: "token",
-		});
-
-		await cmd.run();
-
-		spyOnExecute.calledOnce();
-		spyOnDiscover.calledTimes(2);
-		assert.equal(cmd.getFlag("token"), "token");
-		assert.equal(cmd.getFlag("network"), "testnet");
 	});
 
 	it("#run - should run the command in interactive mode", async ({ cmd }) => {
@@ -156,19 +130,6 @@ describe<{
 
 		spyOnInteract.neverCalled();
 		spyOnExecute.calledOnce();
-	});
-
-	it("should run the command and try to detect a network", async ({ cmd }) => {
-		// @ts-ignore
-		cmd.input.setFlag("token", "ark");
-		// @ts-ignore
-		cmd.input.setFlag("network");
-
-		const spyOnDiscover = stub(DiscoverNetwork.prototype, "discover");
-
-		await assert.resolves(() => cmd.run());
-
-		spyOnDiscover.calledOnce();
 	});
 
 	it("should run the command and throw an error", async ({ cmd }) => {
