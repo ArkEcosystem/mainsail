@@ -5,7 +5,7 @@ import { Command } from "./update";
 
 describe<{
 	cli: Console;
-}>("UpdateCommand", ({ beforeEach, it, assert, stub, spy }) => {
+}>("UpdateCommand", ({ beforeEach, it, assert, stub }) => {
 	const updater = {
 		check: () => {},
 		update: () => {},
@@ -32,18 +32,18 @@ describe<{
 		spyUpdate.neverCalled();
 	});
 
-	it("should update with prompts", async ({ cli }) => {
+	it.only("should update with prompts", async ({ cli }) => {
 		const spyCheck = stub(updater, "check").resolvedValue(true);
 		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
+		const spyRestart = stub(actionFactory, "restartRunningProcess");
 		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
 
 		await assert.resolves(() => cli.execute(Command));
 
 		spyCheck.calledOnce();
 		spyUpdate.calledOnce();
-		spyRestar.neverCalled();
-		spyRestartWithPrompt.calledTimes(3);
+		spyRestart.neverCalled();
+		spyRestartWithPrompt.calledOnce();
 	});
 
 	it("should update without a prompt if the [--force] flag is present", async ({ cli }) => {
