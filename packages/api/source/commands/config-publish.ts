@@ -55,9 +55,7 @@ export class Command extends Commands.Command {
 	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app
 			.rebind(Identifiers.ApplicationPaths)
-			.toConstantValue(
-				this.environment.getPaths(flags.token, flags.network, this.app.get(Identifiers.Application.Name)),
-			);
+			.toConstantValue(this.environment.getPaths(this.app.get(Identifiers.Application.Name)));
 
 		const configDestination = this.app.getCorePath("config");
 		const configSource = resolve(

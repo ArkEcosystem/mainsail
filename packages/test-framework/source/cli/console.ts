@@ -41,9 +41,7 @@ export class Console {
 		this.app
 			.rebind(Identifiers.ApplicationPaths)
 			.toConstantValue(
-				this.app
-					.get<Services.Environment>(Identifiers.Environment)
-					.getPaths(this.flags.token, this.flags.network, Object.keys(this.pkg.bin)[0]),
+				this.app.get<Services.Environment>(Identifiers.Environment).getPaths(Object.keys(this.pkg.bin)[0]),
 			);
 
 		const cmd = this.app.resolve<Commands.Command>(command);

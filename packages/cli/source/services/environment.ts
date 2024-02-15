@@ -8,11 +8,11 @@ import { envPaths as environmentPaths, Paths } from "../env-paths";
 
 @injectable()
 export class Environment {
-	public getPaths(token: string, network: string, name: string): Paths {
-		let paths: Paths = environmentPaths.get(token, { suffix: "core" });
+	public getPaths(name: string): Paths {
+		let paths: Paths = environmentPaths.get(name);
 
 		for (const [key, value] of Object.entries(paths)) {
-			paths[key] = `${value}/${network}/${name}`;
+			paths[key] = value;
 		}
 
 		if (process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]) {

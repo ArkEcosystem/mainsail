@@ -19,11 +19,6 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		return await this.pluginManager.remove(
-			this.getFlag("token"),
-			this.getFlag("network"),
-			this.app.get(Identifiers.Application.Name),
-			this.getArgument("package"),
-		);
+		return await this.pluginManager.remove(this.app.get(Identifiers.Application.Name), this.getArgument("package"));
 	}
 }

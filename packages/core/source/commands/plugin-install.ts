@@ -20,11 +20,6 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		return await this.pluginManager.install(
-			this.getFlag("token"),
-			this.getFlag("network"),
-			this.getArgument("package"),
-			this.getFlag("version"),
-		);
+		return await this.pluginManager.install(this.getArgument("package"), this.getFlag("version"));
 	}
 }
