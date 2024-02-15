@@ -103,9 +103,7 @@ export class CommandLineInterface {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
 		const commands: CliContracts.CommandList = commandsDiscoverer.within(resolve(dirname, "./commands"));
 
-		const plugins = await this.#app
-			.get<CliContracts.PluginManager>(Identifiers.PluginManager)
-			.list(this.#app.get(Identifiers.Application.Name));
+		const plugins = await this.#app.get<CliContracts.PluginManager>(Identifiers.PluginManager).list();
 
 		const commandsFromPlugins = commandsDiscoverer.from(plugins.map((plugin) => plugin.path));
 

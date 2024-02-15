@@ -40,9 +40,7 @@ export class Console {
 	public async execute(command): Promise<void> {
 		this.app
 			.rebind(Identifiers.ApplicationPaths)
-			.toConstantValue(
-				this.app.get<Services.Environment>(Identifiers.Environment).getPaths(Object.keys(this.pkg.bin)[0]),
-			);
+			.toConstantValue(this.app.get<Services.Environment>(Identifiers.Environment).getPaths());
 
 		const cmd = this.app.resolve<Commands.Command>(command);
 

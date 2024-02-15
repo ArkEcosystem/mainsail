@@ -1,15 +1,19 @@
-import { injectable } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs-extra";
 import path from "path";
 
 import { envPaths as environmentPaths, Paths } from "../env-paths";
+import { Identifiers } from "../ioc";
 
 @injectable()
 export class Environment {
-	public getPaths(name: string): Paths {
-		let paths: Paths = environmentPaths.get(name, { suffix: "" });
+	@inject(Identifiers.Application.Name)
+	private readonly appName!: string;
+
+	public getPaths(): Paths {
+		let paths: Paths = environmentPaths.get(this.appName, { suffix: "" });
 
 		for (const [key, value] of Object.entries(paths)) {
 			paths[key] = value;
@@ -18,14 +22,14 @@ export class Environment {
 		if (process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]) {
 			paths = {
 				...paths,
-				config: path.resolve(process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]!, name),
+				config: path.resolve(process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]!, this.appName),
 			};
 		}
 
 		if (process.env[Constants.EnvironmentVariables.CORE_PATH_DATA]) {
 			paths = {
 				...paths,
-				data: path.resolve(process.env[Constants.EnvironmentVariables.CORE_PATH_DATA]!, name),
+				data: path.resolve(process.env[Constants.EnvironmentVariables.CORE_PATH_DATA]!, this.appName),
 			};
 		}
 

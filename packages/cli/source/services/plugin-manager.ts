@@ -13,10 +13,10 @@ export class PluginManager implements Contracts.PluginManager {
 	@inject(Identifiers.Environment)
 	private readonly environment!: Environment;
 
-	public async list(name: string): Promise<Contracts.Plugin[]> {
+	public async list(): Promise<Contracts.Plugin[]> {
 		const plugins: Contracts.Plugin[] = [];
 
-		const path = this.#getPluginsPath(name);
+		const path = this.#getPluginsPath();
 		const packagePaths = glob
 			.sync("{@*/*/package.json,*/package.json}", { cwd: path })
 			.map((packagePath) => join(path, packagePath).slice(0, -"/package.json".length));
@@ -34,11 +34,11 @@ export class PluginManager implements Contracts.PluginManager {
 		return plugins.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
-	public async install(name: string, package_: string, version?: string): Promise<void> {
+	public async install(package_: string, version?: string): Promise<void> {
 		for (const Instance of [File, Git, NPM]) {
 			const source: Source = new Instance({
-				data: this.#getPluginsPath(name),
-				temp: this.#getTempPath(name),
+				data: this.#getPluginsPath(),
+				temp: this.#getTempPath(),
 			});
 
 			if (await source.exists(package_, version)) {
@@ -49,10 +49,10 @@ export class PluginManager implements Contracts.PluginManager {
 		throw new Error(`The given package [${package_}] is neither a git nor a npm package.`);
 	}
 
-	public async update(name: string, package_: string): Promise<void> {
+	public async update(package_: string): Promise<void> {
 		const paths = {
-			data: this.#getPluginsPath(name),
-			temp: this.#getTempPath(name),
+			data: this.#getPluginsPath(),
+			temp: this.#getTempPath(),
 		};
 		const directory: string = join(paths.data, package_);
 
@@ -67,8 +67,8 @@ export class PluginManager implements Contracts.PluginManager {
 		return new NPM(paths).update(package_);
 	}
 
-	public async remove(name: string, package_): Promise<void> {
-		const directory: string = join(this.#getPluginsPath(name), package_);
+	public async remove(package_): Promise<void> {
+		const directory: string = join(this.#getPluginsPath(), package_);
 
 		if (!existsSync(directory)) {
 			throw new Error(`The package [${package_}] does not exist.`);
@@ -77,11 +77,11 @@ export class PluginManager implements Contracts.PluginManager {
 		removeSync(directory);
 	}
 
-	#getPluginsPath(name: string): string {
-		return join(this.environment.getPaths(name).data, "plugins");
+	#getPluginsPath(): string {
+		return join(this.environment.getPaths().data, "plugins");
 	}
 
-	#getTempPath(name: string): string {
-		return join(this.environment.getPaths(name).temp, "plugins");
+	#getTempPath(): string {
+		return join(this.environment.getPaths().temp, "plugins");
 	}
 }

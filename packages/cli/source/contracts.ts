@@ -62,13 +62,13 @@ export interface Plugin {
 }
 
 export interface PluginManager {
-	list(name: string): Promise<Plugin[]>;
+	list(): Promise<Plugin[]>;
 
-	install(name: string, package_: string, version?: string): Promise<void>;
+	install(package_: string, version?: string): Promise<void>;
 
-	update(name: string, package_: string): Promise<void>;
+	update(package_: string): Promise<void>;
 
-	remove(name: string, package_: string): Promise<void>;
+	remove(package_: string): Promise<void>;
 }
 
 export enum ProcessState {

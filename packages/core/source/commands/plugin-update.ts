@@ -16,6 +16,6 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		return await this.pluginManager.update(this.app.get(Identifiers.Application.Name), this.getArgument("package"));
+		return await this.pluginManager.update(this.getArgument("package"));
 	}
 }
