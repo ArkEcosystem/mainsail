@@ -16,20 +16,14 @@ export class Command extends Commands.Command {
 	public requiresNetwork = false;
 
 	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag(
-				"channel",
-				"The NPM registry channel that should be used.",
-				Joi.string().valid(...Constants.Channels),
-			);
+		this.definition.setFlag(
+			"channel",
+			"The NPM registry channel that should be used.",
+			Joi.string().valid(...Constants.Channels),
+		);
 	}
 
 	public async execute(): Promise<void> {
-		if (this.hasFlag("token")) {
-			this.config.set("token", this.getFlag("token"));
-		}
-
 		if (this.hasFlag("channel")) {
 			const newChannel: string = this.getFlag("channel");
 			const oldChannel: string = this.config.get("channel");
@@ -49,7 +43,7 @@ export class Command extends Commands.Command {
 
 			spinner.succeed();
 
-			await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-api`);
+			await this.actions.restartRunningProcessWithPrompt(`mainsail-api`);
 		}
 	}
 }

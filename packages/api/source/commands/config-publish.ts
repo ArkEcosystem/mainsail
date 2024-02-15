@@ -16,10 +16,11 @@ export class Command extends Commands.Command {
 	public requiresNetwork = false;
 
 	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().required())
-			.setFlag("network", "The name of the network.", Joi.string().required())
-			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
+		this.definition.setFlag(
+			"reset",
+			"Using the --reset flag will overwrite existing configuration.",
+			Joi.boolean(),
+		);
 	}
 
 	public async execute(): Promise<void> {

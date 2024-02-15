@@ -12,8 +12,6 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().required())
-			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("env", "", Joi.string().default("production"))
 			.setFlag("skipPrompts", "Skip prompts.", Joi.boolean().default(false));
 	}

@@ -1,6 +1,5 @@
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
-import { Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
 @injectable()
@@ -14,8 +13,6 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("force", "Force an update.", Joi.boolean().default(false))
 			.setFlag("updateProcessManager", "Update process manager.", Joi.boolean().default(false))
 			.setFlag("restart", "Restart all running processes.", Joi.boolean());
 	}
@@ -26,19 +23,13 @@ export class Command extends Commands.Command {
 		if (hasNewVersion) {
 			await this.updater.update(this.getFlag("updateProcessManager"), this.getFlag("force"));
 
-			if (this.#hasRestartFlag()) {
-				if (this.hasFlag("restart")) {
-					this.actions.restartRunningProcess(`${this.getFlag("token")}-api`);
-				}
+			if (this.hasFlag("restart")) {
+				this.actions.restartRunningProcess(`mainsail-api`);
 			} else if (!this.getFlag("force")) {
-				await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-api`);
+				await this.actions.restartRunningProcessWithPrompt(`mainsail-api`);
 			}
 		} else {
 			this.components.success(`You already have the latest version (${this.pkg.version})`);
 		}
-	}
-
-	#hasRestartFlag(): boolean {
-		return Utils.hasSomeProperty(this.getFlags(), ["restart"]);
 	}
 }
