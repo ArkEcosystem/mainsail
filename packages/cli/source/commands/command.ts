@@ -145,9 +145,7 @@ export abstract class Command {
 	}
 
 	async #detectConfig(): Promise<void> {
-		const config = await this.app
-			.resolve(DiscoverConfig)
-			.discover(this.input.getFlag("token"), this.input.getFlag("network"));
+		const config = await this.app.resolve(DiscoverConfig).discover();
 
 		if (config) {
 			this.input.setFlag("token", config.token);

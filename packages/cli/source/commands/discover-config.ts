@@ -18,7 +18,7 @@ export class DiscoverConfig {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	public async discover(token = "", network = ""): Promise<Config | undefined> {
+	public async discover(): Promise<Config | undefined> {
 		const applicationName = this.app.get<string>(Identifiers.Application.Name);
 		Utils.assert.defined<string>(applicationName);
 
@@ -34,12 +34,7 @@ export class DiscoverConfig {
 
 		try {
 			return await readJSON(
-				path.join(
-					environmentPaths.get(token, { suffix: "core" }).config,
-					network,
-					applicationName,
-					"config.json",
-				),
+				path.join(environmentPaths.get(applicationName, { suffix: "" }).config, "config.json"),
 			);
 		} catch {}
 
