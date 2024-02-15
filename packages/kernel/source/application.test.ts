@@ -59,8 +59,6 @@ describe<{
 				name: "local",
 			},
 		});
-
-		assert.equal(context.app.dirPrefix(), "ark/testnet/local");
 	});
 
 	it("should bootstrap the application with a config path from process.env", async (context) => {
@@ -71,26 +69,6 @@ describe<{
 		});
 
 		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);
-	});
-
-	it("should fail to bootstrap the application if no token is provided", async (context) => {
-		await assert.rejects(
-			() =>
-				context.app.bootstrap({
-					flags: { network: "testnet", paths: { config: resolve(__dirname, "../test/stubs/config") } },
-				}),
-			Exceptions.NetworkCannotBeDetermined,
-		);
-	});
-
-	it("should fail to bootstrap the application if no network is provided", async (context) => {
-		await assert.rejects(
-			() =>
-				context.app.bootstrap({
-					flags: { paths: { config: resolve(__dirname, "../test/stubs/config") }, token: "ark" },
-				}),
-			Exceptions.NetworkCannotBeDetermined,
-		);
 	});
 
 	it("should boot the application", async (context) => {
@@ -155,53 +133,10 @@ describe<{
 		assert.is(context.app.config("key", "new"), "new");
 	});
 
-	it("should return the directory prefix", (context) => {
-		context.app.bind(Identifiers.Application.DirPrefix).toConstantValue("Hello World");
-
-		assert.is(context.app.dirPrefix(), "Hello World");
-	});
-
-	it("should return the namespace", (context) => {
-		context.app.bind(Identifiers.Application.Namespace).toConstantValue("Hello World");
-
-		assert.is(context.app.namespace(), "Hello World");
-	});
-
 	it("should return the version", (context) => {
 		context.app.bind(Identifiers.Application.Version).toConstantValue("Hello World");
 
 		assert.is(context.app.version(), "Hello World");
-	});
-
-	it("should return the token", (context) => {
-		context.app.bind(Identifiers.Application.Token).toConstantValue("Hello World");
-
-		assert.is(context.app.token(), "Hello World");
-	});
-
-	it("should return the network", (context) => {
-		context.app.bind(Identifiers.Application.Network).toConstantValue("Hello World");
-
-		assert.is(context.app.network(), "Hello World");
-	});
-
-	it("should use the given network", (context) => {
-		context.app.useNetwork("testnet");
-
-		assert.is(context.app.network(), "testnet");
-	});
-
-	it("should use the given network even if one is already set", (context) => {
-		context.app.useNetwork("testnet");
-
-		assert.is(context.app.network(), "testnet");
-
-		const unbindSpy = spy(context.container, "unbind");
-
-		context.app.useNetwork("mainnet");
-
-		assert.is(context.app.network(), "mainnet");
-		unbindSpy.calledOnce();
 	});
 
 	it("should fail to set a path if it does not exist", (context) => {
@@ -303,78 +238,6 @@ describe<{
 		context.app.useEnvironment("production");
 
 		assert.is(context.app.environment(), "production");
-	});
-
-	it("should determine if the application is in production (by environment)", (context) => {
-		context.app.bind(Identifiers.Application.Network).toConstantValue("devnet");
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("development");
-
-		assert.false(context.app.isProduction());
-
-		context.app.unbind(Identifiers.Application.Environment);
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
-
-		assert.true(context.app.isProduction());
-	});
-
-	it("should determine if the application is in production (by network)", (context) => {
-		context.app.bind(Identifiers.Application.Network).toConstantValue("devnet");
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("development");
-
-		assert.false(context.app.isProduction());
-
-		context.app.unbind(Identifiers.Application.Network);
-		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
-
-		assert.true(context.app.isProduction());
-	});
-
-	it("should determine if the application is in development (by environment)", (context) => {
-		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
-
-		assert.false(context.app.isDevelopment());
-
-		context.app.unbind(Identifiers.Application.Environment);
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("development");
-
-		assert.true(context.app.isDevelopment());
-	});
-
-	it("should determine if the application is in development (by network)", (context) => {
-		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
-
-		assert.false(context.app.isDevelopment());
-
-		context.app.unbind(Identifiers.Application.Network);
-		context.app.bind(Identifiers.Application.Network).toConstantValue("devnet");
-
-		assert.true(context.app.isDevelopment());
-	});
-
-	it("should determine if the application is in tests (by environment)", (context) => {
-		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
-
-		assert.false(context.app.runningTests());
-
-		context.app.unbind(Identifiers.Application.Environment);
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("test");
-
-		assert.true(context.app.runningTests());
-	});
-
-	it("should determine if the application is in tests (by network)", (context) => {
-		context.app.bind(Identifiers.Application.Network).toConstantValue("mainnet");
-		context.app.bind(Identifiers.Application.Environment).toConstantValue("production");
-
-		assert.false(context.app.runningTests());
-
-		context.app.unbind(Identifiers.Application.Network);
-		context.app.bind(Identifiers.Application.Network).toConstantValue("testnet");
-
-		assert.true(context.app.runningTests());
 	});
 
 	it("should enable and disable maintenance mode", (context) => {
