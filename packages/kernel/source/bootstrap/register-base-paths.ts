@@ -18,7 +18,7 @@ export class RegisterBasePaths implements Bootstrapper {
 	private readonly configRepository!: ConfigRepository;
 
 	public async bootstrap(): Promise<void> {
-		const paths: Array<[string, string]> = Object.entries(envPaths(this.app.token(), { suffix: "core" }));
+		const paths: Array<[string, string]> = Object.entries(envPaths(this.app.name(), { suffix: "" }));
 
 		for (let [type, path] of paths) {
 			const configKey = `CORE_PATH_${type.toUpperCase()}`;
@@ -36,9 +36,6 @@ export class RegisterBasePaths implements Bootstrapper {
 			} else if (this.configRepository.has(`app.flags.paths.${type}`)) {
 				// 2. Check if a path is defined via configuration repository.
 				path = this.configRepository.get(`app.flags.paths.${type}`);
-			} else {
-				// 3. If the default path is used we'll append the network name to it.
-				path = join(path, this.app.network(), this.app.name());
 			}
 
 			path = resolve(expandTilde(path));
