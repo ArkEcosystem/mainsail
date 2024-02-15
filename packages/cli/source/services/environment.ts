@@ -9,7 +9,7 @@ import { envPaths as environmentPaths, Paths } from "../env-paths";
 @injectable()
 export class Environment {
 	public getPaths(name: string): Paths {
-		let paths: Paths = environmentPaths.get(name);
+		let paths: Paths = environmentPaths.get(name, { suffix: "" });
 
 		for (const [key, value] of Object.entries(paths)) {
 			paths[key] = value;
