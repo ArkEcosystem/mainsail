@@ -87,6 +87,15 @@ export type ProcessDescription = Record<string, any>;
 
 export type ProcessOptions = Record<"name" | "script" | "args", string>;
 
+export interface Process {
+	stop(daemon: boolean): void;
+	restart(): void;
+	status(): void;
+	log(showErrors: boolean, lines: number): void;
+}
+
+export type ProcessFactory = (name: string) => Process;
+
 // APPLICATION
 export interface Application {
 	bind<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): interfaces.BindingToSyntax<T>;

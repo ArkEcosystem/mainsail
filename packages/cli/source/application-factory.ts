@@ -73,15 +73,12 @@ export class ApplicationFactory {
 
 		app.bind(Identifiers.ComponentFactory).to(ComponentFactory).inSingletonScope();
 
-		app.bind(Identifiers.ProcessFactory).toFactory(
-			(context: interfaces.Context) =>
-				(token: string, type: string): Process => {
-					const process: Process = context.container.resolve(Process);
-					process.initialize(token, type);
+		app.bind(Identifiers.ProcessFactory).toFactory((context: interfaces.Context) => (type: string): Process => {
+			const process: Process = context.container.resolve(Process);
+			process.initialize(type);
 
-					return process;
-				},
-		);
+			return process;
+		});
 
 		// Services
 		app.bind(Identifiers.Output).to(Output).inSingletonScope();

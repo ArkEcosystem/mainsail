@@ -17,7 +17,7 @@ describe<{
 		const isUnknown = stub(processManager, "isUnknown").returnValue(false);
 		const isStopped = stub(processManager, "isStopped").returnValue(false);
 
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process does not exist.');
+		await assert.rejects(() => cli.execute(Command), 'The "mainsail" process does not exist.');
 	});
 
 	it("should throw if the process entered an unknown state", async ({ processManager, cli }) => {
@@ -25,7 +25,7 @@ describe<{
 		const isUnknown = stub(processManager, "isUnknown").returnValue(true);
 		const isStopped = stub(processManager, "isStopped").returnValue(false);
 
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process has entered an unknown state.');
+		await assert.rejects(() => cli.execute(Command), 'The "mainsail" process has entered an unknown state.');
 	});
 
 	it("should throw if the process is stopped", async ({ processManager, cli }) => {
@@ -33,7 +33,7 @@ describe<{
 		const isUnknown = stub(processManager, "isUnknown").returnValue(false);
 		const isStopped = stub(processManager, "isStopped").returnValue(true);
 
-		await assert.rejects(() => cli.execute(Command), 'The "ark-core" process is not running.');
+		await assert.rejects(() => cli.execute(Command), 'The "mainsail" process is not running.');
 	});
 
 	it("should stop the process if the [--daemon] flag is not present", async ({ processManager, cli }) => {

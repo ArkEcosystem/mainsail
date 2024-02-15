@@ -24,7 +24,7 @@ describe<{
 				return process;
 			});
 
-		context.process = context.cli.app.get(Identifiers.ProcessFactory)("ark", "core");
+		context.process = context.cli.app.get(Identifiers.ProcessFactory)("mainsail");
 	});
 
 	afterAll(() => setGracefulCleanup());
@@ -34,7 +34,7 @@ describe<{
 		stub(processManager, "isUnknown").returnValue(false);
 		stub(processManager, "isStopped").returnValue(false);
 
-		assert.throws(() => process.stop(false), 'The "ark-core" process does not exist.');
+		assert.throws(() => process.stop(false), 'The "mainsail" process does not exist.');
 	});
 
 	it("#stop - should throw if the process entered an unknown state", ({ process, processManager }) => {
@@ -42,7 +42,7 @@ describe<{
 		stub(processManager, "isUnknown").returnValue(true);
 		stub(processManager, "isStopped").returnValue(false);
 
-		assert.throws(() => process.stop(false), 'The "ark-core" process has entered an unknown state.');
+		assert.throws(() => process.stop(false), 'The "mainsail" process has entered an unknown state.');
 	});
 
 	it("#stop - should throw if the process is stopped", ({ process, processManager }) => {
@@ -50,7 +50,7 @@ describe<{
 		stub(processManager, "isUnknown").returnValue(false);
 		stub(processManager, "isStopped").returnValue(true);
 
-		assert.throws(() => process.stop(false), 'The "ark-core" process is not running.');
+		assert.throws(() => process.stop(false), 'The "mainsail" process is not running.');
 	});
 
 	it("#stop - should delete the process if the [--daemon] flag is not present", ({ process, processManager }) => {
@@ -79,14 +79,14 @@ describe<{
 		stub(processManager, "missing").returnValue(true);
 		stub(processManager, "isStopped").returnValue(false);
 
-		assert.throws(() => process.restart(), 'The "ark-core" process does not exist.');
+		assert.throws(() => process.restart(), 'The "mainsail" process does not exist.');
 	});
 
 	it("#restart - should throw if the process is stopped", ({ process, processManager }) => {
 		stub(processManager, "missing").returnValue(false);
 		stub(processManager, "isStopped").returnValue(true);
 
-		assert.throws(() => process.restart(), 'The "ark-core" process is not running.');
+		assert.throws(() => process.restart(), 'The "mainsail" process is not running.');
 	});
 
 	it("#restart - should restart the process", ({ process, processManager }) => {
@@ -100,14 +100,14 @@ describe<{
 	});
 
 	it("#status - should throw if the process does not exist", async ({ process }) => {
-		assert.throws(() => process.status(), 'The "ark-core" process does not exist.');
+		assert.throws(() => process.status(), 'The "mainsail" process does not exist.');
 	});
 
 	it("#status - should render a table with the process information", async ({ process, processManager }) => {
 		stub(processManager, "missing").returnValue(false);
 		stub(processManager, "describe").returnValue({
 			monit: { cpu: 2, memory: 2048 },
-			name: "ark-core",
+			name: "mainsail",
 			pid: 1,
 			pm2_env: {
 				pm_uptime: 1_387_045_673_686,
@@ -128,7 +128,7 @@ describe<{
 		assert.true(
 			[
 				"1",
-				"ark-core",
+				"mainsail",
 				"1.0.0",
 				"online",
 				// "5y 267d 19h 31m 28.1s",
@@ -139,14 +139,14 @@ describe<{
 	});
 
 	it("#log - should throw if the process does not exist", async ({ process }) => {
-		await assert.rejects(() => process.log(false, 1), 'The "ark-core" process does not exist.');
+		await assert.rejects(() => process.log(false, 1), 'The "mainsail" process does not exist.');
 	});
 
 	it("#log - should log to pm_out_log_path", async ({ cli, process, processManager }) => {
 		stub(cli.app.get(Identifiers.AbortMissingProcess), "execute");
 		stub(processManager, "describe").returnValue({
 			monit: { cpu: 2, memory: 2048 },
-			name: "ark-core",
+			name: "mainsail",
 			pid: 1,
 			pm2_env: {
 				pm_err_log_path: fileSync().name,
@@ -162,14 +162,14 @@ describe<{
 		await process.log(false, 15);
 
 		spyWatch.calledOnce();
-		spyLog.calledWith("Tailing last 15 lines for [ark-core] process (change the value with --lines option)");
+		spyLog.calledWith("Tailing last 15 lines for [mainsail] process (change the value with --lines option)");
 	});
 
 	it("#log - should log to pm_err_log_path", async ({ cli, process, processManager }) => {
 		stub(cli.app.get(Identifiers.AbortMissingProcess), "execute");
 		stub(processManager, "describe").returnValue({
 			monit: { cpu: 2, memory: 2048 },
-			name: "ark-core",
+			name: "mainsail",
 			pid: 1,
 			pm2_env: {
 				pm_err_log_path: fileSync().name,
@@ -185,6 +185,6 @@ describe<{
 		await process.log(true, 15);
 
 		spyWatch.calledOnce();
-		spyLog.calledWith("Tailing last 15 lines for [ark-core] process (change the value with --lines option)");
+		spyLog.calledWith("Tailing last 15 lines for [mainsail] process (change the value with --lines option)");
 	});
 });
