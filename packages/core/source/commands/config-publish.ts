@@ -13,8 +13,6 @@ export class Command extends Commands.Command {
 
 	public description = "Publish the configuration.";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
@@ -53,11 +51,7 @@ export class Command extends Commands.Command {
 	}
 
 	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
-		this.app
-			.rebind(Identifiers.ApplicationPaths)
-			.toConstantValue(
-				this.environment.getPaths(flags.token, flags.network, this.app.get(Identifiers.Application.Name)),
-			);
+		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
 		const configSource = resolve(

@@ -64,7 +64,7 @@ describe<{
 
 		spyOnInstall.calledOnce();
 		spyOnUpdate.calledOnce();
-		spyOnIsOnline.calledTimes(3);
-		spyOnRestart.calledTimes(3);
+		spyOnIsOnline.calledOnce();
+		spyOnRestart.calledOnce();
 	});
 });

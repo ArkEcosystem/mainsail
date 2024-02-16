@@ -13,13 +13,12 @@ export class Command extends Commands.Command {
 
 	public description = "Publish the configuration.";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().required())
-			.setFlag("network", "The name of the network.", Joi.string().required())
-			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
+		this.definition.setFlag(
+			"reset",
+			"Using the --reset flag will overwrite existing configuration.",
+			Joi.boolean(),
+		);
 	}
 
 	public async execute(): Promise<void> {
@@ -53,11 +52,7 @@ export class Command extends Commands.Command {
 	}
 
 	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
-		this.app
-			.rebind(Identifiers.ApplicationPaths)
-			.toConstantValue(
-				this.environment.getPaths(flags.token, flags.network, this.app.get(Identifiers.Application.Name)),
-			);
+		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
 		const configSource = resolve(

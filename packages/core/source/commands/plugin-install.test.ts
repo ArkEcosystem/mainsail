@@ -8,8 +8,6 @@ describe<{
 	pluginManager: Services.PluginManager;
 }>("PluginInstallCommand", ({ beforeEach, it, assert, stub }) => {
 	const packageName = "dummyPackageName";
-	const token = "ark";
-	const network = "testnet";
 
 	beforeEach((context) => {
 		process.argv = ["", "test"];
@@ -30,10 +28,8 @@ describe<{
 		const spyOnInstall = stub(pluginManager, "install");
 
 		const version = "3.0.0";
-		await assert.resolves(() =>
-			cli.withArgs([packageName]).withFlags({ network, token, version }).execute(Command),
-		);
+		await assert.resolves(() => cli.withArgs([packageName]).withFlags({ version }).execute(Command));
 
-		spyOnInstall.calledWith(token, network, packageName, version);
+		spyOnInstall.calledWith(packageName, version);
 	});
 });

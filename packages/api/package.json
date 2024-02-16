@@ -14,7 +14,7 @@
 		"/distribution"
 	],
 	"scripts": {
-		"api:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail-api api:run -- --token=ark --network=testnet",
+		"api:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail-api api:run",
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
@@ -39,7 +39,6 @@
 		"boxen": "4.2.0",
 		"cross-env": "7.0.3",
 		"dayjs": "1.11.10",
-		"env-paths": "2.2.1",
 		"envfile": "7.0.0",
 		"execa": "5.1.1",
 		"fs-extra": "11.2.0",
@@ -51,7 +50,6 @@
 	},
 	"devDependencies": {
 		"@types/boxen": "3.0.1",
-		"@types/env-paths": "2.1.0",
 		"@types/execa": "2.0.0",
 		"@types/fs-extra": "11.0.4",
 		"@types/prompts": "2.4.9",

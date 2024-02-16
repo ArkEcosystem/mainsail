@@ -30,12 +30,8 @@ export class Command extends Commands.Command {
 
 	public description = "Publish the configuration from online sources.";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().required())
-			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri().required())
 			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri())
 			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri().required())
@@ -47,11 +43,7 @@ export class Command extends Commands.Command {
 	}
 
 	async #publish(flags: Contracts.AnyObject): Promise<void> {
-		this.app
-			.rebind(Identifiers.ApplicationPaths)
-			.toConstantValue(
-				this.environment.getPaths(flags.token, flags.network, this.app.get(Identifiers.Application.Name)),
-			);
+		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
 

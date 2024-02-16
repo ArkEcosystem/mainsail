@@ -16,7 +16,7 @@ describe<{
 		stub(processManager, "list").returnValue([
 			{
 				monit: { cpu: 2, memory: 2048 },
-				name: "ark-core",
+				name: "mainsail",
 				pid: 1,
 				pm2_env: {
 					pm_uptime: 1_387_045_673_686,
@@ -26,7 +26,7 @@ describe<{
 			},
 			{
 				monit: { cpu: 2, memory: 2048 },
-				name: "btc-core",
+				name: "some-process",
 				pid: 2,
 				pm2_env: {
 					pm_uptime: 1_387_045_673_686,
@@ -47,7 +47,7 @@ describe<{
 		assert.true(
 			[
 				"1",
-				"ark-core",
+				"mainsail",
 				"1.0.0",
 				"online",
 				// "5y 267d 19h 31m 28.1s",

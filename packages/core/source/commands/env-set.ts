@@ -14,8 +14,6 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag(
 				"key",
 				"The environment variable that you wish to set.",

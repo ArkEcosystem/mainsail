@@ -56,15 +56,13 @@ describe<{
 		const spyOnUpdate = stub(processManager, "update");
 		const spyOnIsOnline = stub(processManager, "isOnline").returnValue(true);
 		const spyOnRestart = stub(processManager, "restart");
-		prompts.inject([true]); // restart core
-		prompts.inject([true]); // restart relay
-		prompts.inject([true]); // restart forger
+		prompts.inject([true]); // restart mainsail
 
 		await cli.withFlags({ force: true }).execute(Command);
 
 		spyOnInstall.calledOnce();
 		spyOnUpdate.calledOnce();
-		spyOnIsOnline.calledTimes(3);
-		spyOnRestart.calledTimes(3);
+		spyOnIsOnline.calledOnce();
+		spyOnRestart.calledOnce();
 	});
 });

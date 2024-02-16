@@ -11,8 +11,6 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string().required())
-			.setFlag("network", "The name of the network.", Joi.string().required())
 			.setFlag("env", "", Joi.string().default("production"))
 			.setFlag("disableDiscovery", "Permanently disable all peer discovery.", Joi.boolean())
 			.setFlag("skipDiscovery", "Skip the initial peer discovery.", Joi.boolean())
@@ -27,8 +25,7 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
-		this.actions.abortRunningProcess(`${flags.token}-forger`);
-		this.actions.abortRunningProcess(`${flags.token}-relay`);
+		this.actions.abortRunningProcess(`mainsail`);
 
 		await this.actions.daemonizeProcess(
 			{

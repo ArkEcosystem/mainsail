@@ -12,10 +12,9 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		context.envFile = `${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`;
+		context.envFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
 
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("mainsail-api");
 	});
 
 	afterAll(() => setGracefulCleanup());
@@ -73,11 +72,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "ark_testnet",
+			CORE_DB_DATABASE: "mainsail-db",
 			CORE_DB_HOST: "dummy",
 			CORE_DB_PASSWORD: "password",
 			CORE_DB_PORT: 5432,
-			CORE_DB_USERNAME: "ark",
+			CORE_DB_USERNAME: "mainsail",
 		});
 	});
 
@@ -89,11 +88,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "ark_testnet",
+			CORE_DB_DATABASE: "mainsail-db",
 			CORE_DB_HOST: "localhost",
 			CORE_DB_PASSWORD: "password",
 			CORE_DB_PORT: 5000,
-			CORE_DB_USERNAME: "ark",
+			CORE_DB_USERNAME: "mainsail",
 		});
 	});
 
@@ -109,7 +108,7 @@ describe<{
 			CORE_DB_HOST: "localhost",
 			CORE_DB_PASSWORD: "password",
 			CORE_DB_PORT: 5432,
-			CORE_DB_USERNAME: "ark",
+			CORE_DB_USERNAME: "mainsail",
 		});
 	});
 
@@ -121,7 +120,7 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "ark_testnet",
+			CORE_DB_DATABASE: "mainsail-db",
 			CORE_DB_HOST: "localhost",
 			CORE_DB_PASSWORD: "password",
 			CORE_DB_PORT: 5432,
@@ -137,11 +136,11 @@ describe<{
 
 		spyOnUpdateVariables.calledOnce();
 		spyOnUpdateVariables.calledWith(envFile, {
-			CORE_DB_DATABASE: "ark_testnet",
+			CORE_DB_DATABASE: "mainsail-db",
 			CORE_DB_HOST: "localhost",
 			CORE_DB_PASSWORD: "dummy",
 			CORE_DB_PORT: 5432,
-			CORE_DB_USERNAME: "ark",
+			CORE_DB_USERNAME: "mainsail",
 		});
 	});
 

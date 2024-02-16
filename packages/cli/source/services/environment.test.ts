@@ -1,8 +1,8 @@
-import fs, { ensureFileSync, removeSync } from "fs-extra";
+import { readFileSync } from "fs";
+import { ensureFileSync, removeSync } from "fs-extra";
 
 import { Console, describe } from "../../../test-framework";
 import { Environment } from "./environment";
-import { readFileSync } from "fs";
 
 describe<{
 	environment: Environment;
@@ -14,19 +14,13 @@ describe<{
 	});
 
 	it("should get all paths for the given token, network and name", async ({ environment }) => {
-		assert.equal(Object.keys(environment.getPaths("ark", "testnet", "mainsail")), [
-			"data",
-			"config",
-			"cache",
-			"log",
-			"temp",
-		]);
+		assert.equal(Object.keys(environment.getPaths("mainsail")), ["data", "config", "cache", "log", "temp"]);
 	});
 
 	it("should respect the CORE_PATH_CONFIG environment variable", async ({ environment }) => {
 		process.env.CORE_PATH_CONFIG = "something";
 
-		assert.true(environment.getPaths("ark", "testnet", "mainsail").config.endsWith("/something/mainsail"));
+		assert.true(environment.getPaths("mainsail").config.endsWith("/something/mainsail"));
 
 		delete process.env.CORE_PATH_CONFIG;
 	});

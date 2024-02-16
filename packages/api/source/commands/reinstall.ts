@@ -15,8 +15,6 @@ export class Command extends Commands.Command {
 
 	public description = "Reinstall the Core installation";
 
-	public requiresNetwork = false;
-
 	public configure(): void {
 		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean());
 	}
@@ -46,8 +44,6 @@ export class Command extends Commands.Command {
 
 		spinner.succeed();
 
-		await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-core`);
-		await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-relay`);
-		await this.actions.restartRunningProcessWithPrompt(`${this.getFlag("token")}-forger`);
+		await this.actions.restartRunningProcessWithPrompt(`mainsail-api`);
 	}
 }

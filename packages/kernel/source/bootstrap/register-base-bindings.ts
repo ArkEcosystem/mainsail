@@ -17,8 +17,6 @@ export class RegisterBaseBindings implements Bootstrapper {
 		assert.defined<Record<string, string>>(flags);
 
 		this.app.bind<string>(Identifiers.Application.Environment).toConstantValue(flags.env);
-		this.app.bind<string>(Identifiers.Application.Token).toConstantValue(flags.token);
-		this.app.bind<string>(Identifiers.Application.Network).toConstantValue(flags.network);
 		this.app.bind<string>(Identifiers.Application.Name).toConstantValue(flags.name);
 		this.app.bind<string>(Identifiers.Application.Version).toConstantValue(version);
 

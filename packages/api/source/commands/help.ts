@@ -9,8 +9,6 @@ export class Command extends Commands.Command {
 
 	public description = "Displays detailed information on all commands available via CLI.";
 
-	public requiresNetwork = false;
-
 	public async execute(): Promise<void> {
 		const commands: Contracts.CommandList = this.app.get(Identifiers.Commands);
 

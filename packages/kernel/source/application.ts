@@ -63,32 +63,12 @@ export class Application implements Contracts.Kernel.Application {
 		return config.get(key, defaultValue);
 	}
 
-	public dirPrefix(): string {
-		return this.get(Identifiers.Application.DirPrefix);
-	}
-
-	public namespace(): string {
-		return this.get(Identifiers.Application.Namespace);
-	}
-
 	public version(): string {
 		return this.get(Identifiers.Application.Version);
 	}
 
-	public token(): string {
-		return this.get(Identifiers.Application.Token);
-	}
-
-	public network(): string {
-		return this.get(Identifiers.Application.Network);
-	}
-
 	public name(): string {
 		return this.get(Identifiers.Application.Name);
-	}
-
-	public useNetwork(value: string): void {
-		this.rebind<string>(Identifiers.Application.Network).toConstantValue(value);
 	}
 
 	public dataPath(path = ""): string {
@@ -141,18 +121,6 @@ export class Application implements Contracts.Kernel.Application {
 
 	public useEnvironment(value: string): void {
 		this.rebind<string>(Identifiers.Application.Environment).toConstantValue(value);
-	}
-
-	public isProduction(): boolean {
-		return this.environment() === "production" || this.network() === "mainnet";
-	}
-
-	public isDevelopment(): boolean {
-		return this.environment() === "development" || ["devnet", "testnet"].includes(this.network());
-	}
-
-	public runningTests(): boolean {
-		return this.environment() === "test" || this.network() === "testnet";
 	}
 
 	public isBooted(): boolean {

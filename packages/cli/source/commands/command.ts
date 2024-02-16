@@ -5,15 +5,12 @@ import { ActionFactory } from "../action-factory";
 import { ComponentFactory } from "../component-factory";
 import { Box } from "../components";
 import { Application, InputValue } from "../contracts";
-import { envPaths as environmentPaths } from "../env-paths";
 import { Input } from "../input";
 import { InputDefinition } from "../input/definition";
 import { Identifiers } from "../ioc";
 import { Output } from "../output";
 import { Config, Environment } from "../services";
 import { CommandHelp } from "./command-help";
-import { DiscoverConfig } from "./discover-config";
-import { DiscoverNetwork } from "./discover-network";
 
 @injectable()
 export abstract class Command {
@@ -43,8 +40,6 @@ export abstract class Command {
 	public description: string | undefined;
 
 	public isHidden = false;
-
-	public requiresNetwork = true;
 
 	protected definition: InputDefinition = new InputDefinition();
 
@@ -81,27 +76,6 @@ export abstract class Command {
 
 	public async run(): Promise<void> {
 		try {
-			await this.#detectConfig();
-
-			if (this.requiresNetwork) {
-				await this.#detectNetwork();
-			}
-
-			// Check for configuration again after network was chosen
-			await this.#detectConfig();
-
-			if (this.input.hasFlag("token") && this.input.hasFlag("network")) {
-				this.app
-					.rebind(Identifiers.ApplicationPaths)
-					.toConstantValue(
-						this.env.getPaths(
-							this.input.getFlag("token"),
-							this.input.getFlag("network"),
-							this.app.get(Identifiers.Application.Name),
-						),
-					);
-			}
-
 			await this.initialize();
 
 			if (this.input.isInteractive()) {
@@ -148,32 +122,6 @@ export abstract class Command {
 
 	public hasFlag(name: string): boolean {
 		return this.input.hasFlag(name);
-	}
-
-	async #detectConfig(): Promise<void> {
-		const config = await this.app
-			.resolve(DiscoverConfig)
-			.discover(this.input.getFlag("token"), this.input.getFlag("network"));
-
-		if (config) {
-			this.input.setFlag("token", config.token);
-			this.input.setFlag("network", config.network);
-		}
-	}
-
-	async #detectNetwork(): Promise<void> {
-		const requiresNetwork: boolean = Object.keys(this.definition.getFlags()).includes("network");
-
-		if (requiresNetwork && !this.input.hasFlag("network")) {
-			this.input.setFlag(
-				"network",
-				await this.app.resolve(DiscoverNetwork).discover(
-					environmentPaths.get(this.input.getFlag("token"), {
-						suffix: "core",
-					}).config,
-				),
-			);
-		}
 	}
 
 	public abstract execute(): Promise<void>;

@@ -68,10 +68,6 @@ export class Config {
 			this.#store = {};
 		}
 
-		if (!this.has("token")) {
-			this.set("token", "ark");
-		}
-
 		if (!this.has("channel")) {
 			this.set(
 				"channel",

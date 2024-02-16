@@ -1,19 +1,12 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Commands, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
 	public signature = "env:paths";
 
 	public description = "Get all of the environment paths.";
-
-	public configure(): void {
-		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
-			.setFlag("network", "The name of the network.", Joi.string());
-	}
 
 	public async execute(): Promise<void> {
 		this.components.table(["Type", "Path"], (table) => {

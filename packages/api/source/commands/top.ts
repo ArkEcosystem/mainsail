@@ -2,7 +2,6 @@ import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import { prettyBytes, prettyTime } from "@mainsail/utils";
 import dayjs from "dayjs";
-import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -13,15 +12,9 @@ export class Command extends Commands.Command {
 
 	public description = "List all Core daemons.";
 
-	public requiresNetwork = false;
-
-	public configure(): void {
-		this.definition.setFlag("token", "The name of the token.", Joi.string());
-	}
-
 	public async execute(): Promise<void> {
 		const processes: Contracts.ProcessDescription[] = (this.processManager.list() || []).filter(
-			(p: Contracts.ProcessDescription) => p.name.startsWith(this.getFlag("token")),
+			(p: Contracts.ProcessDescription) => p.name.startsWith("mainsail"),
 		);
 
 		if (!processes || Object.keys(processes).length === 0) {

@@ -1,9 +1,9 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 import { Console, describe } from "@mainsail/test-framework";
 import { ensureDirSync, ensureFileSync, writeFileSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./env-get";
-import { Identifiers } from "@mainsail/cli";
 
 describe<{
 	cli: Console;
@@ -11,16 +11,15 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail-api`);
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail`);
 
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("mainsail-api");
 	});
 
 	afterAll(() => setGracefulCleanup());
 
 	it("should get the value of an environment variable", async ({ cli }) => {
-		writeFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`, "CORE_LOG_LEVEL=emergency");
+		writeFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail/.env`, "CORE_LOG_LEVEL=emergency");
 
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));
@@ -31,7 +30,7 @@ describe<{
 	});
 
 	it("should fail to get the value of a non-existent environment variable", async ({ cli }) => {
-		ensureFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`);
+		ensureFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail/.env`);
 
 		await assert.rejects(
 			() => cli.withFlags({ key: "FAKE_KEY" }).execute(Command),
@@ -40,11 +39,11 @@ describe<{
 	});
 
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail-api/jestnet`);
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail/jestnet`);
 
 		await assert.rejects(
 			() => cli.withFlags({ key: "FAKE_KEY" }).execute(Command),
-			`No environment file found at ${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`,
+			`No environment file found at ${process.env.CORE_PATH_CONFIG}/mainsail/.env`,
 		);
 	});
 });
