@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/contracts",
-	"version": "0.0.1-alpha.4",
+	"version": "0.0.1-alpha.5",
 	"description": "Contracts for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-worker",
-	"version": "0.0.1-alpha.4",
+	"version": "0.0.1-alpha.5",
 	"description": "Crypto worker based on node child processes for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
