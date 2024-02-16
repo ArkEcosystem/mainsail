@@ -42,7 +42,7 @@ error ()
 
 osCommons() {
 
-# Detect OS and version 
+# Detect OS and version
 OS_ID=$( (grep -w "ID" /etc/os-release)  2>/dev/null | cut -d'=' -f2 )
 OS_VERSION=$( (grep -w "VERSION_ID" /etc/os-release)  2>/dev/null | cut -d'=' -f2 | tr -d '"' | cut -d. -f1 )
 OS_CODENAME=$( (grep -w "VERSION_CODENAME" /etc/os-release)  2>/dev/null | cut -d'=' -f2 )
@@ -114,7 +114,7 @@ heading "Installing Pnpm..."
     npm install --prefix=~/.pnpm -g pnpm
     if ! $(grep -Eq "(PNPM_HOME)" "$HOME/.bashrc"); then
         echo 'export PNPM_HOME=~/.pnpm/bin' >> ~/.bashrc
-        echo 'export PATH=$PATH:$PNPM_HOME' >> ~/.bashrc 
+        echo 'export PATH=$PATH:$PNPM_HOME' >> ~/.bashrc
     fi
     export PNPM_HOME=~/.pnpm/bin
     export PATH=$PATH:$PNPM_HOME
@@ -175,7 +175,7 @@ addCore() {
 
 heading "Configuring for custom TestNet ..."
 
-    channel=alpha addCore ${channel} && rm -rf ~/.config/ark-core/testnet/mainsail/ &&  rm -rf ~/.local/state/ark-core/testnet/mainsail/ &&  rm -rf ~/.local/share/ark-core/testnet/mainsail/  && mainsail config:publish:custom --token=ark --network=testnet --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset && mainsail env:set --token=ark --network=testnet --key=CORE_P2P_PORT --value=4000 && mainsail env:set --token=ark --network=testnet --key=CORE_API_DEV_ENABLED --value=true
+    channel=alpha addCore ${channel} && rm -rf ~/.config/mainsail/ &&  rm -rf ~/.local/state/mainsail/ &&  rm -rf ~/.local/share/mainsail/  && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset && mainsail env:set --key=CORE_P2P_PORT --value=4000 && mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
 
 warning "Cleaning up Pnpm cache .."
     pnpm store prune
@@ -236,14 +236,14 @@ if [[ "$choice" =~ ^(yes|y|Y) ]]; then
 
     userExists=$(sudo -i -u postgres psql -tAc "SELECT 1 FROM pg_user WHERE usename = '${databaseUsername}'")
     databaseExists=$(sudo -i -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname = '${databaseName}'")
-checkData() { 
+checkData() {
     f_data=$(sudo -i -u postgres psql -tAc "SELECT 1 FROM pg_tables WHERE schemaname = 'public' LIMIT 1" ${databaseName})
     echo $f_data
 }
 checkTables() {
     f_tables=$(sudo -i -u postgres psql -tAc "SELECT tablename FROM pg_tables WHERE schemaname = 'public'" ${databaseName})
     echo $f_tables
-} 
+}
     if [[ $userExists == 1 ]]; then
         read -p "The database user ${databaseUsername} already exists, do you want to recreate it? [y/N]: " choice
         choice="${choice:=N}"
@@ -255,8 +255,8 @@ checkTables() {
 		    warning "Data dependencies found. Transfering ownership to postgres ... "
 		    tables=$(checkTables)
 	            for table in ${tables}
-		    do 
-		    sudo -i -u postgres psql -c "ALTER table public.${table} owner to postgres" ${databaseName} 
+		    do
+		    sudo -i -u postgres psql -c "ALTER table public.${table} owner to postgres" ${databaseName}
 	       	    done
 		fi
             fi
@@ -299,7 +299,7 @@ if [ ! -z "$API" ] ; then
     pnpm rm -g @mainsail/api > /dev/null 2>&1 || true
 fi
 
-    channel=alpha addApi ${channel} && rm -rf ~/.config/ark-core/testnet/mainsail-api/ &&  rm -rf ~/.local/state/ark-core/testnet/mainsail-api/ &&  rm -rf ~/.local/share/ark-core/testnet/mainsail-api/ && mainsail-api config:publish --token=ark --network=testnet --reset && mainsail-api env:set --token=ark --network=testnet --key=CORE_DB_USERNAME --value="${databaseUsername}" && mainsail-api env:set --token=ark --network=testnet --key=CORE_DB_PASSWORD --value="${databasePassword}" && mainsail-api env:set --token=ark --network=testnet --key=CORE_DB_DATABASE --value="${databaseName}"
+    channel=alpha addApi ${channel} && rm -rf ~/.config/mainsail-api/ &&  rm -rf ~/.local/state/mainsail-api/ &&  rm -rf ~/.local/share/mainsail-api/ && mainsail-api config:publish --reset && mainsail-api env:set --key=CORE_DB_USERNAME --value="${databaseUsername}" && mainsail-api env:set --key=CORE_DB_PASSWORD --value="${databasePassword}" && mainsail-api env:set --key=CORE_DB_DATABASE --value="${databaseName}"
 
 warning "Cleaning up Pnpm cache .."
     pnpm store prune
@@ -312,16 +312,16 @@ CORE=$(which mainsail || :)
 
 if [[ "$choice" =~ ^(yes|y|Y) ]]; then
 	if [ -z "$CORE" ] ; then
-	   coreServer	
+	   coreServer
         fi
 heading "Configuring ..."
 
-        rm -rf ~/.config/ark-core/testnet/mainsail/ && rm -rf ~/.local/state/ark-core/testnet/mainsail/ && rm -rf ~/.local/share/ark-core/testnet/mainsail/ && mainsail config:publish:custom --token=ark --network=testnet --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/api-app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset 
-	mainsail env:set --token=ark --network=testnet --key=CORE_P2P_PORT --value=4000 
-	mainsail env:set --token=ark --network=testnet --key=CORE_API_DEV_ENABLED --value=true 
-	mainsail env:set --token=ark --network=testnet --key=CORE_DB_USERNAME --value="${databaseUsername}" 
-       	mainsail env:set --token=ark --network=testnet --key=CORE_DB_PASSWORD --value="${databasePassword}" 
-	mainsail env:set --token=ark --network=testnet --key=CORE_DB_DATABASE --value="${databaseName}"
+        rm -rf ~/.config/mainsail/ && rm -rf ~/.local/state/mainsail/ && rm -rf ~/.local/share/mainsail/ && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/api-app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset
+	mainsail env:set --key=CORE_P2P_PORT --value=4000
+	mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
+	mainsail env:set --key=CORE_DB_USERNAME --value="${databaseUsername}"
+       	mainsail env:set --key=CORE_DB_PASSWORD --value="${databasePassword}"
+	mainsail env:set --key=CORE_DB_DATABASE --value="${databaseName}"
 
 success "Configured ..."
 else
@@ -358,7 +358,7 @@ handle_flags() {
 }
 
 handle_flags "$@"
-coreServer 
+coreServer
 
 exec "$BASH"
 
