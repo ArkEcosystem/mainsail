@@ -22,43 +22,14 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		if (this.hasFlag("network")) {
-			return this.#performPublishment(this.getFlags());
-		}
-
-		const response = await this.components.prompt([
-			// {
-			// 	choices: Object.keys(Networks).map((network) => ({ title: network, value: network })),
-			// 	message: "Please select which network you want to operate on",
-			// 	name: "network",
-			// 	type: "select",
-			// },
-			{
-				message: "Can you confirm?",
-				name: "confirm",
-				type: "confirm",
-			},
-		]);
-
-		if (!response.network) {
-			this.components.fatal("You'll need to select the network to continue.");
-		}
-
-		if (!response.confirm) {
-			this.components.fatal("You'll need to confirm the network to continue.");
-		}
-
-		await this.#performPublishment({ ...response, ...this.getFlags() });
+		await this.#performPublishment(this.getFlags());
 	}
 
 	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
-		const configSource = resolve(
-			__dirname,
-			`../../bin/config/${flags.network}/${this.app.get(Identifiers.Application.Name)}`,
-		);
+		const configSource = resolve(__dirname, `../../bin/config/${this.app.get(Identifiers.Application.Name)}`);
 
 		await this.components.taskList([
 			{
