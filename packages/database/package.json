@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/database",
-	"version": "0.0.1-alpha.4",
+	"version": "0.0.1-alpha.5",
 	"description": "LMDB based database for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
