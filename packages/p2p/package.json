@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/p2p",
-	"version": "0.0.1-alpha.5",
+	"version": "0.0.1-alpha.6",
 	"description": "P2P for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
