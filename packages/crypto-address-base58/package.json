@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-address-base58",
-	"version": "0.0.1-alpha.5",
+	"version": "0.0.1-alpha.6",
 	"description": "Base58 address derivation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
