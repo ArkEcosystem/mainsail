@@ -299,7 +299,7 @@ if [ ! -z "$API" ] ; then
     pnpm rm -g @mainsail/api > /dev/null 2>&1 || true
 fi
 
-    channel=alpha addApi ${channel} && rm -rf ~/.config/mainsail-api/ &&  rm -rf ~/.local/state/mainsail-api/ &&  rm -rf ~/.local/share/mainsail-api/ && mainsail-api config:publish --network=testnet --reset && mainsail-api env:set --key=CORE_DB_USERNAME --value="${databaseUsername}" && mainsail-api env:set --key=CORE_DB_PASSWORD --value="${databasePassword}" && mainsail-api env:set --key=CORE_DB_DATABASE --value="${databaseName}"
+    channel=alpha addApi ${channel} && rm -rf ~/.config/mainsail-api/ &&  rm -rf ~/.local/state/mainsail-api/ &&  rm -rf ~/.local/share/mainsail-api/ && mainsail-api config:publish --reset && mainsail-api env:set --key=CORE_DB_USERNAME --value="${databaseUsername}" && mainsail-api env:set --key=CORE_DB_PASSWORD --value="${databasePassword}" && mainsail-api env:set --key=CORE_DB_DATABASE --value="${databaseName}"
 
 warning "Cleaning up Pnpm cache .."
     pnpm store prune
