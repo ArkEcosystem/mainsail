@@ -8,7 +8,6 @@ describe<{
 	pluginManager: Services.PluginManager;
 }>("PluginUpdateCommand", ({ beforeEach, it, assert, stub }) => {
 	const packageName = "dummyPackageName";
-	const applicationName = "mainsail";
 
 	beforeEach((context) => {
 		context.cli = new Console();
@@ -29,6 +28,6 @@ describe<{
 
 		await assert.resolves(() => cli.withArgs([packageName]).execute(Command));
 
-		spyOnUpdate.calledWith(applicationName, packageName);
+		spyOnUpdate.calledWith(packageName);
 	});
 });

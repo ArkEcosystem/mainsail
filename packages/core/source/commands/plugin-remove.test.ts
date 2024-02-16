@@ -8,7 +8,6 @@ describe<{
 	pluginManager: Services.PluginManager;
 }>("PluginRemoveCommand", ({ beforeEach, it, assert, stub }) => {
 	const packageName = "dummyPackageName";
-	const applicationName = "mainsail";
 
 	beforeEach((context) => {
 		context.cli = new Console();
@@ -30,6 +29,6 @@ describe<{
 
 		await assert.resolves(() => cli.withArgs([packageName]).execute(Command));
 
-		spyOnRemove.calledWith(applicationName, packageName);
+		spyOnRemove.calledWith(packageName);
 	});
 });
