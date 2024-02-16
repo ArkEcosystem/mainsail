@@ -11,15 +11,15 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail-env`);
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail`);
 
 		context.cli = new Console();
 	});
 
 	afterAll(() => setGracefulCleanup());
 
-	it.only("should get the value of an environment variable", async ({ cli }) => {
-		writeFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail-env/.env`, "CORE_LOG_LEVEL=emergency");
+	it("should get the value of an environment variable", async ({ cli }) => {
+		writeFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail/.env`, "CORE_LOG_LEVEL=emergency");
 
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));

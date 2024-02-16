@@ -1,9 +1,9 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 import { Console, describe } from "@mainsail/test-framework";
 import { ensureDirSync, removeSync, writeFileSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./env-list";
-import { Identifiers } from "@mainsail/cli";
 
 describe<{
 	cli: Console;
@@ -12,7 +12,6 @@ describe<{
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("mainsail-api");
 	});
 
 	afterAll(() => setGracefulCleanup());
@@ -20,7 +19,7 @@ describe<{
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.execute(Command),
-			`No environment file found at ${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`,
+			`No environment file found at ${process.env.CORE_PATH_CONFIG}/mainsail/.env`,
 		);
 	});
 
@@ -28,9 +27,9 @@ describe<{
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail-api`);
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail`);
 
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail-api/.env`;
+		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
 		removeSync(environmentFile);
 		writeFileSync(environmentFile, "someKey=someValue", { flag: "w" });
 
