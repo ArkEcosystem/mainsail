@@ -50,7 +50,7 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		assert.equal(crypto.network.client.token, "DARK");
 	});
 
-	it.only("should dispose", async () => {
+	it("should dispose", async () => {
 		const sandbox = new Sandbox();
 
 		sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
