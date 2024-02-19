@@ -62,8 +62,7 @@ export class ApplicationFactory {
 		Utils.assert.defined<string>(package_.name);
 		app.bind(Identifiers.ConsolePaths).toConstantValue(environmentPaths.get(package_.name));
 
-		// @ts-ignore
-		const applicationName = Object.keys(package_.bin)[0];
+		const applicationName = package_.name?.split("/")[1];
 		Utils.assert.defined<string>(applicationName);
 
 		app.bind(Identifiers.Application.Name).toConstantValue(applicationName);
