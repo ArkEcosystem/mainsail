@@ -18,9 +18,11 @@ export class RegisterBasePaths implements Bootstrapper {
 	private readonly configRepository!: ConfigRepository;
 
 	public async bootstrap(): Promise<void> {
-		const paths: Array<[string, string]> = Object.entries(envPaths(this.app.name(), { suffix: "" }));
+		const paths: Array<[string, string]> = Object.entries(envPaths("mainsail", { suffix: "" }));
 
 		for (let [type, path] of paths) {
+			path = join(path, this.app.name());
+
 			const configKey = `CORE_PATH_${type.toUpperCase()}`;
 
 			const processPath: string | undefined = process.env[configKey];
