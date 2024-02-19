@@ -7,7 +7,7 @@ import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/cr
 import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
-import cryptoJson from "../../../core/bin/config/testnet/mainsail/crypto.json";
+import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import { ServiceProvider as CryptoConsensusServiceProvider } from "../../../crypto-consensus-bls12-381";
 import { describe, Sandbox } from "../../../test-framework";
 import { ValidatorRegistrationTransaction } from "./1";

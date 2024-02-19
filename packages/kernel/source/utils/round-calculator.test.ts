@@ -1,6 +1,6 @@
 import { Exceptions, Identifiers } from "@mainsail/contracts";
 
-import crypto from "../../../core/bin/config/testnet/mainsail/crypto.json";
+import crypto from "../../../core/bin/config/testnet/core/crypto.json";
 import { Configuration } from "../../../crypto-config";
 import { describe, Sandbox } from "../../../test-framework";
 import { calculateRound, isNewRound } from "./round-calculator";
