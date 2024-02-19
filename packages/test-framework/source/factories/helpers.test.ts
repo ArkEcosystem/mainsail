@@ -1,4 +1,4 @@
-import cryptoConfig from "../../../core/bin/config/testnet/mainsail/crypto.json";
+import cryptoConfig from "../../../core/bin/config/testnet/core/crypto.json";
 import { describe } from "../index";
 import { factory } from "./helpers";
 

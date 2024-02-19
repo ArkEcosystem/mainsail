@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import crypto from "../../../core/bin/config/testnet/mainsail/crypto.json";
+import crypto from "../../../core/bin/config/testnet/core/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoBlock } from "../../../crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config";
@@ -48,15 +48,13 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoMessages).register();
 
 	const workerPool = {
-		getWorker: () => {
-			return {
-				// @ts-ignore
-				consensusSignature: (method, message, privateKey) =>
-					context.sandbox.app
-						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
-						[method](message, privateKey),
-			};
-		},
+		getWorker: () => ({
+			// @ts-ignore
+			consensusSignature: (method, message, privateKey) =>
+				context.sandbox.app
+					.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
+					[method](message, privateKey),
+		}),
 	};
 	context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 

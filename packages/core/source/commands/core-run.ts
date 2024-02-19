@@ -23,12 +23,12 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const { bin } = require(resolve(__dirname, "../../package.json"));
-		AppUtils.assert.defined<Record<string, string>>(bin);
+		const { name } = require(resolve(__dirname, "../../package.json"));
+		AppUtils.assert.defined<string>(name);
 
 		const flags: Contracts.AnyObject = {
 			...this.getFlags(),
-			name: Object.keys(bin)[0],
+			name: name.split("/")[1],
 		};
 
 		await Utils.Builder.buildApplication({

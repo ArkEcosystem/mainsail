@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 
-import crypto from "../../../core/bin/config/testnet/mainsail/crypto.json";
+import crypto from "../../../core/bin/config/testnet/core/crypto.json";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "../../../crypto-address-bech32m";
 import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "../../../crypto-consensus-bls12-381";

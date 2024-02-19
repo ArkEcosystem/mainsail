@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 import { Console, describe } from "@mainsail/test-framework";
 import { parse } from "envfile";
 import { ensureFileSync, readFileSync, removeSync } from "fs-extra";
@@ -17,7 +18,7 @@ describe<{
 	afterAll(() => setGracefulCleanup());
 
 	it("should set the value of an environment variable", async ({ cli }) => {
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
+		const environmentFile = `${process.env.CORE_PATH_CONFIG}/core/.env`;
 
 		removeSync(environmentFile);
 		ensureFileSync(environmentFile);

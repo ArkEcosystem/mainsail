@@ -5,7 +5,7 @@ import { schemas as consensusSchemas } from "@mainsail/crypto-consensus-bls12-38
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import cryptoJson from "../../core/bin/config/testnet/mainsail/crypto.json";
+import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
 import { describe, Sandbox } from "../../test-framework";
 import {
 	precommitData,

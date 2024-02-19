@@ -13,10 +13,10 @@ export class Environment {
 	private readonly appName!: string;
 
 	public getPaths(): Paths {
-		let paths: Paths = environmentPaths.get(this.appName, { suffix: "" });
+		let paths: Paths = environmentPaths.get("mainsail", { suffix: "" });
 
 		for (const [key, value] of Object.entries(paths)) {
-			paths[key] = value;
+			paths[key] = path.join(value, this.appName);
 		}
 
 		if (process.env[Constants.EnvironmentVariables.CORE_PATH_CONFIG]) {

@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Enums } from "@mainsail/kernel";
 
-import crypto from "../../core/bin/config/testnet/mainsail/crypto.json";
+import crypto from "../../core/bin/config/testnet/core/crypto.json";
 import { describe } from "../../test-framework";
 import { SenderState } from ".";
 

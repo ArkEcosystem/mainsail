@@ -14,13 +14,13 @@ describe<{
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
 		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("mainsail");
+		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("core");
 	});
 
 	afterAll(() => setGracefulCleanup());
 
 	it("should set the value of an environment variable", async ({ cli }) => {
-		const environmentFile = `${process.env.CORE_PATH_CONFIG}/mainsail/.env`;
+		const environmentFile = `${process.env.CORE_PATH_CONFIG}/core/.env`;
 
 		removeSync(environmentFile);
 		ensureFileSync(environmentFile);

@@ -10,7 +10,7 @@ export const registerIdentityFactory = async (
 	config?: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
 	const app = await generateApp(
-		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/mainsail/crypto.json")),
+		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/core/crypto.json")),
 	);
 
 	factory.set("Identity", async ({ options }) => {

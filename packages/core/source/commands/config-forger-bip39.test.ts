@@ -15,8 +15,8 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail/`);
-		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`, {});
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/core/`);
+		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`, {});
 
 		context.cli = new Console();
 	});
@@ -26,7 +26,7 @@ describe<{
 	it("should configure from flags", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: [bip39Flags] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Flags] });
 	});
 
 	it("should configure from a prompt if it receives a valid bip39 and confirmation", async ({ cli }) => {
@@ -34,7 +34,7 @@ describe<{
 
 		await cli.execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: [bip39Prompt] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Prompt] });
 	});
 
 	it("should fail to configure from a prompt if it receives a valid bip39 and but no confirmation", async ({
@@ -46,7 +46,7 @@ describe<{
 
 		await cli.execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: [bip39] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39] });
 	});
 
 	it("should fail to configure from a prompt if it receives an invalid bip39", async ({ cli }) => {
@@ -56,7 +56,7 @@ describe<{
 
 		await assert.rejects(() => cli.execute(Command), "Failed to verify the given passphrase as BIP39 compliant.");
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: [bip39] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39] });
 	});
 
 	it("should configure from a prompt if it receives an invalid bip39 and skipValidation flag is set", async ({
@@ -68,7 +68,7 @@ describe<{
 
 		await cli.withFlags({ skipValidation: true }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), {
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), {
 			secrets: ["random-string"],
 		});
 	});

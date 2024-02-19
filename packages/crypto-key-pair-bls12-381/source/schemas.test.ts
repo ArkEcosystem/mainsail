@@ -4,7 +4,7 @@ import { schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
-import cryptoJson from "../../core/bin/config/testnet/mainsail/crypto.json";
+import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
 import { describe, Sandbox } from "../../test-framework";
 import { KeyPairFactory } from "./pair";
 import { schemas } from "./schemas";

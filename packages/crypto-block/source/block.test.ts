@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import clone from "lodash.clone";
 
-import crypto from "../../core/bin/config/testnet/mainsail/crypto.json";
+import crypto from "../../core/bin/config/testnet/core/crypto.json";
 import { describe, Factories } from "../../test-framework";
 import { blockData } from "../test/fixtures/block";
 import { sealBlock } from "./block";

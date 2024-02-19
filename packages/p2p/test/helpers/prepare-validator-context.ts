@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import cryptoJson from "../../../core/bin/config/testnet/mainsail/crypto.json";
+import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import { schemas as cryptoBlockSchemas } from "../../../crypto-block/distribution";
 import { Configuration } from "../../../crypto-config/distribution";
 import { makeKeywords as makeMessageKeywords } from "../../../crypto-messages/distribution/keywords";
