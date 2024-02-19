@@ -15,8 +15,8 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail/`);
-		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`, {});
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/core/`);
+		writeJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`, {});
 
 		context.cli = new Console();
 	});
@@ -26,13 +26,13 @@ describe<{
 	it("should configure from flags (BIP39)", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, method: "bip39" }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: [bip39Flags] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Flags] });
 	});
 
 	it("should configure from flags (BIP38)", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, method: "bip38", password: "password" }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: [] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [] });
 	});
 
 	it("should prompt if method is missing", async ({ cli }) => {
@@ -40,6 +40,6 @@ describe<{
 
 		await cli.withFlags({ bip39: bip39Flags }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/mainsail/validators.json`), { secrets: [bip39Flags] });
+		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Flags] });
 	});
 });
