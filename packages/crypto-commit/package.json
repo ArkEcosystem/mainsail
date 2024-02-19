@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-commit",
-	"version": "0.0.1-alpha.6",
+	"version": "0.0.1-alpha.7",
 	"description": "Commit utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
