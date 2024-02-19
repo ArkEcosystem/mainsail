@@ -11,7 +11,7 @@ describe<{
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail`);
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/core`);
 
 		context.cli = new Console();
 	});
@@ -19,7 +19,7 @@ describe<{
 	afterAll(() => setGracefulCleanup());
 
 	it("should get the value of an environment variable", async ({ cli }) => {
-		writeFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail/.env`, "CORE_LOG_LEVEL=emergency");
+		writeFileSync(`${process.env.CORE_PATH_CONFIG}/core/.env`, "CORE_LOG_LEVEL=emergency");
 
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));
@@ -30,7 +30,7 @@ describe<{
 	});
 
 	it("should fail to get the value of a non-existent environment variable", async ({ cli }) => {
-		ensureFileSync(`${process.env.CORE_PATH_CONFIG}/mainsail/.env`);
+		ensureFileSync(`${process.env.CORE_PATH_CONFIG}/core/.env`);
 
 		await assert.rejects(
 			() => cli.withFlags({ key: "FAKE_KEY" }).execute(Command),
@@ -39,11 +39,11 @@ describe<{
 	});
 
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
-		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/mainsail/jestnet`);
+		ensureDirSync(`${process.env.CORE_PATH_CONFIG}/core/jestnet`);
 
 		await assert.rejects(
 			() => cli.withFlags({ key: "FAKE_KEY" }).execute(Command),
-			`No environment file found at ${process.env.CORE_PATH_CONFIG}/mainsail/.env`,
+			`No environment file found at ${process.env.CORE_PATH_CONFIG}/core/.env`,
 		);
 	});
 });
