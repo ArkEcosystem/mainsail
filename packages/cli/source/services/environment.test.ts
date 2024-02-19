@@ -6,7 +6,7 @@ import { Environment } from "./environment";
 
 describe<{
 	environment: Environment;
-}>("Environment", ({ beforeEach, it, assert, stub }) => {
+}>("Environment", ({ beforeEach, it, assert }) => {
 	beforeEach((context) => {
 		const cli = new Console();
 
@@ -14,13 +14,13 @@ describe<{
 	});
 
 	it("should get all paths for the given token, network and name", async ({ environment }) => {
-		assert.equal(Object.keys(environment.getPaths("mainsail")), ["data", "config", "cache", "log", "temp"]);
+		assert.equal(Object.keys(environment.getPaths()), ["data", "config", "cache", "log", "temp"]);
 	});
 
 	it("should respect the CORE_PATH_CONFIG environment variable", async ({ environment }) => {
 		process.env.CORE_PATH_CONFIG = "something";
 
-		assert.true(environment.getPaths("mainsail").config.endsWith("/something/mainsail"));
+		assert.true(environment.getPaths().config.endsWith("/something/core"));
 
 		delete process.env.CORE_PATH_CONFIG;
 	});
