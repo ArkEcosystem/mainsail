@@ -23,7 +23,7 @@ cd ~/docker/testnet/core
 ```
 
 > [!NOTE]
-> Please pay attention to the following option in your [`testnet.env`](./core/testnet.env) file!**
+> Please pay attention to the following option in your [`testnet.env`](./core/testnet.env) file!
 
 |`API=false`| Set `API=true` if you intend to run an API server |
 |-----------|:--------------------------------------------------|
@@ -99,7 +99,7 @@ cd ~/docker/testnet/api
 ```
 
 > [!NOTE]
-> Please pay attention to the following option in your Mainsail Core [`testnet.env`](./core/testnet.env) file!**
+> Please pay attention to the following option in your Mainsail Core [`testnet.env`](./core/testnet.env) file!
 
 |`API=false`| Set `API=true` if you intend to run an API server |
 |-----------|:--------------------------------------------------|
