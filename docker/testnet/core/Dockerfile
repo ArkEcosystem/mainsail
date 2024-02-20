@@ -2,9 +2,9 @@ FROM node:20-alpine
 
 WORKDIR /home/node
 
-ADD docker/production/entrypoint.sh /entrypoint.sh
+ADD entrypoint.sh /entrypoint.sh
 
-ARG mainsail_channel=latest
+ARG mainsail_channel=alpha
 
 ENV PNPM_HOME=/home/node/.pnpm/bin
 ENV PATH="${PATH}:${PNPM_HOME}"
