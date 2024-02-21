@@ -1,7 +1,7 @@
 version: '3.5'
 services:
   core:
-    image: mainsail/core:testnet
+    image: arkecosystem/mainsail-core:testnet
     container_name: mainsail-testnet
     restart: always
     ports:

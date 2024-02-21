@@ -1,8 +1,8 @@
-version: '2'
+version: '3.5'
 services:
   core:
-    image: mainsail/core
-    container_name: core-mainnet
+    image: arkecosystem/mainsail-core 
+    container_name: mainsail-mainnet
     restart: always
     ports:
      - "4001:4001"

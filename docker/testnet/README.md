@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Mainsail Core Alpha images soon available at [Docker Hub](https://hub.docker.com/r/mainsail/core).
+Mainsail Core Alpha images now available at [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-core).
 
 ## Documentation
 
@@ -50,7 +50,7 @@ docker-compose down -v --rmi all
 > If you have set `API=true` Mainsail Core will log errors untill the API container gets up, so you should next proceed with deploying API node.
 
 > [!IMPORTANT]  
-> If you prefer to build your own image instead of using our pre-built from [Docker Hub](https://hub.docker.com/r/mainsail/core), then you can proceed as follows:
+> If you prefer to build your own image instead of using our pre-built from [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-core), then you can proceed as follows:
 
 ```bash
 cd ~/docker/testnet/core
@@ -81,7 +81,7 @@ docker-compose -f docker-compose-build.yml down -v --rmi all
 
 ## Introduction
 
-Mainsail API Alpha images soon available now at [Docker Hub](https://hub.docker.com/r/mainsail/api).
+Mainsail API Alpha images soon available now at [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-api).
 
 ## Documentation
 
@@ -130,7 +130,7 @@ docker logs --tail mainsail-testnet -f
 ```
 
 > [!IMPORTANT]
-> If you prefer to build your own image instead of using our pre-built from [Docker Hub](https://hub.docker.com/r/mainsail/api), then you can proceed as follows:
+> If you prefer to build your own image instead of using our pre-built from [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-api), then you can proceed as follows:
 
 ```bash
 cd ~/docker/testnet/api
