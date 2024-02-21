@@ -1,16 +1,11 @@
-version: '2'
+version: '3.5'
 services:
   core:
-    build:
-      context: ../../../
-      dockerfile: docker/production/Dockerfile
-      args:
-        core_channel: next
-    image: mainsail-core-devnet
-    container_name: mainsail-devnet
+    image: mainsail/core:testnet
+    container_name: mainsail-testnet
     restart: always
     ports:
-     - "4002:4002"
+     - "4000:4000"
      - "127.0.0.1:4004:4004"
      - "127.0.0.1:4006:4006"
      - "4007:4007"
@@ -26,9 +21,12 @@ services:
      - ./enc:/run/secrets
     networks:
       - core
-    env_file: ./devnet.env
+    env_file: testnet.env
     tty: true
+    external_links:
+     - mainsail-api-testnet
 volumes:
   core:
 networks:
   core:
+    name: core
