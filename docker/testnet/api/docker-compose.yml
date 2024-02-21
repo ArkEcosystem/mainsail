@@ -13,7 +13,7 @@ services:
      POSTGRES_DB: api_testnet
      POSTGRES_USER: node
   api:
-    image: mainsail/api:testnet 
+    image: arkecosystem/mainsail-core:testnet 
     container_name: mainsail-api-testnet 
     restart: always
     ports:

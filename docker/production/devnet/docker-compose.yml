@@ -1,7 +1,7 @@
-version: '2'
+version: '3.5'
 services:
   core:
-    image: mainsail/core:devnet
+    image: arkecosystem/mainsail-core:devnet 
     container_name: mainsail-devnet
     restart: always
     ports:
