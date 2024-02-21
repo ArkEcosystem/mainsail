@@ -32,3 +32,4 @@ volumes:
   core:
 networks:
   core:
+    external: true
