@@ -23,6 +23,12 @@ Run Relay only node using [Docker Compose](https://docs.docker.com/compose/)
 cd ~/docker/testnet/core
 ```
 
+> Create docker network:
+
+```bash
+docker network create core
+```
+
 > [!NOTE]
 > Please pay attention to the following option in your [`testnet.env`](./core/testnet.env) file!
 
@@ -47,15 +53,24 @@ docker logs --tail mainsail-testnet -f
 ```bash
 docker-compose down -v --rmi all
 ```
+
 > [!WARNING]  
 > If you have set `API=true` Mainsail Core will log errors untill the API container gets up, so you should next proceed with deploying API node.
 
 > [!IMPORTANT]  
 > If you prefer to build your own image instead of using our pre-built from [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-core), then you can proceed as follows:
 
+
 ```bash
 cd ~/docker/testnet/core
 ```
+
+> Create docker network:
+
+```bash
+docker network create core
+```
+
 > _Start_:
 
 ```bash
@@ -99,6 +114,12 @@ Run API node using [Docker Compose](https://docs.docker.com/compose/)
 cd ~/docker/testnet/api
 ```
 
+> Create docker network:
+
+```bash
+docker network create core
+```
+
 > [!NOTE]
 > Please pay attention to the following option in your Mainsail Core [`testnet.env`](./core/testnet.env) file!
 
@@ -126,6 +147,7 @@ docker-compose down -v --rmi all
 > [!NOTE]
 > At this stage your Mainsail Core node should pick up.
 
+
 ```bash
 docker logs --tail mainsail-testnet -f
 ```
@@ -133,9 +155,17 @@ docker logs --tail mainsail-testnet -f
 > [!IMPORTANT]
 > If you prefer to build your own image instead of using our pre-built from [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-api), then you can proceed as follows:
 
+
 ```bash
 cd ~/docker/testnet/api
 ```
+
+> Create docker network:
+
+```bash
+docker network create core
+```
+
 > _Start_:
 
 ```bash

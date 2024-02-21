@@ -7,7 +7,7 @@ services:
     volumes:
       - 'postgres:/var/lib/postgresql/data'
     networks: 
-      - api 
+      - core 
     environment:
      POSTGRES_PASSWORD: password
      POSTGRES_DB: api_testnet
@@ -33,7 +33,7 @@ services:
      - ~/.local/state/mainsail:/home/node/.local/state/mainsail
      - /etc/localtime:/etc/localtime:ro
     networks:
-      - api 
+      - core
     env_file: ./testnet.env
     tty: true
     links:
@@ -44,6 +44,6 @@ volumes:
   postgres:
   api:
 networks:
-  api:
-    external: 
-      name: core
+  core:
+    external: true 
+      

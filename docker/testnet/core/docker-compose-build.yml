@@ -28,10 +28,8 @@ services:
       - core
     env_file: testnet.env
     tty: true
-    external_links:
-     - mainsail-api-testnet 
 volumes:
   core:
 networks:
   core:
-    name: core
+    external: true
