@@ -7,6 +7,7 @@
 ## Introduction
 
 Mainsail Core Alpha images now available at [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-core).
+Mainsail API Alpha images now available at [Docker Hub](https://hub.docker.com/r/arkecosystem/mainsail-api).
 
 ## Documentation
 
