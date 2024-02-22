@@ -13,7 +13,8 @@ const main = async () => {
 		await depcheck(
 			`${source}/${package_}`,
 			{
-				ignoreDirs: ["__tests__", "benchmark", "distribution", "docker", "scripts"],
+				ignorePatterns: ["*.test.ts"],
+				ignoreDirs: ["node_modules", "benchmark", "distribution", "test"],
 				ignoreMatches: ["@types/*"],
 			},
 			(unused) => {
