@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for dir in `find ../packages -mindepth 1 -maxdepth 1 -type d | sort -nr`; do
+for dir in `find packages -mindepth 1 -maxdepth 1 -type d | sort -nr`; do
     json=$(<"$dir/package.json")
 	# Remove leading/trailing whitespace
 	json=$(echo "$json" | tr -d '\n' | tr -d '\r' | sed 's/ //g')
