@@ -57,6 +57,7 @@
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-signature-schnorr-secp256k1": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
 		"@mainsail/crypto-transaction-multi-signature-registration": "workspace:*",
 		"@mainsail/crypto-transaction-transfer": "workspace:*",

@@ -67,6 +67,9 @@
 			"package": "@mainsail/crypto-transaction-vote"
 		},
 		{
+			"package": "@mainsail/crypto-transaction-evm-call"
+		},
+		{
 			"package": "@mainsail/crypto-worker"
 		},
 		{

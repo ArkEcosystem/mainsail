@@ -900,6 +900,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-transaction-multi-payment':
         specifier: workspace:*
         version: link:../crypto-transaction-multi-payment
@@ -1842,6 +1845,40 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/crypto-transaction-evm-call:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
