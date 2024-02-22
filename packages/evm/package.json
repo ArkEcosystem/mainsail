@@ -16,7 +16,7 @@
 		"build": "pnpm run clean && tsc && pnpm run copy",
 		"copy": "mkdir distribution/generated && cp source/generated/bindings.js distribution/generated/ && cp source/generated/bindings.d.ts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
 		"build:watch": "pnpm run clean && tsc -w",
-		"build-napi": "napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts --release && mv evm.*.node bindings.js bindings.d.ts source/generated",
+		"build-napi": "mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts --release && mv evm.*.node bindings.js bindings.d.ts source/generated",
 		"build-napi:debug": "napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts && mv evm.*.node bindings.js bindings.d.ts source/generated",
 		"clean": "del distribution",
 		"release": "pnpm publish --access public",
