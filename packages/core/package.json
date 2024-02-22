@@ -68,6 +68,7 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/crypto-worker": "workspace:*",
+		"@mainsail/evm": "workspace:*",
 		"@mainsail/database": "workspace:*",
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",

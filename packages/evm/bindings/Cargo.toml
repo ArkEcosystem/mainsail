@@ -1,0 +1,32 @@
+[package]
+name = "mainsail_evm_bindings"
+version.workspace = true
+rust-version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = { workspace = true }
+ethers-contract = { workspace = true }
+ethers-core = { workspace = true }
+ethers-providers = { workspace = true }
+revm = { workspace = true, features = ["serde"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+
+napi = { version = "2.15.2", default-features = false, features = [
+    "napi9",
+    "serde-json",
+    "tokio_rt",
+] }
+napi-derive = "2.15.3"
+
+mainsail_evm_core = { path = "../core", version = "0.1.0" }
+
+[build-dependencies]
+napi-build = "2.1.2"

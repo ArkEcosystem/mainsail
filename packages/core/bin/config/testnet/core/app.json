@@ -79,6 +79,9 @@
 			"package": "@mainsail/database"
 		},
 		{
+			"package": "@mainsail/evm"
+		},
+		{
 			"package": "@mainsail/transactions"
 		},
 		{
