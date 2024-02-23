@@ -1,0 +1,43 @@
+{
+	"name": "@mainsail/evm",
+	"version": "0.0.1-alpha.7",
+	"description": "EVM for the Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && pnpm run build-napi && tsc && pnpm run copy",
+		"build-napi": "mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts --release && mv evm.*.node bindings.js bindings.d.ts source/generated",
+		"build-napi:debug": "napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts && mv evm.*.node bindings.js bindings.d.ts source/generated",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution && del source/generated",
+		"copy": "mkdir distribution/generated && cp source/generated/bindings.js distribution/generated/ && cp source/generated/bindings.d.ts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
+		"release": "pnpm publish --access public",
+		"test": "uvu -r tsm source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "uvu -r tsm source"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*"
+	},
+	"devDependencies": {
+		"@mainsail/test-framework": "workspace:*",
+		"@napi-rs/cli": "^2.18.0",
+		"rewiremock": "3.14.5",
+		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	},
+	"napi": {
+		"name": "evm"
+	}
+}

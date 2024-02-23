@@ -124,6 +124,9 @@ export const Identifiers = {
 			Proposal: Symbol("Database<Storage.Proposal>"),
 		},
 	},
+	Evm: {
+		Instance: Symbol("Evm<Instance>"),
+	},
 	Fee: {
 		Matcher: Symbol("Fee<Matcher>"),
 		Registry: Symbol("Fee<Registry>"),
