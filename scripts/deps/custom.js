@@ -1,6 +1,5 @@
 const depcheck = require("depcheck");
 const { resolve, join } = require("path");
-const { lstatSync, readdirSync } = require("fs");
 
 // Dependency categorization:
 // USAGE in code -> Type:
@@ -42,6 +41,16 @@ class Package {
 
 		this.exceptions = this.findExceptions();
 		this.devExceptions = this.findExceptions();
+
+		const result = this.getResult();
+		this.used = result.used;
+		this.unused = result.unused;
+		this.missing = result.missing;
+
+		const devResult = this.getDevResult();
+		this.devUsed = devResult.used;
+		this.devUnused = devResult.unused;
+		this.devMissing = devResult.missing;
 	}
 
 	findExceptions() {
@@ -134,56 +143,25 @@ const main = async () => {
 	for (const pkg of pkgs) {
 		const packageJson = require(join(source, pkg, "package.json"));
 
-		// console.log("Checking: ", package);
-
 		await depcheck(
 			join(source, pkg),
 			{
-				// ignorePatterns: ["*.test.ts"],
 				ignoreDirs: ["node_modules", "distribution"],
 				ignoreMatches: ["@types/*"],
 			},
 			(result) => {
-				// const missing = Object.keys(result.missing);
-				// packageJson;
-				// console.log("Missing: ", result.missing);
-				// console.log("Dependencies: ", result.dependencies);
-				// console.log("DevDependencies: ", result.devDependencies);
-				// console.log("Using: ", result.using);
-				// if (missing.length > 0) {
-				// 	console.log(`[FAIL] ${package_}`);
-				// 	for (const dep of missing) {
-				// 		console.log(`lerna add ${dep} --scope=@mainsail/${package_}`);
-				// 	}
-				// } else {
-				// 	console.log(`[PASS] ${package_}`);
-				// }
-
 				const dependencies = Object.keys(result.using).map((name) => new Dependency(name, result.using[name]));
-
 				const package = new Package(packageJson, dependencies);
 
-				// console.log(
-				// 	"Dependencies: ",
-				// 	dependencies.filter((dep) => dep.testOnly),
-				// );
+				console.log("Used: ", package.used);
+				console.log("Missing: ", package.missing);
+				console.log("Unused: ", package.unused);
+				console.log("Exceptions: ", package.exceptions);
 
-				const { missing, unused, used } = package.getResult();
-
-				console.log("Used: ", used);
-				console.log("Missing: ", missing);
-				console.log("Unused: ", unused);
-
-				// const { missing: devMissing, unused: devUnused } = testDevDependencies(package, dependencies);
-
-				// console.log(
-				// 	"DevMissing: ",
-				// 	devMissing.map((dep) => dep.name),
-				// );
-				// console.log(
-				// 	"DevUnused: ",
-				// 	devUnused.map((dep) => dep.name),
-				// );
+				console.log("DevUsed: ", package.devUsed);
+				console.log("DevMissing: ", package.devMissing);
+				console.log("DevUnused: ", package.devUnused);
+				console.log("DevExceptions: ", package.devExceptions);
 			},
 		);
 	}
