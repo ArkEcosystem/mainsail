@@ -33,11 +33,11 @@ const EXCEPTIONS = {
 };
 
 class Package {
-	constructor(packageJson, codeDependencies) {
+	constructor(packageJson, imports) {
 		this.name = packageJson.name;
 		this.dependencies = Object.keys(packageJson.dependencies);
 		this.devDependencies = Object.keys(packageJson.devDependencies).filter((x) => !x.startsWith("@types/"));
-		this.codeDependencies = codeDependencies;
+		this.imports = imports;
 
 		this.exceptions = this.findExceptions();
 		this.devExceptions = this.findExceptions();
@@ -68,16 +68,16 @@ class Package {
 		const unused = [];
 		const missing = [];
 
-		const codeDepNames = this.codeDependencies.filter((dep) => !dep.testOnly).map((dep) => dep.name);
-		const combined = new Set([...codeDepNames, ...this.dependencies]);
+		const importNames = this.imports.filter((dep) => !dep.testOnly).map((dep) => dep.name);
+		const combined = new Set([...importNames, ...this.dependencies]);
 
 		for (const dep of combined.values()) {
-			if (codeDepNames.includes(dep) && this.dependencies.includes(dep)) {
+			if (importNames.includes(dep) && this.dependencies.includes(dep)) {
 				used.push(dep);
 				continue;
 			}
 
-			if (codeDepNames.includes(dep)) {
+			if (importNames.includes(dep)) {
 				missing.push(dep);
 			} else {
 				unused.push(dep);
@@ -96,16 +96,16 @@ class Package {
 		const unused = [];
 		const missing = [];
 
-		const codeDepNames = this.codeDependencies.filter((dep) => dep.testOnly).map((dep) => dep.name);
-		const combined = new Set([...codeDepNames, ...this.devDependencies]);
+		const importNames = this.imports.filter((dep) => dep.testOnly).map((dep) => dep.name);
+		const combined = new Set([...importNames, ...this.devDependencies]);
 
 		for (const dep of combined.values()) {
-			if (codeDepNames.includes(dep) && this.devDependencies.includes(dep)) {
+			if (importNames.includes(dep) && this.devDependencies.includes(dep)) {
 				used.push(dep);
 				continue;
 			}
 
-			if (codeDepNames.includes(dep)) {
+			if (importNames.includes(dep)) {
 				missing.push(dep);
 			} else {
 				unused.push(dep);
@@ -120,7 +120,7 @@ class Package {
 	}
 }
 
-class Dependency {
+class Import {
 	constructor(name, paths) {
 		this.name = name;
 		this.paths = paths;
@@ -150,8 +150,8 @@ const main = async () => {
 				ignoreMatches: ["@types/*"],
 			},
 			(result) => {
-				const dependencies = Object.keys(result.using).map((name) => new Dependency(name, result.using[name]));
-				const package = new Package(packageJson, dependencies);
+				const imports = Object.keys(result.using).map((name) => new Import(name, result.using[name]));
+				const package = new Package(packageJson, imports);
 
 				console.log("Used: ", package.used);
 				console.log("Missing: ", package.missing);
