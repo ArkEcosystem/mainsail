@@ -164,17 +164,28 @@ const main = async () => {
 				const imports = Object.keys(result.using).map((name) => new Import(name, result.using[name]));
 				const package = new Package(packageJson, imports);
 
-				console.log("Used: ", package.used);
-				console.log("Missing: ", package.missing);
-				console.log("Unused: ", package.unused);
-				console.log("Exceptions: ", package.exceptions);
+				if (!package.pass()) {
+					console.log("Package: ", package.name);
 
-				console.log("DevUsed: ", package.devUsed);
-				console.log("DevMissing: ", package.devMissing);
-				console.log("DevUnused: ", package.devUnused);
-				console.log("DevExceptions: ", package.devExceptions);
+					const { missing, unused, devMissing, devUnused } = package;
 
-				console.log("Pass ", package.pass());
+					console.log({
+						missing,
+						unused,
+						devMissing,
+						devUnused,
+					});
+				}
+
+				// console.log("Used: ", package.used);
+				// console.log("Missing: ", package.missing);
+				// console.log("Unused: ", package.unused);
+				// console.log("Exceptions: ", package.exceptions);
+
+				// console.log("DevUsed: ", package.devUsed);
+				// console.log("DevMissing: ", package.devMissing);
+				// console.log("DevUnused: ", package.devUnused);
+				// console.log("DevExceptions: ", package.devExceptions);
 			},
 		);
 	}
