@@ -39,7 +39,7 @@ import {
 import { Identifiers as InternalIdentifiers } from "./identifiers";
 
 export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
-	options = { address: "bech32m", bech32mPrefix: "ark", name: "mainsail", ...options };
+	options = { address: "keccak256", name: "mainsail", ...options };
 
 	const app = new Application(new Container());
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);

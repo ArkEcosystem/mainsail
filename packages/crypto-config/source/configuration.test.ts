@@ -35,7 +35,7 @@ describe<{
 		assert.equal(configManager.getMilestones(), [
 			{
 				activeValidators: 0,
-				address: { bech32m: "ark" },
+				address: { keccak256: true },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
@@ -49,7 +49,7 @@ describe<{
 			},
 			{
 				activeValidators: 53,
-				address: { bech32m: "ark" },
+				address: { keccak256: true },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
@@ -63,7 +63,7 @@ describe<{
 			},
 			{
 				activeValidators: 53,
-				address: { bech32m: "ark" },
+				address: { keccak256: true },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
