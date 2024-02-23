@@ -900,6 +900,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-transaction-multi-payment':
         specifier: workspace:*
         version: link:../crypto-transaction-multi-payment
@@ -936,6 +939,9 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../database
+      '@mainsail/evm':
+        specifier: workspace:*
+        version: link:../evm
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../fees
@@ -1843,6 +1849,40 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/crypto-transaction-evm-call:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/crypto-transaction-multi-payment:
     dependencies:
       '@mainsail/container':
@@ -2340,6 +2380,34 @@ importers:
       tmp:
         specifier: 0.2.1
         version: 0.2.1
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/evm:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
+      '@napi-rs/cli':
+        specifier: ^2.18.0
+        version: 2.18.0
+      rewiremock:
+        specifier: 3.14.5
+        version: 3.14.5
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -4059,6 +4127,12 @@ packages:
     requiresBuild: true
     dev: false
     optional: true
+
+  /@napi-rs/cli@2.18.0:
+    resolution: {integrity: sha512-lfSRT7cs3iC4L+kv9suGYQEezn5Nii7Kpu+THsYVI0tA1Vh59LH45p4QADaD7hvIkmOz79eEGtoKQ9nAkAPkzA==}
+    engines: {node: '>= 10'}
+    hasBin: true
+    dev: true
 
   /@noble/curves@1.2.0:
     resolution: {integrity: sha512-oYclrNgRaM9SsBUBVbb8M6DTV7ZHRTKugureoYEncY5c65HOmRzvSiTE3y5CYaPYJA/GVkrhXEoF0M3Ya9PMnw==}
