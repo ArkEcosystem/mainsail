@@ -6,7 +6,7 @@ members = ["core", "bindings"]
 version = "0.1.0"
 rust-version = "1.76"
 edition = "2021"
-license = "TBD"
+license = "GPL-3.0-only"
 authors = [""]
 
 [workspace.dependencies]
