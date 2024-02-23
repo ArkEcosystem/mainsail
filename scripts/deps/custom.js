@@ -53,6 +53,15 @@ class Package {
 		this.devMissing = devResult.missing;
 	}
 
+	pass() {
+		return (
+			this.unused.length === 0 &&
+			this.missing.length === 0 &&
+			this.devUnused.length === 0 &&
+			this.devMissing.length === 0
+		);
+	}
+
 	findExceptions() {
 		const exception = EXCEPTIONS[this.name];
 		return exception ? exception.dependencies : [];
@@ -162,6 +171,8 @@ const main = async () => {
 				console.log("DevMissing: ", package.devMissing);
 				console.log("DevUnused: ", package.devUnused);
 				console.log("DevExceptions: ", package.devExceptions);
+
+				console.log("Pass ", package.pass());
 			},
 		);
 	}
