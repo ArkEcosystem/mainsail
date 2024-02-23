@@ -26,11 +26,88 @@ const { lstatSync, readdirSync } = require("fs");
 // UsedDev -> Used in tests and registered in devDependencies
 // Exceptions: Not used in code (Unused type), but required for build or other purposes
 
+const EXCEPTIONS = {
+	"@mainsail/api": {
+		dependencies: [],
+		devDependencies: [],
+	},
+};
+
 class Package {
-	constructor(packageJson) {
+	constructor(packageJson, codeDependencies) {
 		this.name = packageJson.name;
 		this.dependencies = Object.keys(packageJson.dependencies);
 		this.devDependencies = Object.keys(packageJson.devDependencies).filter((x) => !x.startsWith("@types/"));
+		this.codeDependencies = codeDependencies;
+
+		this.exceptions = this.findExceptions();
+		this.devExceptions = this.findExceptions();
+	}
+
+	findExceptions() {
+		const exception = EXCEPTIONS[this.name];
+		return exception ? exception.dependencies : [];
+	}
+
+	findDevExceptions() {
+		const exception = EXCEPTIONS[this.name];
+		return exception ? exception.devDependencies : [];
+	}
+
+	getResult() {
+		const used = [];
+		const unused = [];
+		const missing = [];
+
+		const codeDepNames = this.codeDependencies.filter((dep) => !dep.testOnly).map((dep) => dep.name);
+		const combined = new Set([...codeDepNames, ...this.dependencies]);
+
+		for (const dep of combined.values()) {
+			if (codeDepNames.includes(dep) && this.dependencies.includes(dep)) {
+				used.push(dep);
+				continue;
+			}
+
+			if (codeDepNames.includes(dep)) {
+				missing.push(dep);
+			} else {
+				unused.push(dep);
+			}
+		}
+
+		return {
+			used,
+			unused,
+			missing,
+		};
+	}
+
+	getDevResult() {
+		const used = [];
+		const unused = [];
+		const missing = [];
+
+		const codeDepNames = this.codeDependencies.filter((dep) => dep.testOnly).map((dep) => dep.name);
+		const combined = new Set([...codeDepNames, ...this.devDependencies]);
+
+		for (const dep of combined.values()) {
+			if (codeDepNames.includes(dep) && this.devDependencies.includes(dep)) {
+				used.push(dep);
+				continue;
+			}
+
+			if (codeDepNames.includes(dep)) {
+				missing.push(dep);
+			} else {
+				unused.push(dep);
+			}
+		}
+
+		return {
+			used,
+			unused,
+			missing,
+		};
 	}
 }
 
@@ -46,55 +123,6 @@ class Dependency {
 	}
 }
 
-testDependencies = (packageJson, dependencies) => {
-	// Should we filter out source only
-	const testDependencies = dependencies.filter((dep) => !dep.testOnly).map((dep) => dep.name);
-
-	const combined = new Set([...testDependencies, ...packageJson.dependencies]);
-
-	const missing = [];
-	const unused = [];
-	const used = [];
-
-	for (const dep of combined.values()) {
-		if (testDependencies.includes(dep) && packageJson.dependencies.includes(dep)) {
-			used.push(dep);
-			continue;
-		}
-
-		if (testDependencies.includes(dep)) {
-			missing.push(dep);
-		} else {
-			unused.push(dep);
-		}
-	}
-
-	return { missing, unused };
-};
-
-testDevDependencies = (packageJson, dependencies, usedDependencies) => {
-	const testDependencies = dependencies.filter((dep) => dep.testOnly).map((dep) => dep.name);
-
-	const combined = new Set([...testDependencies, ...packageJson.devDependencies]);
-
-	const missing = [];
-	const unused = [];
-
-	for (const dep of combined.values()) {
-		if (testDependencies.includes(dep) && packageJson.devDependencies.includes(dep)) {
-			continue;
-		}
-
-		if (testDependencies.includes(dep)) {
-			missing.push(dep);
-		} else {
-			unused.push(dep);
-		}
-	}
-
-	return { missing, unused };
-};
-
 const main = async () => {
 	const source = resolve(__dirname, "../../packages");
 
@@ -105,8 +133,6 @@ const main = async () => {
 
 	for (const pkg of pkgs) {
 		const packageJson = require(join(source, pkg, "package.json"));
-
-		const package = new Package(packageJson);
 
 		// console.log("Checking: ", package);
 
@@ -135,12 +161,14 @@ const main = async () => {
 
 				const dependencies = Object.keys(result.using).map((name) => new Dependency(name, result.using[name]));
 
+				const package = new Package(packageJson, dependencies);
+
 				// console.log(
 				// 	"Dependencies: ",
 				// 	dependencies.filter((dep) => dep.testOnly),
 				// );
 
-				const { missing, unused, used } = testDependencies(package, dependencies);
+				const { missing, unused, used } = package.getResult();
 
 				console.log("Used: ", used);
 				console.log("Missing: ", missing);
