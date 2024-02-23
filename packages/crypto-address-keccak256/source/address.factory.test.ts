@@ -66,10 +66,21 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 
 		assert.true(await context.app.resolve(AddressFactory).validate("0xC7C50f33278bDe272ffe23865fF9fBd0155a5175"));
 		assert.true(await context.app.resolve(AddressFactory).validate("0xC7C50f33278bDe272ffe23865fF9fBd0155a5175"));
+		assert.false(await context.app.resolve(AddressFactory).validate("0xC7C50f33278bde272ffe23865ff9fbd0155a5175"));
 		assert.false(
 			await context.app
 				.resolve(AddressFactory)
 				.validate("m0d1q05ypy7qw2hhqqz28rwetc6dauge6g6g65npy2qht5pjuheqwrse7gxkhwv"),
 		);
+	});
+
+	it("should convert from and to buffer", async (context) => {
+		await context.app.resolve<ECDSA>(ECDSA).register();
+
+		const buffer = await context.app.resolve(AddressFactory).toBuffer("0xC7C50f33278bDe272ffe23865fF9fBd0155a5175");
+		assert.equal(buffer.byteLength, 20);
+
+		const restored = await context.app.resolve(AddressFactory).fromBuffer(buffer);
+		assert.equal(restored, "0xC7C50f33278bDe272ffe23865fF9fBd0155a5175");
 	});
 });

@@ -16,13 +16,13 @@
 			"package": "@mainsail/crypto-signature-schnorr"
 		},
 		{
-			"package": "@mainsail/crypto-key-pair-schnorr"
+			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
-			"package": "@mainsail/crypto-address-bech32m"
+			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
 			"package": "@mainsail/crypto-wif"

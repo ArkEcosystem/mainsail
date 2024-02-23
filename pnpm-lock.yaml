@@ -570,6 +570,9 @@ importers:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../crypto-address-bech32m
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
