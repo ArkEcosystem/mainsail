@@ -2,12 +2,13 @@ import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@mainsail/crypto-address-bech32m";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
-import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
+import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoMessages } from "@mainsail/crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
@@ -38,7 +39,7 @@ import {
 import { Identifiers as InternalIdentifiers } from "./identifiers";
 
 export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
-	options = { address: "bech32m", bech32mPrefix: "ark", name: "mainsail", ...options };
+	options = { address: "keccak256", name: "mainsail", ...options };
 
 	const app = new Application(new Container());
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
@@ -49,7 +50,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoValidation).register();
 	await app.resolve(CoreCryptoHashBcrypto).register();
 	await app.resolve(CoreCryptoSignatureSchnorr).register();
-	await app.resolve(CoreCryptoKeyPairSchnorr).register();
+	await app.resolve(CoreCryptoKeyPairEcdsa).register();
 
 	let addressMilestone;
 
@@ -62,6 +63,11 @@ export const makeApplication = async (configurationPath: string, options: Record
 		case "bech32m": {
 			await app.resolve(CoreCryptoAddressBech32m).register();
 			addressMilestone = { bech32m: options.bech32mPrefix };
+			break;
+		}
+		case "keccak256": {
+			await app.resolve(CoreCryptoAddressKeccak256).register();
+			addressMilestone = { keccak256: true };
 			break;
 		}
 		default: {

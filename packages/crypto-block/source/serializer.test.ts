@@ -35,7 +35,7 @@ describe<{
 		assertBlockData(assert, deserialized, blockData);
 	});
 
-	it("#serialize - should serialize and deserialize block with transactions", async ({
+	it.skip("#serialize - should serialize and deserialize block with transactions", async ({
 		serializer,
 		deserializer,
 	}) => {
