@@ -2,6 +2,30 @@ const depcheck = require("depcheck");
 const { resolve, join } = require("path");
 const { lstatSync, readdirSync } = require("fs");
 
+// Dependency categorization:
+// USAGE in code -> Type:
+// - Source -> Used in source code, but not in tests
+// - Test -> not used in source code, but only in tests
+// - Both -> Used in both source code and tests
+// * NOTE: We are using testOnly flag, because Source & Both can be treated the same and should be registered in dependencies
+
+// INVALID CASES:
+// Unused -> Not used in source code or tests -> (should be removed from dependencies && devDependencies)
+
+// Unused -> Unused in the source code & registered in dependencies -> (should be removed from dependencies)
+// UnusedDev -> Unused in tests & registered in devDependencies -> (should be removed from devDependencies)
+
+// Missing: -> Used in source code (& tests -> Both Type || Source Type) , but not registered in dependencies or devDependencies -> (should be added to dependencies)
+// MissingDev: -> Used in tests (Test Type), but not registered in devDependencies -> (should be added to devDependencies)
+
+// MissingException: Registered as exception, but not registered in dependencies
+// MissingDevException: Registered as exception, but not registered in devDependencies
+
+// VALID CASES:
+// Used -> Used in source code & tests and registered in dependencies
+// UsedDev -> Used in tests and registered in devDependencies
+// Exceptions: Not used in code (Unused type), but required for build or other purposes
+
 class Package {
 	constructor(packageJson) {
 		this.name = packageJson.name;
@@ -23,6 +47,7 @@ class Dependency {
 }
 
 testDependencies = (packageJson, dependencies) => {
+	// Should we filter out source only
 	const testDependencies = dependencies.filter((dep) => !dep.testOnly).map((dep) => dep.name);
 
 	const combined = new Set([...testDependencies, ...packageJson.dependencies]);
@@ -47,7 +72,7 @@ testDependencies = (packageJson, dependencies) => {
 	return { missing, unused };
 };
 
-testDevDependencies = (packageJson, dependencies) => {
+testDevDependencies = (packageJson, dependencies, usedDependencies) => {
 	const testDependencies = dependencies.filter((dep) => dep.testOnly).map((dep) => dep.name);
 
 	const combined = new Set([...testDependencies, ...packageJson.devDependencies]);
