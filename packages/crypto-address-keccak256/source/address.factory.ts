@@ -29,11 +29,11 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	}
 
 	public async fromBuffer(buffer: Buffer): Promise<string> {
-		return "";
+		return ethers.getAddress(ethers.hexlify(buffer));
 	}
 
 	public async toBuffer(address: string): Promise<Buffer> {
-		return Buffer.alloc(1);
+		return Buffer.from(ethers.getBytes(address));
 	}
 
 	public async validate(address: string): Promise<boolean> {
