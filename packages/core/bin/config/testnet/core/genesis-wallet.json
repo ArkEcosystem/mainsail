@@ -1,14 +1,14 @@
 {
-	"address": "ark1m22g682le8uzttkg3nxsrv08v53z5gzk9qn4j8fp3e3600wxnefsqphf4d",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "68677f92fda397fcf0110f927e591713a7c9d923631e745f75ee632c1637e3fd",
-		"publicKey": "a08058db53e2665c84a40f5152e76dd2b652125a6079130d4c315e728bcf4dd1dfb44ac26e82302331d61977d3141118"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "fde322b64f45c256eadeac2087d76440805bf7f3ae2fed7fa1ae63ecdc44a5b9",
-		"publicKey": "da948d1d5fc9f825aec88ccd01b1e765222a20562827591d218e63a7bdc69e53"
-	},
-	"passphrase": "damp manual option end drill energy bless clinic bleak veteran syrup repair total proud chest evil speed utility west canvas spider border wage cabin"
+    "address": "0xb693449AdDa7EFc015D87944EAE8b7C37EB1690A",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "7025c5447f499173754e2b9772749bfa2e0ce0ce967d98009905cbdfad9d1758",
+        "publicKey": "b6e7bf4d56301a12a79c5641bd1c3da9e9ce0ef31311eaa27572e38d9dd909d423c07e154ab55b1ea08107c02ddc28d2"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "6acdb0def03305800b75e9c020e0a9b0504a543f56253f694ff35f1dce8a193f",
+        "publicKey": "025f7362e1baff21b8441c20b3f54583eb2f5925afada140b5a95880a2224a9d48"
+    },
+    "passphrase": "galaxy pull effort prosper immune mansion brown expect advice harvest dilemma plug pole oval start agent dizzy glow way arrange parent ghost sample icon"
 }
