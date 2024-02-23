@@ -110,9 +110,6 @@ export const Identifiers = {
 		},
 		Validator: Symbol("Crypto<Validator>"),
 	},
-	Evm: {
-		Instance: Symbol("Evm<Instance>"),
-	},
 	Database: {
 		Instance: {
 			Consensus: Symbol("Database<Instance.Consensus>"),
@@ -126,6 +123,9 @@ export const Identifiers = {
 			PreVote: Symbol("Database<Storage.PreVote>"),
 			Proposal: Symbol("Database<Storage.Proposal>"),
 		},
+	},
+	Evm: {
+		Instance: Symbol("Evm<Instance>"),
 	},
 	Fee: {
 		Matcher: Symbol("Fee<Matcher>"),

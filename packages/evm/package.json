@@ -9,16 +9,13 @@
 	"files": [
 		"distribution"
 	],
-	"napi": {
-		"name": "evm"
-	},
 	"scripts": {
 		"build": "pnpm run clean && pnpm run build-napi && tsc && pnpm run copy",
-		"copy": "mkdir distribution/generated && cp source/generated/bindings.js distribution/generated/ && cp source/generated/bindings.d.ts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
-		"build:watch": "pnpm run clean && tsc -w",
 		"build-napi": "mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts --release && mv evm.*.node bindings.js bindings.d.ts source/generated",
 		"build-napi:debug": "napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts && mv evm.*.node bindings.js bindings.d.ts source/generated",
+		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution && del source/generated",
+		"copy": "mkdir distribution/generated && cp source/generated/bindings.js distribution/generated/ && cp source/generated/bindings.d.ts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
 		"release": "pnpm publish --access public",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
@@ -39,5 +36,8 @@
 	},
 	"engines": {
 		"node": ">=20.x"
+	},
+	"napi": {
+		"name": "evm"
 	}
 }
