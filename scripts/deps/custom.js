@@ -1,5 +1,6 @@
 const depcheck = require("depcheck");
 const { resolve, join } = require("path");
+const { readdirSync, lstatSync } = require("fs");
 
 // Dependency categorization:
 // USAGE in code -> Type:
@@ -35,8 +36,10 @@ const EXCEPTIONS = {
 class Package {
 	constructor(packageJson, imports) {
 		this.name = packageJson.name;
-		this.dependencies = Object.keys(packageJson.dependencies);
-		this.devDependencies = Object.keys(packageJson.devDependencies).filter((x) => !x.startsWith("@types/"));
+		this.dependencies = packageJson.dependencies ? Object.keys(packageJson.dependencies) : [];
+		this.devDependencies = packageJson.devDependencies
+			? Object.keys(packageJson.devDependencies).filter((x) => !x.startsWith("@types/"))
+			: [];
 		this.imports = imports;
 
 		this.exceptions = this.findExceptions();
@@ -144,10 +147,9 @@ class Import {
 const main = async () => {
 	const source = resolve(__dirname, "../../packages");
 
-	// const pkgs = readdirSync(source)
-	// 	.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
-	// 	.sort();
-	const pkgs = ["api"];
+	const pkgs = readdirSync(source)
+		.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
+		.sort();
 
 	for (const pkg of pkgs) {
 		const packageJson = require(join(source, pkg, "package.json"));
