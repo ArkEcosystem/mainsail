@@ -1,7 +1,7 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts as AppContracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
+import { Contracts as AppContracts, Identifiers as AppIdentifiers, Exceptions } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
 import path from "path";
@@ -19,7 +19,7 @@ type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount
 	peers: string;
 	rewardAmount: number | string;
 
-	address: "base58" | "bech32m";
+	address: "base58" | "bech32m" | "keccak256";
 	base58Prefix: number;
 	bech32mPrefix: string;
 };
@@ -148,8 +148,8 @@ export class Command extends Commands.Command {
 		{
 			name: "address",
 			description: "The desired address format of the network.",
-			schema: Joi.valid("bech32m", "base58"),
-			default: "bech32m",
+			schema: Joi.valid("bech32m", "base58", "keccak256"),
+			default: "keccak256",
 		},
 		{
 			name: "base58Prefix",
@@ -285,10 +285,28 @@ export class Command extends Commands.Command {
 	}
 
 	#convertFlags(options: Flags): AppContracts.NetworkGenerator.Options {
+		let address;
+		switch (options.address) {
+			case "base58": {
+				address = { base58: options.base58Prefix };
+				break;
+			}
+			case "bech32m": {
+				address = { bech32m: options.bech32mPrefix };
+				break;
+			}
+			case "keccak256": {
+				address = { keccak256: true };
+				break;
+			}		
+			default: {
+				throw new Exceptions.NotImplemented(options.address, "#convertFlags");
+			}
+		}
+
 		return {
 			...options,
-			address:
-				options.address === "bech32m" ? { bech32m: options.bech32mPrefix } : { base58: options.base58Prefix },
+			address,
 			peers: options.peers.replace(" ", "").split(","),
 			rewardAmount: options.rewardAmount.toString(),
 		};
