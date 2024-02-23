@@ -151,6 +151,8 @@ const main = async () => {
 		.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
 		.sort();
 
+	let pass = true;
+
 	for (const pkg of pkgs) {
 		const packageJson = require(join(source, pkg, "package.json"));
 
@@ -165,6 +167,7 @@ const main = async () => {
 				const package = new Package(packageJson, imports);
 
 				if (!package.pass()) {
+					pass = false;
 					console.log("Package: ", package.name);
 
 					const { missing, unused, devMissing, devUnused } = package;
@@ -188,6 +191,10 @@ const main = async () => {
 				// console.log("DevExceptions: ", package.devExceptions);
 			},
 		);
+	}
+
+	if (!pass) {
+		process.exit(1);
 	}
 };
 
