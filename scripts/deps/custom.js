@@ -27,7 +27,7 @@ const { resolve, join } = require("path");
 
 const EXCEPTIONS = {
 	"@mainsail/api": {
-		dependencies: [],
+		dependencies: ["@mainsail/logger-pino", "@mainsail/api-database", "@mainsail/api-http"],
 		devDependencies: [],
 	},
 };
@@ -40,7 +40,7 @@ class Package {
 		this.imports = imports;
 
 		this.exceptions = this.findExceptions();
-		this.devExceptions = this.findExceptions();
+		this.devExceptions = this.findDevExceptions();
 
 		const result = this.getResult();
 		this.used = result.used;
@@ -79,7 +79,7 @@ class Package {
 
 			if (importNames.includes(dep)) {
 				missing.push(dep);
-			} else {
+			} else if (!this.exceptions.includes(dep)) {
 				unused.push(dep);
 			}
 		}
@@ -107,7 +107,7 @@ class Package {
 
 			if (importNames.includes(dep)) {
 				missing.push(dep);
-			} else {
+			} else if (!this.devExceptions.includes(dep)) {
 				unused.push(dep);
 			}
 		}
