@@ -1,6 +1,7 @@
 import { inject } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+
 import { Instance } from "./instance";
 
 export class ServiceProvider extends Providers.ServiceProvider {

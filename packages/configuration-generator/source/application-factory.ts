@@ -69,7 +69,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 			await app.resolve(CoreCryptoAddressKeccak256).register();
 			addressMilestone = { keccak256: true };
 			break;
-		}		
+		}
 		default: {
 			throw new Exceptions.NotImplemented(options.addressFormat, "makeApplication");
 		}

@@ -1,7 +1,7 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts as AppContracts, Identifiers as AppIdentifiers, Exceptions } from "@mainsail/contracts";
+import { Contracts as AppContracts, Exceptions, Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
 import path from "path";
@@ -298,7 +298,7 @@ export class Command extends Commands.Command {
 			case "keccak256": {
 				address = { keccak256: true };
 				break;
-			}		
+			}
 			default: {
 				throw new Exceptions.NotImplemented(options.address, "#convertFlags");
 			}

@@ -7,9 +7,8 @@ import { EvmCallTransaction } from "../versions";
 
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
-
 	@inject(Identifiers.Evm.Instance)
-	 // TODO: types
+	// TODO: types
 	// @ts-ignore
 	private evm: any;
 
