@@ -11,7 +11,7 @@
 	],
 	"scripts": {
 		"build": "pnpm run clean && pnpm run build-napi && tsc && pnpm run copy",
-		"build-napi": "mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts --release && mv evm.*.node bindings.js bindings.d.ts source/generated",
+		"build-napi": "del source/generated && mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts --release && mv evm.*.node bindings.js bindings.d.ts source/generated",
 		"build-napi:debug": "napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts && mv evm.*.node bindings.js bindings.d.ts source/generated",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution && del source/generated",
