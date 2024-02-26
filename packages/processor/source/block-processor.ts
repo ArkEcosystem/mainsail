@@ -63,7 +63,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			return true;
 		} catch (error) {
-			this.logger.error(`Cannot process block, because: ${error.message}`);
+			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 
 		return false;
