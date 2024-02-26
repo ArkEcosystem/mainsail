@@ -13,8 +13,6 @@ export const request = async <T = Record<string, any>>(
 	}
 
 	const response = await got(`http://localhost:4003/api/${path}${transform}`);
-	// console.log(response);
-
 	const { statusCode, headers, body } = response;
 	return { statusCode, headers, data: JSON.parse(body) as T };
 };
