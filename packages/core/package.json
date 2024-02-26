@@ -71,6 +71,7 @@
 		"@mainsail/crypto-worker": "workspace:*",
 		"@mainsail/database": "workspace:*",
 		"@mainsail/evm": "workspace:*",
+		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/kernel": "workspace:*",

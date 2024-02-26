@@ -945,6 +945,9 @@ importers:
       '@mainsail/evm':
         specifier: workspace:*
         version: link:../evm
+      '@mainsail/evm-development':
+        specifier: workspace:*
+        version: link:../evm-development
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../fees
@@ -1208,8 +1211,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       ethers:
-        specifier: ^6.9.0
-        version: 6.9.0
+        specifier: ^6.11.0
+        version: 6.11.1
     devDependencies:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
@@ -1863,6 +1866,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/evm':
+        specifier: workspace:*
+        version: link:../evm
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1872,6 +1878,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ethers:
+        specifier: ^6.11.0
+        version: 6.11.1
     devDependencies:
       '@mainsail/crypto-config':
         specifier: workspace:*
@@ -2401,6 +2410,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ethers:
+        specifier: ^6.11.0
+        version: 6.11.1
     devDependencies:
       '@mainsail/test-framework':
         specifier: workspace:*
@@ -2411,6 +2423,43 @@ importers:
       rewiremock:
         specifier: 3.14.5
         version: 3.14.5
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/evm-development:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/evm':
+        specifier: workspace:*
+        version: link:../evm
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      ethers:
+        specifier: ^6.11.0
+        version: 6.11.1
+    devDependencies:
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -3382,8 +3431,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /@adraffy/ens-normalize@1.10.0:
-    resolution: {integrity: sha512-nA9XHtlAkYfJxY7bce8DcN7eKxWWCWkU+1GR9d+U6MbNpfwQp8TI7vqOsBsMcHoT4mBu2kypKoSKnghEzOOq5Q==}
+  /@adraffy/ens-normalize@1.10.1:
+    resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
     dev: false
 
   /@babel/code-frame@7.23.5:
@@ -9132,11 +9181,11 @@ packages:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
 
-  /ethers@6.9.0:
-    resolution: {integrity: sha512-pmfNyQzc2mseLe91FnT2vmNaTt8dDzhxZ/xItAV7uGsF4dI4ek2ufMu3rAkgQETL/TIs0GS5A+U05g9QyWnv3Q==}
+  /ethers@6.11.1:
+    resolution: {integrity: sha512-mxTAE6wqJQAbp5QAe/+o+rXOID7Nw91OZXvgpjDa1r4fAbq2Nu314oEZSbjoRLacuCzs7kUC3clEvkCQowffGg==}
     engines: {node: '>=14.0.0'}
     dependencies:
-      '@adraffy/ens-normalize': 1.10.0
+      '@adraffy/ens-normalize': 1.10.1
       '@noble/curves': 1.2.0
       '@noble/hashes': 1.3.2
       '@types/node': 18.15.13

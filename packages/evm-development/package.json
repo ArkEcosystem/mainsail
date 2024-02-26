@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/crypto-transaction-evm-call",
+	"name": "@mainsail/evm-development",
 	"version": "0.0.1-alpha.7",
-	"description": "EVM transaction for the Mainsail blockchain",
+	"description": "EVM development support for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"main": "distribution/index.js",
@@ -22,7 +22,6 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/evm": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/transactions": "workspace:*",

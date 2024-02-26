@@ -26,7 +26,8 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/utils": "workspace:*",
+		"ethers": "^6.11.0"
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",

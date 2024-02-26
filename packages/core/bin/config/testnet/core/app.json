@@ -40,6 +40,12 @@
 			"package": "@mainsail/fees-static"
 		},
 		{
+			"package": "@mainsail/evm"
+		},
+		{
+			"package": "@mainsail/evm-development"
+		},
+		{
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
@@ -80,9 +86,6 @@
 		},
 		{
 			"package": "@mainsail/database"
-		},
-		{
-			"package": "@mainsail/evm"
 		},
 		{
 			"package": "@mainsail/transactions"

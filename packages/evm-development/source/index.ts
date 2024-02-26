@@ -1,11 +1,9 @@
-import { inject } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+import { Deployer } from "./deployer";
 
-import { Instance } from "./instance";
-
-export * as Bindings from "./generated/bindings";
-
+@injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -13,11 +11,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> { }
 
 	public async boot(): Promise<void> {
-		this.logger.info("Booting EVM...");
-		this.app.bind(Identifiers.Evm.Instance).to(Instance).inSingletonScope();
-	}
+		this.logger.info("Setting up EVM for development...");
 
-	public async dispose(): Promise<void> {
-		this.logger.info("Disposing EVM...");
+		await this.app.resolve(Deployer).deploy();
 	}
 }

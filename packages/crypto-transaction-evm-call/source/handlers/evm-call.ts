@@ -1,16 +1,15 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Handlers } from "@mainsail/transactions";
+// import { Bindings } from "@mainsail/evm";
 
 import { EvmCallTransaction } from "../versions";
 
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.Evm.Instance)
-	// TODO: types
-	// @ts-ignore
-	private evm: any;
+	// @inject(Identifiers.Evm.Instance)
+	// private readonly evm!: Bindings.Evm;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -55,5 +54,5 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
-	): Promise<void> {}
+	): Promise<void> { }
 }
