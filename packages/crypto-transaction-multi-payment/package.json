@@ -22,7 +22,6 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
@@ -34,6 +33,7 @@
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
