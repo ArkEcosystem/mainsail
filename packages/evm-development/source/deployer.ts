@@ -41,20 +41,16 @@ export class Deployer {
 			`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.deployedContractAddress}`,
 		);
 
-		await this.ensureFunds(result.deployedContractAddress!);
+		const recipients = [...new Set(genesisBlock.block.transactions.map(({ recipientId }) => recipientId!).filter(Boolean))];
+		await this.ensureFunds(result.deployedContractAddress!, recipients);
 	}
 
-	private async ensureFunds(erc20ContractAddress: string): Promise<void> {
-		const secrets = this.app.config("validators.secrets");
-		Utils.assert.defined<string[]>(secrets);
-
+	private async ensureFunds(erc20ContractAddress: string, recipients: string[]): Promise<void> {
 		const iface = new ethers.Interface(ERC20.abi.abi);
 		const amount = ethers.parseEther("1000");
 
-		for (const secret of secrets) {
-			const address = await this.addressFactory.fromMnemonic(secret);
-
-			const encodedCall = iface.encodeFunctionData("transfer", [address, amount]);
+		for (const recipient of recipients) {
+			const encodedCall = iface.encodeFunctionData("transfer", [recipient, amount]);
 
 			const result = await this.evm.transact({
 				caller: this.#genesisAddress,
