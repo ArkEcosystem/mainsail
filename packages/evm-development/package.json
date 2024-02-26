@@ -1,13 +1,13 @@
 {
-	"name": "@mainsail/crypto-address-keccak256",
-	"version": "0.0.1-alpha.8",
-	"description": "Keccak256 address derivation for the Mainsail blockchain",
+	"name": "@mainsail/evm-development",
+	"version": "0.0.1-alpha.7",
+	"description": "EVM development support for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
-		"distribution"
+		"/distribution"
 	],
 	"scripts": {
 		"build": "pnpm run clean && tsc",
@@ -22,17 +22,16 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/evm": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ethers": "^6.11.0"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
-		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"bip39": "3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
