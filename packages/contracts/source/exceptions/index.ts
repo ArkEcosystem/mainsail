@@ -1,5 +1,4 @@
 export * from "./base";
-export * from "./cache";
 export * from "./cli";
 export * from "./config";
 export * from "./consensus";
@@ -10,6 +9,7 @@ export * from "./logic";
 export * from "./p2p";
 export * from "./plugins";
 export * from "./pool";
+export * from "./processor";
 export * from "./runtime";
 export * from "./state";
 export * from "./validation";
