@@ -24,7 +24,6 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
 		"@mainsail/crypto-transaction-multi-signature-registration": "workspace:*",
@@ -36,9 +35,7 @@
 		"@mainsail/p2p": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@mainsail/validation": "workspace:*",
 		"bip39": "3.1.0",
-		"chance": "1.1.11",
 		"concordance": "~5.0.4",
 		"dayjs": "1.11.10",
 		"fast-memoize": "2.5.2",
@@ -53,6 +50,7 @@
 		"zod": "~3.22.4"
 	},
 	"devDependencies": {
+		"@mainsail/validation": "workspace:*",
 		"@types/chance": "1.1.6",
 		"@types/fs-extra": "11.0.4",
 		"@types/got": "9.6.12",

@@ -2922,9 +2922,6 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-messages':
-        specifier: workspace:*
-        version: link:../crypto-messages
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2958,15 +2955,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
       bip39:
         specifier: 3.1.0
         version: 3.1.0
-      chance:
-        specifier: 1.1.11
-        version: 1.1.11
       concordance:
         specifier: ~5.0.4
         version: 5.0.4
@@ -3004,6 +2995,9 @@ importers:
         specifier: ~3.22.4
         version: 3.22.4
     devDependencies:
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       '@types/chance':
         specifier: 1.1.6
         version: 1.1.6
@@ -6965,10 +6959,6 @@ packages:
     resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
     dev: true
-
-  /chance@1.1.11:
-    resolution: {integrity: sha512-kqTg3WWywappJPqtgrdvbA380VoXO2eu9VCV895JgbyHsaErXdyHK9LOZ911OvAk6L0obK7kDk9CGs8+oBawVA==}
-    dev: false
 
   /chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
