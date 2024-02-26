@@ -28,9 +28,9 @@
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

@@ -28,8 +28,8 @@
 		"ajv": "8.12.0"
 	},
 	"devDependencies": {
-		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",

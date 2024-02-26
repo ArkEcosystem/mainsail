@@ -29,10 +29,10 @@
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
