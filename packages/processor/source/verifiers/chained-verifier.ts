@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
@@ -10,11 +10,13 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (unit.getBlock().data.height === 0) {
-			return true;
+			return;
 		}
 
-		return Utils.isBlockChained(this.stateService.getStore().getLastBlock().data, unit.getBlock().data);
+		if (!Utils.isBlockChained(this.stateService.getStore().getLastBlock().data, unit.getBlock().data)) {
+			throw new Exceptions.BlockNotChained(unit.getBlock());
+		}
 	}
 }

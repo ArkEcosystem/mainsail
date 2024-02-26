@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class VerifyBlockVerifier implements Contracts.Processor.Handler {
@@ -12,10 +12,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const block = unit.getBlock();
 
 		let verification: Contracts.Crypto.BlockVerification = await this.blockVerifier.verify(block);
@@ -30,22 +27,12 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 				// @TODO: check if we can remove this duplicate verification
 				verification = await this.blockVerifier.verify(block);
 			} catch (error) {
-				this.logger.warning(`Failed to verify block, because: ${error.message}`);
+				throw new Exceptions.BlockNotVerified(block, error.message);
 			}
 		}
 
 		if (!verification.verified) {
-			this.logger.warning(
-				`Block ${block.data.height.toLocaleString()} (${
-					block.data.id
-				}) disregarded because verification failed`,
-			);
-
-			this.logger.warning(JSON.stringify(verification, undefined, 4));
-
-			return false;
+			throw new Exceptions.BlockNotVerified(block, verification.errors.join(", "));
 		}
-
-		return true;
 	}
 }
