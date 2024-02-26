@@ -6,7 +6,6 @@ export * from "./consensus";
 export * from "./container";
 export * from "./crypto";
 export * from "./filesystem";
-export * from "./forger";
 export * from "./logic";
 export * from "./p2p";
 export * from "./plugins";
