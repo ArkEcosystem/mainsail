@@ -19,20 +19,24 @@ export class Deployer {
     @inject(Identifiers.Cryptography.Identity.Address.Factory)
     private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
-    #genesis1 = "0x0000000000000000000000000000000000000001";
+    #genesisAddress!: string;
 
     public async deploy(): Promise<void> {
+        const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
+        Utils.assert.defined(genesisBlock);
+
+        this.#genesisAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
         const result = await this.evm.transact({
             data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
-            caller: this.#genesis1,
+            caller: this.#genesisAddress,
         });
 
         if (!result.success) {
             throw new Error("failed to deploy erc20 contract");
         }
 
-        this.logger.info(`Deployed ERC20 dummy contract: ${result.deployedContractAddress}`);
+        this.logger.info(`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.deployedContractAddress}`);
 
         await this.ensureFunds(
             result.deployedContractAddress!
@@ -50,7 +54,7 @@ export class Deployer {
             const encodedCall = iface.encodeFunctionData("transfer", [address, 1]);
 
             const result = await this.evm.transact({
-                caller: this.#genesis1,
+                caller: this.#genesisAddress,
                 recipient: erc20ContractAddress,
                 data: Buffer.from(ethers.getBytes(encodedCall)),
             });
