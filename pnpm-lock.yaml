@@ -3037,9 +3037,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       better-sqlite3:
         specifier: 9.2.2
         version: 9.2.2
@@ -3053,6 +3050,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@types/better-sqlite3':
         specifier: 7.6.8
         version: 7.6.8
