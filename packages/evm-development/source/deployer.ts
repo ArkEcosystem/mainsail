@@ -41,7 +41,9 @@ export class Deployer {
 			`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.deployedContractAddress}`,
 		);
 
-		const recipients = [...new Set(genesisBlock.block.transactions.map(({ recipientId }) => recipientId!).filter(Boolean))];
+		const recipients = [
+			...new Set(genesisBlock.block.transactions.map(({ recipientId }) => recipientId!).filter(Boolean)),
+		];
 		await this.ensureFunds(result.deployedContractAddress!, recipients);
 	}
 
