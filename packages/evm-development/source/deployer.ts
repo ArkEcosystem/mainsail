@@ -48,11 +48,13 @@ export class Deployer {
 		const secrets = this.app.config("validators.secrets");
 		Utils.assert.defined<string[]>(secrets);
 
+		const iface = new ethers.Interface(ERC20.abi.abi);
+		const amount = ethers.parseEther("1000");
+
 		for (const secret of secrets) {
 			const address = await this.addressFactory.fromMnemonic(secret);
 
-			const iface = new ethers.Interface(ERC20.abi.abi);
-			const encodedCall = iface.encodeFunctionData("transfer", [address, 1]);
+			const encodedCall = iface.encodeFunctionData("transfer", [address, amount]);
 
 			const result = await this.evm.transact({
 				caller: this.#genesisAddress,
