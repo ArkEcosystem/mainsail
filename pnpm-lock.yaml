@@ -3176,16 +3176,10 @@ importers:
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
-      delay:
-        specifier: 5.0.0
-        version: 5.0.0
     devDependencies:
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
-      '@types/delay':
-        specifier: 3.1.0
-        version: 3.1.0
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

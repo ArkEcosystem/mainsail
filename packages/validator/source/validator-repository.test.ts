@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
+import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { describe, Sandbox } from "../../test-framework";
 import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Validator } from "./validator";
@@ -13,10 +13,10 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		const validators: Contracts.Consensus.IValidator[] = [];
+		const validators: Contracts.Validator.Validator[] = [];
 		for (const { consensusKeyPair } of validatorKeys) {
 			validators.push(
-				context.sandbox.app.resolve<Contracts.Consensus.IValidator>(Validator).configure(consensusKeyPair),
+				context.sandbox.app.resolve<Contracts.Validator.Validator>(Validator).configure(consensusKeyPair),
 			);
 		}
 
