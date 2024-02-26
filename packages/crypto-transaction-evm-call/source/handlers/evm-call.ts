@@ -2,8 +2,8 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Handlers } from "@mainsail/transactions";
-// import { Bindings } from "@mainsail/evm";
 
+// import { Bindings } from "@mainsail/evm";
 import { EvmCallTransaction } from "../versions";
 
 @injectable()
@@ -54,5 +54,5 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
-	): Promise<void> { }
+	): Promise<void> {}
 }
