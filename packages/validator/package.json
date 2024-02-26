@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/validator",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Local validator utils for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
