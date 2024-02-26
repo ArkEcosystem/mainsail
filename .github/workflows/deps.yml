@@ -1,8 +1,5 @@
 jobs:
-    unit:
-        concurrency:
-            cancel-in-progress: true
-            group: ${{ github.head_ref }}-unit
+    source:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
@@ -42,7 +39,7 @@ jobs:
             matrix:
                 node-version:
                     - 20.x
-name: CI
+name: Dependencies
 on:
     pull_request:
         types:
