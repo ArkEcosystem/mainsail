@@ -28,7 +28,6 @@
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
 		"@types/seedrandom": "^3.0.8",
-		"import-fresh": "3.3.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

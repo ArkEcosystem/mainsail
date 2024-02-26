@@ -24,10 +24,8 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10",
 		"pg": "8.11.3",
-		"reflect-metadata": "0.2.0",
 		"typeorm": "0.3.17"
 	},
 	"devDependencies": {

@@ -24,7 +24,6 @@
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
 		"@hapi/hapi": "21.3.2",
-		"@hapi/hoek": "11.0.4",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/container": "workspace:*",
@@ -32,9 +31,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10",
-		"joi": "17.11.0",
-		"nanomatch": "1.2.13",
-		"rate-limiter-flexible": "3.0.6"
+		"joi": "17.11.0"
 	},
 	"devDependencies": {
 		"@types/ip": "1.1.3",

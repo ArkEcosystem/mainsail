@@ -22,12 +22,12 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ethers": "^6.9.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
