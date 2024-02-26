@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
@@ -16,9 +16,9 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (unit.getBlock().data.height === 0) {
-			return true;
+			return;
 		}
 
 		if (
@@ -33,9 +33,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 				`Block ${unit.getBlock().data.height.toLocaleString()} disregarded, because it's timestamp is too low`,
 			);
 
-			return false;
+			throw new Exceptions.InvalidTimestamp(unit.getBlock());
 		}
-
-		return true;
 	}
 }

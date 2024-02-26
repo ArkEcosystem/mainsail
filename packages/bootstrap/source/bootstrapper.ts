@@ -172,7 +172,7 @@ export class Bootstrapper {
 			const commitState = this.commitStateFactory(commit);
 			const result = await this.blockProcessor.process(commitState);
 			if (result === false) {
-				throw new Error(`Cannot process block`);
+				throw new Error(`Block is not processed.`);
 			}
 			await this.blockProcessor.commit(commitState);
 		} catch (error) {

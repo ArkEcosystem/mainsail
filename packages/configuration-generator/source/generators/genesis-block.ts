@@ -247,7 +247,6 @@ export class GenesisBlockGenerator extends Generator {
 
 		const verified = await this.blockVerifier.verify(genesis.block);
 		if (!verified.verified) {
-			console.log(verified);
 			throw new Error("failed to generate genesis block");
 		}
 	}

@@ -15,7 +15,7 @@ export interface ProcessableUnit {
 }
 
 export interface Handler {
-	execute(unit: ProcessableUnit): Promise<boolean>;
+	execute(unit: ProcessableUnit): Promise<void>;
 }
 
 export interface BlockProcessor {
@@ -28,5 +28,5 @@ export interface TransactionProcessor {
 }
 
 export interface Verifier {
-	verify(unit: ProcessableUnit): Promise<boolean>;
+	verify(unit: ProcessableUnit): Promise<void>;
 }
