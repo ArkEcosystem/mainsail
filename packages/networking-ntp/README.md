@@ -1,6 +1,6 @@
 # Mainsail - Networking NTP
 
-![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.png)
+![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 
 ## Documentation
 
