@@ -1,6 +1,6 @@
 # Mainsail - Crypto signature Schnorr Secp256k1
 
-![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.png)
+![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 
 ## Documentation
 
