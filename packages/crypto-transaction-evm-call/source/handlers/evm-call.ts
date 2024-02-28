@@ -48,10 +48,8 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		// TODO:
-		// 	super.applyToSender(walletRepository, transaction);
-		// - update nonce
-		// - subtract consumed gas
+		// TODO: subtract consumed gas only after evm call
+		await super.applyToSender(walletRepository, transaction);
 	}
 
 	public async applyToRecipient(
@@ -64,8 +62,10 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		const { evmCall } = transaction.data.asset;
 
+		const sender = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+
 		const result = await this.evm.transact({
-			caller: transaction.data.senderPublicKey,
+			caller: sender.getAddress(),
 			data: Buffer.from(evmCall.payload, "hex"),
 			recipient: transaction.data.recipientId,
 		});

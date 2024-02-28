@@ -111,7 +111,7 @@ export class Signer {
 	public async makeEvmCall(options: EvmCallOptions): Promise<Contracts.Crypto.Transaction> {
 		await this.#initialize();
 
-		options = { ...options, nonce: this.#nonce.toFixed() };
+		options = { nonce: this.#nonce.toFixed(), ...options };
 
 		const builder = await this.#factoryBuilder
 			.get("EvmCall")

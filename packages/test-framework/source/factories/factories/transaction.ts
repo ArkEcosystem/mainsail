@@ -248,6 +248,7 @@ export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.K
 	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
 		const builder = app.resolve(EvmCallBuilder);
 
+		builder.nonce(options.nonce);
 		builder.payload(options.evmCall?.payload ?? "");
 		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);
 
