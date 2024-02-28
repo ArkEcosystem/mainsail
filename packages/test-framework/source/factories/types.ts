@@ -11,6 +11,7 @@ export type TransactionOptions = {
 	nonce?: string;
 	fee?: string;
 	timestamp?: number;
+	recipientId?: string;
 	senderPublicKey?: string;
 	passphrase?: string;
 	passphrases?: string[];

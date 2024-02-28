@@ -1885,9 +1885,9 @@ importers:
         specifier: ^6.11.0
         version: 6.11.1
     devDependencies:
-      '@mainsail/crypto-address-base58':
+      '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
-        version: link:../crypto-address-base58
+        version: link:../crypto-address-keccak256
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config

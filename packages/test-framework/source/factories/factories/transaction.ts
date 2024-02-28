@@ -60,7 +60,7 @@ const applyModifiers = <T extends TransactionBuilder<T>>(
 		entity.version(options.version);
 	}
 
-	if (entity.data.version > 1 && options.nonce) {
+	if (entity.data.version && options.nonce) {
 		entity.nonce(options.nonce);
 	}
 
@@ -70,6 +70,10 @@ const applyModifiers = <T extends TransactionBuilder<T>>(
 
 	if (options.senderPublicKey) {
 		entity.senderPublicKey(options.senderPublicKey);
+	}
+
+	if (options.recipientId) {
+		entity.recipientId(options.recipientId);
 	}
 
 	return entity;
@@ -248,7 +252,6 @@ export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.K
 	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
 		const builder = app.resolve(EvmCallBuilder);
 
-		builder.nonce(options.nonce);
 		builder.payload(options.evmCall?.payload ?? "");
 		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);
 

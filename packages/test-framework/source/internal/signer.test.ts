@@ -80,25 +80,27 @@ describe<{
 		assert.array(entity.data.asset?.payments);
 	});
 
-	it.only("should make evm call", async ({ signer }) => {
+	it("should make evm call", async ({ signer }) => {
 		const options: Types.EvmCallOptions = {
 			evmCall: {
 				gasLimit: 21_000,
-				payload: "12345678",
+				payload:
+					"a9059cbb000000000000000000000000bd6f65c58a46427af4b257cbe231d0ed69ed550800000000000000000000000000000000000000000000003635c9adc5dea00000",
 			},
 			fee: "2500000000",
 			passphrase:
 				"violin hello resist adult roof breeze blood old tell source enforce token void wagon sweet detail raw coast viable garden cause gasp soap fat",
+			recipientId: "0xD3D80a3Df661414a76aAd7738a136A8d7aAa1666",
 		};
 
 		const entity = await signer.makeEvmCall(options);
 
-		console.log(entity.serialized.toString("hex"));
-
 		assert.defined(entity.data.signature);
+		assert.equal(entity.data.recipientId, "0xD3D80a3Df661414a76aAd7738a136A8d7aAa1666");
 		assert.equal(entity.data.asset?.evmCall, {
 			gasLimit: 21_000,
-			payload: "12345678",
+			payload:
+				"a9059cbb000000000000000000000000bd6f65c58a46427af4b257cbe231d0ed69ed550800000000000000000000000000000000000000000000003635c9adc5dea00000",
 		});
 	});
 });

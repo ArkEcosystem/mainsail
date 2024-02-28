@@ -34,7 +34,7 @@
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
-		"@mainsail/crypto-address-base58": "workspace:*",
+		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

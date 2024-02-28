@@ -4,8 +4,8 @@ import { Configuration } from "@mainsail/crypto-config";
 import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-schnorr";
 import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
-import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { BigNumber } from "@mainsail/utils";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import { describe, Sandbox } from "../../../test-framework";

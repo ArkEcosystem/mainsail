@@ -1,11 +1,12 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { schemas as addressSchemas } from "@mainsail/crypto-address-base58";
+import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ethers } from "ethers";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import { describe, Sandbox } from "../../../test-framework";
@@ -49,8 +50,15 @@ describe<{
 
 	const transactionOriginal = {
 		amount: 0,
+		asset: {
+			evmCall: {
+				gasLimit: 21_000,
+				payload: "00",
+			},
+		},
 		fee: 1,
 		nonce: 1,
+		recipientId: ethers.ZeroAddress,
 		senderPublicKey: "a".repeat(66),
 		type: Contracts.Crypto.TransactionType.EvmCall,
 	};

@@ -45,9 +45,7 @@ export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {
 			throw new Exceptions.EvmCallIncompleteAssetError();
 		}
 
-		if (!this.data.recipientId && !this.data.asset.evmCall.payload) {
-			// recipient may only be absent if payload is present in which case
-			// it would be a contract creation
+		if (!this.data.recipientId) {
 			throw new Exceptions.EvmCallMissingRecipientError();
 		}
 
