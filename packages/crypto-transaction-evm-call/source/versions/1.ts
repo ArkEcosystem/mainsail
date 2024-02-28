@@ -25,7 +25,7 @@ export class EvmCallTransaction extends Transaction {
 					properties: {
 						evmCall: {
 							properties: {
-								gasLimit: { type: "integer", minimum: 0 },
+								gasLimit: { minimum: 0, type: "integer" },
 								payload: {
 									// TODO: milestone for max allowed bytecode
 									allOf: [{ maxLength: 1_000_000, minLength: 0 }, { $ref: "hex" }],
