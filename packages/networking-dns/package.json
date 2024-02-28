@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/networking-dns",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "DNS networking tools for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

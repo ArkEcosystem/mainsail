@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-key-pair-schnorr",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Schnorr key derivation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -22,13 +22,13 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"bcrypto": "5.5.2",
 		"wif": "^4.0.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/wif": "^2.0.5",

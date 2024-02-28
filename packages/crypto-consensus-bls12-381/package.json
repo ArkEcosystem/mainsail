@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-consensus-bls12-381",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Combined BLS12-381 utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -24,13 +24,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/crypto-signature-bls12-381": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"ajv": "8.12.0",
-		"dayjs": "1.11.10",
-		"inversify": "6.0.2",
-		"reflect-metadata": "0.2.0",
-		"type-fest": "4.8.3"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

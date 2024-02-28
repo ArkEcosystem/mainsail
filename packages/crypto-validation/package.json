@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-validation",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Crypto validation utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -21,14 +21,14 @@
 	},
 	"dependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ajv": "8.12.0",
-		"uvu": "^0.5.6"
+		"ajv": "8.12.0"
 	},
 	"devDependencies": {
-		"@mainsail/validation": "workspace:*"
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/validation": "workspace:*",
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"

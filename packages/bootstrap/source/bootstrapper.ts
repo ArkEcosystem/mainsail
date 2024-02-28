@@ -67,6 +67,7 @@ export class Bootstrapper {
 			}
 
 			await this.#setGenesisCommit();
+			await this.#checkStoredGenesisCommit();
 			await this.#storeGenesisCommit();
 
 			await this.#restoreStateSnapshot();
@@ -98,6 +99,17 @@ export class Bootstrapper {
 		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
 		this.#store.setGenesisCommit(genesisBlock);
+	}
+	async #checkStoredGenesisCommit(): Promise<void> {
+		const genesisBlock = await this.databaseService.getBlock(0);
+
+		if (!genesisBlock) {
+			return;
+		}
+
+		if (this.#store.getGenesisCommit().block.data.id !== genesisBlock.data.id) {
+			throw new Error("Block from crypto.json doesn't match stored genesis block");
+		}
 	}
 
 	async #storeGenesisCommit(): Promise<void> {
@@ -160,7 +172,7 @@ export class Bootstrapper {
 			const commitState = this.commitStateFactory(commit);
 			const result = await this.blockProcessor.process(commitState);
 			if (result === false) {
-				throw new Error(`Cannot process block`);
+				throw new Error(`Block is not processed.`);
 			}
 			await this.blockProcessor.commit(commitState);
 		} catch (error) {

@@ -15,6 +15,6 @@ run(async () => {
 		}
 	}
 
-	bench.logMem();
-	bench.getTime();
+	// bench.logMem();
+	// bench.getTime();
 });

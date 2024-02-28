@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class GeneratorVerifier implements Contracts.Processor.Handler {
@@ -12,14 +12,16 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (unit.getBlock().data.height === 0) {
-			return true;
+			return;
 		}
 
 		const validatorIndex = this.proposerSelector.getValidatorIndex(unit.getBlock().data.round);
 		const validator = this.validatorSet.getValidator(validatorIndex);
 
-		return unit.getBlock().data.generatorPublicKey === validator.getWalletPublicKey();
+		if (unit.getBlock().data.generatorPublicKey !== validator.getWalletPublicKey()) {
+			throw new Exceptions.InvalidGenerator(unit.getBlock(), validator.getWalletPublicKey());
+		}
 	}
 }
