@@ -30,7 +30,9 @@
 		"ethers": "^6.11.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"uvu": "^0.5.6"
