@@ -57,7 +57,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=develop --tag=alpha
+                  pnpm run release -- --publish-branch=develop --tag=alpha --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
             - name: Set dist-tag latest
