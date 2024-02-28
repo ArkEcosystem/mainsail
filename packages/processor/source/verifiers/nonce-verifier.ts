@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
@@ -8,10 +8,7 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
+	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const block = unit.getBlock();
 
 		const nonceBySender = {};
@@ -33,18 +30,10 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 			const nonce: BigNumber = BigNumber.make(data.nonce);
 
 			if (!nonceBySender[sender].plus(1).isEqualTo(nonce)) {
-				this.logger.warning(
-					`Block { height: ${block.data.height.toLocaleString()}, id: ${block.data.id} } ` +
-						`not accepted: invalid nonce order for sender ${sender}: ` +
-						`preceding nonce: ${nonceBySender[sender].toFixed(0)}, ` +
-						`transaction ${data.id} has nonce ${nonce.toFixed()}.`,
-				);
-				return false;
+				throw new Exceptions.InvalidNonce(block, sender);
 			}
 
 			nonceBySender[sender] = nonce;
 		}
-
-		return true;
 	}
 }

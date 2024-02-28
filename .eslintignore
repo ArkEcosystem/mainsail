@@ -6,5 +6,6 @@ distribution
 node_modules
 LICENSE
 CODE_OF_CONDUCT.md
+scripts
 
 packages/p2p/source/hapi-nes

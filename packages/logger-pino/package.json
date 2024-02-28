@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/logger-pino",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Pino logger implementation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -23,7 +23,6 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"chalk": "^4.1.2",
-		"fs-extra": "11.2.0",
 		"joi": "17.11.0",
 		"pino": "8.17.0",
 		"pino-pretty": "10.2.3",
@@ -46,6 +45,7 @@
 		"@types/split2": "4.2.3",
 		"@types/tmp": "0.2.6",
 		"capture-console": "1.0.2",
+		"fs-extra": "11.2.0",
 		"import-fresh": "3.3.0",
 		"tmp": "0.2.1",
 		"uvu": "^0.5.6"

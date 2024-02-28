@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-transaction",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Crypto transaction utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -22,15 +22,15 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@mainsail/validation": "workspace:*",
 		"ajv": "8.12.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

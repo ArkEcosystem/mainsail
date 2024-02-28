@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-key-pair-bls12-381",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "BLS12-381 key derivation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -23,7 +23,6 @@
 		"@chainsafe/blst": "^0.2.9",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@scure/bip39": "^1.2.1",
@@ -31,6 +30,7 @@
 		"wif": "^4.0.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/wif": "^2.0.5",

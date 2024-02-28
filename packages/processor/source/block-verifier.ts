@@ -15,31 +15,17 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	public async verify(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
-		if (!(await this.app.resolve(ChainedVerifier).execute(unit))) {
-			return false;
-		}
+	public async verify(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
+		await this.app.resolve(ChainedVerifier).execute(unit);
 
-		if (!(await this.app.resolve(TimestampVerifier).execute(unit))) {
-			return false;
-		}
+		await this.app.resolve(TimestampVerifier).execute(unit);
 
-		if (!(await this.app.resolve(GeneratorVerifier).execute(unit))) {
-			return false;
-		}
+		await this.app.resolve(GeneratorVerifier).execute(unit);
 
-		if (!(await this.app.resolve(VerifyBlockVerifier).execute(unit))) {
-			return false;
-		}
+		await this.app.resolve(VerifyBlockVerifier).execute(unit);
 
-		if (!(await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit))) {
-			return false;
-		}
+		await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit);
 
-		if (!(await this.app.resolve(NonceVerifier).execute(unit))) {
-			return false;
-		}
-
-		return true;
+		await this.app.resolve(NonceVerifier).execute(unit);
 	}
 }

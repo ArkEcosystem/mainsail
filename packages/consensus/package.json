@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/consensus",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Consensus for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -23,15 +23,11 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10",
-		"delay": "5.0.0",
 		"lmdb": "2.9.2"
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
-		"@types/delay": "3.1.0",
-		"@types/seedrandom": "^3.0.8",
 		"rewiremock": "3.14.5",
 		"uvu": "^0.5.6"
 	},

@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/validator-set-static",
-	"version": "0.0.1-alpha.7",
+	"version": "0.0.1-alpha.8",
 	"description": "Static validator set strategy for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -22,13 +22,10 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"delay": "5.0.0"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
-		"@types/delay": "3.1.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

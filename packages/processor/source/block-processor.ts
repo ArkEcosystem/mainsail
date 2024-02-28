@@ -53,9 +53,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		try {
-			if (!(await this.verifier.verify(unit))) {
-				return false;
-			}
+			await this.verifier.verify(unit);
 
 			for (const transaction of unit.getBlock().transactions) {
 				await this.transactionProcessor.process(unit.store.walletRepository, transaction);
@@ -65,8 +63,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			return true;
 		} catch (error) {
-			console.log(error);
-			this.logger.error(`Cannot process block, because: ${error.message}`);
+			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 
 		return false;
