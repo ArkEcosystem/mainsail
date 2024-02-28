@@ -10,6 +10,7 @@ import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "../../../../crypto-ke
 import { ServiceProvider as CoreCryptoMessages } from "../../../../crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "../../../../crypto-transaction";
+import { ServiceProvider as CoreEvmCallTransaction } from "../../../../crypto-transaction-evm-call";
 import { ServiceProvider as CoreMultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment";
 import { ServiceProvider as CoreMultiSignatureRegistrationTransaction } from "../../../../crypto-transaction-multi-signature-registration";
 import { ServiceProvider as CoreTransferTransaction } from "../../../../crypto-transaction-transfer";
@@ -50,6 +51,7 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreValidatorResignationTransaction).register();
 	await sandbox.app.resolve(CoreMultiSignatureRegistrationTransaction).register();
 	await sandbox.app.resolve(CoreMultiPaymentTransaction).register();
+	await sandbox.app.resolve(CoreEvmCallTransaction).register();
 	await sandbox.app.resolve(CoreCryptoBlock).register();
 	await sandbox.app.resolve(CoreCryptoMessages).register();
 	await sandbox.app.resolve(CoreCryptoCommit).register();

@@ -34,6 +34,12 @@ export interface TransactionAsset {
 	multiSignatureLegacy?: MultiSignatureLegacyAsset;
 	multiSignature?: MultiSignatureAsset;
 	payments?: MultiPaymentItem[];
+	evmCall?: EvmCallAsset;
+}
+
+export interface EvmCallAsset {
+	payload: string;
+	gasLimit: number;
 }
 
 export interface TransactionData {

@@ -1,15 +1,16 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { schemas as addressSchemas } from "@mainsail/crypto-address-bech32m";
+import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-schnorr";
+import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+import { ethers } from "ethers";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import { describe, Sandbox } from "../../../test-framework";
-import { TransferTransaction } from "./1";
+import { EvmCallTransaction } from "./1";
 
 describe<{
 	sandbox: Sandbox;
@@ -48,47 +49,53 @@ describe<{
 	});
 
 	const transactionOriginal = {
-		amount: 1,
+		amount: 0,
+		asset: {
+			evmCall: {
+				gasLimit: 21_000,
+				payload: "00",
+			},
+		},
 		fee: 1,
 		nonce: 1,
-		recipientId: "a".repeat(62),
-		senderPublicKey: "a".repeat(64),
-		type: 0,
+		recipientId: ethers.ZeroAddress,
+		senderPublicKey: "a".repeat(66),
+		type: Contracts.Crypto.TransactionType.EvmCall,
 	};
 
 	it("#getSchema - should be valid", ({ validator }) => {
-		validator.addSchema(TransferTransaction.getSchema());
+		validator.addSchema(EvmCallTransaction.getSchema());
 
-		assert.undefined(validator.validate("transfer", transactionOriginal).error);
+		assert.undefined(validator.validate("evmCall", transactionOriginal).error);
 	});
 
-	it("#getSchema - expiration should be integer, min 0", ({ validator }) => {
-		validator.addSchema(TransferTransaction.getSchema());
+	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
+		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validValues = [0, 1, 100, undefined];
+		const validValues = [0, "0", BigNumber.ZERO];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
-				expiration: value,
+				amount: value,
 			};
 
-			assert.undefined(validator.validate("transfer", transaction).error);
+			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, BigNumber.ONE, "test", null, {}];
+		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
 
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
-				expiration: value,
+				amount: value,
 			};
 
-			assert.true(validator.validate("transfer", transaction).error.includes("expiration"));
+			assert.true(validator.validate("evmCall", transaction).error.includes("amount"));
 		}
 	});
 
 	it("#getSchema - fee should be bigNumber, min 0", ({ validator }) => {
-		validator.addSchema(TransferTransaction.getSchema());
+		validator.addSchema(EvmCallTransaction.getSchema());
 
 		const validValues = [0, 1, 100, BigNumber.ZERO, BigNumber.ONE];
 		for (const value of validValues) {
@@ -97,7 +104,7 @@ describe<{
 				fee: value,
 			};
 
-			assert.undefined(validator.validate("transfer", transaction).error);
+			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
 		const invalidValues = [-1, 1.1, "test", null, undefined, {}];
@@ -107,45 +114,21 @@ describe<{
 				fee: value,
 			};
 
-			assert.true(validator.validate("transfer", transaction).error.includes("fee"));
+			assert.true(validator.validate("evmCall", transaction).error.includes("fee"));
 		}
 	});
 
-	it("#getSchema - recipientId should be address", ({ validator }) => {
-		validator.addSchema(TransferTransaction.getSchema());
+	it("#getSchema - type should be evmCall", ({ validator }) => {
+		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validChars = "0123456789abcdefghijklmnopqrstuvwxyz";
-		for (const char of validChars) {
-			const transaction = {
-				...transactionOriginal,
-				recipientId: char.repeat(62),
-			};
-
-			assert.undefined(validator.validate("transfer", transaction).error);
-		}
-
-		const invalidValues = ["a".repeat(61), "a".repeat(63), "A".repeat(62), "&".repeat(62), null, undefined, {}];
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				recipientId: value,
-			};
-
-			assert.true(validator.validate("transfer", transaction).error.includes("recipientId"));
-		}
-	});
-
-	it("#getSchema - type should be transfer", ({ validator }) => {
-		validator.addSchema(TransferTransaction.getSchema());
-
-		const validValues = [Contracts.Crypto.TransactionType.Transfer];
+		const validValues = [Contracts.Crypto.TransactionType.EvmCall];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
 				type: value,
 			};
 
-			assert.undefined(validator.validate("transfer", transaction).error);
+			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
 		const invalidValues = [
@@ -164,31 +147,7 @@ describe<{
 				type: value,
 			};
 
-			assert.true(validator.validate("transfer", transaction).error.includes("type"));
-		}
-	});
-
-	it("#getSchema - vendorField should be vendorField or null", ({ validator }) => {
-		validator.addSchema(TransferTransaction.getSchema());
-
-		const validValues = ["", "dummy", "a".repeat(255), null, undefined];
-		for (const value of validValues) {
-			const transaction = {
-				...transactionOriginal,
-				vendorField: value,
-			};
-
-			assert.undefined(validator.validate("transfer", transaction).error);
-		}
-
-		const invalidValues = [-1, 1.1, 0, BigNumber.ZERO, "a".repeat(256), {}];
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				vendorField: value,
-			};
-
-			assert.true(validator.validate("transfer", transaction).error.includes("vendorField"));
+			assert.true(validator.validate("evmCall", transaction).error.includes("type"));
 		}
 	});
 });
