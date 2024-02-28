@@ -32,7 +32,11 @@ const EXCEPTIONS = {
 		devDependencies: [],
 	},
 	"@mainsail/configuration-generator": {
-		dependencies: ["@mainsail/crypto-key-pair-ecdsa", "@mainsail/crypto-signature-schnorr-secp256k1"],
+		dependencies: [
+			"@mainsail/crypto-key-pair-ecdsa",
+			"@mainsail/crypto-key-pair-schnorr",
+			"@mainsail/crypto-signature-schnorr-secp256k1",
+		],
 		devDependencies: [],
 	},
 	"@mainsail/core": {
@@ -93,6 +97,9 @@ const EXCEPTIONS = {
 			"@mainsail/validator-set-static",
 			"@mainsail/validator-set-vote-weighted",
 			"@mainsail/webhooks",
+			"@mainsail/crypto-transaction-evm-call",
+			"@mainsail/evm",
+			"@mainsail/evm-development",
 		],
 		devDependencies: [],
 	},

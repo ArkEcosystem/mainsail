@@ -24,14 +24,9 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/evm": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"ethers": "^6.11.0"
 	},
 	"devDependencies": {
-		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/validation": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
