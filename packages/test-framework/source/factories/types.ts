@@ -45,6 +45,10 @@ export type MultiPaymentOptions = TransactionOptions & {
 	}[];
 };
 
+export type EvmCallOptions = TransactionOptions & {
+	evmCall?: Contracts.Crypto.EvmCallAsset;
+};
+
 export interface Identity {
 	keys: Contracts.Crypto.KeyPair;
 	publicKey: string;

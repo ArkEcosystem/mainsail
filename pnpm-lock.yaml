@@ -660,6 +660,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-transaction-transfer':
         specifier: workspace:*
         version: link:../crypto-transaction-transfer
@@ -1882,9 +1885,15 @@ importers:
         specifier: ^6.11.0
         version: 6.11.1
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -3048,6 +3057,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-transaction-multi-payment':
         specifier: workspace:*
         version: link:../crypto-transaction-multi-payment

@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
+import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
 import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
@@ -12,6 +13,7 @@ import { join } from "path";
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder";
 import {
+	EvmCallOptions,
 	MultiPaymentOptions,
 	MultiSignatureOptions,
 	TransactionOptions,
@@ -242,6 +244,22 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contra
 	factory.get("MultiPayment").state("multiSign", multiSign);
 };
 
+export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
+		const builder = app.resolve(EvmCallBuilder);
+
+		builder.payload(options.evmCall?.payload ?? "");
+		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);
+
+		applyModifiers(builder, options);
+
+		return builder;
+	});
+
+	// @ts-ignore
+	factory.get("EvmCall").state("sign", sign);
+};
+
 export const registerTransactionFactory = async (
 	factory: FactoryBuilder,
 	config?: Contracts.Crypto.NetworkConfigPartial,
@@ -257,4 +275,5 @@ export const registerTransactionFactory = async (
 	registerUnvoteFactory(factory, app);
 	registerMultiSignature(factory, app);
 	registerMultiPaymentFactory(factory, app);
+	registerEvmCallFactory(factory, app);
 };

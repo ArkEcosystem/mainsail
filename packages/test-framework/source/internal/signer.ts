@@ -5,6 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 import { registerTransactionFactory } from "../factories/factories/transaction";
 import { FactoryBuilder } from "../factories/factory-builder";
 import {
+	EvmCallOptions,
 	MultiPaymentOptions,
 	MultiSignatureOptions,
 	TransferOptions,
@@ -37,14 +38,14 @@ export class Signer {
 			states.unshift("vendorField");
 		}
 
-		const transferBuilder = await this.#factoryBuilder
+		const builder = await this.#factoryBuilder
 			.get("Transfer")
 			.withOptions(options)
 			.withStates(...states)
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.build();
+		return builder.build();
 	}
 
 	public async makeValidator(options: ValidatorRegistrationOptions): Promise<Contracts.Crypto.Transaction> {
@@ -52,14 +53,14 @@ export class Signer {
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
 
-		const transferBuilder = await this.#factoryBuilder
+		const builder = await this.#factoryBuilder
 			.get("ValidatorRegistration")
 			.withOptions(options)
 			.withStates("sign")
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return await transferBuilder.build();
+		return await builder.build();
 	}
 
 	public async makeVote(options: VoteOptions): Promise<Contracts.Crypto.Transaction> {
@@ -67,14 +68,14 @@ export class Signer {
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
 
-		const transferBuilder = await this.#factoryBuilder
+		const builder = await this.#factoryBuilder
 			.get("Vote")
 			.withOptions(options)
 			.withStates("sign")
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.build();
+		return builder.build();
 	}
 
 	public async makeMultiSignatureRegistration(options: MultiSignatureOptions): Promise<Contracts.Crypto.Transaction> {
@@ -82,14 +83,14 @@ export class Signer {
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
 
-		const transferBuilder = await this.#factoryBuilder
+		const builder = await this.#factoryBuilder
 			.get("MultiSignature")
 			.withOptions(options)
 			.withStates("sign", "multiSign")
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.build();
+		return builder.build();
 	}
 
 	public async makeMultipayment(options: MultiPaymentOptions): Promise<Contracts.Crypto.Transaction> {
@@ -97,14 +98,29 @@ export class Signer {
 
 		options = { ...options, nonce: this.#nonce.toFixed() };
 
-		const transferBuilder = await this.#factoryBuilder
+		const builder = await this.#factoryBuilder
 			.get("MultiPayment")
 			.withOptions(options)
 			.withStates("sign")
 			.make<TransactionBuilder<any>>();
 
 		this.#incrementNonce();
-		return transferBuilder.build();
+		return builder.build();
+	}
+
+	public async makeEvmCall(options: EvmCallOptions): Promise<Contracts.Crypto.Transaction> {
+		await this.#initialize();
+
+		options = { ...options, nonce: this.#nonce.toFixed() };
+
+		const builder = await this.#factoryBuilder
+			.get("EvmCall")
+			.withOptions(options)
+			.withStates("sign")
+			.make<TransactionBuilder<any>>();
+
+		this.#incrementNonce();
+		return builder.build();
 	}
 
 	#incrementNonce(): void {

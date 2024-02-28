@@ -13,5 +13,6 @@ describe("Helpers", ({ it, assert }) => {
 		assert.defined(await factory("Unvote", cryptoConfig));
 		assert.defined(await factory("MultiSignature", cryptoConfig));
 		assert.defined(await factory("MultiPayment", cryptoConfig));
+		assert.defined(await factory("EvmCall", cryptoConfig));
 	});
 });

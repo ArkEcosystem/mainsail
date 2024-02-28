@@ -79,4 +79,26 @@ describe<{
 		assert.defined(entity.data.signature);
 		assert.array(entity.data.asset?.payments);
 	});
+
+	it.only("should make evm call", async ({ signer }) => {
+		const options: Types.EvmCallOptions = {
+			evmCall: {
+				gasLimit: 21_000,
+				payload: "12345678",
+			},
+			fee: "2500000000",
+			passphrase:
+				"violin hello resist adult roof breeze blood old tell source enforce token void wagon sweet detail raw coast viable garden cause gasp soap fat",
+		};
+
+		const entity = await signer.makeEvmCall(options);
+
+		console.log(entity.serialized.toString("hex"));
+
+		assert.defined(entity.data.signature);
+		assert.equal(entity.data.asset?.evmCall, {
+			gasLimit: 21_000,
+			payload: "12345678",
+		});
+	});
 });
