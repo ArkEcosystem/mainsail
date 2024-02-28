@@ -156,6 +156,18 @@ export class PreviousBlockIdFormatError extends Exception {
 	}
 }
 
+export class EvmCallIncompleteAssetError extends Exception {
+	public constructor() {
+		super(`EvmCall asset is incomplete`);
+	}
+}
+
+export class EvmCallMissingRecipientError extends Exception {
+	public constructor() {
+		super(`EvmCall is missing recipient`);
+	}
+}
+
 export class InvalidMilestoneConfigurationError extends Exception {
 	public constructor(message: string) {
 		super(message);
