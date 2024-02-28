@@ -30,7 +30,6 @@
 		"ethers": "^6.11.0"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
 		"@napi-rs/cli": "^2.18.0",
 		"rewiremock": "3.14.5",
 		"uvu": "^0.5.6"
