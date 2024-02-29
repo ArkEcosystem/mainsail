@@ -28,7 +28,7 @@ export const defaults = {
 		http: {
 			enabled: Environment.isTrue(Constants.EnvironmentVariables.CORE_API_EVM_ENABLED),
 			host: Environment.get(Constants.EnvironmentVariables.CORE_API_EVM_HOST, "127.0.0.1"),
-			port: Environment.get(Constants.EnvironmentVariables.CORE_API_EVM_PORT, 4006),
+			port: Environment.get(Constants.EnvironmentVariables.CORE_API_EVM_PORT, 4008),
 		},
 		https: {
 			enabled: Environment.isTrue(Constants.EnvironmentVariables.CORE_API_EVM_SSL),
