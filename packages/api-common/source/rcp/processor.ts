@@ -1,7 +1,6 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import Joi from "joi";
 
 import { getRcpId, prepareRcpError } from "./utils";
 
@@ -14,6 +13,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 
 	public registerAction(action: Contracts.Api.RPC.Action): void {
 		this.#actions.set(action.name, action);
+		this.validator.addSchema(action.schema);
 	}
 
 	async process(request: Hapi.Request): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
@@ -51,11 +51,12 @@ export class Processor implements Contracts.Api.RPC.Processor {
 	}
 
 	#validateParams(parameters: any, action: Contracts.Api.RPC.Action): boolean {
-		return this.#validate(action.schema, parameters);
-	}
+		if (!action.schema.$id) {
+			return true;
+		}
 
-	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {
-		const { error } = schema.validate(data);
+		const { error } = this.validator.validate(action.schema.$id, parameters);
+
 		return !error;
 	}
 }

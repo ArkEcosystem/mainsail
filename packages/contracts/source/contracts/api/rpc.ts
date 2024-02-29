@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { Schema } from "joi";
+import { SchemaObject } from "ajv";
 
 export type Processor = {
 	registerAction(action: Action): void;
@@ -33,7 +33,7 @@ export type Error = {
 export interface Action {
 	name: string;
 	handle: (parameters: any) => Promise<any>;
-	schema: Schema;
+	schema: SchemaObject;
 }
 
 export enum ErrorCode {
