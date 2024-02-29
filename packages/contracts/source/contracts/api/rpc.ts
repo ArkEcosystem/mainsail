@@ -29,7 +29,7 @@ export type Error = {
 	};
 };
 
-export interface Method {
+export interface Action {
 	name: string;
 	handle: (parameters: any) => Promise<any>;
 	schema: Schema;
