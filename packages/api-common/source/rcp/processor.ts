@@ -21,17 +21,26 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		}
 
 		const payload = request.payload as Contracts.Api.RPC.Request<any>;
-
 		const action = this.#actions.get(payload.method);
 		if (!action) {
 			return this.#errorMethodNotFound(getRcpId(request));
 		}
 
-		return {
-			id: getRcpId(request),
-			jsonrpc: "2.0",
-			result: "OK",
-		};
+		if (!this.#validateParams(payload.params, action)) {
+			return this.#errorInvalidParams(getRcpId(request));
+		}
+
+		try {
+			return {
+				id: getRcpId(request),
+				jsonrpc: "2.0",
+				result: await action.handle(payload.params),
+			};
+		} catch (error) {
+			console.log("Internal RPC error:", error);
+
+			return this.#errorInternal(getRcpId(request));
+		}
 	}
 
 	#validatePayload(request: Hapi.Request): boolean {
@@ -46,6 +55,10 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		const payload = request.payload as Contracts.Types.JsonObject;
 
 		return this.#validate(schema, payload);
+	}
+
+	#validateParams(params: any, action: Contracts.Api.RPC.Action): boolean {
+		return this.#validate(action.schema, params);
 	}
 
 	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {
@@ -69,11 +82,33 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		};
 	}
 
+	#errorInvalidParams(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
+		return {
+			error: {
+				code: -32_602,
+				message: "Invalid params",
+			},
+			id,
+			jsonrpc: "2.0",
+		};
+	}
+
 	#errorMethodNotFound(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
 		return {
 			error: {
 				code: -32_601,
 				message: "Method not found",
+			},
+			id,
+			jsonrpc: "2.0",
+		};
+	}
+
+	#errorInternal(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
+		return {
+			error: {
+				code: -32_603,
+				message: "Internal error",
 			},
 			id,
 			jsonrpc: "2.0",
