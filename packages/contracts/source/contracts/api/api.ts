@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
 
-import { Application } from "./kernel";
+import { Application } from "../kernel";
+import { Processor } from "./rpc";
 
 export type ApiServer = Hapi.Server<ServerState>;
 
@@ -12,6 +13,7 @@ export enum ServerType {
 export interface ServerState {
 	app: Application;
 	schemas: any;
+	rpc: Processor;
 }
 
 export type Sorting = {

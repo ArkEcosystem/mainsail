@@ -301,6 +301,43 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/api-evm:
+    dependencies:
+      '@hapi/boom':
+        specifier: 10.0.1
+        version: 10.0.1
+      '@hapi/hapi':
+        specifier: 21.3.2
+        version: 21.3.2
+      '@mainsail/api-common':
+        specifier: workspace:*
+        version: link:../api-common
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
+      joi:
+        specifier: 17.11.0
+        version: 17.11.0
+      semver:
+        specifier: 7.5.4
+        version: 7.5.4
+    devDependencies:
+      '@types/semver':
+        specifier: 7.5.6
+        version: 7.5.6
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/api-http:
     dependencies:
       '@hapi/boom':
@@ -735,6 +772,9 @@ importers:
       inversify:
         specifier: 6.0.2
         version: 6.0.2
+      joi:
+        specifier: 17.11.0
+        version: 17.11.0
       reflect-metadata:
         specifier: 0.2.0
         version: 0.2.0
@@ -757,6 +797,9 @@ importers:
       '@mainsail/api-development':
         specifier: workspace:*
         version: link:../api-development
+      '@mainsail/api-evm':
+        specifier: workspace:*
+        version: link:../api-evm
       '@mainsail/api-http':
         specifier: workspace:*
         version: link:../api-http

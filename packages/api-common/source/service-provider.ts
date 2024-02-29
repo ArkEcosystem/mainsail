@@ -11,6 +11,9 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 	protected abstract getServerConstructor(): ServerConstructor<T>;
 	protected abstract getHandlers(): any;
 	protected abstract getPlugins(): any[];
+	protected getActions(): Contracts.Api.RPC.Action[] {
+		return [];
+	}
 
 	public async register(): Promise<void> {
 		if (this.config().get("server.http.enabled")) {
@@ -91,5 +94,9 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 			plugin: this.getHandlers(),
 			routes: { prefix: "/api" },
 		});
+
+		for (const action of this.getActions()) {
+			server.getRPCProcessor().registerAction(action);
+		}
 	}
 }
