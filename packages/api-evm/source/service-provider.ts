@@ -1,6 +1,6 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
+import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
-import { Contracts } from "packages/contracts/distribution";
 
 import { CallAction } from "./actions";
 import Handlers from "./handlers";

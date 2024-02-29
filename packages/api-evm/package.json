@@ -26,9 +26,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
-		"joi": "17.11.0",
-		"semver": "7.5.4"
+		"joi": "17.11.0"
 	},
 	"devDependencies": {
 		"@types/semver": "7.5.6",
