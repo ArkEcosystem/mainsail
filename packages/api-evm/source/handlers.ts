@@ -1,10 +1,10 @@
-import Hapi from "@hapi/hapi";
+import { Contracts } from "@mainsail/contracts";
 
 import { BaseRoute } from "./routes/base";
 
 export = {
 	name: "EVM API Routes",
-	async register(server: Hapi.Server): Promise<void> {
+	async register(server: Contracts.Api.ApiServer): Promise<void> {
 		const handlers = [BaseRoute];
 
 		for (const handler of handlers) {

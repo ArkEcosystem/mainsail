@@ -1,16 +1,11 @@
 import Hapi from "@hapi/hapi";
-import { Constants } from "@mainsail/contracts";
+import { Constants, Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { BaseController } from "../controllers/base";
-
 export const BaseRoute = {
-	register(server: Hapi.Server<any>): void {
-		const controller = server.app.app.resolve(BaseController);
-		server.bind(controller);
-
+	register(server: Contracts.Api.ApiServer): void {
 		server.route({
-			handler: (request: Hapi.Request) => controller.index(request),
+			handler: (request: Hapi.Request) => server.app.rpc.process(request),
 			method: "POST",
 			options: {
 				payload: {
