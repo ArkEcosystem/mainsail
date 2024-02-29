@@ -40,27 +40,12 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.rateLimit,
 			},
-			{ plugin: Plugins.commaArrayQuery },
-			{ plugin: Plugins.dotSeparatedQuery },
-			{
-				options: {
-					query: {
-						limit: {
-							default: config.pagination.limit,
-						},
-					},
-				},
-				plugin: Plugins.pagination,
-			},
 		];
 	}
 
 	public configSchema(): Joi.ObjectSchema {
 		return Joi.object({
 			plugins: Joi.object({
-				pagination: Joi.object({
-					limit: Joi.number().integer().min(0).required(),
-				}).required(),
 				rateLimit: Joi.object({
 					blacklist: Joi.array().items(Joi.string()).required(),
 					duration: Joi.number().integer().min(0).required(),

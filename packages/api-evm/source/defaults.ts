@@ -3,9 +3,6 @@ import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	plugins: {
-		pagination: {
-			limit: 100,
-		},
 		rateLimit: {
 			blacklist:
 				Environment.get<undefined>(Constants.EnvironmentVariables.CORE_API_EVM_RATE_LIMIT_BLACKLIST)?.split(
