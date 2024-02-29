@@ -9,8 +9,8 @@ export const defaults = {
 					",",
 				) ?? [],
 			duration: Environment.get(Constants.EnvironmentVariables.CORE_API_EVM_RATE_LIMIT_USER_EXPIRES, 60), // Sec
-			enabled: Environment.isTrue(Constants.EnvironmentVariables.CORE_API_EVM_RATE_LIMIT_DISABLED),
-			points: Environment.get(Constants.EnvironmentVariables.CORE_API_EVM_RATE_LIMIT_USER_LIMIT, 100),
+			enabled: !Environment.isTrue(Constants.EnvironmentVariables.CORE_API_EVM_RATE_LIMIT_DISABLED),
+			points: Environment.get(Constants.EnvironmentVariables.CORE_API_EVM_RATE_LIMIT_USER_LIMIT, 1),
 
 			whitelist:
 				Environment.get<undefined>(Constants.EnvironmentVariables.CORE_API_EVM_RATE_LIMIT_WHITELIST)?.split(
