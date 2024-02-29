@@ -4,6 +4,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
 
+import { Processor } from "./rcp";
+
 @injectable()
 export abstract class AbstractServer {
 	@inject(Identifiers.Application.Instance)
@@ -37,6 +39,7 @@ export abstract class AbstractServer {
 
 		this.server.app.app = this.app;
 		this.server.app.schemas = this.schemas();
+		this.server.app.rpc = this.app.resolve(Processor);
 
 		this.server.ext("onPreHandler", (request, h) => {
 			request.headers["content-type"] = "application/json";
