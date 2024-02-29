@@ -5,7 +5,6 @@ import { Contracts } from "packages/contracts/distribution";
 import { CallAction } from "./actions";
 import Handlers from "./handlers";
 import { Identifiers as ApiIdentifiers } from "./identifiers";
-import { rpcResponseHandler } from "./plugins";
 import { Server } from "./server";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
@@ -44,7 +43,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				plugin: Plugins.rateLimit,
 			},
 			{
-				plugin: rpcResponseHandler,
+				plugin: Plugins.rpcResponseHandler,
 			},
 		];
 	}
