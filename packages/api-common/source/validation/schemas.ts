@@ -7,9 +7,9 @@ export const jsonRpcPayloadSchema: SchemaObject = {
 		id: { anyOf: [{ type: "string" }, { type: "integer" }, { type: "null" }] },
 		jsonRpc: { const: "2.0" },
 		method: { type: "string" },
-		params: { type: "any" },
+		params: { type: "object" },
 	},
 
-	required: ["id", "jsonRpc", "method"],
+	required: ["jsonRpc", "method"],
 	type: "object",
 };
