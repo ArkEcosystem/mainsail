@@ -1,4 +1,5 @@
 import Hapi from "@hapi/hapi";
+import { Schema } from "joi";
 
 export type Processor = {
 	process(request: Hapi.Request): Promise<Response | Error>;
@@ -27,3 +28,9 @@ export type Error = {
 		message: string;
 	};
 };
+
+export interface Method {
+	name: string;
+	handle: (parameters: any) => Promise<any>;
+	schema: Schema;
+}
