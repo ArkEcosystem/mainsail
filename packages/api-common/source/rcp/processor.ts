@@ -3,7 +3,7 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { getRcpId } from "./utils";
+import { getRcpId, prepareRcpError } from "./utils";
 
 @injectable()
 export class Processor implements Contracts.Api.RPC.Processor {
@@ -15,17 +15,17 @@ export class Processor implements Contracts.Api.RPC.Processor {
 
 	async process(request: Hapi.Request): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
 		if (!this.#validatePayload(request)) {
-			return this.#errorInvalidRequest(getRcpId(request));
+			return prepareRcpError(getRcpId(request), Contracts.Api.RPC.ErrorCode.InvalidRequest);
 		}
 
 		const payload = request.payload as Contracts.Api.RPC.Request<any>;
 		const action = this.#actions.get(payload.method);
 		if (!action) {
-			return this.#errorMethodNotFound(getRcpId(request));
+			return prepareRcpError(getRcpId(request), Contracts.Api.RPC.ErrorCode.MethodNotFound);
 		}
 
 		if (!this.#validateParams(payload.params, action)) {
-			return this.#errorInvalidParams(getRcpId(request));
+			return prepareRcpError(getRcpId(request), Contracts.Api.RPC.ErrorCode.InvalidParameters);
 		}
 
 		try {
@@ -35,7 +35,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 				result: await action.handle(payload.params),
 			};
 		} catch {
-			return this.#errorInternal(getRcpId(request));
+			return prepareRcpError(getRcpId(request), Contracts.Api.RPC.ErrorCode.InternalError);
 		}
 	}
 
@@ -60,49 +60,5 @@ export class Processor implements Contracts.Api.RPC.Processor {
 	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {
 		const { error } = schema.validate(data);
 		return !error;
-	}
-
-	#errorInvalidRequest(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
-		return {
-			error: {
-				code: -32_600,
-				message: "Invalid Request",
-			},
-			id,
-			jsonrpc: "2.0",
-		};
-	}
-
-	#errorInvalidParams(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
-		return {
-			error: {
-				code: -32_602,
-				message: "Invalid params",
-			},
-			id,
-			jsonrpc: "2.0",
-		};
-	}
-
-	#errorMethodNotFound(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
-		return {
-			error: {
-				code: -32_601,
-				message: "Method not found",
-			},
-			id,
-			jsonrpc: "2.0",
-		};
-	}
-
-	#errorInternal(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
-		return {
-			error: {
-				code: -32_603,
-				message: "Internal error",
-			},
-			id,
-			jsonrpc: "2.0",
-		};
 	}
 }

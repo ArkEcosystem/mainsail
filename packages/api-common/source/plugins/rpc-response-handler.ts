@@ -1,17 +1,8 @@
 import { Boom } from "@hapi/boom";
-import { Request, ResponseObject, Server as HapiServer } from "@hapi/hapi";
+import { ResponseObject, Server as HapiServer } from "@hapi/hapi";
 import { Contracts } from "@mainsail/contracts";
 
 import { Utils } from "../rcp";
-
-const prepareErrorResponse = (request: Request, response: Boom): Contracts.Api.RPC.Error => ({
-	error: {
-		code: -32_603,
-		message: "Internal error",
-	},
-	id: Utils.getRcpId(request),
-	jsonrpc: "2.0",
-});
 
 const responseIsBoom = (response: ResponseObject | Boom): response is Boom => !!(response as Boom).isBoom;
 
@@ -23,7 +14,9 @@ export const rpcResponseHandler = {
 				const response = request.response;
 
 				if (responseIsBoom(response)) {
-					return h.response(prepareErrorResponse(request, response));
+					return h.response(
+						Utils.prepareRcpError(Utils.getRcpId(request), Contracts.Api.RPC.ErrorCode.InternalError),
+					);
 				}
 
 				return h.continue;
