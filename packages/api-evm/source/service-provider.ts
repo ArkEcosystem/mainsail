@@ -3,6 +3,7 @@ import Joi from "joi";
 
 import Handlers from "./handlers";
 import { Identifiers as ApiIdentifiers } from "./identifiers";
+import { rpcResponseHandler } from "./plugins";
 import { Server } from "./server";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
@@ -39,6 +40,9 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					trustProxy: config.trustProxy,
 				},
 				plugin: Plugins.rateLimit,
+			},
+			{
+				plugin: rpcResponseHandler,
 			},
 		];
 	}
