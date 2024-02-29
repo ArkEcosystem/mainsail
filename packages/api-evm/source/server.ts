@@ -9,7 +9,7 @@ import * as Schemas from "./schemas";
 @injectable()
 export class Server extends AbstractServer {
 	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "api-avm")
+	@tagged("plugin", "api-evm")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	protected baseName(): string {
