@@ -100,6 +100,7 @@ const EXCEPTIONS = {
 			"@mainsail/crypto-transaction-evm-call",
 			"@mainsail/evm",
 			"@mainsail/evm-development",
+			"@mainsail/api-evm",
 		],
 		devDependencies: [],
 	},

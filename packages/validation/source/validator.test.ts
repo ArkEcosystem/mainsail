@@ -169,7 +169,31 @@ describe<{
 		assert.defined(validator.validate("test", 1).error);
 	});
 
-	it("#addSchema - should remove schema", ({ validator }) => {
+	it("#addSchema - should fail if schema already exist", ({ validator }) => {
+		validator.addSchema({
+			$id: "test",
+			type: "string",
+		});
+		assert.throws(() => {
+			validator.addSchema({
+				$id: "test",
+				type: "string",
+			});
+		}, `schema with key or id "test" already exists`);
+	});
+
+	it("#hasSchema - should be valid", ({ validator }) => {
+		assert.false(validator.hasSchema("test"));
+
+		validator.addSchema({
+			$id: "test",
+			type: "string",
+		});
+
+		assert.true(validator.hasSchema("test"));
+	});
+
+	it("#removeSchema - should remove schema", ({ validator }) => {
 		validator.addSchema({
 			$id: "test",
 			type: "string",

@@ -1,16 +1,19 @@
 import Hapi from "@hapi/hapi";
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
-import Joi from "joi";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { getRcpId, prepareRcpError } from "./utils";
 
 @injectable()
 export class Processor implements Contracts.Api.RPC.Processor {
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.Validator;
+
 	#actions: Map<string, Contracts.Api.RPC.Action> = new Map();
 
 	public registerAction(action: Contracts.Api.RPC.Action): void {
 		this.#actions.set(action.name, action);
+		this.validator.addSchema(action.schema);
 	}
 
 	async process(request: Hapi.Request): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
@@ -40,25 +43,20 @@ export class Processor implements Contracts.Api.RPC.Processor {
 	}
 
 	#validatePayload(request: Hapi.Request): boolean {
-		const schema = Joi.object({
-			// eslint-disable-next-line unicorn/no-null
-			id: Joi.alternatives(Joi.string().allow(null), Joi.number()).required(),
-			jsonrpc: Joi.string().valid("2.0").required(),
-			method: Joi.string().required(),
-			params: Joi.any(),
-		});
-
 		const payload = request.payload as Contracts.Types.JsonObject;
 
-		return this.#validate(schema, payload);
+		const { error } = this.validator.validate("jsonRpcPayload", payload);
+
+		return !error;
 	}
 
-	#validateParams(params: any, action: Contracts.Api.RPC.Action): boolean {
-		return this.#validate(action.schema, params);
-	}
+	#validateParams(parameters: any, action: Contracts.Api.RPC.Action): boolean {
+		if (!action.schema.$id) {
+			return true;
+		}
 
-	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {
-		const { error } = schema.validate(data);
+		const { error } = this.validator.validate(action.schema.$id, parameters);
+
 		return !error;
 	}
 }

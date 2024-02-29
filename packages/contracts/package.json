@@ -23,7 +23,6 @@
 		"@hapi/hapi": "21.3.2",
 		"@mainsail/utils": "workspace:*",
 		"ajv": "8.12.0",
-		"joi": "17.11.0",
 		"dayjs": "1.11.10",
 		"inversify": "6.0.2",
 		"reflect-metadata": "0.2.0",
