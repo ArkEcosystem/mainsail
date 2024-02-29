@@ -11,8 +11,6 @@ export class Processor implements Contracts.Api.RPC.Processor {
 
 	public registerAction(action: Contracts.Api.RPC.Action): void {
 		this.#actions.set(action.name, action);
-
-		console.log("Registered action:", action.name);
 	}
 
 	async process(request: Hapi.Request): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
@@ -36,9 +34,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 				jsonrpc: "2.0",
 				result: await action.handle(payload.params),
 			};
-		} catch (error) {
-			console.log("Internal RPC error:", error);
-
+		} catch {
 			return this.#errorInternal(getRcpId(request));
 		}
 	}
@@ -63,11 +59,6 @@ export class Processor implements Contracts.Api.RPC.Processor {
 
 	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {
 		const { error } = schema.validate(data);
-
-		if (error) {
-			console.log("Validation error:", error.details);
-		}
-
 		return !error;
 	}
 
