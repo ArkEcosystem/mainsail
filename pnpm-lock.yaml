@@ -794,6 +794,9 @@ importers:
       '@mainsail/api-development':
         specifier: workspace:*
         version: link:../api-development
+      '@mainsail/api-evm':
+        specifier: workspace:*
+        version: link:../api-evm
       '@mainsail/api-http':
         specifier: workspace:*
         version: link:../api-http

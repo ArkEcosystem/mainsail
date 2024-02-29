@@ -29,6 +29,7 @@
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/api-development": "workspace:*",
+		"@mainsail/api-evm": "workspace:*",
 		"@mainsail/api-http": "workspace:*",
 		"@mainsail/api-sync": "workspace:*",
 		"@mainsail/api-transaction-pool": "workspace:*",
