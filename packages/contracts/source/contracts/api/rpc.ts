@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 
 export type Processor = {
-	process(request: Hapi.Request): any;
+	process(request: Hapi.Request): Promise<Response | Error>;
 };
 
 export type Id = string | number | null;
@@ -16,10 +16,7 @@ export type Request<T> = {
 export type Response = {
 	id: Id;
 	jsonrpc: "2.0";
-	error: {
-		code: number;
-		message: string;
-	};
+	result: any;
 };
 
 export type Error = {
