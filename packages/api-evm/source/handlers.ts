@@ -1,9 +1,11 @@
 import Hapi from "@hapi/hapi";
 
+import { BaseRoute } from "./routes/base";
+
 export = {
-	name: "EVM API",
+	name: "EVM API Routes",
 	async register(server: Hapi.Server): Promise<void> {
-		const handlers: { register: (server: Hapi.Server) => {} }[] = [];
+		const handlers = [BaseRoute];
 
 		for (const handler of handlers) {
 			handler.register(server);
