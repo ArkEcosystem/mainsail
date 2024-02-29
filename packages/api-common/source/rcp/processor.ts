@@ -17,7 +17,14 @@ export class Processor implements Contracts.Api.RPC.Processor {
 
 	async process(request: Hapi.Request): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
 		if (!this.#validatePayload(request)) {
-			return this.#invalidRequest(getRcpId(request));
+			return this.#errorInvalidRequest(getRcpId(request));
+		}
+
+		const payload = request.payload as Contracts.Api.RPC.Request<any>;
+
+		const action = this.#actions.get(payload.method);
+		if (!action) {
+			return this.#errorMethodNotFound(getRcpId(request));
 		}
 
 		return {
@@ -41,7 +48,17 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		return this.#validate(schema, payload);
 	}
 
-	#invalidRequest(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
+	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {
+		const { error } = schema.validate(data);
+
+		if (error) {
+			console.log("Validation error:", error.details);
+		}
+
+		return !error;
+	}
+
+	#errorInvalidRequest(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
 		return {
 			error: {
 				code: -32_600,
@@ -52,13 +69,14 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		};
 	}
 
-	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {
-		const { error } = schema.validate(data);
-
-		if (error) {
-			console.log("Validation error:", error.details);
-		}
-
-		return !error;
+	#errorMethodNotFound(id: Contracts.Api.RPC.Id): Contracts.Api.RPC.Error {
+		return {
+			error: {
+				code: -32_601,
+				message: "Method not found",
+			},
+			id,
+			jsonrpc: "2.0",
+		};
 	}
 }
