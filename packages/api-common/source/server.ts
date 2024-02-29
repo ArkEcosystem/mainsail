@@ -96,6 +96,10 @@ export abstract class AbstractServer {
 		return this.server.table().find((route) => route.method === method.toLowerCase() && route.path === path);
 	}
 
+	public getRPCProcessor(): Contracts.Api.RPC.Processor {
+		return this.server.app.rpc;
+	}
+
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {
 		return this.server.inject(options);
 	}
