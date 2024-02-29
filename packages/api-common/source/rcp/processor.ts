@@ -7,6 +7,14 @@ import { getRcpId } from "./utils";
 
 @injectable()
 export class Processor implements Contracts.Api.RPC.Processor {
+	#actions: Map<string, Contracts.Api.RPC.Action> = new Map();
+
+	public registerAction(action: Contracts.Api.RPC.Action): void {
+		this.#actions.set(action.name, action);
+
+		console.log("Registered action:", action.name);
+	}
+
 	async process(request: Hapi.Request): Promise<Contracts.Api.RPC.Response | Contracts.Api.RPC.Error> {
 		if (!this.#validatePayload(request)) {
 			return this.#invalidRequest(getRcpId(request));

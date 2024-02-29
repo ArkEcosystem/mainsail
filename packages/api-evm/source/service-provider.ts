@@ -1,6 +1,8 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import Joi from "joi";
+import { Contracts } from "packages/contracts/distribution";
 
+import { CallAction } from "./actions";
 import Handlers from "./handlers";
 import { Identifiers as ApiIdentifiers } from "./identifiers";
 import { rpcResponseHandler } from "./plugins";
@@ -45,6 +47,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				plugin: rpcResponseHandler,
 			},
 		];
+	}
+
+	protected getActions(): Contracts.Api.RPC.Action[] {
+		return [this.app.resolve(CallAction)];
 	}
 
 	public configSchema(): Joi.ObjectSchema {

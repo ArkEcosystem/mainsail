@@ -2,6 +2,7 @@ import Hapi from "@hapi/hapi";
 import { Schema } from "joi";
 
 export type Processor = {
+	registerAction(action: Action): void;
 	process(request: Hapi.Request): Promise<Response | Error>;
 };
 
