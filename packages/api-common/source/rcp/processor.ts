@@ -3,7 +3,7 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { getRcpId, prepareRcpError } from "./utils";
+import { getRcpId, prepareRcpError } from "./utils.js";
 
 @injectable()
 export class Processor implements Contracts.Api.RPC.Processor {
@@ -53,8 +53,8 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		return this.#validate(schema, payload);
 	}
 
-	#validateParams(params: any, action: Contracts.Api.RPC.Action): boolean {
-		return this.#validate(action.schema, params);
+	#validateParams(parameters: any, action: Contracts.Api.RPC.Action): boolean {
+		return this.#validate(action.schema, parameters);
 	}
 
 	#validate(schema: Joi.Schema, data: Contracts.Types.JsonObject): boolean {

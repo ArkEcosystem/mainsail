@@ -1,2 +1,2 @@
-export { Processor } from "./processor";
-export * as Utils from "./utils";
+export { Processor } from "./processor.js";
+export * as Utils from "./utils.js";
