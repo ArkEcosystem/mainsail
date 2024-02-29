@@ -1,40 +1,15 @@
 import { Boom } from "@hapi/boom";
 import { Request, ResponseObject, Server as HapiServer } from "@hapi/hapi";
+import { Contracts } from "@mainsail/contracts";
 
-type Id = string | number | null;
+import { Utils } from "../rcp";
 
-type RpcErrorResponse = {
-	id: Id;
-	jsonrpc: "2.0";
+const prepareErrorResponse = (request: Request, response: Boom): Contracts.Api.RPC.Error => ({
 	error: {
-		code: number;
-		message: string;
-	};
-};
-
-const getRcpId = (request: Request): Id => {
-	const payload = request.payload as Record<string, unknown>;
-
-	if (payload && typeof payload === "object") {
-		const { id } = payload;
-
-		if (typeof id === "string" || typeof id === "number") {
-			return id;
-		}
-	}
-
-	// eslint-disable-next-line unicorn/no-null
-	return null;
-};
-
-const getRpcError = () => ({
-	code: -32_603,
-	message: "Internal error",
-});
-
-const prepareErrorResponse = (request: Request, response: Boom): RpcErrorResponse => ({
-	error: getRpcError(),
-	id: getRcpId(request),
+		code: -32_603,
+		message: "Internal error",
+	},
+	id: Utils.getRcpId(request),
 	jsonrpc: "2.0",
 });
 
