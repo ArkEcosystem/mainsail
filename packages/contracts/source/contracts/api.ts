@@ -12,7 +12,39 @@ export enum ServerType {
 export interface ServerState {
 	app: Application;
 	schemas: any;
+	rpc: RpcProcessor;
 }
+
+export type RpcProcessor = {
+	process(request: Hapi.Request): any;
+};
+
+export type RpcId = string | number | null;
+
+export type RpcRequest<T> = {
+	id: RpcId;
+	jsonrpc: "2.0";
+	method: string;
+	params: T;
+};
+
+export type RpcResponse = {
+	id: RpcId;
+	jsonrpc: "2.0";
+	error: {
+		code: number;
+		message: string;
+	};
+};
+
+export type RpcError = {
+	id: RpcId;
+	jsonrpc: "2.0";
+	error: {
+		code: number;
+		message: string;
+	};
+};
 
 export type Sorting = {
 	property: string;
