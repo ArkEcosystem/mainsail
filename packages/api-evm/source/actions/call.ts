@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ethers } from "ethers";
 
 type BlockTag = "latest" | "earliest" | "pending";
@@ -55,6 +55,6 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			return `0x${result.output?.toString("hex")}`;
 		}
 
-		return `OK ${this.name}`;
+		throw new Exceptions.RpcError("execution reverted");
 	}
 }
