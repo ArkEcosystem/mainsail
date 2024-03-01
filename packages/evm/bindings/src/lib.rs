@@ -1,19 +1,15 @@
 use std::{str::FromStr, sync::Arc};
 
+use ctx::{JsTransactionContext, TxContext};
 use mainsail_evm_core::EvmInstance;
 use napi::{bindgen_prelude::*, JsBigInt, JsBuffer, JsObject, JsString};
 use napi_derive::napi;
+use result::{JsTransactionResult, TxResult};
 use revm::primitives::{AccountInfo, Address, Bytes, ExecutionResult, Log, U256};
 
-pub struct TxResult {
-    gas_used: u64,
-    gas_refunded: u64,
-    success: bool,
-    // TODO: expose additional data needed to JS
-    deployed_contract_address: Option<String>,
-    logs: Option<Vec<Log>>,
-    output: Option<Bytes>,
-}
+mod ctx;
+mod result;
+mod utils;
 
 // A complex struct which cannot be exposed to JavaScript directly.
 pub struct EvmInner {
@@ -23,26 +19,6 @@ pub struct EvmInner {
 
 // NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
 unsafe impl Send for EvmInner {}
-
-pub struct TxContext {
-    pub caller: Address,
-    /// Omit recipient when deploying a contract
-    pub recipient: Option<Address>,
-    pub data: Bytes,
-}
-
-impl From<JsTransactionContext> for TxContext {
-    fn from(value: JsTransactionContext) -> Self {
-        let buf = value.data.into_value().unwrap();
-        TxContext {
-            caller: Address::from_str(value.caller.into_utf8().unwrap().as_str().unwrap()).unwrap(),
-            recipient: value
-                .recipient
-                .map(|v| Address::from_str(v.into_utf8().unwrap().as_str().unwrap()).unwrap()),
-            data: Bytes::from(buf.as_ref().to_owned()),
-        }
-    }
-}
 
 pub struct UpdateAccountInfoCtx {
     pub address: Address,
@@ -199,14 +175,6 @@ impl EvmInner {
 }
 
 #[napi(object)]
-pub struct JsTransactionContext {
-    pub caller: JsString,
-    /// Omit recipient when deploying a contract
-    pub recipient: Option<JsString>,
-    pub data: JsBuffer,
-}
-
-#[napi(object)]
 pub struct JsAccountInfo {
     pub address: JsString,
     pub balance: JsBigInt,
@@ -220,16 +188,6 @@ pub struct JsEvmWrapper {
     evm: Arc<tokio::sync::Mutex<EvmInner>>,
 }
 
-#[napi(object)]
-pub struct JsTransactionResult {
-    pub gas_used: JsBigInt,
-    pub gas_refunded: JsBigInt,
-    pub success: bool,
-    pub deployed_contract_address: Option<JsString>,
-    pub logs: serde_json::Value,
-    pub output: Option<JsBuffer>,
-}
-
 #[napi]
 impl JsEvmWrapper {
     #[napi(constructor)]
@@ -241,19 +199,19 @@ impl JsEvmWrapper {
 
     #[napi(ts_return_type = "Promise<JsTransactionResult>")]
     pub fn transact(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
-        let tx_ctx = TxContext::from(tx_ctx);
+        let tx_ctx = TxContext::try_from(tx_ctx)?;
         node_env.execute_tokio_future(
             Self::transact_async(self.evm.clone(), tx_ctx),
-            |&mut node_env, result| Ok(Self::to_result(node_env, result)),
+            |&mut node_env, result| Ok(result::JsTransactionResult::new(node_env, result)?),
         )
     }
 
     #[napi(ts_return_type = "Promise<JsTransactionResult>")]
     pub fn view(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
-        let tx_ctx = TxContext::from(tx_ctx);
+        let tx_ctx = TxContext::try_from(tx_ctx)?;
         node_env.execute_tokio_future(
             Self::view_async(self.evm.clone(), tx_ctx),
-            |&mut node_env, result| Ok(Self::to_result(node_env, result)),
+            |&mut node_env, result| Ok(result::JsTransactionResult::new(node_env, result)?),
         )
     }
 
@@ -343,30 +301,6 @@ impl JsEvmWrapper {
                 balance: node_env.create_bigint_from_u64(0).unwrap(),
                 nonce: node_env.create_bigint_from_u64(0).unwrap(),
             },
-        }
-    }
-
-    fn to_result(node_env: Env, result: TxResult) -> JsTransactionResult {
-        JsTransactionResult {
-            gas_used: node_env.create_bigint_from_u64(result.gas_used).unwrap(),
-            gas_refunded: node_env
-                .create_bigint_from_u64(result.gas_refunded)
-                .unwrap(),
-            success: result.success,
-            deployed_contract_address: result
-                .deployed_contract_address
-                .map(|a| node_env.create_string_from_std(a).unwrap()),
-            logs: result
-                .logs
-                .map(|l| serde_json::to_value(l).unwrap())
-                .unwrap_or_else(|| serde_json::Value::Null),
-
-            output: result.output.map(|o| {
-                node_env
-                    .create_buffer_with_data(Into::<Vec<u8>>::into(o))
-                    .unwrap()
-                    .into_raw()
-            }),
         }
     }
 }
