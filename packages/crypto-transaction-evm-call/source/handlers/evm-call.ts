@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
-import { Bindings } from "@mainsail/evm";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
@@ -10,7 +9,7 @@ import { EvmCallTransaction } from "../versions";
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Evm.Instance)
-	private readonly evm!: Bindings.Evm;
+	private readonly evm!: Contracts.Evm.Instance;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];

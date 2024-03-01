@@ -28,6 +28,7 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
+		"@mainsail/test-framework": "workspace:*",
 		"@napi-rs/cli": "^2.18.0",
 		"uvu": "^0.5.6"
 	},
