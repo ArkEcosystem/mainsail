@@ -27,7 +27,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			{
 				additionalProperties: false,
 				properties: {
-					data: { type: "string" },
+					data: { $ref: "0xHex" },
 					from: { $ref: "address" },
 					to: { $ref: "address" },
 				},
