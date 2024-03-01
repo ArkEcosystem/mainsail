@@ -28,8 +28,8 @@ export class CallAction implements Contracts.Api.RPC.Action {
 				additionalProperties: false,
 				properties: {
 					data: { type: "string" },
-					from: { type: "string" },
-					to: { type: "string" },
+					from: { $ref: "address" },
+					to: { $ref: "address" },
 				},
 				required: ["from", "to", "data"],
 				type: "object",
