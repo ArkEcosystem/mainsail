@@ -127,12 +127,16 @@ jobs:
               run: cd packages/crypto-transaction-validator-resignation && pnpm run test
             - name: Test crypto-transaction-vote
               run: cd packages/crypto-transaction-vote && pnpm run test
+            - name: Test crypto-transaction-evm-call
+              run: cd packages/crypto-transaction-evm-call && pnpm run test
             - name: Test crypto-validation
               run: cd packages/crypto-validation && pnpm run test
             - name: Test crypto-wif
               run: cd packages/crypto-wif && pnpm run test
             - name: Test database
               run: cd packages/database && pnpm run test
+            - name: Test evm
+              run: cd packages/evm && pnpm run test
             - name: Test fees
               run: cd packages/fees && pnpm run test
             - name: Test fees-burn
