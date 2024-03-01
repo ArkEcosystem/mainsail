@@ -51,7 +51,9 @@ export class CallAction implements Contracts.Api.RPC.Action {
 
 		const result = await this.evm.view(txContext);
 
-		console.log(result);
+		if (result.success) {
+			return `0x${result.output?.toString("hex")}`;
+		}
 
 		return `OK ${this.name}`;
 	}
