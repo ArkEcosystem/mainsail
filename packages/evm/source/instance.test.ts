@@ -30,7 +30,7 @@ describe<{
 		assert.equal(result.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
-	it.only("should deploy, transfer and call balanceOf", async ({ instance }) => {
+	it("should deploy, transfer and call balanceOf", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
 		const result = await instance.transact({
