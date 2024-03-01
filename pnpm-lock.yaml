@@ -2275,6 +2275,9 @@ importers:
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../test-framework
       '@napi-rs/cli':
         specifier: ^2.18.0
         version: 2.18.0
