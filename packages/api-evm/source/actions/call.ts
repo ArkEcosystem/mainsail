@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { ethers } from "ethers";
 
 type BlockTag = "latest" | "earliest" | "pending";
 
@@ -44,7 +45,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 
 		const txContext = {
 			caller: data.from,
-			data: Buffer.from(data.data, "hex"),
+			data: Buffer.from(ethers.getBytes(data.data)),
 			recipient: data.to,
 		};
 
