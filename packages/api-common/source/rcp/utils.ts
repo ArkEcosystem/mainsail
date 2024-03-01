@@ -28,10 +28,12 @@ export const prepareRcpError = (
 	id: Contracts.Api.RPC.Id,
 	errorCode: Contracts.Api.RPC.ErrorCode,
 ): Contracts.Api.RPC.Error => ({
+	jsonrpc: "2.0",
+	// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+	id,
+	// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 	error: {
 		code: errorCode,
 		message: errorMessageMap[errorCode],
 	},
-	id,
-	jsonrpc: "2.0",
 });

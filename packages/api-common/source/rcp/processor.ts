@@ -33,8 +33,9 @@ export class Processor implements Contracts.Api.RPC.Processor {
 
 		try {
 			return {
-				id: getRcpId(request),
 				jsonrpc: "2.0",
+				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
+				id: getRcpId(request),
 				result: await action.handle(payload.params),
 			};
 		} catch {
