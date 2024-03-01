@@ -28,8 +28,8 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
-		"ethers": "6.11.0",
 		"@napi-rs/cli": "^2.18.0",
+		"ethers": "6.11.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
