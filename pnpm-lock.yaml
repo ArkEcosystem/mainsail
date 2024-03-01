@@ -324,6 +324,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      ethers:
+        specifier: 6.11.0
+        version: 6.11.0
       joi:
         specifier: 17.11.0
         version: 17.11.0
@@ -8995,7 +8998,6 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
-    dev: true
 
   /ethers@6.11.1:
     resolution: {integrity: sha512-mxTAE6wqJQAbp5QAe/+o+rXOID7Nw91OZXvgpjDa1r4fAbq2Nu314oEZSbjoRLacuCzs7kUC3clEvkCQowffGg==}
