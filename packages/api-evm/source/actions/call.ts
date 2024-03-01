@@ -1,8 +1,19 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+
+type BlockTag = "latest" | "earliest" | "pending";
+
+type TxData = {
+	from: string;
+	to: string;
+	data: string;
+};
 
 @injectable()
 export class CallAction implements Contracts.Api.RPC.Action {
+	@inject(Identifiers.Evm.Instance)
+	private readonly evm!: Contracts.Evm.Instance;
+
 	public readonly name: string = "eth_call";
 
 	public readonly schema = {
@@ -28,7 +39,19 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: any): Promise<any> {
+	public async handle(parameters: [TxData, BlockTag]): Promise<any> {
+		const [data] = parameters;
+
+		const txContext = {
+			caller: data.from,
+			data: Buffer.from(data.data, "hex"),
+			recipient: data.to,
+		};
+
+		const result = await this.evm.view(txContext);
+
+		console.log(result);
+
 		return `OK ${this.name}`;
 	}
 }
