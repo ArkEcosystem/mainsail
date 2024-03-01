@@ -1802,9 +1802,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/evm':
-        specifier: workspace:*
-        version: link:../evm
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
