@@ -60,7 +60,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(unvote);
 
 				// unvote also changes vote balance by fee
-				const voteBalanceChange: BigNumber = senderValidatorAmount.minus(transaction.fee);
+				const voteBalanceChange: BigNumber = senderValidatorAmount.plus(transaction.fee);
 
 				const voteBalance: BigNumber = validator
 					.getAttribute("validatorVoteBalance", BigNumber.ZERO)
