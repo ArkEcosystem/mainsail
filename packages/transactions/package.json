@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/transactions",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.9",
 	"description": "Transaction Services for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

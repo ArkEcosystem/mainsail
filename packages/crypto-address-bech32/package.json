@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-address-bech32",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.9",
 	"description": "Bech32 address derivation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

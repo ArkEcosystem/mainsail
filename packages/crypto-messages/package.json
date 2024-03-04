@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-messages",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.9",
 	"description": "Crypto messages utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
