@@ -25,7 +25,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
-			this.#buildValidatorRanking(unit.store);
+			this.#buildActiveValidators(unit.store);
 		}
 	}
 
@@ -53,9 +53,23 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
-	#buildValidatorRanking(store: Contracts.State.Store): void {
-		this.#validators = [];
+	#buildActiveValidators(store: Contracts.State.Store): void {
+		const validators = this.#buildValidatorRanking(store);
+
+		this.#validators = validators.slice(0, this.configuration.getMilestone().activeValidators);
+
 		this.#indexByPublicKey = new Map();
+		for (const [index, validator] of this.#validators.entries()) {
+			const walletPublicKey = validator.getWalletPublicKey();
+			Utils.assert.defined<string>(walletPublicKey);
+			this.#indexByPublicKey.set(walletPublicKey, index);
+		}
+
+		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
+	}
+
+	#buildValidatorRanking(store: Contracts.State.Store): Contracts.State.ValidatorWallet[] {
+		this.#validators = [];
 
 		for (const wallet of store.walletRepository.allValidators()) {
 			const validator = this.validatorWalletFactory(wallet);
@@ -97,12 +111,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 			validator.setRank(index + 1);
 			validator.setApproval(Utils.validatorCalculator.calculateApproval(validator.getVoteBalance(), totalSupply));
-
-			const walletPublicKey = validator.getWalletPublicKey();
-			Utils.assert.defined<string>(walletPublicKey);
-			this.#indexByPublicKey.set(walletPublicKey, index);
 		}
 
-		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
+		return this.#validators;
 	}
 }
