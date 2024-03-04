@@ -50,10 +50,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.votes);
 			AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.unvotes);
 
-			const senderValidatorAmount = sender
-				.getBalance()
-				// balance already includes reverted fee when #updateVoteBalances is called
-				.minus(BigNumber.ZERO);
+			const senderValidatorAmount = sender.getBalance();
 
 			if (transaction.asset.unvotes.length > 0) {
 				const unvote: string = transaction.asset.unvotes[0];
