@@ -69,7 +69,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	#buildValidatorRanking(store: Contracts.State.Store): Contracts.State.ValidatorWallet[] {
-		this.#validators = [];
+		const validators: Contracts.State.ValidatorWallet[] = [];
 
 		for (const wallet of store.walletRepository.allValidators()) {
 			const validator = this.validatorWalletFactory(wallet);
@@ -77,11 +77,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 				validator.unsetRank();
 				validator.unsetApproval();
 			} else {
-				this.#validators.push(validator);
+				validators.push(validator);
 			}
 		}
 
-		this.#validators.sort((a, b) => {
+		validators.sort((a, b) => {
 			const voteBalanceA: Utils.BigNumber = a.getVoteBalance();
 			const voteBalanceB: Utils.BigNumber = b.getVoteBalance();
 
@@ -106,13 +106,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
 
-		for (let index = 0; index < this.#validators.length; index++) {
-			const validator = this.#validators[index];
+		for (let index = 0; index < validators.length; index++) {
+			const validator = validators[index];
 
 			validator.setRank(index + 1);
 			validator.setApproval(Utils.validatorCalculator.calculateApproval(validator.getVoteBalance(), totalSupply));
 		}
 
-		return this.#validators;
+		return validators;
 	}
 }
