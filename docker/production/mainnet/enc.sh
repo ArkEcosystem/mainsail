@@ -45,12 +45,12 @@ warning "Encrypting ..."
 
 openssl genrsa -out secret.key 2048
 openssl rsa -in secret.key -out secret.pub -outform PEM -pubout
-echo "${SECRET}" | openssl rsautl -encrypt -inkey secret.pub -pubin -out secret.dat
+echo "${SECRET}" | openssl pkeyutl -encrypt -inkey secret.pub -pubin -out secret.dat
 
 openssl genrsa -out bip.key 2048
 openssl rsa -in bip.key -out bip.pub -outform PEM -pubout
-echo "${BIP38}" | openssl rsautl -encrypt -inkey bip.pub -pubin -out bip.dat
+echo "${BIP38}" | openssl pkeyutl -encrypt -inkey bip.pub -pubin -out bip.dat
 
 success "Done! Created folder $(echo "${lila}enc${reset}") with all certificates and keys inside."
-success "You are now ready to run your docker $(echo "${yellow}forger")."
+success "You are now ready to run your docker $(echo "${yellow}validator node")."
 
