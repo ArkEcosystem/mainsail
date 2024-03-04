@@ -25,7 +25,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
-			this.buildValidatorRanking(unit.store);
+			this.#buildValidatorRanking(unit.store);
 		}
 	}
 
@@ -53,7 +53,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
-	public buildValidatorRanking(store: Contracts.State.Store): void {
+	#buildValidatorRanking(store: Contracts.State.Store): void {
 		this.#validators = [];
 		this.#indexByPublicKey = new Map();
 
