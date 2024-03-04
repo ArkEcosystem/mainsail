@@ -12,7 +12,7 @@ export const schemas: Record<"alphanumeric" | "hex" | "prefixedHex", SchemaObjec
 		type: "string",
 	},
 	prefixedHex: {
-		$id: "0xHex",
+		$id: "prefixedHex",
 		pattern: "^0x[0-9a-f]+$",
 		type: "string",
 	},
