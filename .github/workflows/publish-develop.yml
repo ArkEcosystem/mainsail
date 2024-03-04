@@ -53,7 +53,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=develop --tag=alpha
+                  pnpm run release -- --publish-branch=develop --tag=alpha --no-git-checks
             - name: Set dist-tag latest
               run: |
                   bash ./scripts/dist-tag-latest.sh
