@@ -64,7 +64,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 				const voteBalance: BigNumber = validator
 					.getAttribute("validatorVoteBalance", BigNumber.ZERO)
-					.plus(voteBalanceChange);
+					.minus(voteBalanceChange);
 
 				validator.setAttribute("validatorVoteBalance", voteBalance);
 			}
