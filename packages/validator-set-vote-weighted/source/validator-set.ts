@@ -56,7 +56,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#buildActiveValidators(store: Contracts.State.Store): void {
 		const validators = this.#buildValidatorRanking(store);
 
-		this.#validators = validators.slice(0, this.configuration.getMilestone().activeValidators);
+		const { activeValidators } = this.configuration.getMilestone();
+		if (validators.length < activeValidators) {
+			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
+		}
+
+		this.#validators = validators.slice(0, activeValidators);
 
 		this.#indexByPublicKey = new Map();
 		for (const [index, validator] of this.#validators.entries()) {
