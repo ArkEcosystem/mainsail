@@ -106,9 +106,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
 
-		for (let index = 0; index < validators.length; index++) {
-			const validator = validators[index];
-
+		for (const [index, validator] of validators.entries()) {
 			validator.setRank(index + 1);
 			validator.setApproval(Utils.validatorCalculator.calculateApproval(validator.getVoteBalance(), totalSupply));
 		}
