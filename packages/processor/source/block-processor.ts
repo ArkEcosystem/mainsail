@@ -20,6 +20,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
+	@inject(Identifiers.Evm.Instance)
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
@@ -54,6 +57,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
 		try {
 			await this.verifier.verify(unit);
+
+			await this.#applyBlockToEvm(unit);
 
 			for (const transaction of unit.getBlock().transactions) {
 				await this.transactionProcessor.process(unit.store.walletRepository, transaction);
@@ -159,5 +164,22 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		for (const validatorMutator of this.validatorMutators) {
 			await validatorMutator.apply(walletRepository, forgerWallet, block.data);
 		}
+	}
+
+	async #applyBlockToEvm(unit: Contracts.Processor.ProcessableUnit) {
+		const block = unit.getBlock();
+
+		return this.evm.configureBlockEnvironment({
+			// TODO: milestone
+			basefee: 0n,
+			difficulty: 0n,
+
+			// u256::max (only for testing)
+			gasLimit:
+				115_792_089_237_316_195_423_570_985_008_687_907_853_269_984_665_640_564_039_457_584_007_913_129_639_935n,
+
+			number: BigInt(block.header.height),
+			timestamp: BigInt(Math.floor(block.header.timestamp / 1000)),
+		});
 	}
 }

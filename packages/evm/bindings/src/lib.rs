@@ -1,12 +1,14 @@
 use std::{str::FromStr, sync::Arc};
 
+use block::JsBlockEnv;
 use ctx::{JsTransactionContext, TxContext};
 use mainsail_evm_core::EvmInstance;
-use napi::{bindgen_prelude::*, JsBigInt, JsBuffer, JsObject, JsString};
+use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{JsTransactionResult, TxResult};
-use revm::primitives::{AccountInfo, Address, Bytes, ExecutionResult, Log, U256};
+use result::TxResult;
+use revm::primitives::{AccountInfo, Address, BlockEnv, ExecutionResult, U256};
 
+mod block;
 mod ctx;
 mod result;
 mod utils;
@@ -96,6 +98,19 @@ impl EvmInner {
         self.transact_evm(tx_ctx, false)
     }
 
+    pub fn configure_block_env(&mut self, block_env: revm::primitives::BlockEnv) {
+        let mut evm = self.evm_instance.take().expect("ok");
+
+        evm = evm
+            .modify()
+            .modify_block_env(|env: &mut revm::primitives::BlockEnv| {
+                *env = block_env;
+            })
+            .build();
+
+        self.evm_instance.replace(evm);
+    }
+
     fn transact_evm(&mut self, tx_ctx: TxContext, commit: bool) -> TxResult {
         let mut evm = self.evm_instance.take().expect("ok");
 
@@ -169,7 +184,10 @@ impl EvmInner {
                     output: None,
                 },
             },
-            Err(_err) => todo!(), // TODO: should never happen?
+            Err(_err) => {
+                println!("transact_evm err: {:?}", _err);
+                todo!() // TODO: should never happen?
+            }
         }
     }
 }
@@ -215,6 +233,19 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<void>")]
+    pub fn configure_block_env(
+        &mut self,
+        node_env: Env,
+        block_env: JsBlockEnv,
+    ) -> Result<JsObject> {
+        let block_env = TryInto::try_into(block_env)?;
+        node_env.execute_tokio_future(
+            Self::configure_block_env_async(self.evm.clone(), block_env),
+            |&mut _, _| Ok(()),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsAccountInfo>")]
     pub fn get_account_info(&mut self, node_env: Env, address: String) -> Result<JsObject> {
         let address = Address::from_str(&address).unwrap();
@@ -256,6 +287,15 @@ impl JsEvmWrapper {
         Ok(result)
     }
 
+    async fn configure_block_env_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        block_env: BlockEnv,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.configure_block_env(block_env);
+        Ok(result)
+    }
+
     async fn get_account_info_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
@@ -291,7 +331,7 @@ impl JsEvmWrapper {
                 address: node_env
                     .create_string_from_std(address.to_string())
                     .unwrap(),
-                balance: convert_u256_to_bigint(node_env, account_info.balance),
+                balance: utils::convert_u256_to_bigint(node_env, account_info.balance),
                 nonce: node_env.create_bigint_from_u64(account_info.nonce).unwrap(),
             },
             None => JsAccountInfo {
@@ -303,21 +343,4 @@ impl JsEvmWrapper {
             },
         }
     }
-}
-
-fn convert_u256_to_bigint(node_env: Env, value: U256) -> JsBigInt {
-    let slice = value.as_le_slice();
-
-    const WORD_SIZE: usize = 8;
-    assert!(slice.len() % WORD_SIZE == 0);
-
-    // https://nodejs.org/api/n-api.html#n_api_napi_create_bigint_words
-    let mut words: Vec<u64> = Vec::with_capacity(slice.len() / WORD_SIZE);
-    for chunk in slice.chunks_exact(WORD_SIZE) {
-        let mut bytes = [0; 8];
-        bytes.copy_from_slice(chunk);
-        words.push(u64::from_le_bytes(bytes));
-    }
-
-    node_env.create_bigint_from_words(false, words).unwrap()
 }
