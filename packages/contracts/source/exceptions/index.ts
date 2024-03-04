@@ -10,6 +10,7 @@ export * from "./p2p";
 export * from "./plugins";
 export * from "./pool";
 export * from "./processor";
+export * from "./rpc";
 export * from "./runtime";
 export * from "./state";
 export * from "./validation";
