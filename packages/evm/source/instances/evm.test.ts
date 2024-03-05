@@ -1,11 +1,11 @@
 import { Contracts } from "@mainsail/contracts";
 import { ethers } from "ethers";
 
-import { describe, Sandbox } from "../../test-framework";
-import { abi, bytecode } from "../test/fixtures/MainsailERC20.json";
-import { wallets } from "../test/fixtures/wallets";
-import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { Instance } from "./instance";
+import { describe, Sandbox } from "../../../test-framework/distribution";
+import { abi, bytecode } from "../../test/fixtures/MainsailERC20.json";
+import { wallets } from "../../test/fixtures/wallets";
+import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { Instance } from "./evm";
 
 describe<{
 	sandbox: Sandbox;
