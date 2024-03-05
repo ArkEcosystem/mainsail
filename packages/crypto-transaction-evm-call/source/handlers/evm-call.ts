@@ -51,7 +51,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-		// tslint:disable-next-line: no-empty
 	): Promise<void> {
 		AppUtils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
 
