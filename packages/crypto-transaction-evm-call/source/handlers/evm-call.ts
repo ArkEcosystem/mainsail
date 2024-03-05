@@ -24,12 +24,12 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		// TODO
-		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
+		return super.throwIfCannotBeApplied(context, transaction, wallet);
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
@@ -37,22 +37,22 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotEnterPool(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		// TODO
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		// TODO: subtract consumed gas only after evm call
-		await super.applyToSender(walletRepository, transaction);
+		await super.applyToSender(context, transaction);
 	}
 
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {
@@ -60,7 +60,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		const { evmCall } = transaction.data.asset;
 
-		const sender = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
 			const result = await this.evm.transact({

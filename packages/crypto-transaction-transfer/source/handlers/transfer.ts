@@ -28,11 +28,11 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
-		return super.throwIfCannotBeApplied(walletRepository, transaction, sender);
+		return super.throwIfCannotBeApplied(context, transaction, sender);
 	}
 
 	public hasVendorField(): boolean {
@@ -40,7 +40,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotEnterPool(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
@@ -55,12 +55,12 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 
-		const recipient: Contracts.State.Wallet = walletRepository.findByAddress(transaction.data.recipientId);
+		const recipient: Contracts.State.Wallet = context.walletRepository.findByAddress(transaction.data.recipientId);
 
 		recipient.increaseBalance(transaction.data.amount);
 	}

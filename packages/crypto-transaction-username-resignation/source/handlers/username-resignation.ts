@@ -21,7 +21,7 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
@@ -29,23 +29,26 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 			throw new Exceptions.WalletUsernameNotRegisteredError();
 		}
 
-		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
+		return super.throwIfCannotBeApplied(context, transaction, wallet);
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		await super.applyToSender(walletRepository, transaction);
+		await super.applyToSender(context, transaction);
 
-		const senderWallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-		walletRepository.forgetOnIndex(Contracts.State.WalletIndexes.Usernames, senderWallet.getAttribute("username"));
+		const senderWallet = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		context.walletRepository.forgetOnIndex(
+			Contracts.State.WalletIndexes.Usernames,
+			senderWallet.getAttribute("username"),
+		);
 
 		senderWallet.forgetAttribute("username");
 	}
 
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		// tslint:disable-next-line: no-empty
 	): Promise<void> {}
