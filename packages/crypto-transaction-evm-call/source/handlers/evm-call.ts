@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
@@ -9,6 +9,7 @@ import { EvmCallTransaction } from "../versions";
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "mock")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
