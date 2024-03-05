@@ -1,4 +1,5 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto";
+import { Instance } from "./evm";
 import { EventDispatcher } from "./kernel";
 import { AttributeType, Wallet, WalletRepository } from "./state";
 
@@ -6,6 +7,7 @@ export type TransactionHandlerConstructor = new () => TransactionHandler;
 
 export type TransactionHandlerContext = {
 	walletRepository: WalletRepository;
+	evm: Instance;
 };
 
 export interface TransactionHandler {

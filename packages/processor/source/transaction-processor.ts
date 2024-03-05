@@ -1,10 +1,14 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "mock")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
@@ -17,11 +21,11 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		if (!(await transactionHandler.verify({ walletRepository }, transaction))) {
+		if (!(await transactionHandler.verify({ evm: this.evm, walletRepository }, transaction))) {
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		await transactionHandler.apply({ walletRepository }, transaction);
+		await transactionHandler.apply({ evm: this.evm, walletRepository }, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
