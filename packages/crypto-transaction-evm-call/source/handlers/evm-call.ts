@@ -1,5 +1,5 @@
-import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
@@ -8,10 +8,6 @@ import { EvmCallTransaction } from "../versions";
 
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "mock")
-	private readonly evm!: Contracts.Evm.Instance;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
@@ -64,7 +60,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
-			const result = await this.evm.transact({
+			const result = await context.evm.transact({
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				recipient: transaction.data.recipientId,
