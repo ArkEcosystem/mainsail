@@ -5,7 +5,7 @@ import { describe, Sandbox } from "../../../test-framework/distribution";
 import { abi, bytecode } from "../../test/fixtures/MainsailERC20.json";
 import { wallets } from "../../test/fixtures/wallets";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
-import { Instance } from "./evm";
+import { EvmInstance } from "./evm";
 
 describe<{
 	sandbox: Sandbox;
@@ -14,7 +14,7 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.instance = context.sandbox.app.resolve<Contracts.Evm.Instance>(Instance);
+		context.instance = context.sandbox.app.resolve<Contracts.Evm.Instance>(EvmInstance);
 	});
 
 	it("should deploy contract successfully", async ({ instance }) => {
