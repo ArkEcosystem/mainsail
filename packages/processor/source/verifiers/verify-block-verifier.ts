@@ -21,7 +21,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 			try {
 				for (const transaction of block.transactions) {
 					const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-					await handler.verify(unit.store.walletRepository, transaction);
+					await handler.verify({ walletRepository: unit.store.walletRepository }, transaction);
 				}
 
 				// @TODO: check if we can remove this duplicate verification

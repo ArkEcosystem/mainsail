@@ -17,11 +17,11 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	): Promise<void> {
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		if (!(await transactionHandler.verify(walletRepository, transaction))) {
+		if (!(await transactionHandler.verify({ walletRepository }, transaction))) {
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		await transactionHandler.apply(walletRepository, transaction);
+		await transactionHandler.apply({ walletRepository }, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 

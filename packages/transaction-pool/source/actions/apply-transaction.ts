@@ -7,6 +7,6 @@ export class ApplyTransactionAction extends Services.Triggers.Action {
 		const transaction: Contracts.Crypto.Transaction = arguments_.transaction;
 		const walletRepository: Contracts.State.WalletRepository = arguments_.walletRepository;
 
-		return handler.apply(walletRepository, transaction);
+		return handler.apply({ walletRepository }, transaction);
 	}
 }

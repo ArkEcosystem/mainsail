@@ -19,7 +19,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	public async verify(
-		walletRepository: Contracts.State.WalletRepository,
+		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -36,7 +36,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
@@ -95,24 +95,26 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async apply(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		await this.applyToSender(walletRepository, transaction);
-		await this.applyToRecipient(walletRepository, transaction);
+		await this.applyToSender(context, transaction);
+		await this.applyToRecipient(context, transaction);
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Contracts.Crypto.TransactionData = transaction.data;
 
-		await this.throwIfCannotBeApplied(walletRepository, transaction, sender);
+		await this.throwIfCannotBeApplied(context, transaction, sender);
 
 		if (data.version) {
 			this.#verifyTransactionNonceApply(sender, transaction);
@@ -136,7 +138,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async throwIfCannotEnterPool(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {}
 
@@ -172,7 +174,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	public abstract isActivated(): Promise<boolean>;
 
 	public abstract applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void>;
 }
