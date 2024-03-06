@@ -22,7 +22,6 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/evm": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"ethers": "^6.11.0"
 	},
