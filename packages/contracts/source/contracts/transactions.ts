@@ -1,21 +1,27 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto";
+import { Instance } from "./evm";
 import { EventDispatcher } from "./kernel";
 import { AttributeType, Wallet, WalletRepository } from "./state";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
 
+export type TransactionHandlerContext = {
+	walletRepository: WalletRepository;
+	evm: Instance;
+};
+
 export interface TransactionHandler {
-	verify(walletRepository: WalletRepository, transaction: Transaction): Promise<boolean>;
+	verify(context: TransactionHandlerContext, transaction: Transaction): Promise<boolean>;
 
-	throwIfCannotBeApplied(walletRepository: WalletRepository, transaction: Transaction, sender: Wallet): Promise<void>;
+	throwIfCannotBeApplied(context: TransactionHandlerContext, transaction: Transaction, sender: Wallet): Promise<void>;
 
-	apply(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 
-	applyToSender(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	applyToSender(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 
 	emitEvents(transaction: Transaction, emitter: EventDispatcher): void;
 
-	throwIfCannotEnterPool(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	throwIfCannotEnterPool(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 
 	verifySignatures(
 		wallet: Wallet,
@@ -32,7 +38,7 @@ export interface TransactionHandler {
 
 	isActivated(): Promise<boolean>;
 
-	applyToRecipient(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	applyToRecipient(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 }
 
 export interface TransactionHandlerRegistry {

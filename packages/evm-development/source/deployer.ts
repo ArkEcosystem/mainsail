@@ -1,6 +1,5 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Bindings } from "@mainsail/evm";
 import { Utils } from "@mainsail/kernel";
 import { ethers } from "ethers";
 
@@ -15,7 +14,8 @@ export class Deployer {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Evm.Instance)
-	private readonly evm!: Bindings.Evm;
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;

@@ -1,5 +1,5 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
@@ -8,9 +8,6 @@ import { EvmCallTransaction } from "../versions";
 
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.Evm.Instance)
-	private readonly evm!: Contracts.Evm.Instance;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
@@ -24,12 +21,12 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
 		// TODO
-		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
+		return super.throwIfCannotBeApplied(context, transaction, wallet);
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
@@ -37,33 +34,32 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotEnterPool(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		// TODO
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		// TODO: subtract consumed gas only after evm call
-		await super.applyToSender(walletRepository, transaction);
+		await super.applyToSender(context, transaction);
 	}
 
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-		// tslint:disable-next-line: no-empty
 	): Promise<void> {
 		AppUtils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
 
 		const { evmCall } = transaction.data.asset;
 
-		const sender = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
-			const result = await this.evm.transact({
+			const result = await context.evm.transact({
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				recipient: transaction.data.recipientId,

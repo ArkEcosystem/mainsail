@@ -1,8 +1,12 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class VerifyBlockVerifier implements Contracts.Processor.Handler {
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
@@ -21,7 +25,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 			try {
 				for (const transaction of block.transactions) {
 					const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-					await handler.verify(unit.store.walletRepository, transaction);
+					await handler.verify({ evm: this.evm, walletRepository: unit.store.walletRepository }, transaction);
 				}
 
 				// @TODO: check if we can remove this duplicate verification

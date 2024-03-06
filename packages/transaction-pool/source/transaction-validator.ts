@@ -1,9 +1,13 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { strictEqual } from "assert";
 
 @injectable()
 export class TransactionValidator implements Contracts.State.TransactionValidator {
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "mock")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
@@ -26,6 +30,6 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 		);
 		strictEqual(transaction.id, deserialized.id);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		await handler.apply(this.#walletRepository, transaction);
+		await handler.apply({ evm: this.evm, walletRepository: this.#walletRepository }, transaction);
 	}
 }
