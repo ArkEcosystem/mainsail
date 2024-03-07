@@ -86,6 +86,8 @@ export class Bootstrapper {
 
 			this.stateVerifier.verifyWalletsConsistency();
 
+			this.validatorRepository.printLoadedValidators();
+
 			await this.transactionPool.reAddTransactions();
 
 			void this.consensus.run();
@@ -168,8 +170,6 @@ export class Bootstrapper {
 				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
 			}
 		}
-
-		this.validatorRepository.printLoadedValidators();
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
