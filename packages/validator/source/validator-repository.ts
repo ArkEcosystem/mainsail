@@ -22,7 +22,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 	}
 
 	public printLoadedValidators(): void {
-		this.logger.info(`Loaded total ${this.#validators.size} validators(s)`);
+		this.logger.info(`A total of ${this.#validators.size} validators(s) were found this node:`);
 
 		const validators = this.stateService.getStore().walletRepository.allValidators();
 
@@ -50,8 +50,8 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 			}
 		}
 
-		this.logger.info(`Active Validators (${active.length}): ${active.join(", ")}`);
-		this.logger.info(`Resigned Validators (${resigned.length}): ${resigned.join(", ")}`);
-		this.logger.info(`Unregistered Validators (${notRegistered.length}): ${notRegistered.join(", ")}`);
+		this.logger.info(`Active validators (${active.length}): [${active}]`);
+		this.logger.info(`Resigned validators (${resigned.length}): [${resigned}]`);
+		this.logger.info(`Unregistered validators (${notRegistered.length}): [${notRegistered}]`);
 	}
 }
