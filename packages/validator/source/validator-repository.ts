@@ -47,22 +47,16 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 
 			if (validator) {
 				if (validator.hasAttribute("validatorResigned")) {
-					validator.hasAttribute("username")
-						? resigned.push(validator.getAttribute("username"))
-						: resigned.push(consensusPublicKey);
+					resigned.push(validator.toString());
 				}
 				if (
 					activeValidators.some(
 						(activeValidator) => activeValidator.getConsensusPublicKey() === consensusPublicKey,
 					)
 				) {
-					validator.hasAttribute("username")
-						? active.push(validator.getAttribute("username"))
-						: active.push(validator.getAddress());
+					active.push(validator.toString());
 				} else {
-					validator.hasAttribute("username")
-						? standBy.push(validator.getAttribute("username"))
-						: standBy.push(validator.getAddress());
+					standBy.push(validator.toString());
 				}
 			} else {
 				notRegistered.push(consensusPublicKey);
