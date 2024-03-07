@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { dotenv, get, set } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
-import importFresh from "import-fresh";
 import Joi from "joi";
 import { extname } from "path";
 
@@ -137,9 +136,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			const fullPath: string = this.app.configPath(file);
 			if (existsSync(fullPath)) {
 				const config: KeyValuePair =
-					extname(fullPath) === ".json"
-						? JSON.parse(readFileSync(fullPath).toString())
-						: importFresh(fullPath);
+					extname(fullPath) === ".json" ? JSON.parse(readFileSync(fullPath).toString()) : require(fullPath);
 
 				assert.defined<KeyValuePair>(config);
 

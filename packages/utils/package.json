@@ -6,6 +6,12 @@
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
+	"type": "module",
+	"browser": {
+		"fs": false,
+		"path": false,
+		"os": false
+	},
 	"files": [
 		"/distribution"
 	],

@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 
 import * as TransactionPool from "./routes/transaction-pool";
 
-export = {
+const config = {
 	name: "Transaction Pool API",
 	async register(server: Contracts.Api.ApiServer): Promise<void> {
 		const handlers = [TransactionPool];
@@ -13,3 +13,5 @@ export = {
 	},
 	version: "2.0.0",
 };
+
+export default config;

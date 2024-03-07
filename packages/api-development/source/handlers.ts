@@ -11,7 +11,7 @@ import * as Transactions from "./routes/transactions";
 import * as Validators from "./routes/validators";
 import * as Wallets from "./routes/wallets";
 
-export = {
+const config = {
 	name: "Development API",
 	async register(server: Hapi.Server): Promise<void> {
 		const handlers = [
@@ -33,3 +33,5 @@ export = {
 	},
 	version: "2.0.0",
 };
+
+export default config;

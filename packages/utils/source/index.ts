@@ -160,7 +160,6 @@ export * from "./reduce-right-array";
 export * from "./reduce-right-object";
 export * from "./reject";
 export * from "./reverse";
-export * from "./safe-equal";
 export * from "./sample";
 export * from "./semver";
 export * from "./set";

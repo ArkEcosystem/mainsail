@@ -7,6 +7,6 @@ import { Bootstrapper } from "./interfaces";
 export class RegisterErrorHandler implements Bootstrapper {
 	public async bootstrap(): Promise<void> {
 		// @TODO implement passing in of options and ensure handling of critical exceptions
-		logProcessErrors({ exitOn: [] });
+		logProcessErrors({ exit: false });
 	}
 }

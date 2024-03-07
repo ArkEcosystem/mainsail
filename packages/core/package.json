@@ -6,6 +6,7 @@
 	"contributors": [],
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
+	"type": "module",
 	"bin": {
 		"mainsail": "./bin/run"
 	},

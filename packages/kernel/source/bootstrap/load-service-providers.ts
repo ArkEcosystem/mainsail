@@ -1,7 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra";
-import { glob } from "glob";
 import { join } from "path";
 
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers";
@@ -27,6 +25,9 @@ export class LoadServiceProviders implements Bootstrapper {
 
 	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
+
+	@inject(Identifiers.Services.Filesystem.Service)
+	private readonly fileSystem!: Contracts.Kernel.Filesystem;
 
 	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviderRepository!: ServiceProviderRepository;
@@ -89,12 +90,13 @@ export class LoadServiceProviders implements Bootstrapper {
 	async #discoverPlugins(path: string): Promise<Plugin[]> {
 		const plugins: Plugin[] = [];
 
+		const glob = await import("glob");
 		const packagePaths = glob
 			.sync("{*/*/package.json,*/package.json}", { cwd: path })
 			.map((packagePath) => join(path, packagePath).slice(0, -"/package.json".length));
 
 		for (const packagePath of packagePaths) {
-			const packageJson = readJSONSync(join(packagePath, "package.json"));
+			const packageJson = await this.fileSystem.readJSONSync<Plugin>(join(packagePath, "package.json"));
 
 			plugins.push({
 				name: packageJson.name,
