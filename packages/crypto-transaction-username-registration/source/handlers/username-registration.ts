@@ -59,7 +59,7 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 
 		if (hasUsername) {
 			throw new Exceptions.PoolError(
-				`Username registration for public key "${username}" already in the pool`,
+				`Username registration for username "${username}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
