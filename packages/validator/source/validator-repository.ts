@@ -6,6 +6,9 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSetService!: Contracts.ValidatorSet.Service;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -30,8 +33,10 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		this.logger.info(`A total of ${this.#validators.size} validators(s) were found this node:`);
 
 		const validators = this.stateService.getStore().walletRepository.allValidators();
+		const activeValidators = this.validatorSetService.getActiveValidators();
 
 		const active: string[] = [];
+		const standBy: string[] = [];
 		const resigned: string[] = [];
 		const notRegistered: string[] = [];
 
@@ -45,10 +50,19 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 					validator.hasAttribute("username")
 						? resigned.push(validator.getAttribute("username"))
 						: resigned.push(consensusPublicKey);
-				} else {
+				}
+				if (
+					activeValidators.some(
+						(activeValidator) => activeValidator.getConsensusPublicKey() === consensusPublicKey,
+					)
+				) {
 					validator.hasAttribute("username")
 						? active.push(validator.getAttribute("username"))
 						: active.push(validator.getAddress());
+				} else {
+					validator.hasAttribute("username")
+						? standBy.push(validator.getAttribute("username"))
+						: standBy.push(validator.getAddress());
 				}
 			} else {
 				notRegistered.push(consensusPublicKey);
@@ -56,7 +70,8 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		}
 
 		this.logger.info(`Active validators (${active.length}): [${active}]`);
+		this.logger.info(`Stand by validators (${standBy.length}): [${standBy}]`);
 		this.logger.info(`Resigned validators (${resigned.length}): [${resigned}]`);
-		this.logger.info(`Unregistered validators (${notRegistered.length}): [${notRegistered}]`);
+		this.logger.info(`Undefined validators (${notRegistered.length}): [${notRegistered}]`);
 	}
 }
