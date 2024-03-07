@@ -14,20 +14,14 @@ export class Command extends Commands.Command {
 	public configure(): void {
 		this.definition.setFlag("state-export", "Clear state exports.", Joi.boolean());
 		this.definition.setFlag("plugins", "Clear installed plugins.", Joi.boolean());
-		this.definition.setFlag("data", "Clear data path.", Joi.boolean());
-		this.definition.setFlag("config", "Clear config path.", Joi.boolean());
-		this.definition.setFlag("cache", "Clear cache path.", Joi.boolean());
-		this.definition.setFlag("log", "Clear log path.", Joi.boolean());
-		this.definition.setFlag("temp", "Clear temp path.", Joi.boolean());
+		this.definition.setFlag("data", "Clear data.", Joi.boolean());
+		this.definition.setFlag("config", "Clear config.", Joi.boolean());
+		this.definition.setFlag("cache", "Clear cache.", Joi.boolean());
+		this.definition.setFlag("log", "Clear log.", Joi.boolean());
+		this.definition.setFlag("temp", "Clear temp.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
-		// this.components.table(["Type", "Path"], (table) => {
-		// 	for (const [type, path] of Object.entries<{}>(this.app.get(Identifiers.ApplicationPaths))) {
-		// 		table.push([type, path]);
-		// 	}
-		// });
-
 		if (this.hasFlag("data")) {
 			await this.#clear("Data", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).data);
 		}
