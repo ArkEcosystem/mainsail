@@ -17,4 +17,5 @@ export interface Validator {
 
 export interface ValidatorRepository {
 	getValidator(publicKey: string): Validator | undefined;
+	print(): void;
 }
