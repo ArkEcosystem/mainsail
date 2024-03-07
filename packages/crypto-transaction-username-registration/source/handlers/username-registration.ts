@@ -51,13 +51,13 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 		AppUtils.assert.defined<string>(data.asset.username);
 
 		const username = data.asset.username;
-		const hasPublicKey: boolean = await this.poolQuery
+		const hasUsername: boolean = await this.poolQuery
 			.getAll()
 			.whereKind(transaction)
 			.wherePredicate(async (t) => t.data.asset?.username === username)
 			.has();
 
-		if (hasPublicKey) {
+		if (hasUsername) {
 			throw new Exceptions.PoolError(
 				`Username registration for public key "${username}" already in the pool`,
 				"ERR_PENDING",
