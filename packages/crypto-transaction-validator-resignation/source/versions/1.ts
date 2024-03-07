@@ -13,7 +13,6 @@ export class ValidatorResignationTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "validatorResignation",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.ValidatorResignation },
 			},
 		});

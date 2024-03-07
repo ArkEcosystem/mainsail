@@ -20,6 +20,7 @@ export class TransferTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "transfer",
 			properties: {
+				amount: { bignumber: { maximum: undefined, minimum: 1 } },
 				expiration: { minimum: 0, type: "integer" },
 				recipientId: { $ref: "address" },
 				type: { transactionType: Contracts.Crypto.TransactionType.Transfer },

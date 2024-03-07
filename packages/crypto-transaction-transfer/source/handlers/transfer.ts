@@ -3,6 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import Transactions from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
+import { BigNumber } from "@mainsail/utils";
 
 import { TransferTransaction } from "../versions";
 
@@ -52,6 +53,20 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 				"ERR_INVALID_RECIPIENT",
 			);
 		}
+	}
+
+	public async applyToSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<void> {
+		await super.applyToSender(walletRepository, transaction);
+
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+
+		const data: Contracts.Crypto.TransactionData = transaction.data;
+
+		const newBalance: BigNumber = sender.getBalance().minus(data.amount);
+		sender.setBalance(newBalance);
 	}
 
 	public async applyToRecipient(
