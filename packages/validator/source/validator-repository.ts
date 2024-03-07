@@ -22,6 +22,11 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 	}
 
 	public printLoadedValidators(): void {
+		if (this.#validators.size === 0) {
+			this.logger.info("No validators found on this node");
+			return;
+		}
+
 		this.logger.info(`A total of ${this.#validators.size} validators(s) were found this node:`);
 
 		const validators = this.stateService.getStore().walletRepository.allValidators();
