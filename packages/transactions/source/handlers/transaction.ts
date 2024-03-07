@@ -117,12 +117,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		this.#verifyTransactionNonceApply(sender, transaction);
 
 		AppUtils.assert.defined<BigNumber>(data.nonce);
+		sender.setNonce(data.nonce);
 
 		// Subtract fee
 		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
 		sender.setBalance(newBalance);
-
-		sender.setNonce(data.nonce);
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {}
