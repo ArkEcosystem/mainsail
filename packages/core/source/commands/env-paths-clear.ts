@@ -16,6 +16,9 @@ export class Command extends Commands.Command {
 		this.definition.setFlag("plugins", "Clear installed plugins.", Joi.boolean());
 		this.definition.setFlag("data", "Clear data path.", Joi.boolean());
 		this.definition.setFlag("config", "Clear config path.", Joi.boolean());
+		this.definition.setFlag("cache", "Clear cache path.", Joi.boolean());
+		this.definition.setFlag("log", "Clear log path.", Joi.boolean());
+		this.definition.setFlag("temp", "Clear temp path.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
@@ -31,6 +34,17 @@ export class Command extends Commands.Command {
 
 		if (this.hasFlag("config")) {
 			await this.#clear("Config", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).config);
+		}
+
+		if (this.hasFlag("cache")) {
+			await this.#clear("Cache", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).cache);
+		}
+
+		if (this.hasFlag("log")) {
+			await this.#clear("Log", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).log);
+		}
+		if (this.hasFlag("temp")) {
+			await this.#clear("temp", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).temp);
 		}
 
 		if (this.hasFlag("state-export")) {
