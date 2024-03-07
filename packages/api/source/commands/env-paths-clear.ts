@@ -18,25 +18,26 @@ export class Command extends Commands.Command {
 		this.definition.setFlag("cache", "Clear cache.", Joi.boolean());
 		this.definition.setFlag("log", "Clear log.", Joi.boolean());
 		this.definition.setFlag("temp", "Clear temp.", Joi.boolean());
+		this.definition.setFlag("all", "Clear all.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
-		if (this.hasFlag("data")) {
+		if (this.hasFlag("data") || this.hasFlag("all")) {
 			await this.#clear("Data", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).data);
 		}
 
-		if (this.hasFlag("config")) {
+		if (this.hasFlag("config") || this.hasFlag("all")) {
 			await this.#clear("Config", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).config);
 		}
 
-		if (this.hasFlag("cache")) {
+		if (this.hasFlag("cache") || this.hasFlag("all")) {
 			await this.#clear("Cache", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).cache);
 		}
 
-		if (this.hasFlag("log")) {
+		if (this.hasFlag("log") || this.hasFlag("all")) {
 			await this.#clear("Log", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).log);
 		}
-		if (this.hasFlag("temp")) {
+		if (this.hasFlag("temp") || this.hasFlag("all")) {
 			await this.#clear("temp", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).temp);
 		}
 
