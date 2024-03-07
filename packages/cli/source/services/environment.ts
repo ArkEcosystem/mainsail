@@ -4,7 +4,8 @@ import { parse, stringify } from "envfile";
 import { existsSync, readFileSync, writeFileSync } from "fs-extra";
 import path from "path";
 
-import { envPaths as environmentPaths, Paths } from "../env-paths";
+import { Paths } from "../contracts";
+import { envPaths as environmentPaths } from "../env-paths";
 import { Identifiers } from "../ioc";
 
 @injectable()
