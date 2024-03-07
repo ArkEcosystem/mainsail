@@ -1,8 +1,11 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class ValidatorRepository implements Contracts.Validator.ValidatorRepository {
+	@inject(Identifiers.State.Service)
+	private readonly stateService!: Contracts.State.Service;
+
 	#validators!: Map<string, Contracts.Validator.Validator>;
 
 	configure(validators: Contracts.Validator.Validator[]): ValidatorRepository {
