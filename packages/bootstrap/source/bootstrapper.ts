@@ -169,7 +169,7 @@ export class Bootstrapper {
 			}
 		}
 
-		this.validatorRepository.print();
+		this.validatorRepository.printLoadedValidators();
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {

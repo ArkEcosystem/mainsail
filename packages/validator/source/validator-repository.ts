@@ -21,7 +21,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		return this.#validators.get(consensusPublicKey);
 	}
 
-	public print(): void {
+	public printLoadedValidators(): void {
 		this.logger.info(`Loaded total ${this.#validators.size} validators(s)`);
 
 		const validators = this.stateService.getStore().walletRepository.allValidators();
