@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-signature-schnorr-secp256k1",
-	"version": "0.0.1-alpha.9",
+	"version": "0.0.1-alpha.10",
 	"description": "Schnorr (BIP340) signatures from libsecp256k1 for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
