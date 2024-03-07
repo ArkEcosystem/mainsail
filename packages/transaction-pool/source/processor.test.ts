@@ -101,10 +101,10 @@ describe<{
 
 		spiedExtension0
 			.callsFakeNth(0, async (transaction) => {
-				throw new Exceptions.TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeTooLowError(transaction);
 			})
 			.callsFakeNth(1, async (transaction) => {
-				throw new Exceptions.TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeTooLowError(transaction);
 			});
 
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
@@ -130,7 +130,7 @@ describe<{
 		poolStub
 			.callsFakeNth(0, async (transaction) => {})
 			.callsFakeNth(1, async (transaction) => {
-				throw new Exceptions.TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeTooLowError(transaction);
 			});
 
 		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
@@ -162,7 +162,7 @@ describe<{
 		spiedExtension0
 			.callsFakeNth(0, async (transaction) => {})
 			.callsFakeNth(1, async (transaction) => {
-				throw new Exceptions.TransactionFeeToLowError(transaction);
+				throw new Exceptions.TransactionFeeTooLowError(transaction);
 			});
 
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
