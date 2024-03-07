@@ -29,13 +29,17 @@ export class Command extends Commands.Command {
 		}
 
 		if (this.hasFlag("state-export")) {
-			const path = join(this.app.get<{ data: string }>(Identifiers.ApplicationPaths).data, "state-export");
-			await this.#clear("State export", path);
+			await this.#clear(
+				"State export",
+				join(this.app.get<{ data: string }>(Identifiers.ApplicationPaths).data, "state-export"),
+			);
 		}
 
 		if (this.hasFlag("plugins")) {
-			const path = join(this.app.get<{ data: string }>(Identifiers.ApplicationPaths).data, "plugins");
-			await this.#clear("Plugins", path);
+			await this.#clear(
+				"Plugins",
+				join(this.app.get<{ data: string }>(Identifiers.ApplicationPaths).data, "plugins"),
+			);
 		}
 	}
 
