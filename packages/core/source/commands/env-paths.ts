@@ -1,5 +1,5 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
-import { Commands, Identifiers } from "@mainsail/cli";
+import { Commands, Contracts, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 
 @injectable()
@@ -10,7 +10,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		this.components.table(["Type", "Path"], (table) => {
-			for (const [type, path] of Object.entries<{}>(this.app.get(Identifiers.ApplicationPaths))) {
+			for (const [type, path] of Object.entries(this.app.get<Contracts.Flags>(Identifiers.ApplicationPaths))) {
 				table.push([type, path]);
 			}
 		});
