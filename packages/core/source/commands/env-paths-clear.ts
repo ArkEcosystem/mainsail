@@ -12,8 +12,9 @@ export class Command extends Commands.Command {
 	public description = "Clear data on environment paths.";
 
 	public configure(): void {
-		this.definition.setFlag("state-export", "Remove state exports.", Joi.boolean());
-		this.definition.setFlag("plugins", "Remove installed plugins.", Joi.boolean());
+		this.definition.setFlag("state-export", "Clear state exports.", Joi.boolean());
+		this.definition.setFlag("plugins", "Clear installed plugins.", Joi.boolean());
+		this.definition.setFlag("data", "Clear data path.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
@@ -22,6 +23,10 @@ export class Command extends Commands.Command {
 		// 		table.push([type, path]);
 		// 	}
 		// });
+
+		if (this.hasFlag("data")) {
+			await this.#clear("Data", this.app.get<{ data: string }>(Identifiers.ApplicationPaths).data);
+		}
 
 		if (this.hasFlag("state-export")) {
 			const path = join(this.app.get<{ data: string }>(Identifiers.ApplicationPaths).data, "state-export");
@@ -39,8 +44,6 @@ export class Command extends Commands.Command {
 			emptyDirSync(path);
 
 			this.components.log(`${name} path (${path}) has been cleared.`);
-		} else {
-			this.components.log(`${name} path (${path}) is already empty.`);
 		}
 	}
 }
