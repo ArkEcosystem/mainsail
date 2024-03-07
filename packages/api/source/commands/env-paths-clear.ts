@@ -38,7 +38,7 @@ export class Command extends Commands.Command {
 			await this.#clear("Log", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).log);
 		}
 		if (this.hasFlag("temp") || this.hasFlag("all")) {
-			await this.#clear("temp", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).temp);
+			await this.#clear("Temp", this.app.get<Contracts.Paths>(Identifiers.ApplicationPaths).temp);
 		}
 
 		if (this.hasFlag("plugins")) {
