@@ -19,6 +19,9 @@ export class Bootstrapper {
 	@inject(Identifiers.State.Verifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
 
+	@inject(Identifiers.Validator.Repository)
+	private readonly validatorRepository!: Contracts.Validator.ValidatorRepository;
+
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
 
@@ -165,6 +168,8 @@ export class Bootstrapper {
 				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
 			}
 		}
+
+		this.validatorRepository.print();
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
