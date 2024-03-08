@@ -50,16 +50,28 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.username);
 
+		const hasSender: boolean = await this.poolQuery
+			.getAllBySender(data.senderPublicKey)
+			.whereKind(transaction)
+			.has();
+
+		if (hasSender) {
+			throw new Exceptions.PoolError(
+				`Sender ${data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.UsernameRegistration}' in the pool`,
+				"ERR_PENDING",
+			);
+		}
+
 		const username = data.asset.username;
-		const hasPublicKey: boolean = await this.poolQuery
+		const hasUsername: boolean = await this.poolQuery
 			.getAll()
 			.whereKind(transaction)
 			.wherePredicate(async (t) => t.data.asset?.username === username)
 			.has();
 
-		if (hasPublicKey) {
+		if (hasUsername) {
 			throw new Exceptions.PoolError(
-				`Username registration for public key "${username}" already in the pool`,
+				`Username registration for username "${username}" already in the pool`,
 				"ERR_PENDING",
 			);
 		}
