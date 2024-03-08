@@ -52,6 +52,8 @@ export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges"> {
 
 	fromJson(data: JsonObject): Wallet;
 	commitChanges(walletRepository: WalletRepository): void;
+
+	toString(): string;
 }
 
 export interface ValidatorWallet {
