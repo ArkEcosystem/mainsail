@@ -3,7 +3,7 @@ import { Providers } from "@mainsail/kernel";
 import { open, RootDatabase } from "lmdb";
 import { join } from "path";
 
-import { DatabaseService } from "./database-service";
+import { DatabaseService } from "./database-service.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
