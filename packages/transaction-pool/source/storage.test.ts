@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Application } from "@mainsail/kernel";
-import fs from "fs-extra";
+import fs from "fs-extra/esm";
 
 import { describe } from "../../test-framework";
 import { Stub } from "../../test-framework/source/uvu/stub";
