@@ -3,7 +3,7 @@ import { Contracts, Exceptions } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { MultiPaymentTransaction } from "./versions/1";
+import { MultiPaymentTransaction } from "./versions/1.js";
 
 @injectable()
 export class MultiPaymentBuilder extends TransactionBuilder<MultiPaymentBuilder> {

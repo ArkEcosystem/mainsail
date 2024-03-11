@@ -1,1 +1,1 @@
-export * from "./keywords";
+export * from "./keywords.js";
