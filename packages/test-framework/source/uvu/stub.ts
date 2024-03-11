@@ -1,6 +1,6 @@
 import { SinonStub } from "sinon";
 
-import { Fake } from "./fake";
+import { Fake } from "./fake.js";
 
 export class Stub extends Fake<SinonStub> {
 	public returnValue(value: unknown): Stub {

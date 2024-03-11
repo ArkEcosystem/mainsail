@@ -1,4 +1,4 @@
-export * as Factories from "./factories";
-export * from "./factory-builder";
-export * from "./helpers";
-export * as Types from "./types";
+export * as Factories from "./factories/index.js";
+export * from "./factory-builder.js";
+export * from "./helpers.js";
+export * as Types from "./types.js";

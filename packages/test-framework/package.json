@@ -4,6 +4,7 @@
 	"description": "Test framework for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"files": [
 		"/distribution"

@@ -3,14 +3,14 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { MultiPaymentBuilder } from "../../../crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "../../../crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "../../../crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "../../../crypto-transaction-validator-registration";
-import { ValidatorResignationBuilder } from "../../../crypto-transaction-validator-resignation";
-import { VoteBuilder } from "../../../crypto-transaction-vote";
+import { MultiPaymentBuilder } from "../../../crypto-transaction-multi-payment/source/builder.js";
+import { MultiSignatureBuilder } from "../../../crypto-transaction-multi-signature-registration/source/builder.js";
+import { TransferBuilder } from "../../../crypto-transaction-transfer/source/builder.js";
+import { ValidatorRegistrationBuilder } from "../../../crypto-transaction-validator-registration/source/builder.js";
+import { ValidatorResignationBuilder } from "../../../crypto-transaction-validator-resignation/source/builder.js";
+import { VoteBuilder } from "../../../crypto-transaction-vote/source/builder.js";
 import secrets from "../internal/passphrases.json";
-import { getWalletNonce } from "./generic";
+import { getWalletNonce } from "./generic.js";
 
 const defaultPassphrase: string = secrets[0];
 
