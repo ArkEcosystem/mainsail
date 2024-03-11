@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { PluginConfiguration } from "./plugin-configuration";
-import { PluginManifest } from "./plugin-manifest";
+import { PluginConfiguration } from "./plugin-configuration.js";
+import { PluginManifest } from "./plugin-manifest.js";
 
 @injectable()
 export abstract class ServiceProvider {

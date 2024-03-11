@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { CacheEvent } from "../../../enums";
+import { CacheEvent } from "../../../enums/events.js";
 
 @injectable()
 export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {

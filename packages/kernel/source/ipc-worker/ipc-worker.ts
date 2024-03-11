@@ -1,8 +1,8 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { Requests } from "../ipc/handler";
-import { Subprocess } from "../ipc/sub-process";
-import { KeyValuePair } from "../types";
+import { Requests } from "../ipc/handler.js";
+import { Subprocess } from "../ipc/sub-process.js";
+import { KeyValuePair } from "../types/index.js";
 
 export interface WorkerFlags extends KeyValuePair {
 	workerLoggingEnabled: boolean;

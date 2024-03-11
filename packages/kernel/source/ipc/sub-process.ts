@@ -1,6 +1,6 @@
 import { ChildProcess } from "child_process";
 
-import { Requests } from "./handler";
+import { Requests } from "./handler.js";
 
 export type SuccessReply = {
 	id: number;

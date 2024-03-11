@@ -4,9 +4,9 @@ import { camelCase, expandTilde, set } from "@mainsail/utils";
 import envPaths from "env-paths";
 import { join, resolve } from "path";
 
-import { ConfigRepository } from "../services/config";
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
+import { ConfigRepository } from "../services/config/index.js";
+import { assert } from "../utils/assert.js";
+import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
 export class RegisterBasePaths implements Bootstrapper {

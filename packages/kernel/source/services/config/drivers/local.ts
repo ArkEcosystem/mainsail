@@ -5,9 +5,9 @@ import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 import { extname } from "path";
 
-import { KeyValuePair } from "../../../types";
-import { assert } from "../../../utils";
-import { ConfigRepository } from "../repository";
+import { KeyValuePair } from "../../../types/index.js";
+import { assert } from "../../../utils/assert.js";
+import { ConfigRepository } from "../repository.js";
 
 @injectable()
 export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {

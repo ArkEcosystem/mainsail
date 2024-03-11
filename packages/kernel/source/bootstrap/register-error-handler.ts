@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import logProcessErrors from "log-process-errors";
 
-import { Bootstrapper } from "./interfaces";
+import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
 export class RegisterErrorHandler implements Bootstrapper {

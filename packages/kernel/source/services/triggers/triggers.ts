@@ -1,9 +1,9 @@
 import { injectable } from "@mainsail/container";
 import { Exceptions } from "@mainsail/contracts";
 
-import { ActionArguments } from "../../types";
-import { assert } from "../../utils";
-import { Action } from "./action";
+import { ActionArguments } from "../../types/index.js";
+import { assert } from "../../utils/assert.js";
+import { Action } from "./action.js";
 
 @injectable()
 export class Triggers {

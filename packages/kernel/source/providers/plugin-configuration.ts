@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { get, has, set, unset } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 
-import { ConfigRepository } from "../services/config";
+import { ConfigRepository } from "../services/config/index.js";
 
 // @TODO review the implementation
 

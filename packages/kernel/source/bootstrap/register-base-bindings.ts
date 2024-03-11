@@ -2,8 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { resolve } from "path";
 
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
+import { assert } from "../utils/assert.js";
+import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {

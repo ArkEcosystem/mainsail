@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { ConfigManager, ConfigRepository } from "../services/config";
-import { Bootstrapper } from "./interfaces";
+import { ConfigManager, ConfigRepository } from "../services/config/index.js";
+import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
 export class LoadConfiguration implements Bootstrapper {

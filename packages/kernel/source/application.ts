@@ -3,14 +3,14 @@ import { exit } from "node:process";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { join } from "path";
 
-import { Bootstrappers } from "./bootstrap";
-import { Bootstrapper } from "./bootstrap/interfaces";
-import { KernelEvent, ShutdownSignal } from "./enums";
-import { ServiceProvider, ServiceProviderRepository } from "./providers";
-import { ConfigRepository } from "./services/config";
-import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
-import { KeyValuePair } from "./types";
-import { Constructor } from "./types/container";
+import { Bootstrappers } from "./bootstrap/index.js";
+import { Bootstrapper } from "./bootstrap/interfaces.js";
+import { KernelEvent, ShutdownSignal } from "./enums/index.js";
+import { ServiceProvider, ServiceProviderRepository } from "./providers/index.js";
+import { ConfigRepository } from "./services/config/index.js";
+import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
+import { Constructor } from "./types/container.js";
+import { KeyValuePair } from "./types/index.js";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;

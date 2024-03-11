@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { BlockJob } from "./block-job";
-import { CronJob } from "./cron-job";
+import { BlockJob } from "./block-job.js";
+import { CronJob } from "./cron-job.js";
 
 @injectable()
 export class Schedule {

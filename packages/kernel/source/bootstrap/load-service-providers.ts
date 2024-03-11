@@ -2,10 +2,10 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { join } from "path";
 
-import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers";
-import { ConfigRepository } from "../services/config";
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
+import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
+import { ConfigRepository } from "../services/config/index.js";
+import { assert } from "../utils/assert.js";
+import { Bootstrapper } from "./interfaces.js";
 
 interface PluginEntry {
 	package: string;

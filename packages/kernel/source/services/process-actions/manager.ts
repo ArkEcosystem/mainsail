@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { InstanceManager } from "../../support/instance-manager";
-import { Pm2ProcessActionsService } from "./drivers/pm2";
+import { InstanceManager } from "../../support/instance-manager.js";
+import { Pm2ProcessActionsService } from "./drivers/pm2.js";
 
 export class ProcessActionsManager extends InstanceManager<Contracts.Kernel.ProcessActionsService> {
 	protected createPm2Driver(): Contracts.Kernel.ProcessActionsService {
