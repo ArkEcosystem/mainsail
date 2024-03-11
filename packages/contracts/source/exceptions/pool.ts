@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { Transaction } from "../contracts/crypto";
-import { Exception } from "./base";
+import { Transaction } from "../contracts/crypto/transactions.js";
+import { Exception } from "./base.js";
 
 export class PoolError extends Exception {
 	public readonly type: string;

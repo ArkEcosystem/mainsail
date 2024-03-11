@@ -1,4 +1,4 @@
-import { Store } from "./store";
+import { Store } from "./store.js";
 
 export interface Exporter {
 	export(store: Store): Promise<void>;

@@ -1,4 +1,4 @@
-import type { JsonObject, KeyValuePair } from "../types";
+import type { JsonObject, KeyValuePair } from "../types/index.js";
 
 export interface Repository {
 	all(): JsonObject;

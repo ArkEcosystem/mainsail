@@ -1,6 +1,5 @@
-import { Block, Transaction } from "./crypto";
-import { Commit } from "./crypto/commit";
-import { Store, WalletRepository } from "./state";
+import { Block, Commit, Transaction } from "./crypto/index.js";
+import { Store, WalletRepository } from "./state/index.js";
 
 export interface ProcessableUnit {
 	readonly height: number;

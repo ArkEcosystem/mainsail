@@ -1,4 +1,4 @@
-import { CommitJson } from "./commit";
+import { CommitJson } from "./commit.js";
 
 export type NetworkConfig = {
 	genesisBlock: CommitJson;

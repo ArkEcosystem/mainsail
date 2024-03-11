@@ -1,7 +1,6 @@
-import { Block } from "../crypto";
-import { Commit, CommitHandler } from "../crypto/commit";
-import { JsonObject } from "../types";
-import { WalletRepository } from "./wallets";
+import { Block, Commit, CommitHandler } from "../crypto/index.js";
+import { JsonObject } from "../types/index.js";
+import { WalletRepository } from "./wallets.js";
 
 export interface Store extends CommitHandler {
 	readonly walletRepository: WalletRepository;

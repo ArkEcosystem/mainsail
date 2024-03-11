@@ -1,4 +1,4 @@
-import { Precommit, Prevote, Proposal, Transaction } from "../crypto";
+import { Precommit, Prevote, Proposal, Transaction } from "../crypto/index.js";
 
 export interface Broadcaster {
 	broadcastTransactions(transactions: Transaction[]): Promise<void>;

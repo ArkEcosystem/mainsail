@@ -1,8 +1,8 @@
 import Hapi from "@hapi/hapi";
 
-import { HeaderData } from "./header";
-import { Socket } from "./nes";
-import { PeerBroadcast, PeerConfig, PeerState } from "./peer";
+import { HeaderData } from "./header.js";
+import { Socket } from "./nes.js";
+import { PeerBroadcast, PeerConfig, PeerState } from "./peer.js";
 
 export interface Request extends Hapi.Request {
 	socket?: Socket;

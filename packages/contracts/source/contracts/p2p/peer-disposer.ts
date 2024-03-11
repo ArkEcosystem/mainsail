@@ -1,4 +1,4 @@
-import { NesError } from "./nes";
+import { NesError } from "./nes.js";
 
 export interface PeerDisposer {
 	banPeer(ip: string, error: Error | NesError, checkRepository?: boolean): void;
