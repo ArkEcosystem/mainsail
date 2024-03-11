@@ -1,4 +1,4 @@
-import { indexOf } from "./index-of";
+import { indexOf } from "./index-of.js";
 
 export const uniq = <T>(iterable: T[]): T[] => {
 	const result: T[] = [];
