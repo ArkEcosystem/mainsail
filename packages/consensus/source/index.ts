@@ -1,7 +1,7 @@
 import { interfaces } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import { RootDatabase } from "lmdb";
+import * as lmbd from "lmdb";
 
 import { Aggregator } from "./aggregator.js";
 import { Bootstrapper } from "./bootstrapper.js";
@@ -31,7 +31,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			);
 
 		// Storage for prevotes, precommits and proposals
-		const storage = this.app.get<RootDatabase>(Identifiers.Database.Instance.Consensus);
+		const storage = this.app.get<lmbd.RootDatabase>(Identifiers.Database.Instance.Consensus);
 		this.app.bind(Identifiers.Database.Storage.Proposal).toConstantValue(storage.openDB({ name: "proposals" }));
 		this.app.bind(Identifiers.Database.Storage.PreVote).toConstantValue(storage.openDB({ name: "prevotes" }));
 		this.app.bind(Identifiers.Database.Storage.PreCommit).toConstantValue(storage.openDB({ name: "precommits" }));
