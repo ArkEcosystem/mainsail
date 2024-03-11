@@ -1,13 +1,14 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { get, has } from "@mainsail/utils";
+import { readJSONSync } from "fs-extra/esm";
 
 @injectable()
 export class PluginManifest {
 	#manifest!: Contracts.Types.JsonObject;
 
 	public discover(packageId: string): this {
-		this.#manifest = require(`${packageId}/package.json`);
+		this.#manifest = readJSONSync(`${packageId}/package.json`);
 
 		return this;
 	}

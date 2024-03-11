@@ -1,6 +1,6 @@
 // Based on https://github.com/fknop/hapi-pagination
 
-import Hoek from "@hapi/hoek";
+import { applyToDefaults, assert } from "@hapi/hoek";
 import { Utils } from "@mainsail/kernel";
 import Qs from "querystring";
 
@@ -50,7 +50,7 @@ export class Extension {
 		const { source } = request.response;
 		const results = Array.isArray(source) ? source : source.results;
 
-		Hoek.assert(Array.isArray(results), "The results must be an array");
+		assert(Array.isArray(results), "The results must be an array");
 
 		// strip prefix in baseUri, we want a "clean" relative path
 		const baseUri = request.url.pathname.slice(this.routePathPrefix.length) + "?";
@@ -69,7 +69,7 @@ export class Extension {
 		const getUri = (page: number | null): string | null =>
 			/* istanbul ignore next */
 			// tslint:disable-next-line: no-null-keyword
-			page ? baseUri + Qs.stringify(Hoek.applyToDefaults({ ...query, ...request.orig.query }, { page })) : null;
+			page ? baseUri + Qs.stringify(applyToDefaults({ ...query, ...request.orig.query }, { page })) : null;
 
 		const newSource = {
 			data: results,

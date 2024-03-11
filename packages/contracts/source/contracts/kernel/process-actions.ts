@@ -6,5 +6,5 @@ export interface ProcessAction {
 }
 
 export interface ProcessActionsService {
-	register(remoteAction: ProcessAction): void;
+	register(remoteAction: ProcessAction): Promise<void>;
 }

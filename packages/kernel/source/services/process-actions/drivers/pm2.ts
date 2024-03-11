@@ -3,13 +3,13 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class Pm2ProcessActionsService implements Contracts.Kernel.ProcessActionsService {
-	readonly #pmx;
+	#pmx;
 
-	public constructor() {
-		this.#pmx = require("@pm2/io");
-	}
+	public constructor() {}
 
-	public register(remoteAction: Contracts.Kernel.ProcessAction): void {
+	public async register(remoteAction: Contracts.Kernel.ProcessAction): Promise<void> {
+		this.#pmx = await import("@pm2/io");
+
 		this.#pmx.action(remoteAction.name, (reply) => {
 			remoteAction
 				.handler()

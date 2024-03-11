@@ -1,9 +1,14 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { resolve } from "path";
+import { readJSONSync } from "fs-extra/esm";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 
 import { assert } from "../utils/assert.js";
 import { Bootstrapper } from "./interfaces.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {
@@ -12,7 +17,7 @@ export class RegisterBaseBindings implements Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
-		const { version } = require(resolve(__dirname, "../../package.json"));
+		const { version } = readJSONSync(resolve(__dirname, "../../package.json"));
 
 		assert.defined<Record<string, string>>(flags);
 

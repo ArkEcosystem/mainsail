@@ -136,7 +136,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			const fullPath: string = this.app.configPath(file);
 			if (existsSync(fullPath)) {
 				const config: KeyValuePair =
-					extname(fullPath) === ".json" ? JSON.parse(readFileSync(fullPath).toString()) : require(fullPath);
+					extname(fullPath) === ".json"
+						? JSON.parse(readFileSync(fullPath).toString())
+						: readFileSync(fullPath);
 
 				assert.defined<KeyValuePair>(config);
 

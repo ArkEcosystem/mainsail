@@ -5,25 +5,27 @@ import { resolve } from "path";
 @injectable()
 export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 	// https://github.com/jprichardson/node-fs-extra/issues/743#issuecomment-580346768
-	private fs!: typeof import("fs-extra");
+	private fsExtra!: typeof import("fs-extra/esm");
+	private fs!: typeof import("fs");
 
 	public async make(): Promise<Contracts.Kernel.Filesystem> {
-		this.fs = await import("fs-extra");
+		this.fsExtra = await import("fs-extra/esm");
+		this.fs = await import("fs");
 
 		return this;
 	}
 
 	public async exists(path: string): Promise<boolean> {
-		return this.fs.pathExists(path);
+		return this.fsExtra.pathExists(path);
 	}
 
 	public async get(path: string): Promise<Buffer> {
-		return this.fs.readFile(path);
+		return this.fs.readFileSync(path);
 	}
 
 	public async put(path: string, contents: string): Promise<boolean> {
 		try {
-			await this.fs.writeFile(path, contents);
+			this.fs.writeFileSync(path, contents);
 
 			return true;
 		} catch {
@@ -33,7 +35,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 
 	public async delete(path: string): Promise<boolean> {
 		try {
-			await this.fs.remove(path);
+			await this.fsExtra.remove(path);
 
 			return true;
 		} catch {
@@ -43,7 +45,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 
 	public async copy(from: string, to: string): Promise<boolean> {
 		try {
-			await this.fs.copyFile(from, to);
+			await this.fsExtra.copy(from, to);
 
 			return true;
 		} catch {
@@ -53,7 +55,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 
 	public async move(from: string, to: string): Promise<boolean> {
 		try {
-			await this.fs.move(from, to);
+			await this.fsExtra.move(from, to);
 
 			return true;
 		} catch {
@@ -62,32 +64,34 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 	}
 
 	public async size(path: string): Promise<number> {
-		return (await this.fs.stat(path)).size;
+		return this.fs.statSync(path).size;
 	}
 
 	public async lastModified(path: string): Promise<number> {
-		return +(await this.fs.stat(path)).mtime;
+		return +this.fs.statSync(path).mtime;
 	}
 
 	public async files(directory: string): Promise<string[]> {
 		directory = resolve(directory);
 
-		return (await this.fs.readdir(directory))
+		return this.fs
+			.readdirSync(directory)
 			.map((item: string) => `${directory}/${item}`)
-			.filter(async (item: string) => (await this.fs.lstat(item)).isFile());
+			.filter(async (item: string) => this.fs.lstatSync(item).isFile());
 	}
 
 	public async directories(directory: string): Promise<string[]> {
 		directory = resolve(directory);
 
-		return (await this.fs.readdir(directory))
+		return this.fs
+			.readdirSync(directory)
 			.map((item: string) => `${directory}/${item}`)
-			.filter(async (item: string) => (await this.fs.lstat(item)).isDirectory());
+			.filter(async (item: string) => this.fs.lstatSync(item).isDirectory());
 	}
 
 	public async makeDirectory(path): Promise<boolean> {
 		try {
-			await this.fs.ensureDir(path);
+			await this.fsExtra.ensureDir(path);
 
 			return true;
 		} catch {
@@ -97,7 +101,7 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 
 	public async deleteDirectory(directory: string): Promise<boolean> {
 		try {
-			await this.fs.rmdir(directory);
+			await this.fsExtra.remove(directory);
 
 			return true;
 		} catch {
@@ -114,14 +118,14 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 	}
 
 	public removeSync(path: string): void {
-		return this.fs.removeSync(path);
+		return this.fsExtra.removeSync(path);
 	}
 
 	public readJSONSync<T>(file: string, options?: Record<string, any>): T {
-		return this.fs.readJSONSync(file, options);
+		return this.fsExtra.readJSONSync(file, options);
 	}
 
 	public ensureDirSync(path: string, options?: any): void {
-		return this.fs.ensureDirSync(path, options);
+		return this.fsExtra.ensureDirSync(path, options);
 	}
 }

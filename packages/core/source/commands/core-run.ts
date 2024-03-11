@@ -1,8 +1,13 @@
 import { Commands, Contracts, Utils } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { Utils as AppUtils } from "@mainsail/kernel";
+import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
-import { resolve } from "path";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 @injectable()
 export class Command extends Commands.Command {
@@ -23,7 +28,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const { name } = require(resolve(__dirname, "../../package.json"));
+		const { name } = readJSONSync(resolve(__dirname, "../../package.json"));
 		AppUtils.assert.defined<string>(name);
 
 		const flags: Contracts.AnyObject = {

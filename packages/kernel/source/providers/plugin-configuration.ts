@@ -22,9 +22,9 @@ export class PluginConfiguration {
 		return this;
 	}
 
-	public discover(name: string, packageId: string): this {
+	public async discover(name: string, packageId: string): Promise<this> {
 		try {
-			this.#items = require(`${packageId}/distribution/defaults.js`).defaults;
+			this.#items = (await import(`${packageId}/distribution/defaults.js`)).defaults;
 		} catch {
 			// Failed to discover the defaults configuration file. This can be intentional.
 		}

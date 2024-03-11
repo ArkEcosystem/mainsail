@@ -1,11 +1,15 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { join } from "path";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { dirname, join, resolve } from "path";
+import { fileURLToPath } from "url";
 
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 import { ConfigRepository } from "../services/config/index.js";
 import { assert } from "../utils/assert.js";
 import { Bootstrapper } from "./interfaces.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 interface PluginEntry {
 	package: string;
@@ -46,15 +50,55 @@ export class LoadServiceProviders implements Bootstrapper {
 			const installedPlugin = installedPlugins.find((installedPlugin) => installedPlugin.name === plugin.package);
 			const packageId = installedPlugin ? installedPlugin.path : plugin.package;
 
-			const packageModule = join(pluginPath, packageId);
-			const serviceProvider: ServiceProvider = this.app.resolve(require(packageModule).ServiceProvider);
+			let packageModule = join(pluginPath, packageId);
+
+			let ServiceProvider;
+			try {
+				({ ServiceProvider } = await import(join(pluginPath, packageId)));
+			} catch (error) {
+				if (error.code === "ERR_MODULE_NOT_FOUND") {
+					// HACK: just a workaround to use import on local packages if they are not installed.
+					//
+					// Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@mainsail/validation' imported from
+					// ~/git/mainsail/packages/kernel/distribution/bootstrap/load-service-providers.js
+					//
+					const extractLocalModulePath = (message: string) => {
+						const prefix = "Did you mean to import ";
+						const suffix = "index.js";
+						const startIndex = message.indexOf(prefix) + prefix.length;
+						const endIndex = message.indexOf(suffix, startIndex) + suffix.length;
+						const path = message.slice(startIndex, endIndex);
+						const parts = path.split("/");
+						return parts.slice(-3).join("/");
+					};
+
+					const localPath = extractLocalModulePath(error.stack);
+					// ~/git/mainsail/packages/kernel/distribution/bootstrap
+					// ~/git/mainsail/packages/
+					// ~/git/mainsail/packages/validation/distribution/index.js
+					const fallback = resolve(__dirname, "..", "..", "..", localPath);
+					({ ServiceProvider } = await import(fallback));
+
+					// ~/git/mainsail/packages/validation/distribution/index.js
+					// ~/git/mainsail/packages/validation/
+					packageModule = resolve(fallback.replaceAll("/index.js", ""), "..");
+				}
+			}
+
+			if (!ServiceProvider) {
+				throw new Exceptions.ServiceNotFound(packageId);
+			}
+
+			const serviceProvider: ServiceProvider = this.app.resolve(ServiceProvider);
 
 			if (this.app.isWorker() && !serviceProvider.requiredByWorker()) {
 				continue;
 			}
 
 			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule));
-			serviceProvider.setConfig(this.#discoverConfiguration(serviceProvider, plugin.options, packageModule));
+			serviceProvider.setConfig(
+				await this.#discoverConfiguration(serviceProvider, plugin.options, packageModule),
+			);
 
 			this.serviceProviderRepository.set(plugin.package, serviceProvider);
 
@@ -66,11 +110,11 @@ export class LoadServiceProviders implements Bootstrapper {
 		}
 	}
 
-	#discoverConfiguration(
+	async #discoverConfiguration(
 		serviceProvider: ServiceProvider,
 		options: Contracts.Types.JsonObject,
 		packageId: string,
-	): PluginConfiguration {
+	): Promise<PluginConfiguration> {
 		const serviceProviderName: string | undefined = serviceProvider.name();
 
 		assert.defined<string>(serviceProviderName);
@@ -84,7 +128,8 @@ export class LoadServiceProviders implements Bootstrapper {
 				.merge(options);
 		}
 
-		return this.app.resolve(PluginConfiguration).discover(serviceProviderName, packageId).merge(options);
+		const plugins = await this.app.resolve(PluginConfiguration).discover(serviceProviderName, packageId);
+		return plugins.merge(options);
 	}
 
 	async #discoverPlugins(path: string): Promise<Plugin[]> {
@@ -96,7 +141,7 @@ export class LoadServiceProviders implements Bootstrapper {
 			.map((packagePath) => join(path, packagePath).slice(0, -"/package.json".length));
 
 		for (const packagePath of packagePaths) {
-			const packageJson = await this.fileSystem.readJSONSync<Plugin>(join(packagePath, "package.json"));
+			const packageJson = this.fileSystem.readJSONSync<Plugin>(join(packagePath, "package.json"));
 
 			plugins.push({
 				name: packageJson.name,

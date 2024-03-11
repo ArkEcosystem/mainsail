@@ -1,6 +1,6 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { Console, describe } from "@mainsail/test-framework";
-import { ensureDirSync, ensureFileSync, writeFileSync } from "fs-extra";
+import { ensureDirSync, ensureFileSync, writeFileSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./env-get";

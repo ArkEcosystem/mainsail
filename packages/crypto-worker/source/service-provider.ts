@@ -3,10 +3,14 @@ import { Ipc, IpcWorker, Providers } from "@mainsail/kernel";
 import { fork } from "child_process";
 import Joi from "joi";
 import { cpus } from "os";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import { Worker } from "./worker.js";
 import { WorkerPool } from "./worker-pool.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker);

@@ -10,7 +10,7 @@ export class DiscoverCommands {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Application;
 
-	public within(path: string): CommandList {
+	public async within(path: string): Promise<CommandList> {
 		const commandFiles: string[] = readdirSync(path)
 			.map((item: string) => `${path}/${item}`)
 			.filter((item: string) => lstatSync(item).isFile())
@@ -19,7 +19,8 @@ export class DiscoverCommands {
 		const commands: CommandList = {};
 
 		for (const file of commandFiles) {
-			const commandInstance: Command = this.app.resolve(require(file).Command);
+			const { Command } = await import(file);
+			const commandInstance: Command = this.app.resolve(Command);
 
 			if (!commandInstance.isHidden) {
 				commands[commandInstance.signature] = commandInstance;
@@ -29,7 +30,7 @@ export class DiscoverCommands {
 		return commands;
 	}
 
-	public from(packages: string[]): CommandList {
+	public async from(packages: string[]): Promise<CommandList> {
 		const commands: CommandList = {};
 
 		if (!Array.isArray(packages) || packages.length <= 0) {
@@ -38,7 +39,8 @@ export class DiscoverCommands {
 
 		for (const package_ of packages) {
 			try {
-				for (const CMD of require(package_).Commands) {
+				const { Commands } = await import(package_);
+				for (const CMD of Commands) {
 					const commandInstance: Command = this.app.resolve(CMD);
 
 					if (!commandInstance.isHidden) {

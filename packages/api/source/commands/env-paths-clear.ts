@@ -1,7 +1,8 @@
 // eslint-disable-next-line unicorn/prevent-abbreviations
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import { emptyDirSync, existsSync, readdirSync } from "fs-extra";
+import { existsSync, readdirSync } from "fs";
+import { emptyDirSync } from "fs-extra/esm";
 import Joi from "joi";
 import { join } from "path";
 
