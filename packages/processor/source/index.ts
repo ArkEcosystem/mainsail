@@ -1,10 +1,10 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 
-import { ProcessBlockAction } from "./actions/process-block";
-import { BlockProcessor } from "./block-processor";
-import { BlockVerifier } from "./block-verifier";
-import { TransactionProcessor } from "./transaction-processor";
+import { ProcessBlockAction } from "./actions/process-block.js";
+import { BlockProcessor } from "./block-processor.js";
+import { BlockVerifier } from "./block-verifier.js";
+import { TransactionProcessor } from "./transaction-processor.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
