@@ -1,2 +1,2 @@
-export * from "./attribute-repository";
-export * from "./factory";
+export * from "./attribute-repository.js";
+export * from "./factory.js";

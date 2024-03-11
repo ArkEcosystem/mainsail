@@ -1,7 +1,7 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { WalletIndex } from "./wallet-index";
+import { WalletIndex } from "./wallet-index.js";
 
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
