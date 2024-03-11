@@ -1,7 +1,7 @@
 import { white } from "kleur";
 
 import { Console, describe } from "../../../test-framework";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { Success } from "./success";
 
 describe<{

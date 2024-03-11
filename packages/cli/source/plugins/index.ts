@@ -1,1 +1,1 @@
-export * from "./suggest";
+export * from "./suggest.js";

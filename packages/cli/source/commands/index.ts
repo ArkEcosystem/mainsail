@@ -1,3 +1,3 @@
-export * from "./command";
-export * from "./command-help";
-export * from "./discover-commands";
+export * from "./command.js";
+export * from "./command-help.js";
+export * from "./discover-commands.js";

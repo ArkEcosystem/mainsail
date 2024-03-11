@@ -2,7 +2,7 @@ import { red, white } from "kleur";
 import os from "os";
 
 import { Console, describe } from "../../../test-framework";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { AppHeader } from "./app-header";
 
 describe<{

@@ -5,7 +5,7 @@ import os from "os";
 import { describe } from "../../../test-framework";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";

@@ -1,9 +1,9 @@
-import fs from "fs-extra";
+import fs from "fs-extra/esm";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../test-framework";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";
 

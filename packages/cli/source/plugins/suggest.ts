@@ -4,8 +4,8 @@ import { minBy } from "@mainsail/utils";
 import Levenshtein from "fast-levenshtein";
 import { blue, red } from "kleur";
 
-import { Application } from "../application";
-import { Identifiers } from "../ioc";
+import { Application } from "../application.js";
+import { Identifiers } from "../ioc/index.js";
 
 @injectable()
 export class SuggestCommand {

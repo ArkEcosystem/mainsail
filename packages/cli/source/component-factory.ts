@@ -30,9 +30,9 @@ import {
 	Title,
 	Toggle,
 	Warning,
-} from "./components";
-import { Application } from "./contracts";
-import { Identifiers } from "./ioc";
+} from "./components/index.js";
+import { Application } from "./contracts.js";
+import { Identifiers } from "./ioc/index.js";
 
 @injectable()
 export class ComponentFactory {

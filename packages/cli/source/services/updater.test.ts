@@ -2,7 +2,7 @@ import prompts from "prompts";
 
 import { Console, describe } from "../../../test-framework";
 import { versionNext } from "../../test/fixtures/latest-version";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { Config } from "./config";
 import { Updater } from "./updater";
 

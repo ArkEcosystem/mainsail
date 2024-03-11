@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers } from "../ioc";
-import { ProcessManager } from "../services";
+import { Identifiers } from "../ioc/index.js";
+import { ProcessManager } from "../services/index.js";
 
 @injectable()
 export class AbortStoppedProcess {

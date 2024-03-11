@@ -1,5 +1,5 @@
 import { Console, describe } from "../../../test-framework";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { Table } from "./table";
 
 describe<{

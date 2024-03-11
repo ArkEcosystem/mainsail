@@ -1,7 +1,7 @@
 import { Utils } from "@mainsail/kernel";
 
-import { execa } from "../../execa";
-import { AbstractSource } from "./abstract-source";
+import { execa } from "../../execa.js";
+import { AbstractSource } from "./abstract-source.js";
 
 export class Git extends AbstractSource {
 	public constructor(paths: { data: string; temp: string }) {

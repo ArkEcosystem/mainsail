@@ -1,9 +1,9 @@
 import { Exceptions } from "@mainsail/contracts";
-import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra";
+import { ensureDirSync, moveSync, readJSONSync, removeSync } from "fs-extra/esm";
 import { join } from "path";
 
-import { execa } from "../../execa";
-import { Source } from "./contracts";
+import { execa } from "../../execa.js";
+import { Source } from "./contracts.js";
 
 export abstract class AbstractSource implements Source {
 	protected readonly dataPath: string;

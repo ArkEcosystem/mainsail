@@ -1,4 +1,4 @@
-import fs from "fs-extra";
+import fs from "fs-extra/esm";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 

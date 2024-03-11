@@ -1,7 +1,7 @@
 import prompts from "prompts";
 
 import { Console, describe } from "../../../test-framework";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { AskPassword } from "./ask-password";
 
 describe<{

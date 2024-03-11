@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { rcompare, satisfies } from "semver";
 
-import { execa } from "../execa";
+import { execa } from "../execa.js";
 
 type Package = {
 	pkg: string;

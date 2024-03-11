@@ -4,12 +4,12 @@ import { dim, green, reset } from "kleur";
 import latestVersion from "latest-version";
 import { lt, lte } from "semver";
 
-import { Application } from "../application";
-import { Confirm, Spinner, Warning } from "../components";
-import { Config, Updater as Contracts_Updater } from "../contracts";
-import { Identifiers } from "../ioc";
-import { Installer } from "./installer";
-import { ProcessManager } from "./process-manager";
+import { Application } from "../application.js";
+import { Confirm, Spinner, Warning } from "../components/index.js";
+import { Config, Updater as Contracts_Updater } from "../contracts.js";
+import { Identifiers } from "../ioc/index.js";
+import { Installer } from "./installer.js";
+import { ProcessManager } from "./process-manager.js";
 
 const ONE_HOUR = 1000 * 60 * 60;
 

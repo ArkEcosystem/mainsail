@@ -1,16 +1,16 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { ActionFactory } from "../action-factory";
-import { ComponentFactory } from "../component-factory";
-import { Box } from "../components";
-import { Application, InputValue } from "../contracts";
-import { Input } from "../input";
-import { InputDefinition } from "../input/definition";
-import { Identifiers } from "../ioc";
-import { Output } from "../output";
-import { Config, Environment } from "../services";
-import { CommandHelp } from "./command-help";
+import { ActionFactory } from "../action-factory.js";
+import { ComponentFactory } from "../component-factory.js";
+import { Box } from "../components/index.js";
+import { Application, InputValue } from "../contracts.js";
+import { InputDefinition } from "../input/definition.js";
+import { Input } from "../input/index.js";
+import { Identifiers } from "../ioc/index.js";
+import { Output } from "../output/index.js";
+import { Config, Environment } from "../services/index.js";
+import { CommandHelp } from "./command-help.js";
 
 @injectable()
 export abstract class Command {

@@ -2,9 +2,9 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { blue } from "kleur";
 
-import { AppHeader } from "../components";
-import { Application } from "../contracts";
-import { Identifiers } from "../ioc";
+import { AppHeader } from "../components/index.js";
+import { Application } from "../contracts.js";
+import { Identifiers } from "../ioc/index.js";
 
 @injectable()
 export class CommandHelp {

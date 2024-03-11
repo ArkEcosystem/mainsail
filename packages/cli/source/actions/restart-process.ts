@@ -1,9 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
 
-import { Application } from "../application";
-import { Spinner } from "../components";
-import { Identifiers } from "../ioc";
-import { ProcessManager } from "../services";
+import { Application } from "../application.js";
+import { Spinner } from "../components/index.js";
+import { Identifiers } from "../ioc/index.js";
+import { ProcessManager } from "../services/index.js";
 
 @injectable()
 export class RestartProcess {

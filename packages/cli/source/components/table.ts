@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import Table3 from "cli-table3";
 
-import { Identifiers } from "../ioc";
-import type { Logger } from "../services";
+import { Identifiers } from "../ioc/index.js";
+import type { Logger } from "../services/index.js";
 
 @injectable()
 export class Table {
