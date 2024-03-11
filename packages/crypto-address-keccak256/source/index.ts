@@ -1,9 +1,9 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { AddressFactory } from "./address.factory";
-import { schemas } from "./schemas";
-import { AddressSerializer } from "./serializer";
+import { AddressFactory } from "./address.factory.js";
+import { schemas } from "./schemas.js";
+import { AddressSerializer } from "./serializer.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
