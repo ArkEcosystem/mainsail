@@ -1,8 +1,8 @@
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
-import { TransactionsController } from "../controllers/transactions";
-import { pagination } from "../schemas";
+import { TransactionsController } from "../controllers/transactions.js";
+import { pagination } from "../schemas.js";
 
 export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(TransactionsController);

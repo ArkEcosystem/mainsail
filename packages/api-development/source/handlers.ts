@@ -1,15 +1,15 @@
 import Hapi from "@hapi/hapi";
 
-import * as ApiNodes from "./routes/api-nodes";
-import * as Blockchain from "./routes/blockchain";
-import * as Blocks from "./routes/blocks";
-import * as Consensus from "./routes/consensus";
-import * as Node from "./routes/node";
-import * as Peers from "./routes/peers";
-import * as Round from "./routes/round";
-import * as Transactions from "./routes/transactions";
-import * as Validators from "./routes/validators";
-import * as Wallets from "./routes/wallets";
+import * as ApiNodes from "./routes/api-nodes.js";
+import * as Blockchain from "./routes/blockchain.js";
+import * as Blocks from "./routes/blocks.js";
+import * as Consensus from "./routes/consensus.js";
+import * as Node from "./routes/node.js";
+import * as Peers from "./routes/peers.js";
+import * as Round from "./routes/round.js";
+import * as Transactions from "./routes/transactions.js";
+import * as Validators from "./routes/validators.js";
+import * as Wallets from "./routes/wallets.js";
 
 const config = {
 	name: "Development API",

@@ -3,8 +3,8 @@ import Hapi from "@hapi/hapi";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { WalletResource } from "../resources";
-import { Controller } from "./controller";
+import { WalletResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class WalletsController extends Controller {

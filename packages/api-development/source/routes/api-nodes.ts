@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 
-import { ApiNodesController } from "../controllers/api-nodes";
+import { ApiNodesController } from "../controllers/api-nodes.js";
 
 export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(ApiNodesController);
