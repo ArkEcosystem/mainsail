@@ -5,6 +5,7 @@
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"main": "distribution/index.js",
+	"type": "module",
 	"files": [
 		"/distribution"
 	],
