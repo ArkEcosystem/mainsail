@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { blue } from "kleur";
+import { blue, bold } from "kleur/colors";
 
 import { AppHeader } from "../components/index.js";
 import { Application } from "../contracts.js";
@@ -17,20 +17,20 @@ export class CommandHelp {
 	public render(command): string {
 		let helpMessage = `${this.app.get<AppHeader>(Identifiers.AppHeader).render()}
 
-${blue().bold("Description")}
+${blue(bold("Description"))}
 ${command.description}`;
 
 		const arguments_: string = this.#buildArguments(command);
 
 		if (arguments_) {
-			helpMessage += `${blue().bold("\n\nArguments")}
+			helpMessage += `${blue(bold("\n\nArguments"))}
 ${arguments_}`;
 		}
 
 		const flags: string = this.#buildFlags(command);
 
 		if (flags) {
-			helpMessage += `${blue().bold("\n\nFlags")}
+			helpMessage += `${blue(bold("\n\nFlags"))}
 ${flags}`;
 		}
 

@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { dim, green, reset } from "kleur";
+import { dim, green, reset } from "kleur/colors";
 import latestVersion from "latest-version";
 import { lt, lte } from "semver";
 

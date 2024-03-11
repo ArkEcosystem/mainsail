@@ -1,4 +1,4 @@
-import { red, white } from "kleur";
+import { red, white } from "kleur/colors";
 import os from "os";
 
 import { Console, describe } from "../../../test-framework";

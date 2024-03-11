@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { yellow } from "kleur";
+import { yellow } from "kleur/colors";
 
 import { Identifiers } from "../ioc/index.js";
 import type { Logger } from "../services/index.js";
