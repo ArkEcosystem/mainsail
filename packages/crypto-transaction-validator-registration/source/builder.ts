@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { ValidatorRegistrationTransaction } from "./versions/1";
+import { ValidatorRegistrationTransaction } from "./versions/1.js";
 
 @injectable()
 export class ValidatorRegistrationBuilder extends TransactionBuilder<ValidatorRegistrationBuilder> {
