@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { InternalTransactionType } from "../internal-transaction-type";
-import { Transaction } from "./transaction";
+import { InternalTransactionType } from "../internal-transaction-type.js";
+import { Transaction } from "./transaction.js";
 
 type TransactionConstructor = typeof Transaction;
 
