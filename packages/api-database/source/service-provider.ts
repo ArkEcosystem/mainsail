@@ -1,22 +1,22 @@
 import { Providers, Utils } from "@mainsail/kernel";
 import { DataSource } from "typeorm";
 
-import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
-import { Identifiers } from "./identifiers";
-import { Migrations } from "./migrations";
+import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts.js";
+import { Identifiers } from "./identifiers.js";
+import { Migrations } from "./migrations.js";
 import {
 	ApiNode,
 	Block,
 	Configuration,
 	MempoolTransaction,
+	Peer,
 	Plugin,
 	State,
 	Transaction,
 	TransactionType,
 	ValidatorRound,
 	Wallet,
-} from "./models";
-import { Peer } from "./models/peer";
+} from "./models/index.js";
 import {
 	makeApiNodeRepository,
 	makeBlockRepository,
@@ -29,8 +29,8 @@ import {
 	makeTransactionTypeRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
-} from "./repositories";
-import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
+} from "./repositories/index.js";
+import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

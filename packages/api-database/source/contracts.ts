@@ -12,9 +12,9 @@ import {
 	TransactionType,
 	ValidatorRound,
 	Wallet,
-} from "./models";
-import type { ExtendedRepository } from "./repositories/repository-extension";
-import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search";
+} from "./models/index.js";
+import type { ExtendedRepository } from "./repositories/repository-extension.js";
+import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "./search/index.js";
 
 export type RepositoryDataSource = DataSource | EntityManager;
 
@@ -128,7 +128,7 @@ export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) =
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 
 export { Entity, Repository } from "typeorm";
-export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions";
+export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 export interface Migrations {
 	run(): Promise<void>;

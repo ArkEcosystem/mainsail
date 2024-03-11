@@ -1,6 +1,6 @@
-export * as Criteria from "./criteria";
-export * as Expressions from "./expressions";
-export * as Filters from "./filters";
+export * as Criteria from "./criteria.js";
+export * as Expressions from "./expressions.js";
+export * as Filters from "./filters/index.js";
 
 export type Sorting = {
 	property: string;
@@ -22,5 +22,5 @@ export type ResultsPage<T> = {
 	meta: { totalCountIsEstimate: boolean };
 };
 
-export * from "./query-helper";
-export * from "./search";
+export * from "./query-helper.js";
+export * from "./search.js";
