@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 
-import { Wallet } from "../contracts";
-import { Generator } from "./generator";
+import { Wallet } from "../contracts.js";
+import { Generator } from "./generator.js";
 
 @injectable()
 export class WalletGenerator extends Generator {

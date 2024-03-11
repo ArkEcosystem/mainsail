@@ -1,7 +1,7 @@
 import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import envPaths from "env-paths";
-import fs from "fs-extra";
+import fs from "fs-extra/esm";
 import { join } from "path";
 
 import { describe } from "../../test-framework";

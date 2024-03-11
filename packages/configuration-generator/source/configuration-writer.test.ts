@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readJSONSync } from "fs-extra";
+import { existsSync, readFileSync, readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
