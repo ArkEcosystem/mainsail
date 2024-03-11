@@ -3,7 +3,7 @@ import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
-import { isValidVersion } from "./utils";
+import { isValidVersion } from "./utils/index.js";
 
 @injectable()
 export class PeerVerifier implements Contracts.P2P.PeerVerifier {

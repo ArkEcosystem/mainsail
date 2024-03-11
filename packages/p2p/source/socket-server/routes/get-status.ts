@@ -1,8 +1,8 @@
-import { Routes } from "../../enums";
-import { Codecs } from "../codecs";
-import { GetStatusController } from "../controllers";
-import { Schemas } from "../schemas";
-import { Route, RouteConfig } from "./route";
+import { Routes } from "../../enums.js";
+import { Codecs } from "../codecs/index.js";
+import { GetStatusController } from "../controllers/index.js";
+import { Schemas } from "../schemas/index.js";
+import { Route, RouteConfig } from "./route.js";
 
 export class GetStatusRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {

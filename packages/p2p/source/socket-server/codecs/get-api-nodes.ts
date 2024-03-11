@@ -1,4 +1,4 @@
-import { getApiNodes as proto } from "./proto/protos";
+import { getApiNodes as proto } from "./proto/protos.js";
 
 export const getApiNodes = {
 	request: {

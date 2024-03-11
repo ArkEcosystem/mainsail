@@ -1,4 +1,4 @@
-import { postTransactions as proto } from "./proto/protos";
+import { postTransactions as proto } from "./proto/protos.js";
 
 // actual max transactions is enforced by schema but we set a hard limit for deserializing (way higher than in schema)
 const hardLimitNumberOfTransactions = 1000;

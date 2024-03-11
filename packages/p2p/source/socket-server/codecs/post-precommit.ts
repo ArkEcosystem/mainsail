@@ -1,4 +1,4 @@
-import { postPrecommit as proto } from "./proto/protos";
+import { postPrecommit as proto } from "./proto/protos.js";
 
 export const postPrecommit = {
 	request: {

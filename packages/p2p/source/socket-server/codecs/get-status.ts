@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { getStatus as proto } from "./proto/protos";
+import { getStatus as proto } from "./proto/protos.js";
 
 export const getStatus = {
 	request: {

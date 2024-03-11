@@ -1,4 +1,4 @@
-import { getBlocks as proto } from "./proto/protos";
+import { getBlocks as proto } from "./proto/protos.js";
 
 export const getBlocks = {
 	request: {

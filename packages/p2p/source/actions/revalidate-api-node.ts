@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Types } from "@mainsail/kernel";
 
-import { ApiNodeProcessor } from "../api-node-processor";
+import { ApiNodeProcessor } from "../api-node-processor.js";
 
 export class RevalidateApiNodeAction extends Services.Triggers.Action {
 	#app: Contracts.Kernel.Application;

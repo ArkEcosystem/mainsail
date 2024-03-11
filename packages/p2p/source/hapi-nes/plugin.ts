@@ -4,7 +4,7 @@
 import Hoek from "@hapi/hoek";
 import Joi from "joi";
 
-import { Listener } from "./listener";
+import { Listener } from "./listener.js";
 
 const internals: any = {
 	defaults: {

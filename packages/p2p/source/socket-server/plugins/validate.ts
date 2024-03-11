@@ -3,7 +3,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { getPeerIp, isValidVersion } from "../../utils";
+import { getPeerIp, isValidVersion } from "../../utils/index.js";
 import {
 	GetApiNodesRoute,
 	GetBlocksRoute,
@@ -15,8 +15,8 @@ import {
 	PostPrevoteRoute,
 	PostProposalRoute,
 	PostTransactionsRoute,
-} from "../routes";
-import { BasePlugin } from "./base-plugin";
+} from "../routes/index.js";
+import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
 export class ValidatePlugin extends BasePlugin {

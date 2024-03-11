@@ -1,4 +1,4 @@
-import { getPeers as proto } from "./proto/protos";
+import { getPeers as proto } from "./proto/protos.js";
 
 export const getPeers = {
 	request: {

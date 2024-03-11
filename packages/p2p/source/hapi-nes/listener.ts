@@ -3,7 +3,7 @@
 import Hoek from "@hapi/hoek";
 import Ws from "ws";
 
-import { Socket } from "./socket";
+import { Socket } from "./socket.js";
 
 const internals = {
 	counter: {

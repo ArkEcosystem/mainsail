@@ -1,4 +1,4 @@
-import { postPrevote as proto } from "./proto/protos";
+import { postPrevote as proto } from "./proto/protos.js";
 
 export const postPrevote = {
 	request: {

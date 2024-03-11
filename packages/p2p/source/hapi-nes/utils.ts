@@ -1,4 +1,4 @@
-import { NesMessage } from "./interfaces";
+import { NesMessage } from "./interfaces.js";
 
 const mapTypeIntToString = {
 	0: "hello",

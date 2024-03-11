@@ -1,4 +1,4 @@
-import { SocketErrors } from "../../enums";
+import { SocketErrors } from "../../enums.js";
 
 // TODO: Add types
 export const validate = (schema, data, validator) => {

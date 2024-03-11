@@ -2,7 +2,7 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
-import { getRandomPeer } from "../utils";
+import { getRandomPeer } from "../utils/index.js";
 
 type DownloadsByRound = {
 	precommits: boolean[];

@@ -1,4 +1,4 @@
-import { getMessages as proto } from "./proto/protos";
+import { getMessages as proto } from "./proto/protos.js";
 
 export const getMessages = {
 	request: {
