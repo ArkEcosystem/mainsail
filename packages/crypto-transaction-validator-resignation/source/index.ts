@@ -4,11 +4,11 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { ValidatorResignationTransactionHandler } from "./handlers";
-import { ValidatorResignationTransaction } from "./versions/1";
+import { ValidatorResignationTransactionHandler } from "./handlers/index.js";
+import { ValidatorResignationTransaction } from "./versions/1.js";
 
-export * from "./builder";
-export * from "./versions";
+export * from "./builder.js";
+export * from "./versions/1.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
