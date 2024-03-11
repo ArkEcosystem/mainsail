@@ -2,11 +2,11 @@ import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { KeyPairFactory } from "./pair";
-import { PrivateKeyFactory } from "./private";
-import { PublicKeyFactory } from "./public";
-import { schemas } from "./schemas";
-import { PublicKeySerializer } from "./serializer";
+import { KeyPairFactory } from "./pair.js";
+import { PrivateKeyFactory } from "./private.js";
+import { PublicKeyFactory } from "./public.js";
+import { schemas } from "./schemas.js";
+import { PublicKeySerializer } from "./serializer.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
