@@ -9,8 +9,8 @@ import {
 import { Signature } from "@mainsail/crypto-signature-bls12-381";
 import { Providers } from "@mainsail/kernel";
 
-import { schemas } from "./schemas";
-export * from "./schemas";
+import { schemas } from "./schemas.js";
+export * from "./schemas.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
