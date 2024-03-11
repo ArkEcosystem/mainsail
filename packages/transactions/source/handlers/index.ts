@@ -1,3 +1,3 @@
-export { TransactionHandlerProvider } from "./handler-provider";
-export { TransactionHandlerRegistry as Registry } from "./handler-registry";
-export { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
+export { TransactionHandlerProvider } from "./handler-provider.js";
+export { TransactionHandlerRegistry as Registry } from "./handler-registry.js";
+export { TransactionHandler, TransactionHandlerConstructor } from "./transaction.js";

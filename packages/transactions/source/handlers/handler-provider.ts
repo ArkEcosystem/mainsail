@@ -3,7 +3,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { InternalTransactionType } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 
-import { TransactionHandlerConstructor } from "./transaction";
+import { TransactionHandlerConstructor } from "./transaction.js";
 
 @injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.TransactionHandlerProvider {
