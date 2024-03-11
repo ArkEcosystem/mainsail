@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import * as TransactionPool from "./routes/transaction-pool";
+import * as TransactionPool from "./routes/transaction-pool.js";
 
 const config = {
 	name: "Transaction Pool API",
