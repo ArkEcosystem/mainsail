@@ -4,8 +4,8 @@ import { fork } from "child_process";
 import Joi from "joi";
 import { cpus } from "os";
 
-import { Worker } from "./worker";
-import { WorkerPool } from "./worker-pool";
+import { Worker } from "./worker.js";
+import { WorkerPool } from "./worker-pool.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
