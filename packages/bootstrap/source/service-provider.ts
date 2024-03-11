@@ -1,6 +1,6 @@
 import { Providers } from "@mainsail/kernel";
 
-import { Bootstrapper } from "./bootstrapper";
+import { Bootstrapper } from "./bootstrapper.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {}
