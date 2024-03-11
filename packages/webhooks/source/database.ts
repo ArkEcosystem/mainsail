@@ -1,11 +1,12 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ensureFileSync, existsSync } from "fs-extra";
+import { existsSync } from "fs";
+import { ensureFileSync } from "fs-extra/esm";
 import lowdb from "lowdb";
-import FileSync from "lowdb/adapters/FileSync";
+import FileSync from "lowdb/adapters/FileSync.js";
 import { v4 as uuidv4 } from "uuid";
 
-import { Webhook } from "./interfaces";
+import { Webhook } from "./interfaces.js";
 
 @injectable()
 export class Database {
