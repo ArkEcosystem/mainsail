@@ -1,1 +1,1 @@
-export * from "./username-registration";
+export * from "./username-registration.js";
