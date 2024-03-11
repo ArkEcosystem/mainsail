@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { AbstractServer } from "./server";
+import { AbstractServer } from "./server.js";
 
 export type ServerConstructor<T extends AbstractServer> = new (...arguments_: any[]) => T;
 export abstract class AbstractServiceProvider<T extends AbstractServer> extends Providers.ServiceProvider {

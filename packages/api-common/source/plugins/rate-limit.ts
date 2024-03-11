@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import mm from "nanomatch";
 import { RateLimiterMemory, RateLimiterRes, RLWrapperBlackAndWhite } from "rate-limiter-flexible";
 
-import { getIp } from "../utils";
+import { getIp } from "../utils/index.js";
 
 type RateLimitPluginData = {
 	remaining: number;

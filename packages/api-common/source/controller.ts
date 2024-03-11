@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { SchemaObject } from "./schemas";
+import { SchemaObject } from "./schemas.js";
 
 @injectable()
 export abstract class AbstractController {
