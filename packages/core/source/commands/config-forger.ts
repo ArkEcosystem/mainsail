@@ -2,8 +2,8 @@ import { Commands } from "@mainsail/cli";
 import { injectable, interfaces } from "@mainsail/container";
 import Joi from "joi";
 
-import { Command as BIP38Command } from "./config-forger-bip38";
-import { Command as BIP39Command } from "./config-forger-bip39";
+import { Command as BIP38Command } from "./config-forger-bip38.js";
+import { Command as BIP39Command } from "./config-forger-bip39.js";
 
 @injectable()
 export class Command extends Commands.Command {

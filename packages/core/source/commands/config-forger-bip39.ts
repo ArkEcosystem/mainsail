@@ -1,7 +1,7 @@
 import { Commands, Contracts } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { validateMnemonic } from "bip39";
-import { writeJSONSync } from "fs-extra";
+import { writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
 @injectable()

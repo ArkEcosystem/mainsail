@@ -1,2 +1,2 @@
-export * as Base from "./base";
-export * as Crypto from "./crypto";
+export * as Base from "./base.js";
+export * as Crypto from "./crypto.js";

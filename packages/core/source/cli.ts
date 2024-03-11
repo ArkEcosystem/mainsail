@@ -8,7 +8,7 @@ import {
 } from "@mainsail/cli";
 import { Container, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { existsSync } from "fs-extra";
+import { existsSync } from "fs";
 import { platform } from "os";
 import { join, resolve } from "path";
 

@@ -1,5 +1,5 @@
 import { Console, describe } from "@mainsail/test-framework";
-import fs from "fs-extra";
+import fs from "fs-extra/esm";
 import prompts from "prompts";
 
 import { Command } from "./pool-clear";
