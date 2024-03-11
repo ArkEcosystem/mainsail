@@ -1,5 +1,7 @@
 import { Providers, Utils } from "@mainsail/kernel";
+import { dirname } from "path";
 import { DataSource } from "typeorm";
+import { fileURLToPath } from "url";
 
 import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts.js";
 import { Identifiers } from "./identifiers.js";
@@ -31,6 +33,9 @@ import {
 	makeWalletRepository,
 } from "./repositories/index.js";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
