@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
 import capcon from "capture-console";
-import { readdirSync } from "fs-extra";
+import { readdirSync } from "fs-extra/esm";
 import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
 
