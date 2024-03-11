@@ -9,9 +9,9 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { TransactionResource } from "../resources";
-import { WalletResource } from "../resources/wallet";
-import { Controller } from "./controller";
+import { TransactionResource } from "../resources/index.js";
+import { WalletResource } from "../resources/wallet.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class WalletsController extends Controller {

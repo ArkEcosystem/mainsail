@@ -3,7 +3,7 @@ import { Schemas } from "@mainsail/api-common";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { PeersController } from "../controllers/peers";
+import { PeersController } from "../controllers/peers.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(PeersController);

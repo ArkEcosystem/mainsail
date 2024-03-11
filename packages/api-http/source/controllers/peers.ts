@@ -8,8 +8,8 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { PeerResource } from "../resources/peer";
-import { Controller } from "./controller";
+import { PeerResource } from "../resources/peer.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class PeersController extends Controller {

@@ -8,7 +8,7 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { BigNumber, validatorSetUnpack } from "@mainsail/utils";
 
-import { Controller } from "./controller";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class CommitsController extends Controller {

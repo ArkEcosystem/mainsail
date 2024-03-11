@@ -8,7 +8,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
-import { Controller } from "./controller";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class NodeController extends Controller {

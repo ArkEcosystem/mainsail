@@ -6,8 +6,8 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { TransactionResource } from "../resources";
-import { Controller } from "./controller";
+import { TransactionResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class TransactionsController extends Controller {
