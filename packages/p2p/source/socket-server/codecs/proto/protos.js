@@ -1,7 +1,8 @@
 /*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
 "use strict";
 
-var $protobuf = require("protobufjs/minimal");
+import * as _$protobuf from "protobufjs";
+const $protobuf = _$protobuf.default;
 
 // Common aliases
 var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
@@ -7324,4 +7325,4 @@ $root.shared = (function() {
     return shared;
 })();
 
-module.exports = $root;
+export default $root;
