@@ -3,14 +3,14 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { RootDatabase } from "lmdb";
 
-import { Aggregator } from "./aggregator";
-import { Bootstrapper } from "./bootstrapper";
-import { CommitState } from "./commit-state";
-import { Consensus } from "./consensus";
-import { CommitProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors";
-import { RoundStateRepository } from "./round-state-repository";
-import { Scheduler } from "./scheduler";
-import { Storage } from "./storage";
+import { Aggregator } from "./aggregator.js";
+import { Bootstrapper } from "./bootstrapper.js";
+import { CommitState } from "./commit-state.js";
+import { Consensus } from "./consensus.js";
+import { CommitProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors/index.js";
+import { RoundStateRepository } from "./round-state-repository.js";
+import { Scheduler } from "./scheduler.js";
+import { Storage } from "./storage.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
