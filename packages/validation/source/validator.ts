@@ -1,22 +1,29 @@
 import { injectable, postConstruct } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import Ajv, { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv/dist/2020";
+import _Ajv, { AnySchema, FormatDefinition, KeywordDefinition, Schema } from "ajv";
+import AjvCore from "ajv/dist/core.js";
 import formats from "ajv-formats";
 import keywords from "ajv-keywords";
 
+// Can be removed once upstream is fixed:
+// https://github.com/ajv-validator/ajv/issues/2132
+// https://github.com/ajv-validator/ajv/pull/2389
+const Ajv = _Ajv as unknown as typeof _Ajv.default;
+
 @injectable()
 export class Validator implements Contracts.Crypto.Validator {
-	#ajv!: Ajv;
+	#ajv!: AjvCore.default;
 
 	@postConstruct()
 	public postConstruct(): void {
+		// @ts-ignore
 		this.#ajv = new Ajv({
 			$data: true,
 			strict: true,
 		});
 
-		keywords(this.#ajv);
-		formats(this.#ajv);
+		keywords.default(this.#ajv);
+		formats.default(this.#ajv);
 	}
 
 	public validate<T = any>(schemaKeyReference: string | Schema, data: T): Contracts.Crypto.SchemaValidationResult<T> {
@@ -55,7 +62,7 @@ export class Validator implements Contracts.Crypto.Validator {
 		this.#ajv.removeSchema(schemaKeyReference);
 	}
 
-	public extend(callback: (ajv: Ajv) => void): void {
+	public extend(callback: (ajv: AjvCore.default) => void): void {
 		callback(this.#ajv);
 	}
 }
