@@ -3,10 +3,8 @@ import { injectable } from "@mainsail/container";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
-import { resolve } from "path";
+import path from "path";
 import { URL } from "url";
-
-const __dirname = new URL(".", import.meta.url).pathname;
 
 @injectable()
 export class Command extends Commands.Command {
@@ -27,7 +25,9 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const { name } = readJSONSync(resolve(__dirname, "../../package.json"));
+		const __dirname = new URL(".", import.meta.url).pathname;
+
+		const { name } = readJSONSync(path.resolve(__dirname, "../../package.json"));
 		AppUtils.assert.defined<string>(name);
 
 		const flags: Contracts.AnyObject = {

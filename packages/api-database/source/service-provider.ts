@@ -33,8 +33,6 @@ import {
 } from "./repositories/index.js";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
-const __dirname = new URL(".", import.meta.url).pathname;
-
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		await this.#configureDatabase();
@@ -55,6 +53,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		const options = this.config().get<PostgresConnectionOptions>("database");
 		Utils.assert.defined<PostgresConnectionOptions>(options);
+
+		const __dirname = new URL(".", import.meta.url).pathname;
 
 		try {
 			const dataSource = new DataSource({

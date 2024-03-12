@@ -8,8 +8,6 @@ import { ConfigRepository } from "../services/config/index.js";
 import { assert } from "../utils/assert.js";
 import { Bootstrapper } from "./interfaces.js";
 
-const __dirname = new URL(".", import.meta.url).pathname;
-
 interface PluginEntry {
 	package: string;
 	options: Contracts.Types.JsonObject;
@@ -75,6 +73,7 @@ export class LoadServiceProviders implements Bootstrapper {
 					// ~/git/mainsail/packages/kernel/distribution/bootstrap
 					// ~/git/mainsail/packages/
 					// ~/git/mainsail/packages/validation/distribution/index.js
+					const __dirname = new URL(".", import.meta.url).pathname;
 					const fallback = path.resolve(__dirname, "..", "..", "..", localPath);
 					({ ServiceProvider } = await import(fallback));
 

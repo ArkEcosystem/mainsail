@@ -6,8 +6,6 @@ import { URL } from "url";
 import { assert } from "../utils/assert.js";
 import { Bootstrapper } from "./interfaces.js";
 
-const __dirname = new URL(".", import.meta.url).pathname;
-
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {
 	@inject(Identifiers.Application.Instance)
@@ -18,6 +16,8 @@ export class RegisterBaseBindings implements Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
+		const __dirname = new URL(".", import.meta.url).pathname;
+
 		const { version } = this.fileSystem.readJSONSync<Contracts.Types.PackageJson>(
 			path.resolve(__dirname, "../../package.json"),
 		);

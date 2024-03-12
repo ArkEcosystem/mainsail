@@ -8,14 +8,13 @@ import { URL } from "url";
 import { Worker } from "./worker.js";
 import { WorkerPool } from "./worker-pool.js";
 
-const __dirname = new URL(".", import.meta.url).pathname;
-
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker);
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
 		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
+			const __dirname = new URL(".", import.meta.url).pathname;
 			const subprocess = fork(`${__dirname}/worker-script.js`, {});
 			return new Ipc.Subprocess(subprocess);
 		});

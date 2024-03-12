@@ -11,10 +11,8 @@ import { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { readJSONSync } from "fs-extra/esm";
 import { platform } from "os";
-import { join, resolve } from "path";
+import path from "path";
 import { URL } from "url";
-
-const __dirname = new URL(".", import.meta.url).pathname;
 
 @injectable()
 export class CommandLineInterface {
@@ -22,12 +20,17 @@ export class CommandLineInterface {
 
 	public constructor(private readonly argv: string[]) {}
 
-	public async execute(dirname = __dirname): Promise<void> {
+	public async execute(dirname?: string): Promise<void> {
+		if (!dirname) {
+			const __dirname = new URL(".", import.meta.url).pathname;
+			dirname = __dirname;
+		}
+
 		// Set NODE_PATHS. Only required for plugins that uses @mainsail as peer dependencies.
-		await this.#setNodePath();
+		await this.#setNodePath(dirname);
 
 		// Load the package information. Only needed for updates and installations.
-		const package_: Contracts.Types.PackageJson = readJSONSync(join(dirname, "..", "package.json"));
+		const package_: Contracts.Types.PackageJson = readJSONSync(path.join(dirname, "..", "package.json"));
 
 		// Create the application we will work with
 		this.#app = ApplicationFactory.make(new Container(), package_);
@@ -84,7 +87,7 @@ export class CommandLineInterface {
 		await commandInstance.run();
 	}
 
-	async #setNodePath(): Promise<void> {
+	async #setNodePath(dirname: string): Promise<void> {
 		const delimiter = platform() === "win32" ? ";" : ":";
 
 		if (!process.env.NODE_PATH) {
@@ -97,8 +100,8 @@ export class CommandLineInterface {
 			}
 		};
 
-		setPath(join(__dirname, "../"));
-		setPath(join(__dirname, "../node_modules"));
+		setPath(path.join(dirname, "../"));
+		setPath(path.join(dirname, "../node_modules"));
 
 		const { Module } = await import("module");
 		// @ts-ignore
@@ -107,7 +110,7 @@ export class CommandLineInterface {
 
 	async #discoverCommands(dirname: string, flags: any): Promise<CliContracts.CommandList> {
 		const commandsDiscoverer = this.#app.resolve(Commands.DiscoverCommands);
-		const commands: CliContracts.CommandList = await commandsDiscoverer.within(resolve(dirname, "./commands"));
+		const commands: CliContracts.CommandList = await commandsDiscoverer.within(path.resolve(dirname, "./commands"));
 
 		const plugins = await this.#app.get<CliContracts.PluginManager>(Identifiers.PluginManager).list();
 
