@@ -11,8 +11,8 @@ import { Importer } from "./snapshots/importer.js";
 import { State } from "./state.js";
 import { StateVerifier } from "./state-verifier.js";
 import { Store } from "./store.js";
-import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets/index.js";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory.js";
+import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

@@ -4,9 +4,9 @@
 	"description": "Elliptic Curve Cryptography (ECDSA) signatures for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
-	"type": "module",
 	"files": [
 		"distribution"
 	],

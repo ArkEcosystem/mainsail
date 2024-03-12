@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import * as iputils from "ip";
+import { cidr } from "ip";
 
 // @TODO review the implementation
 @injectable()
@@ -80,7 +80,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	public getSameSubnetPeers(ip: string): Contracts.P2P.Peer[] {
 		return this.getPeers().filter((peer) => {
 			if (!Utils.IpAddress.isIPv6Address(peer.ip) && !Utils.IpAddress.isIPv6Address(ip)) {
-				return iputils.cidr(`${peer.ip}/24`) === iputils.cidr(`${ip}/24`);
+				return cidr(`${peer.ip}/24`) === cidr(`${ip}/24`);
 			}
 
 			return false;

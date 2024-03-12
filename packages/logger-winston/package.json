@@ -4,8 +4,8 @@
 	"description": "Winston logger implementation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
-	"main": "distribution/index.js",
 	"type": "module",
+	"main": "distribution/index.js",
 	"files": [
 		"/distribution"
 	],
