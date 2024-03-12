@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { join, resolve } from "path";
+import path from "path";
 import { URL } from "url";
 
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
@@ -49,11 +49,11 @@ export class LoadServiceProviders implements Bootstrapper {
 			const installedPlugin = installedPlugins.find((installedPlugin) => installedPlugin.name === plugin.package);
 			const packageId = installedPlugin ? installedPlugin.path : plugin.package;
 
-			let packageModule = join(pluginPath, packageId);
+			let packageModule = path.join(pluginPath, packageId);
 
 			let ServiceProvider;
 			try {
-				({ ServiceProvider } = await import(join(pluginPath, packageId)));
+				({ ServiceProvider } = await import(path.join(pluginPath, packageId)));
 			} catch (error) {
 				if (error.code === "ERR_MODULE_NOT_FOUND") {
 					// HACK: just a workaround to use import on local packages if they are not installed.
@@ -75,12 +75,12 @@ export class LoadServiceProviders implements Bootstrapper {
 					// ~/git/mainsail/packages/kernel/distribution/bootstrap
 					// ~/git/mainsail/packages/
 					// ~/git/mainsail/packages/validation/distribution/index.js
-					const fallback = resolve(__dirname, "..", "..", "..", localPath);
+					const fallback = path.resolve(__dirname, "..", "..", "..", localPath);
 					({ ServiceProvider } = await import(fallback));
 
 					// ~/git/mainsail/packages/validation/distribution/index.js
 					// ~/git/mainsail/packages/validation/
-					packageModule = resolve(fallback.replaceAll("/index.js", ""), "..");
+					packageModule = path.resolve(fallback.replaceAll("/index.js", ""), "..");
 				}
 			}
 
@@ -131,16 +131,16 @@ export class LoadServiceProviders implements Bootstrapper {
 		return plugins.merge(options);
 	}
 
-	async #discoverPlugins(path: string): Promise<Plugin[]> {
+	async #discoverPlugins(pluginPath: string): Promise<Plugin[]> {
 		const plugins: Plugin[] = [];
 
 		const glob = await import("glob");
 		const packagePaths = glob
-			.sync("{*/*/package.json,*/package.json}", { cwd: path })
-			.map((packagePath) => join(path, packagePath).slice(0, -"/package.json".length));
+			.sync("{*/*/package.json,*/package.json}", { cwd: pluginPath })
+			.map((packagePath) => path.join(pluginPath, packagePath).slice(0, -"/package.json".length));
 
 		for (const packagePath of packagePaths) {
-			const packageJson = this.fileSystem.readJSONSync<Plugin>(join(packagePath, "package.json"));
+			const packageJson = this.fileSystem.readJSONSync<Plugin>(path.join(packagePath, "package.json"));
 
 			plugins.push({
 				name: packageJson.name,
