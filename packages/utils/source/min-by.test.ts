@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { minBy } from "./min-by";
 
 describe("minBy", async ({ assert, it, nock, loader }) => {

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { kebabCase } from "./kebab-case";
 
 describe("kebabCase", async ({ assert, it, nock, loader }) => {

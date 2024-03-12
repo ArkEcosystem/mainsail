@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { fill } from "./fill";
 
 describe("#fill", ({ it, assert }) => {

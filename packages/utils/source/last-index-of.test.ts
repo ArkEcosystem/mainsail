@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { lastIndexOf } from "./last-index-of";
 
 describe("lastIndexOf", async ({ assert, it, nock, loader }) => {

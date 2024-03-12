@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { numberArray } from "./number-array";
 import { shuffle } from "./shuffle";
 

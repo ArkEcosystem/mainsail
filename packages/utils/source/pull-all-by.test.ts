@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { pullAllBy } from "./pull-all-by";
 
 describe("pullAllBy", async ({ assert, it, nock, loader }) => {

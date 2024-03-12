@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { hasProperty } from "./has-property";
 
 describe("hasProperty", async ({ assert, it, nock, loader }) => {

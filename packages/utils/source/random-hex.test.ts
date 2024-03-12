@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { randomHex } from "./random-hex";
 
 describe("#randomHex", ({ it, assert }) => {
