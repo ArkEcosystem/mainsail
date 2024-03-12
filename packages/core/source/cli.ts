@@ -11,12 +11,10 @@ import { Contracts } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { readJSONSync } from "fs-extra/esm";
 import { platform } from "os";
-import { dirname } from "path";
 import { join, resolve } from "path";
-import { fileURLToPath } from "url";
+import { URL } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = new URL(".", import.meta.url).pathname;
 
 @injectable()
 export class CommandLineInterface {

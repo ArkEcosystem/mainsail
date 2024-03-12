@@ -3,11 +3,10 @@ import { injectable } from "@mainsail/container";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { resolve } from "path";
+import { URL } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = new URL(".", import.meta.url).pathname;
 
 @injectable()
 export class Command extends Commands.Command {

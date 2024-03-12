@@ -1,14 +1,12 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra/esm";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import path from "path";
+import { URL } from "url";
 
 import { assert } from "../utils/assert.js";
 import { Bootstrapper } from "./interfaces.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = new URL(".", import.meta.url).pathname;
 
 @injectable()
 export class RegisterBaseBindings implements Bootstrapper {

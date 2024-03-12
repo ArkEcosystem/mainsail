@@ -4,13 +4,12 @@
 import { applyToDefaults } from "@hapi/hoek";
 import Joi from "joi";
 import { readJSONSync } from "fs-extra/esm";
-import { dirname, resolve } from "path";
-import { fileURLToPath } from "url";
+import { resolve } from "path";
+import { URL } from "url";
 
 import { Listener } from "./listener.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = new URL(".", import.meta.url).pathname;
 
 const internals: any = {
 	defaults: {
