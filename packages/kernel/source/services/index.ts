@@ -4,7 +4,6 @@ export * as Events from "./events/index.js";
 export * as Filesystem from "./filesystem/index.js";
 export * as Log from "./log/index.js";
 export * as Pipeline from "./pipeline/index.js";
-export * as ProcessActions from "./process-actions/index.js";
 export * as Queue from "./queue/index.js";
 export * as Schedule from "./schedule/index.js";
 export * as Triggers from "./triggers/index.js";

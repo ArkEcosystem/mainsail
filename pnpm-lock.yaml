@@ -2315,9 +2315,6 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      '@pm2/io':
-        specifier: 5.0.2
-        version: 5.0.2
       chalk:
         specifier: ^4.1.2
         version: 4.1.2

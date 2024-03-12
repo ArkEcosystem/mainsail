@@ -8,7 +8,6 @@ export * from "./filesystem.js";
 export * from "./lock.js";
 export * from "./log.js";
 export * from "./pipeline.js";
-export * from "./process-actions.js";
 export * from "./queue.js";
 export * from "./repository.js";
 export * from "./validation.js";

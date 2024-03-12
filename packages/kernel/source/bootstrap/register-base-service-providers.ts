@@ -1,17 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import {
-	Cache,
-	Filesystem,
-	Log,
-	Pipeline,
-	ProcessActions,
-	Queue,
-	Schedule,
-	Triggers,
-	Validation,
-} from "../services/index.js";
+import { Cache, Filesystem, Log, Pipeline, Queue, Schedule, Triggers, Validation } from "../services/index.js";
 import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
@@ -31,8 +21,6 @@ export class RegisterBaseServiceProviders implements Bootstrapper {
 		await this.app.resolve(Pipeline.ServiceProvider).register();
 
 		await this.app.resolve(Queue.ServiceProvider).register();
-
-		await this.app.resolve(ProcessActions.ServiceProvider).register();
 
 		await this.app.resolve(Validation.ServiceProvider).register();
 
