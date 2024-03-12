@@ -13,10 +13,16 @@ export class RegisterBaseBindings implements Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Services.Filesystem.Service)
+	private readonly fileSystem!: Contracts.Kernel.Filesystem;
+
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
-		const { version } = readJSONSync(resolve(__dirname, "../../package.json"));
+		const { version } = this.fileSystem.readJSONSync<Contracts.Types.PackageJson>(
+			path.resolve(__dirname, "../../package.json"),
+		);
 
+		assert.defined(version);
 		assert.defined<Record<string, string>>(flags);
 
 		this.app.bind<string>(Identifiers.Application.Environment).toConstantValue(flags.env);
