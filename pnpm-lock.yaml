@@ -2883,6 +2883,40 @@ importers:
         specifier: 17.11.0
         version: 17.11.0
 
+  packages/test-runner:
+    dependencies:
+      concordance:
+        specifier: ~5.0.4
+        version: 5.0.4
+      kleur:
+        specifier: ~4.1.5
+        version: 4.1.5
+      nock:
+        specifier: ^13.4.0
+        version: 13.4.0
+      sinon:
+        specifier: ^17.0.1
+        version: 17.0.1
+      string-kit:
+        specifier: ~0.18.0
+        version: 0.18.0
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+      zod:
+        specifier: ~3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@types/chance':
+        specifier: 1.1.6
+        version: 1.1.6
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
+      '@types/sinon':
+        specifier: ^17.0.2
+        version: 17.0.2
+
   packages/transaction-pool:
     dependencies:
       '@mainsail/container':
