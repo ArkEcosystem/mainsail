@@ -105,6 +105,7 @@ export interface WalletRepository {
 	getIndex(name: string): WalletIndex;
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 	forgetOnIndex(index: string, key: string): void;
+	sizeOfIndex(index: string): void;
 
 	setDirtyWallet(wallet: Wallet): void;
 	getDirtyWallets(): IterableIterator<Wallet>;
