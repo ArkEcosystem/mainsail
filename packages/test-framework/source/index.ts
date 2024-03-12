@@ -1,6 +1,5 @@
 // uvu
-export { describe, describeEach, describeSkip, describeWithContext } from "./uvu/describe.js";
-export { loader } from "./uvu/loader.js";
+export { describe, describeEach, describeSkip, describeWithContext, loader } from "@mainsail/test-runner";
 // Entity Factories for commonly used entities like blocks and wallets
 export * from "./app/index.js";
 // CLI Helpers
