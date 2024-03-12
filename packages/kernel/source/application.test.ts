@@ -3,11 +3,12 @@ import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { resolve } from "path";
 import { dirSync } from "tmp";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { Application } from "./application";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
+import { setMaxListeners } from "events";
 
 @injectable()
 class StubClass {}
@@ -31,6 +32,9 @@ describe<{
 }>("Application", ({ afterEach, assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		delete process.env.CORE_PATH_CONFIG;
+
+		// TODO
+		setMaxListeners(1000);
 
 		context.container = new Container();
 

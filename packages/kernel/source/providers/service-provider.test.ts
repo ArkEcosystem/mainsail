@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { Application } from "../application";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";

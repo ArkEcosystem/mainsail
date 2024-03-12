@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { describe } from "../../../../../test-framework";
+import { describe } from "../../../../../test-framework/source";
 import { NullEventDispatcher } from "./null";
 
 class MyEventListener implements Contracts.Kernel.EventListener {

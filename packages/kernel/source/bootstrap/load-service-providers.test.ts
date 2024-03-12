@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";

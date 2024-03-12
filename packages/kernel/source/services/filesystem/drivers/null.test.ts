@@ -1,4 +1,4 @@
-import { describe } from "../../../../../test-framework";
+import { describe } from "../../../../../test-framework/source";
 import { NullFilesystem } from "./null";
 
 describe("NullFilesystem", ({ assert, it }) => {

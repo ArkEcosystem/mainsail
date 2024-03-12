@@ -79,7 +79,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 		level = level ? this.#levelStyles[level](`[${level.toUpperCase()}] `) : "";
 
-		const timestamp: string = format(new Date(), "YYYY-MM-DD HH:MM:ss.SSS");
+		const timestamp: string = format(new Date(), "yyyy-MM-dd HH:MM:ss.SSS");
 		const timestampDiff: string = this.#getTimestampDiff();
 
 		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);

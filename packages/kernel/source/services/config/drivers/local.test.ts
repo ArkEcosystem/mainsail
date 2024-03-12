@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { resolve } from "path";
 
-import { describe } from "../../../../../test-framework";
+import { describe } from "../../../../../test-framework/source";
 import { Application } from "../../../application";
 import { MemoryEventDispatcher } from "../../events";
 import { JoiValidator } from "../../validation/drivers/joi";

@@ -1,4 +1,4 @@
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { assert as assertToTest } from "./assert";
 
 describe("Assertions", ({ assert, it }) => {
