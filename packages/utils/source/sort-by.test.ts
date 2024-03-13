@@ -1,4 +1,4 @@
-import { describeWithContext } from "../../test-framework";
+import { describeWithContext } from "../../test-framework/source";
 import { sortBy } from "./sort-by";
 
 describeWithContext(

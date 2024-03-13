@@ -1,8 +1,8 @@
-import { ApiNodeRepository, ApiNodeRepositoryExtension, RepositoryDataSource } from "../contracts";
-import { ApiNode } from "../models/api-node";
-import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
-import { ApiNodeFilter } from "../search/filters";
-import { makeExtendedRepository } from "./repository-extension";
+import { ApiNodeRepository, ApiNodeRepositoryExtension, RepositoryDataSource } from "../contracts.js";
+import { ApiNode } from "../models/api-node.js";
+import { ApiNodeFilter } from "../search/filters/index.js";
+import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/index.js";
+import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeApiNodeRepository = (dataSource: RepositoryDataSource): ApiNodeRepository =>
 	makeExtendedRepository<ApiNode, ApiNodeRepositoryExtension>(ApiNode, dataSource, {

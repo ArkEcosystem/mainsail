@@ -1,5 +1,5 @@
-import { compoundWords } from "./internal";
-import { upperFirst } from "./upper-first";
+import { compoundWords } from "./internal/compound-words.js";
+import { upperFirst } from "./upper-first.js";
 
 export const startCase = (value: string): string | undefined =>
 	compoundWords(

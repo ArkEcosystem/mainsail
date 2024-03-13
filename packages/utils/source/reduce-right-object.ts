@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal";
+import { FunctionReturning } from "./internal/index.js";
 
 export const reduceRightObject = <T extends {}, V>(
 	iterable: T,

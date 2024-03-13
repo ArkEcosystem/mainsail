@@ -2,11 +2,11 @@ import { ConfigurationGenerator, makeApplication } from "@mainsail/configuration
 import { Container, interfaces } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
-import { readJSONSync, removeSync } from "fs-extra";
+import { readJSONSync, removeSync } from "fs-extra/esm";
 import { join, resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { SandboxCallback } from "./contracts";
+import { SandboxCallback } from "./contracts.js";
 
 export class Sandbox {
 	public readonly app: Application;
@@ -111,7 +111,7 @@ export class Sandbox {
 	}): Promise<this> {
 		const serviceProvider: Providers.ServiceProvider = this.app.resolve<any>(klass);
 		// serviceProvider.setManifest(this.app.resolve(Providers.PluginManifest).discover(path)); // TODO: Check resolve path
-		serviceProvider.setConfig(this.app.resolve(Providers.PluginConfiguration).discover(name, path));
+		serviceProvider.setConfig(await this.app.resolve(Providers.PluginConfiguration).discover(name, path));
 
 		this.app
 			.get<Providers.ServiceProviderRepository>(Identifiers.ServiceProvider.Repository)

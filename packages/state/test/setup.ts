@@ -22,7 +22,7 @@ import {
 	Verifier,
 } from "../../crypto-transaction";
 import { Selector } from "../../proposer/source/selector";
-import { Factories, Sandbox } from "../../test-framework";
+import { Factories, Sandbox } from "../../test-framework/source";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
 import { store } from "../source/state-store";

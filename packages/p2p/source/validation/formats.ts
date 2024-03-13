@@ -1,6 +1,6 @@
 import { FormatDefinition } from "ajv";
 
-import { isValidPeerIp } from "./is-valid-peer";
+import { isValidPeerIp } from "./is-valid-peer.js";
 
 export const makeFormats = () => {
 	const validPeer: FormatDefinition<string> = {

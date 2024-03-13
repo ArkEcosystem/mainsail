@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 
-import { Application } from "./kernel";
+import { Application } from "./kernel/application.js";
 
 export type ApiServer = Hapi.Server<ServerState>;
 

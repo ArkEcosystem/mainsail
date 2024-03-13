@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts, Exceptions } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { readJSONSync } from "fs-extra";
+import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
 interface PluginEntry {

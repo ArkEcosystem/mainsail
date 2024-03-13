@@ -3,9 +3,9 @@ import Hapi from "@hapi/hapi";
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { ValidatorRoundResource } from "../resources";
-import { RoundResource } from "../resources/round";
-import { Controller } from "./controller";
+import { ValidatorRoundResource } from "../resources/index.js";
+import { RoundResource } from "../resources/round.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class ValidatorRoundsController extends Controller {

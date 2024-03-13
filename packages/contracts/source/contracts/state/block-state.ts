@@ -1,5 +1,5 @@
-import { Block, BlockData, TransactionData } from "../crypto";
-import { Wallet, WalletRepository } from "./wallets";
+import { Block, BlockData, TransactionData } from "../crypto/index.js";
+import { Wallet, WalletRepository } from "./wallets.js";
 
 export interface BlockState {
 	applyBlock(walletRepository: WalletRepository, block: Block): Promise<void>;

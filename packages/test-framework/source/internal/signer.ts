@@ -2,15 +2,15 @@ import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { registerTransactionFactory } from "../factories/factories/transaction";
-import { FactoryBuilder } from "../factories/factory-builder";
+import { registerTransactionFactory } from "../factories/factories/transaction.js";
+import { FactoryBuilder } from "../factories/factory-builder.js";
 import {
 	MultiPaymentOptions,
 	MultiSignatureOptions,
 	TransferOptions,
 	ValidatorRegistrationOptions,
 	VoteOptions,
-} from "../factories/types";
+} from "../factories/types.js";
 
 export class Signer {
 	#config: Contracts.Crypto.NetworkConfig;

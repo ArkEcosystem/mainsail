@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { resolve } from "path";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { dotenv } from "./dot-env";
 
 describe("#DotEnv", ({ it, assert }) => {

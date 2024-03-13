@@ -3,9 +3,10 @@ import { Ipc, IpcWorker, Providers } from "@mainsail/kernel";
 import { fork } from "child_process";
 import Joi from "joi";
 import { cpus } from "os";
+import { URL } from "url";
 
-import { Worker } from "./worker";
-import { WorkerPool } from "./worker-pool";
+import { Worker } from "./worker.js";
+import { WorkerPool } from "./worker-pool.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -13,6 +14,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
 		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
+			const __dirname = new URL(".", import.meta.url).pathname;
 			const subprocess = fork(`${__dirname}/worker-script.js`, {});
 			return new Ipc.Subprocess(subprocess);
 		});

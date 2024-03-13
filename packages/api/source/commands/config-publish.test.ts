@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/cli";
-import { Console, describe } from "@mainsail/test-framework";
-import fs from "fs-extra";
+import { Console, describe } from "../../../test-framework/source";
+import fs from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./config-publish";

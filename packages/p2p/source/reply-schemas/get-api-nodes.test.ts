@@ -1,9 +1,10 @@
-import { Validator } from "@mainsail/validation/source/validator";
-import { describe, Sandbox } from "../../../test-framework/distribution";
-import { headers } from "../../test/fixtures/responses/headers";
-import { getApiNodes } from "./get-api-nodes";
-import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { Contracts } from "@mainsail/contracts";
+import { Validator } from "@mainsail/validation/source/validator";
+
+import { describe, Sandbox } from "../../../test-framework/source";
+import { headers } from "../../test/fixtures/responses/headers";
+import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
+import { getApiNodes } from "./get-api-nodes";
 
 type Context = {
 	sandbox: Sandbox;

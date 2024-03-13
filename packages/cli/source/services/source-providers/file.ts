@@ -1,8 +1,8 @@
 import { Exceptions } from "@mainsail/contracts";
-import { existsSync } from "fs-extra";
+import { existsSync } from "fs";
 import { extract } from "tar";
 
-import { AbstractSource } from "./abstract-source";
+import { AbstractSource } from "./abstract-source.js";
 
 export class File extends AbstractSource {
 	public constructor(paths: { data: string; temp: string }) {

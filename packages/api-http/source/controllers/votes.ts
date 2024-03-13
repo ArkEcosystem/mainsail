@@ -8,8 +8,8 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { TransactionResource } from "../resources";
-import { Controller } from "./controller";
+import { TransactionResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class VotesController extends Controller {

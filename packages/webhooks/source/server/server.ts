@@ -5,12 +5,12 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { randomBytes } from "crypto";
 
-import { Database } from "../database";
-import { InternalIdentifiers } from "../identifiers";
-import { Webhook } from "../interfaces";
-import { whitelist } from "./plugins/whitelist";
-import { destroy, show, store, update } from "./schema";
-import { respondWithResource } from "./utils";
+import { Database } from "../database.js";
+import { InternalIdentifiers } from "../identifiers.js";
+import { Webhook } from "../interfaces.js";
+import { whitelist } from "./plugins/whitelist.js";
+import { destroy, show, store, update } from "./schema.js";
+import { respondWithResource } from "./utils.js";
 
 export type WebhookAppState = { database: Database };
 export type WebhookServer = HapiServer<WebhookAppState>;

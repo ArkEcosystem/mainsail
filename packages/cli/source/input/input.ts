@@ -1,11 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 
-import { Application } from "../application";
-import { InputValue, InputValues } from "../contracts";
-import { Identifiers } from "../ioc";
-import { InputDefinition } from "./definition";
-import { InputParser } from "./parser";
-import { InputValidator } from "./validator";
+import { Application } from "../application.js";
+import { InputValue, InputValues } from "../contracts.js";
+import { Identifiers } from "../ioc/index.js";
+import { InputDefinition } from "./definition.js";
+import { InputParser } from "./parser.js";
+import { InputValidator } from "./validator.js";
 
 @injectable()
 export class Input {

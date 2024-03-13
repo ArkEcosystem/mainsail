@@ -3,9 +3,9 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { IpcWorker } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
 
-import { Precommit } from "./precommit";
-import { Prevote } from "./prevote";
-import { Proposal } from "./proposal";
+import { Precommit } from "./precommit.js";
+import { Prevote } from "./prevote.js";
+import { Proposal } from "./proposal.js";
 
 @injectable()
 export class MessageFactory implements Contracts.Crypto.MessageFactory {

@@ -2,8 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { DataSource, QueryFailedError } from "typeorm";
 
-import { Migrations as ApiDatabaseContracts_Migrations } from "./contracts";
-import { Identifiers as ApiDatabaseIdentifiers } from "./identifiers";
+import { Migrations as ApiDatabaseContracts_Migrations } from "./contracts.js";
+import { Identifiers as ApiDatabaseIdentifiers } from "./identifiers.js";
 
 @injectable()
 export class Migrations implements ApiDatabaseContracts_Migrations {

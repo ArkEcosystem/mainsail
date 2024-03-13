@@ -3,8 +3,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { constants } from "../../constants";
-import { getPeerIp } from "../../utils/get-peer-ip";
+import { constants } from "../../constants.js";
+import { getPeerIp } from "../../utils/get-peer-ip.js";
 
 @injectable()
 export class GetPeersController implements Contracts.P2P.Controller {

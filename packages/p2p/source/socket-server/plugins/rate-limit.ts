@@ -3,8 +3,8 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { RateLimiter } from "../../rate-limiter";
-import { buildRateLimiter } from "../../utils/build-rate-limiter";
+import { RateLimiter } from "../../rate-limiter.js";
+import { buildRateLimiter } from "../../utils/build-rate-limiter.js";
 import {
 	GetApiNodesRoute,
 	GetBlocksRoute,
@@ -16,7 +16,7 @@ import {
 	PostPrevoteRoute,
 	PostProposalRoute,
 	PostTransactionsRoute,
-} from "../routes";
+} from "../routes/index.js";
 
 @injectable()
 export class RateLimitPlugin {

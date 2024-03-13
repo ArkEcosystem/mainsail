@@ -1,3 +1,3 @@
-export * from "./keywords";
-export * from "./schemas";
-export * from "./service-provider";
+export * from "./keywords.js";
+export * from "./schemas.js";
+export * from "./service-provider.js";

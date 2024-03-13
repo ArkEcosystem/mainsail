@@ -1,7 +1,7 @@
 import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
-import { blockCriteriaSchemas } from "./schemas";
+import { blockCriteriaSchemas } from "./schemas.js";
 
 const blockHeightSchema = Joi.number().integer().min(1);
 const blockIdSchema = Joi.alternatives(Joi.string().min(13).max(20).regex(/^\d+$/), Joi.string().hex().length(64));

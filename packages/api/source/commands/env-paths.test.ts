@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { Console, describe } from "@mainsail/test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import envPaths, { Paths } from "env-paths";
 
 import { Command } from "./env-paths";

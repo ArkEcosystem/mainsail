@@ -1,9 +1,9 @@
-import { constants } from "../../constants";
-import { Routes } from "../../enums";
-import { Codecs } from "../codecs";
-import { PostTransactionsController } from "../controllers";
-import { createPostTransactionsSchema } from "../schemas/post-transactions";
-import { Route, RouteConfig } from "./route";
+import { constants } from "../../constants.js";
+import { Routes } from "../../enums.js";
+import { Codecs } from "../codecs/index.js";
+import { PostTransactionsController } from "../controllers/index.js";
+import { createPostTransactionsSchema } from "../schemas/post-transactions.js";
+import { Route, RouteConfig } from "./route.js";
 
 export class PostTransactionsRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {

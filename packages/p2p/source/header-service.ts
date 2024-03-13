@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { constants } from "./constants";
+import { constants } from "./constants.js";
 
 @injectable()
 export class HeaderService implements Contracts.P2P.HeaderService {

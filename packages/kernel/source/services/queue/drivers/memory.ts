@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
-import { QueueEvent } from "../../../enums";
+import { QueueEvent } from "../../../enums/events.js";
 
 decorateInjectable(EventEmitter);
 

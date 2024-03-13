@@ -1,4 +1,3 @@
-import { BigNumber } from "@mainsail/utils";
 import { format } from "concordance";
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "fs";
 import { join } from "path";
@@ -25,11 +24,11 @@ export const assert = {
 	defined: (value: unknown): void => uvu.ok(value !== undefined, "Expected value to be defined."),
 	empty: (value: any): void => uvu.ok(!value || value.length === 0 || Object.keys(value).length === 0),
 	equal: (a: any, b: any): void => {
-		if (a instanceof BigNumber) {
+		if (typeof a === "object" && typeof a.toBigInt === "function") {
 			a = a.toString();
 		}
 
-		if (b instanceof BigNumber) {
+		if (typeof b === "object" && typeof b.toBigInt === "function") {
 			b = b.toString();
 		}
 
@@ -51,11 +50,11 @@ export const assert = {
 		defined: (value: unknown): void => uvu.ok(value === undefined, "Expected value not to be defined."),
 		empty: (value: unknown[]): void => uvu.ok(Object.keys(value).length > 0),
 		equal: (a: any, b: any): void => {
-			if (a instanceof BigNumber) {
+			if (typeof a === "object" && typeof a.toBigInt === "function") {
 				a = a.toString();
 			}
 
-			if (b instanceof BigNumber) {
+			if (typeof b === "object" && typeof b.toBigInt === "function") {
 				b = b.toString();
 			}
 

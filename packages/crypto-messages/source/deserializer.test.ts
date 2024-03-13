@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import {
 	precommitData,
 	precommitDataNoBlock,

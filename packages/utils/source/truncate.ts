@@ -1,4 +1,4 @@
-import { isLessThanOrEqual } from "./is-less-than-or-equal";
+import { isLessThanOrEqual } from "./is-less-than-or-equal.js";
 
 export const truncate = (
 	value: string,

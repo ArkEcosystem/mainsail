@@ -1,4 +1,4 @@
-import { Exception } from "./base";
+import { Exception } from "./base.js";
 
 export class InvalidPackageJson extends Exception {
 	public constructor() {

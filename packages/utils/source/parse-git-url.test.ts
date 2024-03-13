@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { parseGitUrl } from "./parse-git-url";
 
 describe("#parseGitUrl", ({ it, assert }) => {

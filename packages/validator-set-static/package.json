@@ -4,6 +4,7 @@
 	"description": "Static validator set strategy for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
@@ -25,7 +26,6 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

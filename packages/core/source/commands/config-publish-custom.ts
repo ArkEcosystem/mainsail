@@ -1,7 +1,8 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import { http } from "@mainsail/utils";
-import { ensureDirSync, existsSync, removeSync, writeFileSync } from "fs-extra";
+import { existsSync, writeFileSync } from "fs";
+import { ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { join } from "path";
 

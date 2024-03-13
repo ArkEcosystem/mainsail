@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { WalletRepository } from "./wallet-repository";
+import { WalletRepository } from "./wallet-repository.js";
 
 @injectable()
 export class WalletRepositoryBySender extends WalletRepository {

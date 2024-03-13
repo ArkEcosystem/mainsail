@@ -23,8 +23,8 @@ import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import { ConfigurationGenerator } from "./configuration-generator";
-import { ConfigurationWriter } from "./configuration-writer";
+import { ConfigurationGenerator } from "./configuration-generator.js";
+import { ConfigurationWriter } from "./configuration-writer.js";
 import {
 	AppGenerator,
 	EnvironmentGenerator,
@@ -34,8 +34,8 @@ import {
 	NetworkGenerator,
 	PeersGenerator,
 	WalletGenerator,
-} from "./generators";
-import { Identifiers as InternalIdentifiers } from "./identifiers";
+} from "./generators/index.js";
+import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 
 export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
 	options = { address: "bech32m", bech32mPrefix: "ark", name: "mainsail", ...options };

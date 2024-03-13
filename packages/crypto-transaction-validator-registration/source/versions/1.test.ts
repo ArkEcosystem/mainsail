@@ -9,7 +9,7 @@ import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validati
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import { ServiceProvider as CryptoConsensusServiceProvider } from "../../../crypto-consensus-bls12-381";
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { ValidatorRegistrationTransaction } from "./1";
 
 describe<{

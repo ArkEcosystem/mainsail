@@ -1,5 +1,5 @@
-import { FunctionReturning } from "./internal";
-import { mapArray } from "./map-array";
+import { FunctionReturning } from "./internal/index.js";
+import { mapArray } from "./map-array.js";
 
 export const minBy = <T>(iterable: T[], iteratee: FunctionReturning): T => {
 	const values: number[] = mapArray<T, number>(iterable, iteratee);

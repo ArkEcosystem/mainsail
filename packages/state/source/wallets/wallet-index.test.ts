@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describeSkip, Factories } from "../../../test-framework";
+import { describeSkip, Factories } from "../../../test-framework/source";
 import { setUp } from "../../test/setup";
 import { Wallets } from "..";
 import { WalletIndex } from ".";

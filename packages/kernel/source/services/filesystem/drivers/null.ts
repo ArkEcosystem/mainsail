@@ -54,4 +54,24 @@ export class NullFilesystem implements Contracts.Kernel.Filesystem {
 	public async deleteDirectory(directory: string): Promise<boolean> {
 		return false;
 	}
+
+	public writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: any): void {
+		return;
+	}
+
+	public existsSync(path: string): boolean {
+		return false;
+	}
+
+	public removeSync(path: string): void {
+		return;
+	}
+
+	public readJSONSync<T>(file: string, options?: Record<string, any>): T {
+		return undefined as T;
+	}
+
+	public ensureDirSync(path: string, options?: any): void {
+		return;
+	}
 }

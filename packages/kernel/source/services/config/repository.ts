@@ -2,8 +2,8 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { get, has, set, unset } from "@mainsail/utils";
 
-import { KeyValuePair } from "../../types";
-import { assert } from "../../utils";
+import { KeyValuePair } from "../../types/index.js";
+import { assert } from "../../utils/assert.js";
 
 @injectable()
 export class ConfigRepository implements Contracts.Kernel.Repository {

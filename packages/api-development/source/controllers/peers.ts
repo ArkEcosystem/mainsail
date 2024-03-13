@@ -5,8 +5,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import semver from "semver";
 
-import { PeerResource } from "../resources";
-import { Controller } from "./controller";
+import { PeerResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class PeersController extends Controller {

@@ -1,4 +1,4 @@
-import Ajv, { AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
+import { AnySchemaObject, ErrorObject, FormatDefinition, KeywordDefinition, Schema } from "ajv";
 
 export interface SchemaValidationResult<T = any> {
 	value: T;
@@ -19,5 +19,5 @@ export interface Validator {
 
 	removeSchema(schemaKeyReference: string): void;
 
-	extend(callback: (ajv: Ajv) => void): void;
+	extend(callback: (ajv: any /* TODO Ajv */) => void): void;
 }

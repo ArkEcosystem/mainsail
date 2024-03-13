@@ -1,5 +1,5 @@
-import { Routes } from "../enums";
-import { RateLimiter } from "../rate-limiter";
+import { Routes } from "../enums.js";
+import { RateLimiter } from "../rate-limiter.js";
 
 export const buildRateLimiter = (options) =>
 	new RateLimiter({

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { cloneObject } from "./clone-object";
 
 describe("#cloneObject", ({ it, assert }) => {

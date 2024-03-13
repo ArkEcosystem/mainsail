@@ -1,8 +1,8 @@
 import { injectable } from "@mainsail/container";
 
-import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts";
-import { execa, ExecaReturnValue, ExecaSyncReturnValue } from "../execa";
-import { Flags } from "../utils";
+import { ProcessDescription, ProcessIdentifier, ProcessState } from "../contracts.js";
+import { execa, ExecaReturnValue, ExecaSyncReturnValue } from "../execa.js";
+import { Flags } from "../utils/index.js";
 
 @injectable()
 export class ProcessManager {

@@ -1,8 +1,8 @@
-export * from "./enums";
-export * as Nes from "./hapi-nes";
-export * from "./peer";
-export * from "./peer-repository";
-export * from "./service";
-export * from "./service-provider";
-export * from "./socket-server/codecs";
-export * from "./utils";
+export * from "./enums.js";
+export * as Nes from "./hapi-nes/index.js";
+export * from "./peer.js";
+export * from "./peer-repository.js";
+export * from "./service.js";
+export * from "./service-provider.js";
+export * from "./socket-server/codecs/index.js";
+export * from "./utils/index.js";

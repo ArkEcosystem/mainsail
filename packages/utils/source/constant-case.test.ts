@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { constantCase } from "./constant-case";
 
 describe("#constantCase", ({ it, assert }) => {

@@ -3,7 +3,7 @@ import { Schemas } from "@mainsail/api-common";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { ValidatorRoundsController } from "../controllers/validator-rounds";
+import { ValidatorRoundsController } from "../controllers/validator-rounds.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(ValidatorRoundsController);

@@ -2,8 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers, Utils } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { sealBlock } from "./block";
-import { IDFactory } from "./id.factory";
+import { sealBlock } from "./block.js";
+import { IDFactory } from "./id.factory.js";
 
 @injectable()
 export class BlockFactory implements Contracts.Crypto.BlockFactory {

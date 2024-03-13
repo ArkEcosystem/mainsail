@@ -72,7 +72,7 @@ class WorkerImpl {
 			}
 
 			return argument;
-		});
+		}) as Parameters<T[K]>;
 
 		// @ts-ignore
 		return object[method](...arguments_);

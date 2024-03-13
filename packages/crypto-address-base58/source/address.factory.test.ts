@@ -6,7 +6,7 @@ import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic = "this is a top secret passphrase";

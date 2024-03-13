@@ -2,8 +2,8 @@ import { interfaces } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { TransactionHandlerConstructor, TransactionHandlerProvider } from "./handlers";
-import { TransactionHandlerRegistry } from "./handlers/handler-registry";
+import { TransactionHandlerRegistry } from "./handlers/handler-registry.js";
+import { TransactionHandlerConstructor, TransactionHandlerProvider } from "./handlers/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public static getTransactionHandlerConstructorsBinding(): (

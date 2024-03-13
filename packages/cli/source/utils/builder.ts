@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-import { AnyObject } from "../contracts";
+import { AnyObject } from "../contracts.js";
 
 export const Builder = {
 	async buildApplication(context?: AnyObject): Promise<Contracts.Kernel.Application> {

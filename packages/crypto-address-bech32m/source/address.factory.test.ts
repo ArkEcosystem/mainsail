@@ -6,7 +6,7 @@ import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { Application } from "@mainsail/kernel";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { AddressFactory } from "./address.factory";
 import { schemas } from "./schemas";
 

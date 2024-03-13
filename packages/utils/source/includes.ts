@@ -1,6 +1,6 @@
-import { isArray } from "./is-array";
-import { isObject } from "./is-object";
-import { isString } from "./is-string";
+import { isArray } from "./is-array.js";
+import { isObject } from "./is-object.js";
+import { isString } from "./is-string.js";
 
 export const includes = <T, V>(iterable: T, value: V): boolean => {
 	if (isArray(iterable)) {

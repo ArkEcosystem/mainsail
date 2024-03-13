@@ -1,4 +1,4 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { Console, describe } from "../../../test-framework/source";
 
 import { Command } from "./version";
 

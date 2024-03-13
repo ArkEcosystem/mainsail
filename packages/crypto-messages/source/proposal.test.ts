@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import { blockData, proposalData, proposalDataWithValidRound, serializedBlock } from "../test/fixtures/proposal";
 import { Proposal } from "./proposal";
 

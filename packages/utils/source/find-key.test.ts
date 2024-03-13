@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { findKey } from "./find-key";
 
 describe("#findKey", ({ it, assert }) => {

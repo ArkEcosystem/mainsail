@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { formatString } from "./format-string";
 
 describe("#formatString", ({ it, assert }) => {

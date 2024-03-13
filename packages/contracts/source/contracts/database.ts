@@ -1,5 +1,5 @@
-import { Block } from "./crypto";
-import { Commit } from "./crypto/commit";
+import { Block } from "./crypto/block.js";
+import { Commit } from "./crypto/commit.js";
 
 export interface DatabaseService {
 	getBlock(height: number): Promise<Block | undefined>;

@@ -1,4 +1,4 @@
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { ProcessBlockAction } from "./process-block";
 
 describe("ProcessBlockAction", ({ assert, it, stub, match }) => {

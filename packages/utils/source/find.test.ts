@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { find } from "./find";
 
 describe("#find", ({ it, assert }) => {

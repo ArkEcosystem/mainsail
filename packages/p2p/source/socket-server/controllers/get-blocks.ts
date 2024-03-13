@@ -3,8 +3,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { constants } from "../../constants";
-import { mapAddr } from "../utils/map-addr";
+import { constants } from "../../constants.js";
+import { mapAddr } from "../utils/map-addr.js";
 
 @injectable()
 export class GetBlocksController implements Contracts.P2P.Controller {

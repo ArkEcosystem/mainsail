@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { type shared } from "../socket-server/codecs/proto/protos";
+import { type shared } from "../socket-server/codecs/proto/protos.js";
 
 export const getPeerUrl = (peer: shared.IPeerLike): string => {
 	let protocol = peer.protocol;

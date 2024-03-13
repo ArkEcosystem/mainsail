@@ -1,4 +1,4 @@
-import { describe } from "../../../../test-framework";
+import { describe } from "../../../../test-framework/source";
 import { Context, ServerHelper } from "../../../test/helpers/server";
 
 describe<Context>("Whitelist", ({ beforeEach, afterEach, afterAll, it, assert }) => {

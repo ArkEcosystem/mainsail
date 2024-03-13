@@ -4,7 +4,7 @@ import { Configuration } from "@mainsail/crypto-config";
 import { Enums } from "@mainsail/kernel";
 
 import crypto from "../../core/bin/config/testnet/core/crypto.json";
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { SenderState } from ".";
 
 describe<{

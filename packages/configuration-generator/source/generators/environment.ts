@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { EnvironmentData } from "../contracts";
+import { EnvironmentData } from "../contracts.js";
 
 @injectable()
 export class EnvironmentGenerator {

@@ -1,5 +1,5 @@
-import type { ProcessableUnit } from "../processor";
-import type { Block, BlockData, BlockJson } from "./block";
+import type { ProcessableUnit } from "../processor.js";
+import type { Block, BlockData, BlockJson } from "./block.js";
 
 export interface CommitJson {
 	readonly block: BlockJson;

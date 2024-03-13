@@ -1,4 +1,4 @@
-import type { JsonObject } from "../types";
+import type { JsonObject } from "../types/index.js";
 
 export interface Validator {
 	validate(data: JsonObject, schema: object): void;

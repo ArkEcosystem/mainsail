@@ -9,7 +9,7 @@ import { Providers, Types, Utils } from "@mainsail/kernel";
 import { sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
-import * as ApiSyncContracts from "./contracts";
+import * as ApiSyncContracts from "./contracts.js";
 
 interface DeferredSync {
 	block: Models.Block;

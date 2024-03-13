@@ -1,5 +1,3 @@
-import { BigNumber } from "@mainsail/utils";
-
 import { describe } from "./describe";
 
 describe("assert", ({ assert, it, schema }) => {
@@ -24,9 +22,9 @@ describe("assert", ({ assert, it, schema }) => {
 	});
 
 	it("determines if two numbers are equal", () => {
-		assert.equal(BigNumber.make(10), BigNumber.make(10));
+		assert.equal(25n, 25n);
 
-		assert.not.equal(BigNumber.make(10), BigNumber.make(15));
+		assert.not.equal(10n, 15n);
 	});
 
 	it("does match the given object", () => {

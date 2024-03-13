@@ -1,4 +1,7 @@
-import { postTransactions as proto } from "./proto/protos";
+import type * as types from "./proto/protos.d.ts";
+import * as _protos from "./proto/protos.js";
+
+const proto = (_protos as any).default.postTransactions as typeof types.postTransactions;
 
 // actual max transactions is enforced by schema but we set a hard limit for deserializing (way higher than in schema)
 const hardLimitNumberOfTransactions = 1000;
@@ -39,9 +42,9 @@ export const postTransactions = {
 		},
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IPostTransactionsResponse =>
+		deserialize: (payload: Buffer): types.postTransactions.IPostTransactionsResponse =>
 			proto.PostTransactionsResponse.toObject(proto.PostTransactionsResponse.decode(payload), { defaults: true }),
-		serialize: (object: proto.IPostTransactionsResponse): Buffer =>
+		serialize: (object: types.postTransactions.IPostTransactionsResponse): Buffer =>
 			Buffer.from(proto.PostTransactionsResponse.encode(object).finish()),
 	},
 };

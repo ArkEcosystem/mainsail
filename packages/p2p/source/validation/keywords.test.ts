@@ -1,6 +1,6 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { makeKeywords } from "./keywords";
 
 type Context = {

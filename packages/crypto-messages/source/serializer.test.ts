@@ -1,5 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../test-framework";
+
+import { describe, Sandbox } from "../../test-framework/source";
 import {
 	precommitData,
 	precommitDataNoBlock,
@@ -20,8 +21,8 @@ import {
 	serializedProposalForSignature,
 } from "../test/fixtures/proposal";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { Serializer } from "./serializer";
 import { Deserializer } from "./deserializer";
+import { Serializer } from "./serializer";
 
 describe<{
 	sandbox: Sandbox;

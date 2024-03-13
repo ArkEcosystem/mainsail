@@ -1,9 +1,9 @@
 import { sort } from "fast-sort";
 
-import { FunctionReturning, Iteratee } from "./internal";
-import { isFunction } from "./is-function";
-import { isString } from "./is-string";
-import { map } from "./map";
+import { FunctionReturning, Iteratee } from "./internal/index.js";
+import { isFunction } from "./is-function.js";
+import { isString } from "./is-string.js";
+import { map } from "./map.js";
 
 export const orderBy = <T>(values: T[], iteratees: Iteratee | Iteratee[], orders: string | string[]): T[] => {
 	if (isString(iteratees)) {

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { indexOf } from "./index-of";
 
 describe("indexOf", async ({ assert, it, nock, loader }) => {

@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { GenericAttribute } from "./generic-attribute";
+import { GenericAttribute } from "./generic-attribute.js";
 
 export class BigNumberAttribute extends GenericAttribute<BigNumber> implements Contracts.State.Attribute<BigNumber> {
 	public clone(): BigNumberAttribute {

@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
 
-import { Signature } from "./signature";
+import { Signature } from "./signature.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

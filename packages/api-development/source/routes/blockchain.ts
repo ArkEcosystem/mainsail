@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 
-import { BlockchainController } from "../controllers/blockchain";
+import { BlockchainController } from "../controllers/blockchain.js";
 
 export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(BlockchainController);

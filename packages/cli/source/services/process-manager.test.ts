@@ -1,4 +1,4 @@
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { ProcessDescription } from "../contracts";
 import { execa } from "../execa";
 import { ProcessManager } from "./process-manager";

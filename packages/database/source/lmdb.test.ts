@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { RootDatabase } from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import { ServiceProvider } from "./index";
 
 describe<{
@@ -14,6 +14,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
+		context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		context.sandbox.app.useDataPath(dirSync().name);
 	});
 

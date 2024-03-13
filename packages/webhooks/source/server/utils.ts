@@ -1,6 +1,6 @@
 import { Boom, notFound } from "@hapi/boom";
 
-import { Webhook } from "../interfaces";
+import { Webhook } from "../interfaces.js";
 
 export const transformResource = (model): Webhook => ({
 	conditions: model.conditions,

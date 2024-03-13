@@ -2,10 +2,10 @@
 
 import Boom from "@hapi/boom";
 import Bounce from "@hapi/bounce";
-import Hoek from "@hapi/hoek";
+import { clone } from "@hapi/hoek";
 import Teamwork from "@hapi/teamwork";
 
-import { parseNesMessage, protocol, stringifyNesMessage } from "./utils";
+import { parseNesMessage, protocol, stringifyNesMessage } from "./utils.js";
 
 const internals = {
 	version: "2",
@@ -167,7 +167,7 @@ export class Socket {
 		if (error.output?.statusCode === protocol.gracefulErrorStatusCode) {
 			error = Boom.boomify(error);
 
-			const message = Hoek.clone(error.output);
+			const message = clone(error.output);
 			delete message.payload.statusCode;
 			message.headers = this._filterHeaders(message.headers);
 

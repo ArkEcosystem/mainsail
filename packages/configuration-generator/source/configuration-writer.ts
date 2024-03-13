@@ -1,11 +1,12 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { stringify } from "envfile";
-import { writeFileSync, writeJSONSync } from "fs-extra";
+import { writeFileSync } from "fs";
+import { writeJSONSync } from "fs-extra/esm";
 import path from "path";
 
-import { EnvironmentData, Wallet } from "./contracts";
-import { Identifiers } from "./identifiers";
+import { EnvironmentData, Wallet } from "./contracts.js";
+import { Identifiers } from "./identifiers.js";
 
 @injectable()
 export class ConfigurationWriter {

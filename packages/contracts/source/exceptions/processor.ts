@@ -1,5 +1,5 @@
-import { Block } from "../contracts/crypto";
-import { Exception } from "./base";
+import { Block } from "../contracts/crypto/block.js";
+import { Exception } from "./base.js";
 
 export class ValidatorException extends Exception {}
 

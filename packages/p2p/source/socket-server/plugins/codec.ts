@@ -13,8 +13,8 @@ import {
 	PostPrevoteRoute,
 	PostProposalRoute,
 	PostTransactionsRoute,
-} from "../routes";
-import { BasePlugin } from "./base-plugin";
+} from "../routes/index.js";
+import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
 export class CodecPlugin extends BasePlugin {

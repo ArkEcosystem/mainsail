@@ -2,7 +2,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import rewiremock from "rewiremock";
 
-import { describeSkip, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework/source";
 import { defaults } from "./defaults";
 import { Routes } from "./enums";
 import { Peer } from "./peer";

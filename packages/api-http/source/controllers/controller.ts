@@ -9,7 +9,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { BlockModel } from "../resources";
+import { BlockModel } from "../resources/index.js";
 
 @injectable()
 export class Controller extends AbstractController {

@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import rewiremock from "rewiremock";
 
-import { describe, Sandbox } from "../../../../test-framework";
+import { describe, Sandbox } from "../../../../test-framework/source";
 import { GetStatusController } from "./get-status";
 
 describe<{

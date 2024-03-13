@@ -1,6 +1,6 @@
-import { describe, Sandbox } from "../../test-framework";
-import { Precommit } from "./precommit";
+import { describe, Sandbox } from "../../test-framework/source";
 import { precommitData } from "../test/fixtures/proposal";
+import { Precommit } from "./precommit";
 
 describe<{
 	sandbox: Sandbox;

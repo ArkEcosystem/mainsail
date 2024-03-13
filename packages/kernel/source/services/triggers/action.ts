@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 
-import { ActionArguments } from "../../types";
+import { ActionArguments } from "../../types/index.js";
 
 @injectable()
 export abstract class Action<T = any> {

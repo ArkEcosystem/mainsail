@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { Repository } from "../repository";
+import { Repository } from "../repository.js";
 
 export class Wallet implements Contracts.State.Wallet {
 	#repository: Repository;

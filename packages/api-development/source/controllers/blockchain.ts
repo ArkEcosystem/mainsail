@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { Controller } from "./controller";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class BlockchainController extends Controller {

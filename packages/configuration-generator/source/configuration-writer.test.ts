@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readJSONSync } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { makeApplication } from "./application-factory";
 import { ConfigurationWriter } from "./configuration-writer";
 import { Identifiers } from "./identifiers";

@@ -2,17 +2,17 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { AttributeRepository } from "./attributes";
-import { AttributeMutator } from "./mutators/attribute";
-import { BalanceMutator } from "./mutators/balance";
-import { Service } from "./service";
-import { Exporter } from "./snapshots/exporter";
-import { Importer } from "./snapshots/importer";
-import { State } from "./state";
-import { StateVerifier } from "./state-verifier";
-import { Store } from "./store";
-import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets";
-import { validatorWalletFactory, walletFactory } from "./wallets/factory";
+import { AttributeRepository } from "./attributes/index.js";
+import { AttributeMutator } from "./mutators/attribute.js";
+import { BalanceMutator } from "./mutators/balance.js";
+import { Service } from "./service.js";
+import { Exporter } from "./snapshots/exporter.js";
+import { Importer } from "./snapshots/importer.js";
+import { State } from "./state.js";
+import { StateVerifier } from "./state-verifier.js";
+import { Store } from "./store.js";
+import { validatorWalletFactory, walletFactory } from "./wallets/factory.js";
+import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

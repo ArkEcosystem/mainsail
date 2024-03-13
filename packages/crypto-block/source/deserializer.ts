@@ -4,7 +4,7 @@ import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { TransactionFactory } from "@mainsail/crypto-transaction";
 import { ByteBuffer } from "@mainsail/utils";
 
-import { IDFactory } from "./id.factory";
+import { IDFactory } from "./id.factory.js";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.BlockDeserializer {

@@ -1,7 +1,7 @@
 import { Utils } from "@mainsail/kernel";
 import { strictEqual } from "assert";
 
-import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types";
+import { FactoryFunction, FactoryFunctionOptions, HookFunction } from "./types.js";
 
 export class Factory {
 	readonly #states: Map<string, FactoryFunction> = new Map<string, FactoryFunction>();

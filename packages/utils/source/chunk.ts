@@ -1,4 +1,4 @@
-import { slice } from "./slice";
+import { slice } from "./slice.js";
 
 export const chunk = <T>(iterable: T[], chunkSize: number): T[][] => {
 	const iterableLength: number = iterable.length;

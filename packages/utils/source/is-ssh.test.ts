@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { isSSH } from "./is-ssh";
 
 describe("isSSH", async ({ assert, it, nock, loader }) => {

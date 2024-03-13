@@ -1,7 +1,7 @@
 import { Commands, Contracts, Identifiers } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import boxen from "boxen";
-import { blue, cyan } from "kleur";
+import { blue, bold, cyan } from "kleur/colors";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -31,7 +31,7 @@ export class Command extends Commands.Command {
 		// turn everything into a human readable format
 		const commandsAsString: string[] = [];
 		for (const [signatureGroup, signatures] of Object.entries(signatureGroups)) {
-			commandsAsString.push(cyan().bold(signatureGroup));
+			commandsAsString.push(cyan(bold(signatureGroup)));
 
 			for (const signature of signatures) {
 				commandsAsString.push(
@@ -45,17 +45,17 @@ export class Command extends Commands.Command {
 				this.components.appHeader() +
 					`
 
-${blue().bold("Usage")}
+${blue(bold("Usage"))}
   command [arguments] [flags]
 
-${blue().bold("Flags")}
+${blue(bold("Flags"))}
   --help              Display the corresponding help message.
   --quiet             Do not output any message
 
-${blue().bold("Arguments")}
+${blue(bold("Arguments"))}
   -v|vv|vvv          Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
-${blue().bold("Available Commands")}
+${blue(bold("Available Commands"))}
 ${commandsAsString.join("\n")}`,
 				{
 					// @ts-ignore

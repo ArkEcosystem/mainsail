@@ -39,7 +39,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#stream = new PassThrough();
-		this.#logger = pino(
+		this.#logger = pino.default(
 			{
 				base: null,
 				customLevels: {

@@ -1,6 +1,6 @@
-import { Wallet } from "../contracts/state";
-import { InternalTransactionType } from "../contracts/transactions";
-import { Exception } from "./base";
+import { Wallet } from "../contracts/state/wallets.js";
+import { InternalTransactionType } from "../contracts/transactions.js";
+import { Exception } from "./base.js";
 
 export class Bip38CompressionError extends Exception {
 	public constructor(expected: string | number, given: string | number) {

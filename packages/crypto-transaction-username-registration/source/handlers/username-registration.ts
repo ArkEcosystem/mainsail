@@ -1,10 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import Transactions from "@mainsail/crypto-transaction";
+import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
-import { UsernameRegistrationTransaction } from "../versions";
+import { UsernameRegistrationTransaction } from "../versions/index.js";
 
 @injectable()
 export class UsernameRegistrationTransactionHandler extends Handlers.TransactionHandler {
@@ -15,7 +15,7 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 		return [];
 	}
 
-	public getConstructor(): Transactions.TransactionConstructor {
+	public getConstructor(): TransactionConstructor {
 		return UsernameRegistrationTransaction;
 	}
 

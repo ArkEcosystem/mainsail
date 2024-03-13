@@ -1,7 +1,6 @@
-import { Contracts } from "@mainsail/contracts";
-import { describe, Sandbox } from "../../test-framework";
-import { Prevote } from "./prevote";
+import { describe, Sandbox } from "../../test-framework/source";
 import { prevoteData } from "../test/fixtures/proposal";
+import { Prevote } from "./prevote";
 
 describe<{
 	sandbox: Sandbox;

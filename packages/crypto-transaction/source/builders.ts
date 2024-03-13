@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { TransactionFactory } from "./factory";
+import { TransactionFactory } from "./factory.js";
 
 @injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {

@@ -1,5 +1,6 @@
-import * as $protobuf from "protobufjs";
-import Long = require("long");
+import * as $protobuf from "protobufjs/minimal.js";
+import Long from "long";
+
 /** Namespace getApiNodes. */
 export namespace getApiNodes {
 

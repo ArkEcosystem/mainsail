@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import {
 	InvalidConfigurationServiceProvider,
 	OptionalDependencyCannotBeFoundServiceProvider,
@@ -36,6 +36,7 @@ describe<{
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		context.serviceProviderRepository = context.app.get<ServiceProviderRepository>(
 			Identifiers.ServiceProvider.Repository,

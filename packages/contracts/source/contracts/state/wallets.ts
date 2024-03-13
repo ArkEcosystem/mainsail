@@ -1,8 +1,8 @@
 import { BigNumber } from "@mainsail/utils";
 import { JsonObject } from "type-fest";
 
-import { BlockData, MultiSignatureAsset } from "../crypto";
-import { Repository } from "./repository";
+import { BlockData, MultiSignatureAsset } from "../crypto/index.js";
+import { Repository } from "./repository.js";
 
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 

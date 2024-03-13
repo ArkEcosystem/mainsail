@@ -1,7 +1,5 @@
 import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, getAttributeRepository, getIndexSet, Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "@mainsail/utils";
 import { spy } from "sinon";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
@@ -9,6 +7,8 @@ import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { Wallets } from "../../state";
 import { validatorWalletFactory, walletFactory } from "../../state/source/wallets/factory";
+import { describe, getAttributeRepository, getIndexSet, Sandbox } from "../../test-framework/source";
+import { BigNumber } from "../../utils";
 import { buildValidatorAndVoteWallets } from "../test/build-validator-and-vote-balances";
 import { ValidatorSet } from "./validator-set";
 

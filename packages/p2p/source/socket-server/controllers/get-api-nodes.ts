@@ -3,7 +3,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { constants } from "../../constants";
+import { constants } from "../../constants.js";
 
 @injectable()
 export class GetApiNodesController implements Contracts.P2P.Controller {

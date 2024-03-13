@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { lastMapValue } from "./last-map-value";
 
 describe("lastMapValue", async ({ assert, it, nock, loader }) => {

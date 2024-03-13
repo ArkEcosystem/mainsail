@@ -5,7 +5,7 @@ import { AddressFactory } from "../../../crypto-address-base58/source/address.fa
 import { Configuration } from "../../../crypto-config";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
-import { describeSkip, Sandbox } from "../../../test-framework";
+import { describeSkip, Sandbox } from "../../../test-framework/source";
 import { AttributeRepository } from "../attributes";
 import {
 	addressesIndexer,

@@ -1,6 +1,6 @@
-import { ApiNode } from "./api-node";
-import { PeerProtocol } from "./enums";
-import { Peer } from "./peer";
+import { ApiNode } from "./api-node.js";
+import { PeerProtocol } from "./enums.js";
+import { Peer } from "./peer.js";
 
 export type ApiNodeFactory = (ip: string, port: string | number, protocol?: PeerProtocol) => ApiNode;
 

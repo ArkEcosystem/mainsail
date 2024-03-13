@@ -1,3 +1,3 @@
-export * from "./container";
-export * from "./exceptions";
-export * from "./ioc";
+export * from "./container.js";
+export * from "./exceptions.js";
+export * from "./ioc.js";

@@ -1,16 +1,16 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { WalletRepository } from "../../contracts";
-import { Transaction } from "../../models";
-import { EqualCriteria, OrTransactionCriteria, TransactionCriteria } from "../criteria";
-import { ContainsExpression, EqualExpression, Expression } from "../expressions";
+import { WalletRepository } from "../../contracts.js";
+import { Transaction } from "../../models/index.js";
+import { EqualCriteria, OrTransactionCriteria, TransactionCriteria } from "../criteria.js";
+import { ContainsExpression, EqualExpression, Expression } from "../expressions.js";
 import {
 	handleAndCriteria,
 	handleNumericCriteria,
 	handleOrCriteria,
 	hasOrCriteria,
 	optimizeExpression,
-} from "../search";
+} from "../search.js";
 
 export class TransactionFilter {
 	public static async getExpression(

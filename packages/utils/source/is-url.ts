@@ -1,3 +1,8 @@
-import { URL } from "url";
-
-export const isURL = (value: unknown): value is URL => value instanceof URL;
+export const isURL = (value: string): boolean => {
+	try {
+		new URL(value);
+		return true;
+	} catch {
+		return false;
+	}
+};

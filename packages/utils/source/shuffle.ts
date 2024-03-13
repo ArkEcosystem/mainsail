@@ -1,4 +1,4 @@
-import { cloneArray } from "./clone-array";
+import { cloneArray } from "./clone-array.js";
 
 export const shuffle = <T>(iterable: T[]): T[] => {
 	const shuffledValues: T[] = cloneArray<T>(iterable);

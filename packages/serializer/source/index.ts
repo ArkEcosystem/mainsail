@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { Serializer } from "./serializer";
+import { Serializer } from "./serializer.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

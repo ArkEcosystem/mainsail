@@ -1,10 +1,10 @@
 import { injectable } from "@mainsail/container";
 import { Contracts, Exceptions } from "@mainsail/contracts";
-import Transactions from "@mainsail/crypto-transaction";
+import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { UsernameRegistrationTransactionHandler } from "@mainsail/crypto-transaction-username-registration";
 import { Handlers } from "@mainsail/transactions";
 
-import { UsernameResignationTransaction } from "../versions";
+import { UsernameResignationTransaction } from "../versions/index.js";
 
 @injectable()
 export class UsernameResignationTransactionHandler extends Handlers.TransactionHandler {
@@ -12,7 +12,7 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 		return [UsernameRegistrationTransactionHandler];
 	}
 
-	public getConstructor(): Transactions.TransactionConstructor {
+	public getConstructor(): TransactionConstructor {
 		return UsernameResignationTransaction;
 	}
 

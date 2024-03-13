@@ -1,7 +1,7 @@
 import Boom from "@hapi/boom";
 import { Utils } from "@mainsail/kernel";
 
-import { getIp } from "../utils";
+import { getIp } from "../utils/index.js";
 
 export const whitelist = {
 	name: "whitelist",

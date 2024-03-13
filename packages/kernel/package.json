@@ -4,7 +4,14 @@
 	"description": "Kernel for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
+	"browser": {
+		"fs": false,
+		"path": false,
+		"os": false,
+		"child_process": false
+	},
 	"types": "distribution/index.d.ts",
 	"files": [
 		"/distribution"
@@ -23,18 +30,16 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@pm2/io": "5.0.2",
 		"chalk": "^4.1.2",
 		"cron": "3.1.6",
-		"dayjs": "1.11.10",
+		"date-fns": "3.3.1",
 		"deepmerge": "4.3.1",
 		"env-paths": "2.2.1",
 		"fs-extra": "11.2.0",
 		"glob": "10.3.10",
-		"import-fresh": "3.3.0",
 		"ipaddr.js": "2.1.0",
 		"joi": "17.11.0",
-		"log-process-errors": "5.1.2",
+		"log-process-errors": "12.0.0",
 		"nanomatch": "1.2.13",
 		"nsfw": "2.2.4",
 		"semver": "7.5.4"

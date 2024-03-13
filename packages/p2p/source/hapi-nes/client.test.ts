@@ -1,5 +1,5 @@
 import { Identifiers } from "@mainsail/contracts";
-import { describeSkip, Sandbox } from "../../../test-framework";
+import { describeSkip, Sandbox } from "../../../test-framework/source";
 
 import * as Hapi from "@hapi/hapi";
 import * as Hoek from "@hapi/hoek";

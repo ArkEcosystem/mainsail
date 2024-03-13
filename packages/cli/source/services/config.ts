@@ -1,9 +1,9 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Constants, Contracts } from "@mainsail/contracts";
-import { ensureFileSync, readJsonSync, writeJsonSync } from "fs-extra";
+import { ensureFileSync, readJSONSync, writeJsonSync } from "fs-extra/esm";
 
-import { Application } from "../contracts";
-import { Identifiers } from "../ioc";
+import { Application } from "../contracts.js";
+import { Identifiers } from "../ioc/index.js";
 
 @injectable()
 export class Config {
@@ -49,7 +49,7 @@ export class Config {
 
 	public load(): any {
 		try {
-			this.#store = readJsonSync(this.#file);
+			this.#store = readJSONSync(this.#file);
 		} catch {
 			this.restoreDefaults();
 

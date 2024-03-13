@@ -1,7 +1,7 @@
 // Based on https://github.com/fknop/hapi-pagination
 
-import { getConfig } from "./config";
-import { Extension } from "./extension";
+import { getConfig } from "./config.js";
+import { Extension } from "./extension.js";
 
 export const pagination = {
 	name: "hapi-pagination",
