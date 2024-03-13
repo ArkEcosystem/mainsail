@@ -24,6 +24,8 @@ import { Signature } from "../../../crypto-signature-schnorr/source/signature";
 import { MultiPaymentTransactionHandler } from "../../../crypto-transaction-multi-payment/source/handlers";
 import { MultiSignatureRegistrationTransactionHandler } from "../../../crypto-transaction-multi-signature-registration/source/handlers";
 import { TransferTransactionHandler } from "../../../crypto-transaction-transfer/source/handlers";
+import { UsernameRegistrationTransactionHandler } from "../../../crypto-transaction-username-registration/source/handlers";
+import { UsernameResignationTransactionHandler } from "../../../crypto-transaction-username-resignation/source/handlers";
 import { ValidatorRegistrationTransactionHandler } from "../../../crypto-transaction-validator-registration/source/handlers";
 import { ValidatorResignationTransactionHandler } from "../../../crypto-transaction-validator-resignation/source/handlers";
 import { VoteTransactionHandler } from "../../../crypto-transaction-vote/source/handlers";
@@ -34,8 +36,8 @@ import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
 
-const NUMBER_OF_REGISTERED_CORE_HANDLERS = 6;
-const NUMBER_OF_ACTIVE_CORE_HANDLERS = 6;
+const NUMBER_OF_REGISTERED_CORE_HANDLERS = 8;
+const NUMBER_OF_ACTIVE_CORE_HANDLERS = 8;
 
 const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
@@ -203,10 +205,12 @@ describe<{
 
 		app.bind(Identifiers.Transaction.Handler.Instances).to(TransferTransactionHandler);
 		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorRegistrationTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorResignationTransactionHandler);
 		app.bind(Identifiers.Transaction.Handler.Instances).to(VoteTransactionHandler);
 		app.bind(Identifiers.Transaction.Handler.Instances).to(MultiSignatureRegistrationTransactionHandler);
 		app.bind(Identifiers.Transaction.Handler.Instances).to(MultiPaymentTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorResignationTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(UsernameRegistrationTransactionHandler);
+		app.bind(Identifiers.Transaction.Handler.Instances).to(UsernameResignationTransactionHandler);
 
 		app.bind(Identifiers.Transaction.Handler.Provider).to(TransactionHandlerProvider).inSingletonScope();
 		app.bind(Identifiers.Transaction.Handler.Registry).to(TransactionHandlerRegistry).inSingletonScope();
