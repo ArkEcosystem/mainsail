@@ -95,6 +95,10 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		this.getIndex(index).forget(key);
 	}
 
+	public sizeOfIndex(index: string): number {
+		return this.getIndex(index).size();
+	}
+
 	public setDirtyWallet(wallet: Contracts.State.Wallet): void {}
 
 	public getDirtyWallets(): IterableIterator<Contracts.State.Wallet> {

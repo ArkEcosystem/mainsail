@@ -41,7 +41,7 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 
 		this.logger.notice(`Tx ${transaction} not eligible for ${action} (fee ${feeString} < ${minFeeString})`);
 
-		throw new Exceptions.TransactionFeeToLowError(transaction);
+		throw new Exceptions.TransactionFeeTooLowError(transaction);
 	}
 
 	#calculateMinFee(transaction: Contracts.Crypto.Transaction): BigNumber {

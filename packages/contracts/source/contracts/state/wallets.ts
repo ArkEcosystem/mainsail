@@ -52,6 +52,8 @@ export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges"> {
 
 	fromJson(data: JsonObject): Wallet;
 	commitChanges(walletRepository: WalletRepository): void;
+
+	toString(): string;
 }
 
 export interface ValidatorWallet {
@@ -103,6 +105,7 @@ export interface WalletRepository {
 	getIndex(name: string): WalletIndex;
 	setOnIndex(index: string, key: string, wallet: Wallet): void;
 	forgetOnIndex(index: string, key: string): void;
+	sizeOfIndex(index: string): number;
 
 	setDirtyWallet(wallet: Wallet): void;
 	getDirtyWallets(): IterableIterator<Wallet>;

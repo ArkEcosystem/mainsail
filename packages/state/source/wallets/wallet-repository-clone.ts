@@ -8,6 +8,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	#originalWalletRepository!: WalletRepository;
 
 	readonly #forgetIndexes: Record<string, Set<string>> = {};
+	readonly #indexOffset: Record<string, number> = {};
 	readonly #dirtyWallets = new Set<Contracts.State.Wallet>();
 
 	@postConstruct()
@@ -16,6 +17,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 		for (const name of this.indexSet.all()) {
 			this.#forgetIndexes[name] = new Set();
+			this.#indexOffset[name] = 0;
 		}
 	}
 
@@ -83,15 +85,34 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	}
 
 	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {
+		// New key registration
+		if (!this.#originalWalletRepository.hasByIndex(index, key) && !this.getIndex(index).has(key)) {
+			this.#indexOffset[index]++;
+		}
+
+		// Remove from forget indexes
+		if (this.#getForgetSet(index).has(key)) {
+			this.#getForgetSet(index).delete(key);
+			this.#indexOffset[index]++;
+		}
+
 		this.getIndex(index).set(key, wallet);
-		this.#getForgetSet(index).delete(key);
 	}
 
 	public forgetOnIndex(index: string, key: string): void {
-		if (this.getIndex(index).has(key) || this.#originalWalletRepository.getIndex(index).has(key)) {
+		if (
+			!this.#getForgetSet(index).has(key) &&
+			(this.getIndex(index).has(key) || this.#originalWalletRepository.getIndex(index).has(key))
+		) {
 			this.getIndex(index).forget(key);
 			this.#getForgetSet(index).add(key);
+
+			this.#indexOffset[index]--;
 		}
+	}
+
+	public sizeOfIndex(index: string): number {
+		return this.#originalWalletRepository.sizeOfIndex(index) + this.#indexOffset[index];
 	}
 
 	public getDirtyWallets(): IterableIterator<Contracts.State.Wallet> {
