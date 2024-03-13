@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import rewiremock from "rewiremock";
 
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { defaults as transactionPoolDefaults } from "../../../transaction-pool/source/defaults";
 import { constants } from "../constants";
 import { defaults } from "../defaults";

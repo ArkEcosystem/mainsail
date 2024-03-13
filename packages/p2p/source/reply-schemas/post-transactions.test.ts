@@ -1,9 +1,9 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework/distribution";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { headers } from "../../test/fixtures/responses/headers";
-import { postTransactions } from "./post-transactions";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
+import { postTransactions } from "./post-transactions";
 
 type Context = {
 	sandbox: Sandbox;

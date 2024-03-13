@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import rewiremock from "rewiremock";
 
-import { describeSkip, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework/source";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 

@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import importFresh from "import-fresh";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { ServiceProvider } from "./service-provider";

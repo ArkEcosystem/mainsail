@@ -2,9 +2,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { describeSkip, Sandbox } from "../../test-framework";
-import { Peer } from "./peer";
+import { describeSkip, Sandbox } from "../../test-framework/source";
 import { Broadcaster } from "./broadcaster";
+import { Peer } from "./peer";
 
 describeSkip<{
 	sandbox: Sandbox;

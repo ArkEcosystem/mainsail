@@ -9,8 +9,6 @@ import { URL } from "url";
 
 import { Listener } from "./listener.js";
 
-const __dirname = new URL(".", import.meta.url).pathname;
-
 const internals: any = {
 	defaults: {
 		headers: null,
@@ -51,7 +49,7 @@ internals.schema = Joi.object({
 });
 
 const plugin = {
-	pkg: readJSONSync(resolve(__dirname, "..", "..", "package.json")),
+	pkg: readJSONSync(resolve(__dirname ?? new URL(".", import.meta.url).pathname, "..", "..", "package.json")),
 	register: function (server, options) {
 		const settings: any = applyToDefaults(internals.defaults, options);
 
