@@ -16,10 +16,10 @@ export class RegisterBaseBindings implements Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
-		const __dirname = new URL(".", import.meta.url).pathname;
+		const dirname = __dirname ?? new URL(".", import.meta.url).pathname;
 
 		const { version } = this.fileSystem.readJSONSync<Contracts.Types.PackageJson>(
-			path.resolve(__dirname, "../../package.json"),
+			path.resolve(dirname, "../../package.json"),
 		);
 
 		assert.defined(version);

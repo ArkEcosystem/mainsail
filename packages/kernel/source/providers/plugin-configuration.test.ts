@@ -26,8 +26,8 @@ describe<{
 		assert.equal(instance.all(), { key: "value", some: "value" });
 	});
 
-	it("should discover the defaults for the given plugin", (context) => {
-		context.pluginConfiguration.discover(
+	it("should discover the defaults for the given plugin", async (context) => {
+		await context.pluginConfiguration.discover(
 			"stub-plugin-with-defaults",
 			resolve(__dirname, "../../test/stubs/stub-plugin-with-defaults"),
 		);

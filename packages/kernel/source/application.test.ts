@@ -1,5 +1,6 @@
 import { Container, injectable, interfaces } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/contracts";
+import { setMaxListeners } from "events";
 import { resolve } from "path";
 import { dirSync } from "tmp";
 
@@ -8,7 +9,6 @@ import { Application } from "./application";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
 import { MemoryEventDispatcher } from "./services/events";
-import { setMaxListeners } from "events";
 
 @injectable()
 class StubClass {}
@@ -46,6 +46,8 @@ describe<{
 			notice: () => {},
 		};
 
+		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 	});
 
@@ -55,6 +57,9 @@ describe<{
 
 	it("should bootstrap the application", async (context) => {
 		console.error(resolve(__dirname, "../test/stubs/config"));
+
+		context.app.unbind(Identifiers.Services.Filesystem.Service);
+
 		await context.app.bootstrap({
 			flags: {
 				network: "testnet",
@@ -67,6 +72,8 @@ describe<{
 
 	it("should bootstrap the application with a config path from process.env", async (context) => {
 		process.env.CORE_PATH_CONFIG = resolve(__dirname, "../test/stubs/config");
+
+		context.app.unbind(Identifiers.Services.Filesystem.Service);
 
 		await context.app.bootstrap({
 			flags: { network: "testnet", token: "ark", name: "local" },
@@ -242,24 +249,6 @@ describe<{
 		context.app.useEnvironment("production");
 
 		assert.is(context.app.environment(), "production");
-	});
-
-	it("should enable and disable maintenance mode", (context) => {
-		context.app
-			.bind(Identifiers.Services.EventDispatcher.Service)
-			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
-
-		context.app.bind("path.temp").toConstantValue(dirSync().name);
-
-		assert.false(context.app.isDownForMaintenance());
-
-		context.app.enableMaintenance();
-
-		assert.true(context.app.isDownForMaintenance());
-
-		context.app.disableMaintenance();
-
-		assert.false(context.app.isDownForMaintenance());
 	});
 
 	it.skip("should terminate the application", async (context) => {

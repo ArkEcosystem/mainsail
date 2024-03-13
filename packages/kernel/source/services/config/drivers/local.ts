@@ -53,7 +53,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadApplication(): void {
 		this.validationService.validate(
-			this.#loadFromLocation(["app.json", "app.js"]),
+			this.#loadFromLocation(["app.json"]),
 			Joi.object({
 				flags: Joi.array().items(Joi.string()).optional(),
 				plugins: Joi.array()

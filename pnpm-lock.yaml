@@ -153,9 +153,6 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
     devDependencies:
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       '@types/boxen':
         specifier: 3.0.1
         version: 3.0.1
@@ -689,9 +686,6 @@ importers:
         specifier: 2.9.2
         version: 2.9.2
     devDependencies:
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       rewiremock:
         specifier: 3.14.5
         version: 3.14.5
@@ -959,9 +953,6 @@ importers:
         specifier: 2.4.2
         version: 2.4.2
     devDependencies:
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       '@types/boxen':
         specifier: 3.0.1
         version: 3.0.1
@@ -2696,9 +2687,6 @@ importers:
         specifier: ^3.0.5
         version: 3.0.5
     devDependencies:
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       '@types/seedrandom':
         specifier: ^3.0.8
         version: 3.0.8
@@ -3086,9 +3074,6 @@ importers:
         specifier: 1.11.10
         version: 1.11.10
     devDependencies:
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

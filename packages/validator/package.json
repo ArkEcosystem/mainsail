@@ -28,7 +28,6 @@
 		"dayjs": "1.11.10"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
