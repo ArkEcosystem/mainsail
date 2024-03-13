@@ -54,7 +54,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const options = this.config().get<PostgresConnectionOptions>("database");
 		Utils.assert.defined<PostgresConnectionOptions>(options);
 
-		const __dirname = new URL(".", import.meta.url).pathname;
+		const dirname = __dirname ?? new URL(".", import.meta.url).pathname;
 
 		try {
 			const dataSource = new DataSource({
@@ -73,7 +73,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					ValidatorRound,
 					Wallet,
 				],
-				migrations: [__dirname + "/migrations/*.js"],
+				migrations: [dirname + "/migrations/*.js"],
 				migrationsRun: false,
 				namingStrategy: new SnakeNamingStrategy(),
 				synchronize: false,
