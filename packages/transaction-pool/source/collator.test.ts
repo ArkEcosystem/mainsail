@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
 import crypto from "../../core/bin/config/testnet/core/crypto.json";
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { Collator } from ".";
 
 describe<{
