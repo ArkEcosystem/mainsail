@@ -2327,9 +2327,6 @@ importers:
       glob:
         specifier: 10.3.10
         version: 10.3.10
-      import-fresh:
-        specifier: 3.3.0
-        version: 3.3.0
       ipaddr.js:
         specifier: 2.1.0
         version: 2.1.0
@@ -2474,9 +2471,6 @@ importers:
       capture-console:
         specifier: 1.0.2
         version: 1.0.2
-      fs-extra:
-        specifier: 11.2.0
-        version: 11.2.0
       import-fresh:
         specifier: 3.3.0
         version: 3.3.0
@@ -2806,49 +2800,28 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
       bip39:
         specifier: 3.1.0
         version: 3.1.0
-      concordance:
-        specifier: ~5.0.4
-        version: 5.0.4
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
       fs-extra:
         specifier: 11.2.0
         version: 11.2.0
-      kleur:
-        specifier: ~4.1.5
-        version: 4.1.5
       lodash.clonedeep:
         specifier: 4.5.0
         version: 4.5.0
       memoizee:
         specifier: 0.4.15
         version: 0.4.15
-      nock:
-        specifier: ^13.4.0
-        version: 13.4.0
-      sinon:
-        specifier: ^17.0.1
-        version: 17.0.1
-      string-kit:
-        specifier: ~0.18.0
-        version: 0.18.0
       tmp:
         specifier: 0.2.1
         version: 0.2.1
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-      zod:
-        specifier: ~3.22.4
-        version: 3.22.4
     devDependencies:
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       '@types/chance':
         specifier: 1.1.6
         version: 1.1.6
@@ -2873,6 +2846,9 @@ importers:
       joi:
         specifier: 17.11.0
         version: 17.11.0
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
 
   packages/test-runner:
     dependencies:
@@ -6699,6 +6675,7 @@ packages:
   /callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
+    dev: true
 
   /camel-case@4.1.2:
     resolution: {integrity: sha512-gxGWBrTT1JuMx6R+o5PTXMmUnhnVzLQ9SNutD4YqKtI6ap897t3tKECYla6gCWEkplXnlNybEkZg9GEGxKFCgw==}
@@ -10220,6 +10197,7 @@ packages:
     dependencies:
       parent-module: 1.0.1
       resolve-from: 4.0.0
+    dev: true
 
   /import-lazy@4.0.0:
     resolution: {integrity: sha512-rKtvo6a868b5Hu3heneU+L4yEQ4jYKLtjpnPeUdK7h0yzXGmyBTypknlkCvHFBqfX9YlorEiMM6Dnq/5atfHkw==}
@@ -13398,6 +13376,7 @@ packages:
     engines: {node: '>=6'}
     dependencies:
       callsites: 3.1.0
+    dev: true
 
   /parse-asn1@5.1.6:
     resolution: {integrity: sha512-RnZRo1EPU6JBnra2vGHj0yhp6ebyjBZpmUCLHWiFhxlzvBCCpAuZ7elsBp1PVAbQN0/04VD/19rfzlBSwLstMw==}
@@ -14644,6 +14623,7 @@ packages:
   /resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
     engines: {node: '>=4'}
+    dev: true
 
   /resolve-from@5.0.0:
     resolution: {integrity: sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==}
