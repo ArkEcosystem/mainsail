@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-common",
-	"version": "0.0.1-alpha.10",
+	"version": "0.0.1-alpha.11",
 	"description": "Common API building blocks for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
