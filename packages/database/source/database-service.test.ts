@@ -19,7 +19,7 @@ import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
-import { describe, Factories, Sandbox } from "../../test-framework";
+import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
 

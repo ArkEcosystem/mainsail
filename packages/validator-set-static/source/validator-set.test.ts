@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe, Sandbox } from "@mainsail/test-framework/source";
 
 import { validatorWalletFactory } from "../../state/source/wallets/factory";
 import { ValidatorSet } from "./validator-set";

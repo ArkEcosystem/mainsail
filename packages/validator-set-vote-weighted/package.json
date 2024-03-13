@@ -26,8 +26,6 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"@types/sinon": "^17.0.2",
 		"sinon": "^17.0.1",
 		"uvu": "^0.5.6"

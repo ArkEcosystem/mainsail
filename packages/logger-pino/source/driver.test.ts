@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
 import capcon from "capture-console";
-import { readdirSync } from "fs-extra/esm";
+import { readdirSync } from "fs";
 import { Writable } from "stream";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -29,6 +29,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 		context.app.bind(Identifiers.Config.Flags).toConstantValue("core");
+		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		context.app.bind("path.log").toConstantValue(dirSync().name);
 
 		context.logger = await context.app.resolve<Contracts.Kernel.Logger>(PinoLogger).make({
@@ -161,6 +162,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		const app = new Application(new Container());
 		app.bind(Identifiers.Config.Flags).toConstantValue("core");
 		app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		app.useLogPath(dirSync().name);
 
 		const ms = new Date().getMilliseconds();

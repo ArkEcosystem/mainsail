@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import { VoteBuilder } from "./builder";
 import { VoteTransaction } from "./versions/1";
 

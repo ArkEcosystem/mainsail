@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
+import { describe, Sandbox } from "@mainsail/test-framework/source";
 
 import { Attributes, Store } from "../../state/distribution";
 import { Selector } from "./selector";

@@ -15,7 +15,7 @@ import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
 import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/events";
 import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers";
 import { ServiceProvider as CoreSerializer } from "../../../serializer";
-import { Sandbox } from "../../../test-framework";
+import { Sandbox } from "../../../test-framework/source";
 import { ServiceProvider as CoreTransactions } from "../../../transactions";
 import { ServiceProvider as CoreValidation } from "../../../validation";
 
