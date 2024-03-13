@@ -1,4 +1,4 @@
-import { Console, describe } from "@mainsail/test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { ensureDirSync, writeJSONSync } from "fs-extra/esm";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";

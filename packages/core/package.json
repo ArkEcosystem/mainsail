@@ -100,7 +100,6 @@
 		"prompts": "2.4.2"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
 		"@types/boxen": "3.0.1",
 		"@types/env-paths": "2.1.0",
 		"@types/execa": "2.0.0",

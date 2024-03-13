@@ -1,9 +1,7 @@
-import { Commands, Services } from "@mainsail/cli";
-import envPaths from "env-paths";
-import { join } from "path";
+import { Services } from "@mainsail/cli";
 import prompts from "prompts";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { CommandLineInterface } from "./cli";
 
 describe("CLI", ({ beforeEach, it, assert, stub }) => {
@@ -14,6 +12,7 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 
 	it("should run successfully using valid commands", async () => {
 		const cli = new CommandLineInterface(["help"]);
+		await cli.execute("distribution");
 		await assert.resolves(() => cli.execute("distribution"));
 	});
 
