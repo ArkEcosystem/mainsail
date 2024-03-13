@@ -28,7 +28,6 @@
 		"lmdb": "2.9.2"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
 		"rewiremock": "3.14.5",
 		"uvu": "^0.5.6"
 	},

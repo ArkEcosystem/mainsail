@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../core/bin/config/testnet/core/crypto.json";
-import { describe, Factories, Sandbox } from "../../test-framework";
+import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { Types } from "../../test-framework/source/factories";
 import {
 	blockData,

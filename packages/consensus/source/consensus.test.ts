@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { describe, Sandbox } from "@mainsail/test-framework";
 
+import { describe, Sandbox } from "../../test-framework/source";
 import { Consensus } from "./consensus";
 
 type Context = {

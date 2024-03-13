@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe, describeSkip, getAttributeRepository } from "../../../test-framework";
+import { describe, describeSkip, getAttributeRepository } from "../../../test-framework/source";
 import { Wallet } from ".";
 
 describe<{

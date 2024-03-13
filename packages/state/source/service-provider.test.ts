@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application, Services } from "@mainsail/kernel";
 import importFresh from "import-fresh";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import { ServiceProvider } from ".";
 
 const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;

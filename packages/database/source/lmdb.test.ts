@@ -14,6 +14,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
+		context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		context.sandbox.app.useDataPath(dirSync().name);
 	});
 

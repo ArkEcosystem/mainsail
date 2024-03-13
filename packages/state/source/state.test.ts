@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../test-framework/distribution";
+import { describe, Sandbox } from "../../test-framework/source";
 import { State } from "./state";
 
 describe<{

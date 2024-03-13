@@ -27,7 +27,6 @@
 		"seedrandom": "^3.0.5"
 	},
 	"devDependencies": {
-		"@mainsail/test-framework": "workspace:*",
 		"@types/seedrandom": "^3.0.8",
 		"uvu": "^0.5.6"
 	},
