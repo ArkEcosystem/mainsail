@@ -1,6 +1,6 @@
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Identifiers } from "../ioc/index.js";
 import { Confirm } from "./confirm";
 

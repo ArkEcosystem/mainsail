@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { Prompt } from "../components";
 import { ProcessIdentifier } from "../contracts";
 import { Identifiers } from "../ioc/index.js";

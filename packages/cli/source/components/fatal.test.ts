@@ -1,6 +1,6 @@
-import { white } from "kleur/colors";
+import { bgRed, white } from "kleur/colors";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Identifiers } from "../ioc/index.js";
 import { Fatal } from "./fatal";
 
@@ -19,6 +19,6 @@ describe<{
 
 		assert.throws(() => component.render("Hello World"), "Hello World");
 
-		spyOnError.calledWith(white().bgRed(`[ERROR] Hello World`));
+		spyOnError.calledWith(white(bgRed(`[ERROR] Hello World`)));
 	});
 });

@@ -1,6 +1,6 @@
-import { white } from "kleur/colors";
+import { bgBlue, white } from "kleur/colors";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Identifiers } from "../ioc/index.js";
 import { Info } from "./info";
 
@@ -19,6 +19,6 @@ describe<{
 
 		component.render("Hello World");
 
-		spyOnInfo.calledWith(white().bgBlue(`[INFO] Hello World`));
+		spyOnInfo.calledWith(white(bgBlue(`[INFO] Hello World`)));
 	});
 });

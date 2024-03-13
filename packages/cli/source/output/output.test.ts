@@ -1,4 +1,4 @@
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Output } from "./output";
 
 describe<{

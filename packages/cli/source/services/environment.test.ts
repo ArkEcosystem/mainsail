@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { ensureFileSync, removeSync } from "fs-extra/esm";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Environment } from "./environment";
 
 describe<{

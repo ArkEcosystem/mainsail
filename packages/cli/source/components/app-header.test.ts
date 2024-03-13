@@ -1,7 +1,7 @@
-import { red, white } from "kleur/colors";
+import { bold, red, white } from "kleur/colors";
 import os from "os";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Identifiers } from "../ioc/index.js";
 import { AppHeader } from "./app-header";
 
@@ -19,8 +19,8 @@ describe<{
 	it("should render the component", ({ component, cli }) => {
 		assert.equal(
 			component.render(),
-			`${red().bold(cli.pkg.description)} ${white().bold(
-				`[${cli.pkg.version} | ${process.version} | ${os.platform()}@${os.arch()}]`,
+			`${red(bold(cli.pkg.description))} ${white(
+				bold(`[${cli.pkg.version} | ${process.version} | ${os.platform()}@${os.arch()}]`),
 			)}`,
 		);
 	});

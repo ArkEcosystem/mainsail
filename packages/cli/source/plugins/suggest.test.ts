@@ -1,7 +1,7 @@
 import { blue, red } from "kleur/colors";
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Identifiers } from "../ioc/index.js";
 import { SuggestCommand } from "./suggest";
 

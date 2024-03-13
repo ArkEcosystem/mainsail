@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import Joi from "joi";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Identifiers } from "../ioc/index.js";
 import { Output } from "../output";
 import { Command } from "./command";
