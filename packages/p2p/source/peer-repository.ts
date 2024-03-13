@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import { cidr } from "ip";
+import ip from "ip";
 
 // @TODO review the implementation
 @injectable()
@@ -77,10 +77,10 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 		return Object.keys(this.getPeers()).length >= this.configuration.getRequired<number>("minimumNetworkReach");
 	}
 
-	public getSameSubnetPeers(ip: string): Contracts.P2P.Peer[] {
+	public getSameSubnetPeers(peerIp: string): Contracts.P2P.Peer[] {
 		return this.getPeers().filter((peer) => {
-			if (!Utils.IpAddress.isIPv6Address(peer.ip) && !Utils.IpAddress.isIPv6Address(ip)) {
-				return cidr(`${peer.ip}/24`) === cidr(`${ip}/24`);
+			if (!Utils.IpAddress.isIPv6Address(peer.ip) && !Utils.IpAddress.isIPv6Address(peerIp)) {
+				return ip.cidr(`${peer.ip}/24`) === ip.cidr(`${peerIp}/24`);
 			}
 
 			return false;
