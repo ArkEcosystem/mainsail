@@ -24,7 +24,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "17.11.0"
+		"joi": "17.12.2"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

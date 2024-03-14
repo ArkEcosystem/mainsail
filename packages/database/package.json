@@ -24,7 +24,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"lmdb": "2.9.2"
+		"lmdb": "2.9.4"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-bech32m": "workspace:*",
@@ -44,7 +44,7 @@
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
-		"tmp": "0.2.1",
+		"tmp": "0.2.3",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

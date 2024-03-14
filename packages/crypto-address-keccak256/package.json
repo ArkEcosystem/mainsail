@@ -25,7 +25,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"ethers": "^6.9.0"
+		"ethers": "^6.11.1"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",

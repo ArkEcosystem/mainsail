@@ -23,14 +23,13 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "17.11.0"
+		"joi": "17.12.2"
 	},
 	"devDependencies": {
 		"@types/chance": "1.1.6",
 		"@types/fs-extra": "11.0.4",
-		"@types/got": "9.6.12",
 		"@types/lodash.clonedeep": "4.5.9",
-		"@types/sinon": "^17.0.2",
+		"@types/sinon": "^17.0.3",
 		"@types/tmp": "0.2.6",
 		"uvu": "^0.5.6"
 	},
