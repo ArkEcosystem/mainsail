@@ -21,7 +21,7 @@
 		"test:file": "uvu -r tsm source"
 	},
 	"dependencies": {
-		"@chainsafe/blst": "^0.2.9",
+		"@chainsafe/blst": "^0.2.10",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",

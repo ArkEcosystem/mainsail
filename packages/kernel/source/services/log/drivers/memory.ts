@@ -1,13 +1,13 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { isEmpty, prettyTime } from "@mainsail/utils";
-import chalk, { Chalk } from "chalk";
+import chalk, { ChalkInstance } from "chalk";
 import { differenceInMilliseconds, format } from "date-fns";
 import { inspect } from "util";
 
 @injectable()
 export class MemoryLogger implements Contracts.Kernel.Logger {
-	readonly #levelStyles: Record<string, Chalk> = {
+	readonly #levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
 		critical: chalk.red,
 		debug: chalk.magenta,

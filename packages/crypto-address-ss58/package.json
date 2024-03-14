@@ -25,8 +25,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@polkadot/util": "^12.6.1",
-		"@polkadot/util-crypto": "^12.6.1"
+		"@polkadot/util": "^12.6.2",
+		"@polkadot/util-crypto": "^12.6.2"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",

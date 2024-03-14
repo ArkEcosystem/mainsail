@@ -2,8 +2,8 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { ensureFileSync } from "fs-extra/esm";
-import lowdb from "lowdb";
-import FileSync from "lowdb/adapters/FileSync.js";
+import { LowSync } from "lowdb";
+import { JSONFileSync } from "lowdb/node";
 import { v4 as uuidv4 } from "uuid";
 
 import { Webhook } from "./interfaces.js";
@@ -13,7 +13,7 @@ export class Database {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	#database: lowdb.LowdbSync<any>;
+	#database!: LowSync<{ webhooks: Webhook[] }>;
 
 	public boot() {
 		const adapterFile: string = this.app.cachePath("webhooks.json");
@@ -22,12 +22,11 @@ export class Database {
 			ensureFileSync(adapterFile);
 		}
 
-		this.#database = lowdb(new FileSync(adapterFile));
-		this.#database.defaults({ webhooks: [] }).write();
+		this.#database = new LowSync<{ webhooks: Webhook[] }>(new JSONFileSync(adapterFile), { webhooks: [] });
 	}
 
 	public all(): Webhook[] {
-		return this.#database.get("webhooks", []).value();
+		return this.#database.data.webhooks;
 	}
 
 	public hasById(id: string): boolean {
@@ -35,26 +34,34 @@ export class Database {
 	}
 
 	public findById(id: string): Webhook | undefined {
-		return this.#database.get("webhooks").find({ id }).value();
+		return this.#database.data.webhooks.find((webhook) => webhook.id === id);
 	}
 
 	public findByEvent(event: string): Webhook[] {
-		return this.#database.get("webhooks").filter({ event }).value();
+		return this.#database.data.webhooks.filter((webhook) => webhook.event === event);
 	}
 
 	public create(data: Webhook): Webhook | undefined {
 		data.id = uuidv4();
 
-		this.#database.get("webhooks").push(data).write();
+		this.#database.data.webhooks.push(data);
+		this.#database.write();
 
 		return this.findById(data.id);
 	}
 
-	public update(id: string, data: Webhook): Webhook {
-		return this.#database.get("webhooks").find({ id }).assign(data).write();
+	public update(id: string, data: Webhook): Webhook | undefined {
+		const webhook = this.#database.data.webhooks.find((webhook) => webhook.id === id);
+		if (webhook) {
+			Object.assign(webhook, data);
+			this.#database.write();
+		}
+
+		return webhook;
 	}
 
 	public destroy(id: string): void {
-		this.#database.get("webhooks").remove({ id }).write();
+		this.#database.data.webhooks = this.#database.data.webhooks.filter((webhook) => webhook.id !== id);
+		this.#database.write();
 	}
 }

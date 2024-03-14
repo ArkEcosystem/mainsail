@@ -39,7 +39,7 @@ export class NPM extends AbstractSource {
 
 	async #getPackage(value: string, version?: string): Promise<{ name: string; tarball: string }> {
 		const registry = process.env[Constants.EnvironmentVariables.CORE_NPM_REGISTRY] || "https://registry.npmjs.org";
-		const { body } = await got.default(`${registry}/${value}`);
+		const { body } = await got(`${registry}/${value}`);
 
 		const response: {
 			name: string;
@@ -61,7 +61,7 @@ export class NPM extends AbstractSource {
 
 		ensureFileSync(destination);
 
-		await promisify(stream.pipeline)(got.default.stream(source), createWriteStream(destination));
+		await promisify(stream.pipeline)(got.stream(source), createWriteStream(destination));
 	}
 
 	async #extractPackage(name: string, file: string): Promise<void> {

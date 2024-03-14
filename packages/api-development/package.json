@@ -22,17 +22,17 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.3.2",
+		"@hapi/hapi": "21.3.6",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
-		"joi": "17.11.0",
-		"semver": "7.5.4"
+		"joi": "17.12.2",
+		"semver": "7.6.0"
 	},
 	"devDependencies": {
-		"@types/semver": "7.5.6",
+		"@types/semver": "7.5.8",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
