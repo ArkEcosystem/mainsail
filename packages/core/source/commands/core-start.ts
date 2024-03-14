@@ -25,13 +25,22 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
+		const dirname = (() => {
+			try {
+				return new URL(".", import.meta.url).pathname;
+			} catch {
+				// eslint-disable-next-line unicorn/prefer-module
+				return __dirname;
+			}
+		})();
+
 		this.actions.abortRunningProcess(`mainsail`);
 
 		await this.actions.daemonizeProcess(
 			{
 				args: `core:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail`,
-				script: resolve(__dirname, "../../bin/run"),
+				script: resolve(dirname, "../../bin/run"),
 			},
 			flags,
 		);
