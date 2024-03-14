@@ -1,9 +1,9 @@
 import { Contracts } from "@mainsail/contracts";
 
-let accept: string[] = [];
-let broadcast: string[] = [];
-let invalid: string[] = [];
-let excess: string[] = [];
+let accept: number[] = [];
+let broadcast: number[] = [];
+let invalid: number[] = [];
+let excess: number[] = [];
 let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
 export const setProcessorState = (state: any): void => {
@@ -17,10 +17,10 @@ export const setProcessorState = (state: any): void => {
 
 class TransactionPoolProcessorMock implements Partial<Contracts.TransactionPool.Processor> {
 	public async process(data: Contracts.Crypto.TransactionJson[] | Buffer[]): Promise<{
-		accept: string[];
-		broadcast: string[];
-		invalid: string[];
-		excess: string[];
+		accept: number[];
+		broadcast: number[];
+		invalid: number[];
+		excess: number[];
 		errors?: { [id: string]: Contracts.TransactionPool.ProcessorError };
 	}> {
 		return {

@@ -104,5 +104,5 @@ export interface PostTransactionsRequest extends Request {
 }
 
 export interface PostTransactionsResponse extends Response {
-	accept: string[];
+	accept: number[];
 }
