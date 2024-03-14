@@ -21,41 +21,39 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
 	public async process(data: Buffer[]): Promise<Contracts.TransactionPool.ProcessorResult> {
-		const accept: string[] = [];
-		const broadcast: string[] = [];
-		const invalid: string[] = [];
-		const excess: string[] = [];
-		let errors: { [id: string]: Contracts.TransactionPool.ProcessorError } | undefined;
+		const accept: number[] = [];
+		const broadcast: number[] = [];
+		const invalid: number[] = [];
+		const excess: number[] = [];
+		let errors: { [index: string]: Contracts.TransactionPool.ProcessorError } | undefined;
 
 		const broadcastTransactions: Contracts.Crypto.Transaction[] = [];
 
 		try {
 			for (const [index, transactionData] of data.entries()) {
-				const entryId = String(index);
-
 				try {
 					const transaction = await this.#getTransactionFromBuffer(transactionData);
 
 					await this.pool.addTransaction(transaction);
-					accept.push(entryId);
+					accept.push(index);
 
 					try {
 						await Promise.all(this.extensions.map((e) => e.throwIfCannotBroadcast(transaction)));
 						broadcastTransactions.push(transaction);
-						broadcast.push(entryId);
+						broadcast.push(index);
 					} catch {}
 				} catch (error) {
-					invalid.push(entryId);
+					invalid.push(index);
 
 					if (error instanceof Exceptions.PoolError) {
 						if (error.type === "ERR_EXCEEDS_MAX_COUNT") {
-							excess.push(entryId);
+							excess.push(index);
 						}
 
 						if (!errors) {
 							errors = {};
 						}
-						errors[entryId] = {
+						errors[index] = {
 							message: error.message,
 							type: error.type,
 						};
