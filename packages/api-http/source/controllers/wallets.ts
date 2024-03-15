@@ -45,7 +45,7 @@ export class WalletsController extends Controller {
 
 		const wallet = await this.getWallet(walletId);
 
-		return this.toResource(wallet, WalletResource, request.params.transform);
+		return this.respondWithResource(wallet, WalletResource, request.params.transform);
 	}
 
 	public async transactions(request: Hapi.Request) {
