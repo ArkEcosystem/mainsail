@@ -61,7 +61,10 @@ describe<{
 		];
 
 		for (const { id, result } of testCases) {
-			const { statusCode, data } = await request(`/delegates/${id}`, options);
+			const {
+				statusCode,
+				data: { data },
+			} = await request(`/delegates/${id}`, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data, result);
 		}

@@ -44,7 +44,7 @@ export class DelegatesController extends Controller {
 			return Boom.notFound("Delegate not found");
 		}
 
-		return this.toResource(delegate, DelegateResource, request.params.transform);
+		return this.respondWithResource(delegate, DelegateResource, request.params.transform);
 	}
 
 	public async voters(request: Hapi.Request) {
