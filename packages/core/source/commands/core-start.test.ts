@@ -35,7 +35,7 @@ describe<{
 				},
 				name: "mainsail",
 				node_args: undefined,
-				script: resolve(__dirname, "../../../../packages/core/bin/run"),
+				script: resolve(__dirname, "../../../../packages/core/bin/run.js"),
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail" },
 		);

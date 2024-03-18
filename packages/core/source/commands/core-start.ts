@@ -40,7 +40,7 @@ export class Command extends Commands.Command {
 			{
 				args: `core:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail`,
-				script: resolve(dirname, "../../bin/run"),
+				script: resolve(dirname, "../../bin/run.js"),
 			},
 			flags,
 		);

@@ -19,7 +19,7 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"full:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail core:run -- --env=test",
-		"mainsail": "node ./bin/run",
+		"mainsail": "node ./bin/run.js",
 		"release": "pnpm publish --access public",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
