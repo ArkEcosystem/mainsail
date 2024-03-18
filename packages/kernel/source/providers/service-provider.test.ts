@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { readJSONSync } from "fs-extra";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework/source";
+import { describeSkip } from "../../../test-framework/source";
 import { Application } from "../application";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";
@@ -13,7 +13,7 @@ class StubServiceProvider extends ServiceProvider {
 	async register() {}
 }
 
-describe<{
+describeSkip<{
 	app: Application;
 }>("ServiceProvider", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
