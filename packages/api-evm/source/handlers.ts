@@ -1,8 +1,8 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { BaseRoute } from "./routes/base";
+import { BaseRoute } from "./routes/base.js";
 
-export = {
+const config = {
 	name: "EVM API Routes",
 	async register(server: Contracts.Api.ApiServer): Promise<void> {
 		const handlers = [BaseRoute];
@@ -13,3 +13,5 @@ export = {
 	},
 	version: "1.0.0",
 };
+
+export default config;

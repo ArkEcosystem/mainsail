@@ -4,11 +4,11 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { EvmCallTransactionHandler } from "./handlers";
-import { EvmCallTransaction } from "./versions/1";
+import { EvmCallTransactionHandler } from "./handlers/index.js";
+import { EvmCallTransaction } from "./versions/1.js";
 
-export * from "./builder";
-export * from "./versions";
+export * from "./builder.js";
+export * from "./versions/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

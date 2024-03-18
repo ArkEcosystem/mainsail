@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { Evm, JsTransactionContext, JsTransactionResult } from "../generated/bindings";
+import { Evm, JsTransactionContext, JsTransactionResult } from "../generated/bindings.js";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance {

@@ -9,7 +9,7 @@ import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validati
 import { ethers } from "ethers";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { EvmCallTransaction } from "./1";
 
 describe<{

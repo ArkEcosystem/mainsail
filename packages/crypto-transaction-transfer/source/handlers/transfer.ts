@@ -56,12 +56,14 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
-		await super.applyToSender(walletRepository, transaction);
+		await super.applyToSender(context, transaction);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Contracts.Crypto.TransactionData = transaction.data;
 

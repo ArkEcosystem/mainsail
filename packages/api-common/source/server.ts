@@ -4,7 +4,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
 
-import { Processor } from "./rcp";
+import { Processor } from "./rcp/index.js";
 
 @injectable()
 export abstract class AbstractServer {
