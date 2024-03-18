@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-consensus-bls12-381",
-	"version": "0.0.1-alpha.12",
+	"version": "0.0.1-alpha.13",
 	"description": "Combined BLS12-381 utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
