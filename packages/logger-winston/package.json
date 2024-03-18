@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/logger-winston",
-	"version": "0.0.1-alpha.12",
+	"version": "0.0.1-alpha.13",
 	"description": "Winston logger implementation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

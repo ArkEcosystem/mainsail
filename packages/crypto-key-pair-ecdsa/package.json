@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-key-pair-ecdsa",
-	"version": "0.0.1-alpha.12",
+	"version": "0.0.1-alpha.13",
 	"description": "Secp256k1 key derivation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
