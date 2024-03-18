@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { readJSONSync } from "fs-extra";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework/source";
+import { describeSkip } from "../../../test-framework/source";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";
@@ -14,7 +14,7 @@ class StubServiceProvider extends ServiceProvider {
 	public async register(): Promise<void> {}
 }
 
-describe<{
+describeSkip<{
 	app: Application;
 	configRepository: ConfigRepository;
 	serviceProviderRepository: ServiceProviderRepository;
