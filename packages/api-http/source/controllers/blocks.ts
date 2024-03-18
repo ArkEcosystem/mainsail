@@ -9,8 +9,8 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { Utils } from "@mainsail/kernel";
 
-import { BlockResource, TransactionResource } from "../resources";
-import { Controller } from "./controller";
+import { BlockResource, TransactionResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class BlocksController extends Controller {

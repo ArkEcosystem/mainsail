@@ -1,6 +1,6 @@
 import { Application } from "@mainsail/kernel";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { Builder } from "./builder";
 
 describe("buildApplication", ({ it, stub }) => {

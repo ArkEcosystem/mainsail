@@ -1,8 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { RoundState } from "./round-state";
-
+import { RoundState } from "./round-state.js";
 @injectable()
 export class RoundStateRepository implements Contracts.Consensus.RoundStateRepository {
 	@inject(Identifiers.Application.Instance)

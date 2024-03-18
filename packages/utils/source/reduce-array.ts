@@ -1,4 +1,4 @@
-import { type FunctionReturning } from "./internal";
+import { type FunctionReturning } from "./internal/types.js";
 
 export const reduceArray = <T, V>(iterable: T[], iteratee: FunctionReturning, initialValue: V): V | undefined => {
 	let result: V = initialValue;

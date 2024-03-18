@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { cloneDeep } from "@mainsail/utils";
 
-import { GenericAttribute } from "./generic-attribute";
+import { GenericAttribute } from "./generic-attribute.js";
 
 export class ObjectAttribute extends GenericAttribute<object> implements Contracts.State.Attribute<object> {
 	public clone(): ObjectAttribute {

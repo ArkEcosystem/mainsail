@@ -1,7 +1,7 @@
-import { FunctionReturning } from "./internal";
-import { isArray } from "./is-array";
-import { reduceArray } from "./reduce-array";
-import { reduceObject } from "./reduce-object";
+import { FunctionReturning } from "./internal/index.js";
+import { isArray } from "./is-array.js";
+import { reduceArray } from "./reduce-array.js";
+import { reduceObject } from "./reduce-object.js";
 
 export const reduce = <T extends {}, V>(
 	iterable: T | T[],

@@ -12,7 +12,7 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { makeKeywords } from "../validation";
 import { VoteTransaction } from "./index";
 

@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts, Exceptions } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { readJSONSync } from "fs-extra";
+import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
 interface PluginEntry {
@@ -13,7 +13,16 @@ export class AppGenerator {
 	generateDefault(packageName = "core"): Contracts.Types.JsonObject {
 		packageName = packageName.replace("@mainsail/", "");
 
-		return readJSONSync(resolve(__dirname, `../../../${packageName}/bin/config/testnet/core/app.json`));
+		const dirname = (() => {
+			try {
+				return new URL(".", import.meta.url).pathname;
+			} catch {
+				// eslint-disable-next-line unicorn/prefer-module
+				return __dirname;
+			}
+		})();
+
+		return readJSONSync(resolve(dirname, `../../../${packageName}/bin/config/testnet/core/app.json`));
 	}
 
 	generate(options: Contracts.NetworkGenerator.InternalOptions): Contracts.Types.JsonObject {

@@ -3,11 +3,11 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { performance } from "perf_hooks";
 
-import { conditions } from "./conditions";
-import { Database } from "./database";
-import { WebhookEvent } from "./events";
-import { InternalIdentifiers } from "./identifiers";
-import { Webhook } from "./interfaces";
+import { conditions } from "./conditions.js";
+import { Database } from "./database.js";
+import { WebhookEvent } from "./events.js";
+import { InternalIdentifiers } from "./identifiers.js";
+import { Webhook } from "./interfaces.js";
 
 @injectable()
 export class Listener {

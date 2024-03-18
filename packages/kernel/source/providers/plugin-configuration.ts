@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { get, has, set, unset } from "@mainsail/utils";
 import deepmerge from "deepmerge";
 
-import { ConfigRepository } from "../services/config";
+import { ConfigRepository } from "../services/config/index.js";
 
 // @TODO review the implementation
 
@@ -22,9 +22,9 @@ export class PluginConfiguration {
 		return this;
 	}
 
-	public discover(name: string, packageId: string): this {
+	public async discover(name: string, packageId: string): Promise<this> {
 		try {
-			this.#items = require(`${packageId}/distribution/defaults.js`).defaults;
+			this.#items = (await import(`${packageId}/distribution/defaults.js`)).defaults;
 		} catch {
 			// Failed to discover the defaults configuration file. This can be intentional.
 		}

@@ -1,6 +1,6 @@
 import { Container, inject, injectable, tagged } from "inversify";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { anyAncestorOrTargetTaggedFirst } from "./selectors";
 
 interface WalletRepository {}

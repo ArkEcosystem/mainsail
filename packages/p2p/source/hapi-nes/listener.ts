@@ -1,9 +1,9 @@
 "use strict";
 
-import Hoek from "@hapi/hoek";
-import Ws from "ws";
+import { ignore } from "@hapi/hoek";
+import { WebSocketServer } from "ws";
 
-import { Socket } from "./socket";
+import { Socket } from "./socket.js";
 
 const internals = {
 	counter: {
@@ -43,10 +43,10 @@ export class Listener {
 			options.verifyClient = (info) => settings.origin.includes(info.origin);
 		}
 
-		this._wss = new Ws.Server(options);
+		this._wss = new WebSocketServer(options);
 
 		this._wss.on("connection", (ws, req) => {
-			ws.on("error", Hoek.ignore);
+			ws.on("error", ignore);
 
 			if (
 				this._stopped ||
@@ -58,7 +58,7 @@ export class Listener {
 			this._add(ws, req);
 		});
 
-		this._wss.on("error", Hoek.ignore);
+		this._wss.on("error", ignore);
 
 		// Register with the server
 
@@ -90,7 +90,7 @@ export class Listener {
 				type: "ping",
 			};
 
-			this._sockets._forEach((socket: Socket) => socket._send(update).catch(Hoek.ignore)); // Ignore errors
+			this._sockets._forEach((socket: Socket) => socket._send(update).catch(ignore)); // Ignore errors
 
 			// Verify client responded
 

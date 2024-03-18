@@ -1,5 +1,5 @@
-import { BlockData } from "../contracts/crypto";
-import { Exception } from "./base";
+import { BlockData } from "../contracts/crypto/block.js";
+import { Exception } from "./base.js";
 
 export class TooManyTransactionsError extends Exception {
 	public constructor(block: BlockData) {

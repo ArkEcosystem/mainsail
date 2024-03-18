@@ -1,6 +1,6 @@
-import { RepositoryDataSource, StateRepository, StateRepositoryExtension } from "../contracts";
-import { State } from "../models";
-import { makeExtendedRepository } from "./repository-extension";
+import { RepositoryDataSource, StateRepository, StateRepositoryExtension } from "../contracts.js";
+import { State } from "../models/index.js";
+import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeStateRepository = (dataSource: RepositoryDataSource): StateRepository =>
 	makeExtendedRepository<State, StateRepositoryExtension>(State, dataSource, {

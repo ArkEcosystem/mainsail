@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -69,7 +69,10 @@ describe<{
 		];
 
 		for (const { id, result } of testCases) {
-			const { statusCode, data } = await request(`/wallets/${id}`, options);
+			const {
+				statusCode,
+				data: { data },
+			} = await request(`/wallets/${id}`, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data, result);
 		}

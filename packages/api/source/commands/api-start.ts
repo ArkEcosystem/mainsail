@@ -21,11 +21,20 @@ export class Command extends Commands.Command {
 
 		this.actions.abortRunningProcess(`mainsail-api`);
 
+		const dirname = (() => {
+			try {
+				return new URL(".", import.meta.url).pathname;
+			} catch {
+				// eslint-disable-next-line unicorn/prefer-module
+				return __dirname;
+			}
+		})();
+
 		await this.actions.daemonizeProcess(
 			{
 				args: `api:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail-api`,
-				script: resolve(__dirname, "../../bin/run"),
+				script: resolve(dirname, "../../bin/run"),
 			},
 			flags,
 		);

@@ -1,7 +1,7 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { WalletIndex } from "./wallet-index";
+import { WalletIndex } from "./wallet-index.js";
 
 @injectable()
 export class WalletRepository implements Contracts.State.WalletRepository {
@@ -93,6 +93,10 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public forgetOnIndex(index: string, key: string): void {
 		this.getIndex(index).forget(key);
+	}
+
+	public sizeOfIndex(index: string): number {
+		return this.getIndex(index).size();
 	}
 
 	public setDirtyWallet(wallet: Contracts.State.Wallet): void {}

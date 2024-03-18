@@ -1,7 +1,7 @@
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import clone from "lodash.clone";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import {
 	blockData,
 	blockDataJson,

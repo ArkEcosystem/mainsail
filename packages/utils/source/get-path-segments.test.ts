@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { getPathSegments } from "./get-path-segments";
 
 describe("getPathSegments", async ({ assert, it, nock, loader }) => {

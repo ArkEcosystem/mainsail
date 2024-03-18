@@ -2,17 +2,17 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ApplyTransactionAction, ThrowIfCannotEnterPoolAction, VerifyTransactionAction } from "./actions";
-import { Collator } from "./collator";
-import { ExpirationService } from "./expiration-service";
-import { Mempool } from "./mempool";
-import { Processor } from "./processor";
-import { Query } from "./query";
-import { SenderMempool } from "./sender-mempool";
-import { SenderState } from "./sender-state";
-import { Service } from "./service";
-import { Storage } from "./storage";
-import { TransactionValidator } from "./transaction-validator";
+import { ApplyTransactionAction, ThrowIfCannotEnterPoolAction, VerifyTransactionAction } from "./actions/index.js";
+import { Collator } from "./collator.js";
+import { ExpirationService } from "./expiration-service.js";
+import { Mempool } from "./mempool.js";
+import { Processor } from "./processor.js";
+import { Query } from "./query.js";
+import { SenderMempool } from "./sender-mempool.js";
+import { SenderState } from "./sender-state.js";
+import { Service } from "./service.js";
+import { Storage } from "./storage.js";
+import { TransactionValidator } from "./transaction-validator.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

@@ -10,9 +10,9 @@ import {
 	RestartProcess,
 	RestartRunningProcess,
 	RestartRunningProcessWithPrompt,
-} from "./actions";
-import { Application, ProcessOptions } from "./contracts";
-import { Identifiers } from "./ioc";
+} from "./actions/index.js";
+import { Application, ProcessOptions } from "./contracts.js";
+import { Identifiers } from "./ioc/index.js";
 
 @injectable()
 export class ActionFactory {

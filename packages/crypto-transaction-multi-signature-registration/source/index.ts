@@ -4,11 +4,11 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { MultiSignatureRegistrationTransactionHandler } from "./handlers";
-import { MultiSignatureRegistrationTransaction } from "./versions/1";
+import { MultiSignatureRegistrationTransactionHandler } from "./handlers/index.js";
+import { MultiSignatureRegistrationTransaction } from "./versions/1.js";
 
-export * from "./builder";
-export * from "./versions";
+export * from "./builder.js";
+export * from "./versions/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

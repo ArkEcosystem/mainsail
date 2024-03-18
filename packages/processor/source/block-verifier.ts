@@ -8,7 +8,7 @@ import {
 	NonceVerifier,
 	TimestampVerifier,
 	VerifyBlockVerifier,
-} from "./verifiers";
+} from "./verifiers/index.js";
 
 @injectable()
 export class BlockVerifier implements Contracts.Processor.Verifier {

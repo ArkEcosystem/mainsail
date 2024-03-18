@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { BlockEvent, KernelEvent } from "../enums";
-import { ServiceProvider, ServiceProviderRepository } from "../providers";
+import { BlockEvent, KernelEvent } from "../enums/index.js";
+import { ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 
 @injectable()
 export class ChangeServiceProviderState implements Contracts.Kernel.EventListener {

@@ -1,11 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Database } from "lmdb";
+import * as lmdb from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.Storage.Block)
-	private readonly blockStorage!: Database;
+	private readonly blockStorage!: lmdb.Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;

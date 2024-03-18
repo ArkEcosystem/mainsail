@@ -3,8 +3,8 @@ import { tmpdir } from "os";
 // eslint-disable-next-line unicorn/import-style
 import { resolve } from "path";
 
-import { Paths } from "./env-paths";
-import { Identifiers } from "./ioc";
+import { Paths } from "./contracts.js";
+import { Identifiers } from "./ioc/index.js";
 
 export class Application {
 	public constructor(private readonly container: interfaces.Container) {

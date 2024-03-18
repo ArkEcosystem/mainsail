@@ -1,7 +1,7 @@
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
-import type { KeyPair } from "./identities";
-import type { SchemaValidationResult } from "./validator";
+import type { KeyPair } from "./identities.js";
+import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
 	readonly id: string | undefined;

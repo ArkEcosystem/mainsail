@@ -1,22 +1,23 @@
 import { Providers, Utils } from "@mainsail/kernel";
 import { DataSource } from "typeorm";
+import { URL } from "url";
 
-import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts";
-import { Identifiers } from "./identifiers";
-import { Migrations } from "./migrations";
+import { PostgresConnectionOptions, RepositoryDataSource } from "./contracts.js";
+import { Identifiers } from "./identifiers.js";
+import { Migrations } from "./migrations.js";
 import {
 	ApiNode,
 	Block,
 	Configuration,
 	MempoolTransaction,
+	Peer,
 	Plugin,
 	State,
 	Transaction,
 	TransactionType,
 	ValidatorRound,
 	Wallet,
-} from "./models";
-import { Peer } from "./models/peer";
+} from "./models/index.js";
 import {
 	makeApiNodeRepository,
 	makeBlockRepository,
@@ -29,8 +30,8 @@ import {
 	makeTransactionTypeRepository,
 	makeValidatorRoundRepository,
 	makeWalletRepository,
-} from "./repositories";
-import { SnakeNamingStrategy } from "./utils/snake-naming-strategy";
+} from "./repositories/index.js";
+import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -53,6 +54,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const options = this.config().get<PostgresConnectionOptions>("database");
 		Utils.assert.defined<PostgresConnectionOptions>(options);
 
+		const dirname = (() => {
+			try {
+				return new URL(".", import.meta.url).pathname;
+			} catch {
+				// eslint-disable-next-line unicorn/prefer-module
+				return __dirname;
+			}
+		})();
+
 		try {
 			const dataSource = new DataSource({
 				...options,
@@ -70,7 +80,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					ValidatorRound,
 					Wallet,
 				],
-				migrations: [__dirname + "/migrations/*.js"],
+				migrations: [dirname + "/migrations/*.js"],
 				migrationsRun: false,
 				namingStrategy: new SnakeNamingStrategy(),
 				synchronize: false,

@@ -14,7 +14,6 @@ export abstract class UsernameRegistrationTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "usernameRegistration",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
 						username: { $ref: "username" },

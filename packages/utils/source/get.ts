@@ -1,7 +1,7 @@
-import { getPathSegments } from "./get-path-segments";
-import { isEnumerable } from "./is-enumerable";
-import { isObject } from "./is-object";
-import { isString } from "./is-string";
+import { getPathSegments } from "./get-path-segments.js";
+import { isEnumerable } from "./is-enumerable.js";
+import { isObject } from "./is-object.js";
+import { isString } from "./is-string.js";
 
 export const get = <T, V>(object: T, path: string | string[], defaultValue?: V): V | undefined => {
 	if (!isObject(object) || !isString(path)) {

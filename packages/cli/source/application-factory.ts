@@ -2,7 +2,7 @@ import { Container, interfaces } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { ActionFactory } from "./action-factory";
+import { ActionFactory } from "./action-factory.js";
 import {
 	AbortErroredProcess,
 	AbortMissingProcess,
@@ -13,9 +13,9 @@ import {
 	RestartProcess,
 	RestartRunningProcess,
 	RestartRunningProcessWithPrompt,
-} from "./actions";
-import { Application } from "./application";
-import { ComponentFactory } from "./component-factory";
+} from "./actions/index.js";
+import { Application } from "./application.js";
+import { ComponentFactory } from "./component-factory.js";
 import {
 	AppHeader,
 	Ask,
@@ -43,13 +43,13 @@ import {
 	Title,
 	Toggle,
 	Warning,
-} from "./components";
-import { envPaths as environmentPaths } from "./env-paths";
-import { Input, InputValidator } from "./input";
-import { Identifiers } from "./ioc";
-import { Output } from "./output";
-import { Config, Environment, Installer, Logger, PluginManager, ProcessManager, Updater } from "./services";
-import { Process } from "./utils";
+} from "./components/index.js";
+import { envPaths as environmentPaths } from "./env-paths.js";
+import { Input, InputValidator } from "./input/index.js";
+import { Identifiers } from "./ioc/index.js";
+import { Output } from "./output/index.js";
+import { Config, Environment, Installer, Logger, PluginManager, ProcessManager, Updater } from "./services/index.js";
+import { Process } from "./utils/index.js";
 
 export class ApplicationFactory {
 	public static make(container: Container, package_: Contracts.Types.PackageJson): Application {

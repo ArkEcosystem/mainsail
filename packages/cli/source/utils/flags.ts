@@ -1,4 +1,4 @@
-import { AnyObject } from "../contracts";
+import { AnyObject } from "../contracts.js";
 
 export const Flags = {
 	castFlagsToString(flags: AnyObject, ignoreKeys: string[] = []): string {

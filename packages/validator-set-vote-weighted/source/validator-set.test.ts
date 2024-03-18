@@ -1,7 +1,5 @@
 import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, getAttributeRepository, getIndexSet, Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "@mainsail/utils";
 import { spy } from "sinon";
 
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
@@ -9,6 +7,8 @@ import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { Wallets } from "../../state";
 import { validatorWalletFactory, walletFactory } from "../../state/source/wallets/factory";
+import { describe, getAttributeRepository, getIndexSet, Sandbox } from "../../test-framework/source";
+import { BigNumber } from "../../utils";
 import { buildValidatorAndVoteWallets } from "../test/build-validator-and-vote-balances";
 import { ValidatorSet } from "./validator-set";
 
@@ -122,7 +122,7 @@ describe<{
 	});
 
 	it("onCommit - should update ranking every full round", async ({ cryptoConfiguration, validatorSet, store }) => {
-		const buildValidatorRankingSpy = spy(validatorSet, "buildValidatorRanking");
+		const spyStoreSetAttribute = spy(store, "setAttribute");
 
 		const { activeValidators } = cryptoConfiguration.getMilestone();
 
@@ -130,7 +130,7 @@ describe<{
 			height: 0,
 			store,
 		} as Contracts.Processor.ProcessableUnit);
-		assert.true(buildValidatorRankingSpy.calledOnce);
+		assert.true(spyStoreSetAttribute.calledOnce);
 
 		let currentHeight = 0;
 		for (let index = 0; index < activeValidators; index++) {
@@ -140,7 +140,7 @@ describe<{
 			} as Contracts.Processor.ProcessableUnit);
 
 			// Genesis block (= height 0) and the first block thereafter rebuild the ranking
-			assert.equal(buildValidatorRankingSpy.callCount, 2);
+			assert.equal(spyStoreSetAttribute.callCount, 2);
 
 			currentHeight++;
 		}
@@ -151,10 +151,10 @@ describe<{
 			height: currentHeight,
 			store,
 		} as Contracts.Processor.ProcessableUnit);
-		assert.equal(buildValidatorRankingSpy.callCount, 3);
+		assert.equal(spyStoreSetAttribute.callCount, 3);
 		currentHeight++;
 
-		buildValidatorRankingSpy.resetHistory();
+		spyStoreSetAttribute.resetHistory();
 
 		// Simulate another round
 		for (let index = 0; index < activeValidators - 1; index++) {
@@ -162,7 +162,7 @@ describe<{
 				height: currentHeight,
 				store,
 			} as Contracts.Processor.ProcessableUnit);
-			assert.true(buildValidatorRankingSpy.notCalled);
+			assert.true(spyStoreSetAttribute.notCalled);
 			currentHeight++;
 		}
 
@@ -172,7 +172,7 @@ describe<{
 			height: currentHeight,
 			store,
 		} as Contracts.Processor.ProcessableUnit);
-		assert.true(buildValidatorRankingSpy.calledOnce);
+		assert.true(spyStoreSetAttribute.calledOnce);
 	});
 
 	it("getActiveValidators - should throw error if insufficient active validators", async ({

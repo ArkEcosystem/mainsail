@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra";
+import { readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 
 import { describe } from "../index";

@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained";
 
 describe("", ({ assert, it, stub }) => {

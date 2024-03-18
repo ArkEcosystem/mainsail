@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { PinoLogger } from "./driver";
+import { PinoLogger } from "./driver.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

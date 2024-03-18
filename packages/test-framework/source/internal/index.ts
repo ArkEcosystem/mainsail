@@ -1,2 +1,2 @@
-export * from "./signer";
-export * from "./wallet-attributes";
+export * from "./signer.js";
+export * from "./wallet-attributes.js";

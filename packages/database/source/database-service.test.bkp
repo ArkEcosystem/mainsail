@@ -19,7 +19,7 @@ import lmdb from "lmdb";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
-import { describe, Factories, Sandbox } from "../../test-framework";
+import { describe, Factories, Sandbox } from "../../test-framework/source";
 import { DatabaseService } from "./database-service";
 import { ServiceProvider as CoreDatabase } from "./index";
 
@@ -58,11 +58,12 @@ describe<{
 	beforeEach(async (context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.useDataPath(dirSync().name);
-
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 			info: () => {},
 		});
+		context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+
+		context.sandbox.app.useDataPath(dirSync().name);
 
 		await context.sandbox.app.resolve(CoreCryptoConfig).register();
 		await context.sandbox.app.resolve(CoreValidation).register();
@@ -132,10 +133,18 @@ describe<{
 		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.Commit>();
 
 		databaseService.addCommit(block);
-		assert.equal(await databaseService.getBlock(block.block.data.height), block.block);
+
+		assertBlockEqual(
+			(await databaseService.getBlock(block.block.data.height)) as unknown as Contracts.Crypto.Block,
+			block.block,
+		);
 
 		await databaseService.persist();
-		assert.equal(await databaseService.getBlock(block.block.data.height), block.block);
+
+		assertBlockEqual(
+			(await databaseService.getBlock(block.block.data.height)) as unknown as Contracts.Crypto.Block,
+			block.block,
+		);
 	});
 
 	it("#findCommitBuffers - should return empty array if blocks are not found", async ({ databaseService }) => {
@@ -190,13 +199,14 @@ describe<{
 			databaseService.addCommit(commit);
 		}
 
-		assert.equal(
+		assertBlocksEqual(
 			await databaseService.findBlocks(1, 4),
 			commits.map(({ block }) => block),
 		);
 
 		await databaseService.persist();
-		assert.equal(
+
+		assertBlocksEqual(
 			await databaseService.findBlocks(1, 4),
 			commits.map(({ block }) => block),
 		);
@@ -212,9 +222,31 @@ describe<{
 			databaseService.addCommit(commit);
 		}
 
-		assert.equal(await databaseService.getLastBlock(), commits[3].block);
+		let lastBlock = (await databaseService.getLastBlock()) as Contracts.Crypto.Block;
+
+		assertBlockEqual(lastBlock, commits[3].block);
 
 		await databaseService.persist();
-		assert.equal(await databaseService.getLastBlock(), commits[3].block);
+		lastBlock = (await databaseService.getLastBlock()) as Contracts.Crypto.Block;
+
+		assertBlockEqual(lastBlock, commits[3].block);
 	});
+
+	const assertBlocksEqual = (blocksA: Contracts.Crypto.Block[], blocksB: Contracts.Crypto.Block[]) => {
+		assert.equal(blocksA.length, blocksB.length);
+
+		for (const [index, element] of blocksA.entries()) {
+			assertBlockEqual(element, blocksB[index]);
+		}
+	};
+
+	const assertBlockEqual = (blockA: Contracts.Crypto.Block, blockB: Contracts.Crypto.Block) => {
+		assert.equal(blockA.data, blockB.data);
+		assert.equal(blockA.header, blockB.header);
+		assert.equal(blockA.serialized, blockB.serialized);
+		assert.equal(
+			blockA.transactions.map((tx) => tx.data),
+			blockB.transactions.map((tx) => tx.data),
+		);
+	};
 });

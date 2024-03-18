@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { IpcWorker } from "@mainsail/kernel";
 
-import { AbstractProcessor } from "./abstract-processor";
+import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
 export class ProposalProcessor extends AbstractProcessor implements Contracts.Consensus.ProposalProcessor {

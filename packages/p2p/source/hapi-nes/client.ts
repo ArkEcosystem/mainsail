@@ -8,9 +8,9 @@
 
 import WebSocket from "ws";
 
-import { parseNesMessage, stringifyNesMessage } from "./utils";
-import { errorTypes } from "./constants";
-import { constants } from "../constants";
+import { parseNesMessage, stringifyNesMessage } from "./utils.js";
+import { errorTypes } from "./constants.js";
+import { constants } from "../constants.js";
 
 /* eslint no-undef: 0 */
 const version = "2";

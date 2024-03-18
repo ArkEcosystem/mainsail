@@ -3,13 +3,13 @@ import sinon from "sinon";
 import { Callback, Context, suite, Test } from "uvu";
 import { z as schema } from "zod";
 
-import { assert } from "./assert";
-import { each, formatName } from "./each";
-import { runHook } from "./hooks";
-import { loader } from "./loader";
-import { nock } from "./nock";
-import { Spy } from "./spy";
-import { Stub } from "./stub";
+import { assert } from "./assert.js";
+import { each, formatName } from "./each.js";
+import { runHook } from "./hooks.js";
+import { loader } from "./loader.js";
+import { nock } from "./nock.js";
+import { Spy } from "./spy.js";
+import { Stub } from "./stub.js";
 
 type ContextFunction<T> = () => T;
 type ContextCallback<T> = (context: T) => Promise<void> | void;

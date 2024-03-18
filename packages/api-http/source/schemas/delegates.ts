@@ -1,8 +1,8 @@
 import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
-import { blockCriteriaSchemaObject } from "./blocks";
-import { walletCriteriaSchemaObject } from "./wallets";
+import { blockCriteriaSchemaObject } from "./blocks.js";
+import { walletCriteriaSchemaObject } from "./wallets.js";
 
 export const delegateCriteriaSchemaObject = {
 	address: walletCriteriaSchemaObject.address,

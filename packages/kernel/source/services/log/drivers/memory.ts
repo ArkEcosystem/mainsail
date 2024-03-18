@@ -1,18 +1,13 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { isEmpty, prettyTime } from "@mainsail/utils";
-import chalk, { Chalk } from "chalk";
-import dayjs, { Dayjs } from "dayjs";
-import advancedFormat from "dayjs/plugin/advancedFormat";
-import utc from "dayjs/plugin/utc";
+import chalk, { ChalkInstance } from "chalk";
+import { differenceInMilliseconds, format } from "date-fns";
 import { inspect } from "util";
-
-dayjs.extend(advancedFormat);
-dayjs.extend(utc);
 
 @injectable()
 export class MemoryLogger implements Contracts.Kernel.Logger {
-	readonly #levelStyles: Record<string, Chalk> = {
+	readonly #levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
 		critical: chalk.red,
 		debug: chalk.magenta,
@@ -25,7 +20,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 	#silentConsole = false;
 
-	#lastTimestamp: Dayjs = dayjs().utc();
+	#lastTimestamp: Date = new Date();
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		return this;
@@ -84,16 +79,18 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 		level = level ? this.#levelStyles[level](`[${level.toUpperCase()}] `) : "";
 
-		const timestamp: string = dayjs.utc().format("YYYY-MM-DD HH:MM:ss.SSS");
+		const timestamp: string = format(new Date(), "yyyy-MM-dd HH:MM:ss.SSS");
 		const timestampDiff: string = this.#getTimestampDiff();
 
 		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);
 	}
 
 	#getTimestampDiff(): string {
-		const diff: number = dayjs().diff(this.#lastTimestamp);
+		const now = new Date();
 
-		this.#lastTimestamp = dayjs.utc();
+		const diff: number = differenceInMilliseconds(now, this.#lastTimestamp);
+
+		this.#lastTimestamp = new Date();
 
 		return chalk.yellow(` +${diff ? prettyTime(diff) : "0ms"}`);
 	}

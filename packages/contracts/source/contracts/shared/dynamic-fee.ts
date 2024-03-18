@@ -1,4 +1,4 @@
-import { Transaction } from "../crypto";
+import { Transaction } from "../crypto/transactions.js";
 
 export interface DynamicFeeContext {
 	transaction: Transaction;

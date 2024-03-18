@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { factory, jsonFactory } from "./attributes";
+import { factory, jsonFactory } from "./attributes/index.js";
 
 export class Repository implements Contracts.State.Repository {
 	protected readonly attributes = new Map<string, Contracts.State.Attribute<unknown>>();

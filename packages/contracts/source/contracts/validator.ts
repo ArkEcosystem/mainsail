@@ -1,4 +1,4 @@
-import { AggregatedSignature, Block, KeyPair, Precommit, Prevote, Proposal } from "./crypto";
+import { AggregatedSignature, Block, KeyPair, Precommit, Prevote, Proposal } from "./crypto/index.js";
 
 export interface Validator {
 	configure(keyPair: KeyPair): Validator;
@@ -17,4 +17,5 @@ export interface Validator {
 
 export interface ValidatorRepository {
 	getValidator(publicKey: string): Validator | undefined;
+	printLoadedValidators(): void;
 }

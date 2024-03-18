@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
-import { errorTypes } from "./hapi-nes";
+import { errorTypes } from "./hapi-nes/index.js";
 
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {

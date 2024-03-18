@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal";
+import { FunctionReturning } from "./internal/index.js";
 
 export const findIndex = <T>(iterable: T[], iteratee: FunctionReturning): number => {
 	for (let index = 0; index < iterable.length; index++) {

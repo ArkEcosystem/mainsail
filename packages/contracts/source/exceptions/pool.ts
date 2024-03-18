@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { Transaction } from "../contracts/crypto";
-import { Exception } from "./base";
+import { Transaction } from "../contracts/crypto/transactions.js";
+import { Exception } from "./base.js";
 
 export class PoolError extends Exception {
 	public readonly type: string;
@@ -45,15 +45,15 @@ export class TransactionHasExpiredError extends PoolError {
 	}
 }
 
-export class TransactionFeeToLowError extends PoolError {
+export class TransactionFeeTooLowError extends PoolError {
 	public constructor(transaction: Transaction) {
-		super(`tx ${transaction.id} fee is to low to enter the pool`, "ERR_LOW_FEE");
+		super(`tx ${transaction.id} fee is too low to enter the pool`, "ERR_LOW_FEE");
 	}
 }
 
-export class TransactionFeeToHighError extends PoolError {
+export class TransactionFeeTooHighError extends PoolError {
 	public constructor(transaction: Transaction) {
-		super(`tx ${transaction.id} fee is to high to enter the pool`, "ERR_HIGH_FEE");
+		super(`tx ${transaction.id} fee is too high to enter the pool`, "ERR_HIGH_FEE");
 	}
 }
 

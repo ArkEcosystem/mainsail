@@ -11,7 +11,7 @@ import { BigNumber } from "@mainsail/utils";
 import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";
-import { FactoryBuilder } from "../factory-builder";
+import { FactoryBuilder } from "../factory-builder.js";
 import {
 	EvmCallOptions,
 	MultiPaymentOptions,
@@ -21,8 +21,8 @@ import {
 	ValidatorRegistrationOptions,
 	ValidatorResignationOptions,
 	VoteOptions,
-} from "../types";
-import { generateApp } from "./generate-app";
+} from "../types.js";
+import { generateApp } from "./generate-app.js";
 
 const AMOUNT = 1;
 const FEE = 1;

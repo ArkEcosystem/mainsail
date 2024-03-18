@@ -1,4 +1,4 @@
-import { headers } from "./headers";
+import { headers } from "./headers.js";
 
 export const postPrevote = {
 	properties: {

@@ -1,5 +1,5 @@
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import nodeConfiguration from "../../test/fixtures/node_configuration.json";
 import nodeFees from "../../test/fixtures/node_fees.json";
 import transactions from "../../test/fixtures/transactions.json";

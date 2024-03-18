@@ -2,10 +2,10 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { minBy } from "@mainsail/utils";
 import Levenshtein from "fast-levenshtein";
-import { blue, red } from "kleur";
+import { blue, red } from "kleur/colors";
 
-import { Application } from "../application";
-import { Identifiers } from "../ioc";
+import { Application } from "../application.js";
+import { Identifiers } from "../ioc/index.js";
 
 @injectable()
 export class SuggestCommand {

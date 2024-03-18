@@ -1,7 +1,7 @@
-import { Block } from "../../models/block";
-import { BlockCriteria, OrBlockCriteria } from "../criteria";
-import { Expression } from "../expressions";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
+import { Block } from "../../models/block.js";
+import { BlockCriteria, OrBlockCriteria } from "../criteria.js";
+import { Expression } from "../expressions.js";
+import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class BlockFilter {
 	public static async getExpression(...criteria: OrBlockCriteria[]): Promise<Expression<Block>> {

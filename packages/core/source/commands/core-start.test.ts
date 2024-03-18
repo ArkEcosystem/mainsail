@@ -1,6 +1,6 @@
 import { Identifiers, Services } from "@mainsail/cli";
-import { Console, describe } from "@mainsail/test-framework";
-import { writeJSONSync } from "fs-extra";
+import { Console, describe } from "../../../test-framework/source";
+import { writeJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 

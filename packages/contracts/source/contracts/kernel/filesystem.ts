@@ -24,4 +24,14 @@ export interface Filesystem {
 	makeDirectory(path): Promise<boolean>;
 
 	deleteDirectory(directory: string): Promise<boolean>;
+
+	writeFileSync(file: string, data: string | NodeJS.ArrayBufferView, options: any): void;
+
+	existsSync(path: string): boolean;
+
+	removeSync(path: string): void;
+
+	readJSONSync<T>(file: string, options?: Record<string, any>): T;
+
+	ensureDirSync(path: string, options?: any): void;
 }

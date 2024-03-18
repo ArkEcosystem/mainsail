@@ -15,6 +15,7 @@ describe("ServiceProvider", ({ assert, beforeEach, it }) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Config.Flags).toConstantValue("core");
 		context.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		context.serviceProvider = context.app.resolve<ServiceProvider>(ServiceProvider);
 	});

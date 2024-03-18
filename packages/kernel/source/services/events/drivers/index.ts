@@ -1,2 +1,2 @@
-export * from "./memory";
-export * from "./null";
+export * from "./memory.js";
+export * from "./null.js";

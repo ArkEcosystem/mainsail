@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { max } from "./max";
 
 describe("max", async ({ assert, it, nock, loader }) => {

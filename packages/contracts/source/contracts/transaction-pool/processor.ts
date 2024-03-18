@@ -1,4 +1,4 @@
-import { Transaction } from "../crypto";
+import { Transaction } from "../crypto/transactions.js";
 
 export type ProcessorError = {
 	type: string;
@@ -6,11 +6,11 @@ export type ProcessorError = {
 };
 
 export type ProcessorResult = {
-	accept: string[];
-	broadcast: string[];
-	invalid: string[];
-	excess: string[];
-	errors?: { [id: string]: ProcessorError };
+	accept: number[];
+	broadcast: number[];
+	invalid: number[];
+	excess: number[];
+	errors?: { [index: string]: ProcessorError };
 };
 
 export interface ProcessorExtension {

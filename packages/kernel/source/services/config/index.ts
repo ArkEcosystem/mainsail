@@ -1,2 +1,2 @@
-export * from "./manager";
-export * from "./repository";
+export * from "./manager.js";
+export * from "./repository.js";

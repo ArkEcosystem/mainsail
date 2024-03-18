@@ -1,5 +1,5 @@
-import { InvalidArgumentException, OutOfRangeException } from "./logic";
-import { RuntimeException } from "./runtime";
+import { InvalidArgumentException, OutOfRangeException } from "./logic.js";
+import { RuntimeException } from "./runtime.js";
 
 export class InvalidPluginConfiguration extends InvalidArgumentException {
 	public constructor(name: string, errors: Record<string, string[]>) {

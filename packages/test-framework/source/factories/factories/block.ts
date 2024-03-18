@@ -5,9 +5,9 @@ import dayjs from "dayjs";
 import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";
-import { Signer } from "../../internal/signer";
-import { FactoryBuilder } from "../factory-builder";
-import { generateApp } from "./generate-app";
+import { Signer } from "../../internal/signer.js";
+import { FactoryBuilder } from "../factory-builder.js";
+import { generateApp } from "./generate-app.js";
 
 export const registerBlockFactory = async (
 	factory: FactoryBuilder,

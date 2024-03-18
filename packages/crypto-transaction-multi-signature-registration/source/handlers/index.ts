@@ -1,1 +1,1 @@
-export * from "./multi-signature-registration";
+export * from "./multi-signature-registration.js";

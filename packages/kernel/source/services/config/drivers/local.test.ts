@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { resolve } from "path";
 
-import { describe } from "../../../../../test-framework";
+import { describe } from "../../../../../test-framework/source";
 import { Application } from "../../../application";
 import { MemoryEventDispatcher } from "../../events";
 import { JoiValidator } from "../../validation/drivers/joi";
@@ -18,6 +18,7 @@ describe<{
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(new MemoryEventDispatcher());
 		context.app.bind(Identifiers.Config.Flags).toConstantValue({});
 		context.app.bind(Identifiers.Config.Plugins).toConstantValue({});
+		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		context.app.bind(Identifiers.Services.Validation.Service).to(JoiValidator);
 
@@ -39,7 +40,7 @@ describe<{
 		await assert.rejects(
 			() => context.configLoader.loadConfiguration(),
 			Exceptions.ApplicationConfigurationCannotBeLoaded,
-			"Unable to load the application configuration file. Failed to discovery any files matching [app.json, app.js].",
+			"Unable to load the application configuration file. Failed to discovery any files matching [app.json].",
 		);
 	});
 

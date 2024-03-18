@@ -1,7 +1,7 @@
-export { commaArrayQuery } from "./comma-separated-query";
-export { dotSeparatedQuery } from "./dot-separated-query";
-export { pagination } from "./pagination";
-export { rateLimit } from "./rate-limit";
-export { responseHeaders } from "./response-headers";
-export { rpcResponseHandler } from "./rpc-response-handler";
-export { whitelist } from "./whitelist";
+export { commaArrayQuery } from "./comma-separated-query.js";
+export { dotSeparatedQuery } from "./dot-separated-query.js";
+export { pagination } from "./pagination/index.js";
+export { rateLimit } from "./rate-limit.js";
+export { responseHeaders } from "./response-headers.js";
+export { rpcResponseHandler } from "./rpc-response-handler.js";
+export { whitelist } from "./whitelist.js";

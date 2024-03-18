@@ -21,7 +21,6 @@ export class VoteTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "vote",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					minVotesUnvotesLength: 1,
 					properties: {

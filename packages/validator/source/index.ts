@@ -1,8 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 
-import { Validator } from "./validator";
-import { ValidatorRepository } from "./validator-repository";
+import { Validator } from "./validator.js";
+import { ValidatorRepository } from "./validator-repository.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

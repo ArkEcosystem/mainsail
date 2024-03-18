@@ -1,7 +1,7 @@
 import Tail from "nodejs-tail";
 import { fileSync, setGracefulCleanup } from "tmp";
 
-import { Console, describe } from "../../../test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { Identifiers, interfaces } from "../ioc";
 import { ProcessManager } from "../services";
 import { Process } from "./process";

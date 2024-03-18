@@ -1,9 +1,10 @@
 {
 	"name": "@mainsail/networking-ntp",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.11",
 	"description": "NTP networking tools for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
@@ -24,7 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "17.11.0"
+		"joi": "17.12.2"
 	},
 	"devDependencies": {
 		"@types/hapi__sntp": "3.1.4",

@@ -2,14 +2,14 @@ import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, Server
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { constants } from "../constants";
-import { plugin as hapiNesPlugin } from "../hapi-nes";
-import { AcceptPeerPlugin } from "./plugins/accept-peer";
-import { CodecPlugin } from "./plugins/codec";
-import { HeaderHandlePlugin } from "./plugins/header-handle";
-import { HeaderIncludePlugin } from "./plugins/header-include";
-import { RateLimitPlugin } from "./plugins/rate-limit";
-import { ValidatePlugin } from "./plugins/validate";
+import { constants } from "../constants.js";
+import { plugin as hapiNesPlugin } from "../hapi-nes/index.js";
+import { AcceptPeerPlugin } from "./plugins/accept-peer.js";
+import { CodecPlugin } from "./plugins/codec.js";
+import { HeaderHandlePlugin } from "./plugins/header-handle.js";
+import { HeaderIncludePlugin } from "./plugins/header-include.js";
+import { RateLimitPlugin } from "./plugins/rate-limit.js";
+import { ValidatePlugin } from "./plugins/validate.js";
 import {
 	GetApiNodesRoute,
 	GetBlocksRoute,
@@ -21,7 +21,7 @@ import {
 	PostPrevoteRoute,
 	PostProposalRoute,
 	PostTransactionsRoute,
-} from "./routes";
+} from "./routes/index.js";
 
 // todo: review the implementation
 @injectable()

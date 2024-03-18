@@ -5,7 +5,7 @@ import {
 	MilestoneSearchResult,
 	NetworkConfig,
 	NetworkConfigPartial,
-} from "./networks";
+} from "./networks.js";
 
 export interface Configuration {
 	setConfig(config: NetworkConfigPartial): void;

@@ -1,11 +1,11 @@
+import { Contracts } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework/distribution";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { headers } from "../../test/fixtures/responses/headers";
+import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { constants } from "../constants";
 import { getPeers } from "./get-peers";
-import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
-import { Contracts } from "@mainsail/contracts";
 
 type Context = {
 	sandbox: Sandbox;

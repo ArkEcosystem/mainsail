@@ -1,6 +1,6 @@
-import { mapArray } from "../map-array";
-import { reduceArray } from "../reduce-array";
-import { words } from "../words";
+import { mapArray } from "../map-array.js";
+import { reduceArray } from "../reduce-array.js";
+import { words } from "../words.js";
 
 export const compoundWords = (
 	value: string,

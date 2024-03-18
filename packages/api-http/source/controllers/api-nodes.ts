@@ -7,8 +7,8 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { ApiNodeResource } from "../resources";
-import { Controller } from "./controller";
+import { ApiNodeResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class ApiNodesController extends Controller {

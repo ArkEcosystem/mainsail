@@ -1,6 +1,7 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
-import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
+import { existsSync } from "fs";
+import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { resolve } from "path";
 
@@ -28,8 +29,17 @@ export class Command extends Commands.Command {
 	async #performPublishment(flags: Contracts.AnyObject): Promise<void> {
 		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
 
+		const dirname = (() => {
+			try {
+				return new URL(".", import.meta.url).pathname;
+			} catch {
+				// eslint-disable-next-line unicorn/prefer-module
+				return __dirname;
+			}
+		})();
+
 		const configDestination = this.app.getCorePath("config");
-		const configSource = resolve(__dirname, `../../bin/config/${this.app.get(Identifiers.Application.Name)}`);
+		const configSource = resolve(dirname, `../../bin/config/${this.app.get<string>(Identifiers.Application.Name)}`);
 
 		await this.components.taskList([
 			{

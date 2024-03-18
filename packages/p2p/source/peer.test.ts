@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import { Peer } from "./peer";
 
 describe<{

@@ -4,13 +4,13 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { UsernameRegistrationTransactionHandler } from "./handlers";
-import { schemas } from "./validation/schemas";
-import { UsernameRegistrationTransaction } from "./versions/1";
+import { UsernameRegistrationTransactionHandler } from "./handlers/index.js";
+import { schemas } from "./validation/schemas.js";
+import { UsernameRegistrationTransaction } from "./versions/1.js";
 
-export * from "./builder";
-export * from "./handlers";
-export * from "./versions";
+export * from "./builder.js";
+export * from "./handlers/index.js";
+export * from "./versions/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

@@ -1,11 +1,12 @@
 import { Constants } from "@mainsail/contracts";
-import { createWriteStream, ensureFileSync, removeSync } from "fs-extra";
+import { createWriteStream } from "fs";
+import { ensureFileSync, removeSync } from "fs-extra/esm";
 import got from "got";
 import stream from "stream";
 import { extract } from "tar";
 import { promisify } from "util";
 
-import { AbstractSource } from "./abstract-source";
+import { AbstractSource } from "./abstract-source.js";
 
 export class NPM extends AbstractSource {
 	public constructor(paths: { data: string; temp: string }) {

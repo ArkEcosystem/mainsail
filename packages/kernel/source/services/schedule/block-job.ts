@@ -2,9 +2,9 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
-import { BlockEvent, ScheduleEvent } from "../../enums";
-import { Job } from "./interfaces";
-import { ExecuteCallbackWhenReady } from "./listeners";
+import { BlockEvent, ScheduleEvent } from "../../enums/events.js";
+import { Job } from "./interfaces.js";
+import { ExecuteCallbackWhenReady } from "./listeners.js";
 
 @injectable()
 export class BlockJob implements Job {

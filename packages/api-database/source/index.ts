@@ -1,6 +1,6 @@
-export * as Contracts from "./contracts";
-export * from "./identifiers";
-export * as Models from "./models";
-export * as Repositories from "./repositories";
-export * as Search from "./search";
-export * from "./service-provider";
+export * as Contracts from "./contracts.js";
+export * from "./identifiers.js";
+export * as Models from "./models/index.js";
+export * as Repositories from "./repositories/index.js";
+export * as Search from "./search/index.js";
+export * from "./service-provider.js";

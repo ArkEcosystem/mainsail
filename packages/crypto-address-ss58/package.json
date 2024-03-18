@@ -1,9 +1,10 @@
 {
 	"name": "@mainsail/crypto-address-ss58",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.11",
 	"description": "Ss58 address derivation for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
@@ -24,8 +25,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@polkadot/util": "^12.6.1",
-		"@polkadot/util-crypto": "^12.6.1"
+		"@polkadot/util": "^12.6.2",
+		"@polkadot/util-crypto": "^12.6.2"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",

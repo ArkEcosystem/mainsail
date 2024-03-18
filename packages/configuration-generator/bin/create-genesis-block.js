@@ -1,11 +1,11 @@
-const envPaths = require("env-paths");
-const { join } = require("path");
-const { makeApplication } = require("../distribution/application-factory");
-const { Identifiers } = require("../distribution/identifiers");
+import envPaths from "env-paths";
+import path from "path";
+import { makeApplication } from "../distribution/application-factory.js";
+import { Identifiers } from "../distribution/identifiers.js";
 
 async function run() {
-	const paths = envPaths("mainsail", { suffix: "" });
-	const configCore = join(paths.config, "core");
+	const paths = envPaths("mainsail", { suffix: "core" });
+	const configCore = path.join(paths.config, "testnet");
 	console.log(paths, configCore);
 
 	const flags = {

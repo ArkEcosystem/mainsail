@@ -1,4 +1,4 @@
-import { JsonValue } from "../types";
+import { JsonValue } from "../types/index.js";
 
 export interface AttributeRepository {
 	set(name: string, type: AttributeType): void;

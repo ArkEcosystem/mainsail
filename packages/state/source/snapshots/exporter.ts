@@ -1,7 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { copyFile, createWriteStream, ensureDirSync, readdirSync, remove } from "fs-extra";
+import { createWriteStream, readdirSync } from "fs";
+import { copy, ensureDirSync, remove } from "fs-extra/esm";
 import { join } from "path";
 import Pumpify from "pumpify";
 import { Writable } from "stream";
@@ -51,7 +52,7 @@ export class Exporter implements Contracts.State.Exporter {
 		await this.#export(temporaryPath, store);
 
 		ensureDirSync(this.app.dataPath("state-export"));
-		await copyFile(temporaryPath, this.app.dataPath(join("state-export", `${height}.gz`)));
+		await copy(temporaryPath, this.app.dataPath(join("state-export", `${height}.gz`)));
 
 		await this.#removeExcessFiles(height);
 

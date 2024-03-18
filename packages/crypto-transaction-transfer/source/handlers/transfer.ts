@@ -1,10 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import Transactions from "@mainsail/crypto-transaction";
+import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
+import { BigNumber } from "@mainsail/utils";
 
-import { TransferTransaction } from "../versions";
+import { TransferTransaction } from "../versions/index.js";
 
 @injectable()
 export class TransferTransactionHandler extends Handlers.TransactionHandler {
@@ -19,7 +20,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 		return [];
 	}
 
-	public getConstructor(): Transactions.TransactionConstructor {
+	public getConstructor(): TransactionConstructor {
 		return TransferTransaction;
 	}
 
@@ -52,6 +53,20 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 				"ERR_INVALID_RECIPIENT",
 			);
 		}
+	}
+
+	public async applyToSender(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<void> {
+		await super.applyToSender(walletRepository, transaction);
+
+		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+
+		const data: Contracts.Crypto.TransactionData = transaction.data;
+
+		const newBalance: BigNumber = sender.getBalance().minus(data.amount);
+		sender.setBalance(newBalance);
 	}
 
 	public async applyToRecipient(

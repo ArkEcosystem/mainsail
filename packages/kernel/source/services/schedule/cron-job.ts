@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { CronCommand, CronJob as Cron } from "cron";
 import { performance } from "perf_hooks";
 
-import { ScheduleEvent } from "../../enums";
-import { Job } from "./interfaces";
+import { ScheduleEvent } from "../../enums/events.js";
+import { Job } from "./interfaces.js";
 
 @injectable()
 export class CronJob implements Job {

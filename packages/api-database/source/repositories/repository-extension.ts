@@ -1,8 +1,8 @@
 import { EntityTarget, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 
-import { RepositoryDataSource } from "../contracts";
-import { Expressions, Options, Pagination, QueryHelper, ResultsPage, Sorting } from "../search";
-import { Expression } from "../search/expressions";
+import { RepositoryDataSource } from "../contracts.js";
+import { Expression } from "../search/expressions.js";
+import { Expressions, Options, Pagination, QueryHelper, ResultsPage, Sorting } from "../search/index.js";
 
 export interface RepositoryExtension<TEntity extends ObjectLiteral> {
 	queryHelper: QueryHelper<TEntity>;

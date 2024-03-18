@@ -1,3 +1,3 @@
-export * from "./block";
-export * from "./identity";
-export * from "./transaction";
+export * from "./block.js";
+export * from "./identity.js";
+export * from "./transaction.js";

@@ -25,7 +25,6 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "multiSignature",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
 						multiSignature: {

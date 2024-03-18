@@ -1,6 +1,6 @@
 import { Dayjs } from "dayjs";
 
-import { PeerProtocol } from "./enums";
+import { PeerProtocol } from "./enums.js";
 
 export interface ApiNode {
 	readonly ip: string;

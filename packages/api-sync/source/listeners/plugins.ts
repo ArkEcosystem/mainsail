@@ -7,7 +7,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers } from "@mainsail/kernel";
 
-import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener";
+import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
 type Event = { name: string };
 

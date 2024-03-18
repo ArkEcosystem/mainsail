@@ -1,4 +1,4 @@
-import { Wallet } from "../../models";
+import { Wallet } from "../../models/index.js";
 import {
 	DelegateBlocks,
 	DelegateCriteria,
@@ -7,9 +7,9 @@ import {
 	DelegateResourceLastBlock,
 	OrDelegateCriteria,
 	OrNumericCriteria,
-} from "../criteria";
-import { Expression, JsonFieldCastType } from "../expressions";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
+} from "../criteria.js";
+import { Expression, JsonFieldCastType } from "../expressions.js";
+import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class DelegateFilter {
 	public static async getExpression(...criteria: OrDelegateCriteria[]): Promise<Expression<Wallet>> {

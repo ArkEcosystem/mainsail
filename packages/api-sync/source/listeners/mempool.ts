@@ -7,7 +7,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
-import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener";
+import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
 @injectable()
 export class Mempool extends AbstractListener<Contracts.Crypto.TransactionData, Models.MempoolTransaction> {

@@ -3,8 +3,8 @@ import { Schemas } from "@mainsail/api-common";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { TransactionsController } from "../controllers/transactions";
-import { transactionSortingSchema } from "../schemas";
+import { TransactionsController } from "../controllers/transactions.js";
+import { transactionSortingSchema } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TransactionsController);

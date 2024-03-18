@@ -8,9 +8,9 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 
-import { BlockResource, DelegateResource, WalletResource } from "../resources";
-import { delegateCriteriaSchemaObject, walletCriteriaSchemaObject } from "../schemas";
-import { Controller } from "./controller";
+import { BlockResource, DelegateResource, WalletResource } from "../resources/index.js";
+import { delegateCriteriaSchemaObject, walletCriteriaSchemaObject } from "../schemas/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class DelegatesController extends Controller {
@@ -44,7 +44,7 @@ export class DelegatesController extends Controller {
 			return Boom.notFound("Delegate not found");
 		}
 
-		return this.toResource(delegate, DelegateResource, request.params.transform);
+		return this.respondWithResource(delegate, DelegateResource, request.params.transform);
 	}
 
 	public async voters(request: Hapi.Request) {

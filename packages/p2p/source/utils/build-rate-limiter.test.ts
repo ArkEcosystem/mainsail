@@ -1,5 +1,4 @@
-import { describe } from "../../../test-framework";
-
+import { describe } from "../../../test-framework/source";
 import { RateLimiter } from "../rate-limiter";
 import { buildRateLimiter } from "./build-rate-limiter";
 

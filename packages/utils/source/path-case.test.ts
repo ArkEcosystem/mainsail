@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { pathCase } from "./path-case";
 
 describe("pathCase", async ({ assert, it, nock, loader }) => {

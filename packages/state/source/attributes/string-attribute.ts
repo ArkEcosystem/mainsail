@@ -1,4 +1,4 @@
-import { GenericAttribute } from "./generic-attribute";
+import { GenericAttribute } from "./generic-attribute.js";
 
 export class StringAttribute extends GenericAttribute<string> {
 	public clone(): StringAttribute {

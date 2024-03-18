@@ -1,11 +1,12 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { parse, stringify } from "envfile";
-import { existsSync, readFileSync, writeFileSync } from "fs-extra";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
-import { envPaths as environmentPaths, Paths } from "../env-paths";
-import { Identifiers } from "../ioc";
+import { Paths } from "../contracts.js";
+import { envPaths as environmentPaths } from "../env-paths.js";
+import { Identifiers } from "../ioc/index.js";
 
 @injectable()
 export class Environment {

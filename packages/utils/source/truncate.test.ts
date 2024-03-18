@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { truncate } from "./truncate";
 
 describe("truncate", async ({ assert, it, nock, loader }) => {

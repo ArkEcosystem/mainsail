@@ -1,7 +1,7 @@
 import { readFileSync } from "fs";
 import { Primitive } from "type-fest";
 
-import { isString } from "./is-string";
+import { isString } from "./is-string.js";
 
 const parse = (contents: string): Record<string, Primitive> => {
 	const result: Record<string, Primitive> = {};

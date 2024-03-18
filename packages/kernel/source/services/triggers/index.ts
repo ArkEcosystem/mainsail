@@ -1,3 +1,3 @@
-export * from "./action";
-export * from "./service-provider";
-export * from "./triggers";
+export * from "./action.js";
+export * from "./service-provider.js";
+export * from "./triggers.js";

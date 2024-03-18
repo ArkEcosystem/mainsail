@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers } from "../ioc";
-import type { Logger } from "../services";
+import { Identifiers } from "../ioc/index.js";
+import type { Logger } from "../services/index.js";
 
 @injectable()
 export class Listing {

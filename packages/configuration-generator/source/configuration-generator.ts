@@ -1,10 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
-import { ensureDirSync, existsSync } from "fs-extra";
+import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 
-import { ConfigurationWriter } from "./configuration-writer";
-import { EnvironmentData } from "./contracts";
+import { ConfigurationWriter } from "./configuration-writer.js";
+import { EnvironmentData } from "./contracts.js";
 import {
 	AppGenerator,
 	EnvironmentGenerator,
@@ -14,8 +14,8 @@ import {
 	NetworkGenerator,
 	PeersGenerator,
 	WalletGenerator,
-} from "./generators";
-import { Identifiers as InternalIdentifiers } from "./identifiers";
+} from "./generators/index.js";
+import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 
 type Task = {
 	task: () => Promise<void>;
@@ -104,7 +104,7 @@ export class ConfigurationGenerator {
 		const tasks: Task[] = [
 			{
 				task: async () => {
-					if (!internalOptions.overwriteConfig && existsSync(this.configurationPath)) {
+					if (!internalOptions.overwriteConfig && pathExistsSync(this.configurationPath)) {
 						throw new Error(`${this.configurationPath} already exists.`);
 					}
 

@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { getPeerUrl } from "./utils";
+import { getPeerUrl } from "./utils/index.js";
 
 @injectable()
 export class ApiNode implements Contracts.P2P.ApiNode {

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { concat } from "./concat";
 
 describe("#concat", ({ it, assert }) => {

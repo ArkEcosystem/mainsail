@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { ByteBuffer } from "./byte-buffer";
 
 describe("ByteBuffer", ({ it, assert }) => {

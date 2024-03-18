@@ -1,8 +1,8 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 
-import Handlers from "./handlers";
-import { Identifiers as ApiTransactionPoolIdentifiers } from "./identifiers";
-import { Server } from "./server";
+import Handlers from "./handlers.js";
+import { Identifiers as ApiTransactionPoolIdentifiers } from "./identifiers.js";
+import { Server } from "./server.js";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected httpIdentifier(): symbol {

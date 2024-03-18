@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { UsernameRegistrationTransaction } from "./versions/1";
+import { UsernameRegistrationTransaction } from "./versions/1.js";
 
 @injectable()
 export class UsernameRegistrationBuilder extends TransactionBuilder<UsernameRegistrationBuilder> {

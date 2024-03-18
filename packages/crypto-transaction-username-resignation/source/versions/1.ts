@@ -13,7 +13,6 @@ export class UsernameResignationTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "usernameResignation",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				type: { transactionType: Contracts.Crypto.TransactionType.UsernameResignation },
 			},
 		});

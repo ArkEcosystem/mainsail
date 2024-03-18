@@ -8,8 +8,8 @@ import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
 
-import { Wallet } from "../contracts";
-import { Generator } from "./generator";
+import { Wallet } from "../contracts.js";
+import { Generator } from "./generator.js";
 
 @injectable()
 export class GenesisBlockGenerator extends Generator {

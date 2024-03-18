@@ -1,10 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { BigNumberAttribute } from "./big-number-attribute";
-import { BooleanAttribute } from "./boolean-attribute";
-import { NumberAttribute } from "./number-attribute";
-import { ObjectAttribute } from "./object-attribute";
-import { StringAttribute } from "./string-attribute";
+import { BigNumberAttribute } from "./big-number-attribute.js";
+import { BooleanAttribute } from "./boolean-attribute.js";
+import { NumberAttribute } from "./number-attribute.js";
+import { ObjectAttribute } from "./object-attribute.js";
+import { StringAttribute } from "./string-attribute.js";
 
 const factories: Record<Contracts.State.AttributeType, new (value?: any) => Contracts.State.Attribute<any>> = {
 	[Contracts.State.AttributeType.Object]: ObjectAttribute,

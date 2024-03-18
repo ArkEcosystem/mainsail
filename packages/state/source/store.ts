@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { Repository } from "./repository";
+import { Repository } from "./repository.js";
 
 @injectable()
 export class Store implements Contracts.State.Store {

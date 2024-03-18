@@ -1,8 +1,8 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { Console, describe } from "@mainsail/test-framework";
 import { ensureDirSync, removeSync, writeFileSync } from "fs-extra";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../test-framework/source";
 import { Command } from "./env-list";
 
 describe<{

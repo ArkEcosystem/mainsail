@@ -1,4 +1,4 @@
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { sortByDesc } from "./sort-by-desc";
 
 const dummies = [

@@ -1,7 +1,7 @@
 import { Contracts, Exceptions } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 
 describe<{
 	transaction: any;
@@ -58,12 +58,12 @@ describe<{
 		assert.equal(error.message, `tx ${context.transaction.id} expired at height 100`);
 	});
 
-	it("TransactionFeeToLowError", (context) => {
-		const error = new Exceptions.TransactionFeeToLowError(context.transaction);
+	it("TransactionFeeTooLowError", (context) => {
+		const error = new Exceptions.TransactionFeeTooLowError(context.transaction);
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_LOW_FEE");
-		assert.equal(error.message, `tx ${context.transaction.id} fee is to low to enter the pool`);
+		assert.equal(error.message, `tx ${context.transaction.id} fee is too low to enter the pool`);
 	});
 
 	it("SenderExceededMaximumTransactionCountError", (context) => {

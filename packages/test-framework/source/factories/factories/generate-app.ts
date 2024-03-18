@@ -1,29 +1,29 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
-import { ServiceProvider as CoreCryptoAddressKeccak256 } from "../../../../crypto-address-keccak256";
-import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block";
-import { ServiceProvider as CoreCryptoCommit } from "../../../../crypto-commit";
-import { ServiceProvider as CoreCryptoConsensus } from "../../../../crypto-consensus-bls12-381";
-import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-hash-bcrypto";
-import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "../../../../crypto-key-pair-ecdsa";
-import { ServiceProvider as CoreCryptoMessages } from "../../../../crypto-messages";
-import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr";
-import { ServiceProvider as CoreCryptoTransaction } from "../../../../crypto-transaction";
-import { ServiceProvider as CoreEvmCallTransaction } from "../../../../crypto-transaction-evm-call";
-import { ServiceProvider as CoreMultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment";
-import { ServiceProvider as CoreMultiSignatureRegistrationTransaction } from "../../../../crypto-transaction-multi-signature-registration";
-import { ServiceProvider as CoreTransferTransaction } from "../../../../crypto-transaction-transfer";
-import { ServiceProvider as CoreValidatorRegistrationTransaction } from "../../../../crypto-transaction-validator-registration";
-import { ServiceProvider as CoreValidatorResignationTransaction } from "../../../../crypto-transaction-validator-resignation";
-import { ServiceProvider as CoreVoteTransaction } from "../../../../crypto-transaction-vote";
-import { ServiceProvider as CoreCryptoValidation } from "../../../../crypto-validation";
-import { ServiceProvider as CoreCryptoWif } from "../../../../crypto-wif";
-import { ServiceProvider as CoreFees } from "../../../../fees";
-import { ServiceProvider as CoreFeesStatic } from "../../../../fees-static";
-import { ServiceProvider as CoreSerializer } from "../../../../serializer";
-import { ServiceProvider as CoreValidation } from "../../../../validation";
-import { Sandbox } from "../../app/sandbox";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "../../../../crypto-address-keccak256/source/index.js";
+import { ServiceProvider as CoreCryptoBlock } from "../../../../crypto-block/source/index.js";
+import { ServiceProvider as CoreCryptoCommit } from "../../../../crypto-commit/source/index.js";
+import { ServiceProvider as CoreCryptoConsensus } from "../../../../crypto-consensus-bls12-381/source/index.js";
+import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../../crypto-hash-bcrypto/source/index.js";
+import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "../../../../crypto-key-pair-ecdsa/source/index.js";
+import { ServiceProvider as CoreEvmCallTransaction } from "../../../../crypto-transaction-evm-call/source/index.js";
+import { ServiceProvider as CoreCryptoMessages } from "../../../../crypto-messages/source/index.js";
+import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../../crypto-signature-schnorr/source/index.js";
+import { ServiceProvider as CoreCryptoTransaction } from "../../../../crypto-transaction/source/index.js";
+import { ServiceProvider as CoreMultiPaymentTransaction } from "../../../../crypto-transaction-multi-payment/source/index.js";
+import { ServiceProvider as CoreMultiSignatureRegistrationTransaction } from "../../../../crypto-transaction-multi-signature-registration/source/index.js";
+import { ServiceProvider as CoreTransferTransaction } from "../../../../crypto-transaction-transfer/source/index.js";
+import { ServiceProvider as CoreValidatorRegistrationTransaction } from "../../../../crypto-transaction-validator-registration/source/index.js";
+import { ServiceProvider as CoreValidatorResignationTransaction } from "../../../../crypto-transaction-validator-resignation/source/index.js";
+import { ServiceProvider as CoreVoteTransaction } from "../../../../crypto-transaction-vote/source/index.js";
+import { ServiceProvider as CoreCryptoValidation } from "../../../../crypto-validation/source/index.js";
+import { ServiceProvider as CoreCryptoWif } from "../../../../crypto-wif/source/index.js";
+import { ServiceProvider as CoreFees } from "../../../../fees/source/index.js";
+import { ServiceProvider as CoreFeesStatic } from "../../../../fees-static/source/index.js";
+import { ServiceProvider as CoreSerializer } from "../../../../serializer/source/index.js";
+import { ServiceProvider as CoreValidation } from "../../../../validation/source/index.js";
+import { Sandbox } from "../../app/sandbox.js";
 
 export const generateApp = async (
 	config: Contracts.Crypto.NetworkConfigPartial,

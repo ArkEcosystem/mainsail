@@ -1,6 +1,6 @@
 import { Validator } from "@mainsail/validation/source/validator";
 
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { headers as data } from "../../test/fixtures/responses/headers";
 import { prepareValidatorContext } from "../../test/helpers/prepare-validator-context";
 import { headers } from "./headers";

@@ -2,12 +2,11 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { camelCase, expandTilde, set } from "@mainsail/utils";
 import envPaths from "env-paths";
-import { ensureDirSync } from "fs-extra";
 import { join, resolve } from "path";
 
-import { ConfigRepository } from "../services/config";
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
+import { ConfigRepository } from "../services/config/index.js";
+import { assert } from "../utils/assert.js";
+import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
 export class RegisterBasePaths implements Bootstrapper {
@@ -16,6 +15,9 @@ export class RegisterBasePaths implements Bootstrapper {
 
 	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
+
+	@inject(Identifiers.Services.Filesystem.Service)
+	private readonly fileSystem!: Contracts.Kernel.Filesystem;
 
 	public async bootstrap(): Promise<void> {
 		const paths: Array<[string, string]> = Object.entries(envPaths("mainsail", { suffix: "" }));
@@ -44,7 +46,7 @@ export class RegisterBasePaths implements Bootstrapper {
 
 			assert.defined<string>(path);
 
-			ensureDirSync(path);
+			this.fileSystem.ensureDirSync(path);
 
 			set(process.env, configKey, path);
 

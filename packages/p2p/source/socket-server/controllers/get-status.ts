@@ -2,7 +2,7 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { getPeerConfig } from "../utils/get-peer-config";
+import { getPeerConfig } from "../utils/get-peer-config.js";
 @injectable()
 export class GetStatusController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Application.Instance)

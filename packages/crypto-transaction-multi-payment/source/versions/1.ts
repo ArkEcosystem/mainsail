@@ -23,6 +23,7 @@ export class MultiPaymentTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "multiPayment",
 			properties: {
+				amount: { bignumber: { maximum: undefined, minimum: 1 } },
 				asset: {
 					properties: {
 						payments: {

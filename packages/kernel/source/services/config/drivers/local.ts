@@ -2,13 +2,12 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { dotenv, get, set } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
-import importFresh from "import-fresh";
 import Joi from "joi";
 import { extname } from "path";
 
-import { KeyValuePair } from "../../../types";
-import { assert } from "../../../utils";
-import { ConfigRepository } from "../repository";
+import { KeyValuePair } from "../../../types/index.js";
+import { assert } from "../../../utils/assert.js";
+import { ConfigRepository } from "../repository.js";
 
 @injectable()
 export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
@@ -54,7 +53,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadApplication(): void {
 		this.validationService.validate(
-			this.#loadFromLocation(["app.json", "app.js"]),
+			this.#loadFromLocation(["app.json"]),
 			Joi.object({
 				flags: Joi.array().items(Joi.string()).optional(),
 				plugins: Joi.array()
@@ -139,7 +138,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 				const config: KeyValuePair =
 					extname(fullPath) === ".json"
 						? JSON.parse(readFileSync(fullPath).toString())
-						: importFresh(fullPath);
+						: readFileSync(fullPath);
 
 				assert.defined<KeyValuePair>(config);
 

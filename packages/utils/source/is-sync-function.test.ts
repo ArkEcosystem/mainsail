@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { isSyncFunction } from "./is-sync-function";
 
 describe("#isSyncFunction", ({ it, assert }) => {

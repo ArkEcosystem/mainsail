@@ -1,5 +1,5 @@
-import { Transaction } from "../crypto";
-import { SenderMempool } from "./sender-mempool";
+import { Transaction } from "../crypto/transactions.js";
+import { SenderMempool } from "./sender-mempool.js";
 
 export interface Mempool {
 	getSize(): number;

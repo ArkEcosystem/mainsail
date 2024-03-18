@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Enums, Providers } from "@mainsail/kernel";
 
-import { describeSkip, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework/source";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { PeerProcessor } from "./peer-processor";

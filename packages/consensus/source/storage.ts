@@ -1,20 +1,20 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Database, Key } from "lmdb";
+import * as lmdb from "lmdb";
 
 @injectable()
 export class Storage implements Contracts.Consensus.ConsensusStorage {
 	@inject(Identifiers.Database.Storage.Proposal)
-	private readonly proposalStorage!: Database;
+	private readonly proposalStorage!: lmdb.Database;
 
 	@inject(Identifiers.Database.Storage.PreVote)
-	private readonly prevoteStorage!: Database;
+	private readonly prevoteStorage!: lmdb.Database;
 
 	@inject(Identifiers.Database.Storage.PreCommit)
-	private readonly precommitStorage!: Database;
+	private readonly precommitStorage!: lmdb.Database;
 
 	@inject(Identifiers.Database.Storage.ConsensusState)
-	private readonly stateStorage!: Database;
+	private readonly stateStorage!: lmdb.Database;
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
@@ -88,17 +88,17 @@ export class Storage implements Contracts.Consensus.ConsensusStorage {
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
-		const proposals = [...this.proposalStorage.getValues(undefined as unknown as Key)];
+		const proposals = [...this.proposalStorage.getValues(undefined as unknown as lmdb.Key)];
 		return Promise.all(proposals.map((proposal) => this.messageFactory.makeProposalFromData(proposal)));
 	}
 
 	public async getPrevotes(): Promise<Contracts.Crypto.Prevote[]> {
-		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as Key)];
+		const prevotes = [...this.prevoteStorage.getValues(undefined as unknown as lmdb.Key)];
 		return Promise.all(prevotes.map((prevote) => this.messageFactory.makePrevoteFromData(prevote)));
 	}
 
 	public async getPrecommits(): Promise<Contracts.Crypto.Precommit[]> {
-		const precommits = [...this.precommitStorage.getValues(undefined as unknown as Key)];
+		const precommits = [...this.precommitStorage.getValues(undefined as unknown as lmdb.Key)];
 		return Promise.all(precommits.map((precommit) => this.messageFactory.makePrecommitFromData(precommit)));
 	}
 

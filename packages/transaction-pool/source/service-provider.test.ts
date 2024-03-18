@@ -4,7 +4,7 @@ import { Application, Services } from "@mainsail/kernel";
 import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { ServiceProvider } from ".";
 
 const importDefaults = () =>

@@ -2,8 +2,8 @@ import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers, Utils as KernelUtils } from "@mainsail/kernel";
 
-import { isValidVersion } from "./utils";
-import { isValidPeerIp } from "./validation";
+import { isValidVersion } from "./utils/index.js";
+import { isValidPeerIp } from "./validation/index.js";
 
 @injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {

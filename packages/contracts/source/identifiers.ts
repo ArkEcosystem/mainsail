@@ -206,10 +206,6 @@ export const Identifiers = {
 		Pipeline: {
 			Factory: Symbol("Kernel<Pipeline.Factory>"),
 		},
-		ProcessActions: {
-			Manager: Symbol("Kernel<ProcessActions.Manager>"),
-			Service: Symbol("Kernel<ProcessActions.Service>"),
-		},
 		Queue: {
 			Factory: Symbol("Kernel<Queue.Factory>"),
 			Manager: Symbol("Kernel<Queue.Manager>"),

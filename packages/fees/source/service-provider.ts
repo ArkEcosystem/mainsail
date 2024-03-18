@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { FeeRegistry } from "./registry";
+import { FeeRegistry } from "./registry.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

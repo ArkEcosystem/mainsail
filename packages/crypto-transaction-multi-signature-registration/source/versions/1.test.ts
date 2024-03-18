@@ -8,7 +8,7 @@ import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validati
 import { BigNumber } from "@mainsail/utils";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { MultiSignatureRegistrationTransaction } from "./1";
 
 describe<{

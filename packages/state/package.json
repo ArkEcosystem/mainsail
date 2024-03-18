@@ -1,9 +1,10 @@
 {
 	"name": "@mainsail/state",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.11",
 	"description": "State management for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
@@ -25,7 +26,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"fs-extra": "11.2.0",
-		"joi": "17.11.0",
+		"joi": "17.12.2",
 		"pumpify": "2.0.1"
 	},
 	"devDependencies": {

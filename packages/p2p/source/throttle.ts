@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types } from "@mainsail/kernel";
 import delay from "delay";
 
-import { RateLimiter } from "./rate-limiter";
-import { buildRateLimiter } from "./utils";
+import { RateLimiter } from "./rate-limiter.js";
+import { buildRateLimiter } from "./utils/index.js";
 
 @injectable()
 export class Throttle {

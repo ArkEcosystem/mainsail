@@ -1,3 +1,3 @@
-export * from "./contracts";
-export * from "./registry";
-export * from "./service-provider";
+export * from "./contracts.js";
+export * from "./registry.js";
+export * from "./service-provider.js";

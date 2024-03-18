@@ -1,9 +1,9 @@
-import { constants } from "../../constants";
-import { Routes } from "../../enums";
-import { Codecs } from "../codecs";
-import { PostPrevoteController } from "../controllers";
-import { Schemas } from "../schemas";
-import { Route, RouteConfig } from "./route";
+import { constants } from "../../constants.js";
+import { Routes } from "../../enums.js";
+import { Codecs } from "../codecs/index.js";
+import { PostPrevoteController } from "../controllers/index.js";
+import { Schemas } from "../schemas/index.js";
+import { Route, RouteConfig } from "./route.js";
 
 export class PostPrevoteRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {

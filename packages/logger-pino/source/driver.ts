@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import chalk, { Chalk } from "chalk";
+import chalk, { ChalkInstance } from "chalk";
 import { error as console_error } from "console";
 import pino from "pino";
 import { prettyFactory, PrettyOptions } from "pino-pretty";
@@ -18,7 +18,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	readonly #levelStyles: Record<string, Chalk> = {
+	readonly #levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
 		critical: chalk.red,
 		debug: chalk.magenta,
@@ -39,7 +39,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 
 	public async make(options?: any): Promise<Contracts.Kernel.Logger> {
 		this.#stream = new PassThrough();
-		this.#logger = pino(
+		this.#logger = pino.default(
 			{
 				base: null,
 				customLevels: {

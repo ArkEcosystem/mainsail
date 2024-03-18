@@ -1,9 +1,9 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import Joi from "joi";
 
-import Handlers from "./handlers";
-import { Identifiers as ApiIdentifiers } from "./identifiers";
-import { Server } from "./server";
+import Handlers from "./handlers.js";
+import { Identifiers as ApiIdentifiers } from "./identifiers.js";
+import { Server } from "./server.js";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected httpIdentifier(): symbol {

@@ -1,8 +1,8 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { Listeners } from "./listeners";
-import { Sync } from "./service";
+import { Listeners } from "./listeners.js";
+import { Sync } from "./service.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

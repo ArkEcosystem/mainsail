@@ -1,9 +1,9 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { InternalTransactionType } from "./internal-transaction-type";
-import { Transaction } from "./types";
-import { signedSchema, strictSchema } from "./validation/utils";
+import { InternalTransactionType } from "./internal-transaction-type.js";
+import { Transaction } from "./types/index.js";
+import { signedSchema, strictSchema } from "./validation/utils.js";
 
 export type TransactionConstructor = typeof Transaction;
 
