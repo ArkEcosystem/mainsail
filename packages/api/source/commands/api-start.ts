@@ -34,7 +34,7 @@ export class Command extends Commands.Command {
 			{
 				args: `api:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail-api`,
-				script: resolve(dirname, "../../bin/run"),
+				script: resolve(dirname, "../../bin/run.js"),
 			},
 			flags,
 		);
