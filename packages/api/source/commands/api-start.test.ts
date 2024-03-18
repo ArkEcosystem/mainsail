@@ -1,8 +1,8 @@
 import { Identifiers, Services } from "@mainsail/cli";
-import { Console, describe } from "../../../test-framework/source";
 import { resolve } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../test-framework/source";
 import { Command } from "./api-start";
 
 describe<{
@@ -32,7 +32,7 @@ describe<{
 				},
 				name: "mainsail-api",
 				node_args: undefined,
-				script: resolve(__dirname, "../../../../packages/api/bin/run"),
+				script: resolve(__dirname, "../../../../packages/api/bin/run.js"),
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail-api" },
 		);
