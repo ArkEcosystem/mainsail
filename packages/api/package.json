@@ -19,7 +19,7 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"mainsail-api": "node ./bin/run",
+		"mainsail-api": "node ./bin/run.js",
 		"release": "pnpm publish --access public",
 		"test": "uvu -r tsm source .test.ts",
 		"test:coverage": "c8 pnpm run test",
