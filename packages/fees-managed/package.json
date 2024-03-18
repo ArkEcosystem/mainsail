@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/fees-managed",
-	"version": "0.0.1-alpha.11",
+	"version": "0.0.1-alpha.12",
 	"description": "Managed fee strategy for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
