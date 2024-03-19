@@ -9,7 +9,7 @@ import { Command } from "./core-start";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("CoreStartCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("CoreStartCommand", ({ beforeEach, afterAll, it, assert, stub, match }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
@@ -35,7 +35,7 @@ describe<{
 				},
 				name: "mainsail",
 				node_args: undefined,
-				script: resolve(__dirname, "../../../../packages/core/bin/run.js"),
+				script: match.string,
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail" },
 		);

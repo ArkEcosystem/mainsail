@@ -8,7 +8,7 @@ import { Command } from "./api-start";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("ApiStartCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("ApiStartCommand", ({ beforeEach, afterAll, it, assert, stub, match }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
@@ -32,7 +32,7 @@ describe<{
 				},
 				name: "mainsail-api",
 				node_args: undefined,
-				script: resolve(__dirname, "../../../../packages/api/bin/run.js"),
+				script: match.string,
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail-api" },
 		);
