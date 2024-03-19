@@ -7,15 +7,14 @@ import { execa } from "../execa.js";
 export class Setup {
 	public isGlobal(): boolean {
 		try {
-			const globalDir = this.getGlobalRootDir();
-			return !!(globalDir && this.getLocalEntrypoint().startsWith(globalDir.replace("node_modules", "")));
+			return this.getEntrypoint().startsWith(this.getGlobalRootDir());
 		} catch {
 			return false;
 		}
 	}
 
-	public getLocalEntrypoint(): string {
-		return require.main!.filename;
+	public getEntrypoint(): string {
+		return process.argv[0];
 	}
 
 	public getGlobalEntrypoint(packageId: string): string {
