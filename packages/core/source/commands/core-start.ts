@@ -1,7 +1,6 @@
 import { Commands, Contracts, Identifiers, Utils } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
 import Joi from "joi";
-import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -28,15 +27,7 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
-		const dirname = (() => {
-			try {
-				return new URL(".", import.meta.url).pathname;
-			} catch {
-				// eslint-disable-next-line unicorn/prefer-module
-				return __dirname;
-			}
-		})();
-
+		console.log("isGlobal", this.setup.isGlobal());
 		console.log("local", this.setup.getEntrypoint());
 		console.log("global", this.setup.getGlobalEntrypoint("@mainsail/core"));
 
@@ -46,7 +37,9 @@ export class Command extends Commands.Command {
 			{
 				args: `core:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail`,
-				script: resolve(dirname, "../../bin/run.js"),
+				script: this.setup.isGlobal()
+					? this.setup.getGlobalEntrypoint("@mainsail/core")
+					: this.setup.getEntrypoint(),
 			},
 			flags,
 		);
