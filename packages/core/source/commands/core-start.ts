@@ -27,10 +27,6 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
-		console.log("isGlobal", this.setup.isGlobal());
-		console.log("local", this.setup.getEntrypoint());
-		console.log("global", this.setup.getGlobalEntrypoint("@mainsail/core"));
-
 		this.actions.abortRunningProcess(`mainsail`);
 
 		await this.actions.daemonizeProcess(
