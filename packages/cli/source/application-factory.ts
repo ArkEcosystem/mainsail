@@ -48,7 +48,16 @@ import { envPaths as environmentPaths } from "./env-paths.js";
 import { Input, InputValidator } from "./input/index.js";
 import { Identifiers } from "./ioc/index.js";
 import { Output } from "./output/index.js";
-import { Config, Environment, Installer, Logger, PluginManager, ProcessManager, Updater } from "./services/index.js";
+import {
+	Config,
+	Environment,
+	Installer,
+	Logger,
+	PluginManager,
+	ProcessManager,
+	Setup,
+	Updater,
+} from "./services/index.js";
 import { Process } from "./utils/index.js";
 
 export class ApplicationFactory {
@@ -95,6 +104,8 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Installer).to(Installer).inSingletonScope();
 
 		app.bind(Identifiers.Environment).to(Environment).inSingletonScope();
+
+		app.bind(Identifiers.Setup).to(Setup).inSingletonScope();
 
 		// Input
 		app.bind(Identifiers.Input).to(Input).inSingletonScope();
