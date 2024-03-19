@@ -34,6 +34,13 @@ export class Command extends Commands.Command {
 			}
 		})();
 
+		console.log("dirname", import.meta.dirname);
+		console.log("filename", import.meta.filename);
+		console.log("url", import.meta.url);
+		console.log("execPath", process.execPath);
+		console.log("cwd", process.cwd());
+		console.log("cwd", process.argv[1]);
+
 		this.actions.abortRunningProcess(`mainsail`);
 
 		await this.actions.daemonizeProcess(
