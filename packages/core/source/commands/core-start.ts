@@ -1,10 +1,13 @@
-import { Commands, Contracts, Utils } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { Commands, Contracts, Identifiers, Utils } from "@mainsail/cli";
+import { inject, injectable } from "@mainsail/container";
 import Joi from "joi";
 import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
+	@inject(Identifiers.Setup)
+	private readonly setup!: Contracts.Setup;
+
 	public signature = "core:start";
 
 	public description = "Start the Core process.";
@@ -34,12 +37,8 @@ export class Command extends Commands.Command {
 			}
 		})();
 
-		console.log("dirname", import.meta.dirname);
-		console.log("filename", import.meta.filename);
-		console.log("url", import.meta.url);
-		console.log("execPath", process.execPath);
-		console.log("cwd", process.cwd());
-		console.log("cwd", process.argv[1]);
+		console.log("local", this.setup.getEntrypoint());
+		console.log("global", this.setup.getGlobalEntrypoint("@mainsail/core"));
 
 		this.actions.abortRunningProcess(`mainsail`);
 

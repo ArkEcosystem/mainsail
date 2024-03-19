@@ -14,11 +14,11 @@ export class Setup {
 	}
 
 	public getEntrypoint(): string {
-		return process.argv[0];
+		return process.argv[1];
 	}
 
 	public getGlobalEntrypoint(packageId: string): string {
-		return join(this.getGlobalRootDir(), `${packageId}/bin/run`);
+		return join(this.getGlobalRootDir(), `${packageId}/bin/run.js`);
 	}
 
 	private getGlobalRootDir(): string {

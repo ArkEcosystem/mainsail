@@ -50,6 +50,12 @@ export interface Updater {
 	getLatestVersion(): Promise<string | undefined>;
 }
 
+export interface Setup {
+	isGlobal(): boolean;
+	getEntrypoint(): string;
+	getGlobalEntrypoint(packageId: string): string;
+}
+
 export interface Installer {
 	install(package_: string): void;
 
