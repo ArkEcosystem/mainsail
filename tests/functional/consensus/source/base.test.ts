@@ -1,4 +1,7 @@
-import { describe } from "@mainsail/test-runner";
+import { describe } from "@mainsail/test-framework";
 
-console.log("Hello from base.test.ts");
-console.log(describe);
+describe("Consensus", ({ it, assert }) => {
+	it("should be ok", () => {
+		assert.true(true);
+	});
+});

@@ -3152,9 +3152,6 @@ importers:
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../../../packages/test-framework
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../../../packages/test-runner
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
