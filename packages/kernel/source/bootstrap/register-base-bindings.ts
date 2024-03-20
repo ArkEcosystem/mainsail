@@ -4,10 +4,9 @@ import path from "path";
 import { URL } from "url";
 
 import { assert } from "../utils/assert.js";
-import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
-export class RegisterBaseBindings implements Bootstrapper {
+export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

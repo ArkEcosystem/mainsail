@@ -5,12 +5,11 @@ import semver from "semver";
 import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 import { ValidationManager } from "../services/validation/index.js";
 import { assert } from "../utils/assert.js";
-import { Bootstrapper } from "./interfaces.js";
 
 // @TODO review the implementation
 
 @injectable()
-export class RegisterServiceProviders implements Bootstrapper {
+export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

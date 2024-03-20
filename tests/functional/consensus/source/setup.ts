@@ -1,5 +1,5 @@
 import { ServiceProvider as Consensus } from "@mainsail/consensus";
-import { Identifiers } from "@mainsail/contracts";
+import { Identifiers, Contracts } from "@mainsail/contracts";
 import { ServiceProvider as CryptoAddressBeach32m } from "@mainsail/crypto-address-bech32m";
 import { ServiceProvider as CryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
@@ -23,11 +23,6 @@ import { ServiceProvider as Transactions } from "@mainsail/transactions";
 import { ServiceProvider as Validation } from "@mainsail/validation";
 import { ServiceProvider as Validator } from "@mainsail/validator";
 
-// TODO: Move to contracts
-type Bootstrapper = {
-	bootstrap: () => Promise<void>;
-};
-
 export const setup = async () => {
 	const sandbox = new Sandbox();
 
@@ -37,19 +32,19 @@ export const setup = async () => {
 
 	// TODO: Register event dispatcher
 
-	await sandbox.app.resolve<Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
-	await sandbox.app.resolve<Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
-	await sandbox.app.resolve<Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
-	// await sandbox.app.resolve<Bootstrapper>(Bootstrap.RegisterBaseBindings).bootstrap();
+	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
+	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
+	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
+	// RegisterBaseBindings
 	sandbox.app.bind("path.data").toConstantValue("/home/ubuntu/mainsail/tests/functional/consensus/paths/data");
 	sandbox.app.bind("path.config").toConstantValue("/home/ubuntu/mainsail/tests/functional/consensus/paths/config");
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
 	sandbox.app.bind("path.temp").toConstantValue("");
 
-	await sandbox.app.resolve<Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
-	await sandbox.app.resolve<Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
+	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
+	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
 	await sandbox.app.resolve(Validation).register();
 	await sandbox.app.resolve(CryptoConfig).register();

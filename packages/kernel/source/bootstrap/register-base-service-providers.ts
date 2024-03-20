@@ -2,10 +2,9 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Cache, Filesystem, Log, Pipeline, Queue, Schedule, Triggers, Validation } from "../services/index.js";
-import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
-export class RegisterBaseServiceProviders implements Bootstrapper {
+export class RegisterBaseServiceProviders implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
