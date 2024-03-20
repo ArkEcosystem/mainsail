@@ -2728,9 +2728,33 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../crypto-address-bech32m
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../crypto-block
+      '@mainsail/crypto-commit':
+        specifier: workspace:*
+        version: link:../crypto-commit
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-messages':
+        specifier: workspace:*
+        version: link:../crypto-messages
+      '@mainsail/crypto-signature-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-signature-schnorr
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2752,12 +2776,27 @@ importers:
       '@mainsail/crypto-transaction-vote':
         specifier: workspace:*
         version: link:../crypto-transaction-vote
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../crypto-wif
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../fees
+      '@mainsail/fees-static':
+        specifier: workspace:*
+        version: link:../fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/p2p':
         specifier: workspace:*
         version: link:../p2p
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
       '@mainsail/state':
         specifier: workspace:*
         version: link:../state
@@ -2767,6 +2806,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       bip39:
         specifier: 3.1.0
         version: 3.1.0
@@ -2786,9 +2828,6 @@ importers:
         specifier: 0.2.3
         version: 0.2.3
     devDependencies:
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
       '@types/chance':
         specifier: 1.1.6
         version: 1.1.6
