@@ -40,6 +40,7 @@
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/fees": "workspace:*",
