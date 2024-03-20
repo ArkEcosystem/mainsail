@@ -3152,6 +3152,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
         version: link:../../../packages/crypto-address-bech32m
@@ -3188,6 +3191,9 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../../../packages/database
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../../../packages/kernel
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../../../packages/logger-pino

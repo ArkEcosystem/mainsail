@@ -35,6 +35,8 @@
 		"@mainsail/validator": "workspace:*",
 		"@mainsail/proposer": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
