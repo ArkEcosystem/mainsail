@@ -3108,6 +3108,15 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  tests/functional/consensus:
+    devDependencies:
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../../../packages/test-framework
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:
