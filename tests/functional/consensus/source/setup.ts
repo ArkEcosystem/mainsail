@@ -1,5 +1,5 @@
 import { ServiceProvider as Consensus } from "@mainsail/consensus";
-import { Identifiers, Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CryptoAddressBeach32m } from "@mainsail/crypto-address-bech32m";
 import { ServiceProvider as CryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
@@ -12,7 +12,7 @@ import { ServiceProvider as CryptoSignatureSchnorr } from "@mainsail/crypto-sign
 import { ServiceProvider as CryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as Database } from "@mainsail/database";
-import { Bootstrap } from "@mainsail/kernel";
+import { Bootstrap, Providers } from "@mainsail/kernel";
 import { ServiceProvider as Processor } from "@mainsail/processor";
 import { ServiceProvider as Proposer } from "@mainsail/proposer";
 import { ServiceProvider as Serializer } from "@mainsail/serializer";
@@ -22,8 +22,10 @@ import { ServiceProvider as TransactionPool } from "@mainsail/transaction-pool";
 import { ServiceProvider as Transactions } from "@mainsail/transactions";
 import { ServiceProvider as Validation } from "@mainsail/validation";
 import { ServiceProvider as Validator } from "@mainsail/validator";
+import { readJSONSync } from "fs-extra";
+import { createRequire } from "module";
 
-export const setup = async () => {
+const setup = async () => {
 	const sandbox = new Sandbox();
 
 	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
@@ -45,29 +47,59 @@ export const setup = async () => {
 
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
+	const { ServiceProvider } = await import("@mainsail/validation");
 
-	await sandbox.app.resolve(Validation).register();
-	await sandbox.app.resolve(CryptoConfig).register();
-	await sandbox.app.resolve(CryptoValidation).register();
-	await sandbox.app.resolve(CryptoHashBcrypto).register();
-	await sandbox.app.resolve(CryptoSignatureSchnorr).register();
-	await sandbox.app.resolve(CryptoKeyPairSchnorr).register();
-	await sandbox.app.resolve(CryptoConsensusBls).register();
-	await sandbox.app.resolve(CryptoAddressBeach32m).register();
-	await sandbox.app.resolve(CryptoWif).register();
-	await sandbox.app.resolve(Serializer).register();
-	await sandbox.app.resolve(CryptoBlock).register();
-	await sandbox.app.resolve(State).register();
-	await sandbox.app.resolve(Database).register();
-	await sandbox.app.resolve(Transactions).register();
-	await sandbox.app.resolve(TransactionPool).register();
-	await sandbox.app.resolve(CryptoMessages).register();
-	await sandbox.app.resolve(CryptoCommit).register();
-	await sandbox.app.resolve(CryptoCommit).register();
-	await sandbox.app.resolve(Processor).register();
-	await sandbox.app.resolve(Validator).register();
-	await sandbox.app.resolve(Proposer).register();
-	await sandbox.app.resolve(Consensus).register();
+	// const manifest = sandbox.app.resolve(Providers.PluginManifest).discover("@mainsail/validation");
+	const manifest = JSON.parse(JSON.stringify(await import("@mainsail/validation/package.json")));
+
+	// console.log("ServiceProvider:", ServiceProvider);
+	console.log("Manifest: ", manifest);
+
+	const serviceProvider = sandbox.app.resolve(ServiceProvider);
+	serviceProvider.setManifest(manifest);
+	// serviceProvider.setConfig(serviceProvider.configDefaults());
+
+	console.log("ServiceProvider:", serviceProvider);
+
+	console.log("Meta", import.meta.url);
+
+	// console.log("ServiceProvider.name():", serviceProvider.name());
+	// console.log("ServiceProvider.configDefaults():", serviceProvider.configDefaults());
+	// console.log("Manifest2:", manifest2);
+
+	// await sandbox.app.resolve(Validation).register();
+	// await sandbox.app.resolve(CryptoConfig).register();
+	// await sandbox.app.resolve(CryptoValidation).register();
+	// await sandbox.app.resolve(CryptoHashBcrypto).register();
+	// await sandbox.app.resolve(CryptoSignatureSchnorr).register();
+	// await sandbox.app.resolve(CryptoKeyPairSchnorr).register();
+	// await sandbox.app.resolve(CryptoConsensusBls).register();
+	// await sandbox.app.resolve(CryptoAddressBeach32m).register();
+	// await sandbox.app.resolve(CryptoWif).register();
+	// await sandbox.app.resolve(Serializer).register();
+	// await sandbox.app.resolve(CryptoBlock).register();
+	// await sandbox.app.resolve(State).register();
+	// await sandbox.app.resolve(Database).register();
+	// await sandbox.app.resolve(Transactions).register();
+	// await sandbox.app.resolve(TransactionPool).register();
+	// await sandbox.app.resolve(CryptoMessages).register();
+	// await sandbox.app.resolve(CryptoCommit).register();
+	// await sandbox.app.resolve(CryptoCommit).register();
+	// await sandbox.app.resolve(Processor).register();
+	// await sandbox.app.resolve(Validator).register();
+	// await sandbox.app.resolve(Proposer).register();
+	// await sandbox.app.resolve(Consensus).register();
 
 	return sandbox;
 };
+
+const dirname = () => {
+	try {
+		return new URL(".", import.meta.url).pathname;
+	} catch {
+		// eslint-disable-next-line unicorn/prefer-module
+		return __dirname;
+	}
+};
+
+export { setup };
