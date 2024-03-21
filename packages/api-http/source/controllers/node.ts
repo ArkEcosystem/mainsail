@@ -58,6 +58,10 @@ export class NodeController extends Controller {
 	}
 
 	public async fees(request: Hapi.Request) {
+		const configuration = await this.getConfiguration();
+		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
+		const genesisTimestamp = cryptoConfiguration.genesisBlock.block.timestamp;
+
 		const transactionTypes = await this.transactionTypeRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -65,7 +69,10 @@ export class NodeController extends Controller {
 			.addOrderBy("type_group", "ASC")
 			.getMany();
 
-		const results = await this.transactionRepositoryFactory().getFeeStatistics(request.query.days);
+		const results = await this.transactionRepositoryFactory().getFeeStatistics(
+			genesisTimestamp,
+			request.query.days,
+		);
 
 		const groupedByTypeGroup = {};
 		for (const transactionType of transactionTypes) {
