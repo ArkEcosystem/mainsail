@@ -7,14 +7,14 @@ import { BigNumber, get, set } from "@mainsail/utils";
 export class FeeRegistry implements Contracts.Fee.FeeRegistry {
 	readonly #registry: Record<number, BigNumber> = {};
 
-	public get(transaction: string, version: number): BigNumber {
+	public get(transaction: string, version = 1): BigNumber {
 		const value = get(this.#registry, `${transaction}.${version}`);
 		Utils.assert.defined<BigNumber>(value);
 
 		return value;
 	}
 
-	public set(transaction: string, version: number, fee: BigNumber): void {
+	public set(transaction: string, fee: BigNumber, version = 1): void {
 		set(this.#registry, `${transaction}.${version}`, fee);
 	}
 }

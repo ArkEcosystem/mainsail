@@ -36,11 +36,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerFees(): void {
 		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			VoteTransaction.key,
-			VoteTransaction.version,
 			{
 				managed: BigNumber.make("100"),
 				static: BigNumber.make("100000000"),
 			}[this.app.get<string>(Identifiers.Fee.Type)]!,
+			VoteTransaction.version,
 		);
 	}
 

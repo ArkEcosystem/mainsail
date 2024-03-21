@@ -27,11 +27,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerFees(): void {
 		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			ValidatorResignationTransaction.key,
-			ValidatorResignationTransaction.version,
 			{
 				managed: BigNumber.make("100"),
 				static: BigNumber.make("2500000000"),
 			}[this.app.get<string>(Identifiers.Fee.Type)]!,
+			ValidatorResignationTransaction.version,
 		);
 	}
 
