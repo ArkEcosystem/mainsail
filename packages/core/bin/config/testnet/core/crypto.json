@@ -3440,7 +3440,7 @@
 					"validatorResignation": 2500000000,
 					"vote": 100000000
 				}
-			},			
+			},
 			"height": 0,
 			"multiPaymentLimit": 256,
 			"reward": "0",
