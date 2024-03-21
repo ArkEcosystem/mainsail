@@ -44,7 +44,7 @@ describe<{
 		await assert.resolves(() => serviceProvider.register());
 
 		spySet.calledOnce();
-		spySet.calledWith(VoteTransaction.key, VoteTransaction.version, BigNumber.make("100"));
+		spySet.calledWith(VoteTransaction.key, BigNumber.make("100"), VoteTransaction.version);
 	});
 
 	it("#register - should register keywords", async ({ serviceProvider, validator }) => {
@@ -62,7 +62,7 @@ describe<{
 		await assert.resolves(() => serviceProvider.register());
 
 		spySet.calledOnce();
-		spySet.calledWith(VoteTransaction.key, VoteTransaction.version, BigNumber.make("100000000"));
+		spySet.calledWith(VoteTransaction.key, BigNumber.make("100000000"), VoteTransaction.version);
 	});
 
 	it("#register - should register type", async ({ serviceProvider, transactionRegistry }) => {
