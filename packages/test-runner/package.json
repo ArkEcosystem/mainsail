@@ -19,7 +19,7 @@
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
-		"uvu": "node --import tsx ./node_modules/uvu/bin.js"
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"concordance": "~5.0.4",
