@@ -3429,6 +3429,18 @@
 			},
 			"blockTime": 8000,
 			"epoch": "2023-12-21T00:00:00.000Z",
+			"fees": {
+				"staticFees": {
+					"transfer": 10000000,
+					"multiPayment": 10000000,
+					"multiSignature": 500000000,
+					"usernameRegistration": 2500000000,
+					"usernameResignation": 2500000000,
+					"validatorRegistration": 2500000000,
+					"validatorResignation": 2500000000,
+					"vote": 100000000
+				}
+			},
 			"height": 0,
 			"multiPaymentLimit": 256,
 			"reward": "0",

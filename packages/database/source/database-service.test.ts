@@ -61,6 +61,11 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 			info: () => {},
 		});
+
+		context.sandbox.app
+			.bind(Identifiers.Services.EventDispatcher.Service)
+			.toConstantValue({ dispatchSync: () => {} });
+
 		context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		context.sandbox.app.useDataPath(dirSync().name);

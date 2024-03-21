@@ -44,7 +44,7 @@ describe<{
 		await assert.resolves(() => serviceProvider.register());
 
 		spySet.calledOnce();
-		spySet.calledWith(VoteTransaction.key, VoteTransaction.version, BigNumber.make("100"));
+		spySet.calledWith(VoteTransaction.key, BigNumber.make("100"), VoteTransaction.version);
 	});
 
 	it("#register - should register keywords", async ({ serviceProvider, validator }) => {
@@ -55,14 +55,14 @@ describe<{
 		spyAddKeyword.calledOnce();
 	});
 
-	it("#register - should register static fees", async ({ serviceProvider, feeRegistry, sandbox }) => {
+	it("#register - should register static fees without a value", async ({ serviceProvider, feeRegistry, sandbox }) => {
 		sandbox.app.rebind(Identifiers.Fee.Type).toConstantValue("static");
 		const spySet = spy(feeRegistry, "set");
 
 		await assert.resolves(() => serviceProvider.register());
 
 		spySet.calledOnce();
-		spySet.calledWith(VoteTransaction.key, VoteTransaction.version, BigNumber.make("100000000"));
+		spySet.calledWith(VoteTransaction.key, undefined, VoteTransaction.version);
 	});
 
 	it("#register - should register type", async ({ serviceProvider, transactionRegistry }) => {
