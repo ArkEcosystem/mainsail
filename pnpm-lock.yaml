@@ -2871,7 +2871,7 @@ importers:
         specifier: ^17.0.1
         version: 17.0.1
       string-kit:
-        specifier: ~0.18.2
+        specifier: 0.18.2
         version: 0.18.2
       uvu:
         specifier: ^0.5.6

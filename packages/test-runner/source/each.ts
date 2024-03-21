@@ -1,8 +1,8 @@
 import { format as concordance } from "concordance";
-import { format } from "string-kit";
+import kit from "string-kit";
 import * as uvu from "uvu";
 
-export const formatName = (name: string, dataset: unknown): string => format(name, concordance(dataset));
+export const formatName = (name: string, dataset: unknown): string => kit.format(name, concordance(dataset));
 
 export const each =
 	(test: uvu.Test) =>
