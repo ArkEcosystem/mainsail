@@ -53,14 +53,19 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const { staticFees = {} } = fees ?? {};
 
 		for (const [key, fee] of Object.entries(staticFees)) {
-			const previousFee = registry.get(key);
 			const newFee = BigNumber.make(fee);
 
-			if (newFee.isEqualTo(previousFee)) {
-				continue;
+			if (configuration.getHeight() > 0) {
+				const previousFee = registry.get(key);
+				if (newFee.isEqualTo(previousFee)) {
+					continue;
+				}
+
+				logger.info(`updating static fee of ${key} ${previousFee} => ${newFee}`);
+			} else {
+				logger.debug(`initializing static fee of ${key} ${newFee}`);
 			}
 
-			logger.info(`updated static fee of ${key} ${previousFee} => ${newFee}`);
 			registry.set(key, newFee);
 		}
 	}

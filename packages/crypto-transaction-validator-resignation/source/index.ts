@@ -29,8 +29,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			ValidatorResignationTransaction.key,
 			{
 				managed: BigNumber.make("100"),
-				static: BigNumber.make("2500000000"),
-			}[this.app.get<string>(Identifiers.Fee.Type)]!,
+			}[this.app.get<string>(Identifiers.Fee.Type)],
 			ValidatorResignationTransaction.version,
 		);
 	}
