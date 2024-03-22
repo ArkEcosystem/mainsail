@@ -46,7 +46,7 @@ export abstract class AbstractServer {
 		this.server.ext("onPreResponse", (request, h) => {
 			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
 				// @ts-ignore
-				this.logger.error(request.response.stack);
+				this.logger.error(`${request.path} - ${request.response.stack ?? request.response.message}`);
 			}
 			return h.continue;
 		});

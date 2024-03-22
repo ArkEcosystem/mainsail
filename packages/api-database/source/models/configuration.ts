@@ -20,4 +20,10 @@ export class Configuration {
 		type: "jsonb",
 	})
 	public cryptoConfiguration!: Record<string, any>;
+
+	@Column({
+		nullable: false,
+		type: "jsonb",
+	})
+	public activeMilestones!: Record<string, any>;
 }
