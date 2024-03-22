@@ -2,6 +2,7 @@ import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
+	Models,
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
@@ -35,7 +36,11 @@ export class TransactionsController extends Controller {
 			options,
 		);
 
-		return this.toPagination(transactions, TransactionResource, request.query.transform);
+		return this.toPagination(
+			await this.enrichTransactionResult(transactions),
+			TransactionResource,
+			request.query.transform,
+		);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -45,7 +50,7 @@ export class TransactionsController extends Controller {
 			.where("id = :id", { id: request.params.id })
 			.getOne();
 
-		return this.respondWithResource(transaction, TransactionResource, request.query.transform);
+		return this.respondEnrichedTransaction(transaction, request);
 	}
 
 	public async unconfirmed(request: Hapi.Request) {
@@ -60,11 +65,11 @@ export class TransactionsController extends Controller {
 			.getManyAndCount();
 
 		return super.toPagination(
-			{
+			await this.enrichTransactionResult({
 				meta: { totalCountIsEstimate: false },
 				results: transactions,
 				totalCount,
-			},
+			}),
 			TransactionResource,
 			request.query.transform,
 		);
@@ -77,7 +82,7 @@ export class TransactionsController extends Controller {
 			.where("id = :id", { id: request.params.id })
 			.getOne();
 
-		return super.respondWithResource(transaction, TransactionResource, request.query.transform);
+		return this.respondEnrichedTransaction(transaction, request);
 	}
 
 	public async types(request: Hapi.Request) {
@@ -120,5 +125,16 @@ export class TransactionsController extends Controller {
 		}
 
 		return { data: schemasByType };
+	}
+
+	private async respondEnrichedTransaction(
+		transaction: Models.Transaction | Models.MempoolTransaction | null,
+		request: Hapi.Request,
+	) {
+		return this.respondWithResource(
+			await this.enrichTransaction(transaction),
+			TransactionResource,
+			request.query.transform,
+		);
 	}
 }

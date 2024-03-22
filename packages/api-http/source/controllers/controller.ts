@@ -9,7 +9,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { BlockModel } from "../resources/index.js";
+import { BlockModel, TransactionModel } from "../resources/index.js";
 
 @injectable()
 export class Controller extends AbstractController {
@@ -88,5 +88,45 @@ export class Controller extends AbstractController {
 		}
 
 		return { ...block, generator, state } as BlockModel;
+	}
+
+	protected async enrichTransactionResult(
+		resultPage: Search.ResultsPage<Models.Transaction | Models.MempoolTransaction>,
+		context?: { state?: Models.State },
+	): Promise<Search.ResultsPage<TransactionModel>> {
+		const state = context?.state ?? (await this.getState());
+
+		const enriched: Promise<TransactionModel | null>[] = [];
+		for (const transaction of resultPage.results) {
+			enriched.push(this.enrichTransaction(transaction, state));
+		}
+
+		// @ts-ignore
+		resultPage.results = await Promise.all(enriched);
+		return resultPage as Search.ResultsPage<TransactionModel>;
+	}
+
+	protected async enrichTransaction(
+		transaction: Models.Transaction | Models.MempoolTransaction | null,
+		state?: Models.State,
+	): Promise<TransactionModel | null> {
+		if (!transaction) {
+			return null;
+		}
+
+		const promises: Promise<any>[] = [];
+		if (!state) {
+			promises.push(
+				(async () => {
+					state = await this.getState();
+				})(),
+			);
+		}
+
+		if (promises.length > 0) {
+			await Promise.all(promises);
+		}
+
+		return { ...transaction, state } as TransactionModel;
 	}
 }

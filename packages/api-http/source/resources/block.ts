@@ -36,7 +36,7 @@ export class BlockResource implements Contracts.Api.Resource {
 			},
 			previous: resource.previousBlock,
 			signature: resource.signature,
-			timestamp: Math.trunc(+resource.timestamp / 1000),
+			timestamp: +resource.timestamp,
 			transactions: resource.numberOfTransactions,
 
 			version: resource.version,
