@@ -3,18 +3,18 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-export interface BlockModel extends Models.Block {
+export interface EnrichedBlock extends Models.Block {
 	state: Models.State;
 	generator: Models.Wallet;
 }
 
 @injectable()
 export class BlockResource implements Contracts.Api.Resource {
-	public raw(resource: BlockModel): object {
+	public raw(resource: EnrichedBlock): object {
 		return { ...resource, generator: undefined, state: undefined };
 	}
 
-	public transform(resource: BlockModel): object {
+	public transform(resource: EnrichedBlock): object {
 		return {
 			confirmations: +resource.state.height ? Number(resource.state.height) - Number(resource.height) : 0,
 			forged: {
