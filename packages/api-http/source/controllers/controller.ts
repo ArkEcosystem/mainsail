@@ -9,7 +9,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { BlockModel, TransactionModel } from "../resources/index.js";
+import { BlockModel, EnrichedTransaction } from "../resources/index.js";
 
 @injectable()
 export class Controller extends AbstractController {
@@ -93,27 +93,23 @@ export class Controller extends AbstractController {
 	protected async enrichTransactionResult(
 		resultPage: Search.ResultsPage<Models.Transaction | Models.MempoolTransaction>,
 		context?: { state?: Models.State },
-	): Promise<Search.ResultsPage<TransactionModel>> {
+	): Promise<Search.ResultsPage<EnrichedTransaction>> {
 		const state = context?.state ?? (await this.getState());
 
-		const enriched: Promise<TransactionModel | null>[] = [];
+		const enriched: Promise<EnrichedTransaction>[] = [];
 		for (const transaction of resultPage.results) {
 			enriched.push(this.enrichTransaction(transaction, state));
 		}
 
 		// @ts-ignore
 		resultPage.results = await Promise.all(enriched);
-		return resultPage as Search.ResultsPage<TransactionModel>;
+		return resultPage as Search.ResultsPage<EnrichedTransaction>;
 	}
 
 	protected async enrichTransaction(
-		transaction: Models.Transaction | Models.MempoolTransaction | null,
+		transaction: Models.Transaction | Models.MempoolTransaction,
 		state?: Models.State,
-	): Promise<TransactionModel | null> {
-		if (!transaction) {
-			return null;
-		}
-
+	): Promise<EnrichedTransaction> {
 		const promises: Promise<any>[] = [];
 		if (!state) {
 			promises.push(
@@ -127,6 +123,6 @@ export class Controller extends AbstractController {
 			await Promise.all(promises);
 		}
 
-		return { ...transaction, state } as TransactionModel;
+		return { ...transaction, state } as EnrichedTransaction;
 	}
 }

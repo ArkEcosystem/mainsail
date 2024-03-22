@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
@@ -131,6 +132,10 @@ export class TransactionsController extends Controller {
 		transaction: Models.Transaction | Models.MempoolTransaction | null,
 		request: Hapi.Request,
 	) {
+		if (!transaction) {
+			return Boom.notFound();
+		}
+
 		return this.respondWithResource(
 			await this.enrichTransaction(transaction),
 			TransactionResource,

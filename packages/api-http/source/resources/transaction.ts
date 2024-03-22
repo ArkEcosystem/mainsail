@@ -2,17 +2,17 @@ import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-export interface TransactionModel extends Models.Transaction {
+export interface EnrichedTransaction extends Models.Transaction {
 	state: Models.State;
 }
 
 @injectable()
 export class TransactionResource implements Contracts.Api.Resource {
-	public raw(resource: TransactionModel): object {
+	public raw(resource: EnrichedTransaction): object {
 		return { ...resource, state: undefined };
 	}
 
-	public async transform(resource: TransactionModel): Promise<object> {
+	public async transform(resource: EnrichedTransaction): Promise<object> {
 		const confirmations: number = +resource.state.height - +resource.blockHeight + 1;
 
 		return {
