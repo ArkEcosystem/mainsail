@@ -7,9 +7,9 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 
-import { BlockModel } from "../resources/index.js";
+import { EnrichedBlock, EnrichedTransaction } from "../resources/index.js";
 
 @injectable()
 export class Controller extends AbstractController {
@@ -40,24 +40,24 @@ export class Controller extends AbstractController {
 	protected async enrichBlockResult(
 		resultPage: Search.ResultsPage<Models.Block>,
 		{ state, generators }: { state?: Models.State; generators: Record<string, Models.Wallet> },
-	): Promise<Search.ResultsPage<BlockModel>> {
+	): Promise<Search.ResultsPage<EnrichedBlock>> {
 		state = state ?? (await this.getState());
 
-		const enriched: Promise<BlockModel | null>[] = [];
+		const enriched: Promise<EnrichedBlock | null>[] = [];
 		for (const block of resultPage.results) {
 			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]));
 		}
 
 		// @ts-ignore
 		resultPage.results = await Promise.all(enriched);
-		return resultPage as Search.ResultsPage<BlockModel>;
+		return resultPage as Search.ResultsPage<EnrichedBlock>;
 	}
 
 	protected async enrichBlock(
 		block: Models.Block | null,
 		state?: Models.State,
 		generator?: Models.Wallet,
-	): Promise<BlockModel | null> {
+	): Promise<EnrichedBlock | null> {
 		if (!block) {
 			return null;
 		}
@@ -87,6 +87,27 @@ export class Controller extends AbstractController {
 			await Promise.all(promises);
 		}
 
-		return { ...block, generator, state } as BlockModel;
+		Utils.assert.defined<Models.Wallet>(generator);
+		Utils.assert.defined<Models.Wallet>(state);
+
+		return { ...block, generator, state };
+	}
+
+	protected async enrichTransactionResult(
+		resultPage: Search.ResultsPage<Models.Transaction | Models.MempoolTransaction>,
+		context?: { state?: Models.State },
+	): Promise<Search.ResultsPage<EnrichedTransaction>> {
+		const state = context?.state ?? (await this.getState());
+		return {
+			...resultPage,
+			results: await Promise.all(resultPage.results.map((tx) => this.enrichTransaction(tx, state))),
+		};
+	}
+
+	protected async enrichTransaction(
+		transaction: Models.Transaction | Models.MempoolTransaction,
+		state?: Models.State,
+	): Promise<EnrichedTransaction> {
+		return { ...transaction, state: state ? state : await this.getState() };
 	}
 }

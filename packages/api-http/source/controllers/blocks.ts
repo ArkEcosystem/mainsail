@@ -104,7 +104,11 @@ export class BlocksController extends Controller {
 			options,
 		);
 
-		return this.toPagination(transactions, TransactionResource, request.query.transform);
+		return this.toPagination(
+			await this.enrichTransactionResult(transactions),
+			TransactionResource,
+			request.query.transform,
+		);
 	}
 
 	private getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
