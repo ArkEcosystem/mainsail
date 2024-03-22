@@ -95,15 +95,10 @@ export class Controller extends AbstractController {
 		context?: { state?: Models.State },
 	): Promise<Search.ResultsPage<EnrichedTransaction>> {
 		const state = context?.state ?? (await this.getState());
-
-		const enriched: Promise<EnrichedTransaction>[] = [];
-		for (const transaction of resultPage.results) {
-			enriched.push(this.enrichTransaction(transaction, state));
-		}
-
-		// @ts-ignore
-		resultPage.results = await Promise.all(enriched);
-		return resultPage as Search.ResultsPage<EnrichedTransaction>;
+		return {
+			...resultPage,
+			results: await Promise.all(resultPage.results.map((tx) => this.enrichTransaction(tx, state))),
+		};
 	}
 
 	protected async enrichTransaction(
