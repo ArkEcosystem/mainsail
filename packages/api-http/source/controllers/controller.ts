@@ -110,19 +110,6 @@ export class Controller extends AbstractController {
 		transaction: Models.Transaction | Models.MempoolTransaction,
 		state?: Models.State,
 	): Promise<EnrichedTransaction> {
-		const promises: Promise<any>[] = [];
-		if (!state) {
-			promises.push(
-				(async () => {
-					state = await this.getState();
-				})(),
-			);
-		}
-
-		if (promises.length > 0) {
-			await Promise.all(promises);
-		}
-
-		return { ...transaction, state } as EnrichedTransaction;
+		return { ...transaction, state: state ? state : await this.getState() };
 	}
 }

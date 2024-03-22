@@ -2,7 +2,11 @@ import { Models } from "@mainsail/api-database";
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-export interface EnrichedTransaction extends Models.Transaction {
+type T_AND = Models.Transaction & Models.MempoolTransaction;
+type T_OR = Models.Transaction | Models.MempoolTransaction;
+type AnyTransaction = Partial<T_AND> & Pick<T_OR, keyof T_OR>;
+
+export interface EnrichedTransaction extends AnyTransaction {
 	state: Models.State;
 }
 
@@ -13,7 +17,10 @@ export class TransactionResource implements Contracts.Api.Resource {
 	}
 
 	public async transform(resource: EnrichedTransaction): Promise<object> {
-		const confirmations: number = +resource.state.height - +resource.blockHeight + 1;
+		let confirmations: number | undefined;
+		if (resource.blockHeight) {
+			confirmations = +resource.state.height - +resource.blockHeight + 1;
+		}
 
 		return {
 			amount: resource.amount,
@@ -31,7 +38,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 			signature: resource.signature,
 			signatures: resource.signatures,
 
-			timestamp: +resource.timestamp,
+			timestamp: resource.timestamp ? +resource.timestamp : undefined,
 
 			type: resource.type,
 			typeGroup: resource.typeGroup,
