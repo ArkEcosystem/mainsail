@@ -1,6 +1,6 @@
 import { interfaces } from "@mainsail/container";
 import { AnySchema } from "joi";
-export { Paths } from "env-paths";
+export type { Paths } from "env-paths";
 
 export type InputValue = any;
 export type InputValues = Record<string, InputValue>;
