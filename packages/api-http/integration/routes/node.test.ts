@@ -55,6 +55,7 @@ describe<{
 
 	it("/node/configuration", async () => {
 		await apiContext.configurationRepository.save({
+			activeMilestones: cryptoJson.milestones[0],
 			cryptoConfiguration: cryptoJson,
 			id: 1,
 			version: "0.0.1",
@@ -67,6 +68,7 @@ describe<{
 
 	it("/node/configuration/crypto", async () => {
 		await apiContext.configurationRepository.save({
+			activeMilestones: cryptoJson.milestones[0],
 			cryptoConfiguration: cryptoJson,
 			id: 1,
 			version: "0.0.1",
@@ -79,6 +81,7 @@ describe<{
 
 	it("/node/fees", async () => {
 		await apiContext.configurationRepository.save({
+			activeMilestones: cryptoJson.milestones[0],
 			cryptoConfiguration: cryptoJson,
 			id: 1,
 			version: "0.0.1",
