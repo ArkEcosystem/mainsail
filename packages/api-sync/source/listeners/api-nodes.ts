@@ -22,8 +22,7 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.ApiNode, Models.Api
 	}
 
 	protected getEventId(event: Contracts.P2P.ApiNode): string {
-		const url = event.url;
-		return url;
+		return event.url;
 	}
 
 	protected getSyncIntervalMs(): number {
