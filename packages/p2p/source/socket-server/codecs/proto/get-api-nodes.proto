@@ -2,11 +2,15 @@ syntax = "proto3";
 
 package getApiNodes;
 
+message ApiNode {
+    string url = 1;
+}
+
 message GetApiNodesRequest {
     shared.Headers headers = 1;
 }
 
 message GetApiNodesResponse {
 	shared.Headers headers = 1;
-    repeated shared.PeerLike apiNodes = 2;
+    repeated ApiNode apiNodes = 2;
 }

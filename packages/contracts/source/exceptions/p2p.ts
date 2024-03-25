@@ -38,3 +38,9 @@ export class MissingCommonBlockError extends Exception {
 		super("Couldn't find any common blocks.");
 	}
 }
+
+export class InvalidApiNodeUrlError extends Exception {
+	public constructor(url: string) {
+		super(`Invalid API Node url: ${url}`);
+	}
+}
