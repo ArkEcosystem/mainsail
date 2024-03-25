@@ -26,7 +26,7 @@ import { Factories, Sandbox } from "../../test-framework/source";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
 import { store } from "../source/state-store";
-import { IndexSet, WalletRepository, WalletRepositoryBySender,WalletRepositoryClone } from "../source/wallets";
+import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
 
 export interface Spies {
