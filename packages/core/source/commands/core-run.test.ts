@@ -1,6 +1,6 @@
 import { Utils } from "@mainsail/cli";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { writeJSONSync } from "fs-extra";
+import { writeJSONSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../test-framework/source";

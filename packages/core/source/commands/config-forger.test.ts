@@ -1,8 +1,8 @@
-import { Console, describe } from "../../../test-framework/source";
-import { ensureDirSync, writeJSONSync } from "fs-extra/esm";
+import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../test-framework/source";
 import { Command } from "./config-forger";
 
 describe<{
@@ -26,13 +26,13 @@ describe<{
 	it("should configure from flags (BIP39)", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, method: "bip39" }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Flags] });
+		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Flags] });
 	});
 
 	it("should configure from flags (BIP38)", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, method: "bip38", password: "password" }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [] });
+		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [] });
 	});
 
 	it("should prompt if method is missing", async ({ cli }) => {
@@ -40,6 +40,6 @@ describe<{
 
 		await cli.withFlags({ bip39: bip39Flags }).execute(Command);
 
-		assert.equal(require(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Flags] });
+		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39Flags] });
 	});
 });
