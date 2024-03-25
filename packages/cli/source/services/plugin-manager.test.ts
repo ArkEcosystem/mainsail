@@ -1,3 +1,4 @@
+import { Contracts } from "@mainsail/test-runner";
 import esmock from "esmock";
 import fs from "fs";
 import { join } from "path";
@@ -8,7 +9,7 @@ import { Identifiers } from "../ioc/index.js";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";
 
-let existSyncResponse: any;
+let existSyncResponse: Contracts.Stub;
 const { PluginManager: PluginManagerProxy } = await esmock("./plugin-manager", {
 	fs: {
 		existsSync: () => existSyncResponse.call(),
