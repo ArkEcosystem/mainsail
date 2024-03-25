@@ -31,6 +31,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@types/better-sqlite3": "7.6.9",
 		"@types/fs-extra": "11.0.4",

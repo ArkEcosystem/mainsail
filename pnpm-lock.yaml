@@ -3031,6 +3031,9 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-transaction-multi-payment':
+        specifier: workspace:*
+        version: link:../crypto-transaction-multi-payment
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -3065,6 +3068,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
