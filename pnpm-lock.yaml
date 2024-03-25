@@ -3253,6 +3253,9 @@ importers:
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@types/sinon':
         specifier: ^17.0.3
         version: 17.0.3
