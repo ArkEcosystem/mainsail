@@ -491,6 +491,9 @@ importers:
         specifier: 21.1.1
         version: 21.1.1
     devDependencies:
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/env-paths':
         specifier: 2.1.0
         version: 2.1.0
@@ -527,6 +530,9 @@ importers:
       '@types/yargs-parser':
         specifier: 21.0.3
         version: 21.0.3
+      esmock:
+        specifier: 2.6.4
+        version: 2.6.4
       tmp:
         specifier: 0.2.3
         version: 0.2.3
@@ -8952,6 +8958,11 @@ packages:
       text-table: 0.2.0
     transitivePeerDependencies:
       - supports-color
+    dev: true
+
+  /esmock@2.6.4:
+    resolution: {integrity: sha512-w/MIHWZeFzlyW6tTUW/sj1aSAScU8IQapjz8oCxjx3J90fhhmO0QdPGBjPD3oQSLLtVCFcgkTvdh7dNigp9K5A==}
+    engines: {node: '>=14.16.0'}
     dev: true
 
   /esniff@2.0.1:

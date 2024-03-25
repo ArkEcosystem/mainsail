@@ -1,8 +1,10 @@
 import { Container } from "@mainsail/container";
+import { Constants } from "@mainsail/contracts";
+import { describe } from "@mainsail/test-runner";
+import esmock from "esmock";
 import { Options as OraOptions, Ora } from "ora";
 import os from "os";
 
-import { describe } from "../../../test-framework/source";
 import { Spinner } from "../components";
 import { ProcessIdentifier } from "../contracts";
 import { Identifiers } from "../ioc/index.js";
@@ -11,9 +13,18 @@ import { AbortRunningProcess } from "./abort-running-process";
 import { AbortUnknownProcess } from "./abort-unknown-process";
 import { DaemonizeProcess } from "./daemonize-process";
 
+let totalMem;
+const { DaemonizeProcess: DaemonizeProcessProxy } = await esmock("./daemonize-process", {
+	os: {
+		totalmem: () => totalMem,
+	},
+});
+
 describe<{
 	action: DaemonizeProcess;
-}>("DaemonizeProcess", ({ beforeEach, afterEach, it, assert, stub, spy }) => {
+}>("DaemonizeProcess", ({ beforeEach, it, assert, stub, spy }) => {
+	totalMem = 3 * Constants.Units.GIGABYTE;
+
 	const options = {
 		args: "core:run --daemon",
 		name: "ark-core",
@@ -49,7 +60,7 @@ describe<{
 		app.bind(Identifiers.AbortUnknownProcess).toConstantValue(abortUnknownProcess);
 		app.bind(Identifiers.AbortRunningProcess).toConstantValue(abortRunningProcess);
 		app.bind(Identifiers.Spinner).toConstantValue(spinner);
-		context.action = app.resolve(DaemonizeProcess);
+		context.action = app.resolve(DaemonizeProcessProxy);
 	});
 
 	it("should throw if the process has entered an unknown state", ({ action }) => {
@@ -158,6 +169,8 @@ describe<{
 	});
 
 	it("should start process should run with potato settings", ({ action }) => {
+		totalMem = 1 * Constants.Units.GIGABYTE;
+
 		const spyOnHas = spy(processManager, "has");
 		const spyOnStart = spy(processManager, "start");
 		stub(os, "totalmem").returnValue(2 * 1024 ** 3 - 1);
