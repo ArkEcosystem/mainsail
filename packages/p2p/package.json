@@ -18,10 +18,11 @@
 		"pbjs": "pbjs -t static-module -w commonjs source/socket-server/codecs/proto/*.proto -o source/socket-server/codecs/proto/protos.cjs",
 		"pbts": "pbts source/socket-server/codecs/proto/protos.cjs -o source/socket-server/codecs/proto/protos.d.ts",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
@@ -56,7 +57,7 @@
 		"@types/ws": "8.5.10",
 		"import-fresh": "3.3.0",
 		"protobufjs-cli": "1.1.2",
-		"rewiremock": "3.14.5",
+		"esmock": "2.6.4",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
