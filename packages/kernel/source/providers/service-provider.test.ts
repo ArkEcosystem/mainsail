@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra";
+import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
 import { describeSkip } from "../../../test-framework/source";

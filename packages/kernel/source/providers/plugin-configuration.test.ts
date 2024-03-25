@@ -1,6 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { resolve } from "path";
+import { join } from "path";
 
 import { describe } from "../../../test-framework/source";
 import { Application } from "../application";
@@ -29,7 +29,7 @@ describe<{
 	it("should discover the defaults for the given plugin", async (context) => {
 		await context.pluginConfiguration.discover(
 			"stub-plugin-with-defaults",
-			resolve(__dirname, "../../test/stubs/stub-plugin-with-defaults"),
+			join(import.meta.dirname, "../../test/stubs/stub-plugin-with-defaults"),
 		);
 
 		assert.equal(context.pluginConfiguration.all(), { defaultKey: "defaultValue" });
