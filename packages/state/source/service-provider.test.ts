@@ -1,12 +1,11 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Application, Services } from "@mainsail/kernel";
-import importFresh from "import-fresh";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { ServiceProvider } from ".";
 
-const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;
+const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
 
 describe<{
 	app: Application;
@@ -37,7 +36,7 @@ describe<{
 	sandbox: Sandbox;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
-	const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;
+	const importDefaults = async () => (await importFresh("../distribution/defaults.js")).defaults;
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
@@ -50,8 +49,8 @@ describe<{
 		}
 	});
 
-	it("should validate schema using defaults", ({ serviceProvider }) => {
-		const defaults = importDefaults();
+	it("should validate schema using defaults", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
 
 		const result = serviceProvider.configSchema().validate(defaults);
 		assert.undefined(result.error);
@@ -65,7 +64,7 @@ describe<{
 	it("should parse process.env.CORE_STATE_EXPORT_DISABLED", async ({ serviceProvider }) => {
 		process.env.CORE_STATE_EXPORT_DISABLED = "true";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.export.enabled, false);
@@ -74,7 +73,7 @@ describe<{
 	it("should parse process.env.CORE_STATE_EXPORT_INTERVAL", async ({ serviceProvider }) => {
 		process.env.CORE_STATE_EXPORT_INTERVAL = "3";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.export.interval, 3);
@@ -83,7 +82,7 @@ describe<{
 	it("should parse process.env.CORE_STATE_EXPORT_INTERVAL", async ({ serviceProvider }) => {
 		process.env.CORE_STATE_EXPORT_RETAIN_FILES = "3";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.export.retainFiles, 3);
