@@ -36,7 +36,6 @@
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
 		"@types/uuid": "9.0.8",
-		"import-fresh": "3.3.0",
 		"tmp": "0.2.3",
 		"uvu": "^0.5.6"
 	},
