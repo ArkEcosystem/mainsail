@@ -1,4 +1,4 @@
-import { ok, not } from "uvu/assert";
+import { not,ok } from "uvu/assert";
 
 export abstract class Fake<T> {
 	protected readonly subject: any;
