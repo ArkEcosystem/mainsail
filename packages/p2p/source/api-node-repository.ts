@@ -1,29 +1,19 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { getPeerUrl } from "./utils/index.js";
-
 @injectable()
 export class ApiNode implements Contracts.P2P.ApiNode {
-	public ip!: string;
-	public port!: number;
-	public protocol!: Contracts.P2P.PeerProtocol;
+	public url!: string;
 
 	statusCode?: number;
 	latency?: number;
 
 	constructor() {}
 
-	public init(ip: string, port: number, protocol?: Contracts.P2P.PeerProtocol): ApiNode {
-		this.ip = ip;
-		this.port = port;
-		this.protocol = protocol ?? (port === 443 ? Contracts.P2P.PeerProtocol.Https : Contracts.P2P.PeerProtocol.Http);
+	public init(url: string): ApiNode {
+		this.url = url;
 
 		return this;
-	}
-
-	url(): string {
-		return getPeerUrl(this);
 	}
 }
 
@@ -37,26 +27,26 @@ export class ApiNodeRepository implements Contracts.P2P.ApiNodeRepository {
 	}
 
 	public hasApiNode(apiNode: Contracts.P2P.ApiNode): boolean {
-		return this.#apiNodes.has(apiNode.ip);
+		return this.#apiNodes.has(apiNode.url);
 	}
 
 	public setApiNode(apiNode: Contracts.P2P.ApiNode): void {
-		this.#apiNodes.set(apiNode.ip, apiNode);
+		this.#apiNodes.set(apiNode.url, apiNode);
 	}
 
 	public forgetApiNode(apiNode: Contracts.P2P.ApiNode): void {
-		this.#apiNodes.delete(apiNode.ip);
+		this.#apiNodes.delete(apiNode.url);
 	}
 
 	public setPendingApiNode(apiNode: Contracts.P2P.ApiNode): void {
-		this.#apiNodesPending.set(apiNode.ip, apiNode);
+		this.#apiNodesPending.set(apiNode.url, apiNode);
 	}
 
 	public forgetPendingApiNode(apiNode: Contracts.P2P.ApiNode): void {
-		this.#apiNodesPending.delete(apiNode.ip);
+		this.#apiNodesPending.delete(apiNode.url);
 	}
 
 	public hasPendingApiNode(apiNode: Contracts.P2P.ApiNode): boolean {
-		return this.#apiNodesPending.has(apiNode.ip);
+		return this.#apiNodesPending.has(apiNode.url);
 	}
 }

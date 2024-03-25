@@ -25,7 +25,7 @@ export class GetApiNodesController implements Contracts.P2P.Controller {
 					return a.latency - b.latency;
 				})
 				.slice(0, constants.MAX_PEERS_GET_API_NODES)
-				.map((node) => ({ ip: node.ip, port: node.port, protocol: node.protocol })),
+				.map((node) => ({ url: node.url })),
 		};
 	}
 }

@@ -28,7 +28,7 @@ export class ApiNodeProcessor implements Contracts.P2P.ApiNodeProcessor {
 		this.repository.setPendingApiNode(apiNode);
 
 		if (await this.apiNodeVerifier.verify(apiNode)) {
-			this.logger.debugExtra(`Accepted new API node ${apiNode.ip}:${apiNode.port}`);
+			this.logger.debugExtra(`Accepted new API node ${apiNode.url}`);
 
 			this.repository.setApiNode(apiNode);
 

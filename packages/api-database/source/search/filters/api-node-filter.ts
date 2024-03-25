@@ -15,8 +15,8 @@ export class ApiNodeFilter {
 	private static async handleApiNodeCriteria(criteria: ApiNodeCriteria): Promise<Expression<ApiNode>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "ip": {
-					return handleOrCriteria(criteria.ip, async (c) => ({ op: "equal", property: "ip", value: c }));
+				case "url": {
+					return handleOrCriteria(criteria.url, async (c) => ({ op: "equal", property: "url", value: c }));
 				}
 				case "version": {
 					return handleOrCriteria(criteria.version, async (c) =>

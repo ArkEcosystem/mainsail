@@ -5,7 +5,7 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import { Enums, Utils } from "@mainsail/kernel";
+import { Enums } from "@mainsail/kernel";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
@@ -22,9 +22,8 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.ApiNode, Models.Api
 	}
 
 	protected getEventId(event: Contracts.P2P.ApiNode): string {
-		const ip = event.ip;
-		Utils.assert.defined<string>(ip);
-		return ip;
+		const url = event.url;
+		return url;
 	}
 
 	protected getSyncIntervalMs(): number {
@@ -34,11 +33,8 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.ApiNode, Models.Api
 	protected mapEventToEntity(event: Contracts.P2P.ApiNode): Models.ApiNode {
 		return {
 			height: event.height,
-			ip: event.ip,
 			latency: event.latency,
-			port: event.port,
-			protocol: event.protocol,
-			url: event.url(),
+			url: event.url,
 			version: event.version,
 		};
 	}

@@ -53,7 +53,7 @@ export abstract class AbstractServer {
 
 		this.server.route({
 			handler() {
-				return { data: "Hello World!" };
+				return { data: "Hello World from Mainsail API!" };
 			},
 			method: "GET",
 			path: "/",

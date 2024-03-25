@@ -6,31 +6,15 @@ import { Column, Entity } from "typeorm";
 export class ApiNode {
 	@Column({
 		primary: true,
-		type: "inet",
+		type: "varchar",
 	})
-	public ip!: string;
-
-	@Column({
-		type: "integer",
-	})
-	public port!: number;
-
-	@Column({
-		type: "integer",
-	})
-	public protocol!: number;
+	public url!: string;
 
 	@Column({
 		nullable: true,
 		type: "integer",
 	})
 	public height!: number | undefined;
-
-	@Column({
-		nullable: false,
-		type: "varchar",
-	})
-	public url!: string;
 
 	@Column({
 		nullable: true,
