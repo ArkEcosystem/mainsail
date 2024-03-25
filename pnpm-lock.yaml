@@ -1202,12 +1202,36 @@ importers:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../crypto-consensus-bls12-381
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-signature-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-signature-schnorr
+      '@mainsail/crypto-transaction-transfer':
+        specifier: workspace:*
+        version: link:../crypto-transaction-transfer
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../crypto-wif
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../fees
+      '@mainsail/fees-static':
+        specifier: workspace:*
+        version: link:../fees-static
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../serializer
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
