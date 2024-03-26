@@ -14,8 +14,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
 		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
-			const __dirname = new URL(".", import.meta.url).pathname;
-			const subprocess = fork(`${__dirname}/worker-script.js`, {});
+			const subprocess = fork(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {});
 			return new Ipc.Subprocess(subprocess);
 		});
 

@@ -7,7 +7,6 @@ import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-valid
 import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
 import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { BigNumber } from "@mainsail/utils";
-import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder.js";
@@ -244,11 +243,9 @@ export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contra
 
 export const registerTransactionFactory = async (
 	factory: FactoryBuilder,
-	config?: Contracts.Crypto.NetworkConfigPartial,
+	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
-	const app = await generateApp(
-		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/core/crypto.json")),
-	);
+	const app = await generateApp(config);
 
 	registerTransferFactory(factory, app);
 	registerValidatorRegistrationFactory(factory, app);

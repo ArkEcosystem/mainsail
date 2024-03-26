@@ -22,8 +22,7 @@ export class CommandLineInterface {
 
 	public async execute(dirname?: string): Promise<void> {
 		if (!dirname) {
-			const __dirname = new URL(".", import.meta.url).pathname;
-			dirname = __dirname;
+			dirname = new URL(".", import.meta.url).pathname;
 		}
 
 		// Set NODE_PATHS. Only required for plugins that uses @mainsail as peer dependencies.
