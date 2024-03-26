@@ -9,13 +9,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.#registerStorage();
 
-		this.app.bind(Identifiers.Consensus.Storage).to(Storage).inSingletonScope();
+		this.app.bind(Identifiers.ConsensusStorage.Service).to(Storage).inSingletonScope();
 	}
 
 	public async dispose(): Promise<void> {
 		await this.#storeConsensusState();
 
-		await this.app.get<RootDatabase>(Identifiers.Database.Instance.Consensus).close();
+		await this.app.get<RootDatabase>(Identifiers.ConsensusStorage.Root).close();
 	}
 
 	#registerStorage() {
@@ -24,13 +24,19 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			name: "consensus",
 			path: join(this.app.dataPath(), "consensus.mdb"),
 		});
-		this.app.bind(Identifiers.Database.Instance.Consensus).toConstantValue(storage);
+		this.app.bind(Identifiers.ConsensusStorage.Root).toConstantValue(storage);
 
-		this.app.bind(Identifiers.Database.Storage.Proposal).toConstantValue(storage.openDB({ name: "proposals" }));
-		this.app.bind(Identifiers.Database.Storage.PreVote).toConstantValue(storage.openDB({ name: "prevotes" }));
-		this.app.bind(Identifiers.Database.Storage.PreCommit).toConstantValue(storage.openDB({ name: "precommits" }));
 		this.app
-			.bind(Identifiers.Database.Storage.ConsensusState)
+			.bind(Identifiers.ConsensusStorage.Storage.Proposal)
+			.toConstantValue(storage.openDB({ name: "proposals" }));
+		this.app
+			.bind(Identifiers.ConsensusStorage.Storage.PreVote)
+			.toConstantValue(storage.openDB({ name: "prevotes" }));
+		this.app
+			.bind(Identifiers.ConsensusStorage.Storage.PreCommit)
+			.toConstantValue(storage.openDB({ name: "precommits" }));
+		this.app
+			.bind(Identifiers.ConsensusStorage.Storage.ConsensusState)
 			.toConstantValue(storage.openDB({ name: "consensus" }));
 	}
 
@@ -39,7 +45,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.get<Contracts.Consensus.RoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
 			.getRoundStates();
 
-		const storage = this.app.get<Storage>(Identifiers.Consensus.Storage);
+		const storage = this.app.get<Storage>(Identifiers.ConsensusStorage.Service);
 
 		await storage.clear();
 		await storage.saveState(
