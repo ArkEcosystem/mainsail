@@ -13,7 +13,6 @@ const setup = async () => {
 		.toConstantValue({ dispatch: () => {}, listen: () => {} });
 
 	// TODO:
-	sandbox.app.bind(Identifiers.Transaction.Handler.Instances).toConstantValue([]);
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({});
 	sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({});
 
@@ -123,11 +122,30 @@ const getPluginConfiguration = async (
 const bootstrap = async (sandbox: Sandbox) => {
 	const configuration = sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = sandbox.app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
-	const genesisBlockJson = configuration.get("genesisBlock");
+	const genesisCommitJson = configuration.get("genesisBlock");
 
-	const genesisBlock = await commitFactory.fromJson(genesisBlockJson);
+	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
-	console.log(genesisBlock);
+	const stateService = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+	const store = stateService.getStore();
+
+	store.setGenesisCommit(genesisCommit);
+	store.setLastBlock(genesisCommit.block);
+
+	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
+	validatorSet.restore(store);
+
+	const commitState = sandbox.app.get<Contracts.Consensus.CommitStateFactory>(
+		Identifiers.Consensus.CommitState.Factory,
+	)(genesisCommit);
+
+	const blockProcessor = sandbox.app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
+
+	const result = await blockProcessor.process(commitState);
+	if (!result) {
+		throw new Error("Failed to process genesis block");
+	}
+	await blockProcessor.commit(commitState);
 };
 
 export { setup };
