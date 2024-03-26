@@ -6,7 +6,6 @@ import { URL } from "url";
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 import { ConfigRepository } from "../services/config/index.js";
 import { assert } from "../utils/assert.js";
-import { Bootstrapper } from "./interfaces.js";
 
 interface PluginEntry {
 	package: string;
@@ -20,7 +19,7 @@ interface Plugin {
 }
 
 @injectable()
-export class LoadServiceProviders implements Bootstrapper {
+export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -92,7 +91,7 @@ export class LoadServiceProviders implements Bootstrapper {
 				continue;
 			}
 
-			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule));
+			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule, import.meta.url));
 			serviceProvider.setConfig(
 				await this.#discoverConfiguration(serviceProvider, plugin.options, packageModule),
 			);

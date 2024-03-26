@@ -6,10 +6,9 @@ import { join, resolve } from "path";
 
 import { ConfigRepository } from "../services/config/index.js";
 import { assert } from "../utils/assert.js";
-import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
-export class RegisterBasePaths implements Bootstrapper {
+export class RegisterBasePaths implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
