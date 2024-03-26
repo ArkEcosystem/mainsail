@@ -1,15 +1,14 @@
 import { describe, Sandbox } from "../../../test-framework/source";
-import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
-import { request } from "../../test/helpers/request";
-
 import apiNodes from "../../test/fixtures/api-nodes.json";
+import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { request } from "../../test/helpers/request";
 
 describe<{
 	sandbox: Sandbox;
 }>("ApiNodes", ({ it, afterAll, assert, afterEach, beforeAll, beforeEach, nock }) => {
 	let apiContext: ApiContext;
 
-	let options = {};
+	const options = {};
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();

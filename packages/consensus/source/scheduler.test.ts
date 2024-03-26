@@ -1,18 +1,20 @@
 import { Identifiers } from "@mainsail/contracts";
-import rewiremock from "rewiremock";
+import esmock from "esmock";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { Scheduler } from "./scheduler";
+
+let currentTimestamp: number;
+
+const { Scheduler: SchedulerProxy } = await esmock("./scheduler", {
+	dayjs: () => ({ valueOf: () => currentTimestamp }),
+});
 
 describe<{
 	sandbox: Sandbox;
 	scheduler: Scheduler;
 }>("Scheduler", ({ beforeEach, it, assert, spy, clock, stub }) => {
-	let currentTimestamp = 0;
-
-	const { Scheduler: SchedulerProxy } = rewiremock.proxy<{ Scheduler: Scheduler }>("./scheduler", {
-		dayjs: () => ({ valueOf: () => currentTimestamp }),
-	});
+	currentTimestamp = 0;
 
 	const delays = [1000, 3000, 5000];
 
@@ -54,6 +56,8 @@ describe<{
 	});
 
 	it("#scheduleTimeoutStartRound - should call onTimeoutStartRound ", async ({ scheduler }) => {
+		currentTimestamp = 2000;
+
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
 		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
@@ -61,8 +65,6 @@ describe<{
 				timestamp: 0,
 			},
 		});
-
-		currentTimestamp = 2000;
 
 		scheduler.scheduleTimeoutStartRound();
 		await fakeTimers.nextAsync();

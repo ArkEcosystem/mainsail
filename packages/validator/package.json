@@ -15,10 +15,11 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
@@ -28,6 +29,20 @@
 		"dayjs": "1.11.10"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
+		"@mainsail/crypto-hash-bcrypto": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-messages": "workspace:*",
+		"@mainsail/crypto-signature-schnorr": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/crypto-wif": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

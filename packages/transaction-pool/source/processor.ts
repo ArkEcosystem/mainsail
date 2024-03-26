@@ -81,7 +81,7 @@ export class Processor implements Contracts.TransactionPool.Processor {
 
 	async #getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
-			return this.transactionFactory.fromBytes(transactionData);
+			return await this.transactionFactory.fromBytes(transactionData);
 		} catch (error) {
 			throw new Exceptions.InvalidTransactionDataError(error.message);
 		}

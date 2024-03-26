@@ -5,7 +5,7 @@ import { registerBlockFactory, registerIdentityFactory, registerTransactionFacto
 import { Factory } from "./factory.js";
 import { FactoryBuilder } from "./factory-builder.js";
 
-const createFactory = memoizee(async (config?: Contracts.Crypto.NetworkConfigPartial): Promise<FactoryBuilder> => {
+const createFactory = memoizee(async (config: Contracts.Crypto.NetworkConfigPartial): Promise<FactoryBuilder> => {
 	const factory: FactoryBuilder = new FactoryBuilder();
 
 	await registerBlockFactory(factory, config);

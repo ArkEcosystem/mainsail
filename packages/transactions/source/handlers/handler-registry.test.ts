@@ -16,7 +16,7 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
-import { Configuration } from "../../../crypto-config";
+import { Configuration } from "@mainsail/crypto-config";
 import { HashFactory } from "../../../crypto-hash-bcrypto/source/hash.factory";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";

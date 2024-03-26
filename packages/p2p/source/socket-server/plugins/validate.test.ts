@@ -1,26 +1,24 @@
 import { Server } from "@hapi/hapi";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
+import esmock from "esmock";
 import Joi from "joi";
-import rewiremock from "rewiremock";
 
 import { describe, Sandbox } from "../../../../test-framework/source";
 import { ValidatePlugin } from "./validate";
+
+const utils = {
+	getPeerIp: () => "",
+	isValidVersion: () => true,
+};
+
+const { ValidatePlugin: ValidatePluginProxy } = await esmock("./validate", {
+	"../../utils": utils,
+});
 
 describe<{
 	sandbox: Sandbox;
 	validatePlugin: ValidatePlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
-	const utils = {
-		getPeerIp: () => "",
-		isValidVersion: () => true,
-	};
-
-	const { ValidatePlugin: ValidatePluginProxy } = rewiremock.proxy<{
-		ValidatePlugin: Contracts.Types.Class<ValidatePlugin>;
-	}>("./validate", {
-		"../../utils": utils,
-	});
-
 	const logger = { debug: () => {}, warning: () => {} };
 	const configuration = { getRequired: () => {} };
 

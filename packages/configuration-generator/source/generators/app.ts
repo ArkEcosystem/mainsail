@@ -13,16 +13,9 @@ export class AppGenerator {
 	generateDefault(packageName = "core"): Contracts.Types.JsonObject {
 		packageName = packageName.replace("@mainsail/", "");
 
-		const dirname = (() => {
-			try {
-				return new URL(".", import.meta.url).pathname;
-			} catch {
-				// eslint-disable-next-line unicorn/prefer-module
-				return __dirname;
-			}
-		})();
-
-		return readJSONSync(resolve(dirname, `../../../${packageName}/bin/config/testnet/core/app.json`));
+		return readJSONSync(
+			resolve(new URL(".", import.meta.url).pathname, `../../../${packageName}/bin/config/testnet/core/app.json`),
+		);
 	}
 
 	generate(options: Contracts.NetworkGenerator.InternalOptions): Contracts.Types.JsonObject {

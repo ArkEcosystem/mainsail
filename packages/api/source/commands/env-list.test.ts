@@ -1,5 +1,6 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { ensureDirSync, removeSync, writeFileSync } from "fs-extra";
+import { writeFileSync } from "fs";
+import { ensureDirSync, removeSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../test-framework/source";

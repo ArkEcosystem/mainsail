@@ -15,17 +15,9 @@ export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
-		const dirname = (() => {
-			try {
-				return new URL(".", import.meta.url).pathname;
-			} catch {
-				// eslint-disable-next-line unicorn/prefer-module
-				return __dirname;
-			}
-		})();
 
 		const { version } = this.fileSystem.readJSONSync<Contracts.Types.PackageJson>(
-			path.resolve(dirname, "../../package.json"),
+			path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"),
 		);
 
 		assert.defined(version);

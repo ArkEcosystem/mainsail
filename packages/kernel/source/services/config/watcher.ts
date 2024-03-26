@@ -1,20 +1,20 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import nsfw, { ActionType, NSFW } from "nsfw";
+import nsfw from "nsfw";
 
 @injectable()
 export class Watcher {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	#watcher!: NSFW;
+	#watcher!: nsfw.NSFW;
 
 	public async boot(): Promise<void> {
 		const configFiles = new Set([".env", "validators.json", "peers.json", "plugins.js", "plugins.json"]);
 
 		this.#watcher = await nsfw(this.app.configPath(), (events) => {
 			for (const event of events) {
-				if (event.action === ActionType.MODIFIED && configFiles.has(event.file)) {
+				if (event.action === nsfw.ActionType.MODIFIED && configFiles.has(event.file)) {
 					this.app.reboot();
 					break;
 				}

@@ -32,7 +32,7 @@ describe<{
 	// TODO: fix stub
 	it.skip("#install - should successfully install the plugin", async ({ source, dataPath, temporaryPath }) => {
 		// Arrange
-		const fileName: string = join(__dirname, "../../../test/files", "utils-0.9.1.tgz");
+		const fileName: string = join(import.meta.dirname, "../../../test/files", "utils-0.9.1.tgz");
 
 		const removeSync = stub(fs, "removeSync");
 		const spyOnExeca = stub(execa, "sync");
@@ -51,7 +51,7 @@ describe<{
 
 	it("#install - should throw error if .tgz doesn't contains package folder", async ({ source }) => {
 		// Arrange
-		const fileName: string = join(__dirname, "../../../test/files", "invalid-utils-0.9.1.tgz");
+		const fileName: string = join(import.meta.dirname, "../../../test/files", "invalid-utils-0.9.1.tgz");
 
 		// Act
 		await assert.rejects(() => source.install(fileName), Exceptions.MissingPackageFolder);
@@ -59,7 +59,7 @@ describe<{
 
 	it("#install - should throw error if .tgz doesn't contains package.json", async ({ source }) => {
 		// Arrange
-		const fileName: string = join(__dirname, "../../../test/files", "missing-utils-0.9.1.tgz");
+		const fileName: string = join(import.meta.dirname, "../../../test/files", "missing-utils-0.9.1.tgz");
 
 		// Act
 		await assert.rejects(() => source.install(fileName), Exceptions.InvalidPackageJson);
@@ -68,7 +68,7 @@ describe<{
 	// TODO: fix stub
 	it.skip("#update - should successfully update the plugin", async ({ source, dataPath, temporaryPath }) => {
 		// Arrange
-		const fileName: string = join(__dirname, "../../../test/files", "utils-0.9.1.tgz");
+		const fileName: string = join(import.meta.dirname, "../../../test/files", "utils-0.9.1.tgz");
 
 		const removeSync = stub(fs, "removeSync");
 		const spyOnExeca = stub(execa, "sync");

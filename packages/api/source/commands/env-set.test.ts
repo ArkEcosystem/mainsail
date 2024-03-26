@@ -1,7 +1,8 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { Identifiers } from "@mainsail/contracts";
 import { parse } from "envfile";
-import { ensureFileSync, readFileSync, removeSync } from "fs-extra";
+import { readFileSync } from "fs";
+import { ensureFileSync, removeSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../test-framework/source";

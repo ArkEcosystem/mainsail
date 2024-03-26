@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-bech32m";
 import { Configuration } from "@mainsail/crypto-config";
+import { ServiceProvider as CryptoConsensusServiceProvider } from "@mainsail/crypto-consensus-bls12-381";
 import { schemas as kayParSchemas } from "@mainsail/crypto-key-pair-schnorr";
 import { makeFormats, makeKeywords, schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CryptoValidationServiceProvider } from "@mainsail/crypto-validation";
@@ -8,7 +9,6 @@ import { BigNumber } from "@mainsail/utils";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
-import { ServiceProvider as CryptoConsensusServiceProvider } from "../../../crypto-consensus-bls12-381";
 import { describe, Sandbox } from "../../../test-framework/source";
 import { ValidatorRegistrationTransaction } from "./1";
 

@@ -58,6 +58,10 @@ export class NodeController extends Controller {
 	}
 
 	public async fees(request: Hapi.Request) {
+		const configuration = await this.getConfiguration();
+		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
+		const genesisTimestamp = cryptoConfiguration.genesisBlock.block.timestamp;
+
 		const transactionTypes = await this.transactionTypeRepositoryFactory()
 			.createQueryBuilder()
 			.select()
@@ -65,7 +69,10 @@ export class NodeController extends Controller {
 			.addOrderBy("type_group", "ASC")
 			.getMany();
 
-		const results = await this.transactionRepositoryFactory().getFeeStatistics(request.query.days);
+		const results = await this.transactionRepositoryFactory().getFeeStatistics(
+			genesisTimestamp,
+			request.query.days,
+		);
 
 		const groupedByTypeGroup = {};
 		for (const transactionType of transactionTypes) {
@@ -90,7 +97,6 @@ export class NodeController extends Controller {
 
 	public async configuration(request: Hapi.Request) {
 		const configuration = await this.getConfiguration();
-		const state = await this.getState();
 		const plugins = await this.getPlugins();
 		const transactionPoolConfiguration = plugins["@mainsail/transaction-pool"]?.configuration ?? {};
 
@@ -99,7 +105,7 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				constants: this.getMilestone(+state.height, cryptoConfiguration),
+				constants: configuration.activeMilestones,
 				core: {
 					version: configuration.version,
 				},
@@ -130,20 +136,6 @@ export class NodeController extends Controller {
 		return {
 			data: configuration?.cryptoConfiguration ?? {},
 		};
-	}
-
-	private getMilestone(height: number, configuration: Contracts.Crypto.NetworkConfig) {
-		const milestones = configuration.milestones ?? [];
-
-		let milestone = milestones[0];
-		for (let index = milestones.length - 1; index >= 0; index--) {
-			milestone = milestones[index];
-			if (milestone.height <= height) {
-				break;
-			}
-		}
-
-		return milestone;
 	}
 
 	private buildPortMapping(plugins: Record<string, Models.Plugin>) {
