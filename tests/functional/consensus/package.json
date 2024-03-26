@@ -38,6 +38,11 @@
 		"@mainsail/consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/fees": "workspace:*",
+		"@mainsail/fees-static": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-worker": "workspace:*",
+		"@mainsail/validator-set-static": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
