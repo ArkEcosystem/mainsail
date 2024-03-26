@@ -15,7 +15,12 @@ const setup = async () => {
 		.toConstantValue({ dispatch: () => {}, listen: () => {} });
 
 	// TODO:
-	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({});
+	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
+		broadcastPrecommit: async () => {},
+		broadcastPrevote: async () => {},
+		broadcastProposal: async () => {},
+		broadcastTransactions: async () => {},
+	});
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
