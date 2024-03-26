@@ -1,7 +1,6 @@
 import { interfaces } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import * as lmbd from "lmdb";
 
 import { Aggregator } from "./aggregator.js";
 import { Bootstrapper } from "./bootstrapper.js";
@@ -10,7 +9,6 @@ import { Consensus } from "./consensus.js";
 import { CommitProcessor, PrecommitProcessor, PrevoteProcessor, ProposalProcessor } from "./processors/index.js";
 import { RoundStateRepository } from "./round-state-repository.js";
 import { Scheduler } from "./scheduler.js";
-import { Storage } from "./storage.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -30,16 +28,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					context.container.resolve(CommitState).configure(commit),
 			);
 
-		// Storage for prevotes, precommits and proposals
-		const storage = this.app.get<lmbd.RootDatabase>(Identifiers.Database.Instance.Consensus);
-		this.app.bind(Identifiers.Database.Storage.Proposal).toConstantValue(storage.openDB({ name: "proposals" }));
-		this.app.bind(Identifiers.Database.Storage.PreVote).toConstantValue(storage.openDB({ name: "prevotes" }));
-		this.app.bind(Identifiers.Database.Storage.PreCommit).toConstantValue(storage.openDB({ name: "precommits" }));
-		this.app
-			.bind(Identifiers.Database.Storage.ConsensusState)
-			.toConstantValue(storage.openDB({ name: "consensus" }));
-		this.app.bind(Identifiers.Consensus.Storage).to(Storage).inSingletonScope();
-
 		this.app.bind(Identifiers.Consensus.Bootstrapper).to(Bootstrapper).inSingletonScope();
 		this.app.bind(Identifiers.Consensus.Service).toConstantValue(this.app.resolve(Consensus));
 	}
@@ -47,24 +35,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async dispose(): Promise<void> {
 		const consensus = this.app.get<Consensus>(Identifiers.Consensus.Service);
 		await consensus.dispose();
-
-		const storage = this.app.get<Storage>(Identifiers.Consensus.Storage);
-		await storage.clear();
-		await storage.saveState(consensus.getState());
-
-		const roundStates = this.app
-			.get<RoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
-			.getRoundStates();
-
-		const proposals = roundStates
-			.map((roundState) => roundState.getProposal())
-			.filter((proposal): proposal is Contracts.Crypto.Proposal => !!proposal);
-		await storage.saveProposals(proposals);
-
-		const prevotes = roundStates.flatMap((roundState) => roundState.getPrevotes());
-		await storage.savePrevotes(prevotes);
-
-		const precommits = roundStates.flatMap((roundState) => roundState.getPrecommits());
-		await storage.savePrecommits(precommits);
 	}
 }
