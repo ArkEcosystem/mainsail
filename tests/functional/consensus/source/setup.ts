@@ -16,8 +16,10 @@ const setup = async () => {
 
 	// TODO:
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({});
-	const worker = sandbox.app.resolve<Worker>(Worker);
-	sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({ getWorker: () => worker });
+	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
+	sandbox.app
+		.bind(Identifiers.CryptoWorker.WorkerPool)
+		.toConstantValue({ getWorker: () => sandbox.app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
 
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
