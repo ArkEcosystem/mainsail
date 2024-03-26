@@ -6,10 +6,11 @@
 	"contributors": [],
 	"type": "module",
 	"scripts": {
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"devDependencies": {
 		"@mainsail/test-framework": "workspace:*",
