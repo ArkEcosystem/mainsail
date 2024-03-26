@@ -146,6 +146,12 @@ const bootstrap = async (sandbox: Sandbox) => {
 		throw new Error("Failed to process genesis block");
 	}
 	await blockProcessor.commit(commitState);
+
+	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
+
+	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+
+	await consensus.run();
 };
 
 export { setup };
