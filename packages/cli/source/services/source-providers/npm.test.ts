@@ -118,7 +118,12 @@ describe<{
 
 		nock.fake(/.*/)
 			.get("/@arkecosystem/utils/-/utils-0.9.1.tgz")
-			.reply(200, fs.readFileSync(resolve(__dirname, "../../../test/files", "utils-0.9.1.tgz")));
+			.reply(
+				200,
+				fs.readFileSync(
+					resolve(new URL(".", import.meta.url).pathname, "../../../test/files", "utils-0.9.1.tgz"),
+				),
+			);
 
 		// Arrange
 		const removeSync = spy(fs, "removeSync");

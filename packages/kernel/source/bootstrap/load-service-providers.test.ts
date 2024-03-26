@@ -33,7 +33,7 @@ describeSkip<{
 	});
 
 	it("should bootstrap with defaults", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "stub-plugin-with-defaults" }] },
@@ -45,7 +45,7 @@ describeSkip<{
 	});
 
 	it("should bootstrap without defaults", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "stub-plugin" }] },
@@ -57,7 +57,7 @@ describeSkip<{
 	});
 
 	it("should throw if package doesn't exist", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "non-existing-plugin" }] },
