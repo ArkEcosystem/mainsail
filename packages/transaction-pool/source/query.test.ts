@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { describe } from "../../test-framework/source";
-import { BigNumber } from "../../utils";
+import { BigNumber } from "@mainsail/utils";
 import { Query, QueryIterable } from ".";
 
 describe<{

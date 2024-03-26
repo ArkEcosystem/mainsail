@@ -15,12 +15,13 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source",
-		"test:integration": "uvu -r tsm integration .test.ts",
-		"test:integration:file": "uvu -r tsm integration"
+		"test:file": "pnpm run uvu source",
+		"test:integration": "pnpm run uvu integration .test.ts",
+		"test:integration:file": "pnpm run uvu integration",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",

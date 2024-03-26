@@ -5,7 +5,6 @@ import importFresh from "import-fresh";
 
 import { describeSkip, Sandbox } from "../../test-framework/source";
 import { Peer } from "./peer";
-import { PeerVerificationResult } from "./peer-verifier";
 import { Service } from "./service";
 
 describeSkip<{

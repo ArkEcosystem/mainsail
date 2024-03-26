@@ -1,11 +1,12 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import importFresh from "import-fresh";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { defaults } from "./defaults";
 import { Peer } from "./peer";
 import { ServiceProvider } from "./service-provider";
+
+const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
 
 describe<{
 	sandbox: Sandbox;
@@ -86,7 +87,7 @@ describe<{
 	sandbox: Sandbox;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
-	const importDefaults = () => importFresh<any>("../distribution/defaults.js").defaults;
+	const importDefaults = async () => (await importFresh<any>("../distribution/defaults.js")).defaults;
 
 	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {} };
@@ -111,8 +112,8 @@ describe<{
 		}
 	});
 
-	it("should validate schema using defaults", ({ serviceProvider }) => {
-		const defaults = importDefaults();
+	it("should validate schema using defaults", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
 
 		const result = serviceProvider.configSchema().validate(defaults);
 		assert.undefined(result.error);
@@ -136,7 +137,7 @@ describe<{
 	});
 
 	it("should allow configuration extension", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		defaults.customField = "dummy";
 
@@ -149,7 +150,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_HOST", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_HOST = "127.0.0.1";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.server.hostname, "127.0.0.1");
@@ -158,7 +159,7 @@ describe<{
 	it("should throw if process.env.CORE_P2P_HOST is not ipv4 or ipv6 address", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_HOST = "123";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(
@@ -170,7 +171,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_PORT", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_PORT = "5000";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.server.port, 5000);
@@ -179,7 +180,7 @@ describe<{
 	it("should throw if process.env.CORE_P2P_PORT is not number", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_PORT = "false";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"server.port" must be a number');
@@ -188,7 +189,7 @@ describe<{
 	it("should return logLevel = 1 if process.env.CORE_NETWORK_NAME is testnet", async ({ serviceProvider }) => {
 		process.env.CORE_NETWORK_NAME = "testnet";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.server.logLevel, 1);
@@ -197,7 +198,7 @@ describe<{
 	it("should return logLevel = 0 if process.env.CORE_NETWORK_NAME is not testnet", async ({ serviceProvider }) => {
 		process.env.CORE_NETWORK_NAME = "devnet";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.server.logLevel, 0);
@@ -206,7 +207,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_MIN_NETWORK_REACH", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_MIN_NETWORK_REACH = "10";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.minimumNetworkReach, 10);
@@ -215,7 +216,7 @@ describe<{
 	it("should throw if process.env.CORE_P2P_MIN_NETWORK_REACH is not number", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_MIN_NETWORK_REACH = "false";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"minimumNetworkReach" must be a number');
@@ -224,7 +225,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET = "5000";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.maxSameSubnetPeers, 5000);
@@ -233,7 +234,7 @@ describe<{
 	it("should throw if process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET is not number", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_MAX_PEERS_SAME_SUBNET = "false";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"maxSameSubnetPeers" must be a number');
@@ -242,7 +243,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_MAX_PEERS_BROADCAST", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_MAX_PEERS_BROADCAST = "10";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.maxPeersBroadcast, 10);
@@ -251,7 +252,7 @@ describe<{
 	it("should throw if process.env.CORE_P2P_MAX_PEERS_BROADCAST is not number", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_MAX_PEERS_BROADCAST = "false";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"maxPeersBroadcast" must be a number');
@@ -260,7 +261,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_RATE_LIMIT", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_RATE_LIMIT = "5000";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.rateLimit, 5000);
@@ -269,7 +270,7 @@ describe<{
 	it("should throw if process.env.CORE_P2P_RATE_LIMIT is not number", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_RATE_LIMIT = "false";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"rateLimit" must be a number');
@@ -278,7 +279,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_PEER_BAN_TIME", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_PEER_BAN_TIME = "5000";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.peerBanTime, 5000);
@@ -287,7 +288,7 @@ describe<{
 	it("should throw if process.env.CORE_P2P_PEER_BAN_TIME is not number", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_PEER_BAN_TIME = "false";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"peerBanTime" must be a number');
@@ -296,7 +297,7 @@ describe<{
 	it("should parse process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS = "5000";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.rateLimitPostTransactions, 5000);
@@ -307,7 +308,7 @@ describe<{
 	}) => {
 		process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS = "false";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"rateLimitPostTransactions" must be a number');
@@ -316,7 +317,7 @@ describe<{
 	it("should parse CORE_P2P_DEVELOPMENT_MODE_ENABLED", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_DEVELOPMENT_MODE_ENABLED = "true";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.developmentMode.enabled, true);
@@ -325,14 +326,14 @@ describe<{
 	it("should parse process.env.CORE_P2P_API_NODES_MAX_CONTENT_LENGTH", async ({ serviceProvider }) => {
 		process.env.CORE_P2P_API_NODES_MAX_CONTENT_LENGTH = "25000";
 
-		const result = serviceProvider.configSchema().validate(importDefaults());
+		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.apiNodesMaxContentLength, 25000);
 	});
 
 	it("#schemaRestrictions - server is required && is object", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.server = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -347,7 +348,7 @@ describe<{
 	it("#schemaRestrictions - server.hostname is required && is string && is IP address", async ({
 		serviceProvider,
 	}) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.server.hostname = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -370,7 +371,7 @@ describe<{
 	it("#schemaRestrictions - server.port is required && is integer && >= 1 && <= 65535", async ({
 		serviceProvider,
 	}) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.server.port = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -398,7 +399,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - server.logLevel is required && is integer && >= 0", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.server.logLevel = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -423,7 +424,7 @@ describe<{
 	it("#schemaRestrictions - minimumVersions is required && is array && contains strings", async ({
 		serviceProvider,
 	}) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.minimumVersions = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -441,7 +442,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - minimumNetworkReach is required && is integer && >= 0", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.minimumNetworkReach = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -464,7 +465,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - verifyTimeout is required && is integer && >= 0", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.verifyTimeout = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -487,7 +488,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - getBlocksTimeout is required && is integer && >= 0", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.getBlocksTimeout = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -510,7 +511,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - maxPeersBroadcast is required && is integer && >= 0", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.maxPeersBroadcast = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -533,7 +534,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - maxSameSubnetPeers is required && is integer && >= 0", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.maxSameSubnetPeers = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -556,7 +557,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - whitelist is required && is array && contains strings", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.whitelist = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -574,7 +575,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - blacklist is required && is array && contains strings", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.blacklist = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -594,7 +595,7 @@ describe<{
 	it("#schemaRestrictions - remoteAccess is required && is array && contains IP addresses", async ({
 		serviceProvider,
 	}) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.remoteAccess = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -620,7 +621,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - peerBanTime is required && is integer && >= 0", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.peerBanTime = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -643,7 +644,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - rateLimit is required && is integer && >= 1", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.rateLimit = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -668,7 +669,7 @@ describe<{
 	it("#schemaRestrictions - rateLimitPostTransactions is required && is integer && >= 0", async ({
 		serviceProvider,
 	}) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.rateLimitPostTransactions = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -691,7 +692,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - developmentMode is required && is object", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.developmentMode = false;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -704,7 +705,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - developmentMode.enabled is required && is boolean", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.developmentMode.enabled = 1;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -717,7 +718,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - disableDiscovery is optional && is boolean", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.disableDiscovery = 123;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -730,7 +731,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - skipDiscovery is optional && is boolean", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.skipDiscovery = 123;
 		let result = serviceProvider.configSchema().validate(defaults);
 
@@ -743,7 +744,7 @@ describe<{
 	});
 
 	it("#schemaRestrictions - ignoreMinimumNetworkReach is optional && is boolean", async ({ serviceProvider }) => {
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 		defaults.ignoreMinimumNetworkReach = 123;
 		let result = serviceProvider.configSchema().validate(defaults);
 

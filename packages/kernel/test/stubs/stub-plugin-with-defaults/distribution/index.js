@@ -1,9 +1,4 @@
-const {
-    ServiceProvider
-} = require('./service-provider')
-const {
-    defaults
-} = require('./defaults')
+import { ServiceProvider } from './service-provider'
+import { defaults } from './defaults'
 
-exports.defaults = defaults;
-exports.ServiceProvider = ServiceProvider;
+export { ServiceProvider, defaults }

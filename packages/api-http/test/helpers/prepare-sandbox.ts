@@ -1,13 +1,13 @@
-import { Identifiers } from "@mainsail/contracts";
-import { Application, Providers } from "@mainsail/kernel";
-
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	ServiceProvider as CoreApiDatabase,
-} from "../../../api-database";
-import { ServiceProvider as CoreApiHttp } from "../../../api-http";
+} from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/contracts";
+import { Application, Providers } from "@mainsail/kernel";
+
 import { Sandbox } from "../../../test-framework/source";
+import { ServiceProvider as CoreApiHttp } from "../../source/service-provider";
 
 export class ApiContext {
 	public constructor(
@@ -100,9 +100,9 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 		.inSingletonScope();
 
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
-		info: (msg) => console.log(msg),
-		notice: (msg) => console.log(msg),
-		error: (msg) => console.log(msg),
+		error: (message) => console.log(message),
+		info: (message) => console.log(message),
+		notice: (message) => console.log(message),
 	});
 
 	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
@@ -122,10 +122,10 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-database-test",
-			migrationsRun: true,
 			dropSchema: true,
-			synchronize: true,
 			logging: false,
+			migrationsRun: true,
+			synchronize: true,
 		},
 	});
 
@@ -142,17 +142,17 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 		.discover("@mainsail/api-http", "@mainsail/api-http");
 
 	pluginConfiguration.merge({
-		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },
+		database: {
+			...databaseOptions,
+			applicationName: "mainsail/api-http-test",
+		},
 		plugins: {
 			pagination: {
 				limit: 100,
 			},
 			socketTimeout: 5000,
 		},
-		database: {
-			...databaseOptions,
-			applicationName: "mainsail/api-http-test",
-		},
+		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },
 	});
 
 	const server = app.resolve(CoreApiHttp);
@@ -165,16 +165,16 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 
 // TODO: either use env or hardcode same values for postgres in CI
 const databaseOptions = {
-	type: "postgres",
 	database: "test_db",
-	username: "test_db",
-	entityPrefix: "public.",
-	password: "password",
-	host: "localhost",
-	port: 5432,
-	logger: "simple-console",
-	migrationsRun: false,
 	dropSchema: false,
-	synchronize: false,
+	entityPrefix: "public.",
+	host: "localhost",
+	logger: "simple-console",
 	logging: false,
+	migrationsRun: false,
+	password: "password",
+	port: 5432,
+	synchronize: false,
+	type: "postgres",
+	username: "test_db",
 };

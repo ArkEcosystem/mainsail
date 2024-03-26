@@ -1,8 +1,9 @@
 import { SinonStub } from "sinon";
 
+import { Stub as IStub } from "./contracts.js";
 import { Fake } from "./fake.js";
 
-export class Stub extends Fake<SinonStub> {
+export class Stub extends Fake<SinonStub> implements IStub {
 	public returnValue(value: unknown): Stub {
 		this.subject.returns(value);
 
