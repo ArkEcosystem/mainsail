@@ -8,12 +8,14 @@ const setup = async () => {
 	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 	sandbox.app.bind(Identifiers.Config.Flags).toConstantValue({});
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
-	// TODO: Register event dispatcher
-	sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatch: () => {} });
+	sandbox.app
+		.bind(Identifiers.Services.EventDispatcher.Service)
+		.toConstantValue({ dispatch: () => {}, listen: () => {} });
 
 	// TODO:
 	sandbox.app.bind(Identifiers.Transaction.Handler.Instances).toConstantValue([]);
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({});
+	sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({});
 
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
@@ -43,7 +45,6 @@ const setup = async () => {
 	await loadPlugin(sandbox, "@mainsail/fees");
 	await loadPlugin(sandbox, "@mainsail/fees-static");
 	await loadPlugin(sandbox, "@mainsail/crypto-transaction");
-	await loadPlugin(sandbox, "@mainsail/crypto-worker");
 	await loadPlugin(sandbox, "@mainsail/state");
 	await loadPlugin(sandbox, "@mainsail/database");
 	await loadPlugin(sandbox, "@mainsail/transactions");
@@ -56,12 +57,38 @@ const setup = async () => {
 	await loadPlugin(sandbox, "@mainsail/proposer");
 	await loadPlugin(sandbox, "@mainsail/consensus");
 
+	await bootPlugin(sandbox, "@mainsail/validation");
+	await bootPlugin(sandbox, "@mainsail/crypto-config");
+	await bootPlugin(sandbox, "@mainsail/crypto-validation");
+	await bootPlugin(sandbox, "@mainsail/crypto-hash-bcrypto");
+	await bootPlugin(sandbox, "@mainsail/crypto-signature-schnorr");
+	await bootPlugin(sandbox, "@mainsail/crypto-key-pair-schnorr");
+	await bootPlugin(sandbox, "@mainsail/crypto-consensus-bls12-381");
+	await bootPlugin(sandbox, "@mainsail/crypto-address-bech32m");
+	await bootPlugin(sandbox, "@mainsail/crypto-wif");
+	await bootPlugin(sandbox, "@mainsail/serializer");
+	await bootPlugin(sandbox, "@mainsail/crypto-block");
+	await bootPlugin(sandbox, "@mainsail/fees");
+	await bootPlugin(sandbox, "@mainsail/fees-static");
+	await bootPlugin(sandbox, "@mainsail/crypto-transaction");
+	await bootPlugin(sandbox, "@mainsail/state");
+	await bootPlugin(sandbox, "@mainsail/database");
+	await bootPlugin(sandbox, "@mainsail/transactions");
+	await bootPlugin(sandbox, "@mainsail/transaction-pool");
+	await bootPlugin(sandbox, "@mainsail/crypto-messages");
+	await bootPlugin(sandbox, "@mainsail/crypto-commit");
+	await bootPlugin(sandbox, "@mainsail/processor");
+	await bootPlugin(sandbox, "@mainsail/validator-set-static");
+	await bootPlugin(sandbox, "@mainsail/validator");
+	await bootPlugin(sandbox, "@mainsail/proposer");
+	await bootPlugin(sandbox, "@mainsail/consensus");
+
 	return sandbox;
 };
 
 const loadPlugin = async (sandbox: Sandbox, packageId: string) => {
-	const serviceProviderRepository = sandbox.app.resolve<Providers.ServiceProviderRepository>(
-		Providers.ServiceProviderRepository,
+	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
+		Identifiers.ServiceProvider.Repository,
 	);
 
 	const { ServiceProvider } = await import(packageId);
@@ -77,6 +104,14 @@ const loadPlugin = async (sandbox: Sandbox, packageId: string) => {
 
 	serviceProviderRepository.set(packageId, serviceProvider);
 	await serviceProviderRepository.register(packageId);
+};
+
+const bootPlugin = async (sandbox: Sandbox, packageId: string) => {
+	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
+		Identifiers.ServiceProvider.Repository,
+	);
+
+	await serviceProviderRepository.boot(packageId);
 };
 
 const getPluginConfiguration = async (
