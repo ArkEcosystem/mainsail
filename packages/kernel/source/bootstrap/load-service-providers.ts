@@ -73,8 +73,7 @@ export class LoadServiceProviders implements Bootstrapper {
 					// ~/git/mainsail/packages/kernel/distribution/bootstrap
 					// ~/git/mainsail/packages/
 					// ~/git/mainsail/packages/validation/distribution/index.js
-					const __dirname = new URL(".", import.meta.url).pathname;
-					const fallback = path.resolve(__dirname, "..", "..", "..", localPath);
+					const fallback = path.resolve(new URL(".", import.meta.url).pathname, "..", "..", "..", localPath);
 					({ ServiceProvider } = await import(fallback));
 
 					// ~/git/mainsail/packages/validation/distribution/index.js

@@ -49,21 +49,7 @@ internals.schema = Joi.object({
 });
 
 const plugin = {
-	pkg: readJSONSync(
-		resolve(
-			(() => {
-				try {
-					return new URL(".", import.meta.url).pathname;
-				} catch {
-					// eslint-disable-next-line unicorn/prefer-module
-					return __dirname;
-				}
-			})(),
-			"..",
-			"..",
-			"package.json",
-		),
-	),
+	pkg: readJSONSync(resolve(new URL(".", import.meta.url).pathname, "..", "..", "package.json")),
 	register: function (server, options) {
 		const settings: any = applyToDefaults(internals.defaults, options);
 

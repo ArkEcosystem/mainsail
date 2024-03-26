@@ -19,16 +19,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const dirname = (() => {
-			try {
-				return new URL(".", import.meta.url).pathname;
-			} catch {
-				// eslint-disable-next-line unicorn/prefer-module
-				return __dirname;
-			}
-		})();
-
-		const { name } = readJSONSync(path.resolve(dirname, "../../package.json"));
+		const { name } = readJSONSync(path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"));
 		AppUtils.assert.defined<string>(name);
 
 		const flags: Contracts.AnyObject = {
