@@ -19,8 +19,8 @@
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
-		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js",
-		"typeorm": "typeorm"
+		"typeorm": "typeorm",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
