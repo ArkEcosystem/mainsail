@@ -1,0 +1,38 @@
+{
+	"name": "@mainsail/consensus-storage",
+	"version": "0.0.1-alpha.13",
+	"description": "Consensus storage for the Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"type": "module",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"release": "pnpm publish --access public",
+		"test": "pnpm run uvu source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
+	},
+	"dependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"dayjs": "1.11.10",
+		"lmdb": "2.9.4"
+	},
+	"devDependencies": {
+		"esmock": "2.6.4",
+		"uvu": "^0.5.6"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}
