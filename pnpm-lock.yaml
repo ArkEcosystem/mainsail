@@ -3335,15 +3335,27 @@ importers:
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../../../packages/crypto-signature-schnorr
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../../../packages/crypto-wif
+      '@mainsail/crypto-worker':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-worker
       '@mainsail/database':
         specifier: workspace:*
         version: link:../../../packages/database
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../../../packages/fees
+      '@mainsail/fees-static':
+        specifier: workspace:*
+        version: link:../../../packages/fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel
@@ -3377,6 +3389,9 @@ importers:
       '@mainsail/validator':
         specifier: workspace:*
         version: link:../../../packages/validator
+      '@mainsail/validator-set-static':
+        specifier: workspace:*
+        version: link:../../../packages/validator-set-static
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

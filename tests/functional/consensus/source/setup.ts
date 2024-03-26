@@ -36,6 +36,10 @@ const setup = async () => {
 	await loadPlugin(sandbox, "@mainsail/crypto-wif");
 	await loadPlugin(sandbox, "@mainsail/serializer");
 	await loadPlugin(sandbox, "@mainsail/crypto-block");
+	await loadPlugin(sandbox, "@mainsail/fees");
+	await loadPlugin(sandbox, "@mainsail/fees-static");
+	await loadPlugin(sandbox, "@mainsail/crypto-transaction");
+	await loadPlugin(sandbox, "@mainsail/crypto-worker");
 	await loadPlugin(sandbox, "@mainsail/state");
 	await loadPlugin(sandbox, "@mainsail/database");
 	await loadPlugin(sandbox, "@mainsail/transactions");
@@ -43,9 +47,10 @@ const setup = async () => {
 	await loadPlugin(sandbox, "@mainsail/crypto-messages");
 	await loadPlugin(sandbox, "@mainsail/crypto-commit");
 	await loadPlugin(sandbox, "@mainsail/processor");
+	await loadPlugin(sandbox, "@mainsail/validator-set-static");
 	await loadPlugin(sandbox, "@mainsail/validator");
-	await loadPlugin(sandbox, "@mainsail/proposer");
-	await loadPlugin(sandbox, "@mainsail/consensus");
+	// await loadPlugin(sandbox, "@mainsail/proposer");
+	// await loadPlugin(sandbox, "@mainsail/consensus");
 
 	return sandbox;
 };
