@@ -2,7 +2,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
-import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";
 import { Signer } from "../../internal/signer.js";
@@ -11,11 +10,9 @@ import { generateApp } from "./generate-app.js";
 
 export const registerBlockFactory = async (
 	factory: FactoryBuilder,
-	config?: Contracts.Crypto.NetworkConfigPartial,
+	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
-	const app = await generateApp(
-		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/core/crypto.json")),
-	);
+	const app = await generateApp(config);
 
 	factory.set("Block", async ({ options }): Promise<Contracts.Crypto.Commit> => {
 		const previousBlock: Contracts.Crypto.BlockData = options.getPreviousBlock
