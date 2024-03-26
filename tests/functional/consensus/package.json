@@ -43,6 +43,14 @@
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-worker": "workspace:*",
 		"@mainsail/validator-set-static": "workspace:*",
+		"@mainsail/crypto-transaction-username-registration": "workspace:*",
+		"@mainsail/crypto-transaction-username-resignation": "workspace:*",
+		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
+		"@mainsail/crypto-transaction-validator-resignation": "workspace:*",
+		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
+		"@mainsail/crypto-transaction-multi-signature-registration": "workspace:*",
+		"@mainsail/crypto-transaction-transfer": "workspace:*",
+		"@mainsail/crypto-transaction-vote": "workspace:*",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

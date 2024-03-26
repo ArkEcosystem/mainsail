@@ -31,57 +31,51 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
-	await loadPlugin(sandbox, "@mainsail/validation");
-	await loadPlugin(sandbox, "@mainsail/crypto-config");
-	await loadPlugin(sandbox, "@mainsail/crypto-validation");
-	await loadPlugin(sandbox, "@mainsail/crypto-hash-bcrypto");
-	await loadPlugin(sandbox, "@mainsail/crypto-signature-schnorr");
-	await loadPlugin(sandbox, "@mainsail/crypto-key-pair-schnorr");
-	await loadPlugin(sandbox, "@mainsail/crypto-consensus-bls12-381");
-	await loadPlugin(sandbox, "@mainsail/crypto-address-bech32m");
-	await loadPlugin(sandbox, "@mainsail/crypto-wif");
-	await loadPlugin(sandbox, "@mainsail/serializer");
-	await loadPlugin(sandbox, "@mainsail/crypto-block");
-	await loadPlugin(sandbox, "@mainsail/fees");
-	await loadPlugin(sandbox, "@mainsail/fees-static");
-	await loadPlugin(sandbox, "@mainsail/crypto-transaction");
-	await loadPlugin(sandbox, "@mainsail/state");
-	await loadPlugin(sandbox, "@mainsail/database");
-	await loadPlugin(sandbox, "@mainsail/transactions");
-	await loadPlugin(sandbox, "@mainsail/transaction-pool");
-	await loadPlugin(sandbox, "@mainsail/crypto-messages");
-	await loadPlugin(sandbox, "@mainsail/crypto-commit");
-	await loadPlugin(sandbox, "@mainsail/processor");
-	await loadPlugin(sandbox, "@mainsail/validator-set-static");
-	await loadPlugin(sandbox, "@mainsail/validator");
-	await loadPlugin(sandbox, "@mainsail/proposer");
-	await loadPlugin(sandbox, "@mainsail/consensus");
+	const packages = [
+		"@mainsail/validation",
+		"@mainsail/crypto-config",
+		"@mainsail/crypto-validation",
+		"@mainsail/crypto-hash-bcrypto",
+		"@mainsail/crypto-signature-schnorr",
+		"@mainsail/crypto-key-pair-schnorr",
+		"@mainsail/crypto-consensus-bls12-381",
+		"@mainsail/crypto-address-bech32m",
+		"@mainsail/crypto-wif",
+		"@mainsail/serializer",
+		"@mainsail/crypto-block",
+		"@mainsail/fees",
+		"@mainsail/fees-static",
+		"@mainsail/crypto-transaction",
+		"@mainsail/crypto-transaction-username-registration",
+		"@mainsail/crypto-transaction-username-resignation",
+		"@mainsail/crypto-transaction-validator-registration",
+		"@mainsail/crypto-transaction-validator-resignation",
+		"@mainsail/crypto-transaction-multi-payment",
+		"@mainsail/crypto-transaction-multi-signature-registration",
+		"@mainsail/crypto-transaction-transfer",
+		"@mainsail/crypto-transaction-vote",
+		"@mainsail/state",
+		"@mainsail/database",
+		"@mainsail/transactions",
+		"@mainsail/transaction-pool",
+		"@mainsail/crypto-messages",
+		"@mainsail/crypto-commit",
+		"@mainsail/processor",
+		"@mainsail/validator-set-static",
+		"@mainsail/validator",
+		"@mainsail/proposer",
+		"@mainsail/consensus",
+	];
 
-	await bootPlugin(sandbox, "@mainsail/validation");
-	await bootPlugin(sandbox, "@mainsail/crypto-config");
-	await bootPlugin(sandbox, "@mainsail/crypto-validation");
-	await bootPlugin(sandbox, "@mainsail/crypto-hash-bcrypto");
-	await bootPlugin(sandbox, "@mainsail/crypto-signature-schnorr");
-	await bootPlugin(sandbox, "@mainsail/crypto-key-pair-schnorr");
-	await bootPlugin(sandbox, "@mainsail/crypto-consensus-bls12-381");
-	await bootPlugin(sandbox, "@mainsail/crypto-address-bech32m");
-	await bootPlugin(sandbox, "@mainsail/crypto-wif");
-	await bootPlugin(sandbox, "@mainsail/serializer");
-	await bootPlugin(sandbox, "@mainsail/crypto-block");
-	await bootPlugin(sandbox, "@mainsail/fees");
-	await bootPlugin(sandbox, "@mainsail/fees-static");
-	await bootPlugin(sandbox, "@mainsail/crypto-transaction");
-	await bootPlugin(sandbox, "@mainsail/state");
-	await bootPlugin(sandbox, "@mainsail/database");
-	await bootPlugin(sandbox, "@mainsail/transactions");
-	await bootPlugin(sandbox, "@mainsail/transaction-pool");
-	await bootPlugin(sandbox, "@mainsail/crypto-messages");
-	await bootPlugin(sandbox, "@mainsail/crypto-commit");
-	await bootPlugin(sandbox, "@mainsail/processor");
-	await bootPlugin(sandbox, "@mainsail/validator-set-static");
-	await bootPlugin(sandbox, "@mainsail/validator");
-	await bootPlugin(sandbox, "@mainsail/proposer");
-	await bootPlugin(sandbox, "@mainsail/consensus");
+	for (const packageId of packages) {
+		await loadPlugin(sandbox, packageId);
+	}
+
+	for (const packageId of packages) {
+		await bootPlugin(sandbox, packageId);
+	}
+
+	await bootstrap(sandbox);
 
 	return sandbox;
 };
@@ -124,6 +118,16 @@ const getPluginConfiguration = async (
 		return sandbox.app.resolve(Providers.PluginConfiguration).from(packageId, defaults);
 	} catch {}
 	return undefined;
+};
+
+const bootstrap = async (sandbox: Sandbox) => {
+	const configuration = sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	const commitFactory = sandbox.app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
+	const genesisBlockJson = configuration.get("genesisBlock");
+
+	const genesisBlock = await commitFactory.fromJson(genesisBlockJson);
+
+	console.log(genesisBlock);
 };
 
 export { setup };
