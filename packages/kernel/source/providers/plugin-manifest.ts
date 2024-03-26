@@ -10,10 +10,8 @@ export class PluginManifest {
 
 	#manifest!: Contracts.Types.JsonObject;
 
-	public discover(packageId: string): this {
-		this.#manifest = this.fileSystem.readJSONSync(
-			createRequire(import.meta.url).resolve(`${packageId}/package.json`),
-		);
+	public discover(packageId: string, url: string): this {
+		this.#manifest = this.fileSystem.readJSONSync(createRequire(url).resolve(`${packageId}/package.json`));
 
 		return this;
 	}
