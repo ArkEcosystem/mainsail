@@ -13,6 +13,7 @@
 		"uvu": "tsx --tsconfig ../../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"devDependencies": {
+		"@mainsail/container": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",

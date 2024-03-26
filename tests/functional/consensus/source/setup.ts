@@ -2,6 +2,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 
+import { Worker } from "./worker.js";
+
 const setup = async () => {
 	const sandbox = new Sandbox();
 
@@ -14,7 +16,8 @@ const setup = async () => {
 
 	// TODO:
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({});
-	sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({});
+	const worker = sandbox.app.resolve<Worker>(Worker);
+	sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({ getWorker: () => worker });
 
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();

@@ -3305,6 +3305,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../../../packages/container
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
