@@ -113,8 +113,8 @@ export const Identifiers = {
 	Database: {
 		Instance: {
 			Consensus: Symbol("Database<Instance.Consensus>"),
-			Root: Symbol("Database<Instance.Root>"),
 		},
+		Root: Symbol("Database<Root>"),
 		Service: Symbol("Database<Service>"),
 		Storage: {
 			Block: Symbol("Database<Storage.Block>"),

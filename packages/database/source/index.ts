@@ -19,7 +19,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async dispose(): Promise<void> {
 		await this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).persist();
 
-		await this.app.get<RootDatabase>(Identifiers.Database.Instance.Root).close();
+		await this.app.get<RootDatabase>(Identifiers.Database.Root).close();
 	}
 
 	#registerStorage() {
@@ -28,7 +28,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			name: "core",
 			path: join(this.app.dataPath(), "ledger.mdb"),
 		});
-		this.app.bind(Identifiers.Database.Instance.Root).toConstantValue(rootStorage);
+		this.app.bind(Identifiers.Database.Root).toConstantValue(rootStorage);
 		this.app.bind(Identifiers.Database.Storage.Block).toConstantValue(rootStorage.openDB({ name: "blocks" }));
 	}
 }
