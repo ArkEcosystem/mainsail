@@ -3,13 +3,13 @@ import { Providers } from "@mainsail/kernel";
 import { open, RootDatabase } from "lmdb";
 import { join } from "path";
 
-import { Storage } from "./storage.js";
+import { Service } from "./service.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.#registerStorage();
 
-		this.app.bind(Identifiers.ConsensusStorage.Service).to(Storage).inSingletonScope();
+		this.app.bind(Identifiers.ConsensusStorage.Service).to(Service).inSingletonScope();
 	}
 
 	public async dispose(): Promise<void> {
@@ -45,7 +45,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.get<Contracts.Consensus.RoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
 			.getRoundStates();
 
-		const storage = this.app.get<Storage>(Identifiers.ConsensusStorage.Service);
+		const storage = this.app.get<Service>(Identifiers.ConsensusStorage.Service);
 
 		await storage.clear();
 		await storage.saveState(

@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import * as lmdb from "lmdb";
 
 @injectable()
-export class Storage implements Contracts.Consensus.ConsensusStorage {
+export class Service implements Contracts.ConsensusStorage.Service {
 	@inject(Identifiers.ConsensusStorage.Storage.Proposal)
 	private readonly proposalStorage!: lmdb.Database;
 

@@ -10,7 +10,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.ConsensusStorage.Service)
-	private readonly storage!: Contracts.Consensus.ConsensusStorage;
+	private readonly storage!: Contracts.ConsensusStorage.Service;
 
 	public async run(): Promise<Contracts.Consensus.ConsensusState | undefined> {
 		const proposals = await this.storage.getProposals();
