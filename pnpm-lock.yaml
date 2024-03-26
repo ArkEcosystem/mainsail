@@ -670,9 +670,6 @@ importers:
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
-      lmdb:
-        specifier: 2.9.4
-        version: 2.9.4
     devDependencies:
       esmock:
         specifier: 2.6.4
@@ -692,16 +689,10 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      dayjs:
-        specifier: 1.11.10
-        version: 1.11.10
       lmdb:
         specifier: 2.9.4
         version: 2.9.4
     devDependencies:
-      esmock:
-        specifier: 2.6.4
-        version: 2.6.4
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

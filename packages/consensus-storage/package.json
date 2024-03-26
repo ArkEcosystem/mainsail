@@ -25,11 +25,9 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"dayjs": "1.11.10",
 		"lmdb": "2.9.4"
 	},
 	"devDependencies": {
-		"esmock": "2.6.4",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
