@@ -11,6 +11,10 @@ const setup = async () => {
 	// TODO: Register event dispatcher
 	sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatch: () => {} });
 
+	// TODO:
+	sandbox.app.bind(Identifiers.Transaction.Handler.Instances).toConstantValue([]);
+	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({});
+
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
@@ -49,8 +53,8 @@ const setup = async () => {
 	await loadPlugin(sandbox, "@mainsail/processor");
 	await loadPlugin(sandbox, "@mainsail/validator-set-static");
 	await loadPlugin(sandbox, "@mainsail/validator");
-	// await loadPlugin(sandbox, "@mainsail/proposer");
-	// await loadPlugin(sandbox, "@mainsail/consensus");
+	await loadPlugin(sandbox, "@mainsail/proposer");
+	await loadPlugin(sandbox, "@mainsail/consensus");
 
 	return sandbox;
 };
