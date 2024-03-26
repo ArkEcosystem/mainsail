@@ -779,6 +779,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../consensus
+      '@mainsail/consensus-storage':
+        specifier: workspace:*
+        version: link:../consensus-storage
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
