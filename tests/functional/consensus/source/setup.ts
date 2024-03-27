@@ -5,8 +5,9 @@ import { join } from "path";
 
 import { TestLogger } from "./logger.js";
 import { Worker } from "./worker.js";
+import { P2PRegistry } from "./p2p.js";
 
-const setup = async (id: number) => {
+const setup = async (id: number, p2pRegistry: P2PRegistry) => {
 	const sandbox = new Sandbox();
 
 	// Basic binds and mocks
@@ -16,6 +17,9 @@ const setup = async (id: number) => {
 	sandbox.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
 		.toConstantValue({ dispatch: () => {}, listen: () => {} });
+
+	p2pRegistry.registerNode(id, sandbox.app);
+	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		clear: async () => {},
@@ -39,12 +43,6 @@ const setup = async (id: number) => {
 		readCommits: async function* () {},
 	});
 
-	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(<Contracts.P2P.Broadcaster>{
-		broadcastPrecommit: async () => {},
-		broadcastPrevote: async () => {},
-		broadcastProposal: async () => {},
-		broadcastTransactions: async () => {},
-	});
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
