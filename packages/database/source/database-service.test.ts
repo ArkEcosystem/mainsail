@@ -211,8 +211,8 @@ describe<{
 		);
 	});
 
-	it("#getLastBlock - should return undefined if block is not found", async ({ databaseService }) => {
-		assert.undefined(await databaseService.getLastBlock());
+	it("#getLastCommit - should return undefined if block is not found", async ({ databaseService }) => {
+		assert.undefined(await databaseService.getLastCommit());
 	});
 
 	it("#getLastBlock - should return last block", async ({ databaseService }) => {
@@ -221,14 +221,14 @@ describe<{
 			databaseService.addCommit(commit);
 		}
 
-		let lastBlock = (await databaseService.getLastBlock()) as Contracts.Crypto.Block;
+		let lastCommit = await databaseService.getLastCommit();
 
-		assertBlockEqual(lastBlock, commits[3].block);
+		assertBlockEqual(lastCommit?.block, commits[3].block);
 
 		await databaseService.persist();
-		lastBlock = (await databaseService.getLastBlock()) as Contracts.Crypto.Block;
+		lastCommit = await databaseService.getLastCommit();
 
-		assertBlockEqual(lastBlock, commits[3].block);
+		assertBlockEqual(lastCommit?.block, commits[3].block);
 	});
 
 	const assertBlocksEqual = (blocksA: Contracts.Crypto.Block[], blocksB: Contracts.Crypto.Block[]) => {
