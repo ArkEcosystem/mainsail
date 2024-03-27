@@ -3423,6 +3423,132 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  tests/functional/transaction-pool-api:
+    devDependencies:
+      '@mainsail/consensus':
+        specifier: workspace:*
+        version: link:../../../packages/consensus
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../../../packages/container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-address-bech32m
+      '@mainsail/crypto-block':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-block
+      '@mainsail/crypto-commit':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-commit
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-config
+      '@mainsail/crypto-consensus-bls12-381':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-consensus-bls12-381
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-schnorr
+      '@mainsail/crypto-messages':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-messages
+      '@mainsail/crypto-signature-schnorr':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-signature-schnorr
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction
+      '@mainsail/crypto-transaction-multi-payment':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-multi-payment
+      '@mainsail/crypto-transaction-multi-signature-registration':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-multi-signature-registration
+      '@mainsail/crypto-transaction-transfer':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-transfer
+      '@mainsail/crypto-transaction-username-registration':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-username-registration
+      '@mainsail/crypto-transaction-username-resignation':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-username-resignation
+      '@mainsail/crypto-transaction-validator-registration':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-validator-registration
+      '@mainsail/crypto-transaction-validator-resignation':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-validator-resignation
+      '@mainsail/crypto-transaction-vote':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-vote
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-validation
+      '@mainsail/crypto-wif':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-wif
+      '@mainsail/crypto-worker':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-worker
+      '@mainsail/database':
+        specifier: workspace:*
+        version: link:../../../packages/database
+      '@mainsail/fees':
+        specifier: workspace:*
+        version: link:../../../packages/fees
+      '@mainsail/fees-static':
+        specifier: workspace:*
+        version: link:../../../packages/fees-static
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../../../packages/kernel
+      '@mainsail/logger-pino':
+        specifier: workspace:*
+        version: link:../../../packages/logger-pino
+      '@mainsail/processor':
+        specifier: workspace:*
+        version: link:../../../packages/processor
+      '@mainsail/proposer':
+        specifier: workspace:*
+        version: link:../../../packages/proposer
+      '@mainsail/serializer':
+        specifier: workspace:*
+        version: link:../../../packages/serializer
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../../../packages/state
+      '@mainsail/test-framework':
+        specifier: workspace:*
+        version: link:../../../packages/test-framework
+      '@mainsail/transaction-pool':
+        specifier: workspace:*
+        version: link:../../../packages/transaction-pool
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../../../packages/transactions
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../../../packages/utils
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../../../packages/validation
+      '@mainsail/validator':
+        specifier: workspace:*
+        version: link:../../../packages/validator
+      '@mainsail/validator-set-static':
+        specifier: workspace:*
+        version: link:../../../packages/validator-set-static
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:
