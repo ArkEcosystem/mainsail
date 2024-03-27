@@ -105,6 +105,23 @@ describe<{
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 0);
 	});
 
+	it("#isEmpty - should return true if no commits are stored", async ({ databaseService }) => {
+		assert.true(databaseService.isEmpty());
+	});
+
+	it("#isEmpty - should return false if commit is added", async ({ databaseService }) => {
+		databaseService.addCommit(await generateCommit());
+
+		assert.false(databaseService.isEmpty());
+	});
+
+	it("#isEmpty - should return false if commit is persisted", async ({ databaseService }) => {
+		databaseService.addCommit(await generateCommit());
+		await databaseService.persist();
+
+		assert.false(databaseService.isEmpty());
+	});
+
 	it("#persist - should store a commit", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
 		assert.undefined(await databaseService.getCommit(commit.block.data.height));
@@ -211,8 +228,8 @@ describe<{
 		);
 	});
 
-	it("#getLastCommit - should return undefined if block is not found", async ({ databaseService }) => {
-		assert.undefined(await databaseService.getLastCommit());
+	it("#getLastCommit - should return throw error if block is not found", async ({ databaseService }) => {
+		await assert.rejects(() => databaseService.getLastCommit(), "Database is empty");
 	});
 
 	it("#getLastBlock - should return last block", async ({ databaseService }) => {
