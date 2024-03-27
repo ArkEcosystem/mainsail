@@ -670,13 +670,29 @@ importers:
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
-      lmdb:
-        specifier: 2.9.4
-        version: 2.9.4
     devDependencies:
       esmock:
         specifier: 2.6.4
         version: 2.6.4
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/consensus-storage:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      lmdb:
+        specifier: 2.9.4
+        version: 2.9.4
+    devDependencies:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -754,6 +770,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../consensus
+      '@mainsail/consensus-storage':
+        specifier: workspace:*
+        version: link:../consensus-storage
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container

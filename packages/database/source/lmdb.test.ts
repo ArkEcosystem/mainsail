@@ -19,17 +19,17 @@ describe<{
 	});
 
 	it("#register - should open database", async ({ sandbox }) => {
-		assert.false(sandbox.app.isBound(Identifiers.Database.Instance.Root));
+		assert.false(sandbox.app.isBound(Identifiers.Database.Root));
 
 		await assert.resolves(() => sandbox.app.resolve(ServiceProvider).register());
 
-		assert.true(sandbox.app.isBound(Identifiers.Database.Instance.Root));
+		assert.true(sandbox.app.isBound(Identifiers.Database.Root));
 	});
 
 	it("root storage is lmdb storage", async ({ sandbox }) => {
 		await sandbox.app.resolve(ServiceProvider).register();
 
-		const storage = sandbox.app.get<RootDatabase>(Identifiers.Database.Instance.Root);
+		const storage = sandbox.app.get<RootDatabase>(Identifiers.Database.Root);
 		await storage.put("test", "test");
 
 		assert.equal(storage.get("test"), "test");

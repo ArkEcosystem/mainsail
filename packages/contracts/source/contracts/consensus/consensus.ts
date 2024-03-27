@@ -77,18 +77,6 @@ export interface ConsensusState extends ConsensusStateData {
 	readonly validValue?: RoundState;
 }
 
-export interface ConsensusStorage {
-	getState(): Promise<ConsensusStateData | undefined>;
-	saveState(state: ConsensusState): Promise<void>;
-	saveProposals(proposal: Proposal[]): Promise<void>;
-	savePrevotes(prevotes: Prevote[]): Promise<void>;
-	savePrecommits(precommits: Precommit[]): Promise<void>;
-	getProposals(): Promise<Proposal[]>;
-	getPrevotes(): Promise<Prevote[]>;
-	getPrecommits(): Promise<Precommit[]>;
-	clear(): Promise<void>;
-}
-
 export interface Bootstrapper {
 	run(): Promise<ConsensusState | undefined>;
 }

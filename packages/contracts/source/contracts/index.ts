@@ -1,6 +1,7 @@
 export * as Api from "./api.js";
 export * as ApiSync from "./api-sync.js";
 export * as Consensus from "./consensus/index.js";
+export * as ConsensusStorage from "./consensus-storage.js";
 export * as Crypto from "./crypto/index.js";
 export * as Database from "./database.js";
 export * as Fee from "./fees.js";
