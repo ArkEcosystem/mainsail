@@ -4,7 +4,7 @@ import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
 import { P2PRegistry } from "./p2p";
 import { run, setup } from "./setup";
-import { prepareNodeValidators } from "./utils";
+import { prepareNodeValidators, snoozeForBlock } from "./utils";
 
 describe<{
 	node0: Sandbox;
@@ -18,11 +18,13 @@ describe<{
 		context.node0 = await setup(0, p2pRegistry, crypto, prepareNodeValidators(validators, 0, totalNodes));
 		context.node1 = await setup(1, p2pRegistry, crypto, prepareNodeValidators(validators, 1, totalNodes));
 
-		run(context.node0);
-		run(context.node1);
+		await run(context.node0);
+		await run(context.node1);
 	});
 
-	it("should be ok", () => {
-		assert.true(true);
+	it("should be ok", async (context) => {
+		await snoozeForBlock(context.node0);
+
+		console.log("APPLIED");
 	});
 });

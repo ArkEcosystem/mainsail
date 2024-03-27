@@ -1,3 +1,7 @@
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Enums } from "@mainsail/kernel";
+import { Sandbox } from "@mainsail/test-framework";
+
 import { Validators } from "./contracts.ts";
 
 export const prepareNodeValidators = (validators: Validators, nodeIndex: number, totalNodes: number) => {
@@ -9,3 +13,10 @@ export const prepareNodeValidators = (validators: Validators, nodeIndex: number,
 		secrets: nodeSecrets,
 	};
 };
+
+export const snoozeForBlock = async (sandbox: Sandbox): Promise<void> =>
+	new Promise((resolve) => {
+		sandbox.app
+			.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
+			.listenOnce(Enums.BlockEvent.Applied, { handle: () => resolve() });
+	});

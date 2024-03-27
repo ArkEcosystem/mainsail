@@ -18,7 +18,8 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
-		.toConstantValue({ dispatch: () => {}, listen: () => {} });
+		.to(Services.Events.MemoryEventDispatcher)
+		.inSingletonScope();
 
 	p2pRegistry.registerNode(id, sandbox.app);
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
