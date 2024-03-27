@@ -3,6 +3,7 @@ import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { join } from "path";
 
+import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
 import { Worker } from "./worker.js";
@@ -33,15 +34,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry) => {
 		saveState: async () => {},
 	});
 
-	sandbox.app.bind(Identifiers.Database.Service).toConstantValue(<Contracts.Database.DatabaseService>{
-		addCommit: () => {},
-		findBlocks: async () => [],
-		findCommitBuffers: async () => [],
-		getBlock: async () => {},
-		getLastBlock: async () => {},
-		persist: async () => {},
-		readCommits: async function* () {},
-	});
+	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
