@@ -14,7 +14,7 @@ const setup = async () => {
 		.bind(Identifiers.Services.EventDispatcher.Service)
 		.toConstantValue({ dispatch: () => {}, listen: () => {} });
 
-	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue({
+	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		clear: async () => {},
 		getPrecommits: async () => [],
 		getPrevotes: async () => [],
@@ -26,7 +26,7 @@ const setup = async () => {
 		saveState: async () => {},
 	});
 
-	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({
+	sandbox.app.bind(Identifiers.Database.Service).toConstantValue(<Contracts.Database.DatabaseService>{
 		addCommit: () => {},
 		findBlocks: async () => [],
 		findCommitBuffers: async () => [],
@@ -36,7 +36,7 @@ const setup = async () => {
 		readCommits: async function* () {},
 	});
 
-	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
+	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(<Contracts.P2P.Broadcaster>{
 		broadcastPrecommit: async () => {},
 		broadcastPrevote: async () => {},
 		broadcastProposal: async () => {},
