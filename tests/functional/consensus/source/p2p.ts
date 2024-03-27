@@ -68,6 +68,6 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	}
 
 	async #postPrevote(node: Contracts.Kernel.Application, prevote: Contracts.Crypto.Prevote): Promise<void> {
-		await node.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.Prevote).process(prevote);
+		await node.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.PreVote).process(prevote);
 	}
 }

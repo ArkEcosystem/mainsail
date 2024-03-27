@@ -4,8 +4,8 @@ import { Sandbox } from "@mainsail/test-framework";
 import { join } from "path";
 
 import { TestLogger } from "./logger.js";
-import { Worker } from "./worker.js";
 import { P2PRegistry } from "./p2p.js";
+import { Worker } from "./worker.js";
 
 const setup = async (id: number, p2pRegistry: P2PRegistry) => {
 	const sandbox = new Sandbox();
@@ -190,9 +190,13 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 
-	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	// const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	// await consensus.run();
+};
 
+const run = async (sandbox: Sandbox) => {
+	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
 	await consensus.run();
 };
 
-export { setup };
+export { run, setup };
