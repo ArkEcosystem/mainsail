@@ -7,7 +7,7 @@ import { inspect } from "util";
 
 @injectable()
 export class MemoryLogger implements Contracts.Kernel.Logger {
-	readonly #levelStyles: Record<string, ChalkInstance> = {
+	protected readonly levelStyles: Record<string, ChalkInstance> = {
 		alert: chalk.red,
 		critical: chalk.red,
 		debug: chalk.magenta,
@@ -18,7 +18,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 		warning: chalk.yellow,
 	};
 
-	#silentConsole = false;
+	protected silentConsole = false;
 
 	#lastTimestamp: Date = new Date();
 
@@ -59,13 +59,13 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
-		this.#silentConsole = suppress;
+		this.silentConsole = suppress;
 	}
 
 	public async dispose(): Promise<void> {}
 
 	protected log(level: string, message: string): void {
-		if (this.#silentConsole) {
+		if (this.silentConsole) {
 			return;
 		}
 
@@ -77,15 +77,15 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 			message = inspect(message, { depth: 1 });
 		}
 
-		level = level ? this.#levelStyles[level](`[${level.toUpperCase()}] `) : "";
+		level = level ? this.levelStyles[level](`[${level.toUpperCase()}] `) : "";
 
 		const timestamp: string = format(new Date(), "yyyy-MM-dd HH:MM:ss.SSS");
-		const timestampDiff: string = this.#getTimestampDiff();
+		const timestampDiff: string = this.getTimestampDiff();
 
 		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);
 	}
 
-	#getTimestampDiff(): string {
+	protected getTimestampDiff(): string {
 		const now = new Date();
 
 		const diff: number = differenceInMilliseconds(now, this.#lastTimestamp);
