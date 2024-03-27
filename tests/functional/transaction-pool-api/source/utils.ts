@@ -8,6 +8,7 @@ export interface TransferOptions {
 	recipient?: string;
 	amount?: number | string | BigNumber;
 	fee?: number | string | BigNumber;
+	signature?: string;
 }
 
 export const makeTransfer = async (
@@ -16,7 +17,7 @@ export const makeTransfer = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, recipient, fee, amount } = options;
+	let { sender, recipient, fee, amount, signature } = options;
 
 	recipient =
 		recipient ??
@@ -38,7 +39,19 @@ export const makeTransfer = async (
 		.amount(BigNumber.make(amount).toFixed())
 		.signWithKeyPair(sender);
 
-	return signed.build();
+	const tx = await signed.build();
+
+	if (signature) {
+		const signatureSize = app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "wallet");
+
+		let serialized = tx.serialized.subarray(0, tx.serialized.byteLength - signatureSize);
+		serialized = Buffer.concat([serialized, Buffer.from(signature, "hex")]);
+
+		tx.serialized = serialized;
+		tx.data.signature = signature;
+	}
+
+	return tx;
 };
 
 export const makeAndAddransfer = async (

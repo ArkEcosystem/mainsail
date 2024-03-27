@@ -91,7 +91,7 @@ export class TransactionFailedToApplyError extends PoolError {
 
 export class TransactionFailedToVerifyError extends PoolError {
 	public constructor(transaction: Transaction) {
-		super(`tx ${transaction.id} didn't passed verification`, "ERR_BAD_DATA");
+		super(`tx ${transaction.id} didn't pass verification`, "ERR_BAD_DATA");
 	}
 }
 

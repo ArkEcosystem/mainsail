@@ -65,7 +65,42 @@ describe<{
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.true(result.errors[0].message.includes("Insufficient balance in the wallet"));
+		assert.equal(result.errors[0].message, `tx ${tx.id} cannot be applied: Insufficient balance in the wallet.`);
+
+		await waitBlock(sandbox);
+		assert.false(await isTransactionCommitted(sandbox, tx));
+	});
+
+	it("should not accept simple transfer [invalid signature]", async ({ sandbox }) => {
+		const [sender] = wallets;
+
+		const tx = await makeTransfer(sandbox, {
+			sender,
+			signature:
+				"8dd7af61d8fa4720bf6388b5d89f8b243587697c6e65e63d2fedf3c8440594366415395075885249a0aab8b6570298491837e364c6c4f9f658c63d4633ea6ff9",
+		});
+
+		const result = await addTransactionsToPool(sandbox, [tx]);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors[0].type, "ERR_BAD_DATA");
+		assert.true(result.errors[0].message.includes("didn't pass verification"));
+
+		await waitBlock(sandbox);
+		assert.false(await isTransactionCommitted(sandbox, tx));
+	});
+
+	it("should not accept simple transfer [malformed signature]", async ({ sandbox }) => {
+		const [sender] = wallets;
+
+		const tx = await makeTransfer(sandbox, { sender, signature: "5161a55859e0be86080ca54d9" });
+
+		const result = await addTransactionsToPool(sandbox, [tx]);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors[0].type, "ERR_BAD_DATA");
+		assert.equal(
+			result.errors[0].message,
+			"Invalid transaction data: Failed to deserialize transaction, encountered invalid bytes: Read over buffer boundary. (length: 64, remaining: 12, diff: 52)",
+		);
 
 		await waitBlock(sandbox);
 		assert.false(await isTransactionCommitted(sandbox, tx));
