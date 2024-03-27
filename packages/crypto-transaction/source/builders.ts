@@ -105,6 +105,10 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.#signWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
+	public async signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+		return this.#signWithKeyPair(keys);
+	}
+
 	public async signWithWif(wif: string): Promise<TBuilder> {
 		return this.#signWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}

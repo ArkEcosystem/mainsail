@@ -98,7 +98,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_BAD_DATA");
-		assert.equal(error.message, `tx ${context.transaction.id} didn't passed verification`);
+		assert.equal(error.message, `tx ${context.transaction.id} didn't pass verification`);
 	});
 
 	it("TransactionFromWrongNetworkError", (context) => {
