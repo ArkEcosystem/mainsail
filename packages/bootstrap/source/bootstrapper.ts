@@ -106,13 +106,13 @@ export class Bootstrapper {
 		this.#store.setGenesisCommit(genesisBlock);
 	}
 	async #checkStoredGenesisCommit(): Promise<void> {
-		const genesisBlock = await this.databaseService.getBlock(0);
+		const genesisCommit = await this.databaseService.getCommit(0);
 
-		if (!genesisBlock) {
+		if (!genesisCommit) {
 			return;
 		}
 
-		if (this.#store.getGenesisCommit().block.data.id !== genesisBlock.data.id) {
+		if (this.#store.getGenesisCommit().block.data.id !== genesisCommit.block.data.id) {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
@@ -145,10 +145,10 @@ export class Bootstrapper {
 		if (this.#store.getLastHeight() === 0) {
 			await this.#processGenesisBlock();
 		} else {
-			const block = await this.databaseService.getBlock(this.#store.getLastHeight());
-			Utils.assert.defined<Contracts.Crypto.Block>(block);
-			this.#store.setLastBlock(block);
-			this.configuration.setHeight(block.data.height + 1);
+			const commit = await this.databaseService.getCommit(this.#store.getLastHeight());
+			Utils.assert.defined(commit);
+			this.#store.setLastBlock(commit.block);
+			this.configuration.setHeight(commit.block.data.height + 1);
 
 			this.validatorSet.restore(this.#store);
 		}

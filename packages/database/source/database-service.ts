@@ -12,11 +12,11 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	#cache = new Map<number, Buffer>();
 
-	public async getBlock(height: number): Promise<Contracts.Crypto.Block | undefined> {
+	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
 		const bytes = this.#get(height);
 
 		if (bytes) {
-			return (await this.commitFactory.fromBytes(bytes)).block;
+			return await this.commitFactory.fromBytes(bytes);
 		}
 
 		return undefined;
