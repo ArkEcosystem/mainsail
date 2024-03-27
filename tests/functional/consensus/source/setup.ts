@@ -48,9 +48,8 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	const basePath = join(import.meta.dirname, `../paths/node${id}`);
-	sandbox.app.bind("path.data").toConstantValue(join(basePath, "/data"));
-	sandbox.app.bind("path.config").toConstantValue(join(basePath, "/config"));
+	sandbox.app.bind("path.data").toConstantValue("");
+	sandbox.app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
 	sandbox.app.bind("path.temp").toConstantValue("");

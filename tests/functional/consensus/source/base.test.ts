@@ -18,8 +18,8 @@ describe<{
 		context.node0 = await setup(0, p2pRegistry, crypto, prepareNodeValidators(validators, 0, totalNodes));
 		context.node1 = await setup(1, p2pRegistry, crypto, prepareNodeValidators(validators, 1, totalNodes));
 
-		// run(context.node0);
-		// run(context.node1);
+		run(context.node0);
+		run(context.node1);
 	});
 
 	it("should be ok", () => {
