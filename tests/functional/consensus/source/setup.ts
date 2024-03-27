@@ -14,7 +14,18 @@ const setup = async () => {
 		.bind(Identifiers.Services.EventDispatcher.Service)
 		.toConstantValue({ dispatch: () => {}, listen: () => {} });
 
-	// TODO:
+	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue({
+		clear: async () => {},
+		getPrecommits: async () => [],
+		getPrevotes: async () => [],
+		getProposals: async () => [],
+		getState: async () => {},
+		savePrecommits: async () => {},
+		savePrevotes: async () => {},
+		saveProposals: async () => {},
+		saveState: async () => {},
+	});
+
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
 		broadcastPrecommit: async () => {},
 		broadcastPrevote: async () => {},
