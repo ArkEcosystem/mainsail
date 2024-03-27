@@ -3,7 +3,7 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
 import { P2PRegistry } from "./p2p";
-import { run, setup } from "./setup";
+import { run, setup, stop } from "./setup";
 import { prepareNodeValidators, snoozeForBlock } from "./utils";
 
 describe<{
@@ -26,5 +26,8 @@ describe<{
 		await snoozeForBlock(context.node0);
 
 		console.log("APPLIED");
+
+		await stop(context.node0);
+		await stop(context.node1);
 	});
 });

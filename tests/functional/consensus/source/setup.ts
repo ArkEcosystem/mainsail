@@ -197,4 +197,9 @@ const run = async (sandbox: Sandbox) => {
 	await consensus.run();
 };
 
-export { run, setup };
+const stop = async (sandbox: Sandbox) => {
+	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	await consensus.dispose();
+};
+
+export { run, setup, stop };
