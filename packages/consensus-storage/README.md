@@ -1,4 +1,4 @@
-# Mainsail - Consensus
+# Mainsail - Consensus Storage
 
 ![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 
