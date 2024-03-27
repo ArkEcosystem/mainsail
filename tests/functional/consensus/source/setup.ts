@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 
 import { MemoryDatabase } from "./database.js";
@@ -8,7 +9,7 @@ import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
 import { Worker } from "./worker.js";
 
-const setup = async (id: number, p2pRegistry: P2PRegistry) => {
+const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: Contracts.Types.JsonObject) => {
 	const sandbox = new Sandbox();
 
 	// Basic binds and mocks
@@ -55,7 +56,13 @@ const setup = async (id: number, p2pRegistry: P2PRegistry) => {
 	sandbox.app.bind("path.temp").toConstantValue("");
 
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
-	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
+
+	// Load configuration
+	// await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
+
+	const configRepository = sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Config.Repository);
+	configRepository.set("validators", readJSONSync(sandbox.app.configPath("validators.json")));
+	configRepository.set("crypto", crypto);
 
 	// Set logger
 	const logManager: Services.Log.LogManager = sandbox.app.get<Services.Log.LogManager>(
