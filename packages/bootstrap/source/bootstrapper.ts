@@ -118,7 +118,7 @@ export class Bootstrapper {
 	}
 
 	async #storeGenesisCommit(): Promise<void> {
-		if (!(await this.databaseService.getLastCommit())) {
+		if (this.databaseService.isEmpty()) {
 			const genesisBlock = this.#store.getGenesisCommit();
 			this.databaseService.addCommit(genesisBlock);
 			await this.databaseService.persist();
@@ -132,7 +132,7 @@ export class Bootstrapper {
 
 	async #restoreStateSnapshot(): Promise<void> {
 		const lastCommit = await this.databaseService.getLastCommit();
-		let restoreHeight = lastCommit?.block.data.height ?? 0;
+		let restoreHeight = lastCommit.block.data.height;
 		if (this.apiSync) {
 			restoreHeight = Math.min(await this.apiSync.getLastSyncedBlockHeight(), restoreHeight);
 		}
@@ -156,7 +156,6 @@ export class Bootstrapper {
 
 	async #processBlocks(): Promise<void> {
 		const lastCommit = await this.databaseService.getLastCommit();
-		Utils.assert.defined<Contracts.Crypto.Commit>(lastCommit);
 
 		for await (const commit of this.databaseService.readCommits(
 			this.#store.getLastHeight() + 1,

@@ -12,6 +12,10 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	#cache = new Map<number, Buffer>();
 
+	public isEmpty(): boolean {
+		return this.#cache.size === 0 && this.blockStorage.getKeysCount() === 0;
+	}
+
 	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
 		const bytes = this.#get(height);
 
@@ -54,18 +58,18 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 	}
 
-	public async getLastCommit(): Promise<Contracts.Crypto.Commit | undefined> {
+	public async getLastCommit(): Promise<Contracts.Crypto.Commit> {
+		if (this.isEmpty()) {
+			throw new Error("Database is empty");
+		}
+
 		if (this.#cache.size > 0) {
 			return await this.commitFactory.fromBytes([...this.#cache.values()].pop()!);
 		}
 
-		try {
-			return await this.commitFactory.fromBytes(
-				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
-			);
-		} catch {
-			return undefined;
-		}
+		return await this.commitFactory.fromBytes(
+			this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
+		);
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
