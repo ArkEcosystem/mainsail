@@ -54,17 +54,15 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 	}
 
-	public async getLastBlock(): Promise<Contracts.Crypto.Block | undefined> {
+	public async getLastCommit(): Promise<Contracts.Crypto.Commit | undefined> {
 		if (this.#cache.size > 0) {
-			return (await this.commitFactory.fromBytes([...this.#cache.values()].pop()!)).block;
+			return await this.commitFactory.fromBytes([...this.#cache.values()].pop()!);
 		}
 
 		try {
-			const lastCommit = await this.commitFactory.fromBytes(
+			return await this.commitFactory.fromBytes(
 				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
 			);
-
-			return lastCommit.block;
 		} catch {
 			return undefined;
 		}

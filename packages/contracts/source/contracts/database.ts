@@ -10,7 +10,7 @@ export interface DatabaseService {
 
 	findBlocks(start: number, end: number): Promise<Block[]>;
 
-	getLastBlock(): Promise<Block | undefined>;
+	getLastCommit(): Promise<Commit | undefined>;
 
 	addCommit(block: Commit): void;
 
