@@ -61,9 +61,11 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitUntilBlock = async (sandbox: Sandbox, targetHeight: number) => {
+export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
 	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+
 	let currentHeight = state.getStore().getLastHeight();
+	const targetHeight = currentHeight + count;
 
 	do {
 		await sleep(200);
@@ -71,15 +73,17 @@ export const waitUntilBlock = async (sandbox: Sandbox, targetHeight: number) => 
 	} while (targetHeight < currentHeight);
 };
 
-export const assertTransactionCommitted = async (
+export const isTransactionCommitted = async (
 	sandbox: Sandbox,
-	targetHeight: number,
 	{ id }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
+	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+	const currentHeight = state.getStore().getLastHeight();
+
 	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 	const forgedBlocks = await database.findBlocks(
-		targetHeight,
-		targetHeight + 2 /* just a buffer in case tx got included after target height */,
+		currentHeight - 1,
+		currentHeight + 2 /* just a buffer in case tx got included after target height */,
 	);
 
 	let found = false;

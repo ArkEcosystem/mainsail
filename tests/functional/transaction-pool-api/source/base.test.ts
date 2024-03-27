@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { setup, shutdown } from "./setup.js";
-import { addTransactionsToPool, assertTransactionCommitted, makeTransfer, waitUntilBlock } from "./utils.js";
+import { addTransactionsToPool, isTransactionCommitted, makeTransfer, waitBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -32,20 +32,13 @@ describe<{
 
 		const tx = await makeTransfer(sandbox, { sender });
 
-		const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
-		const currentHeight = state.getStore().getLastHeight();
-
-		const expectedHeight = currentHeight + 1;
-
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.accept, [0]);
 		assert.equal(result.broadcast, [0]);
 
-		await waitUntilBlock(sandbox, expectedHeight);
+		await waitBlock(sandbox);
 
-		const found = await assertTransactionCommitted(sandbox, expectedHeight, tx);
-
-		assert.true(found);
+		assert.true(await isTransactionCommitted(sandbox, tx));
 	});
 
 	it("should not accept simple transfer [invalid fee]", async ({ sandbox }) => {
@@ -56,6 +49,26 @@ describe<{
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors[0].type, "ERR_LOW_FEE");
+
+		await waitBlock(sandbox);
+		assert.false(await isTransactionCommitted(sandbox, tx));
+	});
+
+	it("should not accept simple transfer [invalid amount]", async ({ sandbox }) => {
+		const [sender] = wallets;
+
+		const { walletRepository } = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+		const balance = (await walletRepository.findByPublicKey(sender.publicKey)).getBalance();
+
+		const tx = await makeTransfer(sandbox, { sender, amount: balance.plus(1) });
+
+		const result = await addTransactionsToPool(sandbox, [tx]);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors[0].type, "ERR_APPLY");
+		assert.true(result.errors[0].message.includes("Insufficient balance in the wallet"));
+
+		await waitBlock(sandbox);
+		assert.false(await isTransactionCommitted(sandbox, tx));
 	});
 });
 
