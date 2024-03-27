@@ -26,6 +26,16 @@ const setup = async () => {
 		saveState: async () => {},
 	});
 
+	sandbox.app.bind(Identifiers.Database.Service).toConstantValue({
+		addCommit: () => {},
+		findBlocks: async () => [],
+		findCommitBuffers: async () => [],
+		getBlock: async () => {},
+		getLastBlock: async () => {},
+		persist: async () => {},
+		readCommits: async function* () {},
+	});
+
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
 		broadcastPrecommit: async () => {},
 		broadcastPrevote: async () => {},
@@ -75,7 +85,6 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
 		"@mainsail/state",
-		"@mainsail/database",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool",
 		"@mainsail/crypto-messages",
