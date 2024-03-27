@@ -1,13 +1,15 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Bootstrap, Providers } from "@mainsail/kernel";
+import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { join } from "path";
 
+import { TestLogger } from "./logger.js";
 import { Worker } from "./worker.js";
 
-const setup = async (paths: string) => {
+const setup = async (id: number) => {
 	const sandbox = new Sandbox();
 
+	// Basic binds and mocks
 	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 	sandbox.app.bind(Identifiers.Config.Flags).toConstantValue({});
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
@@ -48,13 +50,15 @@ const setup = async (paths: string) => {
 		.bind(Identifiers.CryptoWorker.WorkerPool)
 		.toConstantValue({ getWorker: () => sandbox.app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
 
+	// Bootstrap
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue(join(paths, "/data"));
-	sandbox.app.bind("path.config").toConstantValue(join(paths, "/config"));
+	const basePath = join(import.meta.dirname, `../paths/node${id}`);
+	sandbox.app.bind("path.data").toConstantValue(join(basePath, "/data"));
+	sandbox.app.bind("path.config").toConstantValue(join(basePath, "/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
 	sandbox.app.bind("path.temp").toConstantValue("");
@@ -62,6 +66,14 @@ const setup = async (paths: string) => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
+	// Set logger
+	const logManager: Services.Log.LogManager = sandbox.app.get<Services.Log.LogManager>(
+		Identifiers.Services.Log.Manager,
+	);
+	await logManager.extend("test", async () => sandbox.app.resolve<TestLogger>(TestLogger).make({ id }));
+	logManager.setDefaultDriver("test");
+
+	// Load packages
 	const packages = [
 		"@mainsail/validation",
 		"@mainsail/crypto-config",
