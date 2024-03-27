@@ -15,6 +15,7 @@
 	"devDependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",

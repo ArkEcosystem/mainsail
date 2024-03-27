@@ -3423,6 +3423,9 @@ importers:
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../../../packages/test-framework
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../../../packages/test-runner
       '@mainsail/transaction-pool':
         specifier: workspace:*
         version: link:../../../packages/transaction-pool

@@ -2,9 +2,10 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
+import { assertBlockId, assertBockHeight } from "./asserts";
 import { P2PRegistry } from "./p2p";
 import { run, setup, stop } from "./setup";
-import { prepareNodeValidators, snoozeForBlock, getLatestBlock } from "./utils";
+import { getLatestBlock, prepareNodeValidators, snoozeForBlock } from "./utils";
 
 describe<{
 	node0: Sandbox;
@@ -30,22 +31,18 @@ describe<{
 	it("should create new block", async (context) => {
 		await snoozeForBlock([context.node0, context.node1]);
 
-		const blockNode1 = await getLatestBlock(context.node0);
-		const blockNode2 = await getLatestBlock(context.node1);
+		const block = await getLatestBlock(context.node0);
 
-		assert.equal(blockNode1?.data.height, 1);
-		assert.equal(blockNode2?.data.height, 1);
-		assert.equal(blockNode1?.data.id, blockNode2?.data.id);
+		await assertBockHeight([context.node0, context.node1], 1);
+		await assertBlockId([context.node0, context.node1], block!.data.id);
 	});
 
 	it("should create new block second time", async (context) => {
 		await snoozeForBlock([context.node0, context.node1]);
 
-		const blockNode1 = await getLatestBlock(context.node0);
-		const blockNode2 = await getLatestBlock(context.node1);
+		const block = await getLatestBlock(context.node0);
 
-		assert.equal(blockNode1?.data.height, 1);
-		assert.equal(blockNode2?.data.height, 1);
-		assert.equal(blockNode1?.data.id, blockNode2?.data.id);
+		await assertBockHeight([context.node0, context.node1], 1);
+		await assertBlockId([context.node0, context.node1], block!.data.id);
 	});
 });
