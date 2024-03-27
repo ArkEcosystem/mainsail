@@ -27,35 +27,35 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 	}
 
 	public emergency(message: string): void {
-		this.#log("emergency", message);
+		this.log("emergency", message);
 	}
 
 	public alert(message: string): void {
-		this.#log("alert", message);
+		this.log("alert", message);
 	}
 
 	public critical(message: string): void {
-		this.#log("critical", message);
+		this.log("critical", message);
 	}
 
 	public error(message: string): void {
-		this.#log("error", message);
+		this.log("error", message);
 	}
 
 	public warning(message: string): void {
-		this.#log("warning", message);
+		this.log("warning", message);
 	}
 
 	public notice(message: string): void {
-		this.#log("notice", message);
+		this.log("notice", message);
 	}
 
 	public info(message: string): void {
-		this.#log("info", message);
+		this.log("info", message);
 	}
 
 	public debug(message: string): void {
-		this.#log("debug", message);
+		this.log("debug", message);
 	}
 
 	public suppressConsoleOutput(suppress: boolean): void {
@@ -64,7 +64,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 	public async dispose(): Promise<void> {}
 
-	#log(level: string, message: string): void {
+	protected log(level: string, message: string): void {
 		if (this.#silentConsole) {
 			return;
 		}
