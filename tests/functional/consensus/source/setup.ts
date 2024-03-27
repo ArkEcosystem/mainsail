@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { join } from "path";
 
 import { Worker } from "./worker.js";
 
@@ -51,9 +52,11 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
+	console.log(import.meta.dirname);
+
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue("/home/ubuntu/mainsail/tests/functional/consensus/paths/data");
-	sandbox.app.bind("path.config").toConstantValue("/home/ubuntu/mainsail/tests/functional/consensus/paths/config");
+	sandbox.app.bind("path.data").toConstantValue(join(import.meta.dirname, "../paths/data"));
+	sandbox.app.bind("path.config").toConstantValue(join(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
 	sandbox.app.bind("path.temp").toConstantValue("");
