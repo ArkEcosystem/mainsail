@@ -97,59 +97,53 @@ describe<{
 
 	it("#addCommit - should add a commit, but not store it", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
-		assert.undefined(await databaseService.getBlock(commit.block.data.height));
+		assert.undefined(await databaseService.getCommit(commit.block.data.height));
 
 		databaseService.addCommit(commit);
 
-		assert.defined(await databaseService.getBlock(commit.block.data.height));
+		assert.defined(await databaseService.getCommit(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 0);
 	});
 
 	it("#persist - should store a commit", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
-		assert.undefined(await databaseService.getBlock(commit.block.data.height));
+		assert.undefined(await databaseService.getCommit(commit.block.data.height));
 
 		databaseService.addCommit(commit);
 		await databaseService.persist();
 
-		assert.defined(await databaseService.getBlock(commit.block.data.height));
+		assert.defined(await databaseService.getCommit(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 1);
 	});
 
 	it("#persist - should store a commit only once", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
-		assert.undefined(await databaseService.getBlock(commit.block.data.height));
+		assert.undefined(await databaseService.getCommit(commit.block.data.height));
 
 		databaseService.addCommit(commit);
 		databaseService.addCommit(commit);
 		await databaseService.persist();
 		await databaseService.persist();
 
-		assert.defined(await databaseService.getBlock(commit.block.data.height));
+		assert.defined(await databaseService.getCommit(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 1);
 	});
 
-	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {
-		assert.undefined(await databaseService.getBlock(-1));
+	it("#getCommit - should return undefined if commit doesn't exists", async ({ databaseService }) => {
+		assert.undefined(await databaseService.getCommit(-1));
 	});
 
-	it("#getBlock - should return block by height", async ({ databaseService }) => {
+	it("#getCommit - should return commit by height", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
 		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.Commit>();
 
 		databaseService.addCommit(block);
 
-		assertBlockEqual(
-			(await databaseService.getBlock(block.block.data.height)) as unknown as Contracts.Crypto.Block,
-			block.block,
-		);
+		assertBlockEqual((await databaseService.getCommit(block.block.data.height))?.block!, block.block);
 
 		await databaseService.persist();
 
-		assertBlockEqual(
-			(await databaseService.getBlock(block.block.data.height)) as unknown as Contracts.Crypto.Block,
-			block.block,
-		);
+		assertBlockEqual((await databaseService.getCommit(block.block.data.height))?.block!, block.block);
 	});
 
 	it("#findCommitBuffers - should return empty array if blocks are not found", async ({ databaseService }) => {
