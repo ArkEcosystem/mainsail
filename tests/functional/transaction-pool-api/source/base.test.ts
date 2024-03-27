@@ -27,7 +27,7 @@ describe<{
 
 	afterEach(async (context) => shutdown(context.sandbox));
 
-	it("should broadcast simple transfer", async ({ sandbox }) => {
+	it("should accept and commit simple transfer", async ({ sandbox }) => {
 		const [sender] = wallets;
 
 		const tx = await makeTransfer(sandbox, { sender });
@@ -46,6 +46,16 @@ describe<{
 		const found = await assertTransactionCommitted(sandbox, expectedHeight, tx);
 
 		assert.true(found);
+	});
+
+	it("should not accept simple transfer [invalid fee]", async ({ sandbox }) => {
+		const [sender] = wallets;
+
+		const tx = await makeTransfer(sandbox, { sender, fee: "1234" });
+
+		const result = await addTransactionsToPool(sandbox, [tx]);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors[0].type, "ERR_LOW_FEE");
 	});
 });
 
