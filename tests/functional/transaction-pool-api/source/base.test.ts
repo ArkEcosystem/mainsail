@@ -1,8 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
-import { addTransactionsToPool, makeTransfer } from "./factories.js";
 import { setup, shutdown } from "./setup.js";
+import { addTransactionsToPool, assertTransactionCommitted, makeTransfer, waitUntilBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -32,9 +32,31 @@ describe<{
 
 		const tx = await makeTransfer(sandbox, { sender });
 
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+		const currentHeight = state.getStore().getLastHeight();
 
+		const expectedHeight = currentHeight + 1;
+
+		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.accept, [0]);
 		assert.equal(result.broadcast, [0]);
+
+		await waitUntilBlock(sandbox, expectedHeight);
+
+		const found = await assertTransactionCommitted(sandbox, expectedHeight, tx);
+
+		assert.true(found);
 	});
 });
+
+// TODO: bind event dispatcher
+// const events = sandbox.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service);
+// const waitForBlock = async (): Promise<Contracts.Crypto.Commit> =>
+// 	new Promise((resolve, reject) => {
+// 		events.listen(Enums.BlockEvent.Applied, {
+// 			handle: ({ name, data }: { name: Contracts.Kernel.EventName; data: Contracts.Crypto.Commit }) => {
+// 				console.log(name, data);
+// 				resolve(data);
+// 			},
+// 		});
+// 	});

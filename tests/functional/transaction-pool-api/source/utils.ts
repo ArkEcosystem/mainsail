@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "@mainsail/utils";
+import { BigNumber, sleep } from "@mainsail/utils";
 
 export interface TransferOptions {
 	sender: Contracts.Crypto.KeyPair;
@@ -57,4 +57,36 @@ export const addTransactionsToPool = async (
 	const { app } = sandbox;
 	const processor = app.get<Contracts.TransactionPool.Processor>(Identifiers.TransactionPool.Processor);
 	return processor.process(transactions.map((t) => t.serialized));
+};
+
+export const waitUntilBlock = async (sandbox: Sandbox, targetHeight: number) => {
+	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+	let currentHeight = state.getStore().getLastHeight();
+
+	do {
+		await sleep(200);
+		currentHeight = state.getStore().getLastHeight();
+	} while (targetHeight < currentHeight);
+};
+
+export const assertTransactionCommitted = async (
+	sandbox: Sandbox,
+	targetHeight: number,
+	{ id }: Contracts.Crypto.Transaction,
+): Promise<boolean> => {
+	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+	const forgedBlocks = await database.findBlocks(
+		targetHeight,
+		targetHeight + 2 /* just a buffer in case tx got included after target height */,
+	);
+
+	let found = false;
+	for (const block of forgedBlocks) {
+		found = block.transactions.some((transaction) => transaction.id === id);
+		if (found) {
+			break;
+		}
+	}
+
+	return found;
 };
