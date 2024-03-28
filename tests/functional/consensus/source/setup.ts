@@ -119,9 +119,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		await loadPlugin(sandbox, packageId, options);
 	}
 
-	for (const packageId of packages) {
-		await bootPlugin(sandbox, packageId);
-	}
+	await boot(sandbox);
 
 	await bootstrap(sandbox);
 
@@ -148,12 +146,14 @@ const loadPlugin = async (sandbox: Sandbox, packageId: string, options: PluginOp
 	await serviceProviderRepository.register(packageId);
 };
 
-const bootPlugin = async (sandbox: Sandbox, packageId: string) => {
+const boot = async (sandbox: Sandbox) => {
 	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
 		Identifiers.ServiceProvider.Repository,
 	);
 
-	await serviceProviderRepository.boot(packageId);
+	for (const [name] of serviceProviderRepository.all()) {
+		await serviceProviderRepository.boot(name);
+	}
 };
 
 const getPluginConfiguration = async (
@@ -201,9 +201,6 @@ const bootstrap = async (sandbox: Sandbox) => {
 	await blockProcessor.commit(commitState);
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
-
-	// const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
-	// await consensus.run();
 };
 
 const run = async (sandbox: Sandbox) => {
@@ -216,4 +213,4 @@ const stop = async (sandbox: Sandbox) => {
 	await consensus.dispose();
 };
 
-export { run, setup, stop };
+export { boot, bootstrap, run, setup, stop };

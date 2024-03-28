@@ -39,7 +39,7 @@ describe<{
 		}
 	});
 
-	it("#singleForge - should forge 3 blocks with all validators signing", async (context) => {
+	it("#single propose - should forge 3 blocks with all validators signing", async (context) => {
 		await snoozeForBlock(context.nodes);
 
 		await assertBockHeight(context.nodes, 1);
@@ -70,4 +70,6 @@ describe<{
 			context.validators[0].publicKey,
 		);
 	});
+
+	it("#missing propose - should increase round and forge on same height", async (context) => {});
 });
