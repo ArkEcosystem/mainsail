@@ -2,40 +2,46 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { Application } from "@mainsail/kernel";
-import fs from "fs-extra";
+import { fileSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../test-framework/source";
-import { Stub } from "../../test-runner/distribution/stub";
 import { Storage } from ".";
 
 describe<{
 	configuration: any;
 	app: Application;
-	ensureFileSync: Stub;
 	config: Configuration;
-}>("Storage", ({ it, beforeAll, afterAll, assert, stub }) => {
-	beforeAll(async (context) => {
+}>("Storage", ({ it, beforeAll, beforeEach, assert, stub }) => {
+	beforeAll(() => setGracefulCleanup());
+
+	beforeEach(async (context) => {
 		context.configuration = { getRequired: () => {} };
 
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);
-
-		context.ensureFileSync = stub(fs, "ensureFileSync").callsFake(() => {});
 	});
 
-	afterAll((context) => {
-		context.ensureFileSync.restore();
+	it("boot - should instantiate BetterSqlite3 with file storage", (context) => {
+		const temporaryFile = fileSync();
+
+		stub(context.configuration, "getRequired").returnValueOnce(temporaryFile.name); // storage
+		const storage = context.app.resolve(Storage);
+		storage.boot();
+
+		const database = storage.getDatabase();
+		assert.equal(database.name, temporaryFile.name);
+		assert.true(database.open);
+		storage.dispose();
 	});
 
-	it("boot - should instantiate BetterSqlite3 using configured filename", (context) => {
+	it("boot - should instantiate BetterSqlite3 in-memory<", (context) => {
 		stub(context.configuration, "getRequired").returnValueOnce(":memory:"); // storage
 		const storage = context.app.resolve(Storage);
 		storage.boot();
 
 		try {
 			const database = storage.getDatabase();
-			// TODO: fix stub
-			// context.ensureFileSync.calledWith(":memory:");
+
 			assert.equal(database.name, ":memory:");
 			assert.true(database.open);
 		} finally {
