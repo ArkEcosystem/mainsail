@@ -56,18 +56,26 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 	}
 
 	async #postProposal(node: Contracts.Kernel.Application, proposal: Contracts.Crypto.Proposal): Promise<void> {
-		await node
-			.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-			.process(proposal);
+		setTimeout(async () => {
+			await node
+				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
+				.process(proposal);
+		}, 0);
 	}
 
 	async #postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Precommit): Promise<void> {
-		await node
-			.get<Contracts.Consensus.PrecommitProcessor>(Identifiers.Consensus.Processor.PreCommit)
-			.process(precommit);
+		setTimeout(async () => {
+			await node
+				.get<Contracts.Consensus.PrecommitProcessor>(Identifiers.Consensus.Processor.PreCommit)
+				.process(precommit);
+		}, 0);
 	}
 
 	async #postPrevote(node: Contracts.Kernel.Application, prevote: Contracts.Crypto.Prevote): Promise<void> {
-		await node.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.PreVote).process(prevote);
+		setTimeout(async () => {
+			await node
+				.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.PreVote)
+				.process(prevote);
+		}, 0);
 	}
 }
