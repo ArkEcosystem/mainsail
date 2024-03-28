@@ -1,3 +1,5 @@
+import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
@@ -64,5 +66,19 @@ describe<{
 		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
 	});
 
-	it("#missing propose - should increase round and forge on same height", async (context) => {});
+	it("#missing propose - should increase round and forge on same height", async ({ nodes }) => {
+		const node0 = nodes[0];
+		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+
+		stubPropose.callsFake(async () => {
+			stubPropose.restore();
+		});
+
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 1);
+		await assertBlockId(nodes);
+		await assertCommitValidators(nodes, allValidators);
+	});
 });
