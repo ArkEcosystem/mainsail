@@ -46,8 +46,8 @@ describe<{
 
 		const tx = await makeMultiPayment(sandbox, {
 			payments: [
-				{ amount: BigNumber.make(1000), recipientId: recipient },
-				{ amount: BigNumber.make(1000), recipientId: recipient2 },
+				{ amount: BigNumber.make(1000), recipientId: recipient.address },
+				{ amount: BigNumber.make(1000), recipientId: recipient2.address },
 			],
 			sender: randomWallet,
 		});
@@ -55,8 +55,8 @@ describe<{
 		await addTransactionsToPool(sandbox, [tx]);
 		await waitBlock(sandbox);
 
-		assert.true(await hasBalance(sandbox, recipient, BigNumber.make(1000)));
-		assert.true(await hasBalance(sandbox, recipient2, BigNumber.make(1000)));
+		assert.true(await hasBalance(sandbox, recipient.address, BigNumber.make(1000)));
+		assert.true(await hasBalance(sandbox, recipient2.address, BigNumber.make(1000)));
 	});
 
 	it("should accept multi payment with same recipients", async ({ sandbox }) => {
@@ -69,9 +69,9 @@ describe<{
 
 		const tx = await makeMultiPayment(sandbox, {
 			payments: [
-				{ amount: BigNumber.make(1000), recipientId: recipient },
-				{ amount: BigNumber.make(1000), recipientId: recipient },
-				{ amount: BigNumber.make(1000), recipientId: recipient2 },
+				{ amount: BigNumber.make(1000), recipientId: recipient.address },
+				{ amount: BigNumber.make(1000), recipientId: recipient.address },
+				{ amount: BigNumber.make(1000), recipientId: recipient2.address },
 			],
 			sender: randomWallet,
 		});
@@ -79,8 +79,8 @@ describe<{
 		await addTransactionsToPool(sandbox, [tx]);
 		await waitBlock(sandbox);
 
-		assert.true(await hasBalance(sandbox, recipient, BigNumber.make(2000)));
-		assert.true(await hasBalance(sandbox, recipient2, BigNumber.make(1000)));
+		assert.true(await hasBalance(sandbox, recipient.address, BigNumber.make(2000)));
+		assert.true(await hasBalance(sandbox, recipient2.address, BigNumber.make(1000)));
 	});
 
 	it("should accept multi payment to self", async ({ sandbox }) => {
@@ -96,7 +96,7 @@ describe<{
 					amount: BigNumber.make(1000),
 					recipientId: await getAddressByPublicKey(sandbox, randomWallet.publicKey),
 				},
-				{ amount: BigNumber.make(1000), recipientId: recipient },
+				{ amount: BigNumber.make(1000), recipientId: recipient.address },
 			],
 			sender: randomWallet,
 		});
@@ -104,7 +104,7 @@ describe<{
 		await addTransactionsToPool(sandbox, [tx]);
 		await waitBlock(sandbox);
 
-		assert.true(await hasBalance(sandbox, recipient, BigNumber.make(1000)));
+		assert.true(await hasBalance(sandbox, recipient.address, BigNumber.make(1000)));
 	});
 
 	it("should accept multi payment with max payments", async ({ sandbox }) => {
@@ -115,7 +115,7 @@ describe<{
 		const payments: Contracts.Crypto.MultiPaymentItem[] = [];
 		for (let i = 0; i < 256; i++) {
 			const recipient = await getRandomColdWallet(sandbox);
-			payments.push({ amount: BigNumber.make(1000), recipientId: recipient });
+			payments.push({ amount: BigNumber.make(1000), recipientId: recipient.address });
 		}
 
 		const tx = await makeMultiPayment(sandbox, {
