@@ -34,6 +34,7 @@
 		"@mainsail/utils": "workspace:*",
 		"@types/better-sqlite3": "7.6.9",
 		"@types/fs-extra": "11.0.4",
+		"tmp": "0.2.3",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
