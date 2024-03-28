@@ -13,6 +13,16 @@ export const assertBockHeight = async (sandbox: Sandbox | Sandbox[], height: num
 	}
 };
 
+export const assertBockRound = async (sandbox: Sandbox | Sandbox[], round: number): Promise<void> => {
+	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+
+	for (const node of nodes) {
+		const commit = await getLastCommit(node);
+		assert.defined(commit);
+		assert.equal(commit.block.data.round, round);
+	}
+};
+
 export const assertBlockId = async (sandbox: Sandbox | Sandbox[], id?: string): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
 
