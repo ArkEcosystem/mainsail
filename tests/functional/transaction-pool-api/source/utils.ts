@@ -16,6 +16,7 @@ export interface TransactionOptions {
 	sender: Contracts.Crypto.KeyPair;
 	fee?: number | string | BigNumber;
 	signature?: string;
+	multiSigKeys?: Contracts.Crypto.KeyPair[];
 }
 
 export interface TransferOptions extends TransactionOptions {
@@ -55,7 +56,7 @@ export const makeTransfer = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, recipient, fee, amount, signature } = options;
+	let { sender, recipient, fee, amount } = options;
 
 	recipient =
 		recipient ??
@@ -63,31 +64,26 @@ export const makeTransfer = async (
 			.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 			.fromPrivateKey(sender));
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-	const nonce = (await walletRepository.findByPublicKey(sender.publicKey)).getNonce();
-
 	amount = amount ?? "1";
 	fee = fee ?? "10000000";
 
 	const builder = app
 		.resolve(TransferBuilder)
 		.fee(BigNumber.make(fee).toFixed())
-		.nonce(nonce.plus(1).toFixed())
 		.recipientId(recipient)
 		.amount(BigNumber.make(amount).toFixed());
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const makeVote = async (sandbox: Sandbox, options: VoteOptions): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, signature, voteAsset, unvoteAsset } = options;
+	let { sender, fee, voteAsset, unvoteAsset } = options;
 
-	const nonce = await getNonceByPublicKey(sandbox, sender.publicKey);
 	fee = fee ?? "100000000";
 
-	let builder = app.resolve(VoteBuilder).fee(BigNumber.make(fee).toFixed()).nonce(nonce.plus(1).toFixed());
+	let builder = app.resolve(VoteBuilder).fee(BigNumber.make(fee).toFixed());
 
 	if (voteAsset) {
 		builder = builder.votesAsset([voteAsset]);
@@ -97,7 +93,7 @@ export const makeVote = async (sandbox: Sandbox, options: VoteOptions): Promise<
 		builder = builder.unvotesAsset([unvoteAsset]);
 	}
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const makeValidatorRegistration = async (
@@ -106,9 +102,7 @@ export const makeValidatorRegistration = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, signature, validatorPublicKey } = options;
-
-	const nonce = await getNonceByPublicKey(sandbox, sender.publicKey);
+	let { sender, fee, validatorPublicKey } = options;
 
 	validatorPublicKey = validatorPublicKey ?? (await getRandomConsensusKeyPair(sandbox)).publicKey;
 	fee = fee ?? "2500000000";
@@ -116,10 +110,9 @@ export const makeValidatorRegistration = async (
 	const builder = app
 		.resolve(ValidatorRegistrationBuilder)
 		.publicKeyAsset(validatorPublicKey)
-		.fee(BigNumber.make(fee).toFixed())
-		.nonce(nonce.plus(1).toFixed());
+		.fee(BigNumber.make(fee).toFixed());
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const makeValidatorResignation = async (
@@ -128,17 +121,13 @@ export const makeValidatorResignation = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, signature } = options;
+	let { sender, fee } = options;
 
-	const nonce = await getNonceByPublicKey(sandbox, sender.publicKey);
 	fee = fee ?? "2500000000";
 
-	const builder = app
-		.resolve(ValidatorResignationBuilder)
-		.fee(BigNumber.make(fee).toFixed())
-		.nonce(nonce.plus(1).toFixed());
+	const builder = app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(fee).toFixed());
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const makeUsernameRegistration = async (
@@ -147,20 +136,14 @@ export const makeUsernameRegistration = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, signature, username } = options;
-
-	const nonce = await getNonceByPublicKey(sandbox, sender.publicKey);
+	let { sender, fee, username } = options;
 
 	username = username ?? getRandomUsername();
 	fee = fee ?? "2500000000";
 
-	const builder = app
-		.resolve(UsernameRegistrationBuilder)
-		.usernameAsset(username)
-		.fee(BigNumber.make(fee).toFixed())
-		.nonce(nonce.plus(1).toFixed());
+	const builder = app.resolve(UsernameRegistrationBuilder).usernameAsset(username).fee(BigNumber.make(fee).toFixed());
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const makeUsernameResignation = async (
@@ -169,18 +152,13 @@ export const makeUsernameResignation = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, signature } = options;
-
-	const nonce = await getNonceByPublicKey(sandbox, sender.publicKey);
+	let { sender, fee } = options;
 
 	fee = fee ?? "2500000000";
 
-	const builder = app
-		.resolve(UsernameResignationBuilder)
-		.fee(BigNumber.make(fee).toFixed())
-		.nonce(nonce.plus(1).toFixed());
+	const builder = app.resolve(UsernameResignationBuilder).fee(BigNumber.make(fee).toFixed());
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const makeMultiPayment = async (
@@ -189,19 +167,17 @@ export const makeMultiPayment = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, signature, payments } = options;
-
-	const nonce = await getNonceByPublicKey(sandbox, sender.publicKey);
+	let { sender, fee, payments } = options;
 
 	fee = fee ?? "10000000";
 
-	let builder = app.resolve(MultiPaymentBuilder).fee(BigNumber.make(fee).toFixed()).nonce(nonce.plus(1).toFixed());
+	let builder = app.resolve(MultiPaymentBuilder).fee(BigNumber.make(fee).toFixed());
 
 	for (const payment of payments) {
 		builder = builder.addPayment(payment.recipientId, payment.amount.toString());
 	}
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const makeMultiSignatureRegistration = async (
@@ -210,9 +186,7 @@ export const makeMultiSignatureRegistration = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, signature, participants, participantSignatureOverwrite } = options;
-
-	const nonce = await getNonceByPublicKey(sandbox, sender.publicKey);
+	let { sender, fee, participants, participantSignatureOverwrite } = options;
 
 	fee = fee ?? "500000000";
 
@@ -220,7 +194,6 @@ export const makeMultiSignatureRegistration = async (
 		.resolve(MultiSignatureBuilder)
 		.senderPublicKey(sender.publicKey)
 		.fee(BigNumber.make(fee).toFixed())
-		.nonce(nonce.plus(1).toFixed())
 		.min(participants.length);
 
 	for (const participant of participants) {
@@ -235,7 +208,7 @@ export const makeMultiSignatureRegistration = async (
 		}
 	}
 
-	return buildSignedTransaction(sandbox, builder, sender, signature);
+	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
 export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
@@ -290,12 +263,38 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	sandbox: Sandbox,
 	builder: TransactionBuilder<TBuilder>,
 	keyPair: Contracts.Crypto.KeyPair,
-	signatureOverwrite?: string,
+	options: TransactionOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
-	const signed = await builder.signWithKeyPair(keyPair);
-	const transaction = await signed.build();
+	if (options.multiSigKeys) {
+		const participants = options.multiSigKeys;
+		const multiSigPublicKey = await sandbox.app
+			.getTagged<Contracts.Crypto.PublicKeyFactory>(
+				Identifiers.Cryptography.Identity.PublicKey.Factory,
+				"type",
+				"wallet",
+			)
+			.fromMultiSignatureAsset({
+				min: participants.length,
+				publicKeys: participants.map((p) => p.publicKey),
+			});
 
-	await applyCustomSignature(sandbox, transaction, signatureOverwrite);
+		const nonce = await getNonceByPublicKey(sandbox, multiSigPublicKey);
+
+		builder = builder.nonce(nonce.plus(1).toString()).senderPublicKey(multiSigPublicKey);
+
+		for (const [index, participant] of options.multiSigKeys.entries()) {
+			builder = await builder.multiSignWithKeyPair(participant, index);
+		}
+	} else {
+		const nonce = await getNonceByPublicKey(sandbox, options.sender.publicKey);
+		builder = await builder.nonce(nonce.plus(1).toString()).signWithKeyPair(keyPair);
+	}
+
+	const transaction = await builder.build();
+
+	if (options.signature) {
+		await applyCustomSignature(sandbox, transaction, options.signature);
+	}
 
 	return transaction;
 };
