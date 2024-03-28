@@ -13,8 +13,13 @@ export const assertBockHeight = async (sandbox: Sandbox | Sandbox[], height: num
 	}
 };
 
-export const assertBlockId = async (sandbox: Sandbox | Sandbox[], id: string): Promise<void> => {
+export const assertBlockId = async (sandbox: Sandbox | Sandbox[], id?: string): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+
+	if (id === undefined) {
+		const commit = await getLastCommit(nodes[0]);
+		id = commit.block.data.id;
+	}
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
