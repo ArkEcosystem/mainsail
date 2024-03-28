@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "packages/utils/distribution/big-number.js";
+import { BigNumber } from "@mainsail/utils";
 
 import { setup, shutdown } from "./setup.js";
 import {
