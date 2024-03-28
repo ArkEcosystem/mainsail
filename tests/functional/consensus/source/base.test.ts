@@ -10,7 +10,7 @@ import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utils.js
 describe<{
 	node0: Sandbox;
 	node1: Sandbox;
-}>("Consensus", ({ beforeEach, afterEach, it, assert }) => {
+}>("Base", ({ beforeEach, afterEach, it, assert }) => {
 	const allValidators = new Array(validators.secrets.length).fill(true);
 
 	beforeEach(async (context) => {
