@@ -99,6 +99,6 @@ export class BlocksController extends Controller {
 
 	// TODO: Support height only
 	private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.Block | undefined> {
-		return this.database.getBlock(Number.parseInt(idOrHeight));
+		return (await this.database.getCommit(Number.parseInt(idOrHeight)))?.block;
 	}
 }

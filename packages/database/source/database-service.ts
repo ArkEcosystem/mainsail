@@ -12,11 +12,15 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	#cache = new Map<number, Buffer>();
 
-	public async getBlock(height: number): Promise<Contracts.Crypto.Block | undefined> {
+	public isEmpty(): boolean {
+		return this.#cache.size === 0 && this.blockStorage.getKeysCount() === 0;
+	}
+
+	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
 		const bytes = this.#get(height);
 
 		if (bytes) {
-			return (await this.commitFactory.fromBytes(bytes)).block;
+			return await this.commitFactory.fromBytes(bytes);
 		}
 
 		return undefined;
@@ -54,20 +58,18 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 	}
 
-	public async getLastBlock(): Promise<Contracts.Crypto.Block | undefined> {
+	public async getLastCommit(): Promise<Contracts.Crypto.Commit> {
+		if (this.isEmpty()) {
+			throw new Error("Database is empty");
+		}
+
 		if (this.#cache.size > 0) {
-			return (await this.commitFactory.fromBytes([...this.#cache.values()].pop()!)).block;
+			return await this.commitFactory.fromBytes([...this.#cache.values()].pop()!);
 		}
 
-		try {
-			const lastCommit = await this.commitFactory.fromBytes(
-				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
-			);
-
-			return lastCommit.block;
-		} catch {
-			return undefined;
-		}
+		return await this.commitFactory.fromBytes(
+			this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
+		);
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
