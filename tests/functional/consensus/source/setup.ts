@@ -3,7 +3,7 @@ import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { join } from "path";
 
-import { Validators } from "./contracts.js";
+import { ValidatorsJson } from "./contracts.js";
 import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
@@ -12,7 +12,7 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
-const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: Validators) => {
+const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: ValidatorsJson) => {
 	const sandbox = new Sandbox();
 
 	// Basic binds and mocks
