@@ -8,8 +8,6 @@ import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
 import { Worker } from "./worker.js";
-import { plugin } from "packages/p2p/distribution/hapi-nes/plugin.js";
-import { Configuration } from "packages/crypto-config/distribution/configuration.js";
 
 type PluginOptions = Record<string, any>;
 
@@ -33,7 +31,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		getPrecommits: async () => [],
 		getPrevotes: async () => [],
 		getProposals: async () => [],
-		getState: async () => undefined,
+		getState: async () => {},
 		savePrecommits: async () => {},
 		savePrevotes: async () => {},
 		saveProposals: async () => {},

@@ -2,7 +2,7 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight } from "./asserts.js";
+import { assertBlockId, assertBockHeight, assertCommitValidators } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { run, setup, stop } from "./setup.js";
 import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utils.js";
@@ -11,6 +11,8 @@ describe<{
 	node0: Sandbox;
 	node1: Sandbox;
 }>("Consensus", ({ beforeEach, afterEach, it, assert }) => {
+	const allValidators = new Array(validators.secrets.length).fill(true);
+
 	beforeEach(async (context) => {
 		const p2pRegistry = new P2PRegistry();
 
@@ -35,6 +37,7 @@ describe<{
 
 		await assertBockHeight([context.node0, context.node1], 1);
 		await assertBlockId([context.node0, context.node1], commit.block.data.id);
+		await assertCommitValidators([context.node0, context.node1], allValidators);
 	});
 
 	it("should create new block second time", async (context) => {
@@ -44,5 +47,6 @@ describe<{
 
 		await assertBockHeight([context.node0, context.node1], 1);
 		await assertBlockId([context.node0, context.node1], commit.block.data.id);
+		await assertCommitValidators([context.node0, context.node1], allValidators);
 	});
 });
