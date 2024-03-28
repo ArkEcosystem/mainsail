@@ -106,19 +106,19 @@ export class Bootstrapper {
 		this.#store.setGenesisCommit(genesisBlock);
 	}
 	async #checkStoredGenesisCommit(): Promise<void> {
-		const genesisBlock = await this.databaseService.getBlock(0);
+		const genesisCommit = await this.databaseService.getCommit(0);
 
-		if (!genesisBlock) {
+		if (!genesisCommit) {
 			return;
 		}
 
-		if (this.#store.getGenesisCommit().block.data.id !== genesisBlock.data.id) {
+		if (this.#store.getGenesisCommit().block.data.id !== genesisCommit.block.data.id) {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
 
 	async #storeGenesisCommit(): Promise<void> {
-		if (!(await this.databaseService.getLastBlock())) {
+		if (this.databaseService.isEmpty()) {
 			const genesisBlock = this.#store.getGenesisCommit();
 			this.databaseService.addCommit(genesisBlock);
 			await this.databaseService.persist();
@@ -131,8 +131,8 @@ export class Bootstrapper {
 	}
 
 	async #restoreStateSnapshot(): Promise<void> {
-		const lastBlock = await this.databaseService.getLastBlock();
-		let restoreHeight = lastBlock?.data?.height ?? 0;
+		const lastCommit = await this.databaseService.getLastCommit();
+		let restoreHeight = lastCommit.block.data.height;
 		if (this.apiSync) {
 			restoreHeight = Math.min(await this.apiSync.getLastSyncedBlockHeight(), restoreHeight);
 		}
@@ -145,22 +145,21 @@ export class Bootstrapper {
 		if (this.#store.getLastHeight() === 0) {
 			await this.#processGenesisBlock();
 		} else {
-			const block = await this.databaseService.getBlock(this.#store.getLastHeight());
-			Utils.assert.defined<Contracts.Crypto.Block>(block);
-			this.#store.setLastBlock(block);
-			this.configuration.setHeight(block.data.height + 1);
+			const commit = await this.databaseService.getCommit(this.#store.getLastHeight());
+			Utils.assert.defined<Contracts.Crypto.Commit>(commit);
+			this.#store.setLastBlock(commit.block);
+			this.configuration.setHeight(commit.block.data.height + 1);
 
 			this.validatorSet.restore(this.#store);
 		}
 	}
 
 	async #processBlocks(): Promise<void> {
-		const lastBlock = await this.databaseService.getLastBlock();
-		Utils.assert.defined<Contracts.Crypto.Commit>(lastBlock);
+		const lastCommit = await this.databaseService.getLastCommit();
 
 		for await (const commit of this.databaseService.readCommits(
 			this.#store.getLastHeight() + 1,
-			lastBlock.data.height,
+			lastCommit.block.data.height,
 		)) {
 			await this.#processCommit(commit);
 

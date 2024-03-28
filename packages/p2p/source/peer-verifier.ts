@@ -88,7 +88,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const receivedCommit = await this.commitFactory.fromBytes(blocks[0]);
 
 		const blockToCompare =
-			block.data.height === heightToRequest ? block : await this.database.getBlock(heightToRequest);
+			block.data.height === heightToRequest ? block : (await this.database.getCommit(heightToRequest))?.block;
 
 		Utils.assert.defined<Contracts.Crypto.Block>(blockToCompare);
 

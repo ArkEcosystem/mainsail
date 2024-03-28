@@ -97,59 +97,70 @@ describe<{
 
 	it("#addCommit - should add a commit, but not store it", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
-		assert.undefined(await databaseService.getBlock(commit.block.data.height));
+		assert.undefined(await databaseService.getCommit(commit.block.data.height));
 
 		databaseService.addCommit(commit);
 
-		assert.defined(await databaseService.getBlock(commit.block.data.height));
+		assert.defined(await databaseService.getCommit(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 0);
+	});
+
+	it("#isEmpty - should return true if no commits are stored", async ({ databaseService }) => {
+		assert.true(databaseService.isEmpty());
+	});
+
+	it("#isEmpty - should return false if commit is added", async ({ databaseService }) => {
+		databaseService.addCommit(await generateCommit());
+
+		assert.false(databaseService.isEmpty());
+	});
+
+	it("#isEmpty - should return false if commit is persisted", async ({ databaseService }) => {
+		databaseService.addCommit(await generateCommit());
+		await databaseService.persist();
+
+		assert.false(databaseService.isEmpty());
 	});
 
 	it("#persist - should store a commit", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
-		assert.undefined(await databaseService.getBlock(commit.block.data.height));
+		assert.undefined(await databaseService.getCommit(commit.block.data.height));
 
 		databaseService.addCommit(commit);
 		await databaseService.persist();
 
-		assert.defined(await databaseService.getBlock(commit.block.data.height));
+		assert.defined(await databaseService.getCommit(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 1);
 	});
 
 	it("#persist - should store a commit only once", async ({ databaseService, sandbox }) => {
 		const commit = await generateCommit();
-		assert.undefined(await databaseService.getBlock(commit.block.data.height));
+		assert.undefined(await databaseService.getCommit(commit.block.data.height));
 
 		databaseService.addCommit(commit);
 		databaseService.addCommit(commit);
 		await databaseService.persist();
 		await databaseService.persist();
 
-		assert.defined(await databaseService.getBlock(commit.block.data.height));
+		assert.defined(await databaseService.getCommit(commit.block.data.height));
 		assert.equal(sandbox.app.get<lmdb.Database>(Identifiers.Database.Storage.Block).getKeysCount(), 1);
 	});
 
-	it("#getBlock - should return undefined if block doesn't exists", async ({ databaseService }) => {
-		assert.undefined(await databaseService.getBlock(-1));
+	it("#getCommit - should return undefined if commit doesn't exists", async ({ databaseService }) => {
+		assert.undefined(await databaseService.getCommit(-1));
 	});
 
-	it("#getBlock - should return block by height", async ({ databaseService }) => {
+	it("#getCommit - should return commit by height", async ({ databaseService }) => {
 		const blockFactory = await Factories.factory("Block", cryptoJson);
 		const block = await blockFactory.withOptions({ transactionsCount: 2 }).make<Contracts.Crypto.Commit>();
 
 		databaseService.addCommit(block);
 
-		assertBlockEqual(
-			(await databaseService.getBlock(block.block.data.height)) as unknown as Contracts.Crypto.Block,
-			block.block,
-		);
+		assertBlockEqual((await databaseService.getCommit(block.block.data.height))?.block!, block.block);
 
 		await databaseService.persist();
 
-		assertBlockEqual(
-			(await databaseService.getBlock(block.block.data.height)) as unknown as Contracts.Crypto.Block,
-			block.block,
-		);
+		assertBlockEqual((await databaseService.getCommit(block.block.data.height))?.block!, block.block);
 	});
 
 	it("#findCommitBuffers - should return empty array if blocks are not found", async ({ databaseService }) => {
@@ -217,8 +228,8 @@ describe<{
 		);
 	});
 
-	it("#getLastBlock - should return undefined if block is not found", async ({ databaseService }) => {
-		assert.undefined(await databaseService.getLastBlock());
+	it("#getLastCommit - should return throw error if block is not found", async ({ databaseService }) => {
+		await assert.rejects(() => databaseService.getLastCommit(), "Database is empty");
 	});
 
 	it("#getLastBlock - should return last block", async ({ databaseService }) => {
@@ -227,14 +238,14 @@ describe<{
 			databaseService.addCommit(commit);
 		}
 
-		let lastBlock = (await databaseService.getLastBlock()) as Contracts.Crypto.Block;
+		let lastCommit = await databaseService.getLastCommit();
 
-		assertBlockEqual(lastBlock, commits[3].block);
+		assertBlockEqual(lastCommit?.block, commits[3].block);
 
 		await databaseService.persist();
-		lastBlock = (await databaseService.getLastBlock()) as Contracts.Crypto.Block;
+		lastCommit = await databaseService.getLastCommit();
 
-		assertBlockEqual(lastBlock, commits[3].block);
+		assertBlockEqual(lastCommit?.block, commits[3].block);
 	});
 
 	const assertBlocksEqual = (blocksA: Contracts.Crypto.Block[], blocksB: Contracts.Crypto.Block[]) => {
