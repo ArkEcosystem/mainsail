@@ -6,7 +6,7 @@ import { addTransactionsToPool, isTransactionCommitted, makeTransfer, waitBlock 
 
 describe<{
 	sandbox: Sandbox;
-}>("Consensus", ({ beforeEach, afterEach, it, assert }) => {
+}>("Transfer", ({ beforeEach, afterEach, it, assert }) => {
 	const wallets: Contracts.Crypto.KeyPair[] = [];
 
 	beforeEach(async (context) => {
@@ -106,15 +106,3 @@ describe<{
 		assert.false(await isTransactionCommitted(sandbox, tx));
 	});
 });
-
-// TODO: bind event dispatcher
-// const events = sandbox.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service);
-// const waitForBlock = async (): Promise<Contracts.Crypto.Commit> =>
-// 	new Promise((resolve, reject) => {
-// 		events.listen(Enums.BlockEvent.Applied, {
-// 			handle: ({ name, data }: { name: Contracts.Kernel.EventName; data: Contracts.Crypto.Commit }) => {
-// 				console.log(name, data);
-// 				resolve(data);
-// 			},
-// 		});
-// 	});
