@@ -20,11 +20,15 @@ export class Storage implements Contracts.TransactionPool.Storage {
 
 	public boot(): void {
 		const filename = this.configuration.getRequired<string>("storage");
-		ensureFileSync(filename);
+
+		if (filename === ":memory:") {
+			this.#database = new BetterSqlite3(":memory:");
+		} else {
+			ensureFileSync(filename);
+			this.#database = new BetterSqlite3(filename);
+		}
 
 		const table = "pool_20201204";
-
-		this.#database = new BetterSqlite3(filename);
 		this.#database.exec(`
             PRAGMA journal_mode = WAL;
 
