@@ -398,7 +398,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		return false;
 	}
 
-	protected async propose(roundState: Contracts.Consensus.RoundState): Promise<void> {
+	public async propose(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		if (roundState.hasProposal()) {
 			return;
 		}
@@ -450,7 +450,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		);
 	}
 
-	protected async prevote(value?: string): Promise<void> {
+	public async prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorSet.getActiveValidators()) {
 			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
@@ -469,7 +469,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 	}
 
-	protected async precommit(value?: string): Promise<void> {
+	public async precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorSet.getActiveValidators()) {
 			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
