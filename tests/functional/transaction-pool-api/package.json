@@ -36,6 +36,7 @@
 		"@mainsail/processor": "workspace:*",
 		"@mainsail/validator": "workspace:*",
 		"@mainsail/proposer": "workspace:*",
+		"@mainsail/consensus-storage": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
