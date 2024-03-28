@@ -5,7 +5,7 @@ import validators from "../config/validators.json";
 import { assertBlockId, assertBockHeight, assertCommitValidators } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { run, setup, stop } from "./setup.js";
-import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utils.js";
+import { prepareNodeValidators, snoozeForBlock } from "./utils.js";
 
 describe<{
 	nodes: Sandbox[];
@@ -15,7 +15,7 @@ describe<{
 	beforeEach(async (context) => {
 		const p2pRegistry = new P2PRegistry();
 
-		const totalNodes = 3;
+		const totalNodes = 5;
 
 		context.nodes = [];
 		for (let index = 0; index < totalNodes; index++) {
@@ -38,10 +38,20 @@ describe<{
 	it("#singleForge - should forge 3 blocks with all validators signing", async (context) => {
 		await snoozeForBlock(context.nodes);
 
-		const commit = await getLastCommit(context.nodes[0]);
-
 		await assertBockHeight(context.nodes, 1);
-		await assertBlockId(context.nodes, commit.block.data.id);
+		await assertBlockId(context.nodes);
+		await assertCommitValidators(context.nodes, allValidators);
+
+		await snoozeForBlock(context.nodes);
+
+		await assertBockHeight(context.nodes, 2);
+		await assertBlockId(context.nodes);
+		await assertCommitValidators(context.nodes, allValidators);
+
+		await snoozeForBlock(context.nodes);
+
+		await assertBockHeight(context.nodes, 3);
+		await assertBlockId(context.nodes);
 		await assertCommitValidators(context.nodes, allValidators);
 	});
 });
