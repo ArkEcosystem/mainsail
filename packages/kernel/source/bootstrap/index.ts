@@ -22,8 +22,8 @@ export { RegisterServiceProviders } from "./register-service-providers.js";
 
 export const Bootstrappers = {
 	app: [
-		RegisterBaseServiceProviders,
 		RegisterErrorHandler,
+		RegisterBaseServiceProviders,
 		RegisterBaseConfiguration,
 		RegisterBaseBindings,
 		RegisterBasePaths,
