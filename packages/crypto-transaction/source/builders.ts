@@ -117,6 +117,10 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.#multiSignWithKeyPair(index, await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
+	public async multiSignWithKeyPair(keys: Contracts.Crypto.KeyPair, index: number): Promise<TBuilder> {
+		return this.#multiSignWithKeyPair(index, keys);
+	}
+
 	public async multiSignWithWif(index: number, wif: string): Promise<TBuilder> {
 		return this.#multiSignWithKeyPair(index, await this.keyPairFactory.fromWIF(wif));
 	}

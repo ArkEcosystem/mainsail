@@ -7,6 +7,10 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@tagged("type", "wallet")
 	private readonly signatureFactory!: Contracts.Crypto.Signature;
 
+	@inject(Identifiers.Cryptography.Signature.Size)
+	@tagged("type", "wallet")
+	private readonly signatureSize!: number;
+
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
@@ -47,7 +51,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 					throw new Exceptions.DuplicateParticipantInMultiSignatureError();
 				}
 
-				const partialSignature: string = signature.slice(2, 130);
+				const partialSignature: string = signature.slice(2, this.signatureSize * 2 + 2);
 				const publicKey: string = publicKeys[publicKeyIndex];
 
 				if (

@@ -1,9 +1,9 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { resolve } from "path";
 
 import { Worker } from "./worker.js";
-import { resolve } from "path";
 
 const setup = async () => {
 	const sandbox = new Sandbox();
@@ -74,6 +74,7 @@ const setup = async () => {
 		"@mainsail/validator-set-static",
 		"@mainsail/validator",
 		"@mainsail/proposer",
+		"@mainsail/consensus-storage",
 		"@mainsail/consensus",
 	];
 
@@ -124,6 +125,11 @@ const getPluginConfiguration = async (
 ): Promise<Providers.PluginConfiguration | undefined> => {
 	try {
 		const { defaults } = await import(`${packageId}/distribution/defaults.js`);
+
+		if (packageId === "@mainsail/transaction-pool") {
+			// bech32m addresses require more bytes than the default which assumes base58.
+			defaults.maxTransactionBytes = 50_000;
+		}
 
 		return sandbox.app.resolve(Providers.PluginConfiguration).from(packageId, defaults);
 	} catch {}

@@ -1,12 +1,23 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { BigNumber } from "packages/utils/distribution/big-number.js";
 
 import { setup, shutdown } from "./setup.js";
-import { addTransactionsToPool, isTransactionCommitted, makeTransfer, waitBlock } from "./utils.js";
+import {
+	addTransactionsToPool,
+	getMultiSignatureWallet,
+	getRandomColdWallet,
+	getRandomFundedWallet,
+	hasBalance,
+	isTransactionCommitted,
+	makeMultiSignatureRegistration,
+	makeTransfer,
+	waitBlock,
+} from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
-}>("Consensus", ({ beforeEach, afterEach, it, assert }) => {
+}>("Transfer", ({ beforeEach, afterEach, it, assert }) => {
 	const wallets: Contracts.Crypto.KeyPair[] = [];
 
 	beforeEach(async (context) => {
@@ -39,6 +50,51 @@ describe<{
 		await waitBlock(sandbox);
 
 		assert.true(await isTransactionCommitted(sandbox, tx));
+	});
+
+	it("should accept and transfer funds [multi signature]", async ({ sandbox }) => {
+		const [sender] = wallets;
+
+		// Register multi sig wallet
+		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+
+		const participant1 = await getRandomColdWallet(sandbox);
+		const participant2 = await getRandomColdWallet(sandbox);
+		const participants = [participant1.keyPair, participant2.keyPair];
+
+		const multiSigRegistrationTx = await makeMultiSignatureRegistration(sandbox, {
+			participants,
+			sender: randomWallet,
+		});
+
+		await addTransactionsToPool(sandbox, [multiSigRegistrationTx]);
+		await waitBlock(sandbox);
+
+		// Now send funds to multi sig wallet
+		const multiSigwallet = await getMultiSignatureWallet(sandbox, participants);
+
+		const amount = BigNumber.make(25_000_000_000);
+		const fundTx = await makeTransfer(sandbox, { amount, recipient: multiSigwallet.getAddress(), sender });
+
+		await addTransactionsToPool(sandbox, [fundTx]);
+		await waitBlock(sandbox);
+
+		assert.true(await hasBalance(sandbox, multiSigwallet.getAddress(), amount));
+
+		// Send funds from multi sig to another random wallet
+		const randomWallet2 = await getRandomColdWallet(sandbox);
+
+		const transferTx = await makeTransfer(sandbox, {
+			amount: BigNumber.ONE,
+			multiSigKeys: participants,
+			recipient: randomWallet2.address,
+			sender,
+		});
+
+		await addTransactionsToPool(sandbox, [transferTx]);
+		await waitBlock(sandbox);
+
+		assert.true(await hasBalance(sandbox, randomWallet2.address, BigNumber.ONE));
 	});
 
 	it("should not accept simple transfer [invalid fee]", async ({ sandbox }) => {
@@ -106,15 +162,3 @@ describe<{
 		assert.false(await isTransactionCommitted(sandbox, tx));
 	});
 });
-
-// TODO: bind event dispatcher
-// const events = sandbox.app.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service);
-// const waitForBlock = async (): Promise<Contracts.Crypto.Commit> =>
-// 	new Promise((resolve, reject) => {
-// 		events.listen(Enums.BlockEvent.Applied, {
-// 			handle: ({ name, data }: { name: Contracts.Kernel.EventName; data: Contracts.Crypto.Commit }) => {
-// 				console.log(name, data);
-// 				resolve(data);
-// 			},
-// 		});
-// 	});

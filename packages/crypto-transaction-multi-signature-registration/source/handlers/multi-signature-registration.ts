@@ -65,7 +65,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			throw new Exceptions.MultiSignatureAlreadyRegisteredError();
 		}
 
-		if (!this.verifySignatures(wallet, data, data.asset.multiSignature)) {
+		if (!(await this.verifySignatures(wallet, data, data.asset.multiSignature))) {
 			throw new Exceptions.InvalidMultiSignatureError();
 		}
 
