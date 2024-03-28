@@ -1,4 +1,5 @@
 import { BootServiceProviders } from "./boot-service-providers.js";
+import { ListenToShutdownSignals } from "./listen-to-shutdown-signals.js";
 import { LoadConfiguration } from "./load-configuration.js";
 import { LoadEnvironmentVariables } from "./load-environment-variables.js";
 import { LoadServiceProviders } from "./load-service-providers.js";
@@ -23,6 +24,7 @@ export { RegisterServiceProviders } from "./register-service-providers.js";
 export const Bootstrappers = {
 	app: [
 		RegisterErrorHandler,
+		ListenToShutdownSignals,
 		RegisterBaseServiceProviders,
 		RegisterBaseConfiguration,
 		RegisterBaseBindings,
