@@ -50,7 +50,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 
 	// Bootstrap
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
-	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
