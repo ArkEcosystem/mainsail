@@ -8,6 +8,10 @@ import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
 import { Worker } from "./worker.js";
+import { plugin } from "packages/p2p/distribution/hapi-nes/plugin.js";
+import { Configuration } from "packages/crypto-config/distribution/configuration.js";
+
+type PluginOptions = Record<string, any>;
 
 const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: Validators) => {
 	const sandbox = new Sandbox();
@@ -105,8 +109,14 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/consensus",
 	];
 
+	const options = {
+		"@mainsail/transaction-pool": {
+			storage: ":memory:",
+		},
+	};
+
 	for (const packageId of packages) {
-		await loadPlugin(sandbox, packageId);
+		await loadPlugin(sandbox, packageId, options);
 	}
 
 	for (const packageId of packages) {
@@ -118,13 +128,13 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	return sandbox;
 };
 
-const loadPlugin = async (sandbox: Sandbox, packageId: string) => {
+const loadPlugin = async (sandbox: Sandbox, packageId: string, options: PluginOptions) => {
 	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
 		Identifiers.ServiceProvider.Repository,
 	);
 
 	const { ServiceProvider } = await import(packageId);
-	const pluginConfiguration = await getPluginConfiguration(sandbox, packageId);
+	const pluginConfiguration = await getPluginConfiguration(sandbox, packageId, options);
 
 	const manifest = sandbox.app.resolve(Providers.PluginManifest).discover(packageId, import.meta.url);
 
@@ -149,11 +159,15 @@ const bootPlugin = async (sandbox: Sandbox, packageId: string) => {
 const getPluginConfiguration = async (
 	sandbox: Sandbox,
 	packageId: string,
+	options: PluginOptions,
 ): Promise<Providers.PluginConfiguration | undefined> => {
 	try {
 		const { defaults } = await import(`${packageId}/distribution/defaults.js`);
 
-		return sandbox.app.resolve(Providers.PluginConfiguration).from(packageId, defaults);
+		return sandbox.app
+			.resolve(Providers.PluginConfiguration)
+			.from(packageId, defaults)
+			.merge(options[packageId] || {});
 	} catch {}
 	return undefined;
 };
