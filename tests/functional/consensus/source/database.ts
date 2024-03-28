@@ -5,6 +5,10 @@ import { Contracts } from "@mainsail/contracts";
 export class MemoryDatabase implements Contracts.Database.DatabaseService {
 	#commits: Contracts.Crypto.Commit[] = [];
 
+	public isEmpty(): boolean {
+		return this.#commits.length === 0;
+	}
+
 	public addCommit(commit: Contracts.Crypto.Commit): void {
 		this.#commits.push(commit);
 	}
@@ -17,12 +21,16 @@ export class MemoryDatabase implements Contracts.Database.DatabaseService {
 		return this.#commits.slice(start, end).map((commit) => Buffer.from(commit.serialized));
 	}
 
-	public async getBlock(height: number): Promise<Contracts.Crypto.Block | undefined> {
-		return this.#commits[height]?.block;
+	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
+		return this.#commits[height];
 	}
 
-	public async getLastBlock(): Promise<Contracts.Crypto.Block | undefined> {
-		return this.#commits.at(-1)?.block;
+	public async getLastCommit(): Promise<Contracts.Crypto.Commit> {
+		if (this.#commits.length === 0) {
+			throw new Error("Database is empty");
+		}
+
+		return this.#commits.at(-1)!;
 	}
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {

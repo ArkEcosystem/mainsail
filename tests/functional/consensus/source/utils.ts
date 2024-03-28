@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 
-import { Validators } from "./contracts.ts";
+import { Validators } from "./contracts.js";
 
 export const prepareNodeValidators = (validators: Validators, nodeIndex: number, totalNodes: number) => {
 	const secrets = validators.secrets;
@@ -29,5 +29,5 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[]): Promise<void
 	}
 };
 
-export const getLatestBlock = async (sandbox: Sandbox): Promise<Contracts.Crypto.Block | undefined> =>
-	sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).getLastBlock();
+export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.Commit> =>
+	sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).getLastCommit();

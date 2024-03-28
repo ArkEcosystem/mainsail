@@ -22,7 +22,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 	#lastTimestamp: Date = new Date();
 
-	public async make(): Promise<Contracts.Kernel.Logger> {
+	public async make(options: unknown): Promise<Contracts.Kernel.Logger> {
 		return this;
 	}
 
