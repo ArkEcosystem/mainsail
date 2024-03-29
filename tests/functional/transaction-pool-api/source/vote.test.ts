@@ -1,10 +1,11 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { setup, shutdown } from "./setup.js";
 import {
 	addTransactionsToPool,
 	getRandomFundedWallet,
+	getWallets,
 	hasUnvoted,
 	hasVotedFor,
 	makeValidatorRegistration,
@@ -15,28 +16,16 @@ import {
 
 describe<{
 	sandbox: Sandbox;
+	wallets: Contracts.Crypto.KeyPair[];
 }>("Vote", ({ beforeEach, afterEach, it, assert }) => {
-	const wallets: Contracts.Crypto.KeyPair[] = [];
-
 	beforeEach(async (context) => {
 		context.sandbox = await setup();
-		const walletKeyPairFactory = context.sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"wallet",
-		);
-		const secrets = context.sandbox.app.config("validators.secrets");
-
-		wallets.length = 0;
-		for (const secret of secrets.values()) {
-			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(secret);
-			wallets.push(walletKeyPair);
-		}
+		context.wallets = await getWallets(context.sandbox);
 	});
 
 	afterEach(async (context) => shutdown(context.sandbox));
 
-	it("should accept and commit vote", async ({ sandbox }) => {
+	it("should accept and commit vote", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -49,7 +38,7 @@ describe<{
 		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, wallets[1].publicKey));
 	});
 
-	it("should accept and commit unvote", async ({ sandbox }) => {
+	it("should accept and commit unvote", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -68,7 +57,7 @@ describe<{
 		assert.true(await hasUnvoted(sandbox, randomWallet.publicKey));
 	});
 
-	it("should reject vote for non-validator", async ({ sandbox }) => {
+	it("should reject vote for non-validator", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -85,7 +74,7 @@ describe<{
 		);
 	});
 
-	it("should accept unvote for resigned validator", async ({ sandbox }) => {
+	it("should accept unvote for resigned validator", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -111,7 +100,7 @@ describe<{
 		assert.true(await hasUnvoted(sandbox, randomWallet.publicKey));
 	});
 
-	it("should reject vote for resigned validator", async ({ sandbox }) => {
+	it("should reject vote for resigned validator", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);

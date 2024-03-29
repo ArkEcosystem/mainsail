@@ -1,10 +1,11 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { setup, shutdown } from "./setup.js";
 import {
 	addTransactionsToPool,
 	getRandomFundedWallet,
+	getWallets,
 	hasUsername,
 	makeUsernameRegistration,
 	makeUsernameResignation,
@@ -13,28 +14,16 @@ import {
 
 describe<{
 	sandbox: Sandbox;
+	wallets: Contracts.Crypto.KeyPair[];
 }>("UsernameRegistration", ({ beforeEach, afterEach, it, assert }) => {
-	const wallets: Contracts.Crypto.KeyPair[] = [];
-
 	beforeEach(async (context) => {
 		context.sandbox = await setup();
-		const walletKeyPairFactory = context.sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"wallet",
-		);
-		const secrets = context.sandbox.app.config("validators.secrets");
-
-		wallets.length = 0;
-		for (const secret of secrets.values()) {
-			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(secret);
-			wallets.push(walletKeyPair);
-		}
+		context.wallets = await getWallets(context.sandbox);
 	});
 
 	afterEach(async (context) => shutdown(context.sandbox));
 
-	it("should accept username registration", async ({ sandbox }) => {
+	it("should accept username registration", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -46,7 +35,7 @@ describe<{
 		assert.true(await hasUsername(sandbox, randomWallet.publicKey, username));
 	});
 
-	it("should accept username change", async ({ sandbox }) => {
+	it("should accept username change", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -64,7 +53,7 @@ describe<{
 		assert.true(await hasUsername(sandbox, randomWallet.publicKey));
 	});
 
-	it("should reject username registration if already used", async ({ sandbox }) => {
+	it("should reject username registration if already used", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -86,7 +75,7 @@ describe<{
 		);
 	});
 
-	it("should make resigned username available again", async ({ sandbox }) => {
+	it("should make resigned username available again", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);

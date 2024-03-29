@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { setup, shutdown } from "./setup.js";
@@ -8,34 +8,23 @@ import {
 	getRandomColdWallet,
 	getRandomFundedWallet,
 	getRandomSignature,
+	getWallets,
 	makeMultiSignatureRegistration,
 	waitBlock,
 } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
+	wallets: Contracts.Crypto.KeyPair[];
 }>("MultiSignature", ({ beforeEach, afterEach, it, assert }) => {
-	const wallets: Contracts.Crypto.KeyPair[] = [];
-
 	beforeEach(async (context) => {
 		context.sandbox = await setup();
-		const walletKeyPairFactory = context.sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"wallet",
-		);
-		const secrets = context.sandbox.app.config("validators.secrets");
-
-		wallets.length = 0;
-		for (const secret of secrets.values()) {
-			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(secret);
-			wallets.push(walletKeyPair);
-		}
+		context.wallets = await getWallets(context.sandbox);
 	});
 
 	afterEach(async (context) => shutdown(context.sandbox));
 
-	it("should accept and process multi signature registration", async ({ sandbox }) => {
+	it("should accept and process multi signature registration", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -56,7 +45,7 @@ describe<{
 		assert.true(wallet.hasMultiSignature());
 	});
 
-	it("should reject multi signature registration if already registered", async ({ sandbox }) => {
+	it("should reject multi signature registration if already registered", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -85,7 +74,7 @@ describe<{
 		);
 	});
 
-	it("should reject multi signature registration if any signature invalid", async ({ sandbox }) => {
+	it("should reject multi signature registration if any signature invalid", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);

@@ -8,6 +8,7 @@ import {
 	getMultiSignatureWallet,
 	getRandomColdWallet,
 	getRandomFundedWallet,
+	getWallets,
 	hasBalance,
 	isTransactionCommitted,
 	makeMultiSignatureRegistration,
@@ -17,28 +18,16 @@ import {
 
 describe<{
 	sandbox: Sandbox;
+	wallets: Contracts.Crypto.KeyPair[];
 }>("Transfer", ({ beforeEach, afterEach, it, assert }) => {
-	const wallets: Contracts.Crypto.KeyPair[] = [];
-
 	beforeEach(async (context) => {
 		context.sandbox = await setup();
-		const walletKeyPairFactory = context.sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"wallet",
-		);
-		const secrets = context.sandbox.app.config("validators.secrets");
-
-		wallets.length = 0;
-		for (const secret of secrets.values()) {
-			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(secret);
-			wallets.push(walletKeyPair);
-		}
+		context.wallets = await getWallets(context.sandbox);
 	});
 
 	afterEach(async (context) => shutdown(context.sandbox));
 
-	it("should accept and commit simple transfer", async ({ sandbox }) => {
+	it("should accept and commit simple transfer", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const tx = await makeTransfer(sandbox, { sender });
@@ -52,7 +41,7 @@ describe<{
 		assert.true(await isTransactionCommitted(sandbox, tx));
 	});
 
-	it("should accept and transfer funds [multi signature]", async ({ sandbox }) => {
+	it("should accept and transfer funds [multi signature]", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		// Register multi sig wallet
@@ -97,7 +86,7 @@ describe<{
 		assert.true(await hasBalance(sandbox, randomWallet2.address, BigNumber.ONE));
 	});
 
-	it("should not accept simple transfer [invalid fee]", async ({ sandbox }) => {
+	it("should not accept simple transfer [invalid fee]", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const tx = await makeTransfer(sandbox, { sender, fee: "1234" });
@@ -110,7 +99,7 @@ describe<{
 		assert.false(await isTransactionCommitted(sandbox, tx));
 	});
 
-	it("should not accept simple transfer [invalid amount]", async ({ sandbox }) => {
+	it("should not accept simple transfer [invalid amount]", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const { walletRepository } = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
@@ -127,7 +116,7 @@ describe<{
 		assert.false(await isTransactionCommitted(sandbox, tx));
 	});
 
-	it("should not accept simple transfer [invalid signature]", async ({ sandbox }) => {
+	it("should not accept simple transfer [invalid signature]", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const tx = await makeTransfer(sandbox, {
@@ -145,7 +134,7 @@ describe<{
 		assert.false(await isTransactionCommitted(sandbox, tx));
 	});
 
-	it("should not accept simple transfer [malformed signature]", async ({ sandbox }) => {
+	it("should not accept simple transfer [malformed signature]", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const tx = await makeTransfer(sandbox, { sender, signature: "5161a55859e0be86080ca54d9" });

@@ -496,3 +496,21 @@ export const isTransactionCommitted = async (
 
 	return found;
 };
+
+export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.KeyPair[]> => {
+	const walletKeyPairFactory = sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+		Identifiers.Cryptography.Identity.KeyPair.Factory,
+		"type",
+		"wallet",
+	);
+
+	const secrets = sandbox.app.config("validators.secrets");
+
+	const wallets = [];
+	for (const secret of secrets.values()) {
+		const walletKeyPair = await walletKeyPairFactory.fromMnemonic(secret);
+		wallets.push(walletKeyPair);
+	}
+
+	return wallets;
+};

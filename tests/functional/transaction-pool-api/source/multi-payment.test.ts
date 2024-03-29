@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 
@@ -8,6 +8,7 @@ import {
 	getAddressByPublicKey,
 	getRandomColdWallet,
 	getRandomFundedWallet,
+	getWallets,
 	hasBalance,
 	makeMultiPayment,
 	waitBlock,
@@ -15,28 +16,16 @@ import {
 
 describe<{
 	sandbox: Sandbox;
+	wallets: Contracts.Crypto.KeyPair[];
 }>("MultiPayment", ({ beforeEach, afterEach, it, assert }) => {
-	const wallets: Contracts.Crypto.KeyPair[] = [];
-
 	beforeEach(async (context) => {
 		context.sandbox = await setup();
-		const walletKeyPairFactory = context.sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"wallet",
-		);
-		const secrets = context.sandbox.app.config("validators.secrets");
-
-		wallets.length = 0;
-		for (const secret of secrets.values()) {
-			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(secret);
-			wallets.push(walletKeyPair);
-		}
+		context.wallets = await getWallets(context.sandbox);
 	});
 
 	afterEach(async (context) => shutdown(context.sandbox));
 
-	it("should accept multi payment", async ({ sandbox }) => {
+	it("should accept multi payment", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -59,7 +48,7 @@ describe<{
 		assert.true(await hasBalance(sandbox, recipient2.address, BigNumber.make(1000)));
 	});
 
-	it("should accept multi payment with same recipients", async ({ sandbox }) => {
+	it("should accept multi payment with same recipients", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -83,7 +72,7 @@ describe<{
 		assert.true(await hasBalance(sandbox, recipient2.address, BigNumber.make(1000)));
 	});
 
-	it("should accept multi payment to self", async ({ sandbox }) => {
+	it("should accept multi payment to self", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -107,7 +96,7 @@ describe<{
 		assert.true(await hasBalance(sandbox, recipient.address, BigNumber.make(1000)));
 	});
 
-	it("should accept multi payment with max payments", async ({ sandbox }) => {
+	it("should accept multi payment with max payments", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
