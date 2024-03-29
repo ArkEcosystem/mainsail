@@ -204,7 +204,7 @@ export const makeMultiSignatureRegistration = async (
 		builder = await builder.multiSignWithKeyPair(participant, index);
 
 		if (participantSignatureOverwrite && participantSignatureOverwrite[index]) {
-			builder.data.signatures[index] = participantSignatureOverwrite[index];
+			builder.data.signatures![index] = participantSignatureOverwrite[index];
 		}
 	}
 
@@ -506,7 +506,7 @@ export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.Key
 
 	const secrets = sandbox.app.config("validators.secrets");
 
-	const wallets = [];
+	const wallets: Contracts.Crypto.KeyPair[] = [];
 	for (const secret of secrets.values()) {
 		const walletKeyPair = await walletKeyPairFactory.fromMnemonic(secret);
 		wallets.push(walletKeyPair);

@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "packages/utils/distribution/big-number.js";
+import { BigNumber } from "@mainsail/utils";
 
 import { setup, shutdown } from "./setup.js";
 import {
@@ -93,7 +93,12 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_LOW_FEE");
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${tx.id} fee is too low to enter the pool`,
+				type: "ERR_LOW_FEE",
+			},
+		});
 
 		await waitBlock(sandbox);
 		assert.false(await isTransactionCommitted(sandbox, tx));
@@ -109,8 +114,12 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(result.errors[0].message, `tx ${tx.id} cannot be applied: Insufficient balance in the wallet.`);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${tx.id} cannot be applied: Insufficient balance in the wallet.`,
+				type: "ERR_APPLY",
+			},
+		});
 
 		await waitBlock(sandbox);
 		assert.false(await isTransactionCommitted(sandbox, tx));
@@ -127,8 +136,8 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_BAD_DATA");
-		assert.true(result.errors[0].message.includes("didn't pass verification"));
+		assert.equal(result.errors![0].type, "ERR_BAD_DATA");
+		assert.true(result.errors![0].message.includes("didn't pass verification"));
 
 		await waitBlock(sandbox);
 		assert.false(await isTransactionCommitted(sandbox, tx));
@@ -141,11 +150,13 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_BAD_DATA");
-		assert.equal(
-			result.errors[0].message,
-			"Invalid transaction data: Failed to deserialize transaction, encountered invalid bytes: Read over buffer boundary. (length: 64, remaining: 12, diff: 52)",
-		);
+		assert.equal(result.errors, {
+			0: {
+				message:
+					"Invalid transaction data: Failed to deserialize transaction, encountered invalid bytes: Read over buffer boundary. (length: 64, remaining: 12, diff: 52)",
+				type: "ERR_BAD_DATA",
+			},
+		});
 
 		await waitBlock(sandbox);
 		assert.false(await isTransactionCommitted(sandbox, tx));

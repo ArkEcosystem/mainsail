@@ -67,11 +67,12 @@ describe<{
 		});
 		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because multi signature is already enabled.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because multi signature is already enabled.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 
 	it("should reject multi signature registration if any signature invalid", async ({ sandbox, wallets }) => {
@@ -92,10 +93,11 @@ describe<{
 		});
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${tx.id} cannot be applied: Failed to apply transaction, because the multi signature could not be verified.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${tx.id} cannot be applied: Failed to apply transaction, because the multi signature could not be verified.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 });

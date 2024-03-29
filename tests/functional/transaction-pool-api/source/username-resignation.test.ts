@@ -47,10 +47,11 @@ describe<{
 		const resignationTx = await makeUsernameResignation(sandbox, { sender: randomWallet });
 		const result = await addTransactionsToPool(sandbox, [resignationTx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${resignationTx.id} cannot be applied: Failed to apply transaction, because the username is not registered.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${resignationTx.id} cannot be applied: Failed to apply transaction, because the username is not registered.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 });

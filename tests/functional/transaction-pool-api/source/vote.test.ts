@@ -67,11 +67,12 @@ describe<{
 		const result = await addTransactionsToPool(sandbox, [tx]);
 
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${tx.id} cannot be applied: Failed to apply transaction, because only validators can be voted.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${tx.id} cannot be applied: Failed to apply transaction, because only validators can be voted.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 
 	it("should accept unvote for resigned validator", async ({ sandbox, wallets }) => {
@@ -118,10 +119,11 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [voteTx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${voteTx.id} cannot be applied: Failed to apply transaction, because it votes for a resigned validator.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${voteTx.id} cannot be applied: Failed to apply transaction, because it votes for a resigned validator.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 });

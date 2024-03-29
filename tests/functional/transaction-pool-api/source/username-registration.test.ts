@@ -68,11 +68,12 @@ describe<{
 		const registrationTx2 = await makeUsernameRegistration(sandbox, { sender: randomWallet2, username });
 		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the username '${username}' is already registered.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the username '${username}' is already registered.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 
 	it("should make resigned username available again", async ({ sandbox, wallets }) => {

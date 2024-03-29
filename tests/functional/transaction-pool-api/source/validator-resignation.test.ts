@@ -47,11 +47,12 @@ describe<{
 		const result = await addTransactionsToPool(sandbox, [tx]);
 
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${tx.id} cannot be applied: Failed to apply transaction, because not enough validators to allow resignation.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${tx.id} cannot be applied: Failed to apply transaction, because not enough validators to allow resignation.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 
 	it("should reject validator resignation if not registered", async ({ sandbox, wallets }) => {
@@ -63,11 +64,12 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [tx]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${tx.id} cannot be applied: Failed to apply transaction, because the wallet is not a validator.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${tx.id} cannot be applied: Failed to apply transaction, because the wallet is not a validator.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 
 	it("should reject double resignation", async ({ sandbox, wallets }) => {
@@ -88,11 +90,12 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [resignationTx2]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${resignationTx2.id} cannot be applied: Failed to apply transaction, because the wallet already resigned as validator.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${resignationTx2.id} cannot be applied: Failed to apply transaction, because the wallet already resigned as validator.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 
 	it("should reject registration after resignation", async ({ sandbox, wallets }) => {
@@ -113,10 +116,11 @@ describe<{
 
 		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the wallet is already a validator.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the wallet is already a validator.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 });

@@ -47,11 +47,12 @@ describe<{
 		const registrationTx2 = await makeValidatorRegistration(sandbox, { sender: randomWallet });
 		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the wallet is already a validator.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the wallet is already a validator.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 
 	it("should reject registration if consensus public key already used", async ({ sandbox, wallets }) => {
@@ -76,10 +77,11 @@ describe<{
 		});
 		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
-		assert.equal(result.errors[0].type, "ERR_APPLY");
-		assert.equal(
-			result.errors[0].message,
-			`tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the validator public key '${consensusPublicKey.publicKey}' is already registered.`,
-		);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the validator public key '${consensusPublicKey.publicKey}' is already registered.`,
+				type: "ERR_APPLY",
+			},
+		});
 	});
 });
