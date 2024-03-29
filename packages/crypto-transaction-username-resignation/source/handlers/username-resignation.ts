@@ -1,13 +1,17 @@
-import { injectable } from "@mainsail/container";
-import { Contracts, Exceptions } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { UsernameRegistrationTransactionHandler } from "@mainsail/crypto-transaction-username-registration";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { UsernameResignationTransaction } from "../versions/index.js";
 
 @injectable()
 export class UsernameResignationTransactionHandler extends Handlers.TransactionHandler {
+	@inject(Identifiers.TransactionPool.Query)
+	private readonly poolQuery!: Contracts.TransactionPool.Query;
+
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [UsernameRegistrationTransactionHandler];
 	}
@@ -30,6 +34,27 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 		}
 
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
+	}
+
+	public async throwIfCannotEnterPool(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<void> {
+		const { data }: Contracts.Crypto.Transaction = transaction;
+
+		AppUtils.assert.defined<string>(data.senderPublicKey);
+
+		const hasSender: boolean = await this.poolQuery
+			.getAllBySender(data.senderPublicKey)
+			.whereKind(transaction)
+			.has();
+
+		if (hasSender) {
+			throw new Exceptions.PoolError(
+				`Sender ${data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.UsernameResignation}' in the pool`,
+				"ERR_PENDING",
+			);
+		}
 	}
 
 	public async applyToSender(

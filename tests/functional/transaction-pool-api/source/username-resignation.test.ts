@@ -61,4 +61,39 @@ describe<{
 			},
 		});
 	});
+
+	it("should only accept one username resignation per sender in pool at the same time", async ({
+		sandbox,
+		wallets,
+	}) => {
+		const [validator1] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+		const registrationTx = await makeUsernameRegistration(sandbox, {
+			sender: randomWallet,
+		});
+		await addTransactionsToPool(sandbox, [registrationTx]);
+		await waitBlock(sandbox);
+
+		// Submit 2 resignations, but only one will be accepted
+		const resignationTx1 = await makeUsernameResignation(sandbox, {
+			nonceOffset: 0,
+			sender: randomWallet,
+		});
+
+		const resignationTx2 = await makeUsernameResignation(sandbox, {
+			nonceOffset: 1,
+			sender: randomWallet,
+		});
+		const result = await addTransactionsToPool(sandbox, [resignationTx1, resignationTx2]);
+
+		assert.equal(result.accept, [0]);
+		assert.equal(result.invalid, [1]);
+		assert.equal(result.errors, {
+			1: {
+				message: `tx ${resignationTx2.id} cannot be applied: Sender ${randomWallet.publicKey} already has a transaction of type '9' in the pool`,
+				type: "ERR_APPLY",
+			},
+		});
+	});
 });
