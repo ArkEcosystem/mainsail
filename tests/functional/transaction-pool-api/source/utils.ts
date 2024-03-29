@@ -16,6 +16,7 @@ export interface TransactionOptions {
 	sender: Contracts.Crypto.KeyPair;
 	fee?: number | string | BigNumber;
 	signature?: string;
+	nonceOffset?: number;
 	multiSigKeys?: Contracts.Crypto.KeyPair[];
 }
 
@@ -280,14 +281,16 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 
 		const nonce = await getNonceByPublicKey(sandbox, multiSigPublicKey);
 
-		builder = builder.nonce(nonce.plus(1).toString()).senderPublicKey(multiSigPublicKey);
+		const { multiSigKeys, nonceOffset = 0 } = options;
+		builder = builder.nonce(nonce.plus(1 + nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
 
-		for (const [index, participant] of options.multiSigKeys.entries()) {
+		for (const [index, participant] of multiSigKeys.entries()) {
 			builder = await builder.multiSignWithKeyPair(participant, index);
 		}
 	} else {
 		const nonce = await getNonceByPublicKey(sandbox, options.sender.publicKey);
-		builder = await builder.nonce(nonce.plus(1).toString()).signWithKeyPair(keyPair);
+		const { nonceOffset = 0 } = options;
+		builder = await builder.nonce(nonce.plus(1 + nonceOffset).toString()).signWithKeyPair(keyPair);
 	}
 
 	const transaction = await builder.build();
