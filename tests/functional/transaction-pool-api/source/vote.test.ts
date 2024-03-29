@@ -2,6 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { setup, shutdown } from "./setup.js";
+import { Snapshot, takeSnapshot } from "./snapshot.js";
 import {
 	addTransactionsToPool,
 	getRandomFundedWallet,
@@ -16,14 +17,20 @@ import {
 
 describe<{
 	sandbox: Sandbox;
+	snapshot: Snapshot;
 	wallets: Contracts.Crypto.KeyPair[];
 }>("Vote", ({ beforeEach, afterEach, it, assert }) => {
 	beforeEach(async (context) => {
 		context.sandbox = await setup();
 		context.wallets = await getWallets(context.sandbox);
+		context.snapshot = await takeSnapshot(context.sandbox);
 	});
 
-	afterEach(async (context) => shutdown(context.sandbox));
+	afterEach(async ({ sandbox, snapshot }) => {
+		await snapshot.validate();
+
+		await shutdown(sandbox);
+	});
 
 	it("should accept and commit vote", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;

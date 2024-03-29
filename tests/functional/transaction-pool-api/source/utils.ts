@@ -514,3 +514,21 @@ export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.Key
 
 	return wallets;
 };
+
+export const getWalletByAddressOrPublicKey = async (
+	sandbox: Sandbox,
+	addressOrPublicKey: string,
+): Promise<Contracts.State.Wallet> => {
+	const { app } = sandbox;
+
+	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+
+	let wallet: Contracts.State.Wallet;
+	if (walletRepository.hasByPublicKey(addressOrPublicKey)) {
+		wallet = await walletRepository.findByPublicKey(addressOrPublicKey);
+	} else {
+		wallet = walletRepository.findByAddress(addressOrPublicKey);
+	}
+
+	return wallet;
+};

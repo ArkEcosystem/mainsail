@@ -3,6 +3,7 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 
 import { setup, shutdown } from "./setup.js";
+import { Snapshot, takeSnapshot } from "./snapshot.js";
 import {
 	addTransactionsToPool,
 	getAddressByPublicKey,
@@ -16,14 +17,20 @@ import {
 
 describe<{
 	sandbox: Sandbox;
+	snapshot: Snapshot;
 	wallets: Contracts.Crypto.KeyPair[];
 }>("MultiPayment", ({ beforeEach, afterEach, it, assert }) => {
 	beforeEach(async (context) => {
 		context.sandbox = await setup();
 		context.wallets = await getWallets(context.sandbox);
+		context.snapshot = await takeSnapshot(context.sandbox);
 	});
 
-	afterEach(async (context) => shutdown(context.sandbox));
+	afterEach(async ({ sandbox, snapshot }) => {
+		await snapshot.validate();
+
+		return shutdown(sandbox);
+	});
 
 	it("should accept multi payment", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;

@@ -4,6 +4,7 @@ import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
 
 import { Worker } from "./worker.js";
+import { MemoryDatabase } from "./database.js";
 
 type PluginOptions = Record<string, any>;
 
@@ -24,6 +25,9 @@ const setup = async () => {
 		broadcastProposal: async () => {},
 		broadcastTransactions: async () => {},
 	});
+
+	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
+
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
@@ -76,7 +80,6 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
 		"@mainsail/state",
-		"@mainsail/database",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool",
 		"@mainsail/crypto-messages",
