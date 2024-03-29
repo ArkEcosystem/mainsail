@@ -108,6 +108,71 @@ describe<{
 		assert.true(await hasUnvoted(sandbox, randomWallet.publicKey));
 	});
 
+	it("should reject unvote for non voted validator", async ({ sandbox, wallets }) => {
+		const [validator1] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+
+		const unvoteTx = await makeVote(sandbox, { sender: randomWallet, unvoteAsset: validator1.publicKey });
+		const result = await addTransactionsToPool(sandbox, [unvoteTx]);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${unvoteTx.id} cannot be applied: Failed to apply transaction, because the wallet has not voted.`,
+				type: "ERR_APPLY",
+			},
+		});
+	});
+
+	it("should accept vote switch", async ({ sandbox, wallets }) => {
+		const [validator1, validator2, validator3] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+
+		// Vote for validator1
+		const voteTx = await makeVote(sandbox, { sender: randomWallet, voteAsset: validator1.publicKey });
+		await addTransactionsToPool(sandbox, [voteTx]);
+		await waitBlock(sandbox);
+		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, validator1.publicKey));
+
+		// Unvote validator1 and vote for validator2
+		const unvoteTx = await makeVote(sandbox, {
+			sender: randomWallet,
+			unvoteAsset: validator1.publicKey,
+			voteAsset: validator2.publicKey,
+		});
+		const result = await addTransactionsToPool(sandbox, [unvoteTx]);
+		assert.equal(result.accept, [0]);
+		await waitBlock(sandbox);
+		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, validator2.publicKey));
+	});
+
+	it("should reject switch vote for non voted validator", async ({ sandbox, wallets }) => {
+		const [validator1, validator2, validator3] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+
+		// Vote for validator1
+		const voteTx = await makeVote(sandbox, { sender: randomWallet, voteAsset: validator1.publicKey });
+		await addTransactionsToPool(sandbox, [voteTx]);
+		await waitBlock(sandbox);
+
+		// Provoke unvote mismatch by unvoting the non voted validator 2
+		const unvoteTx = await makeVote(sandbox, {
+			sender: randomWallet,
+			unvoteAsset: validator2.publicKey,
+			voteAsset: validator3.publicKey,
+		});
+		const result = await addTransactionsToPool(sandbox, [unvoteTx]);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors, {
+			0: {
+				message: `tx ${unvoteTx.id} cannot be applied: Failed to apply transaction, because the wallet vote does not match.`,
+				type: "ERR_APPLY",
+			},
+		});
+	});
+
 	it("should reject vote for resigned validator", async ({ sandbox, wallets }) => {
 		const [sender] = wallets;
 
