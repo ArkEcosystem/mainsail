@@ -81,7 +81,7 @@ describe<{
 		);
 	});
 
-	it("should reject validator resignation if already resignated", async ({ sandbox }) => {
+	it("should reject double resignation", async ({ sandbox }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
@@ -106,7 +106,7 @@ describe<{
 		);
 	});
 
-	it("should reject new validator registration if resignated", async ({ sandbox }) => {
+	it("should reject registration after resignation", async ({ sandbox }) => {
 		const [sender] = wallets;
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
