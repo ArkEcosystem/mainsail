@@ -8,10 +8,6 @@ export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 	const snapshot = new Snapshot(sandbox);
 	const { walletRepository } = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 
-	for (const wallet of walletRepository.allByPublicKey()) {
-		await snapshot.add(wallet.getPublicKey()!);
-	}
-
 	for (const wallet of walletRepository.allByAddress()) {
 		await snapshot.add(wallet.getAddress()!);
 	}
@@ -38,13 +34,8 @@ export class Snapshot {
 		const balanceDeltas = await this.collectBalanceDeltas();
 
 		// Verify final balance of all wallets matches with delta and snapshot taken at block 0
-		const seenAddresses = new Map<string, boolean>();
 		const validateBalance = async (wallet: Contracts.State.Wallet): Promise<boolean> => {
 			const currentBalance = wallet.getBalance();
-
-			if (seenAddresses.has(wallet.getAddress())) {
-				return seenAddresses.get(wallet.getAddress())!;
-			}
 
 			const previousBalance = this.balances[wallet.getAddress()] ?? BigNumber.ZERO;
 			const balanceDelta = balanceDeltas[wallet.getAddress()] ?? BigNumber.ZERO;
@@ -67,7 +58,6 @@ export class Snapshot {
 				ok = false;
 			}
 
-			seenAddresses.set(wallet.getAddress(), ok);
 			return ok;
 		};
 
@@ -96,24 +86,22 @@ export class Snapshot {
 		}
 
 		const blocks = await database.findBlocks(0, (await database.getLastCommit()).block.header.height);
-		const positiveBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
+		const updateBalanceDelta = async (addressOrPublicKey: string, delta: BigNumber): Promise<void> => {
 			const wallet = await getWalletByAddressOrPublicKey(this.sandbox, addressOrPublicKey);
 
 			if (!balanceDeltas[wallet.getAddress()]) {
 				balanceDeltas[wallet.getAddress()] = BigNumber.ZERO;
 			}
 
-			balanceDeltas[wallet.getAddress()] = balanceDeltas[wallet.getAddress()].plus(amount);
+			balanceDeltas[wallet.getAddress()] = balanceDeltas[wallet.getAddress()].plus(delta);
+		};
+
+		const positiveBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
+			await updateBalanceDelta(addressOrPublicKey, amount);
 		};
 
 		const negativeBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
-			const wallet = await getWalletByAddressOrPublicKey(this.sandbox, addressOrPublicKey);
-
-			if (!balanceDeltas[wallet.getAddress()]) {
-				balanceDeltas[wallet.getAddress()] = BigNumber.ZERO;
-			}
-
-			balanceDeltas[wallet.getAddress()] = balanceDeltas[wallet.getAddress()].minus(amount);
+			await updateBalanceDelta(addressOrPublicKey, amount.times(-1));
 		};
 
 		for (const block of blocks) {
