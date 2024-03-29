@@ -19,6 +19,14 @@ export class P2PRegistry {
 		return [...this.#nodes.entries()].map(([, node]) => node);
 	}
 
+	getNodes(nodes?: number[]): Contracts.Kernel.Application[] {
+		if (nodes === undefined) {
+			return this.getAllNodes();
+		}
+
+		return nodes.map((node) => this.#nodes.get(node)).filter((node) => node !== undefined);
+	}
+
 	public makeBroadcaster(id: number): Broadcaster {
 		return new Broadcaster(id, this);
 	}
@@ -47,20 +55,20 @@ export class P2PRegistry {
 		}, 0);
 	}
 
-	async broadcastProposal(proposal: Contracts.Crypto.Proposal): Promise<void> {
-		for (const node of this.getAllNodes()) {
+	async broadcastProposal(proposal: Contracts.Crypto.Proposal, nodes?: number[]): Promise<void> {
+		for (const node of this.getNodes(nodes)) {
 			await this.postProposal(node, proposal);
 		}
 	}
 
-	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit): Promise<void> {
-		for (const node of this.getAllNodes()) {
+	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit, nodes?: number[]): Promise<void> {
+		for (const node of this.getNodes(nodes)) {
 			await this.postPrecommit(node, precommit);
 		}
 	}
 
-	async broadcastPrevote(prevote: Contracts.Crypto.Prevote): Promise<void> {
-		for (const node of this.getAllNodes()) {
+	async broadcastPrevote(prevote: Contracts.Crypto.Prevote, nodes?: number[]): Promise<void> {
+		for (const node of this.getNodes(nodes)) {
 			await this.postPrevote(node, prevote);
 		}
 	}

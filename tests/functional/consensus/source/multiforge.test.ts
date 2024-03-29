@@ -103,7 +103,7 @@ describe<{
 		await assertCommitValidators(nodes, allValidators);
 	});
 
-	it.only("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
+	it("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
 		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {
@@ -125,4 +125,56 @@ describe<{
 		await assertBlockId(nodes, proposal0.block.block.data.id);
 		await assertCommitValidators(nodes, allValidators);
 	});
+
+	it.only("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		stubPropose.callsFake(async () => {
+			stubPropose.restore();
+		});
+
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+
+		assert.not.equal(proposal0.block.block.data.id, proposal1.block.block.data.id);
+
+		await p2p.broadcastProposal(proposal0, [0, 1, 2]);
+		await p2p.broadcastProposal(proposal1, [3, 4]);
+
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 1);
+		await assertBlockId(nodes);
+		await assertCommitValidators(nodes, allValidators);
+
+		// TODO: Check precommits
+	});
+
+	// it("#double propose - majority : minority split - should not accept block broadcasted to majority", async ({
+	// 	nodes,
+	// 	validators,
+	// 	p2p,
+	// }) => {
+	// 	const node0 = nodes[0];
+	// 	const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+	// 	stubPropose.callsFake(async () => {
+	// 		stubPropose.restore();
+	// 	});
+
+	// 	const proposal0 = await makeProposal(node0, validators[0], 1, 0);
+	// 	const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+
+	// 	assert.not.equal(proposal0.block.block.data.id, proposal1.block.block.data.id);
+
+	// 	await p2p.broadcastProposal(proposal0, [0, 1, 2, 3]);
+	// 	await p2p.broadcastProposal(proposal1, [4]);
+
+	// 	await snoozeForBlock(nodes);
+
+	// 	await assertBockHeight(nodes, 1);
+	// 	await assertBockRound(nodes, 0);
+	// 	await assertBlockId(nodes, proposal0.block.block.data.id);
+	// 	// await assertCommitValidators(nodes, allValidators);
+	// });
 });
