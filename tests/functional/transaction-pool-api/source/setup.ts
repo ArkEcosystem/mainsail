@@ -1,9 +1,12 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { resolve } from "path";
 
 import { Worker } from "./worker.js";
-import { resolve } from "path";
+import { MemoryDatabase } from "./database.js";
+
+type PluginOptions = Record<string, any>;
 
 const setup = async () => {
 	const sandbox = new Sandbox();
@@ -22,6 +25,9 @@ const setup = async () => {
 		broadcastProposal: async () => {},
 		broadcastTransactions: async () => {},
 	});
+
+	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
+
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
@@ -40,6 +46,15 @@ const setup = async () => {
 
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
+
+	const options = {
+		"@mainsail/transaction-pool": {
+			// bech32m addresses require more bytes than the default which assumes base58.
+			maxTransactionBytes: 50_000,
+
+			storage: ":memory:",
+		},
+	};
 
 	const packages = [
 		"@mainsail/validation",
@@ -65,7 +80,6 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
 		"@mainsail/state",
-		"@mainsail/database",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool",
 		"@mainsail/crypto-messages",
@@ -74,11 +88,12 @@ const setup = async () => {
 		"@mainsail/validator-set-static",
 		"@mainsail/validator",
 		"@mainsail/proposer",
+		"@mainsail/consensus-storage",
 		"@mainsail/consensus",
 	];
 
 	for (const packageId of packages) {
-		await loadPlugin(sandbox, packageId);
+		await loadPlugin(sandbox, packageId, options);
 	}
 
 	for (const packageId of packages) {
@@ -90,13 +105,13 @@ const setup = async () => {
 	return sandbox;
 };
 
-const loadPlugin = async (sandbox: Sandbox, packageId: string) => {
+const loadPlugin = async (sandbox: Sandbox, packageId: string, options: PluginOptions) => {
 	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
 		Identifiers.ServiceProvider.Repository,
 	);
 
 	const { ServiceProvider } = await import(packageId);
-	const pluginConfiguration = await getPluginConfiguration(sandbox, packageId);
+	const pluginConfiguration = await getPluginConfiguration(sandbox, packageId, options);
 
 	const manifest = sandbox.app.resolve(Providers.PluginManifest).discover(packageId, import.meta.url);
 
@@ -121,11 +136,15 @@ const bootPlugin = async (sandbox: Sandbox, packageId: string) => {
 const getPluginConfiguration = async (
 	sandbox: Sandbox,
 	packageId: string,
+	options: PluginOptions,
 ): Promise<Providers.PluginConfiguration | undefined> => {
 	try {
 		const { defaults } = await import(`${packageId}/distribution/defaults.js`);
 
-		return sandbox.app.resolve(Providers.PluginConfiguration).from(packageId, defaults);
+		return sandbox.app
+			.resolve(Providers.PluginConfiguration)
+			.from(packageId, defaults)
+			.merge(options[packageId] || {});
 	} catch {}
 	return undefined;
 };
