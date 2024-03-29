@@ -91,4 +91,68 @@ describe<{
 			},
 		});
 	});
+
+	it("should only accept one validator registration per sender in pool at the same time", async ({
+		sandbox,
+		wallets,
+	}) => {
+		const [validator1] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+
+		// Submit 2 registrations, but only one will be accepted
+		const registrationTx1 = await makeValidatorRegistration(sandbox, {
+			nonceOffset: 0,
+			sender: randomWallet,
+		});
+
+		const registrationTx2 = await makeValidatorRegistration(sandbox, {
+			nonceOffset: 1,
+			sender: randomWallet,
+		});
+		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
+		await waitBlock(sandbox);
+
+		assert.equal(result.accept, [0]);
+		assert.equal(result.invalid, [1]);
+		assert.equal(result.errors, {
+			1: {
+				message: `tx ${registrationTx2.id} cannot be applied: Sender ${randomWallet.publicKey} already has a transaction of type '2' in the pool`,
+				type: "ERR_APPLY",
+			},
+		});
+	});
+
+	it("should reject duplicate validator BLS key", async ({ sandbox, wallets }) => {
+		const [validator1] = wallets;
+
+		const randomWallet1 = await getRandomFundedWallet(sandbox, validator1);
+		const randomWallet2 = await getRandomFundedWallet(sandbox, validator1);
+
+		const validatorKey = (await getRandomConsensusKeyPair(sandbox)).publicKey;
+
+		// Submit 2 registration from different wallets using same BLS key
+		const registrationTx1 = await makeValidatorRegistration(sandbox, {
+			nonceOffset: 0,
+			sender: randomWallet1,
+			validatorPublicKey: validatorKey,
+		});
+
+		const registrationTx2 = await makeValidatorRegistration(sandbox, {
+			nonceOffset: 1,
+			sender: randomWallet2,
+			validatorPublicKey: validatorKey,
+		});
+		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
+		await waitBlock(sandbox);
+
+		assert.equal(result.accept, [0]);
+		assert.equal(result.invalid, [1]);
+		assert.equal(result.errors, {
+			1: {
+				message: `tx ${registrationTx2.id} cannot be applied: Validator registration for public key "${validatorKey}" already in the pool`,
+				type: "ERR_APPLY",
+			},
+		});
+	});
 });
