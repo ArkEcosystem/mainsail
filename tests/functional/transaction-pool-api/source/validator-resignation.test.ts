@@ -130,4 +130,42 @@ describe<{
 			},
 		});
 	});
+
+	it("should only accept one validator resignation per sender in pool at the same time", async ({
+		sandbox,
+		wallets,
+	}) => {
+		const [validator1] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+
+		const registrationTx = await makeValidatorRegistration(sandbox, {
+			nonceOffset: 0,
+			sender: randomWallet,
+		});
+		await addTransactionsToPool(sandbox, [registrationTx]);
+		await waitBlock(sandbox);
+
+		// Submit 2 resignations, but only one will be accepted
+		const resignationTx1 = await makeValidatorResignation(sandbox, {
+			nonceOffset: 0,
+			sender: randomWallet,
+		});
+
+		const resignationTx2 = await makeValidatorResignation(sandbox, {
+			nonceOffset: 1,
+			sender: randomWallet,
+		});
+		const result = await addTransactionsToPool(sandbox, [resignationTx1, resignationTx2]);
+		await waitBlock(sandbox);
+
+		assert.equal(result.accept, [0]);
+		assert.equal(result.invalid, [1]);
+		assert.equal(result.errors, {
+			1: {
+				message: `tx ${resignationTx2.id} cannot be applied: Validator resignation for "${randomWallet.publicKey}" already in the pool`,
+				type: "ERR_APPLY",
+			},
+		});
+	});
 });
