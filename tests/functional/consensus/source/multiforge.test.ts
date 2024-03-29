@@ -1,5 +1,5 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
@@ -13,18 +13,39 @@ import { getLastCommit, getValidators, prepareNodeValidators, snoozeForBlock } f
 describe<{
 	nodes: Sandbox[];
 	validators: Validator[];
+	p2p: P2PRegistry;
 }>("Consensus", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const allValidators = Array.from<boolean>({ length: validators.secrets.length }).fill(true);
 
-	beforeEach(async (context) => {
-		const p2pRegistry = new P2PRegistry();
+	const makeProposal = async (node: Sandbox, validator: Validator, height: number, round: number) => {
+		const proposer = node.app
+			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+			.getValidator(validator.consensusPublicKey);
 
+		if (!proposer) {
+			throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+		}
+
+		const block = await proposer.prepareBlock(validator.publicKey, round);
+		return await proposer.propose(
+			node.app
+				.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
+				.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			round,
+			undefined,
+			block,
+		);
+	};
+
+	beforeEach(async (context) => {
 		const totalNodes = 5;
+
+		context.p2p = new P2PRegistry();
 
 		context.nodes = [];
 		for (let index = 0; index < totalNodes; index++) {
 			context.nodes.push(
-				await setup(index, p2pRegistry, crypto, prepareNodeValidators(validators, index, totalNodes)),
+				await setup(index, context.p2p, crypto, prepareNodeValidators(validators, index, totalNodes)),
 			);
 		}
 
@@ -79,6 +100,29 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 1);
 		await assertBlockId(nodes);
+		await assertCommitValidators(nodes, allValidators);
+	});
+
+	it.only("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		stubPropose.callsFake(async () => {
+			stubPropose.restore();
+		});
+
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+
+		assert.not.equal(proposal0.block.block.data.id, proposal1.block.block.data.id);
+
+		await p2p.broadcastProposal(proposal0);
+		await p2p.broadcastProposal(proposal1);
+
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes, proposal0.block.block.data.id);
 		await assertCommitValidators(nodes, allValidators);
 	});
 });

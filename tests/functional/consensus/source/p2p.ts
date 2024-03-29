@@ -15,8 +15,54 @@ export class P2PRegistry {
 		return [...this.#nodes.entries()].filter(([nodeId]) => nodeId !== id).map(([, node]) => node);
 	}
 
+	public getAllNodes(): Contracts.Kernel.Application[] {
+		return [...this.#nodes.entries()].map(([, node]) => node);
+	}
+
 	public makeBroadcaster(id: number): Broadcaster {
 		return new Broadcaster(id, this);
+	}
+
+	async postProposal(node: Contracts.Kernel.Application, proposal: Contracts.Crypto.Proposal): Promise<void> {
+		setTimeout(async () => {
+			await node
+				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
+				.process(proposal);
+		}, 0);
+	}
+
+	async postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Precommit): Promise<void> {
+		setTimeout(async () => {
+			await node
+				.get<Contracts.Consensus.PrecommitProcessor>(Identifiers.Consensus.Processor.PreCommit)
+				.process(precommit);
+		}, 0);
+	}
+
+	async postPrevote(node: Contracts.Kernel.Application, prevote: Contracts.Crypto.Prevote): Promise<void> {
+		setTimeout(async () => {
+			await node
+				.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.PreVote)
+				.process(prevote);
+		}, 0);
+	}
+
+	async broadcastProposal(proposal: Contracts.Crypto.Proposal): Promise<void> {
+		for (const node of this.getAllNodes()) {
+			await this.postProposal(node, proposal);
+		}
+	}
+
+	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit): Promise<void> {
+		for (const node of this.getAllNodes()) {
+			await this.postPrecommit(node, precommit);
+		}
+	}
+
+	async broadcastPrevote(prevote: Contracts.Crypto.Prevote): Promise<void> {
+		for (const node of this.getAllNodes()) {
+			await this.postPrevote(node, prevote);
+		}
 	}
 }
 
@@ -35,47 +81,23 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 
 	async broadcastProposal(proposal: Contracts.Crypto.Proposal): Promise<void> {
 		for (const node of this.#getNodes()) {
-			await this.#postProposal(node, proposal);
+			await this.#p2p.postProposal(node, proposal);
 		}
 	}
 
 	async broadcastPrecommit(precommit: Contracts.Crypto.Precommit): Promise<void> {
 		for (const node of this.#getNodes()) {
-			await this.#postPrecommit(node, precommit);
+			await this.#p2p.postPrecommit(node, precommit);
 		}
 	}
 
 	async broadcastPrevote(prevote: Contracts.Crypto.Prevote): Promise<void> {
 		for (const node of this.#getNodes()) {
-			await this.#postPrevote(node, prevote);
+			await this.#p2p.postPrevote(node, prevote);
 		}
 	}
 
 	#getNodes(): Contracts.Kernel.Application[] {
 		return this.#p2p.getOtherNodes(this.#id);
-	}
-
-	async #postProposal(node: Contracts.Kernel.Application, proposal: Contracts.Crypto.Proposal): Promise<void> {
-		setTimeout(async () => {
-			await node
-				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-				.process(proposal);
-		}, 0);
-	}
-
-	async #postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Precommit): Promise<void> {
-		setTimeout(async () => {
-			await node
-				.get<Contracts.Consensus.PrecommitProcessor>(Identifiers.Consensus.Processor.PreCommit)
-				.process(precommit);
-		}, 0);
-	}
-
-	async #postPrevote(node: Contracts.Kernel.Application, prevote: Contracts.Crypto.Prevote): Promise<void> {
-		setTimeout(async () => {
-			await node
-				.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.PreVote)
-				.process(prevote);
-		}, 0);
 	}
 }
