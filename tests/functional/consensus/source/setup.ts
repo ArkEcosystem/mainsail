@@ -1,45 +1,77 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Bootstrap, Providers } from "@mainsail/kernel";
+import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { join } from "path";
 
+import { Validators } from "./contracts.js";
+import { MemoryDatabase } from "./database.js";
+import { TestLogger } from "./logger.js";
+import { P2PRegistry } from "./p2p.js";
 import { Worker } from "./worker.js";
 
-const setup = async () => {
+type PluginOptions = Record<string, any>;
+
+const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: Validators) => {
 	const sandbox = new Sandbox();
 
+	// Basic binds and mocks
 	sandbox.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 	sandbox.app.bind(Identifiers.Config.Flags).toConstantValue({});
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
-		.toConstantValue({ dispatch: () => {}, listen: () => {} });
+		.to(Services.Events.MemoryEventDispatcher)
+		.inSingletonScope();
 
-	// TODO:
-	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
-		broadcastPrecommit: async () => {},
-		broadcastPrevote: async () => {},
-		broadcastProposal: async () => {},
-		broadcastTransactions: async () => {},
+	p2pRegistry.registerNode(id, sandbox.app);
+	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
+
+	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+		clear: async () => {},
+		getPrecommits: async () => [],
+		getPrevotes: async () => [],
+		getProposals: async () => [],
+		getState: async () => {},
+		savePrecommits: async () => {},
+		savePrevotes: async () => {},
+		saveProposals: async () => {},
+		saveState: async () => {},
 	});
+
+	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
+
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
 		.toConstantValue({ getWorker: () => sandbox.app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
 
+	// Bootstrap
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue("/home/ubuntu/mainsail/tests/functional/consensus/paths/data");
-	sandbox.app.bind("path.config").toConstantValue("/home/ubuntu/mainsail/tests/functional/consensus/paths/config");
+	sandbox.app.bind("path.data").toConstantValue("");
+	sandbox.app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
 	sandbox.app.bind("path.temp").toConstantValue("");
 
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadEnvironmentVariables).bootstrap();
-	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
+	// Load configuration
+	const configRepository = sandbox.app.get<Services.Config.ConfigRepository>(Identifiers.Config.Repository);
+	configRepository.set("validators", validators);
+	configRepository.set("crypto", crypto);
+
+	// Set logger
+	const logManager: Services.Log.LogManager = sandbox.app.get<Services.Log.LogManager>(
+		Identifiers.Services.Log.Manager,
+	);
+	await logManager.extend("test", async () => sandbox.app.resolve<TestLogger>(TestLogger).make({ id }));
+	logManager.setDefaultDriver("test");
+
+	// Load packages
 	const packages = [
 		"@mainsail/validation",
 		"@mainsail/crypto-config",
@@ -64,7 +96,6 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
 		"@mainsail/state",
-		"@mainsail/database",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool",
 		"@mainsail/crypto-messages",
@@ -76,8 +107,14 @@ const setup = async () => {
 		"@mainsail/consensus",
 	];
 
+	const options = {
+		"@mainsail/transaction-pool": {
+			storage: ":memory:",
+		},
+	};
+
 	for (const packageId of packages) {
-		await loadPlugin(sandbox, packageId);
+		await loadPlugin(sandbox, packageId, options);
 	}
 
 	for (const packageId of packages) {
@@ -89,13 +126,13 @@ const setup = async () => {
 	return sandbox;
 };
 
-const loadPlugin = async (sandbox: Sandbox, packageId: string) => {
+const loadPlugin = async (sandbox: Sandbox, packageId: string, options: PluginOptions) => {
 	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
 		Identifiers.ServiceProvider.Repository,
 	);
 
 	const { ServiceProvider } = await import(packageId);
-	const pluginConfiguration = await getPluginConfiguration(sandbox, packageId);
+	const pluginConfiguration = await getPluginConfiguration(sandbox, packageId, options);
 
 	const manifest = sandbox.app.resolve(Providers.PluginManifest).discover(packageId, import.meta.url);
 
@@ -120,11 +157,15 @@ const bootPlugin = async (sandbox: Sandbox, packageId: string) => {
 const getPluginConfiguration = async (
 	sandbox: Sandbox,
 	packageId: string,
+	options: PluginOptions,
 ): Promise<Providers.PluginConfiguration | undefined> => {
 	try {
 		const { defaults } = await import(`${packageId}/distribution/defaults.js`);
 
-		return sandbox.app.resolve(Providers.PluginConfiguration).from(packageId, defaults);
+		return sandbox.app
+			.resolve(Providers.PluginConfiguration)
+			.from(packageId, defaults)
+			.merge(options[packageId] || {});
 	} catch {}
 	return undefined;
 };
@@ -159,9 +200,18 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 
-	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	// const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	// await consensus.run();
+};
 
+const run = async (sandbox: Sandbox) => {
+	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
 	await consensus.run();
 };
 
-export { setup };
+const stop = async (sandbox: Sandbox) => {
+	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	await consensus.dispose();
+};
+
+export { run, setup, stop };
