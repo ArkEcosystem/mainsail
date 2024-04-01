@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { TransactionBuilder } from "@mainsail/crypto-transaction";
+import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
 import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
 import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
@@ -12,12 +12,16 @@ import { Sandbox } from "@mainsail/test-framework";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
+
 export interface TransactionOptions {
 	sender: Contracts.Crypto.KeyPair;
 	fee?: number | string | BigNumber;
 	signature?: string;
 	nonceOffset?: number;
 	multiSigKeys?: Contracts.Crypto.KeyPair[];
+
+	callback?: (transaction: Contracts.Crypto.Transaction) => Promise<void>;
 }
 
 export interface TransferOptions extends TransactionOptions {
@@ -266,6 +270,10 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	keyPair: Contracts.Crypto.KeyPair,
 	options: TransactionOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+	(builder as any).factory = sandbox.app.resolve(TransactionFactory);
+
 	if (options.multiSigKeys) {
 		const participants = options.multiSigKeys;
 		const multiSigPublicKey = await sandbox.app
@@ -298,6 +306,36 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	if (options.signature) {
 		await applyCustomSignature(sandbox, transaction, options.signature);
 	}
+
+	if (options.callback) {
+		// manipulates the buffer, so signature has to be re-calculated
+		await options.callback(transaction);
+
+		const signatureFactory = sandbox.app.getTagged<Contracts.Crypto.Signature>(
+			Identifiers.Cryptography.Signature.Instance,
+			"type",
+			"wallet",
+		);
+
+		const hashFactory = sandbox.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
+		const transactionHex = transaction.serialized.toString("hex");
+
+		const signatureIndex = transactionHex.indexOf(transaction.data.signature!);
+		const dataPart = transactionHex.slice(0, signatureIndex);
+
+		const newSignature = await signatureFactory.sign(
+			await hashFactory.sha256(Buffer.from(dataPart, "hex")),
+			Buffer.from(options.sender.privateKey, "hex"),
+		);
+
+		transaction.serialized = Buffer.from(
+			transaction.serialized.toString("hex").replace(transaction.data.signature!, newSignature),
+			"hex",
+		);
+	}
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return transaction;
 };
