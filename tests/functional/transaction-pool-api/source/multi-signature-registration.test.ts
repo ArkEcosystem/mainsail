@@ -175,7 +175,6 @@ describe<{
 		});
 
 		const result = await addTransactionsToPool(sandbox, [registrationTxMin, registrationTxMax]);
-		console.log(result);
 		assert.equal(result.accept, []);
 		assert.equal(result.invalid, [0, 1]);
 		assert.equal(result.errors, {
