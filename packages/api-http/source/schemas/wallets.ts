@@ -23,7 +23,7 @@ export const walletCriteriaSchemaObject = {
 	),
 	attributes: Joi.object(),
 	balance: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
-	nonce: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
+	nonce: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(0)),
 	publicKey: Joi.alternatives(
 		walletPublicKeySchema,
 		Joi.string()
