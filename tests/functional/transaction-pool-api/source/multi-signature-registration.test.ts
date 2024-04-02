@@ -271,4 +271,31 @@ describe<{
 			},
 		});
 	});
+
+	it("should reject multi signature registration if missing participant signature", async ({ sandbox, wallets }) => {
+		const [sender] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+
+		const participant1 = (await getRandomColdWallet(sandbox)).keyPair;
+		const participant2 = (await getRandomColdWallet(sandbox)).keyPair;
+		const participant3 = (await getRandomColdWallet(sandbox)).keyPair;
+
+		const registrationTx = await makeMultiSignatureRegistration(sandbox, {
+			omitParticipantSignatures: [1], // omit participant with index 1
+			participants: [participant1, participant2, participant3],
+			sender: randomWallet,
+		});
+
+		const result = await addTransactionsToPool(sandbox, [registrationTx]);
+		assert.equal(result.accept, []);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors, {
+			0: {
+				message:
+					"Invalid transaction data: data/signatures must NOT have fewer than 3 items, data/signatures must NOT have fewer than 3 items, data/signatures must NOT have fewer than 3 items, data must match a schema in anyOf",
+				type: "ERR_BAD_DATA",
+			},
+		});
+	});
 });

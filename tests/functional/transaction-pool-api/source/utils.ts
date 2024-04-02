@@ -18,8 +18,10 @@ export interface TransactionOptions {
 	sender: Contracts.Crypto.KeyPair;
 	fee?: number | string | BigNumber;
 	signature?: string;
+	omitParticipantSignatures?: number[];
 	nonceOffset?: number;
 	multiSigKeys?: Contracts.Crypto.KeyPair[];
+	participantSignatures?: string[];
 
 	callback?: (transaction: Contracts.Crypto.Transaction) => Promise<void>;
 }
@@ -205,15 +207,19 @@ export const makeMultiSignatureRegistration = async (
 		builder = builder.participant(participant.publicKey);
 	}
 
+	const participantSignatures: string[] = [];
 	for (const [index, participant] of participants.entries()) {
 		builder = await builder.multiSignWithKeyPair(participant, index);
+
+		const participantSignature = builder.data.signatures![index];
+		participantSignatures.push(participantSignature);
 
 		if (participantSignatureOverwrite && participantSignatureOverwrite[index]) {
 			builder.data.signatures![index] = participantSignatureOverwrite[index];
 		}
 	}
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(sandbox, builder, sender, { ...options, participantSignatures });
 };
 
 export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
@@ -307,6 +313,10 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 		await applyCustomSignature(sandbox, transaction, options.signature);
 	}
 
+	if (options.omitParticipantSignatures) {
+		await applyCustomSignatures(sandbox, transaction, options);
+	}
+
 	if (options.callback) {
 		// manipulates the buffer, so signature has to be re-calculated
 		await options.callback(transaction);
@@ -393,6 +403,31 @@ export const applyCustomSignature = async (
 
 	transaction.serialized = serialized;
 	transaction.data.signature = signature;
+};
+
+export const applyCustomSignatures = async (
+	sandbox: Sandbox,
+	transaction: Contracts.Crypto.Transaction,
+	{ omitParticipantSignatures, participantSignatures }: TransactionOptions,
+) => {
+	if (!omitParticipantSignatures || !participantSignatures) {
+		return;
+	}
+
+	let transactionHex = transaction.serialized.toString("hex");
+
+	omitParticipantSignatures.sort((a, b) => b - a);
+
+	for (const index of omitParticipantSignatures) {
+		const signatureToOmit = participantSignatures[index];
+
+		const signatureIndex = transactionHex.indexOf(signatureToOmit);
+		transactionHex = transactionHex.slice(0, signatureIndex);
+
+		transaction.data.signatures!.splice(transaction.data.signatures!.indexOf(signatureToOmit), 1);
+	}
+
+	transaction.serialized = Buffer.from(transactionHex, "hex");
 };
 
 export const addTransactionsToPool = async (
