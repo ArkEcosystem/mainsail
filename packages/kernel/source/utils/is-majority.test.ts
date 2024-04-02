@@ -1,7 +1,16 @@
 import { describe } from "../../../test-framework/source";
+import { majorityMinority } from "../../test/fixtures/active-validators";
 import { isMajority } from "./is-majority";
 
 describe("isMajority", ({ assert, it }) => {
+	it("should be ok ", () => {
+		for (const { n, majority } of majorityMinority) {
+			assert.true(isMajority(majority, n));
+			assert.true(isMajority(majority + 1, n));
+			assert.false(isMajority(majority - 1, n));
+		}
+	});
+
 	it("should be ok for n = 3f + 1", () => {
 		for (let f = 1; f < 10; f++) {
 			const n = 3 * f + 1; // n = active validators
@@ -24,14 +33,6 @@ describe("isMajority", ({ assert, it }) => {
 			assert.true(isMajority(majority + 1, n));
 			assert.false(isMajority(majority - 1, n));
 		}
-	});
-
-	it("should be ok for 53 active validators", () => {
-		const n = 53;
-		const majority = 36;
-		assert.true(isMajority(majority, n));
-		assert.true(isMajority(majority + 1, n));
-		assert.false(isMajority(majority - 1, n));
 	});
 
 	it("should be ok for random numbers", () => {
