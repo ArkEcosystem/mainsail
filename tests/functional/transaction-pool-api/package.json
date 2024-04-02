@@ -7,10 +7,12 @@
 	"type": "module",
 	"scripts": {
 		"test": "pnpm run uvu source .test.ts",
+		"test:check": "tsc -p tsconfig.test.json --noEmit",
+		"test:full": "pnpm run test:check && pnpm run test",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
-		"uvu": "tsx --tsconfig ../../../tsconfig.test.json ./node_modules/uvu/bin.js"
+		"uvu": "tsx --tsconfig tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"devDependencies": {
 		"@mainsail/container": "workspace:*",
@@ -36,6 +38,7 @@
 		"@mainsail/processor": "workspace:*",
 		"@mainsail/validator": "workspace:*",
 		"@mainsail/proposer": "workspace:*",
+		"@mainsail/consensus-storage": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
