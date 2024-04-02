@@ -1,12 +1,14 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { Identifiers as ValidatorIdentifiers } from "@mainsail/validator";
 import { join } from "path";
 
 import { Validators } from "./contracts.js";
 import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
+import { Validator } from "./validator.js";
 import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
@@ -70,6 +72,9 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	);
 	await logManager.extend("test", async () => sandbox.app.resolve<TestLogger>(TestLogger).make({ id }));
 	logManager.setDefaultDriver("test");
+
+	// Set validator implementation
+	sandbox.app.bind(ValidatorIdentifiers.ValidatorConstructor).toConstructor(Validator);
 
 	// Load packages
 	const packages = [

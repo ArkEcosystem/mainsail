@@ -7,28 +7,28 @@ import dayjs from "dayjs";
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
+	protected readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.TransactionPool.Collator)
-	private readonly collator!: Contracts.TransactionPool.Collator;
+	protected readonly collator!: Contracts.TransactionPool.Collator;
 
 	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
+	protected readonly transactionPool!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+	protected readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
 	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
+	protected readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
-	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+	protected readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+	protected readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Message.Factory)
-	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
+	protected readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
@@ -46,8 +46,8 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	public async prepareBlock(generatorPublicKey: string, round: number): Promise<Contracts.Crypto.Block> {
-		const transactions = await this.#getTransactionsForForging();
-		return this.#makeBlock(round, generatorPublicKey, transactions);
+		const transactions = await this.getTransactionsForForging();
+		return this.makeBlock(round, generatorPublicKey, transactions);
 	}
 
 	public async propose(
@@ -105,7 +105,7 @@ export class Validator implements Contracts.Validator.Validator {
 		);
 	}
 
-	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
+	protected async getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
 		const transactions: Contracts.Crypto.Transaction[] = await this.collator.getBlockCandidateTransactions();
 
 		if (isEmpty(transactions)) {
@@ -121,7 +121,7 @@ export class Validator implements Contracts.Validator.Validator {
 		return transactions;
 	}
 
-	async #makeBlock(
+	protected async makeBlock(
 		round: number,
 		generatorPublicKey: string,
 		transactions: Contracts.Crypto.Transaction[],
