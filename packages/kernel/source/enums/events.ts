@@ -45,6 +45,10 @@ export enum PeerEvent {
 	Removed = "peer.removed",
 }
 
+export enum ConsensusEvent {
+	Bootstrapped = "consensus.bootstrapped",
+}
+
 export enum ApiNodeEvent {
 	Added = "apiNode.added",
 	Removed = "apiNode.removed",

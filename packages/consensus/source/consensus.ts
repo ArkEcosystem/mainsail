@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { Utils, Enums } from "@mainsail/kernel";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.ConsensusService {
@@ -42,6 +42,9 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -522,5 +525,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 
 		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}/${store.getTotalRound()}`);
+
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.Bootstrapped);
 	}
 }
