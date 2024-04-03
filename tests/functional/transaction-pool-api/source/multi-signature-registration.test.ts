@@ -114,7 +114,7 @@ describe<{
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
 		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
 
-		const minParticipants = 1;
+		const minParticipants = 2;
 		const maxParticipants = 16;
 
 		const allParticipants: Contracts.Crypto.KeyPair[] = [];
@@ -151,6 +151,7 @@ describe<{
 
 		const randomWallet = await getRandomFundedWallet(sandbox, sender);
 		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
+		const randomWallet3 = await getRandomFundedWallet(sandbox, sender);
 
 		const minParticipants = 1; // set to 0 in callback below
 		const maxParticipants = 16 + 1;
@@ -161,7 +162,7 @@ describe<{
 		}
 
 		const minimumParticipants = allParticipants.slice(0, minParticipants);
-		const registrationTxMin = await makeMultiSignatureRegistration(sandbox, {
+		const registrationTx1 = await makeMultiSignatureRegistration(sandbox, {
 			callback: async (transaction) => {
 				// set min participants to 0
 				transaction.serialized.fill(0, 58, 59);
@@ -169,14 +170,18 @@ describe<{
 			participants: minimumParticipants,
 			sender: randomWallet,
 		});
-		const registrationTxMax = await makeMultiSignatureRegistration(sandbox, {
-			participants: allParticipants,
+		const registrationTx2 = await makeMultiSignatureRegistration(sandbox, {
+			participants: [allParticipants[0]],
 			sender: randomWallet2,
 		});
+		const registrationTx3 = await makeMultiSignatureRegistration(sandbox, {
+			participants: allParticipants,
+			sender: randomWallet3,
+		});
 
-		const result = await addTransactionsToPool(sandbox, [registrationTxMin, registrationTxMax]);
+		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2, registrationTx3]);
 		assert.equal(result.accept, []);
-		assert.equal(result.invalid, [0, 1]);
+		assert.equal(result.invalid, [0, 1, 2]);
 		assert.equal(result.errors, {
 			0: {
 				message:
@@ -184,6 +189,11 @@ describe<{
 				type: "ERR_BAD_DATA",
 			},
 			1: {
+				message:
+					"Invalid transaction data: data/asset/multiSignature/publicKeys must NOT have fewer than 2 items, data/asset/multiSignature/publicKeys must NOT have fewer than 2 items, data/asset/multiSignature/publicKeys must NOT have fewer than 2 items, data must match a schema in anyOf",
+				type: "ERR_BAD_DATA",
+			},
+			2: {
 				message:
 					"Invalid transaction data: data/asset/multiSignature/publicKeys must NOT have more than 16 items, data/asset/multiSignature/publicKeys must NOT have more than 16 items, data/asset/multiSignature/publicKeys must NOT have more than 16 items, data must match a schema in anyOf",
 				type: "ERR_BAD_DATA",
@@ -258,6 +268,33 @@ describe<{
 			1: {
 				message: `tx ${registrationTx2.id} cannot be applied: MultiSignatureRegistration for address ${multiSigAddress} already in the pool`,
 				type: "ERR_APPLY",
+			},
+		});
+	});
+
+	it("should reject multi signature registration if missing participant signature", async ({ sandbox, wallets }) => {
+		const [sender] = wallets;
+
+		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+
+		const participant1 = (await getRandomColdWallet(sandbox)).keyPair;
+		const participant2 = (await getRandomColdWallet(sandbox)).keyPair;
+		const participant3 = (await getRandomColdWallet(sandbox)).keyPair;
+
+		const registrationTx = await makeMultiSignatureRegistration(sandbox, {
+			omitParticipantSignatures: [1], // omit participant with index 1
+			participants: [participant1, participant2, participant3],
+			sender: randomWallet,
+		});
+
+		const result = await addTransactionsToPool(sandbox, [registrationTx]);
+		assert.equal(result.accept, []);
+		assert.equal(result.invalid, [0]);
+		assert.equal(result.errors, {
+			0: {
+				message:
+					"Invalid transaction data: data/signatures must NOT have fewer than 3 items, data/signatures must NOT have fewer than 3 items, data/signatures must NOT have fewer than 3 items, data must match a schema in anyOf",
+				type: "ERR_BAD_DATA",
 			},
 		});
 	});

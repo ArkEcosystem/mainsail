@@ -12,9 +12,6 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class NodeController extends Controller {
-	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
-	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
-
 	@inject(ApiDatabaseIdentifiers.PluginRepositoryFactory)
 	private readonly pluginRepositoryFactory!: ApiDatabaseContracts.PluginRepositoryFactory;
 
@@ -155,13 +152,6 @@ export class NodeController extends Controller {
 		}
 
 		return result;
-	}
-
-	private async getConfiguration(): Promise<Models.Configuration> {
-		const configurationRepository = this.configurationRepositoryFactory();
-		const configuration = await configurationRepository.createQueryBuilder().getOne();
-
-		return configuration ?? ({} as Models.Configuration);
 	}
 
 	private async getPlugins(): Promise<Record<string, Models.Plugin>> {

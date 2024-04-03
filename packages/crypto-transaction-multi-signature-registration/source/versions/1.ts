@@ -37,7 +37,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 								publicKeys: {
 									items: { $ref: "publicKey" },
 									maxItems: 16,
-									minItems: 1,
+									minItems: 2,
 									type: "array",
 									uniqueItems: true,
 								},
