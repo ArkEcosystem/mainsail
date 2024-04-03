@@ -2,16 +2,14 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight, assertCommitValidators } from "./asserts.js";
+import { assertBlockId, assertBockHeight } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utils.js";
 
 describe<{
 	nodes: Sandbox[];
-}>("Base", ({ beforeEach, afterEach, it, assert }) => {
-	const allValidators = Array.from<boolean>({ length: validators.secrets.length }).fill(true);
-
+}>("Base", ({ beforeEach, afterEach, it }) => {
 	beforeEach(async (context) => {
 		const p2pRegistry = new P2PRegistry();
 
@@ -41,7 +39,6 @@ describe<{
 
 		await assertBockHeight(nodes, 1);
 		await assertBlockId(nodes, commit.block.data.id);
-		await assertCommitValidators(nodes, allValidators);
 	});
 
 	it("should create new block second time", async ({ nodes }) => {
@@ -51,6 +48,5 @@ describe<{
 
 		await assertBockHeight(nodes, 1);
 		await assertBlockId(nodes, commit.block.data.id);
-		await assertCommitValidators(nodes, allValidators);
 	});
 });

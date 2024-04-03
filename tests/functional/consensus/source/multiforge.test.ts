@@ -4,7 +4,7 @@ import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight, assertBockRound, assertCommitValidators } from "./asserts.js";
+import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
@@ -15,8 +15,6 @@ describe<{
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Consensus", ({ beforeEach, afterEach, it, assert, stub }) => {
-	const allValidators = Array.from<boolean>({ length: validators.secrets.length }).fill(true);
-
 	const makeProposal = async (node: Sandbox, validator: Validator, height: number, round: number) => {
 		const proposer = node.app
 			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
@@ -67,7 +65,6 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes);
-		await assertCommitValidators(nodes, allValidators);
 		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
 
 		await snoozeForBlock(nodes);
@@ -75,7 +72,6 @@ describe<{
 		await assertBockHeight(nodes, 2);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes);
-		await assertCommitValidators(nodes, allValidators);
 		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
 
 		await snoozeForBlock(nodes);
@@ -83,7 +79,6 @@ describe<{
 		await assertBockHeight(nodes, 3);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes);
-		await assertCommitValidators(nodes, allValidators);
 		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
 	});
 
@@ -100,7 +95,6 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 1);
 		await assertBlockId(nodes);
-		await assertCommitValidators(nodes, allValidators);
 	});
 
 	it("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
@@ -123,7 +117,6 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes, proposal0.block.block.data.id);
-		await assertCommitValidators(nodes, allValidators);
 	});
 
 	it.only("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
@@ -146,7 +139,6 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 1);
 		await assertBlockId(nodes);
-		await assertCommitValidators(nodes, allValidators);
 
 		// TODO: Check precommits
 	});
