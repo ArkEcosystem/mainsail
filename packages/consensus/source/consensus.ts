@@ -194,6 +194,8 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer}`);
 
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.NewRound, this.getState());
+
 		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
 		await this.#propose(roundState);
@@ -526,6 +528,6 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}/${store.getTotalRound()}`);
 
-		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.Bootstrapped);
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.Bootstrapped, this.getState());
 	}
 }

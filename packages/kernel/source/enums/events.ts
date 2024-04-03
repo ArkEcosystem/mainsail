@@ -47,6 +47,7 @@ export enum PeerEvent {
 
 export enum ConsensusEvent {
 	Bootstrapped = "consensus.bootstrapped",
+	NewRound = "consensus.newRound",
 }
 
 export enum ApiNodeEvent {
