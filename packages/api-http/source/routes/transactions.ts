@@ -95,4 +95,17 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		method: "GET",
 		path: "/transactions/schemas",
 	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.fees(request),
+		method: "GET",
+		options: {
+			validate: {
+				query: Joi.object({
+					days: Joi.number().integer().min(1).max(30),
+				}),
+			},
+		},
+		path: "/transactions/fees",
+	});
 };
