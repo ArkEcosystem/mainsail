@@ -95,4 +95,10 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		method: "GET",
 		path: "/transactions/schemas",
 	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.fees(request),
+		method: "GET",
+		path: "/transactions/fees",
+	});
 };
