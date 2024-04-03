@@ -178,11 +178,22 @@ export const makeMultiPayment = async (
 
 	fee = fee ?? "10000000";
 
+	// Temporary raise limit to exceed the number of normally allowed payments
+	const originalMultiPaymentLimit = app
+		.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+		.getMilestone().multiPaymentLimit;
+
+	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getMilestone().multiPaymentLimit =
+		999;
+
 	let builder = app.resolve(MultiPaymentBuilder).fee(BigNumber.make(fee).toFixed());
 
 	for (const payment of payments) {
 		builder = builder.addPayment(payment.recipientId, payment.amount.toString());
 	}
+
+	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getMilestone().multiPaymentLimit =
+		originalMultiPaymentLimit;
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
