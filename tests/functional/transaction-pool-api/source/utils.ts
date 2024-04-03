@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { TransactionBuilder } from "@mainsail/crypto-transaction";
+import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
 import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
 import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
@@ -12,12 +12,18 @@ import { Sandbox } from "@mainsail/test-framework";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
+
 export interface TransactionOptions {
 	sender: Contracts.Crypto.KeyPair;
 	fee?: number | string | BigNumber;
 	signature?: string;
+	omitParticipantSignatures?: number[];
 	nonceOffset?: number;
 	multiSigKeys?: Contracts.Crypto.KeyPair[];
+	participantSignatures?: string[];
+
+	callback?: (transaction: Contracts.Crypto.Transaction) => Promise<void>;
 }
 
 export interface TransferOptions extends TransactionOptions {
@@ -201,15 +207,19 @@ export const makeMultiSignatureRegistration = async (
 		builder = builder.participant(participant.publicKey);
 	}
 
+	const participantSignatures: string[] = [];
 	for (const [index, participant] of participants.entries()) {
 		builder = await builder.multiSignWithKeyPair(participant, index);
+
+		const participantSignature = builder.data.signatures![index];
+		participantSignatures.push(participantSignature);
 
 		if (participantSignatureOverwrite && participantSignatureOverwrite[index]) {
 			builder.data.signatures![index] = participantSignatureOverwrite[index];
 		}
 	}
 
-	return buildSignedTransaction(sandbox, builder, sender, options);
+	return buildSignedTransaction(sandbox, builder, sender, { ...options, participantSignatures });
 };
 
 export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
@@ -266,6 +276,10 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	keyPair: Contracts.Crypto.KeyPair,
 	options: TransactionOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+	(builder as any).factory = sandbox.app.resolve(TransactionFactory);
+
 	if (options.multiSigKeys) {
 		const participants = options.multiSigKeys;
 		const multiSigPublicKey = await sandbox.app
@@ -298,6 +312,40 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	if (options.signature) {
 		await applyCustomSignature(sandbox, transaction, options.signature);
 	}
+
+	if (options.omitParticipantSignatures) {
+		await applyCustomSignatures(sandbox, transaction, options);
+	}
+
+	if (options.callback) {
+		// manipulates the buffer, so signature has to be re-calculated
+		await options.callback(transaction);
+
+		const signatureFactory = sandbox.app.getTagged<Contracts.Crypto.Signature>(
+			Identifiers.Cryptography.Signature.Instance,
+			"type",
+			"wallet",
+		);
+
+		const hashFactory = sandbox.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
+		const transactionHex = transaction.serialized.toString("hex");
+
+		const signatureIndex = transactionHex.indexOf(transaction.data.signature!);
+		const dataPart = transactionHex.slice(0, signatureIndex);
+
+		const newSignature = await signatureFactory.sign(
+			await hashFactory.sha256(Buffer.from(dataPart, "hex")),
+			Buffer.from(options.sender.privateKey, "hex"),
+		);
+
+		transaction.serialized = Buffer.from(
+			transaction.serialized.toString("hex").replace(transaction.data.signature!, newSignature),
+			"hex",
+		);
+	}
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return transaction;
 };
@@ -355,6 +403,31 @@ export const applyCustomSignature = async (
 
 	transaction.serialized = serialized;
 	transaction.data.signature = signature;
+};
+
+export const applyCustomSignatures = async (
+	sandbox: Sandbox,
+	transaction: Contracts.Crypto.Transaction,
+	{ omitParticipantSignatures, participantSignatures }: TransactionOptions,
+) => {
+	if (!omitParticipantSignatures || !participantSignatures) {
+		return;
+	}
+
+	let transactionHex = transaction.serialized.toString("hex");
+
+	omitParticipantSignatures.sort((a, b) => b - a);
+
+	for (const index of omitParticipantSignatures) {
+		const signatureToOmit = participantSignatures[index];
+
+		const signatureIndex = transactionHex.indexOf(signatureToOmit);
+		transactionHex = transactionHex.slice(0, signatureIndex);
+
+		transaction.data.signatures!.splice(transaction.data.signatures!.indexOf(signatureToOmit), 1);
+	}
+
+	transaction.serialized = Buffer.from(transactionHex, "hex");
 };
 
 export const addTransactionsToPool = async (

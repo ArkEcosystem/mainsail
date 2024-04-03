@@ -3,8 +3,8 @@ import { Bootstrap, Providers } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
 
-import { Worker } from "./worker.js";
 import { MemoryDatabase } from "./database.js";
+import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
