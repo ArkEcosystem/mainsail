@@ -108,16 +108,11 @@ export class TransactionsController extends Controller {
 	}
 
 	public async schemas(request: Hapi.Request) {
-		const rows = await this.transactionTypeRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.addOrderBy("type", "ASC")
-			.addOrderBy("type_group", "ASC")
-			.getMany();
+		const transactionTypes = await this.getTransactionTypes();
 
 		const schemasByType: Record<string, Record<string, any>> = {};
 
-		for (const { type, typeGroup, schema } of rows) {
+		for (const { type, typeGroup, schema } of transactionTypes) {
 			if (schemasByType[typeGroup] === undefined) {
 				schemasByType[typeGroup] = {};
 			}
@@ -126,6 +121,36 @@ export class TransactionsController extends Controller {
 		}
 
 		return { data: schemasByType };
+	}
+
+	public async fees(request: Hapi.Request) {
+		const configuration = await this.getConfiguration();
+		const {
+			fees: { staticFees },
+		} = configuration.activeMilestones;
+
+		const transactionTypes = await this.getTransactionTypes();
+
+		const typeGroups: Record<string | number, Record<string, number>> = {};
+
+		for (const { typeGroup, key } of transactionTypes) {
+			if (typeGroups[typeGroup] === undefined) {
+				typeGroups[typeGroup] = {};
+			}
+
+			typeGroups[typeGroup][key] = staticFees[key].toFixed() ?? "0";
+		}
+
+		return { data: typeGroups };
+	}
+
+	private async getTransactionTypes(): Promise<Models.TransactionType[]> {
+		return this.transactionTypeRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.addOrderBy("type", "ASC")
+			.addOrderBy("type_group", "ASC")
+			.getMany();
 	}
 
 	private async respondEnrichedTransaction(

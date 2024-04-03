@@ -20,6 +20,9 @@ export class Controller extends AbstractController {
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	protected readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
+	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	protected readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
@@ -35,6 +38,13 @@ export class Controller extends AbstractController {
 		const stateRepository = this.stateRepositoryFactory();
 		const state = await stateRepository.createQueryBuilder().getOne();
 		return state ?? ({ height: "0", supply: "0" } as Models.State);
+	}
+
+	protected async getConfiguration(): Promise<Models.Configuration> {
+		const configurationRepository = this.configurationRepositoryFactory();
+		const configuration = await configurationRepository.createQueryBuilder().getOne();
+
+		return configuration ?? ({} as Models.Configuration);
 	}
 
 	protected async enrichBlockResult(
