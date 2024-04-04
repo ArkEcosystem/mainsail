@@ -1,17 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { ValidatorRegistrations, ValidatorResignations } from "@mainsail/test-transaction-builders";
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import {
-	addTransactionsToPool,
-	getRandomFundedWallet,
-	getWallets,
-	hasResigned,
-	makeValidatorRegistration,
-	makeValidatorResignation,
-	waitBlock,
-} from "./utils.js";
+import { addTransactionsToPool, getRandomFundedWallet, getWallets, hasResigned, waitBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -30,46 +23,37 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	it("should accept validator resignation", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept validator resignation", async (context) => {
+		const [registrationTx, resignationTx] = await ValidatorResignations.makeValidValidatorResignation(context);
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
+		assert.false(await hasResigned(context, registrationTx.data.senderPublicKey));
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
 
-		const registrationTx = await makeValidatorRegistration(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.false(await hasResigned(sandbox, randomWallet.publicKey));
-
-		const resignationTx = await makeValidatorResignation(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [resignationTx]);
-		await waitBlock(sandbox);
-
-		assert.true(await hasResigned(sandbox, randomWallet.publicKey));
+		assert.true(await hasResigned(context, registrationTx.data.senderPublicKey));
 	});
 
-	it("should reject resignation if not enough validators", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject resignation if not enough validators", async (context) => {
+		const [validator1] = context.wallets;
 
-		const tx = await makeValidatorResignation(sandbox, { sender });
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const resignationTx = await ValidatorResignations.makeValidatorResignation(context, { sender: validator1 });
+		const result = await addTransactionsToPool(context, [resignationTx]);
 
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
-				message: `tx ${tx.id} cannot be applied: Failed to apply transaction, because not enough validators to allow resignation.`,
+				message: `tx ${resignationTx.id} cannot be applied: Failed to apply transaction, because not enough validators to allow resignation.`,
 				type: "ERR_APPLY",
 			},
 		});
 	});
 
-	it("should reject validator resignation if not registered", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject validator resignation if not registered", async (context) => {
+		const tx = await ValidatorResignations.makeInvalidValidatorResignationForNonValidator(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const tx = await makeValidatorResignation(sandbox, { sender: randomWallet });
-
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -79,23 +63,18 @@ describe<{
 		});
 	});
 
-	it("should reject double resignation", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject double resignation", async (context) => {
+		const [registrationTx, resignationTx, resignationTx2] =
+			await ValidatorResignations.makeInvalidDoubleValidatorResignation(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
+		assert.false(await hasResigned(context, registrationTx.data.senderPublicKey));
 
-		const registrationTx = await makeValidatorRegistration(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.false(await hasResigned(sandbox, randomWallet.publicKey));
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
 
-		const resignationTx = await makeValidatorResignation(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [resignationTx]);
-		await waitBlock(sandbox);
-
-		const resignationTx2 = await makeValidatorResignation(sandbox, { sender: randomWallet });
-
-		const result = await addTransactionsToPool(sandbox, [resignationTx2]);
+		const result = await addTransactionsToPool(context, [resignationTx2]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -105,23 +84,18 @@ describe<{
 		});
 	});
 
-	it("should reject registration after resignation", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject registration after resignation", async (context) => {
+		const [registrationTx1, resignationTx, registrationTx2] =
+			await ValidatorResignations.makeInvalidValidatorRegistrationAfterResignation(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx1]);
+		await waitBlock(context);
+		assert.false(await hasResigned(context, registrationTx1.data.senderPublicKey));
 
-		const registrationTx = await makeValidatorRegistration(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.false(await hasResigned(sandbox, randomWallet.publicKey));
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
 
-		const resignationTx = await makeValidatorResignation(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [resignationTx]);
-		await waitBlock(sandbox);
-
-		const registrationTx2 = await makeValidatorRegistration(sandbox, { sender: randomWallet });
-
-		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
+		const result = await addTransactionsToPool(context, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -131,33 +105,31 @@ describe<{
 		});
 	});
 
-	it("should only accept one validator resignation per sender in pool at the same time", async ({
-		sandbox,
-		wallets,
-	}) => {
+	it("should only accept one validator resignation per sender in pool at the same time", async (context) => {
+		const { wallets } = context;
 		const [validator1] = wallets;
 
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+		const randomWallet = await getRandomFundedWallet(context, validator1);
 
-		const registrationTx = await makeValidatorRegistration(sandbox, {
+		const registrationTx = await ValidatorRegistrations.makeValidatorRegistration(context, {
 			nonceOffset: 0,
 			sender: randomWallet,
 		});
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
 
 		// Submit 2 resignations, but only one will be accepted
-		const resignationTx1 = await makeValidatorResignation(sandbox, {
+		const resignationTx1 = await ValidatorResignations.makeValidatorResignation(context, {
 			nonceOffset: 0,
 			sender: randomWallet,
 		});
 
-		const resignationTx2 = await makeValidatorResignation(sandbox, {
+		const resignationTx2 = await ValidatorResignations.makeValidatorResignation(context, {
 			nonceOffset: 1,
 			sender: randomWallet,
 		});
-		const result = await addTransactionsToPool(sandbox, [resignationTx1, resignationTx2]);
-		await waitBlock(sandbox);
+		const result = await addTransactionsToPool(context, [resignationTx1, resignationTx2]);
+		await waitBlock(context);
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);

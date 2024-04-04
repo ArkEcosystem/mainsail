@@ -1,5 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { ValidatorRegistrations } from "@mainsail/test-transaction-builders";
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
@@ -9,7 +10,6 @@ import {
 	getRandomFundedWallet,
 	getWallets,
 	isValidator,
-	makeValidatorRegistration,
 	waitBlock,
 } from "./utils.js";
 
@@ -30,29 +30,23 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	it("should accept validator registration", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept validator registration", async (context) => {
+		const registrationTx = await ValidatorRegistrations.makeValidatorRegistration(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const registrationTx = await makeValidatorRegistration(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await isValidator(sandbox, randomWallet.publicKey));
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
+		assert.true(await isValidator(context, registrationTx.data.senderPublicKey));
 	});
 
-	it("should reject registration if already a validator", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject registration if already a validator", async (context) => {
+		const [registrationTx1, registrationTx2] =
+			await ValidatorRegistrations.makeInvalidValidatorRegistrationIfAlreadyValidator(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx1]);
+		await waitBlock(context);
+		assert.true(await isValidator(context, registrationTx1.data.senderPublicKey));
 
-		const registrationTx = await makeValidatorRegistration(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await isValidator(sandbox, randomWallet.publicKey));
-
-		const registrationTx2 = await makeValidatorRegistration(sandbox, { sender: randomWallet });
-		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
+		const result = await addTransactionsToPool(context, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -62,56 +56,46 @@ describe<{
 		});
 	});
 
-	it("should reject registration if consensus public key already used", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject registration if consensus public key already used", async (context) => {
+		const validatorPublicKey = (await getRandomConsensusKeyPair(context)).publicKey;
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
+		const [registrationTx1, registrationTx2] =
+			await ValidatorRegistrations.makeInvalidValidatorRegistrationWithExistingPublicKeyAsset(context, {
+				validatorPublicKey,
+			});
 
-		const consensusPublicKey = await getRandomConsensusKeyPair(sandbox);
-		const registrationTx = await makeValidatorRegistration(sandbox, {
-			sender: randomWallet,
-			validatorPublicKey: consensusPublicKey.publicKey,
-		});
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await isValidator(sandbox, randomWallet.publicKey));
+		await addTransactionsToPool(context, [registrationTx1]);
+		await waitBlock(context);
+		assert.true(await isValidator(context, registrationTx1.data.senderPublicKey));
 
-		// Can't reuse key with randomWallet2
-		const registrationTx2 = await makeValidatorRegistration(sandbox, {
-			sender: randomWallet2,
-			validatorPublicKey: consensusPublicKey.publicKey,
-		});
-		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
+		const result = await addTransactionsToPool(context, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
-				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the validator public key '${consensusPublicKey.publicKey}' is already registered.`,
+				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the validator public key '${validatorPublicKey}' is already registered.`,
 				type: "ERR_APPLY",
 			},
 		});
 	});
 
-	it("should only accept one validator registration per sender in pool at the same time", async ({
-		sandbox,
-		wallets,
-	}) => {
+	it("should only accept one validator registration per sender in pool at the same time", async (context) => {
+		const { wallets } = context;
 		const [validator1] = wallets;
 
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+		const randomWallet = await getRandomFundedWallet(context, validator1);
 
 		// Submit 2 registrations, but only one will be accepted
-		const registrationTx1 = await makeValidatorRegistration(sandbox, {
+		const registrationTx1 = await ValidatorRegistrations.makeValidatorRegistration(context, {
 			nonceOffset: 0,
 			sender: randomWallet,
 		});
 
-		const registrationTx2 = await makeValidatorRegistration(sandbox, {
+		const registrationTx2 = await ValidatorRegistrations.makeValidatorRegistration(context, {
 			nonceOffset: 1,
 			sender: randomWallet,
 		});
-		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
-		await waitBlock(sandbox);
+		const result = await addTransactionsToPool(context, [registrationTx1, registrationTx2]);
+		await waitBlock(context);
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);
@@ -123,34 +107,23 @@ describe<{
 		});
 	});
 
-	it("should reject duplicate validator BLS key", async ({ sandbox, wallets }) => {
-		const [validator1] = wallets;
+	it("should reject duplicate validator BLS key in pool", async (context) => {
+		const validatorPublicKey = (await getRandomConsensusKeyPair(context)).publicKey;
 
-		const randomWallet1 = await getRandomFundedWallet(sandbox, validator1);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, validator1);
-
-		const validatorKey = (await getRandomConsensusKeyPair(sandbox)).publicKey;
+		const [registrationTx1, registrationTx2] =
+			await ValidatorRegistrations.makeInvalidValidatorRegistrationWithExistingPublicKeyAsset(context, {
+				validatorPublicKey,
+			});
 
 		// Submit 2 registration from different wallets using same BLS key
-		const registrationTx1 = await makeValidatorRegistration(sandbox, {
-			nonceOffset: 0,
-			sender: randomWallet1,
-			validatorPublicKey: validatorKey,
-		});
-
-		const registrationTx2 = await makeValidatorRegistration(sandbox, {
-			nonceOffset: 1,
-			sender: randomWallet2,
-			validatorPublicKey: validatorKey,
-		});
-		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
-		await waitBlock(sandbox);
+		const result = await addTransactionsToPool(context, [registrationTx1, registrationTx2]);
+		await waitBlock(context);
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);
 		assert.equal(result.errors, {
 			1: {
-				message: `tx ${registrationTx2.id} cannot be applied: Validator registration for public key "${validatorKey}" already in the pool`,
+				message: `tx ${registrationTx2.id} cannot be applied: Validator registration for public key "${validatorPublicKey}" already in the pool`,
 				type: "ERR_APPLY",
 			},
 		});

@@ -1,17 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { UsernameResignations } from "@mainsail/test-transaction-builders";
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import {
-	addTransactionsToPool,
-	getRandomFundedWallet,
-	getWallets,
-	hasUsername,
-	makeUsernameRegistration,
-	makeUsernameResignation,
-	waitBlock,
-} from "./utils.js";
+import { addTransactionsToPool, getWallets, hasUsername, waitBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -30,29 +23,21 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	it("should accept username resignation", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept username resignation", async (context) => {
+		const [registrationTx, resignationTx] = await UsernameResignations.makeValidUsernameResignation(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
+		assert.true(await hasUsername(context, registrationTx.data.senderPublicKey));
 
-		const registrationTx = await makeUsernameRegistration(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasUsername(sandbox, randomWallet.publicKey));
-
-		const resignationTx = await makeUsernameResignation(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [resignationTx]);
-		await waitBlock(sandbox);
-		assert.false(await hasUsername(sandbox, randomWallet.publicKey));
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
+		assert.false(await hasUsername(context, registrationTx.data.senderPublicKey));
 	});
 
-	it("should reject username resignation without a username", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const resignationTx = await makeUsernameResignation(sandbox, { sender: randomWallet });
-		const result = await addTransactionsToPool(sandbox, [resignationTx]);
+	it("should reject username resignation without a username", async (context) => {
+		const resignationTx = await UsernameResignations.makeInvalidUsernameResignationWithoutUsername(context);
+		const result = await addTransactionsToPool(context, [resignationTx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -62,36 +47,21 @@ describe<{
 		});
 	});
 
-	it("should only accept one username resignation per sender in pool at the same time", async ({
-		sandbox,
-		wallets,
-	}) => {
-		const [validator1] = wallets;
+	it("should only accept one username resignation per sender in pool at the same time", async (context) => {
+		const [registrationTx, resignationTx1, resignationTx2] =
+			await UsernameResignations.makeDuplicateUsernameResignation(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
-		const registrationTx = await makeUsernameRegistration(sandbox, {
-			sender: randomWallet,
-		});
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
 
 		// Submit 2 resignations, but only one will be accepted
-		const resignationTx1 = await makeUsernameResignation(sandbox, {
-			nonceOffset: 0,
-			sender: randomWallet,
-		});
-
-		const resignationTx2 = await makeUsernameResignation(sandbox, {
-			nonceOffset: 1,
-			sender: randomWallet,
-		});
-		const result = await addTransactionsToPool(sandbox, [resignationTx1, resignationTx2]);
+		const result = await addTransactionsToPool(context, [resignationTx1, resignationTx2]);
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);
 		assert.equal(result.errors, {
 			1: {
-				message: `tx ${resignationTx2.id} cannot be applied: Sender ${randomWallet.publicKey} already has a transaction of type '9' in the pool`,
+				message: `tx ${resignationTx2.id} cannot be applied: Sender ${registrationTx.data.senderPublicKey} already has a transaction of type '9' in the pool`,
 				type: "ERR_APPLY",
 			},
 		});
