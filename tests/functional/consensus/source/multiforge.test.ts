@@ -85,7 +85,7 @@ describe<{
 		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
 	});
 
-	it("#missing propose - should increase round and forge on same height", async ({ nodes }) => {
+	it("#missing propose - should not accept block", async ({ nodes }) => {
 		const node0 = nodes[0];
 		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
 
@@ -120,6 +120,45 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, rounds + 1); // +1 for accepted block
 		await assertBlockId(nodes);
+
+		// Next block
+		await snoozeForBlock(nodes, 2);
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+	});
+
+	it("#invalid proposer - should not accept block", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+
+		stubPropose.callsFake(async () => {
+			stubPropose.restore();
+		});
+
+		const proposal0 = await makeProposal(nodes[1], validators[1], 1, 0);
+		await p2p.broadcastProposal(proposal0);
+
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 1);
+		await assertBlockId(nodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+
+		// Assert all nodes prevote
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			Array.from({ length: totalNodes }).fill(undefined),
+		);
+
+		// Assert all nodes precommit (null)
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
+			Array.from({ length: totalNodes }).fill(undefined),
+		);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
