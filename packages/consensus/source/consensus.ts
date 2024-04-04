@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.ConsensusService {
@@ -42,6 +42,9 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -191,6 +194,8 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer}`);
 
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.RoundStarted, this.getState());
+
 		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
 		await this.#propose(roundState);
@@ -212,6 +217,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 		const { block } = proposal.block;
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.ProposalAccepted, this.getState());
 
 		await this.#prevote(roundState.getProcessorResult() ? block.data.id : undefined);
 	}
@@ -230,10 +236,10 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 
 		const { block } = proposal.block;
+		this.#step = Contracts.Consensus.Step.Prevote;
 
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
-
-		this.#step = Contracts.Consensus.Step.Prevote;
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.ProposalAccepted, this.getState());
 
 		const lockedRound = this.getLockedRound();
 
@@ -268,9 +274,12 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 			this.#validValue = roundState;
 			this.#step = Contracts.Consensus.Step.Precommit;
 
+			await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedProposal, this.getState());
 			await this.#precommit(block.data.id);
 		} else {
 			this.#validValue = roundState;
+
+			await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedProposal, this.getState());
 		}
 	}
 
@@ -280,6 +289,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 
 		this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedAny, this.getState());
 	}
 
 	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -291,6 +301,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 		this.#step = Contracts.Consensus.Step.Precommit;
 
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedNull, this.getState());
 		await this.#precommit();
 	}
 
@@ -300,6 +311,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 
 		this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrecommitedAny, this.getState());
 	}
 
 	protected async onMajorityPrecommit(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -319,6 +331,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 
 		this.logger.info(`Received +2/3 precommits for ${this.#height}/${roundState.round} blockId: ${block.data.id}`);
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrecommitedProposal, this.getState());
 
 		await this.commitLock.runExclusive(async () => {
 			try {
@@ -522,5 +535,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 
 		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}/${store.getTotalRound()}`);
+
+		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.Bootstrapped, this.getState());
 	}
 }

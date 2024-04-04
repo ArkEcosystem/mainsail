@@ -45,6 +45,17 @@ export enum PeerEvent {
 	Removed = "peer.removed",
 }
 
+export enum ConsensusEvent {
+	Bootstrapped = "consensus.bootstrapped",
+	RoundStarted = "consensus.round.started",
+	ProposalAccepted = "consensus.proposal.accepted",
+	PrevotedProposal = "consensus.prevoted.proposal",
+	PrevotedAny = "consensus.prevoted.any",
+	PrevotedNull = "consensus.prevoted.null",
+	PrecommitedAny = "consensus.precommited.any",
+	PrecommitedProposal = "consensus.precommited.proposal",
+}
+
 export enum ApiNodeEvent {
 	Added = "apiNode.added",
 	Removed = "apiNode.removed",
