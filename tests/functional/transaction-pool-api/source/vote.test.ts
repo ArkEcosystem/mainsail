@@ -1,5 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { Votes } from "@mainsail/test-transaction-builders";
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
@@ -9,9 +10,6 @@ import {
 	getWallets,
 	hasUnvoted,
 	hasVotedFor,
-	makeValidatorRegistration,
-	makeValidatorResignation,
-	makeVote,
 	waitBlock,
 } from "./utils.js";
 
@@ -32,46 +30,33 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	it("should accept and commit vote", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept and commit vote", async (context) => {
+		const tx = await Votes.makeValidVote(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [tx]);
+		await waitBlock(context);
 
-		const tx = await makeVote(sandbox, { sender: randomWallet, voteAsset: wallets[1].publicKey });
-
-		await addTransactionsToPool(sandbox, [tx]);
-		await waitBlock(sandbox);
-
-		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, wallets[1].publicKey));
+		assert.true(await hasVotedFor(context, tx.data.senderPublicKey, tx.data.asset!.votes![0]));
 	});
 
-	it("should accept and commit unvote", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+	it("should accept and commit unvote", async (context) => {
+		const [voteTx, unvoteTx] = await Votes.makeValidVoteAndUnvote(context);
 
 		// Vote
-		const voteTx = await makeVote(sandbox, { sender: randomWallet, voteAsset: wallets[1].publicKey });
-		await addTransactionsToPool(sandbox, [voteTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, wallets[1].publicKey));
+		await addTransactionsToPool(context, [voteTx]);
+		await waitBlock(context);
+		assert.true(await hasVotedFor(context, voteTx.data.senderPublicKey, voteTx.data.asset!.votes![0]));
 
 		// Unvote
-		const unvoteTx = await makeVote(sandbox, { sender: randomWallet, unvoteAsset: wallets[1].publicKey });
-		await addTransactionsToPool(sandbox, [unvoteTx]);
-		await waitBlock(sandbox);
+		await addTransactionsToPool(context, [unvoteTx]);
+		await waitBlock(context);
 
-		assert.true(await hasUnvoted(sandbox, randomWallet.publicKey));
+		assert.true(await hasUnvoted(context, voteTx.data.senderPublicKey));
 	});
 
-	it("should reject vote for non-validator", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
-
-		const tx = await makeVote(sandbox, { sender: randomWallet, voteAsset: randomWallet2.publicKey });
-		const result = await addTransactionsToPool(sandbox, [tx]);
+	it("should reject vote for non-validator", async (context) => {
+		const tx = await Votes.makeInvalidVoteForNonValidator(context);
+		const result = await addTransactionsToPool(context, [tx]);
 
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
@@ -82,39 +67,27 @@ describe<{
 		});
 	});
 
-	it("should accept unvote for resigned validator", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept unvote for resigned validator", async (context) => {
+		const [registrationTx, voteTx, resignationTx, unvoteTx] = await Votes.makeUnvoteForResignedValidator(context);
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [voteTx]);
+		await waitBlock(context);
+		assert.true(await hasVotedFor(context, voteTx.data.senderPublicKey, voteTx.data.asset!.votes![0]));
 
-		const registrationTx = await makeValidatorRegistration(sandbox, { sender: randomWallet2 });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
 
-		const voteTx = await makeVote(sandbox, { sender: randomWallet, voteAsset: randomWallet2.publicKey });
-		await addTransactionsToPool(sandbox, [voteTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, randomWallet2.publicKey));
+		await addTransactionsToPool(context, [unvoteTx]);
+		await waitBlock(context);
 
-		const resignationTx = await makeValidatorResignation(sandbox, { sender: randomWallet2 });
-		await addTransactionsToPool(sandbox, [resignationTx]);
-		await waitBlock(sandbox);
-
-		const tx = await makeVote(sandbox, { sender: randomWallet, unvoteAsset: randomWallet2.publicKey });
-		await addTransactionsToPool(sandbox, [tx]);
-		await waitBlock(sandbox);
-
-		assert.true(await hasUnvoted(sandbox, randomWallet.publicKey));
+		assert.true(await hasUnvoted(context, voteTx.data.senderPublicKey));
 	});
 
-	it("should reject unvote for non voted validator", async ({ sandbox, wallets }) => {
-		const [validator1] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
-
-		const unvoteTx = await makeVote(sandbox, { sender: randomWallet, unvoteAsset: validator1.publicKey });
-		const result = await addTransactionsToPool(sandbox, [unvoteTx]);
+	it("should reject unvote for non voted validator", async (context) => {
+		const unvoteTx = await Votes.makeInvalidUnvoteForNonValidator(context);
+		const result = await addTransactionsToPool(context, [unvoteTx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -124,46 +97,30 @@ describe<{
 		});
 	});
 
-	it("should accept vote switch", async ({ sandbox, wallets }) => {
-		const [validator1, validator2, validator3] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+	it("should accept vote switch", async (context) => {
+		const [voteTx, switchVoteTx] = await Votes.makeValidVoteSwitch(context);
 
 		// Vote for validator1
-		const voteTx = await makeVote(sandbox, { sender: randomWallet, voteAsset: validator1.publicKey });
-		await addTransactionsToPool(sandbox, [voteTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, validator1.publicKey));
+		await addTransactionsToPool(context, [voteTx]);
+		await waitBlock(context);
+		assert.true(await hasVotedFor(context, voteTx.data.senderPublicKey, voteTx.data.asset!.votes![0]));
 
 		// Unvote validator1 and vote for validator2
-		const unvoteTx = await makeVote(sandbox, {
-			sender: randomWallet,
-			unvoteAsset: validator1.publicKey,
-			voteAsset: validator2.publicKey,
-		});
-		const result = await addTransactionsToPool(sandbox, [unvoteTx]);
+		const result = await addTransactionsToPool(context, [switchVoteTx]);
 		assert.equal(result.accept, [0]);
-		await waitBlock(sandbox);
-		assert.true(await hasVotedFor(sandbox, randomWallet.publicKey, validator2.publicKey));
+		await waitBlock(context);
+		assert.true(await hasVotedFor(context, switchVoteTx.data.senderPublicKey, switchVoteTx.data.asset!.votes![0]));
 	});
 
-	it("should reject switch vote for non voted validator", async ({ sandbox, wallets }) => {
-		const [validator1, validator2, validator3] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+	it("should reject switch vote for non voted validator", async (context) => {
+		const [voteTx, unvoteTx] = await Votes.makeInvalidVoteSwitchForNonVotedValidator(context);
 
 		// Vote for validator1
-		const voteTx = await makeVote(sandbox, { sender: randomWallet, voteAsset: validator1.publicKey });
-		await addTransactionsToPool(sandbox, [voteTx]);
-		await waitBlock(sandbox);
+		await addTransactionsToPool(context, [voteTx]);
+		await waitBlock(context);
 
 		// Provoke unvote mismatch by unvoting the non voted validator 2
-		const unvoteTx = await makeVote(sandbox, {
-			sender: randomWallet,
-			unvoteAsset: validator2.publicKey,
-			voteAsset: validator3.publicKey,
-		});
-		const result = await addTransactionsToPool(sandbox, [unvoteTx]);
+		const result = await addTransactionsToPool(context, [unvoteTx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -173,23 +130,16 @@ describe<{
 		});
 	});
 
-	it("should reject vote for resigned validator", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject vote for resigned validator", async (context) => {
+		const [registrationTx, resignationTx, voteTx] = await Votes.makeInvalidVoteForResignedValidator(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
 
-		const registrationTx = await makeValidatorRegistration(sandbox, { sender: randomWallet2 });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
 
-		const resignationTx = await makeValidatorResignation(sandbox, { sender: randomWallet2 });
-		await addTransactionsToPool(sandbox, [resignationTx]);
-		await waitBlock(sandbox);
-
-		const voteTx = await makeVote(sandbox, { sender: randomWallet, voteAsset: randomWallet2.publicKey });
-
-		const result = await addTransactionsToPool(sandbox, [voteTx]);
+		const result = await addTransactionsToPool(context, [voteTx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -199,31 +149,32 @@ describe<{
 		});
 	});
 
-	it("should only accept one vote per sender in pool at the same time", async ({ sandbox, wallets }) => {
+	it("should only accept one vote per sender in pool at the same time", async (context) => {
+		const { wallets } = context;
 		const [validator1, validator2] = wallets;
 
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
+		const randomWallet = await getRandomFundedWallet(context, validator1);
 
-		const voteForValidator1Tx = await makeVote(sandbox, {
+		const voteForValidator1Tx = await Votes.makeVote(context, {
 			nonceOffset: 0,
 			sender: randomWallet,
 			voteAsset: validator1.publicKey,
 		});
 
-		const voteForValidator1TxDuplicate = await makeVote(sandbox, {
+		const voteForValidator1TxDuplicate = await Votes.makeVote(context, {
 			nonceOffset: 1,
 			sender: randomWallet,
 			voteAsset: validator1.publicKey,
 		});
 
-		const voteForValidator2Tx = await makeVote(sandbox, {
+		const voteForValidator2Tx = await Votes.makeVote(context, {
 			nonceOffset: 2,
 			sender: randomWallet,
 			voteAsset: validator2.publicKey,
 		});
 
 		// Only accepts first vote
-		const result = await addTransactionsToPool(sandbox, [
+		const result = await addTransactionsToPool(context, [
 			voteForValidator1Tx,
 			voteForValidator1TxDuplicate,
 			voteForValidator2Tx,
@@ -242,28 +193,14 @@ describe<{
 		});
 	});
 
-	it("should reject vote when already voted", async ({ sandbox, wallets }) => {
-		const [validator1, validator2] = wallets;
+	it("should reject vote when already voted", async (context) => {
+		const [voteForValidator1Tx, voteForValidator2Tx] = await Votes.makeInvalidDoubleVote(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
-
-		const voteForValidator1Tx = await makeVote(sandbox, {
-			nonceOffset: 0,
-			sender: randomWallet,
-			voteAsset: validator1.publicKey,
-		});
-
-		const voteForValidator2Tx = await makeVote(sandbox, {
-			nonceOffset: 1,
-			sender: randomWallet,
-			voteAsset: validator2.publicKey,
-		});
-
-		let result = await addTransactionsToPool(sandbox, [voteForValidator1Tx]);
+		let result = await addTransactionsToPool(context, [voteForValidator1Tx]);
 		assert.equal(result.accept, [0]);
-		await waitBlock(sandbox);
+		await waitBlock(context);
 
-		result = await addTransactionsToPool(sandbox, [voteForValidator2Tx]);
+		result = await addTransactionsToPool(context, [voteForValidator2Tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {

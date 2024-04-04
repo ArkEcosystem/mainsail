@@ -21,7 +21,7 @@ export class Snapshot {
 	public constructor(public sandbox: Sandbox) {}
 
 	public async add(addressOrPublicKey: string): Promise<void> {
-		const wallet = await getWalletByAddressOrPublicKey(this.sandbox, addressOrPublicKey);
+		const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
 		this.balances[wallet.getAddress()] = wallet.getBalance();
 	}
 
@@ -87,7 +87,7 @@ export class Snapshot {
 
 		const blocks = await database.findBlocks(0, (await database.getLastCommit()).block.header.height);
 		const updateBalanceDelta = async (addressOrPublicKey: string, delta: BigNumber): Promise<void> => {
-			const wallet = await getWalletByAddressOrPublicKey(this.sandbox, addressOrPublicKey);
+			const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
 
 			if (!balanceDeltas[wallet.getAddress()]) {
 				balanceDeltas[wallet.getAddress()] = BigNumber.ZERO;

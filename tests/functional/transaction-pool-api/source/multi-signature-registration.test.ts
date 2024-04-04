@@ -1,18 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { MultiSignatureRegistrations } from "@mainsail/test-transaction-builders";
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import {
-	addTransactionsToPool,
-	getMultiSignatureWallet,
-	getRandomColdWallet,
-	getRandomFundedWallet,
-	getRandomSignature,
-	getWallets,
-	makeMultiSignatureRegistration,
-	waitBlock,
-} from "./utils.js";
+import { addTransactionsToPool, getMultiSignatureWallet, getWallets, waitBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -31,48 +23,23 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	it("should accept and process multi signature registration", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept and process multi signature registration", async (context) => {
+		const tx = await MultiSignatureRegistrations.makeValidMultiSignatureRegistration(context);
+		await addTransactionsToPool(context, [tx]);
+		await waitBlock(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const participant1 = await getRandomColdWallet(sandbox);
-		const participant2 = await getRandomColdWallet(sandbox);
-		const participants = [participant1.keyPair, participant2.keyPair];
-
-		const tx = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet,
-		});
-
-		await addTransactionsToPool(sandbox, [tx]);
-		await waitBlock(sandbox);
-
-		const wallet = await getMultiSignatureWallet(sandbox, participants);
+		const wallet = await getMultiSignatureWallet(context, tx.data.asset!.multiSignature!);
 		assert.true(wallet.hasMultiSignature());
 	});
 
-	it("should reject multi signature registration if already registered", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject multi signature registration if already registered", async (context) => {
+		const [registrationTx1, registrationTx2] =
+			await MultiSignatureRegistrations.makeDuplicateMultiSignatureRegistration(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx1]);
+		await waitBlock(context);
 
-		const participant1 = await getRandomColdWallet(sandbox);
-		const participant2 = await getRandomColdWallet(sandbox);
-		const participants = [participant1.keyPair, participant2.keyPair];
-
-		const registrationTx1 = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet,
-		});
-		await addTransactionsToPool(sandbox, [registrationTx1]);
-		await waitBlock(sandbox);
-
-		const registrationTx2 = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet,
-		});
-		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
+		const result = await addTransactionsToPool(context, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -82,23 +49,13 @@ describe<{
 		});
 	});
 
-	it("should reject multi signature registration if any signature invalid", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject multi signature registration if any signature invalid", async (context) => {
+		const tx =
+			await MultiSignatureRegistrations.makeInvalidMultiSignatureRegistrationWithInvalidParticipantSignature(
+				context,
+			);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const participant1 = await getRandomColdWallet(sandbox);
-		const participant2 = await getRandomColdWallet(sandbox);
-		const participants = [participant1.keyPair, participant2.keyPair];
-
-		const tx = await makeMultiSignatureRegistration(sandbox, {
-			participantSignatureOverwrite: {
-				0: `00${await getRandomSignature(sandbox)}`,
-			},
-			participants,
-			sender: randomWallet,
-		});
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -108,78 +65,32 @@ describe<{
 		});
 	});
 
-	it("should accept multi signature registration within min and max participants", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept multi signature registration within min and max participants", async (context) => {
+		const [registrationTxMin, registrationTxMax] =
+			await MultiSignatureRegistrations.makeValidMultiSignatureRegistrationWithMinAndMaxParticipants(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
-
-		const minParticipants = 2;
-		const maxParticipants = 16;
-
-		const allParticipants: Contracts.Crypto.KeyPair[] = [];
-		for (let i = 0; i < maxParticipants; i++) {
-			allParticipants.push((await getRandomColdWallet(sandbox)).keyPair);
-		}
-
-		const minimumParticipants = allParticipants.slice(0, minParticipants);
-		const registrationTxMin = await makeMultiSignatureRegistration(sandbox, {
-			participants: minimumParticipants,
-			sender: randomWallet,
-		});
-		const registrationTxMax = await makeMultiSignatureRegistration(sandbox, {
-			participants: allParticipants,
-			sender: randomWallet2,
-		});
-
-		const result = await addTransactionsToPool(sandbox, [registrationTxMin, registrationTxMax]);
+		const result = await addTransactionsToPool(context, [registrationTxMin, registrationTxMax]);
 		assert.equal(result.accept, [0, 1]);
-		await waitBlock(sandbox);
+		await waitBlock(context);
 
-		const walletWithMinParticipants = await getMultiSignatureWallet(sandbox, minimumParticipants);
+		const walletWithMinParticipants = await getMultiSignatureWallet(
+			context,
+			registrationTxMin.data.asset!.multiSignature!,
+		);
 		assert.true(walletWithMinParticipants.hasMultiSignature());
 
-		const walletWithMaxParticipants = await getMultiSignatureWallet(sandbox, allParticipants);
+		const walletWithMaxParticipants = await getMultiSignatureWallet(
+			context,
+			registrationTxMax.data.asset!.multiSignature!,
+		);
 		assert.true(walletWithMaxParticipants.hasMultiSignature());
 	});
 
-	it("should reject multi signature registration below min or above max participants", async ({
-		sandbox,
-		wallets,
-	}) => {
-		const [sender] = wallets;
+	it("should reject multi signature registration below min or above max participants", async (context) => {
+		const [registrationTx1, registrationTx2, registrationTx3] =
+			await MultiSignatureRegistrations.makeInvalidMultiSignatureRegistratioOutsideMinMaxParticipants(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet3 = await getRandomFundedWallet(sandbox, sender);
-
-		const minParticipants = 1; // set to 0 in callback below
-		const maxParticipants = 16 + 1;
-
-		const allParticipants: Contracts.Crypto.KeyPair[] = [];
-		for (let index = 0; index < maxParticipants; index++) {
-			allParticipants.push((await getRandomColdWallet(sandbox)).keyPair);
-		}
-
-		const minimumParticipants = allParticipants.slice(0, minParticipants);
-		const registrationTx1 = await makeMultiSignatureRegistration(sandbox, {
-			callback: async (transaction) => {
-				// set min participants to 0
-				transaction.serialized.fill(0, 58, 59);
-			},
-			participants: minimumParticipants,
-			sender: randomWallet,
-		});
-		const registrationTx2 = await makeMultiSignatureRegistration(sandbox, {
-			participants: [allParticipants[0]],
-			sender: randomWallet2,
-		});
-		const registrationTx3 = await makeMultiSignatureRegistration(sandbox, {
-			participants: allParticipants,
-			sender: randomWallet3,
-		});
-
-		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2, registrationTx3]);
+		const result = await addTransactionsToPool(context, [registrationTx1, registrationTx2, registrationTx3]);
 		assert.equal(result.accept, []);
 		assert.equal(result.invalid, [0, 1, 2]);
 		assert.equal(result.errors, {
@@ -201,67 +112,30 @@ describe<{
 		});
 	});
 
-	it("should only accept one multi signature registration from sender in pool at the same time", async ({
-		sandbox,
-		wallets,
-	}) => {
-		const [sender] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const participant1 = await getRandomColdWallet(sandbox);
-		const participant2 = await getRandomColdWallet(sandbox);
-		const participants = [participant1.keyPair, participant2.keyPair];
-
-		const registrationTx1 = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet,
-		});
-
-		const registrationTx2 = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet,
-		});
+	it("should only accept one multi signature registration from sender in pool at the same time", async (context) => {
+		const [registrationTx1, registrationTx2] =
+			await MultiSignatureRegistrations.makeDuplicateMultiSignatureRegistration(context);
 
 		// Submit 2 registration with same asset => only first gets accepted
-		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
+		const result = await addTransactionsToPool(context, [registrationTx1, registrationTx2]);
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);
 		assert.equal(result.errors, {
 			1: {
-				message: `tx ${registrationTx2.id} cannot be applied: Sender ${randomWallet.publicKey} already has a transaction of type '4' in the pool`,
+				message: `tx ${registrationTx2.id} cannot be applied: Sender ${registrationTx1.data.senderPublicKey} already has a transaction of type '4' in the pool`,
 				type: "ERR_APPLY",
 			},
 		});
 	});
 
-	it("should reject multiple multi signature registration for same asset in pool at the same time", async ({
-		sandbox,
-		wallets,
-	}) => {
-		const [sender] = wallets;
+	it("should reject multiple multi signature registration for same asset in pool at the same time", async (context) => {
+		const [registrationTx1, registrationTx2] =
+			await MultiSignatureRegistrations.makeMultiSignatureRegistrationSameAssetDifferentSender(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
-
-		const participant1 = await getRandomColdWallet(sandbox);
-		const participant2 = await getRandomColdWallet(sandbox);
-		const participants = [participant1.keyPair, participant2.keyPair];
-
-		const registrationTx1 = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet,
-		});
-
-		const registrationTx2 = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet2,
-		});
-
-		const multiSigAddress = await getMultiSignatureWallet(sandbox, participants);
+		const multiSigAddress = await getMultiSignatureWallet(context, registrationTx1.data.asset!.multiSignature!);
 
 		// Submit 2 registration with same asset => only first gets accepted
-		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
+		const result = await addTransactionsToPool(context, [registrationTx1, registrationTx2]);
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);
 		assert.equal(result.errors, {
@@ -272,22 +146,13 @@ describe<{
 		});
 	});
 
-	it("should reject multi signature registration if missing participant signature", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject multi signature registration if missing participant signature", async (context) => {
+		const registrationTx =
+			await MultiSignatureRegistrations.makeInvalidMultiSignatureRegistrationWithMissingParticipantSignature(
+				context,
+			);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const participant1 = (await getRandomColdWallet(sandbox)).keyPair;
-		const participant2 = (await getRandomColdWallet(sandbox)).keyPair;
-		const participant3 = (await getRandomColdWallet(sandbox)).keyPair;
-
-		const registrationTx = await makeMultiSignatureRegistration(sandbox, {
-			omitParticipantSignatures: [1], // omit participant with index 1
-			participants: [participant1, participant2, participant3],
-			sender: randomWallet,
-		});
-
-		const result = await addTransactionsToPool(sandbox, [registrationTx]);
+		const result = await addTransactionsToPool(context, [registrationTx]);
 		assert.equal(result.accept, []);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
