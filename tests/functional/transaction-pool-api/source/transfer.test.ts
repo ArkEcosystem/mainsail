@@ -1,21 +1,10 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
-import { BigNumber } from "@mainsail/utils";
+import { Transfers } from "@mainsail/test-transaction-builders";
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import {
-	addTransactionsToPool,
-	getMultiSignatureWallet,
-	getRandomColdWallet,
-	getRandomFundedWallet,
-	getWallets,
-	hasBalance,
-	isTransactionCommitted,
-	makeMultiSignatureRegistration,
-	makeTransfer,
-	waitBlock,
-} from "./utils.js";
+import { addTransactionsToPool, getWallets, hasBalance, isTransactionCommitted, waitBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -34,71 +23,42 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	it("should accept and commit simple transfer", async ({ sandbox, snapshot, wallets }) => {
-		const [sender] = wallets;
+	it("should accept and commit simple transfer", async (context) => {
+		const tx = await Transfers.makeTransfer(context);
 
-		const tx = await makeTransfer(sandbox, { sender });
-
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.accept, [0]);
 		assert.equal(result.broadcast, [0]);
 
-		await waitBlock(sandbox);
+		await waitBlock(context);
 
-		assert.true(await isTransactionCommitted(sandbox, tx));
+		assert.true(await isTransactionCommitted(context, tx));
 	});
 
-	it("should accept and transfer funds [multi signature]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept and transfer funds [multi signature]", async (context) => {
+		const [multiSigRegistrationTx, fundTx, transferTx] = await Transfers.makeTransferWithMultiSignature(context);
 
 		// Register multi sig wallet
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
-		const participant1 = await getRandomColdWallet(sandbox);
-		const participant2 = await getRandomColdWallet(sandbox);
-		const participants = [participant1.keyPair, participant2.keyPair];
-
-		const multiSigRegistrationTx = await makeMultiSignatureRegistration(sandbox, {
-			participants,
-			sender: randomWallet,
-		});
-
-		await addTransactionsToPool(sandbox, [multiSigRegistrationTx]);
-		await waitBlock(sandbox);
+		await addTransactionsToPool(context, [multiSigRegistrationTx]);
+		await waitBlock(context);
 
 		// Now send funds to multi sig wallet
-		const multiSigwallet = await getMultiSignatureWallet(sandbox, participants);
+		await addTransactionsToPool(context, [fundTx]);
+		await waitBlock(context);
 
-		const amount = BigNumber.make(25_000_000_000);
-		const fundTx = await makeTransfer(sandbox, { amount, recipient: multiSigwallet.getAddress(), sender });
-
-		await addTransactionsToPool(sandbox, [fundTx]);
-		await waitBlock(sandbox);
-
-		assert.true(await hasBalance(sandbox, multiSigwallet.getAddress(), amount));
+		assert.true(await hasBalance(context, fundTx.data.recipientId!, fundTx.data.amount));
 
 		// Send funds from multi sig to another random wallet
-		const randomWallet2 = await getRandomColdWallet(sandbox);
+		await addTransactionsToPool(context, [transferTx]);
+		await waitBlock(context);
 
-		const transferTx = await makeTransfer(sandbox, {
-			amount: BigNumber.ONE,
-			multiSigKeys: participants,
-			recipient: randomWallet2.address,
-			sender,
-		});
-
-		await addTransactionsToPool(sandbox, [transferTx]);
-		await waitBlock(sandbox);
-
-		assert.true(await hasBalance(sandbox, randomWallet2.address, BigNumber.ONE));
+		assert.true(await hasBalance(context, transferTx.data.recipientId!, transferTx.data.amount));
 	});
 
-	it("should not accept simple transfer [invalid fee]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [invalid fee]", async (context) => {
+		const tx = await Transfers.makeTransferInvalidFee(context);
 
-		const tx = await makeTransfer(sandbox, { sender, fee: "1234" });
-
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -107,20 +67,15 @@ describe<{
 			},
 		});
 
-		await waitBlock(sandbox);
-		assert.false(await isTransactionCommitted(sandbox, tx));
+		await waitBlock(context);
+		assert.false(await isTransactionCommitted(context, tx));
 	});
 
-	it("should not accept simple transfer [invalid amount]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [invalid amount]", async (context) => {
+		const tx1 = await Transfers.makeTransferInsufficientBalance(context);
+		const tx2 = await Transfers.makeTransferZeroBalance(context);
 
-		const { walletRepository } = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-		const balance = (await walletRepository.findByPublicKey(sender.publicKey)).getBalance();
-
-		const tx1 = await makeTransfer(sandbox, { sender, amount: balance.plus(1) });
-		const tx2 = await makeTransfer(sandbox, { sender, amount: BigNumber.ZERO });
-
-		const result = await addTransactionsToPool(sandbox, [tx1, tx2]);
+		const result = await addTransactionsToPool(context, [tx1, tx2]);
 		assert.equal(result.invalid, [0, 1]);
 		assert.equal(result.errors, {
 			0: {
@@ -134,30 +89,22 @@ describe<{
 		});
 	});
 
-	it("should not accept simple transfer [invalid signature]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [invalid signature]", async (context) => {
+		const tx = await Transfers.makeTransferInvalidSignature(context);
 
-		const tx = await makeTransfer(sandbox, {
-			sender,
-			signature:
-				"8dd7af61d8fa4720bf6388b5d89f8b243587697c6e65e63d2fedf3c8440594366415395075885249a0aab8b6570298491837e364c6c4f9f658c63d4633ea6ff9",
-		});
-
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors![0].type, "ERR_BAD_DATA");
 		assert.true(result.errors![0].message.includes("didn't pass verification"));
 
-		await waitBlock(sandbox);
-		assert.false(await isTransactionCommitted(sandbox, tx));
+		await waitBlock(context);
+		assert.false(await isTransactionCommitted(context, tx));
 	});
 
-	it("should not accept simple transfer [malformed signature]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [malformed signature]", async (context) => {
+		const tx = await Transfers.makeTransferMalformedSignature(context);
 
-		const tx = await makeTransfer(sandbox, { sender, signature: "5161a55859e0be86080ca54d9" });
-
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -167,42 +114,32 @@ describe<{
 			},
 		});
 
-		await waitBlock(sandbox);
-		assert.false(await isTransactionCommitted(sandbox, tx));
+		await waitBlock(context);
+		assert.false(await isTransactionCommitted(context, tx));
 	});
 
-	it("should not accept simple transfer [invalid nonce]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [invalid nonce]", async (context) => {
+		const tx1 = await Transfers.makeTransferInvalidNonceTooHigh(context);
+		const tx2 = await Transfers.makeTransferInvalidNonceTooLow(context);
 
-		const tx1 = await makeTransfer(sandbox, { nonceOffset: 2, sender });
-		const tx2 = await makeTransfer(sandbox, { nonceOffset: -4, sender });
-
-		const result = await addTransactionsToPool(sandbox, [tx1, tx2]);
+		const result = await addTransactionsToPool(context, [tx1, tx2]);
 		assert.equal(result.invalid, [0, 1]);
 		assert.equal(result.errors, {
 			0: {
-				message: `tx ${tx1.id} cannot be applied: Cannot apply a transaction with nonce 6: the sender ${sender.publicKey} has nonce 3.`,
+				message: `tx ${tx1.id} cannot be applied: Cannot apply a transaction with nonce 6: the sender ${tx1.data.senderPublicKey} has nonce 3.`,
 				type: "ERR_APPLY",
 			},
 			1: {
-				message: `tx ${tx2.id} cannot be applied: Cannot apply a transaction with nonce 0: the sender ${sender.publicKey} has nonce 3.`,
+				message: `tx ${tx2.id} cannot be applied: Cannot apply a transaction with nonce 0: the sender ${tx2.data.senderPublicKey} has nonce 3.`,
 				type: "ERR_APPLY",
 			},
 		});
 	});
 
-	it("should not accept simple transfer [invalid network]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [invalid network]", async (context) => {
+		const tx = await Transfers.makeTransferInvalidNetwork(context);
 
-		const tx = await makeTransfer(sandbox, {
-			callback: async (transaction) => {
-				// set network to 37
-				transaction.serialized.fill(37, 2, 3);
-			},
-			sender,
-		});
-
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
@@ -212,43 +149,19 @@ describe<{
 		});
 	});
 
-	it("should not accept simple transfer [invalid header]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [invalid header]", async (context) => {
+		const tx = await Transfers.makeTransferInvalidHeader(context);
 
-		const tx = await makeTransfer(sandbox, {
-			callback: async (transaction) => {
-				// set preamble to 3
-				transaction.serialized.fill(3, 0, 1);
-			},
-			sender,
-		});
-
-		const result = await addTransactionsToPool(sandbox, [tx]);
+		const result = await addTransactionsToPool(context, [tx]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors![0].type, "ERR_BAD_DATA");
 		assert.true(result.errors![0].message.endsWith("didn't pass verification"));
 	});
 
-	it("should not accept simple transfer [invalid version]", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should not accept simple transfer [invalid version]", async (context) => {
+		const txs = await Transfers.makeTransferInvalidVersions(context);
 
-		const tx1 = await makeTransfer(sandbox, {
-			callback: async (transaction) => {
-				// set version to 0
-				transaction.serialized.fill(0, 1, 2);
-			},
-			sender,
-		});
-
-		const tx2 = await makeTransfer(sandbox, {
-			callback: async (transaction) => {
-				// set version to 2
-				transaction.serialized.fill(2, 1, 2);
-			},
-			sender,
-		});
-
-		const result = await addTransactionsToPool(sandbox, [tx1, tx2]);
+		const result = await addTransactionsToPool(context, txs);
 		assert.equal(result.invalid, [0, 1]);
 		assert.equal(result.errors![0].type, "ERR_BAD_DATA");
 		assert.true(result.errors![0].message.endsWith("didn't pass verification"));

@@ -1,17 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
+import { UsernameRegistrations } from "@mainsail/test-transaction-builders";
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import {
-	addTransactionsToPool,
-	getRandomFundedWallet,
-	getWallets,
-	hasUsername,
-	makeUsernameRegistration,
-	makeUsernameResignation,
-	waitBlock,
-} from "./utils.js";
+import { addTransactionsToPool, getWalletByAddressOrPublicKey, getWallets, hasUsername, waitBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -30,135 +23,102 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	it("should accept username registration", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-
+	it("should accept username registration", async (context) => {
 		const username = "randomvalidator";
-		const registrationTx = await makeUsernameRegistration(sandbox, { sender: randomWallet, username });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasUsername(sandbox, randomWallet.publicKey, username));
+		const registrationTx = await UsernameRegistrations.makeUsernameRegistration(context, { username });
+
+		await addTransactionsToPool(context, [registrationTx]);
+		await waitBlock(context);
+		assert.true(await hasUsername(context, registrationTx.data.senderPublicKey, username));
 	});
 
-	it("should accept username change", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should accept username change", async (context) => {
+		const [registrationTx1, registrationTx2] =
+			await UsernameRegistrations.makeValidUsernameRegistrationChange(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx1]);
+		await waitBlock(context);
+		assert.true(await hasUsername(context, registrationTx1.data.senderPublicKey));
 
-		const username = "randomvalidator1";
-		const registrationTx = await makeUsernameRegistration(sandbox, { sender: randomWallet, username });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasUsername(sandbox, randomWallet.publicKey));
-
-		const username2 = "randomvalidator2";
-		const registrationTx2 = await makeUsernameRegistration(sandbox, { sender: randomWallet, username: username2 });
-		await addTransactionsToPool(sandbox, [registrationTx2]);
-		await waitBlock(sandbox);
-		assert.true(await hasUsername(sandbox, randomWallet.publicKey));
+		await addTransactionsToPool(context, [registrationTx2]);
+		await waitBlock(context);
+		assert.true(await hasUsername(context, registrationTx1.data.senderPublicKey));
 	});
 
-	it("should reject username registration if already used", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should reject username registration if already used", async (context) => {
+		const [registrationTx1, registrationTx2] =
+			await UsernameRegistrations.makeInvalidDuplicateUsernameRegistration(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx1]);
+		await waitBlock(context);
+		assert.true(await hasUsername(context, registrationTx1.data.senderPublicKey));
 
-		const username = "randomvalidator";
-		const registrationTx = await makeUsernameRegistration(sandbox, { sender: randomWallet, username });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasUsername(sandbox, randomWallet.publicKey, username));
+		const wallet = await getWalletByAddressOrPublicKey(context, registrationTx1.data.senderPublicKey);
 
-		const registrationTx2 = await makeUsernameRegistration(sandbox, { sender: randomWallet2, username });
-		const result = await addTransactionsToPool(sandbox, [registrationTx2]);
+		const result = await addTransactionsToPool(context, [registrationTx2]);
 		assert.equal(result.invalid, [0]);
 		assert.equal(result.errors, {
 			0: {
-				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the username '${username}' is already registered.`,
+				message: `tx ${registrationTx2.id} cannot be applied: Failed to apply transaction, because the username '${wallet.getAttribute("username")}' is already registered.`,
 				type: "ERR_APPLY",
 			},
 		});
 	});
 
-	it("should make resigned username available again", async ({ sandbox, wallets }) => {
-		const [sender] = wallets;
+	it("should make resigned username available again", async (context) => {
+		const [registrationTx1, resignationTx, registrationTx2] =
+			await UsernameRegistrations.makeUsernameRegistrationReusePreviouslyResigned(context);
 
-		const randomWallet = await getRandomFundedWallet(sandbox, sender);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, sender);
+		await addTransactionsToPool(context, [registrationTx1]);
+		await waitBlock(context);
+		assert.true(await hasUsername(context, registrationTx1.data.senderPublicKey));
 
-		const username = "randomvalidator";
-		const registrationTx = await makeUsernameRegistration(sandbox, { sender: randomWallet, username });
-		await addTransactionsToPool(sandbox, [registrationTx]);
-		await waitBlock(sandbox);
-		assert.true(await hasUsername(sandbox, randomWallet.publicKey, username));
+		const previousUsername = (
+			await getWalletByAddressOrPublicKey(context, registrationTx1.data.senderPublicKey)
+		).getAttribute("username");
 
-		const resignationTx = await makeUsernameResignation(sandbox, { sender: randomWallet });
-		await addTransactionsToPool(sandbox, [resignationTx]);
-		await waitBlock(sandbox);
-		assert.false(await hasUsername(sandbox, randomWallet.publicKey));
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
 
-		const registrationTx2 = await makeUsernameRegistration(sandbox, { sender: randomWallet2, username });
-		await addTransactionsToPool(sandbox, [registrationTx2]);
-		await waitBlock(sandbox);
-		assert.true(await hasUsername(sandbox, randomWallet2.publicKey, username));
+		assert.false(await hasUsername(context, registrationTx1.data.senderPublicKey));
+
+		await addTransactionsToPool(context, [registrationTx2]);
+		await waitBlock(context);
+		assert.true(await hasUsername(context, registrationTx2.data.senderPublicKey, previousUsername));
 	});
 
-	it("should only accept one username registration per sender in pool at the same time", async ({
-		sandbox,
-		wallets,
-	}) => {
-		const [validator1] = wallets;
-
-		const randomWallet = await getRandomFundedWallet(sandbox, validator1);
-
+	it("should only accept one username registration per sender in pool at the same time", async (context) => {
 		// Submit 2 registrations, but only one will be accepted
-		const registrationTx1 = await makeUsernameRegistration(sandbox, {
+		const registrationTx1 = await UsernameRegistrations.makeUsernameRegistration(context, {
 			nonceOffset: 0,
-			sender: randomWallet,
 		});
 
-		const registrationTx2 = await makeUsernameRegistration(sandbox, {
+		const registrationTx2 = await UsernameRegistrations.makeUsernameRegistration(context, {
 			nonceOffset: 1,
-			sender: randomWallet,
 		});
-		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
-		await waitBlock(sandbox);
+		const result = await addTransactionsToPool(context, [registrationTx1, registrationTx2]);
+		await waitBlock(context);
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);
 		assert.equal(result.errors, {
 			1: {
-				message: `tx ${registrationTx2.id} cannot be applied: Sender ${randomWallet.publicKey} already has a transaction of type '8' in the pool`,
+				message: `tx ${registrationTx2.id} cannot be applied: Sender ${registrationTx1.data.senderPublicKey} already has a transaction of type '8' in the pool`,
 				type: "ERR_APPLY",
 			},
 		});
 	});
 
-	it("should reject duplicate username in pool", async ({ sandbox, wallets }) => {
-		const [validator1] = wallets;
-
-		const randomWallet1 = await getRandomFundedWallet(sandbox, validator1);
-		const randomWallet2 = await getRandomFundedWallet(sandbox, validator1);
-
-		const username = "bob";
-
+	it("should reject duplicate username in pool", async (context) => {
 		// Submit 2 registration from different wallets using same username
-		const registrationTx1 = await makeUsernameRegistration(sandbox, {
-			nonceOffset: 0,
-			sender: randomWallet1,
-			username,
-		});
+		const username = "bob";
+		const [registrationTx1, registrationTx2] = await UsernameRegistrations.makeInvalidDuplicateUsernameRegistration(
+			context,
+			{ username },
+		);
 
-		const registrationTx2 = await makeUsernameRegistration(sandbox, {
-			nonceOffset: 1,
-			sender: randomWallet2,
-			username,
-		});
-		const result = await addTransactionsToPool(sandbox, [registrationTx1, registrationTx2]);
-		await waitBlock(sandbox);
+		const result = await addTransactionsToPool(context, [registrationTx1, registrationTx2]);
+		await waitBlock(context);
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.invalid, [1]);

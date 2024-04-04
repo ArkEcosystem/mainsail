@@ -1,237 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
-import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
-import { UsernameRegistrationBuilder } from "@mainsail/crypto-transaction-username-registration";
-import { UsernameResignationBuilder } from "@mainsail/crypto-transaction-username-resignation";
-import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
-import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
-import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { Sandbox } from "@mainsail/test-framework";
+import { Transfers } from "@mainsail/test-transaction-builders";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
-
-import { AcceptAnyTransactionVerifier } from "./verifier.js";
-
-export interface TransactionOptions {
-	sender: Contracts.Crypto.KeyPair;
-	fee?: number | string | BigNumber;
-	signature?: string;
-	omitParticipantSignatures?: number[];
-	nonceOffset?: number;
-	multiSigKeys?: Contracts.Crypto.KeyPair[];
-	participantSignatures?: string[];
-
-	callback?: (transaction: Contracts.Crypto.Transaction) => Promise<void>;
-}
-
-export interface TransferOptions extends TransactionOptions {
-	recipient?: string;
-	amount?: number | string | BigNumber;
-}
-
-export interface VoteOptions extends TransactionOptions {
-	voteAsset?: string;
-	unvoteAsset?: string;
-}
-
-export interface ValidatorRegistrationOptions extends TransactionOptions {
-	validatorPublicKey?: string;
-}
-
-export interface ValidatorResignationOptions extends TransactionOptions {}
-
-export interface UsernameRegistrationOptions extends TransactionOptions {
-	username?: string;
-}
-
-export interface UsernameResignationOptions extends TransactionOptions {}
-
-export interface MultiPaymentOptions extends TransactionOptions {
-	payments: Contracts.Crypto.MultiPaymentItem[];
-}
-
-export interface MultiSignatureOptions extends TransactionOptions {
-	participants: Contracts.Crypto.KeyPair[];
-	participantSignatureOverwrite?: { [index: number]: string };
-}
-
-export const makeTransfer = async (
-	sandbox: Sandbox,
-	options: TransferOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, recipient, fee, amount } = options;
-
-	recipient =
-		recipient ??
-		(await app
-			.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-			.fromPrivateKey(sender));
-
-	amount = amount ?? "1";
-	fee = fee ?? "10000000";
-
-	const builder = app
-		.resolve(TransferBuilder)
-		.fee(BigNumber.make(fee).toFixed())
-		.recipientId(recipient)
-		.amount(BigNumber.make(amount).toFixed());
-
-	return buildSignedTransaction(sandbox, builder, sender, options);
-};
-
-export const makeVote = async (sandbox: Sandbox, options: VoteOptions): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, fee, voteAsset, unvoteAsset } = options;
-
-	fee = fee ?? "100000000";
-
-	let builder = app.resolve(VoteBuilder).fee(BigNumber.make(fee).toFixed());
-
-	if (voteAsset) {
-		builder = builder.votesAsset([voteAsset]);
-	}
-
-	if (unvoteAsset) {
-		builder = builder.unvotesAsset([unvoteAsset]);
-	}
-
-	return buildSignedTransaction(sandbox, builder, sender, options);
-};
-
-export const makeValidatorRegistration = async (
-	sandbox: Sandbox,
-	options: ValidatorRegistrationOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, fee, validatorPublicKey } = options;
-
-	validatorPublicKey = validatorPublicKey ?? (await getRandomConsensusKeyPair(sandbox)).publicKey;
-	fee = fee ?? "2500000000";
-
-	const builder = app
-		.resolve(ValidatorRegistrationBuilder)
-		.publicKeyAsset(validatorPublicKey)
-		.fee(BigNumber.make(fee).toFixed());
-
-	return buildSignedTransaction(sandbox, builder, sender, options);
-};
-
-export const makeValidatorResignation = async (
-	sandbox: Sandbox,
-	options: ValidatorResignationOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, fee } = options;
-
-	fee = fee ?? "2500000000";
-
-	const builder = app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(fee).toFixed());
-
-	return buildSignedTransaction(sandbox, builder, sender, options);
-};
-
-export const makeUsernameRegistration = async (
-	sandbox: Sandbox,
-	options: UsernameRegistrationOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, fee, username } = options;
-
-	username = username ?? getRandomUsername();
-	fee = fee ?? "2500000000";
-
-	const builder = app.resolve(UsernameRegistrationBuilder).usernameAsset(username).fee(BigNumber.make(fee).toFixed());
-
-	return buildSignedTransaction(sandbox, builder, sender, options);
-};
-
-export const makeUsernameResignation = async (
-	sandbox: Sandbox,
-	options: UsernameResignationOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, fee } = options;
-
-	fee = fee ?? "2500000000";
-
-	const builder = app.resolve(UsernameResignationBuilder).fee(BigNumber.make(fee).toFixed());
-
-	return buildSignedTransaction(sandbox, builder, sender, options);
-};
-
-export const makeMultiPayment = async (
-	sandbox: Sandbox,
-	options: MultiPaymentOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, fee, payments } = options;
-
-	fee = fee ?? "10000000";
-
-	// Temporary raise limit to exceed the number of normally allowed payments
-	const originalMultiPaymentLimit = app
-		.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-		.getMilestone().multiPaymentLimit;
-
-	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getMilestone().multiPaymentLimit =
-		999;
-
-	let builder = app.resolve(MultiPaymentBuilder).fee(BigNumber.make(fee).toFixed());
-
-	for (const payment of payments) {
-		builder = builder.addPayment(payment.recipientId, payment.amount.toString());
-	}
-
-	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getMilestone().multiPaymentLimit =
-		originalMultiPaymentLimit;
-
-	return buildSignedTransaction(sandbox, builder, sender, options);
-};
-
-export const makeMultiSignatureRegistration = async (
-	sandbox: Sandbox,
-	options: MultiSignatureOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	const { app } = sandbox;
-
-	let { sender, fee, participants, participantSignatureOverwrite } = options;
-
-	fee = fee ?? "500000000";
-
-	let builder = app
-		.resolve(MultiSignatureBuilder)
-		.senderPublicKey(sender.publicKey)
-		.fee(BigNumber.make(fee).toFixed())
-		.min(participants.length);
-
-	for (const participant of participants) {
-		builder = builder.participant(participant.publicKey);
-	}
-
-	const participantSignatures: string[] = [];
-	for (const [index, participant] of participants.entries()) {
-		builder = await builder.multiSignWithKeyPair(participant, index);
-
-		const participantSignature = builder.data.signatures![index];
-		participantSignatures.push(participantSignature);
-
-		if (participantSignatureOverwrite && participantSignatureOverwrite[index]) {
-			builder.data.signatures![index] = participantSignatureOverwrite[index];
-		}
-	}
-
-	return buildSignedTransaction(sandbox, builder, sender, { ...options, participantSignatures });
-};
 
 export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
 	const { app } = sandbox;
@@ -247,11 +18,13 @@ export const getAddressByPublicKey = async (sandbox: Sandbox, publicKey: string)
 };
 
 export const getRandomFundedWallet = async (
-	sandbox: Sandbox,
+	context: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
 	funder: Contracts.Crypto.KeyPair,
 	amount?: BigNumber,
 ): Promise<Contracts.Crypto.KeyPair> => {
-	const { app } = sandbox;
+	const {
+		sandbox: { app },
+	} = context;
 
 	const seed = Date.now().toString();
 
@@ -265,10 +38,10 @@ export const getRandomFundedWallet = async (
 
 	amount = amount ?? BigNumber.make("10000000000");
 
-	const fundTx = await makeTransfer(sandbox, { amount, recipient, sender: funder });
+	const fundTx = await Transfers.makeTransfer(context, { amount, recipient, sender: funder });
 
-	await addTransactionsToPool(sandbox, [fundTx]);
-	await waitBlock(sandbox);
+	await addTransactionsToPool(context, [fundTx]);
+	await waitBlock(context);
 
 	return randomKeyPair;
 };
@@ -281,87 +54,11 @@ export const getRandomSignature = async (sandbox: Sandbox): Promise<string> => {
 	return randomBytes(signatureSize).toString("hex");
 };
 
-export const buildSignedTransaction = async <TBuilder extends TransactionBuilder<TBuilder>>(
-	sandbox: Sandbox,
-	builder: TransactionBuilder<TBuilder>,
-	keyPair: Contracts.Crypto.KeyPair,
-	options: TransactionOptions,
-): Promise<Contracts.Crypto.Transaction> => {
-	// !! Overwrite verifier to accept invalid schema data
-	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
-	(builder as any).factory = sandbox.app.resolve(TransactionFactory);
-
-	if (options.multiSigKeys) {
-		const participants = options.multiSigKeys;
-		const multiSigPublicKey = await sandbox.app
-			.getTagged<Contracts.Crypto.PublicKeyFactory>(
-				Identifiers.Cryptography.Identity.PublicKey.Factory,
-				"type",
-				"wallet",
-			)
-			.fromMultiSignatureAsset({
-				min: participants.length,
-				publicKeys: participants.map((p) => p.publicKey),
-			});
-
-		const nonce = await getNonceByPublicKey(sandbox, multiSigPublicKey);
-
-		const { multiSigKeys, nonceOffset = 0 } = options;
-		builder = builder.nonce(nonce.plus(1 + nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
-
-		for (const [index, participant] of multiSigKeys.entries()) {
-			builder = await builder.multiSignWithKeyPair(participant, index);
-		}
-	} else {
-		const nonce = await getNonceByPublicKey(sandbox, options.sender.publicKey);
-		const { nonceOffset = 0 } = options;
-		builder = await builder.nonce(nonce.plus(1 + nonceOffset).toString()).signWithKeyPair(keyPair);
-	}
-
-	const transaction = await builder.build();
-
-	if (options.signature) {
-		await applyCustomSignature(sandbox, transaction, options.signature);
-	}
-
-	if (options.omitParticipantSignatures) {
-		await applyCustomSignatures(sandbox, transaction, options);
-	}
-
-	if (options.callback) {
-		// manipulates the buffer, so signature has to be re-calculated
-		await options.callback(transaction);
-
-		const signatureFactory = sandbox.app.getTagged<Contracts.Crypto.Signature>(
-			Identifiers.Cryptography.Signature.Instance,
-			"type",
-			"wallet",
-		);
-
-		const hashFactory = sandbox.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
-		const transactionHex = transaction.serialized.toString("hex");
-
-		const signatureIndex = transactionHex.indexOf(transaction.data.signature!);
-		const dataPart = transactionHex.slice(0, signatureIndex);
-
-		const newSignature = await signatureFactory.sign(
-			await hashFactory.sha256(Buffer.from(dataPart, "hex")),
-			Buffer.from(options.sender.privateKey, "hex"),
-		);
-
-		transaction.serialized = Buffer.from(
-			transaction.serialized.toString("hex").replace(transaction.data.signature!, newSignature),
-			"hex",
-		);
-	}
-
-	// !! Reset
-	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
-
-	return transaction;
-};
-
-export const getRandomConsensusKeyPair = async (sandbox: Sandbox): Promise<Contracts.Crypto.KeyPair> => {
+export const getRandomConsensusKeyPair = async ({
+	sandbox,
+}: {
+	sandbox: Sandbox;
+}): Promise<Contracts.Crypto.KeyPair> => {
 	const { app } = sandbox;
 
 	const seed = Array.from({ length: 12 }).fill(Date.now().toString()).join(" ");
@@ -397,52 +94,8 @@ export const getRandomColdWallet = async (
 	};
 };
 
-export const applyCustomSignature = async (
-	sandbox: Sandbox,
-	transaction: Contracts.Crypto.Transaction,
-	signature?: string,
-) => {
-	if (!signature) {
-		return;
-	}
-
-	const { app } = sandbox;
-	const signatureSize = app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "wallet");
-
-	let serialized = transaction.serialized.subarray(0, transaction.serialized.byteLength - signatureSize);
-	serialized = Buffer.concat([serialized, Buffer.from(signature, "hex")]);
-
-	transaction.serialized = serialized;
-	transaction.data.signature = signature;
-};
-
-export const applyCustomSignatures = async (
-	sandbox: Sandbox,
-	transaction: Contracts.Crypto.Transaction,
-	{ omitParticipantSignatures, participantSignatures }: TransactionOptions,
-) => {
-	if (!omitParticipantSignatures || !participantSignatures) {
-		return;
-	}
-
-	let transactionHex = transaction.serialized.toString("hex");
-
-	omitParticipantSignatures.sort((a, b) => b - a);
-
-	for (const index of omitParticipantSignatures) {
-		const signatureToOmit = participantSignatures[index];
-
-		const signatureIndex = transactionHex.indexOf(signatureToOmit);
-		transactionHex = transactionHex.slice(0, signatureIndex);
-
-		transaction.data.signatures!.splice(transaction.data.signatures!.indexOf(signatureToOmit), 1);
-	}
-
-	transaction.serialized = Buffer.from(transactionHex, "hex");
-};
-
 export const addTransactionsToPool = async (
-	sandbox: Sandbox,
+	{ sandbox, wallets }: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
 	transactions: Contracts.Crypto.Transaction[],
 ): Promise<Contracts.TransactionPool.ProcessorResult> => {
 	const { app } = sandbox;
@@ -450,7 +103,10 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
+export const waitBlock = async (
+	{ sandbox, wallets }: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
+	count: number = 1,
+) => {
 	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
 
 	let currentHeight = state.getStore().getLastHeight();
@@ -463,7 +119,7 @@ export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
 };
 
 export const hasVotedFor = async (
-	sandbox: Sandbox,
+	{ sandbox }: { sandbox: Sandbox },
 	voterPublicKey: string,
 	votePublicKey: string,
 ): Promise<boolean> => {
@@ -475,7 +131,7 @@ export const hasVotedFor = async (
 	return voterWallet.getAttribute("vote") === votePublicKey;
 };
 
-export const isValidator = async (sandbox: Sandbox, publicKey: string): Promise<boolean> => {
+export const isValidator = async ({ sandbox }: { sandbox: Sandbox }, publicKey: string): Promise<boolean> => {
 	const { app } = sandbox;
 
 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
@@ -484,7 +140,11 @@ export const isValidator = async (sandbox: Sandbox, publicKey: string): Promise<
 	return wallet.hasAttribute("validatorPublicKey");
 };
 
-export const hasUsername = async (sandbox: Sandbox, publicKey: string, username?: string): Promise<boolean> => {
+export const hasUsername = async (
+	{ sandbox }: { sandbox: Sandbox },
+	publicKey: string,
+	username?: string,
+): Promise<boolean> => {
 	const { app } = sandbox;
 
 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
@@ -497,7 +157,7 @@ export const hasUsername = async (sandbox: Sandbox, publicKey: string, username?
 	return wallet.hasAttribute("username");
 };
 
-export const hasUnvoted = async (sandbox: Sandbox, voterPublicKey: string): Promise<boolean> => {
+export const hasUnvoted = async ({ sandbox }: { sandbox: Sandbox }, voterPublicKey: string): Promise<boolean> => {
 	const { app } = sandbox;
 
 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
@@ -506,7 +166,7 @@ export const hasUnvoted = async (sandbox: Sandbox, voterPublicKey: string): Prom
 	return !voterWallet.hasAttribute("vote");
 };
 
-export const hasResigned = async (sandbox: Sandbox, publicKey: string): Promise<boolean> => {
+export const hasResigned = async ({ sandbox }: { sandbox: Sandbox }, publicKey: string): Promise<boolean> => {
 	const { app } = sandbox;
 
 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
@@ -516,14 +176,14 @@ export const hasResigned = async (sandbox: Sandbox, publicKey: string): Promise<
 };
 
 export const hasBalance = async (
-	sandbox: Sandbox,
+	{ sandbox }: { sandbox: Sandbox },
 	address: string,
 	balance: number | string | BigNumber,
 ): Promise<boolean> => getBalanceByAddress(sandbox, address).isEqualTo(balance);
 
 export const getMultiSignatureWallet = async (
-	sandbox: Sandbox,
-	participants: Contracts.Crypto.KeyPair[],
+	{ sandbox }: { sandbox: Sandbox },
+	asset: Contracts.Crypto.MultiSignatureAsset,
 ): Promise<Contracts.State.Wallet> => {
 	const { app } = sandbox;
 
@@ -533,10 +193,7 @@ export const getMultiSignatureWallet = async (
 			"type",
 			"wallet",
 		)
-		.fromMultiSignatureAsset({
-			min: participants.length,
-			publicKeys: participants.map((p) => p.publicKey),
-		});
+		.fromMultiSignatureAsset(asset);
 
 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 	return walletRepository.findByPublicKey(multiSigPublicKey);
@@ -561,7 +218,7 @@ export const getBalanceByAddress = (sandbox: Sandbox, address: string): BigNumbe
 };
 
 export const isTransactionCommitted = async (
-	sandbox: Sandbox,
+	{ sandbox, wallets }: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
 	{ id }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
 	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
@@ -603,7 +260,7 @@ export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.Key
 };
 
 export const getWalletByAddressOrPublicKey = async (
-	sandbox: Sandbox,
+	{ sandbox }: { sandbox: Sandbox },
 	addressOrPublicKey: string,
 ): Promise<Contracts.State.Wallet> => {
 	const { app } = sandbox;
