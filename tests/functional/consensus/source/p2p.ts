@@ -93,6 +93,12 @@ export class P2PRegistry {
 		}, 0);
 	}
 
+	async postCommit(node: Contracts.Kernel.Application, commit: Contracts.Crypto.Commit): Promise<void> {
+		setTimeout(async () => {
+			await node.get<Contracts.Consensus.CommitProcessor>(Identifiers.Consensus.Processor.Commit).process(commit);
+		}, 0);
+	}
+
 	async broadcastProposal(proposal: Contracts.Crypto.Proposal, nodes?: number[]): Promise<void> {
 		for (const node of this.getNodes(nodes)) {
 			await this.postProposal(node, proposal);

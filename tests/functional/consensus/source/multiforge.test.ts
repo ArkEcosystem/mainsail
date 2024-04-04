@@ -95,6 +95,11 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 1);
 		await assertBlockId(nodes);
+
+		// Next block
+		await snoozeForBlock(nodes, 2);
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
 	});
 
 	it("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
@@ -139,6 +144,11 @@ describe<{
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
 			new Array(totalNodes).fill(proposal0.block.block.data.id),
 		);
+
+		// Next block
+		await snoozeForBlock(nodes, 2);
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
 	});
 
 	it("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
@@ -183,6 +193,11 @@ describe<{
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
 			new Array(totalNodes).fill(undefined),
 		);
+
+		// Next block
+		await snoozeForBlock(nodes, 2);
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
 	});
 
 	it("#double propose - majority : minority split - should  accept block broadcasted to majority", async ({
@@ -232,5 +247,14 @@ describe<{
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
 			new Array(totalNodes - 1).fill(proposal0.block.block.data.id),
 		);
+
+		// Download blocks
+		await p2p.postCommit(nodes[4].app, await getLastCommit(nodes[0]));
+		await snoozeForBlock([nodes[4]], 1);
+
+		// Next block
+		await snoozeForBlock(nodes, 2);
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
 	});
 });
