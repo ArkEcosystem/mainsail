@@ -70,7 +70,7 @@ export const makeValidMultiSignatureRegistrationWithMinAndMaxParticipants = asyn
 	const maxParticipants = 16;
 
 	const allParticipants: Contracts.Crypto.KeyPair[] = [];
-	for (let i = 0; i < maxParticipants; i++) {
+	for (let index = 0; index < maxParticipants; index++) {
 		allParticipants.push((await getRandomColdWallet(context)).keyPair);
 	}
 

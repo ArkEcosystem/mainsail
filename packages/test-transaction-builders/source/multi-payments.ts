@@ -98,7 +98,7 @@ export const makeValidMultiPaymentWithMaxPayments = async (
 	const randomWallet = await getRandomFundedWallet(context);
 
 	const payments: Contracts.Crypto.MultiPaymentItem[] = [];
-	for (let i = 0; i < 256; i++) {
+	for (let index = 0; index < 256; index++) {
 		const recipient = await getRandomColdWallet(context);
 		payments.push({ amount: BigNumber.make(1000), recipientId: recipient.address });
 	}
@@ -116,7 +116,7 @@ export const makeInvalidMultiPaymentExceedingMaxPayments = async (
 	const randomWallet = await getRandomFundedWallet(context);
 
 	const payments: Contracts.Crypto.MultiPaymentItem[] = [];
-	for (let i = 0; i < 257; i++) {
+	for (let index = 0; index < 257; index++) {
 		const recipient = await getRandomColdWallet(context);
 		payments.push({ amount: BigNumber.make(1000), recipientId: recipient.address });
 	}

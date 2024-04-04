@@ -89,7 +89,7 @@ export const makeTransferInsufficientBalance = async (
 	const { walletRepository } = context.sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 	const balance = (await walletRepository.findByPublicKey(wallet.publicKey)).getBalance();
 
-	return makeTransfer(context, { ...options, sender: wallet, amount: balance.plus(1) });
+	return makeTransfer(context, { ...options, amount: balance.plus(1), sender: wallet });
 };
 
 export const makeTransferZeroBalance = async (
