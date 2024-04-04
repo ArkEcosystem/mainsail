@@ -22,25 +22,25 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"@mainsail/crypto-transaction-multi-signature-registration": "workspace:*",
 		"@mainsail/crypto-transaction-transfer": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/crypto-transaction-username-registration": "workspace:*",
 		"@mainsail/crypto-transaction-username-resignation": "workspace:*",
-		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
 		"@mainsail/crypto-transaction-validator-resignation": "workspace:*",
-		"@mainsail/container": "workspace:*",
-		"@mainsail/crypto-transaction-vote": "workspace:*"
+		"@mainsail/crypto-transaction-vote": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"uvu": "^0.5.6",
 		"@types/chance": "1.1.6",
 		"@types/fs-extra": "11.0.4",
-		"@types/sinon": "^17.0.3"
+		"@types/sinon": "^17.0.3",
+		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"
