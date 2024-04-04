@@ -52,6 +52,7 @@ export const getValidators = async (sandbox: Sandbox, validators: ValidatorsJson
 export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: number): Promise<void> => {
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {
+			const event = Enums.BlockEvent.Applied;
 			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
@@ -59,13 +60,40 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: numb
 			const listener = {
 				handle: ({ data: commit }: { data: Contracts.Crypto.Commit }) => {
 					if (!height || commit.block.data.height >= height) {
-						eventDispatcher.forget(Enums.BlockEvent.Applied, listener);
+						eventDispatcher.forget(event, listener);
 						resolve();
 					}
 				},
 			};
 
-			eventDispatcher.listen(Enums.BlockEvent.Applied, listener);
+			eventDispatcher.listen(event, listener);
+		});
+
+	if (Array.isArray(sandbox)) {
+		await Promise.all(sandbox.map((s) => function_(s)));
+	} else {
+		await function_(sandbox);
+	}
+};
+
+export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: number): Promise<void> => {
+	const function_ = async (sandbox: Sandbox): Promise<void> =>
+		new Promise((resolve) => {
+			const event = Enums.ConsensusEvent.RoundStarted;
+			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+				Identifiers.Services.EventDispatcher.Service,
+			);
+
+			const listener = {
+				handle: ({ data: state }: { data: Contracts.Consensus.ConsensusState }) => {
+					if (!round || state.round >= round) {
+						eventDispatcher.forget(event, listener);
+						resolve();
+					}
+				},
+			};
+
+			eventDispatcher.listen(event, listener);
 		});
 
 	if (Array.isArray(sandbox)) {
