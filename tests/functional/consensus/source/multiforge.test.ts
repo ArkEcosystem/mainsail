@@ -185,30 +185,52 @@ describe<{
 		);
 	});
 
-	// it("#double propose - majority : minority split - should not accept block broadcasted to majority", async ({
-	// 	nodes,
-	// 	validators,
-	// 	p2p,
-	// }) => {
-	// 	const node0 = nodes[0];
-	// 	const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
-	// 	stubPropose.callsFake(async () => {
-	// 		stubPropose.restore();
-	// 	});
+	it("#double propose - majority : minority split - should  accept block broadcasted to majority", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = nodes[0];
+		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		stubPropose.callsFake(async () => {
+			stubPropose.restore();
+		});
 
-	// 	const proposal0 = await makeProposal(node0, validators[0], 1, 0);
-	// 	const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
 
-	// 	assert.not.equal(proposal0.block.block.data.id, proposal1.block.block.data.id);
+		assert.not.equal(proposal0.block.block.data.id, proposal1.block.block.data.id);
 
-	// 	await p2p.broadcastProposal(proposal0, [0, 1, 2, 3]);
-	// 	await p2p.broadcastProposal(proposal1, [4]);
+		await p2p.broadcastProposal(proposal0, [0, 1, 2, 3]);
+		await p2p.broadcastProposal(proposal1, [4]);
 
-	// 	await snoozeForBlock(nodes);
+		const nodesSubset = nodes.slice(0, 4);
+		await snoozeForBlock(nodesSubset);
 
-	// 	await assertBockHeight(nodes, 1);
-	// 	await assertBockRound(nodes, 0);
-	// 	await assertBlockId(nodes, proposal0.block.block.data.id);
-	// 	// await assertCommitValidators(nodes, allValidators);
-	// });
+		await assertBockHeight(nodesSubset, 1);
+		await assertBockRound(nodesSubset, 0);
+		await assertBlockId(nodesSubset);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes - 1); // Assert number of precommits
+
+		// Assert all nodes prevote
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal1.block.block.data.id,
+			],
+		);
+
+		// // Assert all nodes precommit (null)
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
+			new Array(totalNodes - 1).fill(proposal0.block.block.data.id),
+		);
+	});
 });
