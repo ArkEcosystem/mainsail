@@ -15,6 +15,8 @@ describe<{
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Consensus", ({ beforeEach, afterEach, it, assert, stub }) => {
+	const totalNodes = 5;
+
 	const makeProposal = async (node: Sandbox, validator: Validator, height: number, round: number) => {
 		const proposer = node.app
 			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
@@ -36,8 +38,6 @@ describe<{
 	};
 
 	beforeEach(async (context) => {
-		const totalNodes = 5;
-
 		context.p2p = new P2PRegistry();
 
 		context.nodes = [];
@@ -117,9 +117,31 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes, proposal0.block.block.data.id);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+
+		// Assert all nodes prevote
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+			],
+		);
+
+		// Assert all nodes precommit
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
+			new Array(totalNodes).fill(proposal0.block.block.data.id),
+		);
 	});
 
-	it.only("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
+	it("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
 		const node0 = nodes[0];
 		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {
@@ -140,7 +162,27 @@ describe<{
 		await assertBockRound(nodes, 1);
 		await assertBlockId(nodes);
 
-		// TODO: Check precommits
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+
+		// Assert all nodes prevote
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal0.block.block.data.id,
+				proposal1.block.block.data.id,
+				proposal1.block.block.data.id,
+			],
+		);
+
+		// Assert all nodes precommit (null)
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
+			new Array(totalNodes).fill(undefined),
+		);
 	});
 
 	// it("#double propose - majority : minority split - should not accept block broadcasted to majority", async ({

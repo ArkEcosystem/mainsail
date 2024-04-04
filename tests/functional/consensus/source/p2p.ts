@@ -20,7 +20,7 @@ export class Messages<T extends Message> {
 	}
 
 	getMessages(height: number, round: number): T[] {
-		return [...this.getMessagesMap(height, round).values()];
+		return [...this.getMessagesMap(height, round).values()].sort((a, b) => a.validatorIndex - b.validatorIndex);
 	}
 
 	getMessagesByValidator(height: number, round: number, validatorIndex: number): T[] {
