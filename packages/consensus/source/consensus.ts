@@ -236,11 +236,10 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 
 		const { block } = proposal.block;
+		this.#step = Contracts.Consensus.Step.Prevote;
 
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.ProposalAccepted, this.getState());
-
-		this.#step = Contracts.Consensus.Step.Prevote;
 
 		const lockedRound = this.getLockedRound();
 
