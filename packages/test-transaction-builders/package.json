@@ -1,0 +1,73 @@
+{
+	"name": "@mainsail/test-transaction-builders",
+	"version": "0.0.1-alpha.14",
+	"description": "Test transaction builders for Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"type": "module",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"release": "pnpm publish --access public",
+		"test": "pnpm run uvu source .test.ts",
+		"test:coverage": "c8 pnpm run test",
+		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
+	},
+	"dependencies": {
+		"concordance": "~5.0.4",
+		"kleur": "~4.1.5",
+		"nock": "14.0.0-beta.4",
+		"sinon": "^17.0.1",
+		"string-kit": "0.18.2",
+		"uvu": "^0.5.6",
+		"zod": "~3.22.4"
+	},
+	"devDependencies": {
+		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-address-bech32m": "workspace:*",
+		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-commit": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
+		"@mainsail/crypto-hash-bcrypto": "workspace:*",
+		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
+		"@mainsail/crypto-messages": "workspace:*",
+		"@mainsail/crypto-signature-schnorr": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-transaction-multi-payment": "workspace:*",
+		"@mainsail/crypto-transaction-multi-signature-registration": "workspace:*",
+		"@mainsail/crypto-transaction-transfer": "workspace:*",
+		"@mainsail/crypto-transaction-username-registration": "workspace:*",
+		"@mainsail/crypto-transaction-username-resignation": "workspace:*",
+		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
+		"@mainsail/crypto-transaction-validator-resignation": "workspace:*",
+		"@mainsail/crypto-transaction-vote": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/crypto-wif": "workspace:*",
+		"@mainsail/fees": "workspace:*",
+		"@mainsail/fees-static": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/p2p": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
+		"@mainsail/state": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"@mainsail/validation": "workspace:*",
+		"uvu": "^0.5.6",
+		"@types/chance": "1.1.6",
+		"@types/fs-extra": "11.0.4",
+		"@types/sinon": "^17.0.3"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}
