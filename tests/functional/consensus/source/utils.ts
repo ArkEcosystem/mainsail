@@ -49,12 +49,23 @@ export const getValidators = async (sandbox: Sandbox, validators: ValidatorsJson
 	return result;
 };
 
-export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[]): Promise<void> => {
+export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: number): Promise<void> => {
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {
-			sandbox.app
-				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-				.listenOnce(Enums.BlockEvent.Applied, { handle: () => resolve() });
+			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+				Identifiers.Services.EventDispatcher.Service,
+			);
+
+			const listener = {
+				handle: ({ data: commit }: { data: Contracts.Crypto.Commit }) => {
+					if (!height || commit.block.data.height >= height) {
+						eventDispatcher.forget(Enums.BlockEvent.Applied, listener);
+						resolve();
+					}
+				},
+			};
+
+			eventDispatcher.listen(Enums.BlockEvent.Applied, listener);
 		});
 
 	if (Array.isArray(sandbox)) {

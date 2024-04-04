@@ -41,12 +41,12 @@ describe<{
 		await assertBlockId(nodes, commit.block.data.id);
 	});
 
-	it("should create new block second time", async ({ nodes }) => {
-		await snoozeForBlock(nodes);
+	it("should create 3 new block", async ({ nodes }) => {
+		await snoozeForBlock(nodes, 3);
 
 		const commit = await getLastCommit(nodes[0]);
 
-		await assertBockHeight(nodes, 1);
+		await assertBockHeight(nodes, 3);
 		await assertBlockId(nodes, commit.block.data.id);
 	});
 });
