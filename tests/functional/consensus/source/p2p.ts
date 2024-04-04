@@ -1,7 +1,39 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+export type Message = Contracts.Crypto.Proposal | Contracts.Crypto.Prevote | Contracts.Crypto.Precommit;
+
+export class Messages<T extends Message> {
+	#messages = new Map<string, Map<string, T>>();
+
+	public getMessagesMap(height: number, round: number): Map<string, T> {
+		const key = `${round}:${height}`;
+
+		if (!this.#messages.has(key)) {
+			this.#messages.set(key, new Map());
+		}
+
+		return this.#messages.get(key)!;
+	}
+
+	set(message: T): void {
+		this.getMessagesMap(message.height, message.round).set(message.serialized.toString("hex"), message);
+	}
+
+	getMessages(height: number, round: number): T[] {
+		return [...this.getMessagesMap(height, round).values()];
+	}
+
+	getMessagesByValidator(height: number, round: number, validatorIndex: number): T[] {
+		return this.getMessages(height, round).filter((message) => message.validatorIndex === validatorIndex);
+	}
+}
+
 export class P2PRegistry {
 	#nodes = new Map<number, Contracts.Kernel.Application>();
+
+	public proposals = new Messages<Contracts.Crypto.Proposal>();
+	public prevotes = new Messages<Contracts.Crypto.Prevote>();
+	public precommits = new Messages<Contracts.Crypto.Precommit>();
 
 	public registerNode(id: number, node: Contracts.Kernel.Application): void {
 		if (this.#nodes.has(id)) {
@@ -32,6 +64,8 @@ export class P2PRegistry {
 	}
 
 	async postProposal(node: Contracts.Kernel.Application, proposal: Contracts.Crypto.Proposal): Promise<void> {
+		this.proposals.set(proposal);
+
 		setTimeout(async () => {
 			await node
 				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
@@ -40,6 +74,8 @@ export class P2PRegistry {
 	}
 
 	async postPrecommit(node: Contracts.Kernel.Application, precommit: Contracts.Crypto.Precommit): Promise<void> {
+		this.precommits.set(precommit);
+
 		setTimeout(async () => {
 			await node
 				.get<Contracts.Consensus.PrecommitProcessor>(Identifiers.Consensus.Processor.PreCommit)
@@ -48,6 +84,8 @@ export class P2PRegistry {
 	}
 
 	async postPrevote(node: Contracts.Kernel.Application, prevote: Contracts.Crypto.Prevote): Promise<void> {
+		this.prevotes.set(prevote);
+
 		setTimeout(async () => {
 			await node
 				.get<Contracts.Consensus.PrevoteProcessor>(Identifiers.Consensus.Processor.PreVote)
