@@ -3,15 +3,16 @@ import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { join } from "path";
 
-import { Validators } from "./contracts.js";
+import { ValidatorsJson } from "./contracts.js";
 import { MemoryDatabase } from "./database.js";
 import { TestLogger } from "./logger.js";
 import { P2PRegistry } from "./p2p.js";
+import { Selector } from "./selector.js";
 import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
-const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: Validators) => {
+const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: ValidatorsJson) => {
 	const sandbox = new Sandbox();
 
 	// Basic binds and mocks
@@ -38,6 +39,8 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		saveState: async () => {},
 	});
 
+	sandbox.app.bind(Identifiers.Proposer.Selector).to(Selector).inSingletonScope();
+
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
@@ -47,7 +50,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 
 	// Bootstrap
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
-	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterErrorHandler).bootstrap();
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
@@ -103,7 +105,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/processor",
 		"@mainsail/validator-set-static",
 		"@mainsail/validator",
-		"@mainsail/proposer",
 		"@mainsail/consensus",
 	];
 
@@ -116,12 +117,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	for (const packageId of packages) {
 		await loadPlugin(sandbox, packageId, options);
 	}
-
-	for (const packageId of packages) {
-		await bootPlugin(sandbox, packageId);
-	}
-
-	await bootstrap(sandbox);
 
 	return sandbox;
 };
@@ -146,14 +141,6 @@ const loadPlugin = async (sandbox: Sandbox, packageId: string, options: PluginOp
 	await serviceProviderRepository.register(packageId);
 };
 
-const bootPlugin = async (sandbox: Sandbox, packageId: string) => {
-	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
-		Identifiers.ServiceProvider.Repository,
-	);
-
-	await serviceProviderRepository.boot(packageId);
-};
-
 const getPluginConfiguration = async (
 	sandbox: Sandbox,
 	packageId: string,
@@ -168,6 +155,22 @@ const getPluginConfiguration = async (
 			.merge(options[packageId] || {});
 	} catch {}
 	return undefined;
+};
+
+const boot = async (sandbox: Sandbox) => {
+	const serviceProviderRepository = sandbox.app.get<Providers.ServiceProviderRepository>(
+		Identifiers.ServiceProvider.Repository,
+	);
+
+	for (const [name] of serviceProviderRepository.all()) {
+		await serviceProviderRepository.boot(name);
+	}
+};
+
+const bootMany = async (sandboxes: Sandbox[]) => {
+	for (const sandbox of sandboxes) {
+		await boot(sandbox);
+	}
 };
 
 const bootstrap = async (sandbox: Sandbox) => {
@@ -199,9 +202,12 @@ const bootstrap = async (sandbox: Sandbox) => {
 	await blockProcessor.commit(commitState);
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
+};
 
-	// const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
-	// await consensus.run();
+const bootstrapMany = async (sandboxes: Sandbox[]) => {
+	for (const sandbox of sandboxes) {
+		await bootstrap(sandbox);
+	}
 };
 
 const run = async (sandbox: Sandbox) => {
@@ -209,9 +215,21 @@ const run = async (sandbox: Sandbox) => {
 	await consensus.run();
 };
 
+const runMany = async (sandboxes: Sandbox[]) => {
+	for (const sandbox of sandboxes) {
+		await run(sandbox);
+	}
+};
+
 const stop = async (sandbox: Sandbox) => {
 	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
 	await consensus.dispose();
 };
 
-export { run, setup, stop };
+const stopMany = async (sandboxes: Sandbox[]) => {
+	for (const sandbox of sandboxes) {
+		await stop(sandbox);
+	}
+};
+
+export { boot, bootMany, bootstrap, bootstrapMany, run, runMany, setup, stop, stopMany };

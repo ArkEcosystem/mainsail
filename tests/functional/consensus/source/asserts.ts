@@ -13,22 +13,27 @@ export const assertBockHeight = async (sandbox: Sandbox | Sandbox[], height: num
 	}
 };
 
-export const assertBlockId = async (sandbox: Sandbox | Sandbox[], id: string): Promise<void> => {
+export const assertBockRound = async (sandbox: Sandbox | Sandbox[], round: number): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+
+	for (const node of nodes) {
+		const commit = await getLastCommit(node);
+		assert.defined(commit);
+		assert.equal(commit.block.data.round, round);
+	}
+};
+
+export const assertBlockId = async (sandbox: Sandbox | Sandbox[], id?: string): Promise<void> => {
+	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+
+	if (id === undefined) {
+		const commit = await getLastCommit(nodes[0]);
+		id = commit.block.data.id;
+	}
 
 	for (const node of nodes) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
 		assert.equal(commit.block!.data.id, id);
-	}
-};
-
-export const assertCommitValidators = async (sandbox: Sandbox | Sandbox[], validators: boolean[]): Promise<void> => {
-	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
-
-	for (const node of nodes) {
-		const commit = await getLastCommit(node);
-		assert.defined(commit);
-		assert.equal(commit.proof.validators, validators);
 	}
 };

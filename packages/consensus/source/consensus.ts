@@ -198,7 +198,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
-		await this.#propose(roundState);
+		await this.propose(roundState);
 	}
 
 	protected async onProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -219,7 +219,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.ProposalAccepted, this.getState());
 
-		await this.#prevote(roundState.getProcessorResult() ? block.data.id : undefined);
+		await this.prevote(roundState.getProcessorResult() ? block.data.id : undefined);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -244,9 +244,9 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		const lockedRound = this.getLockedRound();
 
 		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult()) {
-			await this.#prevote(block.data.id);
+			await this.prevote(block.data.id);
 		} else {
-			await this.#prevote();
+			await this.prevote();
 		}
 	}
 
@@ -275,7 +275,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 			this.#step = Contracts.Consensus.Step.Precommit;
 
 			await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedProposal, this.getState());
-			await this.#precommit(block.data.id);
+			await this.precommit(block.data.id);
 		} else {
 			this.#validValue = roundState;
 
@@ -302,7 +302,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		this.#step = Contracts.Consensus.Step.Precommit;
 
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedNull, this.getState());
-		await this.#precommit();
+		await this.precommit();
 	}
 
 	protected async onMajorityPrecommitAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -367,7 +367,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 			this.logger.info(`Timeout to propose ${this.#height}/${this.#round} expired`);
 
 			this.#step = Contracts.Consensus.Step.Prevote;
-			await this.#prevote();
+			await this.prevote();
 		});
 	}
 
@@ -381,7 +381,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 			this.roundStateRepository.getRoundState(this.#height, this.#round).logPrevotes();
 
 			this.#step = Contracts.Consensus.Step.Precommit;
-			await this.#precommit();
+			await this.precommit();
 		});
 	}
 
@@ -411,7 +411,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		return false;
 	}
 
-	async #propose(roundState: Contracts.Consensus.RoundState): Promise<void> {
+	public async propose(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		if (roundState.hasProposal()) {
 			return;
 		}
@@ -463,7 +463,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		);
 	}
 
-	async #prevote(value?: string): Promise<void> {
+	public async prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorSet.getActiveValidators()) {
 			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
@@ -482,7 +482,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		}
 	}
 
-	async #precommit(value?: string): Promise<void> {
+	public async precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorSet.getActiveValidators()) {
 			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
