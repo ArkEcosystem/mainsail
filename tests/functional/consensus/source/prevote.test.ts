@@ -13,9 +13,9 @@ import {
 	getLastCommit,
 	getValidators,
 	makePrevote,
+	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
-	makeProposal,
 } from "./utils.js";
 
 describe<{
