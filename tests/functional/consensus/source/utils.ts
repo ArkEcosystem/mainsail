@@ -102,6 +102,31 @@ export const makePrevote = async (
 	);
 };
 
+export const makePrecommit = async (
+	node: Sandbox,
+	validator: Validator,
+	height: number,
+	round: number,
+	blockId?: string,
+): Promise<Contracts.Crypto.Precommit> => {
+	const proposer = node.app
+		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+		.getValidator(validator.consensusPublicKey);
+
+	if (!proposer) {
+		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+	}
+
+	return await proposer.precommit(
+		node.app
+			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
+			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+		height,
+		round,
+		blockId,
+	);
+};
+
 export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: number): Promise<void> => {
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {

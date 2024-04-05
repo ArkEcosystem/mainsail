@@ -14,9 +14,9 @@ export class Worker implements IpcWorker.WorkerScriptHandler {
 	@tagged("type", "consensus")
 	private readonly consensusSignatureImp!: Contracts.Crypto.Signature;
 
-	// @inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
-	// @tagged("type", "consensus")
-	// private readonly publicKeyFactoryImp!: Contracts.Crypto.PublicKeyFactory;
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
+	@tagged("type", "consensus")
+	private readonly publicKeyFactoryImp!: Contracts.Crypto.PublicKeyFactory;
 
 	// @inject(Identifiers.Cryptography.Signature.Instance)
 	// @tagged("type", "wallet")
@@ -58,7 +58,7 @@ export class Worker implements IpcWorker.WorkerScriptHandler {
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
-		throw new Error("Method publicKeyFactory not implemented.");
+		return this.#callPublicKeyFactory(method, arguments_);
 	}
 
 	public async getQueueSize(): Promise<number> {
@@ -97,12 +97,12 @@ export class Worker implements IpcWorker.WorkerScriptHandler {
 	// 	return this.#call(this.blockFactoryImp, method, arguments_);
 	// }
 
-	// async #callPublicKeyFactory<K extends Ipc.Requests<Contracts.Crypto.PublicKeyFactory>>(
-	// 	method: K,
-	// 	arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>,
-	// ): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
-	// 	return this.#call(this.publicKeyFactoryImp, method, arguments_);
-	// }
+	async #callPublicKeyFactory<K extends Ipc.Requests<Contracts.Crypto.PublicKeyFactory>>(
+		method: K,
+		arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>,
+	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
+		return this.#call(this.publicKeyFactoryImp, method, arguments_);
+	}
 
 	async #call<T extends { [K in keyof T]: (...arguments_: any) => any }, K extends Ipc.Requests<T>>(
 		object: T,

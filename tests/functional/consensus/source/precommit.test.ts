@@ -5,14 +5,14 @@ import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
+import { assertBlockId, assertBockHeight, assertBockRound, assertCommitRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
 	getLastCommit,
 	getValidators,
-	makePrevote,
+	makePrecommit,
 	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
@@ -89,5 +89,131 @@ describe<{
 		await sleep(500);
 
 		assert.equal(p2p.precommits.getMessages(1, 0).length, 3);
+	});
+
+	it("should confirm block, if < minority precommits null", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPrecommit = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const precommit = await makePrecommit(node0, validators[0], 1, 0);
+
+		stubPrecommit.callsFake(async () => {
+			stubPrecommit.restore();
+			await p2p.broadcastPrecommit(precommit);
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+
+		// Assert all nodes precommits
+		const commit = await getLastCommit(nodes[0]);
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[undefined, commit.block.data.id, commit.block.data.id, commit.block.data.id, commit.block.data.id],
+		);
+
+		// Next block
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
+	});
+
+	it("should re-propose block, if one missed, malicious sends null", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		stubPrecommit0.callsFake(async () => {
+			stubPrecommit0.restore();
+		});
+
+		const node1 = nodes[1];
+		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0);
+		stubPrecommit1.callsFake(async () => {
+			stubPrecommit1.restore();
+			await p2p.broadcastPrecommit(precommit1);
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 0); // Block should be locker and re-proposed
+		await assertCommitRound(nodes, 1);
+		await assertBlockId(nodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes - 1); // Assert number of precommits
+
+		// Assert all nodes precommits
+		const commit = await getLastCommit(nodes[0]);
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[undefined, commit.block.data.id, commit.block.data.id, commit.block.data.id],
+		);
+
+		// Next block
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
+	});
+
+	it("should re-propose block, if one missed, malicious sends random block id", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = nodes[0];
+		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		stubPrecommit0.callsFake(async () => {
+			stubPrecommit0.restore();
+		});
+
+		const proposal = await makeProposal(node0, validators[0], 1, 0);
+
+		const node1 = nodes[1];
+		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.block.block.data.id);
+		stubPrecommit1.callsFake(async () => {
+			stubPrecommit1.restore();
+			await p2p.broadcastPrecommit(precommit1);
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 0); // Block should be locker and re-proposed
+		await assertCommitRound(nodes, 1);
+		await assertBlockId(nodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes - 1); // Assert number of precommits
+
+		// Assert all nodes precommits
+		const commit = await getLastCommit(nodes[0]);
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[proposal.block.block.data.id, commit.block.data.id, commit.block.data.id, commit.block.data.id],
+		);
+
+		// Next block
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
 	});
 });
