@@ -1,5 +1,5 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 
@@ -9,7 +9,7 @@ import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
-import { getLastCommit, getValidators, prepareNodeValidators, snoozeForBlock, snoozeForRound } from "./utils.js";
+import { getLastCommit, getValidators, makePrevote, prepareNodeValidators, snoozeForBlock } from "./utils.js";
 
 describe<{
 	nodes: Sandbox[];
@@ -17,31 +17,6 @@ describe<{
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
-
-	const makePrevote = async (
-		node: Sandbox,
-		validator: Validator,
-		height: number,
-		round: number,
-		blockId?: string,
-	): Promise<Contracts.Crypto.Prevote> => {
-		const proposer = node.app
-			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
-			.getValidator(validator.consensusPublicKey);
-
-		if (!proposer) {
-			throw new Error(`Validator ${validator.consensusPublicKey} not found`);
-		}
-
-		return await proposer.prevote(
-			node.app
-				.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-				.getValidatorIndexByWalletPublicKey(validator.publicKey),
-			height,
-			round,
-			blockId,
-		);
-	};
 
 	beforeEach(async (context) => {
 		context.p2p = new P2PRegistry();

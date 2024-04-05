@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { sleep } from "@mainsail/utils";
 
 import { Validator, ValidatorsJson } from "./contracts.js";
 
@@ -47,6 +48,58 @@ export const getValidators = async (sandbox: Sandbox, validators: ValidatorsJson
 	}
 
 	return result;
+};
+
+export const makeProposal = async (
+	node: Sandbox,
+	validator: Validator,
+	height: number,
+	round: number,
+): Promise<Contracts.Crypto.Proposal> => {
+	const proposer = node.app
+		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+		.getValidator(validator.consensusPublicKey);
+
+	if (!proposer) {
+		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+	}
+
+	await sleep(1); // Sleep to avoid same timestamp
+
+	const block = await proposer.prepareBlock(validator.publicKey, round);
+	return await proposer.propose(
+		node.app
+			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
+			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+		round,
+		undefined,
+		block,
+	);
+};
+
+export const makePrevote = async (
+	node: Sandbox,
+	validator: Validator,
+	height: number,
+	round: number,
+	blockId?: string,
+): Promise<Contracts.Crypto.Prevote> => {
+	const proposer = node.app
+		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+		.getValidator(validator.consensusPublicKey);
+
+	if (!proposer) {
+		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+	}
+
+	return await proposer.prevote(
+		node.app
+			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
+			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+		height,
+		round,
+		blockId,
+	);
 };
 
 export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: number): Promise<void> => {
