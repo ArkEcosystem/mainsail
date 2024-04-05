@@ -15,7 +15,7 @@ describe<{
 	nodes: Sandbox[];
 	validators: Validator[];
 	p2p: P2PRegistry;
-}>("Consensus", ({ beforeEach, afterEach, it, assert, stub }) => {
+}>("Proposal", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
 
 	const makeProposal = async (node: Sandbox, validator: Validator, height: number, round: number) => {
