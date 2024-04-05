@@ -264,4 +264,64 @@ describe<{
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes);
 	});
+
+	it("should confirm block, if < minority prevote multiple random blocks", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal2 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal3 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal4 = await makeProposal(node0, validators[0], 1, 0);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.block.block.data.id);
+		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.block.block.data.id);
+		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.block.block.data.id);
+		const prevote3 = await makePrevote(node0, validators[0], 1, 0, proposal3.block.block.data.id);
+		const prevote4 = await makePrevote(node0, validators[0], 1, 0, proposal4.block.block.data.id);
+
+		stubPrevote.callsFake(async () => {
+			stubPrevote.restore();
+			await p2p.broadcastPrevote(prevote0);
+			await p2p.broadcastPrevote(prevote1);
+			await p2p.broadcastPrevote(prevote2);
+			await p2p.broadcastPrevote(prevote3);
+			await p2p.broadcastPrevote(prevote4);
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes + 4); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+
+		// Assert all nodes prevote
+		const commit = await getLastCommit(nodes[0]);
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[
+				proposal0.block.block.data.id,
+				proposal1.block.block.data.id,
+				proposal2.block.block.data.id,
+				proposal3.block.block.data.id,
+				proposal4.block.block.data.id,
+				commit.block.data.id,
+				commit.block.data.id,
+				commit.block.data.id,
+				commit.block.data.id,
+			],
+		);
+
+		// Next block
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
+	});
 });
