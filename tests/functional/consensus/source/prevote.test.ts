@@ -18,6 +18,31 @@ describe<{
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
 
+	const makePrevote = async (
+		node: Sandbox,
+		validator: Validator,
+		height: number,
+		round: number,
+		blockId?: string,
+	): Promise<Contracts.Crypto.Prevote> => {
+		const proposer = node.app
+			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+			.getValidator(validator.consensusPublicKey);
+
+		if (!proposer) {
+			throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+		}
+
+		return await proposer.prevote(
+			node.app
+				.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
+				.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			height,
+			round,
+			blockId,
+		);
+	};
+
 	beforeEach(async (context) => {
 		context.p2p = new P2PRegistry();
 
@@ -82,5 +107,86 @@ describe<{
 		await sleep(500);
 
 		assert.equal(p2p.precommits.getMessages(1, 0).length, 0);
+	});
+
+	it("should confirm block, if < minority prevote null", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+
+		const prevote = await makePrevote(node0, validators[0], 1, 0);
+
+		stubPrevote.callsFake(async () => {
+			stubPrevote.restore();
+			await p2p.broadcastPrevote(prevote);
+		});
+
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+
+		// Assert all nodes prevote
+		const commit = await getLastCommit(nodes[0]);
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[undefined, commit.block.data.id, commit.block.data.id, commit.block.data.id, commit.block.data.id],
+		);
+
+		// Next block
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
+	});
+
+	it("should not confirm block, if > minority prevote null", async ({ nodes, validators, p2p }) => {
+		const node0 = nodes[0];
+		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0);
+
+		stubPrevote0.callsFake(async () => {
+			stubPrevote0.restore();
+			await p2p.broadcastPrevote(prevote0);
+		});
+
+		const node1 = nodes[1];
+		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
+		const prevote1 = await makePrevote(node1, validators[1], 1, 0);
+
+		stubPrevote1.callsFake(async () => {
+			stubPrevote1.restore();
+			await p2p.broadcastPrevote(prevote1);
+		});
+
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 1);
+		await assertBockRound(nodes, 1);
+		await assertBlockId(nodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
+
+		// Assert all nodes prevote
+		const blockId = p2p.prevotes.getMessages(1, 0)[3].blockId;
+		assert.defined(blockId);
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
+			[undefined, undefined, blockId, blockId, blockId],
+		);
+
+		// Next block
+		await snoozeForBlock(nodes);
+
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+		await assertBlockId(nodes);
 	});
 });
