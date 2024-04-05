@@ -109,9 +109,15 @@ export class DelegatesController extends Controller {
 		return this.walletRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("address = :address", { address: walletId })
-			.orWhere("public_key = :publicKey", { publicKey: walletId })
-			.orWhere("attributes @> :username", { username: { username: walletId } })
+			.where("attributes ? :validatorPublicKey", { validatorPublicKey: "validatorPublicKey" })
+			.andWhere(
+				new ApiDatabaseContracts.Brackets((query) => {
+					query
+						.where("address = :address", { address: walletId })
+						.orWhere("public_key = :publicKey", { publicKey: walletId })
+						.orWhere("attributes @> :username", { username: { username: walletId } });
+				}),
+			)
 			.getOne();
 	}
 }

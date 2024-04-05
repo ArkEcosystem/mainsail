@@ -59,6 +59,12 @@ export type OrExpression<TEntity> = {
 	expressions: Expression<TEntity>[];
 };
 
+export type JsonbAttributeExists<TEntity> = {
+	property: keyof TEntity;
+	op: "jsonbAttributeExists";
+	attribute: string;
+};
+
 export type Expression<TEntity> =
 	| TrueExpression
 	| FalseExpression
@@ -69,7 +75,8 @@ export type Expression<TEntity> =
 	| LikeExpression<TEntity>
 	| ContainsExpression<TEntity>
 	| AndExpression<TEntity>
-	| OrExpression<TEntity>;
+	| OrExpression<TEntity>
+	| JsonbAttributeExists<TEntity>;
 
 export type JsonFieldOperator = "->>";
 export type JsonFieldCastType = "bigint";

@@ -127,7 +127,7 @@ export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) 
 export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) => StateRepository;
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
 
-export { Entity, Repository } from "typeorm";
+export { Brackets, Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
 export interface Migrations {
