@@ -37,7 +37,10 @@ describe<{
 
 		const { statusCode, data } = await request("/delegates", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, delegates);
+
+		const sorted = [...delegates];
+		sorted.sort((a, b) => a.attributes.validatorRank - b.attributes.validatorRank);
+		assert.equal(data.data, sorted);
 	});
 
 	it("/delegates/{id}", async () => {
@@ -76,12 +79,13 @@ describe<{
 
 		const wallet = wallets[wallets.length - 1];
 
-		let { statusCode, data } = await request(`/delegates/${wallet.address}/voters`, options);
-		assert.equal(statusCode, 200);
-		assert.empty(data.data);
+		await assert.rejects(
+			async () => request(`/delegates/${wallet.address}/voters`, options),
+			"Response code 404 (Not Found)",
+		);
 
 		const delegate = delegates[0];
-		({ statusCode, data } = await request(`/delegates/${delegate.address}/voters`, options));
+		const { statusCode, data } = await request(`/delegates/${delegate.address}/voters`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, [delegate]);
 	});

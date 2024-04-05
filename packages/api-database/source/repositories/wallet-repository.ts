@@ -24,6 +24,17 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			options?: Options,
 		): Promise<ResultsPage<Wallet>> {
 			const walletExpression = await DelegateFilter.getExpression(delegateCriteria);
+
+			if (sorting.length === 0) {
+				sorting = [
+					{
+						direction: "asc",
+						jsonFieldAccessor: { cast: "bigint", fieldName: "validatorRank", operator: "->>" },
+						property: "attributes",
+					},
+				];
+			}
+
 			return this.listByExpression(walletExpression, sorting, pagination, options);
 		},
 	});
