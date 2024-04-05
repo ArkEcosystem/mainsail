@@ -56,7 +56,7 @@ export class P2PRegistry {
 			return this.getAllNodes();
 		}
 
-		return nodes.map((node) => this.#nodes.get(node)).filter((node) => node !== undefined);
+		return nodes.map((node) => this.#nodes.get(node)).filter(isApp);
 	}
 
 	public makeBroadcaster(id: number): Broadcaster {
@@ -153,3 +153,6 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		return this.#p2p.getOtherNodes(this.#id);
 	}
 }
+
+const isApp = (node: Contracts.Kernel.Application | undefined): node is Contracts.Kernel.Application =>
+	node !== undefined;

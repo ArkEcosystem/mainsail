@@ -249,7 +249,6 @@ describe<{
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
-		const commit = await getLastCommit(nodes[0]);
 		const blockId = p2p.prevotes.getMessages(1, 0)[3].blockId;
 		assert.defined(blockId);
 		assert.equal(

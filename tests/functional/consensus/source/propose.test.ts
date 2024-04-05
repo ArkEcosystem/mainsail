@@ -135,13 +135,13 @@ describe<{
 		// Assert all nodes prevote
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			Array.from({ length: totalNodes }).fill(),
+			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// Assert all nodes precommit (null)
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
-			Array.from({ length: totalNodes }).fill(),
+			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// Next block
@@ -235,7 +235,7 @@ describe<{
 		// Assert all nodes precommit (null)
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
-			Array.from({ length: totalNodes }).fill(),
+			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// Next block
@@ -279,7 +279,7 @@ describe<{
 			// Assert all nodes precommit (null)
 			assert.equal(
 				p2p.precommits.getMessages(1, round).map((precommit) => precommit.blockId),
-				Array.from({ length: totalNodes }).fill(),
+				Array.from({ length: totalNodes }).fill(undefined),
 			);
 		}
 
@@ -396,7 +396,7 @@ describe<{
 		// Assert all nodes precommit (null)
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
-			Array.from({ length: totalNodes }).fill(),
+			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// // Next block
