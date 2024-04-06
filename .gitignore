@@ -120,3 +120,4 @@ tags
 :memory:
 
 tests/functional/**/paths/data/**
+!tests/functional/**/paths/data/.gitkeep
