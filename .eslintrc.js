@@ -132,7 +132,7 @@ module.exports = {
 		"unicorn/no-new-array": "warn",
 		"unicorn/no-null": "warn",
 		"unicorn/no-object-as-default-parameter": "warn",
-		"unicorn/no-useless-undefined": "warn",
+		"unicorn/no-useless-undefined": "off",
 		"unicorn/prefer-array-some": "warn",
 		"unicorn/prefer-at": "warn",
 		"unicorn/prefer-module": "warn",

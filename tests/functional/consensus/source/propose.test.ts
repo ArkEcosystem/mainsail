@@ -1,7 +1,6 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
-import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
@@ -9,7 +8,14 @@ import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
-import { getLastCommit, getValidators, prepareNodeValidators, snoozeForBlock, snoozeForRound } from "./utils.js";
+import {
+	getLastCommit,
+	getValidators,
+	makeProposal,
+	prepareNodeValidators,
+	snoozeForBlock,
+	snoozeForRound,
+} from "./utils.js";
 
 describe<{
 	nodes: Sandbox[];
@@ -17,28 +23,6 @@ describe<{
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
-
-	const makeProposal = async (node: Sandbox, validator: Validator, height: number, round: number) => {
-		const proposer = node.app
-			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
-			.getValidator(validator.consensusPublicKey);
-
-		if (!proposer) {
-			throw new Error(`Validator ${validator.consensusPublicKey} not found`);
-		}
-
-		await sleep(1); // Sleep to avoid same timestamp
-
-		const block = await proposer.prepareBlock(validator.publicKey, round);
-		return await proposer.propose(
-			node.app
-				.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-				.getValidatorIndexByWalletPublicKey(validator.publicKey),
-			round,
-			undefined,
-			block,
-		);
-	};
 
 	beforeEach(async (context) => {
 		context.p2p = new P2PRegistry();
@@ -251,7 +235,7 @@ describe<{
 		// Assert all nodes precommit (null)
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
-			Array.from({ length: totalNodes }).fill(),
+			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// Next block
@@ -412,7 +396,7 @@ describe<{
 		// Assert all nodes precommit (null)
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
-			new Array(totalNodes).fill(undefined),
+			Array.from({ length: totalNodes }).fill(undefined),
 		);
 
 		// // Next block
