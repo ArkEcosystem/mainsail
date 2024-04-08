@@ -114,6 +114,7 @@ export class PeersController extends Controller {
 				totalCount: totalCount,
 			},
 			BannedPeerResource,
+			true,
 		);
 	}
 }
