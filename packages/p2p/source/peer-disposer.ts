@@ -84,6 +84,12 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		return false;
 	}
 
+	public bannedPeers(): { ip: string; timeout: string }[] {
+		return [...this.#blacklist.entries()]
+			.filter(([ip]) => this.isBanned(ip))
+			.map(([ip, timeout]) => ({ ip, timeout: timeout.format() }));
+	}
+
 	#isNesError(error: Error | Contracts.P2P.NesError): error is Contracts.P2P.NesError {
 		// @ts-ignore
 		return !!error.isNes;

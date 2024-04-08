@@ -5,4 +5,5 @@ export interface PeerDisposer {
 	disposePeer(ip: string): void;
 	disposePeers(): Promise<void>;
 	isBanned(ip: string): boolean;
+	bannedPeers(): { ip: string; timeout: string }[];
 }
