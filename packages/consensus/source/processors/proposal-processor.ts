@@ -40,22 +40,27 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			}
 
 			if (!this.isRoundInBounds(proposal)) {
+				console.log("!isRoundInBounds");
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!this.#hasValidProposer(proposal)) {
+				console.log("!hasValidProposer");
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!(await this.#hasValidSignature(proposal))) {
+				console.log("!hasValidSignature");
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!this.#hasValidBlockGenerator(proposal)) {
+				console.log("!hasValidBlockGenerator");
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
 			if (!(await this.#hasValidLockProof(proposal))) {
+				console.log("!hasValidLockProof");
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
