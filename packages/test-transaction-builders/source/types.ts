@@ -5,6 +5,10 @@ import { BigNumber } from "@mainsail/utils";
 export interface Context {
 	sandbox: Sandbox;
 	wallets: Contracts.Crypto.KeyPair[];
+	fundedWalletProvider?: (
+		context: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
+		amount?: BigNumber,
+	) => Promise<Contracts.Crypto.KeyPair>;
 }
 
 export interface TransactionOptions {

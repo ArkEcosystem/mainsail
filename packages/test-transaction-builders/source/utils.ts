@@ -163,6 +163,10 @@ export const getRandomFundedWallet = async (
 	context: Context,
 	amount?: BigNumber,
 ): Promise<Contracts.Crypto.KeyPair> => {
+	if (context.fundedWalletProvider) {
+		return context.fundedWalletProvider(context, amount);
+	}
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
