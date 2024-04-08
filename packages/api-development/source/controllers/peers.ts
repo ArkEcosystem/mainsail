@@ -97,12 +97,21 @@ export class PeersController extends Controller {
 	}
 
 	public async banned(request: Hapi.Request) {
-		const bannedPeers = this.peerDisposer.bannedPeers();
+		const result = this.peerDisposer.bannedPeers();
+
+		const totalCount: number = result.length;
+		const limit: number = +request.query.limit || 100;
+
+		let offset: number = +(Utils.get(request.query, "offset", 0) || 0);
+
+		if (offset <= 0 && +request.query.page > 1) {
+			offset = (+request.query.page - 1) * limit;
+		}
 
 		return super.toPagination(
 			{
-				results: bannedPeers,
-				totalCount: bannedPeers.length,
+				results: result.slice(offset, offset + limit),
+				totalCount: totalCount,
 			},
 			BannedPeerResource,
 		);
