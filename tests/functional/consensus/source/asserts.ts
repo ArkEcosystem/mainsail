@@ -1,7 +1,9 @@
+import { Exceptions } from "@mainsail/contracts";
+import { interfaces } from "@mainsail/container";
 import { Sandbox } from "@mainsail/test-framework";
 import { assert } from "@mainsail/test-runner";
 
-import { getLastCommit } from "./utils.js";
+import { getLastCommit, snoozeForInvalidBlock } from "./utils.js";
 
 export const assertBockHeight = async (sandbox: Sandbox | Sandbox[], height: number): Promise<void> => {
 	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
@@ -45,5 +47,23 @@ export const assertBlockId = async (sandbox: Sandbox | Sandbox[], id?: string): 
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
 		assert.equal(commit.block!.data.id, id);
+	}
+};
+
+export const assertInvalidBlock = async (
+	exception: interfaces.Newable<Exceptions.Exception>,
+	sandbox: Sandbox | Sandbox[],
+	height: number,
+	round: number = 0,
+): Promise<void> => {
+	const nodes = Array.isArray(sandbox) ? sandbox : [sandbox];
+	const invalidBlocks = await snoozeForInvalidBlock(nodes, height);
+
+	assert.length(nodes, invalidBlocks.length);
+
+	for (const { block, error } of invalidBlocks) {
+		assert.equal(block.header.height, height);
+		assert.equal(block.header.round, round);
+		assert.instance(error, exception);
 	}
 };
