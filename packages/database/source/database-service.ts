@@ -53,7 +53,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
-			const commit = await this.commitFactory.fromBytes(this.#get(height));
+			const data = this.#get(height);
+
+			if (!data) {
+				throw new Error(`Failed to read commit at height ${height}`);
+			}
+
+			const commit = await this.commitFactory.fromBytes(data);
 			yield commit;
 		}
 	}
