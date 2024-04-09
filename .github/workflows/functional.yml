@@ -15,7 +15,7 @@ jobs:
         strategy:
             matrix:
                 node-version: [20.x]
-                functional-test: ['consensus', 'transaction-pool-api']
+                name: ['consensus', 'transaction-pool-api']
 
         steps:
             - uses: actions/checkout@v3
@@ -50,5 +50,5 @@ jobs:
             - name: Build
               run: pnpm run build
 
-            - name: Test ${{ matrix.functional-test }}
-              run: cd tests/functional/${{ matrix.functional-test }} && pnpm run test:full
+            - name: Test ${{ matrix.name }}
+              run: cd tests/functional/${{ matrix.name }} && pnpm run test:full
