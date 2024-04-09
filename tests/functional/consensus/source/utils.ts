@@ -181,5 +181,41 @@ export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: numbe
 	}
 };
 
+export interface InvalidBlock {
+	block: Contracts.Crypto.Block;
+	error: Error;
+}
+export async function snoozeForInvalidBlock(sandbox: Sandbox, height?: number): Promise<InvalidBlock>;
+export async function snoozeForInvalidBlock(sandbox: Sandbox[], height?: number): Promise<InvalidBlock[]>;
+export async function snoozeForInvalidBlock(
+	sandbox: Sandbox | Sandbox[],
+	height?: number,
+): Promise<InvalidBlock | InvalidBlock[]> {
+	const function_ = async (sandbox: Sandbox): Promise<InvalidBlock> =>
+		new Promise((resolve) => {
+			const event = Enums.BlockEvent.Invalid;
+			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+				Identifiers.Services.EventDispatcher.Service,
+			);
+
+			const listener = {
+				handle: ({ data: { block, error } }: { data: InvalidBlock }) => {
+					if (!height || block.data.height >= height) {
+						eventDispatcher.forget(event, listener);
+						resolve({ block, error });
+					}
+				},
+			};
+
+			eventDispatcher.listen(event, listener);
+		});
+
+	if (Array.isArray(sandbox)) {
+		return Promise.all(sandbox.map((s) => function_(s)));
+	} else {
+		return function_(sandbox);
+	}
+}
+
 export const getLastCommit = async (sandbox: Sandbox): Promise<Contracts.Crypto.Commit> =>
 	sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).getLastCommit();

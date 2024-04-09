@@ -22,8 +22,8 @@ export enum CryptoEvent {
 
 export enum BlockEvent {
 	Applied = "block.applied",
-	Disregarded = "block.disregarded",
 	Forged = "block.forged",
+	Invalid = "block.invalid",
 	Received = "block.received",
 }
 
