@@ -13,7 +13,7 @@ jobs:
     functional:
         concurrency:
             cancel-in-progress: true
-            group: ${{ github.head_ref }}-functional
+            group: ${{ github.head_ref }}-functional-${{matrix.name}}
         runs-on: ubuntu-latest
 
         strategy:
