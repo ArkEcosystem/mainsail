@@ -3,7 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import {
 	Transfers,
 	Votes,
-	MultiPayments,
 	MultiSignatureRegistrations,
 	UsernameRegistrations,
 	UsernameResignations,
