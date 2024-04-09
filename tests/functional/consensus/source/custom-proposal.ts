@@ -7,6 +7,7 @@ import { Validator } from "./contracts.js";
 
 import { BigNumber } from "@mainsail/utils";
 import { Utils } from "@mainsail/kernel";
+import { randomBytes } from "crypto";
 
 // To create blocks containing arbitrary transactions, the transactions have to be added
 // in serialized form as the serializer could just fail e.g. due to malformed bytes etc.
@@ -191,7 +192,7 @@ export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], v
 			const { sandbox } = context;
 			const { app } = sandbox;
 
-			const seed = Date.now().toString();
+			const seed = randomBytes(32).toString("hex");
 
 			const randomKeyPair = await app
 				.getTagged<Contracts.Crypto.KeyPairFactory>(
