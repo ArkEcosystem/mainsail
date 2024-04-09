@@ -693,8 +693,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       lmdb:
-        specifier: 2.9.4
-        version: 2.9.4
+        specifier: 3.0.4
+        version: 3.0.4
     devDependencies:
       uvu:
         specifier: ^0.5.6
@@ -2252,8 +2252,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       lmdb:
-        specifier: 2.9.4
-        version: 2.9.4
+        specifier: 3.0.4
+        version: 3.0.4
     devDependencies:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
@@ -4491,48 +4491,48 @@ packages:
       - supports-color
     dev: true
 
-  /@lmdb/lmdb-darwin-arm64@2.9.4:
-    resolution: {integrity: sha512-38XmbES/wVcvMXdwcM5QzL0cSaZu3VwE7mCd0I89eliHQTMQblgWXsr2HQoP9v0JnH6jVt7+E/TkeGNLmp4wzA==}
+  /@lmdb/lmdb-darwin-arm64@3.0.4:
+    resolution: {integrity: sha512-+pdk9UW9E6W1accZJ7aEN+y7SQlvxb+/k7hic8andt/ok7iGr0rsmuzIQGRhx1LX1DqXlP9+ogJwepbcBYWsFQ==}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
     dev: false
     optional: true
 
-  /@lmdb/lmdb-darwin-x64@2.9.4:
-    resolution: {integrity: sha512-JkPrV8rEu88FzMcuouZeU2b/NuVC3KwQxKo5vKhNycBtsCn7KCWHalxL4sdTiHQ4xtgMca3mmeDAdxgqQqnDig==}
+  /@lmdb/lmdb-darwin-x64@3.0.4:
+    resolution: {integrity: sha512-1VgW4VH5rW7YslsUAIw06Nwe4cfpk0N0kcZMR/EH1DMdAT9g8CJHcF29ock3eqFJsGsU5F+/D/EwEO310oXdIg==}
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
     dev: false
     optional: true
 
-  /@lmdb/lmdb-linux-arm64@2.9.4:
-    resolution: {integrity: sha512-aIzmw0g4Wdd/w2rDppGfo1JEl4xWpg6HPbf5ZeuWXCjFms8oc8cazm6oBEAimiZEgYYBFPDPdM644xJcwuJbxQ==}
+  /@lmdb/lmdb-linux-arm64@3.0.4:
+    resolution: {integrity: sha512-IcDuTZOO/Oig/YtSK9scE83CWRteM7R7oTC2LRieeBI1vNTwnkL4Zte3sW2v7QMfb96Q+o+CkKN8hNhUxwN8hw==}
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     dev: false
     optional: true
 
-  /@lmdb/lmdb-linux-arm@2.9.4:
-    resolution: {integrity: sha512-b3JZL5pLuvcGEbcsThUQPFlQdBFaBxImrlNbFUeJmzLwpdgGRi0RSQdZZ2PuIoZvpRj0tfNlhXQwXiYMz+9iTw==}
+  /@lmdb/lmdb-linux-arm@3.0.4:
+    resolution: {integrity: sha512-AocrkB2bRs1H3o2WiXpLp0GK69lHn/pJbLLSBNuwykRx4ze2a6DLDTw6Nek5sdnp1+LU6MUvpHFrnOfNUm+N1w==}
     cpu: [arm]
     os: [linux]
     requiresBuild: true
     dev: false
     optional: true
 
-  /@lmdb/lmdb-linux-x64@2.9.4:
-    resolution: {integrity: sha512-Yj6Nb+/j+ZZ65oH/UCE0UfUu/6TO5wWLIeE2izGCpsCxcozZVbzwhzrCs0FUXf6lXv46DJteONosWH9o1XjzqQ==}
+  /@lmdb/lmdb-linux-x64@3.0.4:
+    resolution: {integrity: sha512-PpHksYJlEYwUUCcY+K5IohSkdovXx0zdy8+7TcK4bdzNc+ntODB7NiV2PgcrBEB1pgM0HINzOUtztY1UkkkXVQ==}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     dev: false
     optional: true
 
-  /@lmdb/lmdb-win32-x64@2.9.4:
-    resolution: {integrity: sha512-0L6Tyun47/kQb+FzTDIumrfZgU6oEos0RgekKa/3YC7nsUY+ZASZHikzGgEZpMQHSz5YeR+DDUtOMSwqodWHDg==}
+  /@lmdb/lmdb-win32-x64@3.0.4:
+    resolution: {integrity: sha512-UCnLqrww4sOQ5Khj9g5NE/j2dK8Fq3LMh7zDP9FYGE55Uwh1PA4PQnW88e8Y+Q7tyIV7/jdbqiQ+TzESRL43vA==}
     cpu: [x64]
     os: [win32]
     requiresBuild: true
@@ -11492,8 +11492,8 @@ packages:
       - zenObservable
     dev: false
 
-  /lmdb@2.9.4:
-    resolution: {integrity: sha512-Kri5TSKgpLk5q1VO7vYCcqAMyXTxmis6Et+6UARkU7ygvg3ZxUX2oEu/UwBkBskaS1d73effiBrTiHYyDppcBg==}
+  /lmdb@3.0.4:
+    resolution: {integrity: sha512-2w9rvXNpLkgtv0n6iGMVC0p1WkpHhJ+b5LImBIjXqxRAY+ABEofXZ8UPLDG/L7QPySNwgHGYL97JyFapYbhXWg==}
     hasBin: true
     requiresBuild: true
     dependencies:
@@ -11503,12 +11503,12 @@ packages:
       ordered-binary: 1.5.1
       weak-lru-cache: 1.2.2
     optionalDependencies:
-      '@lmdb/lmdb-darwin-arm64': 2.9.4
-      '@lmdb/lmdb-darwin-x64': 2.9.4
-      '@lmdb/lmdb-linux-arm': 2.9.4
-      '@lmdb/lmdb-linux-arm64': 2.9.4
-      '@lmdb/lmdb-linux-x64': 2.9.4
-      '@lmdb/lmdb-win32-x64': 2.9.4
+      '@lmdb/lmdb-darwin-arm64': 3.0.4
+      '@lmdb/lmdb-darwin-x64': 3.0.4
+      '@lmdb/lmdb-linux-arm': 3.0.4
+      '@lmdb/lmdb-linux-arm64': 3.0.4
+      '@lmdb/lmdb-linux-x64': 3.0.4
+      '@lmdb/lmdb-win32-x64': 3.0.4
     dev: false
 
   /load-json-file@4.0.0:
