@@ -53,7 +53,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
-			const commit = await this.commitFactory.fromBytes(this.#get(height));
+			const data = this.#get(height);
+
+			if (!data) {
+				throw new Error(`Failed to read commit at height ${height}`);
+			}
+
+			const commit = await this.commitFactory.fromBytes(data);
 			yield commit;
 		}
 	}
@@ -77,11 +83,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	async persist(): Promise<void> {
-		await this.blockStorage.transaction(async () => {
+		await this.blockStorage.transaction(() => {
 			for (const [height, block] of this.#cache.entries()) {
-				await this.blockStorage.put(height, block);
+				void this.blockStorage.put(height, block);
 			}
 		});
+
+		await this.blockStorage.flushed;
 
 		this.#cache.clear();
 	}
