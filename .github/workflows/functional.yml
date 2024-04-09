@@ -15,7 +15,7 @@ jobs:
         strategy:
             matrix:
                 node-version: [20.x]
-                name: ['consensus', 'transaction-pool-api']
+                name: ["consensus", "transaction-pool-api"]
 
         steps:
             - uses: actions/checkout@v3
