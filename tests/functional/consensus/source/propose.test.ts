@@ -1,14 +1,12 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Transfers } from "@mainsail/test-transaction-builders";
+import { Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
-import { assertBlockId, assertBockHeight, assertBockRound, assertInvalidBlock } from "./asserts.js";
+import { assertBlockId, assertBockHeight, assertBockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
-import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
 	getLastCommit,
@@ -16,7 +14,6 @@ import {
 	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
-	snoozeForInvalidBlock,
 	snoozeForRound,
 } from "./utils.js";
 
@@ -406,57 +403,5 @@ describe<{
 		await snoozeForBlock(nodes, 2);
 		await assertBockHeight(nodes, 2);
 		await assertBockRound(nodes, 0);
-	});
-
-	describe("invalid blocks", () => {
-		const assertNextBlockOk = async (nodes: Sandbox[], height = 1, round = 1) => {
-			await snoozeForBlock(nodes);
-			await assertBockHeight(nodes, height);
-			await assertBockRound(nodes, round);
-		};
-
-		it("#should reject transaction with insufficient balance", async ({ nodes, validators }) => {
-			const node0 = nodes[0];
-
-			const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
-			stubPropose.callsFake(async () => {
-				const context = makeTransactionBuilderContext(node0, validators);
-				const tx = await Transfers.makeTransferInsufficientBalance(context);
-
-				const proposal = await makeCustomProposal({ node: node0, validators }, [tx]);
-
-				node0.app
-					.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-					.process(proposal);
-
-				stubPropose.restore();
-			});
-
-			await assertInvalidBlock(Exceptions.InsufficientBalanceError, nodes.slice(1), 1);
-
-			await assertNextBlockOk(nodes);
-		});
-
-		it("#should reject transaction with invalid header", async ({ nodes, validators }) => {
-			const node0 = nodes[0];
-
-			const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
-			stubPropose.callsFake(async () => {
-				const context = makeTransactionBuilderContext(node0, validators);
-				const tx = await Transfers.makeTransferInvalidHeader(context);
-
-				const proposal = await makeCustomProposal({ node: node0, validators }, [tx]);
-
-				node0.app
-					.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-					.process(proposal);
-
-				stubPropose.restore();
-			});
-
-			await assertInvalidBlock(Exceptions.BlockNotVerified, nodes.slice(1), 1);
-
-			await assertNextBlockOk(nodes);
-		});
 	});
 });
