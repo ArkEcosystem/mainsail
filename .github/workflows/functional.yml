@@ -1,4 +1,4 @@
-name: Functional - Tests
+name: CI
 
 on:
     push:
@@ -9,7 +9,10 @@ on:
         types: [ready_for_review, synchronize, opened]
 
 jobs:
-    test:
+    functional:
+        concurrency:
+            cancel-in-progress: true
+            group: ${{ github.head_ref }}-functional
         runs-on: ubuntu-latest
 
         strategy:
