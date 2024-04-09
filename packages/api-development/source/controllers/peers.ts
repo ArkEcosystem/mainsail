@@ -5,13 +5,16 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import semver from "semver";
 
-import { PeerResource } from "../resources/index.js";
+import { BannedPeerResource, PeerResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
 export class PeersController extends Controller {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
+
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	public async index(request: Hapi.Request) {
 		const allPeers: Contracts.P2P.Peer[] = [...this.peerRepository.getPeers()];
@@ -91,5 +94,27 @@ export class PeersController extends Controller {
 		}
 
 		return super.respondWithResource(this.peerRepository.getPeer(request.params.ip), PeerResource);
+	}
+
+	public async banned(request: Hapi.Request) {
+		const result = this.peerDisposer.bannedPeers();
+
+		const totalCount: number = result.length;
+		const limit: number = +request.query.limit || 100;
+
+		let offset: number = +(Utils.get(request.query, "offset", 0) || 0);
+
+		if (offset <= 0 && +request.query.page > 1) {
+			offset = (+request.query.page - 1) * limit;
+		}
+
+		return super.toPagination(
+			{
+				results: result.slice(offset, offset + limit),
+				totalCount: totalCount,
+			},
+			BannedPeerResource,
+			true,
+		);
 	}
 }

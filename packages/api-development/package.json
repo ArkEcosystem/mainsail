@@ -30,6 +30,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"joi": "17.12.2",
+		"pretty-ms": "9.0.0",
 		"semver": "7.6.0"
 	},
 	"devDependencies": {
