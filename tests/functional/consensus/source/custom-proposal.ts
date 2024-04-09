@@ -171,7 +171,7 @@ export const makeCustomProposal = async (
 	});
 };
 
-export const makeTransactionBuilderContext = (node: Sandbox, validators: Validator[]) => {
+export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], validators: Validator[]) => {
 	const context = {
 		sandbox: node,
 		wallets: validators.map((v) => ({
@@ -207,9 +207,13 @@ export const makeTransactionBuilderContext = (node: Sandbox, validators: Validat
 
 			amount = amount ?? BigNumber.make("10000000000");
 
-			const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-			const wallet = walletRepository.findByAddress(recipient);
-			wallet.setBalance(amount);
+			for (const node of nodes) {
+				const { walletRepository } = node.app
+					.get<Contracts.State.Service>(Identifiers.State.Service)
+					.getStore();
+				const wallet = walletRepository.findByAddress(recipient);
+				wallet.setBalance(amount);
+			}
 
 			// console.log("random funded wallet", recipient, randomKeyPair.publicKey);
 

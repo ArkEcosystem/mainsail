@@ -126,6 +126,7 @@ export const makeInvalidVoteSwitchForNonVotedValidator = async (
 
 	// Provoke unvote mismatch by unvoting the non voted validator 2
 	const unvoteTx = makeVote(context, {
+		nonceOffset: 1,
 		sender: voter,
 		unvoteAsset: validator2.publicKey,
 		voteAsset: validator3.publicKey,
