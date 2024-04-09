@@ -1,4 +1,4 @@
-name: Functional - Consensus
+name: Functional - Tests
 
 on:
     push:
@@ -9,12 +9,13 @@ on:
         types: [ready_for_review, synchronize, opened]
 
 jobs:
-    source:
+    test:
         runs-on: ubuntu-latest
 
         strategy:
             matrix:
                 node-version: [20.x]
+                functional-test: ['consensus', 'transaction-pool-api']
 
         steps:
             - uses: actions/checkout@v3
@@ -49,5 +50,5 @@ jobs:
             - name: Build
               run: pnpm run build
 
-            - name: Test consensus
-              run: cd tests/functional/consensus && pnpm run test
+            - name: Test ${{ matrix.functional-test }}
+              run: cd tests/functional/${{ matrix.functional-test }} && pnpm run test:full
