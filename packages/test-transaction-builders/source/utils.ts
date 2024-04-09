@@ -163,10 +163,14 @@ export const getRandomFundedWallet = async (
 	context: Context,
 	amount?: BigNumber,
 ): Promise<Contracts.Crypto.KeyPair> => {
+	if (context.fundedWalletProvider) {
+		return context.fundedWalletProvider(context, amount);
+	}
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
-	const seed = Date.now().toString();
+	const seed = randomBytes(32).toString("hex");
 
 	const randomKeyPair = await app
 		.getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")

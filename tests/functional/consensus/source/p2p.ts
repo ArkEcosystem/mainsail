@@ -67,9 +67,18 @@ export class P2PRegistry {
 		this.proposals.set(proposal);
 
 		setTimeout(async () => {
-			await node
+			// simulate post-proposal controller
+			const deserializedProposal = await node
+				.get<Contracts.Crypto.MessageFactory>(Identifiers.Cryptography.Message.Factory)
+				.makeProposalFromBytes(proposal.serialized);
+
+			const result = await node
 				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-				.process(proposal);
+				.process(deserializedProposal);
+
+			if (result === Contracts.Consensus.ProcessorResult.Invalid) {
+				console.log("postProposal process failed");
+			}
 		}, 0);
 	}
 
