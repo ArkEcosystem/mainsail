@@ -64,6 +64,11 @@ export const assertInvalidBlock = async (
 	for (const { block, error } of invalidBlocks) {
 		assert.equal(block.header.height, height);
 		assert.equal(block.header.round, round);
+
+		if (!(error instanceof exception)) {
+			console.log(exception.name, error);
+		}
+
 		assert.instance(error, exception);
 	}
 };
