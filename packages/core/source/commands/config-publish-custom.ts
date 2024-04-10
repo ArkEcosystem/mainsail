@@ -33,9 +33,9 @@ export class Command extends Commands.Command {
 
 	public configure(): void {
 		this.definition
-			.setFlag("app", "The link to the app.json file.", Joi.string().uri().required())
+			.setFlag("app", "The link to the app.json file.", Joi.string().uri())
 			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri())
-			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri().required())
+			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri())
 			.setFlag("reset", "Using the --reset flag will remove existing configuration.", Joi.boolean())
 			.setFlag("overwrite", "Using the --overwrite will overwrite existing configuration.", Joi.boolean());
 	}
