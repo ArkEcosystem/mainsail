@@ -51,7 +51,6 @@ export class Command extends Commands.Command {
 
 		await this.components.taskList([
 			{
-				title: "Prepare directories",
 				task: () => {
 					if (flags.reset) {
 						removeSync(configDestination);
@@ -59,9 +58,9 @@ export class Command extends Commands.Command {
 
 					ensureDirSync(configDestination);
 				},
+				title: "Prepare directories",
 			},
 			{
-				title: "Publish environment (.env)",
 				skip: () => {
 					if (existsSync(`${configDestination}/.env`)) {
 						return true;
@@ -72,9 +71,9 @@ export class Command extends Commands.Command {
 				task: () => {
 					writeFileSync(`${configDestination}/.env`, ENV);
 				},
+				title: "Publish environment (.env)",
 			},
 			{
-				title: "Publish validators (validators.json)",
 				skip: () => {
 					if (existsSync(`${configDestination}/validators.json`)) {
 						return true;
@@ -85,9 +84,9 @@ export class Command extends Commands.Command {
 				task: () => {
 					writeFileSync(`${configDestination}/validators.json`, JSON.stringify(VALIDATORS, undefined, 4));
 				},
+				title: "Publish validators (validators.json)",
 			},
 			{
-				title: "Publish peers (peers.json)",
 				skip: () => {
 					if (!existsSync(`${configDestination}/peers.json`)) {
 						return false;
@@ -103,9 +102,9 @@ export class Command extends Commands.Command {
 					const peers = flags.peers ? await this.#getFile(flags.peers) : JSON.stringify(PEERS, undefined, 4);
 					writeFileSync(`${configDestination}/peers.json`, peers);
 				},
+				title: "Publish peers (peers.json)",
 			},
 			{
-				title: "Publish app (app.json)",
 				skip: () => {
 					if (!flags.app) {
 						return true;
@@ -120,9 +119,9 @@ export class Command extends Commands.Command {
 				task: async () => {
 					writeFileSync(join(configDestination, "app.json"), await this.#getFile(flags.app));
 				},
+				title: "Publish app (app.json)",
 			},
 			{
-				title: "Publish crypto (crypto.json)",
 				skip: () => {
 					if (!flags.crypto) {
 						return true;
@@ -137,6 +136,7 @@ export class Command extends Commands.Command {
 				task: async () => {
 					writeFileSync(join(configDestination, "crypto.json"), await this.#getFile(flags.crypto));
 				},
+				title: "Publish crypto (crypto.json)",
 			},
 		]);
 	}
