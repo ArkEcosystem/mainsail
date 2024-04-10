@@ -36,7 +36,8 @@ export class Command extends Commands.Command {
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri().required())
 			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri())
 			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri().required())
-			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
+			.setFlag("reset", "Using the --reset flag will remove existing configuration.", Joi.boolean())
+			.setFlag("overwrite", "Using the --overwrite will overwrite existing configuration.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
@@ -50,46 +51,92 @@ export class Command extends Commands.Command {
 
 		await this.components.taskList([
 			{
+				title: "Prepare directories",
 				task: () => {
 					if (flags.reset) {
 						removeSync(configDestination);
 					}
 
-					if (existsSync(configDestination)) {
-						this.components.fatal("Please use the --reset flag if you wish to reset your configuration.");
-					}
-
 					ensureDirSync(configDestination);
 				},
-				title: "Prepare directories",
 			},
 			{
-				task: () => writeFileSync(`${configDestination}/.env`, ENV),
 				title: "Publish environment (.env)",
-			},
-			{
-				task: () =>
-					writeFileSync(`${configDestination}/validators.json`, JSON.stringify(VALIDATORS, undefined, 4)),
-				title: "Publish validators (validators.json)",
-			},
-			{
-				task: async () => {
-					if (flags.peers) {
-						writeFileSync(`${configDestination}/peers.json`, await this.#getFile(flags.peers));
-					} else {
-						writeFileSync(`${configDestination}/peers.json`, JSON.stringify(PEERS, undefined, 4));
+				skip: () => {
+					if (existsSync(`${configDestination}/.env`)) {
+						return true;
 					}
+
+					return false;
 				},
+				task: () => {
+					writeFileSync(`${configDestination}/.env`, ENV);
+				},
+			},
+			{
+				title: "Publish validators (validators.json)",
+				skip: () => {
+					if (existsSync(`${configDestination}/validators.json`)) {
+						return true;
+					}
+
+					return false;
+				},
+				task: () => {
+					writeFileSync(`${configDestination}/validators.json`, JSON.stringify(VALIDATORS, undefined, 4));
+				},
+			},
+			{
 				title: "Publish peers (peers.json)",
+				skip: () => {
+					if (!existsSync(`${configDestination}/peers.json`)) {
+						return false;
+					}
+
+					if (flags.peers && flags.overwrite) {
+						return false;
+					}
+
+					return true;
+				},
+				task: async () => {
+					const peers = flags.peers ? await this.#getFile(flags.peers) : JSON.stringify(PEERS, undefined, 4);
+					writeFileSync(`${configDestination}/peers.json`, peers);
+				},
 			},
 			{
-				task: async () => writeFileSync(join(configDestination, "app.json"), await this.#getFile(flags.app)),
 				title: "Publish app (app.json)",
+				skip: () => {
+					if (!flags.app) {
+						return true;
+					}
+
+					if (existsSync(`${configDestination}/app.json`) && !flags.overwrite) {
+						return true;
+					}
+
+					return false;
+				},
+				task: async () => {
+					writeFileSync(join(configDestination, "app.json"), await this.#getFile(flags.app));
+				},
 			},
 			{
-				task: async () =>
-					writeFileSync(join(configDestination, "crypto.json"), await this.#getFile(flags.crypto)),
 				title: "Publish crypto (crypto.json)",
+				skip: () => {
+					if (!flags.crypto) {
+						return true;
+					}
+
+					if (existsSync(`${configDestination}/crypto.json`) && !flags.overwrite) {
+						return true;
+					}
+
+					return false;
+				},
+				task: async () => {
+					writeFileSync(join(configDestination, "crypto.json"), await this.#getFile(flags.crypto));
+				},
 			},
 		]);
 	}
