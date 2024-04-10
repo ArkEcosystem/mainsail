@@ -47,6 +47,10 @@ export const createSortingSchema = (
 
 		const sortingCriteria: string[] = Array.isArray(value) ? value : [value];
 
+		// properties may only contain letters (a-z) and can optionally be delimited by `.`
+		// and not exceed 50 characters.
+		const propertyRegex = /^(?=.{1,50}$)(?!.*\.\.)(?!.*\.$)(?!^\.)[.a-z]+$/i;
+
 		for (const criteria of sortingCriteria) {
 			for (const item of criteria.split(",")) {
 				const pair = item.split(":");
@@ -56,6 +60,12 @@ export const createSortingSchema = (
 				if (!exactPaths.includes(property) && !wildcardPaths.find((wp) => property.startsWith(`${wp}.`))) {
 					return helpers.message({
 						custom: `Unknown orderBy property '${property}'`,
+					});
+				}
+
+				if (!propertyRegex.test(property)) {
+					return helpers.message({
+						custom: `Invalid property name '${property}'`,
 					});
 				}
 

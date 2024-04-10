@@ -34,4 +34,4 @@ export const walletCriteriaSchemaObject = {
 
 export const walletParamSchema = Joi.alternatives(walletAddressSchema, walletPublicKeySchema, walletUsernameSchema);
 export const walletCriteriaSchema = Schemas.createCriteriaSchema(walletCriteriaSchemaObject);
-export const walletSortingSchema = Schemas.createSortingSchema(walletCriteriaSchemaObject, ["attributes"]);
+export const walletSortingSchema = Schemas.createSortingSchema(walletCriteriaSchemaObject, ["attributes"], false);

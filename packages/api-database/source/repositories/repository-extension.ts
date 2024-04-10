@@ -45,11 +45,11 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 				sorting[0].property,
 				sorting[0].jsonFieldAccessor,
 			);
-			queryBuilder.orderBy(column, sorting[0].direction === "desc" ? "DESC" : "ASC");
+			queryBuilder.orderBy(column, sorting[0].direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
 
 			for (const item of sorting.slice(1)) {
 				const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
-				queryBuilder.addOrderBy(column, item.direction === "desc" ? "DESC" : "ASC");
+				queryBuilder.addOrderBy(column, item.direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
 			}
 		}
 	},
