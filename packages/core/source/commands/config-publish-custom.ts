@@ -45,6 +45,10 @@ export class Command extends Commands.Command {
 	}
 
 	async #publish(flags: Contracts.AnyObject): Promise<void> {
+		if (!flags.overwrite && (!flags.app || !flags.crypto)) {
+			throw new Error("You must provide the --app and --crypto flags to publish the configuration.");
+		}
+
 		this.app.rebind(Identifiers.ApplicationPaths).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
