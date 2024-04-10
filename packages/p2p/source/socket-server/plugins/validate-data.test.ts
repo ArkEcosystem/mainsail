@@ -4,20 +4,19 @@ import esmock from "esmock";
 import Joi from "joi";
 
 import { describe, Sandbox } from "../../../../test-framework/source";
-import { ValidatePlugin } from "./validate";
+import { ValidateDataPlugin } from "./validate-data";
 
 const utils = {
-	getPeerIp: () => "",
 	isValidVersion: () => true,
 };
 
-const { ValidatePlugin: ValidatePluginProxy } = await esmock("./validate", {
+const { ValidateDataPlugin: ValidateDataPluginProxy } = await esmock("./validate-data", {
 	"../../utils": utils,
 });
 
 describe<{
 	sandbox: Sandbox;
-	validatePlugin: ValidatePlugin;
+	validatePlugin: ValidateDataPlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
 	const logger = { debug: () => {}, warning: () => {} };
 	const configuration = { getRequired: () => {} };
@@ -44,12 +43,11 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue({ validatePeerIp: () => true });
 		context.sandbox.app
 			.bind(Identifiers.P2P.Peer.Disposer)
 			.toConstantValue({ banPeer: () => {}, disposePeer: () => {} });
 
-		context.validatePlugin = context.sandbox.app.resolve(ValidatePluginProxy);
+		context.validatePlugin = context.sandbox.app.resolve(ValidateDataPluginProxy);
 	});
 
 	// TODO: fix stub

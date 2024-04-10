@@ -18,7 +18,7 @@ export const defaults = {
 	minimumNetworkReach: Environment.get(Constants.EnvironmentVariables.CORE_P2P_MIN_NETWORK_REACH, 20),
 	minimumVersions: ["^0.0.1"],
 
-	peerBanTime: Environment.get(Constants.EnvironmentVariables.CORE_P2P_PEER_BAN_TIME, 0),
+	peerBanTime: Environment.get(Constants.EnvironmentVariables.CORE_P2P_PEER_BAN_TIME, 3),
 
 	rateLimit: Environment.get(Constants.EnvironmentVariables.CORE_P2P_RATE_LIMIT, 150),
 	// max number of messages per second per socket connection
