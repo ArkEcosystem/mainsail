@@ -7,11 +7,10 @@ import { describe, Sandbox } from "../../../../test-framework/source";
 import { ValidateDataPlugin } from "./validate-data";
 
 const utils = {
-	getPeerIp: () => "",
 	isValidVersion: () => true,
 };
 
-const { ValidatePlugin: ValidatePluginProxy } = await esmock("./validate-data", {
+const { ValidateDataPlugin: ValidateDataPluginProxy } = await esmock("./validate-data", {
 	"../../utils": utils,
 });
 
@@ -44,12 +43,11 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
-		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue({ validatePeerIp: () => true });
 		context.sandbox.app
 			.bind(Identifiers.P2P.Peer.Disposer)
 			.toConstantValue({ banPeer: () => {}, disposePeer: () => {} });
 
-		context.validatePlugin = context.sandbox.app.resolve(ValidatePluginProxy);
+		context.validatePlugin = context.sandbox.app.resolve(ValidateDataPluginProxy);
 	});
 
 	// TODO: fix stub
