@@ -4,20 +4,20 @@ import esmock from "esmock";
 import Joi from "joi";
 
 import { describe, Sandbox } from "../../../../test-framework/source";
-import { ValidatePlugin } from "./validate";
+import { ValidateDataPlugin } from "./validate-data";
 
 const utils = {
 	getPeerIp: () => "",
 	isValidVersion: () => true,
 };
 
-const { ValidatePlugin: ValidatePluginProxy } = await esmock("./validate", {
+const { ValidatePlugin: ValidatePluginProxy } = await esmock("./validate-data", {
 	"../../utils": utils,
 });
 
 describe<{
 	sandbox: Sandbox;
-	validatePlugin: ValidatePlugin;
+	validatePlugin: ValidateDataPlugin;
 }>("ValidatePlugin", ({ it, assert, beforeEach, spy, match, stub }) => {
 	const logger = { debug: () => {}, warning: () => {} };
 	const configuration = { getRequired: () => {} };
