@@ -50,7 +50,13 @@ export class ValidatePlugin extends BasePlugin {
 
 		server.ext({
 			method: async (request: Contracts.P2P.Request, h: ResponseToolkit) => {
-				if (!this.peerProcessor.validatePeerIp(getPeerIp(request))) {
+				const ip = getPeerIp(request);
+
+				if (this.peerDisposer.isBanned(ip)) {
+					return this.banAndReturnBadRequest(request, h, "Validation failed (peer is bannned)");
+				}
+
+				if (!this.peerProcessor.validatePeerIp(ip)) {
 					return this.disposeAndReturnBadRequest(request, h, "Validation failed (bad ip)");
 				}
 
