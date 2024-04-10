@@ -49,7 +49,7 @@ export const createSortingSchema = (
 
 		// properties may only contain letters (a-z) and can optionally be delimited by `.`
 		// and not exceed 50 characters.
-		const propertyRegex = /^(?=.{1,50}$)(?!.*\.\.)(?!.*\.$)(?!^\.)[a-z.]+$/i;
+		const propertyRegex = /^(?=.{1,50}$)(?!.*\.\.)(?!.*\.$)(?!^\.)[.a-z]+$/i;
 
 		for (const criteria of sortingCriteria) {
 			for (const item of criteria.split(",")) {
