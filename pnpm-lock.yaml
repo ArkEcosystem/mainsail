@@ -2991,9 +2991,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -3015,9 +3012,6 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
@@ -3596,6 +3590,9 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../../../packages/database
+      '@mainsail/evm':
+        specifier: workspace:*
+        version: link:../../../packages/evm
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../../../packages/fees
@@ -3737,6 +3734,9 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../../../packages/database
+      '@mainsail/evm':
+        specifier: workspace:*
+        version: link:../../../packages/evm
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../../../packages/fees

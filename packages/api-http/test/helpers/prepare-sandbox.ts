@@ -7,6 +7,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 
 import { Sandbox } from "../../../test-framework/source";
+import { Validator } from "../../../validation/source/validator";
 import { ServiceProvider as CoreApiHttp } from "../../source/service-provider";
 
 export class ApiContext {

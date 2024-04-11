@@ -33,6 +33,7 @@
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/database": "workspace:*",
+		"@mainsail/evm": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/transaction-pool": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
