@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { base64 } from "./base64";
 
 describe("#base64", ({ it, assert }) => {

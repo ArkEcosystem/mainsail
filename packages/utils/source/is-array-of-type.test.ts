@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { isArrayOfType } from "./is-array-of-type";
 
 describe("isArrayOfType", async ({ assert, it, nock, loader }) => {

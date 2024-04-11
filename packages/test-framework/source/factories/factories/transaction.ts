@@ -8,10 +8,9 @@ import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-valid
 import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
 import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { BigNumber } from "@mainsail/utils";
-import { join } from "path";
 
 import secrets from "../../internal/passphrases.json";
-import { FactoryBuilder } from "../factory-builder";
+import { FactoryBuilder } from "../factory-builder.js";
 import {
 	EvmCallOptions,
 	MultiPaymentOptions,
@@ -21,8 +20,8 @@ import {
 	ValidatorRegistrationOptions,
 	ValidatorResignationOptions,
 	VoteOptions,
-} from "../types";
-import { generateApp } from "./generate-app";
+} from "../types.js";
+import { generateApp } from "./generate-app.js";
 
 const AMOUNT = 1;
 const FEE = 1;
@@ -266,11 +265,9 @@ export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.K
 
 export const registerTransactionFactory = async (
 	factory: FactoryBuilder,
-	config?: Contracts.Crypto.NetworkConfigPartial,
+	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
-	const app = await generateApp(
-		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/core/crypto.json")),
-	);
+	const app = await generateApp(config);
 
 	registerTransferFactory(factory, app);
 	registerValidatorRegistrationFactory(factory, app);

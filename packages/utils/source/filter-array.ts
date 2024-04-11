@@ -1,4 +1,4 @@
-import { FunctionReturning } from "./internal";
+import { FunctionReturning } from "./internal/index.js";
 
 export const filterArray = <T>(iterable: T[], iteratee: FunctionReturning): T[] => {
 	const result: T[] = [];

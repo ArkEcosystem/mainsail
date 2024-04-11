@@ -1,6 +1,6 @@
 import { AnySchema } from "joi";
 
-import { InputArgument, InputArguments } from "../contracts";
+import { InputArgument, InputArguments } from "../contracts.js";
 
 export class InputDefinition {
 	readonly #arguments: InputArguments = {};

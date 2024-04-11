@@ -3,7 +3,7 @@ import { Contracts, Exceptions } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { EvmCallTransaction } from "./versions/1";
+import { EvmCallTransaction } from "./versions/1.js";
 
 @injectable()
 export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {

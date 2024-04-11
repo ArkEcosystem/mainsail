@@ -7,7 +7,7 @@ import { Configuration } from "../../../crypto-config/distribution";
 import { makeKeywords as makeMessageKeywords } from "../../../crypto-messages/distribution/keywords";
 import { schemas as cryptoTransactionSchemas } from "../../../crypto-transaction/distribution";
 import { schemas as cryptoValidationSchemas } from "../../../crypto-validation/distribution";
-import { Sandbox } from "../../../test-framework/distribution";
+import { Sandbox } from "../../../test-framework/source";
 import { makeKeywords } from "../../source/validation/keywords";
 
 type Context = {

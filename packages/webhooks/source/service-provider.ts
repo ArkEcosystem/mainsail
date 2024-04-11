@@ -2,10 +2,10 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { Database } from "./database";
-import { InternalIdentifiers } from "./identifiers";
-import { Listener } from "./listener";
-import { Server } from "./server";
+import { Database } from "./database.js";
+import { InternalIdentifiers } from "./identifiers.js";
+import { Listener } from "./listener.js";
+import { Server } from "./server/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

@@ -3,13 +3,13 @@ import { Schemas } from "@mainsail/api-common";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { WalletsController } from "../controllers/wallets";
+import { WalletsController } from "../controllers/wallets.js";
 import {
 	transactionSortingSchema,
 	walletCriteriaSchemaObject,
 	walletParamSchema as walletParameterSchema,
 	walletSortingSchema,
-} from "../schemas";
+} from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(WalletsController);

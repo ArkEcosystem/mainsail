@@ -1,7 +1,7 @@
 import { Commands, Contracts } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
 import { validateMnemonic } from "bip39";
-import { writeJSONSync } from "fs-extra";
+import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
 @injectable()
@@ -85,7 +85,7 @@ export class Command extends Commands.Command {
 				task: () => {
 					const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
-					const validators: Record<string, string | string[]> = require(validatorsConfig);
+					const validators: Record<string, string | string[]> = readJSONSync(validatorsConfig);
 					// validators.bip38 = bip38.encrypt(
 					//     decodedWIF.privateKey,
 					//     decodedWIF.compressed,

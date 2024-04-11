@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { isEmptyObject } from "./is-empty-object";
 
 describe("isEmptyObject", async ({ assert, it, nock, loader }) => {

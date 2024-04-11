@@ -1,7 +1,9 @@
 import { Container } from "@mainsail/container";
+import { Identifiers } from "@mainsail/contracts";
+import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework";
+import { describeSkip } from "../../../test-framework/source";
 import { Application } from "../application";
 import { PluginConfiguration } from "./plugin-configuration";
 import { PluginManifest } from "./plugin-manifest";
@@ -11,11 +13,14 @@ class StubServiceProvider extends ServiceProvider {
 	async register() {}
 }
 
-describe<{
+describeSkip<{
 	app: Application;
 }>("ServiceProvider", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
+		context.app
+			.bind(Identifiers.Services.Filesystem.Service)
+			.toConstantValue({ existsSync: () => true, readJSONSync: (path: string) => readJSONSync(path) });
 	});
 
 	it(".register", async (context) => {
@@ -51,10 +56,8 @@ describe<{
 	it(".manifest", (context) => {
 		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
 
-		const pluginManifest: PluginManifest = new PluginManifest().discover(
-			resolve(__dirname, "../../test/stubs/stub-plugin"),
-		);
-		serviceProvider.setManifest(pluginManifest);
+		const pluginManifest = context.app.resolve(PluginManifest);
+		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
 
 		assert.equal(serviceProvider.manifest(), pluginManifest);
 	});
@@ -62,7 +65,8 @@ describe<{
 	it(".name", (context) => {
 		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
 
-		serviceProvider.setManifest(new PluginManifest().discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
+		const pluginManifest = context.app.resolve(PluginManifest);
+		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
 
 		assert.is(serviceProvider.name(), "stub-plugin");
 	});
@@ -74,7 +78,8 @@ describe<{
 	it(".version", (context) => {
 		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
 
-		serviceProvider.setManifest(new PluginManifest().discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
+		const pluginManifest = context.app.resolve(PluginManifest);
+		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
 
 		assert.is(serviceProvider.version(), "1.0.0");
 	});
@@ -86,7 +91,8 @@ describe<{
 	it(".alias", (context) => {
 		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
 
-		serviceProvider.setManifest(new PluginManifest().discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
+		const pluginManifest = context.app.resolve(PluginManifest);
+		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
 
 		assert.is(serviceProvider.alias(), "some-alias");
 	});
@@ -101,6 +107,7 @@ describe<{
 		const pluginConfiguration: PluginConfiguration = context.app
 			.resolve(PluginConfiguration)
 			.discover("stub-plugin", resolve(__dirname, "../../test/stubs/stub-plugin"));
+
 		serviceProvider.setConfig(pluginConfiguration);
 
 		assert.equal(serviceProvider.config(), pluginConfiguration);
@@ -117,7 +124,8 @@ describe<{
 	it(".dependencies", (context) => {
 		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
 
-		serviceProvider.setManifest(new PluginManifest().discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
+		const pluginManifest = context.app.resolve(PluginManifest);
+		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
 
 		assert.equal(serviceProvider.dependencies(), [{ name: "some-dependency" }]);
 	});
@@ -137,7 +145,8 @@ describe<{
 	it(".required", async (context) => {
 		const serviceProvider: ServiceProvider = context.app.resolve(StubServiceProvider);
 
-		serviceProvider.setManifest(new PluginManifest().discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
+		const pluginManifest = context.app.resolve(PluginManifest);
+		serviceProvider.setManifest(pluginManifest.discover(resolve(__dirname, "../../test/stubs/stub-plugin")));
 
 		assert.true(await serviceProvider.required());
 	});

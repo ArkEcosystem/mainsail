@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 
-import { ValidatorsController } from "../controllers/validators";
-import { pagination } from "../schemas";
+import { ValidatorsController } from "../controllers/validators.js";
+import { pagination } from "../schemas.js";
 
 export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(ValidatorsController);

@@ -1,15 +1,16 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Application, Services } from "@mainsail/kernel";
-import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { ServiceProvider } from ".";
 
-const importDefaults = () =>
+const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
+
+const importDefaults = async () =>
 	// @ts-ignore
-	importFresh("../distribution/defaults.js").defaults;
+	(await importFresh("../distribution/defaults.js")).defaults;
 
 const removeTransactionPoolEnvironmentVariables = () => {
 	for (const key of Object.keys(process.env)) {
@@ -70,7 +71,7 @@ describe<{
 	it("should validate schema using defaults", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 
@@ -87,7 +88,7 @@ describe<{
 	it("should allow configuration extension", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		defaults.customField = "dummy";
 
@@ -100,7 +101,7 @@ describe<{
 	it("should return true when process.env.CORE_TRANSACTION_POOL_DISABLED is undefined", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.true(result.value.enabled);
@@ -111,7 +112,7 @@ describe<{
 
 		process.env.CORE_TRANSACTION_POOL_DISABLED = "true";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.false(result.value.enabled);
@@ -122,7 +123,7 @@ describe<{
 
 		process.env.CORE_PATH_DATA = "dummy/path";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.storage, "dummy/path/transaction-pool.sqlite");
@@ -133,7 +134,7 @@ describe<{
 
 		process.env.CORE_MAX_TRANSACTIONS_IN_POOL = "4000";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.maxTransactionsInPool, 4000);
@@ -144,7 +145,7 @@ describe<{
 
 		process.env.CORE_MAX_TRANSACTIONS_IN_POOL = "false";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error.message, '"maxTransactionsInPool" must be a number');
@@ -155,7 +156,7 @@ describe<{
 
 		process.env.CORE_TRANSACTION_POOL_MAX_PER_SENDER = "4000";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.maxTransactionsPerSender, 4000);
@@ -166,7 +167,7 @@ describe<{
 
 		process.env.CORE_TRANSACTION_POOL_MAX_PER_SENDER = "false";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error.message, '"maxTransactionsPerSender" must be a number');
@@ -177,7 +178,7 @@ describe<{
 
 		process.env.CORE_TRANSACTION_POOL_MAX_PER_REQUEST = "4000";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.maxTransactionsPerRequest, 4000);
@@ -188,7 +189,7 @@ describe<{
 
 		process.env.CORE_TRANSACTION_POOL_MAX_PER_REQUEST = "false";
 
-		const result = (context.serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (context.serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.defined(result.error);
 		assert.equal(result.error.message, '"maxTransactionsPerRequest" must be a number');
@@ -196,7 +197,7 @@ describe<{
 
 	it("schema restrictions - enabled is required", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		delete defaults.enabled;
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -207,7 +208,7 @@ describe<{
 	it("schema restrictions - storage is required", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		delete defaults.storage;
 		const result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -218,7 +219,7 @@ describe<{
 	it("schema restrictions - maxTransactionsInPool is required && is integer && >= 1", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		defaults.maxTransactionsInPool = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -244,7 +245,7 @@ describe<{
 	it("schema restrictions - maxTransactionsPerSender is required && is integer && >= 1", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		defaults.maxTransactionsPerSender = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -270,7 +271,7 @@ describe<{
 	it("schema restrictions - allowedSenders is required && must contain strings", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		delete defaults.allowedSenders;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -286,7 +287,7 @@ describe<{
 	it("schema restrictions - maxTransactionsPerRequest is required && is integer && >= 1", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		defaults.maxTransactionsPerRequest = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -312,7 +313,7 @@ describe<{
 	it("schema restrictions - maxTransactionAge is required && is integer && >= 1", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		defaults.maxTransactionAge = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);
@@ -338,7 +339,7 @@ describe<{
 	it("schema restrictions - maxTransactionBytes is required && is integer && >= 1", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 
-		const defaults = importDefaults();
+		const defaults = await importDefaults();
 
 		defaults.maxTransactionBytes = false;
 		let result = (context.serviceProvider.configSchema() as AnySchema).validate(defaults);

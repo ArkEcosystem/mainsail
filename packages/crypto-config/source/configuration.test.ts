@@ -1,5 +1,5 @@
 import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { Configuration } from "./configuration";
 
 describe<{
@@ -39,6 +39,7 @@ describe<{
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
+				fees: cryptoJson.milestones[0].fees,
 				height: 0,
 				multiPaymentLimit: 256,
 				reward: "0",
@@ -53,6 +54,7 @@ describe<{
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
+				fees: cryptoJson.milestones[0].fees,
 				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
@@ -67,6 +69,7 @@ describe<{
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
+				fees: cryptoJson.milestones[0].fees,
 				height: 75_600,
 				multiPaymentLimit: 256,
 				reward: "200000000",

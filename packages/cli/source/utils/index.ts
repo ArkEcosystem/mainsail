@@ -1,3 +1,3 @@
-export * from "./builder";
-export * from "./flags";
-export * from "./process";
+export * from "./builder.js";
+export * from "./flags.js";
+export * from "./process.js";

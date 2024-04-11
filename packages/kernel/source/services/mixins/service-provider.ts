@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 
-import { ServiceProvider as BaseServiceProvider } from "../../providers";
-import { MixinService } from "./mixins";
+import { ServiceProvider as BaseServiceProvider } from "../../providers/index.js";
+import { MixinService } from "./mixins.js";
 
 export class ServiceProvider extends BaseServiceProvider {
 	public async register(): Promise<void> {

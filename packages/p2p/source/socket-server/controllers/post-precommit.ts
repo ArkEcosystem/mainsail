@@ -2,7 +2,7 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { getPeerIp } from "../../utils";
+import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
 export class PostPrecommitController implements Contracts.P2P.Controller {

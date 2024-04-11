@@ -1,9 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { KernelEvent } from "../enums";
-import { assert } from "../utils";
-import { ServiceProvider } from "./service-provider";
+import { KernelEvent } from "../enums/index.js";
+import { assert } from "../utils/assert.js";
+import { ServiceProvider } from "./service-provider.js";
 
 @injectable()
 export class ServiceProviderRepository {

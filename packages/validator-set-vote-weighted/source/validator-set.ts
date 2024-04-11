@@ -25,7 +25,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
-			this.buildValidatorRanking(unit.store);
+			this.#buildActiveValidators(unit.store);
 		}
 	}
 
@@ -53,9 +53,28 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
-	public buildValidatorRanking(store: Contracts.State.Store): void {
-		this.#validators = [];
+	#buildActiveValidators(store: Contracts.State.Store): void {
+		const validators = this.#buildValidatorRanking(store);
+
+		const { activeValidators } = this.configuration.getMilestone();
+		if (validators.length < activeValidators) {
+			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
+		}
+
+		this.#validators = validators.slice(0, activeValidators);
+
 		this.#indexByPublicKey = new Map();
+		for (const [index, validator] of this.#validators.entries()) {
+			const walletPublicKey = validator.getWalletPublicKey();
+			Utils.assert.defined<string>(walletPublicKey);
+			this.#indexByPublicKey.set(walletPublicKey, index);
+		}
+
+		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
+	}
+
+	#buildValidatorRanking(store: Contracts.State.Store): Contracts.State.ValidatorWallet[] {
+		const validators: Contracts.State.ValidatorWallet[] = [];
 
 		for (const wallet of store.walletRepository.allValidators()) {
 			const validator = this.validatorWalletFactory(wallet);
@@ -63,11 +82,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 				validator.unsetRank();
 				validator.unsetApproval();
 			} else {
-				this.#validators.push(validator);
+				validators.push(validator);
 			}
 		}
 
-		this.#validators.sort((a, b) => {
+		validators.sort((a, b) => {
 			const voteBalanceA: Utils.BigNumber = a.getVoteBalance();
 			const voteBalanceB: Utils.BigNumber = b.getVoteBalance();
 
@@ -92,17 +111,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
 
-		for (let index = 0; index < this.#validators.length; index++) {
-			const validator = this.#validators[index];
-
+		for (const [index, validator] of validators.entries()) {
 			validator.setRank(index + 1);
 			validator.setApproval(Utils.validatorCalculator.calculateApproval(validator.getVoteBalance(), totalSupply));
-
-			const walletPublicKey = validator.getWalletPublicKey();
-			Utils.assert.defined<string>(walletPublicKey);
-			this.#indexByPublicKey.set(walletPublicKey, index);
 		}
 
-		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
+		return validators;
 	}
 }

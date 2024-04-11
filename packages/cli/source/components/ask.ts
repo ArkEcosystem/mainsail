@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 
-import { Application } from "../contracts";
-import { Identifiers } from "../ioc";
-import { Prompt } from "./prompt";
+import { Application } from "../contracts.js";
+import { Identifiers } from "../ioc/index.js";
+import { Prompt } from "./prompt.js";
 
 @injectable()
 export class Ask {

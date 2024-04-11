@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Services, Utils } from "@mainsail/kernel";
+import { readJSONSync } from "fs-extra/esm";
 
 @injectable()
 export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
@@ -75,7 +76,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		for (const url of urls) {
 			// Local File...
 			if (url.startsWith("/")) {
-				return require(url);
+				return readJSONSync(url);
 			}
 
 			// URL...

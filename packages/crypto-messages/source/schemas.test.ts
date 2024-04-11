@@ -6,7 +6,7 @@ import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mains
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
-import { describe, Sandbox } from "../../test-framework";
+import { describe, Sandbox } from "../../test-framework/source";
 import {
 	precommitData,
 	precommitDataNoBlock,

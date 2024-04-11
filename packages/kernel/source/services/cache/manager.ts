@@ -1,8 +1,8 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { ClassManager } from "../../support/class-manager";
-import { MemoryCacheStore } from "./drivers/memory";
+import { ClassManager } from "../../support/class-manager.js";
+import { MemoryCacheStore } from "./drivers/memory.js";
 
 @injectable()
 export class CacheManager extends ClassManager {

@@ -1,0 +1,64 @@
+import { not, ok } from "uvu/assert";
+
+export abstract class Fake<T> {
+	protected readonly subject: any;
+
+	public constructor(subject: T) {
+		this.subject = subject;
+	}
+
+	public call<U>(...arguments_: any[]): U {
+		return this.subject(...arguments_);
+	}
+
+	public called(): void {
+		ok(this.subject.called);
+	}
+
+	public calledWith(...arguments_: any[]): void {
+		ok(this.subject.calledWith(...arguments_));
+	}
+
+	public notCalledWith(...arguments_: any[]): void {
+		not.ok(this.subject.calledWith(...arguments_));
+	}
+
+	public calledNthWith(index: number, ...arguments_: any[]): void {
+		if (this.subject.callCount <= index) {
+			throw new Error(`Failed to get arguments for call#${index}`);
+		}
+
+		ok(this.subject.getCall(index).calledWith(...arguments_));
+	}
+
+	public calledOnce(): void {
+		this.calledTimes(1);
+	}
+
+	public calledTimes(times: number): void {
+		ok(this.subject.callCount === times);
+	}
+
+	public neverCalled(): void {
+		this.calledTimes(0);
+	}
+
+	public getCallArgs(index: number): any[] {
+		if (this.subject.callCount > index) {
+			return this.subject.getCall(index).args;
+		}
+
+		throw new Error(`Failed to get arguments for call#${index}`);
+	}
+
+	public restore(): void {
+		this.subject.restore();
+	}
+
+	public reset(): void {
+		this.subject.resetHistory();
+	}
+	public toFunction(): T {
+		return this.subject;
+	}
+}

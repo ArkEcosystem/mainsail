@@ -165,6 +165,8 @@ jobs:
               run: cd packages/serializer && pnpm run test
             - name: Test state
               run: cd packages/state && pnpm run test
+            - name: Test test-runner
+              run: cd packages/test-runner && pnpm run test
             - name: Test test-framework
               run: cd packages/test-framework && pnpm run test
             - name: Test transaction-pool

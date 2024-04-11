@@ -5,8 +5,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
-import { TransactionResource } from "../resources";
-import { Controller } from "./controller";
+import { TransactionResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class TransactionsController extends Controller {

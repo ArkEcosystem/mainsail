@@ -1,5 +1,5 @@
-import { JsonObject } from "../types";
-import { Container } from "./container";
+import { JsonObject } from "../types/index.js";
+import { Container } from "./container.js";
 
 export interface Application {
 	readonly container: Container.Container;
@@ -81,4 +81,8 @@ export interface PluginDependency {
 	version?: string;
 
 	required?: boolean | (() => Promise<boolean>);
+}
+
+export interface Bootstrapper {
+	bootstrap(): Promise<void>;
 }

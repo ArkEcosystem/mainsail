@@ -1,3 +1,3 @@
-export * from "./consensus";
-export * from "./enums";
-export * from "./processor";
+export * from "./consensus.js";
+export * from "./enums.js";
+export * from "./processor.js";

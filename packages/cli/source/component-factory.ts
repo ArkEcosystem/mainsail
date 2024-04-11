@@ -30,9 +30,9 @@ import {
 	Title,
 	Toggle,
 	Warning,
-} from "./components";
-import { Application } from "./contracts";
-import { Identifiers } from "./ioc";
+} from "./components/index.js";
+import { Application } from "./contracts.js";
+import { Identifiers } from "./ioc/index.js";
 
 @injectable()
 export class ComponentFactory {
@@ -127,7 +127,7 @@ export class ComponentFactory {
 		return this.app.get<Table>(Identifiers.Table).render(head, callback, options);
 	}
 
-	public async taskList(tasks: { title: string; task: any }[]): Promise<void> {
+	public async taskList(tasks: { title: string; task: any; skip?: any }[]): Promise<void> {
 		return this.app.get<TaskList>(Identifiers.TaskList).render(tasks);
 	}
 

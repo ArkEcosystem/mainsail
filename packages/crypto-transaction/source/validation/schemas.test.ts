@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 import { Validator } from "@mainsail/validation/source/validator";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { makeKeywords } from "./keywords";
 import { schemas, transactionBaseSchema } from "./schemas";
 import { extendSchema, signedSchema, strictSchema } from "./utils";
@@ -83,7 +83,7 @@ describe<{
 	});
 
 	const transactionOriginal = {
-		amount: 1,
+		amount: 0,
 		fee: 1,
 		id: "1".repeat(64),
 		network: 30,
@@ -138,10 +138,10 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - amount should be big number min 1", ({ validator }) => {
+	it("transactionBaseSchema - amount should be big number 0 ", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const validValues = [1, "1", BigNumber.ONE, 100, "100", BigNumber.make(100)];
+		const validValues = [0, "0", BigNumber.ZERO];
 
 		for (const value of validValues) {
 			const transaction = {
@@ -152,7 +152,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [0, "0", 1.1, BigNumber.ZERO, -1, null, undefined, {}, "test"];
+		const invalidValues = [1, "1", BigNumber.ONE, 100, "100", BigNumber.make(100), -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {

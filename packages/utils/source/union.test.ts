@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { union } from "./union";
 
 describe("union", async ({ assert, it, nock, loader }) => {

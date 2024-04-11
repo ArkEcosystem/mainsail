@@ -1,21 +1,21 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../../core/bin/config/testnet/core/crypto.json";
-import { ServiceProvider as CoreCryptoAddressKeccak256 } from "../../../crypto-address-keccak256";
-import { ServiceProvider as CoreCryptoBlock } from "../../../crypto-block";
-import { ServiceProvider as CoreCryptoConfig } from "../../../crypto-config";
-import { ServiceProvider as CoreCryptoHashBcrypto } from "../../../crypto-hash-bcrypto";
-import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "../../../crypto-key-pair-ecdsa";
-import { ServiceProvider as CoreCryptoSignatureSchnorr } from "../../../crypto-signature-schnorr";
-import { ServiceProvider as CoreCryptoTransaction } from "../../../crypto-transaction";
-import { ServiceProvider as CoreCryptoValidation } from "../../../crypto-validation";
-import { ServiceProvider as CoreCryptoWif } from "../../../crypto-wif";
-import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/events";
-import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers";
-import { ServiceProvider as CoreSerializer } from "../../../serializer";
-import { Sandbox } from "../../../test-framework";
-import { ServiceProvider as CoreTransactions } from "../../../transactions";
-import { ServiceProvider as CoreValidation } from "../../../validation";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
+import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
+import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
+import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
+import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
+import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
+import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
+import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
+import { ServiceProvider as CoreEvents } from "@mainsail/kernel/source/services/events";
+import { ServiceProvider as CoreTriggers } from "@mainsail/kernel/source/services/triggers";
+import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
+import { Sandbox } from "@mainsail/test-framework";
+import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
+import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox = new Sandbox();

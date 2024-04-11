@@ -2,8 +2,8 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application, Enums, Utils } from "@mainsail/kernel";
 import { SinonSpy } from "sinon";
 
-import { Configuration } from "../../crypto-config";
-import { describeSkip } from "../../test-framework";
+import { Configuration } from "../../crypto-config/distribution/index";
+import { describeSkip } from "../../test-framework/source";
 import { setUp, setUpDefaults } from "../test/setup";
 import { StateBuilder } from "./state-builder";
 import { WalletRepository } from "./wallets";

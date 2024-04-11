@@ -13,9 +13,21 @@ Mainsail API Alpha images now available at [Docker Hub](https://hub.docker.com/r
 
 -   https://ark.dev/docs/mainsail
 
-## Mainsail Core Relay
+## Mainsail Core  
 
-Run Relay only node using [Docker Compose](https://docs.docker.com/compose/)
+Run Core node using [Docker Compose](https://docs.docker.com/compose/)
+
+## Mainsail Core Validator
+
+> [!NOTE]
+> Default configuration is for a Relay only node. If you would also like to run a `Validator` please set `MODE=validator` in your [`testnet.env`](./core/testnet.env) file in advance!
+
+Additionally you would need to protect your delegate secret with a password and encrypt it by using the script [`enc.sh`](./core/enc.sh). The script will generate the folder `enc` which is going to be mounted as a volume inside the container. 
+
+> [!NOTE]
+> From this point just follow [Relay running](#mainsail-core-relay) instructions. 
+
+## Mainsail Core Relay
 
 **_TestNet_**
 

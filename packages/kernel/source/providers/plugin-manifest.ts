@@ -1,13 +1,17 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { get, has } from "@mainsail/utils";
+import { createRequire } from "module";
 
 @injectable()
 export class PluginManifest {
+	@inject(Identifiers.Services.Filesystem.Service)
+	private readonly fileSystem!: Contracts.Kernel.Filesystem;
+
 	#manifest!: Contracts.Types.JsonObject;
 
-	public discover(packageId: string): this {
-		this.#manifest = require(`${packageId}/package.json`);
+	public discover(packageId: string, url: string): this {
+		this.#manifest = this.fileSystem.readJSONSync(createRequire(url).resolve(`${packageId}/package.json`));
 
 		return this;
 	}

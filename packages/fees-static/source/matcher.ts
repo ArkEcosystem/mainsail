@@ -37,12 +37,12 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		if (transaction.data.fee.isLessThan(staticFee)) {
 			this.logger.notice(`${transaction.id} not eligible for ${action} (fee ${feeString} < ${staticFeeString})`);
 
-			throw new Exceptions.TransactionFeeToLowError(transaction);
+			throw new Exceptions.TransactionFeeTooLowError(transaction);
 		}
 
 		this.logger.notice(`${transaction.id} not eligible for ${action} (fee ${feeString} > ${staticFeeString})`);
 
-		throw new Exceptions.TransactionFeeToHighError(transaction);
+		throw new Exceptions.TransactionFeeTooHighError(transaction);
 	}
 
 	#formatSatoshi(amount: BigNumber): string {

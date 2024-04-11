@@ -1,7 +1,7 @@
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { Checker } from "./checker";
+import { Checker } from "./checker.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

@@ -1,8 +1,7 @@
-import { AggregatedSignature, Precommit, Prevote, Proposal } from "../crypto";
-import { Commit } from "../crypto/commit";
-import { ProcessableUnit } from "../processor";
-import { ValidatorWallet } from "../state";
-import { Step } from "./enums";
+import { AggregatedSignature, Commit, Precommit, Prevote, Proposal } from "../crypto/index.js";
+import { ProcessableUnit } from "../processor.js";
+import { ValidatorWallet } from "../state/index.js";
+import { Step } from "./enums.js";
 
 export interface RoundState extends ProcessableUnit {
 	readonly validators: string[];
@@ -76,18 +75,6 @@ export interface ConsensusService {
 export interface ConsensusState extends ConsensusStateData {
 	readonly lockedValue?: RoundState;
 	readonly validValue?: RoundState;
-}
-
-export interface ConsensusStorage {
-	getState(): Promise<ConsensusStateData | undefined>;
-	saveState(state: ConsensusState): Promise<void>;
-	saveProposals(proposal: Proposal[]): Promise<void>;
-	savePrevotes(prevotes: Prevote[]): Promise<void>;
-	savePrecommits(precommits: Precommit[]): Promise<void>;
-	getProposals(): Promise<Proposal[]>;
-	getPrevotes(): Promise<Prevote[]>;
-	getPrecommits(): Promise<Precommit[]>;
-	clear(): Promise<void>;
 }
 
 export interface Bootstrapper {

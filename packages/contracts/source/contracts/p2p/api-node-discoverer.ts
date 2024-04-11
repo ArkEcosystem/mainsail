@@ -1,8 +1,7 @@
-import { ApiNode } from "./api-node";
-import { PeerProtocol } from "./enums";
-import { Peer } from "./peer";
+import { ApiNode } from "./api-node.js";
+import { Peer } from "./peer.js";
 
-export type ApiNodeFactory = (ip: string, port: string | number, protocol?: PeerProtocol) => ApiNode;
+export type ApiNodeFactory = (url: string) => ApiNode;
 
 export interface ApiNodeDiscoverer {
 	populateApiNodesFromConfiguration(): Promise<void>;

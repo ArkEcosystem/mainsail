@@ -3,8 +3,8 @@ import { request, RequestOptions } from "https";
 import { Primitive } from "type-fest";
 import { parse } from "url";
 
-import { isObject } from "./is-object";
-import { isUndefined } from "./is-undefined";
+import { isObject } from "./is-object.js";
+import { isUndefined } from "./is-undefined.js";
 
 const sendRequest = (method: string, url: string, options?: HttpOptions): Promise<HttpResponse> =>
 	new Promise((resolve, reject) => {

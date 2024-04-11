@@ -30,7 +30,17 @@ export const Identifiers = {
 		RoundStateRepository: Symbol("Consensus<RoundStateRepository>"),
 		Scheduler: Symbol("Consensus<Scheduler>"),
 		Service: Symbol("Consensus<Service>"),
-		Storage: Symbol("Consensus<Storage>"),
+	},
+	ConsensusStorage: {
+		Root: Symbol("ConsensusStorage<Root>"),
+		Service: Symbol("ConsensusStorage<Service>"),
+
+		Storage: {
+			ConsensusState: Symbol("ConsensusStorage<Storage.ConsensusState>"),
+			PreCommit: Symbol("ConsensusStorage<Storage.PreCommit>"),
+			PreVote: Symbol("ConsensusStorage<Storage.PreVote>"),
+			Proposal: Symbol("ConsensusStorage<Storage.Proposal>"),
+		},
 	},
 	CryptoWorker: {
 		Worker: {
@@ -113,15 +123,11 @@ export const Identifiers = {
 	Database: {
 		Instance: {
 			Consensus: Symbol("Database<Instance.Consensus>"),
-			Root: Symbol("Database<Instance.Root>"),
 		},
+		Root: Symbol("Database<Root>"),
 		Service: Symbol("Database<Service>"),
 		Storage: {
 			Block: Symbol("Database<Storage.Block>"),
-			ConsensusState: Symbol("Database<Storage.ConsensusState>"),
-			PreCommit: Symbol("Database<Storage.PreCommit>"),
-			PreVote: Symbol("Database<Storage.PreVote>"),
-			Proposal: Symbol("Database<Storage.Proposal>"),
 		},
 	},
 	Evm: {
@@ -205,10 +211,6 @@ export const Identifiers = {
 		},
 		Pipeline: {
 			Factory: Symbol("Kernel<Pipeline.Factory>"),
-		},
-		ProcessActions: {
-			Manager: Symbol("Kernel<ProcessActions.Manager>"),
-			Service: Symbol("Kernel<ProcessActions.Service>"),
 		},
 		Queue: {
 			Factory: Symbol("Kernel<Queue.Factory>"),

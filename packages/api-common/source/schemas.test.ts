@@ -1,5 +1,6 @@
 import Joi from "joi";
-import { describe } from "../../test-framework";
+
+import { describe } from "../../test-framework/source";
 import * as schemas from "./schemas";
 
 describe<{}>("Schemas", ({ it, assert }) => {

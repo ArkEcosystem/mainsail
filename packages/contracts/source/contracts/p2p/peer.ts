@@ -1,9 +1,9 @@
 import { Dayjs } from "dayjs";
 
-import { Queue } from "../kernel";
-import { ApiNode } from "./api-node";
-import { PeerProtocol } from "./enums";
-import { HeaderData } from "./header";
+import { Queue } from "../kernel/queue.js";
+import { ApiNode } from "./api-node.js";
+import { PeerProtocol } from "./enums.js";
+import { HeaderData } from "./header.js";
 
 export interface PeerPorts {
 	[name: string]: number;

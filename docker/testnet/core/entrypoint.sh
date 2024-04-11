@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 sudo /usr/sbin/ntpd
 
-MODE=${MODE:-relay}
-
 if [ "$DB_RESET" = "true" ]; then
   sudo rm -rf /home/node/.local/share/mainsail/core/*	
 fi
@@ -17,15 +15,15 @@ else
   mainsail config:publish:custom --token=$TOKEN --network=$NETWORK --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset
 fi
 
-if [ "$MODE" = "forger" ]; then
-  SECRET=`openssl rsautl -decrypt -inkey /run/secrets/secret.key -in /run/secrets/secret.dat`
-  CORE_FORGER_PASSWORD=`openssl rsautl -decrypt -inkey /run/secrets/bip.key -in /run/secrets/bip.dat`
+if [ "$MODE" = "validator" ]; then
+  SECRET=`openssl pkeyutl -decrypt -inkey /run/secrets/secret.key -in /run/secrets/secret.dat`
+  CORE_FORGER_PASSWORD=`openssl pkeyutl -decrypt -inkey /run/secrets/bip.key -in /run/secrets/bip.dat`
 
   # configure
-  if [ "$MODE" = "forger" ] && [ -z "$SECRET" ] && [ -z "$CORE_FORGER_PASSWORD" ]; then
+  if [ "$MODE" = "validator" ] && [ -z "$SECRET" ] && [ -z "$CORE_FORGER_PASSWORD" ]; then
     echo "set SECRET and/or CORE_FORGER_PASWORD if you want to run a forger"
     exit
-  elif [ -n "$SECRET" ] && [ -z "$CORE_FORGER_PASSWORD" ]; then
+  elif [ -n "$SECRET" ] && [ -n "$CORE_FORGER_PASSWORD" ]; then
     mainsail --token=$TOKEN --network=$NETWORK config:forger:bip39 --bip39 "$SECRET"
   fi
 fi
@@ -36,9 +34,10 @@ if [[ "$MODE" = "relay" ]]; then
 fi
 
 # forging
-if [ "$MODE" = "forger" ] && [ -z "$SECRET" ] && [ -z "$CORE_FORGER_PASSWORD" ]; then
+if [ "$MODE" = "validator" ] && [ -z "$SECRET" ] && [ -z "$CORE_FORGER_PASSWORD" ]; then
     echo "set SECRET and/or CORE_FORGER_PASWORD if you want to run a forger"
     exit
-elif [ "$MODE" = "forger" ] && [ -n "$SECRET" ] && [ -z "$CORE_FORGER_PASSWORD" ]; then
+elif [ "$MODE" = "validator" ] && [ -n "$SECRET" ] && [ -n "$CORE_FORGER_PASSWORD" ]; then
     mainsail --token=$TOKEN --network=$NETWORK core:run
 fi
+

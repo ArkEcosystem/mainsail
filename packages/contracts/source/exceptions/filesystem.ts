@@ -1,4 +1,4 @@
-import { RuntimeException } from "./runtime";
+import { RuntimeException } from "./runtime.js";
 
 export class FileException extends RuntimeException {}
 

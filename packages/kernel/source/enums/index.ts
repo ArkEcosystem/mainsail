@@ -1,2 +1,2 @@
-export * from "./events";
-export * from "./shutdown-signals";
+export * from "./events.js";
+export * from "./shutdown-signals.js";

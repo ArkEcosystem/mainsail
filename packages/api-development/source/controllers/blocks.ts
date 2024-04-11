@@ -3,8 +3,8 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { BlockResource, TransactionResource } from "../resources";
-import { Controller } from "./controller";
+import { BlockResource, TransactionResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class BlocksController extends Controller {
@@ -99,6 +99,6 @@ export class BlocksController extends Controller {
 
 	// TODO: Support height only
 	private async getBlock(idOrHeight: string): Promise<Contracts.Crypto.Block | undefined> {
-		return this.database.getBlock(Number.parseInt(idOrHeight));
+		return (await this.database.getCommit(Number.parseInt(idOrHeight)))?.block;
 	}
 }

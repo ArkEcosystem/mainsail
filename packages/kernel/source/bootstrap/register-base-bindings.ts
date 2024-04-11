@@ -1,19 +1,26 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
-import { resolve } from "path";
+import path from "path";
+import { URL } from "url";
 
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
+import { assert } from "../utils/assert.js";
 
 @injectable()
-export class RegisterBaseBindings implements Bootstrapper {
+export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Services.Filesystem.Service)
+	private readonly fileSystem!: Contracts.Kernel.Filesystem;
+
 	public async bootstrap(): Promise<void> {
 		const flags: Record<string, string> | undefined = this.app.config("app.flags");
-		const { version } = require(resolve(__dirname, "../../package.json"));
 
+		const { version } = this.fileSystem.readJSONSync<Contracts.Types.PackageJson>(
+			path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"),
+		);
+
+		assert.defined(version);
 		assert.defined<Record<string, string>>(flags);
 
 		this.app.bind<string>(Identifiers.Application.Environment).toConstantValue(flags.env);

@@ -1,4 +1,4 @@
-import { protocols } from "./protocols";
+import { protocols } from "./protocols.js";
 
 export const isSSH = (value: string): boolean => {
 	const results: string[] = protocols(value);

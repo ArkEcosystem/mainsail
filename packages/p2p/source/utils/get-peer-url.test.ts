@@ -1,6 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
-import { describe } from "../../../test-framework";
 
+import { describe } from "../../../test-framework/source";
 import { getPeerUrl } from "./get-peer-url";
 
 describe("getPeerUrl", ({ each, assert }) => {

@@ -1,1 +1,1 @@
-export * from "./instance-manager";
+export * from "./instance-manager.js";

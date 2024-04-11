@@ -3,7 +3,7 @@ import { Schemas } from "@mainsail/api-common";
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { DelegatesController } from "../controllers/delegates";
+import { DelegatesController } from "../controllers/delegates.js";
 import {
 	blockSortingSchema,
 	delegateCriteriaSchema,
@@ -11,7 +11,7 @@ import {
 	walletCriteriaSchema,
 	walletParamSchema as walletParameterSchema,
 	walletSortingSchema,
-} from "../schemas";
+} from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(DelegatesController);

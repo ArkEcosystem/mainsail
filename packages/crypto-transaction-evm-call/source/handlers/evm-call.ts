@@ -1,10 +1,10 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
-import Transactions from "@mainsail/crypto-transaction";
+import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
-import { EvmCallTransaction } from "../versions";
+import { EvmCallTransaction } from "../versions/index.js";
 
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
@@ -12,7 +12,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		return [];
 	}
 
-	public getConstructor(): Transactions.TransactionConstructor {
+	public getConstructor(): TransactionConstructor {
 		return EvmCallTransaction;
 	}
 

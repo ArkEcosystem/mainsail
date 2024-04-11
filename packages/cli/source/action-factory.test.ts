@@ -1,4 +1,4 @@
-import { Console, describe } from "../../test-framework";
+import { Console, describe } from "../../test-framework/source";
 import { ActionFactory } from "./action-factory";
 import { Identifiers } from "./ioc";
 

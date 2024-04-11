@@ -1,11 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import Transactions from "@mainsail/crypto-transaction";
+import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
 import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
-import { ValidatorResignationTransaction } from "../versions";
+import { ValidatorResignationTransaction } from "../versions/1.js";
 
 @injectable()
 export class ValidatorResignationTransactionHandler extends Handlers.TransactionHandler {
@@ -16,7 +16,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		return [ValidatorRegistrationTransactionHandler];
 	}
 
-	public getConstructor(): Transactions.TransactionConstructor {
+	public getConstructor(): TransactionConstructor {
 		return ValidatorResignationTransaction;
 	}
 
@@ -37,12 +37,10 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			throw new Exceptions.WalletAlreadyResignedError();
 		}
 
-		// TODO: use validator count relative to proposed block height
 		const requiredValidatorsCount: number = this.configuration.getMilestone().activeValidators;
-		// TODO: use resigned index to improve performance
-		const currentValidatorsCount: number = context.walletRepository
-			.allValidators()
-			.filter((w) => w.hasAttribute("validatorResigned") === false).length;
+		const currentValidatorsCount: number =
+			context.walletRepository.sizeOfIndex(Contracts.State.WalletIndexes.Validators) -
+			context.walletRepository.sizeOfIndex(Contracts.State.WalletIndexes.Resignations);
 
 		if (currentValidatorsCount - 1 < requiredValidatorsCount) {
 			throw new Exceptions.NotEnoughValidatorsError();

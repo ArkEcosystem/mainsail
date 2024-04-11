@@ -1,7 +1,7 @@
 import { homedir } from "os";
 import { join } from "path";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { expandTilde } from "./expand-tilde";
 
 describe("#expandTilde", ({ it, assert }) => {

@@ -1,7 +1,7 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe } from "../../../../test-framework";
+import { describe } from "../../../../test-framework/source";
 import { Application } from "../../application";
 import { MemoryLogger } from "./drivers/memory";
 import { ServiceProvider } from "./service-provider";

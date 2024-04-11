@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import BetterSqlite3 from "better-sqlite3";
-import { ensureFileSync } from "fs-extra";
+import { ensureFileSync } from "fs-extra/esm";
 
 @injectable()
 export class Storage implements Contracts.TransactionPool.Storage {
@@ -20,11 +20,15 @@ export class Storage implements Contracts.TransactionPool.Storage {
 
 	public boot(): void {
 		const filename = this.configuration.getRequired<string>("storage");
-		ensureFileSync(filename);
+
+		if (filename === ":memory:") {
+			this.#database = new BetterSqlite3(":memory:");
+		} else {
+			ensureFileSync(filename);
+			this.#database = new BetterSqlite3(filename);
+		}
 
 		const table = "pool_20201204";
-
-		this.#database = new BetterSqlite3(filename);
 		this.#database.exec(`
             PRAGMA journal_mode = WAL;
 

@@ -9,8 +9,8 @@
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
 		"lib": ["es2021"],
-		"module": "CommonJS",
-		"moduleResolution": "node",
+		"module": "nodenext",
+		"moduleResolution": "nodenext",
 		"newLine": "lf",
 		"noEmitOnError": true,
 		"noFallthroughCasesInSwitch": true,
@@ -28,5 +28,5 @@
 		"typeRoots": ["reflect-metadata", "node_modules/@types"],
 		"useUnknownInCatchVariables": false
 	},
-	"exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
+	"exclude": ["node_modules", "**/*.test.ts"]
 }

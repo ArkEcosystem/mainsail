@@ -1,4 +1,4 @@
-export * from "./formats";
-export * from "./keywords";
-export * from "./schemas";
-export { extendSchema } from "./utils";
+export * from "./formats.js";
+export * from "./keywords.js";
+export * from "./schemas.js";
+export { extendSchema } from "./utils.js";

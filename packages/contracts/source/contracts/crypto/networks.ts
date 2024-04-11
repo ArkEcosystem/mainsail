@@ -1,4 +1,5 @@
-import { CommitJson } from "./commit";
+import { Fees } from "../fees.js";
+import { CommitJson } from "./commit.js";
 
 export type NetworkConfig = {
 	genesisBlock: CommitJson;
@@ -43,6 +44,7 @@ export type Milestone = {
 	block: MilestoneBlock;
 	blockTime: number;
 	epoch: string;
+	fees: Fees;
 	multiPaymentLimit: number;
 	reward: string;
 	satoshi: MilestoneSatoshi;

@@ -1,6 +1,4 @@
-const {
-    Providers
-} = require("../../../../source");
+import { Providers } from "../../../../source"
 
 class ServiceProvider extends Providers.ServiceProvider {
     async register() {
@@ -22,4 +20,4 @@ class ServiceProvider extends Providers.ServiceProvider {
     }
 }
 
-exports.ServiceProvider = ServiceProvider;
+export { ServiceProvider };

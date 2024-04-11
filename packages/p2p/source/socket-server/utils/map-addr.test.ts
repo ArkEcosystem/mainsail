@@ -1,6 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
-import { describe } from "../../../../test-framework";
-
+import { describe } from "../../../../test-framework/source";
 import { mapAddr } from "./map-addr";
 
 describe("mapAddr", ({ it, assert }) => {

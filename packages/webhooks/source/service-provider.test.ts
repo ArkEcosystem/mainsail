@@ -2,13 +2,14 @@ import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 import { NullEventDispatcher } from "@mainsail/kernel/source/services/events/drivers/null";
-import importFresh from "import-fresh";
 import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "../../test-framework/source";
 import { defaults } from "./defaults";
 import { ServiceProvider } from "./service-provider";
+
+const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
 
 type Context = {
 	serviceProvider: ServiceProvider;
@@ -31,6 +32,8 @@ const init = (context: Context) => {
 	app.bind(Identifiers.Transaction.Handler.Registry).toConstantValue({});
 	app.bind(Identifiers.Services.EventDispatcher.Service).to(NullEventDispatcher);
 	app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
@@ -38,9 +41,9 @@ const init = (context: Context) => {
 	context.serviceProvider.setConfig(context.pluginConfiguration.from("webhooks", defaults));
 };
 
-const importDefaults = () =>
+const importDefaults = async () =>
 	// @ts-ignore
-	importFresh("../distribution/defaults.js").defaults;
+	(await importFresh("../distribution/defaults.js")).defaults;
 describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
 	beforeEach(init);
 
@@ -72,7 +75,7 @@ describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
 describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) => {
 	let defaults;
 
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		init(context);
 
 		for (const key of Object.keys(process.env)) {
@@ -81,7 +84,7 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 			}
 		}
 
-		defaults = importDefaults();
+		defaults = await importDefaults();
 	});
 
 	it("should validate schema using defaults", async ({ serviceProvider }) => {
@@ -110,7 +113,7 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 	it("should return true if process.env.CORE_WEBHOOKS_ENABLED is defined", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_ENABLED = "true";
 
-		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.true(result.value.enabled);
@@ -119,7 +122,7 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 	it("should return value of process.env.CORE_WEBHOOKS_HOST if defined", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_HOST = "127.0.0.1";
 
-		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.server.http.host, "127.0.0.1");
@@ -128,7 +131,7 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 	it("should return value of process.env.CORE_WEBHOOKS_PORT if number", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_PORT = "200";
 
-		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.server.http.port, 200);
@@ -137,7 +140,7 @@ describe<Context>("ServiceProvider.configSchema", ({ beforeEach, assert, it }) =
 	it("should return value of process.env.CORE_WEBHOOKS_TIMEOUT if defined", async ({ serviceProvider }) => {
 		process.env.CORE_WEBHOOKS_TIMEOUT = "5000";
 
-		const result = (serviceProvider.configSchema() as AnySchema).validate(importDefaults());
+		const result = (serviceProvider.configSchema() as AnySchema).validate(await importDefaults());
 
 		assert.undefined(result.error);
 		assert.equal(result.value.timeout, 5000);

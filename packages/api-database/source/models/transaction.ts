@@ -1,6 +1,6 @@
 import { Column, Entity } from "typeorm";
 
-import { vendorFieldTransformer } from "../transformers/vendor-field";
+import { vendorFieldTransformer } from "../transformers/vendor-field.js";
 
 @Entity({
 	name: "transactions",

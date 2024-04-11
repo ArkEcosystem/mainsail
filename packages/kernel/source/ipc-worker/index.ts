@@ -1,1 +1,1 @@
-export * from "./ipc-worker";
+export * from "./ipc-worker.js";

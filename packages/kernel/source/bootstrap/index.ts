@@ -1,20 +1,31 @@
-/* eslint-disable simple-import-sort/imports */
-import { RegisterBaseServiceProviders } from "./register-base-service-providers";
-import { RegisterErrorHandler } from "./register-error-handler";
-import { RegisterBaseConfiguration } from "./register-base-configuration";
-import { RegisterBaseBindings } from "./register-base-bindings";
-import { RegisterBasePaths } from "./register-base-paths";
-import { LoadEnvironmentVariables } from "./load-environment-variables";
-import { LoadConfiguration } from "./load-configuration";
-import { LoadServiceProviders } from "./load-service-providers";
+import { BootServiceProviders } from "./boot-service-providers.js";
+import { ListenToShutdownSignals } from "./listen-to-shutdown-signals.js";
+import { LoadConfiguration } from "./load-configuration.js";
+import { LoadEnvironmentVariables } from "./load-environment-variables.js";
+import { LoadServiceProviders } from "./load-service-providers.js";
+import { RegisterBaseBindings } from "./register-base-bindings.js";
+import { RegisterBaseConfiguration } from "./register-base-configuration.js";
+import { RegisterBasePaths } from "./register-base-paths.js";
+import { RegisterBaseServiceProviders } from "./register-base-service-providers.js";
+import { RegisterErrorHandler } from "./register-error-handler.js";
+import { RegisterServiceProviders } from "./register-service-providers.js";
 
-import { RegisterServiceProviders } from "./register-service-providers";
-import { BootServiceProviders } from "./boot-service-providers";
+export { BootServiceProviders } from "./boot-service-providers.js";
+export { LoadConfiguration } from "./load-configuration.js";
+export { LoadEnvironmentVariables } from "./load-environment-variables.js";
+export { LoadServiceProviders } from "./load-service-providers.js";
+export { RegisterBaseBindings } from "./register-base-bindings.js";
+export { RegisterBaseConfiguration } from "./register-base-configuration.js";
+export { RegisterBasePaths } from "./register-base-paths.js";
+export { RegisterBaseServiceProviders } from "./register-base-service-providers.js";
+export { RegisterErrorHandler } from "./register-error-handler.js";
+export { RegisterServiceProviders } from "./register-service-providers.js";
 
 export const Bootstrappers = {
 	app: [
-		RegisterBaseServiceProviders,
 		RegisterErrorHandler,
+		ListenToShutdownSignals,
+		RegisterBaseServiceProviders,
 		RegisterBaseConfiguration,
 		RegisterBaseBindings,
 		RegisterBasePaths,

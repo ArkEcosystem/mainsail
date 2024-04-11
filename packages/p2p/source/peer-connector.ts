@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import delay from "delay";
 
-import { Client } from "./hapi-nes";
+import { Client } from "./hapi-nes/index.js";
 
 const TEN_SECONDS_IN_MILLISECONDS = 10_000;
 

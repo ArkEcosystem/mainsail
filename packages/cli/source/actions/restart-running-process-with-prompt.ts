@@ -1,10 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 
-import { Application } from "../application";
-import { Prompt } from "../components";
-import { Identifiers } from "../ioc";
-import { ProcessManager } from "../services";
-import { RestartProcess } from "./restart-process";
+import { Application } from "../application.js";
+import { Prompt } from "../components/index.js";
+import { Identifiers } from "../ioc/index.js";
+import { ProcessManager } from "../services/index.js";
+import { RestartProcess } from "./restart-process.js";
 
 @injectable()
 export class RestartRunningProcessWithPrompt {

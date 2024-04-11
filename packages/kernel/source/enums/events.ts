@@ -22,8 +22,8 @@ export enum CryptoEvent {
 
 export enum BlockEvent {
 	Applied = "block.applied",
-	Disregarded = "block.disregarded",
 	Forged = "block.forged",
+	Invalid = "block.invalid",
 	Received = "block.received",
 }
 
@@ -43,6 +43,17 @@ export enum PeerEvent {
 	Disconnected = "peer.disconnected",
 	Disconnecting = "peer.disconnecting",
 	Removed = "peer.removed",
+}
+
+export enum ConsensusEvent {
+	Bootstrapped = "consensus.bootstrapped",
+	RoundStarted = "consensus.round.started",
+	ProposalAccepted = "consensus.proposal.accepted",
+	PrevotedProposal = "consensus.prevoted.proposal",
+	PrevotedAny = "consensus.prevoted.any",
+	PrevotedNull = "consensus.prevoted.null",
+	PrecommitedAny = "consensus.precommited.any",
+	PrecommitedProposal = "consensus.precommited.proposal",
 }
 
 export enum ApiNodeEvent {

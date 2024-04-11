@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { WalletRepository } from "./wallet-repository";
+import { WalletRepository } from "./wallet-repository.js";
 
 @injectable()
 export class WalletRepositoryBySender extends WalletRepository {
@@ -70,7 +70,12 @@ export class WalletRepositoryBySender extends WalletRepository {
 		return this.#blockchainWalletRepository.hasByIndex(index, key);
 	}
 
+	// TODO: set, forget & sizeOfIndex methods are not implemented fully
 	public setOnIndex(index: string, key: string, wallet: Contracts.State.Wallet): void {}
+
+	public sizeOfIndex(index: string): number {
+		return this.#blockchainWalletRepository.sizeOfIndex(index);
+	}
 
 	#cloneWallet(address: string): Contracts.State.Wallet {
 		return this.#blockchainWalletRepository.findByAddress(address).clone(this);

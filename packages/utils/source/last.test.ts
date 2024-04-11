@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { last } from "./last";
 
 describe("last", async ({ assert, it, nock, loader }) => {

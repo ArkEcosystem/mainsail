@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { WIFFactory } from "./wif.factory";
+import { WIFFactory } from "./wif.factory.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

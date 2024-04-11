@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { PinoLogger } from "./driver";
+import { PinoLogger } from "./driver.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -10,9 +10,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			Identifiers.Services.Log.Manager,
 		);
 
-		await logManager.extend("pino", async () =>
-			this.app.resolve<Contracts.Kernel.Logger>(PinoLogger).make(this.config().all()),
-		);
+		await logManager.extend("pino", async () => this.app.resolve<PinoLogger>(PinoLogger).make(this.config().all()));
 
 		logManager.setDefaultDriver("pino");
 	}

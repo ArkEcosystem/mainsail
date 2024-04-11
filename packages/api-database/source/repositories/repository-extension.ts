@@ -1,8 +1,8 @@
 import { EntityTarget, ObjectLiteral, Repository, SelectQueryBuilder } from "typeorm";
 
-import { RepositoryDataSource } from "../contracts";
-import { Expressions, Options, Pagination, QueryHelper, ResultsPage, Sorting } from "../search";
-import { Expression } from "../search/expressions";
+import { RepositoryDataSource } from "../contracts.js";
+import { Expression } from "../search/expressions.js";
+import { Expressions, Options, Pagination, QueryHelper, ResultsPage, Sorting } from "../search/index.js";
 
 export interface RepositoryExtension<TEntity extends ObjectLiteral> {
 	queryHelper: QueryHelper<TEntity>;
@@ -40,12 +40,16 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 	ThisRepositoryExtension<TEntity> => ({
 	addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Sorting): void {
 		if (sorting.length > 0) {
-			const column = this.queryHelper.getColumnName(this.metadata, sorting[0].property);
-			queryBuilder.orderBy(column, sorting[0].direction === "desc" ? "DESC" : "ASC");
+			const column = this.queryHelper.getColumnName(
+				this.metadata,
+				sorting[0].property,
+				sorting[0].jsonFieldAccessor,
+			);
+			queryBuilder.orderBy(column, sorting[0].direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
 
 			for (const item of sorting.slice(1)) {
-				const column = this.queryHelper.getColumnName(this.metadata, item.property);
-				queryBuilder.addOrderBy(column, item.direction === "desc" ? "DESC" : "ASC");
+				const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
+				queryBuilder.addOrderBy(column, item.direction === "desc" ? "DESC" : "ASC", "NULLS LAST");
 			}
 		}
 	},

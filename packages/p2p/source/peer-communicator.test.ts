@@ -1,34 +1,32 @@
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import rewiremock from "rewiremock";
+import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework/source";
 import { defaults } from "./defaults";
 import { Routes } from "./enums";
 import { Peer } from "./peer";
 import { PeerCommunicator } from "./peer-communicator";
 
+const codec = { request: { serialize: (item) => item }, response: { deserialize: (item) => item } };
+
+const { PeerCommunicator: PeerCommunicatorProxy } = await esmock("./peer-communicator", {
+	"./socket-server/codecs": {
+		Codecs: {
+			[Routes.GetBlocks]: codec,
+			[Routes.GetCommonBlocks]: codec,
+			[Routes.GetPeers]: codec,
+			[Routes.GetStatus]: codec,
+			[Routes.PostBlock]: codec,
+			[Routes.PostTransactions]: codec,
+		},
+	},
+});
+
 describeSkip<{
 	sandbox: Sandbox;
 	peerCommunicator: PeerCommunicator;
 }>("PeerCommunicator", ({ it, assert, beforeEach, stub, spy, match }) => {
-	const codec = { request: { serialize: (item) => item }, response: { deserialize: (item) => item } };
-
-	const { PeerCommunicator: PeerCommunicatorProxy } = rewiremock.proxy<{
-		PeerCommunicator: Contracts.Types.Class<PeerCommunicator>;
-	}>("./peer-communicator", {
-		"./socket-server/codecs": {
-			Codecs: {
-				[Routes.GetBlocks]: codec,
-				[Routes.GetCommonBlocks]: codec,
-				[Routes.GetPeers]: codec,
-				[Routes.GetStatus]: codec,
-				[Routes.PostBlock]: codec,
-				[Routes.PostTransactions]: codec,
-			},
-		},
-	});
-
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, warning: () => {} };
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 	const connector = { connect: () => {}, emit: () => {}, forgetError: () => {}, setError: () => {} };

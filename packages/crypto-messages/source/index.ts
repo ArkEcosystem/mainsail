@@ -1,11 +1,13 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { Deserializer } from "./deserializer";
-import { MessageFactory } from "./factory";
-import { makeKeywords } from "./keywords";
-import { schemas } from "./schemas";
-import { Serializer } from "./serializer";
+import { Deserializer } from "./deserializer.js";
+import { MessageFactory } from "./factory.js";
+import { makeKeywords } from "./keywords.js";
+import { schemas } from "./schemas.js";
+import { Serializer } from "./serializer.js";
+
+export { Proposal } from "./proposal.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

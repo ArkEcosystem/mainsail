@@ -1,1 +1,1 @@
-export * from "./multi-payment";
+export * from "./multi-payment.js";

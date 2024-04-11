@@ -1,38 +1,36 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import rewiremock from "rewiremock";
+import esmock from "esmock";
 
-import { describeSkip, Sandbox } from "../../test-framework";
+import { describeSkip, Sandbox } from "../../test-framework/source";
 import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 
 let onDelay = (timeout: number) => {};
 
+class ClientMock {
+	static onConstructor = (...arguments_) => {};
+
+	constructor(...arguments_) {
+		ClientMock.onConstructor(...arguments_);
+	}
+	async connect() {}
+	async request() {}
+	async terminate() {}
+}
+
+const { PeerConnector: PeerConnectorProxy } = await esmock("./peer-connector", {
+	"./hapi-nes": {
+		Client: ClientMock,
+	},
+	delay: async (timeout: number) => {
+		onDelay(timeout);
+	},
+});
+
 describeSkip<{
 	sandbox: Sandbox;
 	peerConnector: PeerConnector;
 }>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
-	class ClientMock {
-		static onConstructor = (...arguments_) => {};
-
-		constructor(...arguments_) {
-			ClientMock.onConstructor(...arguments_);
-		}
-		async connect() {}
-		async request() {}
-		async terminate() {}
-	}
-
-	const { PeerConnector: PeerConnectorProxy } = rewiremock.proxy<{
-		PeerConnector: Contracts.Types.Class<PeerConnector>;
-	}>("./peer-connector", {
-		"./hapi-nes": {
-			Client: ClientMock,
-		},
-		delay: async (timeout: number) => {
-			onDelay(timeout);
-		},
-	});
-
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, warning: () => {} };
 	beforeEach((context) => {
 		onDelay = () => {};

@@ -1,5 +1,5 @@
-import { Client } from "./nes";
-import { Peer } from "./peer";
+import { Client } from "./nes.js";
+import { Peer } from "./peer.js";
 
 export interface PeerConnector {
 	connect(peer: Peer): Promise<Client>;

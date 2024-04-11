@@ -1,9 +1,9 @@
 import { Container } from "@mainsail/container";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { Prompt } from "../components";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { RestartProcess } from "./restart-process";
 import { RestartRunningProcessWithPrompt } from "./restart-running-process-with-prompt";

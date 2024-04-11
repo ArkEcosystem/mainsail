@@ -1,1 +1,1 @@
-export * from "./evm-call";
+export * from "./evm-call.js";

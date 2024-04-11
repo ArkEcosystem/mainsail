@@ -1,3 +1,3 @@
-export { ApplyTransactionAction } from "./apply-transaction";
-export { ThrowIfCannotEnterPoolAction } from "./throw-if-cannot-enter-pool";
-export { VerifyTransactionAction } from "./verify-transaction";
+export { ApplyTransactionAction } from "./apply-transaction.js";
+export { ThrowIfCannotEnterPoolAction } from "./throw-if-cannot-enter-pool.js";
+export { VerifyTransactionAction } from "./verify-transaction.js";

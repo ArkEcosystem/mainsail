@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { getRandomPeer } from "../utils";
+import { getRandomPeer } from "../utils/index.js";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;

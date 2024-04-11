@@ -1,16 +1,16 @@
 import { Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Configuration } from "@mainsail/crypto-config";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
-import { Configuration } from "../../../crypto-config";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
-import { describeSkip, Sandbox } from "../../../test-framework";
+import { describeSkip, Sandbox } from "../../../test-framework/source";
 import { AttributeRepository } from "../attributes";
 import {
-	addressesIndexer,
-	publicKeysIndexer,
-	usernamesIndexer,
+	// addressesIndexer,
+	// publicKeysIndexer,
+	// usernamesIndexer,
 	Wallet,
 	WalletRepository,
 	WalletRepositoryClone,

@@ -1,9 +1,9 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { InternalTransactionType } from "@mainsail/crypto-transaction";
+import { InternalTransactionType, TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 
-import { TransactionHandlerConstructor } from "./transaction";
+import { TransactionHandlerConstructor } from "./transaction.js";
 
 @injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.TransactionHandlerProvider {
@@ -17,6 +17,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 	private readonly transactionRegistry!: Contracts.Crypto.TransactionRegistry;
 
 	#registered = false;
+	#handlerDependencyLookup = new Set<TransactionConstructor>();
 
 	public isRegistrationRequired(): boolean {
 		return this.#registered === false;
@@ -34,6 +35,8 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 		const handler = new handlerConstructor();
 		const transactionConstructor = handler.getConstructor();
 
+		this.#handlerDependencyLookup.add(transactionConstructor);
+
 		Utils.assert.defined<number>(transactionConstructor.type);
 		Utils.assert.defined<number>(transactionConstructor.typeGroup);
 
@@ -47,7 +50,7 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 		}
 
 		for (const dependency of handler.dependencies()) {
-			if (this.#hasOtherHandler(handlerConstructor, dependency) === false) {
+			if (this.#hasOtherHandler(dependency) === false) {
 				throw new Exceptions.UnsatisfiedDependencyError(internalType);
 			}
 		}
@@ -92,11 +95,14 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 		return false;
 	}
 
-	#hasOtherHandler(handlerConstructor: TransactionHandlerConstructor, dependency: TransactionHandlerConstructor) {
-		return this.handlerConstructors.some(
-			(otherHandlerConstructor) =>
-				otherHandlerConstructor.name !== handlerConstructor.name &&
-				otherHandlerConstructor.name === dependency.name,
+	#hasOtherHandler(dependencyConstructor: TransactionHandlerConstructor) {
+		const dependency = new dependencyConstructor().getConstructor();
+
+		return [...this.#handlerDependencyLookup].some(
+			(handler) =>
+				handler.type === dependency.type &&
+				handler.typeGroup === dependency.typeGroup &&
+				handler.version === dependency.version,
 		);
 	}
 }

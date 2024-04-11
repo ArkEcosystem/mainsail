@@ -48,6 +48,7 @@ describe<{
 		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
 
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		context.database = app.get<Database>(InternalIdentifiers.Database);
 		context.database.boot();

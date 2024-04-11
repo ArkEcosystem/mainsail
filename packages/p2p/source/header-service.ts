@@ -1,12 +1,15 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { constants } from "./constants";
+import { constants } from "./constants.js";
 
 @injectable()
 export class HeaderService implements Contracts.P2P.HeaderService {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly repository!: Contracts.P2P.PeerRepository;
 
 	#pending = new Set<Contracts.P2P.Peer>();
 
@@ -18,6 +21,10 @@ export class HeaderService implements Contracts.P2P.HeaderService {
 		}
 
 		await this.#delay(peer);
+
+		if (!this.repository.hasPeer(peer.ip)) {
+			return;
+		}
 
 		this.app.get<Contracts.P2P.Downloader>(Identifiers.P2P.Downloader.Block).download(peer);
 		this.app.get<Contracts.P2P.Downloader>(Identifiers.P2P.Downloader.Proposal).download(peer);

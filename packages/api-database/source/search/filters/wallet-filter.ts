@@ -1,7 +1,7 @@
-import { Wallet } from "../../models";
-import { EqualCriteria, OrWalletCriteria, WalletCriteria } from "../criteria";
-import { Expression } from "../expressions";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
+import { Wallet } from "../../models/index.js";
+import { EqualCriteria, OrWalletCriteria, WalletCriteria } from "../criteria.js";
+import { Expression } from "../expressions.js";
+import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class WalletFilter {
 	public static async getExpression(...criteria: OrWalletCriteria[]): Promise<Expression<Wallet>> {

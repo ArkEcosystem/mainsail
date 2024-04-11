@@ -1,4 +1,4 @@
-import { Wallet } from "../../models";
+import { Wallet } from "../../models/index.js";
 import {
 	DelegateBlocks,
 	DelegateCriteria,
@@ -7,9 +7,9 @@ import {
 	DelegateResourceLastBlock,
 	OrDelegateCriteria,
 	OrNumericCriteria,
-} from "../criteria";
-import { Expression, JsonFieldCastType } from "../expressions";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
+} from "../criteria.js";
+import { Expression, JsonFieldCastType } from "../expressions.js";
+import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class DelegateFilter {
 	public static async getExpression(...criteria: OrDelegateCriteria[]): Promise<Expression<Wallet>> {
@@ -17,7 +17,18 @@ export class DelegateFilter {
 			criteria.map((c) => handleOrCriteria(c, (c) => this.handleDelegateCriteria(c))),
 		);
 
-		return optimizeExpression({ expressions, op: "and" });
+		return optimizeExpression({
+			expressions: [
+				{
+					expressions: [
+						{ attribute: "validatorPublicKey", op: "jsonbAttributeExists", property: "attributes" },
+					],
+					op: "and",
+				},
+				...expressions,
+			],
+			op: "and",
+		});
 	}
 
 	private static async handleDelegateCriteria(criteria: DelegateCriteria): Promise<Expression<Wallet>> {
@@ -27,7 +38,7 @@ export class DelegateFilter {
 					return handleOrCriteria(criteria.address, async (c) => ({
 						op: "equal",
 						property: "address",
-						value: criteria,
+						value: c,
 					}));
 				}
 
@@ -35,7 +46,7 @@ export class DelegateFilter {
 					return handleOrCriteria(criteria.publicKey, async (c) => ({
 						op: "equal",
 						property: "publicKey",
-						value: criteria,
+						value: c,
 					}));
 				}
 

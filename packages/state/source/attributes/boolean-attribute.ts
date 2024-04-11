@@ -1,4 +1,4 @@
-import { GenericAttribute } from "./generic-attribute";
+import { GenericAttribute } from "./generic-attribute.js";
 
 export class BooleanAttribute extends GenericAttribute<boolean> {
 	public clone(): BooleanAttribute {

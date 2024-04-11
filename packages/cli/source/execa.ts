@@ -1,7 +1,7 @@
-import * as execaImport from "execa";
-export { ExecaReturnValue, ExecaSyncReturnValue } from "execa";
+import { execaNode, execaSync } from "execa";
+export type { ExecaReturnValue, ExecaSyncReturnValue } from "execa";
 
 export const execa = {
-	...execaImport,
-	run: execaImport.default,
+	run: execaNode,
+	sync: execaSync,
 };

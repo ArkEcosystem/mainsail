@@ -6,7 +6,8 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { Validator } from "@mainsail/validation/source/validator";
 import { generateMnemonic } from "bip39";
 
-import { describe, Sandbox } from "../../test-framework";
+import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
+import { describe, Sandbox } from "../../test-framework/source";
 import { AddressFactory } from "./address.factory";
 import { schemas } from "./schemas";
 

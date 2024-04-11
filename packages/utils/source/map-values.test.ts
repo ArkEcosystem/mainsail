@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { mapValues } from "./map-values";
 
 describe("mapValues", async ({ assert, it, nock, loader }) => {

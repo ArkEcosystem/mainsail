@@ -2,13 +2,13 @@ import { inject, injectable } from "@mainsail/container";
 import { Constants } from "@mainsail/contracts";
 import { totalmem } from "os";
 
-import { Application } from "../application";
-import { Spinner } from "../components";
-import { ProcessOptions } from "../contracts";
-import { Identifiers } from "../ioc";
-import { ProcessManager } from "../services";
-import { AbortRunningProcess } from "./abort-running-process";
-import { AbortUnknownProcess } from "./abort-unknown-process";
+import { Application } from "../application.js";
+import { Spinner } from "../components/index.js";
+import { ProcessOptions } from "../contracts.js";
+import { Identifiers } from "../ioc/index.js";
+import { ProcessManager } from "../services/index.js";
+import { AbortRunningProcess } from "./abort-running-process.js";
+import { AbortUnknownProcess } from "./abort-unknown-process.js";
 
 @injectable()
 export class DaemonizeProcess {

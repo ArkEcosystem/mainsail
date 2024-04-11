@@ -1,6 +1,6 @@
 import { parse, UrlWithStringQuery } from "url";
 
-import { last } from "./last";
+import { last } from "./last.js";
 
 const getOwner = (value: string): string => {
 	const string: number = value.indexOf(":");

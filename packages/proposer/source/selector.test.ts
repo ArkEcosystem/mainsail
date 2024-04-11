@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { describe, Sandbox } from "@mainsail/test-framework";
 
 import { Attributes, Store } from "../../state/distribution";
+import { describe, Sandbox } from "../../test-framework/source";
 import { Selector } from "./selector";
 
 type Context = {

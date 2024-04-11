@@ -1,10 +1,12 @@
-import { Commands, Contracts, Utils } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { Commands, Contracts, Identifiers, Utils } from "@mainsail/cli";
+import { inject, injectable } from "@mainsail/container";
 import Joi from "joi";
-import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
+	@inject(Identifiers.Setup)
+	private readonly setup!: Contracts.Setup;
+
 	public signature = "core:start";
 
 	public description = "Start the Core process.";
@@ -31,7 +33,9 @@ export class Command extends Commands.Command {
 			{
 				args: `core:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail`,
-				script: resolve(__dirname, "../../bin/run"),
+				script: this.setup.isGlobal()
+					? this.setup.getGlobalEntrypoint("@mainsail/core")
+					: this.setup.getEntrypoint(),
 			},
 			flags,
 		);

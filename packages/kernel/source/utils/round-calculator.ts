@@ -1,7 +1,7 @@
 import { Contracts, Exceptions } from "@mainsail/contracts";
 
-import { assert } from "./assert";
-import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
+import { assert } from "./assert.js";
+import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info.js";
 
 export const isNewRound = (height: number, configuration: Contracts.Crypto.Configuration): boolean => {
 	const milestones = configuration.get("milestones");

@@ -1,8 +1,8 @@
 import { Container } from "@mainsail/container";
 
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { ProcessIdentifier } from "../contracts";
-import { Identifiers } from "../ioc";
+import { Identifiers } from "../ioc/index.js";
 import { ProcessManager } from "../services";
 import { AbortUnknownProcess } from "./abort-unknown-process";
 

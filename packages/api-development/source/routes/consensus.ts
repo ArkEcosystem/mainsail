@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 
-import { ConsensusController } from "../controllers/consensus";
+import { ConsensusController } from "../controllers/consensus.js";
 
 export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(ConsensusController);

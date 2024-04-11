@@ -1,5 +1,6 @@
 import { Contracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
-import { describe } from "../../../test-framework";
+
+import { describe } from "../../../test-framework/source";
 import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
 import { GenesisBlockGenerator } from "./genesis-block";

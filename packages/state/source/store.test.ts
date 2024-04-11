@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-import { describe, Sandbox } from "../../test-framework/distribution";
+import { describe, Sandbox } from "../../test-framework/source";
 import { AttributeRepository } from "./attributes";
 import { Store } from "./store";
 

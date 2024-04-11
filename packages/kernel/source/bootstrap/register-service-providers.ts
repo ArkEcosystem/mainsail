@@ -2,15 +2,14 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import semver from "semver";
 
-import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../providers";
-import { ValidationManager } from "../services/validation";
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
+import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
+import { ValidationManager } from "../services/validation/index.js";
+import { assert } from "../utils/assert.js";
 
 // @TODO review the implementation
 
 @injectable()
-export class RegisterServiceProviders implements Bootstrapper {
+export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

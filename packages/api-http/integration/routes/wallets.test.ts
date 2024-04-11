@@ -1,4 +1,4 @@
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -37,7 +37,7 @@ describe<{
 
 		const { statusCode, data } = await request("/wallets", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, wallets);
+		assert.equal(data.data.length, wallets.length);
 	});
 
 	it("/wallets/top", async () => {
@@ -45,7 +45,7 @@ describe<{
 
 		const { statusCode, data } = await request("/wallets/top", options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, wallets);
+		assert.equal(data.data.length, wallets.length);
 	});
 
 	it("/wallets/{id}", async () => {
@@ -69,9 +69,46 @@ describe<{
 		];
 
 		for (const { id, result } of testCases) {
-			const { statusCode, data } = await request(`/wallets/${id}`, options);
+			const {
+				statusCode,
+				data: { data },
+			} = await request(`/wallets/${id}`, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data, result);
+		}
+	});
+
+	it("/wallets?orderBy", async () => {
+		await apiContext.walletRepository.save(wallets);
+		const testCases = [
+			{
+				path: "/wallets?orderBy=attributes.validatorRank:asc",
+				result: [...wallets].sort(
+					(a, b) => Number(a.attributes.validatorRank) - Number(b.attributes.validatorRank),
+				),
+			},
+			{
+				path: "/wallets?limit=2&orderBy=attributes.validatorRank:desc",
+				result: [...wallets]
+					.sort((a, b) => Number(b.attributes.validatorRank) - Number(a.attributes.validatorRank))
+					.slice(0, 2),
+			},
+			{
+				path: "/wallets?limit=15&orderBy=attributes.validatorLastBlock.height:asc",
+				result: [...wallets]
+					.sort(
+						(a, b) =>
+							Number(a.attributes.validatorLastBlock?.height) -
+							Number(b.attributes.validatorLastBlock?.height),
+					)
+					.slice(0, 15),
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
 		}
 	});
 

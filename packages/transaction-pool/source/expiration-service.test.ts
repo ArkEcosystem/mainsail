@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { ExpirationService } from ".";
 
 describe<{

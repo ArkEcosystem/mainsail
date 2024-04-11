@@ -1,7 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 
-import { ValidatorWallet } from "./validator-wallet";
-import { Wallet } from "./wallet";
+import { ValidatorWallet } from "./validator-wallet.js";
+import { Wallet } from "./wallet.js";
 
 export const walletFactory =
 	(attributeRepository: Contracts.State.AttributeRepository) =>

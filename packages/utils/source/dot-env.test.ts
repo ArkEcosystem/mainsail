@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { resolve } from "path";
+import { join } from "path";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { dotenv } from "./dot-env";
 
 describe("#DotEnv", ({ it, assert }) => {
@@ -19,7 +19,7 @@ describe("#DotEnv", ({ it, assert }) => {
 	});
 
 	it("should parse the given file", () => {
-		assert.equal(dotenv.parseFile(resolve(__dirname, "../test/fixtures/.env")), {
+		assert.equal(dotenv.parseFile(join(import.meta.dirname, "../test/fixtures/.env")), {
 			key1: "value",
 			key2: 1,
 			key3: 1,

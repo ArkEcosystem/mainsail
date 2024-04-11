@@ -1,9 +1,10 @@
 {
 	"name": "@mainsail/configuration-generator",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.14",
 	"description": "Configuration generator for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
@@ -14,10 +15,11 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
@@ -51,15 +53,15 @@
 		"@mainsail/validation": "workspace:*",
 		"bip39": "3.1.0",
 		"dayjs": "1.11.10",
-		"envfile": "7.0.0",
+		"envfile": "7.1.0",
 		"fs-extra": "11.2.0"
 	},
 	"devDependencies": {
 		"@types/env-paths": "2.1.0",
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
-		"env-paths": "2.2.1",
-		"tmp": "0.2.1",
+		"env-paths": "3.0.0",
+		"tmp": "0.2.3",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

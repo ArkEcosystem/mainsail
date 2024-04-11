@@ -1,17 +1,5 @@
 import { injectable, Selectors } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Services } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
-import { SinonSpy, spy } from "sinon";
-
-import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
-import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
-import { Configuration } from "../../crypto-config";
-import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";
-import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
-import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
-import { PublicKeySerializer } from "../../crypto-key-pair-schnorr/source/serializer";
-import { Signature } from "../../crypto-signature-schnorr/source/signature";
 import {
 	Deserializer as TransactionDeserializer,
 	Serializer,
@@ -20,13 +8,25 @@ import {
 	TransactionTypeFactory,
 	Utils,
 	Verifier,
-} from "../../crypto-transaction";
+} from "@mainsail/crypto-transaction";
+import { Providers, Services } from "@mainsail/kernel";
+import { BigNumber } from "@mainsail/utils";
+import { SinonSpy, spy } from "sinon";
+
+import cryptoJson from "../../core/bin/config/testnet/core/crypto.json";
+import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
+import { Configuration } from "../../crypto-config/distribution/index";
+import { HashFactory } from "../../crypto-hash-bcrypto/source/hash.factory";
+import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
+import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
+import { PublicKeySerializer } from "../../crypto-key-pair-schnorr/source/serializer";
+import { Signature } from "../../crypto-signature-schnorr/source/signature";
 import { Selector } from "../../proposer/source/selector";
-import { Factories, Sandbox } from "../../test-framework";
+import { Factories, Sandbox } from "../../test-framework/source";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
 import { store } from "../source/state-store";
-import { IndexSet, WalletRepository, WalletRepositoryClone, WalletRepositoryCopyOnWrite } from "../source/wallets";
+import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "../source/wallets";
 import { walletFactory } from "../source/wallets/factory";
 
 export interface Spies {
@@ -50,7 +50,7 @@ export interface Setup {
 	app: Contracts.Kernel.Application;
 	sandbox: Sandbox;
 	walletRepo: WalletRepository;
-	walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite;
+	walletRepoCopyOnWrite: WalletRepositoryBySender;
 	factory: Factories.FactoryBuilder;
 	store: store;
 	spies: Spies;
@@ -251,7 +251,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app
 		.bind(Identifiers.WalletRepository)
-		.to(WalletRepositoryCopyOnWrite)
+		.to(WalletRepositoryBySender)
 		.inRequestScope()
 		.when(Selectors.anyAncestorOrTargetTaggedFirst("state", "copy-on-write"));
 
@@ -265,7 +265,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	const walletRepo: WalletRepository = sandbox.app.getTagged(Identifiers.WalletRepository, "state", "blockchain");
 
-	const walletRepoCopyOnWrite: WalletRepositoryCopyOnWrite = sandbox.app.getTagged(
+	const walletRepoCopyOnWrite: WalletRepositoryBySender = sandbox.app.getTagged(
 		Identifiers.WalletRepository,
 		"state",
 		"copy-on-write",

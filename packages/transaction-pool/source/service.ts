@@ -114,7 +114,9 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.events.dispatch(Enums.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
 				this.storage.removeTransaction(transaction.id);
-				this.logger.warning(`tx ${transaction.id} failed to enter pool: ${error.message}`);
+				this.logger.warning(
+					`tx ${transaction.id} (type: ${transaction.type}) failed to enter pool: ${error.message}`,
+				);
 				// eslint-disable-next-line @typescript-eslint/no-floating-promises
 				this.events.dispatch(Enums.TransactionEvent.RejectedByPool, transaction.data);
 

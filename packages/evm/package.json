@@ -1,9 +1,10 @@
 {
 	"name": "@mainsail/evm",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.11",
 	"description": "EVM for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
@@ -11,16 +12,17 @@
 	],
 	"scripts": {
 		"build": "pnpm run clean && pnpm run build-napi && tsc && pnpm run copy",
-		"build-napi": "pnpm run clean && mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts --release && mv evm.*.node bindings.js bindings.d.ts source/generated",
-		"build-napi:debug": "napi build --platform --cargo-cwd bindings --js bindings.js --dts bindings.d.ts && mv evm.*.node bindings.js bindings.d.ts source/generated",
+		"build-napi": "pnpm run clean && mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.cjs --dts bindings.d.cts --release && mv evm.*.node bindings.cjs bindings.d.cts source/generated",
+		"build-napi:debug": "napi build --platform --cargo-cwd bindings --js bindings.cjs --dts bindings.d.cts && mv evm.*.node bindings.cjs bindings.d.cts source/generated",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution && del source/generated",
-		"copy": "mkdir distribution/generated && cp source/generated/bindings.js distribution/generated/ && cp source/generated/bindings.d.ts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
+		"copy": "mkdir distribution/generated && cp source/generated/bindings.cjs distribution/generated/ && cp source/generated/bindings.d.cts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
@@ -28,6 +30,19 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-keccak256": "workspace:*",
+		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/crypto-hash-bcrypto": "workspace:*",
+		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/crypto-signature-schnorr": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/crypto-wif": "workspace:*",
+		"@mainsail/serializer": "workspace:*",
+		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@napi-rs/cli": "^2.18.0",
 		"ethers": "6.11.0",
 		"uvu": "^0.5.6"

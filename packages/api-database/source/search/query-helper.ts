@@ -1,6 +1,6 @@
 import { EntityMetadata } from "typeorm";
 
-import { Expression, JsonFieldAccessor } from "./expressions";
+import { Expression, JsonFieldAccessor } from "./expressions.js";
 
 export type SqlExpression = {
 	query: string;
@@ -116,6 +116,13 @@ export class QueryHelper<TEntity> {
 				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
 				const query = `(${built.map((b) => b.query).join(" OR ")})`;
 				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
+				return { parameters, query };
+			}
+			case "jsonbAttributeExists": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} ? :${parameter}`;
+				const parameters = { [parameter]: expression.attribute };
 				return { parameters, query };
 			}
 			default: {

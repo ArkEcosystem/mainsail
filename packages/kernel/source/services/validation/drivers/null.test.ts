@@ -1,4 +1,4 @@
-import { describe } from "../../../../../test-framework";
+import { describe } from "../../../../../test-framework/source";
 import { NullValidator } from "./null";
 
 describe("NullValidator.validate", ({ assert, beforeEach, it }) => {

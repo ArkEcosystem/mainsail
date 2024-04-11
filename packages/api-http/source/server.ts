@@ -4,7 +4,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import * as Schemas from "./schemas";
+import * as Schemas from "./schemas/index.js";
 
 @injectable()
 export class Server extends AbstractServer {

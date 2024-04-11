@@ -5,8 +5,8 @@ import {
 	GetPeersResponse,
 	GetProposalResponse,
 	GetStatusResponse,
-} from "./endpoints";
-import { Peer } from "./peer";
+} from "./endpoints.js";
+import { Peer } from "./peer.js";
 
 export type EmitOptions = {
 	timeout: number;

@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import capcon from "capture-console";
 
-import { describe } from "../../../../../test-framework";
+import { describe } from "../../../../../test-framework/source";
 import { Application } from "../../../application";
 import { MemoryLogger } from "./memory";
 

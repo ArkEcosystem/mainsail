@@ -1,5 +1,5 @@
-import { constants } from "../constants";
-import { headers } from "./headers";
+import { constants } from "../constants.js";
+import { headers } from "./headers.js";
 
 export const getBlocks = {
 	properties: {

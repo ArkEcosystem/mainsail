@@ -3,12 +3,12 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import delay from "delay";
 
-import { constants } from "./constants";
-import { Routes, SocketErrors } from "./enums";
+import { constants } from "./constants.js";
+import { Routes, SocketErrors } from "./enums.js";
 // eslint-disable-next-line import/no-namespace
-import * as replySchemas from "./reply-schemas";
-import { Codecs } from "./socket-server/codecs";
-import { Throttle } from "./throttle";
+import * as replySchemas from "./reply-schemas/index.js";
+import { Codecs } from "./socket-server/codecs/index.js";
+import { Throttle } from "./throttle.js";
 
 // @TODO review the implementation
 @injectable()

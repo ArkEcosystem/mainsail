@@ -1,4 +1,4 @@
-import { describe } from "../../../../../test-framework";
+import { describe } from "../../../../../test-framework/source";
 import { QueueJob } from "../../../contracts/kernel";
 import { NullQueue } from "./null";
 

@@ -1,21 +1,19 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import rewiremock from "rewiremock";
+import { Identifiers } from "@mainsail/contracts";
+import esmock from "esmock";
 
-import { describe, Sandbox } from "../../../../test-framework";
+import { describe, Sandbox } from "../../../../test-framework/source";
 import { GetStatusController } from "./get-status";
+
+const { GetStatusController: GetStatusControllerProxy } = await esmock("./get-status", {
+	"../utils/get-peer-config": {
+		getPeerConfig: () => ({}),
+	},
+});
 
 describe<{
 	sandbox: Sandbox;
 	controller: GetStatusController;
 }>("GetStatusController", ({ it, assert, beforeEach, stub }) => {
-	const { GetStatusController: GetStatusControllerProxy } = rewiremock.proxy<{
-		GetStatusController: Contracts.Types.Class<GetStatusController>;
-	}>("./get-status", {
-		"../utils/get-peer-config": {
-			getPeerConfig: () => ({}),
-		},
-	});
-
 	const store = { getLastBlock: () => {} };
 	const stateService = { getStore: () => store };
 	const slots = { getSlotInfo: () => {} };

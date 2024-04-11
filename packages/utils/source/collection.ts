@@ -1,9 +1,9 @@
-import { get } from "./get";
-import { has } from "./has";
-import { sample } from "./sample";
-import { set } from "./set";
-import { stringify } from "./stringify";
-import { unset } from "./unset";
+import { get } from "./get.js";
+import { has } from "./has.js";
+import { sample } from "./sample.js";
+import { set } from "./set.js";
+import { stringify } from "./stringify.js";
+import { unset } from "./unset.js";
 
 export class Collection<T> {
 	#collection: Record<string, T> = {};

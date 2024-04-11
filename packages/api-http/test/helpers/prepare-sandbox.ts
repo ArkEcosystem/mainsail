@@ -1,14 +1,14 @@
-import { Identifiers } from "@mainsail/contracts";
-import { Application, Providers } from "@mainsail/kernel";
-
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	ServiceProvider as CoreApiDatabase,
-} from "../../../api-database";
-import { Sandbox } from "../../../test-framework";
+} from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/contracts";
+import { Application, Providers } from "@mainsail/kernel";
+
+import { Sandbox } from "../../../test-framework/source";
 import { Validator } from "../../../validation/source/validator";
-import { ServiceProvider as CoreApiHttp } from "../..";
+import { ServiceProvider as CoreApiHttp } from "../../source/service-provider";
 
 export class ApiContext {
 	public constructor(
@@ -109,6 +109,8 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 		notice: (message) => console.log(message),
 	});
 
+	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+
 	const apiDatabase = await setupDatabase(context.sandbox.app);
 	const apiHttp = await setupHttp(context.sandbox.app);
 
@@ -116,19 +118,20 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 };
 
 const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
-	const pluginConfiguration = app
+	const pluginConfiguration = await app
 		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
-		.discover("@mainsail/api-database", "@mainsail/api-database")
-		.merge({
-			database: {
-				...databaseOptions,
-				applicationName: "mainsail/api-database-test",
-				dropSchema: true,
-				logging: false,
-				migrationsRun: true,
-				synchronize: true,
-			},
-		});
+		.discover("@mainsail/api-database", "@mainsail/api-database");
+
+	pluginConfiguration.merge({
+		database: {
+			...databaseOptions,
+			applicationName: "mainsail/api-database-test",
+			dropSchema: true,
+			logging: false,
+			migrationsRun: true,
+			synchronize: true,
+		},
+	});
 
 	const database = app.resolve(CoreApiDatabase);
 	database.setConfig(pluginConfiguration);
@@ -138,22 +141,23 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 };
 
 const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
-	const pluginConfiguration = app
+	const pluginConfiguration = await app
 		.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration)
-		.discover("@mainsail/api-http", "@mainsail/api-http")
-		.merge({
-			database: {
-				...databaseOptions,
-				applicationName: "mainsail/api-http-test",
+		.discover("@mainsail/api-http", "@mainsail/api-http");
+
+	pluginConfiguration.merge({
+		database: {
+			...databaseOptions,
+			applicationName: "mainsail/api-http-test",
+		},
+		plugins: {
+			pagination: {
+				limit: 100,
 			},
-			plugins: {
-				pagination: {
-					limit: 100,
-				},
-				socketTimeout: 5000,
-			},
-			server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },
-		});
+			socketTimeout: 5000,
+		},
+		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },
+	});
 
 	const server = app.resolve(CoreApiHttp);
 	server.setConfig(pluginConfiguration);

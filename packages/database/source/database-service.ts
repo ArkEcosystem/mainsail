@@ -1,22 +1,26 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Database } from "lmdb";
+import * as lmdb from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.Storage.Block)
-	private readonly blockStorage!: Database;
+	private readonly blockStorage!: lmdb.Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
 	#cache = new Map<number, Buffer>();
 
-	public async getBlock(height: number): Promise<Contracts.Crypto.Block | undefined> {
+	public isEmpty(): boolean {
+		return this.#cache.size === 0 && this.blockStorage.getKeysCount() === 0;
+	}
+
+	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
 		const bytes = this.#get(height);
 
 		if (bytes) {
-			return (await this.commitFactory.fromBytes(bytes)).block;
+			return await this.commitFactory.fromBytes(bytes);
 		}
 
 		return undefined;
@@ -49,25 +53,29 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
-			const commit = await this.commitFactory.fromBytes(this.#get(height));
+			const data = this.#get(height);
+
+			if (!data) {
+				throw new Error(`Failed to read commit at height ${height}`);
+			}
+
+			const commit = await this.commitFactory.fromBytes(data);
 			yield commit;
 		}
 	}
 
-	public async getLastBlock(): Promise<Contracts.Crypto.Block | undefined> {
+	public async getLastCommit(): Promise<Contracts.Crypto.Commit> {
+		if (this.isEmpty()) {
+			throw new Error("Database is empty");
+		}
+
 		if (this.#cache.size > 0) {
-			return (await this.commitFactory.fromBytes([...this.#cache.values()].pop()!)).block;
+			return await this.commitFactory.fromBytes([...this.#cache.values()].pop()!);
 		}
 
-		try {
-			const lastCommit = await this.commitFactory.fromBytes(
-				this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
-			);
-
-			return lastCommit.block;
-		} catch {
-			return undefined;
-		}
+		return await this.commitFactory.fromBytes(
+			this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
+		);
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
@@ -75,11 +83,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	async persist(): Promise<void> {
-		await this.blockStorage.transaction(async () => {
+		await this.blockStorage.transaction(() => {
 			for (const [height, block] of this.#cache.entries()) {
-				await this.blockStorage.put(height, block);
+				void this.blockStorage.put(height, block);
 			}
 		});
+
+		await this.blockStorage.flushed;
 
 		this.#cache.clear();
 	}

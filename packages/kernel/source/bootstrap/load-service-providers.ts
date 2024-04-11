@@ -1,13 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra";
-import { glob } from "glob";
-import { join } from "path";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import path from "path";
+import { URL } from "url";
 
-import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers";
-import { ConfigRepository } from "../services/config";
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
+import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
+import { ConfigRepository } from "../services/config/index.js";
+import { assert } from "../utils/assert.js";
 
 interface PluginEntry {
 	package: string;
@@ -21,12 +19,15 @@ interface Plugin {
 }
 
 @injectable()
-export class LoadServiceProviders implements Bootstrapper {
+export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
+
+	@inject(Identifiers.Services.Filesystem.Service)
+	private readonly fileSystem!: Contracts.Kernel.Filesystem;
 
 	@inject(Identifiers.ServiceProvider.Repository)
 	private readonly serviceProviderRepository!: ServiceProviderRepository;
@@ -45,15 +46,55 @@ export class LoadServiceProviders implements Bootstrapper {
 			const installedPlugin = installedPlugins.find((installedPlugin) => installedPlugin.name === plugin.package);
 			const packageId = installedPlugin ? installedPlugin.path : plugin.package;
 
-			const packageModule = join(pluginPath, packageId);
-			const serviceProvider: ServiceProvider = this.app.resolve(require(packageModule).ServiceProvider);
+			let packageModule = path.join(pluginPath, packageId);
+
+			let ServiceProvider;
+			try {
+				({ ServiceProvider } = await import(path.join(pluginPath, packageId)));
+			} catch (error) {
+				if (error.code === "ERR_MODULE_NOT_FOUND") {
+					// HACK: just a workaround to use import on local packages if they are not installed.
+					//
+					// Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@mainsail/validation' imported from
+					// ~/git/mainsail/packages/kernel/distribution/bootstrap/load-service-providers.js
+					//
+					const extractLocalModulePath = (message: string) => {
+						const prefix = "Did you mean to import ";
+						const suffix = "index.js";
+						const startIndex = message.indexOf(prefix) + prefix.length;
+						const endIndex = message.indexOf(suffix, startIndex) + suffix.length;
+						const path = message.slice(startIndex, endIndex);
+						const parts = path.split("/");
+						return parts.slice(-3).join("/");
+					};
+
+					const localPath = extractLocalModulePath(error.stack);
+					// ~/git/mainsail/packages/kernel/distribution/bootstrap
+					// ~/git/mainsail/packages/
+					// ~/git/mainsail/packages/validation/distribution/index.js
+					const fallback = path.resolve(new URL(".", import.meta.url).pathname, "..", "..", "..", localPath);
+					({ ServiceProvider } = await import(fallback));
+
+					// ~/git/mainsail/packages/validation/distribution/index.js
+					// ~/git/mainsail/packages/validation/
+					packageModule = path.resolve(fallback.replaceAll("/index.js", ""), "..");
+				}
+			}
+
+			if (!ServiceProvider) {
+				throw new Exceptions.ServiceNotFound(packageId);
+			}
+
+			const serviceProvider: ServiceProvider = this.app.resolve(ServiceProvider);
 
 			if (this.app.isWorker() && !serviceProvider.requiredByWorker()) {
 				continue;
 			}
 
-			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule));
-			serviceProvider.setConfig(this.#discoverConfiguration(serviceProvider, plugin.options, packageModule));
+			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule, import.meta.url));
+			serviceProvider.setConfig(
+				await this.#discoverConfiguration(serviceProvider, plugin.options, packageModule),
+			);
 
 			this.serviceProviderRepository.set(plugin.package, serviceProvider);
 
@@ -65,11 +106,11 @@ export class LoadServiceProviders implements Bootstrapper {
 		}
 	}
 
-	#discoverConfiguration(
+	async #discoverConfiguration(
 		serviceProvider: ServiceProvider,
 		options: Contracts.Types.JsonObject,
 		packageId: string,
-	): PluginConfiguration {
+	): Promise<PluginConfiguration> {
 		const serviceProviderName: string | undefined = serviceProvider.name();
 
 		assert.defined<string>(serviceProviderName);
@@ -83,18 +124,20 @@ export class LoadServiceProviders implements Bootstrapper {
 				.merge(options);
 		}
 
-		return this.app.resolve(PluginConfiguration).discover(serviceProviderName, packageId).merge(options);
+		const plugins = await this.app.resolve(PluginConfiguration).discover(serviceProviderName, packageId);
+		return plugins.merge(options);
 	}
 
-	async #discoverPlugins(path: string): Promise<Plugin[]> {
+	async #discoverPlugins(pluginPath: string): Promise<Plugin[]> {
 		const plugins: Plugin[] = [];
 
+		const glob = await import("glob");
 		const packagePaths = glob
-			.sync("{*/*/package.json,*/package.json}", { cwd: path })
-			.map((packagePath) => join(path, packagePath).slice(0, -"/package.json".length));
+			.sync("{*/*/package.json,*/package.json}", { cwd: pluginPath })
+			.map((packagePath) => path.join(pluginPath, packagePath).slice(0, -"/package.json".length));
 
 		for (const packagePath of packagePaths) {
-			const packageJson = readJSONSync(join(packagePath, "package.json"));
+			const packageJson = this.fileSystem.readJSONSync<Plugin>(path.join(packagePath, "package.json"));
 
 			plugins.push({
 				name: packageJson.name,

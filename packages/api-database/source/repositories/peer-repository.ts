@@ -1,8 +1,8 @@
-import { PeerRepository, PeerRepositoryExtension, RepositoryDataSource } from "../contracts";
-import { Peer } from "../models/peer";
-import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search";
-import { PeerFilter } from "../search/filters";
-import { makeExtendedRepository } from "./repository-extension";
+import { PeerRepository, PeerRepositoryExtension, RepositoryDataSource } from "../contracts.js";
+import { Peer } from "../models/peer.js";
+import { PeerFilter } from "../search/filters/index.js";
+import { Criteria, Options, Pagination, ResultsPage, Sorting } from "../search/index.js";
+import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makePeerRepository = (dataSource: RepositoryDataSource): PeerRepository =>
 	makeExtendedRepository<Peer, PeerRepositoryExtension>(Peer, dataSource, {

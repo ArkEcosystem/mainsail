@@ -4,12 +4,12 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { VoteTransactionHandler } from "./handlers";
-import { makeKeywords } from "./validation";
-import { VoteTransaction } from "./versions/1";
+import { VoteTransactionHandler } from "./handlers/index.js";
+import { makeKeywords } from "./validation/index.js";
+import { VoteTransaction } from "./versions/1.js";
 
-export * from "./builder";
-export * from "./versions";
+export * from "./builder.js";
+export * from "./versions/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -36,11 +36,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerFees(): void {
 		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			VoteTransaction.key,
-			VoteTransaction.version,
 			{
 				managed: BigNumber.make("100"),
-				static: BigNumber.make("100000000"),
-			}[this.app.get<string>(Identifiers.Fee.Type)]!,
+			}[this.app.get<string>(Identifiers.Fee.Type)],
+			VoteTransaction.version,
 		);
 	}
 

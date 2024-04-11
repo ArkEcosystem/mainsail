@@ -2,31 +2,36 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { RevalidateApiNodeAction, ValidateAndAcceptApiNodeAction, ValidateAndAcceptPeerAction } from "./actions";
-import { ApiNodeDiscoverer } from "./api-node-discoverer";
-import { ApiNodeProcessor } from "./api-node-processor";
-import { ApiNode, ApiNodeRepository } from "./api-node-repository";
-import { ApiNodeVerifier } from "./api-node-verifier";
-import { Broadcaster } from "./broadcaster";
-import { BlockDownloader } from "./downloader/block-downloader";
-import { MessageDownloader } from "./downloader/message-downloader";
-import { ProposalDownloader } from "./downloader/proposal-downloader";
-import { Header } from "./header";
-import { HeaderService } from "./header-service";
-import { Logger } from "./logger";
-import { Peer } from "./peer";
-import { PeerCommunicator } from "./peer-communicator";
-import { PeerConnector } from "./peer-connector";
-import { PeerDiscoverer } from "./peer-discoverer";
-import { PeerDisposer } from "./peer-disposer";
-import { PeerProcessor } from "./peer-processor";
-import { PeerRepository } from "./peer-repository";
-import { PeerVerifier } from "./peer-verifier";
-import { Service } from "./service";
-import { Server } from "./socket-server/server";
-import { State } from "./state";
-import { Throttle } from "./throttle";
-import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation";
+import {
+	RevalidateApiNodeAction,
+	ValidateAndAcceptApiNodeAction,
+	ValidateAndAcceptPeerAction,
+} from "./actions/index.js";
+import { ApiNodeDiscoverer } from "./api-node-discoverer.js";
+import { ApiNodeProcessor } from "./api-node-processor.js";
+import { ApiNode, ApiNodeRepository } from "./api-node-repository.js";
+import { ApiNodeVerifier } from "./api-node-verifier.js";
+import { Broadcaster } from "./broadcaster.js";
+import { BlockDownloader } from "./downloader/block-downloader.js";
+import { MessageDownloader } from "./downloader/message-downloader.js";
+import { ProposalDownloader } from "./downloader/proposal-downloader.js";
+import { Header } from "./header.js";
+import { HeaderService } from "./header-service.js";
+import { normalizeUrl } from "./index.js";
+import { Logger } from "./logger.js";
+import { Peer } from "./peer.js";
+import { PeerCommunicator } from "./peer-communicator.js";
+import { PeerConnector } from "./peer-connector.js";
+import { PeerDiscoverer } from "./peer-discoverer.js";
+import { PeerDisposer } from "./peer-disposer.js";
+import { PeerProcessor } from "./peer-processor.js";
+import { PeerRepository } from "./peer-repository.js";
+import { PeerVerifier } from "./peer-verifier.js";
+import { Service } from "./service.js";
+import { Server } from "./socket-server/server.js";
+import { State } from "./state.js";
+import { Throttle } from "./throttle.js";
+import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -95,16 +100,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
 		});
 
-		this.app
-			.bind(Identifiers.P2P.ApiNode.Factory)
-			.toFactory<
-				ApiNode,
-				[string, string | number, Contracts.P2P.PeerProtocol?]
-			>(() => (ip: string, port: string | number, protocol?: Contracts.P2P.PeerProtocol) => {
-				const sanitizedIp = sanitizeRemoteAddress(ip);
-				Utils.assert.defined<string>(sanitizedIp);
-				return this.app.resolve(ApiNode).init(sanitizedIp, Number(port), protocol);
-			});
+		this.app.bind(Identifiers.P2P.ApiNode.Factory).toFactory<ApiNode, [string]>(() => (url: string) => {
+			const normalizedUrl = normalizeUrl(url);
+			return this.app.resolve(ApiNode).init(normalizedUrl);
+		});
 
 		this.app
 			.bind(Identifiers.P2P.Header.Factory)

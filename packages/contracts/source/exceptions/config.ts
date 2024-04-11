@@ -1,4 +1,4 @@
-import { InvalidArgumentException } from "./logic";
+import { InvalidArgumentException } from "./logic.js";
 
 export class ConfigurationException extends InvalidArgumentException {}
 

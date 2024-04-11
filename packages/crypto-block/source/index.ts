@@ -1,19 +1,19 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { Deserializer } from "./deserializer";
-import { BlockFactory } from "./factory";
-import { IDFactory } from "./id.factory";
-import { schemas } from "./schemas";
-import { Serializer } from "./serializer";
-import { Verifier } from "./verifier";
+import { Deserializer } from "./deserializer.js";
+import { BlockFactory } from "./factory.js";
+import { IDFactory } from "./id.factory.js";
+import { schemas } from "./schemas.js";
+import { Serializer } from "./serializer.js";
+import { Verifier } from "./verifier.js";
 
-export * from "./deserializer";
-export * from "./factory";
-export * from "./id.factory";
-export * from "./schemas";
-export * from "./serializer";
-export * from "./verifier";
+export * from "./deserializer.js";
+export * from "./factory.js";
+export * from "./id.factory.js";
+export * from "./schemas.js";
+export * from "./serializer.js";
+export * from "./verifier.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

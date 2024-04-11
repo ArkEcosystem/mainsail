@@ -1,16 +1,15 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { BlockEvent, KernelEvent } from "../enums";
-import { ServiceProviderRepository } from "../providers";
-import { assert } from "../utils";
-import { Bootstrapper } from "./interfaces";
-import { ChangeServiceProviderState } from "./listeners";
+import { BlockEvent, KernelEvent } from "../enums/events.js";
+import { ServiceProviderRepository } from "../providers/index.js";
+import { assert } from "../utils/assert.js";
+import { ChangeServiceProviderState } from "./listeners.js";
 
 // @TODO review the implementation
 
 @injectable()
-export class BootServiceProviders implements Bootstrapper {
+export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

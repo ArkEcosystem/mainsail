@@ -1,17 +1,14 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { generateMnemonic } from "bip39";
-import { join } from "path";
 
-import { FactoryBuilder } from "../factory-builder";
-import { generateApp } from "./generate-app";
+import { FactoryBuilder } from "../factory-builder.js";
+import { generateApp } from "./generate-app.js";
 
 export const registerIdentityFactory = async (
 	factory: FactoryBuilder,
-	config?: Contracts.Crypto.NetworkConfigPartial,
+	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
-	const app = await generateApp(
-		config ?? require(join(__dirname, "../../../../core/bin/config/testnet/core/crypto.json")),
-	);
+	const app = await generateApp(config);
 
 	factory.set("Identity", async ({ options }) => {
 		const passphrase: string = options.passphrase || generateMnemonic();

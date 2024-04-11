@@ -1,4 +1,4 @@
-import { chars } from "./chars";
+import { chars } from "./chars.js";
 
 const encode = (value: string): string =>
 	chars(value)

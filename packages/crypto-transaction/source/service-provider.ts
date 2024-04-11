@@ -1,15 +1,15 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { Deserializer } from "./deserializer";
-import { TransactionFactory } from "./factory";
-import { TransactionRegistry } from "./registry";
-import { Serializer } from "./serializer";
-import { Signer } from "./signer";
-import { TransactionTypeFactory } from "./types";
-import { Utils } from "./utils";
-import { makeFormats, makeKeywords, schemas } from "./validation";
-import { Verifier } from "./verifier";
+import { Deserializer } from "./deserializer.js";
+import { TransactionFactory } from "./factory.js";
+import { TransactionRegistry } from "./registry.js";
+import { Serializer } from "./serializer.js";
+import { Signer } from "./signer.js";
+import { TransactionTypeFactory } from "./types/index.js";
+import { Utils } from "./utils.js";
+import { makeFormats, makeKeywords, schemas } from "./validation/index.js";
+import { Verifier } from "./verifier.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

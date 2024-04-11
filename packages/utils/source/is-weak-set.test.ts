@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { isWeakSet } from "./is-weak-set";
 
 describe("isWeakSet", async ({ assert, it, nock, loader }) => {

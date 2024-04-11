@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { TransactionFactory } from "./factory";
+import { TransactionFactory } from "./factory.js";
 
 @injectable()
 export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBuilder>> {
@@ -105,12 +105,20 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		return this.#signWithKeyPair(await this.keyPairFactory.fromMnemonic(passphrase));
 	}
 
+	public async signWithKeyPair(keys: Contracts.Crypto.KeyPair): Promise<TBuilder> {
+		return this.#signWithKeyPair(keys);
+	}
+
 	public async signWithWif(wif: string): Promise<TBuilder> {
 		return this.#signWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
 	public async multiSign(passphrase: string, index: number): Promise<TBuilder> {
 		return this.#multiSignWithKeyPair(index, await this.keyPairFactory.fromMnemonic(passphrase));
+	}
+
+	public async multiSignWithKeyPair(keys: Contracts.Crypto.KeyPair, index: number): Promise<TBuilder> {
+		return this.#multiSignWithKeyPair(index, keys);
 	}
 
 	public async multiSignWithWif(index: number, wif: string): Promise<TBuilder> {

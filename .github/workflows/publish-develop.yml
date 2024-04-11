@@ -54,6 +54,9 @@ jobs:
             - name: Publish to NPM
               run: |
                   pnpm run release -- --publish-branch=develop --tag=alpha
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
             - name: Set dist-tag latest
               run: |
                   bash ./scripts/dist-tag-latest.sh

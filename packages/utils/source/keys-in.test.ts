@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { keysIn } from "./keys-in";
 
 describe("includeAllMembers", async ({ assert, it, nock, loader }) => {

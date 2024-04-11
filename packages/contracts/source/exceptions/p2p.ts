@@ -1,5 +1,5 @@
-import { BlockData } from "../contracts/crypto";
-import { Exception } from "./base";
+import { BlockData } from "../contracts/crypto/block.js";
+import { Exception } from "./base.js";
 
 export class TooManyTransactionsError extends Exception {
 	public constructor(block: BlockData) {
@@ -36,5 +36,11 @@ export class PeerVerificationFailedError extends Exception {
 export class MissingCommonBlockError extends Exception {
 	public constructor() {
 		super("Couldn't find any common blocks.");
+	}
+}
+
+export class InvalidApiNodeUrlError extends Exception {
+	public constructor(url: string) {
+		super(`Invalid API Node url: ${url}`);
 	}
 }

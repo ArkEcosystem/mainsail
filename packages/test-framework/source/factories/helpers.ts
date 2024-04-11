@@ -1,11 +1,11 @@
 import { Contracts } from "@mainsail/contracts";
-import memoize from "fast-memoize";
+import memoizee from "memoizee";
 
-import { registerBlockFactory, registerIdentityFactory, registerTransactionFactory } from "./factories";
-import { Factory } from "./factory";
-import { FactoryBuilder } from "./factory-builder";
+import { registerBlockFactory, registerIdentityFactory, registerTransactionFactory } from "./factories/index.js";
+import { Factory } from "./factory.js";
+import { FactoryBuilder } from "./factory-builder.js";
 
-const createFactory = memoize(async (config?: Contracts.Crypto.NetworkConfigPartial): Promise<FactoryBuilder> => {
+const createFactory = memoizee(async (config: Contracts.Crypto.NetworkConfigPartial): Promise<FactoryBuilder> => {
 	const factory: FactoryBuilder = new FactoryBuilder();
 
 	await registerBlockFactory(factory, config);

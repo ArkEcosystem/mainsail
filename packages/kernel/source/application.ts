@@ -1,25 +1,21 @@
 import { exit } from "node:process";
 
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { existsSync, removeSync, writeFileSync } from "fs-extra";
 import { join } from "path";
 
-import { Bootstrappers } from "./bootstrap";
-import { Bootstrapper } from "./bootstrap/interfaces";
-import { KernelEvent, ShutdownSignal } from "./enums";
-import { ServiceProvider, ServiceProviderRepository } from "./providers";
-import { ConfigRepository } from "./services/config";
-import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider";
-import { KeyValuePair } from "./types";
-import { Constructor } from "./types/container";
+import { Bootstrappers } from "./bootstrap/index.js";
+import { KernelEvent } from "./enums/index.js";
+import { ServiceProvider, ServiceProviderRepository } from "./providers/index.js";
+import { ConfigRepository } from "./services/config/index.js";
+import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
+import { Constructor } from "./types/container.js";
+import { KeyValuePair } from "./types/index.js";
 
 export class Application implements Contracts.Kernel.Application {
 	#booted = false;
 	#terminating = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
-		this.#listenToShutdownSignals();
-
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
 		this.bind<ConfigRepository>(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
@@ -132,33 +128,30 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public enableMaintenance(): void {
-		writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
-
-		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
-			"Application is now in maintenance mode.",
-		);
-
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
-			"kernel.maintenance",
-			true,
-		);
+		// writeFileSync(this.tempPath("maintenance"), JSON.stringify({ time: Date.now() }));
+		// this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
+		// 	"Application is now in maintenance mode.",
+		// );
+		// // eslint-disable-next-line @typescript-eslint/no-floating-promises
+		// this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
+		// 	"kernel.maintenance",
+		// 	true,
+		// );
 	}
 
 	public disableMaintenance(): void {
-		removeSync(this.tempPath("maintenance"));
-
-		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice("Application is now live.");
-
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
-			"kernel.maintenance",
-			false,
-		);
+		// removeSync(this.tempPath("maintenance"));
+		// this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice("Application is now live.");
+		// // eslint-disable-next-line @typescript-eslint/no-floating-promises
+		// this.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).dispatch(
+		// 	"kernel.maintenance",
+		// 	false,
+		// );
 	}
 
 	public isDownForMaintenance(): boolean {
-		return existsSync(this.tempPath("maintenance"));
+		// existsSync(this.tempPath("maintenance"));
+		return false;
 	}
 
 	public async terminate(reason?: string, error?: Error): Promise<void> {
@@ -261,13 +254,13 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Constructor<Bootstrapper>[] = Object.values(Bootstrappers[type]);
+		const bootstrappers: Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(Bootstrappers[type]);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
 			await events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
 
-			await this.resolve<Bootstrapper>(bootstrapper).bootstrap();
+			await this.resolve<Contracts.Kernel.Bootstrapper>(bootstrapper).bootstrap();
 
 			await events.dispatch(KernelEvent.Bootstrapped, { bootstrapper: bootstrapper.name });
 		}
@@ -312,7 +305,7 @@ export class Application implements Contracts.Kernel.Application {
 	#getPath(type: string): string {
 		const path: string = this.get<string>(`path.${type}`);
 
-		if (!existsSync(path)) {
+		if (!this.get<Contracts.Kernel.Filesystem>(Identifiers.Services.Filesystem.Service).existsSync(path)) {
 			throw new Exceptions.DirectoryCannotBeFound(path);
 		}
 
@@ -320,18 +313,10 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	#usePath(type: string, path: string): void {
-		if (!existsSync(path)) {
+		if (!this.get<Contracts.Kernel.Filesystem>(Identifiers.Services.Filesystem.Service).existsSync(path)) {
 			throw new Exceptions.DirectoryCannotBeFound(path);
 		}
 
 		this.rebind<string>(`path.${type}`).toConstantValue(path);
-	}
-
-	#listenToShutdownSignals(): void {
-		for (const signal in ShutdownSignal) {
-			process.on(signal as any, async (code) => {
-				await this.terminate(signal);
-			});
-		}
 	}
 }

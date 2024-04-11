@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { CappedSet } from "./capped-set";
 
 describe("CappedSet", ({ it, assert }) => {

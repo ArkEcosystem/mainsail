@@ -4,11 +4,11 @@ import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-import { TransferTransactionHandler } from "./handlers";
-import { TransferTransaction } from "./versions";
+import { TransferTransactionHandler } from "./handlers/index.js";
+import { TransferTransaction } from "./versions/index.js";
 
-export * from "./builder";
-export * from "./versions";
+export * from "./builder.js";
+export * from "./versions/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -27,11 +27,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerFees(): void {
 		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			TransferTransaction.key,
-			TransferTransaction.version,
 			{
 				managed: BigNumber.make("100"),
-				static: BigNumber.make("10000000"),
-			}[this.app.get<string>(Identifiers.Fee.Type)]!,
+			}[this.app.get<string>(Identifiers.Fee.Type)],
+			TransferTransaction.version,
 		);
 	}
 

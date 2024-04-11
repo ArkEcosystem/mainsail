@@ -1,15 +1,14 @@
 import { Identifiers, Services } from "@mainsail/cli";
-import { Console, describe } from "@mainsail/test-framework";
-import { writeJSONSync } from "fs-extra";
-import { resolve } from "path";
+import { writeJSONSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../test-framework/source";
 import { Command } from "./core-start";
 
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("CoreStartCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("CoreStartCommand", ({ beforeEach, afterAll, it, assert, stub, match }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 
@@ -35,7 +34,7 @@ describe<{
 				},
 				name: "mainsail",
 				node_args: undefined,
-				script: resolve(__dirname, "../../../../packages/core/bin/run"),
+				script: match.string,
 			},
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail" },
 		);

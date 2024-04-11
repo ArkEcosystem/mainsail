@@ -1,10 +1,13 @@
 /* tslint:disable */
 "use strict";
 
-import Hoek from "@hapi/hoek";
+import { applyToDefaults } from "@hapi/hoek";
 import Joi from "joi";
+import { readJSONSync } from "fs-extra/esm";
+import { resolve } from "path";
+import { URL } from "url";
 
-import { Listener } from "./listener";
+import { Listener } from "./listener.js";
 
 const internals: any = {
 	defaults: {
@@ -46,9 +49,9 @@ internals.schema = Joi.object({
 });
 
 const plugin = {
-	pkg: require("../../package.json"),
+	pkg: readJSONSync(resolve(new URL(".", import.meta.url).pathname, "..", "..", "package.json")),
 	register: function (server, options) {
-		const settings: any = Hoek.applyToDefaults(internals.defaults, options);
+		const settings: any = applyToDefaults(internals.defaults, options);
 
 		if (Array.isArray(settings.headers)) {
 			settings.headers = settings.headers.map((field) => field.toLowerCase());

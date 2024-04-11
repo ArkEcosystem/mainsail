@@ -1,8 +1,8 @@
-import { Routes } from "../../enums";
-import { Codecs } from "../codecs";
-import { GetApiNodesController } from "../controllers";
-import { Schemas } from "../schemas";
-import { Route, RouteConfig } from "./route";
+import { Routes } from "../../enums.js";
+import { Codecs } from "../codecs/index.js";
+import { GetApiNodesController } from "../controllers/index.js";
+import { Schemas } from "../schemas/index.js";
+import { Route, RouteConfig } from "./route.js";
 
 export class GetApiNodesRoute extends Route {
 	public getRoutesConfigByPath(): { [path: string]: RouteConfig } {

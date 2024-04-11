@@ -1,6 +1,7 @@
 import { Commands, Contracts, Identifiers, Services } from "@mainsail/cli";
 import { inject, injectable } from "@mainsail/container";
-import { copySync, ensureDirSync, existsSync, removeSync } from "fs-extra";
+import { existsSync } from "fs";
+import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { resolve } from "path";
 
@@ -55,8 +56,8 @@ export class Command extends Commands.Command {
 
 		const configDestination = this.app.getCorePath("config");
 		const configSource = resolve(
-			__dirname,
-			`../../bin/config/${flags.network}/${this.app.get(Identifiers.Application.Name)}`,
+			new URL(".", import.meta.url).pathname,
+			`../../bin/config/${flags.network}/${this.app.get<string>(Identifiers.Application.Name)}`,
 		);
 
 		await this.components.taskList([

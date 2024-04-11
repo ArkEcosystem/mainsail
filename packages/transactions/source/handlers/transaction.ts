@@ -85,7 +85,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			}
 
 			if (
-				!this.verifySignatures(databaseSender, transaction.data, databaseSender.getAttribute("multiSignature"))
+				!(await this.verifySignatures(
+					databaseSender,
+					transaction.data,
+					databaseSender.getAttribute("multiSignature"),
+				))
 			) {
 				throw new Exceptions.InvalidMultiSignaturesError();
 			}
@@ -116,18 +120,13 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 		await this.throwIfCannotBeApplied(context, transaction, sender);
 
-		if (data.version) {
-			this.#verifyTransactionNonceApply(sender, transaction);
+		this.#verifyTransactionNonceApply(sender, transaction);
 
-			AppUtils.assert.defined<BigNumber>(data.nonce);
+		AppUtils.assert.defined<BigNumber>(data.nonce);
+		sender.setNonce(data.nonce);
 
-			sender.setNonce(data.nonce);
-		} else {
-			sender.increaseNonce();
-		}
-
-		const newBalance: BigNumber = sender.getBalance().minus(data.amount).minus(data.fee);
-
+		// Subtract fee
+		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
 		sender.setBalance(newBalance);
 	}
 

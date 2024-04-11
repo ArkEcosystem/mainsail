@@ -1,4 +1,7 @@
-import { postProposal as proto } from "./proto/protos";
+import type * as types from "./proto/protos.d.ts";
+import * as _protos from "./proto/protos.js";
+
+const proto = (_protos as any).default.postProposal as typeof types.postProposal;
 
 export const postProposal = {
 	request: {
@@ -9,13 +12,13 @@ export const postProposal = {
 				proposal: Buffer.from(decoded.proposal),
 			};
 		},
-		serialize: (object: proto.IPostProposalRequest): Buffer =>
+		serialize: (object: types.postProposal.IPostProposalRequest): Buffer =>
 			Buffer.from(proto.PostProposalRequest.encode(object).finish()),
 	},
 	response: {
 		deserialize: (payload: Buffer): {} =>
 			proto.PostProposalResponse.toObject(proto.PostProposalResponse.decode(payload), { defaults: true }),
-		serialize: (object: proto.IPostProposalResponse): Buffer =>
+		serialize: (object: types.postProposal.IPostProposalResponse): Buffer =>
 			Buffer.from(proto.PostProposalResponse.encode(object).finish()),
 	},
 };

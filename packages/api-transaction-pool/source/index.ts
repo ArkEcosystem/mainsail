@@ -1,3 +1,3 @@
-export * from "./identifiers";
-export * from "./server";
-export * from "./service-provider";
+export * from "./identifiers.js";
+export * from "./server.js";
+export * from "./service-provider.js";

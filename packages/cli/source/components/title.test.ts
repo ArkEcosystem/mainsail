@@ -1,7 +1,7 @@
-import { yellow } from "kleur";
+import { yellow } from "kleur/colors";
 
-import { Console, describe } from "../../../test-framework";
-import { Identifiers } from "../ioc";
+import { Console, describe } from "../../../test-framework/source";
+import { Identifiers } from "../ioc/index.js";
 import { Title } from "./title";
 describe<{
 	component: Title;

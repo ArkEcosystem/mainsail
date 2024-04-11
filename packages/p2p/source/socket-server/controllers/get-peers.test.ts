@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 
-import { describe, Sandbox } from "../../../../test-framework";
+import { describe, Sandbox } from "../../../../test-framework/source";
 import { Peer } from "../../peer";
 import { GetPeersController } from "./get-peers";
 

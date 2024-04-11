@@ -1,8 +1,8 @@
 import Hapi from "@hapi/hapi";
 import Joi from "joi";
 
-import { PeersController } from "../controllers/peers";
-import { orderBy, pagination } from "../schemas";
+import { PeersController } from "../controllers/peers.js";
+import { orderBy, pagination } from "../schemas.js";
 
 export const register = (server: Hapi.Server<any>): void => {
 	const controller = server.app.app.resolve(PeersController);
@@ -39,5 +39,21 @@ export const register = (server: Hapi.Server<any>): void => {
 			},
 		},
 		path: "/peers/{ip}",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.banned(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: pagination,
+			},
+		},
+		path: "/peers/banned",
 	});
 };

@@ -1,4 +1,4 @@
-import { Exception } from "./base";
+import { Exception } from "./base.js";
 
 export class NotEnoughActiveValidatorsError extends Exception {
 	public constructor(actual: number, expected: number) {

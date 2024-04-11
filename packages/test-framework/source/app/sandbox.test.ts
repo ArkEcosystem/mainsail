@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra";
+import { readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 
 import { describe } from "../index";
@@ -97,7 +97,7 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 		sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
 		const serviceProviderOptions = {
-			klass: require("@mainsail/validation").ServiceProvider,
+			klass: (await import("@mainsail/validation")).ServiceProvider,
 			name: "@mainsail/validation",
 			path: "@mainsail/validation",
 		};

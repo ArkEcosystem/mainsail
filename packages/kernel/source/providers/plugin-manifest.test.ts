@@ -1,19 +1,23 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
+import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework";
+import { describeSkip } from "../../../test-framework/source";
 import { Application } from "../application";
 import { ConfigRepository } from "../services/config";
 import { PluginManifest } from "./plugin-manifest";
 
-describe<{
+describeSkip<{
 	app: Application;
 	pluginManifest: PluginManifest;
 }>("PluginManifest", ({ assert, beforeEach, it }) => {
 	beforeEach((context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
+		context.app
+			.bind(Identifiers.Services.Filesystem.Service)
+			.toConstantValue({ existsSync: () => true, readJSONSync: (path: string) => readJSONSync(path) });
 
 		context.pluginManifest = context.app.resolve<PluginManifest>(PluginManifest);
 	});

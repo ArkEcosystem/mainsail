@@ -1,20 +1,48 @@
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
+import { majorityMinority } from "../../test/fixtures/active-validators";
 import { isMajority } from "./is-majority";
 
 describe("isMajority", ({ assert, it }) => {
-	it("should be true", () => {
-		for (let i = (53 / 3) * 2 + 1; i <= 53; i++) {
-			assert.true(isMajority(i, 53));
+	it("should be ok ", () => {
+		for (const { n, majority } of majorityMinority) {
+			assert.true(isMajority(majority, n));
+			assert.true(isMajority(majority + 1, n));
+			assert.false(isMajority(majority - 1, n));
 		}
-
-		assert.true(isMajority(7, 7));
 	});
 
-	it("should be false", () => {
-		for (let i = 0; i < (53 / 3) * 2 + 1; i++) {
-			assert.false(isMajority(i, 53));
-		}
+	it("should be ok for n = 3f + 1", () => {
+		for (let f = 1; f < 10; f++) {
+			const n = 3 * f + 1; // n = active validators
+			const majority = 2 * f + 1; // majority = 2f + 1
 
-		assert.false(isMajority(0, 0));
+			assert.true(isMajority(majority, n));
+			assert.true(isMajority(majority + 1, n));
+			assert.false(isMajority(majority - 1, n));
+		}
+	});
+
+	it("should be ok for prime numbers", () => {
+		const primeNumbers = [5, 7, 11, 13, 17, 19, 23, 29, 53];
+
+		for (const n of primeNumbers) {
+			const f = (n - 1) / 3;
+
+			const majority = Math.ceil(2 * f + 1);
+			assert.true(isMajority(majority, n));
+			assert.true(isMajority(majority + 1, n));
+			assert.false(isMajority(majority - 1, n));
+		}
+	});
+
+	it("should be ok for random numbers", () => {
+		for (let n = 5; n < 100; n++) {
+			const third = n / 3;
+
+			const majority = Number.isInteger(third) ? 2 * third + 1 : Math.ceil(2 * third);
+			assert.true(isMajority(majority, n));
+			assert.true(isMajority(majority + 1, n));
+			assert.false(isMajority(majority - 1, n));
+		}
 	});
 });

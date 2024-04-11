@@ -2,9 +2,9 @@ import {
 	MempoolTransactionRepository,
 	MempoolTransactionRepositoryExtension,
 	RepositoryDataSource,
-} from "../contracts";
-import { MempoolTransaction } from "../models";
-import { makeExtendedRepository } from "./repository-extension";
+} from "../contracts.js";
+import { MempoolTransaction } from "../models/index.js";
+import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeMempoolTransactionRepository = (dataSource: RepositoryDataSource): MempoolTransactionRepository =>
 	makeExtendedRepository<MempoolTransaction, MempoolTransactionRepositoryExtension>(MempoolTransaction, dataSource, {

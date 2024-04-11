@@ -18,7 +18,6 @@ export abstract class ValidatorRegistrationTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "validatorRegistration",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
 				asset: {
 					properties: {
 						validatorPublicKey: { $ref: "consensusPublicKey" },

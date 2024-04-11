@@ -1,5 +1,5 @@
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
-import { describe, Sandbox } from "../../../test-framework";
+import { describe, Sandbox } from "../../../test-framework/source";
 import nodeConfiguration from "../../test/fixtures/node_configuration.json";
 import nodeFees from "../../test/fixtures/node_fees.json";
 import transactions from "../../test/fixtures/transactions.json";
@@ -55,6 +55,7 @@ describe<{
 
 	it("/node/configuration", async () => {
 		await apiContext.configurationRepository.save({
+			activeMilestones: cryptoJson.milestones[0],
 			cryptoConfiguration: cryptoJson,
 			id: 1,
 			version: "0.0.1",
@@ -67,6 +68,7 @@ describe<{
 
 	it("/node/configuration/crypto", async () => {
 		await apiContext.configurationRepository.save({
+			activeMilestones: cryptoJson.milestones[0],
 			cryptoConfiguration: cryptoJson,
 			id: 1,
 			version: "0.0.1",
@@ -78,8 +80,17 @@ describe<{
 	});
 
 	it("/node/fees", async () => {
+		await apiContext.configurationRepository.save({
+			activeMilestones: cryptoJson.milestones[0],
+			cryptoConfiguration: cryptoJson,
+			id: 1,
+			version: "0.0.1",
+		});
+
 		await apiContext.transactionTypeRepository.save(transactionTypes);
-		await apiContext.transactionRepository.save(transactions);
+		await apiContext.transactionRepository.save(
+			transactions.map((tx) => ({ ...tx, timestamp: Math.floor(new Date().getTime()) })),
+		);
 
 		const { statusCode, data } = await request(`/node/fees`, options);
 		assert.equal(statusCode, 200);

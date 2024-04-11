@@ -1,8 +1,9 @@
 import { Container } from "@mainsail/container";
+import { Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel/source/application";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { Database } from "./database";
 import { InternalIdentifiers } from "./identifiers";
@@ -16,6 +17,7 @@ describe<{
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
+		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		const database = app.get<Database>(InternalIdentifiers.Database);
 		database.boot();

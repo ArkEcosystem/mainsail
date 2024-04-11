@@ -50,6 +50,7 @@ export const Identifiers = {
 	RestartRunningProcess: Symbol.for("Action<RestartRunningProcess>"),
 	RestartRunningProcessWithPrompt: Symbol.for("Action<RestartRunningProcessWithPrompt>"),
 	Select: Symbol.for("Component<Select>"),
+	Setup: Symbol.for("Setup"),
 	Spinner: Symbol.for("Component<Spinner>"),
 	Success: Symbol.for("Component<Success>"),
 	Table: Symbol.for("Component<Table>"),

@@ -1,5 +1,4 @@
-import { describe } from "../../../../test-framework";
-
+import { describe } from "../../../../test-framework/source";
 import { SocketErrors } from "../../enums";
 import { validate } from "./validate";
 

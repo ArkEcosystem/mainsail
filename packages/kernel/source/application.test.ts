@@ -1,9 +1,10 @@
 import { Container, injectable, interfaces } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/contracts";
-import { resolve } from "path";
+import { setMaxListeners } from "events";
+import { join } from "path";
 import { dirSync } from "tmp";
 
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { Application } from "./application";
 import { ServiceProvider, ServiceProviderRepository } from "./providers";
 import { ConfigRepository } from "./services/config";
@@ -32,6 +33,9 @@ describe<{
 	beforeEach((context) => {
 		delete process.env.CORE_PATH_CONFIG;
 
+		// TODO
+		setMaxListeners(1000);
+
 		context.container = new Container();
 
 		context.app = new Application(context.container);
@@ -42,6 +46,8 @@ describe<{
 			notice: () => {},
 		};
 
+		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 	});
 
@@ -50,22 +56,25 @@ describe<{
 	});
 
 	it("should bootstrap the application", async (context) => {
-		console.error(resolve(__dirname, "../test/stubs/config"));
+		context.app.unbind(Identifiers.Services.Filesystem.Service);
+
 		await context.app.bootstrap({
 			flags: {
-				network: "testnet",
-				paths: { config: resolve(__dirname, "../test/stubs/config/local") },
-				token: "ark",
 				name: "local",
+				network: "testnet",
+				paths: { config: join(import.meta.dirname, "../test/stubs/config/local") },
+				token: "ark",
 			},
 		});
 	});
 
 	it("should bootstrap the application with a config path from process.env", async (context) => {
-		process.env.CORE_PATH_CONFIG = resolve(__dirname, "../test/stubs/config");
+		process.env.CORE_PATH_CONFIG = join(import.meta.dirname, "../test/stubs/config");
+
+		context.app.unbind(Identifiers.Services.Filesystem.Service);
 
 		await context.app.bootstrap({
-			flags: { network: "testnet", token: "ark", name: "local" },
+			flags: { name: "local", network: "testnet", token: "ark" },
 		});
 
 		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);
@@ -238,24 +247,6 @@ describe<{
 		context.app.useEnvironment("production");
 
 		assert.is(context.app.environment(), "production");
-	});
-
-	it("should enable and disable maintenance mode", (context) => {
-		context.app
-			.bind(Identifiers.Services.EventDispatcher.Service)
-			.toConstantValue(context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher));
-
-		context.app.bind("path.temp").toConstantValue(dirSync().name);
-
-		assert.false(context.app.isDownForMaintenance());
-
-		context.app.enableMaintenance();
-
-		assert.true(context.app.isDownForMaintenance());
-
-		context.app.disableMaintenance();
-
-		assert.false(context.app.isDownForMaintenance());
 	});
 
 	it.skip("should terminate the application", async (context) => {

@@ -1,8 +1,8 @@
 import prompts from "prompts";
 
-import { Console, describe } from "../../../test-framework";
-import { Identifiers } from "../ioc";
-import { Prompt } from "./prompt";
+import { Console, describe } from "../../../test-framework/source";
+import { Identifiers } from "../ioc/index.js";
+import { Prompt } from "./prompt.js";
 
 describe<{
 	component: Prompt;

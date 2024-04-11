@@ -1,2 +1,2 @@
-export * from "./compound-words";
-export * from "./types";
+export * from "./compound-words.js";
+export * from "./types.js";

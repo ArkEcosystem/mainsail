@@ -1,2 +1,2 @@
-export * from "./api";
-export * as RPC from "./rpc";
+export * from "./api.js";
+export * as RPC from "./rpc.js";

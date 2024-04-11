@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
-import { errorTypes } from "./hapi-nes";
+import { errorTypes } from "./hapi-nes/index.js";
 
 @injectable()
 export class PeerDisposer implements Contracts.P2P.PeerDisposer {
@@ -25,8 +25,8 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
-	public banPeer(ip: string, error: Error | Contracts.P2P.NesError, checkRepository = true): void {
-		if ((checkRepository && !this.repository.hasPeer(ip)) || this.isBanned(ip)) {
+	public banPeer(ip: string, error: Error | Contracts.P2P.NesError): void {
+		if (this.isBanned(ip)) {
 			return;
 		}
 
@@ -82,6 +82,12 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 		}
 
 		return false;
+	}
+
+	public bannedPeers(): { ip: string; timeout: number }[] {
+		return [...this.#blacklist.entries()]
+			.filter(([ip]) => this.isBanned(ip))
+			.map(([ip, timeout]) => ({ ip, timeout: timeout.diff(dayjs()) }));
 	}
 
 	#isNesError(error: Error | Contracts.P2P.NesError): error is Contracts.P2P.NesError {

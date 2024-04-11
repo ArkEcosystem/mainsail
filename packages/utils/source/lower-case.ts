@@ -1,4 +1,4 @@
-import { compoundWords } from "./internal";
+import { compoundWords } from "./internal/compound-words.js";
 
 export const lowerCase = (value: string): string | undefined =>
 	compoundWords(

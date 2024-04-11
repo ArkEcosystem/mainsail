@@ -1,2 +1,2 @@
-export * as Base from "./base";
-export * as Runtime from "./runtime";
+export * as Base from "./base.js";
+export * as Runtime from "./runtime.js";

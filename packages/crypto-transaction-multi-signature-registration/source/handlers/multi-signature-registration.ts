@@ -1,10 +1,10 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import Transactions from "@mainsail/crypto-transaction";
+import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
-import { MultiSignatureRegistrationTransaction } from "../versions";
+import { MultiSignatureRegistrationTransaction } from "../versions/index.js";
 
 @injectable()
 export class MultiSignatureRegistrationTransactionHandler extends Handlers.TransactionHandler {
@@ -26,7 +26,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		return [{ name: "multiSignature", type: Contracts.State.AttributeType.Object }];
 	}
 
-	public getConstructor(): Transactions.TransactionConstructor {
+	public getConstructor(): TransactionConstructor {
 		return MultiSignatureRegistrationTransaction;
 	}
 
@@ -66,7 +66,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 			throw new Exceptions.MultiSignatureAlreadyRegisteredError();
 		}
 
-		if (!this.verifySignatures(wallet, data, data.asset.multiSignature)) {
+		if (!(await this.verifySignatures(wallet, data, data.asset.multiSignature))) {
 			throw new Exceptions.InvalidMultiSignatureError();
 		}
 

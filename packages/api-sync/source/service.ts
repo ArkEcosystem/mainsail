@@ -9,13 +9,14 @@ import { Providers, Types, Utils } from "@mainsail/kernel";
 import { sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
-import * as ApiSyncContracts from "./contracts";
+import { Listeners } from "./contracts.js";
 
 interface DeferredSync {
 	block: Models.Block;
 	transactions: Models.Transaction[];
 	validatorRound?: Models.ValidatorRound;
 	wallets: Models.Wallet[];
+	newMilestones?: Record<string, any>;
 }
 
 const drainQueue = async (queue: Contracts.Kernel.Queue) => new Promise((resolve) => queue.once("drain", resolve));
@@ -79,7 +80,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	#queue!: Contracts.Kernel.Queue;
 
 	@inject(Identifiers.ApiSync.Listener)
-	private readonly listeners!: ApiSyncContracts.Listeners;
+	private readonly listeners!: Listeners;
 
 	public async prepareBootstrap(): Promise<void> {
 		await this.migrations.run();
@@ -168,6 +169,12 @@ export class Sync implements Contracts.ApiSync.Service {
 						validatorRound: this.#createValidatorRound(header.height + 1),
 					}
 				: {}),
+
+			...(this.configuration.isNewMilestone(header.height + 1)
+				? {
+						newMilestones: this.configuration.getMilestone(header.height + 1),
+					}
+				: {}),
 		};
 
 		return this.#queueDeferredSync(deferredSync);
@@ -190,14 +197,17 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	async #bootstrapConfiguration(): Promise<void> {
-		await this.configurationRepositoryFactory().upsert(
-			{
+		await this.configurationRepositoryFactory()
+			.createQueryBuilder()
+			.insert()
+			.orIgnore()
+			.values({
+				activeMilestones: this.configuration.getMilestone(0) as Record<string, any>,
 				cryptoConfiguration: (this.configuration.all() ?? {}) as Record<string, any>,
 				id: 1,
 				version: this.app.version(),
-			},
-			["id"],
-		);
+			})
+			.execute();
 	}
 
 	async #bootstrapState(): Promise<void> {
@@ -281,6 +291,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
+			const configurationRepository = this.configurationRepositoryFactory(entityManager);
 			const stateRepository = this.stateRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
@@ -315,6 +326,17 @@ export class Sync implements Contracts.ApiSync.Service {
 					.insert()
 					.orIgnore()
 					.values(deferred.validatorRound)
+					.execute();
+			}
+
+			if (deferred.newMilestones) {
+				await configurationRepository
+					.createQueryBuilder()
+					.update()
+					.set({
+						activeMilestones: deferred.newMilestones,
+					})
+					.where("id = :id", { id: 1 })
 					.execute();
 			}
 

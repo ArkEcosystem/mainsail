@@ -1,6 +1,6 @@
 import { Utils } from "@mainsail/cli";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { Console, describe } from "@mainsail/test-framework";
+import { Console, describe } from "../../../test-framework/source";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./api-run";

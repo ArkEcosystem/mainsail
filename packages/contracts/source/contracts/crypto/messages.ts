@@ -1,6 +1,6 @@
-import { Block, BlockJson } from "./block";
-import { KeyPair } from "./identities";
-import { AggregatedSignature } from "./signatures";
+import { Block, BlockJson } from "./block.js";
+import { KeyPair } from "./identities.js";
+import { AggregatedSignature } from "./signatures.js";
 
 export enum MessageType {
 	Prevote = 1,

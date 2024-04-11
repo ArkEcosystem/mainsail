@@ -1,6 +1,6 @@
-import { CommitHandler } from "../crypto";
-import { Store } from "./store";
-import { WalletRepository } from "./wallets";
+import { CommitHandler } from "../crypto/commit.js";
+import { Store } from "./store.js";
+import { WalletRepository } from "./wallets.js";
 
 export interface Service extends CommitHandler {
 	getStore(): Store;

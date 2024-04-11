@@ -1,4 +1,4 @@
-import { NumericCriteria, OrCriteria } from "./criteria";
+import { NumericCriteria, OrCriteria } from "./criteria.js";
 import {
 	AndExpression,
 	BetweenExpression,
@@ -8,7 +8,7 @@ import {
 	JsonFieldAccessor,
 	LessThanEqualExpression,
 	OrExpression,
-} from "./expressions";
+} from "./expressions.js";
 
 export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Expression<TEntity> => {
 	switch (expression.op) {

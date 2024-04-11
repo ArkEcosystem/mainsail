@@ -2,7 +2,7 @@ import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { getRcpId, prepareRcpError } from "./utils";
+import { getRcpId, prepareRcpError } from "./utils.js";
 
 @injectable()
 export class Processor implements Contracts.Api.RPC.Processor {

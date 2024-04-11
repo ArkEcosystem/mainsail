@@ -1,4 +1,4 @@
-import { Exception } from "./base";
+import { Exception } from "./base.js";
 
 export class WalletIndexAlreadyRegisteredError extends Exception {
 	public constructor(what: string) {

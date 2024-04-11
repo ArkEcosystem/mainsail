@@ -1,7 +1,7 @@
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import appJson from "../../../core/bin/config/testnet/core/app.json";
-import { describe } from "../../../test-framework";
+import { describe } from "../../../test-framework/source";
 import { makeApplication } from "../application-factory";
 import { AppGenerator } from "./app";
 

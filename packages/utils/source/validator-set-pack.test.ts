@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { validatorSetPack, validatorSetUnpack } from "./validator-set-pack";
 
 describe("validatorSet", async ({ assert, it }) => {

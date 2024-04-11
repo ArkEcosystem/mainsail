@@ -49,6 +49,7 @@ const EXCEPTIONS = {
 			"@mainsail/api-transaction-pool",
 			"@mainsail/bootstrap",
 			"@mainsail/consensus",
+			"@mainsail/consensus-storage",
 			"@mainsail/crypto-address-base58",
 			"@mainsail/crypto-address-bech32m",
 			"@mainsail/crypto-address-keccak256",

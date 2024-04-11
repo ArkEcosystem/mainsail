@@ -8,8 +8,8 @@ import {
 import { inject, injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { TransactionResource } from "../resources";
-import { Controller } from "./controller";
+import { TransactionResource } from "../resources/index.js";
+import { Controller } from "./controller.js";
 
 @injectable()
 export class VotesController extends Controller {
@@ -36,7 +36,11 @@ export class VotesController extends Controller {
 			options,
 		);
 
-		return this.toPagination(transactions, TransactionResource, request.query.transform);
+		return this.toPagination(
+			await this.enrichTransactionResult(transactions),
+			TransactionResource,
+			request.query.transform,
+		);
 	}
 
 	public async show(request: Hapi.Request) {
@@ -52,6 +56,10 @@ export class VotesController extends Controller {
 			return Boom.notFound("Vote not found");
 		}
 
-		return this.respondWithResource(transaction, TransactionResource, request.query.transform);
+		return this.respondWithResource(
+			await this.enrichTransaction(transaction),
+			TransactionResource,
+			request.query.transform,
+		);
 	}
 }

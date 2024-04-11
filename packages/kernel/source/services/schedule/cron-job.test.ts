@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import moment from "moment-timezone";
 
-import { describe, Sandbox } from "../../../../test-framework";
+import { describe, Sandbox } from "../../../../test-framework/source";
 import { Enums } from "../../index";
 import { CronJob } from "./cron-job";
 

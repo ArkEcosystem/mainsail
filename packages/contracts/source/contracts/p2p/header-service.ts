@@ -1,5 +1,5 @@
-import { HeaderData } from "./header";
-import { Peer } from "./peer";
+import { HeaderData } from "./header.js";
+import { Peer } from "./peer.js";
 
 export interface HeaderService {
 	handle(peer: Peer, header: HeaderData): Promise<void>;

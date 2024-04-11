@@ -1,9 +1,10 @@
 {
 	"name": "@mainsail/crypto-worker",
-	"version": "0.0.1-alpha.8",
+	"version": "0.0.1-alpha.14",
 	"description": "Crypto worker based on node child processes for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
+	"type": "module",
 	"main": "distribution/index.js",
 	"files": [
 		"/distribution"
@@ -13,23 +14,23 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "17.11.0"
+		"joi": "17.12.2"
 	},
 	"devDependencies": {
 		"@types/chance": "1.1.6",
 		"@types/fs-extra": "11.0.4",
-		"@types/got": "9.6.12",
 		"@types/lodash.clonedeep": "4.5.9",
-		"@types/sinon": "^17.0.2",
+		"@types/sinon": "^17.0.3",
 		"@types/tmp": "0.2.6",
 		"uvu": "^0.5.6"
 	},

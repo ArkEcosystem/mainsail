@@ -2,7 +2,7 @@ import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifier
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { EventListener } from "../contracts";
+import { EventListener } from "../contracts.js";
 
 export enum ListenerEvent {
 	OnAdded,

@@ -1,4 +1,4 @@
-import { describe } from "../../test-framework";
+import { describe } from "../../test-framework/source";
 import { isUndefined } from "./is-undefined";
 
 describe("isUndefined", async ({ assert, it, nock, loader }) => {

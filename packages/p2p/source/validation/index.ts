@@ -1,3 +1,3 @@
-export * from "./formats";
-export * from "./is-valid-peer";
-export * from "./keywords";
+export * from "./formats.js";
+export * from "./is-valid-peer.js";
+export * from "./keywords.js";

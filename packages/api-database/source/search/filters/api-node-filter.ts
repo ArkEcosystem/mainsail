@@ -1,7 +1,7 @@
-import { ApiNode } from "../../models";
-import { ApiNodeCriteria, OrApiNodeCriteria } from "../criteria";
-import { Expression } from "../expressions";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search";
+import { ApiNode } from "../../models/index.js";
+import { ApiNodeCriteria, OrApiNodeCriteria } from "../criteria.js";
+import { Expression } from "../expressions.js";
+import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class ApiNodeFilter {
 	public static async getExpression(...criteria: OrApiNodeCriteria[]): Promise<Expression<ApiNode>> {
@@ -15,8 +15,8 @@ export class ApiNodeFilter {
 	private static async handleApiNodeCriteria(criteria: ApiNodeCriteria): Promise<Expression<ApiNode>> {
 		return handleAndCriteria(criteria, async (key) => {
 			switch (key) {
-				case "ip": {
-					return handleOrCriteria(criteria.ip, async (c) => ({ op: "equal", property: "ip", value: c }));
+				case "url": {
+					return handleOrCriteria(criteria.url, async (c) => ({ op: "equal", property: "url", value: c }));
 				}
 				case "version": {
 					return handleOrCriteria(criteria.version, async (c) =>
