@@ -22,9 +22,9 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@chainsafe/blst": "^0.2.10",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*"
 	},

@@ -13,6 +13,7 @@ export * from "./private.js";
 export * from "./public.js";
 export * from "./schemas.js";
 export * from "./serializer.js";
+export * from "./get-bls.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
