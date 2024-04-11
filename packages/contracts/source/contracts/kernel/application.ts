@@ -82,3 +82,7 @@ export interface PluginDependency {
 
 	required?: boolean | (() => Promise<boolean>);
 }
+
+export interface Bootstrapper {
+	bootstrap(): Promise<void>;
+}

@@ -1,7 +1,7 @@
 import { Container, injectable, interfaces } from "@mainsail/container";
 import { Exceptions, Identifiers } from "@mainsail/contracts";
 import { setMaxListeners } from "events";
-import { resolve } from "path";
+import { join } from "path";
 import { dirSync } from "tmp";
 
 import { describe } from "../../test-framework/source";
@@ -56,27 +56,25 @@ describe<{
 	});
 
 	it("should bootstrap the application", async (context) => {
-		console.error(resolve(__dirname, "../test/stubs/config"));
-
 		context.app.unbind(Identifiers.Services.Filesystem.Service);
 
 		await context.app.bootstrap({
 			flags: {
-				network: "testnet",
-				paths: { config: resolve(__dirname, "../test/stubs/config/local") },
-				token: "ark",
 				name: "local",
+				network: "testnet",
+				paths: { config: join(import.meta.dirname, "../test/stubs/config/local") },
+				token: "ark",
 			},
 		});
 	});
 
 	it("should bootstrap the application with a config path from process.env", async (context) => {
-		process.env.CORE_PATH_CONFIG = resolve(__dirname, "../test/stubs/config");
+		process.env.CORE_PATH_CONFIG = join(import.meta.dirname, "../test/stubs/config");
 
 		context.app.unbind(Identifiers.Services.Filesystem.Service);
 
 		await context.app.bootstrap({
-			flags: { network: "testnet", token: "ark", name: "local" },
+			flags: { name: "local", network: "testnet", token: "ark" },
 		});
 
 		assert.is(context.app.configPath(), process.env.CORE_PATH_CONFIG);

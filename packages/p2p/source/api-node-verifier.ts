@@ -5,7 +5,7 @@ import { http, HttpResponse } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 // The default API server "/" response
-const helloWorld = { data: "Hello World!" };
+const helloWorld = { data: "Hello World from Mainsail API!" };
 const helloWorldLength = JSON.stringify(helloWorld).length;
 
 @injectable()
@@ -24,7 +24,7 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 			const t0 = dayjs();
 			apiNode.lastPinged = t0;
 
-			const response = await http.get(apiNode.url(), {
+			const response = await http.get(apiNode.url, {
 				headers: {},
 				maxContentLength: apiNodesMaxContentLength,
 				timeout: 5000,
@@ -39,7 +39,7 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 			this.#verifyHeaders(response);
 			this.#verifyResponseBody(response);
 		} catch (error) {
-			this.logger.debugExtra(`API node ${apiNode.ip} verification failed: ${error.message}`);
+			this.logger.debugExtra(`API node ${apiNode.url} verification failed: ${error.message}`);
 			return false;
 		}
 

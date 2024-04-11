@@ -4,8 +4,8 @@ import { makeApplication } from "../distribution/application-factory.js";
 import { Identifiers } from "../distribution/identifiers.js";
 
 async function run() {
-	const paths = envPaths("mainsail", { suffix: "core" });
-	const configCore = path.join(paths.config, "testnet");
+	const paths = envPaths("mainsail", { suffix: "" });
+	const configCore = path.join(paths.config, "core");
 	console.log(paths, configCore);
 
 	const flags = {

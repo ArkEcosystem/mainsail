@@ -1,3 +1,5 @@
+import { Contracts } from "@mainsail/test-runner";
+import esmock from "esmock";
 import fs from "fs";
 import { join } from "path";
 import { setGracefulCleanup } from "tmp";
@@ -7,26 +9,35 @@ import { Identifiers } from "../ioc/index.js";
 import { PluginManager } from "./plugin-manager";
 import { File, Git, NPM } from "./source-providers";
 
+let existSyncResponse: Contracts.Stub;
+const { PluginManager: PluginManagerProxy } = await esmock("./plugin-manager", {
+	fs: {
+		existsSync: () => existSyncResponse.call(),
+	},
+});
+
 describe<{
 	cli: Console;
 	pluginManager: PluginManager;
-}>("DiscoverPlugins", ({ beforeEach, afterAll, assert, it, stub }) => {
+}>("DiscoverPlugins", ({ beforeEach, afterAll, assert, it, stub, stubFn }) => {
+	existSyncResponse = stubFn().returnValue(false);
+
 	const applicationName = "mainsail";
 	const packageName = "dummyPackageName";
 
 	beforeEach((context) => {
 		context.cli = new Console();
 
-		context.pluginManager = context.cli.app.resolve(PluginManager);
+		context.pluginManager = context.cli.app.resolve(PluginManagerProxy);
 	});
 
 	afterAll(() => setGracefulCleanup());
 
 	it("#discover - should discover packages containing package.json", async ({ cli, pluginManager }) => {
-		const pluginsPath: string = join(__dirname, "../../test/plugins");
+		const pluginsPath: string = join(import.meta.dirname, "../../test/plugins");
 
 		stub(cli.app.get(Identifiers.Environment), "getPaths").returnValue({
-			data: join(__dirname, "../../test"),
+			data: join(import.meta.dirname, "../../test"),
 		});
 
 		const plugins = await pluginManager.list(applicationName);
@@ -159,7 +170,7 @@ describe<{
 
 	it("#update - if the plugin is a git directory, it should be updated", async ({ pluginManager }) => {
 		const spyGitUpdate = stub(Git.prototype, "update");
-		stub(fs, "existsSync").returnValue(true);
+		existSyncResponse = stubFn().returnValue(true);
 
 		await assert.resolves(() => pluginManager.update(packageName));
 
@@ -168,7 +179,7 @@ describe<{
 
 	it("#update - if the plugin is a NPM package, it should be updated on default path", async ({ pluginManager }) => {
 		const spyNpmUpdate = stub(NPM.prototype, "update");
-		stub(fs, "existsSync").returnValueOnce(true).returnValue(false);
+		existSyncResponse = stubFn().returnValueOnce(true).returnValue(false);
 
 		await assert.resolves(() => pluginManager.update(packageName));
 

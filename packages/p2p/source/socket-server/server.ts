@@ -9,7 +9,8 @@ import { CodecPlugin } from "./plugins/codec.js";
 import { HeaderHandlePlugin } from "./plugins/header-handle.js";
 import { HeaderIncludePlugin } from "./plugins/header-include.js";
 import { RateLimitPlugin } from "./plugins/rate-limit.js";
-import { ValidatePlugin } from "./plugins/validate.js";
+import { ValidateDataPlugin } from "./plugins/validate-data.js";
+import { ValidateIpPlugin } from "./plugins/validate-ip.js";
 import {
 	GetApiNodesRoute,
 	GetBlocksRoute,
@@ -63,11 +64,12 @@ export class Server implements Contracts.P2P.Server {
 		this.app.resolve(PostTransactionsRoute).register(this.server);
 
 		// onPreAuth
+		this.app.resolve(ValidateIpPlugin).register(this.server);
 		this.app.resolve(RateLimitPlugin).register(this.server);
 
 		// onPostAuth
 		this.app.resolve(CodecPlugin).register(this.server);
-		this.app.resolve(ValidatePlugin).register(this.server);
+		this.app.resolve(ValidateDataPlugin).register(this.server);
 
 		// onPreHandler
 		this.app.resolve(AcceptPeerPlugin).register(this.server);

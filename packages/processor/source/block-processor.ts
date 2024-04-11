@@ -63,6 +63,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			return true;
 		} catch (error) {
+			void this.events.dispatch(Enums.BlockEvent.Invalid, { block: unit.getBlock(), error });
 			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 

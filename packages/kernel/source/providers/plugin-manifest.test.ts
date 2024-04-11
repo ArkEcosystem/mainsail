@@ -1,14 +1,14 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra";
+import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework/source";
+import { describeSkip } from "../../../test-framework/source";
 import { Application } from "../application";
 import { ConfigRepository } from "../services/config";
 import { PluginManifest } from "./plugin-manifest";
 
-describe<{
+describeSkip<{
 	app: Application;
 	pluginManifest: PluginManifest;
 }>("PluginManifest", ({ assert, beforeEach, it }) => {

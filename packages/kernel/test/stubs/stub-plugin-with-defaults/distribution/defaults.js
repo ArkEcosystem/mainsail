@@ -1,1 +1,1 @@
-module.exports = { defaults: { defaultKey: "defaultValue" } }
+export const defaults = { defaultKey: "defaultValue" }

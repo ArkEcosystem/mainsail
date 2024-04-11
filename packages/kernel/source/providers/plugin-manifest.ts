@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { get, has } from "@mainsail/utils";
+import { createRequire } from "module";
 
 @injectable()
 export class PluginManifest {
@@ -9,8 +10,8 @@ export class PluginManifest {
 
 	#manifest!: Contracts.Types.JsonObject;
 
-	public discover(packageId: string): this {
-		this.#manifest = this.fileSystem.readJSONSync(`${packageId}/package.json`);
+	public discover(packageId: string, url: string): this {
+		this.#manifest = this.fileSystem.readJSONSync(createRequire(url).resolve(`${packageId}/package.json`));
 
 		return this;
 	}

@@ -1,6 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-
-import { BigNumber } from "../../utils";
+import { BigNumber } from "@mainsail/utils";
 
 export const buildValidatorAndVoteWallets = async (
 	numberDelegates: number,

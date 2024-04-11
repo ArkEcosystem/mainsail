@@ -19,6 +19,209 @@ $root.getApiNodes = (function() {
      */
     var getApiNodes = {};
 
+    getApiNodes.ApiNode = (function() {
+
+        /**
+         * Properties of an ApiNode.
+         * @memberof getApiNodes
+         * @interface IApiNode
+         * @property {string|null} [url] ApiNode url
+         */
+
+        /**
+         * Constructs a new ApiNode.
+         * @memberof getApiNodes
+         * @classdesc Represents an ApiNode.
+         * @implements IApiNode
+         * @constructor
+         * @param {getApiNodes.IApiNode=} [properties] Properties to set
+         */
+        function ApiNode(properties) {
+            if (properties)
+                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * ApiNode url.
+         * @member {string} url
+         * @memberof getApiNodes.ApiNode
+         * @instance
+         */
+        ApiNode.prototype.url = "";
+
+        /**
+         * Creates a new ApiNode instance using the specified properties.
+         * @function create
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {getApiNodes.IApiNode=} [properties] Properties to set
+         * @returns {getApiNodes.ApiNode} ApiNode instance
+         */
+        ApiNode.create = function create(properties) {
+            return new ApiNode(properties);
+        };
+
+        /**
+         * Encodes the specified ApiNode message. Does not implicitly {@link getApiNodes.ApiNode.verify|verify} messages.
+         * @function encode
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {getApiNodes.IApiNode} message ApiNode message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApiNode.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.url != null && Object.hasOwnProperty.call(message, "url"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.url);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified ApiNode message, length delimited. Does not implicitly {@link getApiNodes.ApiNode.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {getApiNodes.IApiNode} message ApiNode message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        ApiNode.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes an ApiNode message from the specified reader or buffer.
+         * @function decode
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getApiNodes.ApiNode} ApiNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApiNode.decode = function decode(reader, length) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            var end = length === undefined ? reader.len : reader.pos + length, message = new $root.getApiNodes.ApiNode();
+            while (reader.pos < end) {
+                var tag = reader.uint32();
+                switch (tag >>> 3) {
+                case 1: {
+                        message.url = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes an ApiNode message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getApiNodes.ApiNode} ApiNode
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        ApiNode.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an ApiNode message.
+         * @function verify
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        ApiNode.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.url != null && message.hasOwnProperty("url"))
+                if (!$util.isString(message.url))
+                    return "url: string expected";
+            return null;
+        };
+
+        /**
+         * Creates an ApiNode message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getApiNodes.ApiNode} ApiNode
+         */
+        ApiNode.fromObject = function fromObject(object) {
+            if (object instanceof $root.getApiNodes.ApiNode)
+                return object;
+            var message = new $root.getApiNodes.ApiNode();
+            if (object.url != null)
+                message.url = String(object.url);
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an ApiNode message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {getApiNodes.ApiNode} message ApiNode
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        ApiNode.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            var object = {};
+            if (options.defaults)
+                object.url = "";
+            if (message.url != null && message.hasOwnProperty("url"))
+                object.url = message.url;
+            return object;
+        };
+
+        /**
+         * Converts this ApiNode to JSON.
+         * @function toJSON
+         * @memberof getApiNodes.ApiNode
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        ApiNode.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for ApiNode
+         * @function getTypeUrl
+         * @memberof getApiNodes.ApiNode
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        ApiNode.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/getApiNodes.ApiNode";
+        };
+
+        return ApiNode;
+    })();
+
     getApiNodes.GetApiNodesRequest = (function() {
 
         /**
@@ -234,7 +437,7 @@ $root.getApiNodes = (function() {
          * @memberof getApiNodes
          * @interface IGetApiNodesResponse
          * @property {shared.IHeaders|null} [headers] GetApiNodesResponse headers
-         * @property {Array.<shared.IPeerLike>|null} [apiNodes] GetApiNodesResponse apiNodes
+         * @property {Array.<getApiNodes.IApiNode>|null} [apiNodes] GetApiNodesResponse apiNodes
          */
 
         /**
@@ -263,7 +466,7 @@ $root.getApiNodes = (function() {
 
         /**
          * GetApiNodesResponse apiNodes.
-         * @member {Array.<shared.IPeerLike>} apiNodes
+         * @member {Array.<getApiNodes.IApiNode>} apiNodes
          * @memberof getApiNodes.GetApiNodesResponse
          * @instance
          */
@@ -297,7 +500,7 @@ $root.getApiNodes = (function() {
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
             if (message.apiNodes != null && message.apiNodes.length)
                 for (var i = 0; i < message.apiNodes.length; ++i)
-                    $root.shared.PeerLike.encode(message.apiNodes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    $root.getApiNodes.ApiNode.encode(message.apiNodes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
             return writer;
         };
 
@@ -339,7 +542,7 @@ $root.getApiNodes = (function() {
                 case 2: {
                         if (!(message.apiNodes && message.apiNodes.length))
                             message.apiNodes = [];
-                        message.apiNodes.push($root.shared.PeerLike.decode(reader, reader.uint32()));
+                        message.apiNodes.push($root.getApiNodes.ApiNode.decode(reader, reader.uint32()));
                         break;
                     }
                 default:
@@ -386,7 +589,7 @@ $root.getApiNodes = (function() {
                 if (!Array.isArray(message.apiNodes))
                     return "apiNodes: array expected";
                 for (var i = 0; i < message.apiNodes.length; ++i) {
-                    var error = $root.shared.PeerLike.verify(message.apiNodes[i]);
+                    var error = $root.getApiNodes.ApiNode.verify(message.apiNodes[i]);
                     if (error)
                         return "apiNodes." + error;
                 }
@@ -418,7 +621,7 @@ $root.getApiNodes = (function() {
                 for (var i = 0; i < object.apiNodes.length; ++i) {
                     if (typeof object.apiNodes[i] !== "object")
                         throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: object expected");
-                    message.apiNodes[i] = $root.shared.PeerLike.fromObject(object.apiNodes[i]);
+                    message.apiNodes[i] = $root.getApiNodes.ApiNode.fromObject(object.apiNodes[i]);
                 }
             }
             return message;
@@ -446,7 +649,7 @@ $root.getApiNodes = (function() {
             if (message.apiNodes && message.apiNodes.length) {
                 object.apiNodes = [];
                 for (var j = 0; j < message.apiNodes.length; ++j)
-                    object.apiNodes[j] = $root.shared.PeerLike.toObject(message.apiNodes[j], options);
+                    object.apiNodes[j] = $root.getApiNodes.ApiNode.toObject(message.apiNodes[j], options);
             }
             return object;
         };

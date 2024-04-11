@@ -44,6 +44,8 @@ export const makeApplication = async (configurationPath: string, options: Record
 
 	const app = new Application(new Container());
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
+	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
+	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();

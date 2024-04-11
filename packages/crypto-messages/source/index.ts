@@ -7,6 +7,8 @@ import { makeKeywords } from "./keywords.js";
 import { schemas } from "./schemas.js";
 import { Serializer } from "./serializer.js";
 
+export { Proposal } from "./proposal.js";
+
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Message.Serializer).to(Serializer).inSingletonScope();

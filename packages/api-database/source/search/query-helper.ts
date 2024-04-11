@@ -118,6 +118,13 @@ export class QueryHelper<TEntity> {
 				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
 				return { parameters, query };
 			}
+			case "jsonbAttributeExists": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column} ? :${parameter}`;
+				const parameters = { [parameter]: expression.attribute };
+				return { parameters, query };
+			}
 			default: {
 				throw new Error(`Unexpected expression`);
 			}

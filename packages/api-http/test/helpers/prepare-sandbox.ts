@@ -1,13 +1,13 @@
-import { Identifiers } from "@mainsail/contracts";
-import { Application, Providers } from "@mainsail/kernel";
-
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
 	ServiceProvider as CoreApiDatabase,
-} from "../../../api-database";
-import { ServiceProvider as CoreApiHttp } from "../../../api-http";
+} from "@mainsail/api-database";
+import { Identifiers } from "@mainsail/contracts";
+import { Application, Providers } from "@mainsail/kernel";
+
 import { Sandbox } from "../../../test-framework/source";
+import { ServiceProvider as CoreApiHttp } from "../../source/service-provider";
 
 export class ApiContext {
 	public constructor(
@@ -125,10 +125,10 @@ const setupDatabase = async (app: Application): Promise<CoreApiDatabase> => {
 		database: {
 			...databaseOptions,
 			applicationName: "mainsail/api-database-test",
-			migrationsRun: true,
 			dropSchema: true,
-			synchronize: true,
 			logging: false,
+			migrationsRun: true,
+			synchronize: true,
 		},
 	});
 
@@ -145,17 +145,17 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 		.discover("@mainsail/api-http", "@mainsail/api-http");
 
 	pluginConfiguration.merge({
-		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },
+		database: {
+			...databaseOptions,
+			applicationName: "mainsail/api-http-test",
+		},
 		plugins: {
 			pagination: {
 				limit: 100,
 			},
 			socketTimeout: 5000,
 		},
-		database: {
-			...databaseOptions,
-			applicationName: "mainsail/api-http-test",
-		},
+		server: { http: { enabled: true, host: "127.0.0.1", port: 4003 } },
 	});
 
 	const server = app.resolve(CoreApiHttp);

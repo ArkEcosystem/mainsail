@@ -25,11 +25,9 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 			return this.listByExpression(transactionExpression, sorting, pagination, options);
 		},
 
-		async getFeeStatistics(days?: number, minFee?: number): Promise<FeeStatistics[]> {
-			minFee = minFee || 0;
-
+		async getFeeStatistics(genesisTimestamp: number, days?: number, minFee = 0): Promise<FeeStatistics[]> {
 			if (days) {
-				const age = dayjs().subtract(days, "day").valueOf();
+				const age = Math.max(dayjs().subtract(days, "day").valueOf() - 1, genesisTimestamp);
 
 				return this.createQueryBuilder()
 					.select(['type_group AS "typeGroup"', "type"])
@@ -37,7 +35,7 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 					.addSelect("COALESCE(MIN(fee), 0)::int8", "min")
 					.addSelect("COALESCE(MAX(fee), 0)::int8", "max")
 					.addSelect("COALESCE(SUM(fee), 0)::int8", "sum")
-					.where("timestamp >= :age AND fee >= :minFee", { age, minFee })
+					.where("timestamp > :age AND fee >= :minFee", { age, minFee })
 					.groupBy("type_group")
 					.addGroupBy("type")
 					.orderBy("type_group")
@@ -56,14 +54,14 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 				from transactions t_outer
 				join lateral (
 					select 1 from transactions t_inner
-					where t_inner.type_group = t_outer.type_group and t_inner.type = t_outer.type and fee >= $1
+					where t_inner.timestamp > $1 and t_inner.type_group = t_outer.type_group and t_inner.type = t_outer.type and fee >= $2
 					order by t_inner.timestamp desc
-					limit $2
+					limit $3
 				) t_limit on true
 				group by t_outer.type_group, t_outer.type
 				order by t_outer.type_group, t_outer.type;
 			`,
-				[minFee, 20],
+				[genesisTimestamp, minFee, 20],
 			);
 		},
 	});

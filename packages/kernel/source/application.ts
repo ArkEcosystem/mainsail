@@ -4,8 +4,7 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { join } from "path";
 
 import { Bootstrappers } from "./bootstrap/index.js";
-import { Bootstrapper } from "./bootstrap/interfaces.js";
-import { KernelEvent, ShutdownSignal } from "./enums/index.js";
+import { KernelEvent } from "./enums/index.js";
 import { ServiceProvider, ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
@@ -17,8 +16,6 @@ export class Application implements Contracts.Kernel.Application {
 	#terminating = false;
 
 	public constructor(public readonly container: Contracts.Kernel.Container.Container) {
-		this.#listenToShutdownSignals();
-
 		this.bind<Contracts.Kernel.Application>(Identifiers.Application.Instance).toConstantValue(this);
 
 		this.bind<ConfigRepository>(Identifiers.Config.Repository).to(ConfigRepository).inSingletonScope();
@@ -257,13 +254,13 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
-		const bootstrappers: Constructor<Bootstrapper>[] = Object.values(Bootstrappers[type]);
+		const bootstrappers: Constructor<Contracts.Kernel.Bootstrapper>[] = Object.values(Bootstrappers[type]);
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
 			await events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
 
-			await this.resolve<Bootstrapper>(bootstrapper).bootstrap();
+			await this.resolve<Contracts.Kernel.Bootstrapper>(bootstrapper).bootstrap();
 
 			await events.dispatch(KernelEvent.Bootstrapped, { bootstrapper: bootstrapper.name });
 		}
@@ -321,13 +318,5 @@ export class Application implements Contracts.Kernel.Application {
 		}
 
 		this.rebind<string>(`path.${type}`).toConstantValue(path);
-	}
-
-	#listenToShutdownSignals(): void {
-		for (const signal in ShutdownSignal) {
-			process.on(signal as any, async (code) => {
-				await this.terminate(signal);
-			});
-		}
 	}
 }

@@ -175,7 +175,7 @@ addCore() {
 
 heading "Configuring for custom TestNet ..."
 
-    channel=alpha addCore ${channel} && rm -rf ~/.config/mainsail/ &&  rm -rf ~/.local/state/mainsail/ &&  rm -rf ~/.local/share/mainsail/  && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset && mainsail env:set --key=CORE_P2P_PORT --value=4000 && mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
+    channel=alpha addCore ${channel} && rm -rf ~/.config/mainsail/core/ &&  rm -rf ~/.local/state/mainsail/core/ &&  rm -rf ~/.local/share/mainsail/core/  && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset && mainsail env:set --key=CORE_P2P_PORT --value=4000 && mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
 
 warning "Cleaning up Pnpm cache .."
     pnpm store prune
@@ -299,7 +299,7 @@ if [ ! -z "$API" ] ; then
     pnpm rm -g @mainsail/api > /dev/null 2>&1 || true
 fi
 
-    channel=alpha addApi ${channel} && rm -rf ~/.config/mainsail-api/ &&  rm -rf ~/.local/state/mainsail-api/ &&  rm -rf ~/.local/share/mainsail-api/ && mainsail-api config:publish --reset && mainsail-api env:set --key=CORE_DB_USERNAME --value="${databaseUsername}" && mainsail-api env:set --key=CORE_DB_PASSWORD --value="${databasePassword}" && mainsail-api env:set --key=CORE_DB_DATABASE --value="${databaseName}"
+    channel=alpha addApi ${channel} && rm -rf ~/.config/mainsail/api/ &&  rm -rf ~/.local/state/mainsail/api/ &&  rm -rf ~/.local/share/mainsail/api/ && mainsail-api config:publish --reset && mainsail-api env:set --key=CORE_DB_USERNAME --value="${databaseUsername}" && mainsail-api env:set --key=CORE_DB_PASSWORD --value="${databasePassword}" && mainsail-api env:set --key=CORE_DB_DATABASE --value="${databaseName}"
 
 warning "Cleaning up Pnpm cache .."
     pnpm store prune
@@ -316,7 +316,7 @@ if [[ "$choice" =~ ^(yes|y|Y) ]]; then
         fi
 heading "Configuring ..."
 
-        rm -rf ~/.config/mainsail/ && rm -rf ~/.local/state/mainsail/ && rm -rf ~/.local/share/mainsail/ && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/api-app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset
+        rm -rf ~/.config/mainsail/core/ && rm -rf ~/.local/state/mainsail/core/ && rm -rf ~/.local/share/mainsail/core/ && mainsail config:publish:custom --app=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/api-app.json --crypto=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/crypto.json --peers=https://raw.githubusercontent.com/ArkEcosystem/mainsail-network-config/main/testnet/mainsail/peers.json --reset
 	mainsail env:set --key=CORE_P2P_PORT --value=4000
 	mainsail env:set --key=CORE_API_DEV_ENABLED --value=true
 	mainsail env:set --key=CORE_DB_USERNAME --value="${databaseUsername}"

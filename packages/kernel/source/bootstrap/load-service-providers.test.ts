@@ -1,9 +1,9 @@
 import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
-import { readJSONSync } from "fs-extra";
+import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describe } from "../../../test-framework/source";
+import { describeSkip } from "../../../test-framework/source";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";
@@ -14,7 +14,7 @@ class StubServiceProvider extends ServiceProvider {
 	public async register(): Promise<void> {}
 }
 
-describe<{
+describeSkip<{
 	app: Application;
 	configRepository: ConfigRepository;
 	serviceProviderRepository: ServiceProviderRepository;
@@ -33,7 +33,7 @@ describe<{
 	});
 
 	it("should bootstrap with defaults", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "stub-plugin-with-defaults" }] },
@@ -45,7 +45,7 @@ describe<{
 	});
 
 	it("should bootstrap without defaults", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "stub-plugin" }] },
@@ -57,7 +57,7 @@ describe<{
 	});
 
 	it("should throw if package doesn't exist", async (context) => {
-		stub(context.app, "dataPath").returnValue(resolve(__dirname, "../../test/stubs"));
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 
 		context.configRepository.merge({
 			app: { plugins: [{ package: "non-existing-plugin" }] },

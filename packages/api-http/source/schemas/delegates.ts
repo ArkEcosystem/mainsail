@@ -29,4 +29,4 @@ export const delegateCriteriaSchemaObject = {
 };
 
 export const delegateCriteriaSchema = Schemas.createCriteriaSchema(delegateCriteriaSchemaObject);
-export const delegateSortingSchema = Schemas.createSortingSchema(delegateCriteriaSchemaObject);
+export const delegateSortingSchema = Schemas.createSortingSchema(delegateCriteriaSchemaObject, ["attributes"], false);

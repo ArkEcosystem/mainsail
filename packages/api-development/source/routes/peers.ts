@@ -40,4 +40,20 @@ export const register = (server: Hapi.Server<any>): void => {
 		},
 		path: "/peers/{ip}",
 	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.banned(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: pagination,
+			},
+		},
+		path: "/peers/banned",
+	});
 };

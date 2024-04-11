@@ -28,7 +28,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		// TODO
 		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
 			EvmCallTransaction.key,
-			EvmCallTransaction.version,
 			{
 				managed: BigNumber.make("100"),
 				static: BigNumber.make("2500000000"),

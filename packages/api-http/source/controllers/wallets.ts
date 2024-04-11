@@ -120,7 +120,11 @@ export class WalletsController extends Controller {
 			options,
 		);
 
-		return this.toPagination(transactions, TransactionResource, request.query.transform);
+		return this.toPagination(
+			await this.enrichTransactionResult(transactions),
+			TransactionResource,
+			request.query.transform,
+		);
 	}
 
 	private async getWallet(walletId: string): Promise<Models.Wallet | null> {

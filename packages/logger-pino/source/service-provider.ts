@@ -10,9 +10,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			Identifiers.Services.Log.Manager,
 		);
 
-		await logManager.extend("pino", async () =>
-			this.app.resolve<Contracts.Kernel.Logger>(PinoLogger).make(this.config().all()),
-		);
+		await logManager.extend("pino", async () => this.app.resolve<PinoLogger>(PinoLogger).make(this.config().all()));
 
 		logManager.setDefaultDriver("pino");
 	}

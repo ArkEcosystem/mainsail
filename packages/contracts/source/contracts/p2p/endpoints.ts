@@ -1,5 +1,6 @@
 import Hapi from "@hapi/hapi";
 
+import { ApiNodeBroadcast } from "./api-node.js";
 import { HeaderData } from "./header.js";
 import { Socket } from "./nes.js";
 import { PeerBroadcast, PeerConfig, PeerState } from "./peer.js";
@@ -62,7 +63,7 @@ export interface GetApiNodesRequest extends Request {
 }
 
 export interface GetApiNodesResponse extends Response {
-	apiNodes: PeerBroadcast[];
+	apiNodes: ApiNodeBroadcast[];
 }
 
 export interface GetProposalResponse extends Response {

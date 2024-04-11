@@ -53,7 +53,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		} catch (error) {
 			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`);
 
-			this.peerDisposer.banPeer(peer.ip, error, false);
+			this.peerDisposer.banPeer(peer.ip, error);
 
 			return false;
 		}
@@ -88,7 +88,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 		const receivedCommit = await this.commitFactory.fromBytes(blocks[0]);
 
 		const blockToCompare =
-			block.data.height === heightToRequest ? block : await this.database.getBlock(heightToRequest);
+			block.data.height === heightToRequest ? block : (await this.database.getCommit(heightToRequest))?.block;
 
 		Utils.assert.defined<Contracts.Crypto.Block>(blockToCompare);
 

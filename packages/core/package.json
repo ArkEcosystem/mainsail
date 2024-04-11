@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/core",
-	"version": "0.0.1-alpha.11",
+	"version": "0.0.1-alpha.14",
 	"description": "Core CLI commands for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -8,7 +8,7 @@
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"bin": {
-		"mainsail": "./bin/run"
+		"mainsail": "./bin/run.js"
 	},
 	"files": [
 		"/bin",
@@ -19,12 +19,13 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"full:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config/testnet pnpm run mainsail core:run -- --env=test",
-		"mainsail": "node ./bin/run",
+		"mainsail": "node ./bin/run.js",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/api-common": "workspace:*",
@@ -38,6 +39,7 @@
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
+		"@mainsail/consensus-storage": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-base58": "workspace:*",

@@ -6,7 +6,7 @@ export class Console {
 
 	public pkg = {
 		bin: {
-			mainsail: "./bin/run",
+			mainsail: "./bin/run.js",
 		},
 		description: "Core of the Mainsail Blockchain",
 		name: "@mainsail/core",

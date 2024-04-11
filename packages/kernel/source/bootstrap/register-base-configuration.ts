@@ -3,10 +3,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { ConfigManager, ConfigRepository } from "../services/config/index.js";
 import { KeyValuePair } from "../types/index.js";
-import { Bootstrapper } from "./interfaces.js";
 
 @injectable()
-export class RegisterBaseConfiguration implements Bootstrapper {
+export class RegisterBaseConfiguration implements Contracts.Kernel.Bootstrapper {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 

@@ -10,9 +10,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			Identifiers.Services.Log.Manager,
 		);
 
-		await logManager.extend("winston", async () =>
-			this.app.resolve<Contracts.Kernel.Logger>(Logger).make(this.config().all()),
-		);
+		await logManager.extend("winston", async () => this.app.resolve<Logger>(Logger).make(this.config().all()));
 
 		logManager.setDefaultDriver("winston");
 	}

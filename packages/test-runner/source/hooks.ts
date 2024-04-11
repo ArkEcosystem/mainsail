@@ -8,5 +8,6 @@ export const runHook =
 			await callback(context);
 		} catch (error) {
 			console.log(kleur.bold(kleur.bgRed(kleur.white(error.stack))));
+			throw error;
 		}
 	};

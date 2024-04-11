@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/webhooks",
-	"version": "0.0.1-alpha.11",
+	"version": "0.0.1-alpha.14",
 	"description": "Webhooks service for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -14,10 +14,11 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
@@ -35,7 +36,6 @@
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
 		"@types/uuid": "9.0.8",
-		"import-fresh": "3.3.0",
 		"tmp": "0.2.3",
 		"uvu": "^0.5.6"
 	},

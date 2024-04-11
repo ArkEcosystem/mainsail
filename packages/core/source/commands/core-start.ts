@@ -1,10 +1,12 @@
-import { Commands, Contracts, Utils } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { Commands, Contracts, Identifiers, Utils } from "@mainsail/cli";
+import { inject, injectable } from "@mainsail/container";
 import Joi from "joi";
-import { resolve } from "path";
 
 @injectable()
 export class Command extends Commands.Command {
+	@inject(Identifiers.Setup)
+	private readonly setup!: Contracts.Setup;
+
 	public signature = "core:start";
 
 	public description = "Start the Core process.";
@@ -25,22 +27,15 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
-		const dirname = (() => {
-			try {
-				return new URL(".", import.meta.url).pathname;
-			} catch {
-				// eslint-disable-next-line unicorn/prefer-module
-				return __dirname;
-			}
-		})();
-
 		this.actions.abortRunningProcess(`mainsail`);
 
 		await this.actions.daemonizeProcess(
 			{
 				args: `core:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail`,
-				script: resolve(dirname, "../../bin/run"),
+				script: this.setup.isGlobal()
+					? this.setup.getGlobalEntrypoint("@mainsail/core")
+					: this.setup.getEntrypoint(),
 			},
 			flags,
 		);

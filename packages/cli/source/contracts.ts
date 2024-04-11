@@ -1,6 +1,6 @@
 import { interfaces } from "@mainsail/container";
 import { AnySchema } from "joi";
-export { Paths } from "env-paths";
+export type { Paths } from "env-paths";
 
 export type InputValue = any;
 export type InputValues = Record<string, InputValue>;
@@ -48,6 +48,12 @@ export interface Updater {
 	update(updateProcessManager?: boolean, force?: boolean): Promise<boolean>;
 
 	getLatestVersion(): Promise<string | undefined>;
+}
+
+export interface Setup {
+	isGlobal(): boolean;
+	getEntrypoint(): string;
+	getGlobalEntrypoint(packageId: string): string;
 }
 
 export interface Installer {

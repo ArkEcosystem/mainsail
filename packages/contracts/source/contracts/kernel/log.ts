@@ -1,6 +1,4 @@
 export interface Logger {
-	make(options?: any): Promise<Logger>;
-
 	emergency(message: string): void;
 
 	alert(message: string): void;
@@ -20,7 +18,4 @@ export interface Logger {
 	suppressConsoleOutput(suppress: boolean): void;
 
 	dispose(): Promise<void>;
-
-	//
-	// setLevels(levels: Record<string, string>): void;
 }

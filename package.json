@@ -59,7 +59,7 @@
 		"npm-check-updates": "^16.14.14",
 		"prettier": "^3.2.5",
 		"sort-package-json": "^2.7.0",
-		"tsm": "^2.3.0",
+		"tsx": "^4.7.1",
 		"typedoc": "^0.25.7",
 		"typescript": "5.4.2",
 		"typesync": "^0.12.1",

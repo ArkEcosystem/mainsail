@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/validator-set-vote-weighted",
-	"version": "0.0.1-alpha.11",
+	"version": "0.0.1-alpha.14",
 	"description": "Vote weighted validator strategy set for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -15,10 +15,11 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
@@ -26,6 +27,7 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
+		"@mainsail/utils": "workspace:*",
 		"@types/sinon": "^17.0.3",
 		"sinon": "^17.0.1",
 		"uvu": "^0.5.6"

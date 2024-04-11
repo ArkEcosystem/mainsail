@@ -3,6 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Services, Utils } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
+import { normalizeUrl } from "./index.js";
+
 @injectable()
 export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	@inject(Identifiers.Application.Instance)
@@ -42,12 +44,9 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	}
 
 	async populateApiNodesFromConfiguration(): Promise<any> {
-		const apiNodes = this.configuration.getOptional<string[]>("apiNodes", []).map((item) => {
-			const [ip, port] = item.split(":");
-			Utils.assert.defined<string>(ip);
-			Utils.assert.defined<string>(port);
-
-			return this.ApiNodeFactory(ip, port);
+		const apiNodes = this.configuration.getOptional<string[]>("apiNodes", []).map((url) => {
+			const normalizedUrl = normalizeUrl(url);
+			return this.ApiNodeFactory(normalizedUrl);
 		});
 
 		return Promise.all(

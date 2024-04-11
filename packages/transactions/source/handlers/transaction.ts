@@ -85,7 +85,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			}
 
 			if (
-				!this.verifySignatures(databaseSender, transaction.data, databaseSender.getAttribute("multiSignature"))
+				!(await this.verifySignatures(
+					databaseSender,
+					transaction.data,
+					databaseSender.getAttribute("multiSignature"),
+				))
 			) {
 				throw new Exceptions.InvalidMultiSignaturesError();
 			}

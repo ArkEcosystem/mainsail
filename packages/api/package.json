@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api",
-	"version": "0.0.1-alpha.11",
+	"version": "0.0.1-alpha.14",
 	"description": "API for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -8,7 +8,7 @@
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"bin": {
-		"mainsail-api": "./bin/run"
+		"mainsail-api": "./bin/run.js"
 	},
 	"files": [
 		"/bin",
@@ -19,12 +19,13 @@
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"mainsail-api": "node ./bin/run",
+		"mainsail-api": "node ./bin/run.js",
 		"release": "pnpm publish --access public",
-		"test": "uvu -r tsm source .test.ts",
+		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:file": "uvu -r tsm source"
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@mainsail/api-database": "workspace:*",
