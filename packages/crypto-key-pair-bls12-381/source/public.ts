@@ -1,6 +1,7 @@
-import { aggregatePubkeys, PublicKey } from "@chainsafe/blst";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+
+import { getBls } from "./get-bls.js";
 
 @injectable()
 export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
@@ -16,14 +17,14 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	}
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		return Buffer.from(
-			aggregatePubkeys(asset.publicKeys.map((pub) => PublicKey.fromBytes(Buffer.from(pub, "hex")))).toBytes(),
-		).toString("hex");
+		throw new Exceptions.NotImplemented(this.constructor.name, "fromMultiSignatureAsset");
 	}
 
 	public async verify(publicKey: string): Promise<boolean> {
+		const bls = await getBls();
+
 		try {
-			PublicKey.fromBytes(Buffer.from(publicKey, "hex")).keyValidate();
+			bls.PublicKey.fromBytes(Buffer.from(publicKey, "hex"), undefined, true);
 		} catch {
 			return false;
 		}
@@ -32,8 +33,9 @@ export class PublicKeyFactory implements Contracts.Crypto.PublicKeyFactory {
 	}
 
 	public async aggregate(publicKeys: Buffer[]): Promise<string> {
-		return Buffer.from(aggregatePubkeys(publicKeys.map((pub) => PublicKey.fromBytes(pub))).toBytes()).toString(
-			"hex",
-		);
+		const bls = await getBls();
+		return Buffer.from(
+			bls.aggregatePublicKeys(publicKeys.map((pub) => bls.PublicKey.fromBytes(pub).toBytes())),
+		).toString("hex");
 	}
 }
