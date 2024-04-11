@@ -3,6 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { mnemonicToSeedSync } from "@scure/bip39";
 import { deriveChild, deriveMaster } from "bls12-381-keygen";
 import WIF from "wif";
+
 import { getBls } from "./get-bls.js";
 
 @injectable()
