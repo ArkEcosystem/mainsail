@@ -72,6 +72,7 @@ export class Extension {
 			page ? baseUri + Qs.stringify(applyToDefaults({ ...query, ...request.orig.query }, { page })) : null;
 
 		const newSource = {
+			data: results,
 			meta: {
 				...source.meta,
 
@@ -92,7 +93,6 @@ export class Extension {
 				self: getUri(currentPage),
 				totalCount: totalCount ? totalCount : 0,
 			},
-			data: results,
 		};
 
 		if (source.response) {
