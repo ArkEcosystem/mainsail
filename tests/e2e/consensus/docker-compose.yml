@@ -3,6 +3,13 @@ services:
     peerdiscovery:
         build: ./peer-discovery
         image: peerdiscovery
+
+    checks:
+        build: ./checks
+        image: checks
+        depends_on:
+            - peerdiscovery
+
     nginx:
         image: nginxinc/nginx-unprivileged:latest
         volumes:

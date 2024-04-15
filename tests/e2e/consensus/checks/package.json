@@ -1,0 +1,11 @@
+{
+    "name": "checks",
+    "type": "module",
+    "dependencies": {
+        "express": "^4.19.2",
+        "got": "^14.2.1"
+    },
+    "engines": {
+        "node": ">=16"
+    }
+}
