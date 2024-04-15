@@ -1,12 +1,7 @@
 name: CI
 
 on:
-    push:
-        branches:
-            - "main"
-            - "develop"
-    pull_request:
-        types: [ready_for_review, synchronize, opened]
+  pull_request:
 
 jobs:
     e2e:
