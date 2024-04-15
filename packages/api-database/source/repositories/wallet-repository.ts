@@ -39,7 +39,7 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 				walletExpression,
 				convertToJsonbSorting(sorting, [
 					{
-						direction: "desc",
+						direction: "asc",
 						jsonFieldAccessor: { cast: "bigint", fieldName: "validatorRank", operator: "->>" },
 						property: "attributes",
 					},
