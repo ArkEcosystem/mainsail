@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+    peerdiscovery:
+        build: ./peer-discovery
+        image: peerdiscovery
+    nginx:
+        image: nginxinc/nginx-unprivileged:latest
+        volumes:
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro,Z
+        ports:
+            - 4900:4900
+
+    node0: &nodeDefinition
+        build: ./nodes
+        image: mainsail
+        volumes:
+            - ./../../../:/mainsail:z,U
+        depends_on:
+            - peerdiscovery
+        command:
+            - /bin/sh
+            - -c
+            - /mainsail/packages/core/bin/run.js core:run --network=testnet
+        environment: &nodeEnvironment
+            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node0
+            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node0
+
+    node1:
+        <<: *nodeDefinition
+        depends_on:
+            - peerdiscovery
+        environment:
+            <<: *nodeEnvironment
+            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node1
+            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node1
+
+    node2:
+        <<: *nodeDefinition
+        depends_on:
+            - peerdiscovery
+        environment:
+            <<: *nodeEnvironment
+            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node2
+            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node2
