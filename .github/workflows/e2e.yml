@@ -51,7 +51,7 @@ jobs:
               run: pnpm run build
 
             - name: Docker ${{ matrix.name }}
-              run: chown -R 1500:1500 tests/e2e/${{ matrix.name }}/nodes && cd tests/e2e/${{ matrix.name }} && docker-compose up # -d
+              run: sudo chmod -R 777 tests/e2e/${{ matrix.name }}/nodes && cd tests/e2e/${{ matrix.name }} && docker-compose up # -d
 
             - name: Test ${{ matrix.name }}
               run: echo 1

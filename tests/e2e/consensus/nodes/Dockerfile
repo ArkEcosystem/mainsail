@@ -11,6 +11,4 @@ RUN apt-get update && apt-get install build-essential -y \
     && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
     && su node -c "export PNPM_HOME=/home/node/.pnpm/bin"
 
-RUN adduser -u 1500 --system --group node
-
 USER node
