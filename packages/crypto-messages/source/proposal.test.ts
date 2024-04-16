@@ -6,7 +6,8 @@ import { Proposal } from "./proposal";
 
 describe<{
 	sandbox: Sandbox;
-}>("Proposal", ({ it, assert }) => {
+	proposal: Proposal;
+}>("Proposal", ({ it, beforeEach, assert }) => {
 	const data: Contracts.Crypto.ProposedData = {
 		block: {
 			data: blockData,
@@ -17,63 +18,69 @@ describe<{
 		serialized: serializedBlock,
 	};
 
-	const proposal = new Proposal({ ...proposalData, data, serialized: Buffer.from("dead", "hex") });
-	const proposalWithValidRound = new Proposal({
-		...proposalDataWithValidRound,
-		data,
-		serialized: Buffer.from("dead", "hex"),
+	beforeEach((context) => {
+		context.sandbox = new Sandbox();
+		context.proposal = context.sandbox.app
+			.resolve(Proposal)
+			.initialize({ ...proposalData, data, serialized: Buffer.from("dead", "hex") });
 	});
 
-	it("#isDataDeserialized", () => {
+	it("#isDataDeserialized", ({ proposal }) => {
 		assert.equal(proposal.isDataDeserialized, true);
 	});
 
-	it("#height", () => {
+	it("#height", ({ proposal }) => {
 		assert.equal(proposal.height, 2);
 	});
 
-	it("#round", () => {
+	it("#round", ({ proposal }) => {
 		assert.equal(proposal.round, 1);
 	});
 
-	it("#validRound", () => {
+	it("#validRound", ({ proposal }) => {
 		assert.undefined(proposal.validRound);
 	});
 
-	it("#validatorIndex", () => {
+	it("#validatorIndex", ({ proposal }) => {
 		assert.equal(proposal.validatorIndex, 0);
 	});
 
-	it("#signature", () => {
+	it("#signature", ({ proposal }) => {
 		assert.equal(proposal.signature, proposalData.signature);
 	});
 
-	it("#serialized", () => {
+	it("#serialized", ({ proposal }) => {
 		assert.equal(proposal.serialized.toString("hex"), "dead");
 	});
 
-	it("#getData", () => {
+	it("#getData", ({ proposal }) => {
 		assert.equal(proposal.getData(), data);
 	});
 
-	it("#toString", () => {
+	it("#toString", ({ proposal }) => {
 		assert.equal(
 			proposal.toString(),
 			`{"block":"3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19","height":2,"round":1,"validatorIndex":0}`,
 		);
 	});
 
-	it("#toData", () => {
+	it("#toData", ({ proposal }) => {
 		assert.equal(proposal.toData(), proposalData);
 	});
 
-	it("#toSerializableData", () => {
+	it("#toSerializableData", ({ sandbox, proposal }) => {
 		assert.equal(proposal.toSerializableData(), {
 			data,
 			round: proposalData.round,
 			signature: proposalData.signature,
 			validRound: proposalData.validRound,
 			validatorIndex: proposalData.validatorIndex,
+		});
+
+		const proposalWithValidRound = sandbox.app.resolve(Proposal).initialize({
+			...proposalDataWithValidRound,
+			data,
+			serialized: Buffer.from("dead", "hex"),
 		});
 
 		assert.equal(proposalWithValidRound.toSerializableData(), {
