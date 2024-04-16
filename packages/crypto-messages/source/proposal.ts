@@ -60,6 +60,10 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	public async deserializeData(): Promise<void> {}
 
 	public getData(): Contracts.Crypto.ProposedData {
+		if (!this.#isDataDeserialized) {
+			throw new Error("Proposed data is not deserialized.");
+		}
+
 		return this.#data;
 	}
 
