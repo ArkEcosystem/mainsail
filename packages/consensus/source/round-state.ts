@@ -116,7 +116,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			return this.#proposal.getData().block;
 		}
 
-		throw new Error("Block is not available, because proposal is not set");
+		throw new Error("Block is not available, because proposal is not set or deserialized");
 	}
 
 	public async getCommit(): Promise<Contracts.Crypto.Commit> {
