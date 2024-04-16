@@ -51,10 +51,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			if (!this.#hasValidBlockGenerator(proposal)) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
-			}
-
 			if (!(await this.#hasValidLockProof(proposal))) {
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
@@ -122,22 +118,5 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		}
 
 		return verified;
-	}
-
-	#hasValidBlockGenerator(proposal: Contracts.Crypto.Proposal): boolean {
-		if (proposal.validRound !== undefined) {
-			// We assume that this check passed when block was proposed first time, so we don't need to check it again.
-			// The check also cannot be repeated because we don't hold the value when the block was proposed first time.
-			return true;
-		}
-
-		const proposer = this.validatorSet.getValidator(this.proposerSelector.getValidatorIndex(proposal.round));
-		const isValid = proposal.block.block.data.generatorPublicKey === proposer.getWalletPublicKey();
-
-		if (!isValid) {
-			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with invalid block generator`);
-		}
-
-		return isValid;
 	}
 }
