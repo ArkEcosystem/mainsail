@@ -163,7 +163,7 @@ export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: numbe
 			);
 
 			const listener = {
-				handle: ({ data: state }: { data: Contracts.Consensus.ConsensusState }) => {
+				handle: ({ data: state }: { data: Contracts.Consensus.State }) => {
 					if (!round || state.round >= round) {
 						eventDispatcher.forget(event, listener);
 						resolve();

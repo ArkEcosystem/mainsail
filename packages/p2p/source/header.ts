@@ -7,7 +7,7 @@ export class Header implements Contracts.P2P.Header {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Service)
-	private readonly consensus!: Contracts.Consensus.ConsensusService;
+	private readonly consensus!: Contracts.Consensus.Service;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;

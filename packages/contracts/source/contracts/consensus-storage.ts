@@ -1,9 +1,9 @@
-import { ConsensusState, ConsensusStateData } from "./consensus/index.js";
+import { State, StateData } from "./consensus/index.js";
 import { Precommit, Prevote, Proposal } from "./crypto/index.js";
 
 export interface Service {
-	getState(): Promise<ConsensusStateData | undefined>;
-	saveState(state: ConsensusState): Promise<void>;
+	getState(): Promise<StateData | undefined>;
+	saveState(state: State): Promise<void>;
 	saveProposals(proposal: Proposal[]): Promise<void>;
 	savePrevotes(prevotes: Prevote[]): Promise<void>;
 	savePrecommits(precommits: Precommit[]): Promise<void>;
