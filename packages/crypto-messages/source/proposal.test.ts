@@ -1,7 +1,8 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { blockData, proposalData, proposalDataWithValidRound, serializedBlock } from "../test/fixtures/proposal";
+import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Proposal } from "./proposal";
 
 describe<{
@@ -18,8 +19,22 @@ describe<{
 		serialized: serializedBlock,
 	};
 
-	beforeEach((context) => {
-		context.sandbox = new Sandbox();
+	beforeEach(async (context) => {
+		await prepareSandbox(context);
+
+		const workerPool = {
+			getWorker: () => ({
+				// @ts-ignore
+				consensusSignature: (method, message, privateKey) =>
+					context.sandbox.app
+						.getTagged(Identifiers.Cryptography.Signature.Instance, "type", "consensus")!
+						[method](message, privateKey),
+			}),
+		};
+
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
+
 		context.proposal = context.sandbox.app
 			.resolve(Proposal)
 			.initialize({ ...proposalData, data, serialized: Buffer.from("dead", "hex") });
