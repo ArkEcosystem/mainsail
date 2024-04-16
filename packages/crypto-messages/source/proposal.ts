@@ -1,28 +1,32 @@
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
+@injectable()
 export class Proposal implements Contracts.Crypto.Proposal {
-	#round: number;
+	#round!: number;
 	#validRound?: number;
-	#data: Contracts.Crypto.ProposedData;
-	#validatorIndex: number;
-	#signature: string;
-	#serialized: Buffer;
+	#data!: Contracts.Crypto.ProposedData;
+	#validatorIndex!: number;
+	#signature!: string;
+	#serialized!: Buffer;
 	#isDataDeserialized = true;
 
-	constructor({
+	public initialize({
 		round,
 		validatorIndex,
 		data,
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.ProposalData & { data: Contracts.Crypto.ProposedData; serialized: Buffer }) {
+	}: Contracts.Crypto.ProposalData & { data: Contracts.Crypto.ProposedData; serialized: Buffer }): Proposal {
 		this.#round = round;
 		this.#validRound = validRound;
 		this.#data = data;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 		this.#serialized = serialized;
+
+		return this;
 	}
 
 	get isDataDeserialized(): boolean {

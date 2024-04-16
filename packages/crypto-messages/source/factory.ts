@@ -9,6 +9,9 @@ import { Proposal } from "./proposal.js";
 
 @injectable()
 export class MessageFactory implements Contracts.Crypto.MessageFactory {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
@@ -52,7 +55,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
 		}
 
-		return new Proposal({ ...proposalData, data, serialized });
+		return this.app.resolve<Proposal>(Proposal).initialize({ ...proposalData, data, serialized });
 	}
 
 	async makeProposedDataFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
