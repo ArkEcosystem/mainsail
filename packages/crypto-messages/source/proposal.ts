@@ -6,27 +6,28 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
+	#height!: number;
 	#round!: number;
 	#validRound?: number;
 	#dataSerialized!: string;
-	#data!: Contracts.Crypto.ProposedData;
+	#data?: Contracts.Crypto.ProposedData;
 	#validatorIndex!: number;
 	#signature!: string;
 	#serialized!: Buffer;
-	#isDataDeserialized = true;
 
 	public initialize({
 		round,
 		validatorIndex,
-		data,
+		height,
+		dataSerialized,
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.ProposalData & { data: Contracts.Crypto.ProposedData; serialized: Buffer }): Proposal {
+	}: Contracts.Crypto.ProposalData & { dataSerialized: string; height: number; serialized: Buffer }): Proposal {
+		this.#height = height;
 		this.#round = round;
 		this.#validRound = validRound;
-		this.#dataSerialized = data.serialized;
-		this.#data = data;
+		this.#dataSerialized = dataSerialized;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 		this.#serialized = serialized;
@@ -35,11 +36,11 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	}
 
 	public get isDataDeserialized(): boolean {
-		return this.#isDataDeserialized;
+		return this.#data !== undefined;
 	}
 
 	public get height(): number {
-		return this.#data.block.header.height;
+		return this.#height;
 	}
 
 	public get round(): number {
@@ -63,16 +64,15 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	}
 
 	public async deserializeData(): Promise<void> {
-		if (this.#isDataDeserialized) {
+		if (this.#data !== undefined) {
 			return;
 		}
 
 		this.#data = await this.messageFactory.makeProposedDataFromBytes(Buffer.from(this.#dataSerialized, "hex"));
-		this.#isDataDeserialized = true;
 	}
 
 	public getData(): Contracts.Crypto.ProposedData {
-		if (!this.#isDataDeserialized) {
+		if (this.#data === undefined) {
 			throw new Error("Proposed data is not deserialized.");
 		}
 
@@ -81,8 +81,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toString(): string {
 		return JSON.stringify({
-			block: this.#data.block.header.id,
-			height: this.#data.block.header.height,
+			block: this.#data?.block.header.id,
+			height: this.#height,
 			round: this.#round,
 			validatorIndex: this.#validatorIndex,
 		});
@@ -90,7 +90,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toSerializableData(): Contracts.Crypto.SerializableProposalData {
 		return {
-			data: this.#data,
+			data: { serialized: this.#dataSerialized },
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
@@ -100,8 +100,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	public toData(): Contracts.Crypto.ProposalData {
 		return {
-			data: { serialized: this.#data.serialized },
-			height: this.#data.block.header.height,
+			data: { serialized: this.#dataSerialized },
+			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,

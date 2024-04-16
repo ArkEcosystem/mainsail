@@ -21,6 +21,9 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
+	@inject(Identifiers.Cryptography.Block.Deserializer)
+	private readonly blockDeserializer!: Contracts.Crypto.BlockDeserializer;
+
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
@@ -49,13 +52,18 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Proposal> {
 		this.#applySchema("proposal", proposalData);
-		const data = await this.makeProposedDataFromBytes(Buffer.from(proposalData.data.serialized, "hex"));
+		const header = await this.#getBlockHeaderFromProposedData(Buffer.from(proposalData.data.serialized, "hex"));
 
 		if (!serialized) {
 			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
 		}
 
-		return this.app.resolve<Proposal>(Proposal).initialize({ ...proposalData, data, serialized });
+		return this.app.resolve<Proposal>(Proposal).initialize({
+			...proposalData,
+			dataSerialized: proposalData.data.serialized,
+			height: header.height,
+			serialized,
+		});
 	}
 
 	async makeProposedDataFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
@@ -146,6 +154,16 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		}
 
 		return new Precommit({ ...data, serialized });
+	}
+
+	// Performance can be improved by returning only a block height
+	async #getBlockHeaderFromProposedData(bytes: Buffer): Promise<Contracts.Crypto.BlockHeader> {
+		const buffer = ByteBuffer.fromBuffer(bytes);
+
+		const lockProofLength = buffer.readUint8();
+		buffer.skip(lockProofLength);
+
+		return this.blockDeserializer.deserializeHeader(buffer.getRemainder());
 	}
 
 	#applySchema<T>(schema: string, data: T): T {
