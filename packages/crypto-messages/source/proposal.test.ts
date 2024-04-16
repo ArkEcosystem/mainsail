@@ -24,6 +24,10 @@ describe<{
 		serialized: Buffer.from("dead", "hex"),
 	});
 
+	it("#isDataDeserialized", () => {
+		assert.equal(proposal.isDataDeserialized, true);
+	});
+
 	it("#height", () => {
 		assert.equal(proposal.height, 2);
 	});
@@ -36,10 +40,6 @@ describe<{
 		assert.undefined(proposal.validRound);
 	});
 
-	it("#block", () => {
-		assert.equal(proposal.data, data);
-	});
-
 	it("#validatorIndex", () => {
 		assert.equal(proposal.validatorIndex, 0);
 	});
@@ -50,6 +50,10 @@ describe<{
 
 	it("#serialized", () => {
 		assert.equal(proposal.serialized.toString("hex"), "dead");
+	});
+
+	it("#getData", () => {
+		assert.equal(proposal.getData(), data);
 	});
 
 	it("#toString", () => {
