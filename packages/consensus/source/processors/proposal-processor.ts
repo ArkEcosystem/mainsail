@@ -79,7 +79,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
 		return this.consensusSignature.verify(
 			Buffer.from(proposal.signature, "hex"),
-			await this.messageSerializer.serializeProposal(proposal, { includeSignature: false }),
+			await this.messageSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
 			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),
 		);
 	}
@@ -97,14 +97,14 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			return false;
 		}
 
-		const lockProof = proposal.data.lockProof;
+		const lockProof = proposal.getData().lockProof;
 		if (!lockProof) {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with missing lock proof`);
 			return true;
 		}
 
 		const data = await this.messageSerializer.serializePrevoteForSignature({
-			blockId: proposal.data.block.header.id,
+			blockId: proposal.getData().block.header.id,
 			height: proposal.height,
 			round: proposal.validRound,
 			type: Contracts.Crypto.MessageType.Prevote,

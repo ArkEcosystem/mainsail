@@ -112,8 +112,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public getBlock(): Contracts.Crypto.Block {
-		if (this.#proposal) {
-			return this.#proposal.data.block;
+		if (this.#proposal && this.#proposal.isDataDeserialized) {
+			return this.#proposal.getData().block;
 		}
 
 		throw new Error("Block is not available, because proposal is not set");
@@ -126,10 +126,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			const proposal = this.getProposal();
 			Utils.assert.defined<Contracts.Crypto.Proposal>(proposal);
 
-			const {
-				round,
-				data: { block },
-			} = proposal;
+			const round = proposal.round;
+			const block = proposal.getData().block;
 
 			const commit: Contracts.Crypto.CommitSerializable = {
 				block,
@@ -195,11 +193,11 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public hasMajorityPrevotes(): boolean {
-		if (!this.#proposal) {
+		if (!this.#proposal || !this.#proposal.isDataDeserialized) {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrevoteCount(this.#proposal.data.block.data.id));
+		return this.#isMajority(this.#getPrevoteCount(this.#proposal.getData().block.data.id));
 	}
 
 	public hasMajorityPrevotesAny(): boolean {
@@ -211,11 +209,11 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public hasMajorityPrecommits(): boolean {
-		if (!this.#proposal) {
+		if (!this.#proposal || !this.#proposal.isDataDeserialized) {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrecommitCount(this.#proposal.data.block.data.id));
+		return this.#isMajority(this.#getPrecommitCount(this.#proposal.getData().block.data.id));
 	}
 
 	public hasMajorityPrecommitsAny(): boolean {
@@ -318,8 +316,10 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		Utils.assert.defined<Contracts.Crypto.Proposal>(this.#proposal);
 		const filtered: Map<number, { signature: string }> = new Map();
 
+		const block = this.#proposal.getData().block;
+
 		for (const [key, value] of s) {
-			if (value.blockId === this.#proposal.data.block.header.id) {
+			if (value.blockId === block.header.id) {
 				filtered.set(key, value);
 			}
 		}

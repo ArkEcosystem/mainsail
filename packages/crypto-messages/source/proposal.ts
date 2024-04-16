@@ -7,6 +7,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	#validatorIndex: number;
 	#signature: string;
 	#serialized: Buffer;
+	#isDataDeserialized = true;
 
 	constructor({
 		round,
@@ -24,6 +25,10 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		this.#serialized = serialized;
 	}
 
+	get isDataDeserialized(): boolean {
+		return this.#isDataDeserialized;
+	}
+
 	get height(): number {
 		return this.#data.block.header.height;
 	}
@@ -36,10 +41,6 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#validRound;
 	}
 
-	get data(): Contracts.Crypto.ProposedData {
-		return this.#data;
-	}
-
 	get validatorIndex(): number {
 		return this.#validatorIndex;
 	}
@@ -50,6 +51,10 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	get serialized(): Buffer {
 		return this.#serialized;
+	}
+
+	public getData(): Contracts.Crypto.ProposedData {
+		return this.#data;
 	}
 
 	toString(): string {

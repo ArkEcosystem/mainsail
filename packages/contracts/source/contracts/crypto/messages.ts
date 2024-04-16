@@ -37,9 +37,12 @@ export interface SerializableProposalData {
 	readonly signature?: string;
 }
 
-export interface Proposal extends ProposalData {
-	readonly data: ProposedData;
+export interface Proposal extends Omit<ProposalData, "data"> {
+	isDataDeserialized: boolean;
+
 	readonly serialized: Buffer;
+
+	getData(): ProposedData;
 
 	toSerializableData(): SerializableProposalData;
 	toData(): ProposalData;
