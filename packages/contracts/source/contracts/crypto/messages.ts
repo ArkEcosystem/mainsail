@@ -42,7 +42,7 @@ export interface Proposal extends Omit<ProposalData, "data"> {
 
 	readonly serialized: Buffer;
 
-	deserializeData(): Promise<void>; // TODO: Return response
+	deserializeData(): Promise<void>;
 	getData(): ProposedData;
 
 	toSerializableData(): SerializableProposalData;
