@@ -42,17 +42,17 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	}
 
 	public async makeProposalFromData(
-		data: Contracts.Crypto.ProposalData,
+		proposalData: Contracts.Crypto.ProposalData,
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Proposal> {
-		this.#applySchema("proposal", data);
-		const block = await this.#makeProposedBlockFromBytes(Buffer.from(data.block.serialized, "hex"));
+		this.#applySchema("proposal", proposalData);
+		const data = await this.#makeProposedBlockFromBytes(Buffer.from(proposalData.data.serialized, "hex"));
 
 		if (!serialized) {
-			serialized = await this.serializer.serializeProposal(data, { includeSignature: true });
+			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
 		}
 
-		return new Proposal({ ...data, block, serialized });
+		return new Proposal({ ...proposalData, data, serialized });
 	}
 
 	public async makePrevote(

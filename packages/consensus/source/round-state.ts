@@ -113,7 +113,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public getBlock(): Contracts.Crypto.Block {
 		if (this.#proposal) {
-			return this.#proposal.block.block;
+			return this.#proposal.data.block;
 		}
 
 		throw new Error("Block is not available, because proposal is not set");
@@ -128,7 +128,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 			const {
 				round,
-				block: { block },
+				data: { block },
 			} = proposal;
 
 			const commit: Contracts.Crypto.CommitSerializable = {
@@ -199,7 +199,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrevoteCount(this.#proposal.block.block.data.id));
+		return this.#isMajority(this.#getPrevoteCount(this.#proposal.data.block.data.id));
 	}
 
 	public hasMajorityPrevotesAny(): boolean {
@@ -215,7 +215,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			return false;
 		}
 
-		return this.#isMajority(this.#getPrecommitCount(this.#proposal.block.block.data.id));
+		return this.#isMajority(this.#getPrecommitCount(this.#proposal.data.block.data.id));
 	}
 
 	public hasMajorityPrecommitsAny(): boolean {
@@ -319,7 +319,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		const filtered: Map<number, { signature: string }> = new Map();
 
 		for (const [key, value] of s) {
-			if (value.blockId === this.#proposal.block.block.header.id) {
+			if (value.blockId === this.#proposal.data.block.header.id) {
 				filtered.set(key, value);
 			}
 		}

@@ -23,7 +23,7 @@ export interface SignaturePrecommitData extends WithOptionalBlockId<SignatureMes
 export interface ProposalData {
 	readonly height: number;
 	readonly round: number;
-	readonly block: { serialized: string };
+	readonly data: { serialized: string };
 	readonly validatorIndex: number;
 	readonly validRound?: number;
 	readonly signature: string;
@@ -32,13 +32,13 @@ export interface ProposalData {
 export interface SerializableProposalData {
 	readonly round: number;
 	readonly validRound?: number;
-	readonly block: { serialized: string };
+	readonly data: { serialized: string };
 	readonly validatorIndex: number;
 	readonly signature?: string;
 }
 
 export interface Proposal extends ProposalData {
-	readonly block: ProposedData;
+	readonly data: ProposedData;
 	readonly serialized: Buffer;
 
 	toSerializableData(): SerializableProposalData;

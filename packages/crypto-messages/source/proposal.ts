@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 export class Proposal implements Contracts.Crypto.Proposal {
 	#round: number;
 	#validRound?: number;
-	#block: Contracts.Crypto.ProposedData;
+	#data: Contracts.Crypto.ProposedData;
 	#validatorIndex: number;
 	#signature: string;
 	#serialized: Buffer;
@@ -11,21 +11,21 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	constructor({
 		round,
 		validatorIndex,
-		block,
+		data,
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.ProposalData & { block: Contracts.Crypto.ProposedData; serialized: Buffer }) {
+	}: Contracts.Crypto.ProposalData & { data: Contracts.Crypto.ProposedData; serialized: Buffer }) {
 		this.#round = round;
 		this.#validRound = validRound;
-		this.#block = block;
+		this.#data = data;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 		this.#serialized = serialized;
 	}
 
 	get height(): number {
-		return this.#block.block.header.height;
+		return this.#data.block.header.height;
 	}
 
 	get round(): number {
@@ -36,8 +36,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#validRound;
 	}
 
-	get block(): Contracts.Crypto.ProposedData {
-		return this.#block;
+	get data(): Contracts.Crypto.ProposedData {
+		return this.#data;
 	}
 
 	get validatorIndex(): number {
@@ -54,8 +54,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	toString(): string {
 		return JSON.stringify({
-			block: this.#block.block.header.id,
-			height: this.#block.block.header.height,
+			block: this.#data.block.header.id,
+			height: this.#data.block.header.height,
 			round: this.#round,
 			validatorIndex: this.#validatorIndex,
 		});
@@ -63,7 +63,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	toSerializableData(): Contracts.Crypto.SerializableProposalData {
 		return {
-			block: this.#block,
+			data: this.#data,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
@@ -73,8 +73,8 @@ export class Proposal implements Contracts.Crypto.Proposal {
 
 	toData(): Contracts.Crypto.ProposalData {
 		return {
-			block: { serialized: this.#block.serialized },
-			height: this.#block.block.header.height,
+			data: { serialized: this.#data.serialized },
+			height: this.#data.block.header.height,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,

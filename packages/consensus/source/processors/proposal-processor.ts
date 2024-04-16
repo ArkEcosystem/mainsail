@@ -97,14 +97,14 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			return false;
 		}
 
-		const lockProof = proposal.block.lockProof;
+		const lockProof = proposal.data.lockProof;
 		if (!lockProof) {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with missing lock proof`);
 			return true;
 		}
 
 		const data = await this.messageSerializer.serializePrevoteForSignature({
-			blockId: proposal.block.block.header.id,
+			blockId: proposal.data.block.header.id,
 			height: proposal.height,
 			round: proposal.validRound,
 			type: Contracts.Crypto.MessageType.Prevote,

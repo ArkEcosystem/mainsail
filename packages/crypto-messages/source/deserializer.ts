@@ -25,7 +25,7 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 					optional: true,
 					type: "uint32",
 				},
-				block: {
+				data: {
 					type: "hex",
 				},
 				validatorIndex: {

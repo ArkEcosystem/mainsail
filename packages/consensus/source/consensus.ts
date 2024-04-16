@@ -215,7 +215,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.#step = Contracts.Consensus.Step.Prevote;
 
-		const { block } = proposal.block;
+		const { block } = proposal.data;
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.ProposalAccepted, this.getState());
 
@@ -228,14 +228,14 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#step !== Contracts.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
-			!proposal.block.lockProof ||
+			!proposal.data.lockProof ||
 			proposal.validRound === undefined ||
 			proposal.validRound >= this.#round
 		) {
 			return;
 		}
 
-		const { block } = proposal.block;
+		const { block } = proposal.data;
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
@@ -263,7 +263,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		const { block } = proposal.block;
+		const { block } = proposal.data;
 
 		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 

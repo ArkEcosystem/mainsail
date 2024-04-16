@@ -60,7 +60,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const serializedProposedBlock = await this.messageSerializer.serializeProposed({ block, lockProof });
 		return this.messagesFactory.makeProposal(
 			{
-				block: { serialized: serializedProposedBlock.toString("hex") },
+				data: { serialized: serializedProposedBlock.toString("hex") },
 				round,
 				validRound,
 				validatorIndex,
