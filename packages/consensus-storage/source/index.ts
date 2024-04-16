@@ -48,9 +48,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const storage = this.app.get<Service>(Identifiers.ConsensusStorage.Service);
 
 		await storage.clear();
-		await storage.saveState(
-			this.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service).getState(),
-		);
+		await storage.saveState(this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).getState());
 
 		await storage.saveProposals(
 			roundStates

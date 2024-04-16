@@ -98,7 +98,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		);
 	}
 
-	#getConsensus(): Contracts.Consensus.ConsensusService {
-		return this.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	#getConsensus(): Contracts.Consensus.Service {
+		return this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 	}
 }

@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
-export class Consensus implements Contracts.Consensus.ConsensusService {
+export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -97,7 +97,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		this.#validValue = round;
 	}
 
-	public getState(): Contracts.Consensus.ConsensusState {
+	public getState(): Contracts.Consensus.State {
 		return {
 			height: this.#height,
 			lockedRound: this.getLockedRound(),

@@ -43,7 +43,7 @@ export interface Verifier {
 	hasValidProposalLockProof(roundState: RoundState): Promise<boolean>;
 }
 
-export interface ConsensusStateData {
+export interface StateData {
 	readonly height: number;
 	readonly round: number;
 	readonly step: Step;
@@ -57,12 +57,12 @@ export interface RoundStateRepository {
 	clear(): void;
 }
 
-export interface ConsensusService {
+export interface Service {
 	run(): Promise<void>;
 	getHeight(): number;
 	getRound(): number;
 	getStep(): Step;
-	getState(): ConsensusState;
+	getState(): State;
 	handle(roundState: RoundState): Promise<void>;
 	handleCommitState(commitState: ProcessableUnit): Promise<void>;
 	onTimeoutStartRound(): Promise<void>;
@@ -72,13 +72,13 @@ export interface ConsensusService {
 	dispose(): Promise<void>;
 }
 
-export interface ConsensusState extends ConsensusStateData {
+export interface State extends StateData {
 	readonly lockedValue?: RoundState;
 	readonly validValue?: RoundState;
 }
 
 export interface Bootstrapper {
-	run(): Promise<ConsensusState | undefined>;
+	run(): Promise<State | undefined>;
 }
 
 export interface Scheduler {

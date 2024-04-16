@@ -211,7 +211,7 @@ const bootstrapMany = async (sandboxes: Sandbox[]) => {
 };
 
 const run = async (sandbox: Sandbox) => {
-	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 	await consensus.run();
 };
 
@@ -222,7 +222,7 @@ const runMany = async (sandboxes: Sandbox[]) => {
 };
 
 const stop = async (sandbox: Sandbox) => {
-	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 	await consensus.dispose();
 };
 
