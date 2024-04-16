@@ -46,7 +46,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Proposal> {
 		this.#applySchema("proposal", proposalData);
-		const data = await this.#makeProposedBlockFromBytes(Buffer.from(proposalData.data.serialized, "hex"));
+		const data = await this.#makeProposedDataFromBytes(Buffer.from(proposalData.data.serialized, "hex"));
 
 		if (!serialized) {
 			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
@@ -126,7 +126,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		return new Precommit({ ...data, serialized });
 	}
 
-	async #makeProposedBlockFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
+	async #makeProposedDataFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
 		const buffer = ByteBuffer.fromBuffer(bytes);
 
 		const lockProofLength = buffer.readUint8();
