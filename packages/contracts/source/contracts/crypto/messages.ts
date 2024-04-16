@@ -1,4 +1,4 @@
-import { Block, BlockJson } from "./block.js";
+import { Block } from "./block.js";
 import { KeyPair } from "./identities.js";
 import { AggregatedSignature } from "./signatures.js";
 
@@ -82,12 +82,6 @@ export interface Precommit extends PrecommitData {
 
 export interface ProposedData {
 	readonly block: Block;
-	readonly lockProof?: AggregatedSignature;
-	readonly serialized: string;
-}
-
-export interface ProposedBlockJson {
-	readonly block: BlockJson;
 	readonly lockProof?: AggregatedSignature;
 	readonly serialized: string;
 }
