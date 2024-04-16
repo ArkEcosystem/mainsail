@@ -126,7 +126,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		return new Precommit({ ...data, serialized });
 	}
 
-	async #makeProposedBlockFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedBlock> {
+	async #makeProposedBlockFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
 		const buffer = ByteBuffer.fromBuffer(bytes);
 
 		const lockProofLength = buffer.readUint8();

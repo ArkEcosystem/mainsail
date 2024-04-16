@@ -71,7 +71,7 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity }) => {
-		const block: Contracts.Crypto.ProposedBlock = {
+		const block: Contracts.Crypto.ProposedData = {
 			block: await blockFactory.fromData(blockData),
 			serialized: serializedBlock,
 		};
@@ -95,7 +95,7 @@ describe<{
 		factory,
 		identity,
 	}) => {
-		const block: Contracts.Crypto.ProposedBlock = {
+		const block: Contracts.Crypto.ProposedData = {
 			block: await blockFactory.fromData(blockData),
 			serialized: serializedBlock,
 		};

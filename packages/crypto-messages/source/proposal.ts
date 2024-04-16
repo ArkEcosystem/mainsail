@@ -3,7 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 export class Proposal implements Contracts.Crypto.Proposal {
 	#round: number;
 	#validRound?: number;
-	#block: Contracts.Crypto.ProposedBlock;
+	#block: Contracts.Crypto.ProposedData;
 	#validatorIndex: number;
 	#signature: string;
 	#serialized: Buffer;
@@ -15,7 +15,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.ProposalData & { block: Contracts.Crypto.ProposedBlock; serialized: Buffer }) {
+	}: Contracts.Crypto.ProposalData & { block: Contracts.Crypto.ProposedData; serialized: Buffer }) {
 		this.#round = round;
 		this.#validRound = validRound;
 		this.#block = block;
@@ -36,7 +36,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#validRound;
 	}
 
-	get block(): Contracts.Crypto.ProposedBlock {
+	get block(): Contracts.Crypto.ProposedData {
 		return this.#block;
 	}
 

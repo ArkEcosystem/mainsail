@@ -7,7 +7,7 @@ import { Proposal } from "./proposal";
 describe<{
 	sandbox: Sandbox;
 }>("Proposal", ({ it, assert }) => {
-	const block: Contracts.Crypto.ProposedBlock = {
+	const block: Contracts.Crypto.ProposedData = {
 		block: {
 			data: blockData,
 			header: { ...blockData, transactions: [] },

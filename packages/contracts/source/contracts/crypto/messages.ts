@@ -38,7 +38,7 @@ export interface SerializableProposalData {
 }
 
 export interface Proposal extends ProposalData {
-	readonly block: ProposedBlock;
+	readonly block: ProposedData;
 	readonly serialized: Buffer;
 
 	toSerializableData(): SerializableProposalData;
@@ -80,7 +80,7 @@ export interface Precommit extends PrecommitData {
 	toString(): string;
 }
 
-export interface ProposedBlock {
+export interface ProposedData {
 	readonly block: Block;
 	readonly lockProof?: AggregatedSignature;
 	readonly serialized: string;
@@ -92,7 +92,7 @@ export interface ProposedBlockJson {
 	readonly serialized: string;
 }
 
-export type ProposedBlockSerializable = Omit<ProposedBlock, "serialized">;
+export type ProposedBlockSerializable = Omit<ProposedData, "serialized">;
 
 export interface SerializeProposalOptions {
 	includeSignature?: boolean;
