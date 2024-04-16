@@ -29,39 +29,41 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this;
 	}
 
-	get isDataDeserialized(): boolean {
+	public get isDataDeserialized(): boolean {
 		return this.#isDataDeserialized;
 	}
 
-	get height(): number {
+	public get height(): number {
 		return this.#data.block.header.height;
 	}
 
-	get round(): number {
+	public get round(): number {
 		return this.#round;
 	}
 
-	get validRound(): number | undefined {
+	public get validRound(): number | undefined {
 		return this.#validRound;
 	}
 
-	get validatorIndex(): number {
+	public get validatorIndex(): number {
 		return this.#validatorIndex;
 	}
 
-	get signature(): string {
+	public get signature(): string {
 		return this.#signature;
 	}
 
-	get serialized(): Buffer {
+	public get serialized(): Buffer {
 		return this.#serialized;
 	}
+
+	public async deserializeData(): Promise<void> {}
 
 	public getData(): Contracts.Crypto.ProposedData {
 		return this.#data;
 	}
 
-	toString(): string {
+	public toString(): string {
 		return JSON.stringify({
 			block: this.#data.block.header.id,
 			height: this.#data.block.header.height,
@@ -70,7 +72,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		});
 	}
 
-	toSerializableData(): Contracts.Crypto.SerializableProposalData {
+	public toSerializableData(): Contracts.Crypto.SerializableProposalData {
 		return {
 			data: this.#data,
 			round: this.#round,
@@ -80,7 +82,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		};
 	}
 
-	toData(): Contracts.Crypto.ProposalData {
+	public toData(): Contracts.Crypto.ProposalData {
 		return {
 			data: { serialized: this.#data.serialized },
 			height: this.#data.block.header.height,
