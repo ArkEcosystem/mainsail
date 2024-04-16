@@ -1,10 +1,14 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Proposal implements Contracts.Crypto.Proposal {
+	@inject(Identifiers.Cryptography.Message.Factory)
+	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
+
 	#round!: number;
 	#validRound?: number;
+	#dataSerialized!: string;
 	#data!: Contracts.Crypto.ProposedData;
 	#validatorIndex!: number;
 	#signature!: string;
@@ -21,6 +25,7 @@ export class Proposal implements Contracts.Crypto.Proposal {
 	}: Contracts.Crypto.ProposalData & { data: Contracts.Crypto.ProposedData; serialized: Buffer }): Proposal {
 		this.#round = round;
 		this.#validRound = validRound;
+		this.#dataSerialized = data.serialized;
 		this.#data = data;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
@@ -57,7 +62,14 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		return this.#serialized;
 	}
 
-	public async deserializeData(): Promise<void> {}
+	public async deserializeData(): Promise<void> {
+		if (this.#isDataDeserialized) {
+			return;
+		}
+
+		this.#data = await this.messageFactory.makeProposedDataFromBytes(Buffer.from(this.#dataSerialized, "hex"));
+		this.#isDataDeserialized = true;
+	}
 
 	public getData(): Contracts.Crypto.ProposedData {
 		if (!this.#isDataDeserialized) {
