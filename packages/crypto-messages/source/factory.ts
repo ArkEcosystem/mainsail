@@ -46,13 +46,32 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		serialized?: Buffer,
 	): Promise<Contracts.Crypto.Proposal> {
 		this.#applySchema("proposal", proposalData);
-		const data = await this.#makeProposedDataFromBytes(Buffer.from(proposalData.data.serialized, "hex"));
+		const data = await this.makeProposedDataFromBytes(Buffer.from(proposalData.data.serialized, "hex"));
 
 		if (!serialized) {
 			serialized = await this.serializer.serializeProposal(proposalData, { includeSignature: true });
 		}
 
 		return new Proposal({ ...proposalData, data, serialized });
+	}
+
+	async makeProposedDataFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
+		const buffer = ByteBuffer.fromBuffer(bytes);
+
+		const lockProofLength = buffer.readUint8();
+		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
+		if (lockProofLength > 0) {
+			const lockProofBuffer = buffer.readBytes(lockProofLength);
+			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
+		}
+
+		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
+
+		return {
+			block,
+			lockProof,
+			serialized: bytes.toString("hex"),
+		};
 	}
 
 	public async makePrevote(
@@ -124,25 +143,6 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 		}
 
 		return new Precommit({ ...data, serialized });
-	}
-
-	async #makeProposedDataFromBytes(bytes: Buffer): Promise<Contracts.Crypto.ProposedData> {
-		const buffer = ByteBuffer.fromBuffer(bytes);
-
-		const lockProofLength = buffer.readUint8();
-		let lockProof: Contracts.Crypto.AggregatedSignature | undefined;
-		if (lockProofLength > 0) {
-			const lockProofBuffer = buffer.readBytes(lockProofLength);
-			lockProof = await this.deserializer.deserializeLockProof(lockProofBuffer);
-		}
-
-		const block = await this.blockFactory.fromBytes(buffer.getRemainder());
-
-		return {
-			block,
-			lockProof,
-			serialized: bytes.toString("hex"),
-		};
 	}
 
 	#applySchema<T>(schema: string, data: T): T {

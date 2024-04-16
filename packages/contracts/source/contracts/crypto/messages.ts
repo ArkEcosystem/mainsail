@@ -106,6 +106,7 @@ export interface MessageFactory {
 	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
 	makeProposalFromData(data: ProposalData): Promise<Proposal>;
+	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
 	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Prevote>;
 	makePrevoteFromBytes(data: Buffer): Promise<Prevote>;
 	makePrevoteFromData(data: PrevoteData): Promise<Prevote>;
