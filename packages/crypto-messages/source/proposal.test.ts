@@ -7,7 +7,7 @@ import { Proposal } from "./proposal";
 describe<{
 	sandbox: Sandbox;
 }>("Proposal", ({ it, assert }) => {
-	const block: Contracts.Crypto.ProposedData = {
+	const data: Contracts.Crypto.ProposedData = {
 		block: {
 			data: blockData,
 			header: { ...blockData, transactions: [] },
@@ -17,10 +17,10 @@ describe<{
 		serialized: serializedBlock,
 	};
 
-	const proposal = new Proposal({ ...proposalData, block, serialized: Buffer.from("dead", "hex") });
+	const proposal = new Proposal({ ...proposalData, data, serialized: Buffer.from("dead", "hex") });
 	const proposalWithValidRound = new Proposal({
 		...proposalDataWithValidRound,
-		block,
+		data,
 		serialized: Buffer.from("dead", "hex"),
 	});
 
@@ -37,7 +37,7 @@ describe<{
 	});
 
 	it("#block", () => {
-		assert.equal(proposal.block, block);
+		assert.equal(proposal.data, data);
 	});
 
 	it("#validatorIndex", () => {
@@ -65,7 +65,7 @@ describe<{
 
 	it("#toSerializableData", () => {
 		assert.equal(proposal.toSerializableData(), {
-			block: block,
+			data,
 			round: proposalData.round,
 			signature: proposalData.signature,
 			validRound: proposalData.validRound,
@@ -73,7 +73,7 @@ describe<{
 		});
 
 		assert.equal(proposalWithValidRound.toSerializableData(), {
-			block: block,
+			data,
 			round: proposalDataWithValidRound.round,
 			signature: proposalDataWithValidRound.signature,
 			validRound: proposalDataWithValidRound.validRound,
