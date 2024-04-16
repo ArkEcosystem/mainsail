@@ -104,7 +104,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.proposal = {
-			block: {
+			data: {
 				block: context.block,
 			},
 			height: 1,
@@ -509,7 +509,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.calledOnce();
 		spyValidatorPrevote.calledWith(1, 1, 0, block.data.id); // validatorIndex, height, round, blockId
 
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.block.block.data.id}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.data.block.data.id}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
 			height: 1,
@@ -567,7 +567,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyPrevoteProcess.calledOnce();
 		spyPrevoteProcess.calledWith(prevote);
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.block.block.data.id}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.data.block.data.id}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
 			height: 1,
@@ -624,7 +624,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrevote.neverCalled();
 		spyPrevoteProcess.neverCalled();
 
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.block.block.data.id}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.data.block.data.id}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
 			height: 1,
@@ -676,7 +676,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		proposal.validRound = 0;
-		proposal.block.lockProof = { signature: "1234", validators: [] };
+		proposal.data.lockProof = { signature: "1234", validators: [] };
 		roundState = { ...roundState, round: 1 };
 		consensus.setRound(1);
 		await consensus.onProposalLocked(roundState);
@@ -692,7 +692,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyPrevoteProcess.calledOnce();
 		spyPrevoteProcess.calledWith(prevote);
-		spyLoggerInfo.calledWith(`Received proposal ${1}/${1} with locked blockId: ${proposal.block.block.data.id}`);
+		spyLoggerInfo.calledWith(`Received proposal ${1}/${1} with locked blockId: ${proposal.data.block.data.id}`);
 		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
 			height: 1,
 			lockedRound: undefined,
@@ -738,7 +738,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		proposal.validRound = 0;
-		proposal.block.lockProof = { signature: "1234", validators: [] };
+		proposal.data.lockProof = { signature: "1234", validators: [] };
 		roundState = { ...roundState, round: 1 };
 		consensus.setRound(1);
 		await consensus.onProposalLocked(roundState);
@@ -900,7 +900,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPrecommit.calledWith(1, 1, 0, block.data.id);
 		spyPrecommitProcess.calledOnce();
 		spyPrecommitProcess.calledWith(precommit);
-		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${1}/${0} blockId: ${proposal.block.block.data.id}`);
+		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${1}/${0} blockId: ${proposal.data.block.data.id}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Enums.ConsensusEvent.PrevotedProposal, {
 			height: 1,
@@ -1274,7 +1274,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const fakeTimers = clock();
 
-		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.data.block);
 		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
@@ -1293,7 +1293,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyConsensusStartRound.calledOnce();
 		spyConsensusStartRound.calledWith(0);
 		spyRoundStateRepositoryClear.calledOnce();
-		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0} blockId: ${proposal.block.block.data.id}`);
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0} blockId: ${proposal.data.block.data.id}`);
 		spyDispatch.calledOnce();
 		spyDispatch.calledWith(Enums.ConsensusEvent.PrecommitedProposal, {
 			height: 1,
@@ -1316,7 +1316,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		const error = new Error("error");
 		const spyAppTerminate = stub(sandbox.app, "terminate").callsFake(() => {});
-		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.data.block);
 		const spyBlockProcessorCommit = stub(blockProcessor, "commit").rejectedValue(error);
 
 		roundState.getProcessorResult = () => true;
@@ -1343,7 +1343,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const fakeTimers = clock();
 
-		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.data.block);
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
@@ -1371,7 +1371,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const fakeTimers = clock();
 
-		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.block.block);
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.data.block);
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
 		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 
