@@ -66,10 +66,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				void this.broadcaster.broadcastProposal(proposal);
 			}
 
-			// Deserialize data after, to re-broadcast as soon as possible
-			// TODO: Handle deserialization errors
-			await proposal.deserializeData();
-
 			void this.getConsensus().handle(roundState);
 
 			return Contracts.Consensus.ProcessorResult.Accepted;

@@ -131,13 +131,14 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			if (
-				!roundState.hasProcessorResult() &&
-				roundState.hasProposal() &&
-				roundState.getProposal()!.isDataDeserialized
-			) {
-				const result = await this.processor.process(roundState);
-				roundState.setProcessorResult(result);
+			const proposal = roundState.getProposal();
+			if (!roundState.hasProcessorResult() && proposal) {
+				try {
+					await proposal.deserializeData();
+					roundState.setProcessorResult(await this.processor.process(roundState));
+				} catch {
+					roundState.setProcessorResult(false);
+				}
 			}
 
 			await this.onProposal(roundState);
