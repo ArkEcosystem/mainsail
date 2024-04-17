@@ -62,3 +62,12 @@ jobs:
                   echo "Error: checks exited with code $exit_code"
                   exit 1
                 fi
+            - name: Show logs - node0
+              if: always()
+              run: docker logs consensus_node0_1
+            - name: Show logs - node1
+              if: always()
+              run: docker logs consensus_node1_1
+            - name: Show logs - node2
+              if: always()
+              run: docker logs consensus_node2_1
