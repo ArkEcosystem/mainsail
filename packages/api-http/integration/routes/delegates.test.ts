@@ -39,7 +39,7 @@ describe<{
 		assert.equal(statusCode, 200);
 
 		const sorted = [...delegates];
-		sorted.sort((a, b) => +b.attributes.validatorRank - +a.attributes.validatorRank);
+		sorted.sort((a, b) => +a.attributes.validatorRank - +b.attributes.validatorRank);
 		assert.equal(data.data, sorted);
 	});
 
