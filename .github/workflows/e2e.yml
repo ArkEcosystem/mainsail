@@ -55,13 +55,13 @@ jobs:
 
             - name: Running checks for ${{ matrix.name }}
               run: |
-                container_id=$(docker ps -a | grep 'consensus_checks' | awk '{print $1}')
-                while docker ps | grep -q $container_id; do echo "checks running..."; sleep 2; done
-                exit_code=$(docker container inspect $container_id --format='{{.State.ExitCode}}')
-                if [ "$exit_code" != "0" ]; then
-                  echo "Error: checks exited with code $exit_code"
-                  exit 1
-                fi
+                  container_id=$(docker ps -a | grep 'consensus_checks' | awk '{print $1}')
+                  while docker ps | grep -q $container_id; do echo "checks running..."; sleep 2; done
+                  exit_code=$(docker container inspect $container_id --format='{{.State.ExitCode}}')
+                  if [ "$exit_code" != "0" ]; then
+                    echo "Error: checks exited with code $exit_code"
+                    exit 1
+                  fi
             - name: Show logs - node0
               if: always()
               run: docker logs consensus_node0_1
