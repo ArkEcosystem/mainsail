@@ -42,6 +42,7 @@ export const EnvironmentVariableNames = [
 	"CORE_WEBHOOKS_HOST",
 	"CORE_WEBHOOKS_PORT",
 	"CORE_WEBHOOKS_TIMEOUT",
+	"CORE_WEBHOOKS_WHITELIST",
 
 	// Cli
 	"CORE_NPM_REGISTRY",
