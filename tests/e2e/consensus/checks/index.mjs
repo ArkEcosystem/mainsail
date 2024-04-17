@@ -50,6 +50,8 @@ async function discoverPeers() {
 
 async function setupWebhook() {
     app.post("/callback", function (req, res) {
+        res.status(200).end();
+
         const { block: { header: { height }} } = req.body.data;
     
         if (!peerBlockHeightMap.has(req.ip)) {
