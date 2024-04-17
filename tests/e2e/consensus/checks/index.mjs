@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 
 // Listen for blocks until reaching TARGET_HEIGHT
-const TARGET_HEIGHT = 15;
+const TARGET_HEIGHT = 30; // ~ 4 minutes
 const EXPECTED_NUMBER_OF_PEERS = 3;
 
 let webhookTarget;
