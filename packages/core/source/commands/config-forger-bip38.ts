@@ -1,10 +1,9 @@
+import { Keystore } from "@chainsafe/bls-keystore";
 import { Commands, Contracts } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
-import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
 import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
-import { Keystore } from "@chainsafe/bls-keystore";
+import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
 import { validateMnemonic } from "bip39";
-
 import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 

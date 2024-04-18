@@ -28,6 +28,7 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@chainsafe/bls-keystore": "3.0.1",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/api-development": "workspace:*",
@@ -91,7 +92,6 @@
 		"@mainsail/validator-set-static": "workspace:*",
 		"@mainsail/validator-set-vote-weighted": "workspace:*",
 		"@mainsail/webhooks": "workspace:*",
-		"@chainsafe/bls-keystore": "3.0.1",
 		"bip39": "3.1.0",
 		"boxen": "7.1.1",
 		"dayjs": "1.11.10",

@@ -1,6 +1,7 @@
-import { Contracts } from "@mainsail/contracts";
-import { Keystore } from "@chainsafe/bls-keystore";
 import { randomBytes } from "node:crypto";
+
+import { Keystore } from "@chainsafe/bls-keystore";
+import { Contracts } from "@mainsail/contracts";
 
 export class BIP38 implements Contracts.Validator.ValidatorKeyPair {
 	#keystore!: Keystore;
@@ -38,9 +39,9 @@ export class BIP38 implements Contracts.Validator.ValidatorKeyPair {
 		this.#otp = otp;
 
 		return {
+			compressed: false,
 			privateKey: Buffer.from(privateKey).toString("hex"),
 			publicKey: this.#keystore.pubkey,
-			compressed: false,
 		};
 	}
 }

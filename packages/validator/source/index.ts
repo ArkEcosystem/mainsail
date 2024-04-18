@@ -1,10 +1,10 @@
+import { Keystore } from "@chainsafe/bls-keystore";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import { Keystore } from "@chainsafe/bls-keystore";
 
+import { BIP38, BIP39 } from "./keys/index.js";
 import { Validator } from "./validator.js";
 import { ValidatorRepository } from "./validator-repository.js";
-import { BIP38, BIP39 } from "./keys/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
