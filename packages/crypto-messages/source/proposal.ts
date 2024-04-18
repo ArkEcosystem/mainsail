@@ -23,7 +23,11 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.ProposalData & { dataSerialized: string; height: number; serialized: Buffer }): Proposal {
+	}: Omit<Contracts.Crypto.ProposalData, "data"> & {
+		dataSerialized: string;
+		height: number;
+		serialized: Buffer;
+	}): Proposal {
 		this.#height = height;
 		this.#round = round;
 		this.#validRound = validRound;
