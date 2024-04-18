@@ -179,7 +179,7 @@ describe<{
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0);
-		const prevote = await makePrevote(node0, validators[0], 1, 0, proposal.block.block.data.id);
+		const prevote = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -202,7 +202,7 @@ describe<{
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
 			[
-				proposal.block.block.data.id,
+				proposal.getData().block.data.id,
 				commit.block.data.id,
 				commit.block.data.id,
 				commit.block.data.id,
@@ -223,14 +223,14 @@ describe<{
 		const node1 = nodes[1];
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0);
-		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.block.block.data.id);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
 		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
 			await p2p.broadcastPrevote(prevote0);
 		});
 
-		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.block.block.data.id);
+		const prevote1 = await makePrevote(node1, validators[1], 1, 0, proposal.getData().block.data.id);
 		const stubPrevote1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
@@ -253,7 +253,7 @@ describe<{
 		assert.defined(blockId);
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[proposal.block.block.data.id, proposal.block.block.data.id, blockId, blockId, blockId],
+			[proposal.getData().block.data.id, proposal.getData().block.data.id, blockId, blockId, blockId],
 		);
 
 		// Next block
@@ -273,11 +273,11 @@ describe<{
 		const proposal2 = await makeProposal(node0, validators[0], 1, 0);
 		const proposal3 = await makeProposal(node0, validators[0], 1, 0);
 		const proposal4 = await makeProposal(node0, validators[0], 1, 0);
-		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.block.block.data.id);
-		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.block.block.data.id);
-		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.block.block.data.id);
-		const prevote3 = await makePrevote(node0, validators[0], 1, 0, proposal3.block.block.data.id);
-		const prevote4 = await makePrevote(node0, validators[0], 1, 0, proposal4.block.block.data.id);
+		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.getData().block.data.id);
+		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.getData().block.data.id);
+		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.getData().block.data.id);
+		const prevote3 = await makePrevote(node0, validators[0], 1, 0, proposal3.getData().block.data.id);
+		const prevote4 = await makePrevote(node0, validators[0], 1, 0, proposal4.getData().block.data.id);
 
 		stubPrevote.callsFake(async () => {
 			stubPrevote.restore();
@@ -304,11 +304,11 @@ describe<{
 		assert.equal(
 			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockId),
 			[
-				proposal0.block.block.data.id,
-				proposal1.block.block.data.id,
-				proposal2.block.block.data.id,
-				proposal3.block.block.data.id,
-				proposal4.block.block.data.id,
+				proposal0.getData().block.data.id,
+				proposal1.getData().block.data.id,
+				proposal2.getData().block.data.id,
+				proposal3.getData().block.data.id,
+				proposal4.getData().block.data.id,
 				commit.block.data.id,
 				commit.block.data.id,
 				commit.block.data.id,
