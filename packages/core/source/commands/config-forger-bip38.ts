@@ -91,8 +91,6 @@ export class Command extends Commands.Command {
 						Buffer.from(keyPair.publicKey, "hex"),
 						path,
 					);
-
-					console.log(keystore.stringify());
 				},
 				title: "Loading keystore.",
 			},
