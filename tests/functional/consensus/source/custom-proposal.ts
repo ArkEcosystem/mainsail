@@ -152,8 +152,7 @@ export const makeCustomProposal = async (
 
 	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);
 
-	node.app.resolve(Proposal).initialize({
-		data: { serialized: proposedBytes.toString("hex") },
+	return node.app.resolve(Proposal).initialize({
 		dataSerialized: proposedBytes.toString("hex"),
 		height: emptyBlock.header.height,
 		round,
@@ -161,8 +160,6 @@ export const makeCustomProposal = async (
 		signature: proposalSignature,
 		validatorIndex: 0,
 	});
-
-	return new Proposal();
 };
 
 export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], validators: Validator[]) => {
