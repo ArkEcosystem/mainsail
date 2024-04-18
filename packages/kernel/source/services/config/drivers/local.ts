@@ -113,7 +113,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			this.#loadFromLocation(["validators.json"]),
 			Joi.object({
 				keystore: Joi.string().optional(),
-				secrets: Joi.array().items(Joi.string()).optional(),
+				secrets: Joi.array().items(Joi.string()).required(),
 			}),
 		);
 

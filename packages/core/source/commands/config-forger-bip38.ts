@@ -4,7 +4,7 @@ import { injectable } from "@mainsail/container";
 import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
 import { validateMnemonic } from "bip39";
-import { readJSONSync, writeJSONSync } from "fs-extra/esm";
+import { writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
 @injectable()
@@ -77,9 +77,6 @@ export class Command extends Commands.Command {
 			},
 			{
 				task: async () => {
-					// use default path
-					const path: string = "m/12381/60/0/0";
-
 					await this.app.resolve(CryptoServiceProvider).register();
 
 					const keyPair = await this.app.resolve(KeyPairFactory).fromMnemonic(flags.bip39);
@@ -88,7 +85,7 @@ export class Command extends Commands.Command {
 						flags.password,
 						Buffer.from(keyPair.privateKey, "hex"),
 						Buffer.from(keyPair.publicKey, "hex"),
-						path,
+						"",
 					);
 				},
 				title: "Loading keystore.",
@@ -100,12 +97,7 @@ export class Command extends Commands.Command {
 					}
 
 					const validatorsConfig = this.app.getCorePath("config", "validators.json");
-
-					const validators: Record<string, any> = readJSONSync(validatorsConfig);
-					validators.keystore = keystore.stringify();
-					validators.secrets = [];
-
-					writeJSONSync(validatorsConfig, validators, { spaces: 2 });
+					writeJSONSync(validatorsConfig, { secrets: [], keystore: keystore.stringify() }, { spaces: 2 });
 				},
 				title: "Writing encrypted BIP39 passphrase to configuration.",
 			},
