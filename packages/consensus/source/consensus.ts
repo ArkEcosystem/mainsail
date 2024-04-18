@@ -58,6 +58,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
 	#isDisposed = false;
+	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Utils.Lock();
@@ -126,27 +127,19 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		if (this.#pendingJobs.has(roundState)) {
+			return;
+		}
+		this.#pendingJobs.add(roundState);
+
 		await this.#handlerLock.runExclusive(async () => {
+			this.#pendingJobs.delete(roundState);
+
 			if (this.#isDisposed) {
 				return;
 			}
 
-			const proposal = roundState.getProposal();
-			// TODO: Extract to processor
-			if (!roundState.hasProcessorResult() && proposal) {
-				try {
-					await proposal.deserializeData();
-
-					if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
-						roundState.setProcessorResult(false);
-						return;
-					}
-
-					roundState.setProcessorResult(await this.processor.process(roundState));
-				} catch {
-					roundState.setProcessorResult(false);
-				}
-			}
+			await this.#processProposal(roundState);
 
 			await this.onProposal(roundState);
 			await this.onProposalLocked(roundState);
@@ -549,5 +542,23 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}/${store.getTotalRound()}`);
 
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.Bootstrapped, this.getState());
+	}
+
+	async #processProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		const proposal = roundState.getProposal();
+		if (!roundState.hasProcessorResult() && proposal) {
+			try {
+				await proposal.deserializeData();
+
+				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
+					roundState.setProcessorResult(false);
+					return;
+				}
+
+				roundState.setProcessorResult(await this.processor.process(roundState));
+			} catch {
+				roundState.setProcessorResult(false);
+			}
+		}
 	}
 }
