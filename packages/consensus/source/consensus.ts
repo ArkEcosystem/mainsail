@@ -58,7 +58,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
 	#isDisposed = false;
-	#pendingJobs = new Set<string>();
+	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Utils.Lock();
@@ -127,14 +127,13 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		const key = `${roundState.height}:${roundState.round}`;
-		if (this.#pendingJobs.has(key)) {
+		if (this.#pendingJobs.has(roundState)) {
 			return;
 		}
-		this.#pendingJobs.add(key);
+		this.#pendingJobs.add(roundState);
 
 		await this.#handlerLock.runExclusive(async () => {
-			this.#pendingJobs.delete(key);
+			this.#pendingJobs.delete(roundState);
 
 			if (this.#isDisposed) {
 				return;
