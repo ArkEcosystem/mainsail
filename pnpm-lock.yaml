@@ -3234,6 +3234,9 @@ importers:
 
   packages/validator:
     dependencies:
+      '@chainsafe/bls-keystore':
+        specifier: 3.0.1
+        version: 3.0.1
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container

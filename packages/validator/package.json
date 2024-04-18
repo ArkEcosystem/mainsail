@@ -26,6 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
+		"@chainsafe/bls-keystore": "3.0.1",
 		"dayjs": "1.11.10"
 	},
 	"devDependencies": {
