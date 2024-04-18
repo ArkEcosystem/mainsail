@@ -97,7 +97,7 @@ export class Command extends Commands.Command {
 					}
 
 					const validatorsConfig = this.app.getCorePath("config", "validators.json");
-					writeJSONSync(validatorsConfig, { secrets: [], keystore: keystore.stringify() }, { spaces: 2 });
+					writeJSONSync(validatorsConfig, { keystore: keystore.stringify(), secrets: [] }, { spaces: 2 });
 				},
 				title: "Writing encrypted BIP39 passphrase to configuration.",
 			},
