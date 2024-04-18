@@ -51,10 +51,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 
-			if (!(await this.#hasValidLockProof(proposal))) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
-			}
-
 			const roundState = this.roundStateRepo.getRoundState(proposal.height, proposal.round);
 			if (roundState.hasProposal()) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
@@ -72,19 +68,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		});
 	}
 
-	#hasValidProposer(proposal: Contracts.Crypto.Proposal): boolean {
-		return proposal.validatorIndex === this.proposerSelector.getValidatorIndex(proposal.round);
-	}
-
-	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
-		return this.consensusSignature.verify(
-			Buffer.from(proposal.signature, "hex"),
-			await this.messageSerializer.serializeProposal(proposal, { includeSignature: false }),
-			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),
-		);
-	}
-
-	async #hasValidLockProof(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
+	async hasValidLockProof(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
 		if (proposal.validRound === undefined) {
 			return true;
 		}
@@ -97,14 +81,14 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			return false;
 		}
 
-		const lockProof = proposal.block.lockProof;
+		const lockProof = proposal.getData().lockProof;
 		if (!lockProof) {
 			this.logger.debug(`Received proposal ${proposal.height}/${proposal.round} with missing lock proof`);
 			return true;
 		}
 
 		const data = await this.messageSerializer.serializePrevoteForSignature({
-			blockId: proposal.block.block.header.id,
+			blockId: proposal.getData().block.header.id,
 			height: proposal.height,
 			round: proposal.validRound,
 			type: Contracts.Crypto.MessageType.Prevote,
@@ -118,5 +102,17 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		}
 
 		return verified;
+	}
+
+	#hasValidProposer(proposal: Contracts.Crypto.Proposal): boolean {
+		return proposal.validatorIndex === this.proposerSelector.getValidatorIndex(proposal.round);
+	}
+
+	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
+		return this.consensusSignature.verify(
+			Buffer.from(proposal.signature, "hex"),
+			await this.messageSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
+			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),
+		);
 	}
 }

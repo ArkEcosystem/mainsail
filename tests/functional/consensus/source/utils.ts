@@ -67,7 +67,7 @@ export const makeProposal = async (
 	await sleep(1); // Sleep to avoid same timestamp
 
 	const block = await proposer.prepareBlock(validator.publicKey, round);
-	return await proposer.propose(
+	const proposal = await proposer.propose(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
 			.getValidatorIndexByWalletPublicKey(validator.publicKey),
@@ -75,6 +75,9 @@ export const makeProposal = async (
 		undefined,
 		block,
 	);
+
+	await proposal.deserializeData();
+	return proposal;
 };
 
 export const makePrevote = async (

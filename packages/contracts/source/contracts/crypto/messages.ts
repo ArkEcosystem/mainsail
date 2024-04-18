@@ -1,4 +1,4 @@
-import { Block, BlockJson } from "./block.js";
+import { Block } from "./block.js";
 import { KeyPair } from "./identities.js";
 import { AggregatedSignature } from "./signatures.js";
 
@@ -23,7 +23,7 @@ export interface SignaturePrecommitData extends WithOptionalBlockId<SignatureMes
 export interface ProposalData {
 	readonly height: number;
 	readonly round: number;
-	readonly block: { serialized: string };
+	readonly data: { serialized: string };
 	readonly validatorIndex: number;
 	readonly validRound?: number;
 	readonly signature: string;
@@ -32,14 +32,18 @@ export interface ProposalData {
 export interface SerializableProposalData {
 	readonly round: number;
 	readonly validRound?: number;
-	readonly block: { serialized: string };
+	readonly data: { serialized: string };
 	readonly validatorIndex: number;
 	readonly signature?: string;
 }
 
-export interface Proposal extends ProposalData {
-	readonly block: ProposedBlock;
+export interface Proposal extends Omit<ProposalData, "data"> {
+	isDataDeserialized: boolean;
+
 	readonly serialized: Buffer;
+
+	deserializeData(): Promise<void>;
+	getData(): ProposedData;
 
 	toSerializableData(): SerializableProposalData;
 	toData(): ProposalData;
@@ -80,19 +84,13 @@ export interface Precommit extends PrecommitData {
 	toString(): string;
 }
 
-export interface ProposedBlock {
+export interface ProposedData {
 	readonly block: Block;
 	readonly lockProof?: AggregatedSignature;
 	readonly serialized: string;
 }
 
-export interface ProposedBlockJson {
-	readonly block: BlockJson;
-	readonly lockProof?: AggregatedSignature;
-	readonly serialized: string;
-}
-
-export type ProposedBlockSerializable = Omit<ProposedBlock, "serialized">;
+export type ProposedBlockSerializable = Omit<ProposedData, "serialized">;
 
 export interface SerializeProposalOptions {
 	includeSignature?: boolean;
@@ -109,6 +107,7 @@ export interface MessageFactory {
 	makeProposal(data: MakeProposalData, keyPair: KeyPair): Promise<Proposal>;
 	makeProposalFromBytes(data: Buffer): Promise<Proposal>;
 	makeProposalFromData(data: ProposalData): Promise<Proposal>;
+	makeProposedDataFromBytes(data: Buffer): Promise<ProposedData>;
 	makePrevote(data: MakePrevoteData, keyPair: KeyPair): Promise<Prevote>;
 	makePrevoteFromBytes(data: Buffer): Promise<Prevote>;
 	makePrevoteFromData(data: PrevoteData): Promise<Prevote>;

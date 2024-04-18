@@ -1,69 +1,100 @@
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
+@injectable()
 export class Proposal implements Contracts.Crypto.Proposal {
-	#round: number;
-	#validRound?: number;
-	#block: Contracts.Crypto.ProposedBlock;
-	#validatorIndex: number;
-	#signature: string;
-	#serialized: Buffer;
+	@inject(Identifiers.Cryptography.Message.Factory)
+	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
-	constructor({
+	#height!: number;
+	#round!: number;
+	#validRound?: number;
+	#dataSerialized!: string;
+	#data?: Contracts.Crypto.ProposedData;
+	#validatorIndex!: number;
+	#signature!: string;
+	#serialized!: Buffer;
+
+	public initialize({
 		round,
 		validatorIndex,
-		block,
+		height,
+		dataSerialized,
 		validRound,
 		signature,
 		serialized,
-	}: Contracts.Crypto.ProposalData & { block: Contracts.Crypto.ProposedBlock; serialized: Buffer }) {
+	}: Omit<Contracts.Crypto.ProposalData, "data"> & {
+		dataSerialized: string;
+		height: number;
+		serialized: Buffer;
+	}): Proposal {
+		this.#height = height;
 		this.#round = round;
 		this.#validRound = validRound;
-		this.#block = block;
+		this.#dataSerialized = dataSerialized;
 		this.#validatorIndex = validatorIndex;
 		this.#signature = signature;
 		this.#serialized = serialized;
+
+		return this;
 	}
 
-	get height(): number {
-		return this.#block.block.header.height;
+	public get isDataDeserialized(): boolean {
+		return this.#data !== undefined;
 	}
 
-	get round(): number {
+	public get height(): number {
+		return this.#height;
+	}
+
+	public get round(): number {
 		return this.#round;
 	}
 
-	get validRound(): number | undefined {
+	public get validRound(): number | undefined {
 		return this.#validRound;
 	}
 
-	get block(): Contracts.Crypto.ProposedBlock {
-		return this.#block;
-	}
-
-	get validatorIndex(): number {
+	public get validatorIndex(): number {
 		return this.#validatorIndex;
 	}
 
-	get signature(): string {
+	public get signature(): string {
 		return this.#signature;
 	}
 
-	get serialized(): Buffer {
+	public get serialized(): Buffer {
 		return this.#serialized;
 	}
 
-	toString(): string {
+	public async deserializeData(): Promise<void> {
+		if (this.#data !== undefined) {
+			return;
+		}
+
+		this.#data = await this.messageFactory.makeProposedDataFromBytes(Buffer.from(this.#dataSerialized, "hex"));
+	}
+
+	public getData(): Contracts.Crypto.ProposedData {
+		if (this.#data === undefined) {
+			throw new Error("Proposed data is not deserialized.");
+		}
+
+		return this.#data;
+	}
+
+	public toString(): string {
 		return JSON.stringify({
-			block: this.#block.block.header.id,
-			height: this.#block.block.header.height,
+			block: this.#data?.block.header.id,
+			height: this.#height,
 			round: this.#round,
 			validatorIndex: this.#validatorIndex,
 		});
 	}
 
-	toSerializableData(): Contracts.Crypto.SerializableProposalData {
+	public toSerializableData(): Contracts.Crypto.SerializableProposalData {
 		return {
-			block: this.#block,
+			data: { serialized: this.#dataSerialized },
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
@@ -71,10 +102,10 @@ export class Proposal implements Contracts.Crypto.Proposal {
 		};
 	}
 
-	toData(): Contracts.Crypto.ProposalData {
+	public toData(): Contracts.Crypto.ProposalData {
 		return {
-			block: { serialized: this.#block.serialized },
-			height: this.#block.block.header.height,
+			data: { serialized: this.#dataSerialized },
+			height: this.#height,
 			round: this.#round,
 			signature: this.#signature,
 			validRound: this.#validRound,
