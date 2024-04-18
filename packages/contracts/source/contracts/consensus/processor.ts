@@ -3,6 +3,7 @@ import { ProcessorResult } from "./enums.js";
 
 export interface ProposalProcessor {
 	process(proposal: Proposal, broadcast?: boolean): Promise<ProcessorResult>;
+	hasValidLockProof(proposal: Proposal): Promise<boolean>;
 }
 
 export interface PrevoteProcessor {

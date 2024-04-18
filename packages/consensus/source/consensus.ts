@@ -132,9 +132,16 @@ export class Consensus implements Contracts.Consensus.Service {
 			}
 
 			const proposal = roundState.getProposal();
+			// TODO: Extract to processor
 			if (!roundState.hasProcessorResult() && proposal) {
 				try {
 					await proposal.deserializeData();
+
+					if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
+						roundState.setProcessorResult(false);
+						return;
+					}
+
 					roundState.setProcessorResult(await this.processor.process(roundState));
 				} catch {
 					roundState.setProcessorResult(false);
