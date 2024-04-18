@@ -91,6 +91,7 @@
 		"@mainsail/validator-set-static": "workspace:*",
 		"@mainsail/validator-set-vote-weighted": "workspace:*",
 		"@mainsail/webhooks": "workspace:*",
+		"@chainsafe/bls-keystore": "3.0.1",
 		"bip39": "3.1.0",
 		"boxen": "7.1.1",
 		"dayjs": "1.11.10",

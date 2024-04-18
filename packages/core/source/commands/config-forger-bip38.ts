@@ -1,6 +1,10 @@
 import { Commands, Contracts } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
+import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
+import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
+import { Keystore } from "@chainsafe/bls-keystore";
 import { validateMnemonic } from "bip39";
+
 import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
@@ -61,7 +65,7 @@ export class Command extends Commands.Command {
 	}
 
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
-		//let decodedWIF;
+		let keystore: Keystore | undefined;
 
 		await this.components.taskList([
 			{
@@ -73,26 +77,40 @@ export class Command extends Commands.Command {
 				title: "Validating passphrase is BIP39 compliant.",
 			},
 			{
-				task: () => {
-					// decodedWIF = wif.decode(Identities.WIF.fromPassphrase(flags.bip39));
+				task: async () => {
+					// use default path
+					const path: string = "m/12381/60/0/0";
+
+					await this.app.resolve(CryptoServiceProvider).register();
+
+					const keyPair = await this.app.resolve(KeyPairFactory).fromMnemonic(flags.bip39);
+
+					keystore = await Keystore.create(
+						flags.password,
+						Buffer.from(keyPair.privateKey, "hex"),
+						Buffer.from(keyPair.publicKey, "hex"),
+						path,
+					);
+
+					console.log(keystore.stringify());
 				},
-				title: "Loading private key.",
+				title: "Loading keystore.",
 			},
 			{
 				task: () => {
+					if (!keystore) {
+						throw new Error("missing keystore");
+					}
+
 					const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
-					const validators: Record<string, string | string[]> = readJSONSync(validatorsConfig);
-					// validators.bip38 = bip38.encrypt(
-					//     decodedWIF.privateKey,
-					//     decodedWIF.compressed,
-					//     flags.password,
-					// );
+					const validators: Record<string, any> = readJSONSync(validatorsConfig);
+					validators.keystore = keystore.stringify();
 					validators.secrets = [];
 
-					writeJSONSync(validatorsConfig, validators);
+					writeJSONSync(validatorsConfig, validators, { spaces: 2 });
 				},
-				title: "Writing BIP39 passphrase to configuration.",
+				title: "Writing encrypted BIP39 passphrase to configuration.",
 			},
 		]);
 	}
