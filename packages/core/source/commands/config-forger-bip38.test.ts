@@ -1,4 +1,5 @@
 import { ensureDirSync, writeJSONSync, readJSONSync } from "fs-extra/esm";
+import { Keystore } from "@chainsafe/bls-keystore";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -27,7 +28,11 @@ describe<{
 	it("should configure from flags", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, password: "password" }).execute(Command);
 
-		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [] });
+		const config = readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`);
+		assert.equal(config.secrets, []);
+
+		const keystore = Keystore.parse(config.keystore);
+		assert.true(await keystore.verifyPassword("password"));
 	});
 
 	it("should configure from a prompt if it receives a valid bip39 and confirmation", async ({ cli }) => {
@@ -35,7 +40,11 @@ describe<{
 
 		await cli.execute(Command);
 
-		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [] });
+		const config = readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`);
+		assert.equal(config.secrets, []);
+
+		const keystore = Keystore.parse(config.keystore);
+		assert.true(await keystore.verifyPassword("password"));
 	});
 
 	it("should fail to configure from a prompt if it receives an invalid bip39", async ({ cli }) => {
@@ -46,20 +55,6 @@ describe<{
 		await assert.rejects(() => cli.execute(Command), "Failed to verify the given passphrase as BIP39 compliant.");
 
 		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39] });
-	});
-
-	it("should configure from a prompt if it receives an invalid bip39 and skipValidation flag is set", async ({
-		cli,
-	}) => {
-		await cli.withFlags({ bip39 }).execute(BIP39Command);
-
-		prompts.inject(["random-string", "password", "password"]);
-
-		await cli.withFlags({ skipValidation: true }).execute(Command);
-
-		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), {
-			secrets: [],
-		});
 	});
 
 	it("should fail to configure from a prompt if it doesn't receive a bip39", async ({ cli }) => {

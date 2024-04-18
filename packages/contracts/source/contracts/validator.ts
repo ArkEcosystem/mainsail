@@ -1,7 +1,12 @@
 import { AggregatedSignature, Block, KeyPair, Precommit, Prevote, Proposal } from "./crypto/index.js";
 
+export interface ValidatorKeyPair {
+	readonly publicKey: string;
+	getKeyPair(): Promise<KeyPair>;
+}
+
 export interface Validator {
-	configure(keyPair: KeyPair): Validator;
+	configure(keyPair: ValidatorKeyPair): Validator;
 	getConsensusPublicKey(): string;
 	prepareBlock(generatorPublicKey: string, round: number): Promise<Block>;
 	propose(

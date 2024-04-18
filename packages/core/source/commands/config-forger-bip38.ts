@@ -1,7 +1,10 @@
+import { Keystore } from "@chainsafe/bls-keystore";
 import { Commands, Contracts } from "@mainsail/cli";
 import { injectable } from "@mainsail/container";
+import { ServiceProvider as CryptoServiceProvider } from "@mainsail/crypto-config";
+import { KeyPairFactory } from "@mainsail/crypto-key-pair-bls12-381";
 import { validateMnemonic } from "bip39";
-import { readJSONSync, writeJSONSync } from "fs-extra/esm";
+import { writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
 @injectable()
@@ -15,8 +18,7 @@ export class Command extends Commands.Command {
 	public configure(): void {
 		this.definition
 			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
-			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
-			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
+			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {
@@ -30,9 +32,7 @@ export class Command extends Commands.Command {
 				name: "bip39",
 				type: "password",
 				validate: (value) =>
-					!validateMnemonic(value) && !this.getFlag("skipValidation")
-						? `Failed to verify the given passphrase as BIP39 compliant.`
-						: true,
+					!validateMnemonic(value) ? `Failed to verify the given passphrase as BIP39 compliant.` : true,
 			},
 			{
 				message: "Please enter your custom password that encrypts the BIP39. Referred to as BIP38.",
@@ -64,38 +64,42 @@ export class Command extends Commands.Command {
 	}
 
 	private async performConfiguration(flags: Contracts.AnyObject): Promise<void> {
-		//let decodedWIF;
+		let keystore: Keystore | undefined;
 
 		await this.components.taskList([
 			{
 				task: () => {
-					if (!flags.bip39 || (!validateMnemonic(flags.bip39) && !flags.skipValidation)) {
+					if (!flags.bip39 || !validateMnemonic(flags.bip39)) {
 						throw new Error(`Failed to verify the given passphrase as BIP39 compliant.`);
 					}
 				},
 				title: "Validating passphrase is BIP39 compliant.",
 			},
 			{
-				task: () => {
-					// decodedWIF = wif.decode(Identities.WIF.fromPassphrase(flags.bip39));
+				task: async () => {
+					await this.app.resolve(CryptoServiceProvider).register();
+
+					const keyPair = await this.app.resolve(KeyPairFactory).fromMnemonic(flags.bip39);
+
+					keystore = await Keystore.create(
+						flags.password,
+						Buffer.from(keyPair.privateKey, "hex"),
+						Buffer.from(keyPair.publicKey, "hex"),
+						"",
+					);
 				},
-				title: "Loading private key.",
+				title: "Loading keystore.",
 			},
 			{
 				task: () => {
+					if (!keystore) {
+						throw new Error("missing keystore");
+					}
+
 					const validatorsConfig = this.app.getCorePath("config", "validators.json");
-
-					const validators: Record<string, string | string[]> = readJSONSync(validatorsConfig);
-					// validators.bip38 = bip38.encrypt(
-					//     decodedWIF.privateKey,
-					//     decodedWIF.compressed,
-					//     flags.password,
-					// );
-					validators.secrets = [];
-
-					writeJSONSync(validatorsConfig, validators);
+					writeJSONSync(validatorsConfig, { keystore: keystore.stringify(), secrets: [] }, { spaces: 2 });
 				},
-				title: "Writing BIP39 passphrase to configuration.",
+				title: "Writing encrypted BIP39 passphrase to configuration.",
 			},
 		]);
 	}

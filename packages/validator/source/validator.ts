@@ -33,9 +33,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
-	#keyPair!: Contracts.Crypto.KeyPair;
+	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
-	public configure(keyPair: Contracts.Crypto.KeyPair): Contracts.Validator.Validator {
+	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
 		this.#keyPair = keyPair;
 
 		return this;
@@ -65,7 +65,7 @@ export class Validator implements Contracts.Validator.Validator {
 				validRound,
 				validatorIndex,
 			},
-			this.#keyPair,
+			await this.#keyPair.getKeyPair(),
 		);
 	}
 
@@ -83,7 +83,7 @@ export class Validator implements Contracts.Validator.Validator {
 				type: Contracts.Crypto.MessageType.Prevote,
 				validatorIndex,
 			},
-			this.#keyPair,
+			await this.#keyPair.getKeyPair(),
 		);
 	}
 
@@ -101,7 +101,7 @@ export class Validator implements Contracts.Validator.Validator {
 				type: Contracts.Crypto.MessageType.Precommit,
 				validatorIndex,
 			},
-			this.#keyPair,
+			await this.#keyPair.getKeyPair(),
 		);
 	}
 
