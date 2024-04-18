@@ -139,22 +139,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			const proposal = roundState.getProposal();
-			// TODO: Extract to processor
-			if (!roundState.hasProcessorResult() && proposal) {
-				try {
-					await proposal.deserializeData();
-
-					if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
-						roundState.setProcessorResult(false);
-						return;
-					}
-
-					roundState.setProcessorResult(await this.processor.process(roundState));
-				} catch {
-					roundState.setProcessorResult(false);
-				}
-			}
+			await this.#processProposal(roundState);
 
 			await this.onProposal(roundState);
 			await this.onProposalLocked(roundState);
@@ -557,5 +542,23 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}/${store.getTotalRound()}`);
 
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.Bootstrapped, this.getState());
+	}
+
+	async #processProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		const proposal = roundState.getProposal();
+		if (!roundState.hasProcessorResult() && proposal) {
+			try {
+				await proposal.deserializeData();
+
+				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
+					roundState.setProcessorResult(false);
+					return;
+				}
+
+				roundState.setProcessorResult(await this.processor.process(roundState));
+			} catch {
+				roundState.setProcessorResult(false);
+			}
+		}
 	}
 }
