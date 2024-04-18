@@ -19,8 +19,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		);
 
 		const validators: Contracts.Validator.Validator[] = [];
-		const secrets = this.app.config("validators.secrets");
-		Utils.assert.defined<string[]>(secrets);
+		const validatorConfig = this.app.config<{ secrets: string[]; keystore?: string }>("validators");
+		Utils.assert.defined(validatorConfig);
+		const { secrets, keystore } = validatorConfig;
 
 		for (const secret of secrets.values()) {
 			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(secret);
@@ -33,7 +34,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		// Load validator from keystore (if any)
-		const keystore = this.app.config<string | undefined>("validators.keystore");
 		if (keystore) {
 			const parsed = Keystore.parse(keystore);
 
