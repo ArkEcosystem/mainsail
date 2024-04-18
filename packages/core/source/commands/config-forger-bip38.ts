@@ -15,8 +15,7 @@ export class Command extends Commands.Command {
 	public configure(): void {
 		this.definition
 			.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string())
-			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
-			.setFlag("skipValidation", "Skip BIP39 mnemonic validation", Joi.boolean().default(false));
+			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string());
 	}
 
 	public async execute(): Promise<void> {
@@ -30,9 +29,7 @@ export class Command extends Commands.Command {
 				name: "bip39",
 				type: "password",
 				validate: (value) =>
-					!validateMnemonic(value) && !this.getFlag("skipValidation")
-						? `Failed to verify the given passphrase as BIP39 compliant.`
-						: true,
+					!validateMnemonic(value) ? `Failed to verify the given passphrase as BIP39 compliant.` : true,
 			},
 			{
 				message: "Please enter your custom password that encrypts the BIP39. Referred to as BIP38.",
@@ -69,7 +66,7 @@ export class Command extends Commands.Command {
 		await this.components.taskList([
 			{
 				task: () => {
-					if (!flags.bip39 || (!validateMnemonic(flags.bip39) && !flags.skipValidation)) {
+					if (!flags.bip39 || !validateMnemonic(flags.bip39)) {
 						throw new Error(`Failed to verify the given passphrase as BIP39 compliant.`);
 					}
 				},
