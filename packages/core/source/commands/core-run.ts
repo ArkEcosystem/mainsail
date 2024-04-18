@@ -21,6 +21,7 @@ export class Command extends Commands.Command {
 			.setFlag("skipDiscovery", "Skip the initial peer discovery.", Joi.boolean())
 			.setFlag("ignoreMinimumNetworkReach", "Ignore the minimum network reach on start.", Joi.boolean())
 			.setFlag("launchMode", "The mode the relay will be launched in (seed only at the moment).", Joi.string())
+			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag("skipPrompts", "Skip prompts.", Joi.boolean().default(false));
 	}
 
@@ -37,7 +38,7 @@ export class Command extends Commands.Command {
 			flags,
 			plugins: {
 				"@mainsail/p2p": Utils.Builder.buildPeerFlags(flags),
-				...(await this.buildValidatorConfiguration()),
+				...(await this.buildValidatorConfiguration(flags)),
 			},
 		});
 
@@ -45,7 +46,7 @@ export class Command extends Commands.Command {
 		return new Promise(() => {});
 	}
 
-	async buildValidatorConfiguration(): Promise<Record<string, any> | undefined> {
+	async buildValidatorConfiguration(flags: Contracts.AnyObject): Promise<Record<string, any> | undefined> {
 		const validatorsConfig = this.app.getCorePath("config", "validators.json");
 
 		if (!existsSync(validatorsConfig)) {
@@ -57,36 +58,42 @@ export class Command extends Commands.Command {
 			return {};
 		}
 
+		let password = flags.password;
+
 		// ask for password
-		const response = await this.components.prompt([
-			{
-				message: "Please enter your validator keystore decryption password.",
-				name: "password",
-				type: "password",
-				validate: (value) => (typeof value !== "string" ? "The password has to be a string." : true),
-			},
-		]);
+		if (!password) {
+			const response = await this.components.prompt([
+				{
+					message: "Please enter your validator keystore decryption password.",
+					name: "password",
+					type: "password",
+					validate: (value) => (typeof value !== "string" ? "The password has to be a string." : true),
+				},
+			]);
 
-		await this.components.prompt([
-			{
-				message: "Confirm validator keystore decryption password.",
-				name: "passwordConfirmation",
-				type: "password",
-				validate: (value) => (value !== response.password ? "Confirm password does not match." : true),
-			},
-		]);
+			await this.components.prompt([
+				{
+					message: "Confirm validator keystore decryption password.",
+					name: "passwordConfirmation",
+					type: "password",
+					validate: (value) => (value !== response.password ? "Confirm password does not match." : true),
+				},
+			]);
 
-		if (!response.password) {
-			throw new Error("The password has to be a string.");
+			if (!response.password) {
+				throw new Error("The password has to be a string.");
+			}
+
+			password = response.password;
 		}
 
-		if (!(await Keystore.parse(validators.keystore).verifyPassword(response.password as string))) {
+		if (!(await Keystore.parse(validators.keystore).verifyPassword(password as string))) {
 			throw new Error("Invalid keystore password");
 		}
 
 		return {
 			"@mainsail/validator": {
-				validatorKeystorePassword: response.password,
+				validatorKeystorePassword: password,
 			},
 		};
 	}
