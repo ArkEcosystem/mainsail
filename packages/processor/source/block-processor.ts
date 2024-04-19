@@ -63,7 +63,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			return true;
 		} catch (error) {
-			void this.events.dispatch(Enums.BlockEvent.Invalid, { block: unit.getBlock(), error });
+			void this.events.dispatch(Enums.BlockEvent.Invalid, { block: unit.getBlock().data, error });
 			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 
@@ -103,7 +103,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		void this.events.dispatch(Enums.BlockEvent.Applied, commit.block);
+		void this.events.dispatch(Enums.BlockEvent.Applied, commit.block.data);
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
