@@ -52,7 +52,7 @@ async function setupWebhook() {
     app.post("/callback", function (req, res) {
         res.status(200).end();
 
-        const { block: { header: { height }} } = req.body.data;
+        const { height } = req.body.data;
     
         if (!peerBlockHeightMap.has(req.ip)) {
             console.log("ignoring peer callback", req.ip);
