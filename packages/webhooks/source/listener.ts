@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { get } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions.js";
@@ -102,7 +103,7 @@ export class Listener {
 					try {
 						const satisfies = conditions[condition.condition];
 
-						if (satisfies(payload[condition.key], condition.value)) {
+						if (satisfies(get(payload, condition.key), condition.value)) {
 							return true;
 						}
 					} catch {
