@@ -1698,9 +1698,9 @@ importers:
         specifier: 8.12.0
         version: 8.12.0
     devDependencies:
-      '@mainsail/crypto-address-bech32m':
+      '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
-        version: link:../crypto-address-bech32m
+        version: link:../crypto-address-keccak256
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
@@ -1713,9 +1713,9 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
