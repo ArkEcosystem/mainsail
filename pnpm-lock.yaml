@@ -1752,9 +1752,6 @@ importers:
 
   packages/crypto-signature-bls12-381:
     dependencies:
-      '@chainsafe/blst':
-        specifier: ^0.2.10
-        version: 0.2.10(encoding@0.1.13)
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
