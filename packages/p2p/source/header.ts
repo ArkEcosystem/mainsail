@@ -7,7 +7,7 @@ export class Header implements Contracts.P2P.Header {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Consensus.Service)
-	private readonly consensus!: Contracts.Consensus.ConsensusService;
+	private readonly consensus!: Contracts.Consensus.Service;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
@@ -34,7 +34,8 @@ export class Header implements Contracts.P2P.Header {
 	public toData(): Contracts.P2P.HeaderData {
 		return {
 			height: this.height,
-			proposedBlockId: this.proposal ? this.proposal.block.block.data.id : undefined,
+			proposedBlockId:
+				this.proposal && this.proposal.isDataDeserialized ? this.proposal.getData().block.data.id : undefined,
 			round: this.round,
 			step: this.step,
 			validatorsSignedPrecommit: this.validatorsSignedPrecommit,

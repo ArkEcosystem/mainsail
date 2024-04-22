@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
-export class Consensus implements Contracts.Consensus.ConsensusService {
+export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -58,6 +58,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
 	#isDisposed = false;
+	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Utils.Lock();
@@ -97,7 +98,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		this.#validValue = round;
 	}
 
-	public getState(): Contracts.Consensus.ConsensusState {
+	public getState(): Contracts.Consensus.State {
 		return {
 			height: this.#height,
 			lockedRound: this.getLockedRound(),
@@ -126,15 +127,19 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 	}
 
 	async handle(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		if (this.#pendingJobs.has(roundState)) {
+			return;
+		}
+		this.#pendingJobs.add(roundState);
+
 		await this.#handlerLock.runExclusive(async () => {
+			this.#pendingJobs.delete(roundState);
+
 			if (this.#isDisposed) {
 				return;
 			}
 
-			if (!roundState.hasProcessorResult() && roundState.hasProposal()) {
-				const result = await this.processor.process(roundState);
-				roundState.setProcessorResult(result);
-			}
+			await this.#processProposal(roundState);
 
 			await this.onProposal(roundState);
 			await this.onProposalLocked(roundState);
@@ -215,7 +220,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 
 		this.#step = Contracts.Consensus.Step.Prevote;
 
-		const { block } = proposal.block;
+		const { block } = proposal.getData();
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.ProposalAccepted, this.getState());
 
@@ -228,14 +233,14 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 			this.#step !== Contracts.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
-			!proposal.block.lockProof ||
+			!proposal.getData().lockProof ||
 			proposal.validRound === undefined ||
 			proposal.validRound >= this.#round
 		) {
 			return;
 		}
 
-		const { block } = proposal.block;
+		const { block } = proposal.getData();
 		this.#step = Contracts.Consensus.Step.Prevote;
 
 		this.logger.info(`Received proposal ${this.#height}/${this.#round} with locked blockId: ${block.data.id}`);
@@ -263,7 +268,7 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 			return;
 		}
 
-		const { block } = proposal.block;
+		const { block } = proposal.getData();
 
 		this.logger.info(`Received +2/3 prevotes for ${this.#height}/${this.#round} blockId: ${block.data.id}`);
 
@@ -537,5 +542,23 @@ export class Consensus implements Contracts.Consensus.ConsensusService {
 		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}/${store.getTotalRound()}`);
 
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.Bootstrapped, this.getState());
+	}
+
+	async #processProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		const proposal = roundState.getProposal();
+		if (!roundState.hasProcessorResult() && proposal) {
+			try {
+				await proposal.deserializeData();
+
+				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
+					roundState.setProcessorResult(false);
+					return;
+				}
+
+				roundState.setProcessorResult(await this.processor.process(roundState));
+			} catch {
+				roundState.setProcessorResult(false);
+			}
+		}
 	}
 }

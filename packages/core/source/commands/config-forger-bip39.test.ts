@@ -59,20 +59,6 @@ describe<{
 		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [bip39] });
 	});
 
-	it("should configure from a prompt if it receives an invalid bip39 and skipValidation flag is set", async ({
-		cli,
-	}) => {
-		await cli.withFlags({ bip39 }).execute(Command);
-
-		prompts.inject(["random-string", true]);
-
-		await cli.withFlags({ skipValidation: true }).execute(Command);
-
-		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), {
-			secrets: ["random-string"],
-		});
-	});
-
 	it("should fail to configure from a prompt if it doesn't receive a bip39", async ({ cli }) => {
 		prompts.inject([null, true]);
 

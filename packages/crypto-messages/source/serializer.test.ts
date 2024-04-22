@@ -40,7 +40,7 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
-					block: { serialized: serializedBlock },
+					data: { serialized: serializedBlock },
 					round: proposalData.round,
 					validatorIndex: proposalData.validatorIndex,
 				},
@@ -55,7 +55,7 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
-					block: { serialized: serializedBlock },
+					data: { serialized: serializedBlock },
 					round: proposalData.round,
 					signature: proposalData.signature,
 					validatorIndex: proposalData.validatorIndex,
@@ -71,7 +71,7 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
-					block: { serialized: serializedBlock },
+					data: { serialized: serializedBlock },
 					round: proposalDataWithValidRound.round,
 					validRound: proposalDataWithValidRound.validRound,
 					validatorIndex: proposalDataWithValidRound.validatorIndex,
@@ -87,7 +87,7 @@ describe<{
 		const serialized = (
 			await serializer.serializeProposal(
 				{
-					block: { serialized: serializedBlock },
+					data: { serialized: serializedBlock },
 					round: proposalDataWithValidRound.round,
 					signature: proposalDataWithValidRound.signature,
 					validRound: proposalDataWithValidRound.validRound,

@@ -1,13 +1,12 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Proposal } from "@mainsail/crypto-messages";
+import { Utils } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
+import { BigNumber } from "@mainsail/utils";
+import { randomBytes } from "crypto";
 
 import { Validator } from "./contracts.js";
-
-import { BigNumber } from "@mainsail/utils";
-import { Utils } from "@mainsail/kernel";
-import { randomBytes } from "crypto";
 
 // To create blocks containing arbitrary transactions, the transactions have to be added
 // in serialized form as the serializer could just fail e.g. due to malformed bytes etc.
@@ -139,7 +138,7 @@ export const makeCustomProposal = async (
 
 	const serializedProposal = await messageSerializer.serializeProposal(
 		{
-			block: { serialized: proposedBytes.toString("hex") },
+			data: { serialized: proposedBytes.toString("hex") },
 			round,
 			validRound: undefined,
 			validatorIndex: 0,
@@ -153,22 +152,13 @@ export const makeCustomProposal = async (
 
 	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);
 
-	return new Proposal({
-		validatorIndex: 0,
-		round,
-		block: {
-			// NOTE: the consensus expects a block to check the round and height.
-			// but we only care about the 'serialized' field which ultimately gets broadcasted
-			// to other validators.
-			block: {
-				...emptyBlock,
-				serialized: blockBuffer.toString("hex"),
-			},
-			serialized: proposedBytes.toString("hex"),
-		},
+	return node.app.resolve(Proposal).initialize({
+		dataSerialized: proposedBytes.toString("hex"),
 		height: emptyBlock.header.height,
-		signature: proposalSignature,
+		round,
 		serialized: signedProposal,
+		signature: proposalSignature,
+		validatorIndex: 0,
 	});
 };
 
@@ -176,9 +166,9 @@ export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], v
 	const context = {
 		sandbox: node,
 		wallets: validators.map((v) => ({
-			publicKey: v.publicKey,
-			privateKey: v.privateKey,
 			compressed: false,
+			privateKey: v.privateKey,
+			publicKey: v.publicKey,
 		})),
 	};
 

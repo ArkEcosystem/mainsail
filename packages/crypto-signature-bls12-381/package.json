@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-signature-bls12-381",
-	"version": "0.0.1-alpha.14",
+	"version": "0.0.1-alpha.16",
 	"description": "BLS12-381 signatures for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -25,6 +25,7 @@
 		"@chainsafe/blst": "^0.2.10",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/crypto-key-pair-bls12-381": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*"
 	},

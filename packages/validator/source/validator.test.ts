@@ -4,6 +4,7 @@ import { describe, Sandbox } from "../../test-framework/source";
 import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Validator } from "./validator";
+import { BIP39 } from "./keys/bip39";
 
 describe<{
 	sandbox: Sandbox;
@@ -15,7 +16,7 @@ describe<{
 		const { consensusKeyPair } = validatorKeys[0];
 		context.validator = context.sandbox.app
 			.resolve<Contracts.Validator.Validator>(Validator)
-			.configure(consensusKeyPair);
+			.configure(await new BIP39().configure(consensusKeyPair));
 	});
 
 	it("#getConsensusPublicKey", async ({ validator }) => {

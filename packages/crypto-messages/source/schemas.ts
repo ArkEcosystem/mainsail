@@ -34,7 +34,7 @@ export const schemas: Record<
 	proposal: {
 		$id: "proposal",
 		properties: {
-			block: {
+			data: {
 				properties: {
 					serialized: { $ref: "hex" },
 				},
@@ -46,7 +46,7 @@ export const schemas: Record<
 			validRound: { minimum: 0, type: "integer" },
 			validatorIndex: { isValidatorIndex: {} },
 		},
-		required: ["round", "block", "validatorIndex", "signature"],
+		required: ["round", "data", "validatorIndex", "signature"],
 		type: "object",
 	},
 	proposalLockProof: {

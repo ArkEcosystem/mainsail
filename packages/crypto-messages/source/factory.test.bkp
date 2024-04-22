@@ -71,14 +71,14 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ blockFactory, factory, identity }) => {
-		const block: Contracts.Crypto.ProposedBlock = {
+		const data: Contracts.Crypto.ProposedData = {
 			block: await blockFactory.fromData(blockData),
 			serialized: serializedBlock,
 		};
 
 		const proposal = await factory.makeProposal(
 			{
-				block,
+				data,
 				round: 1,
 				validatorIndex: 0,
 			},
@@ -95,14 +95,14 @@ describe<{
 		factory,
 		identity,
 	}) => {
-		const block: Contracts.Crypto.ProposedBlock = {
+		const data: Contracts.Crypto.ProposedData = {
 			block: await blockFactory.fromData(blockData),
 			serialized: serializedBlock,
 		};
 
 		const proposal = await factory.makeProposal(
 			{
-				block,
+				data,
 				round: 1,
 				validRound: 0,
 				validatorIndex: 0,

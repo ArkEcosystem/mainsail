@@ -30,8 +30,8 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 			length:
 				4 + // round
 				(proposal.validRound === undefined ? 1 : 5) + // validRound
-				4 + // serialized block length
-				proposal.block.serialized.length / 2 + // serialized block
+				4 + // serialized data length
+				proposal.data.serialized.length / 2 + // serialized data
 				1 + // validatorIndex
 				(options.includeSignature ? this.signatureSize : 0), // signature
 			skip: 0,
@@ -43,7 +43,7 @@ export class Serializer implements Contracts.Crypto.MessageSerializer {
 					optional: true,
 					type: "uint32",
 				},
-				block: {
+				data: {
 					type: "hex",
 				},
 				validatorIndex: {

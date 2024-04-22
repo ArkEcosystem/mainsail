@@ -60,7 +60,7 @@ export class Listener {
 
 			await this.#dispatchWebhookEvent(start, webhook, payload);
 		} catch (error) {
-			this.logger.error(`Webhooks Job ${webhook.id} failed: ${error.message}`);
+			this.logger.error(`Webhooks Job ${webhook.id} failed: ${error.code ?? error.message}`);
 
 			await this.#dispatchWebhookEvent(start, webhook, payload, error);
 		}

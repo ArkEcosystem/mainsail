@@ -5,6 +5,7 @@ import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { Validator } from "./validator";
 import { ValidatorRepository } from "./validator-repository";
+import { BIP39 } from "./keys/bip39";
 
 describe<{
 	sandbox: Sandbox;
@@ -16,7 +17,9 @@ describe<{
 		const validators: Contracts.Validator.Validator[] = [];
 		for (const { consensusKeyPair } of validatorKeys) {
 			validators.push(
-				context.sandbox.app.resolve<Contracts.Validator.Validator>(Validator).configure(consensusKeyPair),
+				context.sandbox.app
+					.resolve<Contracts.Validator.Validator>(Validator)
+					.configure(await new BIP39().configure(consensusKeyPair)),
 			);
 		}
 

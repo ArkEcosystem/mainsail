@@ -11,7 +11,7 @@ export class Bootstrapper {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Consensus.Service)
-	private readonly consensus!: Contracts.Consensus.ConsensusService;
+	private readonly consensus!: Contracts.Consensus.Service;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;

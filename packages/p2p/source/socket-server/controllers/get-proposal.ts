@@ -17,7 +17,7 @@ export class GetProposalController implements Contracts.P2P.Controller {
 
 		const { height, round } = request.payload.headers;
 
-		const consensus = this.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+		const consensus = this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.RoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
 		);

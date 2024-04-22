@@ -22,7 +22,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messageFactory!: Contracts.Crypto.MessageFactory;
 
-	public async getState(): Promise<Contracts.Consensus.ConsensusStateData | undefined> {
+	public async getState(): Promise<Contracts.Consensus.StateData | undefined> {
 		if (!this.stateStorage.doesExist("consensus-state")) {
 			return undefined;
 		}
@@ -38,9 +38,9 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		};
 	}
 
-	public async saveState(state: Contracts.Consensus.ConsensusState): Promise<void> {
+	public async saveState(state: Contracts.Consensus.State): Promise<void> {
 		// always overwrite existing state; we only care about state for uncommitted blocks
-		const data: Contracts.Consensus.ConsensusStateData = {
+		const data: Contracts.Consensus.StateData = {
 			height: state.height,
 			lockedRound: state.lockedRound,
 			round: state.round,

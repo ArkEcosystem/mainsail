@@ -184,7 +184,7 @@ describe<{
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.block.block.data.id);
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal.getData().block.data.id);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastPrecommit(precommit1);
@@ -206,7 +206,7 @@ describe<{
 		const commit = await getLastCommit(nodes[0]);
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
-			[proposal.block.block.data.id, commit.block.data.id, commit.block.data.id, commit.block.data.id],
+			[proposal.getData().block.data.id, commit.block.data.id, commit.block.data.id, commit.block.data.id],
 		);
 
 		// Next block
@@ -236,11 +236,11 @@ describe<{
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
-		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.block.block.data.id);
-		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.block.block.data.id);
-		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.block.block.data.id);
-		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.block.block.data.id);
-		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.block.block.data.id);
+		const precommit0 = await makePrecommit(node1, validators[1], 1, 0, proposal0.getData().block.data.id);
+		const precommit1 = await makePrecommit(node1, validators[1], 1, 0, proposal1.getData().block.data.id);
+		const precommit2 = await makePrecommit(node1, validators[1], 1, 0, proposal2.getData().block.data.id);
+		const precommit3 = await makePrecommit(node1, validators[1], 1, 0, proposal3.getData().block.data.id);
+		const precommit4 = await makePrecommit(node1, validators[1], 1, 0, proposal4.getData().block.data.id);
 		stubPrecommit1.callsFake(async () => {
 			stubPrecommit1.restore();
 			await p2p.broadcastPrecommit(precommit0);
@@ -267,11 +267,11 @@ describe<{
 		assert.equal(
 			p2p.precommits.getMessages(1, 0).map((prevote) => prevote.blockId),
 			[
-				proposal0.block.block.data.id,
-				proposal1.block.block.data.id,
-				proposal2.block.block.data.id,
-				proposal3.block.block.data.id,
-				proposal4.block.block.data.id,
+				proposal0.getData().block.data.id,
+				proposal1.getData().block.data.id,
+				proposal2.getData().block.data.id,
+				proposal3.getData().block.data.id,
+				proposal4.getData().block.data.id,
 				commit.block.data.id,
 				commit.block.data.id,
 				commit.block.data.id,

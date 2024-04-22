@@ -105,6 +105,9 @@ const EXCEPTIONS = {
 		],
 		devDependencies: [],
 	},
+	"@mainsail/crypto-key-pair-bls12-381": {
+		dependencies: ["@chainsafe/blst"]
+	},
 };
 
 class Package {
