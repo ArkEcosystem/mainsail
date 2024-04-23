@@ -284,7 +284,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${0} with proposer: ${proposer}`);
-		spyDispatch.calledOnce();
+		spyDispatch.calledTimes(2);
 		spyDispatch.calledWith(Enums.ConsensusEvent.RoundStarted, {
 			height: 1,
 			lockedRound: undefined,

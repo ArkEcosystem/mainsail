@@ -460,6 +460,8 @@ export class Consensus implements Contracts.Consensus.Service {
 		const block = await registeredProposer.prepareBlock(roundState.proposer.getWalletPublicKey(), this.#round);
 		this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
 
+		void this.eventDispatcher.dispatch(Enums.BlockEvent.Forged, block.data);
+
 		return registeredProposer.propose(
 			this.validatorSet.getValidatorIndexByWalletPublicKey(roundState.proposer.getWalletPublicKey()),
 			this.#round,

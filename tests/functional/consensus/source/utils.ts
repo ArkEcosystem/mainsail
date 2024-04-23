@@ -139,8 +139,8 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: numb
 			);
 
 			const listener = {
-				handle: ({ data: commit }: { data: Contracts.Crypto.Commit }) => {
-					if (!height || commit.block.data.height >= height) {
+				handle: ({ data }: { data: Contracts.Crypto.BlockData }) => {
+					if (!height || data.height >= height) {
 						eventDispatcher.forget(event, listener);
 						resolve();
 					}
@@ -185,7 +185,7 @@ export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: numbe
 };
 
 export interface InvalidBlock {
-	block: Contracts.Crypto.Block;
+	block: Contracts.Crypto.BlockData;
 	error: Error;
 }
 export async function snoozeForInvalidBlock(sandbox: Sandbox, height?: number): Promise<InvalidBlock>;
@@ -203,7 +203,7 @@ export async function snoozeForInvalidBlock(
 
 			const listener = {
 				handle: ({ data: { block, error } }: { data: InvalidBlock }) => {
-					if (!height || block.data.height >= height) {
+					if (!height || block.height >= height) {
 						eventDispatcher.forget(event, listener);
 						resolve({ block, error });
 					}
