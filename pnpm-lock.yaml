@@ -3170,6 +3170,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-transaction-multi-payment':
         specifier: workspace:*
         version: link:../crypto-transaction-multi-payment
