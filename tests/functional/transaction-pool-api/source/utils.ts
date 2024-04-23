@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
+import { Enums } from "@mainsail/kernel";
 import { Transfers } from "@mainsail/test-transaction-builders";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -276,3 +277,35 @@ export const getWalletByAddressOrPublicKey = async (
 
 	return wallet;
 };
+
+export interface EvmTransactionResult {
+	result: Contracts.Evm.TransactionResult;
+}
+export async function waitForEvmResult(sandbox: Sandbox): Promise<EvmTransactionResult>;
+export async function waitForEvmResult(sandbox: Sandbox[]): Promise<EvmTransactionResult[]>;
+export async function waitForEvmResult(
+	sandbox: Sandbox | Sandbox[],
+): Promise<EvmTransactionResult | EvmTransactionResult[]> {
+	const function_ = async (sandbox: Sandbox): Promise<EvmTransactionResult> =>
+		new Promise((resolve) => {
+			const event = Enums.EvmEvent.CallExecuted;
+			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+				Identifiers.Services.EventDispatcher.Service,
+			);
+
+			const listener = {
+				handle: ({ data }: { data: Contracts.Evm.TransactionResult }) => {
+					eventDispatcher.forget(event, listener);
+					resolve({ result: data });
+				},
+			};
+
+			eventDispatcher.listen(event, listener);
+		});
+
+	if (Array.isArray(sandbox)) {
+		return Promise.all(sandbox.map((s) => function_(s)));
+	} else {
+		return function_(sandbox);
+	}
+}
