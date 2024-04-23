@@ -4,7 +4,7 @@ import { EvmCalls } from "@mainsail/test-transaction-builders";
 // import { ContractAbis, Identifiers as EvmDevelopmentIdentifiers } from "@mainsail/evm-development";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import { addTransactionsToPool, getWallets, isTransactionCommitted, waitBlock, waitForEvmResult } from "./utils.js";
+import { addTransactionsToPool, getWallets, isTransactionCommitted, waitBlock } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
