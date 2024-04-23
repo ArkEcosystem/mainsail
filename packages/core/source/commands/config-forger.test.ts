@@ -1,4 +1,5 @@
 import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
+import { Keystore } from "@chainsafe/bls-keystore";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -32,7 +33,11 @@ describe<{
 	it("should configure from flags (BIP38)", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags, method: "bip38", password: "password" }).execute(Command);
 
-		assert.equal(readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`), { secrets: [] });
+		const config = readJSONSync(`${process.env.CORE_PATH_CONFIG}/core/validators.json`);
+		assert.equal(config.secrets, []);
+
+		const keystore = Keystore.parse(config.keystore);
+		assert.true(await keystore.verifyPassword("password"));
 	});
 
 	it("should prompt if method is missing", async ({ cli }) => {

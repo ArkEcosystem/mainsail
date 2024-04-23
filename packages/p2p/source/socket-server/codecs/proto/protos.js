@@ -6611,7 +6611,7 @@ $root.postTransactions = (function() {
          * @memberof postTransactions
          * @interface IPostTransactionsResponse
          * @property {shared.IHeaders|null} [headers] PostTransactionsResponse headers
-         * @property {Array.<string>|null} [accept] PostTransactionsResponse accept
+         * @property {Array.<number>|null} [accept] PostTransactionsResponse accept
          */
 
         /**
@@ -6640,7 +6640,7 @@ $root.postTransactions = (function() {
 
         /**
          * PostTransactionsResponse accept.
-         * @member {Array.<string>} accept
+         * @member {Array.<number>} accept
          * @memberof postTransactions.PostTransactionsResponse
          * @instance
          */
@@ -6672,9 +6672,12 @@ $root.postTransactions = (function() {
                 writer = $Writer.create();
             if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.accept != null && message.accept.length)
+            if (message.accept != null && message.accept.length) {
+                writer.uint32(/* id 2, wireType 2 =*/18).fork();
                 for (var i = 0; i < message.accept.length; ++i)
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.accept[i]);
+                    writer.int32(message.accept[i]);
+                writer.ldelim();
+            }
             return writer;
         };
 
@@ -6716,7 +6719,12 @@ $root.postTransactions = (function() {
                 case 2: {
                         if (!(message.accept && message.accept.length))
                             message.accept = [];
-                        message.accept.push(reader.string());
+                        if ((tag & 7) === 2) {
+                            var end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.accept.push(reader.int32());
+                        } else
+                            message.accept.push(reader.int32());
                         break;
                     }
                 default:
@@ -6763,8 +6771,8 @@ $root.postTransactions = (function() {
                 if (!Array.isArray(message.accept))
                     return "accept: array expected";
                 for (var i = 0; i < message.accept.length; ++i)
-                    if (!$util.isString(message.accept[i]))
-                        return "accept: string[] expected";
+                    if (!$util.isInteger(message.accept[i]))
+                        return "accept: integer[] expected";
             }
             return null;
         };
@@ -6791,7 +6799,7 @@ $root.postTransactions = (function() {
                     throw TypeError(".postTransactions.PostTransactionsResponse.accept: array expected");
                 message.accept = [];
                 for (var i = 0; i < object.accept.length; ++i)
-                    message.accept[i] = String(object.accept[i]);
+                    message.accept[i] = object.accept[i] | 0;
             }
             return message;
         };

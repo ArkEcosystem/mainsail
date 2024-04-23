@@ -1,6 +1,5 @@
 import * as $protobuf from "protobufjs/minimal.js";
 import Long from "long";
-
 /** Namespace getApiNodes. */
 export namespace getApiNodes {
 
@@ -2809,7 +2808,7 @@ export namespace postTransactions {
         headers?: (shared.IHeaders|null);
 
         /** PostTransactionsResponse accept */
-        accept?: (string[]|null);
+        accept?: (number[]|null);
     }
 
     /** Represents a PostTransactionsResponse. */
@@ -2825,7 +2824,7 @@ export namespace postTransactions {
         public headers?: (shared.IHeaders|null);
 
         /** PostTransactionsResponse accept. */
-        public accept: string[];
+        public accept: number[];
 
         /**
          * Creates a new PostTransactionsResponse instance using the specified properties.

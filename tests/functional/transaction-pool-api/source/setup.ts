@@ -179,7 +179,7 @@ const bootstrap = async (sandbox: Sandbox) => {
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 
-	const consensus = sandbox.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 
 	void consensus.run();
 };

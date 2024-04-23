@@ -107,13 +107,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
-		const block = unit.getBlock();
-		const height = block.data.height;
-		const totalTransactions = block.data.numberOfTransactions;
-
 		if (!this.state.isBootstrap()) {
 			this.logger.info(
-				`Block ${height.toLocaleString()} with ${totalTransactions.toLocaleString()} tx(s) committed`,
+				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${unit.getBlock().data.numberOfTransactions.toLocaleString()} tx(s) committed`,
 			);
 		}
 	}

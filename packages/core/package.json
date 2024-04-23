@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/core",
-	"version": "0.0.1-alpha.14",
+	"version": "0.0.1-alpha.16",
 	"description": "Core CLI commands for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -28,6 +28,7 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@chainsafe/bls-keystore": "3.0.1",
 		"@mainsail/api-common": "workspace:*",
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/api-development": "workspace:*",

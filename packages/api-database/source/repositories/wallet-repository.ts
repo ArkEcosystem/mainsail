@@ -14,7 +14,18 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			options?: Options,
 		): Promise<ResultsPage<Wallet>> {
 			const walletExpression = await WalletFilter.getExpression(walletCriteria);
-			return this.listByExpression(walletExpression, convertToJsonbSorting(sorting), pagination, options);
+			return this.listByExpression(
+				walletExpression,
+				convertToJsonbSorting(sorting, [
+					{
+						direction: "desc",
+						jsonFieldAccessor: { cast: "bigint", fieldName: "balance", operator: "->>" },
+						property: "attributes",
+					},
+				]),
+				pagination,
+				options,
+			);
 		},
 
 		async findManyDelegatesByCritera(
@@ -24,20 +35,24 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			options?: Options,
 		): Promise<ResultsPage<Wallet>> {
 			const walletExpression = await DelegateFilter.getExpression(delegateCriteria);
-			return this.listByExpression(walletExpression, convertToJsonbSorting(sorting), pagination, options);
+			return this.listByExpression(
+				walletExpression,
+				convertToJsonbSorting(sorting, [
+					{
+						direction: "asc",
+						jsonFieldAccessor: { cast: "bigint", fieldName: "validatorRank", operator: "->>" },
+						property: "attributes",
+					},
+				]),
+				pagination,
+				options,
+			);
 		},
 	});
 
-const convertToJsonbSorting = (sorting: Sorting): Sorting => {
+const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
 	if (sorting.length === 0) {
-		// default sort
-		return [
-			{
-				direction: "desc",
-				jsonFieldAccessor: { cast: "bigint", fieldName: "balance", operator: "->>" },
-				property: "attributes",
-			},
-		];
+		return defaultSort;
 	}
 
 	return sorting.map(

@@ -12,7 +12,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 	@inject(Identifiers.ConsensusStorage.Service)
 	private readonly storage!: Contracts.ConsensusStorage.Service;
 
-	public async run(): Promise<Contracts.Consensus.ConsensusState | undefined> {
+	public async run(): Promise<Contracts.Consensus.State | undefined> {
 		const proposals = await this.storage.getProposals();
 
 		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`);
@@ -38,7 +38,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 			roundState.addPrecommit(precommit);
 		}
 
-		const state = (await this.storage.getState()) as Utils.Mutable<Contracts.Consensus.ConsensusState> | undefined;
+		const state = (await this.storage.getState()) as Utils.Mutable<Contracts.Consensus.State> | undefined;
 		if (!state) {
 			return undefined;
 		}

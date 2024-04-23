@@ -8,6 +8,7 @@ import { PublicKeyFactory } from "./public.js";
 import { schemas } from "./schemas.js";
 import { PublicKeySerializer } from "./serializer.js";
 
+export * from "./get-bls.js";
 export * from "./pair.js";
 export * from "./private.js";
 export * from "./public.js";

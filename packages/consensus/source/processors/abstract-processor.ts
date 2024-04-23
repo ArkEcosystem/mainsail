@@ -32,7 +32,7 @@ export class AbstractProcessor {
 		return dayjs().isAfter(dayjs(earliestTime));
 	}
 
-	protected getConsensus(): Contracts.Consensus.ConsensusService {
-		return this.app.get<Contracts.Consensus.ConsensusService>(Identifiers.Consensus.Service);
+	protected getConsensus(): Contracts.Consensus.Service {
+		return this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 	}
 }
