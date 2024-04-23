@@ -3197,12 +3197,18 @@ importers:
       '@mainsail/crypto-transaction-vote':
         specifier: workspace:*
         version: link:../crypto-transaction-vote
+      '@mainsail/evm-development':
+        specifier: workspace:*
+        version: link:../evm-development
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ethers:
+        specifier: ^6.11.0
+        version: 6.11.1
     devDependencies:
       '@types/chance':
         specifier: 1.1.6
@@ -3680,9 +3686,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
-      '@mainsail/crypto-address-bech32m':
+      '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
-        version: link:../../../packages/crypto-address-bech32m
+        version: link:../../../packages/crypto-address-keccak256
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../../../packages/crypto-block
@@ -3698,9 +3704,9 @@ importers:
       '@mainsail/crypto-hash-bcrypto':
         specifier: workspace:*
         version: link:../../../packages/crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../../../packages/crypto-key-pair-schnorr
+        version: link:../../../packages/crypto-key-pair-ecdsa
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
@@ -3710,6 +3716,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-evm-call
       '@mainsail/crypto-transaction-multi-payment':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction-multi-payment
@@ -3749,6 +3758,9 @@ importers:
       '@mainsail/evm':
         specifier: workspace:*
         version: link:../../../packages/evm
+      '@mainsail/evm-development':
+        specifier: workspace:*
+        version: link:../../../packages/evm-development
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../../../packages/fees

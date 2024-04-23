@@ -84,3 +84,7 @@ export enum QueueEvent {
 	Finished = "queue.finished",
 	Failed = "queue.failed",
 }
+
+export enum EvmEvent {
+	CallExecuted = "evm.call.executed",
+}
