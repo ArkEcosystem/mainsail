@@ -1,16 +1,13 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
-import { Enums, Utils as AppUtils } from "@mainsail/kernel";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { EvmCallTransaction } from "../versions/index.js";
 
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
@@ -72,9 +69,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			// - like subtracting gas from sender
 			// - populating indexes, etc.
 			this.logger.debug(`executed EVM call (success=${result.success}, gasUsed=${result.gasUsed})`);
-
-			// TODO: don't emit when running in tx pool context
-			void this.eventDispatcher.dispatch(Enums.EvmEvent.CallExecuted, result);
 		} catch (error) {
 			this.logger.critical(`invalid EVM call: ${error.stack}`);
 		}

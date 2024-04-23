@@ -4,7 +4,7 @@ import { EvmCalls } from "@mainsail/test-transaction-builders";
 // import { ContractAbis, Identifiers as EvmDevelopmentIdentifiers } from "@mainsail/evm-development";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import { addTransactionsToPool, getWallets, waitForEvmResult } from "./utils.js";
+import { addTransactionsToPool, getWallets, isTransactionCommitted, waitBlock, waitForEvmResult } from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -29,8 +29,7 @@ describe<{
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		const { result } = await waitForEvmResult(context.sandbox);
-		console.log(result);
-		assert.true(result.success);
+		await waitBlock(context);
+		await isTransactionCommitted(context, tx);
 	});
 });
