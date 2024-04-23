@@ -71,14 +71,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerActions(): void {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("applyTransaction", new ApplyTransactionAction());
+			.bind("applyTransaction", this.app.resolve(ApplyTransactionAction));
 
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("throwIfCannotEnterPool", new ThrowIfCannotEnterPoolAction());
+			.bind("throwIfCannotEnterPool", this.app.resolve(ThrowIfCannotEnterPoolAction));
 
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("verifyTransaction", new VerifyTransactionAction());
+			.bind("verifyTransaction", this.app.resolve(VerifyTransactionAction));
 	}
 }
