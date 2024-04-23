@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers } from "ethers";
 
-import { Identifiers as EvmDevelopmentIdentifiers } from "./identifiers.js";
 import { ERC20 } from "./contracts.ts/index.js";
+import { Identifiers as EvmDevelopmentIdentifiers } from "./identifiers.js";
 
 @injectable()
 export class Deployer {

@@ -2,13 +2,10 @@ import { Contracts } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { ContractAbis, Identifiers as EvmDevelopmentIdentifiers } from "@mainsail/evm-development";
 import { BigNumber } from "@mainsail/utils";
-import { ethers } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 
 import { Context, EvmCallOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey } from "./utils.js";
-import { BigNumberish } from "ethers";
-
-export { ContractAbis };
 
 export const makeEvmCall = async (
 	{ sandbox, wallets }: Context,
@@ -41,3 +38,5 @@ export const encodeErc20Transfer = (recipient: string, amount: BigNumberish): st
 	const iface = new ethers.Interface(ContractAbis.ERC20.abi.abi);
 	return iface.encodeFunctionData("transfer", [recipient, amount]).slice(2);
 };
+
+export { ContractAbis } from "@mainsail/evm-development";
