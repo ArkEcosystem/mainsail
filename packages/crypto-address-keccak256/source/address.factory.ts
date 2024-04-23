@@ -8,6 +8,10 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	@tagged("type", "wallet")
 	private readonly keyPairFactory!: Contracts.Crypto.KeyPairFactory;
 
+	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
+	@tagged("type", "wallet")
+	private readonly publicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
+
 	public async fromMnemonic(passphrase: string): Promise<string> {
 		return this.fromPublicKey((await this.keyPairFactory.fromMnemonic(passphrase)).publicKey);
 	}
@@ -21,11 +25,11 @@ export class AddressFactory implements Contracts.Crypto.AddressFactory {
 	}
 
 	public async fromMultiSignatureAsset(asset: Contracts.Crypto.MultiSignatureAsset): Promise<string> {
-		return "";
+		return this.fromPublicKey(await this.publicKeyFactory.fromMultiSignatureAsset(asset));
 	}
 
 	public async fromPrivateKey(privateKey: Contracts.Crypto.KeyPair): Promise<string> {
-		return "";
+		return this.fromPublicKey(privateKey.publicKey);
 	}
 
 	public async fromBuffer(buffer: Buffer): Promise<string> {
