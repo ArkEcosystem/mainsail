@@ -2,10 +2,10 @@ use std::{str::FromStr, sync::Arc};
 
 use ctx::{JsTransactionContext, TxContext};
 use mainsail_evm_core::EvmInstance;
-use napi::{bindgen_prelude::*, JsBigInt, JsBuffer, JsObject, JsString};
+use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{JsTransactionResult, TxResult};
-use revm::primitives::{AccountInfo, Address, Bytes, ExecutionResult, Log, U256};
+use result::TxResult;
+use revm::primitives::{AccountInfo, Address, ExecutionResult, U256};
 
 mod ctx;
 mod result;
@@ -69,10 +69,10 @@ impl EvmInner {
 
         let evm = &mut self.evm_instance.as_mut().expect("get evm").context.evm;
 
-        let db = &mut evm.db;
+        let mut db = evm.db.clone();
         let journal = &mut evm.journaled_state;
 
-        let (account, _) = journal.load_account(address, db).unwrap();
+        let (account, _) = journal.load_account(address, &mut db).unwrap();
         account.info = account_info;
     }
 
@@ -81,10 +81,10 @@ impl EvmInner {
 
         let evm = &mut self.evm_instance.as_mut().expect("get evm").context.evm;
 
-        let db = &mut evm.db;
+        let mut db = evm.db.clone();
         let journal = &mut evm.journaled_state;
 
-        let (account, _) = journal.load_account(address, db).unwrap();
+        let (account, _) = journal.load_account(address, &mut db).unwrap();
         Some(account.info.clone())
     }
 
