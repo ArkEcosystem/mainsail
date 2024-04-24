@@ -1,20 +1,26 @@
 export interface Instance {
-	transact(txContext: TransactionContext): Promise<TransactionResult>;
-	view(txContext: TransactionContext): Promise<TransactionResult>;
+	process(txContext: TransactionContext): Promise<ProcessResult>;
+	commit(): Promise<CommitResult>;
 }
+
+export interface ProcessResult {
+	readonly receipt: TransactionReceipt;
+}
+export interface CommitResult {}
 
 export interface TransactionContext {
-	caller: string;
+	readonly readonly: boolean;
+	readonly caller: string;
 	/** Omit recipient when deploying a contract */
-	recipient?: string;
-	data: Buffer;
+	readonly recipient?: string;
+	readonly data: Buffer;
 }
 
-export interface TransactionResult {
-	gasUsed: bigint;
-	gasRefunded: bigint;
-	success: boolean;
-	deployedContractAddress?: string;
-	logs: any;
-	output?: Buffer;
+export interface TransactionReceipt {
+	readonly gasUsed: bigint;
+	readonly gasRefunded: bigint;
+	readonly success: boolean;
+	readonly deployedContractAddress?: string;
+	readonly logs: any;
+	readonly output?: Buffer;
 }

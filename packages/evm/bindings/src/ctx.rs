@@ -1,4 +1,4 @@
-use napi::{JsBuffer, JsString};
+use napi::{JsBoolean, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{Address, Bytes};
 
@@ -10,9 +10,11 @@ pub struct JsTransactionContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<JsString>,
     pub data: JsBuffer,
+    pub readonly: JsBoolean,
 }
 
 pub struct TxContext {
+    pub readonly: bool,
     pub caller: Address,
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
@@ -32,6 +34,7 @@ impl TryFrom<JsTransactionContext> for TxContext {
         };
 
         let tx_ctx = TxContext {
+            readonly: value.readonly.get_value()?,
             recipient,
             caller: utils::create_address_from_js_string(value.caller)?,
             data: Bytes::from(buf.as_ref().to_owned()),

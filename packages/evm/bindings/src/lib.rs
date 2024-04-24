@@ -1,11 +1,14 @@
-use std::{str::FromStr, sync::Arc};
+use std::{convert::Infallible, str::FromStr, sync::Arc};
 
 use ctx::{JsTransactionContext, TxContext};
 use mainsail_evm_core::EvmInstance;
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::TxResult;
-use revm::primitives::{AccountInfo, Address, ExecutionResult, U256};
+use result::TxReceipt;
+use revm::{
+    primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
+    DatabaseCommit,
+};
 
 mod ctx;
 mod result;
@@ -15,6 +18,7 @@ mod utils;
 pub struct EvmInner {
     // 'Option' is used because of the ownership changing when updating the EVM.
     evm_instance: Option<EvmInstance>,
+    pending_commits: Vec<ResultAndState>,
 }
 
 // NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
@@ -61,6 +65,7 @@ impl EvmInner {
         let evm = mainsail_evm_core::create_evm_instance();
         EvmInner {
             evm_instance: Some(evm),
+            pending_commits: Default::default(),
         }
     }
 
@@ -88,15 +93,39 @@ impl EvmInner {
         Some(account.info.clone())
     }
 
-    pub fn transact(&mut self, tx_ctx: TxContext) -> TxResult {
-        self.transact_evm(tx_ctx, true)
+    pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
+        let add_commit = !tx_ctx.readonly;
+
+        let result = self.transact_evm(tx_ctx);
+
+        match result {
+            Ok(result) => {
+                let receipt = map_execution_result(result.result.clone());
+
+                if add_commit {
+                    self.pending_commits.push(result);
+                }
+
+                Ok(receipt)
+            }
+            Err(_) => todo!(),
+        }
     }
 
-    pub fn transact_readonly(&mut self, tx_ctx: TxContext) -> TxResult {
-        self.transact_evm(tx_ctx, false)
+    pub fn commit(&mut self) {
+        let db = self.evm_instance.as_mut().expect("get evm").db_mut();
+
+        println!("committing {} transactions", self.pending_commits.len());
+
+        for pending in self.pending_commits.drain(..) {
+            db.commit(pending.state);
+        }
     }
 
-    fn transact_evm(&mut self, tx_ctx: TxContext, commit: bool) -> TxResult {
+    fn transact_evm(
+        &mut self,
+        tx_ctx: TxContext,
+    ) -> std::result::Result<ResultAndState, EVMError<Infallible>> {
         let mut evm = self.evm_instance.take().expect("ok");
 
         evm = evm
@@ -116,61 +145,58 @@ impl EvmInner {
             })
             .build();
 
-        let result = if commit {
-            evm.transact_commit()
-        } else {
-            // TODO: return state to caller?
-            evm.transact()
-                .map(|result_and_state| result_and_state.result)
-        };
+        let result = evm.transact();
 
         self.evm_instance.replace(evm);
 
-        match result {
-            Ok(result) => match result {
-                ExecutionResult::Success {
-                    gas_used,
-                    gas_refunded,
-                    output,
-                    logs,
-                    ..
-                } => match output {
-                    revm::primitives::Output::Call(output) => TxResult {
-                        gas_used,
-                        gas_refunded,
-                        success: true,
-                        deployed_contract_address: None,
-                        logs: Some(logs),
-                        output: Some(output),
-                    },
-                    revm::primitives::Output::Create(output, address) => TxResult {
-                        gas_used,
-                        gas_refunded,
-                        success: true,
-                        deployed_contract_address: address.map(|address| address.to_string()),
-                        logs: Some(logs),
-                        output: Some(output),
-                    },
-                },
-                ExecutionResult::Revert { gas_used, output } => TxResult {
-                    gas_used,
-                    success: false,
-                    gas_refunded: 0,
-                    deployed_contract_address: None,
-                    logs: None,
-                    output: Some(output),
-                },
-                ExecutionResult::Halt { gas_used, .. } => TxResult {
-                    gas_used,
-                    success: false,
-                    gas_refunded: 0,
-                    deployed_contract_address: None,
-                    logs: None,
-                    output: None,
-                },
+        // TODO: error handling
+
+        result
+    }
+}
+
+fn map_execution_result(result: ExecutionResult) -> TxReceipt {
+    match result {
+        ExecutionResult::Success {
+            gas_used,
+            gas_refunded,
+            output,
+            logs,
+            ..
+        } => match output {
+            revm::primitives::Output::Call(output) => TxReceipt {
+                gas_used,
+                gas_refunded,
+                success: true,
+                deployed_contract_address: None,
+                logs: Some(logs),
+                output: Some(output),
             },
-            Err(_err) => todo!(), // TODO: should never happen?
-        }
+            revm::primitives::Output::Create(output, address) => TxReceipt {
+                gas_used,
+                gas_refunded,
+                success: true,
+                deployed_contract_address: address.map(|address| address.to_string()),
+                logs: Some(logs),
+                output: Some(output),
+            },
+        },
+        ExecutionResult::Revert { gas_used, output } => TxReceipt {
+            gas_used,
+            success: false,
+            gas_refunded: 0,
+            deployed_contract_address: None,
+            logs: None,
+            output: Some(output),
+        },
+        ExecutionResult::Halt { gas_used, .. } => TxReceipt {
+            gas_used,
+            success: false,
+            gas_refunded: 0,
+            deployed_contract_address: None,
+            logs: None,
+            output: None,
+        },
     }
 }
 
@@ -197,22 +223,20 @@ impl JsEvmWrapper {
         }
     }
 
-    #[napi(ts_return_type = "Promise<JsTransactionResult>")]
-    pub fn transact(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
+    #[napi(ts_return_type = "Promise<JsProcessResult>")]
+    pub fn process(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
         let tx_ctx = TxContext::try_from(tx_ctx)?;
         node_env.execute_tokio_future(
-            Self::transact_async(self.evm.clone(), tx_ctx),
-            |&mut node_env, result| Ok(result::JsTransactionResult::new(node_env, result)?),
+            Self::process_async(self.evm.clone(), tx_ctx),
+            |&mut node_env, result| Ok(result::JsProcessResult::new(&node_env, result)?),
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsTransactionResult>")]
-    pub fn view(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
-        let tx_ctx = TxContext::try_from(tx_ctx)?;
-        node_env.execute_tokio_future(
-            Self::view_async(self.evm.clone(), tx_ctx),
-            |&mut node_env, result| Ok(result::JsTransactionResult::new(node_env, result)?),
-        )
+    #[napi(ts_return_type = "Promise<JsCommitResult>")]
+    pub fn commit(&mut self, node_env: Env) -> Result<JsObject> {
+        node_env.execute_tokio_future(Self::commit_async(self.evm.clone()), |&mut node_env, _| {
+            Ok(result::JsCommitResult::new(&node_env)?)
+        })
     }
 
     #[napi(ts_return_type = "Promise<JsAccountInfo>")]
@@ -238,21 +262,17 @@ impl JsEvmWrapper {
         )
     }
 
-    async fn transact_async(
+    async fn process_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         tx_ctx: TxContext,
-    ) -> Result<TxResult> {
+    ) -> Result<TxReceipt> {
         let mut lock = evm.lock().await;
-        let result = lock.transact(tx_ctx);
-        Ok(result)
+        lock.process(tx_ctx)
     }
 
-    async fn view_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        tx_ctx: TxContext,
-    ) -> Result<TxResult> {
+    async fn commit_async(evm: Arc<tokio::sync::Mutex<EvmInner>>) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.transact_readonly(tx_ctx);
+        let result = lock.commit();
         Ok(result)
     }
 

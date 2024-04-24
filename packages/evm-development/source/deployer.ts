@@ -29,17 +29,20 @@ export class Deployer {
 
 		this.#genesisAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
-		const result = await this.evm.transact({
+		const result = await this.evm.process({
+			readonly: false,
 			caller: this.#genesisAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 		});
 
-		if (!result.success) {
+		await this.evm.commit();
+
+		if (!result.receipt.success) {
 			throw new Error("failed to deploy erc20 contract");
 		}
 
 		this.logger.info(
-			`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.deployedContractAddress}`,
+			`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.receipt.deployedContractAddress}`,
 		);
 
 		const recipients = [
@@ -49,9 +52,9 @@ export class Deployer {
 		this.app.bind(EvmDevelopmentIdentifiers.Wallets.Funded).toConstantValue(recipients);
 		this.app
 			.bind(EvmDevelopmentIdentifiers.Contracts.Addresses.Erc20)
-			.toConstantValue(result.deployedContractAddress!);
+			.toConstantValue(result.receipt.deployedContractAddress!);
 
-		await this.ensureFunds(result.deployedContractAddress!, recipients);
+		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients);
 	}
 
 	private async ensureFunds(erc20ContractAddress: string, recipients: string[]): Promise<void> {
@@ -61,15 +64,18 @@ export class Deployer {
 		for (const recipient of recipients) {
 			const encodedCall = iface.encodeFunctionData("transfer", [recipient, amount]);
 
-			const result = await this.evm.transact({
+			const { receipt } = await this.evm.process({
+				readonly: false,
 				caller: this.#genesisAddress,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				recipient: erc20ContractAddress,
 			});
 
-			if (!result.success) {
+			if (!receipt.success) {
 				throw new Error("failed to ensure funds");
 			}
 		}
+
+		await this.evm.commit();
 	}
 }
