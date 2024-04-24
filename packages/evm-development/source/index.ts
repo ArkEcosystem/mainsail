@@ -4,6 +4,9 @@ import { Providers } from "@mainsail/kernel";
 
 import { Deployer } from "./deployer.js";
 
+export * as ContractAbis from "./contracts.ts/index.js";
+export { Identifiers } from "./identifiers.js";
+
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {}

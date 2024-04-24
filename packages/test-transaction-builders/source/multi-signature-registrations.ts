@@ -197,7 +197,7 @@ export const makeInvalidMultiSignatureRegistratioOutsideMinMaxParticipants = asy
 	const registrationTx1 = makeMultiSignatureRegistration(context, {
 		callback: async (transaction) => {
 			// set min participants to 0
-			transaction.serialized.fill(0, 58, 59);
+			transaction.serialized.fill(0, 59, 60);
 		},
 		participants: minimumParticipants,
 		sender: randomWallet,

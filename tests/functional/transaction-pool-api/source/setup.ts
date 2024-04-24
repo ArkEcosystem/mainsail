@@ -1,5 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Bootstrap, Providers } from "@mainsail/kernel";
+import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
 
@@ -16,7 +16,8 @@ const setup = async () => {
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
-		.toConstantValue({ dispatch: () => {}, listen: () => {} });
+		.to(Services.Events.MemoryEventDispatcher)
+		.inSingletonScope();
 
 	// TODO:
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
@@ -61,15 +62,16 @@ const setup = async () => {
 		"@mainsail/crypto-validation",
 		"@mainsail/crypto-hash-bcrypto",
 		"@mainsail/crypto-signature-schnorr",
-		"@mainsail/crypto-key-pair-schnorr",
+		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-consensus-bls12-381",
-		"@mainsail/crypto-address-bech32m",
+		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
 		"@mainsail/fees",
 		"@mainsail/fees-static",
 		"@mainsail/evm",
+		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-username-registration",
 		"@mainsail/crypto-transaction-username-resignation",
@@ -79,6 +81,7 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-multi-signature-registration",
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
+		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool",

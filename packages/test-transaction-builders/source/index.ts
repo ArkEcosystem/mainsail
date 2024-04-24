@@ -1,3 +1,4 @@
+export * as EvmCalls from "./evm-calls.js";
 export * as MultiPayments from "./multi-payments.js";
 export * as MultiSignatureRegistrations from "./multi-signature-registrations.js";
 export * as Transfers from "./transfers.js";

@@ -4,6 +4,7 @@ import { Utils } from "@mainsail/kernel";
 import { ethers } from "ethers";
 
 import { ERC20 } from "./contracts.ts/index.js";
+import { Identifiers as EvmDevelopmentIdentifiers } from "./identifiers.js";
 
 @injectable()
 export class Deployer {
@@ -44,6 +45,12 @@ export class Deployer {
 		const recipients = [
 			...new Set(genesisBlock.block.transactions.map(({ recipientId }) => recipientId!).filter(Boolean)),
 		];
+
+		this.app.bind(EvmDevelopmentIdentifiers.Wallets.Funded).toConstantValue(recipients);
+		this.app
+			.bind(EvmDevelopmentIdentifiers.Contracts.Addresses.Erc20)
+			.toConstantValue(result.deployedContractAddress!);
+
 		await this.ensureFunds(result.deployedContractAddress!, recipients);
 	}
 
