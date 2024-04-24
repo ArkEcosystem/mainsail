@@ -6,7 +6,7 @@ import { BigNumber } from "@mainsail/utils";
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "mock")
+	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Application.Instance)
