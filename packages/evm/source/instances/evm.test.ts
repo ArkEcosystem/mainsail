@@ -20,80 +20,95 @@ describe<{
 	it("should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
-		const result = await instance.transact({
+		const { receipt } = await instance.process({
+			readonly: true,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 		});
 
-		assert.true(result.success);
-		assert.equal(result.gasUsed, 964_156n);
-		assert.equal(result.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
 	it("should deploy, transfer and call balanceOf", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
-		const result = await instance.transact({
+		let { receipt } = await instance.process({
+			readonly: false,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 		});
 
-		assert.true(result.success);
-		assert.equal(result.gasUsed, 964_156n);
-		assert.equal(result.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+		// TODO: other tx need to see changes inside a commit
+		await instance.commit();
 
-		const contractAddress = result.deployedContractAddress;
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+
+		const contractAddress = receipt.deployedContractAddress;
 		assert.defined(contractAddress);
 
 		const iface = new ethers.Interface(abi);
 		const amount = ethers.parseEther("1000");
 
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
-		const transferResult = await instance.transact({
+		({ receipt } = await instance.process({
+			readonly: false,
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
-		});
+		}));
+		// TODO: other tx need to see changes inside a commit
+		await instance.commit();
 
-		assert.true(transferResult.success);
-		assert.equal(transferResult.gasUsed, 52_222n);
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 52_222n);
 
 		const balanceOfEncodedCall = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		const balanceOfResult = await instance.view({
+		({ receipt } = await instance.process({
+			readonly: true,
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(balanceOfEncodedCall)),
 			recipient: contractAddress,
-		});
+		}));
 
-		assert.true(balanceOfResult.success);
-		assert.equal(balanceOfResult.gasUsed, 24_295n);
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 24_295n);
 	});
 
 	it("should revert on invalid call", async ({ instance }) => {
 		const [sender] = wallets;
 
-		let result = await instance.transact({
+		let { receipt } = await instance.process({
+			readonly: false,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 		});
 
-		const contractAddress = result.deployedContractAddress;
+		// TODO: other tx need to see changes inside a commit
+		await instance.commit();
+
+		const contractAddress = receipt.deployedContractAddress;
 		assert.defined(contractAddress);
 
-		result = await instance.transact({
+		({ receipt } = await instance.process({
+			readonly: false,
 			caller: sender.address,
 			data: Buffer.from("0xdead", "hex"),
 			recipient: contractAddress,
-		});
+		}));
 
-		assert.false(result.success);
-		assert.equal(result.gasUsed, 21_070n);
+		assert.false(receipt.success);
+		assert.equal(receipt.gasUsed, 21_070n);
 	});
 
 	it("should throw on invalid tx context caller", async ({ instance }) => {
 		await assert.rejects(
 			async () =>
-				await instance.transact({
+				await instance.process({
+					readonly: false,
 					caller: "badsender_",
 					data: Buffer.from(bytecode.slice(2), "hex"),
 				}),
