@@ -3,13 +3,7 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class MockInstance implements Contracts.Evm.Instance {
-	private _pendingTransactions: Contracts.Evm.TransactionContext[] = [];
-
 	public async process(txContext: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.ProcessResult> {
-		if (!txContext.readonly) {
-			this._pendingTransactions.push(txContext);
-		}
-
 		return {
 			receipt: {
 				gasRefunded: BigInt(0),
@@ -19,10 +13,7 @@ export class MockInstance implements Contracts.Evm.Instance {
 			},
 		};
 	}
-
-	public async commit(): Promise<Contracts.Evm.CommitResult> {
-		this._pendingTransactions = [];
-
-		return {};
-	}
+	public async setAutoCommit(enabled: boolean): Promise<void> {}
+	public async configure(height: bigint, round: bigint): Promise<void> {}
+	public async onCommit(_: Contracts.Processor.ProcessableUnit): Promise<void> {}
 }

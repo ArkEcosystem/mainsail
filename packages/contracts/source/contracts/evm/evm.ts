@@ -1,6 +1,8 @@
-export interface Instance {
+import { CommitHandler } from "../crypto/commit.js";
+
+export interface Instance extends CommitHandler {
+	setAutoCommit(enabled: boolean): Promise<void>;
 	process(txContext: TransactionContext): Promise<ProcessResult>;
-	commit(): Promise<CommitResult>;
 }
 
 export interface ProcessResult {
@@ -9,11 +11,16 @@ export interface ProcessResult {
 export interface CommitResult {}
 
 export interface TransactionContext {
-	readonly readonly: boolean;
 	readonly caller: string;
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
 	readonly data: Buffer;
+	readonly roundKey?: RoundKey;
+}
+
+export interface RoundKey {
+	readonly height: bigint;
+	readonly round: bigint;
 }
 
 export interface TransactionReceipt {

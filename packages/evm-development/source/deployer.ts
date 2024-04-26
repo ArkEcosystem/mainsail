@@ -24,18 +24,17 @@ export class Deployer {
 	#genesisAddress!: string;
 
 	public async deploy(): Promise<void> {
+		await this.evm.setAutoCommit(true);
+
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
 		this.#genesisAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
 		const result = await this.evm.process({
-			readonly: false,
 			caller: this.#genesisAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 		});
-
-		await this.evm.commit();
 
 		if (!result.receipt.success) {
 			throw new Error("failed to deploy erc20 contract");
@@ -55,6 +54,8 @@ export class Deployer {
 			.toConstantValue(result.receipt.deployedContractAddress!);
 
 		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients);
+
+		await this.evm.setAutoCommit(false);
 	}
 
 	private async ensureFunds(erc20ContractAddress: string, recipients: string[]): Promise<void> {
@@ -65,7 +66,6 @@ export class Deployer {
 			const encodedCall = iface.encodeFunctionData("transfer", [recipient, amount]);
 
 			const { receipt } = await this.evm.process({
-				readonly: false,
 				caller: this.#genesisAddress,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				recipient: erc20ContractAddress,
@@ -75,7 +75,5 @@ export class Deployer {
 				throw new Error("failed to ensure funds");
 			}
 		}
-
-		await this.evm.commit();
 	}
 }

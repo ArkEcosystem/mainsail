@@ -60,7 +60,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		try {
 			const { receipt } = await context.evm.process({
-				readonly: false,
+				roundKey: undefined, // TODO
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				recipient: transaction.data.recipientId,

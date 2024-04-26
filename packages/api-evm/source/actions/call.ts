@@ -45,7 +45,6 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		const [data] = parameters;
 
 		const { receipt } = await this.evm.process({
-			readonly: true,
 			caller: data.from,
 			data: Buffer.from(ethers.getBytes(data.data)),
 			recipient: data.to,
