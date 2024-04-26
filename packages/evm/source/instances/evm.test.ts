@@ -91,6 +91,10 @@ describe<{
 		assert.equal(receipt.gasUsed, 21_070n);
 	});
 
+	it("should not throw when commit is empty", async ({ instance }) => {
+		await assert.resolves(async () => await instance.onCommit({ height: 0, round: 0 } as any));
+	});
+
 	it("should throw on invalid tx context caller", async ({ instance }) => {
 		await assert.rejects(
 			async () =>

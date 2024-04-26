@@ -144,17 +144,20 @@ impl EvmInner {
     }
 
     pub fn commit(&mut self, round_key: RoundKey) {
-        let mut pending_commit = self.pending_commit.take().expect("pending commit");
+        match self.pending_commit.take() {
+            Some(mut pending_commit) => {
+                println!(
+                    "committing {:?} with {} transactions",
+                    round_key,
+                    pending_commit.diff.len(),
+                );
 
-        println!(
-            "committing {:?} with {} transactions",
-            round_key,
-            pending_commit.diff.len(),
-        );
-
-        let db = self.evm_instance.as_mut().expect("get evm").db_mut();
-        for pending in pending_commit.diff.drain(..) {
-            db.commit(pending.state);
+                let db = self.evm_instance.as_mut().expect("get evm").db_mut();
+                for pending in pending_commit.diff.drain(..) {
+                    db.commit(pending.state);
+                }
+            }
+            None => (),
         }
     }
     fn transact_evm(
