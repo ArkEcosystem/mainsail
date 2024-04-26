@@ -25,7 +25,8 @@ pub struct EvmInner {
     // Off by default.
     auto_commit: bool,
 
-    // Holds the state diffs for a pending commit. A pending commit consists of one or more transactions.
+    // A pending commit consists of one or more transactions.
+    // TODO: this is a initial temporary solution, waiting for database backend
     pending_commit: Option<PendingCommit>,
 }
 
@@ -79,6 +80,7 @@ impl EvmInner {
     }
 
     pub fn set_auto_commit(&mut self, enabled: bool) {
+        self.pending_commit.take();
         self.auto_commit = enabled;
     }
 
@@ -121,13 +123,10 @@ impl EvmInner {
             Ok(result) => {
                 let receipt = map_execution_result(result.result.clone());
 
-                println!("11 {} {:?}", result.result.gas_used(), round_key);
                 if let Some(round_key) = round_key {
                     let pending_commit = self
                         .pending_commit
                         .get_or_insert_with(|| PendingCommit::new(round_key));
-
-                    println!("22 {:?} {:?}", pending_commit.key, round_key);
 
                     assert_eq!(pending_commit.key, round_key);
                     pending_commit.diff.push(result);
@@ -146,11 +145,12 @@ impl EvmInner {
     pub fn commit(&mut self, round_key: RoundKey) {
         match self.pending_commit.take() {
             Some(mut pending_commit) => {
-                println!(
-                    "committing {:?} with {} transactions",
-                    round_key,
-                    pending_commit.diff.len(),
-                );
+                // println!(
+                //     "committing {:?} with {} transactions",
+                //     round_key,
+                //     pending_commit.diff.len(),
+                // );
+                assert_eq!(pending_commit.key, round_key);
 
                 let db = self.evm_instance.as_mut().expect("get evm").db_mut();
                 for pending in pending_commit.diff.drain(..) {
@@ -168,20 +168,17 @@ impl EvmInner {
 
         // Prepare the EVM to run the given transaction
         let mut original_db = Option::default();
-        println!("transact  {:?}", tx_ctx.round_key);
 
         evm = evm
             .modify()
             .modify_db(|db| {
-                // Ensure pending commits are visible to the current transaction being applied
+                // Ensure pending commits from same round are visible to the transaction being applied
                 if let Some(inner) = tx_ctx.round_key {
-                    println!("transact inner  {:?}", inner);
-                    if let Some(pending) = self.pending_commit.as_ref() {
-                        println!(
-                            "cloning db for {:?} with {} diffs",
-                            pending.key,
-                            pending.diff.len()
-                        );
+                    if let Some(pending) = self
+                        .pending_commit
+                        .as_mut()
+                        .filter(|pending| pending.key == inner)
+                    {
                         // TODO: don't deep clone db
                         let mut temp_db = db.clone();
                         for pending in &pending.diff {
