@@ -1,14 +1,16 @@
 use std::{convert::Infallible, str::FromStr, sync::Arc};
 
-use ctx::{JsTransactionContext, TxContext};
+use ctx::{JsRoundKey, JsTransactionContext, PendingCommit, TxContext};
 use mainsail_evm_core::EvmInstance;
-use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
+use napi::{bindgen_prelude::*, JsBigInt, JsBoolean, JsObject, JsString};
 use napi_derive::napi;
 use result::TxReceipt;
 use revm::{
     primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
     DatabaseCommit,
 };
+
+use crate::ctx::RoundKey;
 
 mod ctx;
 mod result;
@@ -18,7 +20,13 @@ mod utils;
 pub struct EvmInner {
     // 'Option' is used because of the ownership changing when updating the EVM.
     evm_instance: Option<EvmInstance>,
-    pending_commits: Vec<ResultAndState>,
+
+    // Whether transactions are auto committed or not. Useful for testing.
+    // Off by default.
+    auto_commit: bool,
+
+    // Holds the state diffs for a pending commit. A pending commit consists of one or more transactions.
+    pending_commit: Option<PendingCommit>,
 }
 
 // NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
@@ -65,8 +73,13 @@ impl EvmInner {
         let evm = mainsail_evm_core::create_evm_instance();
         EvmInner {
             evm_instance: Some(evm),
-            pending_commits: Default::default(),
+            pending_commit: Default::default(),
+            auto_commit: false,
         }
+    }
+
+    pub fn set_auto_commit(&mut self, enabled: bool) {
+        self.auto_commit = enabled;
     }
 
     pub fn update_account_info(&mut self, address: Address, account_info: AccountInfo) {
@@ -94,7 +107,13 @@ impl EvmInner {
     }
 
     pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
-        let add_commit = !tx_ctx.readonly;
+        let round_key = tx_ctx.round_key.or_else(|| {
+            if self.auto_commit {
+                Some(RoundKey(0, 0))
+            } else {
+                None
+            }
+        });
 
         let result = self.transact_evm(tx_ctx);
 
@@ -102,8 +121,20 @@ impl EvmInner {
             Ok(result) => {
                 let receipt = map_execution_result(result.result.clone());
 
-                if add_commit {
-                    self.pending_commits.push(result);
+                println!("11 {} {:?}", result.result.gas_used(), round_key);
+                if let Some(round_key) = round_key {
+                    let pending_commit = self
+                        .pending_commit
+                        .get_or_insert_with(|| PendingCommit::new(round_key));
+
+                    println!("22 {:?} {:?}", pending_commit.key, round_key);
+
+                    assert_eq!(pending_commit.key, round_key);
+                    pending_commit.diff.push(result);
+
+                    if self.auto_commit {
+                        self.commit(round_key);
+                    }
                 }
 
                 Ok(receipt)
@@ -112,24 +143,53 @@ impl EvmInner {
         }
     }
 
-    pub fn commit(&mut self) {
+    pub fn commit(&mut self, round_key: RoundKey) {
+        let mut pending_commit = self.pending_commit.take().expect("pending commit");
+
+        println!(
+            "committing {:?} with {} transactions",
+            round_key,
+            pending_commit.diff.len(),
+        );
+
         let db = self.evm_instance.as_mut().expect("get evm").db_mut();
-
-        println!("committing {} transactions", self.pending_commits.len());
-
-        for pending in self.pending_commits.drain(..) {
+        for pending in pending_commit.diff.drain(..) {
             db.commit(pending.state);
         }
     }
-
     fn transact_evm(
         &mut self,
         tx_ctx: TxContext,
     ) -> std::result::Result<ResultAndState, EVMError<Infallible>> {
         let mut evm = self.evm_instance.take().expect("ok");
 
+        // Prepare the EVM to run the given transaction
+        let mut original_db = Option::default();
+        println!("transact  {:?}", tx_ctx.round_key);
+
         evm = evm
             .modify()
+            .modify_db(|db| {
+                // Ensure pending commits are visible to the current transaction being applied
+                if let Some(inner) = tx_ctx.round_key {
+                    println!("transact inner  {:?}", inner);
+                    if let Some(pending) = self.pending_commit.as_ref() {
+                        println!(
+                            "cloning db for {:?} with {} diffs",
+                            pending.key,
+                            pending.diff.len()
+                        );
+                        // TODO: don't deep clone db
+                        let mut temp_db = db.clone();
+                        for pending in &pending.diff {
+                            temp_db.commit(pending.state.clone());
+                        }
+
+                        original_db = Some(std::mem::take(db));
+                        *db = temp_db;
+                    }
+                }
+            })
             .modify_tx_env(|tx_env| {
                 tx_env.caller = tx_ctx.caller;
                 tx_env.transact_to = match tx_ctx.recipient {
@@ -146,6 +206,16 @@ impl EvmInner {
             .build();
 
         let result = evm.transact();
+
+        // Reset any pending DB changes by rolling back to the original DB
+        if let Some(mut original_db) = original_db {
+            evm = evm
+                .modify()
+                .modify_db(|db| {
+                    std::mem::swap(db, &mut original_db);
+                })
+                .build();
+        }
 
         self.evm_instance.replace(evm);
 
@@ -223,6 +293,15 @@ impl JsEvmWrapper {
         }
     }
 
+    #[napi(ts_return_type = "Promise<undefined>")]
+    pub fn set_auto_commit(&mut self, node_env: Env, enabled: JsBoolean) -> Result<JsObject> {
+        let enabled = enabled.get_value()?;
+        node_env.execute_tokio_future(
+            Self::set_auto_commit_async(self.evm.clone(), enabled),
+            |&mut node_env, _| Ok(node_env.get_undefined()),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsProcessResult>")]
     pub fn process(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
         let tx_ctx = TxContext::try_from(tx_ctx)?;
@@ -233,10 +312,12 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<JsCommitResult>")]
-    pub fn commit(&mut self, node_env: Env) -> Result<JsObject> {
-        node_env.execute_tokio_future(Self::commit_async(self.evm.clone()), |&mut node_env, _| {
-            Ok(result::JsCommitResult::new(&node_env)?)
-        })
+    pub fn commit(&mut self, node_env: Env, round_key: JsRoundKey) -> Result<JsObject> {
+        let round_key = RoundKey::try_from(round_key)?;
+        node_env.execute_tokio_future(
+            Self::commit_async(self.evm.clone(), round_key),
+            |&mut node_env, _| Ok(result::JsCommitResult::new(&node_env)?),
+        )
     }
 
     #[napi(ts_return_type = "Promise<JsAccountInfo>")]
@@ -262,6 +343,15 @@ impl JsEvmWrapper {
         )
     }
 
+    async fn set_auto_commit_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        enabled: bool,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        lock.set_auto_commit(enabled);
+        Ok(())
+    }
+
     async fn process_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         tx_ctx: TxContext,
@@ -270,9 +360,12 @@ impl JsEvmWrapper {
         lock.process(tx_ctx)
     }
 
-    async fn commit_async(evm: Arc<tokio::sync::Mutex<EvmInner>>) -> Result<()> {
+    async fn commit_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        round_key: RoundKey,
+    ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.commit();
+        let result = lock.commit(round_key);
         Ok(result)
     }
 

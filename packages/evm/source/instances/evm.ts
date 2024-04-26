@@ -1,17 +1,22 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
-import { Evm, JsCommitResult, JsProcessResult, JsTransactionContext } from "../generated/bindings.cjs";
+import { Evm } from "../generated/bindings.cjs";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance {
 	private readonly evm: Evm = new Evm();
 
-	public async process(txContext: JsTransactionContext): Promise<JsProcessResult> {
+	public async setAutoCommit(enabled: boolean): Promise<void> {
+		return this.evm.setAutoCommit(enabled);
+	}
+
+	public async process(txContext: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.ProcessResult> {
 		return this.evm.process(txContext);
 	}
 
-	public async commit(): Promise<JsCommitResult> {
-		return this.evm.commit();
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
+		const { height, round } = unit;
+		await this.evm.commit({ height: BigInt(height), round: BigInt(round) });
 	}
 }
