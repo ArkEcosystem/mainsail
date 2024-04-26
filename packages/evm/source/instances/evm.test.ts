@@ -15,13 +15,13 @@ describe<{
 		await prepareSandbox(context);
 
 		context.instance = context.sandbox.app.resolve<Contracts.Evm.Instance>(EvmInstance);
+		await context.instance.setAutoCommit(true);
 	});
 
 	it("should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
 		const { receipt } = await instance.process({
-			readonly: true,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 		});
@@ -35,13 +35,9 @@ describe<{
 		const [sender, recipient] = wallets;
 
 		let { receipt } = await instance.process({
-			readonly: false,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 		});
-
-		// TODO: other tx need to see changes inside a commit
-		await instance.commit();
 
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
@@ -55,20 +51,16 @@ describe<{
 
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
 		({ receipt } = await instance.process({
-			readonly: false,
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 		}));
-		// TODO: other tx need to see changes inside a commit
-		await instance.commit();
 
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 52_222n);
 
 		const balanceOfEncodedCall = iface.encodeFunctionData("balanceOf", [recipient.address]);
 		({ receipt } = await instance.process({
-			readonly: true,
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(balanceOfEncodedCall)),
 			recipient: contractAddress,
@@ -82,19 +74,14 @@ describe<{
 		const [sender] = wallets;
 
 		let { receipt } = await instance.process({
-			readonly: false,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 		});
-
-		// TODO: other tx need to see changes inside a commit
-		await instance.commit();
 
 		const contractAddress = receipt.deployedContractAddress;
 		assert.defined(contractAddress);
 
 		({ receipt } = await instance.process({
-			readonly: false,
 			caller: sender.address,
 			data: Buffer.from("0xdead", "hex"),
 			recipient: contractAddress,
@@ -108,7 +95,6 @@ describe<{
 		await assert.rejects(
 			async () =>
 				await instance.process({
-					readonly: false,
 					caller: "badsender_",
 					data: Buffer.from(bytecode.slice(2), "hex"),
 				}),
