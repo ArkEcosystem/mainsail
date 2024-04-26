@@ -30,6 +30,6 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 		);
 		strictEqual(transaction.id, deserialized.id);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		await handler.apply({ evm: this.evm, walletRepository: this.#walletRepository }, transaction);
+		await handler.apply({ evm: { instance: this.evm }, walletRepository: this.#walletRepository }, transaction);
 	}
 }

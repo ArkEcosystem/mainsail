@@ -1,5 +1,5 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
-import { Instance } from "./evm/index.js";
+import { Instance, RoundKey } from "./evm/index.js";
 import { EventDispatcher } from "./kernel/events.js";
 import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
 
@@ -7,7 +7,10 @@ export type TransactionHandlerConstructor = new () => TransactionHandler;
 
 export type TransactionHandlerContext = {
 	walletRepository: WalletRepository;
-	evm: Instance;
+	evm: {
+		instance: Instance;
+		roundKey?: RoundKey;
+	};
 };
 
 export interface TransactionHandler {

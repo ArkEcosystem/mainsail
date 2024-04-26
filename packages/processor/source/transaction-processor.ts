@@ -15,17 +15,27 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	async process(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	async process(unit: Contracts.Processor.ProcessableUnit, transaction: Contracts.Crypto.Transaction): Promise<void> {
+		const walletRepository = unit.store.walletRepository;
+
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		if (!(await transactionHandler.verify({ evm: this.evm, walletRepository }, transaction))) {
+		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
+			walletRepository,
+			evm: {
+				instance: this.evm,
+				roundKey: {
+					height: BigInt(unit.height),
+					round: BigInt(unit.round),
+				},
+			},
+		};
+
+		if (!(await transactionHandler.verify(transactionHandlerContext, transaction))) {
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		await transactionHandler.apply({ evm: this.evm, walletRepository }, transaction);
+		await transactionHandler.apply(transactionHandlerContext, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 

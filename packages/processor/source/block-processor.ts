@@ -60,7 +60,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.verifier.verify(unit);
 
 			for (const transaction of unit.getBlock().transactions) {
-				await this.transactionProcessor.process(unit.store.walletRepository, transaction);
+				await this.transactionProcessor.process(unit, transaction);
 			}
 
 			await this.#applyBlockToForger(unit);
@@ -94,7 +94,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
-		await this.evm.commit();
+		await this.evm.onCommit(unit);
 
 		if (this.apiSync) {
 			await this.apiSync.onCommit(unit);

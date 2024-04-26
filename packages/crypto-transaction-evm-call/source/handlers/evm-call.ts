@@ -59,8 +59,9 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
-			const { receipt } = await context.evm.process({
-				roundKey: undefined, // TODO
+			const { instance, roundKey } = context.evm;
+			const { receipt } = await instance.process({
+				roundKey,
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				recipient: transaction.data.recipientId,
