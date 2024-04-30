@@ -27,6 +27,10 @@ describe<{
 		dispatch: () => {},
 	};
 
+	const state = {
+		isBootstrap: () => false,
+	};
+
 	const expectFinishedEventData = ({ executionTime, webhook, payload }) => {
 		assert.number(executionTime);
 		assert.object(webhook);
@@ -45,6 +49,7 @@ describe<{
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
+		app.bind(Identifiers.State.State).toConstantValue(state);
 		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
 
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
