@@ -61,8 +61,8 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		try {
 			const { instance, commitKey } = context.evm;
 			const { receipt } = await instance.process({
-				commitKey,
 				caller: sender.getAddress(),
+				commitKey,
 				data: Buffer.from(evmCall.payload, "hex"),
 				recipient: transaction.data.recipientId,
 			});

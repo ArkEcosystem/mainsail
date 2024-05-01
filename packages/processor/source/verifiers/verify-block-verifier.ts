@@ -28,8 +28,8 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 					await handler.verify(
 						{
 							evm: {
-								instance: this.evm,
 								commitKey: { height: BigInt(unit.height), round: BigInt(unit.round) },
+								instance: this.evm,
 							},
 							walletRepository: unit.store.walletRepository,
 						},

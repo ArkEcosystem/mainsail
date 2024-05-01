@@ -21,14 +21,14 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
 		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
-			walletRepository,
 			evm: {
-				instance: this.evm,
 				commitKey: {
 					height: BigInt(unit.height),
 					round: BigInt(unit.round),
 				},
+				instance: this.evm,
 			},
+			walletRepository,
 		};
 
 		if (!(await transactionHandler.verify(transactionHandlerContext, transaction))) {
