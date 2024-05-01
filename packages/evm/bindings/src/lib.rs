@@ -116,6 +116,17 @@ impl EvmInner {
             }
         });
 
+        // Drop pending commit on key change
+        if let Some(commit_key) = commit_key {
+            if self
+                .pending_commit
+                .as_ref()
+                .is_some_and(|pending| pending.key != commit_key)
+            {
+                self.pending_commit.take();
+            }
+        }
+
         let result = self.transact_evm(tx_ctx);
 
         match result {
@@ -131,7 +142,7 @@ impl EvmInner {
                     pending_commit.diff.push(result);
 
                     if self.auto_commit {
-                        self.commit(commit_key);
+                        self.commit(commit_key).expect("auto commit succeeds");
                     }
                 }
 
@@ -141,7 +152,15 @@ impl EvmInner {
         }
     }
 
-    pub fn commit(&mut self, commit_key: CommitKey) {
+    pub fn commit(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
+        if self
+            .pending_commit
+            .as_ref()
+            .is_some_and(|pending| pending.key != commit_key)
+        {
+            return Err(EVMError::Database("invalid commit key".into()));
+        }
+
         match self.pending_commit.take() {
             Some(mut pending_commit) => {
                 // println!(
@@ -149,14 +168,15 @@ impl EvmInner {
                 //     commit_key,
                 //     pending_commit.diff.len(),
                 // );
-                assert_eq!(pending_commit.key, commit_key);
 
                 let db = self.evm_instance.as_mut().expect("get evm").db_mut();
                 for pending in pending_commit.diff.drain(..) {
                     db.commit(pending.state);
                 }
+
+                Ok(())
             }
-            None => (),
+            None => Ok(()), /* nothing to commit  */
         }
     }
     fn transact_evm(
@@ -365,7 +385,11 @@ impl JsEvmWrapper {
     ) -> Result<()> {
         let mut lock = evm.lock().await;
         let result = lock.commit(commit_key);
-        Ok(result)
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
     }
 
     async fn get_account_info_async(

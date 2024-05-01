@@ -140,50 +140,73 @@ describe<{
 		assert.equal(amount, balance);
 	});
 
-	it("should assert pending state is modified within same context", async ({ instance }) => {
-		await instance.setAutoCommit(false);
+	it("should overwrite pending state if modified in different context [no auto commit]", async ({ instance }) => {
+		await instance.setAutoCommit(true);
 
 		const [sender, recipient] = wallets;
 
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+
+		let { receipt } = await instance.process({
+			commitKey,
+			caller: sender.address,
+			data: Buffer.from(bytecode.slice(2), "hex"),
+		});
+
+		const contractAddress = receipt.deployedContractAddress;
+		assert.defined(contractAddress);
+
+		await instance.setAutoCommit(false);
+
+		//
+
 		const iface = new ethers.Interface(abi);
-		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("1")]);
 
-		const commitKey1 = { height: BigInt(0), round: BigInt(0) };
+		const commitKey1 = { height: BigInt(1), round: BigInt(0) };
+		const commitKey2 = { height: BigInt(1), round: BigInt(1) };
 
-		await assert.resolves(async () =>
-			instance.process({
-				commitKey: commitKey1,
-				caller: sender.address,
-				data: Buffer.from(ethers.getBytes(transferEncodedCall)),
-			}),
+		// Transfer 1 ARK (1,0)
+		await assert.resolves(
+			async () =>
+				await instance.process({
+					commitKey: commitKey1,
+					caller: sender.address,
+					data: Buffer.from(
+						ethers.getBytes(
+							iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("1")]),
+						),
+					),
+					recipient: contractAddress,
+				}),
 		);
 
-		// Calling with same context again is fine
-		await assert.resolves(async () =>
-			instance.process({
-				commitKey: commitKey1,
+		// Transfer 2 ARK (1,1)
+		await assert.resolves(async () => {
+			await instance.process({
+				commitKey: commitKey2,
 				caller: sender.address,
-				data: Buffer.from(ethers.getBytes(transferEncodedCall)),
-			}),
-		);
+				data: Buffer.from(
+					ethers.getBytes(iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("2")])),
+				),
+				recipient: contractAddress,
+			});
+		});
 
-		// Calling with different context is not fine
-		await assert.rejects(async () =>
-			instance.process({
-				commitKey: { ...commitKey1, round: BigInt(1) },
-				caller: sender.address,
-				data: Buffer.from(ethers.getBytes(transferEncodedCall)),
-			}),
-		);
+		// Commit (1,0) fails since it was overwritten
+		await assert.rejects(async () => instance.onCommit(commitKey1 as any), "invalid commit key");
+		// Commit (1,1) succeeds
+		await assert.resolves(async () => instance.onCommit(commitKey2 as any));
 
-		// Still fine
-		await assert.resolves(async () =>
-			instance.process({
-				commitKey: commitKey1,
-				caller: sender.address,
-				data: Buffer.from(ethers.getBytes(transferEncodedCall)),
-			}),
-		);
+		// Balance updated correctly
+		const balanceOf = iface.encodeFunctionData("balanceOf", [recipient.address]);
+		({ receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(balanceOf)),
+			recipient: contractAddress,
+		}));
+
+		const [balance] = iface.decodeFunctionResult("balanceOf", receipt.output!);
+		assert.equal(ethers.parseEther("2"), balance);
 	});
 
 	it("should not throw when commit is empty", async ({ instance }) => {
