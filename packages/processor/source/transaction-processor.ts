@@ -24,7 +24,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			walletRepository,
 			evm: {
 				instance: this.evm,
-				roundKey: {
+				commitKey: {
 					height: BigInt(unit.height),
 					round: BigInt(unit.round),
 				},

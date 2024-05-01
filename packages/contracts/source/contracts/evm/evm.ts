@@ -15,10 +15,10 @@ export interface TransactionContext {
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
 	readonly data: Buffer;
-	readonly roundKey?: RoundKey;
+	readonly commitKey?: CommitKey;
 }
 
-export interface RoundKey {
+export interface CommitKey {
 	readonly height: bigint;
 	readonly round: bigint;
 }

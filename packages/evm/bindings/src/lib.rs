@@ -1,6 +1,6 @@
 use std::{convert::Infallible, str::FromStr, sync::Arc};
 
-use ctx::{JsRoundKey, JsTransactionContext, PendingCommit, TxContext};
+use ctx::{JsCommitKey, JsTransactionContext, PendingCommit, TxContext};
 use mainsail_evm_core::EvmInstance;
 use napi::{bindgen_prelude::*, JsBigInt, JsBoolean, JsObject, JsString};
 use napi_derive::napi;
@@ -10,7 +10,7 @@ use revm::{
     DatabaseCommit,
 };
 
-use crate::ctx::RoundKey;
+use crate::ctx::CommitKey;
 
 mod ctx;
 mod result;
@@ -26,7 +26,6 @@ pub struct EvmInner {
     auto_commit: bool,
 
     // A pending commit consists of one or more transactions.
-    // TODO: this is a initial temporary solution, waiting for database backend
     pending_commit: Option<PendingCommit>,
 }
 
@@ -109,9 +108,9 @@ impl EvmInner {
     }
 
     pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
-        let round_key = tx_ctx.round_key.or_else(|| {
+        let commit_key = tx_ctx.commit_key.or_else(|| {
             if self.auto_commit {
-                Some(RoundKey(0, 0))
+                Some(CommitKey::default())
             } else {
                 None
             }
@@ -123,16 +122,16 @@ impl EvmInner {
             Ok(result) => {
                 let receipt = map_execution_result(result.result.clone());
 
-                if let Some(round_key) = round_key {
+                if let Some(commit_key) = commit_key {
                     let pending_commit = self
                         .pending_commit
-                        .get_or_insert_with(|| PendingCommit::new(round_key));
+                        .get_or_insert_with(|| PendingCommit::new(commit_key));
 
-                    assert_eq!(pending_commit.key, round_key);
+                    assert_eq!(pending_commit.key, commit_key);
                     pending_commit.diff.push(result);
 
                     if self.auto_commit {
-                        self.commit(round_key);
+                        self.commit(commit_key);
                     }
                 }
 
@@ -142,15 +141,15 @@ impl EvmInner {
         }
     }
 
-    pub fn commit(&mut self, round_key: RoundKey) {
+    pub fn commit(&mut self, commit_key: CommitKey) {
         match self.pending_commit.take() {
             Some(mut pending_commit) => {
                 // println!(
                 //     "committing {:?} with {} transactions",
-                //     round_key,
+                //     commit_key,
                 //     pending_commit.diff.len(),
                 // );
-                assert_eq!(pending_commit.key, round_key);
+                assert_eq!(pending_commit.key, commit_key);
 
                 let db = self.evm_instance.as_mut().expect("get evm").db_mut();
                 for pending in pending_commit.diff.drain(..) {
@@ -173,7 +172,7 @@ impl EvmInner {
             .modify()
             .modify_db(|db| {
                 // Ensure pending commits from same round are visible to the transaction being applied
-                if let Some(inner) = tx_ctx.round_key {
+                if let Some(inner) = tx_ctx.commit_key {
                     if let Some(pending) = self
                         .pending_commit
                         .as_mut()
@@ -312,10 +311,10 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<JsCommitResult>")]
-    pub fn commit(&mut self, node_env: Env, round_key: JsRoundKey) -> Result<JsObject> {
-        let round_key = RoundKey::try_from(round_key)?;
+    pub fn commit(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+        let commit_key = CommitKey::try_from(commit_key)?;
         node_env.execute_tokio_future(
-            Self::commit_async(self.evm.clone(), round_key),
+            Self::commit_async(self.evm.clone(), commit_key),
             |&mut node_env, _| Ok(result::JsCommitResult::new(&node_env)?),
         )
     }
@@ -362,10 +361,10 @@ impl JsEvmWrapper {
 
     async fn commit_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        round_key: RoundKey,
+        commit_key: CommitKey,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.commit(round_key);
+        let result = lock.commit(commit_key);
         Ok(result)
     }
 

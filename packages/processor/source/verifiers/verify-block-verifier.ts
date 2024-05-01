@@ -29,7 +29,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 						{
 							evm: {
 								instance: this.evm,
-								roundKey: { height: BigInt(unit.height), round: BigInt(unit.round) },
+								commitKey: { height: BigInt(unit.height), round: BigInt(unit.round) },
 							},
 							walletRepository: unit.store.walletRepository,
 						},
