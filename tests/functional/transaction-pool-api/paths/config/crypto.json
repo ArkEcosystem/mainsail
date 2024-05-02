@@ -3533,7 +3533,7 @@
 				"maxTransactions": 150,
 				"version": 1
 			},
-			"blockTime": 500,
+			"blockTime": 100,
 			"epoch": "2023-12-21T00:00:00.000Z",
 			"fees": {
 				"staticFees": {
