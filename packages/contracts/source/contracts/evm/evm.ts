@@ -1,20 +1,45 @@
-export interface Instance {
-	transact(txContext: TransactionContext): Promise<TransactionResult>;
-	view(txContext: TransactionContext): Promise<TransactionResult>;
+import { CommitHandler } from "../crypto/commit.js";
+
+export interface Instance extends CommitHandler {
+	process(txContext: TransactionContext): Promise<ProcessResult>;
+	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 }
+
+export interface ProcessResult {
+	readonly receipt: TransactionReceipt;
+}
+
+export interface ViewResult {
+	readonly success: boolean;
+	readonly output?: Buffer;
+}
+
+export interface CommitResult {}
 
 export interface TransactionContext {
-	caller: string;
+	readonly caller: string;
 	/** Omit recipient when deploying a contract */
-	recipient?: string;
-	data: Buffer;
+	readonly recipient?: string;
+	readonly data: Buffer;
+	readonly commitKey: CommitKey;
 }
 
-export interface TransactionResult {
-	gasUsed: bigint;
-	gasRefunded: bigint;
-	success: boolean;
-	deployedContractAddress?: string;
-	logs: any;
-	output?: Buffer;
+export interface TransactionViewContext {
+	readonly caller: string;
+	readonly recipient: string;
+	readonly data: Buffer;
+}
+
+export interface CommitKey {
+	readonly height: bigint;
+	readonly round: bigint;
+}
+
+export interface TransactionReceipt {
+	readonly gasUsed: bigint;
+	readonly gasRefunded: bigint;
+	readonly success: boolean;
+	readonly deployedContractAddress?: string;
+	readonly logs: any;
+	readonly output?: Buffer;
 }

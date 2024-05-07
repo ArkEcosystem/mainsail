@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, optional } from "@mainsail/container";
+import { inject, injectable, multiInject, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 // TODO: Move enums to contracts
 import { Enums, Utils } from "@mainsail/kernel";
@@ -19,6 +19,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
+
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPool!: Contracts.TransactionPool.Service;
@@ -56,7 +60,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.verifier.verify(unit);
 
 			for (const transaction of unit.getBlock().transactions) {
-				await this.transactionProcessor.process(unit.store.walletRepository, transaction);
+				await this.transactionProcessor.process(unit, transaction);
 			}
 
 			await this.#applyBlockToForger(unit);
@@ -90,6 +94,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
+		await this.evm.onCommit(unit);
 
 		if (this.apiSync) {
 			await this.apiSync.onCommit(unit);

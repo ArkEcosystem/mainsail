@@ -44,16 +44,14 @@ export class CallAction implements Contracts.Api.RPC.Action {
 	public async handle(parameters: [TxData, BlockTag]): Promise<any> {
 		const [data] = parameters;
 
-		const txContext = {
+		const { success, output } = await this.evm.view({
 			caller: data.from,
 			data: Buffer.from(ethers.getBytes(data.data)),
 			recipient: data.to,
-		};
+		});
 
-		const result = await this.evm.view(txContext);
-
-		if (result.success) {
-			return `0x${result.output?.toString("hex")}`;
+		if (success) {
+			return `0x${output?.toString("hex")}`;
 		}
 
 		throw new Exceptions.RpcError("execution reverted");

@@ -19,6 +19,18 @@ const setup = async () => {
 		.to(Services.Events.MemoryEventDispatcher)
 		.inSingletonScope();
 
+	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+		clear: async () => {},
+		getPrecommits: async () => [],
+		getPrevotes: async () => [],
+		getProposals: async () => [],
+		getState: async () => {},
+		savePrecommits: async () => {},
+		savePrevotes: async () => {},
+		saveProposals: async () => {},
+		saveState: async () => {},
+	});
+
 	// TODO:
 	sandbox.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
 		broadcastPrecommit: async () => {},
@@ -38,7 +50,8 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
+
+	sandbox.app.bind("path.data").toConstantValue("");
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -91,7 +104,6 @@ const setup = async () => {
 		"@mainsail/validator-set-static",
 		"@mainsail/validator",
 		"@mainsail/proposer",
-		"@mainsail/consensus-storage",
 		"@mainsail/consensus",
 	];
 

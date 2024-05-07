@@ -20,82 +20,211 @@ describe<{
 	it("should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
-		const result = await instance.transact({
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		const { receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey,
 		});
 
-		assert.true(result.success);
-		assert.equal(result.gasUsed, 964_156n);
-		assert.equal(result.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
 	it("should deploy, transfer and call balanceOf", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
-		const result = await instance.transact({
+		let { receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey: { height: BigInt(0), round: BigInt(0) },
 		});
 
-		assert.true(result.success);
-		assert.equal(result.gasUsed, 964_156n);
-		assert.equal(result.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 
-		const contractAddress = result.deployedContractAddress;
+		const contractAddress = receipt.deployedContractAddress;
 		assert.defined(contractAddress);
 
 		const iface = new ethers.Interface(abi);
 		const amount = ethers.parseEther("1000");
 
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
-		const transferResult = await instance.transact({
+		({ receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
-		});
+			commitKey: { height: BigInt(0), round: BigInt(0) },
+		}));
 
-		assert.true(transferResult.success);
-		assert.equal(transferResult.gasUsed, 52_222n);
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 52_222n);
 
 		const balanceOfEncodedCall = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		const balanceOfResult = await instance.view({
+		({ receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(balanceOfEncodedCall)),
 			recipient: contractAddress,
-		});
+			commitKey: { height: BigInt(0), round: BigInt(0) },
+		}));
 
-		assert.true(balanceOfResult.success);
-		assert.equal(balanceOfResult.gasUsed, 24_295n);
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 24_295n);
 	});
 
 	it("should revert on invalid call", async ({ instance }) => {
 		const [sender] = wallets;
 
-		let result = await instance.transact({
+		let { receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey: { height: BigInt(0), round: BigInt(0) },
+		});
+
+		const contractAddress = receipt.deployedContractAddress;
+		assert.defined(contractAddress);
+
+		({ receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from("0xdead", "hex"),
+			recipient: contractAddress,
+			commitKey: { height: BigInt(0), round: BigInt(0) },
+		}));
+
+		assert.false(receipt.success);
+		assert.equal(receipt.gasUsed, 21_070n);
+	});
+
+	it("should deploy, transfer and call balanceOf [commit]", async ({ instance }) => {
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+
+		const [sender, recipient] = wallets;
+
+		let { receipt } = await instance.process({
+			commitKey,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 		});
 
-		const contractAddress = result.deployedContractAddress;
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+
+		const contractAddress = receipt.deployedContractAddress;
 		assert.defined(contractAddress);
 
-		result = await instance.transact({
+		const iface = new ethers.Interface(abi);
+		const amount = ethers.parseEther("1337");
+
+		await instance.onCommit(commitKey as any);
+		commitKey.height++;
+
+		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
+		({ receipt } = await instance.process({
+			commitKey,
 			caller: sender.address,
-			data: Buffer.from("0xdead", "hex"),
+			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
+		}));
+
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 52_222n);
+
+		await instance.onCommit(commitKey as any);
+
+		const balanceOf = iface.encodeFunctionData("balanceOf", [recipient.address]);
+		const { success, output } = await instance.view({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(balanceOf)),
+			recipient: contractAddress!,
 		});
 
-		assert.false(result.success);
-		assert.equal(result.gasUsed, 21_070n);
+		assert.true(success);
+		const [balance] = iface.decodeFunctionResult("balanceOf", output!);
+		assert.equal(amount, balance);
+	});
+
+	it("should overwrite pending state if modified in different context", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+
+		let { receipt } = await instance.process({
+			commitKey,
+			caller: sender.address,
+			data: Buffer.from(bytecode.slice(2), "hex"),
+		});
+
+		const contractAddress = receipt.deployedContractAddress;
+		assert.defined(contractAddress);
+
+		await instance.onCommit(commitKey as any);
+
+		//
+
+		const iface = new ethers.Interface(abi);
+
+		const commitKey1 = { height: BigInt(1), round: BigInt(0) };
+		const commitKey2 = { height: BigInt(1), round: BigInt(1) };
+
+		// Transfer 1 ARK (1,0)
+		await assert.resolves(
+			async () =>
+				await instance.process({
+					commitKey: commitKey1,
+					caller: sender.address,
+					data: Buffer.from(
+						ethers.getBytes(
+							iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("1")]),
+						),
+					),
+					recipient: contractAddress,
+				}),
+		);
+
+		// Transfer 2 ARK (1,1)
+		await assert.resolves(async () => {
+			await instance.process({
+				commitKey: commitKey2,
+				caller: sender.address,
+				data: Buffer.from(
+					ethers.getBytes(iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("2")])),
+				),
+				recipient: contractAddress,
+			});
+		});
+
+		// Commit (1,0) fails since it was overwritten
+		await assert.rejects(async () => instance.onCommit(commitKey1 as any), "invalid commit key");
+		// Commit (1,1) succeeds
+		await assert.resolves(async () => instance.onCommit(commitKey2 as any));
+
+		// Balance updated correctly
+		const balanceOf = iface.encodeFunctionData("balanceOf", [recipient.address]);
+		const { success, output } = await instance.view({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(balanceOf)),
+			recipient: contractAddress!,
+		});
+
+		assert.true(success);
+		const [balance] = iface.decodeFunctionResult("balanceOf", output!);
+		assert.equal(ethers.parseEther("2"), balance);
+	});
+
+	it("should not throw when commit is empty", async ({ instance }) => {
+		await assert.resolves(async () => await instance.onCommit({ height: 0, round: 0 } as any));
 	});
 
 	it("should throw on invalid tx context caller", async ({ instance }) => {
 		await assert.rejects(
 			async () =>
-				await instance.transact({
+				await instance.process({
 					caller: "badsender_",
 					data: Buffer.from(bytecode.slice(2), "hex"),
+					commitKey: { height: BigInt(0), round: BigInt(0) },
 				}),
 		);
 	});

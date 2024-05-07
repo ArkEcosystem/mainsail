@@ -12,6 +12,9 @@ export class ApplyTransactionAction extends Services.Triggers.Action {
 		const transaction: Contracts.Crypto.Transaction = arguments_.transaction;
 		const walletRepository: Contracts.State.WalletRepository = arguments_.walletRepository;
 
-		return handler.apply({ evm: this.evm, walletRepository }, transaction);
+		return handler.apply(
+			{ evm: { commitKey: { height: BigInt(0), round: BigInt(0) }, instance: this.evm }, walletRepository },
+			transaction,
+		);
 	}
 }

@@ -29,17 +29,19 @@ export class Deployer {
 
 		this.#genesisAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
-		const result = await this.evm.transact({
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		const result = await this.evm.process({
 			caller: this.#genesisAddress,
+			commitKey,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 		});
 
-		if (!result.success) {
+		if (!result.receipt.success) {
 			throw new Error("failed to deploy erc20 contract");
 		}
 
 		this.logger.info(
-			`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.deployedContractAddress}`,
+			`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.receipt.deployedContractAddress}`,
 		);
 
 		const recipients = [
@@ -49,25 +51,31 @@ export class Deployer {
 		this.app.bind(EvmDevelopmentIdentifiers.Wallets.Funded).toConstantValue(recipients);
 		this.app
 			.bind(EvmDevelopmentIdentifiers.Contracts.Addresses.Erc20)
-			.toConstantValue(result.deployedContractAddress!);
+			.toConstantValue(result.receipt.deployedContractAddress!);
 
-		await this.ensureFunds(result.deployedContractAddress!, recipients);
+		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients, commitKey);
+		await this.evm.onCommit(commitKey as any);
 	}
 
-	private async ensureFunds(erc20ContractAddress: string, recipients: string[]): Promise<void> {
+	private async ensureFunds(
+		erc20ContractAddress: string,
+		recipients: string[],
+		commitKey: Contracts.Evm.CommitKey,
+	): Promise<void> {
 		const iface = new ethers.Interface(ERC20.abi.abi);
 		const amount = ethers.parseEther("1000");
 
 		for (const recipient of recipients) {
 			const encodedCall = iface.encodeFunctionData("transfer", [recipient, amount]);
 
-			const result = await this.evm.transact({
+			const { receipt } = await this.evm.process({
 				caller: this.#genesisAddress,
+				commitKey,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				recipient: erc20ContractAddress,
 			});
 
-			if (!result.success) {
+			if (!receipt.success) {
 				throw new Error("failed to ensure funds");
 			}
 		}

@@ -108,13 +108,21 @@ export const waitBlock = async (
 	count: number = 1,
 ) => {
 	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+	const query = sandbox.app.get<Contracts.TransactionPool.Query>(Identifiers.TransactionPool.Query);
+
+	let remainingTransactions = await query.getAll().all();
 
 	let currentHeight = state.getStore().getLastHeight();
-	const targetHeight = currentHeight + count;
+	let targetHeight = currentHeight + count;
 
 	do {
-		await sleep(200);
+		await sleep(100);
 		currentHeight = state.getStore().getLastHeight();
+		remainingTransactions = await query.getAll().all();
+
+		if (remainingTransactions.length > 0) {
+			targetHeight = Math.max(currentHeight, targetHeight) + 1;
+		}
 	} while (currentHeight < targetHeight);
 };
 
@@ -226,8 +234,8 @@ export const isTransactionCommitted = async (
 
 	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 	const forgedBlocks = await database.findBlocks(
-		currentHeight - 1,
-		currentHeight + 2 /* just a buffer in case tx got included after target height */,
+		currentHeight - 5,
+		currentHeight + 5 /* just a buffer in case tx got included after target height */,
 	);
 
 	let found = false;

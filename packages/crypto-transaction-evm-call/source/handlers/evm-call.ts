@@ -59,8 +59,10 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
-			const result = await context.evm.transact({
+			const { instance, commitKey } = context.evm;
+			const { receipt } = await instance.process({
 				caller: sender.getAddress(),
+				commitKey,
 				data: Buffer.from(evmCall.payload, "hex"),
 				recipient: transaction.data.recipientId,
 			});
@@ -68,7 +70,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			// TODO: handle result
 			// - like subtracting gas from sender
 			// - populating indexes, etc.
-			this.logger.debug(`executed EVM call (success=${result.success}, gasUsed=${result.gasUsed})`);
+			this.logger.debug(`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed})`);
 		} catch (error) {
 			this.logger.critical(`invalid EVM call: ${error.stack}`);
 		}

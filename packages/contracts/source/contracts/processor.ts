@@ -1,5 +1,5 @@
 import { Block, Commit, Transaction } from "./crypto/index.js";
-import { Store, WalletRepository } from "./state/index.js";
+import { Store } from "./state/index.js";
 
 export interface ProcessableUnit {
 	readonly height: number;
@@ -23,7 +23,7 @@ export interface BlockProcessor {
 }
 
 export interface TransactionProcessor {
-	process(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	process(unit: ProcessableUnit, transaction: Transaction): Promise<void>;
 }
 
 export interface Verifier {
