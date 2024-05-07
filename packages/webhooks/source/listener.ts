@@ -23,7 +23,7 @@ export class Listener {
 
 	public async handle({ name, data }): Promise<void> {
 		// Skip own events to prevent cycling
-		if (name.toString().includes("webhooks")) {
+		if (name.includes("webhooks")) {
 			return;
 		}
 
