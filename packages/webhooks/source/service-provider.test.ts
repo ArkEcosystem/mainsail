@@ -24,12 +24,7 @@ const init = (context: Context) => {
 		notice: () => {},
 	};
 
-	const state = {
-		isBootstrap: () => false,
-	};
-
 	const app = new Application(new Container());
-	app.bind(Identifiers.State.State).toConstantValue(state);
 	app.bind(Identifiers.ServiceProvider.Configuration).to(Providers.PluginConfiguration).inSingletonScope();
 	app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});
 	app.bind(Identifiers.TransactionPool.Query).toConstantValue({});

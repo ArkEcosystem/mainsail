@@ -15,9 +15,6 @@ export class Listener {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.State.State)
-	private readonly state!: Contracts.State.State;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -27,13 +24,6 @@ export class Listener {
 	public async handle({ name, data }): Promise<void> {
 		// Skip own events to prevent cycling
 		if (name.includes("webhooks")) {
-			return;
-		}
-
-		if (
-			this.state.isBootstrap() && // Skip all but kernel events during bootstrap
-			!name.startsWith("kernel.")
-		) {
 			return;
 		}
 
