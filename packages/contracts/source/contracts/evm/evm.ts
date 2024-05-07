@@ -1,7 +1,6 @@
 import { CommitHandler } from "../crypto/commit.js";
 
 export interface Instance extends CommitHandler {
-	setAutoCommit(enabled: boolean): Promise<void>;
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 }

@@ -15,16 +15,16 @@ describe<{
 		await prepareSandbox(context);
 
 		context.instance = context.sandbox.app.resolve<Contracts.Evm.Instance>(EvmInstance);
-		await context.instance.setAutoCommit(true);
 	});
 
 	it("should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
 		const { receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
-			commitKey: { height: BigInt(0), round: BigInt(0) },
+			commitKey,
 		});
 
 		assert.true(receipt.success);
@@ -97,9 +97,7 @@ describe<{
 		assert.equal(receipt.gasUsed, 21_070n);
 	});
 
-	it("should deploy, transfer and call balanceOf [no auto commit]", async ({ instance }) => {
-		await instance.setAutoCommit(false);
-
+	it("should deploy, transfer and call balanceOf [commit]", async ({ instance }) => {
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
 
 		const [sender, recipient] = wallets;
@@ -120,6 +118,9 @@ describe<{
 		const iface = new ethers.Interface(abi);
 		const amount = ethers.parseEther("1337");
 
+		await instance.onCommit(commitKey as any);
+		commitKey.height++;
+
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
 		({ receipt } = await instance.process({
 			commitKey,
@@ -131,24 +132,21 @@ describe<{
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 52_222n);
 
-		const balanceOfEncodedCall = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		({ receipt } = await instance.process({
-			commitKey,
+		await instance.onCommit(commitKey as any);
+
+		const balanceOf = iface.encodeFunctionData("balanceOf", [recipient.address]);
+		const { success, output } = await instance.view({
 			caller: sender.address,
-			data: Buffer.from(ethers.getBytes(balanceOfEncodedCall)),
-			recipient: contractAddress,
-		}));
+			data: Buffer.from(ethers.getBytes(balanceOf)),
+			recipient: contractAddress!,
+		});
 
-		assert.true(receipt.success);
-		assert.equal(receipt.gasUsed, 24_295n);
-
-		const [balance] = iface.decodeFunctionResult("balanceOf", receipt.output!);
+		assert.true(success);
+		const [balance] = iface.decodeFunctionResult("balanceOf", output!);
 		assert.equal(amount, balance);
 	});
 
-	it("should overwrite pending state if modified in different context [no auto commit]", async ({ instance }) => {
-		await instance.setAutoCommit(true);
-
+	it("should overwrite pending state if modified in different context", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
@@ -162,7 +160,7 @@ describe<{
 		const contractAddress = receipt.deployedContractAddress;
 		assert.defined(contractAddress);
 
-		await instance.setAutoCommit(false);
+		await instance.onCommit(commitKey as any);
 
 		//
 

@@ -7,10 +7,6 @@ import { Evm } from "../generated/bindings.cjs";
 export class EvmInstance implements Contracts.Evm.Instance {
 	private readonly evm: Evm = new Evm();
 
-	public async setAutoCommit(enabled: boolean): Promise<void> {
-		return this.evm.setAutoCommit(enabled);
-	}
-
 	public async view(viewContext: Contracts.Evm.TransactionViewContext): Promise<Contracts.Evm.ViewResult> {
 		return this.evm.view(viewContext);
 	}

@@ -20,7 +20,6 @@ export class MockInstance implements Contracts.Evm.Instance {
 		};
 	}
 
-	public async setAutoCommit(enabled: boolean): Promise<void> {}
 	public async configure(height: bigint, round: bigint): Promise<void> {}
 	public async onCommit(_: Contracts.Processor.ProcessableUnit): Promise<void> {}
 }

@@ -24,16 +24,15 @@ export class Deployer {
 	#genesisAddress!: string;
 
 	public async deploy(): Promise<void> {
-		await this.evm.setAutoCommit(true);
-
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
 		this.#genesisAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
 		const result = await this.evm.process({
 			caller: this.#genesisAddress,
-			commitKey: { height: BigInt(0), round: BigInt(0) },
+			commitKey,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 		});
 
@@ -54,12 +53,15 @@ export class Deployer {
 			.bind(EvmDevelopmentIdentifiers.Contracts.Addresses.Erc20)
 			.toConstantValue(result.receipt.deployedContractAddress!);
 
-		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients);
-
-		await this.evm.setAutoCommit(false);
+		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients, commitKey);
+		await this.evm.onCommit(commitKey as any);
 	}
 
-	private async ensureFunds(erc20ContractAddress: string, recipients: string[]): Promise<void> {
+	private async ensureFunds(
+		erc20ContractAddress: string,
+		recipients: string[],
+		commitKey: Contracts.Evm.CommitKey,
+	): Promise<void> {
 		const iface = new ethers.Interface(ERC20.abi.abi);
 		const amount = ethers.parseEther("1000");
 
@@ -68,7 +70,7 @@ export class Deployer {
 
 			const { receipt } = await this.evm.process({
 				caller: this.#genesisAddress,
-				commitKey: { height: BigInt(0), round: BigInt(0) },
+				commitKey,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				recipient: erc20ContractAddress,
 			});

@@ -5,7 +5,7 @@ use ctx::{
     TxContext, TxViewContext,
 };
 use mainsail_evm_core::EvmInstance;
-use napi::{bindgen_prelude::*, JsBigInt, JsBoolean, JsObject, JsString};
+use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
@@ -23,10 +23,6 @@ mod utils;
 pub struct EvmInner {
     // 'Option' is used because of the ownership changing when updating the EVM.
     evm_instance: Option<EvmInstance>,
-
-    // Whether transactions are auto committed or not. Useful for testing.
-    // Off by default.
-    auto_commit: bool,
 
     // A pending commit consists of one or more transactions.
     pending_commit: Option<PendingCommit>,
@@ -77,13 +73,7 @@ impl EvmInner {
         EvmInner {
             evm_instance: Some(evm),
             pending_commit: Default::default(),
-            auto_commit: false,
         }
-    }
-
-    pub fn set_auto_commit(&mut self, enabled: bool) {
-        self.pending_commit.take();
-        self.auto_commit = enabled;
     }
 
     pub fn update_account_info(&mut self, address: Address, account_info: AccountInfo) {
@@ -149,10 +139,6 @@ impl EvmInner {
 
                 assert_eq!(pending_commit.key, commit_key);
                 pending_commit.diff.push(result);
-
-                if self.auto_commit {
-                    self.commit(commit_key).expect("auto commit succeeds");
-                }
 
                 Ok(receipt)
             }
@@ -320,15 +306,6 @@ impl JsEvmWrapper {
         }
     }
 
-    #[napi(ts_return_type = "Promise<undefined>")]
-    pub fn set_auto_commit(&mut self, node_env: Env, enabled: JsBoolean) -> Result<JsObject> {
-        let enabled = enabled.get_value()?;
-        node_env.execute_tokio_future(
-            Self::set_auto_commit_async(self.evm.clone(), enabled),
-            |&mut node_env, _| Ok(node_env.get_undefined()),
-        )
-    }
-
     #[napi(ts_return_type = "Promise<JsViewResult>")]
     pub fn view(&mut self, node_env: Env, view_ctx: JsTransactionViewContext) -> Result<JsObject> {
         let view_ctx = TxViewContext::try_from(view_ctx)?;
@@ -377,15 +354,6 @@ impl JsEvmWrapper {
             Self::update_account_info_async(self.evm.clone(), update_account_info_ctx),
             |_, result| Ok(result),
         )
-    }
-
-    async fn set_auto_commit_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        enabled: bool,
-    ) -> Result<()> {
-        let mut lock = evm.lock().await;
-        lock.set_auto_commit(enabled);
-        Ok(())
     }
 
     async fn view_async(
