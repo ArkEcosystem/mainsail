@@ -12,6 +12,9 @@ export class ThrowIfCannotEnterPoolAction extends Services.Triggers.Action {
 		const transaction: Contracts.Crypto.Transaction = arguments_.transaction;
 		const walletRepository: Contracts.State.WalletRepository = arguments_.walletRepository;
 
-		return handler.throwIfCannotEnterPool({ evm: { instance: this.evm }, walletRepository }, transaction);
+		return handler.throwIfCannotEnterPool(
+			{ evm: { instance: this.evm, commitKey: { height: BigInt(0), round: BigInt(0) } }, walletRepository },
+			transaction,
+		);
 	}
 }
