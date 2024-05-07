@@ -11,6 +11,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.evm.setAutoCommit(enabled);
 	}
 
+	public async view(viewContext: Contracts.Evm.TransactionViewContext): Promise<Contracts.Evm.ViewResult> {
+		return this.evm.view(viewContext);
+	}
+
 	public async process(txContext: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.ProcessResult> {
 		return this.evm.process(txContext);
 	}

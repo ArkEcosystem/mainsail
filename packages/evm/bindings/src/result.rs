@@ -24,6 +24,25 @@ impl JsCommitResult {
 }
 
 #[napi(object)]
+pub struct JsViewResult {
+    pub success: bool,
+    pub output: Option<JsBuffer>,
+}
+impl JsViewResult {
+    pub fn new(node_env: &napi::Env, result: TxViewResult) -> anyhow::Result<Self> {
+        Ok(Self {
+            success: result.success,
+            output: result.output.map(|o| {
+                node_env
+                    .create_buffer_with_data(Into::<Vec<u8>>::into(o))
+                    .unwrap()
+                    .into_raw()
+            }),
+        })
+    }
+}
+
+#[napi(object)]
 pub struct JsTransactionReceipt {
     pub gas_used: JsBigInt,
     pub gas_refunded: JsBigInt,
@@ -42,6 +61,11 @@ pub struct TxReceipt {
     // TODO: expose additional data needed to JS
     pub deployed_contract_address: Option<String>,
     pub logs: Option<Vec<Log>>,
+    pub output: Option<Bytes>,
+}
+
+pub struct TxViewResult {
+    pub success: bool,
     pub output: Option<Bytes>,
 }
 

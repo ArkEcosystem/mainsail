@@ -1,10 +1,13 @@
 use std::{convert::Infallible, str::FromStr, sync::Arc};
 
-use ctx::{JsCommitKey, JsTransactionContext, PendingCommit, TxContext};
+use ctx::{
+    ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, PendingCommit,
+    TxContext, TxViewContext,
+};
 use mainsail_evm_core::EvmInstance;
 use napi::{bindgen_prelude::*, JsBigInt, JsBoolean, JsObject, JsString};
 use napi_derive::napi;
-use result::TxReceipt;
+use result::{TxReceipt, TxViewResult};
 use revm::{
     primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
     DatabaseCommit,
@@ -107,43 +110,48 @@ impl EvmInner {
         Some(account.info.clone())
     }
 
+    pub fn view(&mut self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
+        let result = self.transact_evm(tx_ctx.into());
+
+        Ok(match result {
+            Ok(r) => TxViewResult {
+                success: r.result.is_success(),
+                output: r.result.into_output(),
+            },
+            Err(_) => TxViewResult {
+                success: false,
+                output: None,
+            },
+        })
+    }
+
     pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
-        let commit_key = tx_ctx.commit_key.or_else(|| {
-            if self.auto_commit {
-                Some(CommitKey::default())
-            } else {
-                None
-            }
-        });
+        let commit_key = tx_ctx.commit_key;
 
         // Drop pending commit on key change
-        if let Some(commit_key) = commit_key {
-            if self
-                .pending_commit
-                .as_ref()
-                .is_some_and(|pending| pending.key != commit_key)
-            {
-                self.pending_commit.take();
-            }
+        if self
+            .pending_commit
+            .as_ref()
+            .is_some_and(|pending| pending.key != commit_key)
+        {
+            self.pending_commit.take();
         }
 
-        let result = self.transact_evm(tx_ctx);
+        let result = self.transact_evm(tx_ctx.into());
 
         match result {
             Ok(result) => {
                 let receipt = map_execution_result(result.result.clone());
 
-                if let Some(commit_key) = commit_key {
-                    let pending_commit = self
-                        .pending_commit
-                        .get_or_insert_with(|| PendingCommit::new(commit_key));
+                let pending_commit = self
+                    .pending_commit
+                    .get_or_insert_with(|| PendingCommit::new(commit_key));
 
-                    assert_eq!(pending_commit.key, commit_key);
-                    pending_commit.diff.push(result);
+                assert_eq!(pending_commit.key, commit_key);
+                pending_commit.diff.push(result);
 
-                    if self.auto_commit {
-                        self.commit(commit_key).expect("auto commit succeeds");
-                    }
+                if self.auto_commit {
+                    self.commit(commit_key).expect("auto commit succeeds");
                 }
 
                 Ok(receipt)
@@ -181,7 +189,7 @@ impl EvmInner {
     }
     fn transact_evm(
         &mut self,
-        tx_ctx: TxContext,
+        ctx: ExecutionContext,
     ) -> std::result::Result<ResultAndState, EVMError<Infallible>> {
         let mut evm = self.evm_instance.take().expect("ok");
 
@@ -192,7 +200,7 @@ impl EvmInner {
             .modify()
             .modify_db(|db| {
                 // Ensure pending commits from same round are visible to the transaction being applied
-                if let Some(inner) = tx_ctx.commit_key {
+                if let Some(inner) = ctx.commit_key {
                     if let Some(pending) = self
                         .pending_commit
                         .as_mut()
@@ -210,15 +218,15 @@ impl EvmInner {
                 }
             })
             .modify_tx_env(|tx_env| {
-                tx_env.caller = tx_ctx.caller;
-                tx_env.transact_to = match tx_ctx.recipient {
+                tx_env.caller = ctx.caller;
+                tx_env.transact_to = match ctx.recipient {
                     Some(recipient) => revm::primitives::TransactTo::Call(recipient),
                     None => {
                         revm::primitives::TransactTo::Create(revm::primitives::CreateScheme::Create)
                     }
                 };
 
-                tx_env.data = tx_ctx.data;
+                tx_env.data = ctx.data;
 
                 // tracing::debug!("{:#?}", tx_env);
             })
@@ -321,6 +329,15 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsViewResult>")]
+    pub fn view(&mut self, node_env: Env, view_ctx: JsTransactionViewContext) -> Result<JsObject> {
+        let view_ctx = TxViewContext::try_from(view_ctx)?;
+        node_env.execute_tokio_future(
+            Self::view_async(self.evm.clone(), view_ctx),
+            |&mut node_env, result| Ok(result::JsViewResult::new(&node_env, result)?),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsProcessResult>")]
     pub fn process(&mut self, node_env: Env, tx_ctx: JsTransactionContext) -> Result<JsObject> {
         let tx_ctx = TxContext::try_from(tx_ctx)?;
@@ -369,6 +386,14 @@ impl JsEvmWrapper {
         let mut lock = evm.lock().await;
         lock.set_auto_commit(enabled);
         Ok(())
+    }
+
+    async fn view_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        view_ctx: TxViewContext,
+    ) -> Result<TxViewResult> {
+        let mut lock = evm.lock().await;
+        lock.view(view_ctx)
     }
 
     async fn process_async(

@@ -3,11 +3,18 @@ import { CommitHandler } from "../crypto/commit.js";
 export interface Instance extends CommitHandler {
 	setAutoCommit(enabled: boolean): Promise<void>;
 	process(txContext: TransactionContext): Promise<ProcessResult>;
+	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 }
 
 export interface ProcessResult {
 	readonly receipt: TransactionReceipt;
 }
+
+export interface ViewResult {
+	readonly success: boolean;
+	readonly output?: Buffer;
+}
+
 export interface CommitResult {}
 
 export interface TransactionContext {
@@ -15,7 +22,13 @@ export interface TransactionContext {
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
 	readonly data: Buffer;
-	readonly commitKey?: CommitKey;
+	readonly commitKey: CommitKey;
+}
+
+export interface TransactionViewContext {
+	readonly caller: string;
+	readonly recipient: string;
+	readonly data: Buffer;
 }
 
 export interface CommitKey {

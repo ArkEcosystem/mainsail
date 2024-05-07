@@ -13,6 +13,13 @@ export class MockInstance implements Contracts.Evm.Instance {
 			},
 		};
 	}
+
+	public async view(viewContext: Contracts.Evm.TransactionViewContext): Promise<Contracts.Evm.ViewResult> {
+		return {
+			success: true,
+		};
+	}
+
 	public async setAutoCommit(enabled: boolean): Promise<void> {}
 	public async configure(height: bigint, round: bigint): Promise<void> {}
 	public async onCommit(_: Contracts.Processor.ProcessableUnit): Promise<void> {}

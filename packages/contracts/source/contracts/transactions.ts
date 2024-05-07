@@ -9,7 +9,7 @@ export type TransactionHandlerContext = {
 	walletRepository: WalletRepository;
 	evm: {
 		instance: Instance;
-		commitKey?: CommitKey;
+		commitKey: CommitKey;
 	};
 };
 

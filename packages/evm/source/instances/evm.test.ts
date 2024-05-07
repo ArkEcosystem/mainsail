@@ -24,6 +24,7 @@ describe<{
 		const { receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey: { height: BigInt(0), round: BigInt(0) },
 		});
 
 		assert.true(receipt.success);
@@ -37,6 +38,7 @@ describe<{
 		let { receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey: { height: BigInt(0), round: BigInt(0) },
 		});
 
 		assert.true(receipt.success);
@@ -54,6 +56,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
+			commitKey: { height: BigInt(0), round: BigInt(0) },
 		}));
 
 		assert.true(receipt.success);
@@ -64,6 +67,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(balanceOfEncodedCall)),
 			recipient: contractAddress,
+			commitKey: { height: BigInt(0), round: BigInt(0) },
 		}));
 
 		assert.true(receipt.success);
@@ -76,6 +80,7 @@ describe<{
 		let { receipt } = await instance.process({
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey: { height: BigInt(0), round: BigInt(0) },
 		});
 
 		const contractAddress = receipt.deployedContractAddress;
@@ -85,6 +90,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from("0xdead", "hex"),
 			recipient: contractAddress,
+			commitKey: { height: BigInt(0), round: BigInt(0) },
 		}));
 
 		assert.false(receipt.success);
@@ -199,13 +205,14 @@ describe<{
 
 		// Balance updated correctly
 		const balanceOf = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		({ receipt } = await instance.process({
+		const { success, output } = await instance.view({
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(balanceOf)),
-			recipient: contractAddress,
-		}));
+			recipient: contractAddress!,
+		});
 
-		const [balance] = iface.decodeFunctionResult("balanceOf", receipt.output!);
+		assert.true(success);
+		const [balance] = iface.decodeFunctionResult("balanceOf", output!);
 		assert.equal(ethers.parseEther("2"), balance);
 	});
 
@@ -219,6 +226,7 @@ describe<{
 				await instance.process({
 					caller: "badsender_",
 					data: Buffer.from(bytecode.slice(2), "hex"),
+					commitKey: { height: BigInt(0), round: BigInt(0) },
 				}),
 		);
 	});

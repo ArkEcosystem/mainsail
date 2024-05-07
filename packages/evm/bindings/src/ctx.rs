@@ -10,8 +10,14 @@ pub struct JsTransactionContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<JsString>,
     pub data: JsBuffer,
-    // Must be provided for mutable transactions
-    pub commit_key: Option<JsCommitKey>,
+    pub commit_key: JsCommitKey,
+}
+
+#[napi(object)]
+pub struct JsTransactionViewContext {
+    pub caller: JsString,
+    pub recipient: JsString,
+    pub data: JsBuffer,
 }
 
 #[napi(object)]
@@ -25,8 +31,13 @@ pub struct TxContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub data: Bytes,
-    // Must be provided for mutable transactions
-    pub commit_key: Option<CommitKey>,
+    pub commit_key: CommitKey,
+}
+
+pub struct TxViewContext {
+    pub caller: Address,
+    pub recipient: Address,
+    pub data: Bytes,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -43,6 +54,35 @@ impl PendingCommit {
         Self {
             key,
             diff: Default::default(),
+        }
+    }
+}
+
+pub struct ExecutionContext {
+    pub caller: Address,
+    pub recipient: Option<Address>,
+    pub data: Bytes,
+    pub commit_key: Option<CommitKey>,
+}
+
+impl From<TxViewContext> for ExecutionContext {
+    fn from(value: TxViewContext) -> Self {
+        Self {
+            caller: value.caller,
+            recipient: Some(value.recipient),
+            data: value.data,
+            commit_key: None,
+        }
+    }
+}
+
+impl From<TxContext> for ExecutionContext {
+    fn from(value: TxContext) -> Self {
+        Self {
+            caller: value.caller,
+            recipient: value.recipient,
+            data: value.data,
+            commit_key: Some(value.commit_key),
         }
     }
 }
@@ -70,16 +110,26 @@ impl TryFrom<JsTransactionContext> for TxContext {
             None
         };
 
-        let commit_key = if let Some(commit_key) = value.commit_key {
-            Some(commit_key.try_into()?)
-        } else {
-            None
-        };
-
         let tx_ctx = TxContext {
-            commit_key,
+            commit_key: value.commit_key.try_into()?,
             recipient,
             caller: utils::create_address_from_js_string(value.caller)?,
+            data: Bytes::from(buf.as_ref().to_owned()),
+        };
+
+        Ok(tx_ctx)
+    }
+}
+
+impl TryFrom<JsTransactionViewContext> for TxViewContext {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsTransactionViewContext) -> std::result::Result<Self, Self::Error> {
+        let buf = value.data.into_value()?;
+
+        let tx_ctx = TxViewContext {
+            caller: utils::create_address_from_js_string(value.caller)?,
+            recipient: utils::create_address_from_js_string(value.recipient)?,
             data: Bytes::from(buf.as_ref().to_owned()),
         };
 
