@@ -23,7 +23,7 @@ export class Database {
 		}
 
 		this.#database = new LowSync<{ webhooks: Webhook[] }>(new JSONFileSync(adapterFile), { webhooks: [] });
-		this.#tryRestore();
+		this.#restore();
 	}
 
 	public all(): Webhook[] {
@@ -66,7 +66,7 @@ export class Database {
 		this.#database.write();
 	}
 
-	#tryRestore(): void {
+	#restore(): void {
 		try {
 			this.#database.read();
 		} catch {}

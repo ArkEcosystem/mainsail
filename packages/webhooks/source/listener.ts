@@ -26,12 +26,15 @@ export class Listener {
 
 	public async handle({ name, data }): Promise<void> {
 		// Skip own events to prevent cycling
-		if (name.toString().includes("webhooks")) {
+		if (name.includes("webhooks")) {
 			return;
 		}
 
 		if (this.state.isBootstrap()) {
-			return;
+			// Skip all but kernel events during bootstrap
+			if (!name.startsWith("kernel.")) {
+				return;
+			}
 		}
 
 		const webhooks: Webhook[] = this.#getWebhooks(name, data);
