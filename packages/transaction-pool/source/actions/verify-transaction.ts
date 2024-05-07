@@ -13,7 +13,7 @@ export class VerifyTransactionAction extends Services.Triggers.Action {
 		const walletRepository: Contracts.State.WalletRepository = arguments_.walletRepository;
 
 		return handler.verify(
-			{ evm: { instance: this.evm, commitKey: { height: BigInt(0), round: BigInt(0) } }, walletRepository },
+			{ evm: { commitKey: { height: BigInt(0), round: BigInt(0) }, instance: this.evm }, walletRepository },
 			transaction,
 		);
 	}

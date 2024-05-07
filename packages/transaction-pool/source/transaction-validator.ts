@@ -32,7 +32,7 @@ export class TransactionValidator implements Contracts.State.TransactionValidato
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		await handler.apply(
 			{
-				evm: { instance: this.evm, commitKey: { height: BigInt(0), round: BigInt(0) } },
+				evm: { commitKey: { height: BigInt(0), round: BigInt(0) }, instance: this.evm },
 				walletRepository: this.#walletRepository,
 			},
 			transaction,
