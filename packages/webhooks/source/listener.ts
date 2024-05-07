@@ -30,11 +30,11 @@ export class Listener {
 			return;
 		}
 
-		if (this.state.isBootstrap()) {
-			// Skip all but kernel events during bootstrap
-			if (!name.startsWith("kernel.")) {
-				return;
-			}
+		if (
+			this.state.isBootstrap() && // Skip all but kernel events during bootstrap
+			!name.startsWith("kernel.")
+		) {
+			return;
 		}
 
 		const webhooks: Webhook[] = this.#getWebhooks(name, data);
