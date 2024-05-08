@@ -1,0 +1,39 @@
+name: Check Minimum Commit Count
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  check-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check number of commits in PR
+        id: commits
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const payload = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            return payload.data.length;
+
+      - name: Post comment if commits are fewer than 2
+        if: steps.commits.outputs.result < 2
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'This pull request does not contain the minimum required number of commits (2). Please add more commits.'
+            });
+
+      - name: Fail the job if fewer than 2 commits
+        if: steps.commits.outputs.result < 2
+        run: |
+          echo "Failing the job because there are fewer than 2 commits."
+          exit 1
