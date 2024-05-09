@@ -200,13 +200,13 @@ export class Sync implements Contracts.ApiSync.Service {
 		await this.configurationRepositoryFactory()
 			.createQueryBuilder()
 			.insert()
-			.orIgnore()
 			.values({
 				activeMilestones: this.configuration.getMilestone(0) as Record<string, any>,
 				cryptoConfiguration: (this.configuration.all() ?? {}) as Record<string, any>,
 				id: 1,
 				version: this.app.version(),
 			})
+			.orUpdate(["crypto_configuration", "version"], ["id"])
 			.execute();
 	}
 
