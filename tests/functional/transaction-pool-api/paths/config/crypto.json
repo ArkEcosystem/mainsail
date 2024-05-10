@@ -3430,8 +3430,8 @@
 			"timeouts": {
 				"blockTime": 100,
 				"blockPrepareTime": 0,
-				"stageTime": 100,
-				"stageTimeIncrease": 100
+				"stageTimeout": 100,
+				"stageTimeoutIncrease": 100
 			},
 			"epoch": "2023-12-21T00:00:00.000Z",
 			"fees": {

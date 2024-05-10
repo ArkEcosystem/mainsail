@@ -27,12 +27,15 @@
 			"decimals": 8,
 			"denomination": 100000000
 		},
-		"blockTime": 8000,
-		"stageTimeout": 2000,
+		"timeouts": {
+			"blockTime": 100,
+			"blockPrepareTime": 0,
+			"stageTimeout": 100,
+			"stageTimeoutIncrease": 100
+		},
 		"activeValidators": 0,
 		"multiPaymentLimit": 256,
-		"vendorFieldLength": 255,
-		"stageTimeoutIncrease": 2000
+		"vendorFieldLength": 255
 	},
 	"core": {
 		"version": "0.0.1"

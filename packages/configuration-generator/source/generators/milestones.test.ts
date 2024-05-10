@@ -45,8 +45,8 @@ describe<{
 					timeouts: {
 						blockPrepareTime: 4000,
 						blockTime: 8000,
-						stageTime: 2000,
-						stageTimeIncrease: 2000,
+						stageTimeout: 2000,
+						stageTimeoutIncrease: 2000,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
 					fees: {

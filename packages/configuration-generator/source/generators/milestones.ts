@@ -38,8 +38,8 @@ export class MilestonesGenerator {
 				timeouts: {
 					blockPrepareTime: options.blockTime / 2,
 					blockTime: options.blockTime,
-					stageTime: 2000,
-					stageTimeIncrease: 2000,
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
 				},
 				vendorFieldLength: options.vendorFieldLength,
 			},

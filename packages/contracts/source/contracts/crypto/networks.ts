@@ -39,8 +39,8 @@ export type MilestoneSatoshi = {
 export type MilestoneTimeouts = {
 	blockTime: number;
 	blockPrepareTime: number;
-	stageTime: number;
-	stageTimeIncrease: number;
+	stageTimeout: number;
+	stageTimeoutIncrease: number;
 };
 
 export type Milestone = {

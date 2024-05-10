@@ -46,8 +46,8 @@ describe<{
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,
-					stageTime: 2000,
-					stageTimeIncrease: 2000,
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
 				},
 				vendorFieldLength: 255,
 			},
@@ -64,8 +64,8 @@ describe<{
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,
-					stageTime: 2000,
-					stageTimeIncrease: 2000,
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
 				},
 				vendorFieldLength: 255,
 			},
@@ -82,8 +82,8 @@ describe<{
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,
-					stageTime: 2000,
-					stageTimeIncrease: 2000,
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
 				},
 				vendorFieldLength: 255,
 			},

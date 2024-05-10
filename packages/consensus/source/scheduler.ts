@@ -93,8 +93,8 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 
 	#getTimeout(round: number): number {
 		return (
-			this.cryptoConfiguration.getMilestone().timeouts.stageTime +
-			round * this.cryptoConfiguration.getMilestone().timeouts.stageTimeIncrease
+			this.cryptoConfiguration.getMilestone().timeouts.stageTimeout +
+			round * this.cryptoConfiguration.getMilestone().timeouts.stageTimeoutIncrease
 		);
 	}
 
