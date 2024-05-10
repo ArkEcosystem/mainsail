@@ -15,7 +15,12 @@ export class MilestonesGenerator {
 					maxTransactions: options.maxTxPerBlock,
 					version: 1,
 				},
-				blockTime: options.blockTime,
+				timeouts: {
+					blockPrepareTime: options.blockTime,
+					blockTime: options.blockTime / 2,
+					stageTime: 2000,
+					stageTimeIncrease: 2000,
+				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
 				fees: {
 					staticFees: {
@@ -36,8 +41,6 @@ export class MilestonesGenerator {
 					decimals: 8,
 					denomination: 1e8,
 				},
-				stageTimeout: 2000,
-				stageTimeoutIncrease: 2000,
 				vendorFieldLength: options.vendorFieldLength,
 			},
 			{
