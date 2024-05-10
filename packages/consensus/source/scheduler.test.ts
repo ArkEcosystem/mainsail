@@ -27,9 +27,12 @@ describe<{
 
 	const config = {
 		getMilestone: () => ({
-			blockTime: 8000,
-			stageTimeout: 1000,
-			stageTimeoutIncrease: 2000,
+			timeouts: {
+				blockPrepareTime: 4000,
+				blockTime: 8000,
+				stageTime: 1000,
+				stageTimeIncrease: 2000,
+			},
 		}),
 	};
 
