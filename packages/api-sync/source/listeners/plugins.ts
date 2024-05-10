@@ -30,7 +30,7 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 	}
 
 	protected getSyncIntervalMs(): number {
-		return this.configuration.getMilestone().blockTime;
+		return this.configuration.getMilestone().timeouts.blockTime;
 	}
 
 	protected mapEventToEntity({ name }: Event): Models.Plugin {
