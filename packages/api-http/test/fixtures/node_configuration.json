@@ -28,10 +28,10 @@
 			"denomination": 100000000
 		},
 		"timeouts": {
-			"blockTime": 100,
-			"blockPrepareTime": 0,
-			"stageTimeout": 100,
-			"stageTimeoutIncrease": 100
+			"blockTime": 8000,
+			"blockPrepareTime": 4000,
+			"stageTimeout": 2000,
+			"stageTimeoutIncrease": 2000
 		},
 		"activeValidators": 0,
 		"multiPaymentLimit": 256,
