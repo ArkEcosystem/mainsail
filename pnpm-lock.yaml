@@ -358,6 +358,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
     devDependencies:
       uvu:
         specifier: ^0.5.6
