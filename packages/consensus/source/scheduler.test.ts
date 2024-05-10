@@ -77,6 +77,27 @@ describe<{
 		assert.equal(fakeTimers.now, 6000); // 8000 - 2000
 	});
 
+	it("#scheduleTimeoutStartRound - should call onTimeoutStartRound with blockPreparationTime", async ({
+		scheduler,
+	}) => {
+		currentTimestamp = 6000;
+
+		const fakeTimers = clock();
+		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
+		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
+			data: {
+				timestamp: 0,
+			},
+		});
+
+		scheduler.scheduleTimeoutStartRound();
+		await fakeTimers.nextAsync();
+
+		spyOnGetLatBlock.calledOnce();
+		spyOnTimeoutStartRound.calledOnce();
+		assert.equal(fakeTimers.now, 4000);
+	});
+
 	it("#scheduleTimeoutPropose - should call onTimeoutStartRound only once", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
