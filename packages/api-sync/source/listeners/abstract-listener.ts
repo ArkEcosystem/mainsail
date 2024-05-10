@@ -1,6 +1,7 @@
 import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 
 import { EventListener } from "../contracts.js";
 
@@ -13,6 +14,10 @@ export type ListenerEventMapping = { [key: Contracts.Kernel.EventName]: Listener
 
 @injectable()
 export abstract class AbstractListener<TEventData, TEntity extends { [key: string]: any }> implements EventListener {
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "api-sync")
+	private readonly pluginConfiguration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -56,7 +61,7 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 	}
 
 	protected getSyncIntervalMs(): number {
-		return this.configuration.getMilestone().timeouts.blockTime;
+		return this.pluginConfiguration.getRequired<number>("syncInterval");
 	}
 
 	protected abstract getEventMapping(): ListenerEventMapping;
