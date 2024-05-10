@@ -1,3 +1,4 @@
+import { time } from "console";
 import { describe } from "../../../test-framework/source";
 import { MilestonesGenerator } from "./milestones";
 
@@ -41,7 +42,12 @@ describe<{
 						maxTransactions: 100,
 						version: 1,
 					},
-					blockTime: 8000,
+					timeouts: {
+						blockPrepareTime: 4000,
+						blockTime: 8000,
+						stageTimeout: 2000,
+						stageTimeoutIncrease: 2000,
+					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
 					fees: {
 						staticFees: {
@@ -62,8 +68,6 @@ describe<{
 						decimals: 8,
 						denomination: 1e8,
 					},
-					stageTimeout: 2000,
-					stageTimeoutIncrease: 2000,
 					vendorFieldLength: 255,
 				},
 				{

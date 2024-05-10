@@ -37,45 +37,54 @@ describe<{
 				activeValidators: 0,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
-				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
 				fees: cryptoJson.milestones[0].fees,
 				height: 0,
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: { decimals: 8, denomination: 100_000_000 },
-				stageTimeout: 2000,
-				stageTimeoutIncrease: 2000,
+				timeouts: {
+					blockPrepareTime: 4000,
+					blockTime: 8000,
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
+				},
 				vendorFieldLength: 255,
 			},
 			{
 				activeValidators: 53,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
-				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
 				fees: cryptoJson.milestones[0].fees,
 				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: { decimals: 8, denomination: 100_000_000 },
-				stageTimeout: 2000,
-				stageTimeoutIncrease: 2000,
+				timeouts: {
+					blockPrepareTime: 4000,
+					blockTime: 8000,
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
+				},
 				vendorFieldLength: 255,
 			},
 			{
 				activeValidators: 53,
 				address: { bech32m: "ark" },
 				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
-				blockTime: 8000,
 				epoch: cryptoJson.milestones[0].epoch,
 				fees: cryptoJson.milestones[0].fees,
 				height: 75_600,
 				multiPaymentLimit: 256,
 				reward: "200000000",
 				satoshi: { decimals: 8, denomination: 100_000_000 },
-				stageTimeout: 2000,
-				stageTimeoutIncrease: 2000,
+				timeouts: {
+					blockPrepareTime: 4000,
+					blockTime: 8000,
+					stageTimeout: 2000,
+					stageTimeoutIncrease: 2000,
+				},
 				vendorFieldLength: 255,
 			},
 		]);
@@ -127,8 +136,8 @@ describe<{
 				...cryptoJson,
 				milestones: [
 					{
-						height: 0,
 						activeValidators: 0,
+						height: 0,
 					},
 				],
 			}),
@@ -140,8 +149,8 @@ describe<{
 					...cryptoJson,
 					milestones: [
 						{
-							height: 1,
 							activeValidators: 0,
+							height: 1,
 						},
 					],
 				}),
@@ -154,12 +163,12 @@ describe<{
 					...cryptoJson,
 					milestones: [
 						{
-							height: 0,
 							activeValidators: 1,
+							height: 0,
 						},
 						{
-							height: 15,
 							activeValidators: 0,
+							height: 15,
 						},
 					],
 				}),
@@ -225,7 +234,7 @@ describe<{
 	it("getMaxActiveValidators - should return maximum active validators from all milestones", ({ configManager }) => {
 		configManager.setConfig({
 			...cryptoJson,
-			milestones: [{ height: 1, activeValidators: 1 }],
+			milestones: [{ activeValidators: 1, height: 1 }],
 		});
 
 		assert.equal(configManager.getMaxActiveValidators(), 1);
@@ -233,9 +242,9 @@ describe<{
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [
-				{ height: 1, activeValidators: 1 },
-				{ height: 3, activeValidators: 5 },
-				{ height: 8, activeValidators: 2 },
+				{ activeValidators: 1, height: 1 },
+				{ activeValidators: 5, height: 3 },
+				{ activeValidators: 2, height: 8 },
 			],
 		});
 
@@ -244,9 +253,9 @@ describe<{
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [
-				{ height: 1, activeValidators: 5 },
-				{ height: 6, activeValidators: 1 },
-				{ height: 7, activeValidators: 10 },
+				{ activeValidators: 5, height: 1 },
+				{ activeValidators: 1, height: 6 },
+				{ activeValidators: 10, height: 7 },
 			],
 		});
 
@@ -255,9 +264,9 @@ describe<{
 		configManager.setConfig({
 			...cryptoJson,
 			milestones: [
-				{ height: 1, activeValidators: 5 },
-				{ height: 6, activeValidators: 1 },
-				{ height: 7, activeValidators: 1 },
+				{ activeValidators: 5, height: 1 },
+				{ activeValidators: 1, height: 6 },
+				{ activeValidators: 1, height: 7 },
 			],
 		});
 
@@ -265,7 +274,7 @@ describe<{
 
 		configManager.setConfig({
 			...cryptoJson,
-			milestones: [{ height: 7, activeValidators: 1 }],
+			milestones: [{ activeValidators: 1, height: 7 }],
 		});
 
 		assert.equal(configManager.getMaxActiveValidators(), 1);

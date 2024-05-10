@@ -86,7 +86,13 @@ export const makeApplication = async (configurationPath: string, options: Record
 
 	// @ts-ignore
 	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-		milestones: [{ address: addressMilestone, blockTime: 8000, height: 0 }],
+		milestones: [
+			{
+				address: addressMilestone,
+				height: 0,
+				timeouts: { blockPrepareTime: 4000, blockTime: 8000, stageTimeout: 2000, stageTimeoutIncrease: 2000 },
+			},
+		],
 	});
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);

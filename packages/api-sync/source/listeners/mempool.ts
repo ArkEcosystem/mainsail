@@ -30,7 +30,7 @@ export class Mempool extends AbstractListener<Contracts.Crypto.TransactionData, 
 	}
 
 	protected getSyncIntervalMs(): number {
-		return this.configuration.getMilestone().blockTime;
+		return this.configuration.getMilestone().timeouts.blockTime;
 	}
 
 	protected mapEventToEntity(event: Contracts.Crypto.TransactionData): Models.MempoolTransaction {

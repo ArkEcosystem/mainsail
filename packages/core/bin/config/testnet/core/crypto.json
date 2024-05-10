@@ -3427,7 +3427,12 @@
 				"maxTransactions": 150,
 				"version": 1
 			},
-			"blockTime": 8000,
+			"timeouts": {
+				"blockTime": 8000,
+				"blockPrepareTime": 4000,
+				"stageTimeout": 2000,
+				"stageTimeoutIncrease": 2000
+			},
 			"epoch": "2023-12-21T00:00:00.000Z",
 			"fees": {
 				"staticFees": {
@@ -3448,8 +3453,6 @@
 				"decimals": 8,
 				"denomination": 100000000
 			},
-			"stageTimeout": 2000,
-			"stageTimeoutIncrease": 2000,
 			"vendorFieldLength": 255
 		},
 		{

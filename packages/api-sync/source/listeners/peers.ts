@@ -28,7 +28,7 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 	}
 
 	protected getSyncIntervalMs(): number {
-		return this.configuration.getMilestone().blockTime;
+		return this.configuration.getMilestone().timeouts.blockTime;
 	}
 
 	protected mapEventToEntity(event: Contracts.P2P.Peer): Models.Peer {

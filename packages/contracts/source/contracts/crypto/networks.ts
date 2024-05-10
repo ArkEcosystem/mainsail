@@ -36,21 +36,25 @@ export type MilestoneSatoshi = {
 	decimals: number;
 	denomination: number;
 };
+export type MilestoneTimeouts = {
+	blockTime: number;
+	blockPrepareTime: number;
+	stageTimeout: number;
+	stageTimeoutIncrease: number;
+};
 
 export type Milestone = {
 	height: number;
 	activeValidators: number;
 	address: Record<string, any>;
 	block: MilestoneBlock;
-	blockTime: number;
 	epoch: string;
 	fees: Fees;
 	multiPaymentLimit: number;
 	reward: string;
 	satoshi: MilestoneSatoshi;
+	timeouts: MilestoneTimeouts;
 	vendorFieldLength: number;
-	stageTimeout: number;
-	stageTimeoutIncrease: number;
 };
 
 export type MilestonePartial = Partial<Milestone> & {
