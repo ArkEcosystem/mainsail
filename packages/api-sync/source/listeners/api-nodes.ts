@@ -25,10 +25,6 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.ApiNode, Models.Api
 		return event.url;
 	}
 
-	protected getSyncIntervalMs(): number {
-		return this.configuration.getMilestone().timeouts.blockTime;
-	}
-
 	protected mapEventToEntity(event: Contracts.P2P.ApiNode): Models.ApiNode {
 		return {
 			height: event.height,

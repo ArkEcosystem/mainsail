@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
+import Joi from "joi";
 
 import { Listeners } from "./listeners.js";
 import { Sync } from "./service.js";
@@ -15,5 +16,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async dispose(): Promise<void> {
 		await this.app.get<Listeners>(Identifiers.ApiSync.Listener).dispose();
+	}
+
+	public configSchema(): Joi.ObjectSchema {
+		return Joi.object({
+			syncInterval: Joi.number().required(),
+		}).unknown(true);
 	}
 }

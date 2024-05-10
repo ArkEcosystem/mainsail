@@ -29,10 +29,6 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 		return event.name;
 	}
 
-	protected getSyncIntervalMs(): number {
-		return this.configuration.getMilestone().timeouts.blockTime;
-	}
-
 	protected mapEventToEntity({ name }: Event): Models.Plugin {
 		const serviceProvider = this.serviceProviderRepository.get(name);
 		const configuration = serviceProvider.config().all();
