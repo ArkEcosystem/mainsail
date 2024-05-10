@@ -43,6 +43,7 @@ export type Milestone = {
 	address: Record<string, any>;
 	block: MilestoneBlock;
 	blockTime: number;
+	blockPrepareTime: number;
 	epoch: string;
 	fees: Fees;
 	multiPaymentLimit: number;
