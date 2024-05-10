@@ -55,9 +55,12 @@ export abstract class AbstractListener<TEventData, TEntity extends { [key: strin
 		}
 	}
 
+	protected getSyncIntervalMs(): number {
+		return this.configuration.getMilestone().timeouts.blockTime;
+	}
+
 	protected abstract getEventMapping(): ListenerEventMapping;
 	protected abstract getEventId(event: TEventData): string;
-	protected abstract getSyncIntervalMs(): number;
 	protected abstract mapEventToEntity(event: TEventData): TEntity;
 	protected abstract makeEntityRepository(
 		dataSource: ApiDatabaseContracts.RepositoryDataSource,
