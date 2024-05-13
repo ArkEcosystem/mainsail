@@ -75,7 +75,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#round;
 	}
 
-	// TODO: Only for testing
+	// TODO: Only for tests
 	public setRound(round: number): void {
 		this.#round = round;
 	}
@@ -84,7 +84,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#step;
 	}
 
-	// TODO: Only for testing
+	// TODO: Only for tests
 	public setStep(step: Contracts.Consensus.Step): void {
 		this.#step = step;
 	}
@@ -97,9 +97,14 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
-	// TODO: Only for testing
+	// TODO: Only for tests
 	public setValidRound(round: Contracts.Consensus.RoundState): void {
 		this.#validValue = round;
+	}
+
+	// TODO: Only for tests
+	public setProposal(proposal: Contracts.Crypto.Proposal): void {
+		this.#proposal = proposal;
 	}
 
 	public getState(): Contracts.Consensus.State {
@@ -211,7 +216,9 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
 		if (this.#proposal) {
-			await this.proposalProcessor.process(this.#proposal);
+			const proposal = this.#proposal;
+			this.#proposal = undefined;
+			await this.proposalProcessor.process(proposal);
 		}
 	}
 
