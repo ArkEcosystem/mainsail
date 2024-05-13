@@ -222,10 +222,11 @@ pub struct JsEvmWrapper {
 #[napi]
 impl JsEvmWrapper {
     #[napi(constructor)]
-    pub fn new() -> Self {
-        JsEvmWrapper {
-            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new())),
-        }
+    pub fn new(path: JsString) -> Result<Self> {
+        let path = path.into_utf8()?.into_owned()?;
+        Ok(JsEvmWrapper {
+            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new(path.into()))),
+        })
     }
 
     #[napi(ts_return_type = "Promise<JsViewResult>")]
