@@ -3668,12 +3668,18 @@ importers:
       '@mainsail/validator-set-static':
         specifier: workspace:*
         version: link:../../../packages/validator-set-static
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
       date-fns:
         specifier: 3.6.0
         version: 3.6.0
       fs-extra:
         specifier: 11.2.0
         version: 11.2.0
+      tmp:
+        specifier: 0.2.3
+        version: 0.2.3
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

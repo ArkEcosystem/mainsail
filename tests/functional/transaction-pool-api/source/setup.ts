@@ -50,7 +50,7 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue(dirSync().name);
+	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
