@@ -133,7 +133,6 @@ impl EvmInner {
                         .as_mut()
                         .filter(|pending| pending.key == inner)
                     {
-                        // let mut temp_db = db.clone();
                         for pending in &pending.diff {
                             db.commit(pending.state.clone());
                         }
