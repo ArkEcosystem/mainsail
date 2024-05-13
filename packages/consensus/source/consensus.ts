@@ -192,17 +192,18 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutStartRound();
-	}
-
-	public async onTimeoutStartRound(): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer}`);
 
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.RoundStarted, this.getState());
 
+		this.scheduler.scheduleTimeoutStartRound();
+	}
+
+	public async onTimeoutStartRound(): Promise<void> {
 		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
+		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		await this.propose(roundState);
 	}
 
