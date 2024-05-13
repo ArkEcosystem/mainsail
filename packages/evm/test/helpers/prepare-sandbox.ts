@@ -16,6 +16,7 @@ import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { Sandbox } from "@mainsail/test-framework";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { dirSync } from "tmp";
 
 export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox = new Sandbox();
@@ -38,6 +39,9 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
+
+	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+	context.sandbox.app.useDataPath(dirSync().name);
 
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 	await context.sandbox.app.resolve(CoreTransactions).register();

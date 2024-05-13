@@ -6,11 +6,14 @@ import { abi, bytecode } from "../../test/fixtures/MainsailERC20.json";
 import { wallets } from "../../test/fixtures/wallets";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { EvmInstance } from "./evm";
+import { setGracefulCleanup } from "tmp";
 
 describe<{
 	sandbox: Sandbox;
 	instance: Contracts.Evm.Instance;
-}>("Instance", ({ it, assert, beforeEach }) => {
+}>("Instance", ({ it, assert, afterAll, beforeEach }) => {
+	afterAll(() => setGracefulCleanup());
+
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
@@ -41,6 +44,8 @@ describe<{
 			commitKey: { height: BigInt(0), round: BigInt(0) },
 		});
 
+		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
@@ -49,7 +54,17 @@ describe<{
 		assert.defined(contractAddress);
 
 		const iface = new ethers.Interface(abi);
-		const amount = ethers.parseEther("1000");
+		const balanceOfSender = iface.encodeFunctionData("balanceOf", [sender.address]);
+		let { output } = await instance.view({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(balanceOfSender)),
+			recipient: contractAddress!,
+		});
+
+		let [balance] = iface.decodeFunctionResult("balanceOf", output!);
+		assert.equal(balance, ethers.parseEther("100000000"));
+
+		const amount = ethers.parseEther("1999");
 
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
 		({ receipt } = await instance.process({
@@ -59,19 +74,20 @@ describe<{
 			commitKey: { height: BigInt(0), round: BigInt(0) },
 		}));
 
+		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 52_222n);
 
-		const balanceOfEncodedCall = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		({ receipt } = await instance.process({
+		const balanceOfRecipient = iface.encodeFunctionData("balanceOf", [recipient.address]);
+		({ output } = await instance.view({
 			caller: sender.address,
-			data: Buffer.from(ethers.getBytes(balanceOfEncodedCall)),
-			recipient: contractAddress,
-			commitKey: { height: BigInt(0), round: BigInt(0) },
+			data: Buffer.from(ethers.getBytes(balanceOfRecipient)),
+			recipient: contractAddress!,
 		}));
 
-		assert.true(receipt.success);
-		assert.equal(receipt.gasUsed, 24_295n);
+		[balance] = iface.decodeFunctionResult("balanceOf", output!);
+		assert.equal(balance, amount);
 	});
 
 	it("should revert on invalid call", async ({ instance }) => {

@@ -2423,9 +2423,15 @@ importers:
       '@napi-rs/cli':
         specifier: ^2.18.0
         version: 2.18.2
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
       ethers:
         specifier: 6.11.0
         version: 6.11.0
+      tmp:
+        specifier: 0.2.3
+        version: 0.2.3
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -3809,6 +3815,12 @@ importers:
       '@mainsail/validator-set-static':
         specifier: workspace:*
         version: link:../../../packages/validator-set-static
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
+      tmp:
+        specifier: 0.2.3
+        version: 0.2.3
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

@@ -2,10 +2,10 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
+import { dirSync } from "tmp";
 
 import { MemoryDatabase } from "./database.js";
 import { Worker } from "./worker.js";
-
 type PluginOptions = Record<string, any>;
 
 const setup = async () => {
@@ -50,8 +50,7 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-
-	sandbox.app.bind("path.data").toConstantValue("");
+	sandbox.app.bind("path.data").toConstantValue(dirSync().name);
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
