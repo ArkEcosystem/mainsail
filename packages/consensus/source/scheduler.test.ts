@@ -80,25 +80,25 @@ describe<{
 		spyOnGetLatBlock.calledOnce();
 	});
 
-	it("#scheduleTimeoutStartRound - should call onTimeoutStartRound", async ({ scheduler }) => {
+	it("#scheduleTimeoutBlockPrepare - should call onTimeoutStartRound", async ({ scheduler }) => {
 		currentTimestamp = 2000;
 
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
 
-		scheduler.scheduleTimeoutStartRound(8000);
+		scheduler.scheduleTimeoutBlockPrepare(8000);
 		await fakeTimers.nextAsync();
 
 		spyOnTimeoutStartRound.calledOnce();
 		assert.equal(fakeTimers.now, 6000); // 8000 - 2000
 	});
 
-	it("#scheduleTimeoutStartRound - should call onTimeoutStartRound only once", async ({ scheduler }) => {
+	it("#scheduleTimeoutBlockPrepare - should call onTimeoutStartRound only once", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
 
-		scheduler.scheduleTimeoutStartRound(8000);
-		scheduler.scheduleTimeoutStartRound(8000);
+		scheduler.scheduleTimeoutBlockPrepare(8000);
+		scheduler.scheduleTimeoutBlockPrepare(8000);
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 

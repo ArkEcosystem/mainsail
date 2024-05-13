@@ -63,7 +63,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			scheduleTimeoutPrecommit: () => {},
 			scheduleTimeoutPrevote: () => {},
 			scheduleTimeoutPropose: () => {},
-			scheduleTimeoutStartRound: () => {},
+			scheduleTimeoutBlockPrepare: () => {},
 		};
 
 		context.bootstrapper = {
@@ -204,7 +204,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		logger,
 	}) => {
 		const spyScheduleClear = spy(scheduler, "clear");
-		const spyScheduleTimeoutStartRound = spy(scheduler, "scheduleTimeoutStartRound");
+		const spyscheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyLoggerInfo = spy(logger, "info");
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
 		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
@@ -216,7 +216,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.startRound(0);
 
 		spyScheduleClear.calledOnce();
-		spyScheduleTimeoutStartRound.calledOnce();
+		spyscheduleTimeoutBlockPrepare.calledOnce();
 
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.getConsensusPublicKey());
@@ -251,7 +251,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const spyScheduleClear = spy(scheduler, "clear");
-		const spyScheduleTimeoutStartRound = spy(scheduler, "scheduleTimeoutStartRound");
+		const spyscheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
 
@@ -269,7 +269,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.startRound(0);
 
 		spyScheduleClear.calledOnce();
-		spyScheduleTimeoutStartRound.calledOnce();
+		spyscheduleTimeoutBlockPrepare.calledOnce();
 
 		spyGetRoundState.calledTimes(1);
 		spyGetRoundState.calledWith(1, 0);
@@ -312,7 +312,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		const spyScheduleClear = spy(scheduler, "clear");
-		const spyScheduleTimeoutStartRound = spy(scheduler, "scheduleTimeoutStartRound");
+		const spyscheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 
 		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
@@ -341,7 +341,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.startRound(1);
 
 		spyScheduleClear.calledOnce();
-		spyScheduleTimeoutStartRound.calledOnce();
+		spyscheduleTimeoutBlockPrepare.calledOnce();
 
 		spyGetRoundState.calledTimes(1);
 		spyGetRoundState.calledWith(1, 1);
