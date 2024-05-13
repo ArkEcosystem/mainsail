@@ -1,16 +1,16 @@
-use std::{convert::Infallible, str::FromStr, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 
 use ctx::{
     ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, PendingCommit,
     TxContext, TxViewContext,
 };
-use mainsail_evm_core::EvmInstance;
+use mainsail_evm_core::{db::EphemeralDB, EvmInstance};
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
-    primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
-    DatabaseCommit,
+    primitives::{EVMError, ExecutionResult, ResultAndState, U256},
+    DatabaseCommit, Evm,
 };
 
 use crate::ctx::CommitKey;
@@ -21,8 +21,7 @@ mod utils;
 
 // A complex struct which cannot be exposed to JavaScript directly.
 pub struct EvmInner {
-    // 'Option' is used because of the ownership changing when updating the EVM.
-    evm_instance: Option<EvmInstance>,
+    evm_instance: EvmInstance,
 
     // A pending commit consists of one or more transactions.
     pending_commit: Option<PendingCommit>,
@@ -32,10 +31,10 @@ pub struct EvmInner {
 unsafe impl Send for EvmInner {}
 
 impl EvmInner {
-    pub fn new() -> Self {
-        let evm = mainsail_evm_core::create_evm_instance();
+    pub fn new(path: PathBuf) -> Self {
+        let evm = mainsail_evm_core::create_evm_instance(path);
         EvmInner {
-            evm_instance: Some(evm),
+            evm_instance: evm,
             pending_commit: Default::default(),
         }
     }
@@ -82,7 +81,10 @@ impl EvmInner {
 
                 Ok(receipt)
             }
-            Err(_) => todo!(),
+            Err(err) => {
+                println!("err {:?}", err);
+                todo!()
+            }
         }
     }
 
@@ -103,7 +105,7 @@ impl EvmInner {
                 //     pending_commit.diff.len(),
                 // );
 
-                let db = self.evm_instance.as_mut().expect("get evm").db_mut();
+                let db = self.evm_instance.db_mut();
                 for pending in pending_commit.diff.drain(..) {
                     db.commit(pending.state);
                 }
@@ -116,14 +118,13 @@ impl EvmInner {
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
-    ) -> std::result::Result<ResultAndState, EVMError<Infallible>> {
-        let mut evm = self.evm_instance.take().expect("ok");
+    ) -> std::result::Result<ResultAndState, EVMError<mainsail_evm_core::db::Error>> {
+        let evm = &self.evm_instance;
 
-        // Prepare the EVM to run the given transaction
-        let mut original_db = Option::default();
+        let ephemeral_db = EphemeralDB::new(evm.db());
 
-        evm = evm
-            .modify()
+        let result = Evm::builder()
+            .with_db(ephemeral_db)
             .modify_db(|db| {
                 // Ensure pending commits from same round are visible to the transaction being applied
                 if let Some(inner) = ctx.commit_key {
@@ -132,14 +133,10 @@ impl EvmInner {
                         .as_mut()
                         .filter(|pending| pending.key == inner)
                     {
-                        // TODO: don't deep clone db
-                        let mut temp_db = db.clone();
+                        // let mut temp_db = db.clone();
                         for pending in &pending.diff {
-                            temp_db.commit(pending.state.clone());
+                            db.commit(pending.state.clone());
                         }
-
-                        original_db = Some(std::mem::take(db));
-                        *db = temp_db;
                     }
                 }
             })
@@ -156,23 +153,8 @@ impl EvmInner {
 
                 // tracing::debug!("{:#?}", tx_env);
             })
-            .build();
-
-        let result = evm.transact();
-
-        // Reset any pending DB changes by rolling back to the original DB
-        if let Some(mut original_db) = original_db {
-            evm = evm
-                .modify()
-                .modify_db(|db| {
-                    std::mem::swap(db, &mut original_db);
-                })
-                .build();
-        }
-
-        self.evm_instance.replace(evm);
-
-        // TODO: error handling
+            .build()
+            .transact();
 
         result
     }
