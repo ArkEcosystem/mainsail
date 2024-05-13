@@ -1,16 +1,16 @@
-use std::{convert::Infallible, str::FromStr, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 
 use ctx::{
     ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, PendingCommit,
     TxContext, TxViewContext,
 };
-use mainsail_evm_core::EvmInstance;
+use mainsail_evm_core::{db::EphemeralDB, EvmInstance};
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
-    primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
-    DatabaseCommit,
+    primitives::{EVMError, ExecutionResult, ResultAndState, U256},
+    DatabaseCommit, Evm,
 };
 
 use crate::ctx::CommitKey;
@@ -21,8 +21,7 @@ mod utils;
 
 // A complex struct which cannot be exposed to JavaScript directly.
 pub struct EvmInner {
-    // 'Option' is used because of the ownership changing when updating the EVM.
-    evm_instance: Option<EvmInstance>,
+    evm_instance: EvmInstance,
 
     // A pending commit consists of one or more transactions.
     pending_commit: Option<PendingCommit>,
@@ -31,73 +30,13 @@ pub struct EvmInner {
 // NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
 unsafe impl Send for EvmInner {}
 
-pub struct UpdateAccountInfoCtx {
-    pub address: Address,
-    pub balance: U256,
-    pub nonce: u64,
-}
-
-impl UpdateAccountInfoCtx {
-    pub fn new_from_js(account_info: JsAccountInfo) -> Self {
-        UpdateAccountInfoCtx {
-            address: Address::from_str(account_info.address.into_utf8().unwrap().as_str().unwrap())
-                .unwrap(),
-            balance: U256::from_str(
-                account_info
-                    .balance
-                    .coerce_to_string()
-                    .unwrap()
-                    .into_utf8()
-                    .unwrap()
-                    .as_str()
-                    .unwrap(),
-            )
-            .unwrap(),
-            nonce: account_info
-                .nonce
-                .coerce_to_string()
-                .unwrap()
-                .into_utf8()
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .parse::<u64>()
-                .unwrap(),
-        }
-    }
-}
-
 impl EvmInner {
-    pub fn new() -> Self {
-        let evm = mainsail_evm_core::create_evm_instance();
+    pub fn new(path: PathBuf) -> Self {
+        let evm = mainsail_evm_core::create_evm_instance(path);
         EvmInner {
-            evm_instance: Some(evm),
+            evm_instance: evm,
             pending_commit: Default::default(),
         }
-    }
-
-    pub fn update_account_info(&mut self, address: Address, account_info: AccountInfo) {
-        println!("update_account_info {} {:#?}", address, account_info);
-
-        let evm = &mut self.evm_instance.as_mut().expect("get evm").context.evm;
-
-        let mut db = evm.db.clone();
-        let journal = &mut evm.journaled_state;
-
-        let (account, _) = journal.load_account(address, &mut db).unwrap();
-        account.info = account_info;
-    }
-
-    pub fn get_account_info(&mut self, address: Address) -> Option<AccountInfo> {
-        println!("get_account_info {}", address);
-
-        let evm = &mut self.evm_instance.as_mut().expect("get evm").context.evm;
-
-        let mut db = evm.db.clone();
-        let journal = &mut evm.journaled_state;
-
-        let (account, _) = journal.load_account(address, &mut db).unwrap();
-        Some(account.info.clone())
     }
 
     pub fn view(&mut self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
@@ -117,6 +56,10 @@ impl EvmInner {
 
     pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
         let commit_key = tx_ctx.commit_key;
+
+        if self.evm_instance.db().is_height_committed(commit_key.0) {
+            return Ok(skipped_tx_receipt());
+        }
 
         // Drop pending commit on key change
         if self
@@ -142,11 +85,19 @@ impl EvmInner {
 
                 Ok(receipt)
             }
-            Err(_) => todo!(),
+            Err(err) => {
+                println!("err {:?}", err);
+                todo!()
+            }
         }
     }
 
     pub fn commit(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
+        if self.evm_instance.db().is_height_committed(commit_key.0) {
+            assert!(self.pending_commit.is_none());
+            return Ok(());
+        }
+
         if self
             .pending_commit
             .as_ref()
@@ -156,19 +107,23 @@ impl EvmInner {
         }
 
         match self.pending_commit.take() {
-            Some(mut pending_commit) => {
+            Some(pending_commit) => {
                 // println!(
                 //     "committing {:?} with {} transactions",
                 //     commit_key,
                 //     pending_commit.diff.len(),
                 // );
 
-                let db = self.evm_instance.as_mut().expect("get evm").db_mut();
-                for pending in pending_commit.diff.drain(..) {
-                    db.commit(pending.state);
-                }
+                let db = self.evm_instance.db_mut();
 
-                Ok(())
+                match db.commit(
+                    commit_key.0,
+                    commit_key.1,
+                    pending_commit.diff.into_iter().map(|v| v.state).collect(),
+                ) {
+                    Ok(()) => Ok(()),
+                    Err(err) => Err(EVMError::Database(format!("commit failed: {}", err).into())),
+                }
             }
             None => Ok(()), /* nothing to commit  */
         }
@@ -176,14 +131,13 @@ impl EvmInner {
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
-    ) -> std::result::Result<ResultAndState, EVMError<Infallible>> {
-        let mut evm = self.evm_instance.take().expect("ok");
+    ) -> std::result::Result<ResultAndState, EVMError<mainsail_evm_core::db::Error>> {
+        let evm = &self.evm_instance;
 
-        // Prepare the EVM to run the given transaction
-        let mut original_db = Option::default();
+        let ephemeral_db = EphemeralDB::new(evm.db());
 
-        evm = evm
-            .modify()
+        let result = Evm::builder()
+            .with_db(ephemeral_db)
             .modify_db(|db| {
                 // Ensure pending commits from same round are visible to the transaction being applied
                 if let Some(inner) = ctx.commit_key {
@@ -192,14 +146,9 @@ impl EvmInner {
                         .as_mut()
                         .filter(|pending| pending.key == inner)
                     {
-                        // TODO: don't deep clone db
-                        let mut temp_db = db.clone();
                         for pending in &pending.diff {
-                            temp_db.commit(pending.state.clone());
+                            db.commit(pending.state.clone());
                         }
-
-                        original_db = Some(std::mem::take(db));
-                        *db = temp_db;
                     }
                 }
             })
@@ -216,25 +165,21 @@ impl EvmInner {
 
                 // tracing::debug!("{:#?}", tx_env);
             })
-            .build();
-
-        let result = evm.transact();
-
-        // Reset any pending DB changes by rolling back to the original DB
-        if let Some(mut original_db) = original_db {
-            evm = evm
-                .modify()
-                .modify_db(|db| {
-                    std::mem::swap(db, &mut original_db);
-                })
-                .build();
-        }
-
-        self.evm_instance.replace(evm);
-
-        // TODO: error handling
+            .build()
+            .transact();
 
         result
+    }
+}
+
+const fn skipped_tx_receipt() -> TxReceipt {
+    TxReceipt {
+        gas_used: 0,
+        gas_refunded: 0,
+        success: true,
+        deployed_contract_address: None,
+        logs: None,
+        output: None,
     }
 }
 
@@ -300,10 +245,11 @@ pub struct JsEvmWrapper {
 #[napi]
 impl JsEvmWrapper {
     #[napi(constructor)]
-    pub fn new() -> Self {
-        JsEvmWrapper {
-            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new())),
-        }
+    pub fn new(path: JsString) -> Result<Self> {
+        let path = path.into_utf8()?.into_owned()?;
+        Ok(JsEvmWrapper {
+            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new(path.into()))),
+        })
     }
 
     #[napi(ts_return_type = "Promise<JsViewResult>")]
@@ -330,29 +276,6 @@ impl JsEvmWrapper {
         node_env.execute_tokio_future(
             Self::commit_async(self.evm.clone(), commit_key),
             |&mut node_env, _| Ok(result::JsCommitResult::new(&node_env)?),
-        )
-    }
-
-    #[napi(ts_return_type = "Promise<JsAccountInfo>")]
-    pub fn get_account_info(&mut self, node_env: Env, address: String) -> Result<JsObject> {
-        let address = Address::from_str(&address).unwrap();
-
-        node_env.execute_tokio_future(
-            Self::get_account_info_async(self.evm.clone(), address),
-            |&mut node_env, result| Ok(Self::to_account_info(node_env, result.0, result.1)),
-        )
-    }
-
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn update_account_info(
-        &mut self,
-        node_env: Env,
-        account_info: JsAccountInfo,
-    ) -> Result<JsObject> {
-        let update_account_info_ctx = UpdateAccountInfoCtx::new_from_js(account_info);
-        node_env.execute_tokio_future(
-            Self::update_account_info_async(self.evm.clone(), update_account_info_ctx),
-            |_, result| Ok(result),
         )
     }
 
@@ -384,56 +307,9 @@ impl JsEvmWrapper {
             Err(err) => Result::Err(serde::de::Error::custom(err)),
         }
     }
-
-    async fn get_account_info_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        address: Address,
-    ) -> Result<(Address, Option<AccountInfo>)> {
-        let mut lock = evm.lock().await;
-        let result = lock.get_account_info(address);
-        Ok((address, result))
-    }
-
-    async fn update_account_info_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        update_account_info_ctx: UpdateAccountInfoCtx,
-    ) -> Result<()> {
-        let mut lock = evm.lock().await;
-        let result = lock.update_account_info(
-            update_account_info_ctx.address,
-            AccountInfo {
-                balance: update_account_info_ctx.balance,
-                nonce: update_account_info_ctx.nonce,
-                ..Default::default()
-            },
-        );
-        Ok(result)
-    }
-
-    fn to_account_info(
-        node_env: Env,
-        address: Address,
-        account_info: Option<AccountInfo>,
-    ) -> JsAccountInfo {
-        match account_info {
-            Some(account_info) => JsAccountInfo {
-                address: node_env
-                    .create_string_from_std(address.to_string())
-                    .unwrap(),
-                balance: convert_u256_to_bigint(node_env, account_info.balance),
-                nonce: node_env.create_bigint_from_u64(account_info.nonce).unwrap(),
-            },
-            None => JsAccountInfo {
-                address: node_env
-                    .create_string_from_std(address.to_string())
-                    .unwrap(),
-                balance: node_env.create_bigint_from_u64(0).unwrap(),
-                nonce: node_env.create_bigint_from_u64(0).unwrap(),
-            },
-        }
-    }
 }
 
+#[allow(unused)]
 fn convert_u256_to_bigint(node_env: Env, value: U256) -> JsBigInt {
     let slice = value.as_le_slice();
 
