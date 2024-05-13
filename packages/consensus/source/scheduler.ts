@@ -18,19 +18,10 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
 
-	public getBlockTimestamp(commitTime: number): number {
+	public getNextBlockTimestamp(commitTime: number): number {
 		return Math.max(
 			commitTime + this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime,
 			this.stateService.getStore().getLastBlock().data.timestamp +
-				this.cryptoConfiguration.getMilestone().timeouts.blockTime,
-		);
-	}
-
-	getTimeoutStartRound(): number {
-		return Math.max(
-			this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime,
-			this.stateService.getStore().getLastBlock().data.timestamp -
-				dayjs().valueOf() +
 				this.cryptoConfiguration.getMilestone().timeouts.blockTime,
 		);
 	}
