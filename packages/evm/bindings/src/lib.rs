@@ -31,42 +31,6 @@ pub struct EvmInner {
 // NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
 unsafe impl Send for EvmInner {}
 
-pub struct UpdateAccountInfoCtx {
-    pub address: Address,
-    pub balance: U256,
-    pub nonce: u64,
-}
-
-impl UpdateAccountInfoCtx {
-    pub fn new_from_js(account_info: JsAccountInfo) -> Self {
-        UpdateAccountInfoCtx {
-            address: Address::from_str(account_info.address.into_utf8().unwrap().as_str().unwrap())
-                .unwrap(),
-            balance: U256::from_str(
-                account_info
-                    .balance
-                    .coerce_to_string()
-                    .unwrap()
-                    .into_utf8()
-                    .unwrap()
-                    .as_str()
-                    .unwrap(),
-            )
-            .unwrap(),
-            nonce: account_info
-                .nonce
-                .coerce_to_string()
-                .unwrap()
-                .into_utf8()
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .parse::<u64>()
-                .unwrap(),
-        }
-    }
-}
-
 impl EvmInner {
     pub fn new() -> Self {
         let evm = mainsail_evm_core::create_evm_instance();
@@ -74,30 +38,6 @@ impl EvmInner {
             evm_instance: Some(evm),
             pending_commit: Default::default(),
         }
-    }
-
-    pub fn update_account_info(&mut self, address: Address, account_info: AccountInfo) {
-        println!("update_account_info {} {:#?}", address, account_info);
-
-        let evm = &mut self.evm_instance.as_mut().expect("get evm").context.evm;
-
-        let mut db = evm.db.clone();
-        let journal = &mut evm.journaled_state;
-
-        let (account, _) = journal.load_account(address, &mut db).unwrap();
-        account.info = account_info;
-    }
-
-    pub fn get_account_info(&mut self, address: Address) -> Option<AccountInfo> {
-        println!("get_account_info {}", address);
-
-        let evm = &mut self.evm_instance.as_mut().expect("get evm").context.evm;
-
-        let mut db = evm.db.clone();
-        let journal = &mut evm.journaled_state;
-
-        let (account, _) = journal.load_account(address, &mut db).unwrap();
-        Some(account.info.clone())
     }
 
     pub fn view(&mut self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
@@ -333,29 +273,6 @@ impl JsEvmWrapper {
         )
     }
 
-    #[napi(ts_return_type = "Promise<JsAccountInfo>")]
-    pub fn get_account_info(&mut self, node_env: Env, address: String) -> Result<JsObject> {
-        let address = Address::from_str(&address).unwrap();
-
-        node_env.execute_tokio_future(
-            Self::get_account_info_async(self.evm.clone(), address),
-            |&mut node_env, result| Ok(Self::to_account_info(node_env, result.0, result.1)),
-        )
-    }
-
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn update_account_info(
-        &mut self,
-        node_env: Env,
-        account_info: JsAccountInfo,
-    ) -> Result<JsObject> {
-        let update_account_info_ctx = UpdateAccountInfoCtx::new_from_js(account_info);
-        node_env.execute_tokio_future(
-            Self::update_account_info_async(self.evm.clone(), update_account_info_ctx),
-            |_, result| Ok(result),
-        )
-    }
-
     async fn view_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         view_ctx: TxViewContext,
@@ -384,56 +301,9 @@ impl JsEvmWrapper {
             Err(err) => Result::Err(serde::de::Error::custom(err)),
         }
     }
-
-    async fn get_account_info_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        address: Address,
-    ) -> Result<(Address, Option<AccountInfo>)> {
-        let mut lock = evm.lock().await;
-        let result = lock.get_account_info(address);
-        Ok((address, result))
-    }
-
-    async fn update_account_info_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        update_account_info_ctx: UpdateAccountInfoCtx,
-    ) -> Result<()> {
-        let mut lock = evm.lock().await;
-        let result = lock.update_account_info(
-            update_account_info_ctx.address,
-            AccountInfo {
-                balance: update_account_info_ctx.balance,
-                nonce: update_account_info_ctx.nonce,
-                ..Default::default()
-            },
-        );
-        Ok(result)
-    }
-
-    fn to_account_info(
-        node_env: Env,
-        address: Address,
-        account_info: Option<AccountInfo>,
-    ) -> JsAccountInfo {
-        match account_info {
-            Some(account_info) => JsAccountInfo {
-                address: node_env
-                    .create_string_from_std(address.to_string())
-                    .unwrap(),
-                balance: convert_u256_to_bigint(node_env, account_info.balance),
-                nonce: node_env.create_bigint_from_u64(account_info.nonce).unwrap(),
-            },
-            None => JsAccountInfo {
-                address: node_env
-                    .create_string_from_std(address.to_string())
-                    .unwrap(),
-                balance: node_env.create_bigint_from_u64(0).unwrap(),
-                nonce: node_env.create_bigint_from_u64(0).unwrap(),
-            },
-        }
-    }
 }
 
+#[allow(unused)]
 fn convert_u256_to_bigint(node_env: Env, value: U256) -> JsBigInt {
     let slice = value.as_le_slice();
 
