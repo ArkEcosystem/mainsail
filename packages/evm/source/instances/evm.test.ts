@@ -71,10 +71,10 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
-			commitKey: { height: BigInt(0), round: BigInt(0) },
+			commitKey: { height: BigInt(1), round: BigInt(0) },
 		}));
 
-		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+		await instance.onCommit({ height: BigInt(1), round: BigInt(0) } as any);
 
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 52_222n);
@@ -243,5 +243,33 @@ describe<{
 					commitKey: { height: BigInt(0), round: BigInt(0) },
 				}),
 		);
+	});
+
+	it("should skip already committed commit key", async ({ instance }) => {
+		const [sender] = wallets;
+
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		let { receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey,
+		});
+
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+		assert.length(receipt.logs, 1);
+
+		await instance.onCommit(commitKey as any);
+
+		({ receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey,
+		}));
+
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 0n);
+		assert.null(receipt.logs);
 	});
 });

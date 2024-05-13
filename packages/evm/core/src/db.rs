@@ -23,9 +23,13 @@ impl heed::BytesEncode<'_> for ContractWrapper {
     }
 }
 
+type HeedHeight = heed::types::U64<heed::byteorder::LittleEndian>;
+type HeedRound = heed::types::U64<heed::byteorder::LittleEndian>;
+
 pub struct PersistentDB {
     env: heed::Env,
     accounts: heed::Database<AddressWrapper, heed::types::SerdeJson<AccountInfo>>,
+    commits: heed::Database<HeedHeight, HeedRound>,
     contracts: heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
     storage: heed::Database<AddressWrapper, heed::types::SerdeJson<Storage>>,
 }
@@ -57,7 +61,7 @@ impl PersistentDB {
         std::fs::create_dir_all(&path)?;
 
         let mut env_builder = EnvOpenOptions::new();
-        env_builder.max_dbs(3);
+        env_builder.max_dbs(4);
 
         let env = unsafe { env_builder.open(path) }?;
 
@@ -68,6 +72,7 @@ impl PersistentDB {
             &mut wtxn,
             Some("accounts"),
         )?;
+        let commits = env.create_database::<HeedHeight, HeedRound>(&mut wtxn, Some("commits"))?;
         let contracts = env.create_database::<ContractWrapper, heed::types::SerdeJson<Bytecode>>(
             &mut wtxn,
             Some("contracts"),
@@ -82,6 +87,7 @@ impl PersistentDB {
         Ok(Self {
             env,
             accounts,
+            commits,
             contracts,
             storage,
         })
@@ -153,70 +159,90 @@ impl DatabaseRef for PersistentDB {
     }
 }
 
-impl DatabaseCommit for PersistentDB {
-    fn commit(&mut self, changes: HashMap<Address, Account>) {
-        let env = self.env.clone();
-        let mut rwtxn = env.write_txn().expect("begin commit");
+impl PersistentDB {
+    pub fn commit(
+        &mut self,
+        height: u64,
+        round: u64,
+        mut changes: Vec<HashMap<Address, Account>>,
+    ) -> Result<(), Error> {
+        assert!(!self.is_height_committed(height));
 
-        for (address, mut account) in changes {
-            let address = AddressWrapper(address);
+        let mut rwtxn = self.env.write_txn()?;
 
-            if !account.is_touched() {
-                continue;
+        let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
+            for change in changes.drain(..) {
+                for (address, mut account) in change {
+                    let address = AddressWrapper(address);
+
+                    if !account.is_touched() {
+                        continue;
+                    }
+                    if account.is_selfdestructed() {
+                        self.accounts.delete(rwtxn, &address)?;
+                        continue;
+                    }
+
+                    let is_newly_created = account.is_created();
+                    insert_contract(rwtxn, &mut self.contracts, &mut account.info)?;
+
+                    self.accounts.put(rwtxn, &address, &account.info)?;
+
+                    // println!("put account {:?}", account.info);
+
+                    let mut account_storage =
+                        self.storage.get(rwtxn, &address)?.unwrap_or_default();
+
+                    if is_newly_created {
+                        account_storage.clear();
+                    }
+
+                    account_storage.extend(account.storage);
+
+                    self.storage.put(rwtxn, &address, &account_storage)?;
+                }
             }
-            if account.is_selfdestructed() {
-                self.accounts
-                    .delete(&mut rwtxn, &address)
-                    .expect("delete account");
-                continue;
-            }
 
-            let is_newly_created = account.is_created();
-            self.insert_contract(&mut rwtxn, &mut account.info);
+            self.commits.put(rwtxn, &height, &round)?;
 
-            self.accounts
-                .put(&mut rwtxn, &address, &account.info)
-                .expect("put account");
+            Ok(())
+        };
 
-            // println!("put account {:?}", account.info);
-
-            let mut account_storage = self
-                .storage
-                .get(&mut rwtxn, &address)
-                .expect("account storage")
-                .unwrap_or_default();
-
-            if is_newly_created {
-                account_storage.clear();
-            }
-
-            account_storage.extend(account.storage);
-
-            self.storage
-                .put(&mut rwtxn, &address, &account_storage)
-                .expect("put storage");
+        if let Err(err) = apply_changes(&mut rwtxn) {
+            rwtxn.abort();
+            return Err(err.into());
         }
 
-        rwtxn.commit().expect("end commit");
+        rwtxn.commit()?;
+        Ok(())
+    }
+
+    pub fn is_height_committed(&self, height: u64) -> bool {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+
+        self.commits.get(&rtxn, &height).is_ok_and(|v| v.is_some())
     }
 }
 
-impl PersistentDB {
-    pub fn insert_contract(&mut self, rwtxn: &mut heed::RwTxn, account: &mut AccountInfo) {
-        if let Some(code) = &account.code {
-            if !code.is_empty() {
-                if account.code_hash == KECCAK_EMPTY {
-                    account.code_hash = code.hash_slow();
-                }
-                self.contracts
-                    .put(rwtxn, &ContractWrapper(account.code_hash), code)
-                    .expect("put contract");
+fn insert_contract(
+    rwtxn: &mut heed::RwTxn,
+    contracts: &mut heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
+    account: &mut AccountInfo,
+) -> Result<(), Error> {
+    if let Some(code) = &account.code {
+        if !code.is_empty() {
+            if account.code_hash == KECCAK_EMPTY {
+                account.code_hash = code.hash_slow();
             }
-        }
-        if account.code_hash == B256::ZERO {
-            account.code_hash = KECCAK_EMPTY;
+            contracts.put(rwtxn, &ContractWrapper(account.code_hash), code)?;
         }
     }
+    if account.code_hash == B256::ZERO {
+        account.code_hash = KECCAK_EMPTY;
+    }
+
+    Ok(())
 }
 
 impl<'a> Database for EphemeralDB<'a> {
@@ -283,7 +309,8 @@ fn test_commit_changes() {
     account.status = AccountStatus::Touched;
 
     changes.insert(address, account);
-    db.commit(changes);
+    let result = db.commit(0, 0, vec![changes]);
+    assert!(result.is_ok());
 
     // 3) Assert updated balance
     let account = db.basic(address).expect("works").expect("account info");

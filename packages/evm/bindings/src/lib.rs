@@ -57,6 +57,10 @@ impl EvmInner {
     pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
         let commit_key = tx_ctx.commit_key;
 
+        if self.evm_instance.db().is_height_committed(commit_key.0) {
+            return Ok(skipped_tx_receipt());
+        }
+
         // Drop pending commit on key change
         if self
             .pending_commit
@@ -89,6 +93,11 @@ impl EvmInner {
     }
 
     pub fn commit(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
+        if self.evm_instance.db().is_height_committed(commit_key.0) {
+            assert!(self.pending_commit.is_none());
+            return Ok(());
+        }
+
         if self
             .pending_commit
             .as_ref()
@@ -98,7 +107,7 @@ impl EvmInner {
         }
 
         match self.pending_commit.take() {
-            Some(mut pending_commit) => {
+            Some(pending_commit) => {
                 // println!(
                 //     "committing {:?} with {} transactions",
                 //     commit_key,
@@ -106,11 +115,15 @@ impl EvmInner {
                 // );
 
                 let db = self.evm_instance.db_mut();
-                for pending in pending_commit.diff.drain(..) {
-                    db.commit(pending.state);
-                }
 
-                Ok(())
+                match db.commit(
+                    commit_key.0,
+                    commit_key.1,
+                    pending_commit.diff.into_iter().map(|v| v.state).collect(),
+                ) {
+                    Ok(()) => Ok(()),
+                    Err(err) => Err(EVMError::Database(format!("commit failed: {}", err).into())),
+                }
             }
             None => Ok(()), /* nothing to commit  */
         }
@@ -156,6 +169,17 @@ impl EvmInner {
             .transact();
 
         result
+    }
+}
+
+const fn skipped_tx_receipt() -> TxReceipt {
+    TxReceipt {
+        gas_used: 0,
+        gas_refunded: 0,
+        success: true,
+        deployed_contract_address: None,
+        logs: None,
+        output: None,
     }
 }
 
