@@ -26,7 +26,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		);
 	}
 
-	public scheduleTimeoutStartRound(timestamp: number): void {
+	public scheduleTimeoutBlockPrepare(timestamp: number): void {
 		if (this.#timeoutStartRound) {
 			return;
 		}

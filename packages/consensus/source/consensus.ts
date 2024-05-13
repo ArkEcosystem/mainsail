@@ -207,7 +207,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.RoundStarted, this.getState());
 
-		this.scheduler.scheduleTimeoutStartRound(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
+		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
 
 		await this.propose(roundState);
 	}
