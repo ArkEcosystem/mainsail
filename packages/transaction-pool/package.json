@@ -15,25 +15,25 @@
 		"/distribution"
 	],
 	"scripts": {
-		"tx-pool:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config pnpm run tx-pool tx-pool:run",
 		"build": "pnpm run clean && tsc",
 		"build:watch": "pnpm run clean && tsc -w",
 		"clean": "del distribution",
-		"tx-pool": "node ./bin/run.js",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
+		"tx-pool": "node ./bin/run.js",
+		"tx-pool:testnet": "cross-env-shell CORE_PATH_CONFIG=./bin/config pnpm run tx-pool tx-pool:run",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
+		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"boxen": "7.1.1",
 		"dayjs": "1.11.10",
