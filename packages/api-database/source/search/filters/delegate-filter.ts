@@ -10,6 +10,7 @@ import {
 } from "../criteria.js";
 import { Expression, JsonFieldCastType } from "../expressions.js";
 import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { WalletFilter } from "./wallet-filter.js";
 
 export class DelegateFilter {
 	public static async getExpression(...criteria: OrDelegateCriteria[]): Promise<Expression<Wallet>> {
@@ -83,7 +84,12 @@ export class DelegateFilter {
 				case "blocks": {
 					return this.handleBlocksCriteria(criteria.blocks);
 				}
-
+				case "attributes": {
+					return handleOrCriteria(criteria.attributes, async (c) =>
+						// @ts-ignore
+						WalletFilter.handleAttributesCriteria(c),
+					);
+				}
 				default: {
 					return { op: "true" };
 				}
