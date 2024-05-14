@@ -99,7 +99,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-transaction-vote",
 		"@mainsail/state",
 		"@mainsail/transactions",
-		"@mainsail/transaction-pool",
+		"@mainsail/transaction-pool-service",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
@@ -109,7 +109,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	];
 
 	const options = {
-		"@mainsail/transaction-pool": {
+		"@mainsail/transaction-pool-service": {
 			storage: ":memory:",
 		},
 	};

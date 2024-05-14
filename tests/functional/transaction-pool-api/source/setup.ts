@@ -60,7 +60,7 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
 	const options = {
-		"@mainsail/transaction-pool": {
+		"@mainsail/transaction-pool-service": {
 			// bech32m addresses require more bytes than the default which assumes base58.
 			maxTransactionBytes: 50_000,
 
@@ -93,7 +93,7 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-vote",
 		"@mainsail/state",
 		"@mainsail/transactions",
-		"@mainsail/transaction-pool",
+		"@mainsail/transaction-pool-service",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",

@@ -33,7 +33,7 @@
 		"@mainsail/state": "workspace:*",
 		"@mainsail/database": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
-		"@mainsail/transaction-pool": "workspace:*",
+		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-commit": "workspace:*",
 		"@mainsail/processor": "workspace:*",

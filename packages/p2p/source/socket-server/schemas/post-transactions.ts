@@ -14,7 +14,7 @@ export const createPostTransactionsSchema = (app: Contracts.Kernel.Application):
 					.getTagged<Providers.PluginConfiguration>(
 						Identifiers.ServiceProvider.Configuration,
 						"plugin",
-						"transaction-pool",
+						"transaction-pool-service",
 					)
 					.getRequired<number>("maxTransactionsPerRequest"),
 			),
