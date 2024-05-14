@@ -164,7 +164,7 @@ export class Validator implements Contracts.Validator.Validator {
 			previousBlock: previousBlock.data.id,
 			reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
 			round,
-                        timestamp,
+			timestamp,
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
 			transactions: transactionData,
