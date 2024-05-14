@@ -35,6 +35,10 @@ const EXCEPTIONS = {
 		dependencies: ["@mainsail/crypto-key-pair-ecdsa", "@mainsail/crypto-signature-schnorr-secp256k1"],
 		devDependencies: [],
 	},
+	"@mainsail/transaction-pool": {
+		dependencies: ["@mainsail/transaction-pool-service", "@mainsail/logger-pino"],
+		devDependencies: [],
+	},
 	"@mainsail/core": {
 		dependencies: [
 			"@mainsail/api-common",
