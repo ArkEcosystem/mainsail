@@ -3086,12 +3086,6 @@ importers:
 
   packages/transaction-pool:
     dependencies:
-      '@mainsail/api-database':
-        specifier: workspace:*
-        version: link:../api-database
-      '@mainsail/api-http':
-        specifier: workspace:*
-        version: link:../api-http
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli
@@ -3107,6 +3101,9 @@ importers:
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
+      '@mainsail/transaction-pool-service':
+        specifier: workspace:*
+        version: link:../transaction-pool-service
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
