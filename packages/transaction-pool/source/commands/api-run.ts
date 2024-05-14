@@ -8,7 +8,7 @@ import { URL } from "url";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "api:run";
+	public signature = "tx-pool:run";
 
 	public description = "Run the API process in foreground. Exiting the process will stop it from running.";
 

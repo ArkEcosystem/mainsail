@@ -4,7 +4,7 @@ import Joi from "joi";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "api:stop";
+	public signature = "tx-pool:stop";
 
 	public description = "Stop the TX Pool process.";
 

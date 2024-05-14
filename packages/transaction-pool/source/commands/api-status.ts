@@ -3,7 +3,7 @@ import { injectable } from "@mainsail/container";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "api:status";
+	public signature = "tx-pool:status";
 
 	public description = "Display the status of the TX Pool process.";
 

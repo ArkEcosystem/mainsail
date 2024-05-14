@@ -7,7 +7,7 @@ export class Command extends Commands.Command {
 	@inject(Identifiers.Setup)
 	private readonly setup!: Contracts.Setup;
 
-	public signature = "api:start";
+	public signature = "tx-pool:start";
 
 	public description = "Start the TX Pool process.";
 
@@ -25,7 +25,7 @@ export class Command extends Commands.Command {
 
 		await this.actions.daemonizeProcess(
 			{
-				args: `api:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
+				args: `tx-pool:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
 				name: `mainsail-tx-pool`,
 				script: this.setup.isGlobal()
 					? this.setup.getGlobalEntrypoint("@mainsail/transaction-pool")

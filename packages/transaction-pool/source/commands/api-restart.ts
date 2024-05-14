@@ -3,7 +3,7 @@ import { injectable } from "@mainsail/container";
 
 @injectable()
 export class Command extends Commands.Command {
-	public signature = "api:restart";
+	public signature = "tx-pool:restart";
 
 	public description = "Restart the TX Pool process.";
 
