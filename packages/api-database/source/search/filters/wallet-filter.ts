@@ -76,7 +76,7 @@ export class WalletFilter {
 				Object.entries(criteria).map(async ([k, v]) => {
 					// flatten 'v' from object to dotted attribute path
 					// { "validatorLastBlock":  { "id": "value" } } -> 'validatorLastBlock.id'
-					if (isObject(v) && Object.keys(v).length > 0) {
+					if (isObject(v) && Object.keys(v).length === 1 && !["from", "to"].includes(Object.keys(v)[0])) {
 						const nestedAttribute = Object.keys(v)[0];
 						k = `${k}.${nestedAttribute}`;
 						v = v[nestedAttribute];
