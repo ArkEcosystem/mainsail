@@ -209,6 +209,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
 
+		// TODO: Skip on sync
 		await this.propose(roundState);
 	}
 
@@ -309,8 +310,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
-		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedAny, this.getState());
+		if (this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round)) {
+			await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedAny, this.getState());
+		}
 	}
 
 	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -331,8 +333,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
-		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrecommitedAny, this.getState());
+		if (this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round)) {
+			await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrecommitedAny, this.getState());
+		}
 	}
 
 	protected async onMajorityPrecommit(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
