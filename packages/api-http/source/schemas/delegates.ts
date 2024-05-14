@@ -6,6 +6,7 @@ import { walletCriteriaSchemaObject } from "./wallets.js";
 
 export const delegateCriteriaSchemaObject = {
 	address: walletCriteriaSchemaObject.address,
+	attributes: Joi.object(),
 	blocks: {
 		last: {
 			height: blockCriteriaSchemaObject.height,
@@ -26,7 +27,6 @@ export const delegateCriteriaSchemaObject = {
 	rank: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(1)),
 	username: Joi.string().max(256),
 	votes: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
-	attributes: Joi.object(),
 };
 
 export const delegateCriteriaSchema = Schemas.createCriteriaSchema(delegateCriteriaSchemaObject);

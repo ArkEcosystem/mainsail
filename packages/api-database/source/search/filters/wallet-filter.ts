@@ -1,4 +1,5 @@
 import { isObject } from "@mainsail/utils";
+
 import { Wallet } from "../../models/index.js";
 import { EqualCriteria, OrWalletCriteria, WalletCriteria } from "../criteria.js";
 import { Expression, JsonFieldCastType, OrExpression } from "../expressions.js";
@@ -71,7 +72,6 @@ export class WalletFilter {
 
 	public static async handleAttributesCriteria(criteria: Record<string, any>): Promise<OrExpression<Wallet>> {
 		return {
-			op: "or",
 			expressions: await Promise.all(
 				Object.entries(criteria).map(async ([k, v]) => {
 					// flatten 'v' from object to dotted attribute path
@@ -83,12 +83,13 @@ export class WalletFilter {
 					}
 
 					return handleNumericCriteria<Wallet, "attributes">("attributes", v, {
+						cast: this.inferAttributeCastType(k),
 						fieldName: k,
 						operator: "->>",
-						cast: this.inferAttributeCastType(k),
 					});
 				}),
 			),
+			op: "or",
 		};
 	}
 
