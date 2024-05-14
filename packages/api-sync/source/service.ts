@@ -6,7 +6,7 @@ import {
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types, Utils } from "@mainsail/kernel";
-import { sleep, validatorSetPack, chunk } from "@mainsail/utils";
+import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
