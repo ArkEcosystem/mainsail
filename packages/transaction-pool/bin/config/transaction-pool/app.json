@@ -1,0 +1,7 @@
+{
+	"plugins": [
+		{
+			"package": "@mainsail/logger-pino"
+		}
+	]
+}
