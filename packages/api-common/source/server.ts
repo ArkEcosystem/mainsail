@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import { Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
@@ -45,8 +46,15 @@ export abstract class AbstractServer {
 
 		this.server.ext("onPreResponse", (request, h) => {
 			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
-				// @ts-ignore
-				this.logger.error(`${request.path} - ${request.response.stack ?? request.response.message}`);
+				if (request.response.name === "QueryFailedError") {
+					const message = `${request.response.name} ${request.response.message}`;
+					// @ts-ignore
+					this.logger.warning(`${request.path} - ${message}`);
+					request.response = Boom.badRequest(message);
+				} else {
+					// @ts-ignore
+					this.logger.error(`${request.path} - ${request.response.stack ?? request.response.message}`);
+				}
 			}
 			return h.continue;
 		});
