@@ -1,12 +1,12 @@
 import { Identifiers, Services } from "@mainsail/cli";
-import { Console, describe } from "../../../test-framework/source";
 
+import { Console, describe } from "../../../test-framework/source";
 import { Command } from "./api-status";
 
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("ApiStatusCommand", ({ beforeEach, it, assert, stub }) => {
+}>("StatusCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Identifiers.ProcessManager);

@@ -1,13 +1,13 @@
 import { Utils } from "@mainsail/cli";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { Console, describe } from "../../../test-framework/source";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { Console, describe } from "../../../test-framework/source";
 import { Command } from "./api-run";
 
 describe<{
 	cli: Console;
-}>("ApiRunCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
+}>("RunCommand", ({ beforeEach, afterAll, it, stub, assert }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 

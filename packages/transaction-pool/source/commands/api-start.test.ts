@@ -7,7 +7,7 @@ import { Command } from "./api-start";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("ApiStartCommand", ({ beforeEach, afterAll, it, assert, stub, match }) => {
+}>("StartCommand", ({ beforeEach, afterAll, it, assert, stub, match }) => {
 	beforeEach((context) => {
 		process.env.CORE_PATH_CONFIG = dirSync().name;
 

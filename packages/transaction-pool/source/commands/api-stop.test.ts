@@ -6,7 +6,7 @@ import { Command } from "./api-stop";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("ApiStopCommand", ({ beforeEach, it, assert, stub }) => {
+}>("StopCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Identifiers.ProcessManager);
