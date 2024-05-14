@@ -3084,6 +3084,82 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/transaction-pool:
+    dependencies:
+      '@mainsail/api-database':
+        specifier: workspace:*
+        version: link:../api-database
+      '@mainsail/api-http':
+        specifier: workspace:*
+        version: link:../api-http
+      '@mainsail/cli':
+        specifier: workspace:*
+        version: link:../cli
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/logger-pino':
+        specifier: workspace:*
+        version: link:../logger-pino
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      boxen:
+        specifier: 7.1.1
+        version: 7.1.1
+      dayjs:
+        specifier: 1.11.10
+        version: 1.11.10
+      envfile:
+        specifier: 7.1.0
+        version: 7.1.0
+      fs-extra:
+        specifier: 11.2.0
+        version: 11.2.0
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+      kleur:
+        specifier: 4.1.5
+        version: 4.1.5
+      pm2:
+        specifier: ^5.3.0
+        version: 5.3.0
+    devDependencies:
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
+      '@types/prompts':
+        specifier: 2.4.9
+        version: 2.4.9
+      '@types/tmp':
+        specifier: 0.2.6
+        version: 0.2.6
+      cross-env:
+        specifier: 7.0.3
+        version: 7.0.3
+      env-paths:
+        specifier: 3.0.0
+        version: 3.0.0
+      execa:
+        specifier: 8.0.1
+        version: 8.0.1
+      prompts:
+        specifier: 2.4.2
+        version: 2.4.2
+      tmp:
+        specifier: 0.2.3
+        version: 0.2.3
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/transaction-pool-service:
     dependencies:
       '@mainsail/container':
