@@ -13,7 +13,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		.getTagged<Providers.PluginConfiguration>(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
-			"transaction-pool",
+			"transaction-pool-service",
 		)
 		.getRequired<number>("maxTransactionsPerRequest");
 
@@ -21,7 +21,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		.getTagged<Providers.PluginConfiguration>(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
-			"transaction-pool",
+			"transaction-pool-service",
 		)
 		.getRequired<number>("maxTransactionBytes");
 
