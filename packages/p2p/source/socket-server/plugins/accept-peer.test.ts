@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { describe, Sandbox } from "../../../../test-framework/source";
-import { defaults as transactionPoolDefaults } from "../../../../transaction-pool/source/defaults";
+import { defaults as transactionPoolDefaults } from "../../../../transaction-pool-service/source/defaults";
 import { defaults } from "../../defaults";
 import { AcceptPeerPlugin } from "./accept-peer";
 
