@@ -29,11 +29,11 @@ describe<{
 					CORE_ENV: "production",
 					NODE_ENV: "production",
 				},
-				name: "mainsail-api",
+				name: "mainsail-tx-pool",
 				node_args: undefined,
 				script: match.string,
 			},
-			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail-api" },
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail-tx-pool" },
 		);
 	});
 });

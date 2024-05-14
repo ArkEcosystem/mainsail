@@ -5,9 +5,9 @@ import { injectable } from "@mainsail/container";
 export class Command extends Commands.Command {
 	public signature = "api:status";
 
-	public description = "Display the status of the API process.";
+	public description = "Display the status of the TX Pool process.";
 
 	public async execute(): Promise<void> {
-		this.app.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-api").status();
+		this.app.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-tx-pool").status();
 	}
 }

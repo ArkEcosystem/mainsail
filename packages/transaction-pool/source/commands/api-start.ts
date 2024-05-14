@@ -9,7 +9,7 @@ export class Command extends Commands.Command {
 
 	public signature = "api:start";
 
-	public description = "Start the API process.";
+	public description = "Start the TX Pool process.";
 
 	public configure(): void {
 		this.definition
@@ -21,14 +21,14 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.AnyObject = { ...this.getFlags() };
 
-		this.actions.abortRunningProcess(`mainsail-api`);
+		this.actions.abortRunningProcess(`mainsail-tx-pool`);
 
 		await this.actions.daemonizeProcess(
 			{
 				args: `api:run ${Utils.Flags.castFlagsToString(flags, ["daemon"])}`,
-				name: `mainsail-api`,
+				name: `mainsail-tx-pool`,
 				script: this.setup.isGlobal()
-					? this.setup.getGlobalEntrypoint("@mainsail/api")
+					? this.setup.getGlobalEntrypoint("@mainsail/transaction-pool")
 					: this.setup.getEntrypoint(),
 			},
 			flags,

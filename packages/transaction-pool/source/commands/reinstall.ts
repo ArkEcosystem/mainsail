@@ -44,6 +44,6 @@ export class Command extends Commands.Command {
 
 		spinner.succeed();
 
-		await this.actions.restartRunningProcessWithPrompt(`mainsail-api`);
+		await this.actions.restartRunningProcessWithPrompt(`mainsail-tx-pool`);
 	}
 }

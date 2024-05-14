@@ -24,9 +24,9 @@ export class Command extends Commands.Command {
 			await this.updater.update(this.getFlag("updateProcessManager"), this.getFlag("force"));
 
 			if (this.hasFlag("restart")) {
-				this.actions.restartRunningProcess(`mainsail-api`);
+				this.actions.restartRunningProcess(`mainsail-tx-pool`);
 			} else if (!this.getFlag("force")) {
-				await this.actions.restartRunningProcessWithPrompt(`mainsail-api`);
+				await this.actions.restartRunningProcessWithPrompt(`mainsail-tx-pool`);
 			}
 		} else {
 			this.components.success(`You already have the latest version (${this.pkg.version})`);

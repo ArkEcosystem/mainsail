@@ -16,7 +16,7 @@ describe<{
 		stub(processManager, "list").returnValue([
 			{
 				monit: { cpu: 2, memory: 2048 },
-				name: "mainsail-api",
+				name: "mainsail-tx-pool",
 				pid: 1,
 				pm2_env: {
 					pm_uptime: 1_387_045_673_686,
@@ -47,7 +47,7 @@ describe<{
 		assert.true(
 			[
 				"1",
-				"mainsail-api",
+				"mainsail-tx-pool",
 				"1.0.0",
 				"online",
 				// "5y 267d 19h 31m 28.1s",

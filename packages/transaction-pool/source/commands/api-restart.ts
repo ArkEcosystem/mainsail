@@ -5,9 +5,9 @@ import { injectable } from "@mainsail/container";
 export class Command extends Commands.Command {
 	public signature = "api:restart";
 
-	public description = "Restart the API process.";
+	public description = "Restart the TX Pool process.";
 
 	public async execute(): Promise<void> {
-		this.app.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-api").restart();
+		this.app.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-tx-pool").restart();
 	}
 }

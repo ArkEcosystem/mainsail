@@ -6,13 +6,15 @@ import Joi from "joi";
 export class Command extends Commands.Command {
 	public signature = "api:stop";
 
-	public description = "Stop the API process.";
+	public description = "Stop the TX Pool process.";
 
 	public configure(): void {
 		this.definition.setFlag("daemon", "Stop the Core process or daemon.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
-		this.app.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-api").stop(this.getFlag("daemon"));
+		this.app
+			.get<Contracts.ProcessFactory>(Identifiers.ProcessFactory)("mainsail-tx-pool")
+			.stop(this.getFlag("daemon"));
 	}
 }
