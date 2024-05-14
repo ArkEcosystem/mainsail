@@ -1,7 +1,7 @@
 import { Identifiers, Services } from "@mainsail/cli";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Command } from "./api-status";
+import { Command } from "./tx-pool-status";
 
 describe<{
 	cli: Console;

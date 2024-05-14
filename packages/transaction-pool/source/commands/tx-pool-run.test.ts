@@ -3,7 +3,7 @@ import { Utils as AppUtils } from "@mainsail/kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Command } from "./api-run";
+import { Command } from "./tx-pool-run";
 
 describe<{
 	cli: Console;

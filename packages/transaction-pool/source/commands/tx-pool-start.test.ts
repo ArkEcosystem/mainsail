@@ -2,7 +2,7 @@ import { Identifiers, Services } from "@mainsail/cli";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console, describe } from "../../../test-framework/source";
-import { Command } from "./api-start";
+import { Command } from "./tx-pool-start";
 
 describe<{
 	cli: Console;
