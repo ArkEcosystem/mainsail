@@ -87,7 +87,7 @@ const EXCEPTIONS = {
 			"@mainsail/proposer",
 			"@mainsail/serializer",
 			"@mainsail/state",
-			"@mainsail/transaction-pool",
+			"@mainsail/transaction-pool-service",
 			"@mainsail/transactions",
 			"@mainsail/validation",
 			"@mainsail/validator",
@@ -98,7 +98,7 @@ const EXCEPTIONS = {
 		devDependencies: [],
 	},
 	"@mainsail/crypto-key-pair-bls12-381": {
-		dependencies: ["@chainsafe/blst"]
+		dependencies: ["@chainsafe/blst"],
 	},
 };
 
