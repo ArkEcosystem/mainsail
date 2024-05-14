@@ -26,9 +26,9 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		);
 	}
 
-	public scheduleTimeoutBlockPrepare(timestamp: number): void {
+	public scheduleTimeoutBlockPrepare(timestamp: number): boolean {
 		if (this.#timeoutStartRound) {
-			return;
+			return false;
 		}
 
 		const timeout = Math.max(0, timestamp - dayjs().valueOf());
@@ -37,39 +37,47 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 			await this.#getConsensus().onTimeoutStartRound();
 			this.#timeoutStartRound = undefined;
 		}, timeout);
+
+		return true;
 	}
 
-	public scheduleTimeoutPropose(height: number, round: number): void {
+	public scheduleTimeoutPropose(height: number, round: number): boolean {
 		if (this.#timeoutPropose) {
-			return;
+			return false;
 		}
 
 		this.#timeoutPropose = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPropose(height, round);
 			this.#timeoutPropose = undefined;
 		}, this.#getTimeout(round));
+
+		return true;
 	}
 
-	public scheduleTimeoutPrevote(height: number, round: number): void {
+	public scheduleTimeoutPrevote(height: number, round: number): boolean {
 		if (this.#timeoutPrevote) {
-			return;
+			return false;
 		}
 
 		this.#timeoutPrevote = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPrevote(height, round);
 			this.#timeoutPrevote = undefined;
 		}, this.#getTimeout(round));
+
+		return true;
 	}
 
-	public scheduleTimeoutPrecommit(height: number, round: number): void {
+	public scheduleTimeoutPrecommit(height: number, round: number): boolean {
 		if (this.#timeoutPrecommit) {
-			return;
+			return false;
 		}
 
 		this.#timeoutPrecommit = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPrecommit(height, round);
 			this.#timeoutPrecommit = undefined;
 		}, this.#getTimeout(round));
+
+		return true;
 	}
 
 	public clear(): void {
