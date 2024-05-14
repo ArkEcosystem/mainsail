@@ -30,7 +30,7 @@ export const makeCustomProposal = async (
 
 	// 2)
 	const round = node.app.get<Consensus>(Identifiers.Consensus.Service).getRound();
-	const emptyBlock = await proposer.prepareBlock(validators[0].publicKey, round);
+	const emptyBlock = await proposer.prepareBlock(validators[0].publicKey, round, Date.now());
 
 	// 3)
 	// update block buffer

@@ -38,8 +38,6 @@ describe<{
 		await bootstrapMany(context.nodes);
 
 		context.validators = await getValidators(context.nodes[0], validators);
-
-		await runMany(context.nodes);
 	});
 
 	afterEach(async ({ nodes }) => {
@@ -47,6 +45,8 @@ describe<{
 	});
 
 	it("#single propose - should forge 3 blocks with all validators signing", async ({ nodes, validators }) => {
+		await runMany(nodes);
+
 		await snoozeForBlock(nodes);
 
 		await assertBockHeight(nodes, 1);
@@ -77,6 +77,8 @@ describe<{
 			stubPropose.restore();
 		});
 
+		await runMany(nodes);
+
 		await snoozeForBlock(nodes);
 
 		await assertBockHeight(nodes, 1);
@@ -95,6 +97,8 @@ describe<{
 		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
 
 		stubPropose.callsFake(async () => {});
+
+		await runMany(nodes);
 
 		await snoozeForRound(nodes, rounds);
 		stubPropose.restore();
@@ -119,7 +123,9 @@ describe<{
 			stubPropose.restore();
 		});
 
-		const proposal0 = await makeProposal(nodes[1], validators[1], 1, 0);
+		await runMany(nodes);
+
+		const proposal0 = await makeProposal(nodes[1], validators[1], 1, 0, Date.now());
 		await p2p.broadcastProposal(proposal0);
 
 		await snoozeForBlock(nodes);
@@ -157,8 +163,10 @@ describe<{
 			stubPropose.restore();
 		});
 
-		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+		await runMany(nodes);
+
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		await p2p.broadcastProposal(proposal0);
 		await p2p.broadcastProposal(proposal1);
@@ -204,8 +212,10 @@ describe<{
 			stubPropose.restore();
 		});
 
-		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+		await runMany(nodes);
+
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		await p2p.broadcastProposal(proposal0, [0, 1, 2]);
 		await p2p.broadcastProposal(proposal1, [3, 4]);
@@ -251,9 +261,11 @@ describe<{
 		const stubPropose = stub(nodes[0].app.get<Consensus>(Identifiers.Consensus.Service), "propose");
 		stubPropose.callsFake(async () => {});
 
+		await runMany(nodes);
+
 		for (let round = 0; round < rounds; round++) {
-			const proposal0 = await makeProposal(node0, validators[0], 1, round);
-			const proposal1 = await makeProposal(node0, validators[0], 1, round);
+			const proposal0 = await makeProposal(node0, validators[0], 1, round, Date.now());
+			const proposal1 = await makeProposal(node0, validators[0], 1, round, Date.now());
 
 			await p2p.broadcastProposal(proposal0, [0, 1, 2]);
 			await p2p.broadcastProposal(proposal1, [3, 4]);
@@ -307,8 +319,10 @@ describe<{
 			stubPropose.restore();
 		});
 
-		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
+		await runMany(nodes);
+
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		await p2p.broadcastProposal(proposal0, [0, 1, 2, 3]);
 		await p2p.broadcastProposal(proposal1, [4]);
@@ -359,11 +373,13 @@ describe<{
 			stubPropose.restore();
 		});
 
-		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal2 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal3 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal4 = await makeProposal(node0, validators[0], 1, 0);
+		await runMany(nodes);
+
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal2 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal3 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal4 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		await p2p.broadcastProposal(proposal0, [0]);
 		await p2p.broadcastProposal(proposal1, [1]);

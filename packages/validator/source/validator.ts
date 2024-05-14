@@ -2,7 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber, isEmpty } from "@mainsail/utils";
-import dayjs from "dayjs";
 
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
@@ -45,9 +44,13 @@ export class Validator implements Contracts.Validator.Validator {
 		return this.#keyPair.publicKey;
 	}
 
-	public async prepareBlock(generatorPublicKey: string, round: number): Promise<Contracts.Crypto.Block> {
+	public async prepareBlock(
+		generatorPublicKey: string,
+		round: number,
+		timestamp: number,
+	): Promise<Contracts.Crypto.Block> {
 		const transactions = await this.#getTransactionsForForging();
-		return this.#makeBlock(round, generatorPublicKey, transactions);
+		return this.#makeBlock(round, generatorPublicKey, transactions, timestamp);
 	}
 
 	public async propose(
@@ -125,6 +128,7 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		generatorPublicKey: string,
 		transactions: Contracts.Crypto.Transaction[],
+		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const totals: { amount: BigNumber; fee: BigNumber } = {
 			amount: BigNumber.ZERO,
@@ -160,7 +164,7 @@ export class Validator implements Contracts.Validator.Validator {
 			previousBlock: previousBlock.data.id,
 			reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
 			round,
-			timestamp: dayjs().valueOf(),
+			timestamp,
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
 			transactions: transactionData,
