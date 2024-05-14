@@ -60,10 +60,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.scheduler = {
 			clear: () => {},
 			getNextBlockTimestamp: (value) => value + 4000,
-			scheduleTimeoutPrecommit: () => {},
-			scheduleTimeoutPrevote: () => {},
-			scheduleTimeoutPropose: () => {},
-			scheduleTimeoutBlockPrepare: () => {},
+			scheduleTimeoutBlockPrepare: () => true,
+			scheduleTimeoutPrecommit: () => true,
+			scheduleTimeoutPrevote: () => true,
+			scheduleTimeoutPropose: () => true,
 		};
 
 		context.bootstrapper = {
@@ -1118,13 +1118,20 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		});
 	});
 
-	it("#onMajorityPrevoteAny - should return if step !== prevote", async ({ consensus, scheduler, roundState }) => {
+	it("#onMajorityPrevoteAny - should return if step !== prevote", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		consensus.setStep(Contracts.Consensus.Step.Propose);
 		await consensus.onMajorityPrevoteAny(roundState);
 
 		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
@@ -1132,30 +1139,55 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus,
 		scheduler,
 		roundState,
+		eventDispatcher,
 	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		roundState = { ...roundState, height: 3 };
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
 
 		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 	});
 
-	it("#onMajorityPrevoteAny - should return if height doesn't match", async ({
+	it("#onMajorityPrevoteAny - should return if round doesn't match", async ({
 		consensus,
 		scheduler,
 		roundState,
+		eventDispatcher,
 	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		roundState = { ...roundState, round: 1 };
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
 
 		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
+	});
+
+	it("#onMajorityPrevoteAny - should not dispatch if timeout is scheduled", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = stub(scheduler, "scheduleTimeoutPrevote").returnValue(false);
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		consensus.setStep(Contracts.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevoteAny(roundState);
+
+		spyScheduleTimeout.calledOnce();
+		spyScheduleTimeout.calledWith(1, 0);
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
+
+		spyDispatch.neverCalled();
 	});
 
 	it("#onMajorityPrevoteNull - should precommit", async ({
@@ -1261,6 +1293,60 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			validRound: undefined,
 		});
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+	});
+
+	it("#onMajorityPrecommitAny - should return if height doesn't match", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrecommit");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+
+		roundState = { ...roundState, height: 3 };
+		await consensus.onMajorityPrecommitAny(roundState);
+
+		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
+	});
+
+	it("#onMajorityPrecommitAny - should return if round doesn't match", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrecommit");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+
+		roundState = { ...roundState, round: 2 };
+		await consensus.onMajorityPrecommitAny(roundState);
+
+		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
+	});
+
+	it("#onMajorityPrecommitAny - should not dispatch if timeout is scheduled", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = stub(scheduler, "scheduleTimeoutPrecommit").returnValue(false);
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+
+		await consensus.onMajorityPrecommitAny(roundState);
+
+		spyScheduleTimeout.calledOnce();
+		spyScheduleTimeout.calledWith(1, 0);
+		spyDispatch.neverCalled();
 	});
 
 	it("#onMajorityPrecommit - should commit & increase height", async ({
