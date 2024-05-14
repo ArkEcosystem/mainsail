@@ -71,6 +71,9 @@
 		},
 		{
 			"package": "@mainsail/transaction-pool-service"
+		},
+		{
+			"package": "@mainsail/api-transaction-pool"
 		}
 	]
 }

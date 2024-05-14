@@ -3086,6 +3086,9 @@ importers:
 
   packages/transaction-pool:
     dependencies:
+      '@mainsail/api-transaction-pool':
+        specifier: workspace:*
+        version: link:../api-transaction-pool
       '@mainsail/cli':
         specifier: workspace:*
         version: link:../cli

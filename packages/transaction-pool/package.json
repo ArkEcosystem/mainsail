@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/api-transaction-pool": "workspace:*",
 		"@mainsail/crypto-transaction-username-registration": "workspace:*",
 		"@mainsail/crypto-transaction-username-resignation": "workspace:*",
 		"@mainsail/crypto-transaction-validator-registration": "workspace:*",
