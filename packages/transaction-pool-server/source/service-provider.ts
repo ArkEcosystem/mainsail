@@ -1,5 +1,7 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
+import { Contracts } from "@mainsail/contracts";
 
+import { GetTransactionsAction } from "./actions/index.js";
 import Handlers from "./handlers.js";
 import { Identifiers as ApiTransactionPoolIdentifiers } from "./identifiers.js";
 import { Server } from "./server.js";
@@ -21,6 +23,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Handlers;
 	}
 
+	protected getActions(): Contracts.Api.RPC.Action[] {
+		return [this.app.resolve<GetTransactionsAction>(GetTransactionsAction)];
+	}
+
 	protected getPlugins(): any[] {
 		const config = this.config().get<any>("plugins");
 
@@ -38,6 +44,9 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					trustProxy: config.trustProxy,
 				},
 				plugin: Plugins.rateLimit,
+			},
+			{
+				plugin: Plugins.rpcResponseHandler,
 			},
 		];
 	}
