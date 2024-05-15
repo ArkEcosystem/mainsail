@@ -105,6 +105,10 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 		notice: (message) => console.log(message),
 	});
 
+	context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue({
+		hasSchema: () => true,
+	});
+
 	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 	const apiDatabase = await setupDatabase(context.sandbox.app);
