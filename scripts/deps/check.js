@@ -37,6 +37,7 @@ const EXCEPTIONS = {
 	},
 	"@mainsail/transaction-pool": {
 		dependencies: [
+			"@mainsail/transaction-pool-server",
 			"@mainsail/transaction-pool-service",
 			"@mainsail/logger-pino",
 			"@mainsail/crypto-transaction",

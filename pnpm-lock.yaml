@@ -3229,6 +3229,28 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/transaction-pool-client:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/transaction-pool-server:
     dependencies:
       '@hapi/boom':
@@ -3249,9 +3271,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      joi:
-        specifier: 17.12.2
-        version: 17.12.2
     devDependencies:
       '@types/ip':
         specifier: 1.1.3

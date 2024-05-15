@@ -1,4 +1,4 @@
-# Mainsail - Transaction pool server
+# Mainsail - Transaction pool client
 
 ![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 
