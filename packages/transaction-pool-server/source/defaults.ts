@@ -14,7 +14,7 @@ export const defaults = {
 		http: {
 			enabled: !Environment.isTrue(Constants.EnvironmentVariables.CORE_TRANSACTION_POOL_SERVER_DISABLED),
 			host: Environment.get(Constants.EnvironmentVariables.CORE_TRANSACTION_POOL_SERVER_HOST, "0.0.0.0"),
-			port: Environment.get(Constants.EnvironmentVariables.CORE_TRANSACTION_POOL_SERVER_PORT, 4007),
+			port: Environment.get(Constants.EnvironmentVariables.CORE_TRANSACTION_POOL_SERVER_PORT, 4008),
 		},
 		// @see https://hapijs.com/api#-serveroptionstls
 		https: {

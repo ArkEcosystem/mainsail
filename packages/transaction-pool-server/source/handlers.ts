@@ -1,17 +1,17 @@
 import { Contracts } from "@mainsail/contracts";
 
-import * as TransactionPool from "./routes/transaction-pool.js";
+import * as TestRoute from "./routes/test.js";
 
 const config = {
 	name: "Transaction Pool API",
 	async register(server: Contracts.Api.ApiServer): Promise<void> {
-		const handlers = [TransactionPool];
+		const handlers = [TestRoute];
 
 		for (const handler of handlers) {
 			handler.register(server);
 		}
 	},
-	version: "2.0.0",
+	version: "1.0.0",
 };
 
 export default config;
