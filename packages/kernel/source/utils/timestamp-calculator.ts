@@ -16,10 +16,12 @@ export const calculateMinimalTimestamp = (
 	return (
 		previousBlock.data.timestamp +
 		// Append block time
-		milestone.blockTime +
+		milestone.timeouts.blockTime +
 		// Round timeout without increase
-		round * milestone.stageTimeout +
+		round * milestone.timeouts.stageTimeout +
 		// Add increase for each round. Using arithmetic progression formula
-		0.5 * roundForMath * (2 * milestone.stageTimeoutIncrease + (roundForMath - 1) * milestone.stageTimeoutIncrease)
+		0.5 *
+			roundForMath *
+			(2 * milestone.timeouts.stageTimeoutIncrease + (roundForMath - 1) * milestone.timeouts.stageTimeoutIncrease)
 	);
 };

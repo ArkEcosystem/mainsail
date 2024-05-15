@@ -178,7 +178,7 @@ describe<{
 		const node0 = nodes[0];
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
-		const proposal = await makeProposal(node0, validators[0], 1, 0);
+		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const prevote = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
 
 		stubPrevote.callsFake(async () => {
@@ -222,7 +222,7 @@ describe<{
 		const node0 = nodes[0];
 		const node1 = nodes[1];
 
-		const proposal = await makeProposal(node0, validators[0], 1, 0);
+		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getData().block.data.id);
 		const stubPrevote0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
@@ -268,11 +268,11 @@ describe<{
 		const node0 = nodes[0];
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
-		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal2 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal3 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal4 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal2 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal3 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal4 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal0.getData().block.data.id);
 		const prevote1 = await makePrevote(node0, validators[0], 1, 0, proposal1.getData().block.data.id);
 		const prevote2 = await makePrevote(node0, validators[0], 1, 0, proposal2.getData().block.data.id);

@@ -39,11 +39,11 @@ export const getValidators = async (sandbox: Sandbox, validators: ValidatorsJson
 
 		result.push({
 			address: await addressFactory.fromMnemonic(mnemonic),
-			publicKey: keyPair.publicKey,
-			privateKey: keyPair.privateKey,
-			consensusPublicKey: consensusKeyPair.publicKey,
 			consensusPrivateKey: consensusKeyPair.privateKey,
+			consensusPublicKey: consensusKeyPair.publicKey,
 			mnemonic,
+			privateKey: keyPair.privateKey,
+			publicKey: keyPair.publicKey,
 		});
 	}
 
@@ -55,6 +55,7 @@ export const makeProposal = async (
 	validator: Validator,
 	height: number,
 	round: number,
+	timestamp: number,
 ): Promise<Contracts.Crypto.Proposal> => {
 	const proposer = node.app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
@@ -66,7 +67,7 @@ export const makeProposal = async (
 
 	await sleep(1); // Sleep to avoid same timestamp
 
-	const block = await proposer.prepareBlock(validator.publicKey, round);
+	const block = await proposer.prepareBlock(validator.publicKey, round, timestamp);
 	const proposal = await proposer.propose(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
@@ -139,8 +140,8 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: numb
 			);
 
 			const listener = {
-				handle: ({ data: commit }: { data: Contracts.Crypto.Commit }) => {
-					if (!height || commit.block.data.height >= height) {
+				handle: ({ data }: { data: Contracts.Crypto.BlockData }) => {
+					if (!height || data.height >= height) {
 						eventDispatcher.forget(event, listener);
 						resolve();
 					}
@@ -185,7 +186,7 @@ export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: numbe
 };
 
 export interface InvalidBlock {
-	block: Contracts.Crypto.Block;
+	block: Contracts.Crypto.BlockData;
 	error: Error;
 }
 export async function snoozeForInvalidBlock(sandbox: Sandbox, height?: number): Promise<InvalidBlock>;
@@ -203,7 +204,7 @@ export async function snoozeForInvalidBlock(
 
 			const listener = {
 				handle: ({ data: { block, error } }: { data: InvalidBlock }) => {
-					if (!height || block.data.height >= height) {
+					if (!height || block.height >= height) {
 						eventDispatcher.forget(event, listener);
 						resolve({ block, error });
 					}

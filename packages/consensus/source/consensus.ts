@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Enums, Utils } from "@mainsail/kernel";
+import dayjs from "dayjs";
 
 @injectable()
 export class Consensus implements Contracts.Consensus.Service {
@@ -60,6 +61,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
+	#proposal?: Contracts.Crypto.Proposal;
+	#roundStartTime = 0;
+
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
 	readonly #handlerLock = new Utils.Lock();
 
@@ -71,7 +75,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#round;
 	}
 
-	// TODO: Only for testing
+	// TODO: Only for tests
 	public setRound(round: number): void {
 		this.#round = round;
 	}
@@ -80,7 +84,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#step;
 	}
 
-	// TODO: Only for testing
+	// TODO: Only for tests
 	public setStep(step: Contracts.Consensus.Step): void {
 		this.#step = step;
 	}
@@ -93,9 +97,14 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
-	// TODO: Only for testing
+	// TODO: Only for tests
 	public setValidRound(round: Contracts.Consensus.RoundState): void {
 		this.#validValue = round;
+	}
+
+	// TODO: Only for tests
+	public setProposal(proposal: Contracts.Crypto.Proposal): void {
+		this.#proposal = proposal;
 	}
 
 	public getState(): Contracts.Consensus.State {
@@ -185,6 +194,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#step = Contracts.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
+		this.#roundStartTime = dayjs().valueOf();
 
 		this.scheduler.clear();
 
@@ -192,18 +202,25 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutStartRound();
-	}
-
-	public async onTimeoutStartRound(): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer}`);
 
 		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.RoundStarted, this.getState());
 
+		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
+
+		// TODO: Skip on sync
+		await this.propose(roundState);
+	}
+
+	public async onTimeoutStartRound(): Promise<void> {
 		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
-		await this.propose(roundState);
+		if (this.#proposal) {
+			const proposal = this.#proposal;
+			this.#proposal = undefined;
+			await this.proposalProcessor.process(proposal);
+		}
 	}
 
 	protected async onProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -293,8 +310,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round);
-		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedAny, this.getState());
+		if (this.scheduler.scheduleTimeoutPrevote(this.#height, this.#round)) {
+			await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrevotedAny, this.getState());
+		}
 	}
 
 	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -315,8 +333,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round);
-		await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrecommitedAny, this.getState());
+		if (this.scheduler.scheduleTimeoutPrecommit(this.#height, this.#round)) {
+			await this.eventDispatcher.dispatch(Enums.ConsensusEvent.PrecommitedAny, this.getState());
+		}
 	}
 
 	protected async onMajorityPrecommit(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -429,9 +448,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.logger.info(`Found registered proposer: ${roundState.proposer}`);
 
-		const proposal = await this.#makeProposal(roundState, registeredProposer);
-
-		void this.proposalProcessor.process(proposal);
+		this.#proposal = await this.#makeProposal(roundState, registeredProposer);
 	}
 
 	async #makeProposal(
@@ -457,8 +474,14 @@ export class Consensus implements Contracts.Consensus.Service {
 			);
 		}
 
-		const block = await registeredProposer.prepareBlock(roundState.proposer.getWalletPublicKey(), this.#round);
+		const block = await registeredProposer.prepareBlock(
+			roundState.proposer.getWalletPublicKey(),
+			this.#round,
+			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
+		);
 		this.logger.info(`Proposing new block ${this.#height}/${this.#round} with blockId: ${block.data.id}`);
+
+		void this.eventDispatcher.dispatch(Enums.BlockEvent.Forged, block.data);
 
 		return registeredProposer.propose(
 			this.validatorSet.getValidatorIndexByWalletPublicKey(roundState.proposer.getWalletPublicKey()),

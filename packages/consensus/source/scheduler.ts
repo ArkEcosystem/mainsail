@@ -18,55 +18,66 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
 
-	public scheduleTimeoutStartRound(): void {
+	public getNextBlockTimestamp(commitTime: number): number {
+		return Math.max(
+			commitTime + this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime,
+			this.stateService.getStore().getLastBlock().data.timestamp +
+				this.cryptoConfiguration.getMilestone().timeouts.blockTime,
+		);
+	}
+
+	public scheduleTimeoutBlockPrepare(timestamp: number): boolean {
 		if (this.#timeoutStartRound) {
-			return;
+			return false;
 		}
 
-		const timeout = Math.max(
-			0,
-			this.stateService.getStore().getLastBlock().data.timestamp -
-				dayjs().valueOf() +
-				this.cryptoConfiguration.getMilestone().blockTime,
-		);
+		const timeout = Math.max(0, timestamp - dayjs().valueOf());
 
 		this.#timeoutStartRound = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutStartRound();
 			this.#timeoutStartRound = undefined;
 		}, timeout);
+
+		return true;
 	}
 
-	public scheduleTimeoutPropose(height: number, round: number): void {
+	public scheduleTimeoutPropose(height: number, round: number): boolean {
 		if (this.#timeoutPropose) {
-			return;
+			return false;
 		}
 
 		this.#timeoutPropose = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPropose(height, round);
 			this.#timeoutPropose = undefined;
 		}, this.#getTimeout(round));
+
+		return true;
 	}
 
-	public scheduleTimeoutPrevote(height: number, round: number): void {
+	public scheduleTimeoutPrevote(height: number, round: number): boolean {
 		if (this.#timeoutPrevote) {
-			return;
+			return false;
 		}
 
 		this.#timeoutPrevote = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPrevote(height, round);
 			this.#timeoutPrevote = undefined;
 		}, this.#getTimeout(round));
+
+		return true;
 	}
 
-	public scheduleTimeoutPrecommit(height: number, round: number): void {
+	public scheduleTimeoutPrecommit(height: number, round: number): boolean {
 		if (this.#timeoutPrecommit) {
-			return;
+			return false;
 		}
 
 		this.#timeoutPrecommit = setTimeout(async () => {
 			await this.#getConsensus().onTimeoutPrecommit(height, round);
 			this.#timeoutPrecommit = undefined;
 		}, this.#getTimeout(round));
+
+		return true;
 	}
 
 	public clear(): void {
@@ -93,8 +104,8 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 
 	#getTimeout(round: number): number {
 		return (
-			this.cryptoConfiguration.getMilestone().stageTimeout +
-			round * this.cryptoConfiguration.getMilestone().stageTimeoutIncrease
+			this.cryptoConfiguration.getMilestone().timeouts.stageTimeout +
+			round * this.cryptoConfiguration.getMilestone().timeouts.stageTimeoutIncrease
 		);
 	}
 

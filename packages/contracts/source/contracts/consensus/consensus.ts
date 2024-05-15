@@ -82,9 +82,10 @@ export interface Bootstrapper {
 }
 
 export interface Scheduler {
-	scheduleTimeoutStartRound(): void;
-	scheduleTimeoutPropose(height: number, round: number): void;
-	scheduleTimeoutPrevote(height: number, round: number): void;
-	scheduleTimeoutPrecommit(height: number, round: number): void;
+	getNextBlockTimestamp(commitTime: number): number;
+	scheduleTimeoutBlockPrepare(timestamp: number): boolean;
+	scheduleTimeoutPropose(height: number, round: number): boolean;
+	scheduleTimeoutPrevote(height: number, round: number): boolean;
+	scheduleTimeoutPrecommit(height: number, round: number): boolean;
 	clear(): void;
 }

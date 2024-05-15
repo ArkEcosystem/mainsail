@@ -146,6 +146,30 @@ describe<{
 		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
+	it("should broadcast satisfied webhook condition with nested key", async ({ database, listener }) => {
+		const spyOnPost = stub(Utils.http, "post").resolvedValue({
+			statusCode: 200,
+		});
+		const spyOnDispatch = stub(eventDispatcher, "dispatch");
+
+		webhook.conditions = [
+			{
+				condition: "eq",
+				key: "some.nested.prop",
+				value: 1,
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
+
+		spyOnPost.calledOnce();
+		spyOnDispatch.calledOnce();
+		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
+		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Broadcasted);
+		expectFinishedEventData(spyOnDispatchArguments[1]);
+	});
+
 	it("should not broadcast if webhook condition is not satisfied", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post");
 
@@ -159,6 +183,23 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { test: 2 }, name: "event" });
+
+		spyOnPost.neverCalled();
+	});
+
+	it("should not broadcast if webhook condition with nested key is not satisfied", async ({ database, listener }) => {
+		const spyOnPost = stub(Utils.http, "post");
+
+		webhook.conditions = [
+			{
+				condition: "eq",
+				key: "some.nested.prop",
+				value: 1,
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { some: { nested: { prop: 2 } } }, name: "event" });
 
 		spyOnPost.neverCalled();
 	});

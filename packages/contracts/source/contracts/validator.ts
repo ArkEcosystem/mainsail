@@ -8,7 +8,7 @@ export interface ValidatorKeyPair {
 export interface Validator {
 	configure(keyPair: ValidatorKeyPair): Validator;
 	getConsensusPublicKey(): string;
-	prepareBlock(generatorPublicKey: string, round: number): Promise<Block>;
+	prepareBlock(generatorPublicKey: string, round: number, timestamp: number): Promise<Block>;
 	propose(
 		validatorIndex: number,
 		round: number,

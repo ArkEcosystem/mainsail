@@ -23,6 +23,7 @@ export class Database {
 		}
 
 		this.#database = new LowSync<{ webhooks: Webhook[] }>(new JSONFileSync(adapterFile), { webhooks: [] });
+		this.#restore();
 	}
 
 	public all(): Webhook[] {
@@ -63,5 +64,11 @@ export class Database {
 	public destroy(id: string): void {
 		this.#database.data.webhooks = this.#database.data.webhooks.filter((webhook) => webhook.id !== id);
 		this.#database.write();
+	}
+
+	#restore(): void {
+		try {
+			this.#database.read();
+		} catch {}
 	}
 }
