@@ -3,7 +3,7 @@ import { isObject } from "@mainsail/utils";
 import { Wallet } from "../../models/index.js";
 import { EqualCriteria, OrWalletCriteria, WalletCriteria } from "../criteria.js";
 import { Expression, JsonFieldCastType, OrExpression } from "../expressions.js";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class WalletFilter {
 	public static async getExpression(...criteria: OrWalletCriteria[]): Promise<Expression<Wallet>> {
@@ -32,13 +32,13 @@ export class WalletFilter {
 				case "balance": {
 					return handleOrCriteria(criteria.balance, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("nonce", c),
+						handleComparisonCriteria("nonce", c),
 					);
 				}
 				case "nonce": {
 					return handleOrCriteria(criteria.nonce, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("nonce", c),
+						handleComparisonCriteria("nonce", c),
 					);
 				}
 				case "attributes": {
@@ -82,7 +82,7 @@ export class WalletFilter {
 						v = v[nestedAttribute];
 					}
 
-					return handleNumericCriteria<Wallet, "attributes">("attributes", v, {
+					return handleComparisonCriteria<Wallet, "attributes">("attributes", v, {
 						cast: this.inferAttributeCastType(k),
 						fieldName: k,
 						operator: "->>",
