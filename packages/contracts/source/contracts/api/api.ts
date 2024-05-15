@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
 
-import { Application } from "./kernel/application.js";
+import { Application } from "../kernel/application.js";
+import { Processor } from "./rpc.js";
 
 export type ApiServer = Hapi.Server<ServerState>;
 
@@ -12,6 +13,7 @@ export enum ServerType {
 export interface ServerState {
 	app: Application;
 	schemas: any;
+	rpc: Processor;
 }
 
 export type Sorting = {
