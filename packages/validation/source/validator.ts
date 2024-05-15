@@ -53,6 +53,10 @@ export class Validator implements Contracts.Crypto.Validator {
 		this.ajv_.addSchema(schema);
 	}
 
+	public hasSchema(keyReference: string): boolean {
+		return this.ajv_.getSchema(keyReference) !== undefined;
+	}
+
 	public removeKeyword(keyword: string): void {
 		this.ajv_.removeKeyword(keyword);
 	}
