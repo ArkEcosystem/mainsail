@@ -156,9 +156,7 @@ impl EvmInner {
                 tx_env.caller = ctx.caller;
                 tx_env.transact_to = match ctx.recipient {
                     Some(recipient) => revm::primitives::TransactTo::Call(recipient),
-                    None => {
-                        revm::primitives::TransactTo::Create(revm::primitives::CreateScheme::Create)
-                    }
+                    None => revm::primitives::TransactTo::Create,
                 };
 
                 tx_env.data = ctx.data;
