@@ -4,7 +4,7 @@ members = ["core", "bindings"]
 
 [workspace.package]
 version = "0.1.0"
-rust-version = "1.76"
+rust-version = "1.78"
 edition = "2021"
 license = "GPL-3.0-only"
 authors = [""]
@@ -14,7 +14,7 @@ anyhow = { version = "1.0.79" }
 ethers-contract = { version = "2.0.13" }
 ethers-core = { version = "2.0.13" }
 ethers-providers = { version = "2.0.13" }
-revm = { version = "8.0.0", features = [
+revm = { version = "9.0.0", features = [
     "ethersdb",
     "tokio",
     "serde",
