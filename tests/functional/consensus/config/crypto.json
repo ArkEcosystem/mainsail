@@ -260,7 +260,9 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": ["ff57a79a945514f1ad482e476fd76f87b52b5bf16612735822e51be31c611acd"]
+						"votes": [
+							"ff57a79a945514f1ad482e476fd76f87b52b5bf16612735822e51be31c611acd"
+						]
 					},
 					"signature": "a5461923a634e6c2de65ea90b54831af52dcc81289c82750d2e2590128c21de752364a1db37512ff2b2409638ec4da221ae118c05593aca1f3daa4d59f0ef5f0",
 					"id": "4aeb1b4ea0cb340eb2553b82793ef7d67b180383b6c76382804e09543a807811",
@@ -277,7 +279,9 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": ["79558d40445df268067ae395f927db5a41ebc425c6a016f7182a148a7eb514d7"]
+						"votes": [
+							"79558d40445df268067ae395f927db5a41ebc425c6a016f7182a148a7eb514d7"
+						]
 					},
 					"signature": "bf6afcacb0f836f4f6e9ab3e7e18864149be22cc93dc74248d59f75f9c562c176094cbb4296f93d8af3a446487d0bf1d6698f68ec7d69a130a4a0e3d3dc20594",
 					"id": "4a1abad0d2687bf49de5ae4f4e08b42e5983180cd852bb8628670178899cce82",
@@ -294,7 +298,9 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": ["51c734aedfb7df647d1583b663eb006686b0d1af56f409ad0920521b1ed08948"]
+						"votes": [
+							"51c734aedfb7df647d1583b663eb006686b0d1af56f409ad0920521b1ed08948"
+						]
 					},
 					"signature": "67f82d5cb0133701b4e05f49416b4b74926e56ead9cd7052c0606bea9c5c7eac205ae6409ec3add3cb15d163eef6d3ee2848448c602658b9e324a7ec98bba3ac",
 					"id": "97c62c9f66b0a04fbce24cc826a7d6ed9b9fe877d2c93133adac02543573655c",
@@ -311,7 +317,9 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": ["dc19566ce614bec1b1dc726b0d11c14c06ba6983785e51de590a82c9a5e2e1f1"]
+						"votes": [
+							"dc19566ce614bec1b1dc726b0d11c14c06ba6983785e51de590a82c9a5e2e1f1"
+						]
 					},
 					"signature": "17c85b1b2b4e645084357bd9131cd2006d4f3bd5d6c5852a448c2c49972cfa8f166e47b81b0a08c05db87ab4ef196256a94f071eeed28377a781c94895e13516",
 					"id": "f4fd02a03f041fa9d339b0afccffa22b1eaa737d0dbc126fa36bdf95aa09f3e4",
@@ -328,7 +336,9 @@
 					"amount": "0",
 					"asset": {
 						"unvotes": [],
-						"votes": ["6949ebb0657838da1ea0d05ad9fef1d0a75c0a2d2b3e5116db2330cbb2f4393b"]
+						"votes": [
+							"6949ebb0657838da1ea0d05ad9fef1d0a75c0a2d2b3e5116db2330cbb2f4393b"
+						]
 					},
 					"signature": "41e523088029ae7c58567c79f63b54fc6010a73d3b5f1751193828e90a568069684a4d08bc86a5894c2edbc901fb2201cf704f49447fde2ff2d4b416bc712dc7",
 					"id": "0787b1ce061d2880aa17871431039e6d50daa4796f615cc8fb1143c4620e03da",
@@ -355,7 +365,12 @@
 				"maxTransactions": 150,
 				"version": 1
 			},
-			"blockTime": 100,
+			"timeouts": {
+				"blockTime": 100,
+				"blockPrepareTime": 0,
+				"stageTimeout": 100,
+				"stageTimeoutIncrease": 100
+			},
 			"epoch": "2024-03-27T00:00:00.000Z",
 			"fees": {
 				"staticFees": {
@@ -376,8 +391,6 @@
 				"decimals": 8,
 				"denomination": 100000000
 			},
-			"stageTimeout": 100,
-			"stageTimeoutIncrease": 100,
 			"vendorFieldLength": 255
 		},
 		{

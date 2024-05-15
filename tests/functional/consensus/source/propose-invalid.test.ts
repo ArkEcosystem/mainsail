@@ -1,22 +1,22 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import {
-	Transfers,
-	Votes,
 	MultiSignatureRegistrations,
+	Transfers,
 	UsernameRegistrations,
 	UsernameResignations,
 	ValidatorRegistrations,
 	ValidatorResignations,
+	Votes,
 } from "@mainsail/test-transaction-builders";
-import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
 import validators from "../config/validators.json";
 import { assertBockHeight, assertBockRound, assertInvalidBlock } from "./asserts.js";
 import { Validator } from "./contracts.js";
-import { P2PRegistry } from "./p2p.js";
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
+import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import { getValidators, prepareNodeValidators, snoozeForBlock } from "./utils.js";
 
@@ -41,8 +41,6 @@ describe<{
 		await bootstrapMany(context.nodes);
 
 		context.validators = await getValidators(context.nodes[0], validators);
-
-		await runMany(context.nodes);
 	});
 
 	afterEach(async ({ nodes }) => {
@@ -76,12 +74,14 @@ describe<{
 					Array.isArray(transactions) ? transactions : [transactions],
 				);
 
-				node0.app
+				void node0.app
 					.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
 					.process(proposal);
 
 				stubPropose.restore();
 			});
+
+			await runMany(nodes);
 
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);
@@ -149,6 +149,8 @@ describe<{
 				stubPropose.restore();
 			});
 
+			await runMany(nodes);
+
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);
 		},
@@ -204,6 +206,8 @@ describe<{
 				stubPropose.restore();
 			});
 
+			await runMany(nodes);
+
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);
 		},
@@ -255,6 +259,8 @@ describe<{
 				stubPropose.restore();
 			});
 
+			await runMany(nodes);
+
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);
 		},
@@ -262,12 +268,12 @@ describe<{
 			{
 				builder: async (context) => [
 					await UsernameRegistrations.makeUsernameRegistration(context, {
-						username: "taken",
 						nonceOffset: 0,
+						username: "taken",
 					}),
 					await UsernameRegistrations.makeUsernameRegistration(context, {
-						username: "taken",
 						nonceOffset: 1,
+						username: "taken",
 					}),
 				],
 				exception: Exceptions.WalletUsernameAlreadyRegisteredError,
@@ -302,6 +308,8 @@ describe<{
 
 				stubPropose.restore();
 			});
+
+			await runMany(nodes);
 
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);
@@ -360,6 +368,8 @@ describe<{
 				stubPropose.restore();
 			});
 
+			await runMany(nodes);
+
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);
 		},
@@ -404,6 +414,8 @@ describe<{
 
 				stubPropose.restore();
 			});
+
+			await runMany(nodes);
 
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);
@@ -463,6 +475,8 @@ describe<{
 
 				stubPropose.restore();
 			});
+
+			await runMany(nodes);
 
 			await assertInvalidBlock(dataset.exception, nodes.slice(1), 1);
 			await assertNextBlockOk(nodes);

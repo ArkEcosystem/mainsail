@@ -196,6 +196,7 @@ export const getRandomFundedWallet = async (
 
 	await addTransactionsToPool(context, [fundTx]);
 	await waitBlock(sandbox);
+	await waitBlock(sandbox); // Await 2 blocks to ensure the transaction is confirmed
 
 	return randomKeyPair;
 };

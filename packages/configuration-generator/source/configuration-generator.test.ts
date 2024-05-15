@@ -211,8 +211,8 @@ describe<{
 						multiPaymentLimit: 256,
 						reward: "0",
 						satoshi: match.object,
-						stageTimeout: 2000,
-						stageTimeoutIncrease: 2000,
+						stageTimeoutout: 2000,
+						stageTimeoutoutIncrease: 2000,
 						vendorFieldLength: 255,
 					}),
 					match({

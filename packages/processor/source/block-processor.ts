@@ -5,9 +5,6 @@ import { Enums, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
@@ -67,7 +64,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			return true;
 		} catch (error) {
-			void this.events.dispatch(Enums.BlockEvent.Invalid, { block: unit.getBlock(), error });
+			void this.#emit(Enums.BlockEvent.Invalid, { block: unit.getBlock().data, error });
 			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 
@@ -108,7 +105,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		void this.events.dispatch(Enums.BlockEvent.Applied, commit);
+		void this.#emit(Enums.BlockEvent.Applied, commit.block.data);
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
@@ -139,14 +136,16 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (this.configuration.isNewMilestone()) {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
-			void this.app
-				.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-				.dispatch(Enums.CryptoEvent.MilestoneChanged);
+			void this.#emit(Enums.CryptoEvent.MilestoneChanged);
 		}
 	}
 
 	async #emitTransactionEvents(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		void this.events.dispatch(Enums.TransactionEvent.Applied, transaction.data);
+		if (this.state.isBootstrap()) {
+			return;
+		}
+
+		void this.#emit(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// TODO: ! no reason to pass this.emitter
 		handler.emitEvents(transaction, this.events);
@@ -161,5 +160,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		for (const validatorMutator of this.validatorMutators) {
 			await validatorMutator.apply(walletRepository, forgerWallet, block.data);
 		}
+	}
+
+	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
+		if (this.state.isBootstrap()) {
+			return;
+		}
+
+		return this.events.dispatch(event, data);
 	}
 }

@@ -180,7 +180,7 @@ describe<{
 			stubPrecommit0.restore();
 		});
 
-		const proposal = await makeProposal(node0, validators[0], 1, 0);
+		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
@@ -228,11 +228,11 @@ describe<{
 			stubPrecommit0.restore();
 		});
 
-		const proposal0 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal1 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal2 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal3 = await makeProposal(node0, validators[0], 1, 0);
-		const proposal4 = await makeProposal(node0, validators[0], 1, 0);
+		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal1 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal2 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal3 = await makeProposal(node0, validators[0], 1, 0, Date.now());
+		const proposal4 = await makeProposal(node0, validators[0], 1, 0, Date.now());
 
 		const node1 = nodes[1];
 		const stubPrecommit1 = stub(node1.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");

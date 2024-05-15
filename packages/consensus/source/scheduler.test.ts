@@ -27,9 +27,12 @@ describe<{
 
 	const config = {
 		getMilestone: () => ({
-			blockTime: 8000,
-			stageTimeout: 1000,
-			stageTimeoutIncrease: 2000,
+			timeouts: {
+				blockPrepareTime: 4000,
+				blockTime: 8000,
+				stageTimeout: 1000,
+				stageTimeoutIncrease: 2000,
+			},
 		}),
 	};
 
@@ -55,40 +58,50 @@ describe<{
 		assert.instance(scheduler, SchedulerProxy);
 	});
 
-	it("#scheduleTimeoutStartRound - should call onTimeoutStartRound ", async ({ scheduler }) => {
+	it("#getNextBlockTimestamp - should return previous block timestamp + blockTime", async ({ scheduler }) => {
+		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
+			data: {
+				timestamp: 0,
+			},
+		});
+
+		assert.equal(scheduler.getNextBlockTimestamp(0), 8000);
+		spyOnGetLatBlock.calledOnce();
+	});
+
+	it("#getNextBlockTimestamp - should return previous block commitTime + blockPrepareTime", async ({ scheduler }) => {
+		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
+			data: {
+				timestamp: 0,
+			},
+		});
+
+		assert.equal(scheduler.getNextBlockTimestamp(6000), 10_000);
+		spyOnGetLatBlock.calledOnce();
+	});
+
+	it("#scheduleTimeoutBlockPrepare - should call onTimeoutStartRound", async ({ scheduler }) => {
 		currentTimestamp = 2000;
 
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
-		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
-			data: {
-				timestamp: 0,
-			},
-		});
 
-		scheduler.scheduleTimeoutStartRound();
+		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
 		await fakeTimers.nextAsync();
 
-		spyOnGetLatBlock.calledOnce();
 		spyOnTimeoutStartRound.calledOnce();
 		assert.equal(fakeTimers.now, 6000); // 8000 - 2000
 	});
 
-	it("#scheduleTimeoutPropose - should call onTimeoutStartRound only once", async ({ scheduler }) => {
+	it("#scheduleTimeoutBlockPrepare - should call onTimeoutStartRound only once", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
-		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
-			data: {
-				timestamp: 0,
-			},
-		});
 
-		scheduler.scheduleTimeoutStartRound();
-		scheduler.scheduleTimeoutStartRound();
+		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
+		assert.false(scheduler.scheduleTimeoutBlockPrepare(8000));
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
-		spyOnGetLatBlock.calledOnce();
 		spyOnTimeoutStartRound.calledOnce();
 	});
 
@@ -96,7 +109,7 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
 
-		scheduler.scheduleTimeoutPropose(1, 2);
+		assert.true(scheduler.scheduleTimeoutPropose(1, 2));
 		await fakeTimers.nextAsync();
 
 		spyOnTimeoutPropose.calledOnce();
@@ -106,8 +119,8 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
 
-		scheduler.scheduleTimeoutPropose(1, 2);
-		scheduler.scheduleTimeoutPropose(1, 2);
+		assert.true(scheduler.scheduleTimeoutPropose(1, 2));
+		assert.false(scheduler.scheduleTimeoutPropose(1, 2));
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
@@ -119,17 +132,17 @@ describe<{
 
 		const timerValues: number[] = [];
 
-		scheduler.scheduleTimeoutPropose(1, 0);
+		assert.true(scheduler.scheduleTimeoutPropose(1, 0));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		scheduler.scheduleTimeoutPropose(1, 1);
+		assert.true(scheduler.scheduleTimeoutPropose(1, 1));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		scheduler.scheduleTimeoutPropose(1, 2);
+		assert.true(scheduler.scheduleTimeoutPropose(1, 2));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 
@@ -140,7 +153,7 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
 
-		scheduler.scheduleTimeoutPrevote(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
 		await fakeTimers.nextAsync();
 
 		spyOnTimeoutPropose.calledOnce();
@@ -150,8 +163,8 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
 
-		scheduler.scheduleTimeoutPrevote(1, 2);
-		scheduler.scheduleTimeoutPrevote(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
+		assert.false(scheduler.scheduleTimeoutPrevote(1, 2));
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
@@ -163,17 +176,17 @@ describe<{
 
 		const timerValues: number[] = [];
 
-		scheduler.scheduleTimeoutPrevote(1, 0);
+		assert.true(scheduler.scheduleTimeoutPrevote(1, 0));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		scheduler.scheduleTimeoutPrevote(1, 1);
+		assert.true(scheduler.scheduleTimeoutPrevote(1, 1));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		scheduler.scheduleTimeoutPrevote(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 
@@ -184,7 +197,7 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
 
-		scheduler.scheduleTimeoutPrecommit(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
 		await fakeTimers.nextAsync();
 
 		spyOnTimeoutPropose.calledOnce();
@@ -194,8 +207,8 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
 
-		scheduler.scheduleTimeoutPrecommit(1, 2);
-		scheduler.scheduleTimeoutPrecommit(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
+		assert.false(scheduler.scheduleTimeoutPrecommit(1, 2));
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
@@ -207,17 +220,17 @@ describe<{
 
 		const timerValues: number[] = [];
 
-		scheduler.scheduleTimeoutPrecommit(1, 0);
+		assert.true(scheduler.scheduleTimeoutPrecommit(1, 0));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		scheduler.scheduleTimeoutPrecommit(1, 1);
+		assert.true(scheduler.scheduleTimeoutPrecommit(1, 1));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 		fakeTimers.now = 0;
 
-		scheduler.scheduleTimeoutPrecommit(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
 		await fakeTimers.nextAsync();
 		timerValues.push(fakeTimers.now);
 
@@ -228,7 +241,7 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
 
-		scheduler.scheduleTimeoutPropose(1, 2);
+		assert.true(scheduler.scheduleTimeoutPropose(1, 2));
 		scheduler.clear();
 		await fakeTimers.nextAsync();
 
@@ -239,7 +252,7 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
 
-		scheduler.scheduleTimeoutPrevote(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
 		scheduler.clear();
 
 		await fakeTimers.nextAsync();
@@ -251,7 +264,7 @@ describe<{
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
 
-		scheduler.scheduleTimeoutPrecommit(1, 2);
+		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
 		scheduler.clear();
 		await fakeTimers.nextAsync();
 

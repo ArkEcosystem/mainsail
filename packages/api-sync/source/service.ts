@@ -6,7 +6,7 @@ import {
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types, Utils } from "@mainsail/kernel";
-import { sleep, validatorSetPack } from "@mainsail/utils";
+import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
@@ -200,13 +200,13 @@ export class Sync implements Contracts.ApiSync.Service {
 		await this.configurationRepositoryFactory()
 			.createQueryBuilder()
 			.insert()
-			.orIgnore()
 			.values({
 				activeMilestones: this.configuration.getMilestone(0) as Record<string, any>,
 				cryptoConfiguration: (this.configuration.all() ?? {}) as Record<string, any>,
 				id: 1,
 				version: this.app.version(),
 			})
+			.orUpdate(["crypto_configuration", "version"], ["id"])
 			.execute();
 	}
 
@@ -307,18 +307,14 @@ export class Sync implements Contracts.ApiSync.Service {
 					supply: () => `supply + ${deferred.block.reward}`,
 				})
 				.where("id = :id", { id: 1 })
-				// TODO: consider additional check constraint (OLD.height = NEW.height - 1)
 				.andWhere("height = :previousHeight", {
 					previousHeight: Utils.BigNumber.make(deferred.block.height).minus(1).toFixed(),
 				})
 				.execute();
 
-			await transactionRepository
-				.createQueryBuilder()
-				.insert()
-				.orIgnore()
-				.values(deferred.transactions)
-				.execute();
+			for (const batch of chunk(deferred.transactions, 256)) {
+				await transactionRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+			}
 
 			if (deferred.validatorRound) {
 				await validatorRoundRepository

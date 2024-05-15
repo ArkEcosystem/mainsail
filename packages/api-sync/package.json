@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-sync",
-	"version": "0.0.1-alpha.16",
+	"version": "0.0.1-alpha.17",
 	"description": "API database sync for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -26,7 +26,8 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/utils": "workspace:*",
+		"joi": "17.12.2"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

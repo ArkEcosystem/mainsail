@@ -59,10 +59,11 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		context.scheduler = {
 			clear: () => {},
-			scheduleTimeoutPrecommit: () => {},
-			scheduleTimeoutPrevote: () => {},
-			scheduleTimeoutPropose: () => {},
-			scheduleTimeoutStartRound: () => {},
+			getNextBlockTimestamp: (value) => value + 4000,
+			scheduleTimeoutBlockPrepare: () => true,
+			scheduleTimeoutPrecommit: () => true,
+			scheduleTimeoutPrevote: () => true,
+			scheduleTimeoutPropose: () => true,
 		};
 
 		context.bootstrapper = {
@@ -193,24 +194,17 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		});
 	});
 
-	it("#startRound - should clear scheduler, scheduleTimeout", async ({ consensus, scheduler }) => {
-		const spyScheduleClear = spy(scheduler, "clear");
-		const spyScheduleTimeoutStartRound = spy(scheduler, "scheduleTimeoutStartRound");
-
-		await consensus.startRound(1);
-
-		spyScheduleClear.calledOnce();
-		spyScheduleTimeoutStartRound.calledOnce();
-	});
-
-	it("#onTimeoutStartRound - should schedule timeout if proposer is not local validator", async ({
+	it("#startRound - should clear scheduler, scheduleTimeout and should not propose is not local validator", async ({
 		consensus,
+		scheduler,
 		validatorsRepository,
 		roundStateRepository,
+		eventDispatcher,
 		proposer,
 		logger,
-		eventDispatcher,
 	}) => {
+		const spyScheduleClear = spy(scheduler, "clear");
+		const spyscheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyLoggerInfo = spy(logger, "info");
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
 		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
@@ -219,7 +213,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		});
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
-		await consensus.onTimeoutStartRound();
+		await consensus.startRound(0);
+
+		spyScheduleClear.calledOnce();
+		spyscheduleTimeoutBlockPrepare.calledOnce();
 
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.getConsensusPublicKey());
@@ -234,26 +231,27 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			step: Contracts.Consensus.Step.Propose,
 			validRound: undefined,
 		});
-		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
-	it("#onTimeoutStartRound - local validator should propose", async ({
+	it("#start round - should clear scheduler, scheduleTimeout and should propose", async ({
 		consensus,
 		validatorsRepository,
 		roundStateRepository,
 		logger,
-		proposalProcessor,
 		block,
 		proposal,
 		proposer,
 		validatorSet,
 		eventDispatcher,
+		scheduler,
 	}) => {
 		const validator = {
 			prepareBlock: () => {},
 			propose: () => {},
 		};
 
+		const spyScheduleClear = spy(scheduler, "clear");
+		const spyscheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
 
@@ -266,10 +264,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const getValidatorIndexByWalletPublicKey = stub(validatorSet, "getValidatorIndexByWalletPublicKey").returnValue(
 			1,
 		);
-		const spyProposalProcess = spy(proposalProcessor, "process");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
-		await consensus.onTimeoutStartRound();
+		await consensus.startRound(0);
+
+		spyScheduleClear.calledOnce();
+		spyscheduleTimeoutBlockPrepare.calledOnce();
 
 		spyGetRoundState.calledTimes(1);
 		spyGetRoundState.calledWith(1, 0);
@@ -281,10 +281,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		getValidatorIndexByWalletPublicKey.calledWith(proposer.getWalletPublicKey());
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 0, undefined, block);
-		spyProposalProcess.calledOnce();
-		spyProposalProcess.calledWith(proposal);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${0} with proposer: ${proposer}`);
-		spyDispatch.calledOnce();
+		spyDispatch.called();
 		spyDispatch.calledWith(Enums.ConsensusEvent.RoundStarted, {
 			height: 1,
 			lockedRound: undefined,
@@ -300,18 +298,21 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		validatorsRepository,
 		roundStateRepository,
 		logger,
-		proposalProcessor,
 		block,
 		proposal,
 		proposer,
 		roundState,
 		validatorSet,
 		eventDispatcher,
+		scheduler,
 	}) => {
 		const validator = {
 			prepareBlock: () => {},
 			propose: () => {},
 		};
+
+		const spyScheduleClear = spy(scheduler, "clear");
+		const spyscheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 
 		const spyValidatorPrepareBlock = stub(validator, "prepareBlock").resolvedValue(block);
 		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
@@ -326,7 +327,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			1,
 		);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
-		const spyProposalProcess = spy(proposalProcessor, "process");
 
 		const lockProof = {
 			signature: "signature",
@@ -338,8 +338,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		consensus.setValidRound(roundState);
-		consensus.setRound(1);
-		await consensus.onTimeoutStartRound();
+		await consensus.startRound(1);
+
+		spyScheduleClear.calledOnce();
+		spyscheduleTimeoutBlockPrepare.calledOnce();
 
 		spyGetRoundState.calledTimes(1);
 		spyGetRoundState.calledWith(1, 1);
@@ -352,8 +354,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		getValidatorIndexByWalletPublicKey.calledWith(proposer.getWalletPublicKey());
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator set, round, validRound, block, lockProof
-		spyProposalProcess.calledOnce();
-		spyProposalProcess.calledWith(proposal);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${1} with proposer: ${proposer}`);
 		spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with blockId: ${block.data.id}`);
 		spyDispatch.calledOnce();
@@ -367,42 +367,38 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
+	it("#onTimeoutStartRound - should propose if proposal is ready", async ({
+		consensus,
+		proposalProcessor,
+		proposal,
+	}) => {
+		const spyProposalProcess = spy(proposalProcessor, "process");
+
+		consensus.setProposal(proposal);
+		await consensus.onTimeoutStartRound();
+
+		spyProposalProcess.calledOnce();
+		spyProposalProcess.calledWith(proposal);
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+	});
+
 	it("#onTimeoutStartRound - should skip propose if already proposed", async ({
 		consensus,
-		validatorSet,
-		validatorsRepository,
-		roundState,
+		proposalProcessor,
 		proposal,
 		eventDispatcher,
 	}) => {
-		const validatorPublicKey = "publicKey";
-		const validator = {
-			prepareBlock: () => {},
-			propose: () => {},
-		};
+		const spyProposalProcess = spy(proposalProcessor, "process");
 
-		stub(validatorSet, "getActiveValidators").returnValue([
-			{
-				getAttribute: () => validatorPublicKey,
-			},
-		]);
-		stub(validatorsRepository, "getValidator").returnValue(validator);
-		roundState.hasProposal = () => true;
-		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
-		const spyDispatch = spy(eventDispatcher, "dispatch");
+		consensus.setProposal(proposal);
+		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutStartRound();
 
-		await consensus.onTimeoutStartRound(0);
+		spyProposalProcess.calledOnce();
+		spyProposalProcess.calledWith(proposal);
 
-		spyValidatorPropose.neverCalled();
-
-		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.RoundStarted, {
-			height: 1,
-			lockedRound: undefined,
-			round: 0,
-			step: Contracts.Consensus.Step.Propose,
-			validRound: undefined,
-		});
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
 	it("#startRound - local validator should locked value", async () => {});
@@ -1123,13 +1119,20 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		});
 	});
 
-	it("#onMajorityPrevoteAny - should return if step !== prevote", async ({ consensus, scheduler, roundState }) => {
+	it("#onMajorityPrevoteAny - should return if step !== prevote", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		consensus.setStep(Contracts.Consensus.Step.Propose);
 		await consensus.onMajorityPrevoteAny(roundState);
 
 		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
 	});
 
@@ -1137,30 +1140,55 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		consensus,
 		scheduler,
 		roundState,
+		eventDispatcher,
 	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		roundState = { ...roundState, height: 3 };
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
 
 		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 	});
 
-	it("#onMajorityPrevoteAny - should return if height doesn't match", async ({
+	it("#onMajorityPrevoteAny - should return if round doesn't match", async ({
 		consensus,
 		scheduler,
 		roundState,
+		eventDispatcher,
 	}) => {
 		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrevote");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		roundState = { ...roundState, round: 1 };
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
 		await consensus.onMajorityPrevoteAny(roundState);
 
 		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
+	});
+
+	it("#onMajorityPrevoteAny - should not dispatch if timeout is scheduled", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = stub(scheduler, "scheduleTimeoutPrevote").returnValue(false);
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		consensus.setStep(Contracts.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevoteAny(roundState);
+
+		spyScheduleTimeout.calledOnce();
+		spyScheduleTimeout.calledWith(1, 0);
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
+
+		spyDispatch.neverCalled();
 	});
 
 	it("#onMajorityPrevoteNull - should precommit", async ({
@@ -1266,6 +1294,60 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			validRound: undefined,
 		});
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+	});
+
+	it("#onMajorityPrecommitAny - should return if height doesn't match", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrecommit");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+
+		roundState = { ...roundState, height: 3 };
+		await consensus.onMajorityPrecommitAny(roundState);
+
+		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
+	});
+
+	it("#onMajorityPrecommitAny - should return if round doesn't match", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = spy(scheduler, "scheduleTimeoutPrecommit");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+
+		roundState = { ...roundState, round: 2 };
+		await consensus.onMajorityPrecommitAny(roundState);
+
+		spyScheduleTimeout.neverCalled();
+		spyDispatch.neverCalled();
+	});
+
+	it("#onMajorityPrecommitAny - should not dispatch if timeout is scheduled", async ({
+		consensus,
+		scheduler,
+		roundState,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeout = stub(scheduler, "scheduleTimeoutPrecommit").returnValue(false);
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Propose);
+
+		await consensus.onMajorityPrecommitAny(roundState);
+
+		spyScheduleTimeout.calledOnce();
+		spyScheduleTimeout.calledWith(1, 0);
+		spyDispatch.neverCalled();
 	});
 
 	it("#onMajorityPrecommit - should commit & increase height", async ({
