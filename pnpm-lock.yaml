@@ -3167,6 +3167,9 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../state
+      '@mainsail/transaction-pool-server':
+        specifier: workspace:*
+        version: link:../transaction-pool-server
       '@mainsail/transaction-pool-service':
         specifier: workspace:*
         version: link:../transaction-pool-service

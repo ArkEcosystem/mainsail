@@ -7,11 +7,11 @@ import { Providers } from "@mainsail/kernel";
 @injectable()
 export class Server extends AbstractServer {
 	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "api-transaction-pool")
+	@tagged("plugin", "transaction-pool-server")
 	private readonly configuration!: Providers.PluginConfiguration;
 
 	protected baseName(): string {
-		return "Transaction Pool API";
+		return "Transaction Pool Server";
 	}
 
 	protected pluginConfiguration(): Providers.PluginConfiguration {

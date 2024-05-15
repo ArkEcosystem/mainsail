@@ -57,6 +57,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/transaction-pool-service": "workspace:*",
+		"@mainsail/transaction-pool-server": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"boxen": "7.1.1",
 		"dayjs": "1.11.10",

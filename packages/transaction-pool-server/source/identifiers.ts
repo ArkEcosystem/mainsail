@@ -1,4 +1,4 @@
 export const Identifiers = {
-	HTTP: Symbol.for("API<TransactionPool.HTTP>"),
-	HTTPS: Symbol.for("API<TransactionPool.HTTPS>"),
+	HTTP: Symbol.for("Server<TransactionPool.HTTP>"),
+	HTTPS: Symbol.for("Server<TransactionPool.HTTPS>"),
 };
