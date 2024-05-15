@@ -26,8 +26,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.11.10"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-bech32m": "workspace:*",

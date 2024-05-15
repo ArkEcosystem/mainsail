@@ -3400,9 +3400,6 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      dayjs:
-        specifier: 1.11.10
-        version: 1.11.10
     devDependencies:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
