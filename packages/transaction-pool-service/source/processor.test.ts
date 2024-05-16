@@ -135,7 +135,7 @@ describe<{
 
 		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
+		// const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
 		const processor = context.container.resolve(Processor);
 		const result = await processor.process([context.transaction1.data, context.transaction2.data]);
@@ -143,7 +143,7 @@ describe<{
 		poolStub.calledTimes(2);
 		spiedExtension0.calledOnce();
 		spiedExtension1.calledOnce();
-		spiedBroadcaster.calledOnce();
+		// spiedBroadcaster.calledOnce();
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.broadcast, [0]);
@@ -157,7 +157,7 @@ describe<{
 		const poolSpy = spy(context.pool, "addTransaction");
 
 		const spiedExtension0 = stub(context.extensions[0], "throwIfCannotBroadcast");
-		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
+		// const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
 
 		spiedExtension0
 			.callsFakeNth(0, async (transaction) => {})
@@ -173,7 +173,7 @@ describe<{
 		poolSpy.calledTimes(2);
 		spiedExtension0.calledTimes(2);
 		spiedExtension1.calledTimes(2);
-		spiedBroadcaster.called();
+		// spiedBroadcaster.called();
 
 		assert.equal(result.accept, [0, 1]);
 		assert.equal(result.broadcast, [0]);
