@@ -111,6 +111,28 @@ export class Repository implements Contracts.State.Repository {
 		}
 	}
 
+	public changesToJson(): Contracts.Types.JsonObject {
+		const set = {};
+		const forget: string[] = [];
+
+		for (const name of this.#setAttributes) {
+			if (this.#setAttributes.has(name)) {
+				continue;
+			}
+
+			forget.push(name);
+		}
+
+		for (const name of this.#setAttributes) {
+			set[name] = this.getAttributeHolder(name).toJson();
+		}
+
+		return {
+			forget,
+			set,
+		};
+	}
+
 	public toJson(): Contracts.Types.JsonObject {
 		const result = {};
 

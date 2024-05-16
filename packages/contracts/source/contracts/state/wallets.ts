@@ -53,6 +53,8 @@ export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges"> {
 	fromJson(data: JsonObject): Wallet;
 	commitChanges(walletRepository: WalletRepository): void;
 
+	changesToJson(): JsonObject;
+
 	toString(): string;
 }
 

@@ -156,6 +156,10 @@ export class Wallet implements Contracts.State.Wallet {
 		return this;
 	}
 
+	public changesToJson(): Contracts.Types.JsonObject {
+		return this.#repository.changesToJson();
+	}
+
 	public toString(): string {
 		if (this.hasAttribute("username")) {
 			return this.getAttribute<string>("username");
