@@ -14,7 +14,6 @@ import {
 	PostPrecommitRoute,
 	PostPrevoteRoute,
 	PostProposalRoute,
-	PostTransactionsRoute,
 } from "../routes/index.js";
 import { BasePlugin } from "./base-plugin.js";
 
@@ -42,7 +41,6 @@ export class ValidateDataPlugin extends BasePlugin {
 			...this.app.resolve(PostPrecommitRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostPrevoteRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostProposalRoute).getRoutesConfigByPath(),
-			...this.app.resolve(PostTransactionsRoute).getRoutesConfigByPath(),
 		};
 
 		server.ext({

@@ -8,4 +8,3 @@ export * from "./headers.js";
 export * from "./post-precommit.js";
 export * from "./post-prevote.js";
 export * from "./post-proposal.js";
-export * from "./post-transactions.js";
