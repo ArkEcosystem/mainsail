@@ -75,7 +75,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
 			rateLimit: Joi.number().integer().min(1).required(),
-			rateLimitPostTransactions: Joi.number().integer().min(1).required(),
 			remoteAccess: Joi.array()
 				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
 				.required(),

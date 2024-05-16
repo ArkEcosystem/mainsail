@@ -35,7 +35,6 @@ export class RateLimitPlugin {
 		this.rateLimiter = buildRateLimiter({
 			activeValidators: this.cryptoConfiguration.getMaxActiveValidators(),
 			rateLimit: this.configuration.getRequired<number>("rateLimit"),
-			rateLimitPostTransactions: this.configuration.getRequired<number>("rateLimitPostTransactions"),
 			remoteAccess: this.configuration.getOptional<Array<string>>("remoteAccess", []),
 			whitelist: [],
 		});
