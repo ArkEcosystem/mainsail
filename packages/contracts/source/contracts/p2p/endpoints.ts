@@ -96,14 +96,3 @@ export interface PostProposalRequest extends Request {
 }
 
 export interface PostProposalResponse extends Response {}
-
-export interface PostTransactionsRequest extends Request {
-	payload: {
-		headers: HeaderData;
-		transactions: Buffer[];
-	};
-}
-
-export interface PostTransactionsResponse extends Response {
-	accept: number[];
-}

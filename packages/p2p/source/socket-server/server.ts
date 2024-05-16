@@ -21,7 +21,6 @@ import {
 	PostPrecommitRoute,
 	PostPrevoteRoute,
 	PostProposalRoute,
-	PostTransactionsRoute,
 } from "./routes/index.js";
 
 // todo: review the implementation
@@ -61,7 +60,6 @@ export class Server implements Contracts.P2P.Server {
 		this.app.resolve(PostPrecommitRoute).register(this.server);
 		this.app.resolve(PostPrevoteRoute).register(this.server);
 		this.app.resolve(PostProposalRoute).register(this.server);
-		this.app.resolve(PostTransactionsRoute).register(this.server);
 
 		// onPreAuth
 		this.app.resolve(ValidateIpPlugin).register(this.server);

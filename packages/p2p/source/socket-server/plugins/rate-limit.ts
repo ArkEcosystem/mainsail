@@ -15,7 +15,6 @@ import {
 	PostPrecommitRoute,
 	PostPrevoteRoute,
 	PostProposalRoute,
-	PostTransactionsRoute,
 } from "../routes/index.js";
 
 @injectable()
@@ -51,7 +50,6 @@ export class RateLimitPlugin {
 			...this.app.resolve(PostPrecommitRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostPrevoteRoute).getRoutesConfigByPath(),
 			...this.app.resolve(PostProposalRoute).getRoutesConfigByPath(),
-			...this.app.resolve(PostTransactionsRoute).getRoutesConfigByPath(),
 		};
 
 		server.ext({
