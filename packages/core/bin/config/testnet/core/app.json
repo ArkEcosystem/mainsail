@@ -94,9 +94,6 @@
 			"package": "@mainsail/p2p"
 		},
 		{
-			"package": "@mainsail/api-transaction-pool"
-		},
-		{
 			"package": "@mainsail/processor"
 		},
 		{
