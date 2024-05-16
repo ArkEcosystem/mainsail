@@ -23,6 +23,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.TransactionPoolClient.Instance)
+	protected readonly txPoolClient!: Contracts.TransactionPool.Client;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -111,7 +114,7 @@ export class Validator implements Contracts.Validator.Validator {
 		// );
 		// return transactions;
 
-		return [];
+		return this.txPoolClient.getTx();
 	}
 
 	async #makeBlock(
