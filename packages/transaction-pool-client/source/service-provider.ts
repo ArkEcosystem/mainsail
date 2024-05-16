@@ -11,10 +11,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
-			export: Joi.object({
-				host: Joi.string().required(),
-				port: Joi.number().integer().min(1).max(65_535).required(),
-			}).required(),
+			host: Joi.string().required(),
+			port: Joi.number().integer().min(1).max(65_535).required(),
 		})
 			.required()
 			.unknown(true);
