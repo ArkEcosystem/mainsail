@@ -1,12 +1,11 @@
 import { Contracts } from "@mainsail/contracts";
 
 import { BaseRoute } from "./routes/base.js";
-import * as TestRoute from "./routes/test.js";
 
 const config = {
 	name: "Transaction Pool Server",
 	async register(server: Contracts.Api.ApiServer): Promise<void> {
-		const handlers = [TestRoute, BaseRoute];
+		const handlers = [BaseRoute];
 
 		for (const handler of handlers) {
 			handler.register(server);
