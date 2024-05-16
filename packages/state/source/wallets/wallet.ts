@@ -157,7 +157,10 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public changesToJson(): Contracts.Types.JsonObject {
-		return this.#repository.changesToJson();
+		return {
+			address: this.address,
+			...this.#repository.changesToJson(),
+		};
 	}
 
 	public toString(): string {
