@@ -126,7 +126,6 @@ describe<{
 		assert.array(result.value.minimumVersions);
 		assert.number(result.value.peerBanTime);
 		assert.number(result.value.rateLimit);
-		assert.number(result.value.rateLimitPostTransactions);
 		assert.array(result.value.remoteAccess);
 		assert.string(result.value.server.hostname);
 		assert.number(result.value.server.logLevel);
@@ -292,26 +291,6 @@ describe<{
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"peerBanTime" must be a number');
-	});
-
-	it("should parse process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS", async ({ serviceProvider }) => {
-		process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS = "5000";
-
-		const result = serviceProvider.configSchema().validate(await importDefaults());
-
-		assert.undefined(result.error);
-		assert.equal(result.value.rateLimitPostTransactions, 5000);
-	});
-
-	it("should throw if process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS is not number", async ({
-		serviceProvider,
-	}) => {
-		process.env.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS = "false";
-
-		const result = serviceProvider.configSchema().validate(await importDefaults());
-
-		assert.defined(result.error);
-		assert.equal(result.error?.message, '"rateLimitPostTransactions" must be a number');
 	});
 
 	it("should parse CORE_P2P_DEVELOPMENT_MODE_ENABLED", async ({ serviceProvider }) => {
@@ -664,31 +643,6 @@ describe<{
 		result = serviceProvider.configSchema().validate(defaults);
 
 		assert.equal(result.error?.message, '"rateLimit" is required');
-	});
-
-	it("#schemaRestrictions - rateLimitPostTransactions is required && is integer && >= 0", async ({
-		serviceProvider,
-	}) => {
-		const defaults = await importDefaults();
-		defaults.rateLimitPostTransactions = false;
-		let result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"rateLimitPostTransactions" must be a number');
-
-		defaults.rateLimitPostTransactions = 1.12;
-		result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"rateLimitPostTransactions" must be an integer');
-
-		defaults.rateLimitPostTransactions = 0;
-		result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"rateLimitPostTransactions" must be greater than or equal to 1');
-
-		delete defaults.rateLimitPostTransactions;
-		result = serviceProvider.configSchema().validate(defaults);
-
-		assert.equal(result.error?.message, '"rateLimitPostTransactions" is required');
 	});
 
 	it("#schemaRestrictions - developmentMode is required && is object", async ({ serviceProvider }) => {

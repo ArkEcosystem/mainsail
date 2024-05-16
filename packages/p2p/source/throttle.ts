@@ -31,8 +31,6 @@ export class Throttle {
 
 			rateLimit: this.configuration.getRequired<number>("rateLimit"),
 
-			rateLimitPostTransactions: this.configuration.getRequired<number>("rateLimitPostTransactions"),
-
 			remoteAccess: [],
 			// White listing anybody here means we would not throttle ourselves when sending
 			// them requests, ie we could spam them.
