@@ -82,7 +82,7 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/transaction-pool-service"
+			"package": "@mainsail/transaction-pool-client"
 		},
 		{
 			"package": "@mainsail/crypto-messages"

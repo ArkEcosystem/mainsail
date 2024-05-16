@@ -118,7 +118,7 @@ const EXCEPTIONS = {
 			"@mainsail/proposer",
 			"@mainsail/serializer",
 			"@mainsail/state",
-			"@mainsail/transaction-pool-service",
+			"@mainsail/transaction-pool-client",
 			"@mainsail/transactions",
 			"@mainsail/validation",
 			"@mainsail/validator",
