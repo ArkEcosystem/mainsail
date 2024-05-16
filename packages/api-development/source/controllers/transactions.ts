@@ -1,11 +1,9 @@
-import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
-import { TransactionResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
 @injectable()
@@ -13,39 +11,6 @@ export class TransactionsController extends Controller {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	@tagged("state", "null")
 	private readonly nullHandlerRegistry!: Handlers.Registry;
-
-	@inject(Identifiers.TransactionPool.Query)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
-
-	public async unconfirmed(request: Hapi.Request) {
-		const pagination: Contracts.Api.Pagination = super.getListingPage(request);
-		const all: Contracts.Crypto.Transaction[] = await this.poolQuery.getFromHighestPriority().all();
-		const transactions: Contracts.Crypto.Transaction[] = all.slice(
-			pagination.offset,
-			pagination.offset + pagination.limit,
-		);
-		const results = transactions.map((t) => t.data);
-		const resultsPage = {
-			results,
-			totalCount: all.length,
-		};
-
-		return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
-	}
-
-	public async showUnconfirmed(request: Hapi.Request) {
-		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
-			.getFromHighestPriority()
-			.whereId(request.params.id);
-
-		if ((await transactionQuery.has()) === false) {
-			return notFound("Transaction not found");
-		}
-
-		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
-
-		return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
-	}
 
 	public async types(request: Hapi.Request) {
 		const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
