@@ -7,6 +7,19 @@ export class Client implements Contracts.TransactionPool.Client {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
+	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
+		const dirtyWallets = unit.store.walletRepository.getDirtyWallets();
+
+		const changes: any[] = [];
+		for (const wallet of dirtyWallets) {
+			changes.push(wallet.changesToJson());
+		}
+
+		console.log(changes);
+
+		return;
+	}
+
 	public async getTx(): Promise<Contracts.Crypto.Transaction[]> {
 		try {
 			const response = await this.#call<[]>("get_transactions", {});
