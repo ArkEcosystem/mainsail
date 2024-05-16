@@ -17,9 +17,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.Processor.TransactionProcessor)
 	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
@@ -93,7 +90,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		for (const transaction of unit.getBlock().transactions) {
-			await this.transactionPool.removeForgedTransaction(transaction);
+			// await this.transactionPool.removeForgedTransaction(transaction); // TODO: transaction-pool-client
 			await this.#emitTransactionEvents(transaction);
 		}
 
