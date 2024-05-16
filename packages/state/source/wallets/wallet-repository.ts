@@ -105,6 +105,10 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		return [].values();
 	}
 
+	public changesToJson(): Contracts.Types.JsonObject {
+		return {};
+	}
+
 	public commitChanges(): void {}
 
 	protected findOrCreate(address: string): Contracts.State.Wallet {

@@ -113,6 +113,8 @@ export interface WalletRepository {
 	getDirtyWallets(): IterableIterator<Wallet>;
 
 	commitChanges(): void;
+
+	changesToJson(): JsonObject;
 }
 
 export type WalletRepositoryFactory = (originalWalletRepository?: WalletRepository) => WalletRepository;

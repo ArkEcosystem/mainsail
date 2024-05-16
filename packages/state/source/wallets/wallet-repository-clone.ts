@@ -119,6 +119,12 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		return this.#dirtyWallets.values();
 	}
 
+	public changesToJson(): Contracts.Types.JsonObject {
+		return {
+			wallets: [...this.#dirtyWallets].map((wallet) => wallet.changesToJson()),
+		};
+	}
+
 	public setDirtyWallet(wallet: Contracts.State.Wallet): void {
 		this.#dirtyWallets.add(wallet);
 	}
