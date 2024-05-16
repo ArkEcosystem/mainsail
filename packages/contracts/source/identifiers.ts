@@ -278,6 +278,9 @@ export const Identifiers = {
 			Instance: Symbol("TransactionPool<TransactionValidator.Instance>"),
 		},
 	},
+	TransactionPoolClient: {
+		Instance: Symbol("TransactionPoolClient<Instance>"),
+	},
 	Validator: {
 		Repository: Symbol("Validator<Repository>"),
 	},

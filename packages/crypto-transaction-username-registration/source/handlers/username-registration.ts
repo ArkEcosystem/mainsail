@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
@@ -9,7 +9,8 @@ import { UsernameRegistrationTransaction } from "../versions/index.js";
 @injectable()
 export class UsernameRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPool.Query)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	@optional()
+	private readonly poolQuery?: Contracts.TransactionPool.Query;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -44,6 +45,8 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
+		AppUtils.assert.defined<Contracts.TransactionPool.Query>(this.poolQuery);
+
 		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);

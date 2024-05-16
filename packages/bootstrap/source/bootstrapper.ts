@@ -22,9 +22,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Validator.Repository)
 	private readonly validatorRepository!: Contracts.Validator.ValidatorRepository;
 
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.P2P.Server)
 	private readonly p2pServer!: Contracts.P2P.Server;
 
@@ -87,8 +84,6 @@ export class Bootstrapper {
 			this.stateVerifier.verifyWalletsConsistency();
 
 			this.validatorRepository.printLoadedValidators();
-
-			await this.transactionPool.reAddTransactions();
 
 			void this.consensus.run();
 

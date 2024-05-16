@@ -1,19 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { BigNumber, isEmpty } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.TransactionPool.Collator)
-	private readonly collator!: Contracts.TransactionPool.Collator;
-
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -31,6 +22,9 @@ export class Validator implements Contracts.Validator.Validator {
 
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
+
+	@inject(Identifiers.TransactionPoolClient.Instance)
+	protected readonly txPoolClient!: Contracts.TransactionPool.Client;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
@@ -109,19 +103,18 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
-		const transactions: Contracts.Crypto.Transaction[] = await this.collator.getBlockCandidateTransactions();
+		// const transactions: Contracts.Crypto.Transaction[] = await this.collator.getBlockCandidateTransactions();
+		// if (isEmpty(transactions)) {
+		// 	return [];
+		// }
+		// this.logger.debug(
+		// 	`Received ${
+		// 		transactions.length
+		// 	} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
+		// );
+		// return transactions;
 
-		if (isEmpty(transactions)) {
-			return [];
-		}
-
-		this.logger.debug(
-			`Received ${
-				transactions.length
-			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
-		);
-
-		return transactions;
+		return this.txPoolClient.getTx();
 	}
 
 	async #makeBlock(

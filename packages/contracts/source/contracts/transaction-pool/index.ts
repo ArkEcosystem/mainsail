@@ -1,3 +1,4 @@
+export * from "./client.js";
 export * from "./collator.js";
 export * from "./dynamic-fee-matcher.js";
 export * from "./expiration-service.js";

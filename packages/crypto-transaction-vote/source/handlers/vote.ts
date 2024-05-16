@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
@@ -10,7 +10,8 @@ import { VoteTransaction } from "../versions/index.js";
 @injectable()
 export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPool.Query)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	@optional()
+	private readonly poolQuery?: Contracts.TransactionPool.Query;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [ValidatorRegistrationTransactionHandler];
@@ -103,6 +104,7 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		walletRepository: Contracts.State.WalletRepository,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
+		Utils.assert.defined<Contracts.TransactionPool.Query>(this.poolQuery);
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = await this.poolQuery
