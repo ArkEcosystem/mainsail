@@ -23,4 +23,5 @@ export interface Repository {
 	fromJson(data: JsonObject): Repository;
 
 	changesToJson(): RepositoryChange;
+	applyChanges(changes: RepositoryChange): void;
 }

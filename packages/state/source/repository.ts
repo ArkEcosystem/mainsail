@@ -133,6 +133,16 @@ export class Repository implements Contracts.State.Repository {
 		};
 	}
 
+	public applyChanges(data: Contracts.State.RepositoryChange): void {
+		for (const name of data.forget) {
+			this.forgetAttribute(name);
+		}
+
+		for (const [name, value] of Object.entries(data.set)) {
+			this.setAttribute(name, jsonFactory(this.attributeRepository.getAttributeType(name), value));
+		}
+	}
+
 	public toJson(): Contracts.Types.JsonObject {
 		const result = {};
 
