@@ -1,8 +1,11 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { injectable, inject } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class CommitAction implements Contracts.Api.RPC.Action {
+	@inject(Identifiers.State.Service)
+	protected readonly stateService!: Contracts.State.Service;
+
 	public readonly name: string = "commit";
 
 	public readonly schema = {
@@ -11,7 +14,15 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: any): Promise<any> {
-		console.log(parameters);
+		try {
+			const store = this.stateService.createStoreClone();
+
+			store.applyChanges(parameters);
+			store.commitChanges();
+		} catch (error) {
+			console.log(error);
+			return { success: false, error: error.message };
+		}
 
 		return { success: true };
 	}

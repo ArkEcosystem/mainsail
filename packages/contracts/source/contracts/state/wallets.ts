@@ -129,6 +129,7 @@ export interface WalletRepository {
 	commitChanges(): void;
 
 	changesToJson(): WalletRepositoryChange;
+	applyChanges(changes: WalletRepositoryChange): void;
 }
 
 export type WalletRepositoryFactory = (originalWalletRepository?: WalletRepository) => WalletRepository;

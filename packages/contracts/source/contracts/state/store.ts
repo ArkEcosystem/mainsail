@@ -30,6 +30,7 @@ export interface Store extends CommitHandler {
 	fromJson(data: JsonObject): void;
 
 	changesToJson(): StoreChange;
+	applyChanges(changes: StoreChange): void;
 }
 
 export type StoreFactory = (originalStore?: Store) => Store;
