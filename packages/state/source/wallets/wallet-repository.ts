@@ -112,6 +112,24 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 		};
 	}
 
+	public applyChanges(data: Contracts.State.WalletRepositoryChange): void {
+		for (const wallet of data.wallets) {
+			this.findByAddress(wallet.address).applyChanges(wallet);
+		}
+
+		for (const [index, { forgets, sets }] of Object.entries(data.indexes)) {
+			const walletIndex = this.getIndex(index);
+
+			for (const key of forgets) {
+				walletIndex.forget(key);
+			}
+
+			for (const [key, address] of Object.entries(sets)) {
+				walletIndex.set(key, this.findByAddress(address));
+			}
+		}
+	}
+
 	public commitChanges(): void {}
 
 	protected findOrCreate(address: string): Contracts.State.Wallet {
