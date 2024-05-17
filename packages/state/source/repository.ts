@@ -111,7 +111,7 @@ export class Repository implements Contracts.State.Repository {
 		}
 	}
 
-	public changesToJson(): Contracts.Types.JsonObject {
+	public changesToJson(): Contracts.State.RepositoryChange {
 		const set = {};
 		const forget: string[] = [];
 
