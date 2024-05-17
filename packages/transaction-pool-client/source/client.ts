@@ -8,7 +8,7 @@ export class Client implements Contracts.TransactionPool.Client {
 	protected readonly logger!: Contracts.Kernel.Logger;
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		console.log(unit.store.changesToJson());
+		await this.commit(unit.store);
 	}
 
 	public async getTx(): Promise<Contracts.Crypto.Transaction[]> {
@@ -20,6 +20,10 @@ export class Client implements Contracts.TransactionPool.Client {
 		}
 
 		return [];
+	}
+
+	public async commit(store: Contracts.State.Store): Promise<void> {
+		await this.#call("commit", store.changesToJson());
 	}
 
 	// eslint-disable-next-line unicorn/no-null
