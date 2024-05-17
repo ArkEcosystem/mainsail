@@ -108,4 +108,11 @@ export class Store implements Contracts.State.Store {
 	public fromJson(data: Contracts.Types.JsonObject): void {
 		this.#repository.fromJson(data);
 	}
+
+	public changesToJson(): Contracts.Types.JsonObject {
+		return {
+			store: this.#repository.changesToJson(),
+			walletRepository: this.#walletRepository.changesToJson(),
+		};
+	}
 }

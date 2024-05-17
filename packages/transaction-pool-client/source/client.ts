@@ -8,7 +8,7 @@ export class Client implements Contracts.TransactionPool.Client {
 	protected readonly logger!: Contracts.Kernel.Logger;
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		console.log(unit.store.walletRepository.changesToJson());
+		console.log(unit.store.changesToJson());
 	}
 
 	public async getTx(): Promise<Contracts.Crypto.Transaction[]> {

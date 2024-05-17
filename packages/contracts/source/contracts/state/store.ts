@@ -22,6 +22,8 @@ export interface Store extends CommitHandler {
 
 	toJson(): JsonObject;
 	fromJson(data: JsonObject): void;
+
+	changesToJson(): JsonObject;
 }
 
 export type StoreFactory = (originalStore?: Store) => Store;
