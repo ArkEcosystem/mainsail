@@ -20,8 +20,7 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 			store.applyChanges(parameters);
 			store.commitChanges();
 		} catch (error) {
-			console.log(error);
-			return { success: false, error: error.message };
+			throw new Error(`Cannot process changes, because: ${error.message}`);
 		}
 
 		return { success: true };

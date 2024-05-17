@@ -23,7 +23,11 @@ export class Client implements Contracts.TransactionPool.Client {
 	}
 
 	public async commit(store: Contracts.State.Store): Promise<void> {
-		await this.#call("commit", store.changesToJson());
+		try {
+			await this.#call("commit", store.changesToJson());
+		} catch (error) {
+			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+		}
 	}
 
 	// eslint-disable-next-line unicorn/no-null
