@@ -115,7 +115,7 @@ export class Repository implements Contracts.State.Repository {
 		const set = {};
 		const forget: string[] = [];
 
-		for (const name of this.#setAttributes) {
+		for (const name of this.#forgetAttributes) {
 			if (this.#setAttributes.has(name)) {
 				continue;
 			}
