@@ -48,6 +48,7 @@
 		"@mainsail/crypto-transaction-validator-resignation": "workspace:*",
 		"@mainsail/crypto-transaction-vote": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
+		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
