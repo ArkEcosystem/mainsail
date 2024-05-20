@@ -1,5 +1,4 @@
 export * from "./actions/index.js";
-export * from "./collator.js";
 export * from "./expiration-service.js";
 export * from "./mempool.js";
 export * from "./processor.js";

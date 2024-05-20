@@ -3,7 +3,6 @@ import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { ApplyTransactionAction, ThrowIfCannotEnterPoolAction, VerifyTransactionAction } from "./actions/index.js";
-import { Collator } from "./collator.js";
 import { ExpirationService } from "./expiration-service.js";
 import { Mempool } from "./mempool.js";
 import { Processor } from "./processor.js";
@@ -47,7 +46,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#registerServices(): void {
-		this.app.bind(Identifiers.TransactionPool.Collator).to(Collator);
 		this.app.bind(Identifiers.TransactionPool.ExpirationService).to(ExpirationService);
 		this.app.bind(Identifiers.TransactionPool.Mempool).to(Mempool).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Processor).to(Processor);
