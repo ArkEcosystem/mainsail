@@ -26,6 +26,18 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.TransactionPoolClient.Instance)
 	protected readonly txPoolClient!: Contracts.TransactionPool.Client;
 
+	@inject(Identifiers.TransactionPool.TransactionValidator.Factory)
+	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
+
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -103,20 +115,44 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
-		// const transactions: Contracts.Crypto.Transaction[] = await this.collator.getBlockCandidateTransactions();
-		// if (isEmpty(transactions)) {
-		// 	return [];
-		// }
-		// this.logger.debug(
-		// 	`Received ${
-		// 		transactions.length
-		// 	} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
-		// );
-		// return transactions;
+		const transactionBytes = await this.txPoolClient.getTransactionBytes();
 
-		// const transactionBytes = this.txPoolClient.getTransactionBytes();
+		const milestone = this.cryptoConfiguration.getMilestone();
 
-		return [];
+		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
+
+		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
+		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
+		const failedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const bytes of transactionBytes) {
+			const transaction = await this.transactionFactory.fromBytes(bytes);
+
+			if (candidateTransactions.length === milestone.block.maxTransactions) {
+				break;
+			}
+
+			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
+				continue;
+			}
+
+			try {
+				if (bytesLeft - 4 - transaction.serialized.length < 0) {
+					break;
+				}
+
+				await validator.validate(transaction);
+				candidateTransactions.push(transaction);
+
+				bytesLeft -= 4;
+				bytesLeft -= transaction.serialized.length;
+			} catch (error) {
+				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
+				failedTransactions.push(transaction);
+			}
+		}
+
+		return candidateTransactions;
 	}
 
 	async #makeBlock(
