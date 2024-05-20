@@ -144,6 +144,7 @@ export class Repository implements Contracts.State.Repository {
 		}
 
 		for (const [name, value] of Object.entries(data.set)) {
+			// Skip attributes that are not registered
 			if (!this.attributeRepository.has(name)) {
 				continue;
 			}
