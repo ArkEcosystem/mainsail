@@ -6,6 +6,9 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	public readonly name: string = "commit";
 
 	public readonly schema = {
@@ -19,6 +22,8 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 
 			store.applyChanges(parameters);
 			store.commitChanges();
+
+			this.configuration.setHeight(store.getLastHeight() + 1);
 		} catch (error) {
 			throw new Error(`Cannot process changes, because: ${error.message}`);
 		}
