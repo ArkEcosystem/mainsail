@@ -29,9 +29,6 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.TransactionPool.TransactionValidator.Factory)
 	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
 
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
-
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
@@ -117,35 +114,20 @@ export class Validator implements Contracts.Validator.Validator {
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
 		const transactionBytes = await this.txPoolClient.getTransactionBytes();
 
-		const milestone = this.cryptoConfiguration.getMilestone();
-
-		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
-
-		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
+		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
 		for (const bytes of transactionBytes) {
 			const transaction = await this.transactionFactory.fromBytes(bytes);
-
-			if (candidateTransactions.length === milestone.block.maxTransactions) {
-				break;
-			}
 
 			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
 				continue;
 			}
 
 			try {
-				if (bytesLeft - 4 - transaction.serialized.length < 0) {
-					break;
-				}
-
 				await validator.validate(transaction);
 				candidateTransactions.push(transaction);
-
-				bytesLeft -= 4;
-				bytesLeft -= transaction.serialized.length;
 			} catch (error) {
 				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
 				failedTransactions.push(transaction);
