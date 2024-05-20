@@ -111,6 +111,49 @@ export class Repository implements Contracts.State.Repository {
 		}
 	}
 
+	public changesToJson(): Contracts.State.RepositoryChange {
+		const set = {};
+		const forget: string[] = [];
+
+		for (const name of this.#forgetAttributes) {
+			if (this.#setAttributes.has(name)) {
+				continue;
+			}
+
+			forget.push(name);
+		}
+
+		for (const name of this.#setAttributes) {
+			set[name] = this.getAttributeHolder(name).toJson();
+		}
+
+		return {
+			forget,
+			set,
+		};
+	}
+
+	public applyChanges(data: Contracts.State.RepositoryChange): void {
+		for (const name of data.forget) {
+			if (!this.attributeRepository.has(name)) {
+				continue;
+			}
+
+			this.forgetAttribute(name);
+			this.#forgetAttributes.add(name);
+		}
+
+		for (const [name, value] of Object.entries(data.set)) {
+			// Skip attributes that are not registered
+			if (!this.attributeRepository.has(name)) {
+				continue;
+			}
+
+			this.attributes.set(name, jsonFactory(this.attributeRepository.getAttributeType(name), value));
+			this.#setAttributes.add(name);
+		}
+	}
+
 	public toJson(): Contracts.Types.JsonObject {
 		const result = {};
 

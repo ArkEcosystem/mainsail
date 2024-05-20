@@ -1,5 +1,12 @@
 import { JsonObject } from "type-fest";
 
+export interface RepositoryChange {
+	set: {
+		[key: string]: JsonObject;
+	};
+	forget: string[];
+}
+
 export interface Repository {
 	isChanged(): boolean;
 
@@ -14,4 +21,7 @@ export interface Repository {
 
 	toJson(): JsonObject;
 	fromJson(data: JsonObject): Repository;
+
+	changesToJson(): RepositoryChange;
+	applyChanges(changes: RepositoryChange): void;
 }

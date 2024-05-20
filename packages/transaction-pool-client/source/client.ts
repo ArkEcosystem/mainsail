@@ -7,6 +7,10 @@ export class Client implements Contracts.TransactionPool.Client {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
+	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
+		await this.commit(unit.store);
+	}
+
 	public async getTx(): Promise<Contracts.Crypto.Transaction[]> {
 		try {
 			const response = await this.#call<[]>("get_transactions", {});
@@ -16,6 +20,14 @@ export class Client implements Contracts.TransactionPool.Client {
 		}
 
 		return [];
+	}
+
+	public async commit(store: Contracts.State.Store): Promise<void> {
+		try {
+			await this.#call("commit", store.changesToJson());
+		} catch (error) {
+			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+		}
 	}
 
 	// eslint-disable-next-line unicorn/no-null
