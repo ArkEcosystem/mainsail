@@ -89,4 +89,27 @@ export class TransactionsController extends AbstractController {
 
 		return { data: typeGroups };
 	}
+
+	public async schemas(request: Hapi.Request) {
+		const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
+		const schemasByType: Record<string, Record<string, any>> = {};
+
+		for (const handler of activatedTransactionHandlers) {
+			const constructor = handler.getConstructor();
+
+			const type: number | undefined = constructor.type;
+			const typeGroup: number | undefined = constructor.typeGroup;
+
+			Utils.assert.defined<number>(type);
+			Utils.assert.defined<number>(typeGroup);
+
+			if (schemasByType[typeGroup] === undefined) {
+				schemasByType[typeGroup] = {};
+			}
+
+			schemasByType[typeGroup][type] = constructor.getSchema().properties;
+		}
+
+		return { data: schemasByType };
+	}
 }
