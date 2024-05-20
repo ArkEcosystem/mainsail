@@ -57,6 +57,7 @@
 		"@mainsail/state": "workspace:*",
 		"@mainsail/transaction-pool-server": "workspace:*",
 		"@mainsail/transaction-pool-service": "workspace:*",
+		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"boxen": "7.1.1",

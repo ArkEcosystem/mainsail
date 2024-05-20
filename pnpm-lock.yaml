@@ -389,6 +389,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -3173,6 +3176,9 @@ importers:
       '@mainsail/transaction-pool-service':
         specifier: workspace:*
         version: link:../transaction-pool-service
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
