@@ -1,5 +1,5 @@
 import Hapi from "@hapi/hapi";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
@@ -9,7 +9,6 @@ import { Controller } from "./controller.js";
 @injectable()
 export class TransactionsController extends Controller {
 	@inject(Identifiers.Transaction.Handler.Registry)
-	@tagged("state", "null")
 	private readonly nullHandlerRegistry!: Handlers.Registry;
 
 	public async types(request: Hapi.Request) {
