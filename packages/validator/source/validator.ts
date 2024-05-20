@@ -114,7 +114,9 @@ export class Validator implements Contracts.Validator.Validator {
 		// );
 		// return transactions;
 
-		return this.txPoolClient.getTx();
+		// const transactionBytes = this.txPoolClient.getTransactionBytes();
+
+		return [];
 	}
 
 	async #makeBlock(

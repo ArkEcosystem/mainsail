@@ -1,5 +1,5 @@
-import { CommitHandler, Transaction } from "../crypto/index.js";
+import { CommitHandler } from "../crypto/index.js";
 
 export interface Client extends CommitHandler {
-	getTx(): Promise<Transaction[]>;
+	getTransactionBytes(): Promise<Buffer[]>;
 }
