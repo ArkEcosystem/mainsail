@@ -134,6 +134,8 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 		}
 
+		this.txPoolClient.setFailedTransactions(failedTransactions);
+
 		return candidateTransactions;
 	}
 

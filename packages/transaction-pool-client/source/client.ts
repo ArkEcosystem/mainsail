@@ -7,8 +7,14 @@ export class Client implements Contracts.TransactionPool.Client {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
+	#failedTransactions: Contracts.Crypto.Transaction[] = [];
+
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.commit(unit.store);
+	}
+
+	public setFailedTransactions(transactions: Contracts.Crypto.Transaction[]): void {
+		this.#failedTransactions = [...this.#failedTransactions, ...transactions];
 	}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {
