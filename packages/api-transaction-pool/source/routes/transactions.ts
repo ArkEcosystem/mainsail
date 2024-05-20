@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { TransactionsController } from "../controllers/transaction-pool.js";
+import { TransactionsController } from "../controllers/transactions.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TransactionsController);
@@ -46,6 +46,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				}),
 			},
 		},
-		path: "/transaction-pool",
+		path: "/transactions",
 	});
 };
