@@ -41,10 +41,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.Transaction.Handler.Registry).to(TransactionHandlerRegistry);
 
-		this.app.bind(Identifiers.TransactionPool.TransactionValidator.Instance).to(TransactionValidator);
+		this.app.bind(Identifiers.Transaction.Validator.Instance).to(TransactionValidator);
 		this.app
-			.bind(Identifiers.TransactionPool.TransactionValidator.Factory)
-			.toAutoFactory(Identifiers.TransactionPool.TransactionValidator.Instance);
+			.bind(Identifiers.Transaction.Validator.Factory)
+			.toAutoFactory(Identifiers.Transaction.Validator.Instance);
 	}
 
 	public async required(): Promise<boolean> {

@@ -26,7 +26,7 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.TransactionPoolClient.Instance)
 	protected readonly txPoolClient!: Contracts.TransactionPool.Client;
 
-	@inject(Identifiers.TransactionPool.TransactionValidator.Factory)
+	@inject(Identifiers.Transaction.Validator.Factory)
 	private readonly createTransactionValidator!: Contracts.State.TransactionValidatorFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
