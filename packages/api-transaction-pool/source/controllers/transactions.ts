@@ -1,3 +1,4 @@
+import { notFound } from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
 import { inject, injectable } from "@mainsail/container";
@@ -43,5 +44,19 @@ export class TransactionsController extends AbstractController {
 		};
 
 		return super.toPagination(resultsPage, TransactionResource, !!request.query.transform);
+	}
+
+	public async showUnconfirmed(request: Hapi.Request) {
+		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
+			.getFromHighestPriority()
+			.whereId(request.params.id);
+
+		if ((await transactionQuery.has()) === false) {
+			return notFound("Transaction not found");
+		}
+
+		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
+
+		return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
 	}
 }

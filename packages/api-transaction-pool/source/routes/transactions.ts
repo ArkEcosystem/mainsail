@@ -67,4 +67,17 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		},
 		path: "/transactions/unconfirmed",
 	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.showUnconfirmed(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					id: Joi.string().hex().length(64),
+				}),
+			},
+		},
+		path: "/transactions/unconfirmed/{id}",
+	});
 };
