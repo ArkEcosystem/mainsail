@@ -18,6 +18,9 @@ export class GetTransactionsAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.Cryptography.Block.Serializer)
+	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+
 	public readonly name: string = "get_transactions";
 
 	public readonly schema = {
@@ -27,7 +30,7 @@ export class GetTransactionsAction implements Contracts.Api.RPC.Action {
 
 	public async handle(parameters: any): Promise<any> {
 		const milestone = this.configuration.getMilestone();
-		let bytesLeft = milestone.block.maxPayload;
+		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
@@ -35,6 +38,10 @@ export class GetTransactionsAction implements Contracts.Api.RPC.Action {
 		for (const transaction of await this.poolQuery.getFromHighestPriority().all()) {
 			if (candidateTransactions.length === milestone.block.maxTransactions) {
 				break;
+			}
+
+			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
+				continue;
 			}
 
 			try {
