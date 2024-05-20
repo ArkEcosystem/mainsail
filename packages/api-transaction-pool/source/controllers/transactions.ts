@@ -3,6 +3,8 @@ import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
+import { Handlers } from "@mainsail/transactions";
 
 import { TransactionResource } from "../resources/index.js";
 
@@ -13,6 +15,9 @@ export class TransactionsController extends AbstractController {
 
 	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
+
+	@inject(Identifiers.Transaction.Handler.Registry)
+	private readonly nullHandlerRegistry!: Handlers.Registry;
 
 	public async store(request: Hapi.Request) {
 		const result = await this.processor.process(
@@ -58,5 +63,30 @@ export class TransactionsController extends AbstractController {
 		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
 
 		return super.respondWithResource(transaction.data, TransactionResource, !!request.query.transform);
+	}
+
+	public async types(request: Hapi.Request) {
+		const activatedTransactionHandlers = await this.nullHandlerRegistry.getActivatedHandlers();
+		const typeGroups: Record<string | number, Record<string, number>> = {};
+
+		for (const handler of activatedTransactionHandlers) {
+			const constructor = handler.getConstructor();
+
+			const type: number | undefined = constructor.type;
+			const typeGroup: number | undefined = constructor.typeGroup;
+			const key: string | undefined = constructor.key;
+
+			Utils.assert.defined<number>(type);
+			Utils.assert.defined<number>(typeGroup);
+			Utils.assert.defined<string>(key);
+
+			if (typeGroups[typeGroup] === undefined) {
+				typeGroups[typeGroup] = {};
+			}
+
+			typeGroups[typeGroup][key[0].toUpperCase() + key.slice(1)] = type;
+		}
+
+		return { data: typeGroups };
 	}
 }

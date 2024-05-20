@@ -39,6 +39,7 @@
 		{
 			"package": "@mainsail/fees-static"
 		},
+
 		{
 			"package": "@mainsail/crypto-transaction"
 		},
@@ -65,6 +66,9 @@
 		},
 		{
 			"package": "@mainsail/crypto-transaction-vote"
+		},
+		{
+			"package": "@mainsail/transactions"
 		},
 		{
 			"package": "@mainsail/state"
