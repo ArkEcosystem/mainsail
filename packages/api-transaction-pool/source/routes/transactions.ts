@@ -4,6 +4,7 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";
+import { pagination } from "../schemas.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TransactionsController);
@@ -47,5 +48,23 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 		},
 		path: "/transactions",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.unconfirmed(request),
+		method: "GET",
+		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
+			validate: {
+				query: Joi.object({
+					transform: Joi.bool().default(true),
+				}).concat(pagination),
+			},
+		},
+		path: "/transactions/unconfirmed",
 	});
 };
