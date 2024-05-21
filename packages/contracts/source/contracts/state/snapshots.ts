@@ -7,3 +7,7 @@ export interface Exporter {
 export interface Importer {
 	import(maxHeight: number, store: Store): Promise<void>;
 }
+
+export interface SnapshotService {
+	listSnapshots(): number[];
+}

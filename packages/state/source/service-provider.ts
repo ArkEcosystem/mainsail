@@ -78,8 +78,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					container.resolve(Store).configure(originalstore),
 		);
 
-		this.app.bind(Identifiers.State.Importer).to(Importer);
-		this.app.bind(Identifiers.State.Exporter).to(Exporter);
+		this.app.bind(Identifiers.State.Snapshot.Importer).to(Importer);
+		this.app.bind(Identifiers.State.Snapshot.Exporter).to(Exporter);
+		this.app.bind(Identifiers.State.Snapshot.Service).to(Exporter);
 
 		this.app.bind(Identifiers.State.Service).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.State.State).to(State).inSingletonScope();

@@ -17,10 +17,10 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
-	@inject(Identifiers.State.Exporter)
+	@inject(Identifiers.State.Snapshot.Exporter)
 	private readonly exporter!: Contracts.State.Exporter;
 
-	@inject(Identifiers.State.Importer)
+	@inject(Identifiers.State.Snapshot.Importer)
 	private readonly importer!: Contracts.State.Importer;
 
 	#baseStore!: Contracts.State.Store;
