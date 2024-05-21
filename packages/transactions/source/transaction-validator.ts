@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { strictEqual } from "assert";
 
 @injectable()
-export class TransactionValidator implements Contracts.State.TransactionValidator {
+export class TransactionValidator implements Contracts.Transactions.TransactionValidator {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 

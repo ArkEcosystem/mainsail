@@ -7,14 +7,22 @@ export class Client implements Contracts.TransactionPool.Client {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
+	#failedTransactions: Contracts.Crypto.Transaction[] = [];
+
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.commit(unit.store);
 	}
 
-	public async getTx(): Promise<Contracts.Crypto.Transaction[]> {
+	public setFailedTransactions(transactions: Contracts.Crypto.Transaction[]): void {
+		this.#failedTransactions = [...this.#failedTransactions, ...transactions];
+	}
+
+	public async getTransactionBytes(): Promise<Buffer[]> {
 		try {
 			const response = await this.#call<[]>("get_transactions", {});
 			this.logger.info(`Transaction pool returned ${response.length} transactions`);
+
+			return response.map((transaction: string) => Buffer.from(transaction, "hex"));
 		} catch (error) {
 			this.logger.error(`Communication error with transaction pool: ${error.message}`);
 		}

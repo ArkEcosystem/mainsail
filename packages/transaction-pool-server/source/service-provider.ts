@@ -24,10 +24,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 	}
 
 	protected getActions(): Contracts.Api.RPC.Action[] {
-		return [
-			this.app.resolve<GetTransactionsAction>(GetTransactionsAction),
-			this.app.resolve<GetTransactionsAction>(CommitAction),
-		];
+		return [this.app.resolve(GetTransactionsAction), this.app.resolve(CommitAction)];
 	}
 
 	protected getPlugins(): any[] {

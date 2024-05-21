@@ -3,8 +3,8 @@ import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "../../test-framework/source";
 import { validatorKeys } from "../test/fixtures/validator-keys";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { Validator } from "./validator";
 import { BIP39 } from "./keys/bip39";
+import { Validator } from "./validator";
 
 describe<{
 	sandbox: Sandbox;

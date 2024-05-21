@@ -39,7 +39,9 @@
 		{
 			"package": "@mainsail/fees-static"
 		},
-
+		{
+			"package": "@mainsail/crypto-block"
+		},
 		{
 			"package": "@mainsail/crypto-transaction"
 		},

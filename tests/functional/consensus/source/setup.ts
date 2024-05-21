@@ -44,7 +44,8 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.TransactionPoolClient.Instance).toConstantValue({
-		getTx: async () => [],
+		getTransactionBytes: async () => [],
+		setFailedTransactions: () => {},
 		onCommit: async () => {},
 	});
 

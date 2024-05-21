@@ -39,6 +39,7 @@ const EXCEPTIONS = {
 		dependencies: [
 			"@mainsail/api-transaction-pool",
 			"@mainsail/crypto-address-bech32m",
+			"@mainsail/crypto-block",
 			"@mainsail/crypto-config",
 			"@mainsail/crypto-consensus-bls12-381",
 			"@mainsail/crypto-hash-bcrypto",

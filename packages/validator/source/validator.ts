@@ -26,6 +26,15 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.TransactionPoolClient.Instance)
 	protected readonly txPoolClient!: Contracts.TransactionPool.Client;
 
+	@inject(Identifiers.Transaction.Validator.Factory)
+	private readonly createTransactionValidator!: Contracts.Transactions.TransactionValidatorFactory;
+
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -103,18 +112,31 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
-		// const transactions: Contracts.Crypto.Transaction[] = await this.collator.getBlockCandidateTransactions();
-		// if (isEmpty(transactions)) {
-		// 	return [];
-		// }
-		// this.logger.debug(
-		// 	`Received ${
-		// 		transactions.length
-		// 	} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
-		// );
-		// return transactions;
+		const transactionBytes = await this.txPoolClient.getTransactionBytes();
 
-		return this.txPoolClient.getTx();
+		const validator = this.createTransactionValidator();
+		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
+		const failedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const bytes of transactionBytes) {
+			const transaction = await this.transactionFactory.fromBytes(bytes);
+
+			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
+				continue;
+			}
+
+			try {
+				await validator.validate(transaction);
+				candidateTransactions.push(transaction);
+			} catch (error) {
+				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
+				failedTransactions.push(transaction);
+			}
+		}
+
+		this.txPoolClient.setFailedTransactions(failedTransactions);
+
+		return candidateTransactions;
 	}
 
 	async #makeBlock(

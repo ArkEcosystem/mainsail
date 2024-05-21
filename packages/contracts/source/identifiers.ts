@@ -259,9 +259,12 @@ export const Identifiers = {
 			Provider: Symbol("Transaction<Handler.Provider>"),
 			Registry: Symbol("Transaction<Handler.Registry>"),
 		},
+		Validator: {
+			Factory: Symbol("Transaction<Validator.Factory>"),
+			Instance: Symbol("Transaction<Validator.Instance>"),
+		},
 	},
 	TransactionPool: {
-		Collator: Symbol("TransactionPool<Collator>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
 		Processor: Symbol("TransactionPool<Processor>"),
@@ -273,10 +276,6 @@ export const Identifiers = {
 		SenderState: Symbol("TransactionPool<SenderState>"),
 		Service: Symbol("TransactionPool<Service>"),
 		Storage: Symbol("TransactionPool<Storage>"),
-		TransactionValidator: {
-			Factory: Symbol("TransactionPool<TransactionValidator.Factory>"),
-			Instance: Symbol("TransactionPool<TransactionValidator.Instance>"),
-		},
 	},
 	TransactionPoolClient: {
 		Instance: Symbol("TransactionPoolClient<Instance>"),
