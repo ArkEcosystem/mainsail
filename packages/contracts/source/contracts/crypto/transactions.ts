@@ -55,7 +55,7 @@ export interface TransactionData {
 	asset?: TransactionAsset;
 	vendorField?: string;
 
-	id?: string;
+	id: string;
 	signature?: string;
 	signatures?: string[];
 
@@ -127,7 +127,7 @@ export interface TransactionVerifier {
 
 	verifyHash(data: TransactionData): Promise<boolean>;
 
-	verifySchema(data: TransactionData, strict?: boolean): Promise<SchemaValidationResult>;
+	verifySchema(data: Omit<TransactionData, "id">, strict?: boolean): Promise<SchemaValidationResult>;
 }
 
 export interface TransactionSigner {
