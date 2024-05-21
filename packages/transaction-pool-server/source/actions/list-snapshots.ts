@@ -17,6 +17,12 @@ export class ListSnapshotsAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: any): Promise<any> {
-		return this.snapshotService.listSnapshots();
+		try {
+			return this.snapshotService.listSnapshots();
+		} catch (error) {
+			this.logger.error(error.message);
+
+			return [];
+		}
 	}
 }

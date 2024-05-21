@@ -53,6 +53,10 @@ export class Bootstrapper {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
+	@inject(Identifiers.TransactionPoolClient.Instance)
+	@optional()
+	private readonly txPoolClient?: Contracts.TransactionPool.Client;
+
 	#store!: Contracts.State.Store;
 
 	@postConstruct()
@@ -71,6 +75,10 @@ export class Bootstrapper {
 			await this.#storeGenesisCommit();
 
 			await this.#restoreStateSnapshot();
+
+			if (this.txPoolClient) {
+				console.log(await this.txPoolClient.listSnapshots());
+			}
 
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();

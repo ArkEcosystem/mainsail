@@ -8,6 +8,7 @@ import { BalanceMutator } from "./mutators/balance.js";
 import { Service } from "./service.js";
 import { Exporter } from "./snapshots/exporter.js";
 import { Importer } from "./snapshots/importer.js";
+import { SnapshotService } from "./snapshots/snapshot-service.js";
 import { State } from "./state.js";
 import { StateVerifier } from "./state-verifier.js";
 import { Store } from "./store.js";
@@ -78,9 +79,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					container.resolve(Store).configure(originalstore),
 		);
 
-		this.app.bind(Identifiers.State.Snapshot.Importer).to(Importer);
-		this.app.bind(Identifiers.State.Snapshot.Exporter).to(Exporter);
-		this.app.bind(Identifiers.State.Snapshot.Service).to(Exporter);
+		this.app.bind(Identifiers.State.Snapshot.Importer).to(Importer).inSingletonScope();
+		this.app.bind(Identifiers.State.Snapshot.Exporter).to(Exporter).inSingletonScope();
+		this.app.bind(Identifiers.State.Snapshot.Service).to(SnapshotService).inSingletonScope();
 
 		this.app.bind(Identifiers.State.Service).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.State.State).to(State).inSingletonScope();
