@@ -4,7 +4,7 @@ import type { KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
-	readonly id: string | undefined;
+	readonly id: string;
 	readonly typeGroup: number | undefined;
 	readonly type: number;
 	readonly key: string;
