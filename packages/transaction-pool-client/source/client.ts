@@ -10,7 +10,7 @@ export class Client implements Contracts.TransactionPool.Client {
 	#failedTransactions: Contracts.Crypto.Transaction[] = [];
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await this.commit(unit.store);
+		await this.commit(unit);
 	}
 
 	public setFailedTransactions(transactions: Contracts.Crypto.Transaction[]): void {
@@ -30,9 +30,15 @@ export class Client implements Contracts.TransactionPool.Client {
 		return [];
 	}
 
-	public async commit(store: Contracts.State.Store): Promise<void> {
+	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		try {
-			await this.#call("commit", store.changesToJson());
+			await this.#call("commit", {
+				block: unit.getBlock().serialized,
+				failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
+				store: unit.store.changesToJson(),
+			});
+
+			this.#failedTransactions = [];
 		} catch (error) {
 			this.logger.error(`Communication error with transaction pool: ${error.message}`);
 		}

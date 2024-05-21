@@ -94,7 +94,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		for (const transaction of unit.getBlock().transactions) {
-			// await this.transactionPool.removeForgedTransaction(transaction); // TODO: transaction-pool-client
 			await this.#emitTransactionEvents(transaction);
 		}
 

@@ -8,7 +8,7 @@ export const BaseRoute = {
 			method: "POST",
 			options: {
 				payload: {
-					maxBytes: 100 * Constants.Units.KILOBYTE,
+					maxBytes: 10 * Constants.Units.MEGABYTE,
 				},
 			},
 			path: "/",
