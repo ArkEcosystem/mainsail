@@ -34,13 +34,15 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 
 			this.configuration.setHeight(store.getLastHeight() + 1);
 
-			for (const transactionId of parameters.failedTransactions) {
-				await this.transactionPoolService.removeTransaction(transactionId);
-			}
-
 			const block = await this.blockFactory.fromHex(parameters.block);
+			store.setLastBlock(block);
+
 			for (const transaction of block.transactions) {
 				await this.transactionPoolService.removeForgedTransaction(transaction);
+			}
+
+			for (const transactionId of parameters.failedTransactions) {
+				await this.transactionPoolService.removeTransaction(transactionId);
 			}
 
 			this.logger.info(
