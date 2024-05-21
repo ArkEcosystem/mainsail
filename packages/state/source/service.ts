@@ -52,7 +52,11 @@ export class Service implements Contracts.State.Service {
 			return;
 		}
 
-		if (unit.height % this.configuration.getRequired<number>("export.interval") === 0) {
+		await this.export(unit.height);
+	}
+
+	public async export(height: number): Promise<void> {
+		if (height % this.configuration.getRequired<number>("export.interval") === 0) {
 			await this.exporter.export(this.#baseStore);
 		}
 	}
