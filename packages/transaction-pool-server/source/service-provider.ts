@@ -1,7 +1,7 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
 import { Contracts } from "@mainsail/contracts";
 
-import { CommitAction, GetTransactionsAction, ListSnapshotsAction } from "./actions/index.js";
+import { CommitAction, GetTransactionsAction, ListSnapshotsAction, ImportSnapshotAction } from "./actions/index.js";
 import Handlers from "./handlers.js";
 import { Identifiers as ApiTransactionPoolIdentifiers } from "./identifiers.js";
 import { Server } from "./server.js";
@@ -28,6 +28,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			this.app.resolve(GetTransactionsAction),
 			this.app.resolve(CommitAction),
 			this.app.resolve(ListSnapshotsAction),
+			this.app.resolve(ImportSnapshotAction),
 		];
 	}
 
