@@ -5,7 +5,7 @@ import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
 	readonly id: string;
-	readonly typeGroup: number | undefined;
+	readonly typeGroup: number;
 	readonly type: number;
 	readonly key: string;
 

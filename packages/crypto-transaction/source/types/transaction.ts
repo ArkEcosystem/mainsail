@@ -26,7 +26,7 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 		return this.data.type;
 	}
 
-	public get typeGroup(): number | undefined {
+	public get typeGroup(): number {
 		return this.data.typeGroup;
 	}
 
