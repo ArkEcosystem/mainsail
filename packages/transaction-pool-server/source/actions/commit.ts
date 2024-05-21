@@ -12,6 +12,12 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+
+	@inject(Identifiers.Services.Log.Service)
+	protected readonly logger!: Contracts.Kernel.Logger;
+
 	public readonly name: string = "commit";
 
 	public readonly schema = {
@@ -31,10 +37,21 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 			for (const transactionId of parameters.failedTransactions) {
 				await this.transactionPoolService.removeTransaction(transactionId);
 			}
+
+			const block = await this.blockFactory.fromHex(parameters.block);
+			for (const transaction of block.transactions) {
+				await this.transactionPoolService.removeForgedTransaction(transaction);
+			}
+
+			this.logger.info(
+				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed.`,
+			);
 		} catch (error) {
+			this.logger.error(`Failed to commit block: ${error.message}`);
+
 			throw new Error(`Cannot process changes, because: ${error.message}`);
 		}
 
-		return { success: true };
+		return {};
 	}
 }
