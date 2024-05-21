@@ -18,7 +18,7 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 	public data!: Contracts.Crypto.TransactionData;
 	public serialized!: Buffer;
 
-	public get id(): string | undefined {
+	public get id(): string {
 		return this.data.id;
 	}
 
@@ -26,7 +26,7 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 		return this.data.type;
 	}
 
-	public get typeGroup(): number | undefined {
+	public get typeGroup(): number {
 		return this.data.typeGroup;
 	}
 
