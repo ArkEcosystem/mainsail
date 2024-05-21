@@ -37,6 +37,8 @@ export class Client implements Contracts.TransactionPool.Client {
 				failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
 				store: unit.store.changesToJson(),
 			});
+
+			this.#failedTransactions = [];
 		} catch (error) {
 			this.logger.error(`Communication error with transaction pool: ${error.message}`);
 		}
