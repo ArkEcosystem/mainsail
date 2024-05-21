@@ -77,7 +77,13 @@ export class Bootstrapper {
 			await this.#restoreStateSnapshot();
 
 			if (this.txPoolClient) {
-				console.log(await this.txPoolClient.listSnapshots());
+				const snapshots = await this.txPoolClient.listSnapshots();
+				if (snapshots.length > 0) {
+					this.logger.info(
+						`Transaction pool has ${snapshots.length} snapshots with heights: ${snapshots.join(", ")}`,
+					);
+					await this.txPoolClient.importSnapshot(snapshots[snapshots.length - 1]);
+				}
 			}
 
 			if (this.apiSync) {
