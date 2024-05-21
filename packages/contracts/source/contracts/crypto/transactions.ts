@@ -38,7 +38,7 @@ export interface TransactionAsset {
 
 export interface TransactionData {
 	version: number;
-	network?: number;
+	network: number;
 
 	typeGroup: number;
 	type: number;
