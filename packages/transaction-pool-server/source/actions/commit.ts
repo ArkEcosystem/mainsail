@@ -9,6 +9,9 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.TransactionPool.Service)
+	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
+
 	public readonly name: string = "commit";
 
 	public readonly schema = {
@@ -20,10 +23,14 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 		try {
 			const store = this.stateService.createStoreClone();
 
-			store.applyChanges(parameters);
+			store.applyChanges(parameters.store);
 			store.commitChanges();
 
 			this.configuration.setHeight(store.getLastHeight() + 1);
+
+			for (const transactionId of parameters.failedTransactions) {
+				await this.transactionPoolService.removeTransaction(transactionId);
+			}
 		} catch (error) {
 			throw new Error(`Cannot process changes, because: ${error.message}`);
 		}

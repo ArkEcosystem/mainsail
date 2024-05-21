@@ -32,7 +32,10 @@ export class Client implements Contracts.TransactionPool.Client {
 
 	public async commit(store: Contracts.State.Store): Promise<void> {
 		try {
-			await this.#call("commit", store.changesToJson());
+			await this.#call("commit", {
+				failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
+				store: store.changesToJson(),
+			});
 		} catch (error) {
 			this.logger.error(`Communication error with transaction pool: ${error.message}`);
 		}
