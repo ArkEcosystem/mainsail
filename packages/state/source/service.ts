@@ -17,8 +17,8 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
-	@inject(Identifiers.State.Snapshot.Exporter)
-	private readonly exporter!: Contracts.State.Exporter;
+	@inject(Identifiers.State.Snapshot.Service)
+	private readonly snapshotService!: Contracts.State.SnapshotService;
 
 	@inject(Identifiers.State.Snapshot.Importer)
 	private readonly importer!: Contracts.State.Importer;
@@ -57,7 +57,7 @@ export class Service implements Contracts.State.Service {
 
 	public async export(height: number): Promise<void> {
 		if (height % this.configuration.getRequired<number>("export.interval") === 0) {
-			await this.exporter.export(this.#baseStore);
+			await this.snapshotService.export(this.#baseStore);
 		}
 	}
 

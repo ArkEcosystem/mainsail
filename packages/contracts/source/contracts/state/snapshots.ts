@@ -1,7 +1,7 @@
 import { Store } from "./store.js";
 
 export interface Exporter {
-	export(store: Store): Promise<void>;
+	export(store: Store, path: string): Promise<void>;
 }
 
 export interface Importer {
@@ -10,4 +10,5 @@ export interface Importer {
 
 export interface SnapshotService {
 	listSnapshots(): number[];
+	export(store: Store): Promise<void>;
 }
