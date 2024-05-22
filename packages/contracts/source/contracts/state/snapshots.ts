@@ -5,7 +5,7 @@ export interface Exporter {
 }
 
 export interface Importer {
-	import(maxHeight: number, store: Store): Promise<void>;
+	import(store: Store, path: string): Promise<void>;
 }
 
 export interface SnapshotService {

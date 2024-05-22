@@ -65,7 +65,16 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 	}
 
 	public async import(height: number, store: Contracts.State.Store): Promise<void> {
-		await this.importer.import(height, store);
+		if (!(await this.#snapshotExists(height))) {
+			this.logger.error(`No state snapshot found to import at height ${height}`);
+			return;
+		}
+
+		this.logger.info(`Importing state snapshot at height ${height}`);
+
+		await this.importer.import(store, this.#getDataPath(height));
+
+		this.logger.info(`State snapshot imported at height ${height}`);
 	}
 
 	#getDataDir(): string {
@@ -82,6 +91,12 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 
 	#getTempPath(height: number): string {
 		return join(this.#getTempDir(), `${height}.gz`);
+	}
+
+	async #snapshotExists(height: number): Promise<boolean> {
+		const snapshots = await this.listSnapshots();
+
+		return snapshots.includes(height);
 	}
 
 	async #removeOldSnapshots(height: number): Promise<void> {
