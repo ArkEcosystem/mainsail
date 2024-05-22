@@ -61,7 +61,7 @@ export class Service implements Contracts.State.Service {
 		}
 	}
 
-	public async restore(maxHeight: number): Promise<void> {
-		await this.importer.import(maxHeight, this.#baseStore);
+	public async restore(height: number): Promise<void> {
+		await this.importer.import(height, this.#baseStore);
 	}
 }

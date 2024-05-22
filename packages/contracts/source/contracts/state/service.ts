@@ -7,5 +7,5 @@ export interface Service extends CommitHandler {
 	createStoreClone(): Store;
 	createWalletRepositoryBySender(publicKey: string): Promise<WalletRepository>;
 	export(height: number): Promise<void>;
-	restore(maxHeight: number): Promise<void>;
+	restore(height: number): Promise<void>;
 }
