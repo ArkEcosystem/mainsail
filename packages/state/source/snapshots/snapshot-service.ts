@@ -2,7 +2,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import { existsSync, readdirSync } from "fs";
-import { copy, ensureDirSync, remove } from "fs-extra/esm";
+import { copy, ensureDir, remove } from "fs-extra/esm";
 import { join } from "path";
 
 @injectable()
@@ -41,10 +41,10 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 		try {
 			this.logger.info(`Exporting state snapshot at height ${height}`);
 
-			ensureDirSync(this.#getTempDir());
+			await ensureDir(this.#getTempDir());
 			await this.exporter.export(store, this.#getTempPath(height));
 
-			ensureDirSync(this.#getDataDir());
+			await ensureDir(this.#getDataDir());
 			await copy(this.#getTempPath(height), this.#getDataPath(height));
 
 			this.logger.info(`State snapshot exported at height ${height}`);
