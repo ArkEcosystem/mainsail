@@ -9,6 +9,6 @@ export interface Importer {
 }
 
 export interface SnapshotService {
-	listSnapshots(): number[];
+	listSnapshots(): Promise<number[]>;
 	export(store: Store): Promise<void>;
 }

@@ -1,8 +1,8 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { existsSync, readdirSync } from "fs";
-import { copy, ensureDir, remove } from "fs-extra/esm";
+import { readdirSync } from "fs";
+import { copy, ensureDir, pathExists, remove } from "fs-extra/esm";
 import { join } from "path";
 
 @injectable()
@@ -20,12 +20,13 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 	@inject(Identifiers.State.Snapshot.Exporter)
 	private readonly exporter!: Contracts.State.Exporter;
 
-	public listSnapshots(): number[] {
+	public async listSnapshots(): Promise<number[]> {
 		const path = this.#getDataDir();
-		if (!existsSync(path)) {
+		if (!(await pathExists(path))) {
 			return [];
 		}
 
+		// TODO: use filesystem
 		const regexPattern = /^\d+\.gz$/;
 		return readdirSync(path)
 			.filter((item) => regexPattern.test(item))
