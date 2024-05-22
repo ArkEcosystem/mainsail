@@ -55,6 +55,8 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 
 		if (exported) {
 			await this.#removeOldSnapshots(height);
+		} else {
+			await this.#removeSnapshot(height);
 		}
 	}
 
@@ -83,7 +85,13 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 			.sort((a, b) => b - a);
 
 		for (const height of heights.slice(this.configuration.getRequired<number>("export.retainFiles") - 1)) {
-			await remove(this.app.dataPath(join("state-export", `${height}.gz`)));
+			await this.#removeSnapshot(height);
 		}
+	}
+
+	async #removeSnapshot(height: number): Promise<void> {
+		try {
+			await remove(this.#getDataPath(height));
+		} catch {}
 	}
 }
