@@ -21,7 +21,7 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 	private readonly exporter!: Contracts.State.Exporter;
 
 	public listSnapshots(): number[] {
-		const path = this.#getImportPath();
+		const path = this.#getDataDir();
 		if (!existsSync(path)) {
 			return [];
 		}
@@ -36,26 +36,45 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 	public async export(store: Contracts.State.Store): Promise<void> {
 		const height = store.getLastHeight();
 
-		this.logger.info(`Exporting state snapshot at height ${height}`);
+		let exported = false;
 
-		ensureDirSync(this.app.tempPath("state-export"));
-		const temporaryPath = this.app.tempPath(join("state-export", `${height}.gz`));
+		try {
+			this.logger.info(`Exporting state snapshot at height ${height}`);
 
-		await this.exporter.export(store, temporaryPath);
+			ensureDirSync(this.#getTempDir());
+			await this.exporter.export(store, this.#getTempPath(height));
 
-		ensureDirSync(this.app.dataPath("state-export"));
-		await copy(temporaryPath, this.app.dataPath(join("state-export", `${height}.gz`)));
+			ensureDirSync(this.#getDataDir());
+			await copy(this.#getTempPath(height), this.#getDataPath(height));
 
-		await this.#removeExcessFiles(height);
+			this.logger.info(`State snapshot exported at height ${height}`);
+			exported = true;
+		} catch (error) {
+			this.logger.error(`Failed to export state snapshot at height ${height}: ${error.message}`);
+		}
 
-		this.logger.info(`State snapshot exported at height ${height}`);
+		if (exported) {
+			await this.#removeOldSnapshots(height);
+		}
 	}
 
-	#getImportPath(): string {
+	#getDataDir(): string {
 		return this.app.dataPath("state-export");
 	}
 
-	async #removeExcessFiles(height: number): Promise<void> {
+	#getDataPath(height: number): string {
+		return join(this.#getDataDir(), `${height}.gz`);
+	}
+
+	#getTempDir(): string {
+		return this.app.tempPath("state-export");
+	}
+
+	#getTempPath(height: number): string {
+		return join(this.#getTempDir(), `${height}.gz`);
+	}
+
+	async #removeOldSnapshots(height: number): Promise<void> {
 		const regexPattern = /^\d+\.gz$/;
 		const heights = readdirSync(this.app.dataPath("state-export"))
 			.filter((item) => regexPattern.test(item))
