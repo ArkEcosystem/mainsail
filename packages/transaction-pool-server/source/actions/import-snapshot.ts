@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class ImportSnapshotAction implements Contracts.Api.RPC.Action {
-	@inject(Identifiers.State.Snapshot.Service)
-	protected readonly snapshotService!: Contracts.State.SnapshotService;
+	@inject(Identifiers.State.Service)
+	protected readonly stateService!: Contracts.State.Service;
 
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
@@ -16,5 +16,7 @@ export class ImportSnapshotAction implements Contracts.Api.RPC.Action {
 		type: "object",
 	};
 
-	public async handle(parameters: any): Promise<any> {}
+	public async handle(parameters: any): Promise<any> {
+		await this.stateService.restore(parameters.height);
+	}
 }
