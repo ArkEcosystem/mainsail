@@ -11,4 +11,5 @@ export interface Importer {
 export interface SnapshotService {
 	listSnapshots(): Promise<number[]>;
 	export(store: Store): Promise<void>;
+	import(height: number, store: Store): Promise<void>;
 }

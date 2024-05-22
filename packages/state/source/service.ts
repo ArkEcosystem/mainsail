@@ -20,9 +20,6 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.Snapshot.Service)
 	private readonly snapshotService!: Contracts.State.SnapshotService;
 
-	@inject(Identifiers.State.Snapshot.Importer)
-	private readonly importer!: Contracts.State.Importer;
-
 	#baseStore!: Contracts.State.Store;
 
 	@postConstruct()
@@ -62,6 +59,6 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public async restore(height: number): Promise<void> {
-		await this.importer.import(height, this.#baseStore);
+		await this.snapshotService.import(height, this.#baseStore);
 	}
 }

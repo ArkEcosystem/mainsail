@@ -20,6 +20,9 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 	@inject(Identifiers.State.Snapshot.Exporter)
 	private readonly exporter!: Contracts.State.Exporter;
 
+	@inject(Identifiers.State.Snapshot.Importer)
+	private readonly importer!: Contracts.State.Importer;
+
 	public async listSnapshots(): Promise<number[]> {
 		const path = this.#getDataDir();
 		if (!(await pathExists(path))) {
@@ -59,6 +62,10 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 		} else {
 			await this.#removeSnapshot(height);
 		}
+	}
+
+	public async import(height: number, store: Contracts.State.Store): Promise<void> {
+		await this.importer.import(height, store);
 	}
 
 	#getDataDir(): string {
