@@ -77,18 +77,7 @@ export class Bootstrapper {
 			await this.#checkStoredGenesisCommit();
 			await this.#storeGenesisCommit();
 
-			await this.#restoreStateSnapshot();
-
-			if (this.txPoolClient) {
-				// @ts-ignore
-				const snapshots = await this.txPoolClient.listSnapshots();
-				// if (snapshots.length > 0) {
-				// 	this.logger.info(
-				// 		`Transaction pool has ${snapshots.length} snapshots with heights: ${snapshots.join(", ")}`,
-				// 	);
-				// 	await this.txPoolClient.importSnapshot(snapshots.at(-1));
-				// }
-			}
+			await this.#restoreSnapshots();
 
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();
@@ -143,21 +132,35 @@ export class Bootstrapper {
 		await this.#processCommit(genesisBlock);
 	}
 
-	async #restoreStateSnapshot(): Promise<void> {
+	async #restoreSnapshots(): Promise<void> {
 		const lastCommit = await this.databaseService.getLastCommit();
 		const ledgerHeight = lastCommit.block.data.height;
 
-		let snapshots = await this.snapshotService.listSnapshots();
-		snapshots = snapshots.filter((snapshot) => snapshot <= ledgerHeight);
+		let localSnapshots = await this.snapshotService.listSnapshots();
+		localSnapshots = localSnapshots.filter((snapshot) => snapshot <= ledgerHeight);
 
 		if (this.apiSync) {
 			const apiSyncHeight = await this.apiSync.getLastSyncedBlockHeight();
-			snapshots = snapshots.filter((snapshot) => snapshot <= apiSyncHeight);
+			localSnapshots = localSnapshots.filter((snapshot) => snapshot <= apiSyncHeight);
 		}
 
-		const snapshotHeight = snapshots.pop();
-		if (snapshotHeight) {
-			await this.stateService.restore(snapshotHeight);
+		if (this.txPoolClient) {
+			let txPoolSnapshots = await this.txPoolClient.listSnapshots();
+			txPoolSnapshots = txPoolSnapshots.filter((snapshot) => snapshot <= ledgerHeight);
+
+			const txPoolSnapshotHeight = txPoolSnapshots.pop();
+			if (txPoolSnapshotHeight) {
+				localSnapshots = localSnapshots.filter((snapshot) => snapshot <= txPoolSnapshotHeight);
+
+				await this.txPoolClient.importSnapshot(txPoolSnapshotHeight);
+			} else {
+				localSnapshots = [];
+			}
+		}
+
+		const localSnapshotHeight = localSnapshots.pop();
+		if (localSnapshotHeight) {
+			await this.stateService.restore(localSnapshotHeight);
 		}
 	}
 
