@@ -78,14 +78,12 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 	}
 
 	async #removeOldSnapshots(height: number): Promise<void> {
-		const regexPattern = /^\d+\.gz$/;
-		const heights = readdirSync(this.app.dataPath("state-export"))
-			.filter((item) => regexPattern.test(item))
-			.map((item) => +item.split(".")[0])
+		const snapshots = await this.listSnapshots();
+		const snapshotsToRemove = snapshots
 			.filter((item) => item !== height)
-			.sort((a, b) => b - a);
+			.slice(this.configuration.getRequired<number>("export.retainFiles") - 1);
 
-		for (const height of heights.slice(this.configuration.getRequired<number>("export.retainFiles") - 1)) {
+		for (const height of snapshotsToRemove) {
 			await this.#removeSnapshot(height);
 		}
 	}
