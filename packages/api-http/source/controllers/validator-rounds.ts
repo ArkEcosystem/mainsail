@@ -49,14 +49,13 @@ export class ValidatorRoundsController extends Controller {
 			.createQueryBuilder()
 			.select()
 			.where("public_key IN (:...publicKeys)", { publicKeys: round.validators })
-			.orderBy("balance", "DESC")
 			.orderBy("public_key", "ASC")
 			.getMany();
 
 		return this.respondWithCollection(
 			validatorWallets.map((wallet) => ({
 				publicKey: wallet.publicKey,
-				votes: "0",
+				votes: wallet.attributes?.["validatorVoteBalance"] ?? "0",
 			})),
 			RoundResource,
 		);
