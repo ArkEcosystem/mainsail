@@ -45,7 +45,7 @@ export class Service implements Contracts.State.Service {
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		unit.store.commitChanges();
 
-		if (this.state.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
+		if (this.state.isBootstrap() || !this.configuration.getRequired("snapshots.enabled")) {
 			return;
 		}
 
@@ -53,7 +53,7 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public async export(height: number): Promise<void> {
-		if (height % this.configuration.getRequired<number>("export.interval") === 0) {
+		if (height % this.configuration.getRequired<number>("snapshots.interval") === 0) {
 			await this.snapshotService.export(this.#baseStore);
 		}
 	}

@@ -103,7 +103,7 @@ export class SnapshotService implements Contracts.State.SnapshotService {
 		const snapshots = await this.listSnapshots();
 		const snapshotsToRemove = snapshots
 			.filter((item) => item !== height)
-			.slice(this.configuration.getRequired<number>("export.retainFiles") - 1);
+			.slice(this.configuration.getRequired<number>("snapshots.retainFiles") - 1);
 
 		for (const height of snapshotsToRemove) {
 			await this.#removeSnapshot(height);
