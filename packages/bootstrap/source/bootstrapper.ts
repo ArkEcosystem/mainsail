@@ -43,6 +43,9 @@ export class Bootstrapper {
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.State.Snapshot.Service)
+	private snapshotService!: Contracts.State.SnapshotService;
+
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
@@ -52,6 +55,10 @@ export class Bootstrapper {
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
+
+	@inject(Identifiers.TransactionPoolClient.Instance)
+	@optional()
+	private readonly txPoolClient?: Contracts.TransactionPool.Client;
 
 	#store!: Contracts.State.Store;
 
@@ -70,7 +77,7 @@ export class Bootstrapper {
 			await this.#checkStoredGenesisCommit();
 			await this.#storeGenesisCommit();
 
-			await this.#restoreStateSnapshot();
+			await this.#restoreSnapshots();
 
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();
@@ -125,14 +132,36 @@ export class Bootstrapper {
 		await this.#processCommit(genesisBlock);
 	}
 
-	async #restoreStateSnapshot(): Promise<void> {
+	async #restoreSnapshots(): Promise<void> {
 		const lastCommit = await this.databaseService.getLastCommit();
-		let restoreHeight = lastCommit.block.data.height;
+		const ledgerHeight = lastCommit.block.data.height;
+
+		let localSnapshots = await this.snapshotService.listSnapshots();
+		localSnapshots = localSnapshots.filter((snapshot) => snapshot <= ledgerHeight);
+
 		if (this.apiSync) {
-			restoreHeight = Math.min(await this.apiSync.getLastSyncedBlockHeight(), restoreHeight);
+			const apiSyncHeight = await this.apiSync.getLastSyncedBlockHeight();
+			localSnapshots = localSnapshots.filter((snapshot) => snapshot <= apiSyncHeight);
 		}
 
-		await this.stateService.restore(restoreHeight);
+		if (this.txPoolClient) {
+			let txPoolSnapshots = await this.txPoolClient.listSnapshots();
+			txPoolSnapshots = txPoolSnapshots.filter((snapshot) => snapshot <= ledgerHeight);
+
+			const txPoolSnapshotHeight = txPoolSnapshots.pop();
+			if (txPoolSnapshotHeight) {
+				localSnapshots = localSnapshots.filter((snapshot) => snapshot <= txPoolSnapshotHeight);
+
+				await this.txPoolClient.importSnapshot(txPoolSnapshotHeight);
+			} else {
+				localSnapshots = [];
+			}
+		}
+
+		const localSnapshotHeight = localSnapshots.pop();
+		if (localSnapshotHeight) {
+			await this.stateService.restore(localSnapshotHeight);
+		}
 	}
 
 	async #initState(): Promise<void> {

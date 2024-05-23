@@ -1,53 +1,15 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { createReadStream, readdirSync } from "fs";
-import { ensureDirSync } from "fs-extra/esm";
-import { join } from "path";
+import { createReadStream } from "fs";
 import Pumpify from "pumpify";
 import readline, { Interface } from "readline";
 import { createGunzip } from "zlib";
 
 @injectable()
 export class Importer implements Contracts.State.Importer {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	async import(maxHeight: number, store: Contracts.State.Store): Promise<void> {
-		// ...
-		const fileName = await this.#findImportFile(maxHeight);
-		if (!fileName) {
-			this.logger.info("No state snapshot found to import");
-			return;
-		}
-
-		this.logger.info(`Importing state snapshot: ${fileName}`);
-
-		await this.#readFile(fileName, store);
-	}
-
-	async #findImportFile(maxHeigh: number): Promise<string | undefined> {
-		const path = this.#getImportPath();
-		ensureDirSync(path);
-
-		const regexPattern = /^\d+\.gz$/;
-		const heights = readdirSync(path)
-			.filter((item) => regexPattern.test(item))
-			.map((item) => +item.split(".")[0])
-			.filter((item) => item <= maxHeigh)
-			.sort((a, b) => b - a);
-
-		if (heights.length > 0) {
-			return `${heights[0]}.gz`;
-		}
-		return undefined;
-	}
-
-	async #readFile(fileName: string, store: Contracts.State.Store): Promise<void> {
-		const readStream = createReadStream(this.app.dataPath(join("state-export", fileName)));
+	async import(store: Contracts.State.Store, fileName: string): Promise<void> {
+		const readStream = createReadStream(fileName);
 		const importStream = new Pumpify(readStream, createGunzip());
 		const reader = readline.createInterface({
 			crlfDelay: Number.POSITIVE_INFINITY,
@@ -127,9 +89,5 @@ export class Importer implements Contracts.State.Importer {
 
 			walletRepository.setOnIndex(indexName, key, walletRepository.findByAddress(address));
 		}
-	}
-
-	#getImportPath(): string {
-		return this.app.dataPath("state-export");
 	}
 }

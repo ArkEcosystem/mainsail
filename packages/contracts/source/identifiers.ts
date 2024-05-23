@@ -226,9 +226,12 @@ export const Identifiers = {
 	},
 	State: {
 		AttributeRepository: Symbol("State<AttributeRepository>"),
-		Exporter: Symbol("State<Exporter>"),
-		Importer: Symbol("State<Importer>"),
 		Service: Symbol("State<Service>"),
+		Snapshot: {
+			Exporter: Symbol("State<Snapshot.Exporter>"),
+			Importer: Symbol("State<Snapshot.Importer>"),
+			Service: Symbol("State<Snapshot.Service>"),
+		},
 		State: Symbol("State<State>"),
 		Store: {
 			Factory: Symbol("State<Store<Factory>>"),

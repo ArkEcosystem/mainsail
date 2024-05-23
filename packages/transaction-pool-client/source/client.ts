@@ -44,6 +44,24 @@ export class Client implements Contracts.TransactionPool.Client {
 		}
 	}
 
+	public async listSnapshots(): Promise<number[]> {
+		try {
+			return await this.#call<number[]>("list_snapshots", {});
+		} catch (error) {
+			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+		}
+
+		return [];
+	}
+
+	public async importSnapshot(height: number): Promise<void> {
+		try {
+			await this.#call("import_snapshot", { height });
+		} catch (error) {
+			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+		}
+	}
+
 	// eslint-disable-next-line unicorn/no-null
 	async #call<T>(method: string, parameters: any, id: null | number = null): Promise<T> {
 		const response = await http.post("http://127.0.0.1:4009/api", {

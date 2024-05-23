@@ -45,6 +45,8 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 				await this.transactionPoolService.removeTransaction(transactionId);
 			}
 
+			await this.stateService.export(block.data.height);
+
 			this.logger.info(
 				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed.`,
 			);
