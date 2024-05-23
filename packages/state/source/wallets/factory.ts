@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 import { ValidatorWallet } from "./validator-wallet.js";
 import { Wallet } from "./wallet.js";
@@ -8,7 +8,7 @@ export const walletFactory =
 	(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet) => {
 		const wallet = app.resolve(Wallet);
 
-		wallet.init(address, app.get(Identifiers.State.Wallet.Attributes), walletRepository, originalWallet);
+		wallet.init(address, walletRepository, originalWallet);
 
 		return wallet;
 	};

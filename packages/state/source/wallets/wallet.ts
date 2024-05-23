@@ -9,28 +9,24 @@ export class Wallet implements Contracts.State.Wallet {
 	@inject(Identifiers.State.Wallet.Factory)
 	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
 
+	@inject(Identifiers.State.Wallet.Attributes)
+	protected readonly attributeRepository!: Contracts.State.AttributeRepository;
+
 	protected address!: string;
-	protected attributeRepository!: Contracts.State.AttributeRepository;
 	protected walletRepository!: Contracts.State.WalletRepository;
 	protected originalWallet?: Wallet;
 
 	#repository!: Repository;
 
-	public init(
-		address: string,
-		attributeRepository: Contracts.State.AttributeRepository,
-		walletRepository: Contracts.State.WalletRepository,
-		originalWallet?: Wallet,
-	) {
+	public init(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet) {
 		this.address = address;
-		this.attributeRepository = attributeRepository;
 		this.walletRepository = walletRepository;
 		this.originalWallet = originalWallet;
 
 		if (originalWallet) {
-			this.#repository = new Repository(attributeRepository, originalWallet.#repository);
+			this.#repository = new Repository(this.attributeRepository, originalWallet.#repository);
 		} else {
-			this.#repository = new Repository(attributeRepository, undefined, {
+			this.#repository = new Repository(this.attributeRepository, undefined, {
 				balance: BigNumber.ZERO,
 				nonce: BigNumber.ZERO,
 			});
