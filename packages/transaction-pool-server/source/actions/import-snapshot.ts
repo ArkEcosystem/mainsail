@@ -17,6 +17,11 @@ export class ImportSnapshotAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: any): Promise<any> {
-		await this.stateService.restore(parameters.height);
+		try {
+			await this.stateService.restore(parameters.height);
+		} catch (error) {
+			this.logger.error(`Cannot import state snapshot because: ${error.message}`);
+			throw error;
+		}
 	}
 }
