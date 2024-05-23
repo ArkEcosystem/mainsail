@@ -55,36 +55,36 @@ describe<{
 		const result = serviceProvider.configSchema().validate(defaults);
 		assert.undefined(result.error);
 
-		assert.object(result.value.export);
-		assert.boolean(result.value.export.enabled);
-		assert.number(result.value.export.interval);
-		assert.number(result.value.export.retainFiles);
+		assert.object(result.value.snapshots);
+		assert.boolean(result.value.snapshots.enabled);
+		assert.number(result.value.snapshots.interval);
+		assert.number(result.value.snapshots.retainFiles);
 	});
 
-	it("should parse process.env.CORE_STATE_EXPORT_DISABLED", async ({ serviceProvider }) => {
-		process.env.CORE_STATE_EXPORT_DISABLED = "true";
+	it("should parse process.env.CORE_STATE_SNAPSHOTS_DISABLED", async ({ serviceProvider }) => {
+		process.env.CORE_STATE_SNAPSHOTS_DISABLED = "true";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
-		assert.equal(result.value.export.enabled, false);
+		assert.equal(result.value.snapshots.enabled, false);
 	});
 
-	it("should parse process.env.CORE_STATE_EXPORT_INTERVAL", async ({ serviceProvider }) => {
-		process.env.CORE_STATE_EXPORT_INTERVAL = "3";
+	it("should parse process.env.CORE_STATE_SNAPSHOTS_INTERVAL", async ({ serviceProvider }) => {
+		process.env.CORE_STATE_SNAPSHOTS_INTERVAL = "3";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
-		assert.equal(result.value.export.interval, 3);
+		assert.equal(result.value.snapshots.interval, 3);
 	});
 
-	it("should parse process.env.CORE_STATE_EXPORT_INTERVAL", async ({ serviceProvider }) => {
-		process.env.CORE_STATE_EXPORT_RETAIN_FILES = "3";
+	it("should parse process.env.CORE_STATE_SNAPSHOTS_INTERVAL", async ({ serviceProvider }) => {
+		process.env.CORE_STATE_SNAPSHOTS_RETAIN_FILES = "3";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
-		assert.equal(result.value.export.retainFiles, 3);
+		assert.equal(result.value.snapshots.retainFiles, 3);
 	});
 });
