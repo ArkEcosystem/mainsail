@@ -338,17 +338,217 @@ fn test_commit_changes() {
     );
 
     // 2) Update balance for account
-    let mut changes = HashMap::new();
+    let mut state = HashMap::new();
 
     let mut account = Account::new_not_existing();
     account.info.balance = U256::from(100);
     account.status = AccountStatus::Touched;
 
-    changes.insert(address, account);
-    let result = db.commit(0, 0, vec![changes]);
-    assert!(result.is_ok());
+    let code = Bytecode::new();
+    account.info.code_hash = code.hash_slow();
+    account.info.code = Some(code.clone());
 
-    // 3) Assert updated balance
+    let mut storage = HashMap::new();
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
+    );
+    storage.insert(
+        U256::from(2),
+        StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
+    );
+
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::InMemoryChange,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(0, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // 3) Assert updated storage
+
+    // Balance
     let account = db.basic(address).expect("works").expect("account info");
     assert_eq!(account.balance, U256::from(100));
+
+    // Code
+    assert_eq!(account.code_hash, code.hash_slow());
+    let account_code = db.code_by_hash(code.hash_slow()).expect("code");
+    assert_eq!(account_code, code);
+
+    // Storage
+    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+    assert_eq!(account_storage, U256::from(1234));
+
+    account_storage = db.storage(address, U256::from(2)).expect("storage");
+    assert_eq!(account_storage, U256::from(5678));
+}
+
+#[test]
+fn test_storage() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+
+    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+    let mut state = HashMap::new();
+
+    let mut account = Account::new_not_existing();
+    account.status = AccountStatus::Touched;
+
+    let mut storage = HashMap::new();
+
+    storage.insert(
+        U256::from(99),
+        StorageSlot::new_changed(U256::ZERO, U256::from(99)),
+    );
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+    );
+    storage.insert(
+        U256::from(101),
+        StorageSlot::new_changed(U256::ZERO, U256::from(101)),
+    );
+    storage.insert(
+        U256::from(2),
+        StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+    );
+    storage.insert(
+        U256::from(4),
+        StorageSlot::new_changed(U256::ZERO, U256::from(4)),
+    );
+
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::InMemoryChange,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(0, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // Assert storage is sorted
+
+    let indexes = vec![1, 2, 4, 99, 101];
+
+    // Storage
+    for index in indexes {
+        let account_storage = db.storage(address, U256::from(index)).expect("storage");
+        assert_eq!(account_storage, U256::from(index));
+    }
+}
+
+#[test]
+fn test_storage_overwrite() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+
+    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+    let mut state = HashMap::new();
+
+    let mut account = Account::new_not_existing();
+    account.status = AccountStatus::Touched;
+
+    let mut storage = HashMap::new();
+
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+    );
+    storage.insert(
+        U256::from(2),
+        StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+    );
+
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::InMemoryChange,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(0, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // Assert storage
+    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+    assert_eq!(account_storage, U256::from(1));
+    account_storage = db.storage(address, U256::from(2)).expect("storage");
+    assert_eq!(account_storage, U256::from(2));
+
+    // Now overwrite index 1
+    let mut storage = HashMap::new();
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::from(1), U256::from(99)),
+    );
+
+    let mut state = HashMap::new();
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::Changed,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(1, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // Assert storage again
+
+    // - index 1 was overwritte
+    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+    assert_eq!(account_storage, U256::from(99));
+
+    // - index 2 remains unchanged
+    account_storage = db.storage(address, U256::from(2)).expect("storage");
+    assert_eq!(account_storage, U256::from(2));
 }

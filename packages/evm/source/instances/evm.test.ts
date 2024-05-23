@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { ethers } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import { abi, bytecode } from "../../test/fixtures/MainsailERC20.json";
@@ -35,7 +35,7 @@ describe<{
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
-	it("should deploy, transfer and call balanceOf", async ({ instance }) => {
+	it("should deploy, transfer and and update balance correctly", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
 		let { receipt } = await instance.process({
@@ -54,15 +54,9 @@ describe<{
 		assert.defined(contractAddress);
 
 		const iface = new ethers.Interface(abi);
-		const balanceOfSender = iface.encodeFunctionData("balanceOf", [sender.address]);
-		let { output } = await instance.view({
-			caller: sender.address,
-			data: Buffer.from(ethers.getBytes(balanceOfSender)),
-			recipient: contractAddress!,
-		});
 
-		let [balance] = iface.decodeFunctionResult("balanceOf", output!);
-		assert.equal(balance, ethers.parseEther("100000000"));
+		const balanceBefore = await getBalance(instance, contractAddress!, sender.address);
+		assert.equal(ethers.parseEther("100000000"), balanceBefore);
 
 		const amount = ethers.parseEther("1999");
 
@@ -79,15 +73,8 @@ describe<{
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 52_222n);
 
-		const balanceOfRecipient = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		({ output } = await instance.view({
-			caller: sender.address,
-			data: Buffer.from(ethers.getBytes(balanceOfRecipient)),
-			recipient: contractAddress!,
-		}));
-
-		[balance] = iface.decodeFunctionResult("balanceOf", output!);
-		assert.equal(balance, amount);
+		const balanceAfter = await getBalance(instance, contractAddress!, recipient.address);
+		assert.equal(amount, balanceAfter);
 	});
 
 	it("should revert on invalid call", async ({ instance }) => {
@@ -111,55 +98,6 @@ describe<{
 
 		assert.false(receipt.success);
 		assert.equal(receipt.gasUsed, 21_070n);
-	});
-
-	it("should deploy, transfer and call balanceOf [commit]", async ({ instance }) => {
-		const commitKey = { height: BigInt(0), round: BigInt(0) };
-
-		const [sender, recipient] = wallets;
-
-		let { receipt } = await instance.process({
-			commitKey,
-			caller: sender.address,
-			data: Buffer.from(bytecode.slice(2), "hex"),
-		});
-
-		assert.true(receipt.success);
-		assert.equal(receipt.gasUsed, 964_156n);
-		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
-
-		const contractAddress = receipt.deployedContractAddress;
-		assert.defined(contractAddress);
-
-		const iface = new ethers.Interface(abi);
-		const amount = ethers.parseEther("1337");
-
-		await instance.onCommit(commitKey as any);
-		commitKey.height++;
-
-		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
-		({ receipt } = await instance.process({
-			commitKey,
-			caller: sender.address,
-			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
-			recipient: contractAddress,
-		}));
-
-		assert.true(receipt.success);
-		assert.equal(receipt.gasUsed, 52_222n);
-
-		await instance.onCommit(commitKey as any);
-
-		const balanceOf = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		const { success, output } = await instance.view({
-			caller: sender.address,
-			data: Buffer.from(ethers.getBytes(balanceOf)),
-			recipient: contractAddress!,
-		});
-
-		assert.true(success);
-		const [balance] = iface.decodeFunctionResult("balanceOf", output!);
-		assert.equal(amount, balance);
 	});
 
 	it("should overwrite pending state if modified in different context", async ({ instance }) => {
@@ -218,15 +156,7 @@ describe<{
 		await assert.resolves(async () => instance.onCommit(commitKey2 as any));
 
 		// Balance updated correctly
-		const balanceOf = iface.encodeFunctionData("balanceOf", [recipient.address]);
-		const { success, output } = await instance.view({
-			caller: sender.address,
-			data: Buffer.from(ethers.getBytes(balanceOf)),
-			recipient: contractAddress!,
-		});
-
-		assert.true(success);
-		const [balance] = iface.decodeFunctionResult("balanceOf", output!);
+		const balance = await getBalance(instance, contractAddress!, recipient.address);
 		assert.equal(ethers.parseEther("2"), balance);
 	});
 
@@ -272,4 +202,76 @@ describe<{
 		assert.equal(receipt.gasUsed, 0n);
 		assert.null(receipt.logs);
 	});
+
+	it("should deploy, transfer multipe times and update balance correctly", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+
+		let { receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey: { height: BigInt(0), round: BigInt(0) },
+		});
+
+		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
+		assert.true(receipt.success);
+		assert.equal(receipt.gasUsed, 964_156n);
+		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+
+		const contractAddress = receipt.deployedContractAddress;
+		assert.defined(contractAddress);
+
+		const iface = new ethers.Interface(abi);
+		const amount = ethers.parseEther("1999");
+
+		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
+		({ receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
+			recipient: contractAddress,
+			commitKey: { height: BigInt(1), round: BigInt(0) },
+		}));
+
+		({ receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
+			recipient: contractAddress,
+			commitKey: { height: BigInt(1), round: BigInt(0) },
+		}));
+
+		({ receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
+			recipient: contractAddress,
+			commitKey: { height: BigInt(1), round: BigInt(0) },
+		}));
+
+		// not updated yet
+		const balanceBefore = await getBalance(instance, contractAddress!, recipient.address);
+		assert.equal(ethers.parseEther("0"), balanceBefore);
+
+		await instance.onCommit({ height: BigInt(1), round: BigInt(0) } as any);
+
+		// Balance updated correctly
+		const balanceAfteer = await getBalance(instance, contractAddress!, recipient.address);
+		assert.equal(ethers.parseEther("5997"), balanceAfteer);
+	});
 });
+
+const getBalance = async (
+	instance: Contracts.Evm.Instance,
+	contractAddress: string,
+	walletAddress: string,
+): Promise<BigNumberish> => {
+	const iface = new ethers.Interface(abi);
+	const balanceOf = iface.encodeFunctionData("balanceOf", [walletAddress]);
+
+	const { output } = await instance.view({
+		caller: ethers.ZeroAddress,
+		data: Buffer.from(ethers.getBytes(balanceOf)),
+		recipient: contractAddress!,
+	});
+
+	const [balance] = iface.decodeFunctionResult("balanceOf", output!);
+	return balance;
+};
