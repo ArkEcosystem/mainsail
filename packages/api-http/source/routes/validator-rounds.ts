@@ -22,7 +22,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({}).concat(Schemas.pagination),
 			},
 		},
-		path: "/validator-rounds",
+		path: "/rounds",
 	});
 
 	server.route({
@@ -35,7 +35,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				}),
 			},
 		},
-		path: "/validator-rounds/{round}",
+		path: "/rounds/{round}",
 	});
 
 	server.route({

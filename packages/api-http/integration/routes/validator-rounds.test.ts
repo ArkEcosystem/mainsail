@@ -32,18 +32,18 @@ describe<{
 		await apiContext.reset();
 	});
 
-	it("/validator-rounds", async () => {
-		let { statusCode, data } = await request("/validator-rounds", options);
+	it("/rounds", async () => {
+		let { statusCode, data } = await request("/rounds", options);
 		assert.equal(statusCode, 200);
 		assert.empty(data.data);
 
 		await apiContext.validatorRoundRepository.save(validatorRounds);
 
-		({ statusCode, data } = await request("/validator-rounds", options));
+		({ statusCode, data } = await request("/rounds", options));
 		assert.equal(data.data, validatorRounds);
 	});
 
-	it("/validator-rounds/{round}", async () => {
+	it("/rounds/{round}", async () => {
 		await apiContext.validatorRoundRepository.save(validatorRounds);
 
 		const testCases = [
@@ -77,7 +77,7 @@ describe<{
 		];
 
 		for (const { round, result } of testCases) {
-			const endpoint = `/validator-rounds/${round}`;
+			const endpoint = `/rounds/${round}`;
 			if (result.statusCode === 404) {
 				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
 			} else {
