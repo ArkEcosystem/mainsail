@@ -43,6 +43,51 @@ describe<{
 		assert.equal(data.data, validatorRounds);
 	});
 
+	it("/validator-rounds/{round}", async () => {
+		await apiContext.validatorRoundRepository.save(validatorRounds);
+
+		const testCases = [
+			{
+				round: 1,
+				result: {
+					data: validatorRounds.find((v) => v.round === "1"),
+					statusCode: 200,
+				},
+			},
+			{
+				round: 2,
+				statusCode: 200,
+				result: {
+					data: validatorRounds.find((v) => v.round === "2"),
+					statusCode: 200,
+				},
+			},
+			{
+				round: 3,
+				result: {
+					statusCode: 404,
+				},
+			},
+			{
+				round: 99,
+				result: {
+					statusCode: 404,
+				},
+			},
+		];
+
+		for (const { round, result } of testCases) {
+			const endpoint = `/validator-rounds/${round}`;
+			if (result.statusCode === 404) {
+				await assert.rejects(async () => request(endpoint, options), "Response code 404 (Not Found)");
+			} else {
+				const { statusCode, data } = await request(endpoint, options);
+				assert.equal(statusCode, result.statusCode);
+				assert.equal(data.data, result.data);
+			}
+		}
+	});
+
 	it("/rounds/{id}/delegates", async () => {
 		await apiContext.validatorRoundRepository.save(validatorRounds);
 		const { statusCode, data } = await request("/rounds/1/delegates", options);
