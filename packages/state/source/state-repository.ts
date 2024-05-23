@@ -1,19 +1,21 @@
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 import { factory, jsonFactory } from "./attributes/index.js";
 
-export class Repository implements Contracts.State.Repository {
+@injectable()
+export class StateRepository implements Contracts.State.StateRepository {
 	protected readonly attributes = new Map<string, Contracts.State.Attribute<unknown>>();
 
-	readonly #originalRepository?: Repository;
+	readonly #originalRepository?: StateRepository;
 	readonly #setAttributes = new Set<string>();
 	readonly #forgetAttributes = new Set<string>();
 	#allowUnknownAttributes = false;
 
 	public constructor(
 		protected readonly attributeRepository: Contracts.State.AttributeRepository,
-		originalRepository?: Repository,
+		originalRepository?: StateRepository,
 		initialData: Record<string, unknown> = {},
 	) {
 		this.attributeRepository = attributeRepository;
@@ -112,7 +114,7 @@ export class Repository implements Contracts.State.Repository {
 		}
 	}
 
-	public changesToJson(): Contracts.State.RepositoryChange {
+	public changesToJson(): Contracts.State.StateRepositoryChange {
 		const set = {};
 		const forget: string[] = [];
 
@@ -134,7 +136,7 @@ export class Repository implements Contracts.State.Repository {
 		};
 	}
 
-	public applyChanges(data: Contracts.State.RepositoryChange): void {
+	public applyChanges(data: Contracts.State.StateRepositoryChange): void {
 		for (const name of data.forget) {
 			if (!this.attributeRepository.has(name)) {
 				continue;
@@ -167,7 +169,7 @@ export class Repository implements Contracts.State.Repository {
 		return result;
 	}
 
-	public fromJson(data: Contracts.Types.JsonObject): Repository {
+	public fromJson(data: Contracts.Types.JsonObject): StateRepository {
 		if (this.isChanged()) {
 			throw new Error("Cannot restore to a changed repository.");
 		}
@@ -191,7 +193,7 @@ export class Repository implements Contracts.State.Repository {
 			return attribute;
 		}
 
-		Utils.assert.defined<Repository>(this.#originalRepository);
+		Utils.assert.defined<StateRepository>(this.#originalRepository);
 		return this.#originalRepository?.getAttributeHolder<T>(key);
 	}
 
