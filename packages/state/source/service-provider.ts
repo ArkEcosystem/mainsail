@@ -54,9 +54,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("validatorApproval", Contracts.State.AttributeType.Number);
 		walletAttributeRepository.set("validatorResigned", Contracts.State.AttributeType.Boolean);
 
-		this.app
-			.bind(Identifiers.State.Wallet.Factory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.Application.Instance)));
+		this.app.bind(Identifiers.State.Wallet.Factory).toFactory(walletFactory);
 
 		this.app.bind(Identifiers.State.WalletRepository.Base.Factory).toFactory(
 			({ container }) =>

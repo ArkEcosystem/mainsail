@@ -19,7 +19,7 @@ export class Wallet implements Contracts.State.Wallet {
 
 	#repository!: Contracts.State.StateRepository;
 
-	public init(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet) {
+	public init(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet): Wallet {
 		this.address = address;
 		this.walletRepository = walletRepository;
 		this.originalWallet = originalWallet;
@@ -32,6 +32,8 @@ export class Wallet implements Contracts.State.Wallet {
 				nonce: BigNumber.ZERO,
 			});
 		}
+
+		return this;
 	}
 
 	public isChanged(): boolean {
