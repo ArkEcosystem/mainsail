@@ -1,17 +1,32 @@
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 import { Repository } from "../repository.js";
 
+@injectable()
 export class Wallet implements Contracts.State.Wallet {
-	#repository: Repository;
+	@inject(Identifiers.State.Wallet.Factory)
+	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
 
-	public constructor(
-		protected readonly address: string,
-		protected readonly attributeRepository: Contracts.State.AttributeRepository,
-		protected walletRepository: Contracts.State.WalletRepository,
-		protected readonly originalWallet?: Wallet,
+	protected address!: string;
+	protected attributeRepository!: Contracts.State.AttributeRepository;
+	protected walletRepository!: Contracts.State.WalletRepository;
+	protected originalWallet?: Wallet;
+
+	#repository!: Repository;
+
+	public init(
+		address: string,
+		attributeRepository: Contracts.State.AttributeRepository,
+		walletRepository: Contracts.State.WalletRepository,
+		originalWallet?: Wallet,
 	) {
+		this.address = address;
+		this.attributeRepository = attributeRepository;
+		this.walletRepository = walletRepository;
+		this.originalWallet = originalWallet;
+
 		if (originalWallet) {
 			this.#repository = new Repository(attributeRepository, originalWallet.#repository);
 		} else {
@@ -113,7 +128,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(walletRepository: Contracts.State.WalletRepository): Contracts.State.Wallet {
-		return new Wallet(this.address, this.attributeRepository, walletRepository, this);
+		return this.createWalletFactory(this.address, walletRepository, this);
 	}
 
 	public isClone(): boolean {

@@ -55,7 +55,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.State.Wallet.Factory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)));
+			.toFactory(({ container }) => walletFactory(container.get(Identifiers.Application.Instance)));
 
 		this.app.bind(Identifiers.State.WalletRepository.Base.Factory).toFactory(
 			({ container }) =>

@@ -77,7 +77,7 @@ export interface ValidatorWallet {
 	toString(): string;
 }
 
-export type WalletFactory = (address: string, walletRepository: WalletRepository) => Wallet;
+export type WalletFactory = (address: string, walletRepository: WalletRepository, wallet?: Wallet) => Wallet;
 
 export type ValidatorWalletFactory = (wallet: Wallet) => ValidatorWallet;
 
