@@ -9,6 +9,7 @@ export class Repository implements Contracts.State.Repository {
 	readonly #originalRepository?: Repository;
 	readonly #setAttributes = new Set<string>();
 	readonly #forgetAttributes = new Set<string>();
+	#allowUnknownAttributes = false;
 
 	public constructor(
 		protected readonly attributeRepository: Contracts.State.AttributeRepository,
@@ -172,6 +173,10 @@ export class Repository implements Contracts.State.Repository {
 		}
 
 		for (const [key, value] of Object.entries(data)) {
+			if (this.#allowUnknownAttributes && !this.attributeRepository.has(key)) {
+				continue;
+			}
+
 			const attribute = jsonFactory(this.attributeRepository.getAttributeType(key), value);
 			this.attributes.set(key, attribute);
 		}
