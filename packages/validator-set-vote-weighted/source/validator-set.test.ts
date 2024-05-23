@@ -6,6 +6,7 @@ import { spy } from "sinon";
 import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
 import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
+import { stateRepositoryFactory } from "../../state/source/factory";
 import { Wallets } from "../../state/source/index";
 import { validatorWalletFactory, walletFactory } from "../../state/source/wallets/factory";
 import { describe, getAttributeRepository, getIndexSet, Sandbox } from "../../test-framework/source";
@@ -50,6 +51,11 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.State.Wallet.Attributes).toConstantValue(getAttributeRepository());
 
+		context.sandbox.app.bind(Identifiers.State.StateRepository.Factory).toFactory(stateRepositoryFactory);
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
+			getRequired: () => false, //snapshots.skipUnknownAttributes
+		});
+
 		// @ts-ignore
 		@injectable()
 		class MockEventDispatcher {
@@ -79,9 +85,7 @@ describe<{
 			.bind(Identifiers.Cryptography.Identity.PublicKey.Factory)
 			.to(PublicKeyFactory)
 			.inSingletonScope();
-		context.sandbox.app
-			.bind(Identifiers.State.Wallet.Factory)
-			.toFactory(() => walletFactory(context.sandbox.app.get(Identifiers.State.Wallet.Attributes)));
+		context.sandbox.app.bind(Identifiers.State.Wallet.Factory).toFactory(walletFactory);
 		context.sandbox.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 
 		context.walletRepository = context.sandbox.app.resolve(Wallets.WalletRepository);

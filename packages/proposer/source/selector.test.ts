@@ -1,6 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { Attributes, Store } from "../../state/distribution";
+import { stateRepositoryFactory } from "../../state/distribution/factory";
 import { describe, Sandbox } from "../../test-framework/source";
 import { Selector } from "./selector";
 
@@ -34,8 +35,8 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 
 		const config = {
 			get: () => [milestone],
-			getMilestone: () => milestone,
 			getHeight: () => 0,
+			getMilestone: () => milestone,
 		};
 
 		context.sandbox = new Sandbox();
@@ -44,6 +45,10 @@ describe<Context>("Selector", ({ it, beforeEach, assert, stub }) => {
 		context.sandbox.app.bind(Identifiers.Proposer.Selector).toConstantValue(context.proposerSelector);
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
+		context.sandbox.app.bind(Identifiers.State.StateRepository.Factory).toFactory(stateRepositoryFactory);
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
+			getRequired: () => false, //snapshots.skipUnknownAttributes
+		});
 		context.sandbox.app
 			.bind(Identifiers.State.AttributeRepository)
 			.to(Attributes.AttributeRepository)
