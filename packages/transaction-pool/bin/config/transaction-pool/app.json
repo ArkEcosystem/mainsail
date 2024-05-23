@@ -73,7 +73,12 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/state"
+			"package": "@mainsail/state",
+			"options": {
+				"snapshots": {
+					"skipUnknownAttributes": true
+				}
+			}
 		},
 		{
 			"package": "@mainsail/transaction-pool-service"
