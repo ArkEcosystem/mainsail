@@ -26,6 +26,19 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					round: Joi.number().integer().min(1),
+				}),
+			},
+		},
+		path: "/validator-rounds/{round}",
+	});
+
+	server.route({
 		handler: (request: Hapi.Request) => controller.delegates(request),
 		method: "GET",
 		options: {

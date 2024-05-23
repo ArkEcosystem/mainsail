@@ -34,6 +34,20 @@ export class ValidatorRoundsController extends Controller {
 		);
 	}
 
+	public async show(request: Hapi.Request) {
+		const validatorRounds = await this.validatorRoundepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("round = :round", { round: request.params.round })
+			.getOne();
+
+		if (!validatorRounds) {
+			return Boom.notFound("Round not found");
+		}
+
+		return this.respondWithResource(validatorRounds, ValidatorRoundResource, false);
+	}
+
 	public async delegates(request: Hapi.Request) {
 		const round = await this.validatorRoundepositoryFactory()
 			.createQueryBuilder()
