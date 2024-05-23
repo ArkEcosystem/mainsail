@@ -1,6 +1,7 @@
+use mainsail_evm_core::db::CommitKey;
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
-use revm::primitives::{Address, Bytes, ResultAndState};
+use revm::primitives::{Address, Bytes};
 
 use crate::utils;
 
@@ -38,24 +39,6 @@ pub struct TxViewContext {
     pub caller: Address,
     pub recipient: Address,
     pub data: Bytes,
-}
-
-// A (height, round) pair used to associate state with a processable unit.
-#[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
-pub struct CommitKey(pub u64, pub u64);
-
-pub struct PendingCommit {
-    pub key: CommitKey,
-    pub diff: Vec<ResultAndState>,
-}
-
-impl PendingCommit {
-    pub fn new(key: CommitKey) -> Self {
-        Self {
-            key,
-            diff: Default::default(),
-        }
-    }
 }
 
 pub struct ExecutionContext {
