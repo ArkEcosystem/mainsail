@@ -17,6 +17,7 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 
 heed = { version = "0.20.0", features = [] }
+rayon = "1.10.0"
 
 [dev-dependencies]
 tempfile = "3"

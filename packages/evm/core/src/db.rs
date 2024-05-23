@@ -1,7 +1,10 @@
-use std::{borrow::Cow, collections::HashMap, convert::Infallible, path::PathBuf};
+use std::{borrow::Cow, cell::RefCell, convert::Infallible, path::PathBuf};
 
 use heed::EnvOpenOptions;
-use revm::{db::CacheDB, primitives::*, Database, DatabaseCommit, DatabaseRef};
+use rayon::slice::ParallelSliceMut;
+use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
+
+use crate::state_changes;
 
 #[derive(Debug)]
 struct AddressWrapper(Address);
@@ -10,6 +13,14 @@ impl heed::BytesEncode<'_> for AddressWrapper {
 
     fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
         Ok(Cow::Borrowed(item.0.as_slice()))
+    }
+}
+
+impl heed::BytesDecode<'_> for AddressWrapper {
+    type DItem = AddressWrapper;
+
+    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
+        Ok(AddressWrapper(Address::from_slice(bytes)))
     }
 }
 
@@ -25,25 +36,28 @@ impl heed::BytesEncode<'_> for ContractWrapper {
 
 type HeedHeight = heed::types::U64<heed::byteorder::LittleEndian>;
 type HeedRound = heed::types::U64<heed::byteorder::LittleEndian>;
+type StorageEntry = (U256, U256);
 
-pub struct PersistentDB {
-    env: heed::Env,
+struct InnerStorage {
     accounts: heed::Database<AddressWrapper, heed::types::SerdeJson<AccountInfo>>,
     commits: heed::Database<HeedHeight, HeedRound>,
     contracts: heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
-    storage: heed::Database<AddressWrapper, heed::types::SerdeJson<Storage>>,
+    storage: heed::Database<AddressWrapper, heed::types::SerdeJson<StorageEntry>>,
 }
 
-pub struct EphemeralDB<'a> {
-    cache_db: CacheDB<&'a PersistentDB>,
+// A (height, round) pair used to associate state with a processable unit.
+#[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
+pub struct CommitKey(pub u64, pub u64);
+
+pub struct PendingCommit {
+    pub key: CommitKey,
+    pub cache: CacheState,
+    pub transitions: TransitionState,
 }
 
-impl<'a> EphemeralDB<'a> {
-    pub fn new(persistent_db: &'a PersistentDB) -> Self {
-        Self {
-            cache_db: CacheDB::new(persistent_db),
-        }
-    }
+pub struct PersistentDB {
+    env: heed::Env,
+    inner: RefCell<InnerStorage>,
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -62,6 +76,7 @@ impl PersistentDB {
 
         let mut env_builder = EnvOpenOptions::new();
         env_builder.max_dbs(4);
+        env_builder.map_size(5 * 1024 * 1024 * 1024); // TODO: dynamically resize
 
         let env = unsafe { env_builder.open(path) }?;
 
@@ -77,19 +92,24 @@ impl PersistentDB {
             &mut wtxn,
             Some("contracts"),
         )?;
-        let storage = env.create_database::<AddressWrapper, heed::types::SerdeJson<Storage>>(
-            &mut wtxn,
-            Some("storage"),
-        )?;
+
+        let storage = env
+            .database_options()
+            .types::<AddressWrapper, heed::types::SerdeJson<StorageEntry>>()
+            .name("storage")
+            .flags(heed::DatabaseFlags::DUP_SORT)
+            .create(&mut wtxn)?;
 
         wtxn.commit()?;
 
         Ok(Self {
             env,
-            accounts,
-            commits,
-            contracts,
-            storage,
+            inner: RefCell::new(InnerStorage {
+                accounts,
+                commits,
+                contracts,
+                storage,
+            }),
         })
     }
 }
@@ -119,8 +139,9 @@ impl DatabaseRef for PersistentDB {
 
     fn basic_ref(&self, address: Address) -> Result<Option<AccountInfo>, Self::Error> {
         let txn = self.env.read_txn()?;
+        let inner = self.inner.borrow();
 
-        let basic = match self.accounts.get(&txn, &AddressWrapper(address))? {
+        let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
             Some(account) => account,
             None => AccountInfo::default(),
         };
@@ -130,8 +151,9 @@ impl DatabaseRef for PersistentDB {
 
     fn code_by_hash_ref(&self, code_hash: B256) -> Result<Bytecode, Self::Error> {
         let txn = self.env.read_txn()?;
+        let inner = self.inner.borrow();
 
-        let contract = match self.contracts.get(&txn, &ContractWrapper(code_hash))? {
+        let contract = match inner.contracts.get(&txn, &ContractWrapper(code_hash))? {
             Some(contract) => contract,
             None => Default::default(),
         };
@@ -141,17 +163,25 @@ impl DatabaseRef for PersistentDB {
 
     fn storage_ref(&self, address: Address, index: U256) -> Result<U256, Self::Error> {
         let txn = self.env.read_txn()?;
+        let inner = self.inner.borrow_mut();
 
-        let address = AddressWrapper(address);
-        match self.accounts.get(&txn, &address)? {
-            Some(_) => match self.storage.get(&txn, &address)? {
-                Some(storage) => Ok(storage
-                    .get(&index)
-                    .map_or_else(|| U256::ZERO, |s| s.present_value())),
-                None => Ok(U256::ZERO),
-            },
-            None => Ok(U256::ZERO),
+        let dups = inner
+            .storage
+            .get_duplicates(&txn, &AddressWrapper(address))?;
+
+        if let Some(mut dups) = dups {
+            while let Some(next) = dups.next() {
+                let (_, value) = next?;
+
+                if value.0 != index {
+                    continue;
+                }
+
+                return Ok(value.1);
+            }
         }
+
+        Ok(U256::ZERO)
     }
 
     fn block_hash_ref(&self, _number: U256) -> Result<B256, Self::Error> {
@@ -160,50 +190,90 @@ impl DatabaseRef for PersistentDB {
 }
 
 impl PersistentDB {
-    pub fn commit(
-        &mut self,
-        height: u64,
-        round: u64,
-        mut changes: Vec<HashMap<Address, Account>>,
-    ) -> Result<(), Error> {
-        assert!(!self.is_height_committed(height));
+    pub fn commit(&self, pending_commit: PendingCommit) -> Result<(), Error> {
+        let PendingCommit {
+            key,
+            cache,
+            transitions,
+        } = pending_commit;
+
+        let mut state_builder = revm::State::builder().with_cached_prestate(cache).build();
+
+        state_builder.transition_state = Some(transitions);
+        state_builder
+            .merge_transitions(revm::db::states::bundle_state::BundleRetention::PlainState);
+
+        let bundle = state_builder.take_bundle();
+
+        assert!(!self.is_height_committed(key.0));
 
         let mut rwtxn = self.env.write_txn()?;
+        let inner = self.inner.borrow_mut();
 
-        let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
-            for change in changes.drain(..) {
-                for (address, mut account) in change {
-                    let address = AddressWrapper(address);
+        let apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
+            let state_changes = state_changes::bundle_into_change_set(bundle);
 
-                    if !account.is_touched() {
-                        continue;
-                    }
-                    if account.is_selfdestructed() {
-                        self.accounts.delete(rwtxn, &address)?;
-                        continue;
-                    }
+            let state_changes::StateChangeset {
+                mut accounts,
+                mut storage,
+                mut contracts,
+            } = state_changes;
 
-                    let is_newly_created = account.is_created();
-                    insert_contract(rwtxn, &mut self.contracts, &mut account.info)?;
+            accounts.par_sort_by_key(|a| a.0);
+            contracts.par_sort_by_key(|a| a.0);
+            storage.par_sort_by_key(|a| a.address);
 
-                    self.accounts.put(rwtxn, &address, &account.info)?;
+            // Update accounts
+            for (address, account) in accounts.into_iter() {
+                let address = AddressWrapper(address);
 
-                    // println!("put account {:?}", account.info);
+                if let Some(account) = account {
+                    inner.accounts.put(rwtxn, &address, &account)?;
+                } else {
+                    inner.accounts.delete(rwtxn, &address)?;
+                }
+            }
+            // Update contracts
+            for (hash, bytecode) in contracts.into_iter() {
+                inner
+                    .contracts
+                    .put(rwtxn, &ContractWrapper(hash), &bytecode)?;
+            }
 
-                    let mut account_storage =
-                        self.storage.get(rwtxn, &address)?.unwrap_or_default();
+            // Update storage
+            for state_changes::StorageChangeset {
+                address,
+                wipe_storage,
+                mut storage,
+            } in storage.into_iter()
+            {
+                let address = AddressWrapper(address);
+                if wipe_storage {
+                    // wipe any existing storage for address
+                    inner.storage.delete(rwtxn, &address)?;
+                }
 
-                    if is_newly_created {
-                        account_storage.clear();
-                    }
+                storage.par_sort_unstable_by_key(|a| a.0);
 
-                    account_storage.extend(account.storage);
+                for value in storage
+                    .into_iter()
+                    .filter(|v| v.1.present_value() != U256::ZERO)
+                {
+                    // delete original value at index (if any) then replace it
+                    inner.storage.delete_one_duplicate(
+                        rwtxn,
+                        &address,
+                        &(value.0, value.1.original_value()),
+                    )?;
 
-                    self.storage.put(rwtxn, &address, &account_storage)?;
+                    inner
+                        .storage
+                        .put(rwtxn, &address, &(value.0, value.1.present_value()))?;
                 }
             }
 
-            self.commits.put(rwtxn, &height, &round)?;
+            // Finalize commit
+            inner.commits.put(rwtxn, &key.0, &key.1)?;
 
             Ok(())
         };
@@ -214,60 +284,26 @@ impl PersistentDB {
         }
 
         rwtxn.commit()?;
+
         Ok(())
     }
 
     pub fn is_height_committed(&self, height: u64) -> bool {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
 
-        self.commits.get(&rtxn, &height).is_ok_and(|v| v.is_some())
+        inner.commits.get(&rtxn, &height).is_ok_and(|v| v.is_some())
     }
 }
 
-fn insert_contract(
-    rwtxn: &mut heed::RwTxn,
-    contracts: &mut heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
-    account: &mut AccountInfo,
-) -> Result<(), Error> {
-    if let Some(code) = &account.code {
-        if !code.is_empty() {
-            if account.code_hash == KECCAK_EMPTY {
-                account.code_hash = code.hash_slow();
-            }
-            contracts.put(rwtxn, &ContractWrapper(account.code_hash), code)?;
+impl PendingCommit {
+    pub fn new(key: CommitKey) -> Self {
+        Self {
+            key,
+            cache: Default::default(),
+            transitions: Default::default(),
         }
-    }
-    if account.code_hash == B256::ZERO {
-        account.code_hash = KECCAK_EMPTY;
-    }
-
-    Ok(())
-}
-
-impl<'a> Database for EphemeralDB<'a> {
-    type Error = Error;
-
-    fn basic(&mut self, address: Address) -> Result<Option<AccountInfo>, Self::Error> {
-        self.cache_db.basic(address)
-    }
-
-    fn code_by_hash(&mut self, code_hash: B256) -> Result<Bytecode, Self::Error> {
-        self.cache_db.code_by_hash(code_hash)
-    }
-
-    fn storage(&mut self, address: Address, index: U256) -> Result<U256, Self::Error> {
-        self.cache_db.storage(address, index)
-    }
-
-    fn block_hash(&mut self, number: U256) -> Result<B256, Self::Error> {
-        self.cache_db.block_hash(number)
-    }
-}
-
-impl<'a> DatabaseCommit for EphemeralDB<'a> {
-    fn commit(&mut self, changes: HashMap<Address, Account>) {
-        self.cache_db.commit(changes)
     }
 }
 
@@ -302,17 +338,217 @@ fn test_commit_changes() {
     );
 
     // 2) Update balance for account
-    let mut changes = HashMap::new();
+    let mut state = HashMap::new();
 
     let mut account = Account::new_not_existing();
     account.info.balance = U256::from(100);
     account.status = AccountStatus::Touched;
 
-    changes.insert(address, account);
-    let result = db.commit(0, 0, vec![changes]);
-    assert!(result.is_ok());
+    let code = Bytecode::new();
+    account.info.code_hash = code.hash_slow();
+    account.info.code = Some(code.clone());
 
-    // 3) Assert updated balance
+    let mut storage = HashMap::new();
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
+    );
+    storage.insert(
+        U256::from(2),
+        StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
+    );
+
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::InMemoryChange,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(0, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // 3) Assert updated storage
+
+    // Balance
     let account = db.basic(address).expect("works").expect("account info");
     assert_eq!(account.balance, U256::from(100));
+
+    // Code
+    assert_eq!(account.code_hash, code.hash_slow());
+    let account_code = db.code_by_hash(code.hash_slow()).expect("code");
+    assert_eq!(account_code, code);
+
+    // Storage
+    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+    assert_eq!(account_storage, U256::from(1234));
+
+    account_storage = db.storage(address, U256::from(2)).expect("storage");
+    assert_eq!(account_storage, U256::from(5678));
+}
+
+#[test]
+fn test_storage() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+
+    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+    let mut state = HashMap::new();
+
+    let mut account = Account::new_not_existing();
+    account.status = AccountStatus::Touched;
+
+    let mut storage = HashMap::new();
+
+    storage.insert(
+        U256::from(99),
+        StorageSlot::new_changed(U256::ZERO, U256::from(99)),
+    );
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+    );
+    storage.insert(
+        U256::from(101),
+        StorageSlot::new_changed(U256::ZERO, U256::from(101)),
+    );
+    storage.insert(
+        U256::from(2),
+        StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+    );
+    storage.insert(
+        U256::from(4),
+        StorageSlot::new_changed(U256::ZERO, U256::from(4)),
+    );
+
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::InMemoryChange,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(0, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // Assert storage is sorted
+
+    let indexes = vec![1, 2, 4, 99, 101];
+
+    // Storage
+    for index in indexes {
+        let account_storage = db.storage(address, U256::from(index)).expect("storage");
+        assert_eq!(account_storage, U256::from(index));
+    }
+}
+
+#[test]
+fn test_storage_overwrite() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+
+    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+    let mut state = HashMap::new();
+
+    let mut account = Account::new_not_existing();
+    account.status = AccountStatus::Touched;
+
+    let mut storage = HashMap::new();
+
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+    );
+    storage.insert(
+        U256::from(2),
+        StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+    );
+
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::InMemoryChange,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(0, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // Assert storage
+    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+    assert_eq!(account_storage, U256::from(1));
+    account_storage = db.storage(address, U256::from(2)).expect("storage");
+    assert_eq!(account_storage, U256::from(2));
+
+    // Now overwrite index 1
+    let mut storage = HashMap::new();
+    storage.insert(
+        U256::from(1),
+        StorageSlot::new_changed(U256::from(1), U256::from(99)),
+    );
+
+    let mut state = HashMap::new();
+    state.insert(
+        address,
+        revm::db::TransitionAccount {
+            status: revm::db::AccountStatus::Changed,
+            info: Some(account.info.clone()),
+            previous_status: revm::db::AccountStatus::Loaded,
+            previous_info: None,
+            storage,
+            storage_was_destroyed: false,
+        },
+    );
+
+    db.commit(PendingCommit {
+        key: CommitKey(1, 0),
+        cache: CacheState::default(),
+        transitions: TransitionState { transitions: state },
+    })
+    .expect("ok");
+
+    // Assert storage again
+
+    // - index 1 was overwritte
+    let mut account_storage = db.storage(address, U256::from(1)).expect("storage");
+    assert_eq!(account_storage, U256::from(99));
+
+    // - index 2 remains unchanged
+    account_storage = db.storage(address, U256::from(2)).expect("storage");
+    assert_eq!(account_storage, U256::from(2));
 }

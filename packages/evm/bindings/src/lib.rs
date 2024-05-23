@@ -1,19 +1,18 @@
-use std::{path::PathBuf, sync::Arc};
+use std::{path::PathBuf, rc::Rc, sync::Arc};
 
 use ctx::{
-    ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, PendingCommit,
-    TxContext, TxViewContext,
+    ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, TxContext,
+    TxViewContext,
 };
-use mainsail_evm_core::{db::EphemeralDB, EvmInstance};
+use mainsail_evm_core::db::{CommitKey, PendingCommit, PersistentDB};
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
-    primitives::{EVMError, ExecutionResult, ResultAndState, U256},
-    DatabaseCommit, Evm,
+    db::{State, WrapDatabaseRef},
+    primitives::{Address, EVMError, ExecutionResult, ResultAndState, U256},
+    DatabaseCommit, Evm, TransitionAccount,
 };
-
-use crate::ctx::CommitKey;
 
 mod ctx;
 mod result;
@@ -21,7 +20,7 @@ mod utils;
 
 // A complex struct which cannot be exposed to JavaScript directly.
 pub struct EvmInner {
-    evm_instance: EvmInstance,
+    persistent_db: Rc<PersistentDB>,
 
     // A pending commit consists of one or more transactions.
     pending_commit: Option<PendingCommit>,
@@ -32,9 +31,10 @@ unsafe impl Send for EvmInner {}
 
 impl EvmInner {
     pub fn new(path: PathBuf) -> Self {
-        let evm = mainsail_evm_core::create_evm_instance(path);
+        let persistent_db = Rc::new(PersistentDB::new(path).expect("path ok"));
+
         EvmInner {
-            evm_instance: evm,
+            persistent_db: persistent_db.clone(),
             pending_commit: Default::default(),
         }
     }
@@ -44,8 +44,8 @@ impl EvmInner {
 
         Ok(match result {
             Ok(r) => TxViewResult {
-                success: r.result.is_success(),
-                output: r.result.into_output(),
+                success: r.is_success(),
+                output: r.into_output(),
             },
             Err(_) => TxViewResult {
                 success: false,
@@ -57,7 +57,7 @@ impl EvmInner {
     pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
         let commit_key = tx_ctx.commit_key;
 
-        if self.evm_instance.db().is_height_committed(commit_key.0) {
+        if self.persistent_db.is_height_committed(commit_key.0) {
             return Ok(skipped_tx_receipt());
         }
 
@@ -74,15 +74,7 @@ impl EvmInner {
 
         match result {
             Ok(result) => {
-                let receipt = map_execution_result(result.result.clone());
-
-                let pending_commit = self
-                    .pending_commit
-                    .get_or_insert_with(|| PendingCommit::new(commit_key));
-
-                assert_eq!(pending_commit.key, commit_key);
-                pending_commit.diff.push(result);
-
+                let receipt = map_execution_result(result);
                 Ok(receipt)
             }
             Err(err) => {
@@ -93,7 +85,7 @@ impl EvmInner {
     }
 
     pub fn commit(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
-        if self.evm_instance.db().is_height_committed(commit_key.0) {
+        if self.persistent_db.is_height_committed(commit_key.0) {
             assert!(self.pending_commit.is_none());
             return Ok(());
         }
@@ -106,7 +98,7 @@ impl EvmInner {
             return Err(EVMError::Database("invalid commit key".into()));
         }
 
-        match self.pending_commit.take() {
+        let outcome = match self.pending_commit.take() {
             Some(pending_commit) => {
                 // println!(
                 //     "committing {:?} with {} transactions",
@@ -114,44 +106,43 @@ impl EvmInner {
                 //     pending_commit.diff.len(),
                 // );
 
-                let db = self.evm_instance.db_mut();
-
-                match db.commit(
-                    commit_key.0,
-                    commit_key.1,
-                    pending_commit.diff.into_iter().map(|v| v.state).collect(),
-                ) {
+                match self.persistent_db.commit(pending_commit) {
                     Ok(()) => Ok(()),
-                    Err(err) => Err(EVMError::Database(format!("commit failed: {}", err).into())),
+                    Err(err) => Err(err),
                 }
             }
             None => Ok(()), /* nothing to commit  */
+        };
+
+        match outcome {
+            Ok(_) => Ok(()),
+            Err(err) => Err(EVMError::Database(format!("commit failed: {}", err).into())),
         }
     }
+
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
-    ) -> std::result::Result<ResultAndState, EVMError<mainsail_evm_core::db::Error>> {
-        let evm = &self.evm_instance;
+    ) -> std::result::Result<ExecutionResult, EVMError<mainsail_evm_core::db::Error>> {
+        let persistent_db = self.persistent_db.as_ref();
 
-        let ephemeral_db = EphemeralDB::new(evm.db());
+        let mut state_builder = State::builder().with_bundle_update();
 
-        let result = Evm::builder()
-            .with_db(ephemeral_db)
-            .modify_db(|db| {
-                // Ensure pending commits from same round are visible to the transaction being applied
-                if let Some(inner) = ctx.commit_key {
-                    if let Some(pending) = self
-                        .pending_commit
-                        .as_mut()
-                        .filter(|pending| pending.key == inner)
-                    {
-                        for pending in &pending.diff {
-                            db.commit(pending.state.clone());
-                        }
-                    }
-                }
-            })
+        if let Some(commit_key) = ctx.commit_key {
+            let pending_commit = self
+                .pending_commit
+                .get_or_insert_with(|| PendingCommit::new(commit_key));
+
+            state_builder =
+                state_builder.with_cached_prestate(std::mem::take(&mut pending_commit.cache));
+        }
+
+        let state_db = state_builder
+            .with_database(WrapDatabaseRef(persistent_db))
+            .build();
+
+        let mut evm = Evm::builder()
+            .with_db(state_db)
             .modify_tx_env(|tx_env| {
                 tx_env.caller = ctx.caller;
                 tx_env.transact_to = match ctx.recipient {
@@ -160,13 +151,41 @@ impl EvmInner {
                 };
 
                 tx_env.data = ctx.data;
-
-                // tracing::debug!("{:#?}", tx_env);
             })
-            .build()
-            .transact();
+            .build();
 
-        result
+        let result = evm.transact();
+
+        match result {
+            Ok(result) => {
+                let ResultAndState { state, result } = result;
+
+                // Update state if transaction is part of a commit
+                if let Some(commit_key) = ctx.commit_key {
+                    if let Some(pending_commit) = &mut self.pending_commit {
+                        assert_eq!(commit_key, pending_commit.key);
+
+                        let state_db = evm.db_mut();
+
+                        state_db.commit(state);
+
+                        pending_commit.cache = std::mem::take(&mut state_db.cache);
+                        pending_commit.transitions.add_transitions(
+                            state_db
+                                .transition_state
+                                .take()
+                                .unwrap_or_default()
+                                .transitions
+                                .into_iter()
+                                .collect::<Vec<(Address, TransitionAccount)>>(),
+                        );
+                    }
+                }
+
+                Ok(result)
+            }
+            Err(err) => Err(err),
+        }
     }
 }
 
