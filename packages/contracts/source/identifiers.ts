@@ -233,6 +233,9 @@ export const Identifiers = {
 			Service: Symbol("State<Snapshot.Service>"),
 		},
 		State: Symbol("State<State>"),
+		StateRepository: {
+			Factory: Symbol("State<StateRepository<Factory>>"),
+		},
 		Store: {
 			Factory: Symbol("State<Store<Factory>>"),
 		},

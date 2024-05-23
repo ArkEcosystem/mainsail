@@ -2,12 +2,13 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { StateRepository } from "../state-repository.js";
-
 @injectable()
 export class Wallet implements Contracts.State.Wallet {
 	@inject(Identifiers.State.Wallet.Factory)
 	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
+
+	@inject(Identifiers.State.StateRepository.Factory)
+	protected readonly createStateRepository!: Contracts.State.StateRepositoryFactory;
 
 	@inject(Identifiers.State.Wallet.Attributes)
 	protected readonly attributeRepository!: Contracts.State.AttributeRepository;
@@ -16,7 +17,7 @@ export class Wallet implements Contracts.State.Wallet {
 	protected walletRepository!: Contracts.State.WalletRepository;
 	protected originalWallet?: Wallet;
 
-	#repository!: StateRepository;
+	#repository!: Contracts.State.StateRepository;
 
 	public init(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet) {
 		this.address = address;
@@ -24,9 +25,9 @@ export class Wallet implements Contracts.State.Wallet {
 		this.originalWallet = originalWallet;
 
 		if (originalWallet) {
-			this.#repository = new StateRepository(this.attributeRepository, originalWallet.#repository);
+			this.#repository = this.createStateRepository(this.attributeRepository, originalWallet.#repository);
 		} else {
-			this.#repository = new StateRepository(this.attributeRepository, undefined, {
+			this.#repository = this.createStateRepository(this.attributeRepository, undefined, {
 				balance: BigNumber.ZERO,
 				nonce: BigNumber.ZERO,
 			});

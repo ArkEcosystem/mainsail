@@ -10,6 +10,7 @@ import { Exporter } from "./snapshots/exporter.js";
 import { Importer } from "./snapshots/importer.js";
 import { SnapshotService } from "./snapshots/snapshot-service.js";
 import { State } from "./state.js";
+import { StateRepository } from "./state-repository.js";
 import { StateVerifier } from "./state-verifier.js";
 import { Store } from "./store.js";
 import { validatorWalletFactory, walletFactory } from "./wallets/factory.js";
@@ -77,6 +78,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			({ container }) =>
 				(originalstore?: Store) =>
 					container.resolve(Store).configure(originalstore),
+		);
+
+		this.app.bind(Identifiers.State.StateRepository.Factory).toFactory(
+			({ container }) =>
+				(
+					attributeRepository: Contracts.State.AttributeRepository,
+					originalRepository?: StateRepository,
+					initialData?: Record<string, unknown>,
+				) =>
+					container.resolve(StateRepository).configure(attributeRepository, originalRepository, initialData),
 		);
 
 		this.app.bind(Identifiers.State.Snapshot.Importer).to(Importer).inSingletonScope();

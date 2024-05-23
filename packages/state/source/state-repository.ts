@@ -8,16 +8,19 @@ import { factory, jsonFactory } from "./attributes/index.js";
 export class StateRepository implements Contracts.State.StateRepository {
 	protected readonly attributes = new Map<string, Contracts.State.Attribute<unknown>>();
 
-	readonly #originalRepository?: StateRepository;
+	protected attributeRepository!: Contracts.State.AttributeRepository;
+
+	#originalRepository?: StateRepository;
+
 	readonly #setAttributes = new Set<string>();
 	readonly #forgetAttributes = new Set<string>();
 	#allowUnknownAttributes = false;
 
-	public constructor(
-		protected readonly attributeRepository: Contracts.State.AttributeRepository,
+	public configure(
+		attributeRepository: Contracts.State.AttributeRepository,
 		originalRepository?: StateRepository,
 		initialData: Record<string, unknown> = {},
-	) {
+	): StateRepository {
 		this.attributeRepository = attributeRepository;
 		this.#originalRepository = originalRepository;
 
@@ -25,6 +28,8 @@ export class StateRepository implements Contracts.State.StateRepository {
 			const attribute = factory(this.attributeRepository.getAttributeType(key), value);
 			this.attributes.set(key, attribute);
 		}
+
+		return this;
 	}
 
 	public isClone(): boolean {

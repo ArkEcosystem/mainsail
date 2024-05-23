@@ -2,8 +2,6 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { StateRepository } from "./state-repository.js";
-
 @injectable()
 export class Store implements Contracts.State.Store {
 	@inject(Identifiers.State.AttributeRepository)
@@ -12,11 +10,14 @@ export class Store implements Contracts.State.Store {
 	@inject(Identifiers.State.WalletRepository.Base.Factory)
 	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
 
+	@inject(Identifiers.State.StateRepository.Factory)
+	protected readonly createStateRepository!: Contracts.State.StateRepositoryFactory;
+
 	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#originalStore?: Store;
 
-	#repository!: StateRepository;
+	#repository!: Contracts.State.StateRepository;
 	#walletRepository!: Contracts.State.WalletRepository;
 
 	configure(store?: Store): Store {
@@ -25,10 +26,10 @@ export class Store implements Contracts.State.Store {
 			this.#genesisBlock = store.#genesisBlock;
 			this.#lastBlock = store.#lastBlock;
 
-			this.#repository = new StateRepository(this.attributeRepository, store.#repository);
+			this.#repository = this.createStateRepository(this.attributeRepository, store.#repository);
 			this.#walletRepository = this.walletRepositoryFactory(store.#walletRepository);
 		} else {
-			this.#repository = new StateRepository(this.attributeRepository, undefined, {
+			this.#repository = this.createStateRepository(this.attributeRepository, undefined, {
 				height: 0,
 				totalRound: 0,
 			});
