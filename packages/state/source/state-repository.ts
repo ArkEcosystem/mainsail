@@ -1,13 +1,14 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 
 import { factory, jsonFactory } from "./attributes/index.js";
 
 @injectable()
 export class StateRepository implements Contracts.State.StateRepository {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "state")
+	private readonly configuration!: Providers.PluginConfiguration;
 
 	protected readonly attributes = new Map<string, Contracts.State.Attribute<unknown>>();
 
@@ -17,7 +18,7 @@ export class StateRepository implements Contracts.State.StateRepository {
 
 	readonly #setAttributes = new Set<string>();
 	readonly #forgetAttributes = new Set<string>();
-	#allowUnknownAttributes = false;
+	#skipUnknownAttributes = false;
 
 	public configure(
 		attributeRepository: Contracts.State.AttributeRepository,
@@ -32,7 +33,7 @@ export class StateRepository implements Contracts.State.StateRepository {
 			this.attributes.set(key, attribute);
 		}
 
-		console.log(this.app.name());
+		this.#skipUnknownAttributes = this.configuration.getRequired<boolean>("snapshots.skipUnknownAttributes");
 
 		return this;
 	}
@@ -185,7 +186,7 @@ export class StateRepository implements Contracts.State.StateRepository {
 		}
 
 		for (const [key, value] of Object.entries(data)) {
-			if (this.#allowUnknownAttributes && !this.attributeRepository.has(key)) {
+			if (this.#skipUnknownAttributes && !this.attributeRepository.has(key)) {
 				continue;
 			}
 

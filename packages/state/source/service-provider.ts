@@ -104,10 +104,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
-			export: Joi.object({
+			snapshots: Joi.object({
 				enabled: Joi.bool().required(),
 				interval: Joi.number().integer().min(1).required(),
 				retainFiles: Joi.number().integer().min(1).required(),
+				skipUnknownAttributes: Joi.bool().required(),
 			}).required(),
 		})
 			.required()
