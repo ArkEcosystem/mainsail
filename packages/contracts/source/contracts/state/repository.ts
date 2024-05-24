@@ -1,13 +1,15 @@
 import { JsonObject } from "type-fest";
 
-export interface RepositoryChange {
+import { AttributeRepository } from "./attributes.js";
+
+export interface StateRepositoryChange {
 	set: {
 		[key: string]: JsonObject;
 	};
 	forget: string[];
 }
 
-export interface Repository {
+export interface StateRepository {
 	isChanged(): boolean;
 
 	hasAttribute(key: string): boolean;
@@ -17,11 +19,19 @@ export interface Repository {
 	forgetAttribute(key: string): void;
 
 	isClone(): boolean;
-	commitChanges(commitChanges: Repository): void;
+	commitChanges(): void;
 
 	toJson(): JsonObject;
-	fromJson(data: JsonObject): Repository;
+	fromJson(data: JsonObject): StateRepository;
 
-	changesToJson(): RepositoryChange;
-	applyChanges(changes: RepositoryChange): void;
+	changesToJson(): StateRepositoryChange;
+	applyChanges(changes: StateRepositoryChange): void;
+}
+
+export interface StateRepositoryFactory {
+	(
+		attributeRepository: AttributeRepository,
+		originalRepository?: StateRepository,
+		initialData?: Record<string, unknown>,
+	): StateRepository;
 }

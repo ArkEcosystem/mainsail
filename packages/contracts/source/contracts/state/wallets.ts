@@ -2,7 +2,7 @@ import { BigNumber } from "@mainsail/utils";
 import { JsonObject } from "type-fest";
 
 import { BlockData, MultiSignatureAsset } from "../crypto/index.js";
-import { Repository, RepositoryChange } from "./repository.js";
+import { StateRepository, StateRepositoryChange } from "./repository.js";
 
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
@@ -26,11 +26,11 @@ export enum WalletIndexes {
 	Validators = "validators",
 }
 
-export interface WalletChange extends RepositoryChange {
+export interface WalletChange extends StateRepositoryChange {
 	address: string;
 }
 
-export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges" | "changesToJson"> {
+export interface Wallet extends Omit<StateRepository, "fromJson" | "commitChanges" | "changesToJson"> {
 	// TODO: Use one form set / increase
 	getAddress(): string;
 
@@ -77,7 +77,7 @@ export interface ValidatorWallet {
 	toString(): string;
 }
 
-export type WalletFactory = (address: string, walletRepository: WalletRepository) => Wallet;
+export type WalletFactory = (address: string, walletRepository: WalletRepository, wallet?: Wallet) => Wallet;
 
 export type ValidatorWalletFactory = (wallet: Wallet) => ValidatorWallet;
 

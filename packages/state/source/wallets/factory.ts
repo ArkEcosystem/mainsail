@@ -4,8 +4,8 @@ import { ValidatorWallet } from "./validator-wallet.js";
 import { Wallet } from "./wallet.js";
 
 export const walletFactory =
-	(attributeRepository: Contracts.State.AttributeRepository) =>
-	(address: string, walletRepository: Contracts.State.WalletRepository) =>
-		new Wallet(address, attributeRepository, walletRepository);
+	({ container }) =>
+	(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet) =>
+		container.resolve(Wallet).init(address, walletRepository, originalWallet);
 
 export const validatorWalletFactory = (wallet: Contracts.State.Wallet) => new ValidatorWallet(wallet);

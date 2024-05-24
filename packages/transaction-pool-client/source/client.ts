@@ -40,7 +40,7 @@ export class Client implements Contracts.TransactionPool.Client {
 
 			this.#failedTransactions = [];
 		} catch (error) {
-			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool: ${error.message}`);
 		}
 	}
 
@@ -48,7 +48,7 @@ export class Client implements Contracts.TransactionPool.Client {
 		try {
 			return await this.#call<number[]>("list_snapshots", {});
 		} catch (error) {
-			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool: ${error.message}`);
 		}
 
 		return [];
@@ -58,7 +58,7 @@ export class Client implements Contracts.TransactionPool.Client {
 		try {
 			await this.#call("import_snapshot", { height });
 		} catch (error) {
-			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool: ${error.message}`);
 		}
 	}
 

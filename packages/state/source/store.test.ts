@@ -2,7 +2,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { AttributeRepository } from "./attributes";
+import { stateRepositoryFactory } from "./factory";
 import { Store } from "./store";
+import { walletFactory } from "./wallets/factory";
 
 describe<{
 	sandbox: Sandbox;
@@ -38,6 +40,12 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app.bind(Identifiers.State.StateRepository.Factory).toFactory(stateRepositoryFactory);
+		context.sandbox.app.bind(Identifiers.State.Wallet.Factory).toFactory(walletFactory);
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
+			getRequired: () => false, //snapshots.skipUnknownAttributes
+		});
+
 		context.sandbox.app
 			.bind(Identifiers.State.WalletRepository.Base.Factory)
 			.toConstantValue(() => context.walletRepository);
@@ -154,6 +162,11 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
+		context.sandbox.app.bind(Identifiers.State.StateRepository.Factory).toFactory(stateRepositoryFactory);
+		context.sandbox.app.bind(Identifiers.State.Wallet.Factory).toFactory(walletFactory);
+		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
+			getRequired: () => false, //snapshots.skipUnknownAttributes
+		});
 		context.sandbox.app
 			.bind(Identifiers.State.WalletRepository.Base.Factory)
 			.toConstantValue(() => context.walletRepository);
