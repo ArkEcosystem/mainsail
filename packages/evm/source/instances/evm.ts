@@ -1,6 +1,5 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { join } from "path";
 
 import { Evm } from "../generated/bindings.cjs";
 
@@ -13,8 +12,7 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	@postConstruct()
 	public initialize() {
-		const path = join(this.app.dataPath(), "evm.mdb");
-		this.#evm = new Evm(path);
+		this.#evm = new Evm(this.app.dataPath());
 	}
 
 	public async view(viewContext: Contracts.Evm.TransactionViewContext): Promise<Contracts.Evm.ViewResult> {

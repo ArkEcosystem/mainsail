@@ -1,6 +1,6 @@
 use std::{borrow::Cow, cell::RefCell, convert::Infallible, path::PathBuf};
 
-use heed::EnvOpenOptions;
+use heed::{EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
 use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 
@@ -77,8 +77,9 @@ impl PersistentDB {
         let mut env_builder = EnvOpenOptions::new();
         env_builder.max_dbs(4);
         env_builder.map_size(5 * 1024 * 1024 * 1024); // TODO: dynamically resize
+        unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
-        let env = unsafe { env_builder.open(path) }?;
+        let env = unsafe { env_builder.open(path.join("evm.mdb")) }?;
 
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
