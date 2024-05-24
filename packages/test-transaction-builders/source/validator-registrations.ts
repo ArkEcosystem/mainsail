@@ -2,6 +2,8 @@ import { Contracts } from "@mainsail/contracts";
 import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
 import { BigNumber } from "@mainsail/utils";
 
+import { makeMultiSignatureRegistration } from "./multi-signature-registrations.js";
+import { makeTransfer } from "./transfers.js";
 import { Context, ValidatorRegistrationOptions } from "./types.js";
 import {
 	buildSignedTransaction,
@@ -10,8 +12,6 @@ import {
 	getRandomConsensusKeyPair,
 	getRandomFundedWallet,
 } from "./utils.js";
-import { makeMultiSignatureRegistration } from "./multi-signature-registrations.js";
-import { makeTransfer } from "./transfers.js";
 
 export const makeValidatorRegistration = async (
 	context: Context,
