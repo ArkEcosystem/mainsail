@@ -294,12 +294,6 @@ export class WalletUsernameNotRegisteredError extends Exception {
 	}
 }
 
-export class NotSupportedForMultiSignatureWalletError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because multi signature is enabled.`);
-	}
-}
-
 export class AlreadyVotedError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because the sender wallet has already voted.`);
