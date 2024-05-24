@@ -6,6 +6,7 @@ import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
 import {
 	addTransactionsToPool,
+	getMultiSignatureWallet,
 	getRandomConsensusKeyPair,
 	getRandomFundedWallet,
 	getWallets,
@@ -127,5 +128,32 @@ describe<{
 				type: "ERR_APPLY",
 			},
 		});
+	});
+
+	it("should accept validator registration from a multi signature wallet", async (context) => {
+		const [multiSigRegistrationTx, fundTx, validatorRegistrationTx] =
+			await ValidatorRegistrations.makeValidatorRegistrationWithMultiSignature(context);
+
+		// Register multi sig wallet
+		await addTransactionsToPool(context, [multiSigRegistrationTx]);
+		await waitBlock(context);
+
+		const multiSigWallet = await getMultiSignatureWallet(
+			context,
+			multiSigRegistrationTx.data.asset!.multiSignature!,
+		);
+		assert.true(multiSigWallet.hasMultiSignature());
+
+		// Now send funds to multi sig wallet
+		await addTransactionsToPool(context, [fundTx]);
+		await waitBlock(context);
+
+		// Lastly, register validator on multi sig wallet
+		const result = await addTransactionsToPool(context, [validatorRegistrationTx]);
+		assert.equal(result.accept, [0]);
+
+		await waitBlock(context);
+
+		assert.true(await isValidator(context, multiSigWallet.getPublicKey()!));
 	});
 });
