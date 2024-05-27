@@ -63,7 +63,9 @@ export class Client implements Contracts.TransactionPool.Client {
 	public async importSnapshot(height: number): Promise<void> {
 		const action = "import_snapshot";
 		try {
-			await this.#call(action, { height });
+			await this.#call<Contracts.TransactionPool.Actions.ImportSnapshotsResponse>(action, {
+				height,
+			} as Contracts.TransactionPool.Actions.ImportSnapshotsRequest);
 		} catch (error) {
 			this.logger.error(`Transaction pool - ${action}: ${error.message}`);
 		}

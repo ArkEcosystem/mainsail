@@ -15,3 +15,8 @@ export type GetStatusResponse = {
 
 export type GetTransactionsRequest = {};
 export type GetTransactionsResponse = string[];
+
+export type ImportSnapshotsRequest = {
+	height: number;
+};
+export type ImportSnapshotsResponse = boolean;
