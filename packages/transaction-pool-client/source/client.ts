@@ -2,8 +2,13 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { http } from "@mainsail/utils";
 
+import { ReplySchemas } from "./reply-schemas.js";
+
 @injectable()
 export class Client implements Contracts.TransactionPool.Client {
+	@inject(Identifiers.Cryptography.Validator)
+	private readonly validator!: Contracts.Crypto.Validator;
+
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
@@ -91,8 +96,11 @@ export class Client implements Contracts.TransactionPool.Client {
 		});
 
 		if (response.statusCode === 200) {
-			if (response.data.result) {
-				return response.data.result;
+			const result = response.data.result;
+
+			if (result) {
+				this.#validateResponse(method, result);
+				return result;
 			}
 
 			throw new Error(
@@ -101,5 +109,17 @@ export class Client implements Contracts.TransactionPool.Client {
 		}
 
 		throw new Error(`RPC Call to ${method} failed with ${response.statusCode}`);
+	}
+
+	#validateResponse(endpoint: string, reply: any): void {
+		const schema = ReplySchemas[endpoint];
+		if (schema === undefined) {
+			throw new Error(`Cannot find schema "${endpoint}"`);
+		}
+
+		const { error } = this.validator.validate(schema, reply);
+		if (error) {
+			throw new Error(`Cannot validate response.`);
+		}
 	}
 }
