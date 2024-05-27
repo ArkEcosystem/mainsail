@@ -62,6 +62,15 @@ export class Client implements Contracts.TransactionPool.Client {
 		}
 	}
 
+	public async getStatus(): Promise<{ height: number; version: string }> {
+		try {
+			return await this.#call<{ height: number; version: string }>("get_status", {});
+		} catch (error) {
+			this.logger.error(`Transaction pool: ${error.message}`);
+			throw error;
+		}
+	}
+
 	// eslint-disable-next-line unicorn/no-null
 	async #call<T>(method: string, parameters: any, id: null | number = null): Promise<T> {
 		const response = await http.post("http://127.0.0.1:4009/api", {
