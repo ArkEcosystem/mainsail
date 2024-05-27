@@ -13,10 +13,13 @@ export class ListSnapshotsAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
+		additionalProperties: false,
 		type: "object",
 	};
 
-	public async handle(parameters: any): Promise<any> {
+	public async handle(
+		parameters: Contracts.TransactionPool.Actions.ListSnapshotsRequest,
+	): Promise<Contracts.TransactionPool.Actions.ListSnapshotsResponse> {
 		try {
 			return this.snapshotService.listSnapshots();
 		} catch (error) {

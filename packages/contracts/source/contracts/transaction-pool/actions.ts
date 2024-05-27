@@ -20,3 +20,6 @@ export type ImportSnapshotsRequest = {
 	height: number;
 };
 export type ImportSnapshotsResponse = boolean;
+
+export type ListSnapshotsRequest = {};
+export type ListSnapshotsResponse = number[];
