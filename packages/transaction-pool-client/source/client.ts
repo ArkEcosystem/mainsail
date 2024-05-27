@@ -18,13 +18,17 @@ export class Client implements Contracts.TransactionPool.Client {
 	}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {
+		const action = "get_transactions";
 		try {
-			const response = await this.#call<[]>("get_transactions", {});
+			const response = await this.#call<Contracts.TransactionPool.Actions.GetTransactionsResponse>(
+				action,
+				{} as Contracts.TransactionPool.Actions.GetTransactionsRequest,
+			);
 			this.logger.info(`Transaction pool returned ${response.length} transactions`);
 
 			return response.map((transaction: string) => Buffer.from(transaction, "hex"));
 		} catch (error) {
-			this.logger.error(`Communication error with transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool - ${action}: ${error.message}`);
 		}
 
 		return [];

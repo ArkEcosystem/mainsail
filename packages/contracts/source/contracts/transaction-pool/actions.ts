@@ -12,3 +12,6 @@ export type GetStatusResponse = {
 	height: number;
 	version: string;
 };
+
+export type GetTransactionsRequest = {};
+export type GetTransactionsResponse = string[];

@@ -25,10 +25,13 @@ export class GetTransactionsAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
+		additionalProperties: false,
 		type: "object",
 	};
 
-	public async handle(parameters: any): Promise<any> {
+	public async handle(
+		parameters: Contracts.TransactionPool.Actions.GetTransactionsRequest,
+	): Promise<Contracts.TransactionPool.Actions.GetTransactionsResponse> {
 		const milestone = this.configuration.getMilestone();
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 
