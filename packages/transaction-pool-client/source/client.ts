@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { http } from "@mainsail/utils";
 
-import { ReplySchemas } from "./reply-schemas.js";
+import { jsonRpcResponse, ReplySchemas } from "./reply-schemas.js";
 
 @injectable()
 export class Client implements Contracts.TransactionPool.Client {
@@ -96,10 +96,11 @@ export class Client implements Contracts.TransactionPool.Client {
 		});
 
 		if (response.statusCode === 200) {
+			this.#validateResponse(response.data);
 			const result = response.data.result;
 
 			if (result) {
-				this.#validateResponse(method, result);
+				this.#validateResult(method, result);
 				return result;
 			}
 
@@ -111,15 +112,22 @@ export class Client implements Contracts.TransactionPool.Client {
 		throw new Error(`RPC Call to ${method} failed with ${response.statusCode}`);
 	}
 
-	#validateResponse(endpoint: string, reply: any): void {
+	#validateResponse(response: any): void {
+		const { error } = this.validator.validate(jsonRpcResponse, response);
+		if (error) {
+			throw new Error(`Cannot validate JSON_RPC response`);
+		}
+	}
+
+	#validateResult(endpoint: string, result: any): void {
 		const schema = ReplySchemas[endpoint];
 		if (schema === undefined) {
 			throw new Error(`Cannot find schema "${endpoint}"`);
 		}
 
-		const { error } = this.validator.validate(schema, reply);
+		const { error } = this.validator.validate(schema, result);
 		if (error) {
-			throw new Error(`Cannot validate response.`);
+			throw new Error(`Cannot validate JSON_RPC result.`);
 		}
 	}
 }
