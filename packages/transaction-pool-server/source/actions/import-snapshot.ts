@@ -13,13 +13,22 @@ export class ImportSnapshotAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
+		additionalProperties: false,
+		properties: {
+			height: {
+				type: "number",
+			},
+		},
+		required: ["height"],
 		type: "object",
 	};
 
-	public async handle(parameters: any): Promise<any> {
+	public async handle(
+		parameters: Contracts.TransactionPool.Actions.ImportSnapshotsRequest,
+	): Promise<Contracts.TransactionPool.Actions.ImportSnapshotsResponse> {
 		try {
 			await this.stateService.restore(parameters.height);
-			return {};
+			return true;
 		} catch (error) {
 			this.logger.error(`Cannot import state snapshot because: ${error.message}`);
 			throw error;

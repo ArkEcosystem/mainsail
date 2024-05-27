@@ -12,6 +12,9 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
+	@inject(Identifiers.TransactionPool.Query)
+	private readonly transactionPoolQuery!: Contracts.TransactionPool.Query;
+
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -22,10 +25,28 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
+		additionalProperties: false,
+		properties: {
+			block: {
+				type: "string",
+			},
+			failedTransactions: {
+				items: {
+					type: "string",
+				},
+				type: "array",
+			},
+			store: {
+				type: "object",
+			},
+		},
+		required: ["block", "failedTransactions", "store"],
 		type: "object",
 	};
 
-	public async handle(parameters: any): Promise<any> {
+	public async handle(
+		parameters: Contracts.TransactionPool.Actions.CommitRequest,
+	): Promise<Contracts.TransactionPool.Actions.CommitResponse> {
 		try {
 			const store = this.stateService.createStoreClone();
 
@@ -42,7 +63,10 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 			}
 
 			for (const transactionId of parameters.failedTransactions) {
-				await this.transactionPoolService.removeTransaction(transactionId);
+				try {
+					const transaction = await this.transactionPoolQuery.getAll().whereId(transactionId).first();
+					await this.transactionPoolService.removeTransaction(transaction);
+				} catch {}
 			}
 
 			await this.stateService.export(block.data.height);
@@ -56,6 +80,6 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 			throw new Error(`Cannot process changes, because: ${error.message}`);
 		}
 
-		return {};
+		return true;
 	}
 }
