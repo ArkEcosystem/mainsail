@@ -59,6 +59,7 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public async restore(height: number): Promise<void> {
+		this.#baseStore = this.storeFactory();
 		await this.snapshotService.import(height, this.#baseStore);
 	}
 }
