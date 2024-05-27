@@ -27,7 +27,8 @@
 		"@mainsail/kernel": "workspace:*",
 		"better-sqlite3": "9.4.3",
 		"fs-extra": "11.2.0",
-		"joi": "17.12.2"
+		"joi": "17.12.2",
+		"dayjs": "1.11.10"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
