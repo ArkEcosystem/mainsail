@@ -5,5 +5,10 @@ export type CommitRequest = {
 	failedTransactions: string[];
 	store: StoreChange;
 };
-
 export type CommitResponse = boolean;
+
+export type GetStatusRequest = {};
+export type GetStatusResponse = {
+	height: number;
+	version: string;
+};

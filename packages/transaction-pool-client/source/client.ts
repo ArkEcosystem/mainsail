@@ -33,11 +33,11 @@ export class Client implements Contracts.TransactionPool.Client {
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const action = "commit";
 		try {
-			await this.#call(action, {
+			await this.#call<Contracts.TransactionPool.Actions.CommitResponse>(action, {
 				block: unit.getBlock().serialized,
 				failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
 				store: unit.store.changesToJson(),
-			});
+			} as Contracts.TransactionPool.Actions.CommitRequest);
 
 			this.#failedTransactions = [];
 		} catch (error) {
@@ -68,7 +68,10 @@ export class Client implements Contracts.TransactionPool.Client {
 	public async getStatus(): Promise<{ height: number; version: string }> {
 		const action = "get_status";
 		try {
-			return await this.#call<{ height: number; version: string }>(action, {});
+			return await this.#call<Contracts.TransactionPool.Actions.GetStatusResponse>(
+				action,
+				{} as Contracts.TransactionPool.Actions.GetStatusRequest,
+			);
 		} catch (error) {
 			this.logger.error(`Transaction pool - ${action}: ${error.message}`);
 			throw error;

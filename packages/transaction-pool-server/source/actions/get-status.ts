@@ -13,10 +13,13 @@ export class GetStatusAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
+		additionalProperties: false,
 		type: "object",
 	};
 
-	public async handle(parameters: any): Promise<any> {
+	public async handle(
+		parameters: Contracts.TransactionPool.Actions.GetStatusRequest,
+	): Promise<Contracts.TransactionPool.Actions.GetStatusResponse> {
 		return {
 			height: this.stateService.getStore().getLastHeight(),
 			version: this.app.version(),
