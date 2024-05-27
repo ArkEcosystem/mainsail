@@ -3090,6 +3090,46 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/transaction-pool-broadcaster:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      better-sqlite3:
+        specifier: 9.4.3
+        version: 9.4.3
+      fs-extra:
+        specifier: 11.2.0
+        version: 11.2.0
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+    devDependencies:
+      '@mainsail/crypto-config':
+        specifier: workspace:*
+        version: link:../crypto-config
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@types/better-sqlite3':
+        specifier: 7.6.9
+        version: 7.6.9
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
+      tmp:
+        specifier: 0.2.3
+        version: 0.2.3
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/transaction-pool-service:
     dependencies:
       '@mainsail/container':
