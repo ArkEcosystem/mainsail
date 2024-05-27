@@ -31,8 +31,9 @@ export class Client implements Contracts.TransactionPool.Client {
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
+		const action = "commit";
 		try {
-			await this.#call("commit", {
+			await this.#call(action, {
 				block: unit.getBlock().serialized,
 				failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
 				store: unit.store.changesToJson(),
@@ -40,33 +41,36 @@ export class Client implements Contracts.TransactionPool.Client {
 
 			this.#failedTransactions = [];
 		} catch (error) {
-			this.logger.error(`Transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool - ${action}: ${error.message}`);
 		}
 	}
 
 	public async listSnapshots(): Promise<number[]> {
+		const action = "list_snapshots";
 		try {
-			return await this.#call<number[]>("list_snapshots", {});
+			return await this.#call<number[]>(action, {});
 		} catch (error) {
-			this.logger.error(`Transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool - ${action}: ${error.message}`);
 		}
 
 		return [];
 	}
 
 	public async importSnapshot(height: number): Promise<void> {
+		const action = "import_snapshot";
 		try {
-			await this.#call("import_snapshot", { height });
+			await this.#call(action, { height });
 		} catch (error) {
-			this.logger.error(`Transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool - ${action}: ${error.message}`);
 		}
 	}
 
 	public async getStatus(): Promise<{ height: number; version: string }> {
+		const action = "get_status";
 		try {
-			return await this.#call<{ height: number; version: string }>("get_status", {});
+			return await this.#call<{ height: number; version: string }>(action, {});
 		} catch (error) {
-			this.logger.error(`Transaction pool: ${error.message}`);
+			this.logger.error(`Transaction pool - ${action}: ${error.message}`);
 			throw error;
 		}
 	}
