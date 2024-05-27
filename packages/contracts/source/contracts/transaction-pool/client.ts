@@ -4,4 +4,5 @@ export interface Client extends CommitHandler {
 	getTransactionBytes(): Promise<Buffer[]>;
 	listSnapshots(): Promise<number[]>;
 	importSnapshot(height: number): Promise<void>;
+	getStatus(): Promise<{ height: number; version: string }>;
 }

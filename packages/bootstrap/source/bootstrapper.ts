@@ -79,6 +79,11 @@ export class Bootstrapper {
 
 			await this.#restoreSnapshots();
 
+			if (this.txPoolClient) {
+				const status = await this.txPoolClient.getStatus();
+				this.logger.info(`Transaction pool client is enabled at height ${status.height.toLocaleString()}`);
+			}
+
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();
 			}
