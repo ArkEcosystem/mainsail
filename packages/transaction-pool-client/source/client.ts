@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { http } from "@mainsail/utils";
 
-import { jsonRpcResponse, ReplySchemas } from "./reply-schemas.js";
+import { ReplySchemas } from "./reply-schemas.js";
 
 @injectable()
 export class Client implements Contracts.TransactionPool.Client {
@@ -113,7 +113,8 @@ export class Client implements Contracts.TransactionPool.Client {
 	}
 
 	#validateResponse(response: any): void {
-		const { error } = this.validator.validate(jsonRpcResponse, response);
+		const { error } = this.validator.validate("jsonRpcResponse", response);
+
 		if (error) {
 			throw new Error(`Cannot validate JSON_RPC response`);
 		}
