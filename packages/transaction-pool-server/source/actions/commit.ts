@@ -25,6 +25,22 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
+		additionalProperties: false,
+		properties: {
+			block: {
+				type: "string",
+			},
+			failedTransactions: {
+				items: {
+					type: "string",
+				},
+				type: "array",
+			},
+			store: {
+				type: "object",
+			},
+		},
+		required: ["block", "failedTransactions", "store"],
 		type: "object",
 	};
 
