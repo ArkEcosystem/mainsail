@@ -272,8 +272,15 @@ export const Identifiers = {
 		},
 	},
 	TransactionPool: {
+		Broadcaster: Symbol("TransactionPoolBroadcaster<Broadcaster>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
+		Peer: {
+			Factory: Symbol("TransactionPoolBroadcaster<Peer.Factory>"),
+			Processor: Symbol("TransactionPoolBroadcaster<Peer.Processor>"),
+			Repository: Symbol("TransactionPoolBroadcaster<Peer.Repository>"),
+			Verifier: Symbol("TransactionPoolBroadcaster<Peer.Verifier>"),
+		},
 		Processor: Symbol("TransactionPool<Processor>"),
 		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
 		Query: Symbol("TransactionPool<Query>"),
