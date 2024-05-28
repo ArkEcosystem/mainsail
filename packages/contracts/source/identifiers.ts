@@ -276,6 +276,7 @@ export const Identifiers = {
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
 		Peer: {
+			Communicator: Symbol("TransactionPoolBroadcaster<Peer.Communicator>"),
 			Factory: Symbol("TransactionPoolBroadcaster<Peer.Factory>"),
 			Processor: Symbol("TransactionPoolBroadcaster<Peer.Processor>"),
 			Repository: Symbol("TransactionPoolBroadcaster<Peer.Repository>"),

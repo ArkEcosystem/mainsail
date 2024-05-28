@@ -30,6 +30,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): object {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
+			maxPeersBroadcast: Joi.number().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
 	}

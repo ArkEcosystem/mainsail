@@ -1,5 +1,7 @@
 import { Dayjs } from "dayjs";
 
+import { Transaction } from "../crypto/index.js";
+
 export enum PeerProtocol {
 	Http = 0,
 	Https = 1,
@@ -48,4 +50,12 @@ export interface PeerVerifier {
 }
 export interface PeerProcessor {
 	validateAndAcceptPeer(ip: string): Promise<void>;
+}
+
+export interface PeerCommunicator {
+	postTransactions(peer: Peer, transactions: Transaction[]): Promise<void>;
+}
+
+export interface Broadcaster {
+	broadcastTransactions(transactions: Transaction[]): Promise<void>;
 }
