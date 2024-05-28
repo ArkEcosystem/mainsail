@@ -40,3 +40,7 @@ export interface PeerRepository {
 	forgetPendingPeer(peer: Peer): void;
 	hasPendingPeer(ip: string): boolean;
 }
+
+export interface PeerVerifier {
+	verify(peer: Peer): Promise<boolean>;
+}
