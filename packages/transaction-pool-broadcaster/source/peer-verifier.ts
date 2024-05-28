@@ -8,11 +8,11 @@ const helloWorld = { data: "Hello World from Mainsail API!" };
 const helloWorldLength = JSON.stringify(helloWorld).length;
 
 @injectable()
-export class PeerVerifier implements Contracts.P2P.ApiNodeVerifier {
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+export class PeerVerifier implements Contracts.TransactionPool.PeerVerifier {
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async verify(apiNode: Contracts.P2P.ApiNode): Promise<boolean> {
+	public async verify(apiNode: Contracts.TransactionPool.Peer): Promise<boolean> {
 		try {
 			const t0 = dayjs();
 			apiNode.lastPinged = t0;
@@ -25,14 +25,13 @@ export class PeerVerifier implements Contracts.P2P.ApiNodeVerifier {
 
 			const t1 = dayjs();
 
-			apiNode.statusCode = response.statusCode;
 			apiNode.latency = t1.valueOf() - t0.valueOf();
 
 			this.#verifyStatusCode(response);
 			this.#verifyHeaders(response);
 			this.#verifyResponseBody(response);
 		} catch (error) {
-			this.logger.debugExtra(`API node ${apiNode.url} verification failed: ${error.message}`);
+			this.logger.debug(`API node ${apiNode.url} verification failed: ${error.message}`);
 			return false;
 		}
 

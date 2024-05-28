@@ -14,12 +14,7 @@ export class Broadcaster implements Contracts.TransactionPool.Broadcaster {
 	@inject(Identifiers.TransactionPool.Peer.Communicator)
 	private readonly communicator!: Contracts.TransactionPool.PeerCommunicator;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
-
 	async broadcastTransactions(transactions: Contracts.Crypto.Transaction[]): Promise<void> {
-		this.state.resetLastMessageTime();
-
 		const promises = this.#getPeersForBroadcast().map((peer) =>
 			this.communicator.postTransactions(peer, transactions),
 		);

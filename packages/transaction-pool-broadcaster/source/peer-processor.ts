@@ -11,26 +11,26 @@ export class PeerProcessor implements Contracts.TransactionPool.PeerProcessor {
 	@tagged("plugin", "transaction-pool-broadcaster")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.P2P.Peer.Repository)
+	@inject(Identifiers.TransactionPool.Peer.Repository)
 	private readonly repository!: Contracts.TransactionPool.PeerRepository;
 
-	// @inject(Identifiers.P2P.Peer.Verifier)
+	// @inject(Identifiers.TransactionPool.Peer.Verifier)
 	// private readonly peerVerifier!: Contracts.TransactionPool.PeerVerifier;
 
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
-	public async validateAndAcceptPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+	public async validateAndAcceptPeer(ip: string): Promise<void> {
 		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip)) {
 			return;
 		}
 
-		if (this.validatePeerIp(ip, options)) {
+		if (this.validatePeerIp(ip)) {
 			await this.#acceptNewPeer(ip);
 		}
 	}
 
-	public validatePeerIp(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): boolean {
+	public validatePeerIp(ip: string): boolean {
 		// if (!isValidPeerIp(ip)) {
 		// 	return false;
 		// }
@@ -47,14 +47,14 @@ export class PeerProcessor implements Contracts.TransactionPool.PeerProcessor {
 	}
 
 	async #acceptNewPeer(ip: string): Promise<void> {
-		const peer = this.app.get<Contracts.TransactionPool.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
+		const peer = this.app.get<Contracts.TransactionPool.PeerFactory>(Identifiers.TransactionPool.Peer.Factory)(ip);
 
 		this.repository.setPendingPeer(peer);
 
 		// if (await this.peerVerifier.verify(peer)) {
 		if (true) {
 			this.repository.setPeer(peer);
-			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
+			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 		}
 
 		this.repository.forgetPendingPeer(peer);
