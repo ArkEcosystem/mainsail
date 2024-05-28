@@ -9,6 +9,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public configSchema(): object {
-		return Joi.object({}).unknown(true);
+		return Joi.object({
+			blacklist: Joi.array().items(Joi.string()).required(),
+			whitelist: Joi.array().items(Joi.string()).required(),
+		}).unknown(true);
 	}
 }
