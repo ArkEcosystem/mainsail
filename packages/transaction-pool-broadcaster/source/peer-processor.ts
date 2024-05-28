@@ -14,8 +14,8 @@ export class PeerProcessor implements Contracts.TransactionPool.PeerProcessor {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.TransactionPool.PeerRepository;
 
-	@inject(Identifiers.P2P.Peer.Verifier)
-	private readonly peerVerifier!: Contracts.TransactionPool.PeerVerifier;
+	// @inject(Identifiers.P2P.Peer.Verifier)
+	// private readonly peerVerifier!: Contracts.TransactionPool.PeerVerifier;
 
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
@@ -51,7 +51,8 @@ export class PeerProcessor implements Contracts.TransactionPool.PeerProcessor {
 
 		this.repository.setPendingPeer(peer);
 
-		if (await this.peerVerifier.verify(peer)) {
+		// if (await this.peerVerifier.verify(peer)) {
+		if (true) {
 			this.repository.setPeer(peer);
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 		}
