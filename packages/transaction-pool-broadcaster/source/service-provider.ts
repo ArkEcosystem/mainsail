@@ -2,7 +2,9 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
+import { Broadcaster } from "./broadcaster.js";
 import { Peer } from "./peer.js";
+import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
@@ -12,7 +14,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.Peer.Repository).to(PeerRepository).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Peer.Processor).to(PeerProcessor).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Peer.Verifier).to(PeerVerifier).inSingletonScope();
-		this.app.bind(Identifiers.TransactionPool.Peer.Verifier).to(PeerVerifier).inSingletonScope();
+		this.app.bind(Identifiers.TransactionPool.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
+		this.app.bind(Identifiers.TransactionPool.Broadcaster).to(Broadcaster).inSingletonScope();
 
 		this.app.bind(Identifiers.TransactionPool.Peer.Factory).toFactory<Peer, [string]>(
 			() => (ip: string) =>
