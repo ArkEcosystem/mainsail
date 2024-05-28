@@ -26,3 +26,17 @@ export interface Peer {
 	recentlyPinged(): boolean;
 	toBroadcast(): PeerBroadcast;
 }
+
+export interface PeerRepository {
+	getPeers(): Peer[];
+	getPeer(ip: string): Peer;
+	setPeer(peer: Peer): void;
+	forgetPeer(peer: Peer): void;
+	hasPeer(ip: string): boolean;
+
+	getPendingPeers(): Peer[];
+	getPendingPeer(ip: string): Peer;
+	setPendingPeer(peer: Peer): void;
+	forgetPendingPeer(peer: Peer): void;
+	hasPendingPeer(ip: string): boolean;
+}
