@@ -7,9 +7,10 @@ import {
 	ValidateAndAcceptApiNodeAction,
 	ValidateAndAcceptPeerAction,
 } from "./actions/index.js";
+import { ApiNode } from "./api-node.js";
 import { ApiNodeDiscoverer } from "./api-node-discoverer.js";
 import { ApiNodeProcessor } from "./api-node-processor.js";
-import { ApiNode, ApiNodeRepository } from "./api-node-repository.js";
+import { ApiNodeRepository } from "./api-node-repository.js";
 import { ApiNodeVerifier } from "./api-node-verifier.js";
 import { Broadcaster } from "./broadcaster.js";
 import { BlockDownloader } from "./downloader/block-downloader.js";
