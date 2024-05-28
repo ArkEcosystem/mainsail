@@ -27,6 +27,8 @@ export interface Peer {
 	toBroadcast(): PeerBroadcast;
 }
 
+export type PeerFactory = (ip: string) => Peer;
+
 export interface PeerRepository {
 	getPeers(): Peer[];
 	getPeer(ip: string): Peer;
@@ -43,4 +45,7 @@ export interface PeerRepository {
 
 export interface PeerVerifier {
 	verify(peer: Peer): Promise<boolean>;
+}
+export interface PeerProcessor {
+	validateAndAcceptPeer(ip: string): Promise<void>;
 }
