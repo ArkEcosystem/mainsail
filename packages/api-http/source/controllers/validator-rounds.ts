@@ -66,9 +66,9 @@ export class ValidatorRoundsController extends Controller {
 			.orderBy("public_key", "ASC")
 			.getMany();
 
-		const indexLookup = round.validators.reduce((acc, key, index) => {
-			acc[key] = index;
-			return acc;
+		const indexLookup = round.validators.reduce((accumulator, key, index) => {
+			accumulator[key] = index;
+			return accumulator;
 		}, {});
 
 		validatorWallets.sort((a, b) => indexLookup[a.publicKey!] - indexLookup[b.publicKey!]);
