@@ -45,7 +45,7 @@ export class Block {
 		nullable: false,
 		type: "integer",
 	})
-	public readonly gasLimit!: number;
+	public readonly totalGas!: number;
 
 	@Column({
 		nullable: false,

@@ -48,7 +48,7 @@ export type MilestoneEvm = {
 	minimumGasLimit: number;
 	minimumGasFee: number;
 	nativeFeeMultiplier: number;
-	//nativeTransactionGasLimits: Record<string, number>;
+	nativeGasLimits: Record<string, number>;
 };
 
 export type Milestone = {

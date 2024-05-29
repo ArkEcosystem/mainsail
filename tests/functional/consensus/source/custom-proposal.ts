@@ -73,7 +73,7 @@ export const makeCustomProposal = async (
 	blockBuffer.writeUint16LE(transactions.length, byteOffset);
 	byteOffset += 2;
 
-	// skip gasLimit
+	// skip totalGas
 	byteOffset += 4;
 
 	// totalAmount

@@ -29,6 +29,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
+	@inject(Identifiers.Evm.Gas.Limits)
+	private readonly gasLimits!: Contracts.Evm.GasLimits;
+
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
@@ -130,9 +133,10 @@ export class Validator implements Contracts.Validator.Validator {
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
-		const totals: { amount: BigNumber; fee: BigNumber } = {
+		const totals: { amount: BigNumber; fee: BigNumber; gas: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
+			gas: 0,
 		};
 
 		const payloadBuffers: Buffer[] = [];
@@ -141,11 +145,13 @@ export class Validator implements Contracts.Validator.Validator {
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
-		for (const { data, serialized } of transactions) {
+		for (const transaction of transactions) {
+			const { data, serialized } = transaction;
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
+			totals.gas += this.gasLimits.of(transaction);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -160,13 +166,13 @@ export class Validator implements Contracts.Validator.Validator {
 			generatorPublicKey,
 			height,
 			numberOfTransactions: transactions.length,
-			gasLimit: milestone.evm.blockGasLimit,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,
 			previousBlock: previousBlock.data.id,
 			reward: BigNumber.make(milestone.reward),
 			round,
 			timestamp,
+			totalGas: totals.gas,
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
 			transactions: transactionData,

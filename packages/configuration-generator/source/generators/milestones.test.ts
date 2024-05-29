@@ -53,6 +53,16 @@ describe<{
 						minimumGasFee: 5,
 						minimumGasLimit: 21_000,
 						nativeFeeMultiplier: 100,
+						nativeGasLimits: {
+							transfer: 21_000,
+							multiPayment: 50_000,
+							multiSignature: 50_000,
+							usernameRegistration: 100_000,
+							usernameResignation: 50_000,
+							validatorRegistration: 100_000,
+							validatorResignation: 50_000,
+							vote: 50_000,
+						},
 					},
 					fees: {
 						staticFees: {

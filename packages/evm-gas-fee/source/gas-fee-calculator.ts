@@ -7,6 +7,9 @@ export class GasFeeCalculator implements Contracts.Evm.GasFeeCalculator {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.Evm.Gas.Limits)
+	private readonly gasLimits!: Contracts.Evm.GasLimits;
+
 	public calculate(transaction: Contracts.Crypto.Transaction): Utils.BigNumber {
 		// Fee calculation example (actual numbers not decided yet)
 		//
@@ -28,24 +31,12 @@ export class GasFeeCalculator implements Contracts.Evm.GasFeeCalculator {
 		// Note that the sender must be able to pay the fee assuming the gasLimit is reached during
 		// execution. The effective fee might be lower, but we do not know until after it has been executed.
 		// The actual fee is deducted in `applyToRecipient`.
-		const gasLimit = this.gasLimit(transaction);
+		const gasLimit = this.gasLimits.of(transaction);
 		return this.#calculate(transaction.data.fee, gasLimit);
 	}
 
 	public calculateConsumed(gasFee: Utils.BigNumber, gasUsed: number): Utils.BigNumber {
 		return this.#calculate(gasFee, gasUsed);
-	}
-
-	public gasLimit(transaction: Contracts.Crypto.Transaction): number {
-		if (transaction.data.asset?.evmCall) {
-			return transaction.data.asset.evmCall.gasLimit;
-		}
-
-		return 0;
-		// const { evm: evmConfig } = this.configuration.getMilestone();
-		// const nativeGasLimit = evmConfig.nativeTransactionGasLimits[transaction.key];
-		// Utils.assert.defined(nativeGasLimit);
-		// return nativeGasLimit;
 	}
 
 	#calculate(gasFee: Utils.BigNumber, gasUsed: number): Utils.BigNumber {

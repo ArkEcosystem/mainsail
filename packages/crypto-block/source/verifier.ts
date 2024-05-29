@@ -7,6 +7,9 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.Evm.Gas.Limits)
+	private readonly gasLimits!: Contracts.Evm.GasLimits;
+
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly serializer!: Contracts.Crypto.BlockSerializer;
 
@@ -63,6 +66,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
 			let totalFee: BigNumber = BigNumber.ZERO;
+			let totalGas: number = 0;
 
 			// The initial payload length takes the overhead for each serialized transaction into account
 			// which is a uint32 per transaction to store the individual length.
@@ -93,6 +97,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				totalAmount = totalAmount.plus(transaction.data.amount);
 				totalFee = totalFee.plus(transaction.data.fee);
 				totalPayloadLength += transaction.serialized.length;
+				totalGas += this.gasLimits.of(transaction);
 
 				payloadBuffers.push(bytes);
 			}
@@ -103,6 +108,10 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 
 			if (!totalFee.isEqualTo(blockData.totalFee)) {
 				result.errors.push("Invalid total fee");
+			}
+
+			if (totalGas !== blockData.totalGas || totalGas > constants.evm.blockGasLimit) {
+				result.errors.push("Invalid total gas limit");
 			}
 
 			if (totalPayloadLength !== blockData.payloadLength) {
