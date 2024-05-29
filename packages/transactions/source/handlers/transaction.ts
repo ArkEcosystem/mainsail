@@ -36,10 +36,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async throwIfCannotBeApplied(
-		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
+		const { walletRepository } = context;
 		const senderWallet: Contracts.State.Wallet = walletRepository.findByAddress(sender.getAddress());
 
 		AppUtils.assert.defined<string>(sender.getPublicKey());
@@ -51,6 +52,8 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		// @TODO: enforce fees here to support dynamic cases
 
 		this.#verifyTransactionNonceApply(sender, transaction);
+
+		this.verifyTransactionFee(context, transaction, sender);
 
 		if (
 			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
@@ -126,8 +129,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		sender.setNonce(data.nonce);
 
 		// Subtract fee
-		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
-		sender.setBalance(newBalance);
+		this.applyFeeToSender(transaction, sender);
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {}
@@ -164,6 +166,26 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 					data.type === this.getConstructor().type && data.typeGroup === this.getConstructor().typeGroup,
 			)
 			.map(({ data }) => data);
+	}
+
+	protected verifyTransactionFee(
+		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
+		transaction: Contracts.Crypto.Transaction,
+		sender: Contracts.State.Wallet,
+	): void {
+		if (
+			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
+			this.configuration.getHeight() > 0
+		) {
+			throw new Exceptions.InsufficientBalanceError();
+		}
+	}
+
+	protected applyFeeToSender(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
+		const data: Contracts.Crypto.TransactionData = transaction.data;
+
+		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
+		sender.setBalance(newBalance);
 	}
 
 	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;

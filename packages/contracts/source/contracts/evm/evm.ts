@@ -20,6 +20,7 @@ export interface TransactionContext {
 	readonly caller: string;
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
+	readonly gasLimit: bigint;
 	readonly data: Buffer;
 	readonly commitKey: CommitKey;
 }

@@ -23,8 +23,21 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	#throwIfCannot(action: string, transaction: Contracts.Crypto.Transaction): void {
-		const feeString = this.#formatSatoshi(transaction.data.fee);
+		// TODO: generalize to all native tx types
+		if (transaction.data.type === Contracts.Crypto.TransactionType.EvmCall) {
+			const { evm } = this.configuration.getMilestone();
+			if (transaction.data.fee.isLessThan(evm.minimumGasFee)) {
+				this.logger.notice(
+					`${transaction.id} not eligible for ${action} (fee ${transaction.data.fee} < ${evm.minimumGasFee})`,
+				);
 
+				throw new Exceptions.TransactionFeeTooLowError(transaction);
+			}
+
+			return undefined;
+		}
+
+		const feeString = this.#formatSatoshi(transaction.data.fee);
 		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);
 		const staticFeeString = this.#formatSatoshi(staticFee);
 
