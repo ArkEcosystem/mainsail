@@ -66,10 +66,17 @@ export class ValidatorRoundsController extends Controller {
 			.orderBy("public_key", "ASC")
 			.getMany();
 
+		const indexLookup = round.validators.reduce((accumulator, key, index) => {
+			accumulator[key] = index;
+			return accumulator;
+		}, {});
+
+		validatorWallets.sort((a, b) => indexLookup[a.publicKey!] - indexLookup[b.publicKey!]);
+
 		return this.respondWithCollection(
 			validatorWallets.map((wallet) => ({
 				publicKey: wallet.publicKey,
-				votes: wallet.attributes?.["validatorVoteBalance"] ?? "0",
+				votes: round.votes[indexLookup[wallet.publicKey!]] ?? "0",
 			})),
 			RoundResource,
 		);

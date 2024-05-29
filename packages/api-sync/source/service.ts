@@ -183,12 +183,16 @@ export class Sync implements Contracts.ApiSync.Service {
 	#createValidatorRound(height: number): Models.ValidatorRound {
 		const activeValidators = this.validatorSet.getActiveValidators();
 
+		// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
+		const validatorWallets = Array.from(
+			{ length: activeValidators.length },
+			(_, index) => activeValidators[this.proposerSelector.getValidatorIndex(index)],
+		);
+
 		return {
 			...Utils.roundCalculator.calculateRound(height, this.configuration),
-			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
-			validators: Array.from({ length: activeValidators.length }, (_, index) =>
-				activeValidators[this.proposerSelector.getValidatorIndex(index)].getWalletPublicKey(),
-			),
+			validators: validatorWallets.map((v) => v.getWalletPublicKey()),
+			votes: validatorWallets.map((v) => v.getVoteBalance().toFixed()),
 		};
 	}
 
