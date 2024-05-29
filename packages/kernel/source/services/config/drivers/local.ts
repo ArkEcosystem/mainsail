@@ -14,6 +14,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Services.Filesystem.Service)
+	protected readonly filesystem!: Contracts.Kernel.Filesystem;
+
 	@inject(Identifiers.Config.Repository)
 	private readonly configRepository!: ConfigRepository;
 
@@ -53,7 +56,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadApplication(): void {
 		this.validationService.validate(
-			this.#loadFromLocation(["app.json"]),
+			this.#loadFromLocation("app.json"),
 			Joi.object({
 				flags: Joi.array().items(Joi.string()).optional(),
 				plugins: Joi.array()
@@ -81,7 +84,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		}
 
 		this.validationService.validate(
-			this.#loadFromLocation(["peers.json"]),
+			this.#loadFromLocation("peers.json"),
 			Joi.object({
 				list: Joi.array()
 					.items(
@@ -110,7 +113,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		}
 
 		this.validationService.validate(
-			this.#loadFromLocation(["validators.json"]),
+			this.#loadFromLocation("validators.json"),
 			Joi.object({
 				keystore: Joi.string().optional(),
 				secrets: Joi.array().items(Joi.string()).required(),
@@ -129,25 +132,21 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			return;
 		}
 
-		this.configRepository.set("crypto", this.#loadFromLocation(["crypto.json"]));
+		this.configRepository.set("crypto", this.#loadFromLocation("crypto.json"));
 	}
 
-	#loadFromLocation(files: string[]): KeyValuePair {
-		for (const file of files) {
-			const fullPath: string = this.app.configPath(file);
-			if (existsSync(fullPath)) {
-				const config: KeyValuePair =
-					extname(fullPath) === ".json"
-						? JSON.parse(readFileSync(fullPath).toString())
-						: readFileSync(fullPath);
+	#loadFromLocation(file: string): KeyValuePair {
+		const fullPath: string = this.app.configPath(file);
+		if (existsSync(fullPath)) {
+			const config: KeyValuePair =
+				extname(fullPath) === ".json" ? this.filesystem.readJSONSync(fullPath) : readFileSync(fullPath);
 
-				assert.defined<KeyValuePair>(config);
+			assert.defined<KeyValuePair>(config);
 
-				return config;
-			}
+			return config;
 		}
 
-		throw new Exceptions.FileException(`Failed to discovery any files matching [${files.join(", ")}].`);
+		throw new Exceptions.FileException(`Failed to discovery any files matching [${file}].`);
 	}
 
 	#skipFileIfNotExists(filename: string, alwaysOptional = false): boolean {
