@@ -48,6 +48,12 @@ describe<{
 						stageTimeoutIncrease: 2000,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
+					evm: {
+						blockGasLimit: 10_000_000,
+						minimumGasFee: 5,
+						minimumGasLimit: 21_000,
+						nativeFeeMultiplier: 100,
+					},
 					fees: {
 						staticFees: {
 							multiPayment: 10_000_000,

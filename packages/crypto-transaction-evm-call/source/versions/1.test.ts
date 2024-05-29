@@ -56,7 +56,7 @@ describe<{
 				payload: "00",
 			},
 		},
-		fee: 1,
+		fee: 5,
 		nonce: 1,
 		recipientId: ethers.ZeroAddress,
 		senderPublicKey: "a".repeat(66),
@@ -94,10 +94,10 @@ describe<{
 		}
 	});
 
-	it("#getSchema - fee should be bigNumber, min 0", ({ validator }) => {
+	it("#getSchema - fee should be integer, min 5", ({ validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validValues = [0, 1, 100, BigNumber.ZERO, BigNumber.ONE];
+		const validValues = [5, 6, 1000];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -107,7 +107,7 @@ describe<{
 			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, "test", null, undefined, {}];
+		const invalidValues = [-1, 1.1, 0, "test", null, undefined, {}, , BigNumber.ZERO, BigNumber.ONE];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,

@@ -20,6 +20,14 @@ describe<{
 		context.instance = context.sandbox.app.resolve<Contracts.Evm.Instance>(EvmInstance);
 	});
 
+	const deployGasConfig = {
+		gasLimit: BigInt(1_000_000),
+	};
+
+	const gasConfig = {
+		gasLimit: BigInt(60_000),
+	};
+
 	it("should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
@@ -28,6 +36,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 			commitKey,
+			...deployGasConfig,
 		});
 
 		assert.true(receipt.success);
@@ -42,6 +51,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 			commitKey: { height: BigInt(0), round: BigInt(0) },
+			...deployGasConfig,
 		});
 
 		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
@@ -66,6 +76,7 @@ describe<{
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			commitKey: { height: BigInt(1), round: BigInt(0) },
+			...gasConfig,
 		}));
 
 		await instance.onCommit({ height: BigInt(1), round: BigInt(0) } as any);
@@ -84,6 +95,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 			commitKey: { height: BigInt(0), round: BigInt(0) },
+			...deployGasConfig,
 		});
 
 		const contractAddress = receipt.deployedContractAddress;
@@ -94,6 +106,7 @@ describe<{
 			data: Buffer.from("0xdead", "hex"),
 			recipient: contractAddress,
 			commitKey: { height: BigInt(0), round: BigInt(0) },
+			...gasConfig,
 		}));
 
 		assert.false(receipt.success);
@@ -109,6 +122,7 @@ describe<{
 			commitKey,
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
+			...deployGasConfig,
 		});
 
 		const contractAddress = receipt.deployedContractAddress;
@@ -135,6 +149,7 @@ describe<{
 						),
 					),
 					recipient: contractAddress,
+					...gasConfig,
 				}),
 		);
 
@@ -147,6 +162,7 @@ describe<{
 					ethers.getBytes(iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("2")])),
 				),
 				recipient: contractAddress,
+				...gasConfig,
 			});
 		});
 
@@ -171,6 +187,7 @@ describe<{
 					caller: "badsender_",
 					data: Buffer.from(bytecode.slice(2), "hex"),
 					commitKey: { height: BigInt(0), round: BigInt(0) },
+					...deployGasConfig,
 				}),
 		);
 	});
@@ -183,6 +200,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 			commitKey,
+			...deployGasConfig,
 		});
 
 		assert.true(receipt.success);
@@ -196,6 +214,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 			commitKey,
+			...deployGasConfig,
 		}));
 
 		assert.true(receipt.success);
@@ -210,6 +229,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(bytecode.slice(2), "hex"),
 			commitKey: { height: BigInt(0), round: BigInt(0) },
+			...deployGasConfig,
 		});
 
 		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
@@ -230,6 +250,7 @@ describe<{
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			commitKey: { height: BigInt(1), round: BigInt(0) },
+			...gasConfig,
 		}));
 
 		({ receipt } = await instance.process({
@@ -237,6 +258,7 @@ describe<{
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			commitKey: { height: BigInt(1), round: BigInt(0) },
+			...gasConfig,
 		}));
 
 		({ receipt } = await instance.process({
@@ -244,6 +266,7 @@ describe<{
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			commitKey: { height: BigInt(1), round: BigInt(0) },
+			...gasConfig,
 		}));
 
 		// not updated yet

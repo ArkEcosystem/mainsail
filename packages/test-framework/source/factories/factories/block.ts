@@ -21,7 +21,7 @@ export const registerBlockFactory = async (
 					.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 					.get("genesisBlock.block");
 
-		const { reward } = app
+		const { reward, evm } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone(previousBlock.height);
 
@@ -80,6 +80,7 @@ export const registerBlockFactory = async (
 					.fromMnemonic(passphrase),
 				height: previousBlock.height + 1,
 				numberOfTransactions: transactions.length,
+				gasLimit: evm.blockGasLimit,
 				payloadHash: (
 					await app
 						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)

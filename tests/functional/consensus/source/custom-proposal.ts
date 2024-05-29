@@ -73,6 +73,9 @@ export const makeCustomProposal = async (
 	blockBuffer.writeUint16LE(transactions.length, byteOffset);
 	byteOffset += 2;
 
+	// skip gasLimit
+	byteOffset += 4;
+
 	// totalAmount
 	blockBuffer.writeBigUInt64LE(totals.amount.toBigInt(), byteOffset);
 	byteOffset += 8;

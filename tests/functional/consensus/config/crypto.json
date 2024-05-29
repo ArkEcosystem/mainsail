@@ -371,6 +371,12 @@
 				"stageTimeout": 100,
 				"stageTimeoutIncrease": 100
 			},
+			"evm": {
+				"blockGasLimit": 10000000,
+				"minimumGasFee": 5,
+				"minimumGasLimit": 21000,
+				"nativeFeeMultiplier": 100
+			},
 			"epoch": "2024-03-27T00:00:00.000Z",
 			"fees": {
 				"staticFees": {
