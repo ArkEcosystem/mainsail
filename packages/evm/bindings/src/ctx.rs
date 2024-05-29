@@ -10,6 +10,7 @@ pub struct JsTransactionContext {
     pub caller: JsString,
     /// Omit recipient when deploying a contract
     pub recipient: Option<JsString>,
+    pub gas_limit: JsBigInt,
     pub data: JsBuffer,
     pub commit_key: JsCommitKey,
 }
@@ -31,6 +32,7 @@ pub struct TxContext {
     pub caller: Address,
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
+    pub gas_limit: u64,
     pub data: Bytes,
     pub commit_key: CommitKey,
 }
@@ -44,6 +46,7 @@ pub struct TxViewContext {
 pub struct ExecutionContext {
     pub caller: Address,
     pub recipient: Option<Address>,
+    pub gas_limit: Option<u64>,
     pub data: Bytes,
     pub commit_key: Option<CommitKey>,
 }
@@ -53,6 +56,7 @@ impl From<TxViewContext> for ExecutionContext {
         Self {
             caller: value.caller,
             recipient: Some(value.recipient),
+            gas_limit: None,
             data: value.data,
             commit_key: None,
         }
@@ -64,6 +68,7 @@ impl From<TxContext> for ExecutionContext {
         Self {
             caller: value.caller,
             recipient: value.recipient,
+            gas_limit: Some(value.gas_limit),
             data: value.data,
             commit_key: Some(value.commit_key),
         }
@@ -96,6 +101,7 @@ impl TryFrom<JsTransactionContext> for TxContext {
         let tx_ctx = TxContext {
             commit_key: value.commit_key.try_into()?,
             recipient,
+            gas_limit: value.gas_limit.try_into()?,
             caller: utils::create_address_from_js_string(value.caller)?,
             data: Bytes::from(buf.as_ref().to_owned()),
         };

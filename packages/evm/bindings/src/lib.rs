@@ -144,6 +144,7 @@ impl EvmInner {
         let mut evm = Evm::builder()
             .with_db(state_db)
             .modify_tx_env(|tx_env| {
+                tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 100_000);
                 tx_env.caller = ctx.caller;
                 tx_env.transact_to = match ctx.recipient {
                     Some(recipient) => revm::primitives::TransactTo::Call(recipient),
