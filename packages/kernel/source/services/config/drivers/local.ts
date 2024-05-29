@@ -1,9 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { dotenv, get, set } from "@mainsail/utils";
-import { existsSync, readFileSync } from "fs";
+import { existsSync } from "fs";
 import Joi from "joi";
-import { extname } from "path";
 
 import { KeyValuePair } from "../../../types/index.js";
 import { assert } from "../../../utils/assert.js";
@@ -137,16 +136,13 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadFromLocation(file: string): KeyValuePair {
 		const fullPath: string = this.app.configPath(file);
-		if (existsSync(fullPath)) {
-			const config: KeyValuePair =
-				extname(fullPath) === ".json" ? this.filesystem.readJSONSync(fullPath) : readFileSync(fullPath);
-
-			assert.defined<KeyValuePair>(config);
-
-			return config;
+		if (!existsSync(fullPath)) {
+			throw new Exceptions.FileException(`Failed to discovery any files matching [${file}].`);
 		}
 
-		throw new Exceptions.FileException(`Failed to discovery any files matching [${file}].`);
+		const config = this.filesystem.readJSONSync(fullPath);
+		assert.defined<KeyValuePair>(config);
+		return config;
 	}
 
 	#skipFileIfNotExists(filename: string, alwaysOptional = false): boolean {
