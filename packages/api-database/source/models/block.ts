@@ -43,6 +43,12 @@ export class Block {
 
 	@Column({
 		nullable: false,
+		type: "integer",
+	})
+	public readonly gasLimit!: number;
+
+	@Column({
+		nullable: false,
 		type: "bigint",
 	})
 	public readonly totalAmount!: string;
