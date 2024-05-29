@@ -217,6 +217,7 @@ export class GenesisBlockGenerator extends Generator {
 				generatorPublicKey: keys.publicKey,
 				height: 0,
 				numberOfTransactions: transactions.length,
+				gasLimit: 0,
 				payloadHash: (
 					await this.app
 						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)

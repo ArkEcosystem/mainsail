@@ -154,15 +154,17 @@ export class Validator implements Contracts.Validator.Validator {
 
 		const previousBlock = this.stateService.getStore().getLastBlock();
 		const height = previousBlock.data.height + 1;
+		const milestone = this.cryptoConfiguration.getMilestone(height);
 
 		return this.blockFactory.make({
 			generatorPublicKey,
 			height,
 			numberOfTransactions: transactions.length,
+			gasLimit: milestone.evm.blockGasLimit,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,
 			previousBlock: previousBlock.data.id,
-			reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
+			reward: BigNumber.make(milestone.reward),
 			round,
 			timestamp,
 			totalAmount: totals.amount,
