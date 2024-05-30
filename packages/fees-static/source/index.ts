@@ -30,10 +30,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return true;
 	}
 
-	public requiredByWorker(): boolean {
-		return true;
-	}
-
 	public async handle({ name }): Promise<void> {
 		// eslint-disable-next-line sonarjs/no-small-switch
 		switch (name) {

@@ -14,10 +14,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		} catch {}
 	}
 
-	public requiredByWorker(): boolean {
-		return true;
-	}
-
 	#fromConfigRepository(): Contracts.Crypto.NetworkConfigPartial {
 		const configRepository = this.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository);
 
