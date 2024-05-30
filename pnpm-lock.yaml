@@ -3197,9 +3197,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       joi:
         specifier: 17.12.2
         version: 17.12.2
