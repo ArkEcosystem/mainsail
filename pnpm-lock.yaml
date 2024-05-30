@@ -3088,6 +3088,9 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
+      '@mainsail/evm-gas-fee':
+        specifier: workspace:*
+        version: link:../evm-gas-fee
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../fees
@@ -3459,6 +3462,9 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
+      '@mainsail/evm-gas-fee':
+        specifier: workspace:*
+        version: link:../evm-gas-fee
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer

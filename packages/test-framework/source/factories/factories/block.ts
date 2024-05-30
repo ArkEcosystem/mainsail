@@ -21,7 +21,7 @@ export const registerBlockFactory = async (
 					.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 					.get("genesisBlock.block");
 
-		const { reward, evm } = app
+		const { reward } = app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.getMilestone(previousBlock.height);
 
@@ -48,19 +48,23 @@ export const registerBlockFactory = async (
 			}
 		}
 
-		const totals: { amount: BigNumber; fee: BigNumber } = {
+		const gasLimits = app.get<Contracts.Evm.GasLimits>(Identifiers.Evm.Gas.Limits);
+		const totals: { amount: BigNumber; fee: BigNumber; gas: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
+			gas: 0,
 		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 		let payloadLength = transactions.length * 4;
 
-		for (const { data, serialized } of transactions) {
+		for (const transaction of transactions) {
+			const { data, serialized } = transaction;
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
+			totals.gas = gasLimits.of(transaction);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -80,7 +84,6 @@ export const registerBlockFactory = async (
 					.fromMnemonic(passphrase),
 				height: previousBlock.height + 1,
 				numberOfTransactions: transactions.length,
-				gasLimit: evm.blockGasLimit,
 				payloadHash: (
 					await app
 						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
@@ -91,6 +94,7 @@ export const registerBlockFactory = async (
 				reward: options.reward || reward,
 				round: 0,
 				timestamp: options.timestamp || dayjs().valueOf(),
+				totalGas: totals.gas,
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions: transactionData,

@@ -110,7 +110,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push("Invalid total fee");
 			}
 
-			if (totalGas !== blockData.totalGas || totalGas > constants.evm.blockGasLimit) {
+			if (totalGas !== blockData.totalGas || (totalGas > constants.evm.blockGasLimit && blockData.height > 0)) {
 				result.errors.push("Invalid total gas limit");
 			}
 
