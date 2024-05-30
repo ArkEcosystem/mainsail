@@ -41,7 +41,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 		);
 	}
 
-	public async shutdown(signal?: number | NodeJS.Signals): Promise<void> {
+	public async shutdown(): Promise<void> {
 		await Promise.all(this.workers.map(async (worker) => await worker.kill()));
 	}
 
