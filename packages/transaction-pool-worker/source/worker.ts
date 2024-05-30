@@ -3,17 +3,16 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
-// @ts-ignore
-export class Worker implements Contracts.Crypto.Worker {
-	@inject(Identifiers.CryptoWorker.WorkerSubprocess.Factory)
+export class Worker implements Contracts.TransactionPool.Worker {
+	@inject(Identifiers.TransactionPoolWorker.WorkerSubprocess.Factory)
 	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
 
-	private ipcSubprocess!: Contracts.Crypto.WorkerSubprocess;
+	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
 
 	#booted = false;
 	#booting = false;
 
-	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
+	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> {
 		this.ipcSubprocess = this.createWorkerSubprocess();
 
 		while (this.#booting) {

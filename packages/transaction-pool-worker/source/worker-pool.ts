@@ -3,14 +3,14 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Types } from "@mainsail/kernel";
 
 @injectable()
-export class WorkerPool implements Contracts.Crypto.WorkerPool {
+export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.CryptoWorker.Worker.Factory)
+	@inject(Identifiers.TransactionPoolWorker.Worker.Factory)
 	private readonly createWorker!: Contracts.Crypto.WorkerFactory;
 
-	private workers: Contracts.Crypto.Worker[] = [];
+	private workers: Contracts.TransactionPool.Worker[] = [];
 
 	@inject(Identifiers.Config.Flags)
 	private readonly flags!: Types.KeyValuePair;
@@ -43,7 +43,7 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 		await Promise.all(this.workers.map(async (worker) => await worker.kill()));
 	}
 
-	public async getWorker(): Promise<Contracts.Crypto.Worker> {
+	public async getWorker(): Promise<Contracts.TransactionPool.Worker> {
 		const worker = this.workers[this.#currentWorkerIndex];
 		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % this.workers.length;
 

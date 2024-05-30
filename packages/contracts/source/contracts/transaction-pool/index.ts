@@ -9,3 +9,4 @@ export * from "./sender-mempool.js";
 export * from "./sender-state.js";
 export * from "./service.js";
 export * from "./storage.js";
+export * from "./worker.js";

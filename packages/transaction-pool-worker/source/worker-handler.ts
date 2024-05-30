@@ -5,8 +5,7 @@ import { Application } from "@mainsail/kernel";
 @injectable()
 class WorkerImpl {}
 
-// @ts-ignore
-export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler {
+export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
 	// @ts-ignore
 	#app: Contracts.Kernel.Application;
 
