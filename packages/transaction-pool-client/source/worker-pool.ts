@@ -1,13 +1,9 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { IpcWorker, Providers, Types } from "@mainsail/kernel";
+import { IpcWorker, Types } from "@mainsail/kernel";
 
 @injectable()
 export class WorkerPool implements IpcWorker.WorkerPool {
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "crypto-worker")
-	private readonly configuration!: Providers.PluginConfiguration;
-
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -22,7 +18,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	#currentWorkerIndex = 0;
 
 	public async boot(): Promise<void> {
-		const workerCount = this.configuration.getRequired<number>("workerCount");
+		const workerCount = 1;
 
 		for (let index = 0; index < workerCount; index++) {
 			const worker = this.createWorker();
@@ -36,7 +32,8 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 				worker.boot({
 					...this.flags,
 					thread: "crypto-worker",
-					workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
+					// workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
+					workerLoggingEnabled: true,
 				}),
 			),
 		);
