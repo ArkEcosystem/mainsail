@@ -84,6 +84,7 @@
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/transaction-pool-client": "workspace:*",
+		"@mainsail/transaction-pool-worker": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",

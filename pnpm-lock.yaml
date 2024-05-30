@@ -919,6 +919,9 @@ importers:
         version: link:../state
       '@mainsail/transaction-pool-client':
         specifier: workspace:*
+        version: link:../transaction-pool-client
+      '@mainsail/transaction-pool-worker':
+        specifier: workspace:*
         version: link:../transaction-pool-worker
       '@mainsail/transactions':
         specifier: workspace:*
