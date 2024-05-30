@@ -55,11 +55,14 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.validationService.validate(
 			this.#loadFromLocation(["app.json"]),
 			Joi.object({
-				flags: Joi.array().items(Joi.string()).optional(),
-				plugins: Joi.array()
+				core: Joi.array()
 					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
 					.required(),
+				flags: Joi.array().items(Joi.string()).optional(),
 				services: Joi.object().optional(),
+				"transaction-pool": Joi.array()
+					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
+					.required(),
 			}).unknown(true),
 		);
 
