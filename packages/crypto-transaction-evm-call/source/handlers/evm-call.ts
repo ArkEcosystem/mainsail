@@ -1,15 +1,21 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
-import { Utils } from "@mainsail/kernel";
+import { Enums, Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { EvmCallTransaction } from "../versions/index.js";
 
 @injectable()
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
 	@inject(Identifiers.Evm.Gas.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+	private readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
+	@inject(Identifiers.State.State)
+	private readonly state!: Contracts.State.State;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -82,6 +88,12 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			this.logger.debug(
 				`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
 			);
+
+			void this.#emit(Enums.EvmEvent.TransactionReceipt, {
+				receipt,
+				sender: sender.getAddress(),
+				transactionId: transaction.id,
+			});
 		} catch (error) {
 			this.logger.critical(`invalid EVM call: ${error.stack}`);
 		}
@@ -102,6 +114,14 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 	protected applyFeeToSender(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
 		// Fee is taken after EVM execution to take the actual consumed gas into account
+	}
+
+	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
+		if (this.state.isBootstrap()) {
+			return;
+		}
+
+		return this.events.dispatch(event, data);
 	}
 
 	#formatSatoshi(amount: Utils.BigNumber): string {
