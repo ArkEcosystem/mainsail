@@ -64,7 +64,7 @@ export const registerBlockFactory = async (
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
-			totals.gas = gasLimits.of(transaction);
+			totals.gas += gasLimits.of(transaction);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
