@@ -1,25 +1,14 @@
+import { Contracts } from "@mainsail/contracts";
 import { parentPort } from "worker_threads";
 
-export type Actions<T extends {}> = {
-	[K in keyof T]: T[K] extends (...arguments_: any[]) => any ? (ReturnType<T[K]> extends void ? K : never) : never;
-}[keyof T];
-
-export type Requests<T extends {}> = {
-	[K in keyof T]: T[K] extends (...arguments_: any[]) => any
-		? ReturnType<T[K]> extends Promise<any>
-			? K
-			: never
-		: never;
-}[keyof T];
-
-export class Handler<T extends {}> {
+export class Handler<T extends {}> implements Contracts.Kernel.IPC.Handler<T> {
 	private readonly handler: T;
 
 	public constructor(handler: T) {
 		this.handler = handler;
 	}
 
-	public handleAction<K extends Actions<T>>(method: K): void {
+	public handleAction<K extends Contracts.Kernel.IPC.Actions<T>>(method: K): void {
 		parentPort?.on("message", (message) => {
 			if (message.method === method) {
 				// @ts-ignore
@@ -28,7 +17,7 @@ export class Handler<T extends {}> {
 		});
 	}
 
-	public handleRequest<K extends Requests<T>>(method: K): void {
+	public handleRequest<K extends Contracts.Kernel.IPC.Requests<T>>(method: K): void {
 		parentPort?.on("message", async (message) => {
 			if (message.method === method) {
 				try {

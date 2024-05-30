@@ -5,6 +5,7 @@ import { Application, IpcWorker, Services } from "@mainsail/kernel";
 @injectable()
 class WorkerImpl {}
 
+// @ts-ignore
 export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 	// @ts-ignore
 	#app: Contracts.Kernel.Application;

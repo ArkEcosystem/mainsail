@@ -3,6 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Ipc, IpcWorker, Utils } from "@mainsail/kernel";
 
 @injectable()
+// @ts-ignore
 export class Worker implements IpcWorker.Worker {
 	@inject(Identifiers.CryptoWorker.WorkerSubprocess.Factory)
 	private readonly createWorkerSubprocess!: IpcWorker.WorkerSubprocessFactory;
