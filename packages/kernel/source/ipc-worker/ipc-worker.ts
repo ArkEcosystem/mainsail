@@ -40,7 +40,7 @@ export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
 export interface Worker extends WorkerScriptHandler {
 	getQueueSize(): number;
-	kill(signal?: number | NodeJS.Signals): Promise<boolean>;
+	kill(): Promise<number>;
 }
 
 export interface WorkerPool {

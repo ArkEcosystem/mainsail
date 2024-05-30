@@ -1,3 +1,5 @@
+import { parentPort } from "worker_threads";
+
 export type Actions<T extends {}> = {
 	[K in keyof T]: T[K] extends (...arguments_: any[]) => any ? (ReturnType<T[K]> extends void ? K : never) : never;
 }[keyof T];
@@ -18,8 +20,7 @@ export class Handler<T extends {}> {
 	}
 
 	public handleAction<K extends Actions<T>>(method: K): void {
-		process.on("message", (message) => {
-			// @ts-ignore
+		parentPort?.on("message", (message) => {
 			if (message.method === method) {
 				// @ts-ignore
 				this.handler[method](...message.args);
@@ -28,17 +29,14 @@ export class Handler<T extends {}> {
 	}
 
 	public handleRequest<K extends Requests<T>>(method: K): void {
-		process.on("message", async (message) => {
-			// @ts-ignore
+		parentPort?.on("message", async (message) => {
 			if (message.method === method) {
 				try {
 					// @ts-ignore
 					const result = await this.handler[method](...message.args);
-					// @ts-ignore
-					process.send({ id: message.id, result });
+					parentPort?.postMessage({ id: message.id, result });
 				} catch (error) {
-					// @ts-ignore
-					process.send({ error: error.message, id: message.id });
+					parentPort?.postMessage({ error: error.message, id: message.id });
 				}
 			}
 		});

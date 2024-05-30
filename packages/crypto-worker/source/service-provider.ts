@@ -1,20 +1,20 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Ipc, IpcWorker, Providers } from "@mainsail/kernel";
-import { fork } from "child_process";
 import Joi from "joi";
 import { cpus } from "os";
 import { URL } from "url";
+import { Worker } from "worker_threads";
 
-import { Worker } from "./worker.js";
+import { Worker as WorkerInstance } from "./worker.js";
 import { WorkerPool } from "./worker-pool.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker);
+		this.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(WorkerInstance);
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
 		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
-			const subprocess = fork(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {});
+			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {});
 			return new Ipc.Subprocess(subprocess);
 		});
 
