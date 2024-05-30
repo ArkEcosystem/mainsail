@@ -286,6 +286,14 @@ export const Identifiers = {
 	},
 	TransactionPoolClient: {
 		Instance: Symbol("TransactionPoolClient<Instance>"),
+		Worker: {
+			Factory: Symbol("TransactionPoolClient<Worker.Factory>"),
+			Instance: Symbol("TransactionPoolClient<Worker.Instance>"),
+		},
+		WorkerPool: Symbol("TransactionPoolClient<WorkerPool>"),
+		WorkerSubprocess: {
+			Factory: Symbol("TransactionPoolClient<WorkerSubprocess.Factory>"),
+		},
 	},
 	Validator: {
 		Repository: Symbol("Validator<Repository>"),
