@@ -29,7 +29,7 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 			this.workers.push(worker);
 		}
 
-		this.logger.info(`Booting up ${this.workers.length} workers`);
+		this.logger.info(`Booting up ${this.workers.length} crypto workers`);
 
 		await Promise.all(
 			this.workers.map((worker) =>

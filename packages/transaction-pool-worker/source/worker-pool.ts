@@ -25,7 +25,7 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 			this.workers.push(worker);
 		}
 
-		this.logger.info(`Booting up ${this.workers.length} workers`);
+		this.logger.info(`Booting up ${this.workers.length} transaction pool workers`);
 
 		await Promise.all(
 			this.workers.map((worker) =>
