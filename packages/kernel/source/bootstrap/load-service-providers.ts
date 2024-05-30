@@ -33,7 +33,7 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 	private readonly serviceProviderRepository!: ServiceProviderRepository;
 
 	public async bootstrap(): Promise<void> {
-		const plugins: PluginEntry[] | undefined = this.configRepository.get<PluginEntry[]>("app.core");
+		const plugins: PluginEntry[] | undefined = this.configRepository.get<PluginEntry[]>(`app.${this.app.thread()}`);
 		assert.defined<PluginEntry[]>(plugins);
 
 		const installedPlugins = await this.#discoverPlugins(this.app.dataPath("plugins"));

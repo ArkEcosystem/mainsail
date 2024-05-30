@@ -67,6 +67,10 @@ export class Application implements Contracts.Kernel.Application {
 		return this.get(Identifiers.Application.Name);
 	}
 
+	public thread(): string {
+		return this.get(Identifiers.Application.Thread);
+	}
+
 	public dataPath(path = ""): string {
 		return join(this.#getPath("data"), path);
 	}
