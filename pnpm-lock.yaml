@@ -919,7 +919,7 @@ importers:
         version: link:../state
       '@mainsail/transaction-pool-client':
         specifier: workspace:*
-        version: link:../transaction-pool-client
+        version: link:../transaction-pool-worker
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -3179,6 +3179,28 @@ importers:
       tmp:
         specifier: 0.2.3
         version: 0.2.3
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/transaction-pool-worker:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+    devDependencies:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
