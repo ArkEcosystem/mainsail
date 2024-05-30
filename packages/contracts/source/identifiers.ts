@@ -7,6 +7,7 @@ export const Identifiers = {
 		Environment: Symbol("Application<Environment>"),
 		Instance: Symbol("Application<Instance>"),
 		Name: Symbol("Application<Name>"),
+		Thread: Symbol("Application<Thread>"),
 		Version: Symbol("Application<Version>"),
 	},
 	Config: {
