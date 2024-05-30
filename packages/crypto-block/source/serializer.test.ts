@@ -27,7 +27,7 @@ describe<{
 		assert.equal(serializer.totalSize(blockDataWithTransactions), 533);
 	});
 
-	it.skip("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {
+	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {
 		const serialized = await serializer.serializeHeader(blockData);
 
 		const deserialized = await deserializer.deserializeHeader(serialized);
@@ -35,7 +35,7 @@ describe<{
 		assertBlockData(assert, deserialized, blockData);
 	});
 
-	it.skip("#serialize - should serialize and deserialize block with transactions", async ({
+	it("#serialize - should serialize and deserialize block with transactions", async ({
 		serializer,
 		deserializer,
 	}) => {

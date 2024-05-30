@@ -14,7 +14,7 @@ describe<{
 		context.deserializer = context.sandbox.app.resolve(Deserializer);
 	});
 
-	it.skip("#deserialize - should correctly deserialize a block", async ({ deserializer }) => {
+	it("#deserialize - should correctly deserialize a block", async ({ deserializer }) => {
 		const deserialized = await deserializer.deserializeHeader(Buffer.from(serialized, "hex"));
 
 		assertBlockData(assert, deserialized, blockData);
@@ -22,7 +22,7 @@ describe<{
 		assert.undefined(deserialized.transactions);
 	});
 
-	it.skip("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
+	it("#deserialize - should correctly deserialize a block with transactions", async ({ deserializer }) => {
 		const deserialized = (
 			await deserializer.deserializeWithTransactions(Buffer.from(serializedWithTransactions, "hex"))
 		).data;
@@ -40,7 +40,7 @@ describe<{
 		}
 	});
 
-	it.skip("#deserializeHeader - should correctly deserialize without transactions", async ({ deserializer }) => {
+	it("#deserializeHeader - should correctly deserialize without transactions", async ({ deserializer }) => {
 		const deserialized = await deserializer.deserializeHeader(Buffer.from(serialized, "hex"));
 
 		assertBlockData(assert, deserialized, blockData);
@@ -48,7 +48,7 @@ describe<{
 		assert.undefined(deserialized.transactions);
 	});
 
-	it.skip("#deserializeHeader - should correctly deserialize with transactions", async ({ deserializer }) => {
+	it("#deserializeHeader - should correctly deserialize with transactions", async ({ deserializer }) => {
 		const deserialized = await deserializer.deserializeHeader(Buffer.from(serializedWithTransactions, "hex"));
 
 		assertBlockData(assert, deserialized, blockDataWithTransactions);
