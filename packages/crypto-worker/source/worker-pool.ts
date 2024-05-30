@@ -35,6 +35,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 			this.workers.map((worker) =>
 				worker.boot({
 					...this.flags,
+					thread: "crypto-worker",
 					workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
 				}),
 			),

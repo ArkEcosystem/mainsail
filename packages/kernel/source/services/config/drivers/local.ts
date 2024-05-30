@@ -55,6 +55,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.validationService.validate(
 			this.#loadFromLocation(["app.json"]),
 			Joi.object({
+				"crypto-worker": Joi.array()
+					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
+					.required(),
 				flags: Joi.array().items(Joi.string()).optional(),
 				main: Joi.array()
 					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
@@ -77,6 +80,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 		this.configRepository.set("app.main", get(this.validationService.valid(), "main", []));
 		this.configRepository.set("app.transaction-pool", get(this.validationService.valid(), "transaction-pool", []));
+		this.configRepository.set("app.crypto-worker", get(this.validationService.valid(), "crypto-worker", []));
 	}
 
 	#loadPeers(): void {

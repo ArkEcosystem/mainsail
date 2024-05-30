@@ -85,11 +85,6 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 			}
 
 			const serviceProvider: ServiceProvider = this.app.resolve(ServiceProvider);
-
-			if (this.app.isWorker() && !serviceProvider.requiredByWorker()) {
-				continue;
-			}
-
 			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule, import.meta.url));
 			serviceProvider.setConfig(
 				await this.#discoverConfiguration(serviceProvider, plugin.options, packageModule),
