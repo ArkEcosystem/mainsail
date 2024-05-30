@@ -1,19 +1,19 @@
 import { inject, injectable } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
-import { Ipc, IpcWorker, Utils } from "@mainsail/kernel";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 // @ts-ignore
-export class Worker implements IpcWorker.Worker {
+export class Worker implements Contracts.Crypto.Worker {
 	@inject(Identifiers.CryptoWorker.WorkerSubprocess.Factory)
-	private readonly createWorkerSubprocess!: IpcWorker.WorkerSubprocessFactory;
+	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
 
-	private ipcSubprocess!: Ipc.Subprocess<IpcWorker.WorkerScriptHandler>;
+	private ipcSubprocess!: Contracts.Crypto.WorkerSubprocess;
 
 	#booted = false;
 	#booting = false;
 
-	public async boot(flags: IpcWorker.WorkerFlags): Promise<void> {
+	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
 		this.ipcSubprocess = this.createWorkerSubprocess();
 
 		while (this.#booting) {

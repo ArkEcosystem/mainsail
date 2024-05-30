@@ -1,6 +1,6 @@
 import { Container, inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Application, Ipc, IpcWorker, Services } from "@mainsail/kernel";
+import { Application, Services } from "@mainsail/kernel";
 
 @injectable()
 class WorkerImpl {
@@ -22,42 +22,42 @@ class WorkerImpl {
 	@tagged("type", "wallet")
 	private readonly walletSignature!: Contracts.Crypto.Signature;
 
-	public async callConsensusSignature<K extends Ipc.Requests<Contracts.Crypto.Signature>>(
+	public async callConsensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
 		arguments_: Parameters<Contracts.Crypto.Signature[K]>,
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
 		return this.#call(this.consensusSignature, method, arguments_);
 	}
 
-	public async callWalletSignawture<K extends Ipc.Requests<Contracts.Crypto.Signature>>(
+	public async callWalletSignawture<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
 		arguments_: Parameters<Contracts.Crypto.Signature[K]>,
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
 		return this.#call(this.walletSignature, method, arguments_);
 	}
 
-	public async callTransactionFactory<K extends Ipc.Requests<Contracts.Crypto.TransactionFactory>>(
+	public async callTransactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
 		arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>,
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
 		return this.#call(this.transactionFactory, method, arguments_);
 	}
 
-	public async callBlockFactory<K extends Ipc.Requests<Contracts.Crypto.BlockFactory>>(
+	public async callBlockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
 		method: K,
 		arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>,
 	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
 		return this.#call(this.blockFactory, method, arguments_);
 	}
 
-	public async callPublicKeyFactory<K extends Ipc.Requests<Contracts.Crypto.PublicKeyFactory>>(
+	public async callPublicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
 		method: K,
 		arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>,
 	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {
 		return this.#call(this.publicKeyFactory, method, arguments_);
 	}
 
-	async #call<T extends { [K in keyof T]: (...arguments_: any) => any }, K extends Ipc.Requests<T>>(
+	async #call<T extends { [K in keyof T]: (...arguments_: any) => any }, K extends Contracts.Kernel.IPC.Requests<T>>(
 		object: T,
 		method: K,
 		arguments_: Parameters<T[K]>,
@@ -79,14 +79,14 @@ class WorkerImpl {
 	}
 }
 
-export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
+export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler {
 	// @ts-ignore
 	#app: Contracts.Kernel.Application;
 
 	// @ts-ignore
 	#impl: WorkerImpl;
 
-	public async boot(flags: IpcWorker.WorkerFlags): Promise<void> {
+	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
 		const app: Contracts.Kernel.Application = new Application(new Container());
 
 		app.config("worker", true);
@@ -107,7 +107,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 		this.#impl = app.resolve(WorkerImpl);
 	}
 
-	public async consensusSignature<K extends Ipc.Requests<Contracts.Crypto.Signature>>(
+	public async consensusSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
@@ -115,7 +115,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 		return this.#impl.callConsensusSignature(method, arguments_[0]);
 	}
 
-	public async walletSignature<K extends Ipc.Requests<Contracts.Crypto.Signature>>(
+	public async walletSignature<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.Signature>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.Signature[K]>
 	): Promise<ReturnType<Contracts.Crypto.Signature[K]>> {
@@ -123,7 +123,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 		return this.#impl.callWalletSignawture(method, arguments_[0]);
 	}
 
-	public async blockFactory<K extends Ipc.Requests<Contracts.Crypto.BlockFactory>>(
+	public async blockFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.BlockFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.BlockFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.BlockFactory[K]>> {
@@ -131,7 +131,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 		return this.#impl.callBlockFactory(method, arguments_[0]);
 	}
 
-	public async transactionFactory<K extends Ipc.Requests<Contracts.Crypto.TransactionFactory>>(
+	public async transactionFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.TransactionFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.TransactionFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.TransactionFactory[K]>> {
@@ -139,7 +139,7 @@ export class WorkerScriptHandler implements IpcWorker.WorkerScriptHandler {
 		return this.#impl.callTransactionFactory(method, arguments_[0]);
 	}
 
-	public async publicKeyFactory<K extends Ipc.Requests<Contracts.Crypto.PublicKeyFactory>>(
+	public async publicKeyFactory<K extends Contracts.Kernel.IPC.Requests<Contracts.Crypto.PublicKeyFactory>>(
 		method: K,
 		...arguments_: Parameters<Contracts.Crypto.PublicKeyFactory[K]>
 	): Promise<ReturnType<Contracts.Crypto.PublicKeyFactory[K]>> {

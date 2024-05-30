@@ -10,3 +10,4 @@ export * from "./networks.js";
 export * from "./signatures.js";
 export * from "./transactions.js";
 export * from "./validator.js";
+export * from "./worker.js";

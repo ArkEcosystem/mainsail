@@ -1,9 +1,9 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { IpcWorker, Providers, Types } from "@mainsail/kernel";
+import { Providers, Types } from "@mainsail/kernel";
 
 @injectable()
-export class WorkerPool implements IpcWorker.WorkerPool {
+export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "crypto-worker")
 	private readonly configuration!: Providers.PluginConfiguration;
@@ -12,9 +12,9 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.CryptoWorker.Worker.Factory)
-	private readonly createWorker!: IpcWorker.WorkerFactory;
+	private readonly createWorker!: Contracts.Crypto.WorkerFactory;
 
-	private workers: IpcWorker.Worker[] = [];
+	private workers: Contracts.Crypto.Worker[] = [];
 
 	@inject(Identifiers.Config.Flags)
 	private readonly flags!: Types.KeyValuePair;
@@ -46,7 +46,7 @@ export class WorkerPool implements IpcWorker.WorkerPool {
 		await Promise.all(this.workers.map(async (worker) => await worker.kill()));
 	}
 
-	public async getWorker(): Promise<IpcWorker.Worker> {
+	public async getWorker(): Promise<Contracts.Crypto.Worker> {
 		const worker = this.workers[this.#currentWorkerIndex];
 		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % this.workers.length;
 
