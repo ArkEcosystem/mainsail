@@ -23,8 +23,7 @@ describe<{
 		await shutdown(sandbox);
 	});
 
-	// TODO: balance snapshot needs to take consumed gas into account
-	it.skip("should accept and commit evm call", async (context) => {
+	it("should accept and commit evm call", async (context) => {
 		const tx = await EvmCalls.makeEvmCall(context);
 
 		const { accept } = await addTransactionsToPool(context, [tx]);

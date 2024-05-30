@@ -74,6 +74,10 @@ export class Snapshot {
 			}
 		}
 
+		if (!allValid) {
+			process.exit(1);
+		}
+
 		assert.true(allValid);
 	}
 
