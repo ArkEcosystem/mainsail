@@ -31,7 +31,7 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 			this.workers.map((worker) =>
 				worker.boot({
 					...this.flags,
-					thread: "crypto-worker",
+					thread: "transaction-pool",
 					// workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
 					workerLoggingEnabled: true,
 				}),

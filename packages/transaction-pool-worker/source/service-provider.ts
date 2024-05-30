@@ -22,11 +22,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.get<Contracts.TransactionPool.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).boot();
+		await this.app.get<Contracts.TransactionPool.WorkerPool>(Identifiers.TransactionPoolWorker.WorkerPool).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.TransactionPool.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).shutdown();
+		await this.app
+			.get<Contracts.TransactionPool.WorkerPool>(Identifiers.TransactionPoolWorker.WorkerPool)
+			.shutdown();
 	}
 
 	public async required(): Promise<boolean> {
