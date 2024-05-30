@@ -1,14 +1,14 @@
 {
-    "address": "0x7D8e0Dbc506413A8eBDE2460FAb1Ce3F504Bb99a",
+    "address": "0xB00dF390b486F646489d0549F5aae824947927b8",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "161681edbb71f60fcd30e5c1544c0385efdfccca7e4f1f46d3bb0fd8fc6dbda3",
-        "publicKey": "b247fd6b9be5d7abc2f3aa5e7424921bea615e43d179ab53b3fcdc9914f85f5021faa9f065085fb62dcb166e9c5806d8"
+        "privateKey": "6e5dc74ecc4e0f39db4b619412a47ec7a6265ca167047f06e6c87d7a50618614",
+        "publicKey": "acc611fd0dcc2ebcf3f1e07b381344dbb936ec09a581534a5e08682f0fa89203700f6946acfb60b225c5b14ddbb49388"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "8e59f4b6bba7974592206311f5c66e9d3394707858adf5e405e1cbf7b833c77d",
-        "publicKey": "03b74cea71aa803cd95ab80d00c9575cb2d2bd0ab7286d17c6b28cc4f329269238"
+        "privateKey": "088ec52b3f30c9edff0eb4b61768adbc00671c25ba5dc8f862a4ffe5b2b4d49d",
+        "publicKey": "0397d3ee7991c0b17bb9269fcf2577d2161d02bc35bab636ed6c9f61c4fb1f42e9"
     },
-    "passphrase": "sponsor wall broom sketch afraid social legend cute cash spray wait cargo sniff travel cabbage nasty invest fiber need engine cry napkin foam honey"
+    "passphrase": "woman receive radio fee deal split destroy glare pizza cook track broccoli swap bone wolf sure deposit van episode girl inner sun jacket desert"
 }
