@@ -1,4 +1,4 @@
-import { ChildProcess } from "child_process";
+import { Worker } from "worker_threads";
 
 import { Requests } from "./handler.js";
 
@@ -24,16 +24,16 @@ export type RequestCallbacks<T extends {}> = RequestCallback<T, Requests<T>>;
 
 export class Subprocess<T extends {}> {
 	private lastId = 1;
-	private readonly subprocess: ChildProcess;
+	private readonly subprocess: Worker;
 	private readonly callbacks = new Map<number, RequestCallbacks<T>>();
 
-	public constructor(subprocess: ChildProcess) {
+	public constructor(subprocess: Worker) {
 		this.subprocess = subprocess;
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 	}
 
-	public kill(signal?: number | NodeJS.Signals): boolean {
-		return this.subprocess.kill(signal);
+	public async kill(): Promise<number> {
+		return this.subprocess.terminate();
 	}
 
 	public getQueueSize(): number {
@@ -43,7 +43,7 @@ export class Subprocess<T extends {}> {
 	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
 	public sendAction(method: string, ...arguments_: any): void {
 		// TODO: we have to make sure args are always serializable
-		this.subprocess.send({ args: arguments_, method });
+		this.subprocess.postMessage({ args: arguments_, method });
 	}
 
 	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
@@ -52,7 +52,7 @@ export class Subprocess<T extends {}> {
 			const id = this.lastId++;
 			this.callbacks.set(id, { reject, resolve });
 			// TODO: we have to make sure args are always serializable and ideally don't copy
-			this.subprocess.send({ args: arguments_, id, method });
+			this.subprocess.postMessage({ args: arguments_, id, method });
 		});
 	}
 
