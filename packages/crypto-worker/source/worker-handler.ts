@@ -89,8 +89,6 @@ export class WorkerScriptHandler implements Contracts.Crypto.WorkerScriptHandler
 	public async boot(flags: Contracts.Crypto.WorkerFlags): Promise<void> {
 		const app: Contracts.Kernel.Application = new Application(new Container());
 
-		app.config("worker", true);
-
 		await app.bootstrap({
 			flags,
 		});
