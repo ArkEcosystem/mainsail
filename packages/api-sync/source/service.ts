@@ -59,6 +59,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.State.State)
+	private readonly state!: Contracts.State.State;
+
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
@@ -345,7 +348,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const t1 = performance.now();
 
-		this.logger.debug(`synced commit: ${deferred.block.height} in ${t1 - t0}ms`);
+		if (!this.state.isBootstrap()) {
+			this.logger.debug(`synced commit: ${deferred.block.height} in ${t1 - t0}ms`);
+		}
 	}
 
 	async #resetDatabaseIfNecessary(): Promise<void> {
