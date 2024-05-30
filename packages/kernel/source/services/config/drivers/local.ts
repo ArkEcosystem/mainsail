@@ -75,7 +75,8 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			...get(this.validationService.valid(), "flags", {}),
 		});
 
-		this.configRepository.set("app.plugins", get(this.validationService.valid(), "plugins", []));
+		this.configRepository.set("app.core", get(this.validationService.valid(), "core", []));
+		this.configRepository.set("app.transaction-pool", get(this.validationService.valid(), "transaction-pool", []));
 	}
 
 	#loadPeers(): void {
