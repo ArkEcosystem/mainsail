@@ -24,8 +24,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"
