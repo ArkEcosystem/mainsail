@@ -1,31 +1,10 @@
+import { Contracts } from "@mainsail/contracts";
 import { Worker } from "worker_threads";
 
-import { Requests } from "./handler.js";
-
-export type SuccessReply = {
-	id: number;
-	result: any;
-};
-
-export type ErrorReply = {
-	id: number;
-	error: string;
-};
-
-export type Reply = SuccessReply | ErrorReply;
-
-export type RequestCallback<T extends {}, K extends Requests<T>> = {
-	// @ts-ignore
-	resolve: (result: ReturnType<T[K]>) => void;
-	reject: (error: Error) => void;
-};
-
-export type RequestCallbacks<T extends {}> = RequestCallback<T, Requests<T>>;
-
-export class Subprocess<T extends {}> {
+export class Subprocess<T extends {}> implements Contracts.Kernel.IPC.Subprocess<T> {
 	private lastId = 1;
 	private readonly subprocess: Worker;
-	private readonly callbacks = new Map<number, RequestCallbacks<T>>();
+	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
 
 	public constructor(subprocess: Worker) {
 		this.subprocess = subprocess;
@@ -56,7 +35,7 @@ export class Subprocess<T extends {}> {
 		});
 	}
 
-	private onSubprocessMessage(message: Reply): void {
+	private onSubprocessMessage(message: Contracts.Kernel.IPC.Reply): void {
 		try {
 			if ("error" in message) {
 				this.callbacks.get(message.id)?.reject(new Error(message.error));

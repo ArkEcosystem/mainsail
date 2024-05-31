@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { IpcWorker, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Aggregator implements Contracts.Consensus.Aggregator {
@@ -8,7 +8,7 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.CryptoWorker.WorkerPool)
-	private readonly workerPool!: IpcWorker.WorkerPool;
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	public async aggregate(
 		majority: Map<number, { signature: string }>,

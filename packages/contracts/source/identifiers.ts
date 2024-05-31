@@ -7,6 +7,7 @@ export const Identifiers = {
 		Environment: Symbol("Application<Environment>"),
 		Instance: Symbol("Application<Instance>"),
 		Name: Symbol("Application<Name>"),
+		Thread: Symbol("Application<Thread>"),
 		Version: Symbol("Application<Version>"),
 	},
 	Config: {
@@ -285,6 +286,16 @@ export const Identifiers = {
 	},
 	TransactionPoolClient: {
 		Instance: Symbol("TransactionPoolClient<Instance>"),
+	},
+	TransactionPoolWorker: {
+		Worker: {
+			Factory: Symbol("TransactionPoolWorker<Worker.Factory>"),
+			Instance: Symbol("TransactionPoolWorker<Worker.Instance>"),
+		},
+		WorkerPool: Symbol("TransactionPoolWorker<WorkerPool>"),
+		WorkerSubprocess: {
+			Factory: Symbol("TransactionPoolWorker<WorkerSubprocess.Factory>"),
+		},
 	},
 	Validator: {
 		Repository: Symbol("Validator<Repository>"),

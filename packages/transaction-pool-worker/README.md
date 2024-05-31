@@ -1,4 +1,4 @@
-# Mainsail - API
+# Mainsail - Transaction pool worker
 
 ![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 

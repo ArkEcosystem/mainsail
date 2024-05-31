@@ -1,5 +1,5 @@
-import { Identifiers } from "@mainsail/contracts";
-import { Ipc, IpcWorker, Providers } from "@mainsail/kernel";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Ipc, Providers } from "@mainsail/kernel";
 import Joi from "joi";
 import { cpus } from "os";
 import { URL } from "url";
@@ -11,22 +11,22 @@ import { WorkerPool } from "./worker-pool.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(WorkerInstance);
+		this.app.bind(Identifiers.CryptoWorker.Worker.Factory).toAutoFactory(Identifiers.CryptoWorker.Worker.Instance);
+
 		this.app.bind(Identifiers.CryptoWorker.WorkerPool).to(WorkerPool).inSingletonScope();
 
 		this.app.bind(Identifiers.CryptoWorker.WorkerSubprocess.Factory).toFactory(() => () => {
 			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {});
 			return new Ipc.Subprocess(subprocess);
 		});
-
-		this.app.bind(Identifiers.CryptoWorker.Worker.Factory).toAutoFactory(Identifiers.CryptoWorker.Worker.Instance);
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.get<IpcWorker.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).boot();
+		await this.app.get<Contracts.Crypto.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<IpcWorker.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).shutdown();
+		await this.app.get<Contracts.Crypto.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).shutdown();
 	}
 
 	public async required(): Promise<boolean> {

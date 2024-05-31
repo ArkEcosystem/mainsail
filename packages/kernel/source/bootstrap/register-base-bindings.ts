@@ -25,6 +25,7 @@ export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 
 		this.app.bind<string>(Identifiers.Application.Environment).toConstantValue(flags.env);
 		this.app.bind<string>(Identifiers.Application.Name).toConstantValue(flags.name);
+		this.app.bind<string>(Identifiers.Application.Thread).toConstantValue(flags.thread || "main");
 		this.app.bind<string>(Identifiers.Application.Version).toConstantValue(version);
 
 		// @@TODO implement a getter/setter that sets vars locally and in the process.env variables

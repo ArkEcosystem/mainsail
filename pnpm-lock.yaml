@@ -920,6 +920,9 @@ importers:
       '@mainsail/transaction-pool-client':
         specifier: workspace:*
         version: link:../transaction-pool-client
+      '@mainsail/transaction-pool-worker':
+        specifier: workspace:*
+        version: link:../transaction-pool-worker
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -3087,157 +3090,6 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/transaction-pool:
-    dependencies:
-      '@mainsail/api-transaction-pool':
-        specifier: workspace:*
-        version: link:../api-transaction-pool
-      '@mainsail/cli':
-        specifier: workspace:*
-        version: link:../cli
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-block':
-        specifier: workspace:*
-        version: link:../crypto-block
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
-      '@mainsail/crypto-hash-bcrypto':
-        specifier: workspace:*
-        version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
-      '@mainsail/crypto-transaction-username-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-registration
-      '@mainsail/crypto-transaction-username-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-resignation
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../crypto-transaction-vote
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/crypto-wif':
-        specifier: workspace:*
-        version: link:../crypto-wif
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/logger-pino':
-        specifier: workspace:*
-        version: link:../logger-pino
-      '@mainsail/serializer':
-        specifier: workspace:*
-        version: link:../serializer
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../state
-      '@mainsail/transaction-pool-server':
-        specifier: workspace:*
-        version: link:../transaction-pool-server
-      '@mainsail/transaction-pool-service':
-        specifier: workspace:*
-        version: link:../transaction-pool-service
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      boxen:
-        specifier: 7.1.1
-        version: 7.1.1
-      dayjs:
-        specifier: 1.11.10
-        version: 1.11.10
-      envfile:
-        specifier: 7.1.0
-        version: 7.1.0
-      fs-extra:
-        specifier: 11.2.0
-        version: 11.2.0
-      joi:
-        specifier: 17.12.2
-        version: 17.12.2
-      kleur:
-        specifier: 4.1.5
-        version: 4.1.5
-      pm2:
-        specifier: ^5.3.0
-        version: 5.3.0
-    devDependencies:
-      '@types/fs-extra':
-        specifier: 11.0.4
-        version: 11.0.4
-      '@types/prompts':
-        specifier: 2.4.9
-        version: 2.4.9
-      '@types/tmp':
-        specifier: 0.2.6
-        version: 0.2.6
-      cross-env:
-        specifier: 7.0.3
-        version: 7.0.3
-      env-paths:
-        specifier: 3.0.0
-        version: 3.0.0
-      execa:
-        specifier: 8.0.1
-        version: 8.0.1
-      prompts:
-        specifier: 2.4.2
-        version: 2.4.2
-      tmp:
-        specifier: 0.2.3
-        version: 0.2.3
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
   packages/transaction-pool-client:
     dependencies:
       '@mainsail/container':
@@ -3330,6 +3182,25 @@ importers:
       tmp:
         specifier: 0.2.3
         version: 0.2.3
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/transaction-pool-worker:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+    devDependencies:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
