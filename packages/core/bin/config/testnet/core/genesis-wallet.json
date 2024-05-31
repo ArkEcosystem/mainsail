@@ -1,14 +1,14 @@
 {
-    "address": "0x7D8e0Dbc506413A8eBDE2460FAb1Ce3F504Bb99a",
+    "address": "0xCC506b8Af63206205379b7e7b6EbDEA3Aea60bA9",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "161681edbb71f60fcd30e5c1544c0385efdfccca7e4f1f46d3bb0fd8fc6dbda3",
-        "publicKey": "b247fd6b9be5d7abc2f3aa5e7424921bea615e43d179ab53b3fcdc9914f85f5021faa9f065085fb62dcb166e9c5806d8"
+        "privateKey": "03ed09990c3426cbf909757be453c7e75a953dde4e3c5c1824685e882b84e96f",
+        "publicKey": "8ccc9da74836ae99581ed497d80054495c55b6d44f0186b7e9eeef64b0e416b232a9da6fbca151d2583f192a0ced52d4"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "8e59f4b6bba7974592206311f5c66e9d3394707858adf5e405e1cbf7b833c77d",
-        "publicKey": "03b74cea71aa803cd95ab80d00c9575cb2d2bd0ab7286d17c6b28cc4f329269238"
+        "privateKey": "4ad93c9151612745ba2afbf45b141c1c59e79734e67a552bb9fea05b4d10c258",
+        "publicKey": "02c0c6ab58e87aa54abf5641fd7d7c5acfbdd55e025323e64d7fdd0cd08ff4679b"
     },
-    "passphrase": "sponsor wall broom sketch afraid social legend cute cash spray wait cargo sniff travel cabbage nasty invest fiber need engine cry napkin foam honey"
+    "passphrase": "radar media entire coast celery round bleak describe slow dance peanut cloud guess carpet urge swamp hawk nerve churn rotate alarm divert hedgehog pipe"
 }
