@@ -32,8 +32,6 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 				worker.boot({
 					...this.flags,
 					thread: "transaction-pool",
-					// workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
-					workerLoggingEnabled: true,
 				}),
 			),
 		);

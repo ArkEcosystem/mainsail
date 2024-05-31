@@ -1,9 +1,7 @@
 import { Subprocess } from "../kernel/ipc.js";
 import { KeyValuePair } from "../types/index.js";
 
-export interface WorkerFlags extends KeyValuePair {
-	workerLoggingEnabled: boolean;
-}
+export interface WorkerFlags extends KeyValuePair {}
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
