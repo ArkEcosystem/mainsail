@@ -41,8 +41,7 @@ export class GasFeeCalculator implements Contracts.Evm.GasFeeCalculator {
 
 	#calculate(gasFee: Utils.BigNumber, gasUsed: number): Utils.BigNumber {
 		const nativeFeeMultiplier = this.#getNativeFeeMultiplier();
-		const maxFee = gasFee.times(gasUsed).times(nativeFeeMultiplier);
-		return maxFee;
+		return gasFee.times(gasUsed).times(nativeFeeMultiplier);
 	}
 
 	#getNativeFeeMultiplier(): number {

@@ -71,9 +71,9 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			const { instance, commitKey } = context.evm;
 			const { receipt } = await instance.process({
 				caller: sender.getAddress(),
-				gasLimit: BigInt(evmCall.gasLimit),
 				commitKey,
 				data: Buffer.from(evmCall.payload, "hex"),
+				gasLimit: BigInt(evmCall.gasLimit),
 				recipient: transaction.data.recipientId,
 			});
 

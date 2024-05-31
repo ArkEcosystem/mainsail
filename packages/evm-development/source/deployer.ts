@@ -32,9 +32,9 @@ export class Deployer {
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
 		const result = await this.evm.process({
 			caller: this.#genesisAddress,
-			gasLimit: BigInt(1_000_000),
 			commitKey,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
+			gasLimit: BigInt(1_000_000),
 		});
 
 		if (!result.receipt.success) {
@@ -72,8 +72,8 @@ export class Deployer {
 			const { receipt } = await this.evm.process({
 				caller: this.#genesisAddress,
 				commitKey,
-				gasLimit: BigInt(100_000),
 				data: Buffer.from(ethers.getBytes(encodedCall)),
+				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,
 			});
 

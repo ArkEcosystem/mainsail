@@ -1,14 +1,14 @@
 {
-    "address": "0xCC506b8Af63206205379b7e7b6EbDEA3Aea60bA9",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "03ed09990c3426cbf909757be453c7e75a953dde4e3c5c1824685e882b84e96f",
-        "publicKey": "8ccc9da74836ae99581ed497d80054495c55b6d44f0186b7e9eeef64b0e416b232a9da6fbca151d2583f192a0ced52d4"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "4ad93c9151612745ba2afbf45b141c1c59e79734e67a552bb9fea05b4d10c258",
-        "publicKey": "02c0c6ab58e87aa54abf5641fd7d7c5acfbdd55e025323e64d7fdd0cd08ff4679b"
-    },
-    "passphrase": "radar media entire coast celery round bleak describe slow dance peanut cloud guess carpet urge swamp hawk nerve churn rotate alarm divert hedgehog pipe"
+	"address": "0xCC506b8Af63206205379b7e7b6EbDEA3Aea60bA9",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "03ed09990c3426cbf909757be453c7e75a953dde4e3c5c1824685e882b84e96f",
+		"publicKey": "8ccc9da74836ae99581ed497d80054495c55b6d44f0186b7e9eeef64b0e416b232a9da6fbca151d2583f192a0ced52d4"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "4ad93c9151612745ba2afbf45b141c1c59e79734e67a552bb9fea05b4d10c258",
+		"publicKey": "02c0c6ab58e87aa54abf5641fd7d7c5acfbdd55e025323e64d7fdd0cd08ff4679b"
+	},
+	"passphrase": "radar media entire coast celery round bleak describe slow dance peanut cloud guess carpet urge swamp hawk nerve churn rotate alarm divert hedgehog pipe"
 }

@@ -1,7 +1,8 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
-import { GasLimits } from "./gas-limits.js";
+
 import { GasFeeCalculator } from "./gas-fee-calculator.js";
+import { GasLimits } from "./gas-limits.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

@@ -172,9 +172,9 @@ export class Validator implements Contracts.Validator.Validator {
 			reward: BigNumber.make(milestone.reward),
 			round,
 			timestamp,
-			totalGas: totals.gas,
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
+			totalGas: totals.gas,
 			transactions: transactionData,
 			version: 1,
 		});
