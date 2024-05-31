@@ -1484,6 +1484,9 @@ export namespace getStatus {
                 /** BlockHeader numberOfTransactions */
                 numberOfTransactions?: (number|null);
 
+                /** BlockHeader totalGas */
+                totalGas?: (number|null);
+
                 /** BlockHeader totalAmount */
                 totalAmount?: (string|null);
 
@@ -1532,6 +1535,9 @@ export namespace getStatus {
 
                 /** BlockHeader numberOfTransactions. */
                 public numberOfTransactions: number;
+
+                /** BlockHeader totalGas. */
+                public totalGas: number;
 
                 /** BlockHeader totalAmount. */
                 public totalAmount: string;

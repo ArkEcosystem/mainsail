@@ -15,13 +15,14 @@ message GetStatusResponse {
             string previousBlock = 4;
             uint32 height = 5;
             uint32 numberOfTransactions = 6;
-            string totalAmount = 7; // bignumber in core
-            string totalFee = 8; // bignumber in core
-            string reward = 9; // bignumber in core
-            uint32 payloadLength = 10;
-            string payloadHash = 11;
-            string generatorPublicKey = 12;
-            string blockSignature = 13;
+            uint32 totalGas = 7;
+            string totalAmount = 8; // bignumber in core
+            string totalFee = 9; // bignumber in core
+            string reward = 10; // bignumber in core
+            uint32 payloadLength = 11;
+            string payloadHash = 12;
+            string generatorPublicKey = 13;
+            string blockSignature = 14;
         }
         uint32 height = 1;
         bool forgingAllowed = 2;
