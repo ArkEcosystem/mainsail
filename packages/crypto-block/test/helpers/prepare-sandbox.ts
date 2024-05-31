@@ -1,9 +1,9 @@
 import { Identifiers } from "@mainsail/contracts";
-import { ServiceProvider as CoreCryptoAddressBech32m } from "@mainsail/crypto-address-bech32m";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
-import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
+import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
@@ -35,8 +35,8 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 	await context.sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
 	await context.sandbox.app.resolve(CoreCryptoConsensus).register();
-	await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
-	await context.sandbox.app.resolve(CoreCryptoAddressBech32m).register();
+	await context.sandbox.app.resolve(CoreCryptoKeyPairEcdsa).register();
+	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 	await context.sandbox.app.resolve(CoreFees).register();
 	await context.sandbox.app.resolve(CoreFeesStatic).register();

@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
-import { schemas as addressSchemas } from "@mainsail/crypto-address-bech32m";
+import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as kayPairSchemas } from "@mainsail/crypto-key-pair-schnorr";
+import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { schemas as transactionSchemas } from "@mainsail/crypto-transaction";
 import { makeKeywords, schemas as sharedSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation/source/validator";
@@ -31,7 +31,7 @@ describe<{
 		for (const schema of Object.values({
 			...sharedSchemas,
 			...addressSchemas,
-			...kayPairSchemas,
+			...keyPairSchemas,
 			...transactionSchemas,
 			...schemas,
 		})) {
@@ -62,7 +62,7 @@ describe<{
 
 	const blockOriginal = {
 		blockSignature: "123",
-		generatorPublicKey: "a".repeat(64),
+		generatorPublicKey: "a".repeat(66),
 		height: 0,
 		id: "1".repeat(64),
 		numberOfTransactions: 0,
@@ -70,6 +70,7 @@ describe<{
 		previousBlock: "0".repeat(64),
 		reward: 0,
 		timestamp: 0,
+		totalGas: 0,
 		totalAmount: 0,
 		totalFee: 0,
 		version: 1,
@@ -99,6 +100,7 @@ describe<{
 			"timestamp",
 			"previousBlock",
 			"height",
+			"totalGas",
 			"totalAmount",
 			"totalFee",
 			"reward",
