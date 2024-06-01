@@ -53,7 +53,10 @@ export class Service implements Contracts.State.Service {
 	}
 
 	public async export(height: number): Promise<void> {
-		if (height % this.configuration.getRequired<number>("snapshots.interval") === 0) {
+		if (
+			this.configuration.getRequired<boolean>("snapshots.enabled") &&
+			height % this.configuration.getRequired<number>("snapshots.interval") === 0
+		) {
 			await this.snapshotService.export(this.#baseStore);
 		}
 	}
