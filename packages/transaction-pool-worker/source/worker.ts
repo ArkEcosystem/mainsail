@@ -11,6 +11,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 	#booted = false;
 	#booting = false;
+	#failedTransactions: Contracts.Crypto.Transaction[] = [];
 
 	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> {
 		this.ipcSubprocess = this.createWorkerSubprocess();
@@ -37,6 +38,18 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 	public getQueueSize(): number {
 		return this.ipcSubprocess.getQueueSize();
+	}
+
+	public setFailedTransactions(transactions: Contracts.Crypto.Transaction[]): void {
+		this.#failedTransactions = [...this.#failedTransactions, ...transactions];
+	}
+
+	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
+		await this.ipcSubprocess.sendRequest("commit", {
+			block: unit.getBlock().serialized,
+			failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
+			store: unit.store.changesToJson(),
+		});
 	}
 
 	public async importSnapshot(height: number): Promise<void> {

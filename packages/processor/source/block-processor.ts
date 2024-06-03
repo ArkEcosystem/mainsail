@@ -38,11 +38,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Processor.BlockVerifier)
 	private readonly verifier!: Contracts.Processor.Verifier;
 
-	@inject(Identifiers.TransactionPoolClient.Instance)
-	private readonly txPoolClient!: Contracts.TransactionPool.Client;
-
 	@multiInject(Identifiers.State.ValidatorMutator)
 	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
+
+	@inject(Identifiers.TransactionPoolWorker.WorkerPool)
+	private readonly txPoolWorkerPool!: Contracts.TransactionPool.WorkerPool;
 
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
@@ -87,7 +87,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
-		await this.txPoolClient.onCommit(unit);
+
+		const transactionPoolWorker = await this.txPoolWorkerPool.getWorker();
+		await transactionPoolWorker.onCommit(unit);
 
 		if (this.apiSync) {
 			await this.apiSync.onCommit(unit);

@@ -1,3 +1,4 @@
+import { CommitHandler, Transaction } from "../crypto/index.js";
 import { Subprocess } from "../kernel/ipc.js";
 import { KeyValuePair } from "../types/index.js";
 
@@ -14,9 +15,10 @@ export type WorkerSubprocess = Subprocess<WorkerScriptHandler>;
 
 export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
-export interface Worker extends WorkerScriptHandler {
+export interface Worker extends WorkerScriptHandler, CommitHandler {
 	getQueueSize(): number;
 	kill(): Promise<number>;
+	setFailedTransactions(transactions: Transaction[]): void;
 }
 
 export interface WorkerPool {
