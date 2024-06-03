@@ -283,15 +283,9 @@ export const Identifiers = {
 		SenderState: Symbol("TransactionPool<SenderState>"),
 		Service: Symbol("TransactionPool<Service>"),
 		Storage: Symbol("TransactionPool<Storage>"),
-	},
-	TransactionPoolWorker: {
-		Worker: {
-			Factory: Symbol("TransactionPoolWorker<Worker.Factory>"),
-			Instance: Symbol("TransactionPoolWorker<Worker.Instance>"),
-		},
-		WorkerPool: Symbol("TransactionPoolWorker<WorkerPool>"),
+		Worker: Symbol("TransactionPool<Worker>"),
 		WorkerSubprocess: {
-			Factory: Symbol("TransactionPoolWorker<WorkerSubprocess.Factory>"),
+			Factory: Symbol("TransactionPool<WorkerSubprocess.Factory>"),
 		},
 	},
 	Validator: {

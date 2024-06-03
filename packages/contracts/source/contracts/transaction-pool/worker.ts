@@ -23,9 +23,3 @@ export interface Worker extends Omit<WorkerScriptHandler, "commit" | "getTransac
 	setFailedTransactions(transactions: Transaction[]): void;
 	getTransactionBytes(): Promise<Buffer[]>;
 }
-
-export interface WorkerPool {
-	boot(): Promise<void>;
-	shutdown(): Promise<void>;
-	getWorker(): Promise<Worker>;
-}

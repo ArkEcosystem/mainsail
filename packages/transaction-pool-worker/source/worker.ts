@@ -4,7 +4,7 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
-	@inject(Identifiers.TransactionPoolWorker.WorkerSubprocess.Factory)
+	@inject(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
 
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
