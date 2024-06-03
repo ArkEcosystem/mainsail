@@ -85,10 +85,6 @@
 			"package": "@mainsail/transaction-pool-worker"
 		},
 		{
-			"package": "@mainsail/transaction-pool-client"
-		},
-
-		{
 			"package": "@mainsail/crypto-messages"
 		},
 		{
@@ -274,9 +270,6 @@
 		},
 		{
 			"package": "@mainsail/transaction-pool-service"
-		},
-		{
-			"package": "@mainsail/transaction-pool-server"
 		},
 		{
 			"package": "@mainsail/api-transaction-pool"

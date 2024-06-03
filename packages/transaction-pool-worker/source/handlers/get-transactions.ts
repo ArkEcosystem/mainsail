@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class GetTransactionsAction implements Contracts.Api.RPC.Action {
+export class GetTransactionsHandler {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
@@ -21,17 +21,7 @@ export class GetTransactionsAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
 
-	public readonly name: string = "get_transactions";
-
-	public readonly schema = {
-		$id: `jsonRpc_${this.name}`,
-		additionalProperties: false,
-		type: "object",
-	};
-
-	public async handle(
-		parameters: Contracts.TransactionPool.Actions.GetTransactionsRequest,
-	): Promise<Contracts.TransactionPool.Actions.GetTransactionsResponse> {
+	public async handle(): Promise<string[]> {
 		const milestone = this.configuration.getMilestone();
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 

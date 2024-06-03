@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
-export class CommitAction implements Contracts.Api.RPC.Action {
+export class CommitHandler {
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
@@ -21,48 +21,27 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public readonly name: string = "commit";
-
-	public readonly schema = {
-		$id: `jsonRpc_${this.name}`,
-		additionalProperties: false,
-		properties: {
-			block: {
-				type: "string",
-			},
-			failedTransactions: {
-				items: {
-					type: "string",
-				},
-				type: "array",
-			},
-			store: {
-				type: "object",
-			},
-		},
-		required: ["block", "failedTransactions", "store"],
-		type: "object",
-	};
-
-	public async handle(
-		parameters: Contracts.TransactionPool.Actions.CommitRequest,
-	): Promise<Contracts.TransactionPool.Actions.CommitResponse> {
+	public async handle(data: {
+		block: string;
+		failedTransactions: string[];
+		store: Contracts.State.StoreChange;
+	}): Promise<void> {
 		try {
 			const store = this.stateService.createStoreClone();
 
-			store.applyChanges(parameters.store);
+			store.applyChanges(data.store);
 			store.commitChanges();
 
 			this.configuration.setHeight(store.getLastHeight() + 1);
 
-			const block = await this.blockFactory.fromHex(parameters.block);
+			const block = await this.blockFactory.fromHex(data.block);
 			store.setLastBlock(block);
 
 			for (const transaction of block.transactions) {
 				await this.transactionPoolService.removeForgedTransaction(transaction);
 			}
 
-			for (const transactionId of parameters.failedTransactions) {
+			for (const transactionId of data.failedTransactions) {
 				try {
 					const transaction = await this.transactionPoolQuery.getAll().whereId(transactionId).first();
 					await this.transactionPoolService.removeTransaction(transaction);
@@ -75,11 +54,7 @@ export class CommitAction implements Contracts.Api.RPC.Action {
 				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed.`,
 			);
 		} catch (error) {
-			this.logger.error(`Failed to commit block: ${error.message}`);
-
-			throw new Error(`Cannot process changes, because: ${error.message}`);
+			throw new Error(`Failed to commit block: ${error.message}`);
 		}
-
-		return true;
 	}
 }

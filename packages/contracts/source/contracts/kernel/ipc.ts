@@ -31,7 +31,6 @@ export type RequestCallback<T extends {}, K extends Requests<T>> = {
 export type RequestCallbacks<T extends {}> = RequestCallback<T, Requests<T>>;
 
 export interface Handler<T extends {}> {
-	handleAction<K extends Actions<T>>(method: K): void;
 	handleRequest<K extends Requests<T>>(method: K): void;
 }
 
