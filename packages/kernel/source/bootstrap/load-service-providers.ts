@@ -70,11 +70,7 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 						"index.js",
 					);
 
-					try {
-						({ ServiceProvider } = await import(fallback));
-					} catch (ex) {
-						throw ex;
-					}
+					({ ServiceProvider } = await import(fallback));
 
 					// ~/git/mainsail/packages/validation/distribution/index.js
 					// ~/git/mainsail/packages/validation/
