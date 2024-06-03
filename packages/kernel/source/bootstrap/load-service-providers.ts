@@ -56,23 +56,25 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 					//
 					// Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@mainsail/validation' imported from
 					// ~/git/mainsail/packages/kernel/distribution/bootstrap/load-service-providers.js
-					//
-					const extractLocalModulePath = (message: string) => {
-						const prefix = "Did you mean to import ";
-						const suffix = "index.js";
-						const startIndex = message.indexOf(prefix) + prefix.length;
-						const endIndex = message.indexOf(suffix, startIndex) + suffix.length;
-						const path = message.slice(startIndex, endIndex);
-						const parts = path.split("/");
-						return parts.slice(-3).join("/");
-					};
-
-					const localPath = extractLocalModulePath(error.stack);
-					// ~/git/mainsail/packages/kernel/distribution/bootstrap
+					// =>
+					// ~/git/mainsail/packages/kernel/distribution/bootstrap/
 					// ~/git/mainsail/packages/
 					// ~/git/mainsail/packages/validation/distribution/index.js
-					const fallback = path.resolve(new URL(".", import.meta.url).pathname, "..", "..", "..", localPath);
-					({ ServiceProvider } = await import(fallback));
+					const fallback = path.resolve(
+						new URL(".", import.meta.url).pathname,
+						"..",
+						"..",
+						"..",
+						packageId.split("/")[1],
+						"distribution",
+						"index.js",
+					);
+
+					try {
+						({ ServiceProvider } = await import(fallback));
+					} catch (ex) {
+						throw ex;
+					}
 
 					// ~/git/mainsail/packages/validation/distribution/index.js
 					// ~/git/mainsail/packages/validation/
