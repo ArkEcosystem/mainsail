@@ -38,4 +38,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	public getQueueSize(): number {
 		return this.ipcSubprocess.getQueueSize();
 	}
+
+	public async importSnapshot(height: number): Promise<void> {
+		await this.ipcSubprocess.sendRequest("importSnapshot", height);
+	}
 }

@@ -1,9 +1,12 @@
 import { Container, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
 @injectable()
-class WorkerImpl {}
+class WorkerImpl {
+	// @ts-ignore
+	#app: Contracts.Kernel.Application;
+}
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
 	// @ts-ignore
@@ -25,5 +28,9 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		this.#app = app;
 
 		this.#impl = app.resolve(WorkerImpl);
+	}
+
+	public async importSnapshot(height: number): Promise<void> {
+		await this.#app.get<Contracts.State.Service>(Identifiers.State.Service).restore(height);
 	}
 }

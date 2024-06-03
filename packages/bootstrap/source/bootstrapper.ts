@@ -59,6 +59,9 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPoolClient.Instance)
 	private readonly txPoolClient!: Contracts.TransactionPool.Client;
 
+	@inject(Identifiers.TransactionPoolWorker.WorkerPool)
+	private readonly txPoolWorkerPool!: Contracts.TransactionPool.WorkerPool;
+
 	public async bootstrap(): Promise<void> {
 		try {
 			if (this.apiSync) {
@@ -144,7 +147,9 @@ export class Bootstrapper {
 		const localSnapshotHeight = localSnapshots.shift();
 		if (localSnapshotHeight) {
 			await this.stateService.restore(localSnapshotHeight);
-			await this.txPoolClient.importSnapshot(localSnapshotHeight);
+
+			const txPoolWorker = await this.txPoolWorkerPool.getWorker();
+			await txPoolWorker.importSnapshot(localSnapshotHeight);
 		} else {
 			this.logger.info("Skipping snapshot restoration");
 		}

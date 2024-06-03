@@ -8,7 +8,7 @@ export class WorkerPool implements Contracts.TransactionPool.WorkerPool {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.TransactionPoolWorker.Worker.Factory)
-	private readonly createWorker!: Contracts.Crypto.WorkerFactory;
+	private readonly createWorker!: Contracts.TransactionPool.WorkerFactory;
 
 	private workers: Contracts.TransactionPool.Worker[] = [];
 
