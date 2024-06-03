@@ -23,9 +23,6 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.TransactionPoolClient.Instance)
-	protected readonly txPoolClient!: Contracts.TransactionPool.Client;
-
 	@inject(Identifiers.Transaction.Validator.Factory)
 	private readonly createTransactionValidator!: Contracts.Transactions.TransactionValidatorFactory;
 
@@ -34,6 +31,9 @@ export class Validator implements Contracts.Validator.Validator {
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.TransactionPoolWorker.WorkerPool)
+	private readonly txPoolWorkerPool!: Contracts.TransactionPool.WorkerPool;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
@@ -112,7 +112,8 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
-		const transactionBytes = await this.txPoolClient.getTransactionBytes();
+		const worker = await this.txPoolWorkerPool.getWorker();
+		const transactionBytes = await worker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
@@ -134,7 +135,7 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 		}
 
-		this.txPoolClient.setFailedTransactions(failedTransactions);
+		worker.setFailedTransactions(failedTransactions);
 
 		return candidateTransactions;
 	}

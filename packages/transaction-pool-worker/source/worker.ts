@@ -57,6 +57,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {
-		return this.ipcSubprocess.sendRequest("getTransactionBytes");
+		const response: string[] = await this.ipcSubprocess.sendRequest("getTransactions");
+		return response.map((transaction: string) => Buffer.from(transaction, "hex"));
 	}
 }

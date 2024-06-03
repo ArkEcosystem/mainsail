@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-import { CommitHandler } from "./handlers/index.js";
+import { CommitHandler, GetTransactionsHandler } from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
 	// @ts-ignore
@@ -28,7 +28,7 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		await this.#app.resolve(CommitHandler).handle(data);
 	}
 
-	public async getTransactionBytes(): Promise<Buffer[]> {
-		return [];
+	public async getTransactions(): Promise<string[]> {
+		return await this.#app.resolve(GetTransactionsHandler).handle();
 	}
 }
