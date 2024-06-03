@@ -56,9 +56,6 @@ export class Bootstrapper {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
-	@inject(Identifiers.TransactionPoolClient.Instance)
-	private readonly txPoolClient!: Contracts.TransactionPool.Client;
-
 	@inject(Identifiers.TransactionPoolWorker.WorkerPool)
 	private readonly txPoolWorkerPool!: Contracts.TransactionPool.WorkerPool;
 
@@ -73,11 +70,6 @@ export class Bootstrapper {
 			await this.#storeGenesisCommit();
 
 			await this.#restoreSnapshots();
-
-			if (this.txPoolClient) {
-				const status = await this.txPoolClient.getStatus();
-				this.logger.info(`Transaction pool client is enabled at height ${status.height.toLocaleString()}`);
-			}
 
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();

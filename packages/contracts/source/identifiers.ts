@@ -284,9 +284,6 @@ export const Identifiers = {
 		Service: Symbol("TransactionPool<Service>"),
 		Storage: Symbol("TransactionPool<Storage>"),
 	},
-	TransactionPoolClient: {
-		Instance: Symbol("TransactionPoolClient<Instance>"),
-	},
 	TransactionPoolWorker: {
 		Worker: {
 			Factory: Symbol("TransactionPoolWorker<Worker.Factory>"),
