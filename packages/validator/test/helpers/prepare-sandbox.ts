@@ -58,7 +58,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	};
 	context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
-	context.sandbox.app.bind(Identifiers.TransactionPoolClient.Instance).toConstantValue({
+	context.sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactionBytes: async () => [],
 		setFailedTransactions: async () => [],
 	});
