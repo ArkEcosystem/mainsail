@@ -11,7 +11,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPoolWorker.Worker.Instance).to(WorkerInstance);
 		this.app
 			.bind(Identifiers.TransactionPoolWorker.Worker.Factory)
-			.toAutoFactory(Identifiers.CryptoWorker.Worker.Instance);
+			.toAutoFactory(Identifiers.TransactionPoolWorker.Worker.Instance);
 
 		this.app.bind(Identifiers.TransactionPoolWorker.WorkerSubprocess.Factory).toFactory(() => () => {
 			const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {});

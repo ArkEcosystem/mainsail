@@ -57,8 +57,7 @@ export class Bootstrapper {
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	@inject(Identifiers.TransactionPoolClient.Instance)
-	@optional()
-	private readonly txPoolClient?: Contracts.TransactionPool.Client;
+	private readonly txPoolClient!: Contracts.TransactionPool.Client;
 
 	public async bootstrap(): Promise<void> {
 		try {
@@ -142,23 +141,12 @@ export class Bootstrapper {
 			localSnapshots = localSnapshots.filter((snapshot) => snapshot <= apiSyncHeight);
 		}
 
-		if (this.txPoolClient) {
-			let txPoolSnapshots = await this.txPoolClient.listSnapshots();
-			txPoolSnapshots = txPoolSnapshots.filter((snapshot) => snapshot <= ledgerHeight);
-
-			const txPoolSnapshotHeight = txPoolSnapshots.pop();
-			if (txPoolSnapshotHeight) {
-				localSnapshots = localSnapshots.filter((snapshot) => snapshot <= txPoolSnapshotHeight);
-
-				await this.txPoolClient.importSnapshot(txPoolSnapshotHeight);
-			} else {
-				localSnapshots = [];
-			}
-		}
-
-		const localSnapshotHeight = localSnapshots.pop();
+		const localSnapshotHeight = localSnapshots.shift();
 		if (localSnapshotHeight) {
 			await this.stateService.restore(localSnapshotHeight);
+			await this.txPoolClient.importSnapshot(localSnapshotHeight);
+		} else {
+			this.logger.info("Skipping snapshot restoration");
 		}
 	}
 

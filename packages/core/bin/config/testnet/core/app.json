@@ -267,6 +267,7 @@
 			"package": "@mainsail/state",
 			"options": {
 				"snapshots": {
+					"enabled": false,
 					"skipUnknownAttributes": true
 				}
 			}
