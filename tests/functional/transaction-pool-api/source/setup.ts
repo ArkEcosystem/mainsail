@@ -4,6 +4,7 @@ import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
 
 import { MemoryDatabase } from "./database.js";
+import { PoolWorker } from "./pool-worker.js";
 import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
@@ -37,6 +38,7 @@ const setup = async () => {
 		broadcastProposal: async () => {},
 		broadcastTransactions: async () => {},
 	});
+	sandbox.app.bind(Identifiers.TransactionPool.Worker).to(PoolWorker).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
@@ -60,6 +62,11 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
 	const options = {
+		"@mainsail/state": {
+			snapshots: {
+				enabled: false,
+			},
+		},
 		"@mainsail/transaction-pool-service": {
 			// bech32m addresses require more bytes than the default which assumes base58.
 			maxTransactionBytes: 50_000,
@@ -191,7 +198,6 @@ const bootstrap = async (sandbox: Sandbox) => {
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 
 	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-
 	void consensus.run();
 };
 

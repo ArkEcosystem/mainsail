@@ -3665,6 +3665,9 @@ importers:
       '@mainsail/transaction-pool-service':
         specifier: workspace:*
         version: link:../../../packages/transaction-pool-service
+      '@mainsail/transaction-pool-worker':
+        specifier: workspace:*
+        version: link:../../../packages/transaction-pool-worker
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../../../packages/transactions

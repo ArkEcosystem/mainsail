@@ -103,10 +103,7 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async (
-	{ sandbox, wallets }: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
-	count: number = 1,
-) => {
+export const waitBlock = async ({ sandbox }: { sandbox: Sandbox }, count: number = 1) => {
 	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
 	const query = sandbox.app.get<Contracts.TransactionPool.Query>(Identifiers.TransactionPool.Query);
 
@@ -122,6 +119,7 @@ export const waitBlock = async (
 
 		if (remainingTransactions.length > 0) {
 			targetHeight = Math.max(currentHeight, targetHeight) + 1;
+			console.log("Waiting for block", targetHeight);
 		}
 	} while (currentHeight < targetHeight);
 };
