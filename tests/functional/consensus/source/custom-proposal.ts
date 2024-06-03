@@ -41,10 +41,10 @@ export const makeCustomProposal = async (
 	// - amount + fee
 	let blockBuffer = Buffer.from(emptyBlock.serialized, "hex");
 
-	const totals: { amount: BigNumber; fee: BigNumber; gas: number } = {
+	const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 		amount: BigNumber.ZERO,
 		fee: BigNumber.ZERO,
-		gas: 0,
+		gasUsed: 0,
 	};
 
 	const payloadBuffers: Buffer[] = [];
@@ -57,7 +57,7 @@ export const makeCustomProposal = async (
 
 		totals.amount = totals.amount.plus(data.amount);
 		totals.fee = totals.fee.plus(data.fee);
-		totals.gas += gasLimits.of(transaction);
+		totals.gasUsed += gasLimits.of(transaction);
 
 		payloadBuffers.push(Buffer.from(data.id, "hex"));
 
@@ -77,8 +77,8 @@ export const makeCustomProposal = async (
 	blockBuffer.writeUint16LE(transactions.length, byteOffset);
 	byteOffset += 2;
 
-	// totalGas
-	blockBuffer.writeUInt32LE(totals.gas, byteOffset);
+	// totalGasUsed
+	blockBuffer.writeUInt32LE(totals.gasUsed, byteOffset);
 	byteOffset += 4;
 
 	// totalAmount

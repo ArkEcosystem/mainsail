@@ -192,10 +192,10 @@ export class GenesisBlockGenerator extends Generator {
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
 	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
-		const totals: { amount: BigNumber; fee: BigNumber; gas: number } = {
+		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
-			gas: 0,
+			gasUsed: 0,
 		};
 
 		const payloadBuffers: Buffer[] = [];
@@ -212,7 +212,7 @@ export class GenesisBlockGenerator extends Generator {
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
-			totals.gas += this.gasLimits.of(transaction);
+			totals.gasUsed += this.gasLimits.of(transaction);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -236,7 +236,7 @@ export class GenesisBlockGenerator extends Generator {
 				timestamp: dayjs(options.epoch).valueOf(),
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
-				totalGas: totals.gas,
+				totalGasUsed: totals.gasUsed,
 				transactions: transactionData,
 				version: 1,
 			}),

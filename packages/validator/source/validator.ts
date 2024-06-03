@@ -133,6 +133,7 @@ export class Validator implements Contracts.Validator.Validator {
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
+		// TODO: pass in gas used from evm
 		const totals: { amount: BigNumber; fee: BigNumber; gas: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
@@ -174,7 +175,7 @@ export class Validator implements Contracts.Validator.Validator {
 			timestamp,
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
-			totalGas: totals.gas,
+			totalGasUsed: totals.gas,
 			transactions: transactionData,
 			version: 1,
 		});

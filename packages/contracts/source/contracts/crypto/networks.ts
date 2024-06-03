@@ -29,6 +29,7 @@ export type Network = {
 
 export type MilestoneBlock = {
 	maxPayload: number;
+	maxGasLimit: number;
 	maxTransactions: number;
 	version: number;
 };
@@ -44,7 +45,6 @@ export type MilestoneTimeouts = {
 };
 
 export type MilestoneEvm = {
-	blockGasLimit: number;
 	minimumGasLimit: number;
 	minimumGasFee: number;
 	nativeFeeMultiplier: number;

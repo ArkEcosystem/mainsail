@@ -6,7 +6,7 @@ export const assertBlockData = (assert, data1, data2) => {
 		"height",
 		"previousBlock",
 		"numberOfTransactions",
-		"totalGas",
+		"totalGasUsed",
 		"totalAmount",
 		"totalFee",
 		"reward",

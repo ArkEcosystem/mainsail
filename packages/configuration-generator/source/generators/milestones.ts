@@ -12,12 +12,12 @@ export class MilestonesGenerator {
 				address: options.address,
 				block: {
 					maxPayload: options.maxBlockPayload,
+					maxGasLimit: options.maxBlockGasLimit,
 					maxTransactions: options.maxTxPerBlock,
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
 				evm: {
-					blockGasLimit: 10_000_000,
 					minimumGasFee: 5,
 					minimumGasLimit: 21_000,
 					nativeFeeMultiplier: 100,

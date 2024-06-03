@@ -3418,7 +3418,7 @@ $root.getStatus = (function() {
                  * @property {string|null} [previousBlock] BlockHeader previousBlock
                  * @property {number|null} [height] BlockHeader height
                  * @property {number|null} [numberOfTransactions] BlockHeader numberOfTransactions
-                 * @property {number|null} [totalGas] BlockHeader totalGas
+                 * @property {number|null} [totalGasUsed] BlockHeader totalGasUsed
                  * @property {string|null} [totalAmount] BlockHeader totalAmount
                  * @property {string|null} [totalFee] BlockHeader totalFee
                  * @property {string|null} [reward] BlockHeader reward
@@ -3492,12 +3492,12 @@ $root.getStatus = (function() {
                 BlockHeader.prototype.numberOfTransactions = 0;
 
                 /**
-                 * BlockHeader totalGas.
-                 * @member {number} totalGas
+                 * BlockHeader totalGasUsed.
+                 * @member {number} totalGasUsed
                  * @memberof getStatus.GetStatusResponse.State.BlockHeader
                  * @instance
                  */
-                BlockHeader.prototype.totalGas = 0;
+                BlockHeader.prototype.totalGasUsed = 0;
 
                 /**
                  * BlockHeader totalAmount.
@@ -3591,8 +3591,8 @@ $root.getStatus = (function() {
                         writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.height);
                     if (message.numberOfTransactions != null && Object.hasOwnProperty.call(message, "numberOfTransactions"))
                         writer.uint32(/* id 6, wireType 0 =*/48).uint32(message.numberOfTransactions);
-                    if (message.totalGas != null && Object.hasOwnProperty.call(message, "totalGas"))
-                        writer.uint32(/* id 7, wireType 0 =*/56).uint32(message.totalGas);
+                    if (message.totalGasUsed != null && Object.hasOwnProperty.call(message, "totalGasUsed"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).uint32(message.totalGasUsed);
                     if (message.totalAmount != null && Object.hasOwnProperty.call(message, "totalAmount"))
                         writer.uint32(/* id 8, wireType 2 =*/66).string(message.totalAmount);
                     if (message.totalFee != null && Object.hasOwnProperty.call(message, "totalFee"))
@@ -3666,7 +3666,7 @@ $root.getStatus = (function() {
                                 break;
                             }
                         case 7: {
-                                message.totalGas = reader.uint32();
+                                message.totalGasUsed = reader.uint32();
                                 break;
                             }
                         case 8: {
@@ -3750,9 +3750,9 @@ $root.getStatus = (function() {
                     if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
                         if (!$util.isInteger(message.numberOfTransactions))
                             return "numberOfTransactions: integer expected";
-                    if (message.totalGas != null && message.hasOwnProperty("totalGas"))
-                        if (!$util.isInteger(message.totalGas))
-                            return "totalGas: integer expected";
+                    if (message.totalGasUsed != null && message.hasOwnProperty("totalGasUsed"))
+                        if (!$util.isInteger(message.totalGasUsed))
+                            return "totalGasUsed: integer expected";
                     if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
                         if (!$util.isString(message.totalAmount))
                             return "totalAmount: string expected";
@@ -3801,8 +3801,8 @@ $root.getStatus = (function() {
                         message.height = object.height >>> 0;
                     if (object.numberOfTransactions != null)
                         message.numberOfTransactions = object.numberOfTransactions >>> 0;
-                    if (object.totalGas != null)
-                        message.totalGas = object.totalGas >>> 0;
+                    if (object.totalGasUsed != null)
+                        message.totalGasUsed = object.totalGasUsed >>> 0;
                     if (object.totalAmount != null)
                         message.totalAmount = String(object.totalAmount);
                     if (object.totalFee != null)
@@ -3840,7 +3840,7 @@ $root.getStatus = (function() {
                         object.previousBlock = "";
                         object.height = 0;
                         object.numberOfTransactions = 0;
-                        object.totalGas = 0;
+                        object.totalGasUsed = 0;
                         object.totalAmount = "";
                         object.totalFee = "";
                         object.reward = "";
@@ -3861,8 +3861,8 @@ $root.getStatus = (function() {
                         object.height = message.height;
                     if (message.numberOfTransactions != null && message.hasOwnProperty("numberOfTransactions"))
                         object.numberOfTransactions = message.numberOfTransactions;
-                    if (message.totalGas != null && message.hasOwnProperty("totalGas"))
-                        object.totalGas = message.totalGas;
+                    if (message.totalGasUsed != null && message.hasOwnProperty("totalGasUsed"))
+                        object.totalGasUsed = message.totalGasUsed;
                     if (message.totalAmount != null && message.hasOwnProperty("totalAmount"))
                         object.totalAmount = message.totalAmount;
                     if (message.totalFee != null && message.hasOwnProperty("totalFee"))

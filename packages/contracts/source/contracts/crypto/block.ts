@@ -27,7 +27,7 @@ export interface BlockData {
 	readonly round: number;
 	readonly previousBlock: string;
 	readonly numberOfTransactions: number;
-	readonly totalGas: number;
+	readonly totalGasUsed: number;
 	readonly totalAmount: BigNumber;
 	readonly totalFee: BigNumber;
 	readonly reward: BigNumber;
@@ -49,7 +49,7 @@ export interface BlockJson {
 	readonly round: number;
 	readonly previousBlock: string;
 	readonly numberOfTransactions: number;
-	readonly totalGas: number;
+	readonly totalGasUsed: number;
 	readonly totalAmount: string;
 	readonly totalFee: string;
 	readonly reward: string;

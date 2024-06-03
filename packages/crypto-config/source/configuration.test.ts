@@ -36,7 +36,7 @@ describe<{
 			{
 				activeValidators: 0,
 				address: { keccak256: true },
-				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				evm: cryptoJson.milestones[0].evm,
 				epoch: cryptoJson.milestones[0].epoch,
 				fees: cryptoJson.milestones[0].fees,
@@ -55,7 +55,7 @@ describe<{
 			{
 				activeValidators: 53,
 				address: { keccak256: true },
-				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				evm: cryptoJson.milestones[0].evm,
 				epoch: cryptoJson.milestones[0].epoch,
 				fees: cryptoJson.milestones[0].fees,
@@ -74,7 +74,7 @@ describe<{
 			{
 				activeValidators: 53,
 				address: { keccak256: true },
-				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				evm: cryptoJson.milestones[0].evm,
 				epoch: cryptoJson.milestones[0].epoch,
 				fees: cryptoJson.milestones[0].fees,

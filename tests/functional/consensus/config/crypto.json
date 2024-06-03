@@ -7,7 +7,7 @@
 			"round": 0,
 			"previousBlock": "0000000000000000000000000000000000000000000000000000000000000000",
 			"numberOfTransactions": 20,
-			"totalGas": 1355000,
+			"totalGasUsed": 1355000,
 			"totalAmount": "12500000000000000",
 			"totalFee": "0",
 			"reward": "0",
@@ -363,12 +363,12 @@
 			},
 			"block": {
 				"maxPayload": 2097152,
+				"maxGasLimit": 10000000,
 				"maxTransactions": 150,
 				"version": 1
 			},
 			"epoch": "2024-05-30T00:00:00.000Z",
 			"evm": {
-				"blockGasLimit": 10000000,
 				"minimumGasFee": 5,
 				"minimumGasLimit": 21000,
 				"nativeFeeMultiplier": 100,

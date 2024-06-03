@@ -75,6 +75,7 @@ export class ConfigurationGenerator {
 			explorer: "",
 			force: false,
 			maxBlockPayload: 2_097_152,
+			maxBlockGasLimit: 10_000_000,
 			maxTxPerBlock: 150,
 			overwriteConfig: false,
 			peers: ["127.0.0.1"],
