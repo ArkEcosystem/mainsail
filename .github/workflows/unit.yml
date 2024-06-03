@@ -171,10 +171,6 @@ jobs:
               run: cd packages/test-runner && pnpm run test
             - name: Test test-transaction-builders
               run: cd packages/test-transaction-builders && pnpm run test
-            - name: Test transaction-pool-client
-              run: cd packages/transaction-pool-client && pnpm run test
-            - name: Test transaction-pool-server
-              run: cd packages/transaction-pool-server && pnpm run test
             - name: Test transaction-pool-service
               run: cd packages/transaction-pool-service && pnpm run test
             - name: Test transaction-pool-worker
