@@ -7,6 +7,7 @@ export interface WorkerFlags extends KeyValuePair {}
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
 	importSnapshot(height: number): Promise<void>;
+	commit(unit: any): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;
@@ -15,7 +16,7 @@ export type WorkerSubprocess = Subprocess<WorkerScriptHandler>;
 
 export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
-export interface Worker extends WorkerScriptHandler, CommitHandler {
+export interface Worker extends Omit<WorkerScriptHandler, "commit">, CommitHandler {
 	getQueueSize(): number;
 	kill(): Promise<number>;
 	setFailedTransactions(transactions: Transaction[]): void;
