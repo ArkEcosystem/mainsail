@@ -11,8 +11,8 @@ export class MilestonesGenerator {
 				activeValidators: 0,
 				address: options.address,
 				block: {
-					maxPayload: options.maxBlockPayload,
 					maxGasLimit: options.maxBlockGasLimit,
+					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
 					version: 1,
 				},

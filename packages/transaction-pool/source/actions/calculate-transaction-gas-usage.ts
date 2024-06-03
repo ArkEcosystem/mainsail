@@ -24,11 +24,11 @@ export class CalculateTransactionGasUsage extends Services.Triggers.Action {
 				const sender = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 				const { receipt } = await this.evm.process({
-					commitKey,
 					caller: sender.getAddress(),
-					recipient: transaction.data.recipientId,
+					commitKey,
 					data: Buffer.from(evmCall.payload, "hex"),
 					gasLimit: BigInt(evmCall.gasLimit),
+					recipient: transaction.data.recipientId,
 				});
 
 				gasUsed = Number(receipt.gasUsed);

@@ -52,7 +52,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateService.getStore().getLastBlock();
 		const height = previousBlock.data.height + 1;
 
-		const transactions = await this.#getTransactionsForForging({ round: BigInt(round), height: BigInt(height) });
+		const transactions = await this.#getTransactionsForForging({ height: BigInt(height), round: BigInt(round) });
 		return this.#makeBlock(round, generatorPublicKey, transactions, timestamp);
 	}
 
