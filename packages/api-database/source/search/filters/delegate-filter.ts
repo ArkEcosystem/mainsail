@@ -9,7 +9,8 @@ import {
 	OrNumericCriteria,
 } from "../criteria.js";
 import { Expression, JsonFieldCastType } from "../expressions.js";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { WalletFilter } from "./wallet-filter.js";
 
 export class DelegateFilter {
 	public static async getExpression(...criteria: OrDelegateCriteria[]): Promise<Expression<Wallet>> {
@@ -53,13 +54,16 @@ export class DelegateFilter {
 				case "votes": {
 					return handleOrCriteria(criteria.votes, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("attributes", c, { fieldName: "validatorVoteBalance", operator: "->>" }),
+						handleComparisonCriteria("attributes", c, {
+							fieldName: "validatorVoteBalance",
+							operator: "->>",
+						}),
 					);
 				}
 				case "rank": {
 					return handleOrCriteria(criteria.rank, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("attributes", c, { fieldName: "validatorRank", operator: "->>" }),
+						handleComparisonCriteria("attributes", c, { fieldName: "validatorRank", operator: "->>" }),
 					);
 				}
 
@@ -83,7 +87,12 @@ export class DelegateFilter {
 				case "blocks": {
 					return this.handleBlocksCriteria(criteria.blocks);
 				}
-
+				case "attributes": {
+					return handleOrCriteria(criteria.attributes, async (c) =>
+						// @ts-ignore
+						WalletFilter.handleAttributesCriteria(c),
+					);
+				}
 				default: {
 					return { op: "true" };
 				}
@@ -101,7 +110,7 @@ export class DelegateFilter {
 			expressions.push(
 				handleOrCriteria(criteria, async (c) =>
 					// @ts-ignore
-					handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
+					handleComparisonCriteria("attributes", c, { fieldName, operator: "->>" }),
 				),
 			);
 
@@ -132,7 +141,7 @@ export class DelegateFilter {
 			expressions.push(
 				handleOrCriteria(criteria, async (c) =>
 					// @ts-ignore
-					handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
+					handleComparisonCriteria("attributes", c, { fieldName, operator: "->>" }),
 				),
 			);
 
@@ -163,7 +172,7 @@ export class DelegateFilter {
 			expressions.push(
 				handleOrCriteria(criteria, async (c) =>
 					// @ts-ignore
-					handleNumericCriteria("attributes", c, { cast, fieldName, operator: "->>" }),
+					handleComparisonCriteria("attributes", c, { cast, fieldName, operator: "->>" }),
 				),
 			);
 
@@ -190,7 +199,7 @@ export class DelegateFilter {
 			expressions.push(
 				handleOrCriteria(criteria, async (c) =>
 					// @ts-ignore
-					handleNumericCriteria("attributes", c, { fieldName, operator: "->>" }),
+					handleComparisonCriteria("attributes", c, { fieldName, operator: "->>" }),
 				),
 			);
 

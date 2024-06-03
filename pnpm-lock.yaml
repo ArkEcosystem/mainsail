@@ -241,6 +241,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
