@@ -6,6 +6,7 @@ import { walletCriteriaSchemaObject } from "./wallets.js";
 
 export const delegateCriteriaSchemaObject = {
 	address: walletCriteriaSchemaObject.address,
+	attributes: Joi.object(),
 	blocks: {
 		last: {
 			height: blockCriteriaSchemaObject.height,

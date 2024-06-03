@@ -4,7 +4,16 @@ import { ValidatorRegistrations, ValidatorResignations } from "@mainsail/test-tr
 
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import { addTransactionsToPool, getRandomFundedWallet, getWallets, hasResigned, waitBlock } from "./utils.js";
+import {
+	addTransactionsToPool,
+	getMultiSignatureWallet,
+	getRandomColdWallet,
+	getRandomFundedWallet,
+	getWallets,
+	hasResigned,
+	isValidator,
+	waitBlock,
+} from "./utils.js";
 
 describe<{
 	sandbox: Sandbox;
@@ -139,5 +148,50 @@ describe<{
 				type: "ERR_APPLY",
 			},
 		});
+	});
+
+	it("should accept validator resignation from a multi signature wallet validator", async (context) => {
+		// Multi sig participants
+		const participant1 = await getRandomColdWallet(context.sandbox);
+		const participant2 = await getRandomColdWallet(context.sandbox);
+		const participants = [participant1.keyPair, participant2.keyPair];
+
+		const [multiSigRegistrationTx, fundTx, validatorRegistrationTx] =
+			await ValidatorRegistrations.makeValidatorRegistrationWithMultiSignature(context, {
+				multiSigKeys: participants,
+			});
+
+		// Register multi sig wallet
+		await addTransactionsToPool(context, [multiSigRegistrationTx]);
+		await waitBlock(context);
+
+		const multiSigWallet = await getMultiSignatureWallet(
+			context,
+			multiSigRegistrationTx.data.asset!.multiSignature!,
+		);
+		assert.true(multiSigWallet.hasMultiSignature());
+
+		// Now send funds to multi sig wallet
+		await addTransactionsToPool(context, [fundTx]);
+		await waitBlock(context);
+
+		// Lastly, register validator on multi sig wallet
+		const result = await addTransactionsToPool(context, [validatorRegistrationTx]);
+		assert.equal(result.accept, [0]);
+
+		await waitBlock(context);
+
+		assert.true(await isValidator(context, multiSigWallet.getPublicKey()!));
+		assert.false(await hasResigned(context, multiSigWallet.getPublicKey()!));
+
+		// Resign validator
+		const resignationTx = await ValidatorResignations.makeValidatorResignation(context, {
+			multiSigKeys: participants,
+		});
+
+		await addTransactionsToPool(context, [resignationTx]);
+		await waitBlock(context);
+
+		assert.true(await hasResigned(context, multiSigWallet.getPublicKey()!));
 	});
 });

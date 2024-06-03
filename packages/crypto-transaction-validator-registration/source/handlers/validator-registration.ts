@@ -36,12 +36,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
-
-		if (sender.hasMultiSignature()) {
-			throw new Exceptions.NotSupportedForMultiSignatureWalletError();
-		}
-
 		if (wallet.isValidator()) {
 			throw new Exceptions.WalletIsAlreadyValidatorError();
 		}

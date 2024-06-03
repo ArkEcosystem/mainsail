@@ -108,7 +108,7 @@ export const handleOrCriteria = async <TEntity, TCriteria>(
 	}
 };
 
-export const handleNumericCriteria = async <TEntity, TProperty extends keyof TEntity>(
+export const handleComparisonCriteria = async <TEntity, TProperty extends keyof TEntity>(
 	property: TProperty,
 	criteria: NumericCriteria<NonNullable<TEntity[TProperty]>>,
 	jsonFieldAccessor?: JsonFieldAccessor,
