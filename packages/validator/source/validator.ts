@@ -29,9 +29,6 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.Evm.Gas.Limits)
-	private readonly gasLimits!: Contracts.Evm.GasLimits;
-
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
 
@@ -52,7 +49,10 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
-		const transactions = await this.#getTransactionsForForging();
+		const previousBlock = this.stateService.getStore().getLastBlock();
+		const height = previousBlock.data.height + 1;
+
+		const transactions = await this.#getTransactionsForForging({ round: BigInt(round), height: BigInt(height) });
 		return this.#makeBlock(round, generatorPublicKey, transactions, timestamp);
 	}
 
@@ -111,8 +111,10 @@ export class Validator implements Contracts.Validator.Validator {
 		);
 	}
 
-	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
-		const transactions: Contracts.Crypto.Transaction[] = await this.collator.getBlockCandidateTransactions();
+	async #getTransactionsForForging(
+		commitKey: Contracts.Evm.CommitKey,
+	): Promise<Contracts.TransactionPool.CollatorTransaction[]> {
+		const transactions = await this.collator.getBlockCandidateTransactions(commitKey);
 
 		if (isEmpty(transactions)) {
 			return [];
@@ -130,14 +132,13 @@ export class Validator implements Contracts.Validator.Validator {
 	async #makeBlock(
 		round: number,
 		generatorPublicKey: string,
-		transactions: Contracts.Crypto.Transaction[],
+		transactions: Contracts.TransactionPool.CollatorTransaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
-		// TODO: pass in gas used from evm
-		const totals: { amount: BigNumber; fee: BigNumber; gas: number } = {
+		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
-			gas: 0,
+			gasUsed: 0,
 		};
 
 		const payloadBuffers: Buffer[] = [];
@@ -147,12 +148,12 @@ export class Validator implements Contracts.Validator.Validator {
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
 		for (const transaction of transactions) {
-			const { data, serialized } = transaction;
+			const { data, serialized, gasUsed } = transaction;
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
-			totals.gas += this.gasLimits.of(transaction);
+			totals.gasUsed += gasUsed;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -175,7 +176,7 @@ export class Validator implements Contracts.Validator.Validator {
 			timestamp,
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
-			totalGasUsed: totals.gas,
+			totalGasUsed: totals.gasUsed,
 			transactions: transactionData,
 			version: 1,
 		});

@@ -17,6 +17,7 @@ describe<{
 	expirationService: any;
 	poolQuery: any;
 	logger: any;
+	triggers: any;
 	blockSerializer: any;
 }>("Collator", ({ it, assert, beforeAll, stub, spy }) => {
 	beforeAll((context) => {
@@ -32,7 +33,9 @@ describe<{
 			},
 		};
 		context.logger = { error: () => {}, warning: () => {} };
-
+		context.triggers = {
+			call: () => {},
+		};
 		context.blockSerializer = {
 			headerSize: () => 152,
 		};
@@ -48,6 +51,7 @@ describe<{
 		context.container
 			.bind(Identifiers.TransactionPool.ExpirationService)
 			.toConstantValue(context.expirationService);
+		context.container.bind(Identifiers.Services.Trigger.Service).toConstantValue(context.triggers);
 		context.container.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
@@ -57,15 +61,17 @@ describe<{
 
 	it("getBlockCandidateTransactions - should respect block.maxTransactions milestone limit", async (context) => {
 		const poolTransactions = [
-			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxPayload: 2_097_152, maxTransactions: 5 } };
+		const milestone = {
+			block: { idFullSha256: true, maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 5 },
+		};
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
@@ -76,7 +82,7 @@ describe<{
 		const validatorSpy = spy(context.validator, "validate");
 
 		const collator = context.container.resolve(Collator);
-		const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const candidateTransaction = await collator.getBlockCandidateTransactions({} as any);
 
 		assert.length(candidateTransaction, 5);
 		milestoneStub.called();
@@ -85,15 +91,17 @@ describe<{
 
 	it("getBlockCandidateTransactions - should respect block.maxPayload milestone limit", async (context) => {
 		const poolTransactions = [
-			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "1" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxPayload: 152 + (10 + 4) * 2, maxTransactions: 5 } };
+		const milestone = {
+			block: { idFullSha256: true, maxPayload: 152 + (10 + 4) * 2, maxGasLimit: 10_000_000, maxTransactions: 5 },
+		};
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
@@ -104,7 +112,7 @@ describe<{
 		const validatorSpy = spy(context.validator, "validate");
 
 		const collator = context.container.resolve(Collator);
-		const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const candidateTransaction = await collator.getBlockCandidateTransactions({} as any);
 
 		assert.length(candidateTransaction, 2);
 		milestoneStub.called();
@@ -113,15 +121,17 @@ describe<{
 
 	it("getBlockCandidateTransactions - should ignore future sender transactions if one of them expired", async (context) => {
 		const poolTransactions = [
-			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxPayload: 2_097_152, maxTransactions: 5 } };
+		const milestone = {
+			block: { idFullSha256: true, maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 5 },
+		};
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
@@ -137,7 +147,7 @@ describe<{
 		const loggerSpy = spy(context.logger, "warning");
 
 		const collator = context.container.resolve(Collator);
-		const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const candidateTransaction = await collator.getBlockCandidateTransactions({} as any);
 
 		assert.length(candidateTransaction, 4);
 		milestoneStub.called();
@@ -147,15 +157,17 @@ describe<{
 
 	it("getBlockCandidateTransactions - should ignore future sender transactions if one of them failed", async (context) => {
 		const poolTransactions = [
-			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10) },
-			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10) },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "0" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "2" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "3" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "4" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
+			{ data: { senderPublicKey: "5" }, serialized: Buffer.alloc(10), gasUsed: 21_000 },
 		];
 
-		const milestone = { block: { idFullSha256: true, maxPayload: 2_097_152, maxTransactions: 5 } };
+		const milestone = {
+			block: { idFullSha256: true, maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 5 },
+		};
 		const lastBlock = { data: { height: 10 } };
 
 		const milestoneStub = stub(context.config, "getMilestone").returnValueOnce(milestone);
@@ -167,7 +179,7 @@ describe<{
 		const loggerSpy = spy(context.logger, "warning");
 
 		const collator = context.container.resolve(Collator);
-		const candidateTransaction = await collator.getBlockCandidateTransactions();
+		const candidateTransaction = await collator.getBlockCandidateTransactions({} as any);
 
 		assert.length(candidateTransaction, 4);
 		milestoneStub.called();
