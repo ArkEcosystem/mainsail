@@ -6,6 +6,7 @@ export interface WorkerFlags extends KeyValuePair {}
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
+	getTransactionBytes(): Promise<Buffer[]>;
 	importSnapshot(height: number): Promise<void>;
 	commit(unit: any): Promise<void>;
 }

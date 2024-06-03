@@ -55,4 +55,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	public async importSnapshot(height: number): Promise<void> {
 		await this.ipcSubprocess.sendRequest("importSnapshot", height);
 	}
+
+	public async getTransactionBytes(): Promise<Buffer[]> {
+		return this.ipcSubprocess.sendRequest("getTransactionBytes");
+	}
 }
