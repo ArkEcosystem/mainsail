@@ -21,7 +21,7 @@ export class GetTransactionsHandler {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
 
-	public async handle(): Promise<Contracts.TransactionPool.Actions.GetTransactionsResponse> {
+	public async handle(): Promise<string[]> {
 		const milestone = this.configuration.getMilestone();
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 

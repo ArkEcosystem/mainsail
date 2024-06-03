@@ -21,25 +21,27 @@ export class CommitHandler {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(
-		parameters: Contracts.TransactionPool.Actions.CommitRequest,
-	): Promise<Contracts.TransactionPool.Actions.CommitResponse> {
+	public async handle(data: {
+		block: string;
+		failedTransactions: string[];
+		store: Contracts.State.StoreChange;
+	}): Promise<void> {
 		try {
 			const store = this.stateService.createStoreClone();
 
-			store.applyChanges(parameters.store);
+			store.applyChanges(data.store);
 			store.commitChanges();
 
 			this.configuration.setHeight(store.getLastHeight() + 1);
 
-			const block = await this.blockFactory.fromHex(parameters.block);
+			const block = await this.blockFactory.fromHex(data.block);
 			store.setLastBlock(block);
 
 			for (const transaction of block.transactions) {
 				await this.transactionPoolService.removeForgedTransaction(transaction);
 			}
 
-			for (const transactionId of parameters.failedTransactions) {
+			for (const transactionId of data.failedTransactions) {
 				try {
 					const transaction = await this.transactionPoolQuery.getAll().whereId(transactionId).first();
 					await this.transactionPoolService.removeTransaction(transaction);
@@ -52,11 +54,7 @@ export class CommitHandler {
 				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed.`,
 			);
 		} catch (error) {
-			this.logger.error(`Failed to commit block: ${error.message}`);
-
-			throw new Error(`Cannot process changes, because: ${error.message}`);
+			throw new Error(`Failed to commit block: ${error.message}`);
 		}
-
-		return true;
 	}
 }

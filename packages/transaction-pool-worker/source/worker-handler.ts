@@ -24,7 +24,11 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		await this.#app.resolve(ImportSnapshotHandler).handle(height);
 	}
 
-	public async commit(data: Contracts.TransactionPool.Actions.CommitRequest): Promise<void> {
+	public async commit(data: {
+		block: string;
+		failedTransactions: string[];
+		store: Contracts.State.StoreChange;
+	}): Promise<void> {
 		await this.#app.resolve(CommitHandler).handle(data);
 	}
 
