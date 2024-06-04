@@ -7,10 +7,11 @@ export class MockInstance implements Contracts.Evm.Instance {
 		return {
 			receipt: {
 				gasRefunded: BigInt(0),
-				gasUsed: BigInt(0), // TODO: Return provided gas
+				gasUsed: BigInt(0),
 				logs: [],
 				success: true,
 			},
+			mocked: true,
 		};
 	}
 

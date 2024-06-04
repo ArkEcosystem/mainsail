@@ -7,6 +7,7 @@ export interface Instance extends CommitHandler {
 
 export interface ProcessResult {
 	readonly receipt: TransactionReceipt;
+	readonly mocked?: boolean;
 }
 
 export interface ViewResult {
@@ -23,6 +24,7 @@ export interface TransactionContext {
 	readonly gasLimit: bigint;
 	readonly data: Buffer;
 	readonly commitKey: CommitKey;
+	readonly sequence?: number;
 }
 
 export interface TransactionViewContext {

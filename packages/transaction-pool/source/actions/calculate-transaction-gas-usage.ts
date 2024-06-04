@@ -13,6 +13,7 @@ export class CalculateTransactionGasUsage extends Services.Triggers.Action {
 	public async execute(arguments_: Types.ActionArguments): Promise<number> {
 		const commitKey: Contracts.Evm.CommitKey = arguments_.commitKey;
 		const transaction: Contracts.Crypto.Transaction = arguments_.transaction;
+		const sequence: number = arguments_.sequence;
 		const walletRepository: Contracts.State.WalletRepository = arguments_.walletRepository;
 
 		let gasUsed: number;
@@ -26,6 +27,7 @@ export class CalculateTransactionGasUsage extends Services.Triggers.Action {
 				const { receipt } = await this.evm.process({
 					caller: sender.getAddress(),
 					commitKey,
+					sequence,
 					data: Buffer.from(evmCall.payload, "hex"),
 					gasLimit: BigInt(evmCall.gasLimit),
 					recipient: transaction.data.recipientId,

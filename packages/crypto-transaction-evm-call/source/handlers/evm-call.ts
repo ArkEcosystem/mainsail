@@ -70,14 +70,16 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		let gasUsed = 0;
+
 		try {
 			const { instance, commitKey } = context.evm;
-			const { receipt } = await instance.process({
+			const { receipt, mocked } = await instance.process({
 				caller: sender.getAddress(),
 				commitKey,
 				data: Buffer.from(evmCall.payload, "hex"),
 				gasLimit: BigInt(evmCall.gasLimit),
 				recipient: transaction.data.recipientId,
+				sequence: transaction.data.sequence,
 			});
 
 			// Subtract native fee from sender based on actual consumed gas
@@ -88,9 +90,12 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			}
 			sender.setBalance(newBalance);
 
-			this.logger.debug(
-				`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
-			);
+			if (!mocked) {
+				this.logger.debug(
+					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
+				);
+			}
+
 			gasUsed = Number(receipt.gasUsed);
 
 			void this.#emit(Enums.EvmEvent.TransactionReceipt, {

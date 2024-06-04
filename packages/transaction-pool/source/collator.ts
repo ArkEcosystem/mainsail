@@ -46,6 +46,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 		const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
+		let sequence = 0;
 		for (const transaction of await this.poolQuery.getFromHighestPriority().all()) {
 			if (candidateTransactions.length === milestone.block.maxTransactions) {
 				break;
@@ -70,6 +71,7 @@ export class Collator implements Contracts.TransactionPool.Collator {
 				const gasUsed = (await this.triggers.call<number>("calculateTransactionGasUsage", {
 					commitKey,
 					transaction,
+					sequence,
 					walletRepository,
 				})) as number;
 
@@ -83,6 +85,8 @@ export class Collator implements Contracts.TransactionPool.Collator {
 
 				bytesLeft -= 4;
 				bytesLeft -= transaction.serialized.length;
+
+				sequence++;
 			} catch (error) {
 				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
 				failedTransactions.push(transaction);
