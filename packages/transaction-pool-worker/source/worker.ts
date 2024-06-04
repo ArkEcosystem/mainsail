@@ -60,4 +60,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		const response: string[] = await this.ipcSubprocess.sendRequest("getTransactions");
 		return response.map((transaction: string) => Buffer.from(transaction, "hex"));
 	}
+
+	public async setPeer(ip: string): Promise<void> {
+		await this.ipcSubprocess.sendRequest("setPeer", ip);
+	}
 }

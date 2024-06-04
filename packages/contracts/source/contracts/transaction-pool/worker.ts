@@ -10,6 +10,7 @@ export interface WorkerScriptHandler {
 	getTransactions(): Promise<string[]>;
 	importSnapshot(height: number): Promise<void>;
 	commit(data: { block: string; failedTransactions: string[]; store: StoreChange }): Promise<void>;
+	setPeer(ip: string): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;
