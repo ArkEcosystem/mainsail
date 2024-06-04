@@ -23,8 +23,8 @@ export class PeerRepository implements Contracts.TransactionPool.PeerRepository 
 		this.#peers.set(peer.ip, peer);
 	}
 
-	public forgetPeer(peer: Contracts.TransactionPool.Peer): void {
-		this.#peers.delete(peer.ip);
+	public forgetPeer(ip: string): void {
+		this.#peers.delete(ip);
 	}
 
 	public hasPeer(ip: string): boolean {
@@ -51,8 +51,8 @@ export class PeerRepository implements Contracts.TransactionPool.PeerRepository 
 		this.#peersPending.set(peer.ip, peer);
 	}
 
-	public forgetPendingPeer(peer: Contracts.TransactionPool.Peer): void {
-		this.#peersPending.delete(peer.ip);
+	public forgetPendingPeer(ip: string): void {
+		this.#peersPending.delete(ip);
 	}
 
 	public hasPendingPeer(ip: string): boolean {

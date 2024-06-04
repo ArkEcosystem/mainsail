@@ -64,4 +64,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	public async setPeer(ip: string): Promise<void> {
 		await this.ipcSubprocess.sendRequest("setPeer", ip);
 	}
+
+	public async forgetPeer(ip: string): Promise<void> {
+		await this.ipcSubprocess.sendRequest("forgetPeer", ip);
+	}
 }

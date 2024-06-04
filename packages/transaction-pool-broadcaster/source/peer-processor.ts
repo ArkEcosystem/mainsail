@@ -57,6 +57,6 @@ export class PeerProcessor implements Contracts.TransactionPool.PeerProcessor {
 			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 		}
 
-		this.repository.forgetPendingPeer(peer);
+		this.repository.forgetPendingPeer(peer.ip);
 	}
 }

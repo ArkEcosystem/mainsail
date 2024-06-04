@@ -35,13 +35,13 @@ export interface PeerRepository {
 	getPeers(): Peer[];
 	getPeer(ip: string): Peer;
 	setPeer(peer: Peer): void;
-	forgetPeer(peer: Peer): void;
+	forgetPeer(ip: string): void;
 	hasPeer(ip: string): boolean;
 
 	getPendingPeers(): Peer[];
 	getPendingPeer(ip: string): Peer;
 	setPendingPeer(peer: Peer): void;
-	forgetPendingPeer(peer: Peer): void;
+	forgetPendingPeer(ip: string): void;
 	hasPendingPeer(ip: string): boolean;
 }
 
