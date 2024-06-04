@@ -5,13 +5,13 @@ import { Contracts } from "@mainsail/contracts";
 export class MockInstance implements Contracts.Evm.Instance {
 	public async process(txContext: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.ProcessResult> {
 		return {
+			mocked: true,
 			receipt: {
 				gasRefunded: BigInt(0),
 				gasUsed: BigInt(0),
 				logs: [],
 				success: true,
 			},
-			mocked: true,
 		};
 	}
 

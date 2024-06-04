@@ -70,8 +70,8 @@ export class Collator implements Contracts.TransactionPool.Collator {
 
 				const gasUsed = (await this.triggers.call<number>("calculateTransactionGasUsage", {
 					commitKey,
-					transaction,
 					sequence,
+					transaction,
 					walletRepository,
 				})) as number;
 

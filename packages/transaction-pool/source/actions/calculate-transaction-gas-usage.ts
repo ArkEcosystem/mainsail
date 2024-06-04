@@ -27,10 +27,10 @@ export class CalculateTransactionGasUsage extends Services.Triggers.Action {
 				const { receipt } = await this.evm.process({
 					caller: sender.getAddress(),
 					commitKey,
-					sequence,
 					data: Buffer.from(evmCall.payload, "hex"),
 					gasLimit: BigInt(evmCall.gasLimit),
 					recipient: transaction.data.recipientId,
+					sequence,
 				});
 
 				gasUsed = Number(receipt.gasUsed);
