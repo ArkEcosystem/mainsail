@@ -58,11 +58,8 @@
 		"@mainsail/crypto-transaction-transfer": "workspace:*",
 		"@mainsail/crypto-transaction-vote": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-<<<<<<< HEAD
 		"@types/tmp": "0.2.6",
 		"tmp": "0.2.3",
-=======
->>>>>>> develop
 		"uvu": "^0.5.6",
 		"date-fns": "3.6.0",
 		"fs-extra": "11.2.0"
@@ -70,8 +67,4 @@
 	"engines": {
 		"node": ">=20.x"
 	}
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> develop

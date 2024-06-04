@@ -153,13 +153,13 @@
 			"package": "@mainsail/crypto-signature-schnorr"
 		},
 		{
-			"package": "@mainsail/crypto-key-pair-schnorr"
+			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
-			"package": "@mainsail/crypto-address-bech32m"
+			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
 			"package": "@mainsail/crypto-wif"
@@ -218,13 +218,13 @@
 			"package": "@mainsail/crypto-signature-schnorr"
 		},
 		{
-			"package": "@mainsail/crypto-key-pair-schnorr"
+			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
-			"package": "@mainsail/crypto-address-bech32m"
+			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
 			"package": "@mainsail/crypto-wif"
@@ -237,6 +237,9 @@
 		},
 		{
 			"package": "@mainsail/fees-static"
+		},
+		{
+			"package": "@mainsail/evm"
 		},
 		{
 			"package": "@mainsail/crypto-block"
@@ -267,6 +270,9 @@
 		},
 		{
 			"package": "@mainsail/crypto-transaction-vote"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-evm-call"
 		},
 		{
 			"package": "@mainsail/transactions"

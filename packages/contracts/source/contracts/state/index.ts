@@ -7,5 +7,4 @@ export * from "./snapshots.js";
 export * from "./state.js";
 export * from "./state-verifier.js";
 export * from "./store.js";
-export * from "./transaction-validator.js";
 export * from "./wallets.js";
