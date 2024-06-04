@@ -1,4 +1,4 @@
-export * as Api from "./api.js";
+export * as Api from "./api/index.js";
 export * as ApiSync from "./api-sync.js";
 export * as Consensus from "./consensus/index.js";
 export * as ConsensusStorage from "./consensus-storage.js";

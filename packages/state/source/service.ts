@@ -17,11 +17,8 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
 
-	@inject(Identifiers.State.Exporter)
-	private readonly exporter!: Contracts.State.Exporter;
-
-	@inject(Identifiers.State.Importer)
-	private readonly importer!: Contracts.State.Importer;
+	@inject(Identifiers.State.Snapshot.Service)
+	private readonly snapshotService!: Contracts.State.SnapshotService;
 
 	#baseStore!: Contracts.State.Store;
 
@@ -48,16 +45,24 @@ export class Service implements Contracts.State.Service {
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		unit.store.commitChanges();
 
-		if (this.state.isBootstrap() || !this.configuration.getRequired("export.enabled")) {
+		if (this.state.isBootstrap() || !this.configuration.getRequired("snapshots.enabled")) {
 			return;
 		}
 
-		if (unit.height % this.configuration.getRequired<number>("export.interval") === 0) {
-			await this.exporter.export(this.#baseStore);
+		await this.export(unit.height);
+	}
+
+	public async export(height: number): Promise<void> {
+		if (
+			this.configuration.getRequired<boolean>("snapshots.enabled") &&
+			height % this.configuration.getRequired<number>("snapshots.interval") === 0
+		) {
+			await this.snapshotService.export(this.#baseStore);
 		}
 	}
 
-	public async restore(maxHeight: number): Promise<void> {
-		await this.importer.import(maxHeight, this.#baseStore);
+	public async restore(height: number): Promise<void> {
+		this.#baseStore = this.storeFactory();
+		await this.snapshotService.import(height, this.#baseStore);
 	}
 }

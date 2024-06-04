@@ -16,6 +16,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/test-transaction-builders": "workspace:*",
 		"@mainsail/validation": "workspace:*",
@@ -33,7 +34,8 @@
 		"@mainsail/state": "workspace:*",
 		"@mainsail/database": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
-		"@mainsail/transaction-pool": "workspace:*",
+		"@mainsail/transaction-pool-service": "workspace:*",
+		"@mainsail/transaction-pool-worker": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-commit": "workspace:*",
 		"@mainsail/processor": "workspace:*",

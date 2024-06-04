@@ -16,6 +16,8 @@ export interface Application {
 
 	name(): string;
 
+	thread(): string;
+
 	dataPath(path?: string): string;
 
 	useDataPath(path: string): void;

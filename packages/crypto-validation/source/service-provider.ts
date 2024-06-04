@@ -11,10 +11,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.#registerSchemas();
 	}
 
-	public requiredByWorker(): boolean {
-		return true;
-	}
-
 	async #registerKeywords(): Promise<void> {
 		for (const keyword of Object.values(makeKeywords())) {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);

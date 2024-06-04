@@ -1,8 +1,9 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { AbstractServer } from "./server.js";
+import { Schemas } from "./validation/index.js";
 
 export type ServerConstructor<T extends AbstractServer> = new (...arguments_: any[]) => T;
 export abstract class AbstractServiceProvider<T extends AbstractServer> extends Providers.ServiceProvider {
@@ -11,6 +12,9 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 	protected abstract getServerConstructor(): ServerConstructor<T>;
 	protected abstract getHandlers(): any;
 	protected abstract getPlugins(): any[];
+	protected getActions(): Contracts.Api.RPC.Action[] {
+		return [];
+	}
 
 	public async register(): Promise<void> {
 		if (this.config().get("server.http.enabled")) {
@@ -20,6 +24,8 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 		if (this.config().get("server.https.enabled")) {
 			await this.buildServer(Contracts.Api.ServerType.Https, this.httpsIdentifier());
 		}
+
+		this.#registerValidation();
 	}
 
 	public async boot(): Promise<void> {
@@ -91,5 +97,19 @@ export abstract class AbstractServiceProvider<T extends AbstractServer> extends 
 			plugin: this.getHandlers(),
 			routes: { prefix: "/api" },
 		});
+
+		for (const action of this.getActions()) {
+			server.getRPCProcessor().registerAction(action);
+		}
+	}
+
+	#registerValidation(): void {
+		const validator = this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+
+		for (const schema of Object.values(Schemas)) {
+			if (schema.$id && !validator.hasSchema(schema.$id)) {
+				validator.addSchema(schema);
+			}
+		}
 	}
 }

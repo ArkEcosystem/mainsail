@@ -4,8 +4,8 @@ import type { KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
-	readonly id: string | undefined;
-	readonly typeGroup: number | undefined;
+	readonly id: string;
+	readonly typeGroup: number;
 	readonly type: number;
 	readonly key: string;
 
@@ -38,7 +38,7 @@ export interface TransactionAsset {
 
 export interface TransactionData {
 	version: number;
-	network?: number;
+	network: number;
 
 	typeGroup: number;
 	type: number;
@@ -55,7 +55,7 @@ export interface TransactionData {
 	asset?: TransactionAsset;
 	vendorField?: string;
 
-	id?: string;
+	id: string;
 	signature?: string;
 	signatures?: string[];
 
@@ -127,7 +127,7 @@ export interface TransactionVerifier {
 
 	verifyHash(data: TransactionData): Promise<boolean>;
 
-	verifySchema(data: TransactionData, strict?: boolean): Promise<SchemaValidationResult>;
+	verifySchema(data: Omit<TransactionData, "id">, strict?: boolean): Promise<SchemaValidationResult>;
 }
 
 export interface TransactionSigner {

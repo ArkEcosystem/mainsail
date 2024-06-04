@@ -1,4 +1,4 @@
-import { inject, injectable, optional, postConstruct } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -22,9 +22,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Validator.Repository)
 	private readonly validatorRepository!: Contracts.Validator.ValidatorRepository;
 
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.P2P.Server)
 	private readonly p2pServer!: Contracts.P2P.Server;
 
@@ -46,6 +43,9 @@ export class Bootstrapper {
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.State.Snapshot.Service)
+	private snapshotService!: Contracts.State.SnapshotService;
+
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
 
@@ -56,12 +56,8 @@ export class Bootstrapper {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
-	#store!: Contracts.State.Store;
-
-	@postConstruct()
-	public initialize(): void {
-		this.#store = this.stateService.getStore();
-	}
+	@inject(Identifiers.TransactionPool.Worker)
+	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
 	public async bootstrap(): Promise<void> {
 		try {
@@ -73,7 +69,7 @@ export class Bootstrapper {
 			await this.#checkStoredGenesisCommit();
 			await this.#storeGenesisCommit();
 
-			await this.#restoreStateSnapshot();
+			await this.#restoreSnapshots();
 
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();
@@ -88,8 +84,6 @@ export class Bootstrapper {
 
 			this.validatorRepository.printLoadedValidators();
 
-			await this.transactionPool.reAddTransactions();
-
 			void this.consensus.run();
 
 			await this.p2pServer.boot();
@@ -103,7 +97,7 @@ export class Bootstrapper {
 		const genesisBlockJson = this.configuration.get("genesisBlock");
 		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
-		this.#store.setGenesisCommit(genesisBlock);
+		this.stateService.getStore().setGenesisCommit(genesisBlock);
 	}
 	async #checkStoredGenesisCommit(): Promise<void> {
 		const genesisCommit = await this.databaseService.getCommit(0);
@@ -112,45 +106,56 @@ export class Bootstrapper {
 			return;
 		}
 
-		if (this.#store.getGenesisCommit().block.data.id !== genesisCommit.block.data.id) {
+		if (this.stateService.getStore().getGenesisCommit().block.data.id !== genesisCommit.block.data.id) {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
 
 	async #storeGenesisCommit(): Promise<void> {
 		if (this.databaseService.isEmpty()) {
-			const genesisBlock = this.#store.getGenesisCommit();
+			const genesisBlock = this.stateService.getStore().getGenesisCommit();
 			this.databaseService.addCommit(genesisBlock);
 			await this.databaseService.persist();
 		}
 	}
 
 	async #processGenesisBlock(): Promise<void> {
-		const genesisBlock = this.#store.getGenesisCommit();
+		const genesisBlock = this.stateService.getStore().getGenesisCommit();
 		await this.#processCommit(genesisBlock);
 	}
 
-	async #restoreStateSnapshot(): Promise<void> {
+	async #restoreSnapshots(): Promise<void> {
 		const lastCommit = await this.databaseService.getLastCommit();
-		let restoreHeight = lastCommit.block.data.height;
+		const ledgerHeight = lastCommit.block.data.height;
+
+		let localSnapshots = await this.snapshotService.listSnapshots();
+		localSnapshots = localSnapshots.filter((snapshot) => snapshot <= ledgerHeight);
+
 		if (this.apiSync) {
-			restoreHeight = Math.min(await this.apiSync.getLastSyncedBlockHeight(), restoreHeight);
+			const apiSyncHeight = await this.apiSync.getLastSyncedBlockHeight();
+			localSnapshots = localSnapshots.filter((snapshot) => snapshot <= apiSyncHeight);
 		}
 
-		await this.stateService.restore(restoreHeight);
+		const localSnapshotHeight = localSnapshots.shift();
+		if (localSnapshotHeight) {
+			await this.stateService.restore(localSnapshotHeight);
+			await this.txPoolWorker.importSnapshot(localSnapshotHeight);
+		} else {
+			this.logger.info("Skipping snapshot restoration");
+		}
 	}
 
 	async #initState(): Promise<void> {
 		// The initial height is > 0 when restoring a snapshot.
-		if (this.#store.getLastHeight() === 0) {
+		if (this.stateService.getStore().getLastHeight() === 0) {
 			await this.#processGenesisBlock();
 		} else {
-			const commit = await this.databaseService.getCommit(this.#store.getLastHeight());
+			const commit = await this.databaseService.getCommit(this.stateService.getStore().getLastHeight());
 			Utils.assert.defined<Contracts.Crypto.Commit>(commit);
-			this.#store.setLastBlock(commit.block);
+			this.stateService.getStore().setLastBlock(commit.block);
 			this.configuration.setHeight(commit.block.data.height + 1);
 
-			this.validatorSet.restore(this.#store);
+			this.validatorSet.restore(this.stateService.getStore());
 		}
 	}
 
@@ -158,7 +163,7 @@ export class Bootstrapper {
 		const lastCommit = await this.databaseService.getLastCommit();
 
 		for await (const commit of this.databaseService.readCommits(
-			this.#store.getLastHeight() + 1,
+			this.stateService.getStore().getLastHeight() + 1,
 			lastCommit.block.data.height,
 		)) {
 			await this.#processCommit(commit);

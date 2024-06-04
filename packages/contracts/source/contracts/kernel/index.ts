@@ -5,6 +5,7 @@ export * from "./container.js";
 export * from "./environment-variables.js";
 export * from "./events.js";
 export * from "./filesystem.js";
+export * as IPC from "./ipc.js";
 export * from "./lock.js";
 export * from "./log.js";
 export * from "./pipeline.js";

@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { IpcWorker } from "@mainsail/kernel";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -19,7 +18,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
 	@inject(Identifiers.CryptoWorker.WorkerPool)
-	private readonly workerPool!: IpcWorker.WorkerPool;
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	async process(
 		precommit: Contracts.Crypto.Precommit,

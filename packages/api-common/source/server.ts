@@ -5,6 +5,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
 import { readFileSync } from "fs";
 
+import { Processor } from "./rcp/index.js";
+
 @injectable()
 export abstract class AbstractServer {
 	@inject(Identifiers.Application.Instance)
@@ -38,6 +40,7 @@ export abstract class AbstractServer {
 
 		this.server.app.app = this.app;
 		this.server.app.schemas = this.schemas();
+		this.server.app.rpc = this.app.resolve(Processor);
 
 		this.server.ext("onPreHandler", (request, h) => {
 			request.headers["content-type"] = "application/json";
@@ -99,6 +102,10 @@ export abstract class AbstractServer {
 
 	public getRoute(method: string, path: string): ServerRoute | undefined {
 		return this.server.table().find((route) => route.method === method.toLowerCase() && route.path === path);
+	}
+
+	public getRPCProcessor(): Contracts.Api.RPC.Processor {
+		return this.server.app.rpc;
 	}
 
 	public async inject(options: string | ServerInjectOptions): Promise<ServerInjectResponse> {

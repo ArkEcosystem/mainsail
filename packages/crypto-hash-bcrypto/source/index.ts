@@ -11,8 +11,4 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.Cryptography.Hash.Factory).to(HashFactory).inSingletonScope();
 	}
-
-	public requiredByWorker(): boolean {
-		return true;
-	}
 }

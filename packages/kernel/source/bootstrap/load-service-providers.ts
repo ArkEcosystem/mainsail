@@ -33,8 +33,7 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 	private readonly serviceProviderRepository!: ServiceProviderRepository;
 
 	public async bootstrap(): Promise<void> {
-		const plugins: PluginEntry[] | undefined = this.configRepository.get<PluginEntry[]>("app.plugins");
-
+		const plugins: PluginEntry[] | undefined = this.configRepository.get<PluginEntry[]>(`app.${this.app.thread()}`);
 		assert.defined<PluginEntry[]>(plugins);
 
 		const installedPlugins = await this.#discoverPlugins(this.app.dataPath("plugins"));
@@ -57,22 +56,20 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 					//
 					// Error [ERR_MODULE_NOT_FOUND]: Cannot find package '@mainsail/validation' imported from
 					// ~/git/mainsail/packages/kernel/distribution/bootstrap/load-service-providers.js
-					//
-					const extractLocalModulePath = (message: string) => {
-						const prefix = "Did you mean to import ";
-						const suffix = "index.js";
-						const startIndex = message.indexOf(prefix) + prefix.length;
-						const endIndex = message.indexOf(suffix, startIndex) + suffix.length;
-						const path = message.slice(startIndex, endIndex);
-						const parts = path.split("/");
-						return parts.slice(-3).join("/");
-					};
-
-					const localPath = extractLocalModulePath(error.stack);
-					// ~/git/mainsail/packages/kernel/distribution/bootstrap
+					// =>
+					// ~/git/mainsail/packages/kernel/distribution/bootstrap/
 					// ~/git/mainsail/packages/
 					// ~/git/mainsail/packages/validation/distribution/index.js
-					const fallback = path.resolve(new URL(".", import.meta.url).pathname, "..", "..", "..", localPath);
+					const fallback = path.resolve(
+						new URL(".", import.meta.url).pathname,
+						"..",
+						"..",
+						"..",
+						packageId.split("/")[1],
+						"distribution",
+						"index.js",
+					);
+
 					({ ServiceProvider } = await import(fallback));
 
 					// ~/git/mainsail/packages/validation/distribution/index.js
@@ -86,11 +83,6 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 			}
 
 			const serviceProvider: ServiceProvider = this.app.resolve(ServiceProvider);
-
-			if (this.app.isWorker() && !serviceProvider.requiredByWorker()) {
-				continue;
-			}
-
 			serviceProvider.setManifest(this.app.resolve(PluginManifest).discover(packageModule, import.meta.url));
 			serviceProvider.setConfig(
 				await this.#discoverConfiguration(serviceProvider, plugin.options, packageModule),
