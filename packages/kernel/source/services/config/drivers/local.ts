@@ -55,11 +55,17 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 		this.validationService.validate(
 			this.#loadFromLocation(["app.json"]),
 			Joi.object({
+				"crypto-worker": Joi.array()
+					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
+					.required(),
 				flags: Joi.array().items(Joi.string()).optional(),
-				plugins: Joi.array()
+				main: Joi.array()
 					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
 					.required(),
 				services: Joi.object().optional(),
+				"transaction-pool": Joi.array()
+					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
+					.required(),
 			}).unknown(true),
 		);
 
@@ -72,7 +78,9 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			...get(this.validationService.valid(), "flags", {}),
 		});
 
-		this.configRepository.set("app.plugins", get(this.validationService.valid(), "plugins", []));
+		this.configRepository.set("app.main", get(this.validationService.valid(), "main", []));
+		this.configRepository.set("app.transaction-pool", get(this.validationService.valid(), "transaction-pool", []));
+		this.configRepository.set("app.crypto-worker", get(this.validationService.valid(), "crypto-worker", []));
 	}
 
 	#loadPeers(): void {

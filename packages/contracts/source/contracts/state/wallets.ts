@@ -2,7 +2,7 @@ import { BigNumber } from "@mainsail/utils";
 import { JsonObject } from "type-fest";
 
 import { BlockData, MultiSignatureAsset } from "../crypto/index.js";
-import { Repository } from "./repository.js";
+import { StateRepository, StateRepositoryChange } from "./repository.js";
 
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
@@ -26,7 +26,11 @@ export enum WalletIndexes {
 	Validators = "validators",
 }
 
-export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges"> {
+export interface WalletChange extends StateRepositoryChange {
+	address: string;
+}
+
+export interface Wallet extends Omit<StateRepository, "fromJson" | "commitChanges" | "changesToJson"> {
 	// TODO: Use one form set / increase
 	getAddress(): string;
 
@@ -53,6 +57,8 @@ export interface Wallet extends Omit<Repository, "fromJson" | "commitChanges"> {
 	fromJson(data: JsonObject): Wallet;
 	commitChanges(walletRepository: WalletRepository): void;
 
+	changesToJson(): WalletChange;
+
 	toString(): string;
 }
 
@@ -71,7 +77,7 @@ export interface ValidatorWallet {
 	toString(): string;
 }
 
-export type WalletFactory = (address: string, walletRepository: WalletRepository) => Wallet;
+export type WalletFactory = (address: string, walletRepository: WalletRepository, wallet?: Wallet) => Wallet;
 
 export type ValidatorWalletFactory = (wallet: Wallet) => ValidatorWallet;
 
@@ -85,6 +91,16 @@ export interface WalletValidatorAttributes {
 }
 
 export type WalletMultiSignatureAttributes = MultiSignatureAsset & { legacy?: boolean };
+
+export type WalletRepositoryChange = {
+	wallets: WalletChange[];
+	indexes: {
+		[index: string]: {
+			forgets: string[];
+			sets: Record<string, string>;
+		};
+	};
+};
 
 export interface WalletRepository {
 	allByAddress(): ReadonlyArray<Wallet>;
@@ -111,6 +127,9 @@ export interface WalletRepository {
 	getDirtyWallets(): IterableIterator<Wallet>;
 
 	commitChanges(): void;
+
+	changesToJson(): WalletRepositoryChange;
+	applyChanges(changes: WalletRepositoryChange): void;
 }
 
 export type WalletRepositoryFactory = (originalWalletRepository?: WalletRepository) => WalletRepository;

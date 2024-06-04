@@ -1,6 +1,6 @@
 FROM node:21-alpine
 
-COPY index.mjs package.json .
+COPY index.mjs package.json ./
 
 RUN npm install
 

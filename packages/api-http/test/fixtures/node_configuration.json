@@ -5,7 +5,7 @@
 			"maxPayload": 2097152,
 			"maxTransactions": 150
 		},
-		"epoch": "2024-02-23T00:00:00.000Z",
+		"epoch": "2023-12-21T00:00:00.000Z",
 		"fees": {
 			"staticFees": {
 				"vote": 100000000,

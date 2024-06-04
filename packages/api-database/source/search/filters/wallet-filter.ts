@@ -1,7 +1,9 @@
+import { isObject } from "@mainsail/utils";
+
 import { Wallet } from "../../models/index.js";
 import { EqualCriteria, OrWalletCriteria, WalletCriteria } from "../criteria.js";
-import { Expression } from "../expressions.js";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { Expression, JsonFieldCastType, OrExpression } from "../expressions.js";
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class WalletFilter {
 	public static async getExpression(...criteria: OrWalletCriteria[]): Promise<Expression<Wallet>> {
@@ -30,13 +32,13 @@ export class WalletFilter {
 				case "balance": {
 					return handleOrCriteria(criteria.balance, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("nonce", c),
+						handleComparisonCriteria("nonce", c),
 					);
 				}
 				case "nonce": {
 					return handleOrCriteria(criteria.nonce, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("nonce", c),
+						handleComparisonCriteria("nonce", c),
 					);
 				}
 				case "attributes": {
@@ -68,20 +70,71 @@ export class WalletFilter {
 		};
 	}
 
-	private static async handleAttributesCriteria(criteria: Record<string, any>): Promise<Expression<Wallet>> {
-		if (criteria.vote) {
-			return {
-				jsonFieldAccessor: {
-					fieldName: "vote",
-					operator: "->>",
-				},
-				op: "equal",
-				property: "attributes",
-				value: criteria.vote,
-			};
+	public static async handleAttributesCriteria(criteria: Record<string, any>): Promise<OrExpression<Wallet>> {
+		return {
+			expressions: await Promise.all(
+				Object.entries(criteria).map(async ([k, v]) => {
+					// flatten 'v' from object to dotted attribute path
+					// { "validatorLastBlock":  { "id": "value" } } -> 'validatorLastBlock.id'
+					if (isObject(v) && Object.keys(v).length === 1 && !["from", "to"].includes(Object.keys(v)[0])) {
+						const nestedAttribute = Object.keys(v)[0];
+						k = `${k}.${nestedAttribute}`;
+						v = v[nestedAttribute];
+					}
+
+					return handleComparisonCriteria<Wallet, "attributes">("attributes", v, {
+						cast: this.inferAttributeCastType(k),
+						fieldName: k,
+						operator: "->>",
+					});
+				}),
+			),
+			op: "or",
+		};
+	}
+
+	private static inferAttributeCastType(attribute: string): JsonFieldCastType | undefined {
+		// Since object attributes can exist with arbitrary keys, we hardcode a list of 'numeric like' attributes
+		// and treat the rest as is.
+
+		/*
+		walletAttributeRepository.set("balance", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("nonce", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("publicKey", Contracts.State.AttributeType.String);
+		walletAttributeRepository.set("username", Contracts.State.AttributeType.String);
+		walletAttributeRepository.set("validatorPublicKey", Contracts.State.AttributeType.String);
+		walletAttributeRepository.set("validatorRank", Contracts.State.AttributeType.Number);
+		walletAttributeRepository.set("validatorVoteBalance", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("validatorLastBlock", Contracts.State.AttributeType.Object);
+		walletAttributeRepository.set("validatorForgedFees", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("validatorForgedRewards", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("validatorForgedTotal", Contracts.State.AttributeType.BigNumber);
+		walletAttributeRepository.set("validatorProducedBlocks", Contracts.State.AttributeType.Number);
+		walletAttributeRepository.set("validatorApproval", Contracts.State.AttributeType.Number);
+		walletAttributeRepository.set("validatorResigned", Contracts.State.AttributeType.Boolean);
+		*/
+
+		if (
+			[
+				"balance",
+				"nonce",
+				"validatorRank",
+				"validatorVoteBalance",
+				"validatorForgedFees",
+				"validatorForgedRewards",
+				"validatorForgedTotal",
+				"validatorProducedBlocks",
+				"validatorLastBlock.height",
+				"validatorLastBlock.timestamp",
+			].includes(attribute)
+		) {
+			return "bigint";
 		}
 
-		// TODO
-		return { op: "false" };
+		if (["validatorApproval"].includes(attribute)) {
+			return "numeric";
+		}
+
+		return undefined;
 	}
 }

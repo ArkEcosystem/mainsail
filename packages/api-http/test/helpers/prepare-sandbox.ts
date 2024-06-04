@@ -7,7 +7,6 @@ import { Identifiers } from "@mainsail/contracts";
 import { Application, Providers } from "@mainsail/kernel";
 
 import { Sandbox } from "../../../test-framework/source";
-import { Validator } from "../../../validation/source/validator";
 import { ServiceProvider as CoreApiHttp } from "../../source/service-provider";
 
 export class ApiContext {
@@ -107,6 +106,10 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 		error: (message) => console.log(message),
 		info: (message) => console.log(message),
 		notice: (message) => console.log(message),
+	});
+
+	context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue({
+		hasSchema: () => true,
 	});
 
 	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });

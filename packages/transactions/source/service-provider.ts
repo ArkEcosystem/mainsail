@@ -4,6 +4,7 @@ import { Providers } from "@mainsail/kernel";
 
 import { TransactionHandlerRegistry } from "./handlers/handler-registry.js";
 import { TransactionHandlerConstructor, TransactionHandlerProvider } from "./handlers/index.js";
+import { TransactionValidator } from "./transaction-validator.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public static getTransactionHandlerConstructorsBinding(): (
@@ -39,6 +40,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toDynamicValue(ServiceProvider.getTransactionHandlerConstructorsBinding());
 
 		this.app.bind(Identifiers.Transaction.Handler.Registry).to(TransactionHandlerRegistry);
+
+		this.app.bind(Identifiers.Transaction.Validator.Instance).to(TransactionValidator);
+		this.app
+			.bind(Identifiers.Transaction.Validator.Factory)
+			.toAutoFactory(Identifiers.Transaction.Validator.Instance);
 	}
 
 	public async required(): Promise<boolean> {

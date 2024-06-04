@@ -2,7 +2,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { join } from "path";
-import { dirSync } from "tmp";
 
 import { ValidatorsJson } from "./contracts.js";
 import { MemoryDatabase } from "./database.js";
@@ -44,6 +43,12 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
+	sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
+		getTransactionBytes: async () => [],
+		setFailedTransactions: () => {},
+		onCommit: async () => {},
+	});
+
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
@@ -54,7 +59,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
+	sandbox.app.bind("path.data").toConstantValue("");
 	sandbox.app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -101,7 +106,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-transaction-vote",
 		"@mainsail/state",
 		"@mainsail/transactions",
-		"@mainsail/transaction-pool",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
@@ -110,11 +114,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/consensus",
 	];
 
-	const options = {
-		"@mainsail/transaction-pool": {
-			storage: ":memory:",
-		},
-	};
+	const options = {};
 
 	for (const packageId of packages) {
 		await loadPlugin(sandbox, packageId, options);

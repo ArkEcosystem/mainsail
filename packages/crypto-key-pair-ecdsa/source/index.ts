@@ -8,9 +8,6 @@ import { PublicKeyFactory } from "./public.js";
 import { schemas } from "./schemas.js";
 import { PublicKeySerializer } from "./serializer.js";
 
-export * from "./pair.js";
-export * from "./schemas.js";
-
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app
@@ -40,10 +37,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("type", "wallet"));
 
 		this.#registerSchemas();
-	}
-
-	public requiredByWorker(): boolean {
-		return true;
 	}
 
 	#registerSchemas(): void {

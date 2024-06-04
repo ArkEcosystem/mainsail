@@ -22,7 +22,20 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				query: Joi.object({}).concat(Schemas.pagination),
 			},
 		},
-		path: "/validator-rounds",
+		path: "/rounds",
+	});
+
+	server.route({
+		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					round: Joi.number().integer().min(1),
+				}),
+			},
+		},
+		path: "/rounds/{round}",
 	});
 
 	server.route({

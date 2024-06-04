@@ -98,6 +98,8 @@ export type DelegateCriteria = {
 	forged?: DelegateForged;
 	production?: DelegateProduction;
 	blocks?: DelegateBlocks;
+
+	attributes?: OrContainsCriteria<Record<string, any>>;
 };
 
 export type OrDelegateCriteria = OrCriteria<DelegateCriteria>;

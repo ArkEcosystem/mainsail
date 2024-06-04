@@ -1,7 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
-import delay from "delay";
 
 import { constants } from "./constants.js";
 import { Routes, SocketErrors } from "./enums.js";
@@ -39,21 +38,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private readonly throttleFactory!: () => Promise<Throttle>;
 
 	#throttle?: Throttle;
-
-	public async postTransactions(peer: Contracts.P2P.Peer, transactions: Buffer[]): Promise<void> {
-		const postTransactionsRateLimit = this.configuration.getRequired<number>("rateLimitPostTransactions");
-
-		const queue = await peer.getTransactionsQueue();
-		void queue.resume();
-		void queue.push({
-			handle: async () => {
-				await this.emit(peer, Routes.PostTransactions, { transactions }, { timeout: 10_000 });
-				await delay(Math.ceil(1000 / postTransactionsRateLimit));
-				// to space up between consecutive calls to postTransactions according to rate limit
-				// optimized here because default throttling would not be effective for postTransactions
-			},
-		});
-	}
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
 		try {

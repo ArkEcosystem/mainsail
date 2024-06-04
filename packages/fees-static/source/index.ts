@@ -30,8 +30,40 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return true;
 	}
 
-	public requiredByWorker(): boolean {
-		return true;
+	public async handle({ name }): Promise<void> {
+		// eslint-disable-next-line sonarjs/no-small-switch
+		switch (name) {
+			case Enums.CryptoEvent.MilestoneChanged: {
+				await this.#updateStaticFees();
+				break;
+			}
+		}
+	}
+
+	async #updateStaticFees(): Promise<void> {
+		const configuration = this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+		const logger = this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+		const registry = this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry);
+
+		const { fees } = configuration.getMilestone();
+		const { staticFees = {} } = fees ?? {};
+
+		for (const [key, fee] of Object.entries(staticFees)) {
+			const newFee = BigNumber.make(fee);
+
+			if (configuration.getHeight() > 0) {
+				const previousFee = registry.get(key);
+				if (newFee.isEqualTo(previousFee)) {
+					continue;
+				}
+
+				logger.info(`updating static fee of ${key} ${previousFee} => ${newFee}`);
+			} else {
+				logger.debug(`initializing static fee of ${key} ${newFee}`);
+			}
+
+			registry.set(key, newFee);
+		}
 	}
 
 	public async handle({ name }): Promise<void> {

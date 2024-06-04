@@ -241,6 +241,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
@@ -423,6 +426,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/transactions':
+        specifier: workspace:*
+        version: link:../transactions
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -810,9 +816,6 @@ importers:
       '@mainsail/api-sync':
         specifier: workspace:*
         version: link:../api-sync
-      '@mainsail/api-transaction-pool':
-        specifier: workspace:*
-        version: link:../api-transaction-pool
       '@mainsail/bootstrap':
         specifier: workspace:*
         version: link:../bootstrap
@@ -969,9 +972,9 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../state
-      '@mainsail/transaction-pool':
+      '@mainsail/transaction-pool-worker':
         specifier: workspace:*
-        version: link:../transaction-pool
+        version: link:../transaction-pool-worker
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
@@ -1701,6 +1704,9 @@ importers:
         specifier: 8.12.0
         version: 8.12.0
     devDependencies:
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../crypto-address-bech32m
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -1719,6 +1725,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
@@ -2425,7 +2434,7 @@ importers:
         version: link:../validation
       '@napi-rs/cli':
         specifier: ^2.18.0
-        version: 2.18.2
+        version: 2.18.3
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
@@ -3006,6 +3015,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../crypto-address-bech32m
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -3027,6 +3039,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
+      '@mainsail/crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
@@ -3232,7 +3247,7 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/transaction-pool:
+  packages/transaction-pool-service:
     dependencies:
       '@mainsail/container':
         specifier: workspace:*
@@ -3268,6 +3283,25 @@ importers:
       tmp:
         specifier: 0.2.3
         version: 0.2.3
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/transaction-pool-worker:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+    devDependencies:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -3650,9 +3684,9 @@ importers:
       '@mainsail/test-transaction-builders':
         specifier: workspace:*
         version: link:../../../packages/test-transaction-builders
-      '@mainsail/transaction-pool':
+      '@mainsail/transaction-pool-service':
         specifier: workspace:*
-        version: link:../../../packages/transaction-pool
+        version: link:../../../packages/transaction-pool-service
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../../../packages/transactions
@@ -3698,6 +3732,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../../../packages/contracts
+      '@mainsail/crypto-address-bech32m':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-address-bech32m
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../../../packages/crypto-address-keccak256
@@ -3719,6 +3756,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../../../packages/crypto-key-pair-ecdsa
+      '@mainsail/crypto-key-pair-schnorr':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-schnorr
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
@@ -3803,9 +3843,12 @@ importers:
       '@mainsail/test-transaction-builders':
         specifier: workspace:*
         version: link:../../../packages/test-transaction-builders
-      '@mainsail/transaction-pool':
+      '@mainsail/transaction-pool-service':
         specifier: workspace:*
-        version: link:../../../packages/transaction-pool
+        version: link:../../../packages/transaction-pool-service
+      '@mainsail/transaction-pool-worker':
+        specifier: workspace:*
+        version: link:../../../packages/transaction-pool-worker
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../../../packages/transactions
@@ -4329,8 +4372,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@napi-rs/cli@2.18.2':
-    resolution: {integrity: sha512-IXQji3IF5eStxTHe/PxDSRjPrFymYAQ5FbIvqurxzxyWR8nJql9mtvmCP8y2g8tSoW5xhaToLQW0+mO3lUZq4w==}
+  '@napi-rs/cli@2.18.3':
+    resolution: {integrity: sha512-L0f4kP0dyG8W5Qtc7MtP73VvLLrOLyRcUEBzknIfu8Jk4Jfhrsx1ItMHgyalYqMSslWdY3ojEfAaU5sx1VyeQQ==}
     engines: {node: '>= 10'}
     hasBin: true
 
@@ -11374,7 +11417,7 @@ snapshots:
   '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.2':
     optional: true
 
-  '@napi-rs/cli@2.18.2': {}
+  '@napi-rs/cli@2.18.3': {}
 
   '@noble/curves@1.2.0':
     dependencies:
