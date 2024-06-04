@@ -920,6 +920,12 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../state
+      '@mainsail/transaction-pool-broadcaster':
+        specifier: workspace:*
+        version: link:../transaction-pool-broadcaster
+      '@mainsail/transaction-pool-service':
+        specifier: workspace:*
+        version: link:../transaction-pool-service
       '@mainsail/transaction-pool-worker':
         specifier: workspace:*
         version: link:../transaction-pool-worker
