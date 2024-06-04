@@ -52,7 +52,7 @@ const setup = async () => {
 
 	// RegisterBaseBindings
 
-	sandbox.app.bind("path.data").toConstantValue("");
+	sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -81,14 +81,16 @@ const setup = async () => {
 		"@mainsail/crypto-validation",
 		"@mainsail/crypto-hash-bcrypto",
 		"@mainsail/crypto-signature-schnorr",
-		"@mainsail/crypto-key-pair-schnorr",
+		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-consensus-bls12-381",
-		"@mainsail/crypto-address-bech32m",
+		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
 		"@mainsail/fees",
 		"@mainsail/fees-static",
+		"@mainsail/evm",
+		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-username-registration",
 		"@mainsail/crypto-transaction-username-resignation",
@@ -98,6 +100,7 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-multi-signature-registration",
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
+		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",
