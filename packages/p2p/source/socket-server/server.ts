@@ -42,7 +42,7 @@ export class Server implements Contracts.P2P.Server {
 		const address = optionsServer.hostname;
 		const port = Number(optionsServer.port);
 
-		this.server = new HapiServer({ address, port });
+		this.server = new HapiServer({ address, port, debug: { request: "*" } });
 		this.server.app = this.app;
 		await this.server.register({
 			options: {
