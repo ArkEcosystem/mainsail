@@ -3,7 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-// @TODO revisit the implementation, container usage and arguments after database rework
 @injectable()
 export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
 	@inject(Identifiers.Application.Instance)
@@ -17,6 +16,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
+
+	@inject(Identifiers.Evm.Gas.Limits)
+	protected readonly gasLimits!: Contracts.Evm.GasLimits;
 
 	public async verify(
 		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
@@ -104,15 +106,18 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await this.applyToSender(context, transaction);
-		await this.applyToRecipient(context, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const senderResult = await this.applyToSender(context, transaction);
+		const recipientResult = await this.applyToRecipient(context, transaction);
+
+		// Merge results; effectively only one is ever set depending on the transaction type.
+		return { gasUsed: senderResult.gasUsed + recipientResult.gasUsed };
 	}
 
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
@@ -130,6 +135,25 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 		// Subtract fee
 		this.applyFeeToSender(transaction, sender);
+
+		// Native gas usage
+		let gasUsed = 0;
+		const isEvmCall =
+			transaction.type === Contracts.Crypto.TransactionType.EvmCall &&
+			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core;
+		if (!isEvmCall) {
+			// TODO: calculate accurate amount (follow-up)
+			gasUsed = this.gasLimits.of(transaction);
+		}
+
+		return { gasUsed };
+	}
+
+	public async applyToRecipient(
+		context: Contracts.Transactions.TransactionHandlerContext,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return { gasUsed: 0 };
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {}
@@ -193,11 +217,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
 
 	public abstract isActivated(): Promise<boolean>;
-
-	public abstract applyToRecipient(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<void>;
 }
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;

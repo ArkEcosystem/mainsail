@@ -52,21 +52,24 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		// TODO: subtract consumed gas only after evm call
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		await super.applyToSender(context, transaction);
+
+		// Taken from receipt in applyToRecipient
+		return { gasUsed: 0 };
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
 
 		const { evmCall } = transaction.data.asset;
 
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
+		let gasUsed = 0;
 		try {
 			const { instance, commitKey } = context.evm;
 			const { receipt } = await instance.process({
@@ -88,6 +91,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			this.logger.debug(
 				`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
 			);
+			gasUsed = Number(receipt.gasUsed);
 
 			void this.#emit(Enums.EvmEvent.TransactionReceipt, {
 				receipt,
@@ -97,6 +101,8 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		} catch (error) {
 			this.logger.critical(`invalid EVM call: ${error.stack}`);
 		}
+
+		return { gasUsed };
 	}
 
 	protected verifyTransactionFee(

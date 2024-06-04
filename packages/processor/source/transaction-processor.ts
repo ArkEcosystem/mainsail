@@ -35,7 +35,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		await transactionHandler.apply(transactionHandlerContext, transaction);
+		const result = await transactionHandler.apply(transactionHandlerContext, transaction);
+
+		unit.consumeGas(result.gasUsed);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 

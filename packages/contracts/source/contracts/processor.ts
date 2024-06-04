@@ -11,6 +11,8 @@ export interface ProcessableUnit {
 	setProcessorResult(processorResult: boolean): void;
 	getBlock(): Block;
 	getCommit(): Promise<Commit>;
+	consumeGas(amount: number): void;
+	hasConsumedAllGas(): boolean;
 }
 
 export interface Handler {

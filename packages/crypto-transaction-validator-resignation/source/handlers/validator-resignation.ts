@@ -76,8 +76,8 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(context, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const result = await super.applyToSender(context, transaction);
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -89,11 +89,14 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 			senderWallet.getAttribute("validatorPublicKey"),
 			senderWallet,
 		);
+
+		return result;
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-		// tslint:disable-next-line: no-empty
-	): Promise<void> {}
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return super.applyToRecipient(context, transaction);
+	}
 }

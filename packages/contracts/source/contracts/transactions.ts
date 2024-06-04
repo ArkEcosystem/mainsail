@@ -13,18 +13,24 @@ export type TransactionHandlerContext = {
 	};
 };
 
+export interface TransactionApplyResult {
+	gasUsed: number;
+}
+
 export interface TransactionHandler {
 	verify(context: TransactionHandlerContext, transaction: Transaction): Promise<boolean>;
 
 	throwIfCannotBeApplied(context: TransactionHandlerContext, transaction: Transaction, sender: Wallet): Promise<void>;
 
-	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
+	throwIfCannotEnterPool(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 
-	applyToSender(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
+	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
+
+	applyToSender(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
+
+	applyToRecipient(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
 	emitEvents(transaction: Transaction, emitter: EventDispatcher): void;
-
-	throwIfCannotEnterPool(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 
 	verifySignatures(
 		wallet: Wallet,
@@ -40,8 +46,6 @@ export interface TransactionHandler {
 	walletAttributes(): ReadonlyArray<{ name: string; type: AttributeType }>;
 
 	isActivated(): Promise<boolean>;
-
-	applyToRecipient(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 }
 
 export interface TransactionHandlerRegistry {

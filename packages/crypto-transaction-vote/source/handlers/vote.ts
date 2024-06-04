@@ -121,8 +121,8 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(context, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const result = await super.applyToSender(context, transaction);
 
 		Utils.assert.defined<string>(transaction.data.senderPublicKey);
 
@@ -140,12 +140,16 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		for (const vote of transaction.data.asset.votes) {
 			sender.setAttribute("vote", vote);
 		}
+
+		return result;
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {}
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return super.applyToRecipient(context, transaction);
+	}
 
 	#checkAsset(data: Contracts.Crypto.TransactionData) {
 		Utils.assert.defined<Contracts.Crypto.VoteAsset>(data.asset);

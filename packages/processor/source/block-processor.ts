@@ -60,6 +60,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				await this.transactionProcessor.process(unit, transaction);
 			}
 
+			if (!unit.hasConsumedAllGas()) {
+				throw new Error("consumed gas mismatch");
+			}
+
 			await this.#applyBlockToForger(unit);
 
 			return true;

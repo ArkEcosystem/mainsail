@@ -114,14 +114,14 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(context, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return super.applyToSender(context, transaction);
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<Contracts.Crypto.MultiSignatureAsset>(data.asset?.multiSignature);
@@ -131,5 +131,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		);
 
 		recipientWallet.setAttribute("multiSignature", data.asset.multiSignature);
+
+		return super.applyToRecipient(context, transaction);
 	}
 }

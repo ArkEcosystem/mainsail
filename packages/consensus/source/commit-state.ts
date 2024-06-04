@@ -13,6 +13,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: boolean;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
+	#gasUsed: number = 0;
 
 	@postConstruct()
 	public initialize(): void {
@@ -69,6 +70,21 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 		}
 
 		return this.#processorResult;
+	}
+
+	public consumeGas(amount: number): void {
+		const totalGas = this.getBlock().header.totalGasUsed;
+
+		if (this.#gasUsed + amount > totalGas) {
+			throw new Error("Cannot consume more gas");
+		}
+
+		this.#gasUsed += amount;
+	}
+
+	public hasConsumedAllGas(): boolean {
+		const totalGas = this.getBlock().header.totalGasUsed;
+		return totalGas == this.#gasUsed;
 	}
 
 	public async getCommit(): Promise<Contracts.Crypto.Commit> {

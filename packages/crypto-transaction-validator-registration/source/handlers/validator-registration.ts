@@ -99,14 +99,14 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);
 		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
-		await super.applyToSender(context, transaction);
+		const result = await super.applyToSender(context, transaction);
 
 		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(data.senderPublicKey);
 
@@ -118,10 +118,14 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 			data.asset.validatorPublicKey,
 			sender,
 		);
+
+		return result;
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {}
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return super.applyToRecipient(context, transaction);
+	}
 }

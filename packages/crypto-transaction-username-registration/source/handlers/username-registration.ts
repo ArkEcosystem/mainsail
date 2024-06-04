@@ -80,13 +80,13 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.username);
 
-		await super.applyToSender(context, transaction);
+		const result = await super.applyToSender(context, transaction);
 
 		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(data.senderPublicKey);
 
@@ -99,10 +99,14 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 
 		sender.setAttribute("username", data.asset.username);
 		context.walletRepository.setOnIndex(Contracts.State.WalletIndexes.Usernames, data.asset.username, sender);
+
+		return result;
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {}
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return super.applyToRecipient(context, transaction);
+	}
 }
