@@ -49,6 +49,10 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		onCommit: async () => {},
 	});
 
+	sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
+		onCommit: async () => {},
+	});
+
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
 		.bind(Identifiers.CryptoWorker.WorkerPool)
@@ -94,7 +98,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-block",
 		"@mainsail/fees",
 		"@mainsail/fees-static",
-		"@mainsail/evm",
+		// "@mainsail/evm",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-username-registration",
 		"@mainsail/crypto-transaction-username-resignation",
@@ -114,7 +118,13 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/consensus",
 	];
 
-	const options = {};
+	const options = {
+		"@mainsail/state": {
+			snapshots: {
+				enabled: false,
+			},
+		},
+	};
 
 	for (const packageId of packages) {
 		await loadPlugin(sandbox, packageId, options);
