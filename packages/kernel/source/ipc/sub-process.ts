@@ -20,12 +20,6 @@ export class Subprocess<T extends {}> implements Contracts.Kernel.IPC.Subprocess
 	}
 
 	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
-	public sendAction(method: string, ...arguments_: any): void {
-		// TODO: we have to make sure args are always serializable
-		this.subprocess.postMessage({ args: arguments_, method });
-	}
-
-	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
 	public sendRequest(method: string, ...arguments_: any): Promise<any> {
 		return new Promise((resolve, reject) => {
 			const id = this.lastId++;

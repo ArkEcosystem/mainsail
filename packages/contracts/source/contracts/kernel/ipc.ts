@@ -37,6 +37,5 @@ export interface Handler<T extends {}> {
 export interface Subprocess<T extends {}> {
 	getQueueSize(): number;
 	kill(): Promise<number>;
-	sendAction(method: string, ...arguments_: any): void;
 	sendRequest(method: string, ...arguments_: any): Promise<any>;
 }
