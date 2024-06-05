@@ -45,4 +45,9 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 		const response: string[] = await this.app.resolve(GetTransactionsHandler).handle();
 		return response.map((transaction: string) => Buffer.from(transaction, "hex"));
 	}
+
+	registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {}
+
+	async setPeer(ip: string): Promise<void> {}
+	async forgetPeer(ip: string): Promise<void> {}
 }
