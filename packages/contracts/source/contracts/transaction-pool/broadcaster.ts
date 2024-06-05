@@ -35,22 +35,9 @@ export type PeerFactory = (ip: string) => Peer;
 export interface PeerRepository {
 	getPeers(): Peer[];
 	getPeer(ip: string): Peer;
-	setPeer(peer: Peer): void;
+	setPeer(ip: string): void;
 	forgetPeer(ip: string): void;
 	hasPeer(ip: string): boolean;
-
-	getPendingPeers(): Peer[];
-	getPendingPeer(ip: string): Peer;
-	setPendingPeer(peer: Peer): void;
-	forgetPendingPeer(ip: string): void;
-	hasPendingPeer(ip: string): boolean;
-}
-
-export interface PeerVerifier {
-	verify(peer: Peer): Promise<boolean>;
-}
-export interface PeerProcessor {
-	validateAndAcceptPeer(ip: string): Promise<void>;
 }
 
 export interface PeerCommunicator {

@@ -3,10 +3,10 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class SetPeerHandler {
-	@inject(Identifiers.TransactionPool.Peer.Processor)
-	private readonly peerProcessor!: Contracts.TransactionPool.PeerProcessor;
+	@inject(Identifiers.TransactionPool.Peer.Repository)
+	private readonly peerRepository!: Contracts.TransactionPool.PeerRepository;
 
 	public async handle(ip: string): Promise<void> {
-		await this.peerProcessor.validateAndAcceptPeer(ip);
+		this.peerRepository.setPeer(ip);
 	}
 }

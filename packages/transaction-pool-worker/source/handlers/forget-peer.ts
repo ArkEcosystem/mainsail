@@ -7,7 +7,6 @@ export class ForgetPeerHandler {
 	private readonly peerRepository!: Contracts.TransactionPool.PeerRepository;
 
 	public async handle(ip: string): Promise<void> {
-		this.peerRepository.forgetPendingPeer(ip);
 		this.peerRepository.forgetPeer(ip);
 	}
 }

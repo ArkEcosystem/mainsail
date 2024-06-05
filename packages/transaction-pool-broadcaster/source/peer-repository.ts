@@ -1,11 +1,13 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class PeerRepository implements Contracts.TransactionPool.PeerRepository {
+	@inject(Identifiers.TransactionPool.Peer.Factory)
+	private readonly peerFactor!: Contracts.TransactionPool.PeerFactory;
+
 	readonly #peers: Map<string, Contracts.TransactionPool.Peer> = new Map();
-	readonly #peersPending: Map<string, Contracts.TransactionPool.Peer> = new Map();
 
 	public getPeers(): Contracts.TransactionPool.Peer[] {
 		return [...this.#peers.values()];
@@ -19,8 +21,8 @@ export class PeerRepository implements Contracts.TransactionPool.PeerRepository 
 		return peer;
 	}
 
-	public setPeer(peer: Contracts.TransactionPool.Peer): void {
-		this.#peers.set(peer.ip, peer);
+	public setPeer(ip: string): void {
+		this.#peers.set(ip, this.peerFactor(ip));
 	}
 
 	public forgetPeer(ip: string): void {
@@ -29,33 +31,5 @@ export class PeerRepository implements Contracts.TransactionPool.PeerRepository 
 
 	public hasPeer(ip: string): boolean {
 		return this.#peers.has(ip);
-	}
-
-	public getPendingPeers(): Contracts.TransactionPool.Peer[] {
-		return [...this.#peersPending.values()];
-	}
-
-	public hasPendingPeers(): boolean {
-		return this.#peersPending.size > 0;
-	}
-
-	public getPendingPeer(ip: string): Contracts.TransactionPool.Peer {
-		const peer = this.#peersPending.get(ip);
-
-		Utils.assert.defined<Contracts.TransactionPool.Peer>(peer);
-
-		return peer;
-	}
-
-	public setPendingPeer(peer: Contracts.TransactionPool.Peer): void {
-		this.#peersPending.set(peer.ip, peer);
-	}
-
-	public forgetPendingPeer(ip: string): void {
-		this.#peersPending.delete(ip);
-	}
-
-	public hasPendingPeer(ip: string): boolean {
-		return this.#peersPending.has(ip);
 	}
 }
