@@ -79,7 +79,7 @@ export type Expression<TEntity> =
 	| JsonbAttributeExists<TEntity>;
 
 export type JsonFieldOperator = "->>";
-export type JsonFieldCastType = "bigint";
+export type JsonFieldCastType = "bigint" | "numeric";
 export type JsonFieldAccessor = {
 	operator: JsonFieldOperator;
 	fieldName: string;

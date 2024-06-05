@@ -58,6 +58,8 @@ jobs:
               run: cd packages/configuration-generator && pnpm run test
             - name: Test consensus
               run: cd packages/consensus && pnpm run test
+            - name: Test consensus-storage
+              run: cd packages/consensus-storage && pnpm run test
             - name: Test container
               run: cd packages/container && pnpm run test
             - name: Test contracts
@@ -76,6 +78,8 @@ jobs:
               run: cd packages/crypto-address-ss58 && pnpm run test
             - name: Test crypto-block
               run: cd packages/crypto-block && pnpm run test
+            - name: Test crypto-commit
+              run: cd packages/crypto-commit && pnpm run test
             - name: Test crypto-config
               run: cd packages/crypto-config && pnpm run test
             - name: Test crypto-consensus-bls12-381
@@ -96,8 +100,6 @@ jobs:
               run: cd packages/crypto-key-pair-schnorr && pnpm run test
             - name: Test crypto-messages
               run: cd packages/crypto-messages && pnpm run test
-            - name: Test crypto-commit
-              run: cd packages/crypto-commit && pnpm run test
             - name: Test crypto-signature-bls12-381
               run: cd packages/crypto-signature-bls12-381 && pnpm run test
             - name: Test crypto-signature-ecdsa
@@ -133,6 +135,8 @@ jobs:
               run: cd packages/crypto-validation && pnpm run test
             - name: Test crypto-wif
               run: cd packages/crypto-wif && pnpm run test
+            - name: Test crypto-worker
+              run: cd packages/crypto-worker && pnpm run test
             - name: Test database
               run: cd packages/database && pnpm run test
             - name: Test evm
@@ -169,8 +173,14 @@ jobs:
               run: cd packages/test-runner && pnpm run test
             - name: Test test-framework
               run: cd packages/test-framework && pnpm run test
-            - name: Test transaction-pool
-              run: cd packages/transaction-pool && pnpm run test
+            - name: Test test-runner
+              run: cd packages/test-runner && pnpm run test
+            - name: Test test-transaction-builders
+              run: cd packages/test-transaction-builders && pnpm run test
+            - name: Test transaction-pool-service
+              run: cd packages/transaction-pool-service && pnpm run test
+            - name: Test transaction-pool-worker
+              run: cd packages/transaction-pool-worker && pnpm run test
             - name: Test transactions
               run: cd packages/transactions && pnpm run test
             - name: Test utils

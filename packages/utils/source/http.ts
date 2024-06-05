@@ -1,6 +1,6 @@
 import { ClientRequest, globalAgent, IncomingMessage } from "http";
 import { request, RequestOptions } from "https";
-import { Primitive } from "type-fest";
+import { JsonArray, JsonObject, Primitive } from "type-fest";
 import { parse } from "url";
 
 import { isObject } from "./is-object.js";
@@ -87,7 +87,10 @@ const sendRequest = (method: string, url: string, options?: HttpOptions): Promis
 		request_.end();
 	});
 
-export type HttpOptions = RequestOptions & { maxContentLength?: number; body?: Record<string, Primitive> };
+export type HttpOptions = RequestOptions & {
+	maxContentLength?: number;
+	body?: Record<string, Primitive | JsonObject | JsonArray>;
+};
 
 export type HttpResponse = {
 	method: string | undefined;

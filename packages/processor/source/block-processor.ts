@@ -21,9 +21,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.Processor.TransactionProcessor)
 	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
 
@@ -47,6 +44,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@multiInject(Identifiers.State.ValidatorMutator)
 	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
+
+	@inject(Identifiers.TransactionPool.Worker)
+	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
@@ -92,13 +92,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
 		await this.evm.onCommit(unit);
+		await this.txPoolWorker.onCommit(unit);
 
 		if (this.apiSync) {
 			await this.apiSync.onCommit(unit);
 		}
 
 		for (const transaction of unit.getBlock().transactions) {
-			await this.transactionPool.removeForgedTransaction(transaction);
 			await this.#emitTransactionEvents(transaction);
 		}
 

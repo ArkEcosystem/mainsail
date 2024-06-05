@@ -21,7 +21,6 @@ import {
 	PostPrecommitRoute,
 	PostPrevoteRoute,
 	PostProposalRoute,
-	PostTransactionsRoute,
 } from "./routes/index.js";
 
 // todo: review the implementation
@@ -43,7 +42,7 @@ export class Server implements Contracts.P2P.Server {
 		const address = optionsServer.hostname;
 		const port = Number(optionsServer.port);
 
-		this.server = new HapiServer({ address, port });
+		this.server = new HapiServer({ address, debug: { request: "*" }, port });
 		this.server.app = this.app;
 		await this.server.register({
 			options: {
@@ -61,7 +60,6 @@ export class Server implements Contracts.P2P.Server {
 		this.app.resolve(PostPrecommitRoute).register(this.server);
 		this.app.resolve(PostPrevoteRoute).register(this.server);
 		this.app.resolve(PostProposalRoute).register(this.server);
-		this.app.resolve(PostTransactionsRoute).register(this.server);
 
 		// onPreAuth
 		this.app.resolve(ValidateIpPlugin).register(this.server);

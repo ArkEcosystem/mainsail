@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { IpcWorker } from "@mainsail/kernel";
 import { ByteBuffer } from "@mainsail/utils";
 
 import { Precommit } from "./precommit.js";
@@ -28,7 +27,7 @@ export class MessageFactory implements Contracts.Crypto.MessageFactory {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	@inject(Identifiers.CryptoWorker.WorkerPool)
-	private readonly workerPool!: IpcWorker.WorkerPool;
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	public async makeProposal(
 		data: Contracts.Crypto.MakeProposalData,

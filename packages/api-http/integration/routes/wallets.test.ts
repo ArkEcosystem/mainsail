@@ -40,6 +40,44 @@ describe<{
 		assert.equal(data.data.length, wallets.length);
 	});
 
+	it("/wallets?attributes", async () => {
+		await apiContext.walletRepository.save(wallets);
+
+		const testCases = [
+			{
+				path: "attributes.validatorPublicKey=9283a37556aa42aa7e2ee363fdd63adb8e91d2a97fe61c55a298075f4075471762371209f190d6d1f674b882e039b78b",
+				result: wallets.filter(
+					(w) =>
+						w.attributes.validatorPublicKey ===
+						"9283a37556aa42aa7e2ee363fdd63adb8e91d2a97fe61c55a298075f4075471762371209f190d6d1f674b882e039b78b",
+				),
+			},
+			{
+				path: "attributes.validatorLastBlock.height=3",
+				result: wallets.filter((w) => w.attributes.validatorLastBlock?.height === 3),
+			},
+			{
+				path: "attributes.validatorProducedBlocks.from=1",
+				result: wallets.filter((w) => w.attributes.validatorProducedBlocks! >= 1),
+			},
+			{
+				path: "attributes.validatorProducedBlocks.from=1&attributes.validatorProducedBlocks.to=1",
+				result: wallets.filter((w) => w.attributes.validatorProducedBlocks === 1),
+			},
+			{
+				path: "attributes.validatorProducedBlocks.from=999",
+				result: [],
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(`/wallets?${path}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data.length, result.length);
+			assert.equal(data.data, result);
+		}
+	});
+
 	it("/wallets/top", async () => {
 		await apiContext.walletRepository.save(wallets);
 

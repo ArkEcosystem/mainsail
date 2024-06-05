@@ -2,6 +2,7 @@ import { exit } from "node:process";
 
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { join } from "path";
+import { isMainThread } from "worker_threads";
 
 import { Bootstrappers } from "./bootstrap/index.js";
 import { KernelEvent } from "./enums/index.js";
@@ -67,6 +68,10 @@ export class Application implements Contracts.Kernel.Application {
 		return this.get(Identifiers.Application.Name);
 	}
 
+	public thread(): string {
+		return this.get(Identifiers.Application.Thread);
+	}
+
 	public dataPath(path = ""): string {
 		return join(this.#getPath("data"), path);
 	}
@@ -124,7 +129,7 @@ export class Application implements Contracts.Kernel.Application {
 	}
 
 	public isWorker(): boolean {
-		return this.config("worker", undefined, false) ?? false;
+		return !isMainThread;
 	}
 
 	public enableMaintenance(): void {

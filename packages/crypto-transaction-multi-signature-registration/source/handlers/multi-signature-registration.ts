@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils as AppUtils } from "@mainsail/kernel";
@@ -9,7 +9,8 @@ import { MultiSignatureRegistrationTransaction } from "../versions/index.js";
 @injectable()
 export class MultiSignatureRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPool.Query)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	@optional()
+	private readonly poolQuery?: Contracts.TransactionPool.Query;
 
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
@@ -77,6 +78,7 @@ export class MultiSignatureRegistrationTransactionHandler extends Handlers.Trans
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
+		AppUtils.assert.defined<Contracts.TransactionPool.Query>(this.poolQuery);
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 		AppUtils.assert.defined<Contracts.Crypto.MultiSignatureAsset>(transaction.data.asset?.multiSignature);
 

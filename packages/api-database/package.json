@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-database",
-	"version": "0.0.1-alpha.17",
+	"version": "0.0.1-alpha.18",
 	"description": "API database for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -26,6 +26,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10",
 		"pg": "8.11.3",
 		"typeorm": "0.3.20"

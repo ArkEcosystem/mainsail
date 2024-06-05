@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
@@ -10,7 +10,8 @@ import { ValidatorResignationTransaction } from "../versions/1.js";
 @injectable()
 export class ValidatorResignationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPool.Query)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	@optional()
+	private readonly poolQuery?: Contracts.TransactionPool.Query;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [ValidatorRegistrationTransactionHandler];
@@ -58,6 +59,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
+		AppUtils.assert.defined<Contracts.TransactionPool.Query>(this.poolQuery);
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const hasSender: boolean = await this.poolQuery

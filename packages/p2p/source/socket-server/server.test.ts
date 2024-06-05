@@ -3,7 +3,7 @@ import { Providers } from "@mainsail/kernel";
 import esmock from "esmock";
 
 import { describeSkip, Sandbox } from "../../../test-framework/source";
-import { defaults as transactionPoolDefaults } from "../../../transaction-pool/source/defaults";
+import { defaults as transactionPoolDefaults } from "../../../transaction-pool-service/source/defaults";
 import { defaults } from "../defaults";
 
 class HapiServerMock {
@@ -49,7 +49,7 @@ describeSkip<{ sandbox: Sandbox; server: ServerProxy }>("Server", ({ it, assert,
 		context.sandbox.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
-			.whenTargetTagged("plugin", "transaction-pool");
+			.whenTargetTagged("plugin", "transaction-pool-service");
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({});

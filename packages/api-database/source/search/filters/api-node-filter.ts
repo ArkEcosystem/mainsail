@@ -1,7 +1,7 @@
 import { ApiNode } from "../../models/index.js";
 import { ApiNodeCriteria, OrApiNodeCriteria } from "../criteria.js";
 import { Expression } from "../expressions.js";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class ApiNodeFilter {
 	public static async getExpression(...criteria: OrApiNodeCriteria[]): Promise<Expression<ApiNode>> {
@@ -21,7 +21,7 @@ export class ApiNodeFilter {
 				case "version": {
 					return handleOrCriteria(criteria.version, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("version", c),
+						handleComparisonCriteria("version", c),
 					);
 				}
 				default: {

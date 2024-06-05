@@ -11,13 +11,13 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
+import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
+import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/testnet/core/crypto.json";
 import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/events";
 import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers";
 import { Sandbox } from "../../../test-framework/source";
-import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox = new Sandbox();
@@ -58,10 +58,15 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	};
 	context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
-	context.sandbox.app.bind(Identifiers.TransactionPool.Collator).toConstantValue({
-		getBlockCandidateTransactions: () => [],
+	context.sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
+		getTransactionBytes: async () => [],
+		setFailedTransactions: async () => [],
 	});
-	context.sandbox.app.bind(Identifiers.TransactionPool.Service).toConstantValue({});
+
+	const validator = {
+		validate: async () => true,
+	};
+	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
 
 	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
 		getStore: () => ({

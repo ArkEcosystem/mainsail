@@ -34,6 +34,20 @@ export class ValidatorRoundsController extends Controller {
 		);
 	}
 
+	public async show(request: Hapi.Request) {
+		const validatorRounds = await this.validatorRoundepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("round = :round", { round: request.params.round })
+			.getOne();
+
+		if (!validatorRounds) {
+			return Boom.notFound("Round not found");
+		}
+
+		return this.respondWithResource(validatorRounds, ValidatorRoundResource, false);
+	}
+
 	public async delegates(request: Hapi.Request) {
 		const round = await this.validatorRoundepositoryFactory()
 			.createQueryBuilder()
@@ -49,14 +63,20 @@ export class ValidatorRoundsController extends Controller {
 			.createQueryBuilder()
 			.select()
 			.where("public_key IN (:...publicKeys)", { publicKeys: round.validators })
-			.orderBy("balance", "DESC")
 			.orderBy("public_key", "ASC")
 			.getMany();
+
+		const indexLookup = round.validators.reduce((accumulator, key, index) => {
+			accumulator[key] = index;
+			return accumulator;
+		}, {});
+
+		validatorWallets.sort((a, b) => indexLookup[a.publicKey!] - indexLookup[b.publicKey!]);
 
 		return this.respondWithCollection(
 			validatorWallets.map((wallet) => ({
 				publicKey: wallet.publicKey,
-				votes: "0",
+				votes: round.votes[indexLookup[wallet.publicKey!]] ?? "0",
 			})),
 			RoundResource,
 		);

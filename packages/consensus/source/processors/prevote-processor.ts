@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { IpcWorker } from "@mainsail/kernel";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -19,7 +18,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
 	@inject(Identifiers.CryptoWorker.WorkerPool)
-	private readonly workerPool!: IpcWorker.WorkerPool;
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	async process(prevote: Contracts.Crypto.Prevote, broadcast = true): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {

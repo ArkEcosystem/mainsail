@@ -1,9 +1,6 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
-import { createWriteStream, readdirSync } from "fs";
-import { copy, ensureDirSync, remove } from "fs-extra/esm";
-import { join } from "path";
+import { createWriteStream } from "fs";
 import Pumpify from "pumpify";
 import { Writable } from "stream";
 import { createGzip } from "zlib";
@@ -28,40 +25,15 @@ class Iterator {
 
 @injectable()
 export class Exporter implements Contracts.State.Exporter {
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "state")
-	private readonly configuration!: Providers.PluginConfiguration;
-
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.State.WalletRepository.IndexSet)
 	protected readonly indexSet!: Contracts.State.IndexSet;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	public async export(store: Contracts.State.Store): Promise<void> {
-		const height = store.getLastHeight();
-
-		ensureDirSync(this.app.tempPath("state-export"));
-		const temporaryPath = this.app.tempPath(join("state-export", `${height}.gz`));
-
-		this.logger.info(`Exporting state at height ${height}`);
-
-		await this.#export(temporaryPath, store);
-
-		ensureDirSync(this.app.dataPath("state-export"));
-		await copy(temporaryPath, this.app.dataPath(join("state-export", `${height}.gz`)));
-
-		await this.#removeExcessFiles(height);
-
-		this.logger.info(`State export done for height ${height}`);
-	}
-
-	async #export(temporaryPath: string, store: Contracts.State.Store): Promise<void> {
+	async export(store: Contracts.State.Store, path: string): Promise<void> {
 		return new Promise(async (resolve, reject) => {
-			const writeStream = createWriteStream(temporaryPath);
+			const writeStream = createWriteStream(path);
 			const exportStream = new Pumpify(createGzip(), writeStream);
 
 			await this.#exportVersion(exportStream);
@@ -122,18 +94,5 @@ export class Exporter implements Contracts.State.Exporter {
 			await iterator.next();
 		}
 		stream.write("\n");
-	}
-
-	async #removeExcessFiles(height: number): Promise<void> {
-		const regexPattern = /^\d+\.gz$/;
-		const heights = readdirSync(this.app.dataPath("state-export"))
-			.filter((item) => regexPattern.test(item))
-			.map((item) => +item.split(".")[0])
-			.filter((item) => item !== height)
-			.sort((a, b) => b - a);
-
-		for (const height of heights.slice(this.configuration.getRequired<number>("export.retainFiles") - 1)) {
-			await remove(this.app.dataPath(join("state-export", `${height}.gz`)));
-		}
 	}
 }

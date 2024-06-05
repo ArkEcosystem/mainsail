@@ -22,4 +22,10 @@ export class ValidatorRound {
 		type: "jsonb",
 	})
 	public readonly validators!: string[];
+
+	@Column({
+		nullable: false,
+		type: "jsonb",
+	})
+	public readonly votes!: string[];
 }

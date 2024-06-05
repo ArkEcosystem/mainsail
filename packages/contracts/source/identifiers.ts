@@ -7,6 +7,7 @@ export const Identifiers = {
 		Environment: Symbol("Application<Environment>"),
 		Instance: Symbol("Application<Instance>"),
 		Name: Symbol("Application<Name>"),
+		Thread: Symbol("Application<Thread>"),
 		Version: Symbol("Application<Version>"),
 	},
 	Config: {
@@ -229,10 +230,16 @@ export const Identifiers = {
 	},
 	State: {
 		AttributeRepository: Symbol("State<AttributeRepository>"),
-		Exporter: Symbol("State<Exporter>"),
-		Importer: Symbol("State<Importer>"),
 		Service: Symbol("State<Service>"),
+		Snapshot: {
+			Exporter: Symbol("State<Snapshot.Exporter>"),
+			Importer: Symbol("State<Snapshot.Importer>"),
+			Service: Symbol("State<Snapshot.Service>"),
+		},
 		State: Symbol("State<State>"),
+		StateRepository: {
+			Factory: Symbol("State<StateRepository<Factory>>"),
+		},
 		Store: {
 			Factory: Symbol("State<Store<Factory>>"),
 		},
@@ -262,9 +269,12 @@ export const Identifiers = {
 			Provider: Symbol("Transaction<Handler.Provider>"),
 			Registry: Symbol("Transaction<Handler.Registry>"),
 		},
+		Validator: {
+			Factory: Symbol("Transaction<Validator.Factory>"),
+			Instance: Symbol("Transaction<Validator.Instance>"),
+		},
 	},
 	TransactionPool: {
-		Collator: Symbol("TransactionPool<Collator>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
 		Processor: Symbol("TransactionPool<Processor>"),
@@ -276,9 +286,9 @@ export const Identifiers = {
 		SenderState: Symbol("TransactionPool<SenderState>"),
 		Service: Symbol("TransactionPool<Service>"),
 		Storage: Symbol("TransactionPool<Storage>"),
-		TransactionValidator: {
-			Factory: Symbol("TransactionPool<TransactionValidator.Factory>"),
-			Instance: Symbol("TransactionPool<TransactionValidator.Instance>"),
+		Worker: Symbol("TransactionPool<Worker>"),
+		WorkerSubprocess: {
+			Factory: Symbol("TransactionPool<WorkerSubprocess.Factory>"),
 		},
 	},
 	Validator: {
