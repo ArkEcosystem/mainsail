@@ -10,6 +10,7 @@ export class Peer implements Contracts.TransactionPool.Peer {
 	public version: string | undefined;
 	public latency: number | undefined;
 	public lastPinged: Dayjs | undefined;
+	public errorCount = 0;
 
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;

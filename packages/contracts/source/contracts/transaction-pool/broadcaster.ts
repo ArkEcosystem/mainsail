@@ -24,6 +24,7 @@ export interface Peer {
 	latency: number | undefined;
 
 	lastPinged: Dayjs | undefined;
+	errorCount: number;
 
 	recentlyPinged(): boolean;
 	toBroadcast(): PeerBroadcast;
