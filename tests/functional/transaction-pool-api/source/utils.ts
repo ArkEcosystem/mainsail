@@ -119,7 +119,6 @@ export const waitBlock = async ({ sandbox }: { sandbox: Sandbox }, count: number
 
 		if (remainingTransactions.length > 0) {
 			targetHeight = Math.max(currentHeight, targetHeight) + 1;
-			console.log("Waiting for block", targetHeight);
 		}
 	} while (currentHeight < targetHeight);
 };
