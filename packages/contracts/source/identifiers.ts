@@ -282,9 +282,7 @@ export const Identifiers = {
 		Peer: {
 			Communicator: Symbol("TransactionPoolBroadcaster<Peer.Communicator>"),
 			Factory: Symbol("TransactionPoolBroadcaster<Peer.Factory>"),
-			Processor: Symbol("TransactionPoolBroadcaster<Peer.Processor>"),
 			Repository: Symbol("TransactionPoolBroadcaster<Peer.Repository>"),
-			Verifier: Symbol("TransactionPoolBroadcaster<Peer.Verifier>"),
 		},
 		Processor: Symbol("TransactionPool<Processor>"),
 		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
