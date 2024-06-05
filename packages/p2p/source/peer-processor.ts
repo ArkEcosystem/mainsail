@@ -32,6 +32,12 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.P2P.ApiNode.Discoverer)
 	private readonly ApiNodeDiscoverer!: Contracts.P2P.ApiNodeDiscoverer;
 
+	@inject(Identifiers.P2P.TxPoolNode.Factory)
+	private readonly txPoolNodeFactory!: Contracts.P2P.TxPoolNodeFactory;
+
+	@inject(Identifiers.P2P.TxPoolNode.Verifier)
+	private readonly txPoolNodeVerifier!: Contracts.P2P.TxPoolNodeVerifier;
+
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
 
@@ -106,17 +112,21 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		this.repository.setPendingPeer(peer);
 
-		if (await this.peerVerifier.verify(peer)) {
-			this.repository.setPeer(peer);
+		const txPoolNode = this.txPoolNodeFactory(ip);
 
+		if ((await this.peerVerifier.verify(peer)) && (await this.txPoolNodeVerifier.verify(txPoolNode))) {
+			this.repository.setPeer(peer);
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
+			console.log("peer accepted", peer.ip);
+
 			void this.events.dispatch(Enums.PeerEvent.Added, peer);
+
+			await this.transactionPoolWorker.setPeer(peer.ip);
 
 			await this.peerCommunicator.pingPorts(peer);
 			await this.peerDiscoverer.discoverPeers(peer);
 			await this.ApiNodeDiscoverer.discoverApiNodes(peer);
-			await this.transactionPoolWorker.setPeer(peer.ip);
 		}
 
 		this.repository.forgetPendingPeer(peer);

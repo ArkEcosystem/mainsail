@@ -32,6 +32,8 @@ import { Service } from "./service.js";
 import { Server } from "./socket-server/server.js";
 import { State } from "./state.js";
 import { Throttle } from "./throttle.js";
+import { TxPoolNode } from "./tx-pool-node.js";
+import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -105,6 +107,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return this.app.resolve(ApiNode).init(normalizedUrl);
 		});
 
+		this.app.bind(Identifiers.P2P.TxPoolNode.Factory).toFactory<TxPoolNode, [string]>(() => (ip: string) => {
+			const sanitizedIp = sanitizeRemoteAddress(ip);
+			Utils.assert.defined<string>(sanitizedIp);
+
+			return this.app.resolve(TxPoolNode).init(sanitizedIp, 4007);
+		});
+
 		this.app
 			.bind(Identifiers.P2P.Header.Factory)
 			.toFactory<Contracts.P2P.Header>(() => () => this.app.resolve(Header));
@@ -126,6 +135,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.ApiNode.Verifier).to(ApiNodeVerifier).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.ApiNode.Processor).to(ApiNodeProcessor).inSingletonScope();
+
+		this.app.bind(Identifiers.P2P.TxPoolNode.Verifier).to(TxPoolNodeVerifier).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Peer.Connector).to(PeerConnector).inSingletonScope();
 

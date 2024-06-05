@@ -171,6 +171,10 @@ export const Identifiers = {
 		Throttle: {
 			Factory: Symbol("P2P<Throttle.Factory>"),
 		},
+		TxPoolNode: {
+			Factory: Symbol("P2P<TxPoolNode.Factory>"),
+			Verifier: Symbol("P2P<TxPoolNode.Verifier>"),
+		},
 	},
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),
