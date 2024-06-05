@@ -1,5 +1,5 @@
 import { CommitHandler, Transaction } from "../crypto/index.js";
-import { Subprocess, EventCallback } from "../kernel/ipc.js";
+import { EventCallback, Subprocess } from "../kernel/ipc.js";
 import { StoreChange } from "../state/index.js";
 import { KeyValuePair } from "../types/index.js";
 
