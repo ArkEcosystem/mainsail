@@ -1,6 +1,5 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
@@ -10,26 +9,24 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
 
 	#booted = false;
-	#booting = false;
 	#failedTransactions: Contracts.Crypto.Transaction[] = [];
 
-	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> {
+	@postConstruct()
+	public initialize(): void {
 		this.ipcSubprocess = this.createWorkerSubprocess();
+	}
 
-		while (this.#booting) {
-			await Utils.sleep(50);
-		}
+	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {
+		this.ipcSubprocess.registerEventHandler(event, callback);
+	}
 
+	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> {
 		if (this.#booted) {
 			return;
 		}
-
-		this.#booting = true;
+		this.#booted = true;
 
 		await this.ipcSubprocess.sendRequest("boot", flags);
-
-		this.#booting = false;
-		this.#booted = true;
 	}
 
 	public async kill(): Promise<number> {
