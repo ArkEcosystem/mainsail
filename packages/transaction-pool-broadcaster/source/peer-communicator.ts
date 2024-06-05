@@ -12,8 +12,6 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 			await http.post(`${peer.url}/api/transactions`, {
 				body: { transactions: transactions.map((transaction) => transaction.serialized.toString("hex")) },
 			});
-
-			// TODO: Validate response
 		} catch (error) {
 			this.handleSocketError(peer, error);
 		}
