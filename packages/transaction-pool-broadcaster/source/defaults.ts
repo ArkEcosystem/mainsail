@@ -7,4 +7,5 @@ export const defaults = {
 		Constants.EnvironmentVariables.CORE_TRANSACTION_POOL_MAX_PEER_SEQUENTIAL_ERRORS,
 		2,
 	),
+	txPoolPort: Environment.get(Constants.EnvironmentVariables.CORE_API_TRANSACTION_POOL_PORT, 4007),
 };

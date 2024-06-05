@@ -13,9 +13,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Broadcaster).to(Broadcaster).inSingletonScope();
 
-		this.app.bind(Identifiers.TransactionPool.Peer.Factory).toFactory<Peer, [string]>(
-			() => (ip: string) => this.app.resolve(Peer).init(ip, 4007), // TODO: Define port
-		);
+		this.app
+			.bind(Identifiers.TransactionPool.Peer.Factory)
+			.toFactory<
+				Peer,
+				[string]
+			>(() => (ip: string) => this.app.resolve(Peer).init(ip, this.config().getRequired<number>("txPoolPort")));
 	}
 
 	public async required(): Promise<boolean> {
@@ -26,6 +29,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return Joi.object({
 			maxPeersBroadcast: Joi.number().min(0).required(),
 			maxSequentialErrors: Joi.number().min(0).required(),
+			txPoolPort: Joi.number().min(0).required(),
 		}).unknown(true);
 	}
 }

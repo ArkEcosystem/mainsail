@@ -112,9 +112,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
 			Utils.assert.defined<string>(sanitizedIp);
 
-			return this.app
-				.resolve(TxPoolNode)
-				.init(sanitizedIp, Number(this.config().getRequired<number>("txPoolPort")));
+			return this.app.resolve(TxPoolNode).init(sanitizedIp, this.config().getRequired<number>("txPoolPort"));
 		});
 
 		this.app
