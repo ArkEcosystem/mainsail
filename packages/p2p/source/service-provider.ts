@@ -89,6 +89,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				port: Joi.number().integer().min(1).max(65_535).required(), // TODO: Check
 			}).required(),
 			skipDiscovery: Joi.bool(),
+			txPoolPort: Joi.number().integer().min(0).required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
@@ -111,7 +112,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
 			Utils.assert.defined<string>(sanitizedIp);
 
-			return this.app.resolve(TxPoolNode).init(sanitizedIp, 4007);
+			return this.app
+				.resolve(TxPoolNode)
+				.init(sanitizedIp, Number(this.config().getRequired<number>("txPoolPort")));
 		});
 
 		this.app

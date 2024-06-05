@@ -17,16 +17,17 @@ export const defaults = {
 	maxSameSubnetPeers: Environment.get(Constants.EnvironmentVariables.CORE_P2P_MAX_PEERS_SAME_SUBNET, 5),
 	minimumNetworkReach: Environment.get(Constants.EnvironmentVariables.CORE_P2P_MIN_NETWORK_REACH, 20),
 	minimumVersions: ["^0.0.1"],
-
 	peerBanTime: Environment.get(Constants.EnvironmentVariables.CORE_P2P_PEER_BAN_TIME, 3),
 
 	rateLimit: Environment.get(Constants.EnvironmentVariables.CORE_P2P_RATE_LIMIT, 150),
+
 	remoteAccess: ["127.0.0.1", "::ffff:127.0.0.1", "::1"],
 	server: {
 		hostname: Environment.get(Constants.EnvironmentVariables.CORE_P2P_HOST, "0.0.0.0"),
 		logLevel: Environment.get(Constants.EnvironmentVariables.CORE_NETWORK_NAME) === "testnet" ? 1 : 0,
 		port: Environment.get(Constants.EnvironmentVariables.CORE_P2P_PORT, 4002),
 	},
+	txPoolPort: Environment.get(Constants.EnvironmentVariables.CORE_API_TRANSACTION_POOL_PORT, 4007),
 	verifyTimeout: 60_000,
 	whitelist: ["*"],
 };
