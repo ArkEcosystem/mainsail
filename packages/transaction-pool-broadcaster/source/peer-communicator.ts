@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import { Providers, Ipc } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -32,7 +32,7 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 	private handleSocketError(peer: Contracts.TransactionPool.Peer, error: Error): void {
 		if (peer.errorCount++ > this.configuration.getRequired<number>("maxSequentialErrors")) {
 			this.repository.forgetPeer(peer.ip);
-			// TODO: Emit event
+			Ipc.emit("peer.removed", peer.ip);
 		}
 	}
 }

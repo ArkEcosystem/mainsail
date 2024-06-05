@@ -46,6 +46,10 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		this.events.listen(Enums.CryptoEvent.MilestoneChanged, {
 			handle: () => this.#disconnectInvalidPeers(),
 		});
+
+		this.transactionPoolWorker.registerEventHandler("peer.removed", (ip: string) => {
+			this.peerDisposer.disposePeer(ip);
+		});
 	}
 
 	public isWhitelisted(peer: Contracts.P2P.Peer): boolean {

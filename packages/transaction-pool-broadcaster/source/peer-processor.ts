@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils as KernelUtils } from "@mainsail/kernel";
+import { Providers, Utils as KernelUtils, Ipc } from "@mainsail/kernel";
 
 @injectable()
 export class PeerProcessor implements Contracts.TransactionPool.PeerProcessor {
@@ -55,6 +55,8 @@ export class PeerProcessor implements Contracts.TransactionPool.PeerProcessor {
 		if (true) {
 			this.repository.setPeer(peer);
 			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
+		} else {
+			Ipc.emit("peer.removed", peer.ip);
 		}
 
 		this.repository.forgetPendingPeer(peer.ip);
