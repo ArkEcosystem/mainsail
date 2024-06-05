@@ -118,8 +118,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			this.repository.setPeer(peer);
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
-			console.log("peer accepted", peer.ip);
-
 			void this.events.dispatch(Enums.PeerEvent.Added, peer);
 
 			await this.transactionPoolWorker.setPeer(peer.ip);
