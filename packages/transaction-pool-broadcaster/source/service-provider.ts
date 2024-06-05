@@ -34,6 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
 			maxPeersBroadcast: Joi.number().min(0).required(),
+			maxSequentialErrors: Joi.number().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
 	}

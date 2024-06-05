@@ -1,5 +1,6 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -7,6 +8,10 @@ import dayjs from "dayjs";
 export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunicator {
 	@inject(Identifiers.TransactionPool.Peer.Repository)
 	private readonly repository!: Contracts.TransactionPool.PeerRepository;
+
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "transaction-pool-broadcaster")
+	protected readonly configuration!: Providers.PluginConfiguration;
 
 	public async postTransactions(
 		peer: Contracts.TransactionPool.Peer,
@@ -25,11 +30,9 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 	}
 
 	private handleSocketError(peer: Contracts.TransactionPool.Peer, error: Error): void {
-		if (peer.errorCount > 3) {
+		if (peer.errorCount++ > this.configuration.getRequired<number>("maxSequentialErrors")) {
 			this.repository.forgetPeer(peer.ip);
 			// TODO: Emit event
 		}
-
-		peer.errorCount++;
 	}
 }
