@@ -37,6 +37,8 @@ const EXCEPTIONS = {
 	},
 	"@mainsail/core": {
 		dependencies: [
+			"@mainsail/transaction-pool-broadcaster",
+			"@mainsail/transaction-pool-service",
 			"@mainsail/api-common",
 			"@mainsail/api-database",
 			"@mainsail/api-development",

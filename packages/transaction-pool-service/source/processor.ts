@@ -10,12 +10,14 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.P2P.Broadcaster)
-	@optional()
-	private readonly broadcaster!: Contracts.P2P.Broadcaster | undefined;
+	@inject(Identifiers.TransactionPool.Broadcaster)
+	private readonly broadcaster!: Contracts.TransactionPool.Broadcaster;
 
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async process(data: Buffer[]): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: number[] = [];
@@ -61,10 +63,9 @@ export class Processor implements Contracts.TransactionPool.Processor {
 			}
 		} finally {
 			if (this.broadcaster && broadcastTransactions.length > 0) {
-				// TODO: Use client to broadcast transactions
-				// this.broadcaster
-				// 	.broadcastTransactions(broadcastTransactions)
-				// 	.catch((error) => this.logger.error(error.stack));
+				this.broadcaster
+					.broadcastTransactions(broadcastTransactions)
+					.catch((error) => this.logger.error(error.stack));
 			}
 		}
 

@@ -7,9 +7,10 @@ import {
 	ValidateAndAcceptApiNodeAction,
 	ValidateAndAcceptPeerAction,
 } from "./actions/index.js";
+import { ApiNode } from "./api-node.js";
 import { ApiNodeDiscoverer } from "./api-node-discoverer.js";
 import { ApiNodeProcessor } from "./api-node-processor.js";
-import { ApiNode, ApiNodeRepository } from "./api-node-repository.js";
+import { ApiNodeRepository } from "./api-node-repository.js";
 import { ApiNodeVerifier } from "./api-node-verifier.js";
 import { Broadcaster } from "./broadcaster.js";
 import { BlockDownloader } from "./downloader/block-downloader.js";
@@ -31,6 +32,8 @@ import { Service } from "./service.js";
 import { Server } from "./socket-server/server.js";
 import { State } from "./state.js";
 import { Throttle } from "./throttle.js";
+import { TxPoolNode } from "./tx-pool-node.js";
+import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
 import { makeFormats, makeKeywords, sanitizeRemoteAddress } from "./validation/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -86,6 +89,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				port: Joi.number().integer().min(1).max(65_535).required(), // TODO: Check
 			}).required(),
 			skipDiscovery: Joi.bool(),
+			txPoolPort: Joi.number().integer().min(0).required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
@@ -102,6 +106,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.ApiNode.Factory).toFactory<ApiNode, [string]>(() => (url: string) => {
 			const normalizedUrl = normalizeUrl(url);
 			return this.app.resolve(ApiNode).init(normalizedUrl);
+		});
+
+		this.app.bind(Identifiers.P2P.TxPoolNode.Factory).toFactory<TxPoolNode, [string]>(() => (ip: string) => {
+			const sanitizedIp = sanitizeRemoteAddress(ip);
+			Utils.assert.defined<string>(sanitizedIp);
+
+			return this.app.resolve(TxPoolNode).init(sanitizedIp, this.config().getRequired<number>("txPoolPort"));
 		});
 
 		this.app
@@ -125,6 +136,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.ApiNode.Verifier).to(ApiNodeVerifier).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.ApiNode.Processor).to(ApiNodeProcessor).inSingletonScope();
+
+		this.app.bind(Identifiers.P2P.TxPoolNode.Verifier).to(TxPoolNodeVerifier).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.Peer.Connector).to(PeerConnector).inSingletonScope();
 

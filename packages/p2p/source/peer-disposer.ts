@@ -23,6 +23,9 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.TransactionPool.Worker)
+	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
+
 	#blacklist = new Map<string, dayjs.Dayjs>();
 
 	public banPeer(ip: string, error: Error | Contracts.P2P.NesError): void {
@@ -60,6 +63,7 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 			peer.dispose();
 
 			void this.events.dispatch(Enums.PeerEvent.Removed, peer);
+			void this.transactionPoolWorker.forgetPeer(ip);
 		}
 	}
 

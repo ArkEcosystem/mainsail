@@ -11,7 +11,7 @@ describe<{
 	container: Container;
 	pool: any;
 	extensions: any[];
-	transactionBroadcaster: any;
+	broadcaster: any;
 	transaction1: any;
 	transaction2: any;
 	factory: any;
@@ -24,21 +24,20 @@ describe<{
 
 		context.extensions = [{ throwIfCannotBroadcast: () => {} }, { throwIfCannotBroadcast: () => {} }];
 
-		context.transactionBroadcaster = {
+		context.broadcaster = {
 			broadcastTransactions: () => Promise.resolve(),
 		};
 
 		context.factory = {
-			fromJson: (tx) => {
-				return tx;
-			},
-			fromBytes: (bytes) => {
-				return {};
-			},
+			fromBytes: (bytes) => ({}),
+			fromJson: (tx) => tx,
 		};
 
 		context.blockSerializer = {
 			headerSize: () => 152,
+		};
+		context.broadcaster = {
+			broadcastTransactions: async () => {},
 		};
 
 		context.container = new Container();
@@ -51,7 +50,7 @@ describe<{
 		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
 		context.container.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.factory);
 		context.container.bind(Identifiers.Cryptography.Transaction.Deserializer).toConstantValue({});
-		context.container.bind(Identifiers.P2P.Broadcaster).toConstantValue(context.transactionBroadcaster);
+		context.container.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue(context.broadcaster);
 		context.container.bind(Identifiers.Services.Log.Service).toConstantValue({
 			error: () => {},
 		});
@@ -93,7 +92,7 @@ describe<{
 	it("should parse transactions through factory pool", async (context) => {
 		const poolSpy = spy(context.pool, "addTransaction");
 		const factoryStub = stub(context.factory, "fromJson");
-		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
+		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
 
 		factoryStub.resolvedValueNth(0, context.transaction1).resolvedValueNth(1, context.transaction2);
 
@@ -187,7 +186,7 @@ describe<{
 
 		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
+		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
 
 		const processor = context.container.resolve(Processor);
 		const promise = processor.process([context.transaction1.data, context.transaction2.data]);
@@ -208,7 +207,7 @@ describe<{
 
 		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
 		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-		const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
+		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
 
 		const processor = context.container.resolve(Processor);
 		const result = await processor.process([context.transaction1.data]);

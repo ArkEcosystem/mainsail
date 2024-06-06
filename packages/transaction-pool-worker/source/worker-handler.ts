@@ -2,7 +2,13 @@ import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-import { CommitHandler, GetTransactionsHandler, ImportSnapshotHandler } from "./handlers/index.js";
+import {
+	CommitHandler,
+	ForgetPeerHandler,
+	GetTransactionsHandler,
+	ImportSnapshotHandler,
+	SetPeerHandler,
+} from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
 	// @ts-ignore
@@ -34,5 +40,13 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 
 	public async getTransactions(): Promise<string[]> {
 		return await this.#app.resolve(GetTransactionsHandler).handle();
+	}
+
+	public async setPeer(ip: string): Promise<void> {
+		return await this.#app.resolve(SetPeerHandler).handle(ip);
+	}
+
+	public async forgetPeer(ip: string): Promise<void> {
+		return await this.#app.resolve(ForgetPeerHandler).handle(ip);
 	}
 }

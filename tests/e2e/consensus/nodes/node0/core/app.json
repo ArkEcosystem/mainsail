@@ -272,6 +272,9 @@
 			"package": "@mainsail/transaction-pool-service"
 		},
 		{
+			"package": "@mainsail/transaction-pool-broadcaster"
+		},
+		{
 			"package": "@mainsail/api-transaction-pool"
 		}
 	]
