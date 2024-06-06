@@ -279,6 +279,21 @@ describe<{
 		const balanceAfteer = await getBalance(instance, contractAddress!, recipient.address);
 		assert.equal(ethers.parseEther("5997"), balanceAfteer);
 	});
+
+	it("should revert transaction if it exceeds gas limit", async ({ instance }) => {
+		const [sender] = wallets;
+
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		const { receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(bytecode.slice(2), "hex"),
+			commitKey,
+			gasLimit: 30_000n,
+		});
+
+		assert.false(receipt.success);
+		assert.equal(receipt.gasUsed, 30_000n);
+	});
 });
 
 const getBalance = async (
