@@ -1,11 +1,12 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Bootstrap, Providers, Services } from "@mainsail/kernel";
+import { Bootstrap, Providers } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
-import { dirSync } from "tmp";
 
 import { MemoryDatabase } from "./database.js";
+import { PoolWorker } from "./pool-worker.js";
 import { Worker } from "./worker.js";
+
 type PluginOptions = Record<string, any>;
 
 const setup = async () => {
@@ -16,8 +17,7 @@ const setup = async () => {
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
-		.to(Services.Events.MemoryEventDispatcher)
-		.inSingletonScope();
+		.toConstantValue({ dispatch: () => {}, listen: () => {} });
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		clear: async () => {},
@@ -38,6 +38,7 @@ const setup = async () => {
 		broadcastProposal: async () => {},
 		broadcastTransactions: async () => {},
 	});
+	sandbox.app.bind(Identifiers.TransactionPool.Worker).to(PoolWorker).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
@@ -50,7 +51,8 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
+
+	sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -60,7 +62,12 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.LoadConfiguration).bootstrap();
 
 	const options = {
-		"@mainsail/transaction-pool": {
+		"@mainsail/state": {
+			snapshots: {
+				enabled: false,
+			},
+		},
+		"@mainsail/transaction-pool-service": {
 			// bech32m addresses require more bytes than the default which assumes base58.
 			maxTransactionBytes: 50_000,
 
@@ -97,7 +104,7 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
 		"@mainsail/transactions",
-		"@mainsail/transaction-pool",
+		"@mainsail/transaction-pool-service",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
@@ -195,7 +202,6 @@ const bootstrap = async (sandbox: Sandbox) => {
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 
 	const consensus = sandbox.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-
 	void consensus.run();
 };
 

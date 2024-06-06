@@ -82,3 +82,9 @@ export interface TransactionTypeFactory {
 
 	get(type: number, typeGroup?: number, version?: number): TransactionConstructor;
 }
+
+export interface TransactionValidator {
+	validate(transaction: Transaction): Promise<void>;
+}
+
+export type TransactionValidatorFactory = () => TransactionValidator;

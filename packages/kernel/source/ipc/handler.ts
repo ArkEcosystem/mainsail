@@ -1,45 +1,26 @@
-export type Actions<T extends {}> = {
-	[K in keyof T]: T[K] extends (...arguments_: any[]) => any ? (ReturnType<T[K]> extends void ? K : never) : never;
-}[keyof T];
+import { Contracts } from "@mainsail/contracts";
+import { parentPort } from "worker_threads";
 
-export type Requests<T extends {}> = {
-	[K in keyof T]: T[K] extends (...arguments_: any[]) => any
-		? ReturnType<T[K]> extends Promise<any>
-			? K
-			: never
-		: never;
-}[keyof T];
-
-export class Handler<T extends {}> {
+export class Handler<T extends {}> implements Contracts.Kernel.IPC.Handler<T> {
 	private readonly handler: T;
 
 	public constructor(handler: T) {
 		this.handler = handler;
+
+		this.handleRequest();
 	}
 
-	public handleAction<K extends Actions<T>>(method: K): void {
-		process.on("message", (message) => {
-			// @ts-ignore
-			if (message.method === method) {
-				// @ts-ignore
-				this.handler[method](...message.args);
+	public handleRequest(): void {
+		parentPort?.on("message", async (message) => {
+			if (this.handler[message.method] === undefined) {
+				throw new Error(`Method ${message.method} is not defined on the handler`);
 			}
-		});
-	}
 
-	public handleRequest<K extends Requests<T>>(method: K): void {
-		process.on("message", async (message) => {
-			// @ts-ignore
-			if (message.method === method) {
-				try {
-					// @ts-ignore
-					const result = await this.handler[method](...message.args);
-					// @ts-ignore
-					process.send({ id: message.id, result });
-				} catch (error) {
-					// @ts-ignore
-					process.send({ error: error.message, id: message.id });
-				}
+			try {
+				const result = await this.handler[message.method](...message.args);
+				parentPort?.postMessage({ id: message.id, result });
+			} catch (error) {
+				parentPort?.postMessage({ error: error.message, id: message.id });
 			}
 		});
 	}

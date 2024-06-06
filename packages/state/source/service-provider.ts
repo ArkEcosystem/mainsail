@@ -3,11 +3,13 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { AttributeRepository } from "./attributes/index.js";
+import { stateRepositoryFactory } from "./factory.js";
 import { AttributeMutator } from "./mutators/attribute.js";
 import { BalanceMutator } from "./mutators/balance.js";
 import { Service } from "./service.js";
 import { Exporter } from "./snapshots/exporter.js";
 import { Importer } from "./snapshots/importer.js";
+import { SnapshotService } from "./snapshots/snapshot-service.js";
 import { State } from "./state.js";
 import { StateVerifier } from "./state-verifier.js";
 import { Store } from "./store.js";
@@ -52,9 +54,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("validatorApproval", Contracts.State.AttributeType.Number);
 		walletAttributeRepository.set("validatorResigned", Contracts.State.AttributeType.Boolean);
 
-		this.app
-			.bind(Identifiers.State.Wallet.Factory)
-			.toFactory(({ container }) => walletFactory(container.get(Identifiers.State.Wallet.Attributes)));
+		this.app.bind(Identifiers.State.Wallet.Factory).toFactory(walletFactory);
 
 		this.app.bind(Identifiers.State.WalletRepository.Base.Factory).toFactory(
 			({ container }) =>
@@ -78,8 +78,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					container.resolve(Store).configure(originalstore),
 		);
 
-		this.app.bind(Identifiers.State.Importer).to(Importer);
-		this.app.bind(Identifiers.State.Exporter).to(Exporter);
+		this.app.bind(Identifiers.State.StateRepository.Factory).toFactory(stateRepositoryFactory);
+
+		this.app.bind(Identifiers.State.Snapshot.Importer).to(Importer).inSingletonScope();
+		this.app.bind(Identifiers.State.Snapshot.Exporter).to(Exporter).inSingletonScope();
+		this.app.bind(Identifiers.State.Snapshot.Service).to(SnapshotService).inSingletonScope();
 
 		this.app.bind(Identifiers.State.Service).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.State.State).to(State).inSingletonScope();
@@ -91,10 +94,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
-			export: Joi.object({
+			snapshots: Joi.object({
 				enabled: Joi.bool().required(),
 				interval: Joi.number().integer().min(1).required(),
 				retainFiles: Joi.number().integer().min(1).required(),
+				skipUnknownAttributes: Joi.bool().required(),
 			}).required(),
 		})
 			.required()

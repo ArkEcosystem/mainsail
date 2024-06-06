@@ -21,11 +21,6 @@ export const defaults = {
 	peerBanTime: Environment.get(Constants.EnvironmentVariables.CORE_P2P_PEER_BAN_TIME, 3),
 
 	rateLimit: Environment.get(Constants.EnvironmentVariables.CORE_P2P_RATE_LIMIT, 150),
-	// max number of messages per second per socket connection
-	rateLimitPostTransactions: Environment.get(
-		Constants.EnvironmentVariables.CORE_P2P_RATE_LIMIT_POST_TRANSACTIONS,
-		25,
-	),
 	remoteAccess: ["127.0.0.1", "::ffff:127.0.0.1", "::1"],
 	server: {
 		hostname: Environment.get(Constants.EnvironmentVariables.CORE_P2P_HOST, "0.0.0.0"),

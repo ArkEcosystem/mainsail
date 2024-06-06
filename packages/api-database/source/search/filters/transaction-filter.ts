@@ -6,7 +6,7 @@ import { EqualCriteria, OrTransactionCriteria, TransactionCriteria } from "../cr
 import { ContainsExpression, EqualExpression, Expression } from "../expressions.js";
 import {
 	handleAndCriteria,
-	handleNumericCriteria,
+	handleComparisonCriteria,
 	handleOrCriteria,
 	hasOrCriteria,
 	optimizeExpression,
@@ -68,19 +68,19 @@ export class TransactionFilter {
 				case "sequence": {
 					return handleOrCriteria(criteria.sequence, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("sequence", c),
+						handleComparisonCriteria("sequence", c),
 					);
 				}
 				case "timestamp": {
 					return handleOrCriteria(criteria.timestamp, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("timestamp", c),
+						handleComparisonCriteria("timestamp", c),
 					);
 				}
 				case "nonce": {
 					return handleOrCriteria(criteria.nonce, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("nonce", c),
+						handleComparisonCriteria("nonce", c),
 					);
 				}
 				case "senderPublicKey": {
@@ -108,13 +108,13 @@ export class TransactionFilter {
 				case "amount": {
 					return handleOrCriteria(criteria.amount, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("amount", c),
+						handleComparisonCriteria("amount", c),
 					);
 				}
 				case "fee": {
 					return handleOrCriteria(criteria.fee, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("fee", c),
+						handleComparisonCriteria("fee", c),
 					);
 				}
 				case "asset": {

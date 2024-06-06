@@ -1,7 +1,7 @@
 import { Block } from "../../models/block.js";
 import { BlockCriteria, OrBlockCriteria } from "../criteria.js";
 import { Expression } from "../expressions.js";
-import { handleAndCriteria, handleNumericCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class BlockFilter {
 	public static async getExpression(...criteria: OrBlockCriteria[]): Promise<Expression<Block>> {
@@ -28,7 +28,7 @@ export class BlockFilter {
 				case "timestamp": {
 					return handleOrCriteria(criteria.timestamp, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("timestamp", c),
+						handleComparisonCriteria("timestamp", c),
 					);
 				}
 				case "previousBlock": {
@@ -41,45 +41,45 @@ export class BlockFilter {
 				case "height": {
 					return handleOrCriteria(criteria.height, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("height", c),
+						handleComparisonCriteria("height", c),
 					);
 				}
 
 				case "round": {
 					return handleOrCriteria(criteria.round, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("round", c),
+						handleComparisonCriteria("round", c),
 					);
 				}
 
 				case "numberOfTransactions": {
 					return handleOrCriteria(criteria.numberOfTransactions, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("numberOfTransactions", c),
+						handleComparisonCriteria("numberOfTransactions", c),
 					);
 				}
 				case "totalAmount": {
 					return handleOrCriteria(criteria.totalAmount, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("totalAmount", c),
+						handleComparisonCriteria("totalAmount", c),
 					);
 				}
 				case "totalFee": {
 					return handleOrCriteria(criteria.totalFee, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("totalFee", c),
+						handleComparisonCriteria("totalFee", c),
 					);
 				}
 				case "reward": {
 					return handleOrCriteria(criteria.reward, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("reward", c),
+						handleComparisonCriteria("reward", c),
 					);
 				}
 				case "payloadLength": {
 					return handleOrCriteria(criteria.payloadLength, async (c) =>
 						// @ts-ignore
-						handleNumericCriteria("payloadLength", c),
+						handleComparisonCriteria("payloadLength", c),
 					);
 				}
 				case "payloadHash": {

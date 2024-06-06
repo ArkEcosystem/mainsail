@@ -3,7 +3,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { describe, Sandbox } from "../../../../test-framework/source";
-import { defaults as transactionPoolDefaults } from "../../../../transaction-pool/source/defaults";
+import { defaults as transactionPoolDefaults } from "../../../../transaction-pool-service/source/defaults";
 import { defaults } from "../../defaults";
 import { AcceptPeerPlugin } from "./accept-peer";
 
@@ -24,7 +24,7 @@ describe<{
 		context.sandbox.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", transactionPoolDefaults))
-			.whenTargetTagged("plugin", "transaction-pool");
+			.whenTargetTagged("plugin", "transaction-pool-service");
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(peerProcessor);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue({});

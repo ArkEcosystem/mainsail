@@ -7,7 +7,6 @@ import { getStatus } from "./get-status.js";
 import { postPrecommit } from "./post-precommit.js";
 import { postPrevote } from "./post-prevote.js";
 import { postProposal } from "./post-proposal.js";
-import { postTransactions } from "./post-transactions.js";
 
 export const Codecs = {
 	getApiNodes,
@@ -19,5 +18,4 @@ export const Codecs = {
 	postPrecommit,
 	postPrevote,
 	postProposal,
-	postTransactions,
 };

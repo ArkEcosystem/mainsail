@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/configuration-generator",
-	"version": "0.0.1-alpha.17",
+	"version": "0.0.1-alpha.18",
 	"description": "Configuration generator for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -33,7 +33,6 @@
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
-		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-signature-schnorr-secp256k1": "workspace:*",

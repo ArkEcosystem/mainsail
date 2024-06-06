@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/kernel";
@@ -10,7 +10,8 @@ import { ValidatorRegistrationTransaction } from "../versions/index.js";
 @injectable()
 export class ValidatorRegistrationTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.TransactionPool.Query)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	@optional()
+	private readonly poolQuery?: Contracts.TransactionPool.Query;
 
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
@@ -35,12 +36,6 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.validatorPublicKey);
 
-		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(data.senderPublicKey);
-
-		if (sender.hasMultiSignature()) {
-			throw new Exceptions.NotSupportedForMultiSignatureWalletError();
-		}
-
 		if (wallet.isValidator()) {
 			throw new Exceptions.WalletIsAlreadyValidatorError();
 		}
@@ -63,6 +58,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
+		AppUtils.assert.defined<Contracts.TransactionPool.Query>(this.poolQuery);
+
 		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<string>(data.senderPublicKey);

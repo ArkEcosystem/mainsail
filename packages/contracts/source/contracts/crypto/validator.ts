@@ -18,7 +18,5 @@ export interface Validator {
 	removeKeyword(keyword: string): void;
 	removeSchema(keyReference: string): void;
 
-	removeSchema(schemaKeyReference: string): void;
-
 	extend(callback: (ajv: any /* TODO Ajv */) => void): void;
 }

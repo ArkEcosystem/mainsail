@@ -1,39 +1,18 @@
-import { ChildProcess } from "child_process";
+import { Contracts } from "@mainsail/contracts";
+import { Worker } from "worker_threads";
 
-import { Requests } from "./handler.js";
-
-export type SuccessReply = {
-	id: number;
-	result: any;
-};
-
-export type ErrorReply = {
-	id: number;
-	error: string;
-};
-
-export type Reply = SuccessReply | ErrorReply;
-
-export type RequestCallback<T extends {}, K extends Requests<T>> = {
-	// @ts-ignore
-	resolve: (result: ReturnType<T[K]>) => void;
-	reject: (error: Error) => void;
-};
-
-export type RequestCallbacks<T extends {}> = RequestCallback<T, Requests<T>>;
-
-export class Subprocess<T extends {}> {
+export class Subprocess<T extends {}> implements Contracts.Kernel.IPC.Subprocess<T> {
 	private lastId = 1;
-	private readonly subprocess: ChildProcess;
-	private readonly callbacks = new Map<number, RequestCallbacks<T>>();
+	private readonly subprocess: Worker;
+	private readonly callbacks = new Map<number, Contracts.Kernel.IPC.RequestCallbacks<T>>();
 
-	public constructor(subprocess: ChildProcess) {
+	public constructor(subprocess: Worker) {
 		this.subprocess = subprocess;
 		this.subprocess.on("message", this.onSubprocessMessage.bind(this));
 	}
 
-	public kill(signal?: number | NodeJS.Signals): boolean {
-		return this.subprocess.kill(signal);
+	public async kill(): Promise<number> {
+		return this.subprocess.terminate();
 	}
 
 	public getQueueSize(): number {
@@ -43,7 +22,7 @@ export class Subprocess<T extends {}> {
 	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
 	public sendAction(method: string, ...arguments_: any): void {
 		// TODO: we have to make sure args are always serializable
-		this.subprocess.send({ args: arguments_, method });
+		this.subprocess.postMessage({ args: arguments_, method });
 	}
 
 	// TODO: use type magic to infer args (didn't work when T is also using same signatures)
@@ -52,11 +31,11 @@ export class Subprocess<T extends {}> {
 			const id = this.lastId++;
 			this.callbacks.set(id, { reject, resolve });
 			// TODO: we have to make sure args are always serializable and ideally don't copy
-			this.subprocess.send({ args: arguments_, id, method });
+			this.subprocess.postMessage({ args: arguments_, id, method });
 		});
 	}
 
-	private onSubprocessMessage(message: Reply): void {
+	private onSubprocessMessage(message: Contracts.Kernel.IPC.Reply): void {
 		try {
 			if ("error" in message) {
 				this.callbacks.get(message.id)?.reject(new Error(message.error));

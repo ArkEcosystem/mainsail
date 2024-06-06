@@ -1,6 +1,5 @@
 import {
 	InsufficientBalanceError,
-	NotSupportedForMultiSignatureWalletError,
 	WalletIsAlreadyDelegateError,
 	WalletUsernameAlreadyRegisteredError,
 } from "@mainsail/core-errors";
@@ -238,24 +237,6 @@ describe<{
 		);
 
 		mock.calledOnce();
-	});
-
-	it("throwIfCannotBeApplied should throw if wallet has a multi signature", async (context) => {
-		const multiSignatureAsset: Crypto.IMultiSignatureAsset = {
-			min: 2,
-			publicKeys: [
-				Identities.PublicKey.fromPassphrase(passphrases[21]),
-				Identities.PublicKey.fromPassphrase(passphrases[22]),
-				Identities.PublicKey.fromPassphrase(passphrases[23]),
-			],
-		};
-
-		context.senderWallet.setAttribute("multiSignature", multiSignatureAsset);
-
-		await assert.rejects(
-			() => context.handler.throwIfCannotBeApplied(context.delegateRegistrationTransaction, context.senderWallet),
-			NotSupportedForMultiSignatureWalletError,
-		);
 	});
 
 	it("throwIfCannotBeApplied should throw if asset.delegate.username is undefined", async (context) => {

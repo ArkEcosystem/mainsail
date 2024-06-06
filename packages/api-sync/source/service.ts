@@ -59,6 +59,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
+	@inject(Identifiers.State.State)
+	private readonly state!: Contracts.State.State;
+
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
@@ -184,12 +187,16 @@ export class Sync implements Contracts.ApiSync.Service {
 	#createValidatorRound(height: number): Models.ValidatorRound {
 		const activeValidators = this.validatorSet.getActiveValidators();
 
+		// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
+		const validatorWallets = Array.from(
+			{ length: activeValidators.length },
+			(_, index) => activeValidators[this.proposerSelector.getValidatorIndex(index)],
+		);
+
 		return {
 			...Utils.roundCalculator.calculateRound(height, this.configuration),
-			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
-			validators: Array.from({ length: activeValidators.length }, (_, index) =>
-				activeValidators[this.proposerSelector.getValidatorIndex(index)].getWalletPublicKey(),
-			),
+			validators: validatorWallets.map((v) => v.getWalletPublicKey()),
+			votes: validatorWallets.map((v) => v.getVoteBalance().toFixed()),
 		};
 	}
 
@@ -342,7 +349,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const t1 = performance.now();
 
-		this.logger.debug(`synced commit: ${deferred.block.height} in ${t1 - t0}ms`);
+		if (!this.state.isBootstrap()) {
+			this.logger.debug(`synced commit: ${deferred.block.height} in ${t1 - t0}ms`);
+		}
 	}
 
 	async #resetDatabaseIfNecessary(): Promise<void> {

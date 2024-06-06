@@ -196,7 +196,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			nonce: BigNumber.ONE,
 			typeGroup: Contracts.Crypto.TransactionTypeGroup.Test,
 			version: 0x01,
-		} as Contracts.Crypto.TransactionData;
+		} as unknown as Contracts.Crypto.TransactionData;
 	}
 
 	protected abstract instance(): TBuilder;

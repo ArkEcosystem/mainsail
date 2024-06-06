@@ -119,6 +119,33 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		return this.#dirtyWallets.values();
 	}
 
+	public changesToJson(): Contracts.State.WalletRepositoryChange {
+		const wallets = [...this.#dirtyWallets].map((wallet) => wallet.changesToJson());
+
+		const indexes = {};
+
+		for (const indexName of this.indexSet.all()) {
+			const sets: Record<string, string> = {};
+			for (const [key, wallet] of this.getIndex(indexName).entries()) {
+				sets[key] = wallet.getAddress();
+			}
+
+			const forgets: string[] = [];
+			for (const key of this.#getForgetSet(indexName).values()) {
+				forgets.push(key);
+			}
+
+			if (Object.keys(sets).length > 0 || forgets.length > 0) {
+				indexes[indexName] = { forgets, sets };
+			}
+		}
+
+		return {
+			indexes,
+			wallets,
+		};
+	}
+
 	public setDirtyWallet(wallet: Contracts.State.Wallet): void {
 		this.#dirtyWallets.add(wallet);
 	}

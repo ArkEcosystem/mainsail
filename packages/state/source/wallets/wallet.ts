@@ -1,25 +1,39 @@
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
-import { Repository } from "../repository.js";
-
+@injectable()
 export class Wallet implements Contracts.State.Wallet {
-	#repository: Repository;
+	@inject(Identifiers.State.Wallet.Factory)
+	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
 
-	public constructor(
-		protected readonly address: string,
-		protected readonly attributeRepository: Contracts.State.AttributeRepository,
-		protected walletRepository: Contracts.State.WalletRepository,
-		protected readonly originalWallet?: Wallet,
-	) {
+	@inject(Identifiers.State.StateRepository.Factory)
+	protected readonly createStateRepository!: Contracts.State.StateRepositoryFactory;
+
+	@inject(Identifiers.State.Wallet.Attributes)
+	protected readonly attributeRepository!: Contracts.State.AttributeRepository;
+
+	protected address!: string;
+	protected walletRepository!: Contracts.State.WalletRepository;
+	protected originalWallet?: Wallet;
+
+	#repository!: Contracts.State.StateRepository;
+
+	public init(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet): Wallet {
+		this.address = address;
+		this.walletRepository = walletRepository;
+		this.originalWallet = originalWallet;
+
 		if (originalWallet) {
-			this.#repository = new Repository(attributeRepository, originalWallet.#repository);
+			this.#repository = this.createStateRepository(this.attributeRepository, originalWallet.#repository);
 		} else {
-			this.#repository = new Repository(attributeRepository, undefined, {
+			this.#repository = this.createStateRepository(this.attributeRepository, undefined, {
 				balance: BigNumber.ZERO,
 				nonce: BigNumber.ZERO,
 			});
 		}
+
+		return this;
 	}
 
 	public isChanged(): boolean {
@@ -113,7 +127,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public clone(walletRepository: Contracts.State.WalletRepository): Contracts.State.Wallet {
-		return new Wallet(this.address, this.attributeRepository, walletRepository, this);
+		return this.createWalletFactory(this.address, walletRepository, this);
 	}
 
 	public isClone(): boolean {
@@ -154,6 +168,18 @@ export class Wallet implements Contracts.State.Wallet {
 		}
 
 		return this;
+	}
+
+	public changesToJson(): Contracts.State.WalletChange {
+		return {
+			address: this.address,
+			...this.#repository.changesToJson(),
+		};
+	}
+
+	public applyChanges(data: Contracts.State.WalletChange): void {
+		this.#repository.applyChanges(data);
+		this.walletRepository.setDirtyWallet(this);
 	}
 
 	public toString(): string {

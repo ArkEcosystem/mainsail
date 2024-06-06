@@ -1,19 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { BigNumber, isEmpty } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.TransactionPool.Collator)
-	private readonly collator!: Contracts.TransactionPool.Collator;
-
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPool!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -31,6 +22,18 @@ export class Validator implements Contracts.Validator.Validator {
 
 	@inject(Identifiers.State.Service)
 	protected readonly stateService!: Contracts.State.Service;
+
+	@inject(Identifiers.Transaction.Validator.Factory)
+	private readonly createTransactionValidator!: Contracts.Transactions.TransactionValidatorFactory;
+
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.TransactionPool.Worker)
+	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
@@ -113,20 +116,33 @@ export class Validator implements Contracts.Validator.Validator {
 
 	async #getTransactionsForForging(
 		commitKey: Contracts.Evm.CommitKey,
-	): Promise<Contracts.TransactionPool.CollatorTransaction[]> {
-		const transactions = await this.collator.getBlockCandidateTransactions(commitKey);
+	): Promise<Contracts.Crypto.CollatorTransaction[]> {
+		const transactionBytes = await this.txPoolWorker.getTransactionBytes(commitKey);
 
-		if (isEmpty(transactions)) {
-			return [];
+		const validator = this.createTransactionValidator();
+		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
+		const failedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const bytes of transactionBytes) {
+			const transaction = await this.transactionFactory.fromBytes(bytes);
+
+			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
+				continue;
+			}
+
+			try {
+				// TODO
+				await validator.validate(transaction);
+				candidateTransactions.push(transaction);
+			} catch (error) {
+				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
+				failedTransactions.push(transaction);
+			}
 		}
 
-		this.logger.debug(
-			`Received ${
-				transactions.length
-			} tx(s) from the pool containing ${this.transactionPool.getPoolSize()} tx(s) total`,
-		);
+		this.txPoolWorker.setFailedTransactions(failedTransactions);
 
-		return transactions;
+		return candidateTransactions;
 	}
 
 	async #makeBlock(
