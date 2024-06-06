@@ -51,7 +51,7 @@ export class CommitHandler {
 			await this.stateService.export(block.data.height);
 
 			this.logger.info(
-				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed.`,
+				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed to pool.`,
 			);
 		} catch (error) {
 			throw new Error(`Failed to commit block: ${error.message}`);

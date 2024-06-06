@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -34,6 +34,13 @@ export class Validator implements Contracts.Validator.Validator {
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
+
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
+	@inject(Identifiers.Evm.Gas.Limits)
+	private readonly gasLimits!: Contracts.Evm.GasLimits;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
@@ -114,10 +121,8 @@ export class Validator implements Contracts.Validator.Validator {
 		);
 	}
 
-	async #getTransactionsForForging(
-		commitKey: Contracts.Evm.CommitKey,
-	): Promise<Contracts.Crypto.CollatorTransaction[]> {
-		const transactionBytes = await this.txPoolWorker.getTransactionBytes(commitKey);
+	async #getTransactionsForForging(commitKey: Contracts.Evm.CommitKey): Promise<Contracts.Crypto.Transaction[]> {
+		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
@@ -131,7 +136,6 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			try {
-				// TODO
 				await validator.validate(transaction);
 				candidateTransactions.push(transaction);
 			} catch (error) {
@@ -148,7 +152,7 @@ export class Validator implements Contracts.Validator.Validator {
 	async #makeBlock(
 		round: number,
 		generatorPublicKey: string,
-		transactions: Contracts.TransactionPool.CollatorTransaction[],
+		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
@@ -157,14 +161,25 @@ export class Validator implements Contracts.Validator.Validator {
 			gasUsed: 0,
 		};
 
+		const previousBlock = this.stateService.getStore().getLastBlock();
+		const height = previousBlock.data.height + 1;
+		const milestone = this.cryptoConfiguration.getMilestone(height);
+
+		const commitKey = { height: BigInt(height), round: BigInt(round) };
+
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
-		for (const transaction of transactions) {
-			const { data, serialized, gasUsed } = transaction;
+		for (let i = 0; i < transactions.length; i++) {
+			const transaction = transactions[i];
+			const { data, serialized } = transaction;
+
+			// We received the transaction from the pool assuming they consume the maximum possible (=gas limit),
+			// now calculate the actual consumption which will be less than or equal the gas limit.
+			const gasUsed = await this.#calculateTransactionGasUsage(commitKey, transaction, i);
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
@@ -175,10 +190,6 @@ export class Validator implements Contracts.Validator.Validator {
 			transactionData.push(data);
 			payloadLength += serialized.length;
 		}
-
-		const previousBlock = this.stateService.getStore().getLastBlock();
-		const height = previousBlock.data.height + 1;
-		const milestone = this.cryptoConfiguration.getMilestone(height);
 
 		return this.blockFactory.make({
 			generatorPublicKey,
@@ -196,5 +207,42 @@ export class Validator implements Contracts.Validator.Validator {
 			transactions: transactionData,
 			version: 1,
 		});
+	}
+
+	async #calculateTransactionGasUsage(
+		commitKey: Contracts.Evm.CommitKey,
+		transaction: Contracts.Crypto.Transaction,
+		sequence: number,
+	): Promise<number> {
+		const walletRepository = this.stateService.getStore().walletRepository;
+
+		let gasUsed: number;
+
+		switch (transaction.type) {
+			case Contracts.Crypto.TransactionType.EvmCall: {
+				Utils.assert.defined(transaction.data.asset?.evmCall);
+				const { evmCall } = transaction.data.asset;
+				const sender = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+
+				const { receipt } = await this.evm.process({
+					caller: sender.getAddress(),
+					commitKey,
+					data: Buffer.from(evmCall.payload, "hex"),
+					gasLimit: BigInt(evmCall.gasLimit),
+					recipient: transaction.data.recipientId,
+					sequence,
+				});
+
+				gasUsed = Number(receipt.gasUsed);
+				// TODO: calculate fee as well
+				break;
+			}
+			default: {
+				gasUsed = this.gasLimits.of(transaction);
+				break;
+			}
+		}
+
+		return gasUsed;
 	}
 }

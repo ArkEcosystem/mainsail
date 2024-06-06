@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Services } from "@mainsail/kernel";
 
 @injectable()
 export class GetTransactionsHandler {
@@ -22,23 +21,15 @@ export class GetTransactionsHandler {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.Evm.Gas.Limits)
+	private readonly gasLimits!: Contracts.Evm.GasLimits;
 
-	@inject(Identifiers.Services.Trigger.Service)
-	private readonly triggers!: Services.Triggers.Triggers;
-
-	public async handle(commitKey: Contracts.Evm.CommitKey): Promise<string[]> {
+	public async handle(): Promise<string[]> {
 		const milestone = this.configuration.getMilestone();
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 		let gasLeft: number = milestone.block.maxGasLimit;
 
-		// TODO: which wallet repo to use here?
-		const walletRepository = this.stateService.getStore().walletRepository;
-
-		const candidateTransactions: Contracts.TransactionPool.CollatorTransaction[] = [];
-		// TODO
-		// const validator: Contracts.State.TransactionValidator = this.createTransactionValidator();
+		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
 		let sequence = 0;
@@ -61,23 +52,14 @@ export class GetTransactionsHandler {
 					break;
 				}
 
-				// TODO
-				//	await validator.validate(transaction);
-
-				const gasUsed = (await this.triggers.call<number>("calculateTransactionGasUsage", {
-					commitKey,
-					sequence,
-					transaction,
-					walletRepository,
-				})) as number;
-
+				const gasUsed = this.gasLimits.of(transaction);
 				if (gasLeft - gasUsed < 0) {
 					break;
 				}
 
-				gasLeft -= gasUsed;
+				candidateTransactions.push(transaction);
 
-				candidateTransactions.push({ ...transaction, gasUsed });
+				gasLeft -= gasUsed;
 
 				bytesLeft -= 4;
 				bytesLeft -= transaction.serialized.length;

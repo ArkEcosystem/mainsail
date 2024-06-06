@@ -114,8 +114,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
 		if (!this.state.isBootstrap()) {
+			const block = unit.getBlock();
 			this.logger.info(
-				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${unit.getBlock().data.numberOfTransactions.toLocaleString()} tx(s) committed`,
+				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed (gasUsed=${block.data.totalGasUsed.toLocaleString()})`,
 			);
 		}
 	}

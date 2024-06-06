@@ -404,7 +404,7 @@
 			},
 			"timeouts": {
 				"blockTime": 100,
-				"blockPrepareTime": 0,
+				"blockPrepareTime": 100,
 				"stageTimeout": 100,
 				"stageTimeoutIncrease": 100
 			},

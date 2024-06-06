@@ -70,6 +70,8 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	};
 	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
 
+	context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue(() => {});
+
 	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
 		getStore: () => ({
 			getLastBlock: () => ({

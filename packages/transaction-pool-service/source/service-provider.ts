@@ -2,12 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
-import {
-	ApplyTransactionAction,
-	CalculateTransactionGasUsage,
-	ThrowIfCannotEnterPoolAction,
-	VerifyTransactionAction,
-} from "./actions/index.js";
+import { ApplyTransactionAction, ThrowIfCannotEnterPoolAction, VerifyTransactionAction } from "./actions/index.js";
 import { ExpirationService } from "./expiration-service.js";
 import { Mempool } from "./mempool.js";
 import { Processor } from "./processor.js";
@@ -77,9 +72,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("verifyTransaction", this.app.resolve(VerifyTransactionAction));
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("calculateTransactionGasUsage", this.app.resolve(CalculateTransactionGasUsage));
 	}
 }
