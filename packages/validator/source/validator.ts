@@ -173,13 +173,12 @@ export class Validator implements Contracts.Validator.Validator {
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
-		for (let i = 0; i < transactions.length; i++) {
-			const transaction = transactions[i];
+		for (const [index, transaction] of transactions.entries()) {
 			const { data, serialized } = transaction;
 
 			// We received the transaction from the pool assuming they consume the maximum possible (=gas limit),
 			// now calculate the actual consumption which will be less than or equal the gas limit.
-			const gasUsed = await this.#calculateTransactionGasUsage(commitKey, transaction, i);
+			const gasUsed = await this.#calculateTransactionGasUsage(commitKey, transaction, index);
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
