@@ -69,8 +69,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
-		let gasUsed = 0;
-
 		try {
 			const { instance, commitKey } = context.evm;
 			const { receipt, mocked } = await instance.process({
@@ -96,18 +94,16 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				);
 			}
 
-			gasUsed = Number(receipt.gasUsed);
-
 			void this.#emit(Enums.EvmEvent.TransactionReceipt, {
 				receipt,
 				sender: sender.getAddress(),
 				transactionId: transaction.id,
 			});
-		} catch (error) {
-			this.logger.critical(`invalid EVM call: ${error.stack}`);
-		}
 
-		return { gasUsed };
+			return { gasUsed: Number(receipt.gasUsed) };
+		} catch (error) {
+			return this.app.terminate("invalid EVM call", error) as never;
+		}
 	}
 
 	protected verifyTransactionFee(
