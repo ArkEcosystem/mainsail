@@ -102,7 +102,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 			return { gasUsed: Number(receipt.gasUsed) };
 		} catch (error) {
-			return this.app.terminate("invalid EVM call", error) as never;
+			return this.app.terminate("invalid EVM call", error);
 		}
 	}
 
