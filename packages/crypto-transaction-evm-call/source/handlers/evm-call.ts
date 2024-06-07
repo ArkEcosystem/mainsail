@@ -90,7 +90,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			}
 			sender.setBalance(newBalance);
 
-			if (!mocked) {
+			if (!mocked && !receipt.cached) {
 				this.logger.debug(
 					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
 				);
