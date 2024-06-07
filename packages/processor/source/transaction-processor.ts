@@ -15,7 +15,10 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	async process(unit: Contracts.Processor.ProcessableUnit, transaction: Contracts.Crypto.Transaction): Promise<void> {
+	async process(
+		unit: Contracts.Processor.ProcessableUnit,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<Contracts.Processor.TransactionProcessorResult> {
 		const walletRepository = unit.store.walletRepository;
 
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
@@ -36,9 +39,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		}
 
 		const result = await transactionHandler.apply(transactionHandlerContext, transaction);
-
-		unit.consumeGas(result.gasUsed);
-
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
@@ -51,6 +51,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		}
 
 		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data);
+
+		return { gasUsed: result.gasUsed };
 	}
 
 	async #updateVoteBalances(

@@ -52,27 +52,30 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
-	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
+	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
+		const processResult = { success: false, gasUsed: 0 };
+
 		try {
+			const block = unit.getBlock();
+
 			await this.verifier.verify(unit);
 
-			for (const transaction of unit.getBlock().transactions) {
-				await this.transactionProcessor.process(unit, transaction);
+			for (const transaction of block.transactions) {
+				const { gasUsed } = await this.transactionProcessor.process(unit, transaction);
+				this.#consumeGas(block, processResult, gasUsed);
 			}
 
-			if (!unit.hasConsumedAllGas()) {
-				throw new Error("consumed gas mismatch");
-			}
+			this.#verifyConsumedAllGas(block, processResult);
 
 			await this.#applyBlockToForger(unit);
 
-			return true;
+			processResult.success = true;
 		} catch (error) {
 			void this.#emit(Enums.BlockEvent.Invalid, { block: unit.getBlock().data, error });
 			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 
-		return false;
+		return processResult;
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -142,6 +145,30 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
 			void this.#emit(Enums.CryptoEvent.MilestoneChanged);
+		}
+	}
+
+	#consumeGas(
+		block: Contracts.Crypto.Block,
+		processorResult: Contracts.Processor.BlockProcessorResult,
+		gasUsed: number,
+	): void {
+		const totalGas = block.header.totalGasUsed;
+
+		if (processorResult.gasUsed + gasUsed > totalGas) {
+			throw new Error("Cannot consume more gas");
+		}
+
+		processorResult.gasUsed += gasUsed;
+	}
+
+	#verifyConsumedAllGas(
+		block: Contracts.Crypto.Block,
+		processorResult: Contracts.Processor.BlockProcessorResult,
+	): void {
+		const totalGas = block.header.totalGasUsed;
+		if (totalGas !== processorResult.gasUsed) {
+			throw new Error("Consumed gas mismatch");
 		}
 	}
 

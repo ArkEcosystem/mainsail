@@ -28,7 +28,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#height = 0;
 	#round = 0;
 	#proposal?: Contracts.Crypto.Proposal;
-	#processorResult?: boolean;
+	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#prevotes = new Map<number, Contracts.Crypto.Prevote>();
 	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<number, Contracts.Crypto.Precommit>();
@@ -37,7 +37,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#validatorsSignedPrevote: boolean[] = [];
 	#validatorsSignedPrecommit: boolean[] = [];
 	#proposer!: Contracts.State.ValidatorWallet;
-	#gasUsed: number = 0;
 
 	#commit: Contracts.Crypto.Commit | undefined;
 	#store!: Contracts.State.Store;
@@ -120,21 +119,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		throw new Error("Block is not available, because proposal is not set or deserialized");
 	}
 
-	public consumeGas(amount: number): void {
-		const totalGas = this.getBlock().header.totalGasUsed;
-
-		if (this.#gasUsed + amount > totalGas) {
-			throw new Error("Cannot consume more gas");
-		}
-
-		this.#gasUsed += amount;
-	}
-
-	public hasConsumedAllGas(): boolean {
-		const totalGas = this.getBlock().header.totalGasUsed;
-		return totalGas == this.#gasUsed;
-	}
-
 	public async getCommit(): Promise<Contracts.Crypto.Commit> {
 		if (!this.#commit) {
 			const majority = await this.aggregatePrecommits();
@@ -164,7 +148,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#commit;
 	}
 
-	public setProcessorResult(processorResult: boolean): void {
+	public setProcessorResult(processorResult: Contracts.Processor.BlockProcessorResult): void {
 		this.#processorResult = processorResult;
 	}
 
@@ -172,7 +156,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#processorResult !== undefined;
 	}
 
-	public getProcessorResult(): boolean {
+	public getProcessorResult(): Contracts.Processor.BlockProcessorResult {
 		if (this.#processorResult === undefined) {
 			throw new Error("Processor result is undefined.");
 		}
