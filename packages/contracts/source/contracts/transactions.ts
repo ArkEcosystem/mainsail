@@ -84,7 +84,11 @@ export interface TransactionTypeFactory {
 }
 
 export interface TransactionValidator {
-	validate(transaction: Transaction): Promise<void>;
+	validate(commitKey: CommitKey, transaction: Transaction): Promise<TransactionValidatorResult>;
+}
+
+export interface TransactionValidatorResult {
+	readonly gasUsed: number;
 }
 
 export type TransactionValidatorFactory = () => TransactionValidator;

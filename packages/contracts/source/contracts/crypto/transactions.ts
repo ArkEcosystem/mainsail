@@ -68,6 +68,7 @@ export interface TransactionData {
 	blockId?: string;
 	blockHeight?: number;
 	sequence?: number;
+	gasUsed?: number;
 }
 
 export interface TransactionJson {

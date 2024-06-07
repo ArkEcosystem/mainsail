@@ -62,6 +62,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			for (const transaction of block.transactions) {
 				const { gasUsed } = await this.transactionProcessor.process(unit, transaction);
+				transaction.data.gasUsed = gasUsed;
+
 				this.#consumeGas(block, processResult, gasUsed);
 			}
 

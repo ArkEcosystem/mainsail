@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -34,13 +34,6 @@ export class Validator implements Contracts.Validator.Validator {
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
-
-	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
-	private readonly evm!: Contracts.Evm.Instance;
-
-	@inject(Identifiers.Evm.Gas.Limits)
-	private readonly gasLimits!: Contracts.Evm.GasLimits;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
@@ -128,15 +121,34 @@ export class Validator implements Contracts.Validator.Validator {
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
+		const milestone = this.cryptoConfiguration.getMilestone(Number(commitKey.height));
+		let gasLeft = milestone.block.maxGasLimit;
+
 		for (const bytes of transactionBytes) {
 			const transaction = await this.transactionFactory.fromBytes(bytes);
+			transaction.data.sequence = candidateTransactions.length;
 
 			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
 				continue;
 			}
 
 			try {
-				await validator.validate(transaction);
+				const result = await validator.validate(commitKey, transaction);
+
+				// We received transactions from the pool without taking gas usage into account yet.
+				// Therefore only include transactions that fit into the block.
+				if (gasLeft - result.gasUsed < 0) {
+					if (gasLeft >= 21_000) {
+						continue; // another transaction potentially still fits
+					}
+
+					// block is full
+					break;
+				}
+
+				gasLeft -= result.gasUsed;
+
+				transaction.data.gasUsed = result.gasUsed;
 				candidateTransactions.push(transaction);
 			} catch (error) {
 				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
@@ -165,54 +177,31 @@ export class Validator implements Contracts.Validator.Validator {
 		const height = previousBlock.data.height + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(height);
 
-		const commitKey = { height: BigInt(height), round: BigInt(round) };
-
 		const payloadBuffers: Buffer[] = [];
-		const includedTransactionData: Contracts.Crypto.TransactionData[] = [];
-
-		let gasLeft = milestone.block.maxGasLimit;
-
-		let payloadLength = 0;
-		for (const transaction of transactions) {
-			const { data, serialized } = transaction;
-			Utils.assert.defined<string>(data.id);
-
-			// We received transactions from the pool without taking gas usage into account yet.
-			// Therefore, calculate the actual consumption and only include transactions that fit into the block.
-			const gasUsed = await this.#calculateTransactionGasUsage(
-				commitKey,
-				transaction,
-				includedTransactionData.length,
-			);
-
-			if (gasLeft - gasUsed < 0) {
-				if (gasLeft >= 21_000) {
-					continue; // another transaction potentially still fits
-				}
-
-				// block is full
-				break;
-			}
-
-			gasLeft -= gasUsed;
-
-			totals.amount = totals.amount.plus(data.amount);
-			totals.fee = totals.fee.plus(data.fee);
-			totals.gasUsed += gasUsed;
-
-			payloadBuffers.push(Buffer.from(data.id, "hex"));
-			includedTransactionData.push(data);
-			payloadLength += serialized.length;
-		}
+		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
 		// The payload length needs to account for the overhead of each serialized transaction
 		// which is a uint32 per transaction to store the individual length.
-		payloadLength += includedTransactionData.length * 4;
+		let payloadLength = transactions.length * 4;
+
+		for (const transaction of transactions) {
+			const { data, serialized } = transaction;
+			Utils.assert.defined<string>(data.id);
+			Utils.assert.defined<number>(data.gasUsed);
+
+			totals.amount = totals.amount.plus(data.amount);
+			totals.fee = totals.fee.plus(data.fee);
+			totals.gasUsed += data.gasUsed;
+
+			payloadBuffers.push(Buffer.from(data.id, "hex"));
+			transactionData.push(data);
+			payloadLength += serialized.length;
+		}
 
 		return this.blockFactory.make({
 			generatorPublicKey,
 			height,
-			numberOfTransactions: includedTransactionData.length,
+			numberOfTransactions: transactionData.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,
 			previousBlock: previousBlock.data.id,
@@ -222,45 +211,8 @@ export class Validator implements Contracts.Validator.Validator {
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
 			totalGasUsed: totals.gasUsed,
-			transactions: includedTransactionData,
+			transactions: transactionData,
 			version: 1,
 		});
-	}
-
-	async #calculateTransactionGasUsage(
-		commitKey: Contracts.Evm.CommitKey,
-		transaction: Contracts.Crypto.Transaction,
-		sequence: number,
-	): Promise<number> {
-		const walletRepository = this.stateService.getStore().walletRepository;
-
-		let gasUsed: number;
-
-		switch (transaction.type) {
-			case Contracts.Crypto.TransactionType.EvmCall: {
-				Utils.assert.defined(transaction.data.asset?.evmCall);
-				const { evmCall } = transaction.data.asset;
-				const sender = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
-
-				const { receipt } = await this.evm.process({
-					caller: sender.getAddress(),
-					commitKey,
-					data: Buffer.from(evmCall.payload, "hex"),
-					gasLimit: BigInt(evmCall.gasLimit),
-					recipient: transaction.data.recipientId,
-					sequence,
-				});
-
-				gasUsed = Number(receipt.gasUsed);
-				// TODO: calculate fee as well
-				break;
-			}
-			default: {
-				gasUsed = this.gasLimits.of(transaction);
-				break;
-			}
-		}
-
-		return gasUsed;
 	}
 }
