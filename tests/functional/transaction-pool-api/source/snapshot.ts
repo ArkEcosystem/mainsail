@@ -37,6 +37,7 @@ export class Snapshot {
 				data: { receipt: Contracts.Evm.TransactionReceipt; sender: string; transactionId: string };
 			}) => {
 				const { sender, receipt, transactionId } = data;
+				if (receipt.cached) return;
 
 				console.log("got receipt", sender, transactionId, receipt);
 

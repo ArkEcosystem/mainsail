@@ -31,10 +31,11 @@ export class EvmInstance implements Contracts.Evm.Instance {
 			this.#lastCommitKey?.height === commitKey.height &&
 			this.#lastCommitKey?.round === commitKey.round
 		) {
-			// Return cached result if the transaction has already been processed for the given commit
-			// This happens when e.g. receiving the transaction directly from the collator
+			// Return cached result if the transaction has already been processed for the given commit to prevent
+			// unnecessary overhead. This happens when e.g. receiving an already validated transaction
 			if (this.#resultCache.has(txContext.sequence)) {
-				return this.#resultCache.get(txContext.sequence)!;
+				const result = this.#resultCache.get(txContext.sequence)!;
+				return { ...result, receipt: { ...result.receipt, cached: true } };
 			}
 		} else {
 			// If commitKey changes (outside of onCommit) reset everything

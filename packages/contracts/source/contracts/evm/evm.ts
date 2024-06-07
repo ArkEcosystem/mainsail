@@ -45,4 +45,7 @@ export interface TransactionReceipt {
 	readonly deployedContractAddress?: string;
 	readonly logs: any;
 	readonly output?: Buffer;
+
+	// See evm.ts
+	readonly cached?: boolean;
 }
