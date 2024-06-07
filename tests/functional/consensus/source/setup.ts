@@ -49,6 +49,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		onCommit: async () => {},
 	});
 
+	// TODO: get rid of mock
 	sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
 		onCommit: async () => {},
 	});
@@ -90,15 +91,16 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-validation",
 		"@mainsail/crypto-hash-bcrypto",
 		"@mainsail/crypto-signature-schnorr",
-		"@mainsail/crypto-key-pair-schnorr",
+		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-consensus-bls12-381",
-		"@mainsail/crypto-address-bech32m",
+		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
 		"@mainsail/fees",
 		"@mainsail/fees-static",
-		// "@mainsail/evm",
+		//"@mainsail/evm",
+		"@mainsail/evm-gas-fee",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-username-registration",
 		"@mainsail/crypto-transaction-username-resignation",

@@ -74,6 +74,7 @@ export class ConfigurationGenerator {
 			epoch: new Date(),
 			explorer: "",
 			force: false,
+			maxBlockGasLimit: 10_000_000,
 			maxBlockPayload: 2_097_152,
 			maxTxPerBlock: 150,
 			overwriteConfig: false,

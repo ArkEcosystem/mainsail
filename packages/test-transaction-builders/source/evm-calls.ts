@@ -16,7 +16,7 @@ export const makeEvmCall = async (
 	let { sender, fee, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
-	fee = fee ?? "2500000000";
+	fee = fee ?? "5";
 
 	if (!payload) {
 		const senderRecipient = await getAddressByPublicKey({ sandbox }, sender.publicKey);

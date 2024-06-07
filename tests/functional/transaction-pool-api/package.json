@@ -35,6 +35,7 @@
 		"@mainsail/state": "workspace:*",
 		"@mainsail/database": "workspace:*",
 		"@mainsail/evm": "workspace:*",
+		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/transaction-pool-service": "workspace:*",

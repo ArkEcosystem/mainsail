@@ -50,6 +50,10 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
 			}
 
+			if (blockData.totalGasUsed > constants.block.maxGasLimit && blockData.height > 0) {
+				result.errors.push("Invalid total gas used");
+			}
+
 			if (block.transactions.length !== blockData.numberOfTransactions) {
 				result.errors.push("Invalid number of transactions");
 			}

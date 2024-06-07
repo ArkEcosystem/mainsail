@@ -54,7 +54,7 @@ export interface Application {
 
 	isDownForMaintenance(): boolean;
 
-	terminate(reason?: string, error?: Error): Promise<void>;
+	terminate(reason?: string, error?: Error): Promise<never>;
 
 	bind<T>(serviceIdentifier: Container.ServiceIdentifier<T>): Container.BindingToSyntax<T>;
 

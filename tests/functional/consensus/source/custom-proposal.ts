@@ -27,6 +27,7 @@ export const makeCustomProposal = async (
 	const proposer = node.app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validators[0].consensusPublicKey)!;
+	const gasLimits = node.app.get<Contracts.Evm.GasLimits>(Identifiers.Evm.Gas.Limits);
 
 	// 2)
 	const round = node.app.get<Consensus>(Identifiers.Consensus.Service).getRound();
@@ -40,20 +41,23 @@ export const makeCustomProposal = async (
 	// - amount + fee
 	let blockBuffer = Buffer.from(emptyBlock.serialized, "hex");
 
-	const totals: { amount: BigNumber; fee: BigNumber } = {
+	const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 		amount: BigNumber.ZERO,
 		fee: BigNumber.ZERO,
+		gasUsed: 0,
 	};
 
 	const payloadBuffers: Buffer[] = [];
 	const transactionBuffers: Buffer[] = [];
 
 	let payloadLength = transactions.length * 4;
-	for (const { data, serialized } of transactions) {
+	for (const transaction of transactions) {
+		const { data, serialized } = transaction;
 		Utils.assert.defined<string>(data.id);
 
 		totals.amount = totals.amount.plus(data.amount);
 		totals.fee = totals.fee.plus(data.fee);
+		totals.gasUsed += gasLimits.of(transaction);
 
 		payloadBuffers.push(Buffer.from(data.id, "hex"));
 
@@ -72,6 +76,10 @@ export const makeCustomProposal = async (
 	let byteOffset = 1 + 6 + 4 + 4 + hashSize; // see headerSize
 	blockBuffer.writeUint16LE(transactions.length, byteOffset);
 	byteOffset += 2;
+
+	// totalGasUsed
+	blockBuffer.writeUInt32LE(totals.gasUsed, byteOffset);
+	byteOffset += 4;
 
 	// totalAmount
 	blockBuffer.writeBigUInt64LE(totals.amount.toBigInt(), byteOffset);

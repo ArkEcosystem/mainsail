@@ -34,6 +34,7 @@ export class Deployer {
 			caller: this.#genesisAddress,
 			commitKey,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
+			gasLimit: BigInt(1_000_000),
 		});
 
 		if (!result.receipt.success) {
@@ -72,6 +73,7 @@ export class Deployer {
 				caller: this.#genesisAddress,
 				commitKey,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
+				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,
 			});
 

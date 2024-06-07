@@ -73,6 +73,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.TransactionPool.Query).toConstantValue(context.poolQuery);
+		context.sandbox.app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({});
 
 		context.handler = context.sandbox.app.resolve(VoteTransactionHandler);
 

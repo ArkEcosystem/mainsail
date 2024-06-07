@@ -54,6 +54,7 @@ pub struct JsTransactionReceipt {
     pub output: Option<JsBuffer>,
 }
 
+#[derive(Default)]
 pub struct TxReceipt {
     pub gas_used: u64,
     pub gas_refunded: u64,

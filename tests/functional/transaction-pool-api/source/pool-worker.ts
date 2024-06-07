@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { GetTransactionsHandler } from "@mainsail/transaction-pool-worker/distribution/handlers/index.js";
+import { Handlers } from "@mainsail/transaction-pool-worker";
 
 @injectable()
 export class PoolWorker implements Contracts.TransactionPool.Worker {
@@ -42,7 +42,7 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 	public async importSnapshot(height: number): Promise<void> {}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {
-		const response: string[] = await this.app.resolve(GetTransactionsHandler).handle();
+		const response: string[] = await this.app.resolve(Handlers.GetTransactionsHandler).handle();
 		return response.map((transaction: string) => Buffer.from(transaction, "hex"));
 	}
 }

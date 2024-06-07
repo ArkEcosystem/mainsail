@@ -33,6 +33,7 @@ describe<{
 			transact: () => ({}),
 			view: () => ({}),
 		});
+		context.app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({ of: () => ({}) });
 		context.txPoolEnv = process.env.CORE_TRANSACTION_POOL;
 		context.maxTxPoolEnv = process.env.CORE_MAX_TRANSACTIONS_IN_POOL;
 

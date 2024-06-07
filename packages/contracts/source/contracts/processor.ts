@@ -7,8 +7,8 @@ export interface ProcessableUnit {
 	readonly persist: boolean;
 	readonly store: Store;
 	hasProcessorResult(): boolean;
-	getProcessorResult(): boolean;
-	setProcessorResult(processorResult: boolean): void;
+	getProcessorResult(): BlockProcessorResult;
+	setProcessorResult(processorResult: BlockProcessorResult): void;
 	getBlock(): Block;
 	getCommit(): Promise<Commit>;
 }
@@ -18,12 +18,21 @@ export interface Handler {
 }
 
 export interface BlockProcessor {
-	process(unit: ProcessableUnit): Promise<boolean>;
+	process(unit: ProcessableUnit): Promise<BlockProcessorResult>;
 	commit(unit: ProcessableUnit): Promise<void>;
 }
 
+export interface BlockProcessorResult {
+	success: boolean;
+	gasUsed: number;
+}
+
 export interface TransactionProcessor {
-	process(unit: ProcessableUnit, transaction: Transaction): Promise<void>;
+	process(unit: ProcessableUnit, transaction: Transaction): Promise<TransactionProcessorResult>;
+}
+
+export interface TransactionProcessorResult {
+	readonly gasUsed: number;
 }
 
 export interface Verifier {

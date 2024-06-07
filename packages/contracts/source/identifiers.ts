@@ -132,6 +132,10 @@ export const Identifiers = {
 		},
 	},
 	Evm: {
+		Gas: {
+			FeeCalculator: Symbol("Evm<Gas.FeeCalculator>"),
+			Limits: Symbol("Evm<Gas.Limits>"),
+		},
 		Instance: Symbol("Evm<Instance>"),
 	},
 	Fee: {

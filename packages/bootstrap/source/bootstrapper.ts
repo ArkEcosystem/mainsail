@@ -178,8 +178,8 @@ export class Bootstrapper {
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
 		try {
 			const commitState = this.commitStateFactory(commit);
-			const result = await this.blockProcessor.process(commitState);
-			if (result === false) {
+			const { success } = await this.blockProcessor.process(commitState);
+			if (!success) {
 				throw new Error(`Block is not processed.`);
 			}
 			await this.blockProcessor.commit(commitState);

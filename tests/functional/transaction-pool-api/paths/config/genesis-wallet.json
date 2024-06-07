@@ -1,14 +1,14 @@
 {
-	"address": "0xB54aA0Af71D34FE80308Fc02a0DF3aB1F9a8cd67",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "4400b800dcb21948fafb603b1ed2959c954de7d2a28ddc172a74f16b4b36fc38",
-		"publicKey": "9161170c06c2e8188d5a9122cf29cf47d2ac34f9bed3a856dfcc70a7e724672cdbbb5f0d1e562e6792c8a0c23c1b7c11"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "78332138b4cdf6e2faf3dc1342d7526422fbf901fdf9bb62da00f5fda3b28d59",
-		"publicKey": "0273d65b46f83612eea7baad6f13aa99784aaa9013ddda26621d1df4509054ad91"
-	},
-	"passphrase": "describe abandon siege fine glass stand globe mask seed buyer angry art release sun profit napkin resource insect remove say fiction index perfect magnet"
+    "address": "0xB00dF390b486F646489d0549F5aae824947927b8",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "6e5dc74ecc4e0f39db4b619412a47ec7a6265ca167047f06e6c87d7a50618614",
+        "publicKey": "acc611fd0dcc2ebcf3f1e07b381344dbb936ec09a581534a5e08682f0fa89203700f6946acfb60b225c5b14ddbb49388"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "088ec52b3f30c9edff0eb4b61768adbc00671c25ba5dc8f862a4ffe5b2b4d49d",
+        "publicKey": "0397d3ee7991c0b17bb9269fcf2577d2161d02bc35bab636ed6c9f61c4fb1f42e9"
+    },
+    "passphrase": "woman receive radio fee deal split destroy glare pizza cook track broccoli swap bone wolf sure deposit van episode girl inner sun jacket desert"
 }

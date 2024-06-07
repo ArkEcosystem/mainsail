@@ -63,8 +63,8 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(context, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const result = await super.applyToSender(context, transaction);
 
 		const senderWallet = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 		context.walletRepository.forgetOnIndex(
@@ -73,11 +73,14 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 		);
 
 		senderWallet.forgetAttribute("username");
+
+		return result;
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-		// tslint:disable-next-line: no-empty
-	): Promise<void> {}
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return super.applyToRecipient(context, transaction);
+	}
 }

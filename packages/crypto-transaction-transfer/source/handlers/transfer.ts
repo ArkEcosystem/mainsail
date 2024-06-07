@@ -58,8 +58,8 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(context, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const result = await super.applyToSender(context, transaction);
 
 		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
 			transaction.data.senderPublicKey,
@@ -69,16 +69,20 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 
 		const newBalance: BigNumber = sender.getBalance().minus(data.amount);
 		sender.setBalance(newBalance);
+
+		return result;
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 
 		const recipient: Contracts.State.Wallet = context.walletRepository.findByAddress(transaction.data.recipientId);
 
 		recipient.increaseBalance(transaction.data.amount);
+
+		return super.applyToRecipient(context, transaction);
 	}
 }

@@ -12,6 +12,7 @@ export type EnvironmentOptions = {
 export type MilestoneOptions = {
 	validators: number;
 	maxBlockPayload: number;
+	maxBlockGasLimit: number;
 	maxTxPerBlock: number;
 	blockTime: number;
 	epoch: Date;

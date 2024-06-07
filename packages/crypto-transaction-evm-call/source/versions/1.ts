@@ -21,11 +21,16 @@ export class EvmCallTransaction extends Transaction {
 			$id: "evmCall",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
+				// TODO: milestone?
 				asset: {
 					properties: {
 						evmCall: {
 							properties: {
-								gasLimit: { minimum: 0, type: "integer" },
+								gasLimit: {
+									maximum: 2_000_000,
+									minimum: 21_000,
+									/* TODO: milestone? */ type: "integer",
+								},
 								payload: {
 									// TODO: milestone for max allowed bytecode
 									allOf: [{ maxLength: 1_000_000, minLength: 0 }, { $ref: "hex" }],
@@ -41,6 +46,7 @@ export class EvmCallTransaction extends Transaction {
 					type: "object",
 					unevaluatedProperties: false,
 				},
+				fee: { bignumber: { maximum: 1000, minimum: 5 } },
 				recipientId: { $ref: "address" },
 				type: { transactionType: Contracts.Crypto.TransactionType.EvmCall },
 			},

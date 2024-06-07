@@ -1,7 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Bootstrap, Providers } from "@mainsail/kernel";
+import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
+import { dirSync } from "tmp";
 
 import { MemoryDatabase } from "./database.js";
 import { PoolWorker } from "./pool-worker.js";
@@ -17,7 +18,8 @@ const setup = async () => {
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
-		.toConstantValue({ dispatch: () => {}, listen: () => {} });
+		.to(Services.Events.MemoryEventDispatcher)
+		.inSingletonScope();
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		clear: async () => {},
@@ -52,7 +54,8 @@ const setup = async () => {
 
 	// RegisterBaseBindings
 
-	sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
+	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
+	//sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -90,6 +93,7 @@ const setup = async () => {
 		"@mainsail/fees",
 		"@mainsail/fees-static",
 		"@mainsail/evm",
+		"@mainsail/evm-gas-fee",
 		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-username-registration",

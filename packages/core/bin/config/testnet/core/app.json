@@ -43,6 +43,9 @@
 			"package": "@mainsail/evm"
 		},
 		{
+			"package": "@mainsail/evm-gas-fee"
+		},
+		{
 			"package": "@mainsail/evm-development"
 		},
 		{
@@ -240,6 +243,9 @@
 		},
 		{
 			"package": "@mainsail/evm"
+		},
+		{
+			"package": "@mainsail/evm-gas-fee"
 		},
 		{
 			"package": "@mainsail/crypto-block"

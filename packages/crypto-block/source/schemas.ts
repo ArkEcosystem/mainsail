@@ -28,6 +28,7 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 			timestamp: { maximum: 2 ** 48 - 1, minimum: 0, type: "integer" },
 			totalAmount: { bignumber: { minimum: 0 } },
 			totalFee: { bignumber: { minimum: 0 } },
+			totalGasUsed: { minimum: 0, type: "integer" },
 			version: { enum: [1] },
 		},
 		required: [
@@ -35,6 +36,7 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 			"timestamp",
 			"previousBlock",
 			"height",
+			"totalGasUsed",
 			"totalAmount",
 			"totalFee",
 			"reward",

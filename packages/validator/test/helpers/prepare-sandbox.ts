@@ -10,6 +10,7 @@ import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
+import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
@@ -27,6 +28,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	await context.sandbox.app.resolve(CoreSerializer).register();
 	await context.sandbox.app.resolve(CoreValidation).register();
+	await context.sandbox.app.resolve(CoreEvmGasFee).register();
 	await context.sandbox.app.resolve(CoreCryptoConfig).register();
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
@@ -67,6 +69,8 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		validate: async () => true,
 	};
 	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
+
+	context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue(() => {});
 
 	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
 		getStore: () => ({

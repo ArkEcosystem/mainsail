@@ -11,7 +11,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 
 	#store!: Contracts.State.Store;
 	#commit!: Contracts.Crypto.Commit;
-	#processorResult?: boolean;
+	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 
 	@postConstruct()
@@ -55,7 +55,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 		return this.#commit.block;
 	}
 
-	public setProcessorResult(processorResult: boolean): void {
+	public setProcessorResult(processorResult: Contracts.Processor.BlockProcessorResult): void {
 		this.#processorResult = processorResult;
 	}
 
@@ -63,7 +63,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 		return this.#processorResult !== undefined;
 	}
 
-	public getProcessorResult(): boolean {
+	public getProcessorResult(): Contracts.Processor.BlockProcessorResult {
 		if (this.#processorResult == undefined) {
 			throw new Error("Processor result is undefined.");
 		}

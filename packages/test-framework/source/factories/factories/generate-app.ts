@@ -18,6 +18,7 @@ import { ServiceProvider as CoreValidatorResignationTransaction } from "@mainsai
 import { ServiceProvider as CoreVoteTransaction } from "@mainsail/crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
+import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
@@ -43,6 +44,7 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
 	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 	await sandbox.app.resolve(CoreCryptoConsensus).register();
+	await sandbox.app.resolve(CoreEvmGasFee).register();
 	await sandbox.app.resolve(CoreFees).register();
 	await sandbox.app.resolve(CoreFeesStatic).register();
 	await sandbox.app.resolve(CoreCryptoTransaction).register();

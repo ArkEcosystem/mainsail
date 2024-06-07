@@ -52,7 +52,10 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
-		const transactions = await this.#getTransactionsForForging();
+		const previousBlock = this.stateService.getStore().getLastBlock();
+		const height = previousBlock.data.height + 1;
+
+		const transactions = await this.#getTransactionsForForging({ height: BigInt(height), round: BigInt(round) });
 		return this.#makeBlock(round, generatorPublicKey, transactions, timestamp);
 	}
 
@@ -111,22 +114,41 @@ export class Validator implements Contracts.Validator.Validator {
 		);
 	}
 
-	async #getTransactionsForForging(): Promise<Contracts.Crypto.Transaction[]> {
+	async #getTransactionsForForging(commitKey: Contracts.Evm.CommitKey): Promise<Contracts.Crypto.Transaction[]> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
+		const milestone = this.cryptoConfiguration.getMilestone(Number(commitKey.height));
+		let gasLeft = milestone.block.maxGasLimit;
+
 		for (const bytes of transactionBytes) {
 			const transaction = await this.transactionFactory.fromBytes(bytes);
+			transaction.data.sequence = candidateTransactions.length;
 
 			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
 				continue;
 			}
 
 			try {
-				await validator.validate(transaction);
+				const result = await validator.validate(commitKey, transaction);
+
+				// We received transactions from the pool without taking gas usage into account yet.
+				// Therefore only include transactions that fit into the block.
+				if (gasLeft - result.gasUsed < 0) {
+					if (gasLeft >= 21_000) {
+						continue; // another transaction potentially still fits
+					}
+
+					// block is full
+					break;
+				}
+
+				gasLeft -= result.gasUsed;
+
+				transaction.data.gasUsed = result.gasUsed;
 				candidateTransactions.push(transaction);
 			} catch (error) {
 				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
@@ -145,43 +167,50 @@ export class Validator implements Contracts.Validator.Validator {
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
-		const totals: { amount: BigNumber; fee: BigNumber } = {
+		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
+			gasUsed: 0,
 		};
+
+		const previousBlock = this.stateService.getStore().getLastBlock();
+		const height = previousBlock.data.height + 1;
+		const milestone = this.cryptoConfiguration.getMilestone(height);
 
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
-		// The initial payload length takes the overhead for each serialized transaction into account
+		// The payload length needs to account for the overhead of each serialized transaction
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
-		for (const { data, serialized } of transactions) {
+
+		for (const transaction of transactions) {
+			const { data, serialized } = transaction;
 			Utils.assert.defined<string>(data.id);
+			Utils.assert.defined<number>(data.gasUsed);
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
+			totals.gasUsed += data.gasUsed;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
 			payloadLength += serialized.length;
 		}
 
-		const previousBlock = this.stateService.getStore().getLastBlock();
-		const height = previousBlock.data.height + 1;
-
 		return this.blockFactory.make({
 			generatorPublicKey,
 			height,
-			numberOfTransactions: transactions.length,
+			numberOfTransactions: transactionData.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,
 			previousBlock: previousBlock.data.id,
-			reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
+			reward: BigNumber.make(milestone.reward),
 			round,
 			timestamp,
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
+			totalGasUsed: totals.gasUsed,
 			transactions: transactionData,
 			version: 1,
 		});

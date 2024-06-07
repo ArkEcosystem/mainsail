@@ -22,6 +22,19 @@ describe<{
 					block: { version: 1, maxPayload: 2097152, maxTransactions: 150 },
 					blockTime: 8000,
 					height: 0,
+					// @ts-ignore
+					gas: {
+						nativeGasLimits: {
+							transfer: 21000,
+							multiPayment: 50000,
+							multiSignature: 50000,
+							usernameRegistration: 100000,
+							usernameResignation: 50000,
+							validatorRegistration: 100000,
+							validatorResignation: 50000,
+							vote: 50000,
+						},
+					},
 				},
 			],
 		});

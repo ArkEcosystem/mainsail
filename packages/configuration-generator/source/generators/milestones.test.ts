@@ -22,6 +22,7 @@ describe<{
 					blockTime: 8000,
 					epoch: date,
 					maxBlockPayload: 2000,
+					maxBlockGasLimit: 1000,
 					maxTxPerBlock: 100,
 					validators: 53,
 					vendorFieldLength: 255,
@@ -38,6 +39,7 @@ describe<{
 					},
 					block: {
 						maxPayload: 2000,
+						maxGasLimit: 1000,
 						maxTransactions: 100,
 						version: 1,
 					},
@@ -48,6 +50,21 @@ describe<{
 						stageTimeoutIncrease: 2000,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
+					gas: {
+						minimumGasFee: 5,
+						minimumGasLimit: 21_000,
+						nativeFeeMultiplier: 100,
+						nativeGasLimits: {
+							transfer: 21_000,
+							multiPayment: 50_000,
+							multiSignature: 50_000,
+							usernameRegistration: 100_000,
+							usernameResignation: 50_000,
+							validatorRegistration: 100_000,
+							validatorResignation: 50_000,
+							vote: 50_000,
+						},
+					},
 					fees: {
 						staticFees: {
 							multiPayment: 10_000_000,

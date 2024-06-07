@@ -29,6 +29,7 @@ export type Network = {
 
 export type MilestoneBlock = {
 	maxPayload: number;
+	maxGasLimit: number;
 	maxTransactions: number;
 	version: number;
 };
@@ -43,12 +44,20 @@ export type MilestoneTimeouts = {
 	stageTimeoutIncrease: number;
 };
 
+export type MilestoneGas = {
+	minimumGasLimit: number;
+	minimumGasFee: number;
+	nativeFeeMultiplier: number;
+	nativeGasLimits: Record<string, number>;
+};
+
 export type Milestone = {
 	height: number;
 	activeValidators: number;
 	address: Record<string, any>;
 	block: MilestoneBlock;
 	epoch: string;
+	gas: MilestoneGas;
 	fees: Fees;
 	multiPaymentLimit: number;
 	reward: string;

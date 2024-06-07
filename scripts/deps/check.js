@@ -79,6 +79,7 @@ const EXCEPTIONS = {
 			"@mainsail/crypto-worker",
 			"@mainsail/database",
 			"@mainsail/evm-development",
+			"@mainsail/evm-gas-fee",
 			"@mainsail/evm",
 			"@mainsail/fees-static",
 			"@mainsail/fees",

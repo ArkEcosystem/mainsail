@@ -7,6 +7,7 @@ export interface Instance extends CommitHandler {
 
 export interface ProcessResult {
 	readonly receipt: TransactionReceipt;
+	readonly mocked?: boolean;
 }
 
 export interface ViewResult {
@@ -20,8 +21,10 @@ export interface TransactionContext {
 	readonly caller: string;
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
+	readonly gasLimit: bigint;
 	readonly data: Buffer;
 	readonly commitKey: CommitKey;
+	readonly sequence?: number;
 }
 
 export interface TransactionViewContext {
@@ -42,4 +45,7 @@ export interface TransactionReceipt {
 	readonly deployedContractAddress?: string;
 	readonly logs: any;
 	readonly output?: Buffer;
+
+	// See evm.ts
+	readonly cached?: boolean;
 }

@@ -49,8 +49,8 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(context, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const result = await super.applyToSender(context, transaction);
 
 		AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.data.asset?.payments);
 
@@ -63,12 +63,14 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 		);
 
 		sender.decreaseBalance(totalPaymentsAmount);
+
+		return result;
 	}
 
 	public async applyToRecipient(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		for (const payment of transaction.data.asset.payments) {
@@ -76,5 +78,7 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 
 			recipient.increaseBalance(payment.amount);
 		}
+
+		return super.applyToRecipient(context, transaction);
 	}
 }
