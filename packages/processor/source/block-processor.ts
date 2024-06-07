@@ -53,7 +53,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
-		const processResult = { success: false, gasUsed: 0 };
+		const processResult = { gasUsed: 0, success: false };
 
 		try {
 			const block = unit.getBlock();

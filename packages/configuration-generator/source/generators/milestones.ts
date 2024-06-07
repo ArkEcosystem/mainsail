@@ -17,6 +17,18 @@ export class MilestonesGenerator {
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
+				fees: {
+					staticFees: {
+						multiPayment: 10_000_000,
+						multiSignature: 500_000_000,
+						transfer: 10_000_000,
+						usernameRegistration: 2_500_000_000,
+						usernameResignation: 2_500_000_000,
+						validatorRegistration: 2_500_000_000,
+						validatorResignation: 2_500_000_000,
+						vote: 100_000_000,
+					},
+				},
 				gas: {
 					minimumGasFee: 5,
 					minimumGasLimit: 21_000,
@@ -30,18 +42,6 @@ export class MilestonesGenerator {
 						validatorRegistration: 100_000,
 						validatorResignation: 50_000,
 						vote: 50_000,
-					},
-				},
-				fees: {
-					staticFees: {
-						multiPayment: 10_000_000,
-						multiSignature: 500_000_000,
-						transfer: 10_000_000,
-						usernameRegistration: 2_500_000_000,
-						usernameResignation: 2_500_000_000,
-						validatorRegistration: 2_500_000_000,
-						validatorResignation: 2_500_000_000,
-						vote: 100_000_000,
 					},
 				},
 				height: 0,
