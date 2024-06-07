@@ -21,13 +21,9 @@ export class GetTransactionsHandler {
 	@inject(Identifiers.Cryptography.Block.Serializer)
 	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
 
-	@inject(Identifiers.Evm.Gas.Limits)
-	private readonly gasLimits!: Contracts.Evm.GasLimits;
-
 	public async handle(): Promise<string[]> {
 		const milestone = this.configuration.getMilestone();
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
-		let gasLeft: number = milestone.block.maxGasLimit;
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
@@ -52,14 +48,7 @@ export class GetTransactionsHandler {
 					break;
 				}
 
-				const gasUsed = this.gasLimits.of(transaction);
-				if (gasLeft - gasUsed < 0) {
-					break;
-				}
-
 				candidateTransactions.push(transaction);
-
-				gasLeft -= gasUsed;
 
 				bytesLeft -= 4;
 				bytesLeft -= transaction.serialized.length;

@@ -168,32 +168,51 @@ export class Validator implements Contracts.Validator.Validator {
 		const commitKey = { height: BigInt(height), round: BigInt(round) };
 
 		const payloadBuffers: Buffer[] = [];
-		const transactionData: Contracts.Crypto.TransactionData[] = [];
+		const includedTransactionData: Contracts.Crypto.TransactionData[] = [];
 
-		// The initial payload length takes the overhead for each serialized transaction into account
-		// which is a uint32 per transaction to store the individual length.
-		let payloadLength = transactions.length * 4;
-		for (const [index, transaction] of transactions.entries()) {
+		let gasLeft = milestone.block.maxGasLimit;
+
+		let payloadLength = 0;
+		for (const transaction of transactions) {
 			const { data, serialized } = transaction;
-
-			// We received the transaction from the pool assuming they consume the maximum possible (=gas limit),
-			// now calculate the actual consumption which will be less than or equal the gas limit.
-			const gasUsed = await this.#calculateTransactionGasUsage(commitKey, transaction, index);
 			Utils.assert.defined<string>(data.id);
+
+			// We received transactions from the pool without taking gas usage into account yet.
+			// Therefore, calculate the actual consumption and only include transactions that fit into the block.
+			const gasUsed = await this.#calculateTransactionGasUsage(
+				commitKey,
+				transaction,
+				includedTransactionData.length,
+			);
+
+			if (gasLeft - gasUsed < 0) {
+				if (gasLeft >= 21_000) {
+					continue; // another transaction potentially still fits
+				}
+
+				// block is full
+				break;
+			}
+
+			gasLeft -= gasUsed;
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
 			totals.gasUsed += gasUsed;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
-			transactionData.push(data);
+			includedTransactionData.push(data);
 			payloadLength += serialized.length;
 		}
+
+		// The payload length needs to account for the overhead of each serialized transaction
+		// which is a uint32 per transaction to store the individual length.
+		payloadLength += includedTransactionData.length * 4;
 
 		return this.blockFactory.make({
 			generatorPublicKey,
 			height,
-			numberOfTransactions: transactions.length,
+			numberOfTransactions: includedTransactionData.length,
 			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 			payloadLength,
 			previousBlock: previousBlock.data.id,
@@ -203,7 +222,7 @@ export class Validator implements Contracts.Validator.Validator {
 			totalAmount: totals.amount,
 			totalFee: totals.fee,
 			totalGasUsed: totals.gasUsed,
-			transactions: transactionData,
+			transactions: includedTransactionData,
 			version: 1,
 		});
 	}
