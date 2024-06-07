@@ -50,7 +50,7 @@ describe<{
 						stageTimeoutIncrease: 2000,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
-					evm: {
+					gas: {
 						minimumGasFee: 5,
 						minimumGasLimit: 21_000,
 						nativeFeeMultiplier: 100,

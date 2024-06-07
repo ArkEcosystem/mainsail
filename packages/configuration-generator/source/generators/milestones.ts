@@ -17,7 +17,7 @@ export class MilestonesGenerator {
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
-				evm: {
+				gas: {
 					minimumGasFee: 5,
 					minimumGasLimit: 21_000,
 					nativeFeeMultiplier: 100,

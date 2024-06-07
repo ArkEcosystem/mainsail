@@ -45,8 +45,8 @@ export class GasFeeCalculator implements Contracts.Evm.GasFeeCalculator {
 	}
 
 	#getNativeFeeMultiplier(): number {
-		const { evm: evmConfig } = this.configuration.getMilestone();
-		const { nativeFeeMultiplier } = evmConfig;
+		const { gas: gasConfig } = this.configuration.getMilestone();
+		const { nativeFeeMultiplier } = gasConfig;
 		return nativeFeeMultiplier;
 	}
 }

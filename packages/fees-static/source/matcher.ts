@@ -25,10 +25,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	#throwIfCannot(action: string, transaction: Contracts.Crypto.Transaction): void {
 		// TODO: generalize to all native tx types
 		if (transaction.data.type === Contracts.Crypto.TransactionType.EvmCall) {
-			const { evm } = this.configuration.getMilestone();
-			if (transaction.data.fee.isLessThan(evm.minimumGasFee)) {
+			const { gas: gasConfig } = this.configuration.getMilestone();
+			if (transaction.data.fee.isLessThan(gasConfig.minimumGasFee)) {
 				this.logger.notice(
-					`${transaction.id} not eligible for ${action} (fee ${transaction.data.fee} < ${evm.minimumGasFee})`,
+					`${transaction.id} not eligible for ${action} (fee ${transaction.data.fee} < ${gasConfig.minimumGasFee})`,
 				);
 
 				throw new Exceptions.TransactionFeeTooLowError(transaction);

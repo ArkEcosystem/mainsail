@@ -17,8 +17,8 @@ export class GasLimits implements Contracts.Evm.GasLimits {
 		}
 
 		// TODO: take vendorField, multiSig, asset size into account
-		const { evm: evmConfig } = this.configuration.getMilestone();
-		const nativeGasLimit = evmConfig.nativeGasLimits[transaction.key];
+		const { gas: gasConfig } = this.configuration.getMilestone();
+		const nativeGasLimit = gasConfig.nativeGasLimits[transaction.key];
 		Utils.assert.defined<number>(nativeGasLimit);
 		return nativeGasLimit;
 	}

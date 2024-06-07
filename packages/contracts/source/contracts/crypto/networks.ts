@@ -44,7 +44,7 @@ export type MilestoneTimeouts = {
 	stageTimeoutIncrease: number;
 };
 
-export type MilestoneEvm = {
+export type MilestoneGas = {
 	minimumGasLimit: number;
 	minimumGasFee: number;
 	nativeFeeMultiplier: number;
@@ -57,7 +57,7 @@ export type Milestone = {
 	address: Record<string, any>;
 	block: MilestoneBlock;
 	epoch: string;
-	evm: MilestoneEvm;
+	gas: MilestoneGas;
 	fees: Fees;
 	multiPaymentLimit: number;
 	reward: string;

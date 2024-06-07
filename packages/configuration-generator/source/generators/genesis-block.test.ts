@@ -23,7 +23,7 @@ describe<{
 					blockTime: 8000,
 					height: 0,
 					// @ts-ignore
-					evm: {
+					gas: {
 						nativeGasLimits: {
 							transfer: 21000,
 							multiPayment: 50000,
