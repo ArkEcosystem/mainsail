@@ -25,17 +25,30 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 	}
 
 	public async validate(
-		commitKey: Contracts.Evm.CommitKey,
+		context: Contracts.Transactions.TransactionValidatorContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Transactions.TransactionValidatorResult> {
 		const deserialized: Contracts.Crypto.Transaction = await this.transactionFactory.fromBytes(
 			transaction.serialized,
 		);
 		strictEqual(transaction.id, deserialized.id);
+
+		const { commitKey, gasLimit, timestamp, generatorPublicKey } = context;
+
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		const result = await handler.apply(
 			{
-				evm: { commitKey, instance: this.evm },
+				evm: {
+					blockContext: {
+						commitKey,
+						gasLimit: BigInt(gasLimit),
+						timestamp: BigInt(timestamp),
+						validatorAddress: (
+							await this.#walletRepository.findByPublicKey(generatorPublicKey)
+						).getAddress(),
+					},
+					instance: this.evm,
+				},
 				walletRepository: this.#walletRepository,
 			},
 			transaction,

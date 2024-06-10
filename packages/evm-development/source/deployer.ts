@@ -11,6 +11,9 @@ export class Deployer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -29,10 +32,19 @@ export class Deployer {
 
 		this.#genesisAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
+		const milestone = this.configuration.getMilestone(0);
+
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		const blockContext = {
+			commitKey,
+			gasLimit: BigInt(milestone.block.maxGasLimit),
+			timestamp: BigInt(genesisBlock.block.timestamp),
+			validatorAddress: this.#genesisAddress,
+		};
+
 		const result = await this.evm.process({
 			caller: this.#genesisAddress,
-			commitKey,
+			blockContext,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(1_000_000),
 		});
@@ -54,14 +66,14 @@ export class Deployer {
 			.bind(EvmDevelopmentIdentifiers.Contracts.Addresses.Erc20)
 			.toConstantValue(result.receipt.deployedContractAddress!);
 
-		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients, commitKey);
+		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients, blockContext);
 		await this.evm.onCommit(commitKey as any);
 	}
 
 	private async ensureFunds(
 		erc20ContractAddress: string,
 		recipients: string[],
-		commitKey: Contracts.Evm.CommitKey,
+		blockContext: Contracts.Evm.BlockContext,
 	): Promise<void> {
 		const iface = new ethers.Interface(ERC20.abi.abi);
 		const amount = ethers.parseEther("1000");
@@ -71,7 +83,7 @@ export class Deployer {
 
 			const { receipt } = await this.evm.process({
 				caller: this.#genesisAddress,
-				commitKey,
+				blockContext,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,

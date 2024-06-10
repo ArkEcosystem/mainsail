@@ -10,6 +10,9 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Cryptography.Block.Verifier)
 	private readonly blockVerifier!: Contracts.Crypto.BlockVerifier;
 
@@ -21,14 +24,28 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 
 		let verification: Contracts.Crypto.BlockVerification = await this.blockVerifier.verify(block);
 
+		const validator: Contracts.State.Wallet = await unit.store.walletRepository.findByPublicKey(
+			unit.getBlock().data.generatorPublicKey,
+		);
+
 		if (verification.containsMultiSignatures) {
 			try {
+				const milestone = this.configuration.getMilestone(unit.height);
+
 				for (const transaction of block.transactions) {
 					const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 					await handler.verify(
 						{
 							evm: {
-								commitKey: { height: BigInt(unit.height), round: BigInt(unit.round) },
+								blockContext: {
+									commitKey: {
+										height: BigInt(unit.height),
+										round: BigInt(unit.round),
+									},
+									gasLimit: BigInt(milestone.block.maxGasLimit),
+									timestamp: BigInt(unit.getBlock().data.timestamp),
+									validatorAddress: validator.getAddress(),
+								},
 								instance: this.evm,
 							},
 							walletRepository: unit.store.walletRepository,

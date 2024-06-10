@@ -55,7 +55,10 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateService.getStore().getLastBlock();
 		const height = previousBlock.data.height + 1;
 
-		const transactions = await this.#getTransactionsForForging({ height: BigInt(height), round: BigInt(round) });
+		const transactions = await this.#getTransactionsForForging(generatorPublicKey, timestamp, {
+			height: BigInt(height),
+			round: BigInt(round),
+		});
 		return this.#makeBlock(round, generatorPublicKey, transactions, timestamp);
 	}
 
@@ -114,7 +117,11 @@ export class Validator implements Contracts.Validator.Validator {
 		);
 	}
 
-	async #getTransactionsForForging(commitKey: Contracts.Evm.CommitKey): Promise<Contracts.Crypto.Transaction[]> {
+	async #getTransactionsForForging(
+		generatorPublicKey: string,
+		timestamp: number,
+		commitKey: Contracts.Evm.CommitKey,
+	): Promise<Contracts.Crypto.Transaction[]> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
@@ -133,7 +140,10 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			try {
-				const result = await validator.validate(commitKey, transaction);
+				const result = await validator.validate(
+					{ commitKey, generatorPublicKey, timestamp, gasLimit: milestone.block.maxGasLimit },
+					transaction,
+				);
 
 				// We received transactions from the pool without taking gas usage into account yet.
 				// Therefore only include transactions that fit into the block.

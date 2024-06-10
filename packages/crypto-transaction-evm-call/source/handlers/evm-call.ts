@@ -70,14 +70,14 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
-			const { instance, commitKey } = context.evm;
+			const { instance, blockContext } = context.evm;
 			const { receipt } = await instance.process({
 				caller: sender.getAddress(),
-				commitKey,
 				data: Buffer.from(evmCall.payload, "hex"),
 				gasLimit: BigInt(evmCall.gasLimit),
 				recipient: transaction.data.recipientId,
 				sequence: transaction.data.sequence,
+				blockContext,
 			});
 
 			// Subtract native fee from sender based on actual consumed gas
