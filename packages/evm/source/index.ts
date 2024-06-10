@@ -2,7 +2,7 @@ import { Selectors } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { EvmInstance, EphemeralInstance, MockInstance } from "./instances/index.js";
+import { EphemeralInstance, EvmInstance, MockInstance } from "./instances/index.js";
 
 export * as Bindings from "./generated/bindings.cjs";
 
