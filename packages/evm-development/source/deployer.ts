@@ -43,8 +43,8 @@ export class Deployer {
 		};
 
 		const result = await this.evm.process({
-			caller: this.#genesisAddress,
 			blockContext,
+			caller: this.#genesisAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(1_000_000),
 		});
@@ -82,8 +82,8 @@ export class Deployer {
 			const encodedCall = iface.encodeFunctionData("transfer", [recipient, amount]);
 
 			const { receipt } = await this.evm.process({
-				caller: this.#genesisAddress,
 				blockContext,
+				caller: this.#genesisAddress,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,

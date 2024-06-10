@@ -1,5 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 import { Types } from "@mainsail/kernel";
+
 import { TransactionTriggerAction } from "./transaction-trigger-action.js";
 
 export class VerifyTransactionAction extends TransactionTriggerAction {

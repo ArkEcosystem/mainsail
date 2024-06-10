@@ -141,7 +141,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 			try {
 				const result = await validator.validate(
-					{ commitKey, generatorPublicKey, timestamp, gasLimit: milestone.block.maxGasLimit },
+					{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorPublicKey, timestamp },
 					transaction,
 				);
 

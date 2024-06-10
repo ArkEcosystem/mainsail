@@ -72,12 +72,12 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		try {
 			const { instance, blockContext } = context.evm;
 			const { receipt } = await instance.process({
+				blockContext,
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				gasLimit: BigInt(evmCall.gasLimit),
 				recipient: transaction.data.recipientId,
 				sequence: transaction.data.sequence,
-				blockContext,
 			});
 
 			// Subtract native fee from sender based on actual consumed gas
