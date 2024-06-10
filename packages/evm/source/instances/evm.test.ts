@@ -3,6 +3,7 @@ import { BigNumberish, ethers } from "ethers";
 
 import { describe, Sandbox } from "../../../test-framework/distribution";
 import * as MainsailERC20 from "../../test/fixtures/MainsailERC20.json";
+import * as MainsailGlobals from "../../test/fixtures/MainsailGlobals.json";
 import { wallets } from "../../test/fixtures/wallets";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { EvmInstance } from "./evm";
@@ -48,6 +49,57 @@ describe<{
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+	});
+
+	it("should correctly set global variables", async ({ instance }) => {
+		const [validator, sender] = wallets;
+
+		const iface = new ethers.Interface(MainsailGlobals.abi);
+
+		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		let { receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(MainsailGlobals.bytecode.slice(2), "hex"),
+			blockContext: { ...blockContext, commitKey },
+			...deployGasConfig,
+		});
+
+		assert.true(receipt.success);
+		assert.equal(receipt.deployedContractAddress, "0x69230f08D82f095aCB9BE4B21043B502b712D3C1");
+		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
+		const encodedCall = iface.encodeFunctionData("emitGlobals");
+		({ receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(ethers.getBytes(encodedCall)),
+			recipient: "0x69230f08D82f095aCB9BE4B21043B502b712D3C1",
+			blockContext: {
+				commitKey: { height: BigInt(1245), round: BigInt(0) },
+				gasLimit: BigInt(12_000_000),
+				timestamp: BigInt(123_456_789),
+				validatorAddress: validator.address,
+			},
+			...gasConfig,
+		}));
+
+		const data = iface.decodeEventLog("GlobalData", receipt.logs[0].data)[0];
+
+		// struct Globals {
+		//     uint256 blockHeight;
+		//     uint256 blockTimestamp;
+		//     uint256 blockGasLimit;
+		//     address blockCoinbase;
+		//     uint256 blockDifficulty;
+		//     uint256 txGasPrice;
+		//     address txOrigin;
+		// }
+		assert.equal(data[0], 1245n);
+		assert.equal(data[1], 123_456_789n);
+		assert.equal(data[2], 12_000_000n);
+		assert.equal(data[3], validator.address);
+		assert.equal(data[4], 0n); // difficulty always 0
+		assert.equal(data[5], 0n); // gas price always 0
+		assert.equal(data[6], sender.address);
 	});
 
 	it("should deploy, transfer and and update balance correctly", async ({ instance }) => {
