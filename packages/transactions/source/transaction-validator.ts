@@ -5,7 +5,7 @@ import { strictEqual } from "assert";
 @injectable()
 export class TransactionValidator implements Contracts.Transactions.TransactionValidator {
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
+	@tagged("instance", "ephemeral")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Transaction.Handler.Registry)

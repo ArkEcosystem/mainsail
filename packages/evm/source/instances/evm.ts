@@ -12,7 +12,6 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	@postConstruct()
 	public initialize() {
-		console.log("postConstruct EVM", this.mode());
 		this.#evm = new Evm(this.app.dataPath());
 	}
 
