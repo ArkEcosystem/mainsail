@@ -71,7 +71,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		try {
 			const { instance, commitKey } = context.evm;
-			const { receipt, mocked } = await instance.process({
+			const { receipt } = await instance.process({
 				caller: sender.getAddress(),
 				commitKey,
 				data: Buffer.from(evmCall.payload, "hex"),
@@ -88,17 +88,17 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			}
 			sender.setBalance(newBalance);
 
-			if (!mocked && !receipt.cached) {
+			if (instance.mode() === Contracts.Evm.EvmMode.Persistent) {
 				this.logger.debug(
 					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
 				);
-			}
 
-			void this.#emit(Enums.EvmEvent.TransactionReceipt, {
-				receipt,
-				sender: sender.getAddress(),
-				transactionId: transaction.id,
-			});
+				void this.#emit(Enums.EvmEvent.TransactionReceipt, {
+					receipt,
+					sender: sender.getAddress(),
+					transactionId: transaction.id,
+				});
+			}
 
 			return { gasUsed: Number(receipt.gasUsed) };
 		} catch (error) {
