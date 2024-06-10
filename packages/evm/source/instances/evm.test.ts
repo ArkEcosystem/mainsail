@@ -51,6 +51,8 @@ describe<{
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
+	// Also see
+	// https://docs.soliditylang.org/en/latest/units-and-global-variables.html#block-and-transaction-properties
 	it("should correctly set global variables", async ({ instance }) => {
 		const [validator, sender] = wallets;
 
