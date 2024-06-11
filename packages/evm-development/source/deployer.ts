@@ -44,10 +44,10 @@ export class Deployer {
 
 		const result = await this.evm.process({
 			blockContext,
-			txHash: this.#generateTxHash(),
 			caller: this.#genesisAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(1_000_000),
+			txHash: this.#generateTxHash(),
 		});
 
 		if (!result.receipt.success) {
@@ -84,11 +84,11 @@ export class Deployer {
 
 			const { receipt } = await this.evm.process({
 				blockContext,
-				txHash: this.#generateTxHash(),
 				caller: this.#genesisAddress,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,
+				txHash: this.#generateTxHash(),
 			});
 
 			if (!receipt.success) {
