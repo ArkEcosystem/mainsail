@@ -40,7 +40,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 								blockContext: {
 									commitKey: {
 										height: BigInt(unit.height),
-										round: BigInt(unit.round),
+										round: BigInt(unit.getBlock().data.round),
 									},
 									gasLimit: BigInt(milestone.block.maxGasLimit),
 									timestamp: BigInt(unit.getBlock().data.timestamp),

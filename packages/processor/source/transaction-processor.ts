@@ -36,7 +36,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				blockContext: {
 					commitKey: {
 						height: BigInt(unit.height),
-						round: BigInt(unit.round),
+						round: BigInt(unit.getBlock().data.round),
 					},
 					gasLimit: BigInt(milestone.block.maxGasLimit),
 					timestamp: BigInt(unit.getBlock().data.timestamp),
