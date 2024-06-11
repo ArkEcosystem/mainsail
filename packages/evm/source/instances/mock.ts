@@ -5,7 +5,6 @@ import { Contracts } from "@mainsail/contracts";
 export class MockInstance implements Contracts.Evm.Instance {
 	public async process(txContext: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.ProcessResult> {
 		return {
-			mocked: true,
 			receipt: {
 				gasRefunded: BigInt(0),
 				gasUsed: BigInt(0),
@@ -23,4 +22,8 @@ export class MockInstance implements Contracts.Evm.Instance {
 
 	public async configure(height: bigint, round: bigint): Promise<void> {}
 	public async onCommit(_: Contracts.Processor.ProcessableUnit): Promise<void> {}
+
+	public mode(): Contracts.Evm.EvmMode {
+		return Contracts.Evm.EvmMode.Mock;
+	}
 }

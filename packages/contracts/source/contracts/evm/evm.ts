@@ -1,8 +1,15 @@
 import { CommitHandler } from "../crypto/commit.js";
 
+export enum EvmMode {
+	Ephemeral,
+	Mock,
+	Persistent,
+}
+
 export interface Instance extends CommitHandler {
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
+	mode(): EvmMode;
 }
 
 export interface ProcessResult {
@@ -45,7 +52,4 @@ export interface TransactionReceipt {
 	readonly deployedContractAddress?: string;
 	readonly logs: any;
 	readonly output?: Buffer;
-
-	// See evm.ts
-	readonly cached?: boolean;
 }
