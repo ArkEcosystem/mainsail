@@ -3,6 +3,7 @@ use std::{borrow::Cow, cell::RefCell, convert::Infallible, path::PathBuf};
 use heed::{EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
 use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
+use serde::{Deserialize, Serialize};
 
 use crate::state_changes;
 
@@ -35,12 +36,23 @@ impl heed::BytesEncode<'_> for ContractWrapper {
 }
 
 type HeedHeight = heed::types::U64<heed::byteorder::LittleEndian>;
-type HeedRound = heed::types::U64<heed::byteorder::LittleEndian>;
 type StorageEntry = (U256, U256);
+
+// Receipt containing only the necessary data for bootstrapping. Storing full receipts is
+// responsibility of a dedicated separated database (e.g. api-sync)
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct TinyReceipt {
+    pub gas_used: u64,
+    pub success: bool,
+}
+
+// txHash -> receipt
+#[derive(Serialize, Deserialize)]
+struct CommitReceipts(HashMap<B256, TinyReceipt>);
 
 struct InnerStorage {
     accounts: heed::Database<AddressWrapper, heed::types::SerdeJson<AccountInfo>>,
-    commits: heed::Database<HeedHeight, HeedRound>,
+    commits: heed::Database<HeedHeight, heed::types::SerdeJson<CommitReceipts>>,
     contracts: heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
     storage: heed::Database<AddressWrapper, heed::types::SerdeJson<StorageEntry>>,
 }
@@ -52,6 +64,7 @@ pub struct CommitKey(pub u64, pub u64);
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,
+    pub results: HashMap<B256, ExecutionResult>,
     pub transitions: TransitionState,
 }
 
@@ -88,7 +101,10 @@ impl PersistentDB {
             &mut wtxn,
             Some("accounts"),
         )?;
-        let commits = env.create_database::<HeedHeight, HeedRound>(&mut wtxn, Some("commits"))?;
+        let commits = env.create_database::<HeedHeight, heed::types::SerdeJson<CommitReceipts>>(
+            &mut wtxn,
+            Some("commits"),
+        )?;
         let contracts = env.create_database::<ContractWrapper, heed::types::SerdeJson<Bytecode>>(
             &mut wtxn,
             Some("contracts"),
@@ -195,6 +211,7 @@ impl PersistentDB {
         let PendingCommit {
             key,
             cache,
+            results,
             transitions,
         } = pending_commit;
 
@@ -274,7 +291,20 @@ impl PersistentDB {
             }
 
             // Finalize commit
-            inner.commits.put(rwtxn, &key.0, &key.1)?;
+            let mut commit_receipts = HashMap::new();
+            for (k, v) in results {
+                commit_receipts.insert(
+                    k,
+                    TinyReceipt {
+                        gas_used: v.gas_used(),
+                        success: v.is_success(),
+                    },
+                );
+            }
+
+            inner
+                .commits
+                .put(rwtxn, &key.0, &CommitReceipts(commit_receipts))?;
 
             Ok(())
         };
@@ -296,6 +326,21 @@ impl PersistentDB {
 
         inner.commits.get(&rtxn, &height).is_ok_and(|v| v.is_some())
     }
+
+    pub fn get_committed_receipt(
+        &self,
+        height: u64,
+        tx_hash: B256,
+    ) -> Result<(bool, Option<TinyReceipt>), Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        match inner.commits.get(&rtxn, &height)? {
+            Some(receipts) => Ok((true, receipts.0.get(&tx_hash).cloned())),
+            None => Ok((false, None)),
+        }
+    }
 }
 
 impl PendingCommit {
@@ -303,6 +348,7 @@ impl PendingCommit {
         Self {
             key,
             cache: Default::default(),
+            results: Default::default(),
             transitions: Default::default(),
         }
     }
@@ -374,6 +420,7 @@ fn test_commit_changes() {
     db.commit(PendingCommit {
         key: CommitKey(0, 0),
         cache: CacheState::default(),
+        results: Default::default(),
         transitions: TransitionState { transitions: state },
     })
     .expect("ok");
@@ -450,6 +497,7 @@ fn test_storage() {
     db.commit(PendingCommit {
         key: CommitKey(0, 0),
         cache: CacheState::default(),
+        results: Default::default(),
         transitions: TransitionState { transitions: state },
     })
     .expect("ok");
@@ -506,6 +554,7 @@ fn test_storage_overwrite() {
     db.commit(PendingCommit {
         key: CommitKey(0, 0),
         cache: CacheState::default(),
+        results: Default::default(),
         transitions: TransitionState { transitions: state },
     })
     .expect("ok");
@@ -539,6 +588,7 @@ fn test_storage_overwrite() {
     db.commit(PendingCommit {
         key: CommitKey(1, 0),
         cache: CacheState::default(),
+        results: Default::default(),
         transitions: TransitionState { transitions: state },
     })
     .expect("ok");
