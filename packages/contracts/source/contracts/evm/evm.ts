@@ -30,7 +30,7 @@ export interface TransactionContext {
 	readonly recipient?: string;
 	readonly gasLimit: bigint;
 	readonly data: Buffer;
-	readonly commitKey: CommitKey;
+	readonly blockContext: BlockContext;
 	readonly sequence?: number;
 }
 
@@ -38,6 +38,13 @@ export interface TransactionViewContext {
 	readonly caller: string;
 	readonly recipient: string;
 	readonly data: Buffer;
+}
+
+export interface BlockContext {
+	readonly commitKey: CommitKey;
+	readonly gasLimit: bigint;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
 }
 
 export interface CommitKey {

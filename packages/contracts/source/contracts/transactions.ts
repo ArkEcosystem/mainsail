@@ -1,5 +1,5 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
-import { CommitKey, Instance } from "./evm/index.js";
+import { BlockContext, CommitKey, Instance } from "./evm/index.js";
 import { EventDispatcher } from "./kernel/events.js";
 import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
 
@@ -9,7 +9,7 @@ export type TransactionHandlerContext = {
 	walletRepository: WalletRepository;
 	evm: {
 		instance: Instance;
-		commitKey: CommitKey;
+		blockContext: BlockContext;
 	};
 };
 
@@ -83,8 +83,15 @@ export interface TransactionTypeFactory {
 	get(type: number, typeGroup?: number, version?: number): TransactionConstructor;
 }
 
+export interface TransactionValidatorContext {
+	commitKey: CommitKey;
+	gasLimit: number;
+	timestamp: number;
+	generatorPublicKey: string;
+}
+
 export interface TransactionValidator {
-	validate(commitKey: CommitKey, transaction: Transaction): Promise<TransactionValidatorResult>;
+	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionValidatorResult>;
 }
 
 export interface TransactionValidatorResult {

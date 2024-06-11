@@ -55,7 +55,7 @@ impl EvmInner {
     }
 
     pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
-        let commit_key = tx_ctx.commit_key;
+        let commit_key = tx_ctx.block_context.commit_key;
 
         if self.persistent_db.is_height_committed(commit_key.0) {
             return Ok(skipped_tx_receipt());
@@ -171,7 +171,7 @@ impl EvmInner {
 
         let mut state_builder = State::builder().with_bundle_update();
 
-        if let Some(commit_key) = ctx.commit_key {
+        if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
             let pending_commit = self
                 .pending_commit
                 .get_or_insert_with(|| PendingCommit::new(commit_key));
@@ -186,6 +186,17 @@ impl EvmInner {
 
         let mut evm = Evm::builder()
             .with_db(state_db)
+            .modify_block_env(|block_env| {
+                let Some(block_ctx) = ctx.block_context.as_ref() else {
+                    return;
+                };
+
+                block_env.number = U256::from(block_ctx.commit_key.0);
+                block_env.coinbase = block_ctx.validator_address;
+                block_env.timestamp = block_ctx.timestamp;
+                block_env.gas_limit = block_ctx.gas_limit;
+                block_env.difficulty = U256::ZERO;
+            })
             .modify_tx_env(|tx_env| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 100_000);
                 tx_env.caller = ctx.caller;
@@ -205,7 +216,7 @@ impl EvmInner {
                 let ResultAndState { state, result } = result;
 
                 // Update state if transaction is part of a commit
-                if let Some(commit_key) = ctx.commit_key {
+                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
                     if let Some(pending_commit) = &mut self.pending_commit {
                         assert_eq!(commit_key, pending_commit.key);
 

@@ -12,6 +12,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
@@ -21,13 +24,23 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	): Promise<Contracts.Processor.TransactionProcessorResult> {
 		const walletRepository = unit.store.walletRepository;
 
+		const milestone = this.configuration.getMilestone(unit.height);
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
+
+		const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+			unit.getBlock().data.generatorPublicKey,
+		);
 
 		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
 			evm: {
-				commitKey: {
-					height: BigInt(unit.height),
-					round: BigInt(unit.round),
+				blockContext: {
+					commitKey: {
+						height: BigInt(unit.height),
+						round: BigInt(unit.getBlock().data.round),
+					},
+					gasLimit: BigInt(milestone.block.maxGasLimit),
+					timestamp: BigInt(unit.getBlock().data.timestamp),
+					validatorAddress: validator.getAddress(),
 				},
 				instance: this.evm,
 			},
