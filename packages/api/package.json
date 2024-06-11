@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"@mainsail/api-database": "workspace:*",
+		"@mainsail/validation": "workspace:*",
 		"@mainsail/api-http": "workspace:*",
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/container": "workspace:*",
