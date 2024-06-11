@@ -72,7 +72,7 @@ impl From<TinyReceipt> for TxReceipt {
             gas_used: value.gas_used,
             gas_refunded: 0,
             success: value.success,
-            deployed_contract_address: None,
+            deployed_contract_address: value.deployed_contract.map(|a| a.to_string()),
             logs: None,
             output: None,
         }

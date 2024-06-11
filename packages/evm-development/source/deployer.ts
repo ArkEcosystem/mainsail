@@ -98,5 +98,5 @@ export class Deployer {
 	}
 
 	#nonce = 0;
-	#generateTxHash = () => sha256(Buffer.from(`deployertx-${this.#nonce++}`, "hex")).slice(2);
+	#generateTxHash = () => sha256(Buffer.from(`deployertx-${this.#nonce++}`, "utf8")).slice(2);
 }

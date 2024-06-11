@@ -44,6 +44,7 @@ type StorageEntry = (U256, U256);
 pub struct TinyReceipt {
     pub gas_used: u64,
     pub success: bool,
+    pub deployed_contract: Option<Address>,
 }
 
 // txHash -> receipt
@@ -293,11 +294,20 @@ impl PersistentDB {
             // Finalize commit
             let mut commit_receipts = HashMap::new();
             for (k, v) in results {
+                let deployed_contract = match &v {
+                    ExecutionResult::Success { output, .. } => match output {
+                        Output::Create(_, address) => address.clone(),
+                        _ => None,
+                    },
+                    _ => None,
+                };
+
                 commit_receipts.insert(
                     k,
                     TinyReceipt {
                         gas_used: v.gas_used(),
                         success: v.is_success(),
+                        deployed_contract,
                     },
                 );
             }

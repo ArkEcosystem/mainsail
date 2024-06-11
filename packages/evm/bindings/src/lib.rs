@@ -1,4 +1,4 @@
-use std::{fmt::format, path::PathBuf, rc::Rc, sync::Arc};
+use std::{path::PathBuf, rc::Rc, sync::Arc};
 
 use ctx::{
     ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, TxContext,
