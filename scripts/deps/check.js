@@ -28,7 +28,7 @@ const { readdirSync, lstatSync } = require("fs");
 
 const EXCEPTIONS = {
 	"@mainsail/api": {
-		dependencies: ["@mainsail/logger-pino", "@mainsail/api-database", "@mainsail/api-http"],
+		dependencies: ["@mainsail/logger-pino", "@mainsail/validation", "@mainsail/api-database", "@mainsail/api-http"],
 		devDependencies: [],
 	},
 	"@mainsail/configuration-generator": {
