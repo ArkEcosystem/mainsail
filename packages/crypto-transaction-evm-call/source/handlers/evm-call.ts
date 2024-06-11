@@ -64,6 +64,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
+		Utils.assert.defined<string>(transaction.id);
 
 		const { evmCall } = transaction.data.asset;
 
@@ -73,6 +74,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			const { instance, blockContext } = context.evm;
 			const { receipt } = await instance.process({
 				blockContext,
+				txHash: transaction.id,
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				gasLimit: BigInt(evmCall.gasLimit),
@@ -88,7 +90,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			}
 			sender.setBalance(newBalance);
 
-			if (instance.mode() === Contracts.Evm.EvmMode.Persistent) {
+			if (instance.mode() === Contracts.Evm.EvmMode.Persistent && !this.state.isBootstrap()) {
 				this.logger.debug(
 					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
 				);
