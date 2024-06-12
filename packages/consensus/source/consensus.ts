@@ -61,7 +61,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
-	#proposal?: Contracts.Crypto.Proposal;
+	#proposalPromise?: Promise<Contracts.Crypto.Proposal>;
 	#roundStartTime = 0;
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
@@ -103,8 +103,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	// TODO: Only for tests
-	public setProposal(proposal: Contracts.Crypto.Proposal): void {
-		this.#proposal = proposal;
+	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>): void {
+		this.#proposalPromise = proposalPromise;
 	}
 
 	public getState(): Contracts.Consensus.State {
@@ -216,9 +216,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async onTimeoutStartRound(): Promise<void> {
 		this.scheduler.scheduleTimeoutPropose(this.#height, this.#round);
 
-		if (this.#proposal) {
-			const proposal = this.#proposal;
-			this.#proposal = undefined;
+		if (this.#proposalPromise) {
+			const proposal = await this.#proposalPromise;
+			this.#proposalPromise = undefined;
 			await this.proposalProcessor.process(proposal);
 		}
 	}
@@ -448,7 +448,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.logger.info(`Found registered proposer: ${roundState.proposer}`);
 
-		this.#proposal = await this.#makeProposal(roundState, registeredProposer);
+		this.#proposalPromise = this.#makeProposal(roundState, registeredProposer);
 	}
 
 	async #makeProposal(
