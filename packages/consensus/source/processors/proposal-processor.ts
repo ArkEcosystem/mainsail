@@ -62,7 +62,10 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				void this.broadcaster.broadcastProposal(proposal);
 			}
 
-			void this.getConsensus().handle(roundState);
+			// Add some time to allow the proposal to be broadcasted to other nodes before processing it.
+			setTimeout(() => {
+				void this.getConsensus().handle(roundState);
+			}, 0);
 
 			return Contracts.Consensus.ProcessorResult.Accepted;
 		});
