@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { ethers } from "ethers";
+import { ethers, sha256 } from "ethers";
 
 import { ERC20 } from "./contracts.ts/index.js";
 import { Identifiers as EvmDevelopmentIdentifiers } from "./identifiers.js";
@@ -47,6 +47,7 @@ export class Deployer {
 			caller: this.#genesisAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(1_000_000),
+			txHash: this.#generateTxHash(),
 		});
 
 		if (!result.receipt.success) {
@@ -87,6 +88,7 @@ export class Deployer {
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,
+				txHash: this.#generateTxHash(),
 			});
 
 			if (!receipt.success) {
@@ -94,4 +96,7 @@ export class Deployer {
 			}
 		}
 	}
+
+	#nonce = 0;
+	#generateTxHash = () => sha256(Buffer.from(`deployertx-${this.#nonce++}`, "utf8")).slice(2);
 }

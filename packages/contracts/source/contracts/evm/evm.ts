@@ -31,6 +31,7 @@ export interface TransactionContext {
 	readonly gasLimit: bigint;
 	readonly data: Buffer;
 	readonly blockContext: BlockContext;
+	readonly txHash: string;
 	readonly sequence?: number;
 }
 

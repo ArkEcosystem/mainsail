@@ -54,11 +54,27 @@ impl EvmInner {
         })
     }
 
-    pub fn process(&mut self, tx_ctx: TxContext) -> Result<TxReceipt> {
+    pub fn process(
+        &mut self,
+        tx_ctx: TxContext,
+    ) -> std::result::Result<TxReceipt, EVMError<String>> {
         let commit_key = tx_ctx.block_context.commit_key;
 
-        if self.persistent_db.is_height_committed(commit_key.0) {
-            return Ok(skipped_tx_receipt());
+        // Check if already committed and return existing receipt
+        let (committed, receipt) = self
+            .persistent_db
+            .get_committed_receipt(commit_key.0, tx_ctx.tx_hash)
+            .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
+
+        if committed {
+            match receipt {
+                Some(receipt) => return Ok(receipt.into()),
+                None => {
+                    return Err(EVMError::Database(
+                        "found commit, but tx hash is missing".into(),
+                    ))
+                }
+            }
         }
 
         // Drop pending commit on key change
@@ -225,6 +241,9 @@ impl EvmInner {
                         state_db.commit(state);
 
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
+                        pending_commit
+                            .results
+                            .insert(ctx.tx_hash.expect("tx hash"), result.clone());
                         pending_commit.transitions.add_transitions(
                             state_db
                                 .transition_state
@@ -241,17 +260,6 @@ impl EvmInner {
             }
             Err(err) => Err(err),
         }
-    }
-}
-
-const fn skipped_tx_receipt() -> TxReceipt {
-    TxReceipt {
-        gas_used: 0,
-        gas_refunded: 0,
-        success: true,
-        deployed_contract_address: None,
-        logs: None,
-        output: None,
     }
 }
 
@@ -364,7 +372,12 @@ impl JsEvmWrapper {
         tx_ctx: TxContext,
     ) -> Result<TxReceipt> {
         let mut lock = evm.lock().await;
-        lock.process(tx_ctx)
+        let result = lock.process(tx_ctx);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
     }
 
     async fn commit_async(

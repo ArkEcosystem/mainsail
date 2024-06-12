@@ -1,3 +1,4 @@
+use mainsail_evm_core::db::TinyReceipt;
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{Bytes, Log};
@@ -63,6 +64,19 @@ pub struct TxReceipt {
     pub deployed_contract_address: Option<String>,
     pub logs: Option<Vec<Log>>,
     pub output: Option<Bytes>,
+}
+
+impl From<TinyReceipt> for TxReceipt {
+    fn from(value: TinyReceipt) -> Self {
+        Self {
+            gas_used: value.gas_used,
+            gas_refunded: 0,
+            success: value.success,
+            deployed_contract_address: value.deployed_contract.map(|a| a.to_string()),
+            logs: None,
+            output: None,
+        }
+    }
 }
 
 pub struct TxViewResult {
