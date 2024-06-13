@@ -574,13 +574,13 @@ export class Consensus implements Contracts.Consensus.Service {
 				await proposal.deserializeData();
 
 				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
-					roundState.setProcessorResult({ gasUsed: 0, success: false });
+					roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 					return;
 				}
 
 				roundState.setProcessorResult(await this.processor.process(roundState));
 			} catch {
-				roundState.setProcessorResult({ gasUsed: 0, success: false });
+				roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 			}
 		}
 	}

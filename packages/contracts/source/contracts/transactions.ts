@@ -1,5 +1,5 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
-import { BlockContext, CommitKey, Instance } from "./evm/index.js";
+import { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
 import { EventDispatcher } from "./kernel/events.js";
 import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
 
@@ -15,6 +15,7 @@ export type TransactionHandlerContext = {
 
 export interface TransactionApplyResult {
 	gasUsed: number;
+	receipt?: TransactionReceipt;
 }
 
 export interface TransactionHandler {

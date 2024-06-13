@@ -178,10 +178,13 @@ export class Bootstrapper {
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
 		try {
 			const commitState = this.commitStateFactory(commit);
-			const { success } = await this.blockProcessor.process(commitState);
-			if (!success) {
+			const result = await this.blockProcessor.process(commitState);
+			if (!result.success) {
 				throw new Error(`Block is not processed.`);
 			}
+
+			commitState.setProcessorResult(result);
+
 			await this.blockProcessor.commit(commitState);
 		} catch (error) {
 			await this.app.terminate(`Failed to process block at height ${commit.block.data.height}`, error);

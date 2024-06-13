@@ -1,4 +1,5 @@
 import { Block, Commit, Transaction } from "./crypto/index.js";
+import { TransactionReceipt } from "./evm/evm.js";
 import { Store } from "./state/index.js";
 
 export interface ProcessableUnit {
@@ -24,6 +25,7 @@ export interface BlockProcessor {
 
 export interface BlockProcessorResult {
 	success: boolean;
+	receipts: Map<string, TransactionReceipt>;
 	gasUsed: number;
 }
 
@@ -33,6 +35,8 @@ export interface TransactionProcessor {
 
 export interface TransactionProcessorResult {
 	readonly gasUsed: number;
+	// only present for evm-calls, unlike 'gasUsed' which is also present for native transactions
+	readonly receipt?: TransactionReceipt;
 }
 
 export interface Verifier {

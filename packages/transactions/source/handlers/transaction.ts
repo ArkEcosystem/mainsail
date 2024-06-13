@@ -111,7 +111,10 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		const recipientResult = await this.applyToRecipient(context, transaction);
 
 		// Merge results; effectively only one is ever set depending on the transaction type.
-		return { gasUsed: senderResult.gasUsed + recipientResult.gasUsed };
+		return {
+			gasUsed: senderResult.gasUsed + recipientResult.gasUsed,
+			receipt: recipientResult.receipt,
+		};
 	}
 
 	public async applyToSender(

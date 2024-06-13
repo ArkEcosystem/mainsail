@@ -53,7 +53,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
-		const processResult = { gasUsed: 0, success: false };
+		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
 
 		try {
 			const block = unit.getBlock();
@@ -61,9 +61,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.verifier.verify(unit);
 
 			for (const transaction of block.transactions) {
-				const { gasUsed } = await this.transactionProcessor.process(unit, transaction);
-				transaction.data.gasUsed = gasUsed;
+				const { gasUsed, receipt } = await this.transactionProcessor.process(unit, transaction);
+				processResult.receipts.set(transaction.id, receipt);
 
+				transaction.data.gasUsed = gasUsed;
 				this.#consumeGas(block, processResult, gasUsed);
 			}
 
