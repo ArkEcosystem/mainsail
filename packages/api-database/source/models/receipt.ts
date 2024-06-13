@@ -43,8 +43,8 @@ export class Receipt {
 	public readonly logs: string | undefined;
 
 	@Column({
-		nullable: true,
 		default: undefined,
+		nullable: true,
 		type: "bytea",
 	})
 	public readonly output: Buffer | undefined;

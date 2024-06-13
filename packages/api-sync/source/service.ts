@@ -128,13 +128,13 @@ export class Sync implements Contracts.ApiSync.Service {
 				const receipt = receipts.get(transaction.id);
 				if (receipt) {
 					transactionReceipts.push({
-						id: transaction.id,
-						success: receipt.success,
-						gasUsed: Number(receipt.gasUsed),
-						gasRefunded: Number(receipt.gasRefunded),
 						deployedContractAddress: receipt.deployedContractAddress,
+						gasRefunded: Number(receipt.gasRefunded),
+						gasUsed: Number(receipt.gasUsed),
+						id: transaction.id,
 						logs: receipt.logs,
 						output: receipt.output,
+						success: receipt.success,
 					});
 				}
 			}
@@ -164,6 +164,8 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: header.version,
 			},
 
+			receipts: transactionReceipts,
+
 			transactions: transactions.map(({ data }) => ({
 				amount: data.amount.toFixed(),
 				asset: data.asset,
@@ -183,8 +185,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				vendorField: data.vendorField,
 				version: data.version,
 			})),
-
-			receipts: transactionReceipts,
 
 			wallets: dirtyWallets.map((wallet) => ({
 				address: wallet.getAddress(),
