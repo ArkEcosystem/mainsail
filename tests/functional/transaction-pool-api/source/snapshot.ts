@@ -156,7 +156,10 @@ export class Snapshot {
 					for (const receipt of receipts) {
 						await negativeBalanceChange(
 							receipt.sender,
-							gasFeeCalculator.calculateConsumed(transaction.data.fee, Number(receipt.receipt.gasUsed)),
+							gasFeeCalculator.calculateConsumed(
+								transaction.data.fee,
+								Number(receipt.receipt.gasUsed - receipt.receipt.gasRefunded),
+							),
 						);
 					}
 				} else {
