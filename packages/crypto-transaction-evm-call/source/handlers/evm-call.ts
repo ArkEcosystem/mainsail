@@ -83,7 +83,8 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 			});
 
 			// Subtract native fee from sender based on actual consumed gas
-			const feeConsumed = this.gasFeeCalculator.calculateConsumed(transaction.data.fee, Number(receipt.gasUsed));
+			const effectiveGasUsed = Number(receipt.gasUsed - receipt.gasRefunded);
+			const feeConsumed = this.gasFeeCalculator.calculateConsumed(transaction.data.fee, effectiveGasUsed);
 			const newBalance: Utils.BigNumber = sender.getBalance().minus(feeConsumed);
 			if (newBalance.isNegative()) {
 				throw new Exceptions.InsufficientBalanceError();
@@ -92,7 +93,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 			if (instance.mode() === Contracts.Evm.EvmMode.Persistent && !this.state.isBootstrap()) {
 				this.logger.debug(
-					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
+					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} gasRefunded=${receipt.gasRefunded} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
 				);
 
 				void this.#emit(Enums.EvmEvent.TransactionReceipt, {
