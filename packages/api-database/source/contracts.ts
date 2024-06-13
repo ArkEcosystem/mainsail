@@ -7,6 +7,7 @@ import {
 	MempoolTransaction,
 	Peer,
 	Plugin,
+	Receipt,
 	State,
 	Transaction,
 	TransactionType,
@@ -93,6 +94,8 @@ export type ValidatorRoundRepositoryExtension = {};
 export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
 export type PluginRepositoryExtension = {};
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
+export type ReceiptRepositoryExtension = {};
+export type ReceiptRepository = ExtendedRepository<Receipt> & ReceiptRepositoryExtension;
 export type StateRepositoryExtension = {};
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 
@@ -117,6 +120,7 @@ export type ApiNodeRepositoryFactory = (customDataSource?: RepositoryDataSource)
 export type BlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => BlockRepository;
 export type ConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => ConfigurationRepository;
 export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
+export type ReceiptRepositoryFactory = (customDataSource?: RepositoryDataSource) => ReceiptRepository;
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
 export type TransactionTypeRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionTypeRepository;
 export type MempoolTransactionRepositoryFactory = (
