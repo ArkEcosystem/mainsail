@@ -65,7 +65,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data);
 
-		return { gasUsed: result.gasUsed };
+		return { gasUsed: result.gasUsed, receipt: result.receipt };
 	}
 
 	async #updateVoteBalances(

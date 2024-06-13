@@ -12,6 +12,7 @@ import {
 	MempoolTransaction,
 	Peer,
 	Plugin,
+	Receipt,
 	State,
 	Transaction,
 	TransactionType,
@@ -25,6 +26,7 @@ import {
 	makeMempoolTransactionRepository,
 	makePeerRepository,
 	makePluginRepository,
+	makeReceiptRepository,
 	makeStateRepository,
 	makeTransactionRepository,
 	makeTransactionTypeRepository,
@@ -65,6 +67,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Peer,
 					MempoolTransaction,
 					Plugin,
+					Receipt,
 					State,
 					TransactionType,
 					Transaction,
@@ -125,6 +128,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makePluginRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind(Identifiers.ReceiptRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeReceiptRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
