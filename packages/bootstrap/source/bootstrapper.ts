@@ -183,6 +183,7 @@ export class Bootstrapper {
 			if (result === false) {
 				throw new Error(`Block is not processed.`);
 			}
+			commitState.setProcessorResult(result);
 			await this.blockProcessor.commit(commitState);
 		} catch (error) {
 			await this.app.terminate(`Failed to process block at height ${commit.block.data.height}`, error);
