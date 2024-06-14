@@ -125,10 +125,7 @@ export const makeCustomProposal = async (
 	// merge with transactions
 	blockBuffer = Buffer.concat([blockBuffer, ...transactionBuffers]);
 
-	if (
-		blockBuffer.byteLength !==
-		headerSize + payloadLength - /*TODO: workaround for uint32 mismatch */ 2 * transactions.length
-	) {
+	if (blockBuffer.byteLength !== headerSize + payloadLength) {
 		throw new Error("invalid block buffer size");
 	}
 
