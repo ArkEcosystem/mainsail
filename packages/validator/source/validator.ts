@@ -191,8 +191,8 @@ export class Validator implements Contracts.Validator.Validator {
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
 		// The payload length needs to account for the overhead of each serialized transaction
-		// which is a uint32 per transaction to store the individual length.
-		let payloadLength = transactions.length * 4;
+		// which is a uint16 per transaction to store the individual length.
+		let payloadLength = transactions.length * 2;
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;

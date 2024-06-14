@@ -201,8 +201,8 @@ export class GenesisBlockGenerator extends Generator {
 		const payloadBuffers: Buffer[] = [];
 
 		// The initial payload length takes the overhead for each serialized transaction into account
-		// which is a uint32 per transaction to store the individual length.
-		let payloadLength = transactions.length * 4;
+		// which is a uint16 per transaction to store the individual length.
+		let payloadLength = transactions.length * 2;
 
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 		for (const transaction of transactions) {
@@ -255,7 +255,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		const verified = await this.blockVerifier.verify(genesis.block);
 		if (!verified.verified) {
-			throw new Error("failed to generate genesis block");
+			throw new Error(`failed to generate genesis block: ${JSON.stringify(verified.errors)}`);
 		}
 	}
 }

@@ -50,7 +50,7 @@ export const makeCustomProposal = async (
 	const payloadBuffers: Buffer[] = [];
 	const transactionBuffers: Buffer[] = [];
 
-	let payloadLength = transactions.length * 4;
+	let payloadLength = transactions.length * 2;
 	for (const transaction of transactions) {
 		const { data, serialized } = transaction;
 		Utils.assert.defined<string>(data.id);
