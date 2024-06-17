@@ -1,7 +1,7 @@
 import { Receipt } from "../../models/index.js";
 import { ReceiptCriteria, OrReceiptCriteria } from "../criteria.js";
 import { Expression } from "../expressions.js";
-import { handleAndCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
+import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
 export class ReceiptFilter {
 	public static async getExpression(...criteria: OrReceiptCriteria[]): Promise<Expression<Receipt>> {
@@ -21,6 +21,12 @@ export class ReceiptFilter {
 						property: "id",
 						value: c,
 					}));
+				}
+				case "blockHeight": {
+					return handleOrCriteria(criteria.blockHeight, async (c) =>
+						// @ts-ignore
+						handleComparisonCriteria("blockHeight", c),
+					);
 				}
 				default: {
 					return { op: "true" };
