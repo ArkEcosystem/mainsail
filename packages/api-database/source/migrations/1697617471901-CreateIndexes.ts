@@ -45,6 +45,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX blocks_version ON blocks(version);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
 
+            CREATE INDEX receipts_block_height ON receipts(block_height);
+
             CREATE INDEX wallets_balance ON wallets(balance);
             CREATE INDEX wallets_attributes ON wallets using GIN(attributes);
         `);

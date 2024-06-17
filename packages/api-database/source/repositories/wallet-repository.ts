@@ -7,7 +7,7 @@ import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRepository =>
 	makeExtendedRepository<Wallet, WalletRepositoryExtension>(Wallet, dataSource, {
-		async findManyByCritera(
+		async findManyByCriteria(
 			walletCriteria: Criteria.OrWalletCriteria,
 			sorting: Sorting,
 			pagination: Pagination,

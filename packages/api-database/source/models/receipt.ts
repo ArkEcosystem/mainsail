@@ -1,5 +1,7 @@
 import { Column, Entity } from "typeorm";
 
+import { bufferTransformer } from "../transformers/buffer.js";
+
 @Entity({
 	name: "receipts",
 })
@@ -15,6 +17,12 @@ export class Receipt {
 		type: "boolean",
 	})
 	public readonly success!: boolean;
+
+	@Column({
+		nullable: false,
+		type: "bigint",
+	})
+	public blockHeight!: string;
 
 	@Column({
 		nullable: false,
@@ -45,6 +53,7 @@ export class Receipt {
 	@Column({
 		default: undefined,
 		nullable: true,
+		transformer: bufferTransformer,
 		type: "bytea",
 	})
 	public readonly output: Buffer | undefined;
