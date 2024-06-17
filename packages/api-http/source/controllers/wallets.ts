@@ -24,7 +24,7 @@ export class WalletsController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
-		const wallets = await this.walletRepositoryFactory().findManyByCritera(criteria, sorting, pagination, options);
+		const wallets = await this.walletRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
 		return this.toPagination(wallets, WalletResource, request.query.transform);
 	}
@@ -35,7 +35,7 @@ export class WalletsController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
-		const wallets = await this.walletRepositoryFactory().findManyByCritera(criteria, sorting, pagination, options);
+		const wallets = await this.walletRepositoryFactory().findManyByCriteria(criteria, sorting, pagination, options);
 
 		return this.toPagination(wallets, WalletResource, request.query.transform);
 	}
@@ -109,7 +109,7 @@ export class WalletsController extends Controller {
 		const sorting = this.getListingOrder(request);
 		const options = this.getListingOptions();
 
-		const transactions = await this.transactionRepositoryFactory().findManyByCritera(
+		const transactions = await this.transactionRepositoryFactory().findManyByCriteria(
 			this.walletRepositoryFactory(),
 			{
 				...request.query,

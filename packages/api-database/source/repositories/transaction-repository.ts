@@ -14,7 +14,7 @@ import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): TransactionRepository =>
 	makeExtendedRepository<Transaction, TransactionRepositoryExtension>(Transaction, dataSource, {
-		async findManyByCritera(
+		async findManyByCriteria(
 			walletRepository: WalletRepository,
 			transactionCriteria: Criteria.OrTransactionCriteria,
 			sorting: Sorting,

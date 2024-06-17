@@ -78,7 +78,7 @@ export type FeeStatistics = {
 };
 
 export type TransactionRepositoryExtension = {
-	findManyByCritera(
+	findManyByCriteria(
 		walletRepository: WalletRepository,
 		transactionCriteria: Criteria.OrTransactionCriteria,
 		sorting: Sorting,
@@ -107,7 +107,7 @@ export type StateRepositoryExtension = {};
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 
 export type WalletRepositoryExtension = {
-	findManyByCritera(
+	findManyByCriteria(
 		walletCriteria: Criteria.OrWalletCriteria,
 		sorting: Sorting,
 		pagination: Pagination,

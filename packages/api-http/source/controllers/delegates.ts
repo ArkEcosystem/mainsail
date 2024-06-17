@@ -63,7 +63,7 @@ export class DelegatesController extends Controller {
 		) as Search.Criteria.WalletCriteria;
 		const options = this.getListingOptions();
 
-		const wallets = await this.walletRepositoryFactory().findManyByCritera(
+		const wallets = await this.walletRepositoryFactory().findManyByCriteria(
 			{
 				...criteria,
 				attributes: {
