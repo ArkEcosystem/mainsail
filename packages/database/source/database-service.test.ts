@@ -211,6 +211,7 @@ describe<{
 
 	it("#findBlocks - should return blocks by height", async ({ databaseService }) => {
 		const commits = await generateCommits(4);
+
 		for (const commit of commits) {
 			databaseService.addCommit(commit);
 		}
@@ -257,8 +258,22 @@ describe<{
 	};
 
 	const assertBlockEqual = (blockA: Contracts.Crypto.Block, blockB: Contracts.Crypto.Block) => {
-		assert.equal(blockA.data, blockB.data);
-		assert.equal(blockA.header, blockB.header);
+		for (const key in Object.keys(blockA.header)) {
+			if (["reward", "totalAmount", "totalFee"].includes(key)) {
+				assert.equal(blockA.header[key].toString(), blockB.header[key].toString());
+			}
+
+			assert.equal(blockA.header[key], blockB.header[key]);
+		}
+
+		for (const key in Object.keys(blockA.data)) {
+			if (["reward", "totalAmount", "totalFee"].includes(key)) {
+				assert.equal(blockA.data[key].toString(), blockB.data[key].toString());
+			}
+
+			assert.equal(blockA.data[key], blockB.data[key]);
+		}
+
 		assert.equal(blockA.serialized, blockB.serialized);
 		assert.equal(
 			blockA.transactions.map((tx) => tx.data),
