@@ -43,7 +43,7 @@ describe<{
 	});
 
 	it("#make - should make a block", async ({ factory, sandbox }) => {
-		const block = await factory.make(blockData);
+		const block = await factory.make(blockData, []);
 
 		assertBlockData(assert, block.data, blockData);
 		assertBlockData(assert, block.header, blockData);
@@ -52,7 +52,10 @@ describe<{
 	});
 
 	it("#make - should make a block with transactions", async ({ factory }) => {
-		const block = await factory.make(blockDataWithTransactions);
+		const block = await factory.make(blockDataWithTransactions, [
+			{ data: blockDataWithTransactions.transactions[0] },
+			{ data: blockDataWithTransactions.transactions[1] },
+		]);
 
 		assertBlockData(assert, block.data, blockDataWithTransactions);
 		assertBlockData(assert, block.header, blockDataWithTransactions);
