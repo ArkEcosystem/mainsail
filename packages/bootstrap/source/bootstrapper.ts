@@ -65,11 +65,11 @@ export class Bootstrapper {
 				await this.apiSync.prepareBootstrap();
 			}
 
+			await this.#restoreSnapshots();
+
 			await this.#setGenesisCommit();
 			await this.#checkStoredGenesisCommit();
 			await this.#storeGenesisCommit();
-
-			await this.#restoreSnapshots();
 
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();
@@ -99,6 +99,7 @@ export class Bootstrapper {
 
 		this.stateService.getStore().setGenesisCommit(genesisBlock);
 	}
+
 	async #checkStoredGenesisCommit(): Promise<void> {
 		const genesisCommit = await this.databaseService.getCommit(0);
 
