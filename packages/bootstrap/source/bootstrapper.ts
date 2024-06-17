@@ -126,6 +126,10 @@ export class Bootstrapper {
 	}
 
 	async #restoreSnapshots(): Promise<void> {
+		if (this.databaseService.isEmpty()) {
+			return;
+		}
+
 		const lastCommit = await this.databaseService.getLastCommit();
 		const ledgerHeight = lastCommit.block.data.height;
 
