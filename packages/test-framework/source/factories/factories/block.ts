@@ -56,7 +56,7 @@ export const registerBlockFactory = async (
 		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
-		let payloadLength = transactions.length * 4;
+		let payloadLength = transactions.length * 2;
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;

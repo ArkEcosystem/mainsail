@@ -50,7 +50,7 @@ export const makeCustomProposal = async (
 	const payloadBuffers: Buffer[] = [];
 	const transactionBuffers: Buffer[] = [];
 
-	let payloadLength = transactions.length * 4;
+	let payloadLength = transactions.length * 2;
 	for (const transaction of transactions) {
 		const { data, serialized } = transaction;
 		Utils.assert.defined<string>(data.id);
@@ -125,10 +125,7 @@ export const makeCustomProposal = async (
 	// merge with transactions
 	blockBuffer = Buffer.concat([blockBuffer, ...transactionBuffers]);
 
-	if (
-		blockBuffer.byteLength !==
-		headerSize + payloadLength - /*TODO: workaround for uint32 mismatch */ 2 * transactions.length
-	) {
+	if (blockBuffer.byteLength !== headerSize + payloadLength) {
 		throw new Error("invalid block buffer size");
 	}
 

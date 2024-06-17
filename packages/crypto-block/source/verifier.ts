@@ -45,9 +45,14 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push("Invalid block version");
 			}
 
-			const size: number = this.serializer.totalSize(blockData);
-			if (size > constants.block.maxPayload) {
-				result.errors.push(`Payload is too large: ${size} > ${constants.block.maxPayload}`);
+			const headerSize = this.serializer.headerSize();
+			const totalSize = headerSize + block.header.payloadLength;
+			if (totalSize > constants.block.maxPayload) {
+				result.errors.push(`Payload is too large: ${totalSize} > ${constants.block.maxPayload}`);
+			}
+
+			if (totalSize !== Buffer.byteLength(block.serialized, "hex")) {
+				result.errors.push("Serialized payload size mismatch");
 			}
 
 			if (blockData.totalGasUsed > constants.block.maxGasLimit && blockData.height > 0) {
@@ -69,8 +74,8 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			let totalFee: BigNumber = BigNumber.ZERO;
 
 			// The initial payload length takes the overhead for each serialized transaction into account
-			// which is a uint32 per transaction to store the individual length.
-			let totalPayloadLength = 4 * block.transactions.length;
+			// which is a uint16 per transaction to store the individual length.
+			let totalPayloadLength = block.transactions.length * 2;
 
 			const payloadBuffers: Buffer[] = [];
 			for (const transaction of block.transactions) {
@@ -96,7 +101,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 
 				totalAmount = totalAmount.plus(transaction.data.amount);
 				totalFee = totalFee.plus(transaction.data.fee);
-				totalPayloadLength += transaction.serialized.length;
+				totalPayloadLength += transaction.serialized.byteLength;
 
 				payloadBuffers.push(bytes);
 			}

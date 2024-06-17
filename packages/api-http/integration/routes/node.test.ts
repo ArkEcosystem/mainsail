@@ -63,7 +63,14 @@ describe<{
 
 		const { statusCode, data } = await request(`/node/configuration`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, nodeConfiguration);
+		assert.equal(data.data, {
+			...nodeConfiguration,
+			constants: {
+				...nodeConfiguration.constants,
+				epoch: cryptoJson.milestones[0].epoch,
+			},
+			nethash: cryptoJson.network.nethash,
+		});
 	});
 
 	it("/node/configuration/crypto", async () => {
