@@ -4,8 +4,8 @@ import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
 import { ReceiptsController } from "../controllers/receipts.js";
-import { transactionCriteriaSchemaObject } from "../schemas/transactions.js";
 import { blockCriteriaSchemaObject } from "../schemas/blocks.js";
+import { transactionCriteriaSchemaObject } from "../schemas/transactions.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(ReceiptsController);
@@ -22,8 +22,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
-					txHash: transactionCriteriaSchemaObject.id,
 					blockHeight: blockCriteriaSchemaObject.height,
+					txHash: transactionCriteriaSchemaObject.id,
 				}).concat(Schemas.pagination),
 			},
 		},

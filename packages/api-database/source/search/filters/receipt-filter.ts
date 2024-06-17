@@ -1,5 +1,5 @@
 import { Receipt } from "../../models/index.js";
-import { ReceiptCriteria, OrReceiptCriteria } from "../criteria.js";
+import { OrReceiptCriteria, ReceiptCriteria } from "../criteria.js";
 import { Expression } from "../expressions.js";
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
