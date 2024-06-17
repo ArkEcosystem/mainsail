@@ -94,7 +94,14 @@ export type ValidatorRoundRepositoryExtension = {};
 export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
 export type PluginRepositoryExtension = {};
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
-export type ReceiptRepositoryExtension = {};
+export type ReceiptRepositoryExtension = {
+	findManyByCriteria(
+		criteria: Criteria.OrReceiptCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Receipt>>;
+};
 export type ReceiptRepository = ExtendedRepository<Receipt> & ReceiptRepositoryExtension;
 export type StateRepositoryExtension = {};
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
