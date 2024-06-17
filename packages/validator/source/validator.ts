@@ -1,11 +1,15 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "validator")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -119,8 +123,11 @@ export class Validator implements Contracts.Validator.Validator {
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
-		// 75% of the time for block preparation, the rest is for  block and proposal serialization and signing
-		const timeLimit = performance.now() + this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime * 0.75;
+		// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
+		const timeLimit =
+			performance.now() +
+			this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime *
+				this.configuration.getRequired<number>("txCollatorFactor");
 
 		for (const bytes of transactionBytes) {
 			if (performance.now() > timeLimit) {
