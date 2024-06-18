@@ -28,6 +28,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 	beforeEach(async (context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+		context.app.bind(Identifiers.Application.Thread).toConstantValue("main");
 		context.app.bind(Identifiers.Config.Flags).toConstantValue("core");
 		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		context.app.bind("path.log").toConstantValue(dirSync().name);
@@ -162,6 +163,7 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		const app = new Application(new Container());
 		app.bind(Identifiers.Config.Flags).toConstantValue("core");
 		app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
+		app.bind(Identifiers.Application.Thread).toConstantValue("main");
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		app.useLogPath(dirSync().name);
 
