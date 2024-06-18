@@ -170,20 +170,23 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateService.getStore().getLastBlock();
 		const height = previousBlock.data.height + 1;
 
-		return this.blockFactory.make({
-			generatorPublicKey,
-			height,
-			numberOfTransactions: transactions.length,
-			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
-			payloadLength,
-			previousBlock: previousBlock.data.id,
-			reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
-			round,
-			timestamp,
-			totalAmount: totals.amount,
-			totalFee: totals.fee,
-			transactions: transactionData,
-			version: 1,
-		});
+		return this.blockFactory.make(
+			{
+				generatorPublicKey,
+				height,
+				numberOfTransactions: transactions.length,
+				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
+				payloadLength,
+				previousBlock: previousBlock.data.id,
+				reward: BigNumber.make(this.cryptoConfiguration.getMilestone(height).reward),
+				round,
+				timestamp,
+				totalAmount: totals.amount,
+				totalFee: totals.fee,
+				transactions: transactionData,
+				version: 1,
+			},
+			transactions,
+		);
 	}
 }

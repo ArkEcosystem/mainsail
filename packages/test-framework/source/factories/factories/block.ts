@@ -70,31 +70,34 @@ export const registerBlockFactory = async (
 		const passphrase = options.passphrase || secrets[0];
 
 		const commit = {
-			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make({
-				generatorPublicKey: await app
-					.getTagged<Contracts.Crypto.PublicKeyFactory>(
-						Identifiers.Cryptography.Identity.PublicKey.Factory,
-						"type",
-						"wallet",
-					)
-					.fromMnemonic(passphrase),
-				height: previousBlock.height + 1,
-				numberOfTransactions: transactions.length,
-				payloadHash: (
-					await app
-						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
-						.sha256(payloadBuffers)
-				).toString("hex"),
-				payloadLength,
-				previousBlock: previousBlock.id,
-				reward: options.reward || reward,
-				round: 0,
-				timestamp: options.timestamp || dayjs().valueOf(),
-				totalAmount: totals.amount,
-				totalFee: totals.fee,
-				transactions: transactionData,
-				version: 1,
-			}),
+			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
+				{
+					generatorPublicKey: await app
+						.getTagged<Contracts.Crypto.PublicKeyFactory>(
+							Identifiers.Cryptography.Identity.PublicKey.Factory,
+							"type",
+							"wallet",
+						)
+						.fromMnemonic(passphrase),
+					height: previousBlock.height + 1,
+					numberOfTransactions: transactions.length,
+					payloadHash: (
+						await app
+							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
+							.sha256(payloadBuffers)
+					).toString("hex"),
+					payloadLength,
+					previousBlock: previousBlock.id,
+					reward: BigNumber.make(options.reward || reward),
+					round: 0,
+					timestamp: options.timestamp || dayjs().valueOf(),
+					totalAmount: BigNumber.make(totals.amount),
+					totalFee: BigNumber.make(totals.fee),
+					transactions: transactionData,
+					version: 1,
+				},
+				transactions,
+			),
 			// TODO: dont hardcode
 			proof: {
 				blockId: "365dbc2f380b65737b439f98ce9ef0318b00d5bbdda57daabea8341f91ce39e7",
