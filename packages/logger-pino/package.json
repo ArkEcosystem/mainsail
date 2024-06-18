@@ -27,7 +27,7 @@
 		"chalk": "^5.3.0",
 		"joi": "17.12.2",
 		"pino": "9.2.0",
-		"pino-pretty": "10.3.1",
+		"pino-pretty": "11.2.1",
 		"pump": "3.0.0",
 		"pumpify": "2.0.1",
 		"readable-stream": "4.5.2",
