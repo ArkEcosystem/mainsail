@@ -68,7 +68,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 			pump(
 				this.#stream,
 				split(),
-				// @ts-ignore - Object literal may only specify known properties, and 'colorize' does not exist in type 'PrettyOptions'.
 				this.#createPrettyTransport(options.levels.console, { colorize: true }),
 				process.stdout,
 
@@ -81,7 +80,6 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 		if (this.#isValidLevel(options.levels.file)) {
 			this.#combinedFileStream = new pumpify(
 				split(),
-				// @ts-ignore
 				this.#createPrettyTransport(options.levels.file, { colorize: false }),
 				this.#getFileStream(options.fileRotator),
 			);
