@@ -2553,8 +2553,8 @@ importers:
         specifier: 4.5.2
         version: 4.5.2
       rotating-file-stream:
-        specifier: 3.2.1
-        version: 3.2.1
+        specifier: 3.2.3
+        version: 3.2.3
       split2:
         specifier: 4.2.0
         version: 4.2.0
@@ -2584,8 +2584,8 @@ importers:
         specifier: 1.4.4
         version: 1.4.4
       '@types/readable-stream':
-        specifier: 4.0.10
-        version: 4.0.10
+        specifier: 4.0.14
+        version: 4.0.14
       '@types/split2':
         specifier: 4.2.3
         version: 4.2.3
@@ -4883,8 +4883,8 @@ packages:
   '@types/pumpify@1.4.4':
     resolution: {integrity: sha512-+cWbQUecD04MQYkjNBhPmcUIP368aloYmqm+ImdMKA8rMpxRNAhZAD6gIj+sAVTF1DliqrT/qUp6aGNi/9U3tw==}
 
-  '@types/readable-stream@4.0.10':
-    resolution: {integrity: sha512-AbUKBjcC8SHmImNi4yK2bbjogQlkFSg7shZCcicxPQapniOlajG8GCc39lvXzCWX4lLRRs7DM3VAeSlqmEVZUA==}
+  '@types/readable-stream@4.0.14':
+    resolution: {integrity: sha512-xZn/AuUbCMShGsqH/ehZtGDwQtbx00M9rZ2ENLe4tOjFZ/JFeWMhEZkk2fEe1jAUqqEAURIkFJ7Az/go8mM1/w==}
 
   '@types/seedrandom@3.0.8':
     resolution: {integrity: sha512-TY1eezMU2zH2ozQoAFAQFOPpvP15g+ZgSfTZt31AUUH/Rxtnz3H+A/Sv1Snw2/amp//omibc+AEkTaA8KUeOLQ==}
@@ -9536,8 +9536,8 @@ packages:
     engines: {node: '>=14.18'}
     hasBin: true
 
-  rotating-file-stream@3.2.1:
-    resolution: {integrity: sha512-n2B18CJb+n2VA5Tdle+1NP2toEcRv68CjAOBjHmwcyswNwMVsrN3gVRZ9ymH3sapaiGY8jc9OhhV5b6I5rAeiA==}
+  rotating-file-stream@3.2.3:
+    resolution: {integrity: sha512-cfmm3tqdnbuYw2FBmRTPBDaohYEbMJ3211T35o6eZdr4d7v69+ZeK1Av84Br7FLj2dlzyeZSbN6qTuXXE6dawQ==}
     engines: {node: '>=14.0'}
 
   run-async@2.4.1:
@@ -12110,7 +12110,7 @@ snapshots:
       '@types/duplexify': 3.6.4
       '@types/node': 20.11.16
 
-  '@types/readable-stream@4.0.10':
+  '@types/readable-stream@4.0.14':
     dependencies:
       '@types/node': 20.11.16
       safe-buffer: 5.1.2
@@ -17689,7 +17689,7 @@ snapshots:
     dependencies:
       glob: 10.3.10
 
-  rotating-file-stream@3.2.1: {}
+  rotating-file-stream@3.2.3: {}
 
   run-async@2.4.1: {}
 
