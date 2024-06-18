@@ -164,8 +164,14 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 	}
 
 	#createPrettyTransport(level: string, prettyOptions?: PrettyOptions): Transform {
+		const thread = this.app.thread();
+		const ignore = this.app.isWorker() ? `` : `pid`;
+
 		const pinoPretty = prettyFactory({
-			ignore: "pid",
+			customPrettifiers: {
+				pid: () => thread,
+			},
+			ignore,
 			levelFirst: false,
 			translateTime: "yyyy-mm-dd HH:MM:ss.l",
 			...prettyOptions,
