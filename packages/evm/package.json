@@ -18,10 +18,12 @@
 		"clean": "del distribution && del source/generated",
 		"copy": "mkdir distribution/generated && cp source/generated/bindings.cjs distribution/generated/ && cp source/generated/bindings.d.cts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
 		"release": "pnpm publish --access public",
-		"test": "pnpm run uvu source .test.ts",
+		"test": "pnpm run test:unit && pnpm run test:evm",
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:evm": "cargo test --release",
 		"test:file": "pnpm run uvu source",
+		"test:unit": "pnpm run uvu source .test.ts",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
