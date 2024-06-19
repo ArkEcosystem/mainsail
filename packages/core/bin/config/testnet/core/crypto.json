@@ -3428,6 +3428,7 @@
 				"version": 1
 			},
 			"timeouts": {
+				"tolerance": 100,
 				"blockTime": 8000,
 				"blockPrepareTime": 4000,
 				"stageTimeout": 2000,

@@ -356,6 +356,7 @@
 				"version": 1
 			},
 			"timeouts": {
+				"tolerance": 100,
 				"blockTime": 100,
 				"blockPrepareTime": 100,
 				"stageTimeout": 100,
