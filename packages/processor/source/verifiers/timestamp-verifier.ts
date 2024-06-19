@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import dayjs from "dayjs";
 
 @injectable()
 export class TimestampVerifier implements Contracts.Processor.Handler {
@@ -13,12 +14,13 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (unit.getBlock().data.height === 0) {
 			return;
+		}
+
+		if (unit.getBlock().data.timestamp > dayjs().valueOf() + this.configuration.getMilestone().timeouts.tolerance) {
+			throw new Exceptions.FutureBlock(unit.getBlock());
 		}
 
 		if (
@@ -29,10 +31,6 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 				this.configuration,
 			)
 		) {
-			this.logger.error(
-				`Block ${unit.getBlock().data.height.toLocaleString()} disregarded, because it's timestamp is too low`,
-			);
-
 			throw new Exceptions.InvalidTimestamp(unit.getBlock());
 		}
 	}

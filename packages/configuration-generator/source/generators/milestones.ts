@@ -40,6 +40,7 @@ export class MilestonesGenerator {
 					blockTime: options.blockTime,
 					stageTimeout: 2000,
 					stageTimeoutIncrease: 2000,
+					tolerance: 100,
 				},
 				vendorFieldLength: options.vendorFieldLength,
 			},

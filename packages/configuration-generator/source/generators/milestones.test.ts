@@ -43,6 +43,7 @@ describe<{
 						version: 1,
 					},
 					timeouts: {
+						tolerance: 100,
 						blockPrepareTime: 4000,
 						blockTime: 8000,
 						stageTimeout: 2000,
