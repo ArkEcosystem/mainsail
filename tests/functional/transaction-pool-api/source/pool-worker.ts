@@ -17,6 +17,8 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 
 	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> {}
 
+	public async start(): Promise<void> {}
+
 	public async kill(): Promise<number> {
 		return 0;
 	}
