@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import dayjs from "dayjs";
 
 @injectable()
 export class TimestampVerifier implements Contracts.Processor.Handler {
@@ -19,6 +20,14 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (unit.getBlock().data.height === 0) {
 			return;
+		}
+
+		if (unit.getBlock().data.timestamp > dayjs().valueOf()) {
+			this.logger.error(
+				`Block ${unit.getBlock().data.height.toLocaleString()} disregarded, because it's timestamp is in the future`,
+			);
+
+			throw new Exceptions.InvalidTimestamp(unit.getBlock());
 		}
 
 		if (
