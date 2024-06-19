@@ -49,6 +49,10 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		});
 	}
 
+	public async start(): Promise<void> {
+		await this.ipcSubprocess.sendRequest("start");
+	}
+
 	public async importSnapshot(height: number): Promise<void> {
 		await this.ipcSubprocess.sendRequest("importSnapshot", height);
 	}

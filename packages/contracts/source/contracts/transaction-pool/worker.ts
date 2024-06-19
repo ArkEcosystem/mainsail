@@ -12,6 +12,7 @@ export interface WorkerScriptHandler {
 	commit(data: { block: string; failedTransactions: string[]; store: StoreChange }): Promise<void>;
 	setPeer(ip: string): Promise<void>;
 	forgetPeer(ip: string): Promise<void>;
+	start(): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;

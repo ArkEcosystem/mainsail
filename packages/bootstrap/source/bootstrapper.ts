@@ -81,8 +81,8 @@ export class Bootstrapper {
 			this.state.setBootstrap(false);
 
 			this.stateVerifier.verifyWalletsConsistency();
-
 			this.validatorRepository.printLoadedValidators();
+			await this.txPoolWorker.start();
 
 			void this.consensus.run();
 
