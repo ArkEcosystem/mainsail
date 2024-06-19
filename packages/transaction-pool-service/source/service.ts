@@ -40,10 +40,6 @@ export class Service implements Contracts.TransactionPool.Service {
 	#disposed = false;
 
 	public async boot(): Promise<void> {
-		this.events.listen(Enums.StateEvent.BuilderFinished, this);
-		this.events.listen(Enums.CryptoEvent.MilestoneChanged, this);
-		this.events.listen(Enums.BlockEvent.Applied, this);
-
 		if (
 			process.env[Constants.EnvironmentVariables.CORE_RESET_DATABASE] ||
 			process.env[Constants.EnvironmentVariables.CORE_RESET_POOL]
@@ -53,25 +49,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	public dispose(): void {
-		this.events.forget(Enums.CryptoEvent.MilestoneChanged, this);
-		this.events.forget(Enums.StateEvent.BuilderFinished, this);
-		this.events.forget(Enums.BlockEvent.Applied, this);
-
 		this.#disposed = true;
-	}
-
-	public async handle({ name }): Promise<void> {
-		try {
-			switch (name) {
-				case Enums.StateEvent.BuilderFinished: {
-					await this.reAddTransactions();
-					break;
-				}
-			}
-		} catch (error) {
-			this.logger.critical(error.stack);
-			throw error;
-		}
 	}
 
 	public getPoolSize(): number {
