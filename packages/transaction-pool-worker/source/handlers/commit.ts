@@ -49,6 +49,10 @@ export class CommitHandler {
 			}
 
 			await this.transactionPoolService.cleanUp();
+
+			if (this.configuration.isNewMilestone()) {
+				void this.transactionPoolService.reAddTransactions();
+			}
 		} catch (error) {
 			throw new Error(`Failed to commit block: ${error.message}`);
 		}

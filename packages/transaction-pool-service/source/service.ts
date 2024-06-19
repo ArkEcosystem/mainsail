@@ -67,10 +67,6 @@ export class Service implements Contracts.TransactionPool.Service {
 					await this.reAddTransactions();
 					break;
 				}
-				case Enums.CryptoEvent.MilestoneChanged: {
-					await this.reAddTransactions();
-					break;
-				}
 			}
 		} catch (error) {
 			this.logger.critical(error.stack);
