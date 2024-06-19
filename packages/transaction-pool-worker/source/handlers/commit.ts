@@ -48,6 +48,8 @@ export class CommitHandler {
 				} catch {}
 			}
 
+			await this.transactionPoolService.cleanUp();
+
 			this.logger.info(
 				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed.`,
 			);

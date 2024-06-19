@@ -71,10 +71,6 @@ export class Service implements Contracts.TransactionPool.Service {
 					await this.reAddTransactions();
 					break;
 				}
-				case Enums.BlockEvent.Applied: {
-					await this.cleanUp();
-					break;
-				}
 			}
 		} catch (error) {
 			this.logger.critical(error.stack);
