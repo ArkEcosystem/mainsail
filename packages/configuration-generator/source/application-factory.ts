@@ -91,11 +91,11 @@ export const makeApplication = async (configurationPath: string, options: Record
 				address: addressMilestone,
 				height: 0,
 				timeouts: {
-					tolerance: 100,
 					blockPrepareTime: 4000,
 					blockTime: 8000,
 					stageTimeout: 2000,
 					stageTimeoutIncrease: 2000,
+					tolerance: 100,
 				},
 			},
 		],

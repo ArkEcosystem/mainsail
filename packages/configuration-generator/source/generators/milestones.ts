@@ -36,11 +36,11 @@ export class MilestonesGenerator {
 					denomination: 1e8,
 				},
 				timeouts: {
-					tolerance: 100,
 					blockPrepareTime: options.blockTime / 2,
 					blockTime: options.blockTime,
 					stageTimeout: 2000,
 					stageTimeoutIncrease: 2000,
+					tolerance: 100,
 				},
 				vendorFieldLength: options.vendorFieldLength,
 			},
