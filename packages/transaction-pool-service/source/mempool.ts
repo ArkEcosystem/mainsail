@@ -111,7 +111,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			return [];
 		}
 
-		const transactions = await senderMempool.removeTransaction(id);
+		const transactions = senderMempool.removeTransaction(id);
 
 		if (transactions.length > 0 && !(await this.#removeDisposableMempool(senderPublicKey))) {
 			this.#sendersForReadd.add(senderPublicKey);
@@ -126,7 +126,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			return [];
 		}
 
-		const transaction = await senderMempool.removeForgedTransaction(id);
+		const transaction = senderMempool.removeForgedTransaction(id);
 
 		if (!transaction) {
 			this.#sendersForReadd.add(senderPublicKey);

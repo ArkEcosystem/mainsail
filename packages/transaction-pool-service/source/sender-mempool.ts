@@ -65,34 +65,23 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 	}
 
-	public async removeTransaction(id: string): Promise<Contracts.Crypto.Transaction[]> {
-		try {
-			this.#concurrency++;
-			const index = this.#transactions.findIndex((t) => t.id === id);
-			if (index === -1) {
-				return [];
-			}
-			return this.#transactions.splice(index, this.#transactions.length - index).reverse();
-		} finally {
-			this.#concurrency--;
+	public removeTransaction(id: string): Contracts.Crypto.Transaction[] {
+		const index = this.#transactions.findIndex((t) => t.id === id);
+		if (index === -1) {
+			return [];
 		}
+		return this.#transactions.splice(index, this.#transactions.length - index).reverse();
 	}
 
-	public async removeForgedTransaction(id: string): Promise<Contracts.Crypto.Transaction | undefined> {
-		try {
-			this.#concurrency++;
-
-			if (this.#transactions.length === 0) {
-				throw new Error("No transactions in sender mempool");
-			}
-
-			if (this.#transactions[0].id === id) {
-				return this.#transactions.shift();
-			}
-
-			return undefined;
-		} finally {
-			this.#concurrency--;
+	public removeForgedTransaction(id: string): Contracts.Crypto.Transaction | undefined {
+		if (this.#transactions.length === 0) {
+			throw new Error("No transactions in sender mempool");
 		}
+
+		if (this.#transactions[0].id === id) {
+			return this.#transactions.shift();
+		}
+
+		return undefined;
 	}
 }
