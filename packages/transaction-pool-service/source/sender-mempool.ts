@@ -66,37 +66,23 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	}
 
 	public async removeTransaction(id: string): Promise<Contracts.Crypto.Transaction[]> {
-		return [];
-		// try {
-		// 	this.#concurrency++;
-		// 	return await this.#lock.runExclusive(async () => {
-		// 		const index = this.#transactions.findIndex((t) => t.id === id);
-		// 		if (index === -1) {
-		// 			return [];
-		// 		}
-		// 		const removedTransactions: Contracts.Crypto.Transaction[] = this.#transactions
-		// 			.splice(index, this.#transactions.length - index)
-		// 			.reverse();
-		// 		try {
-		// 			for (const removedTransaction of removedTransactions) {
-		// 				await this.senderState.revert(removedTransaction);
-		// 			}
-		// 			return removedTransactions;
-		// 		} catch {
-		// 			const otherRemovedTransactions = this.#transactions.splice(0, this.#transactions.length).reverse();
-		// 			return [...removedTransactions, ...otherRemovedTransactions];
-		// 		}
-		// 	});
-		// } finally {
-		// 	this.#concurrency--;
-		// }
+		try {
+			this.#concurrency++;
+			const index = this.#transactions.findIndex((t) => t.id === id);
+			if (index === -1) {
+				return [];
+			}
+			return this.#transactions.splice(index, this.#transactions.length - index).reverse();
+		} finally {
+			this.#concurrency--;
+		}
 	}
 
 	public async removeForgedTransaction(id: string): Promise<boolean> {
 		try {
 			this.#concurrency++;
 
-			if (!this.#transactions.length) {
+			if (this.#transactions.length === 0) {
 				throw new Error("No transactions in sender mempool");
 			}
 

@@ -57,14 +57,24 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			}
 		}
 
-		// TODO: Remove failed transactions from collator
-		// for (const senderPublicKey of failedTransactions.map((tx) => tx.data.senderPublicKey)) {
-		// 	sendersForReadd.add(senderPublicKey);
-		// }
-
-		// Readd transactions
 		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+		// Remove failed transactions from collator
+		for (const failedTransaction of failedTransactions) {
+			const senderMempool = this.#senderMempools.get(failedTransaction.data.senderPublicKey);
 
+			if (!senderMempool) {
+				continue;
+			}
+
+			const transactions = await senderMempool.removeTransaction(failedTransaction.id);
+
+			if (transactions.length > 0) {
+				removedTransactions.push(...transactions);
+				sendersForReadd.add(failedTransaction.data.senderPublicKey);
+			}
+		}
+
+		// Try to readd transactions and fix sender
 		for (const senderPublicKey of sendersForReadd) {
 			const transactionsForReadd = [...this.getSenderMempool(senderPublicKey).getFromEarliest()];
 
@@ -78,7 +88,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 				} catch {
 					transactionsForReadd.slice(i).map((tx) => {
 						removedTransactions.push(tx);
-						this.logger.debug(`Removed invalid ${transaction}`);
 					});
 					break;
 				}
