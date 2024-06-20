@@ -41,22 +41,10 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		block: Contracts.Crypto.Block,
 		failedTransactions: Contracts.Crypto.Transaction[],
 	): Promise<Contracts.Crypto.Transaction[]> {
-		// Remove block transactions
 		for (const transaction of block.transactions) {
-			const senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
-
-			if (!senderMempool) {
-				continue;
-			}
-
-			if (await senderMempool.removeForgedTransaction(transaction.id)) {
-				await this.#removeDisposableMempool(transaction.data.senderPublicKey);
-			} else {
-				this.#sendersForReadd.add(transaction.data.senderPublicKey);
-			}
+			await this.removeForgedTransaction(transaction.data.senderPublicKey, transaction.id);
 		}
 
-		// Remove failed transactions from collator
 		const removedTransactions: Contracts.Crypto.Transaction[] = [];
 		for (const failedTransaction of failedTransactions) {
 			removedTransactions.push(
@@ -130,6 +118,24 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 
 		return transactions;
+	}
+
+	public async removeForgedTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
+		const senderMempool = this.#senderMempools.get(senderPublicKey);
+		if (!senderMempool) {
+			return [];
+		}
+
+		const transaction = await senderMempool.removeForgedTransaction(id);
+
+		if (!transaction) {
+			this.#sendersForReadd.add(senderPublicKey);
+			return [];
+		}
+
+		await this.#removeDisposableMempool(senderPublicKey);
+
+		return [transaction];
 	}
 
 	public flush(): void {

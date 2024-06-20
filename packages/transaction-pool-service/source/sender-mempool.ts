@@ -78,7 +78,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 	}
 
-	public async removeForgedTransaction(id: string): Promise<boolean> {
+	public async removeForgedTransaction(id: string): Promise<Contracts.Crypto.Transaction | undefined> {
 		try {
 			this.#concurrency++;
 
@@ -87,11 +87,10 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 			}
 
 			if (this.#transactions[0].id === id) {
-				this.#transactions.shift();
-				return true;
+				return this.#transactions.shift();
 			}
 
-			return false;
+			return undefined;
 		} finally {
 			this.#concurrency--;
 		}
