@@ -44,13 +44,13 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 			const newSenderMempool = await this.createSenderMempool.call(this, senderPublicKey);
 
-			for (let i = 0; i < transactionsForReadd.length; i++) {
-				const transaction = transactionsForReadd[i];
+			for (let index = 0; index < transactionsForReadd.length; index++) {
+				const transaction = transactionsForReadd[index];
 
 				try {
 					await newSenderMempool.addTransaction(transaction);
 				} catch {
-					transactionsForReadd.slice(i).map((tx) => {
+					transactionsForReadd.slice(index).map((tx) => {
 						removedTransactions.push(tx);
 					});
 					break;
