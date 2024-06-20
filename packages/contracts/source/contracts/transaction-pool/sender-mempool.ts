@@ -9,7 +9,7 @@ export interface SenderMempool {
 
 	addTransaction(transaction: Transaction): Promise<void>;
 	removeTransaction(id: string): Promise<Transaction[]>;
-	removeForgedTransaction(id: string): Promise<Transaction[]>;
+	removeForgedTransaction(id: string): Promise<boolean>;
 }
 
 export type SenderMempoolFactory = (publicKey: string) => Promise<SenderMempool>;
