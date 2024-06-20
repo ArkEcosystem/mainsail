@@ -8,6 +8,7 @@ import {
 	GetTransactionsHandler,
 	ImportSnapshotHandler,
 	SetPeerHandler,
+	StartHandler,
 } from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
@@ -24,6 +25,10 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		await app.boot();
 		this.#app = app;
+	}
+
+	public async start(): Promise<void> {
+		await this.#app.resolve(StartHandler).handle();
 	}
 
 	public async importSnapshot(height: number): Promise<void> {
