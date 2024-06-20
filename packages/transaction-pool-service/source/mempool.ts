@@ -15,6 +15,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
+	readonly #sendersForReadd = new Set<string>();
 
 	public getSize(): number {
 		return [...this.#senderMempools.values()].reduce((sum, p) => sum + p.getSize(), 0);
@@ -40,8 +41,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		block: Contracts.Crypto.Block,
 		failedTransactions: Contracts.Crypto.Transaction[],
 	): Promise<Contracts.Crypto.Transaction[]> {
-		const sendersForReadd: Set<string> = new Set();
-
 		// Remove block transactions
 		for (const transaction of block.transactions) {
 			const senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
@@ -53,29 +52,25 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			if (await senderMempool.removeForgedTransaction(transaction.id)) {
 				await this.#removeDisposableMempool(transaction.data.senderPublicKey);
 			} else {
-				sendersForReadd.add(transaction.data.senderPublicKey);
+				this.#sendersForReadd.add(transaction.data.senderPublicKey);
 			}
 		}
 
-		const removedTransactions: Contracts.Crypto.Transaction[] = [];
 		// Remove failed transactions from collator
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
 		for (const failedTransaction of failedTransactions) {
-			const senderMempool = this.#senderMempools.get(failedTransaction.data.senderPublicKey);
-
-			if (!senderMempool) {
-				continue;
-			}
-
-			const transactions = await senderMempool.removeTransaction(failedTransaction.id);
-
-			if (transactions.length > 0) {
-				removedTransactions.push(...transactions);
-				sendersForReadd.add(failedTransaction.data.senderPublicKey);
-			}
+			removedTransactions.push(
+				...(await this.removeTransaction(failedTransaction.data.senderPublicKey, failedTransaction.id)),
+			);
 		}
 
-		// Try to readd transactions and fix sender
-		for (const senderPublicKey of sendersForReadd) {
+		return [...removedTransactions, ...(await this.reAddTransactions())];
+	}
+
+	public async reAddTransactions(): Promise<Contracts.Crypto.Transaction[]> {
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const senderPublicKey of this.#sendersForReadd) {
 			const transactionsForReadd = [...this.getSenderMempool(senderPublicKey).getFromEarliest()];
 
 			const newSenderMempool = await this.createSenderMempool.call(this, senderPublicKey);
@@ -99,6 +94,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			}
 		}
 
+		this.#sendersForReadd.clear();
 		return removedTransactions;
 	}
 
@@ -127,26 +123,29 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			return [];
 		}
 
-		try {
-			return await senderMempool.removeTransaction(id);
-		} finally {
-			if (senderMempool.isDisposable()) {
-				this.#senderMempools.delete(senderPublicKey);
-				this.logger.debug(`${await this.addressFactory.fromPublicKey(senderPublicKey)} state disposed`);
-			}
+		const transactions = await senderMempool.removeTransaction(id);
+
+		if (transactions.length > 0 && !(await this.#removeDisposableMempool(senderPublicKey))) {
+			this.#sendersForReadd.add(senderPublicKey);
 		}
+
+		return transactions;
 	}
 
 	public flush(): void {
 		this.#senderMempools.clear();
 	}
 
-	async #removeDisposableMempool(senderPublicKey: string): Promise<void> {
+	async #removeDisposableMempool(senderPublicKey: string): Promise<boolean> {
 		const senderMempool = this.#senderMempools.get(senderPublicKey);
 
 		if (senderMempool && senderMempool.isDisposable()) {
 			this.#senderMempools.delete(senderPublicKey);
 			this.logger.debug(`${await this.addressFactory.fromPublicKey(senderPublicKey)} state disposed`);
+
+			return true;
 		}
+
+		return false;
 	}
 }
