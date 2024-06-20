@@ -161,40 +161,6 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async removeTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		await this.#lock.runNonExclusive(async () => {
-			if (this.#disposed) {
-				return;
-			}
-
-			if (this.storage.hasTransaction(transaction.id) === false) {
-				this.logger.error(`Failed to remove tx ${transaction.id} that isn't in pool`);
-				return;
-			}
-
-			const removedTransactions = await this.mempool.removeTransaction(
-				transaction.data.senderPublicKey,
-				transaction.id,
-			);
-
-			await this.#fixInvalidStates();
-
-			for (const removedTransaction of removedTransactions) {
-				this.storage.removeTransaction(removedTransaction.id);
-				this.logger.debug(`Removed tx ${removedTransaction.id}`);
-
-				void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
-			}
-
-			if (!removedTransactions.some((t) => t.id === transaction.id)) {
-				this.storage.removeTransaction(transaction.id);
-				this.logger.error(`Removed tx ${transaction.id} from storage`);
-
-				void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, transaction.data);
-			}
-		});
-	}
-
 	public async flush(): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
