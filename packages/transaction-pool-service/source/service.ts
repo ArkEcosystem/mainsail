@@ -74,7 +74,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 				for (const forgedTransaction of transactions) {
 					this.storage.removeTransaction(transaction.id);
-					this.logger.info(`Removed forged tx ${transaction.id}`);
+					this.logger.debug(`Removed forged tx ${transaction.id}`);
 					void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, forgedTransaction.data);
 				}
 			}
@@ -87,7 +87,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 				for (const forgedTransaction of transactions) {
 					this.storage.removeTransaction(transaction.id);
-					this.logger.info(`Removed tx ${transaction.id}`);
+					this.logger.debug(`Removed tx ${transaction.id}`);
 					void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, forgedTransaction.data);
 				}
 			}
@@ -213,7 +213,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			for (const removedTransaction of removedTransactions) {
 				this.storage.removeTransaction(removedTransaction.id);
-				this.logger.info(`Removed old tx ${removedTransaction.id}`);
+				this.logger.debug(`Removed old tx ${removedTransaction.id}`);
 
 				void this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
 			}
@@ -230,7 +230,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 				for (const removedTransaction of removedTransactions) {
 					this.storage.removeTransaction(removedTransaction.id);
-					this.logger.info(`Removed expired tx ${removedTransaction.id}`);
+					this.logger.debug(`Removed expired tx ${removedTransaction.id}`);
 					void this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
 				}
 			}
@@ -251,7 +251,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		for (const removedTransaction of removedTransactions) {
 			this.storage.removeTransaction(removedTransaction.id);
-			this.logger.info(`Removed lowest priority tx ${removedTransaction.id}`);
+			this.logger.debug(`Removed lowest priority tx ${removedTransaction.id}`);
 			void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
 		}
 	}
@@ -269,7 +269,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		for (const transaction of transactions) {
 			this.storage.removeTransaction(transaction.id);
-			this.logger.info(`Removed invalid tx ${transaction.id}`);
+			this.logger.debug(`Removed invalid tx ${transaction.id}`);
 
 			void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, transaction.data);
 		}
