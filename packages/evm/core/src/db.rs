@@ -5,7 +5,7 @@ use rayon::slice::ParallelSliceMut;
 use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 use serde::{Deserialize, Serialize};
 
-use crate::state_changes;
+use crate::{state_changes, state_commit::StateCommit};
 
 #[derive(Debug)]
 struct AddressWrapper(Address);
@@ -80,6 +80,8 @@ pub enum Error {
     IO(#[from] std::io::Error),
     #[error("heed error")]
     Heed(#[from] heed::Error),
+    #[error("db full error")]
+    DbFull,
     #[error("infallible error")]
     Infallible(#[from] Infallible),
 }
@@ -90,10 +92,20 @@ impl PersistentDB {
 
         let mut env_builder = EnvOpenOptions::new();
         env_builder.max_dbs(4);
-        env_builder.map_size(5 * 1024 * 1024 * 1024); // TODO: dynamically resize
+        env_builder.map_size(1 * MAP_SIZE_UNIT);
         unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
         let env = unsafe { env_builder.open(path.join("evm.mdb")) }?;
+
+        Self::new_with_env(env)
+    }
+
+    pub fn new_with_env(env: heed::Env) -> Result<Self, Error> {
+        let real_disk_size = env.real_disk_size()?;
+        if real_disk_size >= env.info().map_size as u64 {
+            // ensure initial map size is always larger than disk size
+            unsafe { env.resize(next_map_size(real_disk_size as usize))? };
+        }
 
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
@@ -130,6 +142,25 @@ impl PersistentDB {
             }),
         })
     }
+
+    pub fn resize(&self) -> Result<(), Error> {
+        let info = self.env.info();
+
+        let current_map_size = info.map_size;
+
+        let next_map_size = next_map_size(current_map_size);
+
+        println!("resizing db {} -> {}", current_map_size, next_map_size);
+
+        unsafe { self.env.resize(next_map_size)? };
+
+        Ok(())
+    }
+}
+
+const MAP_SIZE_UNIT: usize = 1024 * 1024 * 1024; // 1 GB
+fn next_map_size(map_size: usize) -> usize {
+    map_size / MAP_SIZE_UNIT * MAP_SIZE_UNIT + MAP_SIZE_UNIT
 }
 
 impl Database for PersistentDB {
@@ -208,35 +239,45 @@ impl DatabaseRef for PersistentDB {
 }
 
 impl PersistentDB {
-    pub fn commit(&self, pending_commit: PendingCommit) -> Result<(), Error> {
-        let PendingCommit {
+    pub fn commit(&self, state_commit: &mut StateCommit) -> Result<(), Error> {
+        let StateCommit {
             key,
-            cache,
-            results,
-            transitions,
-        } = pending_commit;
+            ref mut change_set,
+            ref results,
+        } = state_commit;
 
-        let mut state_builder = revm::State::builder().with_cached_prestate(cache).build();
+        match self.commit_to_db(*key, change_set, results) {
+            Ok(_) => return Ok(()),
+            Err(err) => match &err {
+                Error::Heed(heed_err) => match heed_err {
+                    heed::Error::Mdb(mdb_err) => match mdb_err {
+                        heed::MdbError::MapFull => return Err(Error::DbFull),
+                        _ => return Err(err),
+                    },
+                    _ => return Err(err),
+                },
+                _ => return Err(err),
+            },
+        }
+    }
 
-        state_builder.transition_state = Some(transitions);
-        state_builder
-            .merge_transitions(revm::db::states::bundle_state::BundleRetention::PlainState);
-
-        let bundle = state_builder.take_bundle();
-
+    fn commit_to_db(
+        &self,
+        key: CommitKey,
+        change_set: &mut state_changes::StateChangeset,
+        results: &HashMap<B256, ExecutionResult>,
+    ) -> Result<(), Error> {
         assert!(!self.is_height_committed(key.0));
 
         let mut rwtxn = self.env.write_txn()?;
         let inner = self.inner.borrow_mut();
 
-        let apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
-            let state_changes = state_changes::bundle_into_change_set(bundle);
-
+        let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
             let state_changes::StateChangeset {
-                mut accounts,
-                mut storage,
-                mut contracts,
-            } = state_changes;
+                ref mut accounts,
+                ref mut storage,
+                ref mut contracts,
+            } = change_set;
 
             accounts.par_sort_by_key(|a| a.0);
             contracts.par_sort_by_key(|a| a.0);
@@ -244,7 +285,7 @@ impl PersistentDB {
 
             // Update accounts
             for (address, account) in accounts.into_iter() {
-                let address = AddressWrapper(address);
+                let address = AddressWrapper(*address);
 
                 if let Some(account) = account {
                     inner.accounts.put(rwtxn, &address, &account)?;
@@ -256,18 +297,18 @@ impl PersistentDB {
             for (hash, bytecode) in contracts.into_iter() {
                 inner
                     .contracts
-                    .put(rwtxn, &ContractWrapper(hash), &bytecode)?;
+                    .put(rwtxn, &ContractWrapper(*hash), &bytecode)?;
             }
 
             // Update storage
             for state_changes::StorageChangeset {
                 address,
                 wipe_storage,
-                mut storage,
+                ref mut storage,
             } in storage.into_iter()
             {
-                let address = AddressWrapper(address);
-                if wipe_storage {
+                let address = AddressWrapper(*address);
+                if *wipe_storage {
                     // wipe any existing storage for address
                     inner.storage.delete(rwtxn, &address)?;
                 }
@@ -303,7 +344,7 @@ impl PersistentDB {
                 };
 
                 commit_receipts.insert(
-                    k,
+                    k.clone(),
                     TinyReceipt {
                         gas_used: v.gas_used(),
                         success: v.is_success(),
@@ -427,12 +468,15 @@ fn test_commit_changes() {
         },
     );
 
-    db.commit(PendingCommit {
-        key: CommitKey(0, 0),
-        cache: CacheState::default(),
-        results: Default::default(),
-        transitions: TransitionState { transitions: state },
-    })
+    crate::state_commit::commit_to_db(
+        &db,
+        PendingCommit {
+            key: CommitKey(0, 0),
+            cache: CacheState::default(),
+            results: Default::default(),
+            transitions: TransitionState { transitions: state },
+        },
+    )
     .expect("ok");
 
     // 3) Assert updated storage
@@ -504,12 +548,15 @@ fn test_storage() {
         },
     );
 
-    db.commit(PendingCommit {
-        key: CommitKey(0, 0),
-        cache: CacheState::default(),
-        results: Default::default(),
-        transitions: TransitionState { transitions: state },
-    })
+    crate::state_commit::commit_to_db(
+        &db,
+        PendingCommit {
+            key: CommitKey(0, 0),
+            cache: CacheState::default(),
+            results: Default::default(),
+            transitions: TransitionState { transitions: state },
+        },
+    )
     .expect("ok");
 
     // Assert storage is sorted
@@ -561,12 +608,15 @@ fn test_storage_overwrite() {
         },
     );
 
-    db.commit(PendingCommit {
-        key: CommitKey(0, 0),
-        cache: CacheState::default(),
-        results: Default::default(),
-        transitions: TransitionState { transitions: state },
-    })
+    crate::state_commit::commit_to_db(
+        &db,
+        PendingCommit {
+            key: CommitKey(0, 0),
+            cache: CacheState::default(),
+            results: Default::default(),
+            transitions: TransitionState { transitions: state },
+        },
+    )
     .expect("ok");
 
     // Assert storage
@@ -595,12 +645,15 @@ fn test_storage_overwrite() {
         },
     );
 
-    db.commit(PendingCommit {
-        key: CommitKey(1, 0),
-        cache: CacheState::default(),
-        results: Default::default(),
-        transitions: TransitionState { transitions: state },
-    })
+    crate::state_commit::commit_to_db(
+        &db,
+        PendingCommit {
+            key: CommitKey(1, 0),
+            cache: CacheState::default(),
+            results: Default::default(),
+            transitions: TransitionState { transitions: state },
+        },
+    )
     .expect("ok");
 
     // Assert storage again
@@ -612,4 +665,90 @@ fn test_storage_overwrite() {
     // - index 2 remains unchanged
     account_storage = db.storage(address, U256::from(2)).expect("storage");
     assert_eq!(account_storage, U256::from(2));
+}
+
+#[test]
+fn test_next_map_size() {
+    let input = vec![0, 1, 2, 3, 4];
+    for i in input {
+        let next = next_map_size(i * MAP_SIZE_UNIT);
+        assert_eq!(next, (i + 1) * MAP_SIZE_UNIT);
+    }
+}
+
+#[test]
+fn test_resize_on_commit() {
+    let create_large_commit = |height: u64, n: usize| {
+        let mut buf = vec![0; 32];
+        buf[0..8].copy_from_slice(&height.to_le_bytes());
+        let address = Address::from_word(ethers_core::utils::keccak256(buf).into());
+
+        let mut state = HashMap::new();
+
+        let mut account = Account::new_not_existing();
+        account.status = AccountStatus::Touched;
+
+        let mut storage = HashMap::new();
+
+        for i in 0..n {
+            storage.insert(
+                U256::from(i + 1),
+                StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+            );
+        }
+
+        state.insert(
+            address,
+            revm::db::TransitionAccount {
+                status: revm::db::AccountStatus::InMemoryChange,
+                info: Some(account.info.clone()),
+                previous_status: revm::db::AccountStatus::Loaded,
+                previous_info: None,
+                storage,
+                storage_was_destroyed: false,
+            },
+        );
+
+        PendingCommit {
+            key: CommitKey(height, 0),
+            cache: CacheState::default(),
+            results: Default::default(),
+            transitions: TransitionState { transitions: state },
+        }
+    };
+
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let mut env_builder = EnvOpenOptions::new();
+    env_builder.max_dbs(4);
+    env_builder.map_size(4096 * 10); // start with very small (few kB)
+
+    unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
+
+    let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
+
+    let db = PersistentDB::new_with_env(env).expect("open");
+    assert_eq!(db.env.info().map_size, 4096 * 10);
+
+    // large commit to trigger a resize
+    crate::state_commit::commit_to_db(&db, create_large_commit(0, 1024)).expect("ok");
+
+    // increased to next MAP_SIZE_UNIT
+    assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+
+    // add more commits without triggering another resize
+    for i in 0..10 {
+        crate::state_commit::commit_to_db(&db, create_large_commit(i + 1, 1024)).expect("ok");
+        assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+    }
+
+    // reopen db with initial env size should automatically resize
+    drop(db);
+
+    let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
+    let db = PersistentDB::new_with_env(env).expect("open");
+    assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
 }

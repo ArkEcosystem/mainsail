@@ -1,10 +1,13 @@
-use std::{path::PathBuf, rc::Rc, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 
 use ctx::{
     ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, TxContext,
     TxViewContext,
 };
-use mainsail_evm_core::db::{CommitKey, PendingCommit, PersistentDB};
+use mainsail_evm_core::{
+    db::{CommitKey, PendingCommit, PersistentDB},
+    state_commit,
+};
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
@@ -20,7 +23,7 @@ mod utils;
 
 // A complex struct which cannot be exposed to JavaScript directly.
 pub struct EvmInner {
-    persistent_db: Rc<PersistentDB>,
+    persistent_db: PersistentDB,
 
     // A pending commit consists of one or more transactions.
     pending_commit: Option<PendingCommit>,
@@ -31,10 +34,10 @@ unsafe impl Send for EvmInner {}
 
 impl EvmInner {
     pub fn new(path: PathBuf) -> Self {
-        let persistent_db = Rc::new(PersistentDB::new(path).expect("path ok"));
+        let persistent_db = PersistentDB::new(path).expect("path ok");
 
         EvmInner {
-            persistent_db: persistent_db.clone(),
+            persistent_db,
             pending_commit: Default::default(),
         }
     }
@@ -164,13 +167,9 @@ impl EvmInner {
                 //     commit_key,
                 //     pending_commit.diff.len(),
                 // );
-
-                match self.persistent_db.commit(pending_commit) {
-                    Ok(()) => Ok(()),
-                    Err(err) => Err(err),
-                }
+                state_commit::commit_to_db(&self.persistent_db, pending_commit)
             }
-            None => Ok(()), /* nothing to commit  */
+            None => Ok(()),
         };
 
         match outcome {
@@ -183,8 +182,6 @@ impl EvmInner {
         &mut self,
         ctx: ExecutionContext,
     ) -> std::result::Result<ExecutionResult, EVMError<mainsail_evm_core::db::Error>> {
-        let persistent_db = self.persistent_db.as_ref();
-
         let mut state_builder = State::builder().with_bundle_update();
 
         if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
@@ -197,7 +194,7 @@ impl EvmInner {
         }
 
         let state_db = state_builder
-            .with_database(WrapDatabaseRef(persistent_db))
+            .with_database(WrapDatabaseRef(&self.persistent_db))
             .build();
 
         let mut evm = Evm::builder()
