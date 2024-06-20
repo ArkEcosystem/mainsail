@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils as AppUtils } from "@mainsail/kernel";
+import { Enums, Providers, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -35,7 +35,7 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
-	readonly #lock: AppUtils.Lock = new AppUtils.Lock();
+	readonly #lock: Utils.Lock = new Utils.Lock();
 
 	#disposed = false;
 
@@ -78,9 +78,6 @@ export class Service implements Contracts.TransactionPool.Service {
 				return;
 			}
 
-			AppUtils.assert.defined<string>(transaction.id);
-			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 			if (this.storage.hasTransaction(transaction.id)) {
 				throw new Exceptions.TransactionAlreadyInPoolError(transaction);
 			}
@@ -96,15 +93,15 @@ export class Service implements Contracts.TransactionPool.Service {
 				await this.feeMatcher.throwIfCannotEnterPool(transaction);
 				await this.#addTransactionToMempool(transaction);
 				this.logger.debug(`tx ${transaction.id} added to pool`);
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.events.dispatch(Enums.TransactionEvent.AddedToPool, transaction.data);
+
+				void this.events.dispatch(Enums.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.warning(
 					`tx ${transaction.id} (type: ${transaction.type}) failed to enter pool: ${error.message}`,
 				);
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.events.dispatch(Enums.TransactionEvent.RejectedByPool, transaction.data);
+
+				void this.events.dispatch(Enums.TransactionEvent.RejectedByPool, transaction.data);
 
 				throw error instanceof Exceptions.PoolError
 					? error
@@ -170,9 +167,6 @@ export class Service implements Contracts.TransactionPool.Service {
 				return;
 			}
 
-			AppUtils.assert.defined<string>(transaction.id);
-			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 			if (this.storage.hasTransaction(transaction.id) === false) {
 				this.logger.error(`Failed to remove tx ${transaction.id} that isn't in pool`);
 				return;
@@ -183,19 +177,20 @@ export class Service implements Contracts.TransactionPool.Service {
 				transaction.id,
 			);
 
+			await this.#fixInvalidStates();
+
 			for (const removedTransaction of removedTransactions) {
-				AppUtils.assert.defined<string>(removedTransaction.id);
 				this.storage.removeTransaction(removedTransaction.id);
 				this.logger.debug(`Removed tx ${removedTransaction.id}`);
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
+
+				void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
 			}
 
 			if (!removedTransactions.some((t) => t.id === transaction.id)) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.error(`Removed tx ${transaction.id} from storage`);
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, transaction.data);
+
+				void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 		});
 	}
@@ -227,20 +222,16 @@ export class Service implements Contracts.TransactionPool.Service {
 			const removedTransactions = await this.mempool.removeTransaction(senderPublicKey, id);
 
 			for (const removedTransaction of removedTransactions) {
-				AppUtils.assert.defined<string>(removedTransaction.id);
 				this.storage.removeTransaction(removedTransaction.id);
 				this.logger.info(`Removed old tx ${removedTransaction.id}`);
-				// eslint-disable-next-line @typescript-eslint/no-floating-promises
-				this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
+
+				void this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
 			}
 		}
 	}
 
 	async #removeExpiredTransactions(): Promise<void> {
 		for (const transaction of await this.poolQuery.getAll().all()) {
-			AppUtils.assert.defined<string>(transaction.id);
-			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 			if (await this.expirationService.isExpired(transaction)) {
 				const removedTransactions = await this.mempool.removeTransaction(
 					transaction.data.senderPublicKey,
@@ -248,11 +239,9 @@ export class Service implements Contracts.TransactionPool.Service {
 				);
 
 				for (const removedTransaction of removedTransactions) {
-					AppUtils.assert.defined<string>(removedTransaction.id);
 					this.storage.removeTransaction(removedTransaction.id);
 					this.logger.info(`Removed expired tx ${removedTransaction.id}`);
-					// eslint-disable-next-line @typescript-eslint/no-floating-promises
-					this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
+					void this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
 				}
 			}
 		}
@@ -265,20 +254,15 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		const transaction = await this.poolQuery.getFromLowestPriority().first();
 
-		AppUtils.assert.defined<string>(transaction.id);
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 		const removedTransactions = await this.mempool.removeTransaction(
 			transaction.data.senderPublicKey,
 			transaction.id,
 		);
 
 		for (const removedTransaction of removedTransactions) {
-			AppUtils.assert.defined<string>(removedTransaction.id);
 			this.storage.removeTransaction(removedTransaction.id);
 			this.logger.info(`Removed lowest priority tx ${removedTransaction.id}`);
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
+			void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
 		}
 	}
 
@@ -302,8 +286,6 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	async #addTransactionToMempool(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
