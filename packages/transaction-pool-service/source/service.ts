@@ -56,17 +56,41 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async commit(block: Contracts.Crypto.Block, removedTransactions: string[]): Promise<void> {
+	public async commit(block: Contracts.Crypto.Block, failedTransactionIds: string[]): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
 			}
 
-			const transactions = await Promise.all(
-				removedTransactions.map(async (id) => await this.poolQuery.getAll().whereId(id).first()),
+			const failedTransactions = await Promise.all(
+				failedTransactionIds.map(async (id) => await this.poolQuery.getAll().whereId(id).first()),
 			);
 
-			await this.mempool.commit(block, transactions);
+			for (const transaction of block.transactions) {
+				const transactions = await this.mempool.removeForgedTransaction(
+					transaction.data.senderPublicKey,
+					transaction.id,
+				);
+
+				for (const forgedTransaction of transactions) {
+					this.storage.removeTransaction(transaction.id);
+					this.logger.info(`Removed forged tx ${transaction.id}`);
+					void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, forgedTransaction.data);
+				}
+			}
+
+			for (const transaction of failedTransactions) {
+				const transactions = await this.mempool.removeTransaction(
+					transaction.data.senderPublicKey,
+					transaction.id,
+				);
+
+				for (const forgedTransaction of transactions) {
+					this.storage.removeTransaction(transaction.id);
+					this.logger.info(`Removed tx ${transaction.id}`);
+					void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, forgedTransaction.data);
+				}
+			}
 
 			await this.#cleanUp();
 		});

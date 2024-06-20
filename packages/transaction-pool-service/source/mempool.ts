@@ -36,24 +36,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return this.#senderMempools.values();
 	}
 
-	public async commit(
-		block: Contracts.Crypto.Block,
-		failedTransactions: Contracts.Crypto.Transaction[],
-	): Promise<Contracts.Crypto.Transaction[]> {
-		for (const transaction of block.transactions) {
-			await this.removeForgedTransaction(transaction.data.senderPublicKey, transaction.id);
-		}
-
-		const removedTransactions: Contracts.Crypto.Transaction[] = [];
-		for (const failedTransaction of failedTransactions) {
-			removedTransactions.push(
-				...(await this.removeTransaction(failedTransaction.data.senderPublicKey, failedTransaction.id)),
-			);
-		}
-
-		return [...removedTransactions, ...(await this.fixInvalidStates())];
-	}
-
 	public async fixInvalidStates(): Promise<Contracts.Crypto.Transaction[]> {
 		const removedTransactions: Contracts.Crypto.Transaction[] = [];
 

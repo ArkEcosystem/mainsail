@@ -1,4 +1,4 @@
-import { Block, Transaction } from "../crypto/index.js";
+import { Transaction } from "../crypto/index.js";
 import { SenderMempool } from "./sender-mempool.js";
 
 export interface Mempool {
@@ -7,8 +7,6 @@ export interface Mempool {
 	hasSenderMempool(senderPublicKey: string): boolean;
 	getSenderMempool(senderPublicKey: string): SenderMempool;
 	getSenderMempools(): Iterable<SenderMempool>;
-
-	commit(block: Block, removedTransactions: Transaction[]): Promise<Transaction[]>;
 
 	addTransaction(transaction: Transaction): Promise<void>;
 	removeTransaction(senderPublicKey: string, id: string): Promise<Transaction[]>;
