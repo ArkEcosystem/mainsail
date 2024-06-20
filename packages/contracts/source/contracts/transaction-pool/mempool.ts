@@ -8,7 +8,7 @@ export interface Mempool {
 	getSenderMempool(senderPublicKey: string): SenderMempool;
 	getSenderMempools(): Iterable<SenderMempool>;
 
-	commit(block: Block, removedTransactions: Transaction[]): Promise<void>;
+	commit(block: Block, removedTransactions: Transaction[]): Promise<Transaction[]>;
 
 	addTransaction(transaction: Transaction): Promise<void>;
 	removeTransaction(senderPublicKey: string, id: string): Promise<Transaction[]>;

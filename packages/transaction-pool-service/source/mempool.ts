@@ -38,8 +38,60 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	public async commit(
 		block: Contracts.Crypto.Block,
-		removedTransactions: Contracts.Crypto.Transaction[],
-	): Promise<void> {}
+		failedTransactions: Contracts.Crypto.Transaction[],
+	): Promise<Contracts.Crypto.Transaction[]> {
+		const sendersForReadd: Set<string> = new Set();
+
+		// Remove block transactions
+		for (const transaction of block.transactions) {
+			const senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
+
+			if (!senderMempool) {
+				continue;
+			}
+
+			if (await senderMempool.removeForgedTransaction(transaction.id)) {
+				await this.#removeDisposableMempool(transaction.data.senderPublicKey);
+			} else {
+				sendersForReadd.add(transaction.data.senderPublicKey);
+			}
+		}
+
+		// TODO: Remove failed transactions from collator
+		// for (const senderPublicKey of failedTransactions.map((tx) => tx.data.senderPublicKey)) {
+		// 	sendersForReadd.add(senderPublicKey);
+		// }
+
+		// Readd transactions
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const senderPublicKey of sendersForReadd) {
+			const transactionsForReadd = [...this.getSenderMempool(senderPublicKey).getFromEarliest()];
+
+			const newSenderMempool = await this.createSenderMempool.call(this, senderPublicKey);
+
+			for (let i = 0; i < transactionsForReadd.length; i++) {
+				const transaction = transactionsForReadd[i];
+
+				try {
+					await newSenderMempool.addTransaction(transaction);
+				} catch {
+					transactionsForReadd.slice(i).map((tx) => {
+						removedTransactions.push(tx);
+						this.logger.debug(`Removed invalid ${transaction}`);
+					});
+					break;
+				}
+			}
+
+			this.#senderMempools.delete(senderPublicKey);
+			if (newSenderMempool.getSize()) {
+				this.#senderMempools.set(senderPublicKey, newSenderMempool);
+			}
+		}
+
+		return removedTransactions;
+	}
 
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -56,12 +108,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		try {
 			await senderMempool.addTransaction(transaction);
 		} finally {
-			if (senderMempool.isDisposable()) {
-				this.#senderMempools.delete(transaction.data.senderPublicKey);
-				this.logger.debug(
-					`${await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey)} state disposed`,
-				);
-			}
+			await this.#removeDisposableMempool(transaction.data.senderPublicKey);
 		}
 	}
 
@@ -83,5 +130,14 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	public flush(): void {
 		this.#senderMempools.clear();
+	}
+
+	async #removeDisposableMempool(senderPublicKey: string): Promise<void> {
+		const senderMempool = this.#senderMempools.get(senderPublicKey);
+
+		if (senderMempool && senderMempool.isDisposable()) {
+			this.#senderMempools.delete(senderPublicKey);
+			this.logger.debug(`${await this.addressFactory.fromPublicKey(senderPublicKey)} state disposed`);
+		}
 	}
 }
