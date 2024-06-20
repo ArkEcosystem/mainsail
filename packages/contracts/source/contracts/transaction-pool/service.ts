@@ -7,6 +7,5 @@ export interface Service {
 	reAddTransactions(): Promise<void>;
 	removeTransaction(transaction: Transaction): Promise<void>;
 	commit(block: Block, removedTransactions: string[]): Promise<void>;
-	cleanUp(): Promise<void>;
 	flush(): Promise<void>;
 }

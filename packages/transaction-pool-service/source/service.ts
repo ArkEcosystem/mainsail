@@ -68,7 +68,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			await this.mempool.commit(block, transactions);
 
-			// await this.cleanUp();
+			await this.#cleanUp();
 		});
 	}
 
@@ -200,18 +200,6 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	public async cleanUp(): Promise<void> {
-		await this.#lock.runNonExclusive(async () => {
-			if (this.#disposed) {
-				return;
-			}
-
-			await this.#removeOldTransactions();
-			await this.#removeExpiredTransactions();
-			await this.#removeLowestPriorityTransactions();
-		});
-	}
-
 	public async flush(): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
@@ -221,6 +209,12 @@ export class Service implements Contracts.TransactionPool.Service {
 			this.mempool.flush();
 			this.storage.flush();
 		});
+	}
+
+	async #cleanUp(): Promise<void> {
+		await this.#removeOldTransactions();
+		await this.#removeExpiredTransactions();
+		await this.#removeLowestPriorityTransactions();
 	}
 
 	async #removeOldTransactions(): Promise<void> {
@@ -301,9 +295,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
-			await this.#removeOldTransactions();
-			await this.#removeExpiredTransactions();
-			await this.#removeLowestPriorityTransactions();
+			await this.#cleanUp();
 		}
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
