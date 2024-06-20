@@ -15,7 +15,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
-	readonly #sendersForReadd = new Set<string>();
+	readonly #brokenSenders = new Set<string>();
 
 	public getSize(): number {
 		return [...this.#senderMempools.values()].reduce((sum, p) => sum + p.getSize(), 0);
@@ -52,13 +52,13 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			);
 		}
 
-		return [...removedTransactions, ...(await this.reAddTransactions())];
+		return [...removedTransactions, ...(await this.fixInvalidStates())];
 	}
 
-	public async reAddTransactions(): Promise<Contracts.Crypto.Transaction[]> {
+	public async fixInvalidStates(): Promise<Contracts.Crypto.Transaction[]> {
 		const removedTransactions: Contracts.Crypto.Transaction[] = [];
 
-		for (const senderPublicKey of this.#sendersForReadd) {
+		for (const senderPublicKey of this.#brokenSenders) {
 			const transactionsForReadd = [...this.getSenderMempool(senderPublicKey).getFromEarliest()];
 
 			const newSenderMempool = await this.createSenderMempool.call(this, senderPublicKey);
@@ -82,7 +82,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 			}
 		}
 
-		this.#sendersForReadd.clear();
+		this.#brokenSenders.clear();
 		return removedTransactions;
 	}
 
@@ -114,7 +114,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		const transactions = senderMempool.removeTransaction(id);
 
 		if (transactions.length > 0 && !(await this.#removeDisposableMempool(senderPublicKey))) {
-			this.#sendersForReadd.add(senderPublicKey);
+			this.#brokenSenders.add(senderPublicKey);
 		}
 
 		return transactions;
@@ -129,7 +129,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		const transaction = senderMempool.removeForgedTransaction(id);
 
 		if (!transaction) {
-			this.#sendersForReadd.add(senderPublicKey);
+			this.#brokenSenders.add(senderPublicKey);
 			return [];
 		}
 
