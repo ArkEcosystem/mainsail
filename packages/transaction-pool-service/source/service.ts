@@ -56,6 +56,22 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
+	public async commit(block: Contracts.Crypto.Block, removedTransactions: string[]): Promise<void> {
+		await this.#lock.runExclusive(async () => {
+			if (this.#disposed) {
+				return;
+			}
+
+			const transactions = await Promise.all(
+				removedTransactions.map(async (id) => await this.poolQuery.getAll().whereId(id).first()),
+			);
+
+			await this.mempool.commit(block, transactions);
+
+			// await this.cleanUp();
+		});
+	}
+
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		await this.#lock.runNonExclusive(async () => {
 			if (this.#disposed) {

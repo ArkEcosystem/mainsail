@@ -36,6 +36,11 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return this.#senderMempools.values();
 	}
 
+	public async commit(
+		block: Contracts.Crypto.Block,
+		removedTransactions: Contracts.Crypto.Transaction[],
+	): Promise<void> {}
+
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
