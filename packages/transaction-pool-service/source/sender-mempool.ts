@@ -43,8 +43,6 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 			this.#concurrency++;
 
 			await this.#lock.runExclusive(async () => {
-				AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 				const maxTransactionsPerSender: number =
 					this.configuration.getRequired<number>("maxTransactionsPerSender");
 				if (this.#transactions.length >= maxTransactionsPerSender) {

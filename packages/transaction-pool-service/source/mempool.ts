@@ -87,8 +87,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	}
 
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 		let senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
 		if (!senderMempool) {
 			senderMempool = await this.createSenderMempool.call(this, transaction.data.senderPublicKey);
