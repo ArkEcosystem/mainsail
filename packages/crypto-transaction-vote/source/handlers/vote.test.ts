@@ -1,6 +1,5 @@
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
-import { Enums as AppEnums } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { describe, Sandbox } from "../../../test-framework/source";
@@ -388,7 +387,7 @@ describe<{
 		);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+		spyDispatch.calledWith(Events.VoteEvent.Vote, {
 			transaction: voteTransaction.data,
 			validator: "validatorPublicKey",
 		});
@@ -401,7 +400,7 @@ describe<{
 		);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+		spyDispatch.calledWith(Events.VoteEvent.Unvote, {
 			transaction: unvoteTransaction.data,
 			validator: "validatorPublicKey",
 		});
@@ -414,11 +413,11 @@ describe<{
 		);
 
 		spyDispatch.calledTimes(2);
-		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+		spyDispatch.calledWith(Events.VoteEvent.Unvote, {
 			transaction: unvoteVoteTransaction.data,
 			validator: "unvoteValidatorPublicKey",
 		});
-		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+		spyDispatch.calledWith(Events.VoteEvent.Vote, {
 			transaction: unvoteVoteTransaction.data,
 			validator: "voteValidatorPublicKey",
 		});

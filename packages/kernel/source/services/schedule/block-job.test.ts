@@ -1,9 +1,8 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Events, Identifiers } from "@mainsail/contracts";
 
 import crypto from "../../../../core/bin/config/testnet/core/crypto.json";
 import { Configuration } from "../../../../crypto-config/distribution/index";
 import { describe, Sandbox } from "../../../../test-framework/source";
-import { BlockEvent, ScheduleEvent } from "../../enums";
 import { MemoryEventDispatcher } from "../events";
 import { BlockJob } from "./block-job";
 
@@ -49,20 +48,20 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 3 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 4 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 6 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 7 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 9 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 10 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 3 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 4 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 6 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 7 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 9 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 10 });
 
 		await delay(100);
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
-		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
 
 	it("should execute every block", async (context) => {
@@ -76,16 +75,16 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
 
 		await delay(100);
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
-		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
 
 	it("should execute every five blocks", async (context) => {
@@ -99,20 +98,20 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 5 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 6 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 10 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 11 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 15 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 16 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 5 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 6 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 10 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 11 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 15 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 16 });
 
 		await delay(100);
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
-		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
 
 	it("should execute every ten blocks", async (context) => {
@@ -126,20 +125,20 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 10 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 11 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 20 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 21 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 30 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 31 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 10 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 11 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 20 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 21 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 30 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 31 });
 
 		await delay(100);
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
-		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
 
 	it("should execute every fifteen blocks", async (context) => {
@@ -153,20 +152,20 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 15 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 16 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 30 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 31 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 45 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 46 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 15 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 16 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 30 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 31 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 45 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 46 });
 
 		await delay(100);
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
-		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
 
 	it("should execute every thirty blocks", async (context) => {
@@ -180,20 +179,20 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 30 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 31 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 60 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 61 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 90 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 91 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 30 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 31 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 60 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 61 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 90 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 91 });
 
 		await delay(100);
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
-		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
 
 	it("should execute every round", async (context) => {
@@ -207,19 +206,19 @@ describe<{
 
 		function_.neverCalled();
 
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 1 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 51 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 53 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 102 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 106 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 153 });
-		context.eventDispatcher.dispatchSync(BlockEvent.Received, { height: 159 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 1 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 51 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 53 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 102 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 106 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 153 });
+		context.eventDispatcher.dispatchSync(Events.BlockEvent.Received, { height: 159 });
 
 		await delay(100);
 
 		function_.calledTimes(3);
 
 		spyOnDispatch.calledTimes(3);
-		spyOnDispatch.calledWith(ScheduleEvent.BlockJobFinished, expectFinishedEventData());
+		spyOnDispatch.calledWith(Events.ScheduleEvent.BlockJobFinished, expectFinishedEventData());
 	});
 });
