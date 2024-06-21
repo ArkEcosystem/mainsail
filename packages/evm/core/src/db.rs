@@ -449,11 +449,11 @@ fn test_commit_changes() {
     let mut storage = HashMap::new();
     storage.insert(
         U256::from(1),
-        StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
     );
     storage.insert(
         U256::from(2),
-        StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
     );
 
     state.insert(
@@ -517,23 +517,23 @@ fn test_storage() {
 
     storage.insert(
         U256::from(99),
-        StorageSlot::new_changed(U256::ZERO, U256::from(99)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(99)),
     );
     storage.insert(
         U256::from(1),
-        StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
     );
     storage.insert(
         U256::from(101),
-        StorageSlot::new_changed(U256::ZERO, U256::from(101)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(101)),
     );
     storage.insert(
         U256::from(2),
-        StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
     );
     storage.insert(
         U256::from(4),
-        StorageSlot::new_changed(U256::ZERO, U256::from(4)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(4)),
     );
 
     state.insert(
@@ -589,11 +589,11 @@ fn test_storage_overwrite() {
 
     storage.insert(
         U256::from(1),
-        StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
     );
     storage.insert(
         U256::from(2),
-        StorageSlot::new_changed(U256::ZERO, U256::from(2)),
+        revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(2)),
     );
 
     state.insert(
@@ -629,7 +629,7 @@ fn test_storage_overwrite() {
     let mut storage = HashMap::new();
     storage.insert(
         U256::from(1),
-        StorageSlot::new_changed(U256::from(1), U256::from(99)),
+        revm::db::states::StorageSlot::new_changed(U256::from(1), U256::from(99)),
     );
 
     let mut state = HashMap::new();
@@ -693,7 +693,7 @@ fn test_resize_on_commit() {
         for i in 0..n {
             storage.insert(
                 U256::from(i + 1),
-                StorageSlot::new_changed(U256::ZERO, U256::from(1)),
+                revm::db::states::StorageSlot::new_changed(U256::ZERO, U256::from(1)),
             );
         }
 

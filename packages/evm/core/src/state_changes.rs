@@ -1,6 +1,6 @@
 use revm::{
-    db::{BundleState, OriginalValuesKnown},
-    primitives::{AccountInfo, Address, Bytecode, StorageSlot, B256, KECCAK_EMPTY, U256},
+    db::{states::StorageSlot, BundleState, OriginalValuesKnown},
+    primitives::{AccountInfo, Address, Bytecode, B256, KECCAK_EMPTY, U256},
 };
 
 /// Loosely based on https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/changes.rs and https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/bundle_state.rs#L449
