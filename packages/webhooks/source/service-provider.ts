@@ -34,7 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async bootWhen(): Promise<boolean> {
-		return this.config().get("enabled") === true;
+		return this.config().getRequired<boolean>("enabled") === true && !this.app.isWorker();
 	}
 
 	public configSchema(): object {
