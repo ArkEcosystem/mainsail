@@ -14,16 +14,11 @@ anyhow = { version = "1.0.79" }
 ethers-contract = { version = "2.0.13" }
 ethers-core = { version = "2.0.13" }
 ethers-providers = { version = "2.0.13" }
-revm = { version = "9.0.0", features = [
-    "ethersdb",
-    "tokio",
-    "serde",
-    "serde-json",
-] }
+revm = { version = "10.0.0", features = ["ethersdb", "serde", "serde-json"] }
 serde = { version = "1.0.195", features = ["derive"] }
 serde_json = "1.0.111"
 thiserror = { version = "1.0" }
-tokio = { version = "1.36.0" }
+tokio = { version = "1.38.0" }
 
 [profile.release]
 lto = true
