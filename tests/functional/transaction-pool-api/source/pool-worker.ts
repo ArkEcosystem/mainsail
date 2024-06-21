@@ -7,8 +7,8 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
+	@inject(Identifiers.TransactionPool.Mempool)
+	private readonly transactionPoolMempool!: Contracts.TransactionPool.Mempool;
 
 	@inject(Identifiers.TransactionPool.Query)
 	private readonly transactionPoolQuery!: Contracts.TransactionPool.Query;
@@ -31,14 +31,16 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const block = unit.getBlock();
 		for (const transaction of block.transactions) {
-			await this.transactionPoolService.removeForgedTransaction(transaction);
+			await this.transactionPoolMempool.removeForgedTransaction(transaction.data.senderPublicKey, transaction.id);
 		}
 		for (const transactionId of this.#failedTransactions.map((transaction) => transaction.id)) {
 			try {
 				const transaction = await this.transactionPoolQuery.getAll().whereId(transactionId).first();
-				await this.transactionPoolService.removeTransaction(transaction);
+				await this.transactionPoolMempool.removeTransaction(transaction.data.senderPublicKey, transaction.id);
 			} catch {}
 		}
+
+		await this.transactionPoolMempool.fixInvalidStates();
 		this.#failedTransactions = [];
 	}
 	public async importSnapshot(height: number): Promise<void> {}
