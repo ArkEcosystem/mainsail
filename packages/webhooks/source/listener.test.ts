@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Events, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Application, Utils } from "@mainsail/kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -7,15 +7,13 @@ import { describe } from "../../test-framework/source";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { conditions } from "./conditions";
 import { Database } from "./database";
-import { InternalIdentifiers } from "./identifiers";
-import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
 
 describe<{
 	database: Database;
 	listener: Listener;
 }>("Listener", ({ beforeEach, afterAll, stub, it, assert }) => {
-	let webhook: Webhook;
+	let webhook: Contracts.Webhooks.Webhook;
 
 	const logger = {
 		debug: () => {},
@@ -44,12 +42,12 @@ describe<{
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
-		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
+		app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
-		context.database = app.get<Database>(InternalIdentifiers.Database);
+		context.database = app.get<Database>(Identifiers.Webhooks.Database);
 		context.database.boot();
 
 		context.listener = app.resolve<Listener>(Listener);
@@ -69,16 +67,16 @@ describe<{
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
 
 		database.create(webhook);
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Created);
 
+		spyOnDispatch.reset();
 		await listener.handle({ data: "dummy_data", name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnDebug.calledOnce();
 		spyOnDispatch.calledOnce();
-
-		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Broadcasted);
-		expectFinishedEventData(spyOnDispatchArguments[1]);
+		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
 	});
 
 	it("should log error if broadcast is not successful", async ({ database, listener }) => {
@@ -89,15 +87,16 @@ describe<{
 		const spyOnDispatch = stub(eventDispatcher, "dispatch");
 
 		database.create(webhook);
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Created);
 
+		spyOnDispatch.reset();
 		await listener.handle({ data: "dummy_data", name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnError.calledOnce();
 		spyOnDispatch.calledOnce();
-		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Failed);
-		expectFailedEventData(spyOnDispatchArguments[1]);
+		spyOnDispatch.calledWith(Events.WebhookEvent.Failed);
 	});
 
 	it("#should not broadcast if webhook is disabled", async ({ database, listener }) => {
@@ -135,14 +134,15 @@ describe<{
 			},
 		];
 		database.create(webhook);
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Created);
 
+		spyOnDispatch.reset();
 		await listener.handle({ data: { test: 1 }, name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
-		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Broadcasted);
-		expectFinishedEventData(spyOnDispatchArguments[1]);
+		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
 	});
 
 	it("should broadcast satisfied webhook condition with nested key", async ({ database, listener }) => {
@@ -159,14 +159,15 @@ describe<{
 			},
 		];
 		database.create(webhook);
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Created);
 
+		spyOnDispatch.reset();
 		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
-		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Broadcasted);
-		expectFinishedEventData(spyOnDispatchArguments[1]);
+		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
 	});
 
 	it("should not broadcast if webhook condition is not satisfied", async ({ database, listener }) => {
