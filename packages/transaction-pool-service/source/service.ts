@@ -156,8 +156,10 @@ export class Service implements Contracts.TransactionPool.Service {
 						const previouslyStoredTransaction = await this.transactionFactory.fromBytes(serialized);
 						await this.#addTransactionToMempool(previouslyStoredTransaction);
 
-						// eslint-disable-next-line @typescript-eslint/no-floating-promises
-						this.events.dispatch(Events.TransactionEvent.AddedToPool, previouslyStoredTransaction.data);
+						void this.events.dispatch(
+							Events.TransactionEvent.AddedToPool,
+							previouslyStoredTransaction.data,
+						);
 
 						previouslyStoredSuccesses++;
 					} catch (error) {

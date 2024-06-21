@@ -51,8 +51,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		emitter.dispatch(Events.ValidatorEvent.Resigned, transaction.data);
+		void emitter.dispatch(Events.ValidatorEvent.Resigned, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(

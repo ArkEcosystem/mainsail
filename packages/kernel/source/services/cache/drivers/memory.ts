@@ -27,10 +27,9 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async get(key: K): Promise<T | undefined> {
 		const value: T | undefined = this.#store.get(key);
 
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		value
-			? this.eventDispatcher.dispatch(Events.CacheEvent.Hit, { key, value })
-			: this.eventDispatcher.dispatch(Events.CacheEvent.Missed, { key });
+			? void this.eventDispatcher.dispatch(Events.CacheEvent.Hit, { key, value })
+			: void this.eventDispatcher.dispatch(Events.CacheEvent.Missed, { key });
 
 		return value;
 	}
@@ -42,8 +41,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async put(key: K, value: T, seconds?: number): Promise<boolean> {
 		this.#store.set(key, value);
 
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.eventDispatcher.dispatch(Events.CacheEvent.Written, { key, seconds, value });
+		void this.eventDispatcher.dispatch(Events.CacheEvent.Written, { key, seconds, value });
 
 		return this.has(key);
 	}
@@ -79,8 +77,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async forget(key: K): Promise<boolean> {
 		this.#store.delete(key);
 
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.eventDispatcher.dispatch(Events.CacheEvent.Forgotten, { key });
+		void this.eventDispatcher.dispatch(Events.CacheEvent.Forgotten, { key });
 
 		return this.missing(key);
 	}
@@ -92,8 +89,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async flush(): Promise<boolean> {
 		this.#store.clear();
 
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.eventDispatcher.dispatch(Events.CacheEvent.Flushed);
+		void this.eventDispatcher.dispatch(Events.CacheEvent.Flushed);
 
 		return this.#store.size === 0;
 	}

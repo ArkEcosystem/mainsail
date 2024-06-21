@@ -48,8 +48,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		emitter.dispatch(Events.ValidatorEvent.Registered, transaction.data);
+		void emitter.dispatch(Events.ValidatorEvent.Registered, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(

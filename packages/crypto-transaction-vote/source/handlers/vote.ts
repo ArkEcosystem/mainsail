@@ -84,16 +84,14 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
 
 		for (const unvote of transaction.data.asset.unvotes) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			emitter.dispatch(Events.VoteEvent.Unvote, {
+			void emitter.dispatch(Events.VoteEvent.Unvote, {
 				transaction: transaction.data,
 				validator: unvote,
 			});
 		}
 
 		for (const vote of transaction.data.asset.votes) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			emitter.dispatch(Events.VoteEvent.Vote, {
+			void emitter.dispatch(Events.VoteEvent.Vote, {
 				transaction: transaction.data,
 				validator: vote,
 			});
