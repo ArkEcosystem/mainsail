@@ -146,8 +146,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		void this.#emit(Enums.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		// TODO: ! no reason to pass this.emitter
-		handler.emitEvents(transaction, this.events);
+		handler.emitEvents(transaction);
 	}
 
 	async #applyBlockToForger(unit: Contracts.Processor.ProcessableUnit) {

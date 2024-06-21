@@ -47,9 +47,8 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
-		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		emitter.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
+	public emitEvents(transaction: Contracts.Crypto.Transaction): void {
+		void this.eventDispatcher.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(
