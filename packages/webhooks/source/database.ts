@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { existsSync } from "fs";
 import { ensureFileSync } from "fs-extra/esm";
 import { LowSync } from "lowdb";
@@ -12,6 +12,9 @@ import { Webhook } from "./interfaces.js";
 export class Database {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	#database!: LowSync<{ webhooks: Webhook[] }>;
 
@@ -48,6 +51,8 @@ export class Database {
 		this.#database.data.webhooks.push(data);
 		this.#database.write();
 
+		void this.eventDispatcher.dispatch(Events.WebhookEvent.Created, { webhook: data });
+
 		return this.findById(data.id);
 	}
 
@@ -56,14 +61,22 @@ export class Database {
 		if (webhook) {
 			Object.assign(webhook, data);
 			this.#database.write();
+
+			void this.eventDispatcher.dispatch(Events.WebhookEvent.Updated, { webhook: data });
 		}
 
 		return webhook;
 	}
 
 	public destroy(id: string): void {
-		this.#database.data.webhooks = this.#database.data.webhooks.filter((webhook) => webhook.id !== id);
-		this.#database.write();
+		const webhook = this.#database.data.webhooks.find((webhook) => webhook.id === id);
+
+		if (webhook) {
+			this.#database.data.webhooks = this.#database.data.webhooks.filter((webhook) => webhook.id !== id);
+			this.#database.write();
+
+			void this.eventDispatcher.dispatch(Events.WebhookEvent.Removed, { webhook });
+		}
 	}
 
 	#restore(): void {
