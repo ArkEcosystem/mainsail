@@ -79,19 +79,19 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.Transaction): void {
 		Utils.assert.defined<string[]>(transaction.data.asset?.votes);
 		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
 
 		for (const unvote of transaction.data.asset.unvotes) {
-			void emitter.dispatch(Events.VoteEvent.Unvote, {
+			void this.eventDispatcher.dispatch(Events.VoteEvent.Unvote, {
 				transaction: transaction.data,
 				validator: unvote,
 			});
 		}
 
 		for (const vote of transaction.data.asset.votes) {
-			void emitter.dispatch(Events.VoteEvent.Vote, {
+			void this.eventDispatcher.dispatch(Events.VoteEvent.Vote, {
 				transaction: transaction.data,
 				validator: vote,
 			});

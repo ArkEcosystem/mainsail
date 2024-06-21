@@ -50,8 +50,8 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
-		void emitter.dispatch(Events.ValidatorEvent.Resigned, transaction.data);
+	public emitEvents(transaction: Contracts.Crypto.Transaction): void {
+		void this.eventDispatcher.dispatch(Events.ValidatorEvent.Resigned, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(

@@ -3,7 +3,6 @@ import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
-// @TODO revisit the implementation, container usage and arguments after database rework
 @injectable()
 export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
 	@inject(Identifiers.Application.Instance)
@@ -17,6 +16,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	public async verify(
 		walletRepository: Contracts.State.WalletRepository,
@@ -128,7 +130,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		sender.setBalance(newBalance);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {}
+	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
 
 	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
 		return [];

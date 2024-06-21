@@ -1,5 +1,4 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
-import { EventDispatcher } from "./kernel/events.js";
 import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
@@ -13,7 +12,7 @@ export interface TransactionHandler {
 
 	applyToSender(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 
-	emitEvents(transaction: Transaction, emitter: EventDispatcher): void;
+	emitEvents(transaction: Transaction): void;
 
 	throwIfCannotEnterPool(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 
