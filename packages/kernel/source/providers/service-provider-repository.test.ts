@@ -1,9 +1,8 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 
 import { describe } from "../../../test-framework/source";
 import { Application } from "../application";
-import { KernelEvent } from "../enums";
 import { MemoryEventDispatcher } from "../services/events";
 import { ServiceProvider } from "./service-provider";
 import { ServiceProviderRepository } from "./service-provider-repository";
@@ -129,7 +128,7 @@ describe<{
 		const fired = spyFn();
 		context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.listenOnce(KernelEvent.ServiceProviderRegistered, new StubListener(() => fired.call()));
+			.listenOnce(Events.KernelEvent.ServiceProviderRegistered, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.register("stub");
 
@@ -145,7 +144,7 @@ describe<{
 		const fired = spyFn();
 		context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.listenOnce(KernelEvent.ServiceProviderBooted, new StubListener(() => fired.call()));
+			.listenOnce(Events.KernelEvent.ServiceProviderBooted, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.boot("stub");
 
@@ -164,7 +163,7 @@ describe<{
 		const fired = spyFn();
 		context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.listenOnce(KernelEvent.ServiceProviderDisposed, new StubListener(() => fired.call()));
+			.listenOnce(Events.KernelEvent.ServiceProviderDisposed, new StubListener(() => fired.call()));
 
 		await context.serviceProviderRepository.dispose("stub");
 

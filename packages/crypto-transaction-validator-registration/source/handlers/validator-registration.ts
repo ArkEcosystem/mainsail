@@ -1,7 +1,7 @@
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
-import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/kernel";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 import { BigNumber } from "@mainsail/utils";
 
@@ -48,7 +48,7 @@ export class ValidatorRegistrationTransactionHandler extends Handlers.Transactio
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {
-		void this.eventDispatcher.dispatch(AppEnums.ValidatorEvent.Registered, transaction.data);
+		void this.eventDispatcher.dispatch(Events.ValidatorEvent.Registered, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(

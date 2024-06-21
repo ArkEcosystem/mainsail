@@ -1,11 +1,10 @@
 import { exit } from "node:process";
 
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
 import { Bootstrappers } from "./bootstrap/index.js";
-import { KernelEvent } from "./enums/index.js";
 import { ServiceProvider, ServiceProviderRepository } from "./providers/index.js";
 import { ConfigRepository } from "./services/config/index.js";
 import { ServiceProvider as EventServiceProvider } from "./services/events/service-provider.js";
@@ -263,11 +262,11 @@ export class Application implements Contracts.Kernel.Application {
 		const events: Contracts.Kernel.EventDispatcher = this.get(Identifiers.Services.EventDispatcher.Service);
 
 		for (const bootstrapper of bootstrappers) {
-			await events.dispatch(KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
+			await events.dispatch(Events.KernelEvent.Bootstrapping, { bootstrapper: bootstrapper.name });
 
 			await this.resolve<Contracts.Kernel.Bootstrapper>(bootstrapper).bootstrap();
 
-			await events.dispatch(KernelEvent.Bootstrapped, { bootstrapper: bootstrapper.name });
+			await events.dispatch(Events.KernelEvent.Bootstrapped, { bootstrapper: bootstrapper.name });
 		}
 	}
 

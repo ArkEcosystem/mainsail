@@ -1,12 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { get } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions.js";
 import { Database } from "./database.js";
-import { WebhookEvent } from "./events.js";
 import { InternalIdentifiers } from "./identifiers.js";
 import { Webhook } from "./interfaces.js";
 
@@ -69,16 +68,14 @@ export class Listener {
 
 	async #dispatchWebhookEvent(start: number, webhook: Webhook, payload: object, error?: Error) {
 		if (error) {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(WebhookEvent.Failed, {
+			void this.events.dispatch(Events.WebhookEvent.Failed, {
 				error: error,
 				executionTime: performance.now() - start,
 				payload: payload,
 				webhook: webhook,
 			});
 		} else {
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(WebhookEvent.Broadcasted, {
+			void this.events.dispatch(Events.WebhookEvent.Broadcasted, {
 				executionTime: performance.now() - start,
 				payload: payload,
 				webhook: webhook,

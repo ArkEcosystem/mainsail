@@ -1,5 +1,5 @@
-import { Identifiers } from "@mainsail/contracts";
-import { Enums, Providers } from "@mainsail/kernel";
+import { Events, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 
 import { describeSkip, Sandbox } from "../../test-framework/source";
 import { defaults } from "./defaults";
@@ -50,13 +50,13 @@ describeSkip<{
 		context.peerProcessor = context.sandbox.app.resolve(PeerProcessor);
 	});
 
-	it("#initialize - should add a listener to Enums.CryptoEvent.MilestoneChanged", ({ peerProcessor }) => {
+	it("#initialize - should add a listener to Events.CryptoEvent.MilestoneChanged", ({ peerProcessor }) => {
 		const spyEventDispatcherListen = stub(eventDispatcher, "listen");
 
 		peerProcessor.initialize();
 
 		spyEventDispatcherListen.calledOnce();
-		spyEventDispatcherListen.calledWith(Enums.CryptoEvent.MilestoneChanged);
+		spyEventDispatcherListen.calledWith(Events.CryptoEvent.MilestoneChanged);
 	});
 
 	it("#validateAndAcceptPeer - should accept a new peer if its ip is validated", async ({ peerProcessor }) => {

@@ -1,8 +1,8 @@
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
-import { Enums as AppEnums, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { VoteTransaction } from "../versions/index.js";
@@ -84,14 +84,14 @@ export class VoteTransactionHandler extends Handlers.TransactionHandler {
 		Utils.assert.defined<string[]>(transaction.data.asset?.unvotes);
 
 		for (const unvote of transaction.data.asset.unvotes) {
-			void this.eventDispatcher.dispatch(AppEnums.VoteEvent.Unvote, {
+			void this.eventDispatcher.dispatch(Events.VoteEvent.Unvote, {
 				transaction: transaction.data,
 				validator: unvote,
 			});
 		}
 
 		for (const vote of transaction.data.asset.votes) {
-			void this.eventDispatcher.dispatch(AppEnums.VoteEvent.Vote, {
+			void this.eventDispatcher.dispatch(Events.VoteEvent.Vote, {
 				transaction: transaction.data,
 				validator: vote,
 			});

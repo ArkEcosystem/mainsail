@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import dayjs from "dayjs";
 
 @injectable()
@@ -32,7 +31,7 @@ export class ApiNodeProcessor implements Contracts.P2P.ApiNodeProcessor {
 
 			this.repository.setApiNode(apiNode);
 
-			void this.events.dispatch(Enums.ApiNodeEvent.Added, apiNode);
+			void this.events.dispatch(Events.ApiNodeEvent.Added, apiNode);
 		}
 
 		this.repository.forgetPendingApiNode(apiNode);
@@ -53,6 +52,6 @@ export class ApiNodeProcessor implements Contracts.P2P.ApiNodeProcessor {
 		}
 
 		this.repository.forgetApiNode(apiNode);
-		void this.events.dispatch(Enums.ApiNodeEvent.Removed, apiNode);
+		void this.events.dispatch(Events.ApiNodeEvent.Removed, apiNode);
 	}
 }

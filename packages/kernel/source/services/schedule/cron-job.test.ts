@@ -1,8 +1,7 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Events, Identifiers } from "@mainsail/contracts";
 import moment from "moment-timezone";
 
 import { describe, Sandbox } from "../../../../test-framework/source";
-import { Enums } from "../../index";
 import { CronJob } from "./cron-job";
 
 const days: Record<string, string> = {
@@ -43,7 +42,7 @@ describe<{
 		function_.calledTimes(3);
 
 		dispatchSpy.calledWith(
-			Enums.ScheduleEvent.CronJobFinished,
+			Events.ScheduleEvent.CronJobFinished,
 			match({
 				executionTime: match.number,
 				expression: match.string,
@@ -73,7 +72,7 @@ describe<{
 		function_.calledOnce();
 
 		dispatchSpy.calledWith(
-			Enums.ScheduleEvent.CronJobFinished,
+			Events.ScheduleEvent.CronJobFinished,
 			match({
 				executionTime: match.number,
 				expression: match.string,

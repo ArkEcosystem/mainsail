@@ -1,7 +1,6 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { Enums } from "@mainsail/kernel";
 
 import crypto from "../../core/bin/config/testnet/core/crypto.json";
 import { describe } from "../../test-framework/source";
@@ -158,7 +157,7 @@ describe<{
 		});
 
 		eventSpy.calledTimes(1);
-		eventSpy.calledWith(Enums.TransactionEvent.Expired);
+		eventSpy.calledWith(Events.TransactionEvent.Expired);
 	});
 
 	it("apply - should throw when transaction fails to verify", async ({

@@ -1,8 +1,8 @@
 import { inject, injectable, optional } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
-import { Enums as AppEnums, Utils as AppUtils } from "@mainsail/kernel";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { ValidatorResignationTransaction } from "../versions/1.js";
@@ -51,7 +51,7 @@ export class ValidatorResignationTransactionHandler extends Handlers.Transaction
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {
-		void this.eventDispatcher.dispatch(AppEnums.ValidatorEvent.Resigned, transaction.data);
+		void this.eventDispatcher.dispatch(Events.ValidatorEvent.Resigned, transaction.data);
 	}
 
 	public async throwIfCannotEnterPool(
