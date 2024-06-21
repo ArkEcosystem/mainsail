@@ -7,7 +7,6 @@ import { performance } from "perf_hooks";
 import { conditions } from "./conditions.js";
 import { Database } from "./database.js";
 import { InternalIdentifiers } from "./identifiers.js";
-import { Webhook } from "./interfaces.js";
 
 @injectable()
 export class Listener {
@@ -26,7 +25,7 @@ export class Listener {
 			return;
 		}
 
-		const webhooks: Webhook[] = this.#getWebhooks(name, data);
+		const webhooks: Contracts.Webhooks.Webhook[] = this.#getWebhooks(name, data);
 
 		const promises: Promise<void>[] = [];
 
@@ -37,7 +36,7 @@ export class Listener {
 		await Promise.all(promises);
 	}
 
-	public async broadcast(webhook: Webhook, payload: object, timeout = 1500): Promise<void> {
+	public async broadcast(webhook: Contracts.Webhooks.Webhook, payload: object, timeout = 1500): Promise<void> {
 		const start = performance.now();
 
 		try {
@@ -66,7 +65,7 @@ export class Listener {
 		}
 	}
 
-	async #dispatchWebhookEvent(start: number, webhook: Webhook, payload: object, error?: Error) {
+	async #dispatchWebhookEvent(start: number, webhook: Contracts.Webhooks.Webhook, payload: object, error?: Error) {
 		if (error) {
 			void this.events.dispatch(Events.WebhookEvent.Failed, {
 				error: error,
@@ -83,11 +82,11 @@ export class Listener {
 		}
 	}
 
-	#getWebhooks(event: string, payload: object): Webhook[] {
+	#getWebhooks(event: string, payload: object): Contracts.Webhooks.Webhook[] {
 		return this.app
 			.get<Database>(InternalIdentifiers.Database)
 			.findByEvent(event)
-			.filter((webhook: Webhook) => {
+			.filter((webhook: Contracts.Webhooks.Webhook) => {
 				if (!webhook.enabled) {
 					return false;
 				}

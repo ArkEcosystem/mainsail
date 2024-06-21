@@ -6,8 +6,6 @@ import { LowSync } from "lowdb";
 import { JSONFileSync } from "lowdb/node";
 import { v4 as uuidv4 } from "uuid";
 
-import { Webhook } from "./interfaces.js";
-
 @injectable()
 export class Database {
 	@inject(Identifiers.Application.Instance)
@@ -16,7 +14,7 @@ export class Database {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
-	#database!: LowSync<{ webhooks: Webhook[] }>;
+	#database!: LowSync<{ webhooks: Contracts.Webhooks.Webhook[] }>;
 
 	public boot() {
 		const adapterFile: string = this.app.cachePath("webhooks.json");
@@ -25,11 +23,13 @@ export class Database {
 			ensureFileSync(adapterFile);
 		}
 
-		this.#database = new LowSync<{ webhooks: Webhook[] }>(new JSONFileSync(adapterFile), { webhooks: [] });
+		this.#database = new LowSync<{ webhooks: Contracts.Webhooks.Webhook[] }>(new JSONFileSync(adapterFile), {
+			webhooks: [],
+		});
 		this.#restore();
 	}
 
-	public all(): Webhook[] {
+	public all(): Contracts.Webhooks.Webhook[] {
 		return this.#database.data.webhooks;
 	}
 
@@ -37,15 +37,15 @@ export class Database {
 		return !!this.findById(id);
 	}
 
-	public findById(id: string): Webhook | undefined {
+	public findById(id: string): Contracts.Webhooks.Webhook | undefined {
 		return this.#database.data.webhooks.find((webhook) => webhook.id === id);
 	}
 
-	public findByEvent(event: string): Webhook[] {
+	public findByEvent(event: string): Contracts.Webhooks.Webhook[] {
 		return this.#database.data.webhooks.filter((webhook) => webhook.event === event);
 	}
 
-	public create(data: Webhook): Webhook | undefined {
+	public create(data: Contracts.Webhooks.Webhook): Contracts.Webhooks.Webhook | undefined {
 		data.id = uuidv4();
 
 		this.#database.data.webhooks.push(data);
@@ -56,7 +56,7 @@ export class Database {
 		return this.findById(data.id);
 	}
 
-	public update(id: string, data: Webhook): Webhook | undefined {
+	public update(id: string, data: Contracts.Webhooks.Webhook): Contracts.Webhooks.Webhook | undefined {
 		const webhook = this.#database.data.webhooks.find((webhook) => webhook.id === id);
 		if (webhook) {
 			Object.assign(webhook, data);

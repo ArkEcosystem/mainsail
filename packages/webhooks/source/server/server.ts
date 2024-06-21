@@ -7,7 +7,6 @@ import { randomBytes } from "crypto";
 
 import { Database } from "../database.js";
 import { InternalIdentifiers } from "../identifiers.js";
-import { Webhook } from "../interfaces.js";
 import { whitelist } from "./plugins/whitelist.js";
 import { destroy, show, store, update } from "./schema.js";
 import { respondWithResource } from "./utils.js";
@@ -168,7 +167,7 @@ export class Server {
 					return Boom.notFound();
 				}
 
-				const webhook: Webhook | undefined = Utils.cloneDeep(
+				const webhook: Contracts.Webhooks.Webhook | undefined = Utils.cloneDeep(
 					// @ts-ignore TODO: check typings
 					request.server.app.database.findById(request.params.id),
 				);
@@ -197,7 +196,7 @@ export class Server {
 				}
 
 				// @ts-ignore TODO: check typings
-				request.server.app.database.update(request.params.id, request.payload as Webhook);
+				request.server.app.database.update(request.params.id, request.payload as Contracts.Webhooks.Webhook);
 
 				return h.response().code(204);
 			},
