@@ -69,4 +69,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	public async forgetPeer(ip: string): Promise<void> {
 		await this.ipcSubprocess.sendRequest("forgetPeer", ip);
 	}
+
+	public async reloadWebhooks(): Promise<void> {
+		await this.ipcSubprocess.sendRequest("reloadWebhooks");
+	}
 }

@@ -13,6 +13,7 @@ export interface WorkerScriptHandler {
 	setPeer(ip: string): Promise<void>;
 	forgetPeer(ip: string): Promise<void>;
 	start(): Promise<void>;
+	reloadWebhooks(): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;
