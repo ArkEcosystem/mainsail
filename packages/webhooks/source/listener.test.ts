@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Events, Identifiers } from "@mainsail/contracts";
 import { Application, Utils } from "@mainsail/kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -7,7 +7,6 @@ import { describe } from "../../test-framework/source";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { conditions } from "./conditions";
 import { Database } from "./database";
-import { WebhookEvent } from "./events";
 import { InternalIdentifiers } from "./identifiers";
 import { Webhook } from "./interfaces";
 import { Listener } from "./listener";
@@ -78,7 +77,7 @@ describe<{
 		spyOnDispatch.calledOnce();
 
 		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Broadcasted);
+		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Broadcasted);
 		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
@@ -97,7 +96,7 @@ describe<{
 		spyOnError.calledOnce();
 		spyOnDispatch.calledOnce();
 		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Failed);
+		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Failed);
 		expectFailedEventData(spyOnDispatchArguments[1]);
 	});
 
@@ -117,7 +116,7 @@ describe<{
 
 		database.create(webhook);
 
-		await listener.handle({ data: "dummy_data", name: WebhookEvent.Broadcasted });
+		await listener.handle({ data: "dummy_data", name: Events.WebhookEvent.Broadcasted });
 
 		spyOnPost.neverCalled();
 	});
@@ -142,7 +141,7 @@ describe<{
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
 		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Broadcasted);
+		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Broadcasted);
 		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
@@ -166,7 +165,7 @@ describe<{
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
 		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Broadcasted);
+		assert.equal(spyOnDispatchArguments[0], Events.WebhookEvent.Broadcasted);
 		expectFinishedEventData(spyOnDispatchArguments[1]);
 	});
 
