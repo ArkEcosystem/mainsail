@@ -1,7 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-
-import { CacheEvent } from "../../../enums/events.js";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
@@ -31,8 +29,8 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
 		value
-			? this.eventDispatcher.dispatch(CacheEvent.Hit, { key, value })
-			: this.eventDispatcher.dispatch(CacheEvent.Missed, { key });
+			? this.eventDispatcher.dispatch(Events.CacheEvent.Hit, { key, value })
+			: this.eventDispatcher.dispatch(Events.CacheEvent.Missed, { key });
 
 		return value;
 	}
@@ -45,7 +43,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 		this.#store.set(key, value);
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.eventDispatcher.dispatch(CacheEvent.Written, { key, seconds, value });
+		this.eventDispatcher.dispatch(Events.CacheEvent.Written, { key, seconds, value });
 
 		return this.has(key);
 	}
@@ -82,7 +80,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 		this.#store.delete(key);
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.eventDispatcher.dispatch(CacheEvent.Forgotten, { key });
+		this.eventDispatcher.dispatch(Events.CacheEvent.Forgotten, { key });
 
 		return this.missing(key);
 	}
@@ -95,7 +93,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 		this.#store.clear();
 
 		// eslint-disable-next-line @typescript-eslint/no-floating-promises
-		this.eventDispatcher.dispatch(CacheEvent.Flushed);
+		this.eventDispatcher.dispatch(Events.CacheEvent.Flushed);
 
 		return this.#store.size === 0;
 	}

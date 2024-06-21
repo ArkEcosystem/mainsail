@@ -1,7 +1,6 @@
 import { inject, injectable, multiInject, optional } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-// TODO: Move enums to contracts
-import { Enums, Utils } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -64,7 +63,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			return true;
 		} catch (error) {
-			void this.#emit(Enums.BlockEvent.Invalid, { block: unit.getBlock().data, error });
+			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().data, error });
 			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 
@@ -104,7 +103,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		void this.#emit(Enums.BlockEvent.Applied, commit.block.data);
+		void this.#emit(Events.BlockEvent.Applied, commit.block.data);
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
@@ -135,7 +134,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (this.configuration.isNewMilestone()) {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
-			void this.#emit(Enums.CryptoEvent.MilestoneChanged);
+			void this.#emit(Events.CryptoEvent.MilestoneChanged);
 		}
 	}
 
@@ -144,7 +143,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
-		void this.#emit(Enums.TransactionEvent.Applied, transaction.data);
+		void this.#emit(Events.TransactionEvent.Applied, transaction.data);
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		// TODO: ! no reason to pass this.emitter
 		handler.emitEvents(transaction, this.events);

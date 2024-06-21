@@ -1,9 +1,7 @@
 import { decorateInjectable, inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
-
-import { QueueEvent } from "../../../enums/events.js";
 
 decorateInjectable(EventEmitter);
 
@@ -132,7 +130,7 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 			try {
 				const data = await job.handle();
 
-				await this.events.dispatch(QueueEvent.Finished, {
+				await this.events.dispatch(Events.QueueEvent.Finished, {
 					data: data,
 					driver: "memory",
 					executionTime: performance.now() - start,
@@ -140,7 +138,7 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 
 				this.emit("jobDone", job, data);
 			} catch (error) {
-				await this.events.dispatch(QueueEvent.Failed, {
+				await this.events.dispatch(Events.QueueEvent.Failed, {
 					driver: "memory",
 					error: error,
 					executionTime: performance.now() - start,

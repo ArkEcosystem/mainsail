@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 
-import { BlockEvent, KernelEvent } from "../enums/index.js";
 import { ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 
 @injectable()
@@ -21,11 +20,11 @@ export class ChangeServiceProviderState implements Contracts.Kernel.EventListene
 	}
 
 	public async handle({ name, data }): Promise<void> {
-		if (name === BlockEvent.Applied) {
+		if (name === Events.BlockEvent.Applied) {
 			return this.#changeState();
 		}
 
-		if (name === KernelEvent.ServiceProviderBooted && data.name !== this.#name) {
+		if (name === Events.KernelEvent.ServiceProviderBooted && data.name !== this.#name) {
 			return this.#changeState(data.name);
 		}
 	}

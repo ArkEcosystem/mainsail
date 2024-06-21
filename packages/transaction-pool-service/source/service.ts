@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Constants, Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils } from "@mainsail/kernel";
+import { Constants, Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Providers, Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -75,7 +75,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				for (const forgedTransaction of transactions) {
 					this.storage.removeTransaction(transaction.id);
 					this.logger.debug(`Removed forged tx ${transaction.id}`);
-					void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, forgedTransaction.data);
+					void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, forgedTransaction.data);
 				}
 			}
 
@@ -88,7 +88,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				for (const forgedTransaction of transactions) {
 					this.storage.removeTransaction(transaction.id);
 					this.logger.debug(`Removed tx ${transaction.id}`);
-					void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, forgedTransaction.data);
+					void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, forgedTransaction.data);
 				}
 			}
 
@@ -118,14 +118,14 @@ export class Service implements Contracts.TransactionPool.Service {
 				await this.#addTransactionToMempool(transaction);
 				this.logger.debug(`tx ${transaction.id} added to pool`);
 
-				void this.events.dispatch(Enums.TransactionEvent.AddedToPool, transaction.data);
+				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.warning(
 					`tx ${transaction.id} (type: ${transaction.type}) failed to enter pool: ${error.message}`,
 				);
 
-				void this.events.dispatch(Enums.TransactionEvent.RejectedByPool, transaction.data);
+				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.data);
 
 				throw error instanceof Exceptions.PoolError
 					? error
@@ -157,7 +157,7 @@ export class Service implements Contracts.TransactionPool.Service {
 						await this.#addTransactionToMempool(previouslyStoredTransaction);
 
 						// eslint-disable-next-line @typescript-eslint/no-floating-promises
-						this.events.dispatch(Enums.TransactionEvent.AddedToPool, previouslyStoredTransaction.data);
+						this.events.dispatch(Events.TransactionEvent.AddedToPool, previouslyStoredTransaction.data);
 
 						previouslyStoredSuccesses++;
 					} catch (error) {
@@ -215,7 +215,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.storage.removeTransaction(removedTransaction.id);
 				this.logger.debug(`Removed old tx ${removedTransaction.id}`);
 
-				void this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
+				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.data);
 			}
 		}
 	}
@@ -231,7 +231,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				for (const removedTransaction of removedTransactions) {
 					this.storage.removeTransaction(removedTransaction.id);
 					this.logger.debug(`Removed expired tx ${removedTransaction.id}`);
-					void this.events.dispatch(Enums.TransactionEvent.Expired, removedTransaction.data);
+					void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.data);
 				}
 			}
 		}
@@ -252,7 +252,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		for (const removedTransaction of removedTransactions) {
 			this.storage.removeTransaction(removedTransaction.id);
 			this.logger.debug(`Removed lowest priority tx ${removedTransaction.id}`);
-			void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, removedTransaction.data);
+			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removedTransaction.data);
 		}
 	}
 
@@ -271,7 +271,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			this.storage.removeTransaction(transaction.id);
 			this.logger.debug(`Removed invalid tx ${transaction.id}`);
 
-			void this.events.dispatch(Enums.TransactionEvent.RemovedFromPool, transaction.data);
+			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 		}
 	}
 
