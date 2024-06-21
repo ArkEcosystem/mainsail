@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Utils } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 import { describe, Sandbox } from "../../test-framework/source";
 import { Consensus } from "./consensus";
@@ -224,7 +224,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyGetRoundState.calledWith(1, 0);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${0} with proposer: ${proposer}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.RoundStarted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -283,7 +283,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyValidatorPropose.calledWith(1, 0, undefined, block);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${0} with proposer: ${proposer}`);
 		spyDispatch.called();
-		spyDispatch.calledWith(Enums.ConsensusEvent.RoundStarted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -357,7 +357,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${1} with proposer: ${proposer}`);
 		spyLoggerInfo.calledWith(`Proposing valid block ${1}/${1} from round ${0} with blockId: ${block.data.id}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.RoundStarted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 1,
@@ -506,7 +506,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -564,7 +564,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyPrevoteProcess.calledWith(prevote);
 		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -621,7 +621,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyLoggerInfo.calledWith(`Received proposal ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -691,7 +691,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerInfo.calledWith(
 			`Received proposal ${1}/${1} with locked blockId: ${proposal.getData().block.data.id}`,
 		);
-		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 1,
@@ -756,7 +756,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyPrevoteProcess.calledWith(prevote);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.ProposalAccepted, {
+		spyDispatch.calledWith(Events.ConsensusEvent.ProposalAccepted, {
 			height: 1,
 			lockedRound: undefined,
 			round: 1,
@@ -902,7 +902,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyPrecommitProcess.calledWith(precommit);
 		spyLoggerInfo.calledWith(`Received +2/3 prevotes for ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.PrevotedProposal, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedProposal, {
 			height: 1,
 			lockedRound: 0,
 			round: 0,
@@ -935,7 +935,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Precommit);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.PrevotedProposal, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedProposal, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -1109,7 +1109,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Contracts.Consensus.Step.Prevote);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.PrevotedAny, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedAny, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -1234,7 +1234,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyPrecommitProcess.calledWith(precommit);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.PrevotedNull, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrevotedNull, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -1285,7 +1285,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyScheduleTimeout.calledWith(1, 0);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.PrecommitedAny, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedAny, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -1381,7 +1381,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyRoundStateRepositoryClear.calledOnce();
 		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0} blockId: ${proposal.getData().block.data.id}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Enums.ConsensusEvent.PrecommitedProposal, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedProposal, {
 			height: 1,
 			lockedRound: undefined,
 			round: 0,

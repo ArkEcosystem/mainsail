@@ -1,5 +1,5 @@
 import { notFound } from "@hapi/boom";
-import { Enums } from "@mainsail/kernel";
+import { Events } from "@mainsail/contracts";
 
 import { describe } from "../../../test-framework/source";
 import { Webhook } from "../interfaces";
@@ -20,7 +20,7 @@ describe("Utils", ({ it, assert }) => {
 			},
 		],
 		enabled: true,
-		event: Enums.BlockEvent.Forged,
+		event: Events.BlockEvent.Forged,
 		id: "dummy_id",
 		target: "https://httpbin.org/post",
 		token: "ark",

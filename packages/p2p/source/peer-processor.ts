@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils as KernelUtils } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Providers, Utils as KernelUtils } from "@mainsail/kernel";
 
 import { isValidVersion } from "./utils/index.js";
 import { isValidPeerIp } from "./validation/index.js";
@@ -49,7 +49,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 	@postConstruct()
 	public initialize(): void {
-		this.events.listen(Enums.CryptoEvent.MilestoneChanged, {
+		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
 			handle: () => this.#disconnectInvalidPeers(),
 		});
 
@@ -118,7 +118,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			this.repository.setPeer(peer);
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
-			void this.events.dispatch(Enums.PeerEvent.Added, peer);
+			void this.events.dispatch(Events.PeerEvent.Added, peer);
 
 			await this.transactionPoolWorker.setPeer(peer.ip);
 

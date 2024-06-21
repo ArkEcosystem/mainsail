@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Utils } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 import { getRandomPeer } from "../utils/index.js";
 
@@ -68,7 +68,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	@postConstruct()
 	public initialize(): void {
-		this.events.listen(Enums.BlockEvent.Applied, {
+		this.events.listen(Events.BlockEvent.Applied, {
 			handle: () => {
 				const store = this.stateService.getStore();
 				this.#downloadsByHeight.delete(store.getLastHeight());

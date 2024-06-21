@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import dayjs from "dayjs";
 
 import { errorTypes } from "./hapi-nes/index.js";
@@ -62,7 +62,7 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 			this.repository.forgetPeer(peer);
 			peer.dispose();
 
-			void this.events.dispatch(Enums.PeerEvent.Removed, peer);
+			void this.events.dispatch(Events.PeerEvent.Removed, peer);
 			void this.transactionPoolWorker.forgetPeer(ip);
 		}
 	}

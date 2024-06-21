@@ -1,10 +1,9 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { sleep } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
 import { describe, Sandbox } from "../../../../../test-framework/source";
-import { QueueEvent } from "../../../enums";
 import { MemoryQueue } from "./memory";
 
 EventEmitter.prototype.constructor = Object.prototype.constructor;
@@ -526,7 +525,7 @@ describe<{
 		jobMethodStub.calledTimes(2);
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
-			QueueEvent.Finished,
+			Events.QueueEvent.Finished,
 			match({
 				data: "dummy_data",
 				driver: "memory",
@@ -553,7 +552,7 @@ describe<{
 		warningLoggerSpy.calledTimes(2);
 		dispatchSpy.calledTimes(2);
 		dispatchSpy.calledWith(
-			QueueEvent.Failed,
+			Events.QueueEvent.Failed,
 			match({
 				driver: "memory",
 				error: match(error),

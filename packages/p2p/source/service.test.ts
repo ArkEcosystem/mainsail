@@ -1,5 +1,5 @@
-import { Identifiers } from "@mainsail/contracts";
-import { Enums, Providers } from "@mainsail/kernel";
+import { Events, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import importFresh from "import-fresh";
 
@@ -413,8 +413,8 @@ describeSkip<{
 
 		spyCommunicatorPing.calledTimes(peers.length);
 		spyEmitterDispatch.calledTimes(2);
-		spyEmitterDispatch.calledWith(Enums.PeerEvent.Disconnect, { peer: match.instanceOf(Peer) }); // TODO: Check consistency
-		spyEmitterDispatch.calledWith(Enums.PeerEvent.Removed, match.instanceOf(Peer)); // TODO: Check consistency
+		spyEmitterDispatch.calledWith(Events.PeerEvent.Disconnect, { peer: match.instanceOf(Peer) }); // TODO: Check consistency
+		spyEmitterDispatch.calledWith(Events.PeerEvent.Removed, match.instanceOf(Peer)); // TODO: Check consistency
 	});
 
 	it.skip("#cleansePeers - should log the responsive peers count and the median network height when initializing", async ({
