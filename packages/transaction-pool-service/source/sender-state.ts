@@ -86,20 +86,4 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
 	}
-
-	public async revert(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		try {
-			// TODO: Implement transaction revert
-			// const handler: Contracts.Transactions.ITransactionHandler =
-			// 	await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-			// await this.triggers.call("revertTransaction", {
-			// 	handler,
-			// 	transaction,
-			// 	walletRepository: this.walletRepository,
-			// });
-		} catch (error) {
-			this.#corrupt = true;
-			throw error;
-		}
-	}
 }
