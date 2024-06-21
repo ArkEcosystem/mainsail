@@ -10,7 +10,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		// Setup Database...
 		this.app.bind(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
-		this.app.get(Identifiers.Webhooks.Database).boot();
+		this.app.get<Contracts.Webhooks.Database>(Identifiers.Webhooks.Database).boot();
 
 		// Setup Server...
 		this.app.bind(Identifiers.Webhooks.Server).to(Server).inSingletonScope();
