@@ -3,22 +3,21 @@ import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
 import { Database } from "./database.js";
-import { InternalIdentifiers } from "./identifiers.js";
 import { Listener } from "./listener.js";
 import { Server } from "./server/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		// Setup Database...
-		this.app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
+		this.app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 
-		this.app.get<Database>(InternalIdentifiers.Database).boot();
+		this.app.get<Database>(Identifiers.Webhooks.Database).boot();
 
 		// Setup Server...
-		this.app.bind(InternalIdentifiers.Server).to(Server).inSingletonScope();
+		this.app.bind(Identifiers.Webhooks.Server).to(Server).inSingletonScope();
 
 		await this.app
-			.get<Server>(InternalIdentifiers.Server)
+			.get<Server>(Identifiers.Webhooks.Server)
 			.register(this.config().get<Contracts.Types.JsonObject>("server")!);
 
 		// Setup Listeners...
@@ -26,11 +25,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.get<any>(InternalIdentifiers.Server).boot();
+		await this.app.get<any>(Identifiers.Webhooks.Server).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<any>(InternalIdentifiers.Server).dispose();
+		await this.app.get<any>(Identifiers.Webhooks.Server).dispose();
 	}
 
 	public async bootWhen(): Promise<boolean> {

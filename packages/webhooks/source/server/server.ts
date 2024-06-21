@@ -6,7 +6,6 @@ import { Utils } from "@mainsail/kernel";
 import { randomBytes } from "crypto";
 
 import { Database } from "../database.js";
-import { InternalIdentifiers } from "../identifiers.js";
 import { whitelist } from "./plugins/whitelist.js";
 import { destroy, show, store, update } from "./schema.js";
 import { respondWithResource } from "./utils.js";
@@ -19,7 +18,7 @@ export class Server {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(InternalIdentifiers.Database)
+	@inject(Identifiers.Webhooks.Database)
 	private readonly database!: Database;
 
 	@inject(Identifiers.Services.Log.Service)

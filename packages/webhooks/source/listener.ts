@@ -6,7 +6,6 @@ import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions.js";
 import { Database } from "./database.js";
-import { InternalIdentifiers } from "./identifiers.js";
 
 @injectable()
 export class Listener {
@@ -84,7 +83,7 @@ export class Listener {
 
 	#getWebhooks(event: string, payload: object): Contracts.Webhooks.Webhook[] {
 		return this.app
-			.get<Database>(InternalIdentifiers.Database)
+			.get<Database>(Identifiers.Webhooks.Database)
 			.findByEvent(event)
 			.filter((webhook: Contracts.Webhooks.Webhook) => {
 				if (!webhook.enabled) {

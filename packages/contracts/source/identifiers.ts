@@ -304,4 +304,10 @@ export const Identifiers = {
 	ValidatorSet: {
 		Service: Symbol("ValidatorSet<Service>"),
 	},
+	Webhooks: {
+		Broadcaster: Symbol.for("Webhooks<Broadcaster>"),
+		Database: Symbol.for("Webhooks<Database>"),
+		Listener: Symbol.for("Webhooks<Listener>"),
+		Server: Symbol.for("Webhooks<Server>"),
+	},
 };
