@@ -5,12 +5,11 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { randomBytes } from "crypto";
 
-import { Database } from "../database.js";
 import { whitelist } from "./plugins/whitelist.js";
 import { destroy, show, store, update } from "./schema.js";
 import { respondWithResource } from "./utils.js";
 
-export type WebhookAppState = { database: Database };
+export type WebhookAppState = { database: Contracts.Webhooks.Database };
 export type WebhookServer = HapiServer<WebhookAppState>;
 
 @injectable()
@@ -19,7 +18,7 @@ export class Server {
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Webhooks.Database)
-	private readonly database!: Database;
+	private readonly database!: Contracts.Webhooks.Database;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

@@ -7,7 +7,7 @@ import { JSONFileSync } from "lowdb/node";
 import { v4 as uuidv4 } from "uuid";
 
 @injectable()
-export class Database {
+export class Database implements Contracts.Webhooks.Database {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -26,7 +26,13 @@ export class Database {
 		this.#database = new LowSync<{ webhooks: Contracts.Webhooks.Webhook[] }>(new JSONFileSync(adapterFile), {
 			webhooks: [],
 		});
-		this.#restore();
+		this.restore();
+	}
+
+	public restore(): void {
+		try {
+			this.#database.read();
+		} catch {}
 	}
 
 	public all(): Contracts.Webhooks.Webhook[] {
@@ -45,7 +51,7 @@ export class Database {
 		return this.#database.data.webhooks.filter((webhook) => webhook.event === event);
 	}
 
-	public create(data: Contracts.Webhooks.Webhook): Contracts.Webhooks.Webhook | undefined {
+	public create(data: Contracts.Webhooks.Webhook): Contracts.Webhooks.Webhook {
 		data.id = uuidv4();
 
 		this.#database.data.webhooks.push(data);
@@ -53,7 +59,7 @@ export class Database {
 
 		void this.eventDispatcher.dispatch(Events.WebhookEvent.Created, { webhook: data });
 
-		return this.findById(data.id);
+		return this.findById(data.id)!;
 	}
 
 	public update(id: string, data: Contracts.Webhooks.Webhook): Contracts.Webhooks.Webhook | undefined {
@@ -68,7 +74,7 @@ export class Database {
 		return webhook;
 	}
 
-	public destroy(id: string): void {
+	public destroy(id: string): Contracts.Webhooks.Webhook | undefined {
 		const webhook = this.#database.data.webhooks.find((webhook) => webhook.id === id);
 
 		if (webhook) {
@@ -77,11 +83,7 @@ export class Database {
 
 			void this.eventDispatcher.dispatch(Events.WebhookEvent.Removed, { webhook });
 		}
-	}
 
-	#restore(): void {
-		try {
-			this.#database.read();
-		} catch {}
+		return webhook;
 	}
 }

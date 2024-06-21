@@ -5,7 +5,6 @@ import { get } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { conditions } from "./conditions.js";
-import { Database } from "./database.js";
 
 @injectable()
 export class Listener {
@@ -83,7 +82,7 @@ export class Listener {
 
 	#getWebhooks(event: string, payload: object): Contracts.Webhooks.Webhook[] {
 		return this.app
-			.get<Database>(Identifiers.Webhooks.Database)
+			.get<Contracts.Webhooks.Database>(Identifiers.Webhooks.Database)
 			.findByEvent(event)
 			.filter((webhook: Contracts.Webhooks.Webhook) => {
 				if (!webhook.enabled) {
