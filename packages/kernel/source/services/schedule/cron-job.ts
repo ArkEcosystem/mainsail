@@ -1,9 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { CronCommand, CronJob as Cron } from "cron";
 import { performance } from "perf_hooks";
 
-import { ScheduleEvent } from "../../enums/events.js";
 import { Job } from "./interfaces.js";
 
 @injectable()
@@ -19,8 +18,7 @@ export class CronJob implements Job {
 			// @ts-ignore
 			callback();
 
-			// eslint-disable-next-line @typescript-eslint/no-floating-promises
-			this.events.dispatch(ScheduleEvent.CronJobFinished, {
+			void this.events.dispatch(Events.ScheduleEvent.CronJobFinished, {
 				executionTime: performance.now() - start,
 				expression: this.expression,
 			});

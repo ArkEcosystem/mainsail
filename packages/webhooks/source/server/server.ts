@@ -5,14 +5,11 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { randomBytes } from "crypto";
 
-import { Database } from "../database.js";
-import { InternalIdentifiers } from "../identifiers.js";
-import { Webhook } from "../interfaces.js";
 import { whitelist } from "./plugins/whitelist.js";
 import { destroy, show, store, update } from "./schema.js";
 import { respondWithResource } from "./utils.js";
 
-export type WebhookAppState = { database: Database };
+export type WebhookAppState = { database: Contracts.Webhooks.Database };
 export type WebhookServer = HapiServer<WebhookAppState>;
 
 @injectable()
@@ -20,8 +17,8 @@ export class Server {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(InternalIdentifiers.Database)
-	private readonly database!: Database;
+	@inject(Identifiers.Webhooks.Database)
+	private readonly database!: Contracts.Webhooks.Database;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -168,7 +165,7 @@ export class Server {
 					return Boom.notFound();
 				}
 
-				const webhook: Webhook | undefined = Utils.cloneDeep(
+				const webhook: Contracts.Webhooks.Webhook | undefined = Utils.cloneDeep(
 					// @ts-ignore TODO: check typings
 					request.server.app.database.findById(request.params.id),
 				);
@@ -197,7 +194,7 @@ export class Server {
 				}
 
 				// @ts-ignore TODO: check typings
-				request.server.app.database.update(request.params.id, request.payload as Webhook);
+				request.server.app.database.update(request.params.id, request.payload as Contracts.Webhooks.Webhook);
 
 				return h.response().code(204);
 			},

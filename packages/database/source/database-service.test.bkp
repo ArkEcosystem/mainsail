@@ -211,6 +211,7 @@ describe<{
 
 	it("#findBlocks - should return blocks by height", async ({ databaseService }) => {
 		const commits = await generateCommits(4);
+
 		for (const commit of commits) {
 			databaseService.addCommit(commit);
 		}

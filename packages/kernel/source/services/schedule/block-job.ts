@@ -1,8 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { performance } from "perf_hooks";
 
-import { BlockEvent, ScheduleEvent } from "../../enums/events.js";
 import { Job } from "./interfaces.js";
 import { ExecuteCallbackWhenReady } from "./listeners.js";
 
@@ -22,13 +21,13 @@ export class BlockJob implements Job {
 
 			await callback();
 
-			await this.events.dispatch(ScheduleEvent.BlockJobFinished, {
+			await this.events.dispatch(Events.ScheduleEvent.BlockJobFinished, {
 				blockCount: this.blockCount,
 				executionTime: performance.now() - start,
 			});
 		};
 
-		this.events.listen(BlockEvent.Received, new ExecuteCallbackWhenReady(onCallback, this.blockCount));
+		this.events.listen(Events.BlockEvent.Received, new ExecuteCallbackWhenReady(onCallback, this.blockCount));
 	}
 
 	public cron(blockCount: number): this {

@@ -4,8 +4,8 @@ import {
 	Models,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
-import { Enums, Utils } from "@mainsail/kernel";
+import { Contracts, Events } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
@@ -16,10 +16,10 @@ export class Mempool extends AbstractListener<Contracts.Crypto.TransactionData, 
 
 	protected getEventMapping(): ListenerEventMapping {
 		return {
-			[Enums.TransactionEvent.AddedToPool]: ListenerEvent.OnAdded,
-			[Enums.TransactionEvent.Applied]: ListenerEvent.OnRemoved,
-			[Enums.TransactionEvent.Expired]: ListenerEvent.OnRemoved,
-			[Enums.TransactionEvent.RemovedFromPool]: ListenerEvent.OnRemoved,
+			[Events.TransactionEvent.AddedToPool]: ListenerEvent.OnAdded,
+			[Events.TransactionEvent.Applied]: ListenerEvent.OnRemoved,
+			[Events.TransactionEvent.Expired]: ListenerEvent.OnRemoved,
+			[Events.TransactionEvent.RemovedFromPool]: ListenerEvent.OnRemoved,
 		};
 	}
 

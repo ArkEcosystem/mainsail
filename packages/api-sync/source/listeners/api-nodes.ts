@@ -4,8 +4,7 @@ import {
 	Models,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
+import { Contracts, Events } from "@mainsail/contracts";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
@@ -16,8 +15,8 @@ export class ApiNodes extends AbstractListener<Contracts.P2P.ApiNode, Models.Api
 
 	protected getEventMapping(): ListenerEventMapping {
 		return {
-			[Enums.ApiNodeEvent.Added]: ListenerEvent.OnAdded,
-			[Enums.ApiNodeEvent.Removed]: ListenerEvent.OnRemoved,
+			[Events.ApiNodeEvent.Added]: ListenerEvent.OnAdded,
+			[Events.ApiNodeEvent.Removed]: ListenerEvent.OnRemoved,
 		};
 	}
 

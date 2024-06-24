@@ -12,9 +12,6 @@ export class CommitHandler {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.TransactionPool.Query)
-	private readonly transactionPoolQuery!: Contracts.TransactionPool.Query;
-
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -37,22 +34,11 @@ export class CommitHandler {
 			const block = await this.blockFactory.fromHex(data.block);
 			store.setLastBlock(block);
 
-			for (const transaction of block.transactions) {
-				await this.transactionPoolService.removeForgedTransaction(transaction);
+			await this.transactionPoolService.commit(block, data.failedTransactions);
+
+			if (this.configuration.isNewMilestone()) {
+				void this.transactionPoolService.reAddTransactions();
 			}
-
-			for (const transactionId of data.failedTransactions) {
-				try {
-					const transaction = await this.transactionPoolQuery.getAll().whereId(transactionId).first();
-					await this.transactionPoolService.removeTransaction(transaction);
-				} catch {}
-			}
-
-			await this.stateService.export(block.data.height);
-
-			this.logger.info(
-				`Block ${block.data.height.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed to pool.`,
-			);
 		} catch (error) {
 			throw new Error(`Failed to commit block: ${error.message}`);
 		}

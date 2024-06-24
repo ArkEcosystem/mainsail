@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Services } from "@mainsail/kernel";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Providers, Services } from "@mainsail/kernel";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
@@ -46,7 +46,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		}
 
 		if (await this.expirationService.isExpired(transaction)) {
-			await this.events.dispatch(Enums.TransactionEvent.Expired, transaction.data);
+			await this.events.dispatch(Events.TransactionEvent.Expired, transaction.data);
 
 			throw new Exceptions.TransactionHasExpiredError(
 				transaction,
@@ -84,22 +84,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			}
 		} else {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
-		}
-	}
-
-	public async revert(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		try {
-			// TODO: Implement transaction revert
-			// const handler: Contracts.Transactions.ITransactionHandler =
-			// 	await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-			// await this.triggers.call("revertTransaction", {
-			// 	handler,
-			// 	transaction,
-			// 	walletRepository: this.walletRepository,
-			// });
-		} catch (error) {
-			this.#corrupt = true;
-			throw error;
 		}
 	}
 }

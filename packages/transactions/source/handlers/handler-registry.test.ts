@@ -222,6 +222,7 @@ describe<{
 		app.bind(Identifiers.Database.Service).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
 		context.app = app;
 	});

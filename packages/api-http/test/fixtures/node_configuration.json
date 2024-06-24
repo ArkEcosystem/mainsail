@@ -47,7 +47,8 @@
 			"blockTime": 8000,
 			"blockPrepareTime": 4000,
 			"stageTimeout": 2000,
-			"stageTimeoutIncrease": 2000
+			"stageTimeoutIncrease": 2000,
+			"tolerance": 100
 		},
 		"activeValidators": 0,
 		"multiPaymentLimit": 256,

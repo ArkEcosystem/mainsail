@@ -20,6 +20,11 @@ export type ErrorReply = {
 	error: string;
 };
 
+export type Event = {
+	event: string;
+	data: string;
+};
+
 export type Reply = SuccessReply | ErrorReply;
 
 export type RequestCallback<T extends {}, K extends Requests<T>> = {
@@ -27,8 +32,9 @@ export type RequestCallback<T extends {}, K extends Requests<T>> = {
 	resolve: (result: ReturnType<T[K]>) => void;
 	reject: (error: Error) => void;
 };
-
 export type RequestCallbacks<T extends {}> = RequestCallback<T, Requests<T>>;
+
+export type EventCallback<T> = (data: T) => void;
 
 export interface Handler<T extends {}> {
 	handleRequest<K extends Requests<T>>(method: K): void;
@@ -37,6 +43,6 @@ export interface Handler<T extends {}> {
 export interface Subprocess<T extends {}> {
 	getQueueSize(): number;
 	kill(): Promise<number>;
-	sendAction(method: string, ...arguments_: any): void;
 	sendRequest(method: string, ...arguments_: any): Promise<any>;
+	registerEventHandler(event: string, callback: EventCallback<any>): void;
 }

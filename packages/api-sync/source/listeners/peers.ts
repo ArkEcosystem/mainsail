@@ -4,8 +4,8 @@ import {
 	Models,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
-import { Enums, Utils } from "@mainsail/kernel";
+import { Contracts, Events } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
@@ -16,8 +16,8 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 
 	protected getEventMapping(): ListenerEventMapping {
 		return {
-			[Enums.PeerEvent.Added]: ListenerEvent.OnAdded,
-			[Enums.PeerEvent.Removed]: ListenerEvent.OnRemoved,
+			[Events.PeerEvent.Added]: ListenerEvent.OnAdded,
+			[Events.PeerEvent.Removed]: ListenerEvent.OnRemoved,
 		};
 	}
 

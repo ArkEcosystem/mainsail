@@ -19,11 +19,19 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
-	public async make(data: Utils.Mutable<Contracts.Crypto.BlockDataSerializable>): Promise<Contracts.Crypto.Block> {
-		const block = data as Utils.Mutable<Contracts.Crypto.BlockData>;
-		block.id = await this.idFactory.make(data);
+	public async make(
+		data: Utils.Mutable<Contracts.Crypto.BlockDataSerializable>,
+		transactions: Contracts.Crypto.Transaction[],
+	): Promise<Contracts.Crypto.Block> {
+		const block: Contracts.Crypto.BlockData = { ...data, id: await this.idFactory.make(data) };
 
-		return this.fromData(block);
+		const serialized: Buffer = await this.serializer.serializeWithTransactions(data);
+
+		return sealBlock({
+			data: block,
+			serialized: serialized.toString("hex"),
+			transactions,
+		});
 	}
 
 	public async fromHex(hex: string): Promise<Contracts.Crypto.Block> {

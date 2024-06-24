@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { KernelEvent } from "../enums/index.js";
 import { assert } from "../utils/assert.js";
 import { ServiceProvider } from "./service-provider.js";
 
@@ -94,13 +93,13 @@ export class ServiceProviderRepository {
 			.whenTargetTagged("plugin", name.split("/")[1]);
 
 		await serviceProvider.register();
-		await this.eventDispatcher.dispatch(KernelEvent.ServiceProviderRegistered, { name });
+		await this.eventDispatcher.dispatch(Events.KernelEvent.ServiceProviderRegistered, { name });
 	}
 
 	public async boot(name: string): Promise<void> {
 		await this.get(name).boot();
 
-		await this.eventDispatcher.dispatch(KernelEvent.ServiceProviderBooted, { name });
+		await this.eventDispatcher.dispatch(Events.KernelEvent.ServiceProviderBooted, { name });
 
 		this.#loadedProviders.add(name);
 		this.#failedProviders.delete(name);
@@ -110,7 +109,7 @@ export class ServiceProviderRepository {
 	public async dispose(name: string): Promise<void> {
 		await this.get(name).dispose();
 
-		await this.eventDispatcher.dispatch(KernelEvent.ServiceProviderDisposed, { name });
+		await this.eventDispatcher.dispatch(Events.KernelEvent.ServiceProviderDisposed, { name });
 
 		this.#loadedProviders.delete(name);
 		this.#failedProviders.delete(name);

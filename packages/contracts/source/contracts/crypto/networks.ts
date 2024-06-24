@@ -38,6 +38,7 @@ export type MilestoneSatoshi = {
 	denomination: number;
 };
 export type MilestoneTimeouts = {
+	tolerance: number;
 	blockTime: number;
 	blockPrepareTime: number;
 	stageTimeout: number;

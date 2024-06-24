@@ -1,4 +1,4 @@
-import { Enums } from "@mainsail/kernel";
+import { Events } from "@mainsail/contracts";
 
 import { describe } from "../../../test-framework/source";
 import { Context, ServerHelper } from "../../test/helpers/server";
@@ -18,7 +18,7 @@ describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) =>
 			},
 		],
 		enabled: true,
-		event: Enums.BlockEvent.Forged,
+		event: Events.BlockEvent.Forged,
 		target: "https://httpbin.org/post",
 	};
 
@@ -63,7 +63,7 @@ describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) =>
 		const response = await createWebhook(server, {
 			conditions: [],
 			enabled: true,
-			event: Enums.BlockEvent.Forged,
+			event: Events.BlockEvent.Forged,
 			target: "https://httpbin.org/post",
 		});
 		assert.equal(response.status, 201);

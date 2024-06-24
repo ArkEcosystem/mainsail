@@ -1,5 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
+import { Contracts, Identifiers, Events } from "@mainsail/contracts";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 
@@ -25,7 +24,7 @@ export class Snapshot {
 	}
 
 	private listenForEvmEvents() {
-		const event = Enums.EvmEvent.TransactionReceipt;
+		const event = Events.EvmEvent.TransactionReceipt;
 		const eventDispatcher = this.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
 			Identifiers.Services.EventDispatcher.Service,
 		);

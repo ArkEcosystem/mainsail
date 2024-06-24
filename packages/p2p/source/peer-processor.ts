@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers, Utils as KernelUtils } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Providers, Utils as KernelUtils } from "@mainsail/kernel";
 
 import { isValidVersion } from "./utils/index.js";
 import { isValidPeerIp } from "./validation/index.js";
@@ -32,6 +32,15 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.P2P.ApiNode.Discoverer)
 	private readonly ApiNodeDiscoverer!: Contracts.P2P.ApiNodeDiscoverer;
 
+	@inject(Identifiers.P2P.TxPoolNode.Factory)
+	private readonly txPoolNodeFactory!: Contracts.P2P.TxPoolNodeFactory;
+
+	@inject(Identifiers.P2P.TxPoolNode.Verifier)
+	private readonly txPoolNodeVerifier!: Contracts.P2P.TxPoolNodeVerifier;
+
+	@inject(Identifiers.TransactionPool.Worker)
+	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
+
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -40,8 +49,12 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 	@postConstruct()
 	public initialize(): void {
-		this.events.listen(Enums.CryptoEvent.MilestoneChanged, {
+		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
 			handle: () => this.#disconnectInvalidPeers(),
+		});
+
+		this.transactionPoolWorker.registerEventHandler("peer.removed", (ip: string) => {
+			this.peerDisposer.disposePeer(ip);
 		});
 	}
 
@@ -99,17 +112,18 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		this.repository.setPendingPeer(peer);
 
-		if (await this.peerVerifier.verify(peer)) {
-			this.repository.setPeer(peer);
+		const txPoolNode = this.txPoolNodeFactory(ip);
 
+		if ((await this.peerVerifier.verify(peer)) && (await this.txPoolNodeVerifier.verify(txPoolNode))) {
+			this.repository.setPeer(peer);
 			this.logger.debugExtra(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`);
 
-			void this.events.dispatch(Enums.PeerEvent.Added, peer);
+			void this.events.dispatch(Events.PeerEvent.Added, peer);
+
+			await this.transactionPoolWorker.setPeer(peer.ip);
 
 			await this.peerCommunicator.pingPorts(peer);
-
 			await this.peerDiscoverer.discoverPeers(peer);
-
 			await this.ApiNodeDiscoverer.discoverApiNodes(peer);
 		}
 

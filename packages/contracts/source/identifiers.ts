@@ -178,6 +178,10 @@ export const Identifiers = {
 		Throttle: {
 			Factory: Symbol("P2P<Throttle.Factory>"),
 		},
+		TxPoolNode: {
+			Factory: Symbol("P2P<TxPoolNode.Factory>"),
+			Verifier: Symbol("P2P<TxPoolNode.Verifier>"),
+		},
 	},
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),
@@ -279,8 +283,14 @@ export const Identifiers = {
 		},
 	},
 	TransactionPool: {
+		Broadcaster: Symbol("TransactionPoolBroadcaster<Broadcaster>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
+		Peer: {
+			Communicator: Symbol("TransactionPoolBroadcaster<Peer.Communicator>"),
+			Factory: Symbol("TransactionPoolBroadcaster<Peer.Factory>"),
+			Repository: Symbol("TransactionPoolBroadcaster<Peer.Repository>"),
+		},
 		Processor: Symbol("TransactionPool<Processor>"),
 		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
 		Query: Symbol("TransactionPool<Query>"),
@@ -300,5 +310,11 @@ export const Identifiers = {
 	},
 	ValidatorSet: {
 		Service: Symbol("ValidatorSet<Service>"),
+	},
+	Webhooks: {
+		Broadcaster: Symbol.for("Webhooks<Broadcaster>"),
+		Database: Symbol.for("Webhooks<Database>"),
+		Listener: Symbol.for("Webhooks<Listener>"),
+		Server: Symbol.for("Webhooks<Server>"),
 	},
 };

@@ -2,7 +2,15 @@ import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-import { CommitHandler, GetTransactionsHandler, ImportSnapshotHandler } from "./handlers/index.js";
+import {
+	CommitHandler,
+	ForgetPeerHandler,
+	GetTransactionsHandler,
+	ImportSnapshotHandler,
+	ReloadWebhooksHandler,
+	SetPeerHandler,
+	StartHandler,
+} from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScriptHandler {
 	// @ts-ignore
@@ -20,6 +28,10 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		this.#app = app;
 	}
 
+	public async start(): Promise<void> {
+		await this.#app.resolve(StartHandler).handle();
+	}
+
 	public async importSnapshot(height: number): Promise<void> {
 		await this.#app.resolve(ImportSnapshotHandler).handle(height);
 	}
@@ -34,5 +46,17 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 
 	public async getTransactions(): Promise<string[]> {
 		return await this.#app.resolve(GetTransactionsHandler).handle();
+	}
+
+	public async setPeer(ip: string): Promise<void> {
+		return await this.#app.resolve(SetPeerHandler).handle(ip);
+	}
+
+	public async forgetPeer(ip: string): Promise<void> {
+		return await this.#app.resolve(ForgetPeerHandler).handle(ip);
+	}
+
+	public async reloadWebhooks(): Promise<void> {
+		await this.#app.resolve(ReloadWebhooksHandler).handle();
 	}
 }

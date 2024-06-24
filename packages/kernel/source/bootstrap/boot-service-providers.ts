@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { BlockEvent, KernelEvent } from "../enums/events.js";
 import { ServiceProviderRepository } from "../providers/index.js";
 import { assert } from "../utils/assert.js";
 import { ChangeServiceProviderState } from "./listeners.js";
@@ -50,10 +49,10 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 				.initialize(serviceProviderName, serviceProvider);
 
 			// Register the "enable/disposeWhen" listeners to be triggered on every block. Use with care!
-			this.events.listen(BlockEvent.Applied, eventListener);
+			this.events.listen(Events.BlockEvent.Applied, eventListener);
 
 			// We only want to trigger this if another service provider has been booted to avoid an infinite loop.
-			this.events.listen(KernelEvent.ServiceProviderBooted, eventListener);
+			this.events.listen(Events.KernelEvent.ServiceProviderBooted, eventListener);
 		}
 	}
 }

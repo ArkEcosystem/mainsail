@@ -60,6 +60,29 @@ export class UsernameResignationTransactionHandler extends Handlers.TransactionH
 		}
 	}
 
+	public async throwIfCannotEnterPool(
+		walletRepository: Contracts.State.WalletRepository,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<void> {
+		AppUtils.assert.defined<Contracts.TransactionPool.Query>(this.poolQuery);
+
+		const { data }: Contracts.Crypto.Transaction = transaction;
+
+		AppUtils.assert.defined<string>(data.senderPublicKey);
+
+		const hasSender: boolean = await this.poolQuery
+			.getAllBySender(data.senderPublicKey)
+			.whereKind(transaction)
+			.has();
+
+		if (hasSender) {
+			throw new Exceptions.PoolError(
+				`Sender ${data.senderPublicKey} already has a transaction of type '${Contracts.Crypto.TransactionType.UsernameResignation}' in the pool`,
+				"ERR_PENDING",
+			);
+		}
+	}
+
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,

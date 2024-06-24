@@ -131,6 +131,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       boxen:
         specifier: 7.1.1
         version: 7.1.1
@@ -975,6 +978,12 @@ importers:
       '@mainsail/state':
         specifier: workspace:*
         version: link:../state
+      '@mainsail/transaction-pool-broadcaster':
+        specifier: workspace:*
+        version: link:../transaction-pool-broadcaster
+      '@mainsail/transaction-pool-service':
+        specifier: workspace:*
+        version: link:../transaction-pool-service
       '@mainsail/transaction-pool-worker':
         specifier: workspace:*
         version: link:../transaction-pool-worker
@@ -2681,11 +2690,11 @@ importers:
         specifier: 17.12.2
         version: 17.12.2
       pino:
-        specifier: 8.19.0
-        version: 8.19.0
+        specifier: 9.2.0
+        version: 9.2.0
       pino-pretty:
-        specifier: 10.3.1
-        version: 10.3.1
+        specifier: 11.2.1
+        version: 11.2.1
       pump:
         specifier: 3.0.0
         version: 3.0.0
@@ -2696,8 +2705,8 @@ importers:
         specifier: 4.5.2
         version: 4.5.2
       rotating-file-stream:
-        specifier: 3.2.1
-        version: 3.2.1
+        specifier: 3.2.3
+        version: 3.2.3
       split2:
         specifier: 4.2.0
         version: 4.2.0
@@ -2727,8 +2736,8 @@ importers:
         specifier: 1.4.4
         version: 1.4.4
       '@types/readable-stream':
-        specifier: 4.0.10
-        version: 4.0.10
+        specifier: 4.0.14
+        version: 4.0.14
       '@types/split2':
         specifier: 4.2.3
         version: 4.2.3
@@ -2925,6 +2934,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      dayjs:
+        specifier: 1.11.10
+        version: 1.11.10
     devDependencies:
       uvu:
         specifier: ^0.5.6
@@ -3257,6 +3269,31 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/transaction-pool-broadcaster:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      dayjs:
+        specifier: 1.11.10
+        version: 1.11.10
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/transaction-pool-service:
     dependencies:
       '@mainsail/container':
@@ -3444,6 +3481,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
     devDependencies:
       '@mainsail/crypto-address-bech32m':
         specifier: workspace:*
@@ -5047,8 +5087,8 @@ packages:
   '@types/pumpify@1.4.4':
     resolution: {integrity: sha512-+cWbQUecD04MQYkjNBhPmcUIP368aloYmqm+ImdMKA8rMpxRNAhZAD6gIj+sAVTF1DliqrT/qUp6aGNi/9U3tw==}
 
-  '@types/readable-stream@4.0.10':
-    resolution: {integrity: sha512-AbUKBjcC8SHmImNi4yK2bbjogQlkFSg7shZCcicxPQapniOlajG8GCc39lvXzCWX4lLRRs7DM3VAeSlqmEVZUA==}
+  '@types/readable-stream@4.0.14':
+    resolution: {integrity: sha512-xZn/AuUbCMShGsqH/ehZtGDwQtbx00M9rZ2ENLe4tOjFZ/JFeWMhEZkk2fEe1jAUqqEAURIkFJ7Az/go8mM1/w==}
 
   '@types/seedrandom@3.0.8':
     resolution: {integrity: sha512-TY1eezMU2zH2ozQoAFAQFOPpvP15g+ZgSfTZt31AUUH/Rxtnz3H+A/Sv1Snw2/amp//omibc+AEkTaA8KUeOLQ==}
@@ -6828,6 +6868,9 @@ packages:
 
   fast-copy@3.0.1:
     resolution: {integrity: sha512-Knr7NOtK3HWRYGtHoJrjkaWepqT8thIVGAwt0p0aUs1zqkAzXZV4vo9fFNwyb5fcqK1GKYFYxldQdIDVKhUAfA==}
+
+  fast-copy@3.0.2:
+    resolution: {integrity: sha512-dl0O9Vhju8IrcLndv2eU4ldt1ftXMqqfgN4H1cpmGV7P6jeB9FwpN9a2c8DPGE1Ys88rNUJVYDHq73CGAGOPfQ==}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -9152,15 +9195,18 @@ packages:
   pino-abstract-transport@1.1.0:
     resolution: {integrity: sha512-lsleG3/2a/JIWUtf9Q5gUNErBqwIu1tUKTT3dUzaf5DySw9ra1wcqKjJjLX1VTY64Wk1eEOYsVGSaGfCK85ekA==}
 
-  pino-pretty@10.3.1:
-    resolution: {integrity: sha512-az8JbIYeN/1iLj2t0jR9DV48/LQ3RC6hZPpapKPkb84Q+yTidMCpgWxIT3N0flnBDilyBQ1luWNpOeJptjdp/g==}
+  pino-abstract-transport@1.2.0:
+    resolution: {integrity: sha512-Guhh8EZfPCfH+PMXAb6rKOjGQEoy0xlAIn+irODG5kgfYV+BQ0rGYYWTIel3P5mmyXqkYkPmdIkywsn6QKUR1Q==}
+
+  pino-pretty@11.2.1:
+    resolution: {integrity: sha512-O05NuD9tkRasFRWVaF/uHLOvoRDFD7tb5VMertr78rbsYFjYp48Vg3477EshVAF5eZaEw+OpDl/tu+B0R5o+7g==}
     hasBin: true
 
-  pino-std-serializers@6.2.2:
-    resolution: {integrity: sha512-cHjPPsE+vhj/tnhCy/wiMh3M3z3h/j15zHQX+S9GkTBgqJuTuJzYJ4gUyACLhDaJ7kk9ba9iRDmbH2tJU03OiA==}
+  pino-std-serializers@7.0.0:
+    resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
-  pino@8.19.0:
-    resolution: {integrity: sha512-oswmokxkav9bADfJ2ifrvfHUwad6MLp73Uat0IkQWY3iAw5xTRoznXbXksZs8oaOUMpmhVWD+PZogNzllWpJaA==}
+  pino@9.2.0:
+    resolution: {integrity: sha512-g3/hpwfujK5a4oVbaefoJxezLzsDgLcNJeITvC6yrfwYeT9la+edCK42j5QpEQSQCZgTKapXvnQIdgZwvRaZug==}
     hasBin: true
 
   pkg-dir@4.2.0:
@@ -9668,8 +9714,8 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  rotating-file-stream@3.2.1:
-    resolution: {integrity: sha512-n2B18CJb+n2VA5Tdle+1NP2toEcRv68CjAOBjHmwcyswNwMVsrN3gVRZ9ymH3sapaiGY8jc9OhhV5b6I5rAeiA==}
+  rotating-file-stream@3.2.3:
+    resolution: {integrity: sha512-cfmm3tqdnbuYw2FBmRTPBDaohYEbMJ3211T35o6eZdr4d7v69+ZeK1Av84Br7FLj2dlzyeZSbN6qTuXXE6dawQ==}
     engines: {node: '>=14.0'}
 
   run-applescript@5.0.0:
@@ -9882,8 +9928,8 @@ packages:
     resolution: {integrity: sha512-7maUZy1N7uo6+WVEX6psASxtNlKaNVMlGQKkG/63nEDdLOWNbiUMoLK7X4uYoLhQstau72mLgfEWcXcwsaHbYQ==}
     engines: {node: '>= 10.13.0', npm: '>= 3.0.0'}
 
-  sonic-boom@3.7.0:
-    resolution: {integrity: sha512-IudtNvSqA/ObjN97tfgNmOKyDOs4dNcg4cUUsHDebqsgb8wGBBwb31LIgShNO8fye0dFI52X1+tFoKKI6Rq1Gg==}
+  sonic-boom@4.0.1:
+    resolution: {integrity: sha512-hTSD/6JMLyT4r9zeof6UtuBDpjJ9sO08/nmS5djaA9eozT9oOlNdpXSnzcgj4FTqpk3nkLrs61l4gip9r1HCrQ==}
 
   sort-keys@2.0.0:
     resolution: {integrity: sha512-/dPCrG1s3ePpWm6yBbxZq5Be1dXGLyLn9Z791chDC3NFrpkVbWGzkBwPN1knaciexFXgRJ7hzdnwZ4stHSDmjg==}
@@ -10180,8 +10226,8 @@ packages:
   thenify@3.3.1:
     resolution: {integrity: sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw==}
 
-  thread-stream@2.4.1:
-    resolution: {integrity: sha512-d/Ex2iWd1whipbT681JmTINKw0ZwOUBZm7+Gjs64DHuX34mmw8vJL2bFAaNacaW72zYiTJxSHi5abUuOi5nsfg==}
+  thread-stream@3.1.0:
+    resolution: {integrity: sha512-OqyPZ9u96VohAyMfJykzmivOrY2wfMSf3C5TtFJVgN+Hm6aj+voFhlK+kZEIv2FBh1X6Xp3DlnCOfEQ3B2J86A==}
 
   through2@2.0.5:
     resolution: {integrity: sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==}
@@ -12229,11 +12275,11 @@ snapshots:
 
   '@types/pino-pretty@5.0.0':
     dependencies:
-      pino-pretty: 10.3.1
+      pino-pretty: 11.2.1
 
   '@types/pino@7.0.4':
     dependencies:
-      pino: 8.19.0
+      pino: 9.2.0
 
   '@types/prompts@2.4.9':
     dependencies:
@@ -12249,7 +12295,7 @@ snapshots:
       '@types/duplexify': 3.6.4
       '@types/node': 20.11.16
 
-  '@types/readable-stream@4.0.10':
+  '@types/readable-stream@4.0.14':
     dependencies:
       '@types/node': 20.11.16
       safe-buffer: 5.1.2
@@ -14426,6 +14472,8 @@ snapshots:
       tmp: 0.0.33
 
   fast-copy@3.0.1: {}
+
+  fast-copy@3.0.2: {}
 
   fast-deep-equal@3.1.3: {}
 
@@ -17215,11 +17263,16 @@ snapshots:
       readable-stream: 4.5.2
       split2: 4.2.0
 
-  pino-pretty@10.3.1:
+  pino-abstract-transport@1.2.0:
+    dependencies:
+      readable-stream: 4.5.2
+      split2: 4.2.0
+
+  pino-pretty@11.2.1:
     dependencies:
       colorette: 2.0.20
       dateformat: 4.6.3
-      fast-copy: 3.0.1
+      fast-copy: 3.0.2
       fast-safe-stringify: 2.1.1
       help-me: 5.0.0
       joycon: 3.1.1
@@ -17229,24 +17282,24 @@ snapshots:
       pump: 3.0.0
       readable-stream: 4.5.2
       secure-json-parse: 2.7.0
-      sonic-boom: 3.7.0
+      sonic-boom: 4.0.1
       strip-json-comments: 3.1.1
 
-  pino-std-serializers@6.2.2: {}
+  pino-std-serializers@7.0.0: {}
 
-  pino@8.19.0:
+  pino@9.2.0:
     dependencies:
       atomic-sleep: 1.0.0
       fast-redact: 3.3.0
       on-exit-leak-free: 2.1.2
-      pino-abstract-transport: 1.1.0
-      pino-std-serializers: 6.2.2
+      pino-abstract-transport: 1.2.0
+      pino-std-serializers: 7.0.0
       process-warning: 3.0.0
       quick-format-unescaped: 4.0.4
       real-require: 0.2.0
       safe-stable-stringify: 2.4.3
-      sonic-boom: 3.7.0
-      thread-stream: 2.4.1
+      sonic-boom: 4.0.1
+      thread-stream: 3.1.0
 
   pkg-dir@4.2.0:
     dependencies:
@@ -17849,7 +17902,7 @@ snapshots:
     dependencies:
       glob: 10.3.10
 
-  rotating-file-stream@3.2.1: {}
+  rotating-file-stream@3.2.3: {}
 
   run-applescript@5.0.0:
     dependencies:
@@ -18087,7 +18140,7 @@ snapshots:
       ip: 2.0.1
       smart-buffer: 4.2.0
 
-  sonic-boom@3.7.0:
+  sonic-boom@4.0.1:
     dependencies:
       atomic-sleep: 1.0.0
 
@@ -18398,7 +18451,7 @@ snapshots:
     dependencies:
       any-promise: 1.3.0
 
-  thread-stream@2.4.1:
+  thread-stream@3.1.0:
     dependencies:
       real-require: 0.2.0
 

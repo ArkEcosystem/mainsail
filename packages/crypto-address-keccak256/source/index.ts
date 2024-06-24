@@ -5,8 +5,6 @@ import { AddressFactory } from "./address.factory.js";
 import { schemas } from "./schemas.js";
 import { AddressSerializer } from "./serializer.js";
 
-export * from "./schemas.js";
-
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Cryptography.Identity.Address.Size).toConstantValue(20);
