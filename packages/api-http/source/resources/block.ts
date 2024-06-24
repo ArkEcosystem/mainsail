@@ -38,8 +38,6 @@ export class BlockResource implements Contracts.Api.Resource {
 			signature: resource.signature,
 			timestamp: +resource.timestamp,
 			transactions: resource.numberOfTransactions,
-
-			version: resource.version,
 		};
 	}
 }

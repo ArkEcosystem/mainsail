@@ -53,9 +53,6 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		await this.serializer.deserialize<Contracts.Crypto.BlockData>(buffer, block, {
 			length: this.blockSerializer.headerSize(),
 			schema: {
-				version: {
-					type: "uint8",
-				},
 				timestamp: {
 					type: "uint48",
 				},

@@ -17,7 +17,6 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 
 	public headerSize(): number {
 		return (
-			1 + // version
 			6 + // timestamp
 			4 + // height
 			4 + // round
@@ -41,9 +40,6 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 			length: this.headerSize(),
 			skip: 0,
 			schema: {
-				version: {
-					type: "uint8",
-				},
 				timestamp: {
 					type: "uint48",
 				},
@@ -86,9 +82,6 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 			length: this.totalSize(block),
 			skip: 0,
 			schema: {
-				version: {
-					type: "uint8",
-				},
 				timestamp: {
 					type: "uint48",
 				},

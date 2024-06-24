@@ -18,13 +18,6 @@ export class BlockFilter {
 				case "id": {
 					return handleOrCriteria(criteria.id, async (c) => ({ op: "equal", property: "id", value: c }));
 				}
-				case "version": {
-					return handleOrCriteria(criteria.version, async (c) => ({
-						op: "equal",
-						property: "version",
-						value: c,
-					}));
-				}
 				case "timestamp": {
 					return handleOrCriteria(criteria.timestamp, async (c) =>
 						// @ts-ignore

@@ -135,7 +135,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				totalFee: header.totalFee.toFixed(),
 				validatorRound: Utils.roundCalculator.calculateRound(header.height, this.configuration).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
-				version: header.version,
 			},
 
 			transactions: transactions.map(({ data }) => ({

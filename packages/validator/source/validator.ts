@@ -199,7 +199,6 @@ export class Validator implements Contracts.Validator.Validator {
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
 				transactions: transactionData,
-				version: 1,
 			},
 			transactions,
 		);

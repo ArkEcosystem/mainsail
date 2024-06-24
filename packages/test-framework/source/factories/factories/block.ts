@@ -94,7 +94,6 @@ export const registerBlockFactory = async (
 					totalAmount: BigNumber.make(totals.amount),
 					totalFee: BigNumber.make(totals.fee),
 					transactions: transactionData,
-					version: 1,
 				},
 				transactions,
 			),

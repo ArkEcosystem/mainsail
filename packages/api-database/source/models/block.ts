@@ -14,11 +14,6 @@ export class Block {
 	public readonly id!: string;
 
 	@Column({
-		type: "smallint",
-	})
-	public readonly version!: number;
-
-	@Column({
 		nullable: false,
 		type: "bigint",
 	})
