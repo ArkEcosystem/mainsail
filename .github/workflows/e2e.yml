@@ -76,3 +76,9 @@ jobs:
             - name: Show logs - node2
               if: always()
               run: docker logs consensus_node2_1
+            - name: Show logs - node3
+              if: always()
+              run: docker logs consensus_node3_1
+            - name: Show logs - node4
+              if: always()
+              run: docker logs consensus_node4_1
