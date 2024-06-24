@@ -923,7 +923,9 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
-		roundState.getProcessorResult = () => true;
+		roundState.getProcessorResult = () => ({
+			success: true,
+		});
 
 		assert.undefined(consensus.getLockedRound());
 		assert.undefined(consensus.getValidRound());

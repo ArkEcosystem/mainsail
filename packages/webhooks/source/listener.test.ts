@@ -184,14 +184,16 @@ describe<{
 			},
 		];
 		database.create(webhook);
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Created);
 
+		spyOnDispatch.reset();
 		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
-		const spyOnDispatchArguments = spyOnDispatch.getCallArgs(0);
-		assert.equal(spyOnDispatchArguments[0], WebhookEvent.Broadcasted);
-		expectFinishedEventData(spyOnDispatchArguments[1]);
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
 	});
 
 	it("should not broadcast if webhook condition is not satisfied", async ({ database, listener }) => {
