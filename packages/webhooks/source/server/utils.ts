@@ -1,8 +1,7 @@
 import { Boom, notFound } from "@hapi/boom";
+import { Contracts } from "@mainsail/contracts";
 
-import { Webhook } from "../interfaces.js";
-
-export const transformResource = (model): Webhook => ({
+export const transformResource = (model): Contracts.Webhooks.Webhook => ({
 	conditions: model.conditions,
 	enabled: model.enabled,
 	event: model.event,
@@ -11,5 +10,5 @@ export const transformResource = (model): Webhook => ({
 	token: model.token,
 });
 
-export const respondWithResource = (data): { data: Webhook } | Boom<Webhook> =>
+export const respondWithResource = (data): { data: Contracts.Webhooks.Webhook } | Boom<Contracts.Webhooks.Webhook> =>
 	data ? { data: transformResource(data) } : notFound();

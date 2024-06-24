@@ -1,4 +1,5 @@
 import { CommitHandler, Transaction } from "../crypto/index.js";
+import { EventListener } from "../kernel/index.js";
 import { EventCallback, Subprocess } from "../kernel/ipc.js";
 import { StoreChange } from "../state/index.js";
 import { KeyValuePair } from "../types/index.js";
@@ -13,6 +14,7 @@ export interface WorkerScriptHandler {
 	setPeer(ip: string): Promise<void>;
 	forgetPeer(ip: string): Promise<void>;
 	start(): Promise<void>;
+	reloadWebhooks(): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;
@@ -21,7 +23,7 @@ export type WorkerSubprocess = Subprocess<WorkerScriptHandler>;
 
 export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
-export interface Worker extends Omit<WorkerScriptHandler, "commit" | "getTransactions">, CommitHandler {
+export interface Worker extends Omit<WorkerScriptHandler, "commit" | "getTransactions">, CommitHandler, EventListener {
 	getQueueSize(): number;
 	kill(): Promise<number>;
 	setFailedTransactions(transactions: Transaction[]): void;

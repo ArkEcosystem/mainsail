@@ -18,3 +18,4 @@ export * as Transactions from "./transactions.js";
 export * as Types from "./types/index.js";
 export * as Validator from "./validator.js";
 export * as ValidatorSet from "./validator-set.js";
+export * as Webhooks from "./webhooks.js";

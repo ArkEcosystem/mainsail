@@ -1,10 +1,13 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 	private readonly createWorkerSubprocess!: Contracts.Crypto.WorkerSubprocessFactory;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
 
@@ -14,6 +17,14 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	@postConstruct()
 	public initialize(): void {
 		this.ipcSubprocess = this.createWorkerSubprocess();
+
+		this.eventDispatcher.listen(Events.WebhookEvent.Created, this);
+		this.eventDispatcher.listen(Events.WebhookEvent.Updated, this);
+		this.eventDispatcher.listen(Events.WebhookEvent.Removed, this);
+	}
+
+	public handle(payload: { name: string; data: any }): void {
+		void this.reloadWebhooks();
 	}
 
 	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {
@@ -68,5 +79,9 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 	public async forgetPeer(ip: string): Promise<void> {
 		await this.ipcSubprocess.sendRequest("forgetPeer", ip);
+	}
+
+	public async reloadWebhooks(): Promise<void> {
+		await this.ipcSubprocess.sendRequest("reloadWebhooks");
 	}
 }

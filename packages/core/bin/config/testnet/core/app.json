@@ -276,6 +276,9 @@
 		},
 		{
 			"package": "@mainsail/api-transaction-pool"
+		},
+		{
+			"package": "@mainsail/webhooks"
 		}
 	]
 }

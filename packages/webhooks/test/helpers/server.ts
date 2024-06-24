@@ -4,7 +4,6 @@ import { Application, Services } from "@mainsail/kernel";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Database } from "../../source/database";
-import { InternalIdentifiers as WebhookIdentifiers } from "../../source/identifiers";
 import { Server } from "../../source/server/server";
 
 export type Context = {
@@ -14,9 +13,9 @@ export type Context = {
 
 const initApp = (context: Context) => {
 	const logger = {
-		info: () => {},
 		debug: () => {},
 		error: () => {},
+		info: () => {},
 		notice: () => {},
 	};
 
@@ -28,13 +27,13 @@ const initApp = (context: Context) => {
 	context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 	context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 	context.app.bind("path.cache").toConstantValue(dirSync().name);
-	context.app.bind<Database>(WebhookIdentifiers.Database).to(Database).inSingletonScope();
-	context.app.get<Database>(WebhookIdentifiers.Database).boot();
-	context.app.bind(WebhookIdentifiers.Server).to(Server).inSingletonScope();
+	context.app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
+	context.app.get<Database>(Identifiers.Webhooks.Database).boot();
+	context.app.bind(Identifiers.Webhooks.Server).to(Server).inSingletonScope();
 };
 
 const initServer = async (context: Context, serverOptions: any) => {
-	context.server = context.app.get<Server>(WebhookIdentifiers.Server);
+	context.server = context.app.get<Server>(Identifiers.Webhooks.Server);
 
 	await context.server.register(serverOptions);
 	await context.server.boot();
