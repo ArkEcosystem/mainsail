@@ -20,6 +20,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	@inject(Identifiers.Evm.Gas.Limits)
 	protected readonly gasLimits!: Contracts.Evm.GasLimits;
 
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
+
 	public async verify(
 		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
@@ -159,7 +162,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		return { gasUsed: 0 };
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {}
+	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
 
 	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
 		return [];

@@ -57,7 +57,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			Joi.object({
 				"crypto-worker": Joi.array()
 					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
-					.required(),
+					.optional(),
 				flags: Joi.array().items(Joi.string()).optional(),
 				main: Joi.array()
 					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
@@ -65,7 +65,7 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 				services: Joi.object().optional(),
 				"transaction-pool": Joi.array()
 					.items(Joi.object().keys({ options: Joi.object().optional(), package: Joi.string() }))
-					.required(),
+					.optional(),
 			}).unknown(true),
 		);
 

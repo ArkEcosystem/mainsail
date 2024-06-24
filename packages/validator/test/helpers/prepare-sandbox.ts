@@ -42,6 +42,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
 
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({ getRequired: () => 0.75 }); // txCollatorFactor
 	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();

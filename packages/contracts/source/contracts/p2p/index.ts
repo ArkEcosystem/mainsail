@@ -22,3 +22,4 @@ export * from "./peer-verifier.js";
 export * from "./server.js";
 export * from "./service.js";
 export * from "./state.js";
+export * from "./tx-pool-node.js";

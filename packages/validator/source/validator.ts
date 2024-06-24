@@ -1,10 +1,15 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
+import { performance } from "perf_hooks";
 
 @injectable()
 export class Validator implements Contracts.Validator.Validator {
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "validator")
+	private readonly configuration!: Providers.PluginConfiguration;
+
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -128,10 +133,19 @@ export class Validator implements Contracts.Validator.Validator {
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
-		const milestone = this.cryptoConfiguration.getMilestone(Number(commitKey.height));
+		const milestone = this.cryptoConfiguration.getMilestone();
 		let gasLeft = milestone.block.maxGasLimit;
 
+		// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
+		const timeLimit =
+			performance.now() +
+			milestone.timeouts.blockPrepareTime * this.configuration.getRequired<number>("txCollatorFactor");
+
 		for (const bytes of transactionBytes) {
+			if (performance.now() > timeLimit) {
+				break;
+			}
+
 			const transaction = await this.transactionFactory.fromBytes(bytes);
 			transaction.data.sequence = candidateTransactions.length;
 
@@ -208,21 +222,24 @@ export class Validator implements Contracts.Validator.Validator {
 			payloadLength += serialized.length;
 		}
 
-		return this.blockFactory.make({
-			generatorPublicKey,
-			height,
-			numberOfTransactions: transactionData.length,
-			payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
-			payloadLength,
-			previousBlock: previousBlock.data.id,
-			reward: BigNumber.make(milestone.reward),
-			round,
-			timestamp,
-			totalAmount: totals.amount,
-			totalFee: totals.fee,
-			totalGasUsed: totals.gasUsed,
-			transactions: transactionData,
-			version: 1,
-		});
+		return this.blockFactory.make(
+			{
+				generatorPublicKey,
+				height,
+				numberOfTransactions: transactionData.length,
+				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
+				payloadLength,
+				previousBlock: previousBlock.data.id,
+				reward: BigNumber.make(milestone.reward),
+				round,
+				timestamp,
+				totalAmount: totals.amount,
+				totalFee: totals.fee,
+				totalGasUsed: totals.gasUsed,
+				transactions: transactionData,
+				version: 1,
+			},
+			transactions,
+		);
 	}
 }

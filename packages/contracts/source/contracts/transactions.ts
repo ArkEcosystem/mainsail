@@ -1,6 +1,5 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
 import { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
-import { EventDispatcher } from "./kernel/events.js";
 import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
@@ -31,7 +30,7 @@ export interface TransactionHandler {
 
 	applyToRecipient(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
-	emitEvents(transaction: Transaction, emitter: EventDispatcher): void;
+	emitEvents(transaction: Transaction): void;
 
 	verifySignatures(
 		wallet: Wallet,

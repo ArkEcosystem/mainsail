@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
-import { Enums, Utils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { EvmCallTransaction } from "../versions/index.js";
@@ -38,7 +38,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		return super.throwIfCannotBeApplied(context, transaction, wallet);
 	}
 
-	public emitEvents(transaction: Contracts.Crypto.Transaction, emitter: Contracts.Kernel.EventDispatcher): void {
+	public emitEvents(transaction: Contracts.Crypto.Transaction): void {
 		// TODO
 	}
 
@@ -95,7 +95,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
 				);
 
-				void this.#emit(Enums.EvmEvent.TransactionReceipt, {
+				void this.#emit(Events.EvmEvent.TransactionReceipt, {
 					receipt,
 					sender: sender.getAddress(),
 					transactionId: transaction.id,

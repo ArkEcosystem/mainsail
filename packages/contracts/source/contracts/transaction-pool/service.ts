@@ -1,12 +1,10 @@
-import { Transaction } from "../crypto/transactions.js";
+import { Block, Transaction } from "../crypto/index.js";
 
 export interface Service {
 	getPoolSize(): number;
 
 	addTransaction(transaction: Transaction): Promise<void>;
 	reAddTransactions(): Promise<void>;
-	removeTransaction(transaction: Transaction): Promise<void>;
-	removeForgedTransaction(transaction: Transaction): Promise<void>;
-	cleanUp(): Promise<void>;
+	commit(block: Block, failedTransactionIds: string[]): Promise<void>;
 	flush(): Promise<void>;
 }

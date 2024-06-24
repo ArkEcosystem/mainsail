@@ -38,6 +38,8 @@ const setup = async () => {
 		broadcastPrecommit: async () => {},
 		broadcastPrevote: async () => {},
 		broadcastProposal: async () => {},
+	});
+	sandbox.app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue({
 		broadcastTransactions: async () => {},
 	});
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).to(PoolWorker).inSingletonScope();

@@ -1,5 +1,5 @@
-import { Identifiers } from "@mainsail/contracts";
-import { Application, Enums, Utils } from "@mainsail/kernel";
+import { Events, Identifiers } from "@mainsail/contracts";
+import { Application, Utils } from "@mainsail/kernel";
 import { SinonSpy } from "sinon";
 
 import { Configuration } from "../../crypto-config/distribution/index";
@@ -149,7 +149,7 @@ describeSkip<{
 		await context.stateBuilder.run();
 
 		assert.false(context.loggerWarningSpy.called);
-		assert.true(context.dispatchSpy.calledWith(Enums.StateEvent.BuilderFinished));
+		assert.true(context.dispatchSpy.calledWith(Events.StateEvent.BuilderFinished));
 	});
 
 	it("should not fail if the publicKey is whitelisted", async (context) => {
@@ -173,7 +173,7 @@ describeSkip<{
 		await context.stateBuilder.run();
 
 		assert.false(context.loggerWarningSpy.called);
-		assert.true(context.dispatchSpy.calledWith(Enums.StateEvent.BuilderFinished));
+		assert.true(context.dispatchSpy.calledWith(Events.StateEvent.BuilderFinished));
 	});
 
 	it("should fail if the whitelisted key doesn't have the allowed negative balance", async (context) => {
@@ -271,7 +271,7 @@ describeSkip<{
 	it("should emit an event when the builder is finished", async (context) => {
 		await context.stateBuilder.run();
 
-		assert.true(context.dispatchSpy.calledWith(Enums.StateEvent.BuilderFinished));
+		assert.true(context.dispatchSpy.calledWith(Events.StateEvent.BuilderFinished));
 	});
 
 	it("should exit app if any vote balance is negative", async (context) => {

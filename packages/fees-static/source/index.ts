@@ -1,5 +1,5 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 import { FeeMatcher } from "./matcher.js";
@@ -15,7 +15,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		this.app
 			.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.listen(Enums.CryptoEvent.MilestoneChanged, this);
+			.listen(Events.CryptoEvent.MilestoneChanged, this);
 
 		await this.#updateStaticFees();
 	}
@@ -23,7 +23,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async dispose(): Promise<void> {
 		this.app
 			.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.forget(Enums.CryptoEvent.MilestoneChanged, this);
+			.forget(Events.CryptoEvent.MilestoneChanged, this);
 	}
 
 	public async required(): Promise<boolean> {
@@ -33,7 +33,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async handle({ name }): Promise<void> {
 		// eslint-disable-next-line sonarjs/no-small-switch
 		switch (name) {
-			case Enums.CryptoEvent.MilestoneChanged: {
+			case Events.CryptoEvent.MilestoneChanged: {
 				await this.#updateStaticFees();
 				break;
 			}

@@ -49,3 +49,21 @@ services:
             <<: *nodeEnvironment
             CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node2
             CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node2
+
+    node3:
+        <<: *nodeDefinition
+        depends_on:
+            - peerdiscovery
+        environment:
+            <<: *nodeEnvironment
+            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node3
+            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node3
+
+    node4:
+        <<: *nodeDefinition
+        depends_on:
+            - peerdiscovery
+        environment:
+            <<: *nodeEnvironment
+            CORE_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/node4
+            CORE_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/node4

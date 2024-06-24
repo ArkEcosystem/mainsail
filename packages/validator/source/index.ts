@@ -1,6 +1,7 @@
 import { Keystore } from "@chainsafe/bls-keystore";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Utils } from "@mainsail/kernel";
+import Joi from "joi";
 
 import { BIP38, BIP39 } from "./keys/index.js";
 import { Validator } from "./validator.js";
@@ -54,5 +55,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		this.app.get<ValidatorRepository>(Identifiers.Validator.Repository).configure(validators);
+	}
+
+	public configSchema(): Joi.AnySchema {
+		return Joi.object({
+			txCollatorFactor: Joi.number().min(0).max(1).required(),
+		}).unknown(true);
 	}
 }

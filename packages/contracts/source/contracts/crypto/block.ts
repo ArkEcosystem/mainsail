@@ -64,7 +64,7 @@ export interface BlockJson {
 export type BlockDataSerializable = Omit<BlockData, "id">;
 
 export interface BlockFactory {
-	make(data: Mutable<BlockDataSerializable>): Promise<Block>;
+	make(data: Mutable<BlockDataSerializable>, transactions: Transaction[]): Promise<Block>;
 
 	fromHex(hex: string): Promise<Block>;
 	fromBytes(buff: Buffer): Promise<Block>;

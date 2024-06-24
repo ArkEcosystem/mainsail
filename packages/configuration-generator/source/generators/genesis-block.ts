@@ -220,26 +220,29 @@ export class GenesisBlockGenerator extends Generator {
 		}
 
 		return {
-			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make({
-				generatorPublicKey: keys.publicKey,
-				height: 0,
-				numberOfTransactions: transactions.length,
-				payloadHash: (
-					await this.app
-						.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
-						.sha256(payloadBuffers)
-				).toString("hex"),
-				payloadLength,
-				previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-				reward: BigNumber.ZERO,
-				round: 0,
-				timestamp: dayjs(options.epoch).valueOf(),
-				totalAmount: totals.amount,
-				totalFee: totals.fee,
-				totalGasUsed: totals.gasUsed,
-				transactions: transactionData,
-				version: 1,
-			}),
+			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
+				{
+					generatorPublicKey: keys.publicKey,
+					height: 0,
+					numberOfTransactions: transactions.length,
+					payloadHash: (
+						await this.app
+							.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory)
+							.sha256(payloadBuffers)
+					).toString("hex"),
+					payloadLength,
+					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+					reward: BigNumber.ZERO,
+					round: 0,
+					timestamp: dayjs(options.epoch).valueOf(),
+					totalAmount: totals.amount,
+					totalFee: totals.fee,
+					totalGasUsed: totals.gasUsed,
+					transactions: transactionData,
+					version: 1,
+				},
+				transactions,
+			),
 			transactions: transactionData,
 		};
 	}

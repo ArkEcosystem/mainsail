@@ -6,8 +6,6 @@ import { dirSync, setGracefulCleanup } from "tmp";
 import { describe } from "../../test-framework/source";
 import { dummyWebhook } from "../test/fixtures/assets";
 import { Database } from "./database";
-import { InternalIdentifiers } from "./identifiers";
-import { Webhook } from "./interfaces";
 
 describe<{
 	database: Database;
@@ -16,10 +14,11 @@ describe<{
 		const app = new Application(new Container());
 		app.bind("path.cache").toConstantValue(dirSync().name);
 
-		app.bind<Database>(InternalIdentifiers.Database).to(Database).inSingletonScope();
+		app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
+		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatch: () => {} });
 
-		const database = app.get<Database>(InternalIdentifiers.Database);
+		const database = app.get<Database>(Identifiers.Webhooks.Database);
 		database.boot();
 
 		context.database = database;
@@ -56,7 +55,7 @@ describe<{
 	});
 
 	it("should find webhooks by their event", ({ database }) => {
-		const webhook: Webhook = database.create(dummyWebhook);
+		const webhook: Contracts.Webhooks.Webhook = database.create(dummyWebhook);
 
 		const rows = database.findByEvent("event");
 
@@ -69,20 +68,20 @@ describe<{
 	});
 
 	it("should create a new webhook", ({ database }) => {
-		const webhook: Webhook = database.create(dummyWebhook);
+		const webhook: Contracts.Webhooks.Webhook = database.create(dummyWebhook);
 
 		assert.equal(database.create(webhook), webhook);
 	});
 
 	it("should update an existing webhook", ({ database }) => {
-		const webhook: Webhook = database.create(dummyWebhook);
-		const updated: Webhook = database.update(webhook.id, dummyWebhook);
+		const webhook: Contracts.Webhooks.Webhook = database.create(dummyWebhook);
+		const updated: Contracts.Webhooks.Webhook = database.update(webhook.id, dummyWebhook);
 
 		assert.equal(database.findById(webhook.id), updated);
 	});
 
 	it("should delete an existing webhook", ({ database }) => {
-		const webhook: Webhook = database.create(dummyWebhook);
+		const webhook: Contracts.Webhooks.Webhook = database.create(dummyWebhook);
 
 		assert.equal(database.findById(webhook.id), webhook);
 

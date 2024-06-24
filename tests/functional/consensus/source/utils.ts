@@ -1,5 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
 import { sleep } from "@mainsail/utils";
 
@@ -134,7 +133,7 @@ export const makePrecommit = async (
 export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: number): Promise<void> => {
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {
-			const event = Enums.BlockEvent.Applied;
+			const event = Events.BlockEvent.Applied;
 			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
@@ -161,7 +160,7 @@ export const snoozeForBlock = async (sandbox: Sandbox | Sandbox[], height?: numb
 export const snoozeForRound = async (sandbox: Sandbox | Sandbox[], round?: number): Promise<void> => {
 	const function_ = async (sandbox: Sandbox): Promise<void> =>
 		new Promise((resolve) => {
-			const event = Enums.ConsensusEvent.RoundStarted;
+			const event = Events.ConsensusEvent.RoundStarted;
 			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
 				Identifiers.Services.EventDispatcher.Service,
 			);
@@ -197,7 +196,7 @@ export async function snoozeForInvalidBlock(
 ): Promise<InvalidBlock | InvalidBlock[]> {
 	const function_ = async (sandbox: Sandbox): Promise<InvalidBlock> =>
 		new Promise((resolve) => {
-			const event = Enums.BlockEvent.Invalid;
+			const event = Events.BlockEvent.Invalid;
 			const eventDispatcher = sandbox.app.get<Contracts.Kernel.EventDispatcher>(
 				Identifiers.Services.EventDispatcher.Service,
 			);

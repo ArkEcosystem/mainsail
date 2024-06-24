@@ -1,6 +1,5 @@
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ValidatorRegistrationTransactionHandler } from "@mainsail/crypto-transaction-validator-registration";
-import { Enums as AppEnums } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
 
 import { describe, Sandbox } from "../../../test-framework/source";
@@ -12,6 +11,7 @@ describe<{
 	walletRepository: any;
 	poolQuery: any;
 	handler: VoteTransactionHandler;
+	emitter: any;
 }>("VoteHandler", ({ beforeEach, it, assert, stub }) => {
 	const wallet: Partial<Contracts.State.Wallet> = {
 		forgetAttribute: () => false,
@@ -66,12 +66,17 @@ describe<{
 			whereKind: () => context.poolQuery,
 		};
 
+		context.emitter = {
+			dispatch: async () => {},
+		};
+
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.emitter);
 		context.sandbox.app.bind(Identifiers.TransactionPool.Query).toConstantValue(context.poolQuery);
 		context.sandbox.app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({});
 
@@ -375,51 +380,41 @@ describe<{
 		spySuper.neverCalled();
 	});
 
-	it("emitEvents - should dispatch", ({ handler }) => {
-		const emitter: Partial<Contracts.Kernel.EventDispatcher> = {
-			dispatch: async () => {},
-		};
+	it("emitEvents - should dispatch", ({ handler, sandbox, emitter }) => {
 		const spyDispatch = stub(emitter, "dispatch");
+
+		sandbox.app.rebind(Identifiers.Services.EventDispatcher.Service).toConstantValue(emitter);
 
 		const voteTransaction = getTransaction(["validatorPublicKey"], []);
 
-		handler.emitEvents(
-			voteTransaction as Contracts.Crypto.Transaction,
-			emitter as Contracts.Kernel.EventDispatcher,
-		);
+		handler.emitEvents(voteTransaction as Contracts.Crypto.Transaction);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+		spyDispatch.calledWith(Events.VoteEvent.Vote, {
 			transaction: voteTransaction.data,
 			validator: "validatorPublicKey",
 		});
 
 		spyDispatch.reset();
 		const unvoteTransaction = getTransaction([], ["validatorPublicKey"]);
-		handler.emitEvents(
-			unvoteTransaction as Contracts.Crypto.Transaction,
-			emitter as Contracts.Kernel.EventDispatcher,
-		);
+		handler.emitEvents(unvoteTransaction as Contracts.Crypto.Transaction);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+		spyDispatch.calledWith(Events.VoteEvent.Unvote, {
 			transaction: unvoteTransaction.data,
 			validator: "validatorPublicKey",
 		});
 
 		spyDispatch.reset();
 		const unvoteVoteTransaction = getTransaction(["voteValidatorPublicKey"], ["unvoteValidatorPublicKey"]);
-		handler.emitEvents(
-			unvoteVoteTransaction as Contracts.Crypto.Transaction,
-			emitter as Contracts.Kernel.EventDispatcher,
-		);
+		handler.emitEvents(unvoteVoteTransaction as Contracts.Crypto.Transaction);
 
 		spyDispatch.calledTimes(2);
-		spyDispatch.calledWith(AppEnums.VoteEvent.Unvote, {
+		spyDispatch.calledWith(Events.VoteEvent.Unvote, {
 			transaction: unvoteVoteTransaction.data,
 			validator: "unvoteValidatorPublicKey",
 		});
-		spyDispatch.calledWith(AppEnums.VoteEvent.Vote, {
+		spyDispatch.calledWith(Events.VoteEvent.Vote, {
 			transaction: unvoteVoteTransaction.data,
 			validator: "voteValidatorPublicKey",
 		});

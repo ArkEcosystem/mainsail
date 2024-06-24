@@ -4,8 +4,8 @@ import {
 	Models,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Enums, Providers } from "@mainsail/kernel";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { Providers } from "@mainsail/kernel";
 
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
@@ -21,7 +21,7 @@ export class Plugins extends AbstractListener<Event, Models.Plugin> {
 
 	protected getEventMapping(): ListenerEventMapping {
 		return {
-			[Enums.KernelEvent.ServiceProviderBooted]: ListenerEvent.OnAdded,
+			[Events.KernelEvent.ServiceProviderBooted]: ListenerEvent.OnAdded,
 		};
 	}
 

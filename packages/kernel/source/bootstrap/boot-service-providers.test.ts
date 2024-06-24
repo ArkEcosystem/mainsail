@@ -1,5 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Exceptions, Identifiers } from "@mainsail/contracts";
+import { Events, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { describe } from "../../../test-framework/source";
 import {
@@ -10,7 +10,6 @@ import {
 	RequiredFaultyBootServiceProvider,
 } from "../../test/stubs/bootstrap/service-providers";
 import { Application } from "../application";
-import { BlockEvent, KernelEvent } from "../enums";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { MemoryEventDispatcher } from "../services/events";
 import { BootServiceProviders } from "./boot-service-providers";
@@ -97,14 +96,14 @@ describe<{
 		await assert.resolves(() =>
 			context.app
 				.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-				.dispatch(BlockEvent.Applied),
+				.dispatch(Events.BlockEvent.Applied),
 		);
 
 		spyBoot.neverCalled();
 		assert.true(context.serviceProviderRepository.deferred("stub"));
 	});
 
-	it("DeferredServiceProvider - bootWhen should react to [BlockEvent.Applied]", async (context) => {
+	it("DeferredServiceProvider - bootWhen should react to [Events.BlockEvent.Applied]", async (context) => {
 		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
 
 		const serviceProvider: ServiceProvider = new DeferredServiceProvider();
@@ -120,12 +119,12 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(BlockEvent.Applied);
+			.dispatch(Events.BlockEvent.Applied);
 
 		spyBoot.calledOnce();
 	});
 
-	it("DeferredServiceProvider - bootWhen should react to [KernelEvent.ServiceProviderBooted]", async (context) => {
+	it("DeferredServiceProvider - bootWhen should react to [Events.KernelEvent.ServiceProviderBooted]", async (context) => {
 		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
 
 		const serviceProvider: ServiceProvider = new DeferredServiceProvider();
@@ -141,12 +140,12 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyBoot.calledOnce();
 	});
 
-	it("DeferredServiceProvider - bootWhen should not react to [KernelEvent.ServiceProviderBooted] if the booted provider is self", async (context) => {
+	it("DeferredServiceProvider - bootWhen should not react to [Events.KernelEvent.ServiceProviderBooted] if the booted provider is self", async (context) => {
 		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
 
 		const serviceProvider: ServiceProvider = new DeferredServiceProvider();
@@ -164,7 +163,7 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "stub" });
 
 		spyBoot.neverCalled();
 	});
@@ -187,7 +186,7 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "expected-stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "expected-stub" });
 
 		spyBoot.calledOnce();
 	});
@@ -208,12 +207,12 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyBoot.neverCalled();
 	});
 
-	it("DeferredServiceProvider - disposeWhen should react to [BlockEvent.Applied]", async (context) => {
+	it("DeferredServiceProvider - disposeWhen should react to [Events.BlockEvent.Applied]", async (context) => {
 		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
 
 		const serviceProvider: ServiceProvider = new DeferredServiceProvider();
@@ -228,12 +227,12 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(BlockEvent.Applied);
+			.dispatch(Events.BlockEvent.Applied);
 
 		spyDispose.calledOnce();
 	});
 
-	it("DeferredServiceProvider - disposeWhen should react to [KernelEvent.ServiceProviderBooted]", async (context) => {
+	it("DeferredServiceProvider - disposeWhen should react to [Events.KernelEvent.ServiceProviderBooted]", async (context) => {
 		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
 
 		const serviceProvider: ServiceProvider = new DeferredServiceProvider();
@@ -248,12 +247,12 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyDispose.calledOnce();
 	});
 
-	it("DeferredServiceProvider - disposeWhen should not react to [KernelEvent.ServiceProviderBooted] if the booted provider is self", async (context) => {
+	it("DeferredServiceProvider - disposeWhen should not react to [Events.KernelEvent.ServiceProviderBooted] if the booted provider is self", async (context) => {
 		const bootServiceProviders = context.app.resolve<BootServiceProviders>(BootServiceProviders);
 
 		const serviceProvider: ServiceProvider = new DeferredServiceProvider();
@@ -268,7 +267,7 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "stub" });
 
 		spyDispose.neverCalled();
 	});
@@ -290,7 +289,7 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "expected-stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "expected-stub" });
 
 		spyDispose.calledOnce();
 	});
@@ -310,7 +309,7 @@ describe<{
 
 		await context.app
 			.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service)
-			.dispatch(KernelEvent.ServiceProviderBooted, { name: "another-stub" });
+			.dispatch(Events.KernelEvent.ServiceProviderBooted, { name: "another-stub" });
 
 		spyDispose.neverCalled();
 	});
