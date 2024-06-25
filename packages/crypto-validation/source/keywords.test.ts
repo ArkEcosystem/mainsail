@@ -177,4 +177,46 @@ describe<{
 		assert.false(object.amount instanceof BigNumber);
 		assert.equal(object.amount, "12");
 	});
+
+	it("keyword transactionGasLimit should be ok", (context) => {
+		const schema = {
+			$id: "test",
+			transactionGasLimit: {},
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", cryptoJson.milestones[0].gas!.minimumGasLimit).error);
+		assert.undefined(context.validator.validate("test", cryptoJson.milestones[0].gas!.maximumGasLimit).error);
+
+		assert.defined(context.validator.validate("test", 1).error);
+		assert.defined(context.validator.validate("test", 0).error);
+		assert.defined(context.validator.validate("test", -1).error);
+		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
+		assert.defined(context.validator.validate("test", "asdf").error);
+	});
+
+	it("keyword bytecode should be ok", (context) => {
+		const schema = {
+			$id: "test",
+			bytecode: {},
+		};
+		context.validator.addSchema(schema);
+
+		assert.undefined(context.validator.validate("test", "").error);
+		assert.undefined(context.validator.validate("test", "0x00").error);
+		assert.undefined(context.validator.validate("test", "0x").error);
+		assert.undefined(context.validator.validate("test", "00").error);
+
+		const maxBytecodeLength = cryptoJson.milestones[0].gas!.maximumGasLimit / 2;
+		const maxPayload = "0x" + "a".repeat(maxBytecodeLength);
+		assert.undefined(context.validator.validate("test", maxPayload).error);
+
+		assert.defined(context.validator.validate("test", maxPayload + "aa").error);
+
+		assert.defined(context.validator.validate("test", 1).error);
+		assert.defined(context.validator.validate("test", 0).error);
+		assert.defined(context.validator.validate("test", -1).error);
+		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
+		assert.defined(context.validator.validate("test", "asdf").error);
+	});
 });
