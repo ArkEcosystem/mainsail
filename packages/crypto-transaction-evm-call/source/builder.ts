@@ -17,7 +17,6 @@ export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {
 		this.data.senderPublicKey = "";
 		this.data.asset = {
 			evmCall: {
-				// TODO: gas parameters
 				gasLimit: 1_000_000,
 				payload: "",
 			},
