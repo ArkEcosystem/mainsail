@@ -116,11 +116,11 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 		},
 		errors: false,
 		keyword: "bytecode",
-		modifying: true,
 		metaSchema: {
 			properties: {},
 			type: "object",
 		},
+		modifying: true,
 	};
 
 	return { bignum, bytecode, maxBytes, transactionGasLimit };
