@@ -373,6 +373,7 @@
 			"gas": {
 				"minimumGasFee": 5,
 				"minimumGasLimit": 21000,
+				"maximumGasLimit": 2000000,
 				"nativeFeeMultiplier": 100,
 				"nativeGasLimits": {
 					"multiPayment": 50000,
