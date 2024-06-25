@@ -219,4 +219,30 @@ describe<{
 		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
 		assert.defined(context.validator.validate("test", "asdf").error);
 	});
+
+	it("keyword bytecode should remove 0x prefix", (context) => {
+		const schema = {
+			$id: "test",
+			type: "object",
+			properties: {
+				payload: { bytecode: {} },
+			},
+		};
+
+		context.validator.addSchema(schema);
+
+		const withPrefix = {
+			payload: "0xdead",
+		};
+
+		assert.undefined(context.validator.validate("test", withPrefix).error);
+		assert.equal(withPrefix.payload, "dead");
+
+		const withoutPrefix = {
+			payload: "dead",
+		};
+
+		assert.undefined(context.validator.validate("test", withoutPrefix).error);
+		assert.equal(withoutPrefix.payload, "dead");
+	});
 });

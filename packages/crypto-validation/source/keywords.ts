@@ -104,11 +104,19 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 				if (!regex.test(data)) {
 					return false;
 				}
+
+				if (parentSchema && parentSchema.parentData && parentSchema.parentDataProperty) {
+					parentSchema.parentData[parentSchema.parentDataProperty] = data.startsWith("0x")
+						? data.slice(2)
+						: data;
+				}
+
 				return true;
 			};
 		},
 		errors: false,
 		keyword: "bytecode",
+		modifying: true,
 		metaSchema: {
 			properties: {},
 			type: "object",
