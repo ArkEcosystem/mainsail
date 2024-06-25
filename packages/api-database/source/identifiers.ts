@@ -3,7 +3,6 @@ export const Identifiers = {
 	BlockRepositoryFactory: Symbol.for("API<Factory.BlockRepository>"),
 	ConfigurationRepositoryFactory: Symbol.for("API<Factory.ConfigurationRepository>"),
 	DataSource: Symbol.for("API<DataSource>"),
-	MempoolTransactionRepositoryFactory: Symbol.for("API<Factory.MempoolTransactionRepositoryFactory>"),
 	Migrations: Symbol.for("API<Migrations>"),
 	PeerRepositoryFactory: Symbol.for("API<Factory.PeerRepositoryFactory>"),
 	PluginRepositoryFactory: Symbol.for("API<Factory.PluginRepositoryFactory>"),
