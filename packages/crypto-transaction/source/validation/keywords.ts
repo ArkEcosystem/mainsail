@@ -107,7 +107,7 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	return {
 		bytecode,
 		network,
-		transactionType,
 		transactionGasLimit,
+		transactionType,
 	};
 };
