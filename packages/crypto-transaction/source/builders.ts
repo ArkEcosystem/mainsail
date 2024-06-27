@@ -160,7 +160,12 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			this.data.recipientId = await this.addressFactory.fromPublicKey(keys.publicKey);
 		}
 
-		this.data.signature = await this.signer.sign(this.#getSigningObject(), keys);
+		const data = this.#getSigningObject();
+		if (!(await this.verifier.verifySchema(data, false))) {
+			throw new Exceptions.ValidationFailed();
+		}
+
+		this.data.signature = await this.signer.sign(data, keys);
 
 		return this.instance();
 	}

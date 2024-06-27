@@ -1,7 +1,8 @@
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
-export const makeKeywords = () => {
+export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	const maxBytes: FuncKeywordDefinition = {
 		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
 		errors: false,

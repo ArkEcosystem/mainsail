@@ -30,6 +30,7 @@ export class MilestonesGenerator {
 					},
 				},
 				gas: {
+					maximumGasLimit: 2_000_000,
 					minimumGasFee: 5,
 					minimumGasLimit: 21_000,
 					nativeFeeMultiplier: 100,

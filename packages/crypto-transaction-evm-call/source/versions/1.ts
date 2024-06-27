@@ -21,20 +21,15 @@ export class EvmCallTransaction extends Transaction {
 			$id: "evmCall",
 			properties: {
 				amount: { bignumber: { maximum: 0, minimum: 0 } },
-				// TODO: milestone?
 				asset: {
 					properties: {
 						evmCall: {
 							properties: {
 								gasLimit: {
-									maximum: 2_000_000,
-									minimum: 21_000,
-									/* TODO: milestone? */ type: "integer",
+									transactionGasLimit: {},
 								},
 								payload: {
-									// TODO: milestone for max allowed bytecode
-									allOf: [{ maxLength: 1_000_000, minLength: 0 }, { $ref: "hex" }],
-									type: "string",
+									bytecode: {},
 								},
 							},
 							required: ["gasLimit", "payload"],
