@@ -47,8 +47,8 @@ export class Deployer {
 			caller: this.#genesisAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(1_000_000),
-			txHash: this.#generateTxHash(),
 			specId: milestone.evmSpec,
+			txHash: this.#generateTxHash(),
 		});
 
 		if (!result.receipt.success) {
@@ -90,8 +90,8 @@ export class Deployer {
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,
-				txHash: this.#generateTxHash(),
 				specId: milestone.evmSpec,
+				txHash: this.#generateTxHash(),
 			});
 
 			if (!receipt.success) {
