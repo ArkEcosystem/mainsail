@@ -61,6 +61,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		const { evmCall } = transaction.data.asset;
 
+		const { evmSpec } = this.configuration.getMilestone();
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
@@ -72,6 +73,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				gasLimit: BigInt(evmCall.gasLimit),
 				recipient: transaction.data.recipientId,
 				sequence: transaction.data.sequence,
+				specId: evmSpec,
 				txHash: transaction.id,
 			});
 

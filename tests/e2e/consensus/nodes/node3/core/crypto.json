@@ -358,6 +358,7 @@
 				"version": 1
 			},
 			"epoch": "2024-06-24T00:00:00.000Z",
+			"evmSpec": "Shanghai",
 			"fees": {
 				"staticFees": {
 					"multiPayment": 10000000,

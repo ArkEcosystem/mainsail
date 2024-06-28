@@ -1,3 +1,4 @@
+import { Contracts } from "@mainsail/contracts";
 import { describe } from "../../../test-framework/source";
 import { MilestonesGenerator } from "./milestones";
 
@@ -51,6 +52,7 @@ describe<{
 						stageTimeoutIncrease: 2000,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
+					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 					gas: {
 						minimumGasFee: 5,
 						minimumGasLimit: 21_000,

@@ -48,6 +48,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 			caller: data.from,
 			data: Buffer.from(ethers.getBytes(data.data)),
 			recipient: data.to,
+			specId: Contracts.Evm.SpecId.LATEST,
 		});
 
 		if (success) {

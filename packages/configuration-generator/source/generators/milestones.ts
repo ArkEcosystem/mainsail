@@ -17,6 +17,7 @@ export class MilestonesGenerator {
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
+				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 				fees: {
 					staticFees: {
 						multiPayment: 10_000_000,

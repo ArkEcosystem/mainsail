@@ -21,12 +21,14 @@ describe<{
 		context.instance = context.sandbox.app.resolve<Contracts.Evm.Instance>(EvmInstance);
 	});
 
-	const deployGasConfig = {
+	const deployConfig = {
 		gasLimit: BigInt(1_000_000),
+		specId: Contracts.Evm.SpecId.SHANGHAI,
 	};
 
-	const gasConfig = {
+	const transferConfig = {
 		gasLimit: BigInt(60_000),
+		specId: Contracts.Evm.SpecId.SHANGHAI,
 	};
 
 	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
@@ -44,7 +46,7 @@ describe<{
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		assert.true(receipt.success);
@@ -65,7 +67,7 @@ describe<{
 			data: Buffer.from(MainsailGlobals.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		assert.true(receipt.success);
@@ -84,7 +86,7 @@ describe<{
 				timestamp: BigInt(123_456_789),
 				validatorAddress: validator.address,
 			},
-			...gasConfig,
+			...transferConfig,
 		}));
 
 		const data = iface.decodeEventLog("GlobalData", receipt.logs[0].data)[0];
@@ -115,7 +117,7 @@ describe<{
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
@@ -141,7 +143,7 @@ describe<{
 			recipient: contractAddress,
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
-			...gasConfig,
+			...transferConfig,
 		}));
 
 		await instance.onCommit({ height: BigInt(1), round: BigInt(0) } as any);
@@ -161,7 +163,7 @@ describe<{
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		const contractAddress = receipt.deployedContractAddress;
@@ -173,7 +175,7 @@ describe<{
 			recipient: contractAddress,
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
-			...gasConfig,
+			...transferConfig,
 		}));
 
 		assert.false(receipt.success);
@@ -190,7 +192,7 @@ describe<{
 			caller: sender.address,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		const contractAddress = receipt.deployedContractAddress;
@@ -218,7 +220,7 @@ describe<{
 					),
 					recipient: contractAddress,
 					txHash: getRandomTxHash(),
-					...gasConfig,
+					...transferConfig,
 				}),
 		);
 
@@ -232,7 +234,7 @@ describe<{
 				),
 				recipient: contractAddress,
 				txHash: getRandomTxHash(),
-				...gasConfig,
+				...transferConfig,
 			});
 		});
 
@@ -258,7 +260,7 @@ describe<{
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 					txHash: getRandomTxHash(),
-					...deployGasConfig,
+					...deployConfig,
 				}),
 		);
 	});
@@ -273,7 +275,7 @@ describe<{
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash,
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		assert.true(receipt.success);
@@ -288,7 +290,7 @@ describe<{
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash,
-			...deployGasConfig,
+			...deployConfig,
 		}));
 
 		assert.true(receipt.success);
@@ -308,7 +310,7 @@ describe<{
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash,
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		await instance.onCommit(commitKey as any);
@@ -321,7 +323,7 @@ describe<{
 				data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 				blockContext: { ...blockContext, commitKey },
 				txHash: randomTxHash,
-				...deployGasConfig,
+				...deployConfig,
 			});
 		}, "found commit, but tx hash is missing");
 	});
@@ -334,7 +336,7 @@ describe<{
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 			txHash: getRandomTxHash(),
-			...deployGasConfig,
+			...deployConfig,
 		});
 
 		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
@@ -356,7 +358,7 @@ describe<{
 			recipient: contractAddress,
 			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
 			txHash: getRandomTxHash(),
-			...gasConfig,
+			...transferConfig,
 		}));
 
 		({ receipt } = await instance.process({
@@ -365,7 +367,7 @@ describe<{
 			recipient: contractAddress,
 			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
 			txHash: getRandomTxHash(),
-			...gasConfig,
+			...transferConfig,
 		}));
 
 		({ receipt } = await instance.process({
@@ -374,7 +376,7 @@ describe<{
 			recipient: contractAddress,
 			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
 			txHash: getRandomTxHash(),
-			...gasConfig,
+			...transferConfig,
 		}));
 
 		// not updated yet
@@ -398,10 +400,28 @@ describe<{
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
 			gasLimit: 30_000n,
+			specId: Contracts.Evm.SpecId.SHANGHAI,
 		});
 
 		assert.false(receipt.success);
 		assert.equal(receipt.gasUsed, 30_000n);
+	});
+
+	it("should reject invalid specId", async ({ instance }) => {
+		const [sender] = wallets;
+
+		await assert.rejects(
+			async () =>
+				instance.process({
+					caller: sender.address,
+					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+					txHash: getRandomTxHash(),
+					gasLimit: 30_000n,
+					specId: "asdf" as unknown as Contracts.Evm.SpecId,
+				}),
+			"invalid spec_id",
+		);
 	});
 });
 
@@ -419,6 +439,7 @@ const getBalance = async (
 		caller: ethers.ZeroAddress,
 		data: Buffer.from(ethers.getBytes(balanceOf)),
 		recipient: contractAddress!,
+		specId: Contracts.Evm.SpecId.SHANGHAI,
 	});
 
 	const [balance] = iface.decodeFunctionResult("balanceOf", output!);

@@ -199,6 +199,7 @@ impl EvmInner {
 
         let mut evm = Evm::builder()
             .with_db(state_db)
+            .with_spec_id(ctx.spec_id)
             .modify_block_env(|block_env| {
                 let Some(block_ctx) = ctx.block_context.as_ref() else {
                     return;
