@@ -197,8 +197,6 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(&self.persistent_db))
             .build();
 
-        println!("ctx = {:#?}", ctx);
-
         let mut evm = Evm::builder()
             .with_db(state_db)
             .with_spec_id(ctx.spec_id)
