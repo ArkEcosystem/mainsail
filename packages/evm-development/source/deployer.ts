@@ -48,6 +48,7 @@ export class Deployer {
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(1_000_000),
 			txHash: this.#generateTxHash(),
+			specId: milestone.evmSpec,
 		});
 
 		if (!result.receipt.success) {
@@ -78,6 +79,7 @@ export class Deployer {
 	): Promise<void> {
 		const iface = new ethers.Interface(ERC20.abi.abi);
 		const amount = ethers.parseEther("1000");
+		const milestone = this.configuration.getMilestone(0);
 
 		for (const recipient of recipients) {
 			const encodedCall = iface.encodeFunctionData("transfer", [recipient, amount]);
@@ -89,6 +91,7 @@ export class Deployer {
 				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,
 				txHash: this.#generateTxHash(),
+				specId: milestone.evmSpec,
 			});
 
 			if (!receipt.success) {

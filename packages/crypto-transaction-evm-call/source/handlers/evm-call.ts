@@ -61,6 +61,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		const { evmCall } = transaction.data.asset;
 
+		const { evmSpec } = this.configuration.getMilestone();
 		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
 
 		try {
@@ -73,6 +74,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				recipient: transaction.data.recipientId,
 				sequence: transaction.data.sequence,
 				txHash: transaction.id,
+				specId: evmSpec,
 			});
 
 			// Subtract native fee from sender based on actual consumed gas

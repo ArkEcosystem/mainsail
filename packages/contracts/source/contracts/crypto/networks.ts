@@ -1,3 +1,4 @@
+import { SpecId } from "../evm/evm.js";
 import { Fees } from "../fees.js";
 import { CommitJson } from "./commit.js";
 
@@ -59,6 +60,7 @@ export type Milestone = {
 	address: Record<string, any>;
 	block: MilestoneBlock;
 	epoch: string;
+	evmSpec: SpecId;
 	gas: MilestoneGas;
 	fees: Fees;
 	multiPaymentLimit: number;

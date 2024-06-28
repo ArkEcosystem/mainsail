@@ -33,12 +33,14 @@ export interface TransactionContext {
 	readonly blockContext: BlockContext;
 	readonly txHash: string;
 	readonly sequence?: number;
+	readonly specId: SpecId;
 }
 
 export interface TransactionViewContext {
 	readonly caller: string;
 	readonly recipient: string;
 	readonly data: Buffer;
+	readonly specId: SpecId;
 }
 
 export interface BlockContext {
@@ -60,4 +62,11 @@ export interface TransactionReceipt {
 	readonly deployedContractAddress?: string;
 	readonly logs: any;
 	readonly output?: Buffer;
+}
+
+// Supported EVM specs
+// https://github.com/ethereum/execution-specs
+export enum SpecId {
+	SHANGHAI = "Shanghai",
+	LATEST = "Latest",
 }
