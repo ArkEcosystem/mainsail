@@ -3437,6 +3437,7 @@
 				"stageTimeoutIncrease": 2000
 			},
 			"epoch": "2023-12-21T00:00:00.000Z",
+			"evmSpec": "Shanghai",
 			"fees": {
 				"staticFees": {
 					"transfer": 10000000,
