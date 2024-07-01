@@ -150,4 +150,15 @@ describe<{
 			assert.true(validator.validate("evmCall", transaction).error.includes("type"));
 		}
 	});
+
+	it("#getSchema - recipient should be optional", ({ validator }) => {
+		validator.addSchema(EvmCallTransaction.getSchema());
+
+		const transaction = {
+			...transactionOriginal,
+			recipientId: undefined,
+		};
+
+		assert.undefined(validator.validate("evmCall", transaction).error);
+	});
 });
