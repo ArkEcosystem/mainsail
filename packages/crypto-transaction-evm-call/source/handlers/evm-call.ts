@@ -87,7 +87,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 			if (instance.mode() === Contracts.Evm.EvmMode.Persistent && !this.state.isBootstrap()) {
 				this.logger.debug(
-					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)})`,
+					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)} deployed=${receipt.deployedContractAddress})`,
 				);
 
 				void this.#emit(Events.EvmEvent.TransactionReceipt, {

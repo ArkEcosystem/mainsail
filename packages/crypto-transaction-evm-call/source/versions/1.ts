@@ -45,7 +45,7 @@ export class EvmCallTransaction extends Transaction {
 				recipientId: { $ref: "address" },
 				type: { transactionType: Contracts.Crypto.TransactionType.EvmCall },
 			},
-			required: ["recipientId", "asset"],
+			required: ["asset"],
 		});
 	}
 
@@ -55,7 +55,8 @@ export class EvmCallTransaction extends Transaction {
 		const { evmCall } = data.asset;
 
 		return (
-			addressSize + // recipient
+			1 + // recipient marker
+			(data.recipientId ? addressSize : 0) + // recipient
 			4 + // gas limit
 			4 + // payload length
 			Buffer.byteLength(evmCall.payload, "hex")
@@ -71,10 +72,16 @@ export class EvmCallTransaction extends Transaction {
 
 		const payloadBytes = Buffer.from(data.asset.evmCall.payload, "hex");
 
-		const buff: ByteBuffer = ByteBuffer.fromSize(addressSize + 4 + 4 + payloadBytes.byteLength);
+		const buff: ByteBuffer = ByteBuffer.fromSize(
+			1 + (data.recipientId ? addressSize : 0) + 4 + 4 + payloadBytes.byteLength,
+		);
 
-		Utils.assert.defined<string>(data.recipientId);
-		addressSerializer.serialize(buff, await addressFactory.toBuffer(data.recipientId));
+		if (data.recipientId) {
+			buff.writeUint8(1);
+			addressSerializer.serialize(buff, await addressFactory.toBuffer(data.recipientId));
+		} else {
+			buff.writeUint8(0);
+		}
 
 		buff.writeUint32(data.asset.evmCall.gasLimit);
 		buff.writeUint32(payloadBytes.byteLength);
@@ -86,7 +93,10 @@ export class EvmCallTransaction extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data, addressFactory, addressSerializer } = this;
 
-		data.recipientId = await addressFactory.fromBuffer(addressSerializer.deserialize(buf));
+		const recipientMarker = buf.readUint8();
+		if (recipientMarker === 1) {
+			data.recipientId = await addressFactory.fromBuffer(addressSerializer.deserialize(buf));
+		}
 
 		const gasLimit = buf.readUint32();
 		const payloadLength = buf.readUint32();

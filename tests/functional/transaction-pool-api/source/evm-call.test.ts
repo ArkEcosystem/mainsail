@@ -1,10 +1,10 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
-import { EvmCalls } from "@mainsail/test-transaction-builders";
-// import { ContractAbis, Identifiers as EvmDevelopmentIdentifiers } from "@mainsail/evm-development";
+import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
 import { addTransactionsToPool, getWallets, isTransactionCommitted, waitBlock } from "./utils.js";
+import { ethers } from "ethers";
 
 describe<{
 	sandbox: Sandbox;
@@ -31,5 +31,41 @@ describe<{
 
 		await waitBlock(context);
 		await isTransactionCommitted(context, tx);
+	});
+
+	it("should deploy contract and interact with it", async (context) => {
+		const deployTx = await EvmCalls.makeEvmCallDeployErc20Contract(context);
+
+		let { accept } = await addTransactionsToPool(context, [deployTx]);
+		assert.equal(accept, [0]);
+
+		await waitBlock(context);
+		await isTransactionCommitted(context, deployTx);
+
+		const erc20Address = ethers.getCreateAddress({
+			from: ethers.computeAddress(`0x${deployTx.data.senderPublicKey}`),
+			nonce: 0,
+		});
+
+		// Successfully transfer tokens on new contract
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const balanceBefore = await EvmCalls.getErc20BalanceOf(context, erc20Address, randomWallet.address);
+		assert.equal(balanceBefore, 0n);
+
+		const transferTx = await EvmCalls.makeEvmCall(context, {
+			recipient: erc20Address,
+			payload: EvmCalls.encodeErc20Transfer(randomWallet.address, ethers.parseEther("1234")),
+		});
+
+		({ accept } = await addTransactionsToPool(context, [transferTx]));
+		assert.equal(accept, [0]);
+
+		await waitBlock(context);
+		await isTransactionCommitted(context, transferTx);
+
+		// Check final balance
+		const balanceAfter = await EvmCalls.getErc20BalanceOf(context, erc20Address, randomWallet.address);
+		assert.equal(balanceAfter, ethers.parseEther("1234"));
 	});
 });

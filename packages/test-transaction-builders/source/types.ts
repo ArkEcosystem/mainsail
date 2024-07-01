@@ -58,4 +58,5 @@ export interface MultiSignatureOptions extends TransactionOptions {
 export interface EvmCallOptions extends TransactionOptions {
 	gasLimit?: number;
 	payload?: string;
+	recipient?: string;
 }
