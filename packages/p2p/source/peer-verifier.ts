@@ -76,7 +76,7 @@ export class PeerVerifier implements Contracts.P2P.PeerVerifier {
 	async #verifyHighestCommonBlock(peer: Contracts.P2P.Peer, state: Contracts.P2P.PeerState): Promise<void> {
 		const block = this.stateService.getStore().getLastBlock();
 
-		const heightToRequest = state.header.height < block.data.height ? state.header.height : block.data.height;
+		const heightToRequest = state.height < block.data.height ? state.height : block.data.height;
 
 		const { blocks } = await this.communicator.getBlocks(peer, { fromHeight: heightToRequest, limit: 1 });
 

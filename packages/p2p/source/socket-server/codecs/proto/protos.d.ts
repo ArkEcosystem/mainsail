@@ -1352,14 +1352,8 @@ export namespace getStatus {
             /** State height */
             height?: (number|null);
 
-            /** State forgingAllowed */
-            forgingAllowed?: (boolean|null);
-
-            /** State currentSlot */
-            currentSlot?: (number|null);
-
-            /** State header */
-            header?: (getStatus.GetStatusResponse.State.IBlockHeader|null);
+            /** State id */
+            id?: (string|null);
         }
 
         /** Represents a State. */
@@ -1374,14 +1368,8 @@ export namespace getStatus {
             /** State height. */
             public height: number;
 
-            /** State forgingAllowed. */
-            public forgingAllowed: boolean;
-
-            /** State currentSlot. */
-            public currentSlot: number;
-
-            /** State header. */
-            public header?: (getStatus.GetStatusResponse.State.IBlockHeader|null);
+            /** State id. */
+            public id: string;
 
             /**
              * Creates a new State instance using the specified properties.
@@ -1459,178 +1447,6 @@ export namespace getStatus {
              * @returns The default type url
              */
             public static getTypeUrl(typeUrlPrefix?: string): string;
-        }
-
-        namespace State {
-
-            /** Properties of a BlockHeader. */
-            interface IBlockHeader {
-
-                /** BlockHeader id */
-                id?: (string|null);
-
-                /** BlockHeader version */
-                version?: (number|null);
-
-                /** BlockHeader timestamp */
-                timestamp?: (number|null);
-
-                /** BlockHeader previousBlock */
-                previousBlock?: (string|null);
-
-                /** BlockHeader height */
-                height?: (number|null);
-
-                /** BlockHeader numberOfTransactions */
-                numberOfTransactions?: (number|null);
-
-                /** BlockHeader totalAmount */
-                totalAmount?: (string|null);
-
-                /** BlockHeader totalFee */
-                totalFee?: (string|null);
-
-                /** BlockHeader reward */
-                reward?: (string|null);
-
-                /** BlockHeader payloadLength */
-                payloadLength?: (number|null);
-
-                /** BlockHeader payloadHash */
-                payloadHash?: (string|null);
-
-                /** BlockHeader generatorPublicKey */
-                generatorPublicKey?: (string|null);
-
-                /** BlockHeader blockSignature */
-                blockSignature?: (string|null);
-            }
-
-            /** Represents a BlockHeader. */
-            class BlockHeader implements IBlockHeader {
-
-                /**
-                 * Constructs a new BlockHeader.
-                 * @param [properties] Properties to set
-                 */
-                constructor(properties?: getStatus.GetStatusResponse.State.IBlockHeader);
-
-                /** BlockHeader id. */
-                public id: string;
-
-                /** BlockHeader version. */
-                public version: number;
-
-                /** BlockHeader timestamp. */
-                public timestamp: number;
-
-                /** BlockHeader previousBlock. */
-                public previousBlock: string;
-
-                /** BlockHeader height. */
-                public height: number;
-
-                /** BlockHeader numberOfTransactions. */
-                public numberOfTransactions: number;
-
-                /** BlockHeader totalAmount. */
-                public totalAmount: string;
-
-                /** BlockHeader totalFee. */
-                public totalFee: string;
-
-                /** BlockHeader reward. */
-                public reward: string;
-
-                /** BlockHeader payloadLength. */
-                public payloadLength: number;
-
-                /** BlockHeader payloadHash. */
-                public payloadHash: string;
-
-                /** BlockHeader generatorPublicKey. */
-                public generatorPublicKey: string;
-
-                /** BlockHeader blockSignature. */
-                public blockSignature: string;
-
-                /**
-                 * Creates a new BlockHeader instance using the specified properties.
-                 * @param [properties] Properties to set
-                 * @returns BlockHeader instance
-                 */
-                public static create(properties?: getStatus.GetStatusResponse.State.IBlockHeader): getStatus.GetStatusResponse.State.BlockHeader;
-
-                /**
-                 * Encodes the specified BlockHeader message. Does not implicitly {@link getStatus.GetStatusResponse.State.BlockHeader.verify|verify} messages.
-                 * @param message BlockHeader message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encode(message: getStatus.GetStatusResponse.State.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Encodes the specified BlockHeader message, length delimited. Does not implicitly {@link getStatus.GetStatusResponse.State.BlockHeader.verify|verify} messages.
-                 * @param message BlockHeader message or plain object to encode
-                 * @param [writer] Writer to encode to
-                 * @returns Writer
-                 */
-                public static encodeDelimited(message: getStatus.GetStatusResponse.State.IBlockHeader, writer?: $protobuf.Writer): $protobuf.Writer;
-
-                /**
-                 * Decodes a BlockHeader message from the specified reader or buffer.
-                 * @param reader Reader or buffer to decode from
-                 * @param [length] Message length if known beforehand
-                 * @returns BlockHeader
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getStatus.GetStatusResponse.State.BlockHeader;
-
-                /**
-                 * Decodes a BlockHeader message from the specified reader or buffer, length delimited.
-                 * @param reader Reader or buffer to decode from
-                 * @returns BlockHeader
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                public static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getStatus.GetStatusResponse.State.BlockHeader;
-
-                /**
-                 * Verifies a BlockHeader message.
-                 * @param message Plain object to verify
-                 * @returns `null` if valid, otherwise the reason why it is not
-                 */
-                public static verify(message: { [k: string]: any }): (string|null);
-
-                /**
-                 * Creates a BlockHeader message from a plain object. Also converts values to their respective internal types.
-                 * @param object Plain object
-                 * @returns BlockHeader
-                 */
-                public static fromObject(object: { [k: string]: any }): getStatus.GetStatusResponse.State.BlockHeader;
-
-                /**
-                 * Creates a plain object from a BlockHeader message. Also converts values to other types if specified.
-                 * @param message BlockHeader
-                 * @param [options] Conversion options
-                 * @returns Plain object
-                 */
-                public static toObject(message: getStatus.GetStatusResponse.State.BlockHeader, options?: $protobuf.IConversionOptions): { [k: string]: any };
-
-                /**
-                 * Converts this BlockHeader to JSON.
-                 * @returns JSON object
-                 */
-                public toJSON(): { [k: string]: any };
-
-                /**
-                 * Gets the default type url for BlockHeader
-                 * @param [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
-                 * @returns The default type url
-                 */
-                public static getTypeUrl(typeUrlPrefix?: string): string;
-            }
         }
 
         /** Properties of a Config. */
