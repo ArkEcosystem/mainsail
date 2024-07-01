@@ -95,17 +95,8 @@ export const getStatus = {
 		headers,
 		state: {
 			properties: {
-				header: {
-					anyOf: [
-						{
-							$ref: "blockHeader",
-						},
-						{
-							maxProperties: 0,
-							minProperties: 0,
-							type: "object",
-						},
-					],
+				id: {
+					$ref: "blockId",
 				},
 				height: {
 					minimum: 0,
