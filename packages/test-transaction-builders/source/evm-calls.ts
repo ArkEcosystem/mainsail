@@ -46,7 +46,7 @@ export const makeEvmCallDeployErc20Contract = async (
 	fee = fee ?? "5";
 
 	if (!payload) {
-		payload = `0x${Buffer.from(ethers.getBytes(ContractAbis.ERC20.abi.bytecode)).toString("hex")}`;
+		payload = Buffer.from(ethers.getBytes(ContractAbis.ERC20.abi.bytecode)).toString("hex");
 	}
 
 	const builder = app

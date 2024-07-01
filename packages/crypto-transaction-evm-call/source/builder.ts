@@ -25,7 +25,7 @@ export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {
 
 	public payload(payload: string): EvmCallBuilder {
 		if (this.data.asset && this.data.asset.evmCall) {
-			this.data.asset.evmCall.payload = payload;
+			this.data.asset.evmCall.payload = payload.startsWith("0x") ? payload : `0x${payload}`;
 		}
 
 		return this;
