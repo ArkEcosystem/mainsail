@@ -73,8 +73,8 @@ export const getErc20BalanceOf = async (
 	const payload = iface.encodeFunctionData("balanceOf", [walletAddress]).slice(2);
 
 	const result = await callViewFunction(context, {
-		data: Buffer.from(ethers.getBytes(`0x${payload}`)),
 		caller: ethers.ZeroAddress,
+		data: Buffer.from(ethers.getBytes(`0x${payload}`)),
 		recipient: erc20ContractAddress,
 	});
 

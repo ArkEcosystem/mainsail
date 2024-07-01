@@ -5,7 +5,7 @@ export * as Transfers from "./transfers.js";
 export * as Types from "./types.js";
 export * as UsernameRegistrations from "./username-registrations.js";
 export * as UsernameResignations from "./username-resignations.js";
+export * as Utils from "./utils.js";
 export * as ValidatorRegistrations from "./validator-registrations.js";
 export * as ValidatorResignations from "./validator-resignations.js";
 export * as Votes from "./votes.js";
-export * as Utils from "./utils.js";
