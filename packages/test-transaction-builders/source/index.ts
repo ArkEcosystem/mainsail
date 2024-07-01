@@ -8,3 +8,4 @@ export * as UsernameResignations from "./username-resignations.js";
 export * as ValidatorRegistrations from "./validator-registrations.js";
 export * as ValidatorResignations from "./validator-resignations.js";
 export * as Votes from "./votes.js";
+export * as Utils from "./utils.js";

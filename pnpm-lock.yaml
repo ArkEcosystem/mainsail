@@ -3926,6 +3926,9 @@ importers:
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
+      ethers:
+        specifier: ^6.11.0
+        version: 6.11.1
       tmp:
         specifier: 0.2.3
         version: 0.2.3
