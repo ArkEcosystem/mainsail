@@ -103,7 +103,7 @@ export const getStatus = {
 					$ref: "blockId",
 				},
 			},
-			required: ["height", "header"],
+			required: ["id", "height"],
 			type: "object",
 		},
 	},
