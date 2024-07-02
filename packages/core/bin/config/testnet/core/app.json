@@ -332,6 +332,9 @@
 		},
 		{
 			"package": "@mainsail/evm"
+		},
+		{
+			"package": "@mainsail/api-evm"
 		}
 	]
 }
