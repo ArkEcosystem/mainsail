@@ -9,7 +9,6 @@ import {
 	ApiNode,
 	Block,
 	Configuration,
-	MempoolTransaction,
 	Peer,
 	Plugin,
 	Receipt,
@@ -23,7 +22,6 @@ import {
 	makeApiNodeRepository,
 	makeBlockRepository,
 	makeConfigurationRepository,
-	makeMempoolTransactionRepository,
 	makePeerRepository,
 	makePluginRepository,
 	makeReceiptRepository,
@@ -65,7 +63,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Block,
 					Configuration,
 					Peer,
-					MempoolTransaction,
 					Plugin,
 					Receipt,
 					State,
@@ -114,13 +111,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makePeerRepository(customDataSource ?? dataSource),
-				);
-
-			this.app
-				.bind(Identifiers.MempoolTransactionRepositoryFactory)
-				.toFactory(
-					() => (customDataSource?: RepositoryDataSource) =>
-						makeMempoolTransactionRepository(customDataSource ?? dataSource),
 				);
 
 			this.app

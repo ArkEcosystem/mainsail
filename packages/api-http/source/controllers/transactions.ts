@@ -19,9 +19,6 @@ export class TransactionsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory)
 	private readonly transactionTypeRepositoryFactory!: ApiDatabaseContracts.TransactionTypeRepositoryFactory;
 
-	@inject(ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory)
-	private readonly mempoolTransactionlRepositoryFactory!: ApiDatabaseContracts.MempoolTransactionRepositoryFactory;
-
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = request.query;
 		const pagination = this.getListingPage(request);
@@ -46,38 +43,6 @@ export class TransactionsController extends Controller {
 
 	public async show(request: Hapi.Request) {
 		const transaction = await this.transactionRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.where("id = :id", { id: request.params.id })
-			.getOne();
-
-		return this.respondEnrichedTransaction(transaction, request);
-	}
-
-	public async unconfirmed(request: Hapi.Request) {
-		const pagination = super.getListingPage(request);
-
-		const [transactions, totalCount] = await this.mempoolTransactionlRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.orderBy("fee", "DESC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getManyAndCount();
-
-		return super.toPagination(
-			await this.enrichTransactionResult({
-				meta: { totalCountIsEstimate: false },
-				results: transactions,
-				totalCount,
-			}),
-			TransactionResource,
-			request.query.transform,
-		);
-	}
-
-	public async showUnconfirmed(request: Hapi.Request) {
-		const transaction = await this.mempoolTransactionlRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.where("id = :id", { id: request.params.id })
@@ -153,10 +118,7 @@ export class TransactionsController extends Controller {
 			.getMany();
 	}
 
-	private async respondEnrichedTransaction(
-		transaction: Models.Transaction | Models.MempoolTransaction | null,
-		request: Hapi.Request,
-	) {
+	private async respondEnrichedTransaction(transaction: Models.Transaction | null, request: Hapi.Request) {
 		if (!transaction) {
 			return Boom.notFound();
 		}

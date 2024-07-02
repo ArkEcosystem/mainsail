@@ -4,7 +4,6 @@ import { request } from "../../test/helpers/request";
 
 import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import transactions from "../../test/fixtures/transactions.json";
-import unconfirmedTransactions from "../../test/fixtures/unconfirmed_transactions.json";
 import transactionTypes from "../../test/fixtures/transactions_types.json";
 import transactionSchemas from "../../test/fixtures/transactions_schemas.json";
 import transactionFees from "../../test/fixtures/transactions_fees.json";
@@ -79,24 +78,6 @@ describe<{
 		const { statusCode, data } = await request(`/transactions/${id}`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, transactions[transactions.length - 1]);
-	});
-
-	it("/transactions/unconfirmed", async () => {
-		await apiContext.mempoolTransactionRepository.save(unconfirmedTransactions);
-
-		const { statusCode, data } = await request(`/transactions/unconfirmed`, options);
-		assert.equal(statusCode, 200);
-		assert.equal(data.data, unconfirmedTransactions);
-	});
-
-	it("/transactions/unconfirmed/{id}", async () => {
-		await apiContext.mempoolTransactionRepository.save(unconfirmedTransactions);
-
-		const id = unconfirmedTransactions[unconfirmedTransactions.length - 1].id;
-
-		const { statusCode, data } = await request(`/transactions/unconfirmed/${id}`, options);
-		assert.equal(statusCode, 200);
-		assert.equal(data.data, unconfirmedTransactions[unconfirmedTransactions.length - 1]);
 	});
 
 	it("/transactions/types", async () => {

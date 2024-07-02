@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/transaction-pool-broadcaster",
-	"version": "0.0.1-alpha.17",
+	"version": "0.0.1-alpha.20",
 	"description": "Transaction Pool Broadcaster for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

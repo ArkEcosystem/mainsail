@@ -8,26 +8,8 @@ message GetStatusRequest {
 
 message GetStatusResponse {
     message State {
-        message BlockHeader {
-            string id = 1;
-            uint32 version = 2;
-            uint32 timestamp = 3;
-            string previousBlock = 4;
-            uint32 height = 5;
-            uint32 numberOfTransactions = 6;
-            uint32 totalGasUsed = 7;
-            string totalAmount = 8; // bignumber in core
-            string totalFee = 9; // bignumber in core
-            string reward = 10; // bignumber in core
-            uint32 payloadLength = 11;
-            string payloadHash = 12;
-            string generatorPublicKey = 13;
-            string blockSignature = 14;
-        }
         uint32 height = 1;
-        bool forgingAllowed = 2;
-        uint32 currentSlot = 3;
-        BlockHeader header = 4;
+		string id = 2;
     }
 
     message Config {
