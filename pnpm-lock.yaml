@@ -939,15 +939,15 @@ importers:
       '@mainsail/evm':
         specifier: workspace:*
         version: link:../evm
+      '@mainsail/evm-api-worker':
+        specifier: workspace:*
+        version: link:../evm-api-worker
       '@mainsail/evm-development':
         specifier: workspace:*
         version: link:../evm-development
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../evm-gas-fee
-      '@mainsail/evm-worker':
-        specifier: workspace:*
-        version: link:../evm-worker
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../fees
@@ -2457,6 +2457,25 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/evm-api-worker:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      joi:
+        specifier: 17.12.2
+        version: 17.12.2
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/evm-development:
     dependencies:
       '@mainsail/container':
@@ -2487,25 +2506,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/evm-worker:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      joi:
-        specifier: 17.12.2
-        version: 17.12.2
     devDependencies:
       uvu:
         specifier: ^0.5.6

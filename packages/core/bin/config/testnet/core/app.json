@@ -127,7 +127,7 @@
 			"package": "@mainsail/api-development"
 		},
 		{
-			"package": "@mainsail/evm-worker"
+			"package": "@mainsail/evm-api-worker"
 		},
 		{
 			"package": "@mainsail/webhooks"
