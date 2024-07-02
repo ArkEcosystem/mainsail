@@ -3,8 +3,8 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 // https://stackoverflow.com/a/53742518
-type T_AND = Models.Transaction & Models.MempoolTransaction;
-type T_OR = Models.Transaction | Models.MempoolTransaction;
+type T_AND = Models.Transaction;
+type T_OR = Models.Transaction;
 type AnyTransaction = Partial<T_AND> & Pick<T_OR, keyof T_OR>;
 
 export interface EnrichedTransaction extends AnyTransaction {

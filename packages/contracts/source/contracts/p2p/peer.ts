@@ -45,8 +45,8 @@ export interface PeerBroadcast {
 }
 
 export interface PeerState {
-	height: number | undefined;
-	header: Record<string, any>; // @@TODO rename, those are block headers but the name is horrible
+	height: number;
+	id: string;
 }
 
 export interface PeerData {
