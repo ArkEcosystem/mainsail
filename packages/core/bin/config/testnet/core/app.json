@@ -319,15 +319,6 @@
 			"package": "@mainsail/crypto-validation"
 		},
 		{
-			"package": "@mainsail/crypto-hash-bcrypto"
-		},
-		{
-			"package": "@mainsail/crypto-signature-schnorr"
-		},
-		{
-			"package": "@mainsail/crypto-key-pair-ecdsa"
-		},
-		{
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
