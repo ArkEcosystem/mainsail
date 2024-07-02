@@ -127,7 +127,7 @@
 			"package": "@mainsail/api-development"
 		},
 		{
-			"package": "@mainsail/api-evm"
+			"package": "@mainsail/evm-api-worker"
 		},
 		{
 			"package": "@mainsail/webhooks"
@@ -303,6 +303,29 @@
 		},
 		{
 			"package": "@mainsail/webhooks"
+		}
+	],
+	"evm-api": [
+		{
+			"package": "@mainsail/logger-pino"
+		},
+		{
+			"package": "@mainsail/validation"
+		},
+		{
+			"package": "@mainsail/crypto-config"
+		},
+		{
+			"package": "@mainsail/crypto-validation"
+		},
+		{
+			"package": "@mainsail/crypto-address-keccak256"
+		},
+		{
+			"package": "@mainsail/evm"
+		},
+		{
+			"package": "@mainsail/api-evm"
 		}
 	]
 }
