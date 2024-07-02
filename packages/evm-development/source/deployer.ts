@@ -46,7 +46,7 @@ export class Deployer {
 			blockContext,
 			caller: this.#genesisAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
-			gasLimit: BigInt(1_000_000),
+			gasLimit: BigInt(2_000_000),
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
 		});

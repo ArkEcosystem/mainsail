@@ -52,7 +52,7 @@ export const makeEvmCallDeployErc20Contract = async (
 	const builder = app
 		.resolve(EvmCallBuilder)
 		.fee(BigNumber.make(fee).toFixed())
-		.gasLimit(gasLimit ?? 1_000_000)
+		.gasLimit(gasLimit ?? 2_000_000)
 		.payload(payload);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
