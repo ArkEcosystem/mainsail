@@ -945,6 +945,9 @@ importers:
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../evm-gas-fee
+      '@mainsail/evm-worker':
+        specifier: workspace:*
+        version: link:../evm-worker
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../fees
