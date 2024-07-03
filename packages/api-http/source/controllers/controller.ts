@@ -104,7 +104,7 @@ export class Controller extends AbstractController {
 	}
 
 	protected async enrichTransactionResult(
-		resultPage: Search.ResultsPage<Models.Transaction | Models.MempoolTransaction>,
+		resultPage: Search.ResultsPage<Models.Transaction>,
 		context?: { state?: Models.State },
 	): Promise<Search.ResultsPage<EnrichedTransaction>> {
 		const state = context?.state ?? (await this.getState());
@@ -115,7 +115,7 @@ export class Controller extends AbstractController {
 	}
 
 	protected async enrichTransaction(
-		transaction: Models.Transaction | Models.MempoolTransaction,
+		transaction: Models.Transaction,
 		state?: Models.State,
 	): Promise<EnrichedTransaction> {
 		return { ...transaction, state: state ? state : await this.getState() };

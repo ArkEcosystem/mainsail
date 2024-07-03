@@ -1,7 +1,6 @@
 export * from "./api-node.js";
 export * from "./block.js";
 export * from "./configuration.js";
-export * from "./mempool-transaction.js";
 export * from "./peer.js";
 export * from "./plugin.js";
 export * from "./receipt.js";
