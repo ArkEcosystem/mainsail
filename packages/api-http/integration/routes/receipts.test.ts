@@ -1,5 +1,7 @@
 import { describe, Sandbox } from "../../../test-framework/source";
 import receipts from "../../test/fixtures/receipts.json";
+import receiptTransactions from "../../test/fixtures/receipt_transactions.json";
+import receiptWallets from "../../test/fixtures/receipt_wallets.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -33,7 +35,9 @@ describe<{
 		assert.equal(statusCode, 200);
 		assert.empty(data.data);
 
+		await apiContext.transactionRepository.save(receiptTransactions);
 		await apiContext.receiptsRepository.save(receipts);
+		await apiContext.walletRepository.save(receiptWallets);
 
 		const testCases = [
 			{
@@ -49,20 +53,12 @@ describe<{
 				result: [],
 			},
 			{
-				query: `?blockHeight=${receipts[0].blockHeight}`,
-				result: [receipts[0]],
-			},
-			{
-				query: "?blockHeight.from=1&blockHeight.to=100",
+				query: `?sender=${receiptTransactions[0].senderPublicKey}`,
 				result: receipts,
 			},
 			{
-				query: "?blockHeight=2",
-				result: [],
-			},
-			{
-				query: "?blockHeight.from=1&blockHeight.to=2",
-				result: [],
+				query: `?recipient=${receipts[1].deployedContractAddress}`,
+				result: [receipts[0]],
 			},
 		];
 
@@ -71,6 +67,42 @@ describe<{
 				statusCode,
 				data: { data },
 			} = await request(`/receipts${query}`, options);
+
+			assert.equal(statusCode, 200);
+			assert.equal(data, result);
+		}
+	});
+
+	it("/receipts/contracts", async () => {
+		let { statusCode, data } = await request("/receipts", options);
+		assert.equal(statusCode, 200);
+		assert.empty(data.data);
+
+		await apiContext.transactionRepository.save(receiptTransactions);
+		await apiContext.receiptsRepository.save(receipts);
+		await apiContext.walletRepository.save(receiptWallets);
+
+		const testCases = [
+			{
+				query: "",
+				result: [receipts[1]],
+			},
+			{
+				query: `?sender=${receiptTransactions[0].senderPublicKey}`,
+				result: [receipts[1]],
+			},
+			{
+				query: `?sender=asdfgfg`,
+				result: [],
+			},
+		];
+
+		for (const { query, result } of testCases) {
+			const {
+				statusCode,
+				data: { data },
+			} = await request(`/receipts/contracts${query}`, options);
+
 			assert.equal(statusCode, 200);
 			assert.equal(data, result);
 		}
