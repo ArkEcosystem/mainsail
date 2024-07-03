@@ -35,6 +35,7 @@
 		"@mainsail/api-evm": "workspace:*",
 		"@mainsail/api-http": "workspace:*",
 		"@mainsail/api-sync": "workspace:*",
+		"@mainsail/api-transaction-pool": "workspace:*",
 		"@mainsail/bootstrap": "workspace:*",
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/configuration-generator": "workspace:*",

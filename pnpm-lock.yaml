@@ -819,6 +819,9 @@ importers:
       '@mainsail/api-sync':
         specifier: workspace:*
         version: link:../api-sync
+      '@mainsail/api-transaction-pool':
+        specifier: workspace:*
+        version: link:../api-transaction-pool
       '@mainsail/bootstrap':
         specifier: workspace:*
         version: link:../bootstrap
