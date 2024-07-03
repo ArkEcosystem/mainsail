@@ -43,6 +43,7 @@ const EXCEPTIONS = {
 			"@mainsail/api-evm",
 			"@mainsail/api-http",
 			"@mainsail/api-sync",
+			"@mainsail/api-transaction-pool",
 			"@mainsail/bootstrap",
 			"@mainsail/consensus-storage",
 			"@mainsail/consensus",
