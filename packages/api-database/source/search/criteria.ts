@@ -120,7 +120,8 @@ export type OrApiNodeCriteria = OrCriteria<ApiNodeCriteria>;
 
 export type ReceiptCriteria = {
 	txHash?: OrEqualCriteria<string>;
-	blockHeight?: OrNumericCriteria<number>;
+	sender?: OrEqualCriteria<string>;
+	recipient?: OrEqualCriteria<string>;
 };
 
 export type OrReceiptCriteria = OrCriteria<ReceiptCriteria>;
