@@ -1,29 +1,29 @@
 [
-    {
-        "address": "0x96D23C39e0F39D73307839aE854f81fe00BD499e",
-        "publicKey": "03ad3690c48962b99319a57a9d4cbe89046d501c0f8eb07045d8d41c8936ffd5f5",
-        "balance": "235848466176773",
-        "nonce": "5",
-        "attributes": {
-            "vote": "03ad3690c48962b99319a57a9d4cbe89046d501c0f8eb07045d8d41c8936ffd5f5",
-            "nonce": "5",
-            "balance": "235848466176773",
-            "username": "genesis_3",
-            "publicKey": "03ad3690c48962b99319a57a9d4cbe89046d501c0f8eb07045d8d41c8936ffd5f5",
-            "validatorRank": 53,
-            "validatorApproval": 1.89,
-            "validatorLastBlock": {
-                "id": "80628d4b61ea6d6b327436ab418b7bec943072ded1f734ef68028a2afaf33c5d",
-                "height": 152,
-                "timestamp": 1719983440854
-            },
-            "validatorPublicKey": "b200a673cb8e61e48e11b1f8b398d911ef86b48149995606ce22ff5aee130a8b8539d3046f9bd4d3fd9bd56026a8b682",
-            "validatorForgedFees": "0",
-            "validatorForgedTotal": "0",
-            "validatorVoteBalance": "235849056603763",
-            "validatorForgedRewards": "0",
-            "validatorProducedBlocks": 3
-        },
-        "updated_at": "159"
-    }
+	{
+		"address": "0x96D23C39e0F39D73307839aE854f81fe00BD499e",
+		"publicKey": "03ad3690c48962b99319a57a9d4cbe89046d501c0f8eb07045d8d41c8936ffd5f5",
+		"balance": "235848466176773",
+		"nonce": "5",
+		"attributes": {
+			"vote": "03ad3690c48962b99319a57a9d4cbe89046d501c0f8eb07045d8d41c8936ffd5f5",
+			"nonce": "5",
+			"balance": "235848466176773",
+			"username": "genesis_3",
+			"publicKey": "03ad3690c48962b99319a57a9d4cbe89046d501c0f8eb07045d8d41c8936ffd5f5",
+			"validatorRank": 53,
+			"validatorApproval": 1.89,
+			"validatorLastBlock": {
+				"id": "80628d4b61ea6d6b327436ab418b7bec943072ded1f734ef68028a2afaf33c5d",
+				"height": 152,
+				"timestamp": 1719983440854
+			},
+			"validatorPublicKey": "b200a673cb8e61e48e11b1f8b398d911ef86b48149995606ce22ff5aee130a8b8539d3046f9bd4d3fd9bd56026a8b682",
+			"validatorForgedFees": "0",
+			"validatorForgedTotal": "0",
+			"validatorVoteBalance": "235849056603763",
+			"validatorForgedRewards": "0",
+			"validatorProducedBlocks": 3
+		},
+		"updated_at": "159"
+	}
 ]
