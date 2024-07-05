@@ -31,13 +31,15 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			unit.getBlock().data.generatorPublicKey,
 		);
 
+		const commitKey: Contracts.Evm.CommitKey = {
+			height: BigInt(unit.height),
+			round: BigInt(unit.getBlock().data.round),
+		};
+
 		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
 			evm: {
 				blockContext: {
-					commitKey: {
-						height: BigInt(unit.height),
-						round: BigInt(unit.getBlock().data.round),
-					},
+					commitKey,
 					gasLimit: BigInt(milestone.block.maxGasLimit),
 					timestamp: BigInt(unit.getBlock().data.timestamp),
 					validatorAddress: validator.getAddress(),
@@ -64,6 +66,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		}
 
 		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data);
+		await this.#updateEvmAccountInfoNative(commitKey, sender);
 
 		return { gasUsed: result.gasUsed, receipt: result.receipt };
 	}
@@ -163,5 +166,16 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				validator.setAttribute("validatorVoteBalance", voteBalance.plus(transaction.amount));
 			}
 		}
+	}
+
+	async #updateEvmAccountInfoNative(
+		commitKey: Contracts.Evm.CommitKey,
+		sender: Contracts.State.Wallet,
+	): Promise<void> {
+		await this.evm.updateAccountInfo({
+			commitKey,
+			account: sender.getAddress(),
+			nonce: sender.getNonce().toBigInt(),
+		});
 	}
 }

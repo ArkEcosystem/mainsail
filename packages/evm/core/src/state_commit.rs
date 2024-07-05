@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use revm::primitives::{ExecutionResult, B256};
+use revm::{
+    db::AccountStatus,
+    primitives::{ExecutionResult, B256},
+    DatabaseRef, TransitionAccount,
+};
 
 use crate::{
     db::{CommitKey, Error, PendingCommit, PersistentDB},
@@ -37,9 +41,11 @@ pub fn build_commit(pending_commit: PendingCommit) -> StateCommit {
 }
 
 pub fn commit_to_db(
-    db: &PersistentDB,
-    pending_commit: PendingCommit,
+    db: &mut PersistentDB,
+    mut pending_commit: PendingCommit,
 ) -> Result<(), crate::db::Error> {
+    merge_native_account_infos(db, &mut pending_commit)?;
+
     let mut commit = build_commit(pending_commit);
 
     match db.commit(&mut commit) {
@@ -52,4 +58,56 @@ pub fn commit_to_db(
             _ => Err(err),
         },
     }
+}
+
+fn merge_native_account_infos(
+    db: &mut PersistentDB,
+    pending: &mut PendingCommit,
+) -> Result<(), crate::db::Error> {
+    let native = db.take_native_account_infos();
+    // TODO: here we could potentially also check for native balance changes caused by contracts
+    // and pass it back to the main process.
+
+    let mut transition_accounts = Vec::with_capacity(native.len());
+
+    for (address, account) in native {
+        let mut transition_account = TransitionAccount::default();
+        transition_account.status = AccountStatus::Changed;
+        transition_account.previous_status = AccountStatus::LoadedEmptyEIP161;
+
+        match pending.cache.accounts.get(&address) {
+            Some(cached) => {
+                transition_account.info = cached.account_info().clone();
+                transition_account.status = cached.status;
+            }
+            None => {
+                // Fetch it from heed
+                match db.basic_ref(address)? {
+                    Some(account) => {
+                        transition_account.info = Some(account);
+                    }
+                    None => {
+                        println!("insert not-existing account");
+                    }
+                }
+            }
+        }
+
+        // Update account in the state cache with native information
+        transition_account.info.as_mut().and_then(|info| {
+            // println!(
+            //     "updating nonce {} {} => {}",
+            //     address, info.nonce, account.nonce
+            // );
+
+            info.nonce = account.nonce;
+            Some(info)
+        });
+
+        transition_accounts.push((address, transition_account));
+    }
+
+    pending.transitions.add_transitions(transition_accounts);
+
+    Ok(())
 }

@@ -9,6 +9,7 @@ export enum EvmMode {
 export interface Instance extends CommitHandler {
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
+	updateAccountInfo(context: AccountUpdateContext): Promise<void>;
 	mode(): EvmMode;
 }
 
@@ -23,6 +24,12 @@ export interface ViewResult {
 }
 
 export interface CommitResult {}
+
+export interface AccountUpdateContext {
+	readonly account: string;
+	readonly commitKey: CommitKey;
+	readonly nonce: bigint;
+}
 
 export interface TransactionContext {
 	readonly caller: string;

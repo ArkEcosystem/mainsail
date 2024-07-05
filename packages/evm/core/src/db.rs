@@ -56,6 +56,9 @@ struct InnerStorage {
     commits: heed::Database<HeedHeight, heed::types::SerdeJson<CommitReceipts>>,
     contracts: heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
     storage: heed::Database<AddressWrapper, heed::types::SerdeJson<StorageEntry>>,
+
+    // AccountInfo from native transactions for things like 'nonce', etc.
+    native_account_infos: HashMap<Address, AccountInfo>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -139,8 +142,24 @@ impl PersistentDB {
                 commits,
                 contracts,
                 storage,
+                native_account_infos: Default::default(),
             }),
         })
+    }
+
+    pub fn upsert_native_account_info(&mut self, address: Address, info: AccountInfo) {
+        self.inner
+            .borrow_mut()
+            .native_account_infos
+            .insert(address, info);
+    }
+
+    pub fn take_native_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
+        std::mem::take(&mut self.inner.borrow_mut().native_account_infos)
+    }
+
+    pub fn clear_native_account_infos(&mut self) {
+        self.inner.borrow_mut().native_account_infos.clear();
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -190,10 +209,15 @@ impl DatabaseRef for PersistentDB {
         let txn = self.env.read_txn()?;
         let inner = self.inner.borrow();
 
-        let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
+        let mut basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
             Some(account) => account,
             None => AccountInfo::default(),
         };
+
+        // Always take native nonce if provided
+        if let Some(native) = inner.native_account_infos.get(&address) {
+            basic.nonce = native.nonce;
+        }
 
         Ok(basic.into())
     }
