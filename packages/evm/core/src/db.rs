@@ -493,7 +493,7 @@ fn test_commit_changes() {
     );
 
     crate::state_commit::commit_to_db(
-        &db,
+        &mut db,
         PendingCommit {
             key: CommitKey(0, 0),
             cache: CacheState::default(),
@@ -573,7 +573,7 @@ fn test_storage() {
     );
 
     crate::state_commit::commit_to_db(
-        &db,
+        &mut db,
         PendingCommit {
             key: CommitKey(0, 0),
             cache: CacheState::default(),
@@ -633,7 +633,7 @@ fn test_storage_overwrite() {
     );
 
     crate::state_commit::commit_to_db(
-        &db,
+        &mut db,
         PendingCommit {
             key: CommitKey(0, 0),
             cache: CacheState::default(),
@@ -670,7 +670,7 @@ fn test_storage_overwrite() {
     );
 
     crate::state_commit::commit_to_db(
-        &db,
+        &mut db,
         PendingCommit {
             key: CommitKey(1, 0),
             cache: CacheState::default(),
@@ -754,18 +754,18 @@ fn test_resize_on_commit() {
 
     let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
 
-    let db = PersistentDB::new_with_env(env).expect("open");
+    let mut db = PersistentDB::new_with_env(env).expect("open");
     assert_eq!(db.env.info().map_size, 4096 * 10);
 
     // large commit to trigger a resize
-    crate::state_commit::commit_to_db(&db, create_large_commit(0, 1024)).expect("ok");
+    crate::state_commit::commit_to_db(&mut db, create_large_commit(0, 1024)).expect("ok");
 
     // increased to next MAP_SIZE_UNIT
     assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
 
     // add more commits without triggering another resize
     for i in 0..10 {
-        crate::state_commit::commit_to_db(&db, create_large_commit(i + 1, 1024)).expect("ok");
+        crate::state_commit::commit_to_db(&mut db, create_large_commit(i + 1, 1024)).expect("ok");
         assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
     }
 
