@@ -1,20 +1,20 @@
 use std::{path::PathBuf, sync::Arc};
 
 use ctx::{
-    ExecutionContext, JsCommitKey, JsTransactionContext, JsTransactionViewContext, TxContext,
-    TxViewContext,
+    AccountUpdateContext, ExecutionContext, JsAccountUpdateContext, JsCommitKey,
+    JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
 };
 use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
     state_commit,
 };
-use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
+use napi::{bindgen_prelude::*, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
-    primitives::{Address, EVMError, ExecutionResult, ResultAndState, U256},
-    DatabaseCommit, Evm, TransitionAccount,
+    primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
+    Database, DatabaseCommit, Evm, TransitionAccount,
 };
 
 mod ctx;
@@ -57,6 +57,53 @@ impl EvmInner {
         })
     }
 
+    pub fn get_account_info(
+        &mut self,
+        address: Address,
+    ) -> std::result::Result<AccountInfo, EVMError<String>> {
+        match self.persistent_db.basic(address) {
+            Ok(account) => Ok(account.unwrap_or_default()),
+            Err(err) => Err(EVMError::Database(
+                format!("account lookup failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn update_account_info(
+        &mut self,
+        account_update_ctx: AccountUpdateContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        if self
+            .persistent_db
+            .is_height_committed(account_update_ctx.commit_key.0)
+        {
+            return Ok(());
+        }
+
+        // Drop pending state on key change
+        if self
+            .pending_commit
+            .as_ref()
+            .is_some_and(|pending| pending.key != account_update_ctx.commit_key)
+        {
+            self.drop_pending_commit();
+        }
+
+        // Update pending state
+        self.pending_commit
+            .get_or_insert_with(|| PendingCommit::new(account_update_ctx.commit_key));
+
+        self.persistent_db.upsert_native_account_info(
+            account_update_ctx.account,
+            AccountInfo {
+                nonce: account_update_ctx.nonce,
+                ..Default::default()
+            },
+        );
+
+        Ok(())
+    }
+
     pub fn process(
         &mut self,
         tx_ctx: TxContext,
@@ -86,7 +133,7 @@ impl EvmInner {
             .as_ref()
             .is_some_and(|pending| pending.key != commit_key)
         {
-            self.pending_commit.take();
+            self.drop_pending_commit();
         }
 
         let gas_limit = tx_ctx.gas_limit;
@@ -160,14 +207,14 @@ impl EvmInner {
             return Err(EVMError::Database("invalid commit key".into()));
         }
 
-        let outcome = match self.pending_commit.take() {
+        let outcome = match self.take_pending_commit() {
             Some(pending_commit) => {
                 // println!(
                 //     "committing {:?} with {} transactions",
                 //     commit_key,
                 //     pending_commit.diff.len(),
                 // );
-                state_commit::commit_to_db(&self.persistent_db, pending_commit)
+                state_commit::commit_to_db(&mut self.persistent_db, pending_commit)
             }
             None => Ok(()),
         };
@@ -259,6 +306,21 @@ impl EvmInner {
             Err(err) => Err(err),
         }
     }
+
+    fn take_pending_commit(&mut self) -> Option<PendingCommit> {
+        let pending = self.pending_commit.take();
+
+        if pending.is_none() {
+            self.persistent_db.clear_native_account_infos();
+        }
+
+        pending
+    }
+
+    fn drop_pending_commit(&mut self) {
+        self.pending_commit.take();
+        self.persistent_db.clear_native_account_infos();
+    }
 }
 
 fn map_execution_result(result: ExecutionResult) -> TxReceipt {
@@ -306,13 +368,6 @@ fn map_execution_result(result: ExecutionResult) -> TxReceipt {
     }
 }
 
-#[napi(object)]
-pub struct JsAccountInfo {
-    pub address: JsString,
-    pub balance: JsBigInt,
-    pub nonce: JsBigInt,
-}
-
 // The EVM wrapper is exposed to JavaScript.
 
 #[napi(js_name = "Evm")]
@@ -348,6 +403,28 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<void>")]
+    pub fn update_account_info(
+        &mut self,
+        node_env: Env,
+        account_update_ctx: JsAccountUpdateContext,
+    ) -> Result<JsObject> {
+        let account_update_ctx = AccountUpdateContext::try_from(account_update_ctx)?;
+        node_env.execute_tokio_future(
+            Self::update_account_info_async(self.evm.clone(), account_update_ctx),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<JsAccountInfo>")]
+    pub fn get_account_info(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
+        let address = utils::create_address_from_js_string(address)?;
+        node_env.execute_tokio_future(
+            Self::get_account_info_async(self.evm.clone(), address),
+            |&mut node_env, result| Ok(result::JsAccountInfo::new(&node_env, result)?),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsCommitResult>")]
     pub fn commit(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
         let commit_key = CommitKey::try_from(commit_key)?;
@@ -378,6 +455,32 @@ impl JsEvmWrapper {
         }
     }
 
+    async fn get_account_info_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        address: Address,
+    ) -> Result<AccountInfo> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_account_info(address);
+
+        match result {
+            Ok(account) => Result::Ok(account),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn update_account_info_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        account_update_ctx: AccountUpdateContext,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.update_account_info(account_update_ctx);
+
+        match result {
+            Ok(_) => Result::Ok(()),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
     async fn commit_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         commit_key: CommitKey,
@@ -390,22 +493,4 @@ impl JsEvmWrapper {
             Err(err) => Result::Err(serde::de::Error::custom(err)),
         }
     }
-}
-
-#[allow(unused)]
-fn convert_u256_to_bigint(node_env: Env, value: U256) -> JsBigInt {
-    let slice = value.as_le_slice();
-
-    const WORD_SIZE: usize = 8;
-    assert!(slice.len() % WORD_SIZE == 0);
-
-    // https://nodejs.org/api/n-api.html#n_api_napi_create_bigint_words
-    let mut words: Vec<u64> = Vec::with_capacity(slice.len() / WORD_SIZE);
-    for chunk in slice.chunks_exact(WORD_SIZE) {
-        let mut bytes = [0; 8];
-        bytes.copy_from_slice(chunk);
-        words.push(u64::from_le_bytes(bytes));
-    }
-
-    node_env.create_bigint_from_words(false, words).unwrap()
 }

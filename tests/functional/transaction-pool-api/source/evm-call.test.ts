@@ -44,7 +44,7 @@ describe<{
 
 		const erc20Address = ethers.getCreateAddress({
 			from: ethers.computeAddress(`0x${deployTx.data.senderPublicKey}`),
-			nonce: 0,
+			nonce: 3,
 		});
 
 		// Successfully transfer tokens on new contract

@@ -34,7 +34,8 @@ export class Deployer {
 
 		const milestone = this.configuration.getMilestone(0);
 
-		const commitKey = { height: BigInt(0), round: BigInt(0) };
+		// Commit Key chosen in a way such that it does not conflict with blocks.
+		const commitKey = { height: BigInt(2 ** 32 + 1), round: BigInt(0) };
 		const blockContext = {
 			commitKey,
 			gasLimit: BigInt(milestone.block.maxGasLimit),

@@ -1,7 +1,9 @@
 use mainsail_evm_core::db::TinyReceipt;
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
-use revm::primitives::{Bytes, Log};
+use revm::primitives::{AccountInfo, Bytes, Log};
+
+use crate::utils;
 
 #[napi(object)]
 pub struct JsProcessResult {
@@ -108,6 +110,21 @@ impl JsTransactionReceipt {
                     .unwrap()
                     .into_raw()
             }),
+        })
+    }
+}
+
+#[napi(object)]
+pub struct JsAccountInfo {
+    pub balance: JsBigInt,
+    pub nonce: JsBigInt,
+}
+
+impl JsAccountInfo {
+    pub fn new(node_env: &napi::Env, account_info: AccountInfo) -> anyhow::Result<Self> {
+        Ok(JsAccountInfo {
+            nonce: node_env.create_bigint_from_u64(account_info.nonce)?,
+            balance: utils::convert_u256_to_bigint(node_env, account_info.balance)?,
         })
     }
 }
