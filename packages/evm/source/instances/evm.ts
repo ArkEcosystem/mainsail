@@ -23,6 +23,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.process(txContext);
 	}
 
+	public async getAccountInfo(address: string): Promise<Contracts.Evm.AccountInfo> {
+		return this.#evm.getAccountInfo(address);
+	}
+
 	public async updateAccountInfo(context: Contracts.Evm.AccountUpdateContext): Promise<void> {
 		return this.#evm.updateAccountInfo(context);
 	}

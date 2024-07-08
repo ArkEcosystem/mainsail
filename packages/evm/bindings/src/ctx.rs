@@ -75,7 +75,6 @@ pub struct BlockContext {
     pub timestamp: U256,
     pub validator_address: Address,
 }
-
 #[derive(Debug)]
 pub struct AccountUpdateContext {
     pub commit_key: CommitKey,

@@ -8,13 +8,13 @@ use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
     state_commit,
 };
-use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
+use napi::{bindgen_prelude::*, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
     primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
-    DatabaseCommit, Evm, TransitionAccount,
+    Database, DatabaseCommit, Evm, TransitionAccount,
 };
 
 mod ctx;
@@ -55,6 +55,18 @@ impl EvmInner {
                 output: None,
             },
         })
+    }
+
+    pub fn get_account_info(
+        &mut self,
+        address: Address,
+    ) -> std::result::Result<AccountInfo, EVMError<String>> {
+        match self.persistent_db.basic(address) {
+            Ok(account) => Ok(account.unwrap_or_default()),
+            Err(err) => Err(EVMError::Database(
+                format!("account lookup failed: {}", err).into(),
+            )),
+        }
     }
 
     pub fn update_account_info(
@@ -356,13 +368,6 @@ fn map_execution_result(result: ExecutionResult) -> TxReceipt {
     }
 }
 
-#[napi(object)]
-pub struct JsAccountInfo {
-    pub address: JsString,
-    pub balance: JsBigInt,
-    pub nonce: JsBigInt,
-}
-
 // The EVM wrapper is exposed to JavaScript.
 
 #[napi(js_name = "Evm")]
@@ -411,6 +416,15 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsAccountInfo>")]
+    pub fn get_account_info(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
+        let address = utils::create_address_from_js_string(address)?;
+        node_env.execute_tokio_future(
+            Self::get_account_info_async(self.evm.clone(), address),
+            |&mut node_env, result| Ok(result::JsAccountInfo::new(&node_env, result)?),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsCommitResult>")]
     pub fn commit(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
         let commit_key = CommitKey::try_from(commit_key)?;
@@ -441,6 +455,19 @@ impl JsEvmWrapper {
         }
     }
 
+    async fn get_account_info_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        address: Address,
+    ) -> Result<AccountInfo> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_account_info(address);
+
+        match result {
+            Ok(account) => Result::Ok(account),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
     async fn update_account_info_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         account_update_ctx: AccountUpdateContext,
@@ -466,22 +493,4 @@ impl JsEvmWrapper {
             Err(err) => Result::Err(serde::de::Error::custom(err)),
         }
     }
-}
-
-#[allow(unused)]
-fn convert_u256_to_bigint(node_env: Env, value: U256) -> JsBigInt {
-    let slice = value.as_le_slice();
-
-    const WORD_SIZE: usize = 8;
-    assert!(slice.len() % WORD_SIZE == 0);
-
-    // https://nodejs.org/api/n-api.html#n_api_napi_create_bigint_words
-    let mut words: Vec<u64> = Vec::with_capacity(slice.len() / WORD_SIZE);
-    for chunk in slice.chunks_exact(WORD_SIZE) {
-        let mut bytes = [0; 8];
-        bytes.copy_from_slice(chunk);
-        words.push(u64::from_le_bytes(bytes));
-    }
-
-    node_env.create_bigint_from_words(false, words).unwrap()
 }
