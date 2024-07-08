@@ -173,8 +173,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
 		await this.evm.updateAccountInfo({
-			commitKey,
 			account: sender.getAddress(),
+			commitKey,
 			nonce: sender.getNonce().toBigInt(),
 		});
 	}
