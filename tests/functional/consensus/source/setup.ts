@@ -52,6 +52,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	// TODO: get rid of mock
 	sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
 		onCommit: async () => {},
+		updateAccountInfo: async () => {},
 	});
 
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
