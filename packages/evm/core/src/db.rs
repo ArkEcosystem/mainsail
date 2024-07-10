@@ -197,7 +197,7 @@ impl Database for PersistentDB {
         <Self as DatabaseRef>::storage_ref(self, address, index)
     }
 
-    fn block_hash(&mut self, number: U256) -> Result<B256, Self::Error> {
+    fn block_hash(&mut self, number: u64) -> Result<B256, Self::Error> {
         <Self as DatabaseRef>::block_hash_ref(self, number)
     }
 }
@@ -257,7 +257,7 @@ impl DatabaseRef for PersistentDB {
         Ok(U256::ZERO)
     }
 
-    fn block_hash_ref(&self, _number: U256) -> Result<B256, Self::Error> {
+    fn block_hash_ref(&self, _number: u64) -> Result<B256, Self::Error> {
         todo!()
     }
 }
