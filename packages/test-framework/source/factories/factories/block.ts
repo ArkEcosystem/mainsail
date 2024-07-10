@@ -92,6 +92,7 @@ export const registerBlockFactory = async (
 					).toString("hex"),
 					payloadLength,
 					previousBlock: previousBlock.id,
+					stateHash: "TODO",
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
 					timestamp: options.timestamp || dayjs().valueOf(),

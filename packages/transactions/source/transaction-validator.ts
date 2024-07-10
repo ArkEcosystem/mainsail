@@ -24,6 +24,10 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 		this.#walletRepository = this.stateService.createStoreClone().walletRepository;
 	}
 
+	public getEvm(): Contracts.Evm.Instance {
+		return this.evm;
+	}
+
 	public async validate(
 		context: Contracts.Transactions.TransactionValidatorContext,
 		transaction: Contracts.Crypto.Transaction,
