@@ -52,10 +52,10 @@ pub struct TinyReceipt {
 struct CommitReceipts(HashMap<B256, TinyReceipt>);
 
 struct InnerStorage {
-    accounts: heed::Database<AddressWrapper, heed::types::SerdeJson<AccountInfo>>,
-    commits: heed::Database<HeedHeight, heed::types::SerdeJson<CommitReceipts>>,
-    contracts: heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
-    storage: heed::Database<AddressWrapper, heed::types::SerdeJson<StorageEntry>>,
+    accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
+    commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
+    contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
+    storage: heed::Database<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>,
 
     // AccountInfo from native transactions for things like 'nonce', etc.
     native_account_infos: HashMap<Address, AccountInfo>,
@@ -65,6 +65,7 @@ struct InnerStorage {
 #[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
 pub struct CommitKey(pub u64, pub u64);
 
+#[derive(Clone, Debug, Default)]
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,
@@ -85,6 +86,8 @@ pub enum Error {
     Heed(#[from] heed::Error),
     #[error("db full error")]
     DbFull,
+    #[error("bincode error")]
+    Bincode(#[from] bincode::Error),
     #[error("infallible error")]
     Infallible(#[from] Infallible),
 }
@@ -113,22 +116,25 @@ impl PersistentDB {
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
 
-        let accounts = env.create_database::<AddressWrapper, heed::types::SerdeJson<AccountInfo>>(
-            &mut wtxn,
-            Some("accounts"),
-        )?;
-        let commits = env.create_database::<HeedHeight, heed::types::SerdeJson<CommitReceipts>>(
-            &mut wtxn,
-            Some("commits"),
-        )?;
-        let contracts = env.create_database::<ContractWrapper, heed::types::SerdeJson<Bytecode>>(
-            &mut wtxn,
-            Some("contracts"),
-        )?;
+        let accounts = env
+            .create_database::<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>(
+                &mut wtxn,
+                Some("accounts"),
+            )?;
+        let commits = env
+            .create_database::<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>(
+                &mut wtxn,
+                Some("commits"),
+            )?;
+        let contracts = env
+            .create_database::<ContractWrapper, heed::types::SerdeBincode<Bytecode>>(
+                &mut wtxn,
+                Some("contracts"),
+            )?;
 
         let storage = env
             .database_options()
-            .types::<AddressWrapper, heed::types::SerdeJson<StorageEntry>>()
+            .types::<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>()
             .name("storage")
             .flags(heed::DatabaseFlags::DUP_SORT)
             .create(&mut wtxn)?;
