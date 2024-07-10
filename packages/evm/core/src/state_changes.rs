@@ -6,7 +6,7 @@ use revm::{
 /// Loosely based on https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/changes.rs and https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/bundle_state.rs#L449
 //
 /// The only change being that we preserve the old storage value.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, serde::Serialize, serde::Deserialize)]
 pub struct StateChangeset {
     /// Vector of **not** sorted accounts information.
     pub accounts: Vec<(Address, Option<AccountInfo>)>,
@@ -16,7 +16,7 @@ pub struct StateChangeset {
     pub contracts: Vec<(B256, Bytecode)>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
 pub struct StorageChangeset {
     /// Address of account
     pub address: Address,

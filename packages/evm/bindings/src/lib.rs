@@ -6,14 +6,16 @@ use ctx::{
 };
 use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
-    state_commit,
+    state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
-    primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
+    primitives::{
+        hex::ToHexExt, AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, B256, U256,
+    },
     Database, DatabaseCommit, Evm, TransitionAccount,
 };
 
@@ -222,6 +224,22 @@ impl EvmInner {
         match outcome {
             Ok(_) => Ok(()),
             Err(err) => Err(EVMError::Database(format!("commit failed: {}", err).into())),
+        }
+    }
+
+    pub fn state_hash(
+        &mut self,
+        current_hash: B256,
+    ) -> std::result::Result<String, EVMError<String>> {
+        let state_commit =
+            state_commit::build_commit(self.pending_commit.clone().unwrap_or_default());
+        let result = state_hash::calculate(current_hash, &state_commit);
+
+        match result {
+            Ok(result) => Ok(result.encode_hex()),
+            Err(err) => Err(EVMError::Database(
+                format!("state_hash failed: {}", err).into(),
+            )),
         }
     }
 
@@ -434,6 +452,15 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<string>")]
+    pub fn state_hash(&mut self, node_env: Env, current_hash: JsString) -> Result<JsObject> {
+        let current_hash = utils::convert_string_to_b256(current_hash)?;
+        node_env.execute_tokio_future(
+            Self::state_hash_async(self.evm.clone(), current_hash),
+            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+        )
+    }
+
     async fn view_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         view_ctx: TxViewContext,
@@ -487,6 +514,19 @@ impl JsEvmWrapper {
     ) -> Result<()> {
         let mut lock = evm.lock().await;
         let result = lock.commit(commit_key);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn state_hash_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        current_hash: B256,
+    ) -> Result<String> {
+        let mut lock = evm.lock().await;
+        let result = lock.state_hash(current_hash);
 
         match result {
             Ok(result) => Result::Ok(result),
