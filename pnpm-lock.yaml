@@ -2467,9 +2467,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      joi:
-        specifier: 17.12.2
-        version: 17.12.2
     devDependencies:
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
@@ -2510,9 +2507,6 @@ importers:
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
-      '@napi-rs/cli':
-        specifier: ^2.18.0
-        version: 2.18.3
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
