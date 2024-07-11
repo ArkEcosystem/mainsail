@@ -457,7 +457,7 @@ describe<{
 
 	it("should return state hash", async ({ instance }) => {
 		const hash = await instance.stateHash("0000000000000000000000000000000000000000000000000000000000000000");
-		assert.equal(hash, "660b057b36925d4a0da5bf6588b4c64cff7f27ee34e9c90b052829bf8e2a3168");
+		assert.equal(hash, "dac7965a57e662c4fe4f2a69213893eec7dd9c0c1650ebf058659dc6fa017720");
 	});
 });
 

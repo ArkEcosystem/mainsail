@@ -231,9 +231,11 @@ impl EvmInner {
         &mut self,
         current_hash: B256,
     ) -> std::result::Result<String, EVMError<String>> {
-        let state_commit =
-            state_commit::build_commit(self.pending_commit.clone().unwrap_or_default());
-        let result = state_hash::calculate(current_hash, &state_commit);
+        let result = state_hash::calculate(
+            &mut self.persistent_db,
+            self.pending_commit.clone().unwrap_or_default(),
+            current_hash,
+        );
 
         match result {
             Ok(result) => Ok(result.encode_hex()),

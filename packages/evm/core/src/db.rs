@@ -164,6 +164,10 @@ impl PersistentDB {
         std::mem::take(&mut self.inner.borrow_mut().native_account_infos)
     }
 
+    pub fn get_native_account_infos_cloned(&self) -> HashMap<Address, AccountInfo> {
+        self.inner.borrow().native_account_infos.clone()
+    }
+
     pub fn clear_native_account_infos(&mut self) {
         self.inner.borrow_mut().native_account_infos.clear();
     }

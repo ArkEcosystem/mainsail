@@ -1,10 +1,24 @@
 use rayon::slice::ParallelSliceMut;
 use revm::primitives::{keccak256, B256};
 
-use crate::{state_changes::StateChangeset, state_commit::StateCommit};
+use crate::{
+    db::{PendingCommit, PersistentDB},
+    state_changes::StateChangeset,
+    state_commit::{build_commit, StateCommit},
+};
 
-pub fn calculate(current_hash: B256, state: &StateCommit) -> Result<B256, crate::db::Error> {
-    let commit_hash = bincode::serialize(&prepare(state))?;
+pub fn calculate(
+    db: &mut PersistentDB,
+    pending_commit: PendingCommit,
+    current_hash: B256,
+) -> Result<B256, crate::db::Error> {
+    let state_commit = build_commit(db, pending_commit, false)?;
+
+    Ok(calculate_state_hash(current_hash, &state_commit)?)
+}
+
+fn calculate_state_hash(current_hash: B256, state: &StateCommit) -> Result<B256, crate::db::Error> {
+    let commit_hash = keccak256(bincode::serialize(&prepare(state))?);
     let result = keccak256([current_hash.as_slice(), commit_hash.as_slice()].concat());
 
     Ok(result)
@@ -24,9 +38,9 @@ fn prepare(state: &StateCommit) -> StateChangeset {
 
 #[test]
 fn test_calculate_state_hash() {
-    let result = calculate(B256::ZERO, &Default::default()).expect("ok");
+    let result = calculate_state_hash(B256::ZERO, &Default::default()).expect("ok");
     assert_eq!(
         result,
-        revm::primitives::b256!("660b057b36925d4a0da5bf6588b4c64cff7f27ee34e9c90b052829bf8e2a3168")
+        revm::primitives::b256!("dac7965a57e662c4fe4f2a69213893eec7dd9c0c1650ebf058659dc6fa017720")
     );
 }

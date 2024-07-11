@@ -18,7 +18,13 @@ pub struct StateCommit {
     pub results: HashMap<B256, ExecutionResult>,
 }
 
-pub fn build_commit(pending_commit: PendingCommit) -> StateCommit {
+pub fn build_commit(
+    db: &mut PersistentDB,
+    mut pending_commit: PendingCommit,
+    is_commit_to_db: bool,
+) -> Result<StateCommit, crate::db::Error> {
+    merge_native_account_infos(db, &mut pending_commit, is_commit_to_db)?;
+
     let PendingCommit {
         key,
         cache,
@@ -34,20 +40,18 @@ pub fn build_commit(pending_commit: PendingCommit) -> StateCommit {
     let bundle = state_builder.take_bundle();
     let change_set = state_changes::bundle_into_change_set(bundle);
 
-    StateCommit {
+    Ok(StateCommit {
         key,
         change_set,
         results,
-    }
+    })
 }
 
 pub fn commit_to_db(
     db: &mut PersistentDB,
-    mut pending_commit: PendingCommit,
+    pending_commit: PendingCommit,
 ) -> Result<(), crate::db::Error> {
-    merge_native_account_infos(db, &mut pending_commit)?;
-
-    let mut commit = build_commit(pending_commit);
+    let mut commit = build_commit(db, pending_commit, true)?;
 
     match db.commit(&mut commit) {
         Ok(_) => Ok(()),
@@ -61,11 +65,17 @@ pub fn commit_to_db(
     }
 }
 
-fn merge_native_account_infos(
+pub(crate) fn merge_native_account_infos(
     db: &mut PersistentDB,
     pending: &mut PendingCommit,
+    take_on_commit: bool,
 ) -> Result<(), crate::db::Error> {
-    let native = db.take_native_account_infos();
+    let native = if take_on_commit {
+        db.take_native_account_infos()
+    } else {
+        db.get_native_account_infos_cloned()
+    };
+
     // TODO: here we could potentially also check for native balance changes caused by contracts
     // and pass it back to the main process.
 
