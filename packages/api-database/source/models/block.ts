@@ -30,6 +30,11 @@ export class Block {
 	public readonly previousBlock!: string;
 
 	@Column({
+		type: "varchar",
+	})
+	public readonly stateHash!: string;
+
+	@Column({
 		nullable: false,
 		type: "bigint",
 	})
