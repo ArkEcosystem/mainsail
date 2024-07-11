@@ -2396,8 +2396,8 @@ importers:
   packages/evm:
     devDependencies:
       '@napi-rs/cli':
-        specifier: ^2.18.0
-        version: 2.18.3
+        specifier: ^2.18.4
+        version: 2.18.4
 
   packages/evm-api-worker:
     dependencies:
@@ -2519,6 +2519,10 @@ importers:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
+
+  packages/evm/npm/linux-arm64-gnu: {}
+
+  packages/evm/npm/linux-x64-gnu: {}
 
   packages/fees:
     dependencies:
@@ -4465,8 +4469,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@napi-rs/cli@2.18.3':
-    resolution: {integrity: sha512-L0f4kP0dyG8W5Qtc7MtP73VvLLrOLyRcUEBzknIfu8Jk4Jfhrsx1ItMHgyalYqMSslWdY3ojEfAaU5sx1VyeQQ==}
+  '@napi-rs/cli@2.18.4':
+    resolution: {integrity: sha512-SgJeA4df9DE2iAEpr3M2H0OKl/yjtg1BnRI5/JyowS71tUWhrfSu2LT0V3vlHET+g1hBVlrO60PmEXwUEKp8Mg==}
     engines: {node: '>= 10'}
     hasBin: true
 
@@ -11516,7 +11520,7 @@ snapshots:
   '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.2':
     optional: true
 
-  '@napi-rs/cli@2.18.3': {}
+  '@napi-rs/cli@2.18.4': {}
 
   '@noble/curves@1.2.0':
     dependencies:

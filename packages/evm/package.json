@@ -18,7 +18,7 @@
 		"version": "napi version"
 	},
 	"devDependencies": {
-		"@napi-rs/cli": "^2.18.0"
+		"@napi-rs/cli": "^2.18.4"
 	},
 	"engines": {
 		"node": ">=20.x"
