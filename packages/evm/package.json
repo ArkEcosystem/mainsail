@@ -15,7 +15,7 @@
 		"prepublishOnly": "napi prepublish -t npm",
 		"release": "pnpm publish --access public",
 		"test": "cargo test --release",
-		"version": "napi version"
+		"version": "napi version & node update_optional_dependencies.js"
 	},
 	"devDependencies": {
 		"@napi-rs/cli": "^2.18.4"
