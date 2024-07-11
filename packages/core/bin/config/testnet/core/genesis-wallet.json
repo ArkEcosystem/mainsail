@@ -1,14 +1,14 @@
 {
-    "address": "0x8331035e60d0f7f5C84ccd4A960d09C805E92cab",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "6516c370fb81f9049e43887dd783a1b99caa0c878b68401bcdeada284ba3db09",
-        "publicKey": "833ce47ee36bb5afe19258a176c55c44ac1e32daeb156b532111ae62ca2210b017ff8ea04706e4fa7f74ab25f6639679"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "ce61b75941fa25390866b4bffe2d5debb5019258bc49cfd22e4140ec1e7ff4bb",
-        "publicKey": "037bede17c73adb9d4c35fc24302cc9c2ec0326c80ab3b4fe5594b4f2f5dfc02d3"
-    },
-    "passphrase": "speed fantasy badge claim smart sunny disorder wink inject quantum aim sunny purchase liberty mesh summer vast gold secret canyon soda similar picnic process"
+	"address": "0x8331035e60d0f7f5C84ccd4A960d09C805E92cab",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "6516c370fb81f9049e43887dd783a1b99caa0c878b68401bcdeada284ba3db09",
+		"publicKey": "833ce47ee36bb5afe19258a176c55c44ac1e32daeb156b532111ae62ca2210b017ff8ea04706e4fa7f74ab25f6639679"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "ce61b75941fa25390866b4bffe2d5debb5019258bc49cfd22e4140ec1e7ff4bb",
+		"publicKey": "037bede17c73adb9d4c35fc24302cc9c2ec0326c80ab3b4fe5594b4f2f5dfc02d3"
+	},
+	"passphrase": "speed fantasy badge claim smart sunny disorder wink inject quantum aim sunny purchase liberty mesh summer vast gold secret canyon soda similar picnic process"
 }
