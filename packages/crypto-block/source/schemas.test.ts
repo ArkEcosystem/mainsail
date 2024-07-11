@@ -68,6 +68,7 @@ describe<{
 		numberOfTransactions: 0,
 		payloadHash: "123",
 		previousBlock: "0".repeat(64),
+		stateHash: "0".repeat(64),
 		reward: 0,
 		timestamp: 0,
 		totalGasUsed: 0,

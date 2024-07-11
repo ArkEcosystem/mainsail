@@ -58,7 +58,7 @@ export class Validator implements Contracts.Validator.Validator {
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateService.getStore().getLastBlock();
-		const height = previousBlock.data.height + 1;
+		const height = previousBlock.header.height + 1;
 
 		const { stateHash, transactions } = await this.#getTransactionsForForging(generatorPublicKey, timestamp, {
 			height: BigInt(height),
@@ -203,7 +203,7 @@ export class Validator implements Contracts.Validator.Validator {
 		};
 
 		const previousBlock = this.stateService.getStore().getLastBlock();
-		const height = previousBlock.data.height + 1;
+		const height = previousBlock.header.height + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(height);
 
 		const payloadBuffers: Buffer[] = [];
@@ -234,7 +234,7 @@ export class Validator implements Contracts.Validator.Validator {
 				numberOfTransactions: transactionData.length,
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength,
-				previousBlock: previousBlock.data.id,
+				previousBlock: previousBlock.header.id,
 				stateHash,
 				reward: BigNumber.make(milestone.reward),
 				round,

@@ -68,6 +68,9 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	const validator = {
 		validate: async () => true,
+		getEvm: () => ({
+			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+		}),
 	};
 	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
 
@@ -76,9 +79,11 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
 		getStore: () => ({
 			getLastBlock: () => ({
-				data: {
+				header: {
 					height: 1,
 					id: "0000000000000000000000000000000000000000000000000000000000000000",
+					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+					stateHash: "0000000000000000000000000000000000000000000000000000000000000000",
 				},
 			}),
 		}),
