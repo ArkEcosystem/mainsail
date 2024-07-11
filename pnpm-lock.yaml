@@ -2394,71 +2394,10 @@ importers:
         version: 0.5.6
 
   packages/evm:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
     devDependencies:
-      '@mainsail/crypto-address-keccak256':
-        specifier: workspace:*
-        version: link:../crypto-address-keccak256
-      '@mainsail/crypto-block':
-        specifier: workspace:*
-        version: link:../crypto-block
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-hash-bcrypto':
-        specifier: workspace:*
-        version: link:../crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-ecdsa':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/crypto-wif':
-        specifier: workspace:*
-        version: link:../crypto-wif
-      '@mainsail/serializer':
-        specifier: workspace:*
-        version: link:../serializer
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
       '@napi-rs/cli':
         specifier: ^2.18.0
         version: 2.18.3
-      '@types/tmp':
-        specifier: 0.2.6
-        version: 0.2.6
-      ethers:
-        specifier: 6.11.0
-        version: 6.11.0
-      tmp:
-        specifier: 0.2.3
-        version: 0.2.3
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
 
   packages/evm-api-worker:
     dependencies:
