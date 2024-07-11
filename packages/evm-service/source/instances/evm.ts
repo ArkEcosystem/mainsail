@@ -1,7 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-
-import { Evm } from "../generated/bindings.cjs";
+import { Evm } from "@mainsail/evm";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance {

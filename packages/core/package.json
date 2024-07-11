@@ -75,7 +75,7 @@
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/crypto-worker": "workspace:*",
 		"@mainsail/database": "workspace:*",
-		"@mainsail/evm": "workspace:*",
+		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-api-worker": "workspace:*",
 		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",

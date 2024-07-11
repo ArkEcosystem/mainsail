@@ -10,3 +10,7 @@ target/
 *.pdb
 
 source/generated
+
+index.js
+index.d.ts
+evm.*.node
