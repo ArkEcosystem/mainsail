@@ -14,7 +14,8 @@
 		"clean": "del index.js index.d.ts evm.*.node",
 		"prepublishOnly": "napi prepublish -t npm",
 		"release": "pnpm publish --access public",
-		"test": "cargo test --release"
+		"test": "cargo test --release",
+		"version": "napi version"
 	},
 	"devDependencies": {
 		"@napi-rs/cli": "^2.18.0"
