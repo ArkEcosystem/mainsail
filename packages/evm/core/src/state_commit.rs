@@ -11,7 +11,7 @@ use crate::{
     state_changes,
 };
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct StateCommit {
     pub key: CommitKey,
     pub change_set: state_changes::StateChangeset,
