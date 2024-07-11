@@ -32,5 +32,9 @@
 				"x86_64-unknown-linux-gnu"
 			]
 		}
+	},
+	"optionalDependencies": {
+		"@mainsail/evm-linux-arm64-gnu": "0.0.1-alpha.20",
+		"@mainsail/evm-linux-x64-gnu": "0.0.1-alpha.20"
 	}
 }
