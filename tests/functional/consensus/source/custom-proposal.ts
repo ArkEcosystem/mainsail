@@ -73,7 +73,7 @@ export const makeCustomProposal = async (
 	const hashSize = node.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
 
 	// numberOfTransactions
-	let byteOffset = 1 + 6 + 4 + 4 + hashSize; // see headerSize
+	let byteOffset = 1 + 6 + 4 + 4 + hashSize + hashSize; // see headerSize
 	blockBuffer.writeUint16LE(transactions.length, byteOffset);
 	byteOffset += 2;
 
