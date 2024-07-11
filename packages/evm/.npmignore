@@ -1,1 +1,16 @@
+artifacts/
+bindings/
+core/
+node_modules/
+npm/
+target/
+
+Cargo.lock
+Cargo.toml
+
+.gitignore
+
+evm.*.node
 update_optional_dependencies.js
+
+
