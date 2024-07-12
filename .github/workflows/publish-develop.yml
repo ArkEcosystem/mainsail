@@ -1,12 +1,17 @@
 name: Publish (Develop)
 
+env:
+    DEBUG: napi:*
+    APP_NAME: evm
+    MACOSX_DEPLOYMENT_TARGET: "10.13"
+permissions:
+    contents: write
+    id-token: write
+
 on:
     push:
         branches:
             - "develop"
-
-permissions:
-    contents: read
 
 jobs:
     build:
