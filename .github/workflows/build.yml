@@ -104,6 +104,10 @@ jobs:
               run: ls -R ./npm
               shell: bash
 
+            - name: Prepublish
+              working-directory: ./packages/evm
+              run: pnpm run prepublishOnly
+
             # - name: Publish
             #   run: |
             #       npm config set provenance true
