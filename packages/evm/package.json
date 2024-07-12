@@ -12,10 +12,10 @@
 		"build-napi": "napi build --platform --cargo-cwd bindings --release",
 		"build-napi:debug": "napi build --platform --cargo-cwd bindings",
 		"clean": "del index.js index.d.ts evm.*.node",
-		"prepublishOnly": "napi prepublish -t npm",
+		"prepublishOnly": "node set_optional_dependencies.js",
 		"release": "pnpm publish --access public",
 		"test": "cargo test --release",
-		"version": "napi version & node update_optional_dependencies.js"
+		"version": "napi version "
 	},
 	"devDependencies": {
 		"@napi-rs/cli": "^2.18.4"

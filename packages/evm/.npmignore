@@ -11,6 +11,6 @@ Cargo.toml
 .gitignore
 
 evm.*.node
-update_optional_dependencies.js
+set_optional_dependencies.js
 
 
