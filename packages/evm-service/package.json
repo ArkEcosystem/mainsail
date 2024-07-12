@@ -24,8 +24,8 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/evm": "workspace:*"
+		"@mainsail/evm": "workspace:*",
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-keccak256": "workspace:*",
