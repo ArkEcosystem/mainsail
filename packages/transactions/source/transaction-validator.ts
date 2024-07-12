@@ -1,5 +1,6 @@
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { strictEqual } from "assert";
 
 @injectable()
@@ -58,6 +59,24 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 			transaction,
 		);
 
+		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+
+		await this.#updateEvmAccountInfoNative(
+			commitKey,
+			await this.#walletRepository.findByPublicKey(transaction.data.senderPublicKey),
+		);
+
 		return { gasUsed: result.gasUsed };
+	}
+
+	async #updateEvmAccountInfoNative(
+		commitKey: Contracts.Evm.CommitKey,
+		sender: Contracts.State.Wallet,
+	): Promise<void> {
+		await this.evm.updateAccountInfo({
+			account: sender.getAddress(),
+			commitKey,
+			nonce: sender.getNonce().toBigInt(),
+		});
 	}
 }
