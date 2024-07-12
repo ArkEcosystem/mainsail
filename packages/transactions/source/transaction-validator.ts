@@ -61,7 +61,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		await this.#updateEvmAccountInfoNative(
+		await this.#updateEvmAccountInfoHost(
 			commitKey,
 			await this.#walletRepository.findByPublicKey(transaction.data.senderPublicKey),
 		);
@@ -69,10 +69,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 		return { gasUsed: result.gasUsed };
 	}
 
-	async #updateEvmAccountInfoNative(
-		commitKey: Contracts.Evm.CommitKey,
-		sender: Contracts.State.Wallet,
-	): Promise<void> {
+	async #updateEvmAccountInfoHost(commitKey: Contracts.Evm.CommitKey, sender: Contracts.State.Wallet): Promise<void> {
 		await this.evm.updateAccountInfo({
 			account: sender.getAddress(),
 			commitKey,

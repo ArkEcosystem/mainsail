@@ -95,7 +95,7 @@ impl EvmInner {
         self.pending_commit
             .get_or_insert_with(|| PendingCommit::new(account_update_ctx.commit_key));
 
-        self.persistent_db.upsert_native_account_info(
+        self.persistent_db.upsert_host_account_info(
             account_update_ctx.account,
             AccountInfo {
                 nonce: account_update_ctx.nonce,
@@ -331,7 +331,7 @@ impl EvmInner {
         let pending = self.pending_commit.take();
 
         if pending.is_none() {
-            self.persistent_db.clear_native_account_infos();
+            self.persistent_db.clear_host_account_infos();
         }
 
         pending
@@ -339,7 +339,7 @@ impl EvmInner {
 
     fn drop_pending_commit(&mut self) {
         self.pending_commit.take();
-        self.persistent_db.clear_native_account_infos();
+        self.persistent_db.clear_host_account_infos();
     }
 }
 

@@ -57,8 +57,8 @@ struct InnerStorage {
     contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
     storage: heed::Database<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>,
 
-    // AccountInfo from native transactions for things like 'nonce', etc.
-    native_account_infos: HashMap<Address, AccountInfo>,
+    // AccountInfo from host transactions for things like 'nonce', etc.
+    host_account_infos: HashMap<Address, AccountInfo>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -148,28 +148,28 @@ impl PersistentDB {
                 commits,
                 contracts,
                 storage,
-                native_account_infos: Default::default(),
+                host_account_infos: Default::default(),
             }),
         })
     }
 
-    pub fn upsert_native_account_info(&mut self, address: Address, info: AccountInfo) {
+    pub fn upsert_host_account_info(&mut self, address: Address, info: AccountInfo) {
         self.inner
             .borrow_mut()
-            .native_account_infos
+            .host_account_infos
             .insert(address, info);
     }
 
-    pub fn take_native_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
-        std::mem::take(&mut self.inner.borrow_mut().native_account_infos)
+    pub fn take_host_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
+        std::mem::take(&mut self.inner.borrow_mut().host_account_infos)
     }
 
-    pub fn get_native_account_infos_cloned(&self) -> HashMap<Address, AccountInfo> {
-        self.inner.borrow().native_account_infos.clone()
+    pub fn get_host_account_infos_cloned(&self) -> HashMap<Address, AccountInfo> {
+        self.inner.borrow().host_account_infos.clone()
     }
 
-    pub fn clear_native_account_infos(&mut self) {
-        self.inner.borrow_mut().native_account_infos.clear();
+    pub fn clear_host_account_infos(&mut self) {
+        self.inner.borrow_mut().host_account_infos.clear();
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -224,9 +224,9 @@ impl DatabaseRef for PersistentDB {
             None => AccountInfo::default(),
         };
 
-        // Always take native nonce if provided
-        if let Some(native) = inner.native_account_infos.get(&address) {
-            basic.nonce = native.nonce;
+        // Always take host nonce if provided
+        if let Some(host) = inner.host_account_infos.get(&address) {
+            basic.nonce = host.nonce;
         }
 
         Ok(basic.into())

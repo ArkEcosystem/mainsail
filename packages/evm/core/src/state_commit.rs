@@ -23,7 +23,7 @@ pub fn build_commit(
     mut pending_commit: PendingCommit,
     is_commit_to_db: bool,
 ) -> Result<StateCommit, crate::db::Error> {
-    merge_native_account_infos(db, &mut pending_commit, is_commit_to_db)?;
+    merge_host_account_infos(db, &mut pending_commit, is_commit_to_db)?;
 
     let PendingCommit {
         key,
@@ -65,23 +65,23 @@ pub fn commit_to_db(
     }
 }
 
-pub(crate) fn merge_native_account_infos(
+pub(crate) fn merge_host_account_infos(
     db: &mut PersistentDB,
     pending: &mut PendingCommit,
     take_on_commit: bool,
 ) -> Result<(), crate::db::Error> {
-    let native = if take_on_commit {
-        db.take_native_account_infos()
+    let host = if take_on_commit {
+        db.take_host_account_infos()
     } else {
-        db.get_native_account_infos_cloned()
+        db.get_host_account_infos_cloned()
     };
 
-    // TODO: here we could potentially also check for native balance changes caused by contracts
+    // TODO: here we could potentially also check for host balance changes caused by contracts
     // and pass it back to the main process.
 
-    let mut transition_accounts = Vec::with_capacity(native.len());
+    let mut transition_accounts = Vec::with_capacity(host.len());
 
-    for (address, account) in native {
+    for (address, account) in host {
         let mut transition_account = TransitionAccount::default();
         transition_account.status = AccountStatus::Changed;
         transition_account.previous_status = AccountStatus::LoadedEmptyEIP161;
@@ -104,7 +104,7 @@ pub(crate) fn merge_native_account_infos(
             }
         }
 
-        // Update account in the state cache with native information
+        // Update account in the state cache with host information
         transition_account.info.as_mut().and_then(|info| {
             // println!(
             //     "updating nonce {} {} => {}",
