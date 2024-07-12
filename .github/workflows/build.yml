@@ -7,17 +7,6 @@ permissions:
     contents: write
     id-token: write
 "on":
-    # push:
-    # branches:
-    #     - main
-    # tags-ignore:
-    #     - "**"
-    # paths-ignore:
-    #     - "**/*.md"
-    #     - LICENSE
-    #     - "**/*.gitignore"
-    #     - .editorconfig
-    #     - docs/**
     pull_request:
         types:
             - ready_for_review
@@ -49,7 +38,6 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: "20.x"
-                  #   cache: yarn
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
@@ -57,48 +45,8 @@ jobs:
                   run_install: false
                   version: latest
 
-            # - name: Install
-            #   uses: dtolnay/rust-toolchain@stable
-            #   if: ${{ !matrix.settings.docker }}
-            #   with:
-            #       toolchain: stable
-            #       targets: ${{ matrix.settings.target }}
-
-            # - name: Cache cargo
-            #   uses: actions/cache@v4
-            #   with:
-            #       path: |
-            #           ~/.cargo/registry/index/
-            #           ~/.cargo/registry/cache/
-            #           ~/.cargo/git/db/
-            #           .cargo-cache
-            #           target/
-            #       key: ${{ matrix.settings.target }}-cargo-${{ matrix.settings.host }}
-            # # - uses: goto-bus-stop/setup-zig@v2
-            # #   if: ${{ matrix.settings.target == 'armv7-unknown-linux-gnueabihf' || matrix.settings.target == 'armv7-unknown-linux-musleabihf' }}
-            # #   with:
-            # #       version: 0.13.0
-
-            # - name: Setup toolchain
-            #   run: ${{ matrix.settings.setup }}
-            #   if: ${{ matrix.settings.setup }}
-            #   shell: bash
-
-            # - name: Setup node x86
-            #   if: matrix.settings.target == 'i686-pc-windows-msvc'
-            #   run: yarn config set supportedArchitectures.cpu "ia32"
-            #   shell: bash
-
             - name: Install dependencies
               run: pnpm install
-
-            # - name: Setup node x86
-            #   uses: actions/setup-node@v4
-            #   if: matrix.settings.target == 'i686-pc-windows-msvc'
-            #   with:
-            #       node-version: 20
-            #       cache: yarn
-            #       architecture: x86
 
             - name: Build in docker
               uses: addnab/docker-run-action@v3
@@ -107,11 +55,6 @@ jobs:
                   image: ${{ matrix.settings.docker }}
                   options: "--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build"
                   run: ${{ matrix.settings.build }}
-
-            # - name: Build
-            #   run: ${{ matrix.settings.build }}
-            #   if: ${{ !matrix.settings.docker }}
-            #   shell: bash
 
             - name: Upload artifact
               uses: actions/upload-artifact@v4
