@@ -53,6 +53,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
 		onCommit: async () => {},
 		updateAccountInfo: async () => {},
+		stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
 	});
 
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();

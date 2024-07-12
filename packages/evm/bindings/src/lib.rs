@@ -6,14 +6,16 @@ use ctx::{
 };
 use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
-    state_commit,
+    state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
-    primitives::{AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, U256},
+    primitives::{
+        hex::ToHexExt, AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, B256, U256,
+    },
     Database, DatabaseCommit, Evm, TransitionAccount,
 };
 
@@ -93,7 +95,7 @@ impl EvmInner {
         self.pending_commit
             .get_or_insert_with(|| PendingCommit::new(account_update_ctx.commit_key));
 
-        self.persistent_db.upsert_native_account_info(
+        self.persistent_db.upsert_host_account_info(
             account_update_ctx.account,
             AccountInfo {
                 nonce: account_update_ctx.nonce,
@@ -225,6 +227,24 @@ impl EvmInner {
         }
     }
 
+    pub fn state_hash(
+        &mut self,
+        current_hash: B256,
+    ) -> std::result::Result<String, EVMError<String>> {
+        let result = state_hash::calculate(
+            &mut self.persistent_db,
+            self.pending_commit.clone().unwrap_or_default(),
+            current_hash,
+        );
+
+        match result {
+            Ok(result) => Ok(result.encode_hex()),
+            Err(err) => Err(EVMError::Database(
+                format!("state_hash failed: {}", err).into(),
+            )),
+        }
+    }
+
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
@@ -311,7 +331,7 @@ impl EvmInner {
         let pending = self.pending_commit.take();
 
         if pending.is_none() {
-            self.persistent_db.clear_native_account_infos();
+            self.persistent_db.clear_host_account_infos();
         }
 
         pending
@@ -319,7 +339,7 @@ impl EvmInner {
 
     fn drop_pending_commit(&mut self) {
         self.pending_commit.take();
-        self.persistent_db.clear_native_account_infos();
+        self.persistent_db.clear_host_account_infos();
     }
 }
 
@@ -434,6 +454,15 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<string>")]
+    pub fn state_hash(&mut self, node_env: Env, current_hash: JsString) -> Result<JsObject> {
+        let current_hash = utils::convert_string_to_b256(current_hash)?;
+        node_env.execute_tokio_future(
+            Self::state_hash_async(self.evm.clone(), current_hash),
+            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+        )
+    }
+
     async fn view_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         view_ctx: TxViewContext,
@@ -487,6 +516,19 @@ impl JsEvmWrapper {
     ) -> Result<()> {
         let mut lock = evm.lock().await;
         let result = lock.commit(commit_key);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn state_hash_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        current_hash: B256,
+    ) -> Result<String> {
+        let mut lock = evm.lock().await;
+        let result = lock.state_hash(current_hash);
 
         match result {
             Ok(result) => Result::Ok(result),

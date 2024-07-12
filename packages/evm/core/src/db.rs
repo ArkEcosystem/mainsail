@@ -52,19 +52,20 @@ pub struct TinyReceipt {
 struct CommitReceipts(HashMap<B256, TinyReceipt>);
 
 struct InnerStorage {
-    accounts: heed::Database<AddressWrapper, heed::types::SerdeJson<AccountInfo>>,
-    commits: heed::Database<HeedHeight, heed::types::SerdeJson<CommitReceipts>>,
-    contracts: heed::Database<ContractWrapper, heed::types::SerdeJson<Bytecode>>,
-    storage: heed::Database<AddressWrapper, heed::types::SerdeJson<StorageEntry>>,
+    accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
+    commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
+    contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
+    storage: heed::Database<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>,
 
-    // AccountInfo from native transactions for things like 'nonce', etc.
-    native_account_infos: HashMap<Address, AccountInfo>,
+    // AccountInfo from host transactions for things like 'nonce', etc.
+    host_account_infos: HashMap<Address, AccountInfo>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
 #[derive(Hash, PartialEq, Eq, Debug, Default, Clone, Copy)]
 pub struct CommitKey(pub u64, pub u64);
 
+#[derive(Clone, Debug, Default)]
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,
@@ -85,6 +86,8 @@ pub enum Error {
     Heed(#[from] heed::Error),
     #[error("db full error")]
     DbFull,
+    #[error("bincode error")]
+    Bincode(#[from] bincode::Error),
     #[error("infallible error")]
     Infallible(#[from] Infallible),
 }
@@ -113,22 +116,25 @@ impl PersistentDB {
         let tx_env = env.clone();
         let mut wtxn = tx_env.write_txn()?;
 
-        let accounts = env.create_database::<AddressWrapper, heed::types::SerdeJson<AccountInfo>>(
-            &mut wtxn,
-            Some("accounts"),
-        )?;
-        let commits = env.create_database::<HeedHeight, heed::types::SerdeJson<CommitReceipts>>(
-            &mut wtxn,
-            Some("commits"),
-        )?;
-        let contracts = env.create_database::<ContractWrapper, heed::types::SerdeJson<Bytecode>>(
-            &mut wtxn,
-            Some("contracts"),
-        )?;
+        let accounts = env
+            .create_database::<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>(
+                &mut wtxn,
+                Some("accounts"),
+            )?;
+        let commits = env
+            .create_database::<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>(
+                &mut wtxn,
+                Some("commits"),
+            )?;
+        let contracts = env
+            .create_database::<ContractWrapper, heed::types::SerdeBincode<Bytecode>>(
+                &mut wtxn,
+                Some("contracts"),
+            )?;
 
         let storage = env
             .database_options()
-            .types::<AddressWrapper, heed::types::SerdeJson<StorageEntry>>()
+            .types::<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>()
             .name("storage")
             .flags(heed::DatabaseFlags::DUP_SORT)
             .create(&mut wtxn)?;
@@ -142,24 +148,28 @@ impl PersistentDB {
                 commits,
                 contracts,
                 storage,
-                native_account_infos: Default::default(),
+                host_account_infos: Default::default(),
             }),
         })
     }
 
-    pub fn upsert_native_account_info(&mut self, address: Address, info: AccountInfo) {
+    pub fn upsert_host_account_info(&mut self, address: Address, info: AccountInfo) {
         self.inner
             .borrow_mut()
-            .native_account_infos
+            .host_account_infos
             .insert(address, info);
     }
 
-    pub fn take_native_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
-        std::mem::take(&mut self.inner.borrow_mut().native_account_infos)
+    pub fn take_host_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
+        std::mem::take(&mut self.inner.borrow_mut().host_account_infos)
     }
 
-    pub fn clear_native_account_infos(&mut self) {
-        self.inner.borrow_mut().native_account_infos.clear();
+    pub fn get_host_account_infos_cloned(&self) -> HashMap<Address, AccountInfo> {
+        self.inner.borrow().host_account_infos.clone()
+    }
+
+    pub fn clear_host_account_infos(&mut self) {
+        self.inner.borrow_mut().host_account_infos.clear();
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -214,9 +224,9 @@ impl DatabaseRef for PersistentDB {
             None => AccountInfo::default(),
         };
 
-        // Always take native nonce if provided
-        if let Some(native) = inner.native_account_infos.get(&address) {
-            basic.nonce = native.nonce;
+        // Always take host nonce if provided
+        if let Some(host) = inner.host_account_infos.get(&address) {
+            basic.nonce = host.nonce;
         }
 
         Ok(basic.into())

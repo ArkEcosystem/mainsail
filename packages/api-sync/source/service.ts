@@ -156,6 +156,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				reward: header.reward.toFixed(),
 				round: header.round,
 				signature: proof.signature,
+				stateHash: header.stateHash,
 				timestamp: header.timestamp.toFixed(),
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),

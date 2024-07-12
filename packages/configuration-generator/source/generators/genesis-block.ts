@@ -234,6 +234,7 @@ export class GenesisBlockGenerator extends Generator {
 					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					round: 0,
+					stateHash: "0000000000000000000000000000000000000000000000000000000000000000",
 					timestamp: dayjs(options.epoch).valueOf(),
 					totalAmount: totals.amount,
 					totalFee: totals.fee,

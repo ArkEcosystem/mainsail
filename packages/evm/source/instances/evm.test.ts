@@ -454,6 +454,11 @@ describe<{
 		info = await instance.getAccountInfo(sender.address);
 		assert.equal(info.nonce, 2n);
 	});
+
+	it("should return state hash", async ({ instance }) => {
+		const hash = await instance.stateHash("0000000000000000000000000000000000000000000000000000000000000000");
+		assert.equal(hash, "dac7965a57e662c4fe4f2a69213893eec7dd9c0c1650ebf058659dc6fa017720");
+	});
 });
 
 const getRandomTxHash = () => Buffer.from(randomBytes(32)).toString("hex");

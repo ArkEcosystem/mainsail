@@ -2,12 +2,18 @@ use std::str::FromStr;
 
 use anyhow;
 use napi::{JsBigInt, JsString};
-use revm::primitives::{Address, U256};
+use revm::primitives::{Address, Bytes, B256, U256};
 
 pub(crate) fn create_address_from_js_string(js_str: JsString) -> anyhow::Result<Address> {
     let js_str = js_str.into_utf8()?;
     let slice = js_str.as_str()?;
     Ok(Address::from_str(slice)?)
+}
+
+pub(crate) fn convert_string_to_b256(js_str: JsString) -> anyhow::Result<B256> {
+    Ok(B256::try_from(
+        &Bytes::from_str(js_str.into_utf8()?.as_str()?)?.as_ref()[..],
+    )?)
 }
 
 pub(crate) fn convert_u256_to_bigint(

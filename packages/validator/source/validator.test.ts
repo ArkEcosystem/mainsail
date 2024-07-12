@@ -25,27 +25,27 @@ describe<{
 	});
 
 	it("#prepareBlock - should prepare block", async ({ validator }) => {
-		const block = await validator.prepareBlock("walletPublicKey", 1);
+		const block = await validator.prepareBlock("walletPublicKey", 1, 0);
 		assert.defined(block);
 		assert.equal(block.data.height, 2);
 	});
 
 	it("#propose - should create signed proposal", async ({ validator }) => {
-		const block = await validator.prepareBlock("walletPublicKey", 1);
+		const block = await validator.prepareBlock("walletPublicKey", 1, 0);
 		const proposal = await validator.propose(0, 1, undefined, block);
 		assert.defined(proposal);
 		assert.defined(proposal.signature);
 	});
 
 	it("#prevote - should create signed prevote", async ({ validator }) => {
-		const block = await validator.prepareBlock("walletPublicKey", 1);
+		const block = await validator.prepareBlock("walletPublicKey", 1, 0);
 		const prevote = await validator.prevote(0, 1, 1, block.header.id);
 		assert.defined(prevote);
 		assert.defined(prevote.signature);
 	});
 
 	it("#precommit - should create signed precommit", async ({ validator }) => {
-		const block = await validator.prepareBlock("walletPublicKey", 1);
+		const block = await validator.prepareBlock("walletPublicKey", 1, 0);
 		const precommit = await validator.precommit(0, 1, 1, block.header.id);
 		assert.defined(precommit);
 		assert.defined(precommit.signature);

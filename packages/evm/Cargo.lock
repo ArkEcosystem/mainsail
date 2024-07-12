@@ -1649,6 +1649,7 @@ name = "mainsail_evm_core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bincode",
  "ethers-contract",
  "ethers-core",
  "ethers-providers",

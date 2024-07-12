@@ -94,6 +94,7 @@ export const registerBlockFactory = async (
 					previousBlock: previousBlock.id,
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
+					stateHash: "TODO",
 					timestamp: options.timestamp || dayjs().valueOf(),
 					totalAmount: BigNumber.make(totals.amount),
 					totalFee: BigNumber.make(totals.fee),

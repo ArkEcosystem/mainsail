@@ -58,13 +58,13 @@ export class Validator implements Contracts.Validator.Validator {
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateService.getStore().getLastBlock();
-		const height = previousBlock.data.height + 1;
+		const height = previousBlock.header.height + 1;
 
-		const transactions = await this.#getTransactionsForForging(generatorPublicKey, timestamp, {
+		const { stateHash, transactions } = await this.#getTransactionsForForging(generatorPublicKey, timestamp, {
 			height: BigInt(height),
 			round: BigInt(round),
 		});
-		return this.#makeBlock(round, generatorPublicKey, transactions, timestamp);
+		return this.#makeBlock(round, generatorPublicKey, stateHash, transactions, timestamp);
 	}
 
 	public async propose(
@@ -126,13 +126,14 @@ export class Validator implements Contracts.Validator.Validator {
 		generatorPublicKey: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
-	): Promise<Contracts.Crypto.Transaction[]> {
+	): Promise<{ stateHash: string; transactions: Contracts.Crypto.Transaction[] }> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
+		const previousBlock = this.stateService.getStore().getLastBlock();
 		const milestone = this.cryptoConfiguration.getMilestone();
 		let gasLeft = milestone.block.maxGasLimit;
 
@@ -182,12 +183,16 @@ export class Validator implements Contracts.Validator.Validator {
 
 		this.txPoolWorker.setFailedTransactions(failedTransactions);
 
-		return candidateTransactions;
+		return {
+			stateHash: await validator.getEvm().stateHash(previousBlock.header.stateHash),
+			transactions: candidateTransactions,
+		};
 	}
 
 	async #makeBlock(
 		round: number,
 		generatorPublicKey: string,
+		stateHash: string,
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
@@ -198,7 +203,7 @@ export class Validator implements Contracts.Validator.Validator {
 		};
 
 		const previousBlock = this.stateService.getStore().getLastBlock();
-		const height = previousBlock.data.height + 1;
+		const height = previousBlock.header.height + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(height);
 
 		const payloadBuffers: Buffer[] = [];
@@ -229,9 +234,10 @@ export class Validator implements Contracts.Validator.Validator {
 				numberOfTransactions: transactionData.length,
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength,
-				previousBlock: previousBlock.data.id,
+				previousBlock: previousBlock.header.id,
 				reward: BigNumber.make(milestone.reward),
 				round,
+				stateHash,
 				timestamp,
 				totalAmount: totals.amount,
 				totalFee: totals.fee,

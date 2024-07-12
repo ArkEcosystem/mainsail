@@ -72,7 +72,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
-
+			await this.#verifyStateHash(block);
 			await this.#applyBlockToForger(unit);
 
 			processResult.success = true;
@@ -175,6 +175,19 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const totalGas = block.header.totalGasUsed;
 		if (totalGas !== processorResult.gasUsed) {
 			throw new Error("Consumed gas mismatch");
+		}
+	}
+
+	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
+		if (block.header.height === 0) {
+			return;
+		}
+
+		const previousBlock = this.stateService.getStore().getLastBlock();
+		const stateHash = await this.evm.stateHash(previousBlock.header.stateHash);
+
+		if (block.header.stateHash !== stateHash) {
+			throw new Error(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
 		}
 	}
 
