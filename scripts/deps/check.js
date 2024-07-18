@@ -82,7 +82,7 @@ const EXCEPTIONS = {
 			"@mainsail/evm-api-worker",
 			"@mainsail/evm-development",
 			"@mainsail/evm-gas-fee",
-			"@mainsail/evm",
+			"@mainsail/evm-service",
 			"@mainsail/fees-static",
 			"@mainsail/fees",
 			"@mainsail/logger-pino",

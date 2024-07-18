@@ -4,8 +4,6 @@ import { Providers } from "@mainsail/kernel";
 
 import { EphemeralInstance, EvmInstance, MockInstance } from "./instances/index.js";
 
-export * as Bindings from "./generated/bindings.cjs";
-
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app

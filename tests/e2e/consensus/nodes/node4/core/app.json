@@ -40,7 +40,7 @@
 			"package": "@mainsail/fees-static"
 		},
 		{
-			"package": "@mainsail/evm"
+			"package": "@mainsail/evm-service"
 		},
 		{
 			"package": "@mainsail/evm-gas-fee"
@@ -242,7 +242,7 @@
 			"package": "@mainsail/fees-static"
 		},
 		{
-			"package": "@mainsail/evm"
+			"package": "@mainsail/evm-service"
 		},
 		{
 			"package": "@mainsail/evm-gas-fee"
@@ -319,7 +319,7 @@
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
-			"package": "@mainsail/evm"
+			"package": "@mainsail/evm-service"
 		},
 		{
 			"package": "@mainsail/api-evm"

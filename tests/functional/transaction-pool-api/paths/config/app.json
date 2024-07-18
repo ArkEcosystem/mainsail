@@ -40,7 +40,7 @@
 			"package": "@mainsail/fees-static"
 		},
 		{
-			"package": "@mainsail/evm"
+			"package": "@mainsail/evm-service"
 		},
 		{
 			"package": "@mainsail/evm-gas-fee"
@@ -242,7 +242,7 @@
 			"package": "@mainsail/fees-static"
 		},
 		{
-			"package": "@mainsail/evm"
+			"package": "@mainsail/evm-service"
 		},
 		{
 			"package": "@mainsail/evm-gas-fee"
@@ -300,6 +300,29 @@
 		},
 		{
 			"package": "@mainsail/api-transaction-pool"
+		}
+	],
+	"evm-api": [
+		{
+			"package": "@mainsail/logger-pino"
+		},
+		{
+			"package": "@mainsail/validation"
+		},
+		{
+			"package": "@mainsail/crypto-config"
+		},
+		{
+			"package": "@mainsail/crypto-validation"
+		},
+		{
+			"package": "@mainsail/crypto-address-keccak256"
+		},
+		{
+			"package": "@mainsail/evm-service"
+		},
+		{
+			"package": "@mainsail/api-evm"
 		}
 	]
 }

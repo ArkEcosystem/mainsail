@@ -35,7 +35,7 @@
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/database": "workspace:*",
-		"@mainsail/evm": "workspace:*",
+		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/transactions": "workspace:*",

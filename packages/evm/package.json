@@ -4,57 +4,33 @@
 	"description": "EVM for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
-	"type": "module",
-	"main": "distribution/index.js",
-	"types": "distribution/index.d.ts",
-	"files": [
-		"distribution"
-	],
+	"main": "index.js",
+	"types": "index.d.ts",
 	"scripts": {
-		"build": "pnpm run clean && pnpm run build-napi && tsc && pnpm run copy",
-		"build-napi": "pnpm run clean && mkdir source/generated && napi build --platform --cargo-cwd bindings --js bindings.cjs --dts bindings.d.cts --release && mv evm.*.node bindings.cjs bindings.d.cts source/generated",
-		"build-napi:debug": "napi build --platform --cargo-cwd bindings --js bindings.cjs --dts bindings.d.cts && mv evm.*.node bindings.cjs bindings.d.cts source/generated",
-		"build:watch": "pnpm run clean && tsc -w",
-		"clean": "del distribution && del source/generated",
-		"copy": "mkdir distribution/generated && cp source/generated/bindings.cjs distribution/generated/ && cp source/generated/bindings.d.cts distribution/generated/ && cp source/generated/evm.*.node distribution/generated/",
+		"artifacts": "napi artifacts",
+		"build": "pnpm run clean && pnpm run build-napi",
+		"build-napi": "napi build --platform --cargo-cwd bindings --release",
+		"build-napi:debug": "napi build --platform --cargo-cwd bindings",
+		"clean": "del index.js index.d.ts evm.*.node",
+		"prepublishOnly": "node set_optional_dependencies.js",
 		"release": "pnpm publish --access public",
-		"test": "pnpm run test:unit && pnpm run test:evm",
-		"test:coverage": "c8 pnpm run test",
-		"test:coverage:html": "c8 -r html --all pnpm run test",
-		"test:evm": "cargo test --release",
-		"test:file": "pnpm run uvu source",
-		"test:unit": "pnpm run uvu source .test.ts",
-		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
-	},
-	"dependencies": {
-		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*"
+		"test": "cargo test --release",
+		"version": "napi version "
 	},
 	"devDependencies": {
-		"@mainsail/crypto-address-keccak256": "workspace:*",
-		"@mainsail/crypto-block": "workspace:*",
-		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-hash-bcrypto": "workspace:*",
-		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
-		"@mainsail/crypto-signature-schnorr": "workspace:*",
-		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/crypto-wif": "workspace:*",
-		"@mainsail/serializer": "workspace:*",
-		"@mainsail/test-framework": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
-		"@mainsail/validation": "workspace:*",
-		"@napi-rs/cli": "^2.18.0",
-		"@types/tmp": "0.2.6",
-		"ethers": "6.11.0",
-		"tmp": "0.2.3",
-		"uvu": "^0.5.6"
+		"@napi-rs/cli": "^2.18.4"
 	},
 	"engines": {
 		"node": ">=20.x"
 	},
 	"napi": {
-		"name": "evm"
+		"name": "evm",
+		"triples": {
+			"defaults": false,
+			"additional": [
+				"aarch64-unknown-linux-gnu",
+				"x86_64-unknown-linux-gnu"
+			]
+		}
 	}
 }

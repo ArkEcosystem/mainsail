@@ -55,7 +55,6 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-
 	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
 	//sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
@@ -94,7 +93,7 @@ const setup = async () => {
 		"@mainsail/crypto-block",
 		"@mainsail/fees",
 		"@mainsail/fees-static",
-		"@mainsail/evm",
+		"@mainsail/evm-service",
 		"@mainsail/evm-gas-fee",
 		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
