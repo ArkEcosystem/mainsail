@@ -12,7 +12,7 @@
 		"build-napi": "napi build --platform --cargo-cwd bindings --release",
 		"build-napi:debug": "napi build --platform --cargo-cwd bindings",
 		"clean": "del index.js index.d.ts evm.*.node",
-		"prepublishOnly": "node set_optional_dependencies.js",
+		"prepublishOnly": "napi prepublish -t pnpm",
 		"release": "pnpm publish --access public",
 		"test": "cargo test --release",
 		"version": "napi version "
