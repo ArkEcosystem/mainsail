@@ -1,4 +1,4 @@
-name: Publish (Develop)
+name: Publish (Evm)
 
 env:
     DEBUG: napi:*
@@ -11,7 +11,7 @@ permissions:
 on:
     push:
         branches:
-            - "develop"
+            - "evm"
 
 jobs:
     build:
@@ -89,6 +89,7 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: "20.x"
+                  registry-url: https://registry.npmjs.org/
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v4
@@ -134,18 +135,14 @@ jobs:
               run: ls -R ./npm
               shell: bash
 
-            - name: Prepublish
-              working-directory: ./packages/evm
-              run: pnpm run prepublishOnly
-
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=develop --tag=alpha
+                  pnpm run release -- --publish-branch=evm --tag=evm
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
-            - name: Set dist-tag latest
-              run: |
-                  bash ./scripts/dist-tag-latest.sh
-              env:
-                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+            # - name: Set dist-tag latest
+            #   run: |
+            #       bash ./scripts/dist-tag-latest.sh
+            #   env:
+            #       NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

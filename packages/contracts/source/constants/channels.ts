@@ -1,1 +1,1 @@
-export const Channels = ["latest", "alpha", "next"];
+export const Channels = ["latest", "alpha", "next", "evm"];
