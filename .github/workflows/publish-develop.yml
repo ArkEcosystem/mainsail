@@ -1,4 +1,4 @@
-name: Publish (Develop)
+name: Publish (Evm)
 
 env:
     DEBUG: napi:*
@@ -11,7 +11,7 @@ permissions:
 on:
     push:
         branches:
-            - "develop"
+            - "evm"
 
 jobs:
     build:
