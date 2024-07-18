@@ -136,7 +136,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=develop --tag=evm
+                  pnpm run release -- --publish-branch=evm --tag=evm
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
