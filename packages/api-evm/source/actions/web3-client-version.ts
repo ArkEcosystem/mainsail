@@ -15,6 +15,6 @@ export class Web3ClientVersionAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: []): Promise<string> {
-		return `@mainsail/core/${this.version}`;
+		return `@mainsail/core/${this.version}/${process.platform}-${process.arch}/node-${process.version}`;
 	}
 }
