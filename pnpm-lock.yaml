@@ -2522,7 +2522,11 @@ importers:
 
   packages/evm/npm/linux-arm64-gnu: {}
 
+  packages/evm/npm/linux-arm64-musl: {}
+
   packages/evm/npm/linux-x64-gnu: {}
+
+  packages/evm/npm/linux-x64-musl: {}
 
   packages/fees:
     dependencies:
