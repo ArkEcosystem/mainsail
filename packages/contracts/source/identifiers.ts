@@ -137,6 +137,7 @@ export const Identifiers = {
 			Limits: Symbol("Evm<Gas.Limits>"),
 		},
 		Instance: Symbol("Evm<Instance>"),
+		State: Symbol("Evm<State>"),
 		Worker: Symbol("Evm<Worker>"),
 		WorkerSubprocess: {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
