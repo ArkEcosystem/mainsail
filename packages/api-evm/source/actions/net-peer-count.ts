@@ -1,8 +1,11 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class NetPeerCountAction implements Contracts.Api.RPC.Action {
+	@inject(Identifiers.Evm.State)
+	private readonly state!: Contracts.Evm.State;
+
 	public readonly name: string = "net_peerCount";
 
 	public readonly schema = {
@@ -12,6 +15,6 @@ export class NetPeerCountAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: []): Promise<number> {
-		return 0;
+		return this.state.peerCount;
 	}
 }
