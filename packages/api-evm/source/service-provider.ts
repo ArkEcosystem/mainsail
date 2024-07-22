@@ -2,7 +2,7 @@ import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/a
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { CallAction, Web3ClientVersionAction } from "./actions/index.js";
+import { CallAction, NetListeningAction, Web3ClientVersionAction } from "./actions/index.js";
 import Handlers from "./handlers.js";
 import { Identifiers as ApiIdentifiers } from "./identifiers.js";
 import { Server } from "./server.js";
@@ -50,7 +50,11 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 	}
 
 	protected getActions(): Contracts.Api.RPC.Action[] {
-		return [this.app.resolve(CallAction), this.app.resolve(Web3ClientVersionAction)];
+		return [
+			this.app.resolve(CallAction),
+			this.app.resolve(NetListeningAction),
+			this.app.resolve(Web3ClientVersionAction),
+		];
 	}
 
 	public configSchema(): Joi.ObjectSchema {
