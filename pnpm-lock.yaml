@@ -954,6 +954,9 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../evm-service
+      '@mainsail/evm-state':
+        specifier: workspace:*
+        version: link:../evm-state
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../fees

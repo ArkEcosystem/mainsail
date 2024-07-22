@@ -325,6 +325,9 @@
 			"package": "@mainsail/evm-service"
 		},
 		{
+			"package": "@mainsail/evm-state"
+		},
+		{
 			"package": "@mainsail/api-evm"
 		}
 	]

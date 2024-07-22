@@ -79,6 +79,7 @@
 		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
+		"@mainsail/evm-state": "workspace:*",
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
