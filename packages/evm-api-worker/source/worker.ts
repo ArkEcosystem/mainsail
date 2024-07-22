@@ -35,4 +35,8 @@ export class Worker implements Contracts.Evm.Worker {
 	public getQueueSize(): number {
 		return this.ipcSubprocess.getQueueSize();
 	}
+
+	public async setPeerCount(peerCount: number): Promise<void> {
+		await this.ipcSubprocess.sendRequest("setPeerCount", peerCount);
+	}
 }

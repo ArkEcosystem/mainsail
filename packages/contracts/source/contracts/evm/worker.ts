@@ -5,6 +5,7 @@ export interface WorkerFlags extends KeyValuePair {}
 
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
+	setPeerCount(peerCount: number): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;
