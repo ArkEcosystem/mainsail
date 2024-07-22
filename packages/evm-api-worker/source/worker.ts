@@ -19,13 +19,13 @@ export class Worker implements Contracts.Evm.Worker {
 	@postConstruct()
 	public initialize(): void {
 		this.ipcSubprocess = this.createWorkerSubprocess();
+
+		this.eventDispatcher.listen(Events.PeerEvent.Added, this);
+		this.eventDispatcher.listen(Events.PeerEvent.Removed, this);
 	}
 
 	public registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {
 		this.ipcSubprocess.registerEventHandler(event, callback);
-
-		this.eventDispatcher.listen(Events.PeerEvent.Added, this);
-		this.eventDispatcher.listen(Events.PeerEvent.Removed, this);
 	}
 
 	public handle(payload: { name: string; data: any }): void {
