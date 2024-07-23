@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/api-evm",
+	"name": "@mainsail/evm-state",
 	"version": "0.0.1-evm.1",
-	"description": "Ethereum JSON-RPC compatible API for the Mainsail blockchain",
+	"description": "EVM state for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"type": "module",
@@ -22,19 +22,11 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.3.6",
-		"@mainsail/api-common": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"ethers": "6.11.0",
-		"joi": "17.12.2"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
-		"@mainsail/validation": "workspace:*",
-		"@types/semver": "7.5.8",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

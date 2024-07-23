@@ -2,7 +2,7 @@ import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/a
 import { Contracts } from "@mainsail/contracts";
 import Joi from "joi";
 
-import { CallAction, NetListeningAction, Web3ClientVersionAction } from "./actions/index.js";
+import { CallAction, NetListeningAction, NetPeerCountAction, Web3ClientVersionAction } from "./actions/index.js";
 import Handlers from "./handlers.js";
 import { Identifiers as ApiIdentifiers } from "./identifiers.js";
 import { Server } from "./server.js";
@@ -53,6 +53,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return [
 			this.app.resolve(CallAction),
 			this.app.resolve(NetListeningAction),
+			this.app.resolve(NetPeerCountAction),
 			this.app.resolve(Web3ClientVersionAction),
 		];
 	}
