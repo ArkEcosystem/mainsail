@@ -42,9 +42,12 @@ describe<{
 	});
 
 	it("should return true", async ({ action, state }) => {
-		assert.equal(await action.handle([]), 0);
+		assert.equal(await action.handle([]), "0x0");
 
 		state.peerCount = 1;
-		assert.equal(await action.handle([]), 1);
+		assert.equal(await action.handle([]), "0x1");
+
+		state.peerCount = 10;
+		assert.equal(await action.handle([]), "0xa");
 	});
 });
