@@ -1,4 +1,4 @@
-# Mainsail - Transaction pool worker
+# Mainsail - EVM State
 
 ![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 
