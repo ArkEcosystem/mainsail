@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { numberToHex } from "@mainsail/utils";
 
 @injectable()
 export class NetPeerCountAction implements Contracts.Api.RPC.Action {
@@ -14,7 +15,7 @@ export class NetPeerCountAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: []): Promise<number> {
-		return this.state.peerCount;
+	public async handle(parameters: []): Promise<string> {
+		return `0x${numberToHex(this.state.peerCount, 1)}`;
 	}
 }
