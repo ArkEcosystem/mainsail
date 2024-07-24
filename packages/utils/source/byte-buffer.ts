@@ -1,3 +1,6 @@
+import { ethers } from "ethers";
+import { BigNumber } from "./big-number.js";
+
 export class ByteBuffer {
 	#buffer: Buffer;
 	#offset = 0;
@@ -69,10 +72,31 @@ export class ByteBuffer {
 		this.#offset = this.#buffer.writeBigUInt64LE(value, this.#offset);
 	}
 
+	public writeUint256(value: bigint): void {
+		if (typeof value !== "bigint") {
+			value = BigInt(value);
+		}
+
+		const bytes = ethers.toBeArray(BigNumber.make(value).toBigInt());
+		if (bytes.byteLength > 32) {
+			throw new Error("value must fit into uint256");
+		}
+
+		const padded = ethers.zeroPadValue(bytes, 32);
+
+		this.writeBytes(Buffer.from(ethers.getBytes(padded)));
+	}
+
 	public readUint64(): bigint {
 		const value = this.#buffer.readBigUInt64LE(this.#offset);
 		this.#offset += 8;
 		return value;
+	}
+
+	public readUint256(): bigint {
+		const bytes = this.readBytes(32);
+		const parsed = ethers.stripZerosLeft(bytes);
+		return parsed === "0x" ? 0n : ethers.toBigInt(parsed);
 	}
 
 	public writeBytes(value: Buffer): void {
