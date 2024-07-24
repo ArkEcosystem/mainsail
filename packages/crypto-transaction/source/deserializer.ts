@@ -49,7 +49,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		transaction.type = buf.readUint16();
 		transaction.nonce = BigNumber.make(buf.readUint64());
 		transaction.senderPublicKey = this.publicKeySerializer.deserialize(buf).toString("hex");
-		transaction.fee = BigNumber.make(buf.readUint64().toString());
+		transaction.fee = BigNumber.make(buf.readUint256());
 		transaction.amount = BigNumber.ZERO;
 	}
 
