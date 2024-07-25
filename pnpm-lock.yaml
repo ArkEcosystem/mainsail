@@ -324,9 +324,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       ethers:
         specifier: 6.11.0
         version: 6.11.0
