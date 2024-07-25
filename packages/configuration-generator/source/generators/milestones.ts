@@ -50,8 +50,8 @@ export class MilestonesGenerator {
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: {
-					decimals: 8,
-					denomination: 1e8,
+					decimals: 18,
+					denomination: 1e18,
 				},
 				timeouts: {
 					blockPrepareTime: options.blockTime / 2,
