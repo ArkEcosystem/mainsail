@@ -322,6 +322,15 @@
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
+			"package": "@mainsail/state",
+			"options": {
+				"snapshots": {
+					"enabled": false,
+					"skipUnknownAttributes": true
+				}
+			}
+		},
+		{
 			"package": "@mainsail/evm-service"
 		},
 		{
