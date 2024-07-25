@@ -42,8 +42,8 @@
 			"keccak256": true
 		},
 		"satoshi": {
-			"decimals": 8,
-			"denomination": 100000000
+			"decimals": 18,
+			"denomination": 1000000000000000000
 		},
 		"timeouts": {
 			"blockTime": 8000,

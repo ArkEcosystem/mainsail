@@ -54,19 +54,19 @@ export class Block {
 
 	@Column({
 		nullable: false,
-		type: "bigint",
+		type: "numeric",
 	})
 	public readonly totalAmount!: string;
 
 	@Column({
 		nullable: false,
-		type: "bigint",
+		type: "numeric",
 	})
 	public readonly totalFee!: string;
 
 	@Column({
 		nullable: false,
-		type: "bigint",
+		type: "numeric",
 	})
 	public readonly reward!: string;
 

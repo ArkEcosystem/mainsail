@@ -36,7 +36,7 @@ export class TransferTransaction extends Transaction {
 
 	public assetSize(): number {
 		return (
-			8 + // amount
+			32 + // amount
 			4 + // expiration
 			this.addressSize // recipient
 		);
@@ -45,7 +45,7 @@ export class TransferTransaction extends Transaction {
 	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { data } = this;
 		const buff: ByteBuffer = ByteBuffer.fromSize(this.assetSize());
-		buff.writeUint64(data.amount.toBigInt());
+		buff.writeUint256(data.amount.toBigInt());
 		buff.writeUint32(data.expiration || 0);
 
 		Utils.assert.defined<string>(data.recipientId);
@@ -57,7 +57,7 @@ export class TransferTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data } = this;
-		data.amount = BigNumber.make(buf.readUint64().toString());
+		data.amount = BigNumber.make(buf.readUint256());
 		data.expiration = buf.readUint32();
 		data.recipientId = await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf));
 	}

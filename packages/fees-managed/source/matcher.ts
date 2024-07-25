@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { FeeRegistry } from "@mainsail/fees";
-import { Providers } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
@@ -28,10 +28,10 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	async #throwIfCannot(action: string, transaction: Contracts.Crypto.Transaction): Promise<void> {
-		const feeString = this.#formatSatoshi(transaction.data.fee);
+		const feeString = Utils.formatCurrency(this.configuration, transaction.data.fee);
 
 		const minFee = this.#calculateMinFee(transaction);
-		const minFeeString = this.#formatSatoshi(minFee);
+		const minFeeString = Utils.formatCurrency(this.configuration, minFee);
 
 		if (transaction.data.fee.isGreaterThanEqual(minFee)) {
 			this.logger.debug(`Tx ${transaction} eligible for ${action} (fee ${feeString} >= ${minFeeString})`);
@@ -51,16 +51,5 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		const transactionSizeInBytes: number = Math.round(transaction.serialized.length / 2);
 
 		return addonBytes.plus(transactionSizeInBytes).times(satoshiPerByte);
-	}
-
-	#formatSatoshi(amount: BigNumber): string {
-		const { decimals, denomination } = this.configuration.getMilestone().satoshi;
-
-		const localeString = (+amount / denomination).toLocaleString("en", {
-			maximumFractionDigits: decimals,
-			minimumFractionDigits: 0,
-		});
-
-		return `${localeString} ${this.configuration.get("network.client.symbol")}`;
 	}
 }

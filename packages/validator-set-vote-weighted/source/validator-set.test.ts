@@ -32,7 +32,7 @@ describe<{
 		context.cryptoConfiguration = {
 			get: (key) => {
 				if (key === "genesisBlock.block.totalAmount") {
-					return BigNumber.make(1_000_000).times(BigNumber.SATOSHI);
+					return BigNumber.make(1_000_000).times(BigNumber.WEI);
 				}
 
 				return [milestone];

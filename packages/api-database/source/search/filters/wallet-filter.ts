@@ -116,13 +116,8 @@ export class WalletFilter {
 
 		if (
 			[
-				"balance",
 				"nonce",
 				"validatorRank",
-				"validatorVoteBalance",
-				"validatorForgedFees",
-				"validatorForgedRewards",
-				"validatorForgedTotal",
 				"validatorProducedBlocks",
 				"validatorLastBlock.height",
 				"validatorLastBlock.timestamp",
@@ -131,7 +126,16 @@ export class WalletFilter {
 			return "bigint";
 		}
 
-		if (["validatorApproval"].includes(attribute)) {
+		if (
+			[
+				"balance",
+				"validatorApproval",
+				"validatorVoteBalance",
+				"validatorForgedFees",
+				"validatorForgedRewards",
+				"validatorForgedTotal",
+			].includes(attribute)
+		) {
 			return "numeric";
 		}
 

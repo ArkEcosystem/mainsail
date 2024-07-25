@@ -147,13 +147,13 @@ describeSkip<{
 	it("findByPublicKey - should return a copy", async (context) => {
 		const wallet = context.walletRepo.findByAddress("ATtEq2tqNumWgR9q9zF6FjGp34Mp5JpKGp");
 		wallet.setPublicKey("03720586a26d8d49ec27059bd4572c49ba474029c3627715380f4df83fb431aece");
-		wallet.setBalance(BigNumber.SATOSHI);
+		wallet.setBalance(BigNumber.WEI);
 		context.walletRepo.index(wallet);
 
 		const temporaryWallet = await context.walletRepoCopyOnWrite.findByPublicKey(wallet.getPublicKey()!);
 		temporaryWallet.setBalance(BigNumber.ZERO);
 
-		assert.equal(wallet.getBalance(), BigNumber.SATOSHI);
+		assert.equal(wallet.getBalance(), BigNumber.WEI);
 		assert.equal(temporaryWallet.getBalance(), BigNumber.ZERO);
 	});
 

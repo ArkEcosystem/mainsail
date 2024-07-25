@@ -40,7 +40,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			2 + // type
 			8 + // nonce
 			(transaction.data.senderPublicKey ? this.publicKeySize : 0) + // sender public key
-			8 // fee
+			32 // fee
 		);
 	}
 
@@ -134,7 +134,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			buff.writeBytes(Buffer.from(transaction.senderPublicKey, "hex"));
 		}
 
-		buff.writeUint64(transaction.fee.toBigInt());
+		buff.writeUint256(transaction.fee.toBigInt());
 	}
 
 	#serializeVendorField(transaction: Contracts.Crypto.Transaction, buff: ByteBuffer): void {

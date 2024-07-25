@@ -45,7 +45,7 @@ export const makeTransferWithMultiSignature = async (
 	context: Context,
 	options: TransferOptions = {},
 ): Promise<Contracts.Crypto.Transaction[]> => {
-	const randomWallet = await getRandomFundedWallet(context, BigNumber.make(250 * 1e8));
+	const randomWallet = await getRandomFundedWallet(context, BigNumber.WEI.times(250));
 
 	// Register multi sig wallet
 	const participant1 = await getRandomColdWallet(context);
@@ -65,7 +65,7 @@ export const makeTransferWithMultiSignature = async (
 	});
 
 	const fundTx = makeTransfer(context, {
-		amount: BigNumber.make(100 * 1e8),
+		amount: BigNumber.WEI.times(100),
 		nonceOffset: 1,
 		recipient: multiSigwallet.getAddress(),
 		sender: randomWallet,

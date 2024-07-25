@@ -87,7 +87,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 			if (instance.mode() === Contracts.Evm.EvmMode.Persistent && !this.state.isBootstrap()) {
 				this.logger.debug(
-					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${this.#formatSatoshi(feeConsumed)} deployed=${receipt.deployedContractAddress})`,
+					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.deployedContractAddress})`,
 				);
 
 				void this.#emit(Events.EvmEvent.TransactionReceipt, {
@@ -126,16 +126,5 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		}
 
 		return this.events.dispatch(event, data);
-	}
-
-	#formatSatoshi(amount: Utils.BigNumber): string {
-		const { decimals, denomination } = this.configuration.getMilestone().satoshi;
-
-		const localeString = (+amount / denomination).toLocaleString("en", {
-			maximumFractionDigits: decimals,
-			minimumFractionDigits: 0,
-		});
-
-		return `${localeString} ${this.configuration.get("network.client.symbol")}`;
 	}
 }

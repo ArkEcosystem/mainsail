@@ -84,13 +84,13 @@ export class Transaction {
 
 	@Column({
 		nullable: false,
-		type: "bigint",
+		type: "numeric",
 	})
 	public amount!: string;
 
 	@Column({
 		nullable: false,
-		type: "bigint",
+		type: "numeric",
 	})
 	public fee!: string;
 

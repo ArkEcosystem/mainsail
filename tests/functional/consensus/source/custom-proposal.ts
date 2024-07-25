@@ -5,6 +5,7 @@ import { Utils } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 import { randomBytes } from "crypto";
+import { ethers } from "ethers";
 
 import { Validator } from "./contracts.js";
 
@@ -82,15 +83,17 @@ export const makeCustomProposal = async (
 	byteOffset += 4;
 
 	// totalAmount
-	blockBuffer.writeBigUInt64LE(totals.amount.toBigInt(), byteOffset);
-	byteOffset += 8;
+	const amountBuffer = toUint256Buffer(totals.amount);
+	amountBuffer.copy(blockBuffer, byteOffset);
+	byteOffset += 32;
 
 	// totalFee
-	blockBuffer.writeBigUInt64LE(totals.fee.toBigInt(), byteOffset);
-	byteOffset += 8;
+	const feeBuffer = toUint256Buffer(totals.fee);
+	feeBuffer.copy(blockBuffer, byteOffset);
+	byteOffset += 32;
 
 	// skip reward
-	byteOffset += 8;
+	byteOffset += 32;
 
 	// payloadLength
 	blockBuffer.writeUint32LE(payloadLength, byteOffset);
@@ -216,4 +219,15 @@ export const makeTransactionBuilderContext = (node: Sandbox, nodes: Sandbox[], v
 			return randomKeyPair;
 		},
 	};
+};
+
+const toUint256Buffer = (amount: BigNumber): Buffer => {
+	const bytes = ethers.toBeArray(BigNumber.make(amount).toBigInt());
+	if (bytes.byteLength > 32) {
+		throw new Error("value must fit into uint256");
+	}
+
+	const padded = ethers.zeroPadValue(bytes, 32);
+
+	return Buffer.from(ethers.getBytes(padded));
 };
