@@ -16,7 +16,7 @@ export class State {
 	public height!: string;
 
 	@Column({
-		type: "bigint",
+		type: "numeric",
 	})
 	public supply!: string;
 }
