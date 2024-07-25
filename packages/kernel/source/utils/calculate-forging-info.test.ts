@@ -43,7 +43,7 @@ describe<{
 	sandbox: Sandbox;
 	configuration: Configuration;
 }>("calculateApproval", ({ assert, it }) => {
-	const toBalance = (n: number) => BigNumber.SATOSHI.times(n);
+	const toBalance = (n: number) => BigNumber.WEI.times(n);
 	const totalSupply = BigNumber.make(toBalance(1000000));
 
 	it("should calculate correctly", () => {

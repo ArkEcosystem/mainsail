@@ -24,7 +24,7 @@ const setup = (context: Context) => {
 	context.configuration.setConfig(cloned);
 };
 
-const blockReward = (n: number) => BigNumber.SATOSHI.times(n);
+const blockReward = (n: number) => BigNumber.WEI.times(n);
 const initialSupply = BigNumber.make(crypto.genesisBlock.block.totalAmount);
 
 describe<Context>("Supply Calculator - calculateSupply", ({ assert, beforeEach, it, each }) => {
