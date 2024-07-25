@@ -96,6 +96,7 @@
 		{
 			"package": "@mainsail/transaction-pool-worker"
 		},
+
 		{
 			"package": "@mainsail/crypto-messages"
 		},
@@ -104,6 +105,9 @@
 		},
 		{
 			"package": "@mainsail/p2p"
+		},
+		{
+			"package": "@mainsail/evm-api-worker"
 		},
 		{
 			"package": "@mainsail/processor"
@@ -125,9 +129,6 @@
 		},
 		{
 			"package": "@mainsail/api-development"
-		},
-		{
-			"package": "@mainsail/evm-api-worker"
 		},
 		{
 			"package": "@mainsail/webhooks"
@@ -319,7 +320,67 @@
 			"package": "@mainsail/crypto-validation"
 		},
 		{
+			"package": "@mainsail/crypto-hash-bcrypto"
+		},
+		{
+			"package": "@mainsail/crypto-signature-schnorr"
+		},
+		{
+			"package": "@mainsail/crypto-key-pair-ecdsa"
+		},
+		{
+			"package": "@mainsail/crypto-consensus-bls12-381"
+		},
+		{
 			"package": "@mainsail/crypto-address-keccak256"
+		},
+		{
+			"package": "@mainsail/crypto-wif"
+		},
+		{
+			"package": "@mainsail/serializer"
+		},
+		{
+			"package": "@mainsail/fees"
+		},
+		{
+			"package": "@mainsail/fees-static"
+		},
+		{
+			"package": "@mainsail/crypto-block"
+		},
+		{
+			"package": "@mainsail/crypto-transaction"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-username-registration"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-username-resignation"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-validator-registration"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-validator-resignation"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-multi-payment"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-multi-signature-registration"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-transfer"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-vote"
+		},
+		{
+			"package": "@mainsail/crypto-transaction-evm-call"
+		},
+		{
+			"package": "@mainsail/transactions"
 		},
 		{
 			"package": "@mainsail/state",
