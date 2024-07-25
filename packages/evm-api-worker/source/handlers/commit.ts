@@ -9,9 +9,6 @@ export class CommitHandler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.TransactionPool.Service)
-	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
-
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
@@ -29,12 +26,6 @@ export class CommitHandler {
 
 			const block = await this.blockFactory.fromHex(data.block);
 			store.setLastBlock(block);
-
-			await this.transactionPoolService.commit(block, []);
-
-			if (this.configuration.isNewMilestone()) {
-				void this.transactionPoolService.reAddTransactions();
-			}
 		} catch (error) {
 			throw new Error(`Failed to commit block: ${error.message}`);
 		}

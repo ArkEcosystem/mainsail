@@ -1,3 +1,4 @@
+import { CommitHandler } from "../crypto/index.js";
 import { EventListener } from "../kernel/index.js";
 import { Subprocess } from "../kernel/ipc.js";
 import { StoreChange } from "../state/index.js";
@@ -18,7 +19,7 @@ export type WorkerSubprocess = Subprocess<WorkerScriptHandler>;
 
 export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
-export interface Worker extends WorkerScriptHandler, EventListener {
+export interface Worker extends WorkerScriptHandler, CommitHandler, EventListener {
 	getQueueSize(): number;
 	kill(): Promise<number>;
 }

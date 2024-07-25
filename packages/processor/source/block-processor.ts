@@ -47,6 +47,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.Evm.Worker)
+	private readonly evmWorker!: Contracts.Evm.Worker;
+
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
@@ -106,6 +109,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.stateService.onCommit(unit);
 		await this.evm.onCommit(unit);
 		await this.txPoolWorker.onCommit(unit);
+		await this.evmWorker.onCommit(unit);
 
 		if (this.apiSync) {
 			await this.apiSync.onCommit(unit);
