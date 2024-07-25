@@ -43,6 +43,9 @@ const setup = async () => {
 		broadcastTransactions: async () => {},
 	});
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).to(PoolWorker).inSingletonScope();
+	sandbox.app.bind(Identifiers.Evm.Worker).toConstantValue({
+		onCommit: async () => {},
+	});
 
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
