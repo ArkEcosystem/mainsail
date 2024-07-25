@@ -58,11 +58,11 @@ export class TransactionFactory {
 
 	public async transfer(
 		recipientId?: string,
-		amount: number = 2 * 1e8,
+		amount: BigNumber = BigNumber.WEI.times(2),
 		vendorField?: string,
 	): Promise<TransactionFactory> {
 		const builder = new TransferBuilder()
-			.amount(BigNumber.make(amount).toFixed())
+			.amount(amount.toFixed())
 			.recipientId(recipientId || (await this.addressFactory.fromMnemonic(defaultPassphrase)));
 
 		if (vendorField) {
