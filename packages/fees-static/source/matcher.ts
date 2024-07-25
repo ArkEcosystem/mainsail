@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
-import { Utils } from "@mainsail/kernel";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { FeeRegistry } from "@mainsail/fees";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
