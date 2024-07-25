@@ -1,14 +1,14 @@
 {
-    "address": "0x8331035e60d0f7f5C84ccd4A960d09C805E92cab",
+    "address": "0xb5DfF3FF44f16874360eD13160c03B1373F4F154",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "6516c370fb81f9049e43887dd783a1b99caa0c878b68401bcdeada284ba3db09",
-        "publicKey": "833ce47ee36bb5afe19258a176c55c44ac1e32daeb156b532111ae62ca2210b017ff8ea04706e4fa7f74ab25f6639679"
+        "privateKey": "4131e47611ae9456e2b7e9c7bf1e91da32d6d9adf3e262e5a974c33ddb7f8217",
+        "publicKey": "b58307aa9fa1a8a9f6c81c1dfe99439cb0ec31de7cfcb2cd9f8c21102109bf48a3275a3495de77a3d1f305a17ca937ba"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "ce61b75941fa25390866b4bffe2d5debb5019258bc49cfd22e4140ec1e7ff4bb",
-        "publicKey": "037bede17c73adb9d4c35fc24302cc9c2ec0326c80ab3b4fe5594b4f2f5dfc02d3"
+        "privateKey": "5fe19495942fd36acd2371af3b49983a46250450e912d06cbc850ed7355bde15",
+        "publicKey": "032325b399c9a49fbc32624fb6e80e5599c5469eb5ab25430549d1d009cc297634"
     },
-    "passphrase": "speed fantasy badge claim smart sunny disorder wink inject quantum aim sunny purchase liberty mesh summer vast gold secret canyon soda similar picnic process"
+    "passphrase": "nephew news thing day index pond cover proud quick exchange toast ozone peasant tragic this acid message space mountain city never where cliff settle"
 }
