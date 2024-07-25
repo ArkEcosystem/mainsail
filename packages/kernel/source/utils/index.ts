@@ -17,3 +17,4 @@ export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chain
 export { isMajority } from "./is-majority.js";
 export { isMinority } from "./is-minority.js";
 export { isWhitelisted } from "./is-whitelisted.js";
+export { formatCurrency } from "./format-currency.js";
