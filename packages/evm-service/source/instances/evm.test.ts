@@ -459,6 +459,64 @@ describe<{
 		const hash = await instance.stateHash("0000000000000000000000000000000000000000000000000000000000000000");
 		assert.equal(hash, "dac7965a57e662c4fe4f2a69213893eec7dd9c0c1650ebf058659dc6fa017720");
 	});
+
+	it("should return code", async ({ instance }) => {
+		const [sender] = wallets;
+
+		// empty
+		let code = await instance.codeAt(sender.address);
+		assert.equal(code, "0x");
+
+		// empty
+		code = await instance.codeAt(ethers.ZeroAddress);
+		assert.equal(code, "0x");
+
+		// deployed code
+		const { receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			...deployConfig,
+		});
+		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
+		code = await instance.codeAt(receipt.deployedContractAddress!);
+		assert.equal(code.slice(0, 16), MainsailERC20.bytecode.slice(0, 16));
+	});
+
+	it("should return storage", async ({ instance }) => {
+		const [sender] = wallets;
+
+		// empty
+		let slot = await instance.storageAt(sender.address, "");
+		assert.equal(slot, ethers.ZeroHash);
+
+		// deploy erc20
+		const { receipt } = await instance.process({
+			caller: sender.address,
+			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			...deployConfig,
+		});
+		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
+		// look up slot containing user balance
+		//
+		// - slot of balance mapping is '0' (depends on code layout, but here it's a OpenZeppelin ERC20 contract)
+		// - calculate storage key by concatenating padded address and slot number
+		const storageKey = ethers.keccak256(
+			ethers.concat([ethers.zeroPadValue(sender.address, 32), ethers.zeroPadValue(ethers.toBeHex(0, 32), 32)]),
+		);
+
+		slot = await instance.storageAt(receipt.deployedContractAddress!, storageKey);
+
+		assert.equal(slot, "0x00000000000000000000000000000000000000000052b7d2dcc80cd2e4000000");
+
+		const balance = ethers.toBigInt(slot);
+		assert.equal(balance, ethers.parseEther("100000000"));
+	});
 });
 
 const getRandomTxHash = () => Buffer.from(randomBytes(32)).toString("hex");
