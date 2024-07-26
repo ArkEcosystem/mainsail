@@ -5,6 +5,7 @@ import Joi from "joi";
 import {
 	CallAction,
 	EthBlockNumberAction,
+	EthGetBalanceAction,
 	NetListeningAction,
 	NetPeerCountAction,
 	Web3ClientVersionAction,
@@ -59,6 +60,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return [
 			this.app.resolve(CallAction),
 			this.app.resolve(EthBlockNumberAction),
+			this.app.resolve(EthGetBalanceAction),
 			this.app.resolve(NetListeningAction),
 			this.app.resolve(NetPeerCountAction),
 			this.app.resolve(Web3ClientVersionAction),
