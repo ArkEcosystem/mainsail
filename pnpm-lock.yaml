@@ -324,9 +324,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       ethers:
         specifier: 6.11.0
         version: 6.11.0
@@ -3933,6 +3930,9 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../../../packages/database
+      '@mainsail/evm-api-worker':
+        specifier: workspace:*
+        version: link:../../../packages/evm-api-worker
       '@mainsail/evm-development':
         specifier: workspace:*
         version: link:../../../packages/evm-development

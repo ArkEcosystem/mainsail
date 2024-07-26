@@ -2,55 +2,63 @@ import { Identifiers } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation";
 
 import { describe, Sandbox } from "../../../test-framework/source";
-import { NetPeerCountAction } from "./index.js";
+import { EthBlockNumberAction } from "./index.js";
 
 describe<{
 	sandbox: Sandbox;
-	action: NetPeerCountAction;
+	action: EthBlockNumberAction;
 	validator: Validator;
 	state: any;
-}>("NetPeerCountAction", ({ beforeEach, it, assert }) => {
+}>("EthBlockNumberAction", ({ beforeEach, it, assert }) => {
+	let height = 0;
+
 	beforeEach(async (context) => {
 		context.state = {
-			peerCount: 0,
+			getStore() {
+				return {
+					getLastHeight() {
+						return height;
+					},
+				};
+			},
 		};
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.Evm.State).toConstantValue(context.state);
+		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.state);
 
-		context.action = context.sandbox.app.resolve(NetPeerCountAction);
+		context.action = context.sandbox.app.resolve(EthBlockNumberAction);
 		context.validator = context.sandbox.app.resolve(Validator);
 	});
 
 	it("should have a name", ({ action }) => {
-		assert.equal(action.name, "net_peerCount");
+		assert.equal(action.name, "eth_blockNumber");
 	});
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
 		assert.equal(action.schema, {
-			$id: "jsonRpc_net_peerCount",
+			$id: "jsonRpc_eth_blockNumber",
 			maxItems: 0,
 			type: "array",
 		});
 
 		validator.addSchema(action.schema);
 
-		assert.undefined(validator.validate("jsonRpc_net_peerCount", []).errors);
-		assert.defined(validator.validate("jsonRpc_net_peerCount", [1]).errors);
-		assert.defined(validator.validate("jsonRpc_net_peerCount", {}).errors);
+		assert.undefined(validator.validate("jsonRpc_eth_blockNumber", []).errors);
+		assert.defined(validator.validate("jsonRpc_eth_blockNumber", [1]).errors);
+		assert.defined(validator.validate("jsonRpc_eth_blockNumber", {}).errors);
 	});
 
 	it("should return true", async ({ action, state }) => {
 		assert.equal(await action.handle([]), "0x0");
 
-		state.peerCount = 1;
+		height = 1;
 		assert.equal(await action.handle([]), "0x1");
 
-		state.peerCount = 10;
+		height = 10;
 		assert.equal(await action.handle([]), "0xa");
 
-		state.peerCount = 20;
+		height = 20;
 		assert.equal(await action.handle([]), "0x14");
 	});
 });

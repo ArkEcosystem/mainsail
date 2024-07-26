@@ -48,6 +48,9 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		setFailedTransactions: () => {},
 		onCommit: async () => {},
 	});
+	sandbox.app.bind(Identifiers.Evm.Worker).toConstantValue({
+		onCommit: async () => {},
+	});
 
 	// TODO: get rid of mock
 	sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
