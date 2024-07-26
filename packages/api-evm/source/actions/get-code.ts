@@ -23,11 +23,9 @@ export class GetCodeAction implements Contracts.Api.RPC.Action {
 
 		// TODO: ensure 0x prefix, 32 byte length, etc.
 
-		const code = await this.evm.codeAt(
+		return await this.evm.codeAt(
 			address,
 			// ignore tag, we always return LATEST
 		);
-
-		return code;
 	}
 }

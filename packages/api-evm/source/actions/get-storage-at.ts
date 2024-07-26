@@ -22,12 +22,10 @@ export class GetStorageAtAction implements Contracts.Api.RPC.Action {
 
 		// TODO: ensure 0x prefix, 32 byte length, etc.
 
-		const value = await this.evm.storageAt(
+		return await this.evm.storageAt(
 			address,
 			slotKey,
 			// ignore tag, we always return LATEST
 		);
-
-		return value;
 	}
 }
