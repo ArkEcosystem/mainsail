@@ -14,7 +14,8 @@ use result::{TxReceipt, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
     primitives::{
-        hex::ToHexExt, AccountInfo, Address, EVMError, ExecutionResult, ResultAndState, B256, U256,
+        hex::ToHexExt, AccountInfo, Address, Bytecode, Bytes, EVMError, ExecutionResult,
+        ResultAndState, B256, U256,
     },
     Database, DatabaseCommit, Evm, TransitionAccount,
 };
@@ -57,6 +58,44 @@ impl EvmInner {
                 output: None,
             },
         })
+    }
+
+    pub fn code_at(&mut self, address: Address) -> std::result::Result<Bytes, EVMError<String>> {
+        let account = self
+            .persistent_db
+            .basic(address)
+            .map_err(|err| EVMError::Database(format!("account lookup failed: {}", err).into()))?;
+
+        match account {
+            Some(account) => {
+                let code = self
+                    .persistent_db
+                    .code_by_hash(account.code_hash)
+                    .map_err(|err| {
+                        EVMError::Database(format!("code lookup failed: {}", err).into())
+                    })?;
+
+                Ok(match code {
+                    Bytecode::LegacyRaw(code) => code,
+                    Bytecode::LegacyAnalyzed(code) => code.original_bytes(),
+                    Bytecode::Eof(code) => code.raw.clone(),
+                })
+            }
+            None => Ok(Default::default()),
+        }
+    }
+
+    pub fn storage_at(
+        &mut self,
+        address: Address,
+        slot: U256,
+    ) -> std::result::Result<U256, EVMError<String>> {
+        match self.persistent_db.storage(address, slot) {
+            Ok(slot) => Ok(slot),
+            Err(err) => Err(EVMError::Database(
+                format!("storage lookup failed: {}", err).into(),
+            )),
+        }
     }
 
     pub fn get_account_info(
@@ -445,6 +484,30 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<string>")]
+    pub fn code_at(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
+        let address = utils::create_address_from_js_string(address)?;
+        node_env.execute_tokio_future(
+            Self::code_at_async(self.evm.clone(), address),
+            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<string>")]
+    pub fn storage_at(
+        &mut self,
+        node_env: Env,
+        address: JsString,
+        slot: JsString,
+    ) -> Result<JsObject> {
+        let address = utils::create_address_from_js_string(address)?;
+        let slot = utils::convert_string_to_u256(slot)?;
+        node_env.execute_tokio_future(
+            Self::storage_at_async(self.evm.clone(), address, slot),
+            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsCommitResult>")]
     pub fn commit(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
         let commit_key = CommitKey::try_from(commit_key)?;
@@ -506,6 +569,35 @@ impl JsEvmWrapper {
 
         match result {
             Ok(_) => Result::Ok(()),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn code_at_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        address: Address,
+    ) -> Result<String> {
+        let mut lock = evm.lock().await;
+        let result = lock.code_at(address);
+
+        match result {
+            Ok(code) => Result::Ok(revm::primitives::hex::encode_prefixed(code.as_ref())),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn storage_at_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        address: Address,
+        slot: U256,
+    ) -> Result<String> {
+        let mut lock = evm.lock().await;
+        let result = lock.storage_at(address, slot);
+
+        match result {
+            Ok(slot) => Result::Ok(revm::primitives::hex::encode_prefixed(
+                slot.to_be_bytes::<32>(),
+            )),
             Err(err) => Result::Err(serde::de::Error::custom(err)),
         }
     }
