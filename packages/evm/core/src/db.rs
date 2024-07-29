@@ -224,9 +224,10 @@ impl DatabaseRef for PersistentDB {
             None => AccountInfo::default(),
         };
 
-        // Always take host nonce if provided
+        // Always take host if provided
         if let Some(host) = inner.host_account_infos.get(&address) {
             basic.nonce = host.nonce;
+            basic.balance = host.balance; // TODO checks
         }
 
         Ok(basic.into())

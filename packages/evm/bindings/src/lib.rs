@@ -88,13 +88,16 @@ impl EvmInner {
         self.pending_commit
             .get_or_insert_with(|| PendingCommit::new(account_update_ctx.commit_key));
 
-        self.persistent_db.upsert_host_account_info(
-            account_update_ctx.account,
-            AccountInfo {
-                nonce: account_update_ctx.nonce,
-                ..Default::default()
-            },
-        );
+        for (account, change) in account_update_ctx.changes {
+            self.persistent_db.upsert_host_account_info(
+                account,
+                AccountInfo {
+                    nonce: change.nonce,
+                    balance: change.balance,
+                    ..Default::default()
+                },
+            );
+        }
 
         Ok(())
     }

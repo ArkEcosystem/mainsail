@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
 use mainsail_evm_core::db::CommitKey;
 use napi::{JsBigInt, JsBuffer, JsString};
@@ -38,8 +38,13 @@ pub struct JsBlockContext {
 #[napi(object)]
 pub struct JsAccountUpdateContext {
     pub commit_key: JsCommitKey,
-    pub account: JsString,
+    pub changes: HashMap<String, JsAccountChange>,
+}
+
+#[napi(object)]
+pub struct JsAccountChange {
     pub nonce: JsBigInt,
+    pub balance: JsBigInt,
 }
 
 #[napi(object)]
@@ -78,8 +83,13 @@ pub struct BlockContext {
 #[derive(Debug)]
 pub struct AccountUpdateContext {
     pub commit_key: CommitKey,
-    pub account: Address,
+    pub changes: HashMap<Address, AccountChange>,
+}
+
+#[derive(Debug)]
+pub struct AccountChange {
     pub nonce: u64,
+    pub balance: U256,
 }
 
 #[derive(Debug)]
@@ -194,10 +204,22 @@ impl TryFrom<JsAccountUpdateContext> for AccountUpdateContext {
     type Error = anyhow::Error;
 
     fn try_from(value: JsAccountUpdateContext) -> Result<Self, Self::Error> {
+        let mut changes = HashMap::with_capacity(value.changes.len());
+        for (address, change) in value.changes {
+            changes.insert(
+                Address::from_str(&address)?,
+                AccountChange {
+                    balance: utils::convert_bigint_to_u256(change.balance)?,
+                    nonce: change.nonce.get_u64()?.0,
+                },
+            );
+        }
+
+        println!("changes {:#?}", changes);
+
         Ok(AccountUpdateContext {
             commit_key: value.commit_key.try_into()?,
-            account: utils::create_address_from_js_string(value.account)?,
-            nonce: value.nonce.get_u64()?.0,
+            changes,
         })
     }
 }

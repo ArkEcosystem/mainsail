@@ -40,6 +40,7 @@
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
 		"ethers": "6.11.0",

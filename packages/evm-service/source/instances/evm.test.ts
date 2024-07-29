@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+import { BigNumber } from "@mainsail/utils";
 import { BigNumberish, ethers, randomBytes } from "ethers";
 
 import { describe, Sandbox } from "../../../test-framework/distribution";
@@ -432,10 +433,23 @@ describe<{
 
 		let commitKey = { height: BigInt(0), round: BigInt(0) };
 
+		const getWalletRepository = (
+			wallets: { address: string; balance?: bigint; nonce: number }[],
+		): Contracts.State.WalletRepository =>
+			({
+				getDirtyWallets: () =>
+					new Set(
+						wallets.map((w) => ({
+							getAddress: () => w.address,
+							getBalance: () => BigNumber.make(w.balance ?? BigInt(0)),
+							getNonce: () => BigNumber.make(w.nonce),
+						})),
+					).values(),
+			}) as Contracts.State.WalletRepository;
+
 		await instance.updateAccountInfo({
-			account: sender.address,
-			nonce: BigInt(1),
 			commitKey,
+			walletRepository: getWalletRepository([{ address: sender.address, nonce: 1 }]),
 		});
 		await instance.onCommit(commitKey as any);
 
@@ -445,9 +459,8 @@ describe<{
 		assert.equal(info.nonce, 1n);
 
 		await instance.updateAccountInfo({
-			account: sender.address,
-			nonce: BigInt(2),
 			commitKey,
+			walletRepository: getWalletRepository([{ address: sender.address, nonce: 2 }]),
 		});
 		await instance.onCommit(commitKey as any);
 
