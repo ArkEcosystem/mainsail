@@ -1,8 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-//import { ethers } from "ethers";
-
-type BlockTag = "latest" | "earliest" | "pending";
 
 @injectable()
 export class GetCodeAction implements Contracts.Api.RPC.Action {
@@ -14,18 +11,16 @@ export class GetCodeAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
-		maxItems: 0,
+
+		maxItems: 2,
+		minItems: 2,
+
+		prefixItems: [{ $ref: "address" }, { enum: ["latest", "finalized", "safe"], type: "string" }],
 		type: "array",
 	};
 
-	public async handle(parameters: [string, BlockTag]): Promise<any> {
+	public async handle(parameters: [string, string]): Promise<any> {
 		const [address] = parameters;
-
-		// TODO: ensure 0x prefix, 32 byte length, etc.
-
-		return await this.evm.codeAt(
-			address,
-			// ignore tag, we always return LATEST
-		);
+		return await this.evm.codeAt(address);
 	}
 }
