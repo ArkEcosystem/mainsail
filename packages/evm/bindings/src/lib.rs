@@ -75,13 +75,6 @@ impl EvmInner {
         &mut self,
         account_update_ctx: AccountUpdateContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        if self
-            .persistent_db
-            .is_height_committed(account_update_ctx.commit_key.0)
-        {
-            return Ok(());
-        }
-
         // Drop pending state on key change
         if self
             .pending_commit
@@ -197,7 +190,7 @@ impl EvmInner {
 
     pub fn commit(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
         if self.persistent_db.is_height_committed(commit_key.0) {
-            assert!(self.pending_commit.is_none());
+            self.drop_pending_commit();
             return Ok(());
         }
 
