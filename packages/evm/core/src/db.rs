@@ -792,3 +792,78 @@ fn test_resize_on_commit() {
     let db = PersistentDB::new_with_env(env).expect("open");
     assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
 }
+
+#[test]
+fn test_host_account_info() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+
+    let address = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+
+    let mut account = db.basic(address).expect("account").expect("loaded");
+
+    // empty by default
+    assert_eq!(account.balance, U256::ZERO);
+    assert_eq!(account.nonce, 0);
+
+    // overwrite
+    db.upsert_host_account_info(
+        address,
+        AccountInfo {
+            nonce: 3,
+            balance: U256::from(12345),
+            ..Default::default()
+        },
+    );
+
+    account = db.basic(address).expect("account").expect("loaded");
+
+    assert_eq!(account.balance, U256::from(12345));
+    assert_eq!(account.nonce, 3);
+
+    // reset
+    db.clear_host_account_infos();
+
+    account = db.basic(address).expect("account").expect("loaded");
+
+    assert_eq!(account.balance, U256::ZERO);
+    assert_eq!(account.nonce, 0);
+
+    // commit
+    db.upsert_host_account_info(
+        address,
+        AccountInfo {
+            nonce: 5,
+            balance: U256::from(9999),
+            ..Default::default()
+        },
+    );
+
+    crate::state_commit::commit_to_db(
+        &mut db,
+        PendingCommit {
+            key: CommitKey(0, 0),
+            cache: CacheState::default(),
+            results: Default::default(),
+            transitions: TransitionState {
+                transitions: Default::default(),
+            },
+        },
+    )
+    .expect("ok");
+    account = db.basic(address).expect("account").expect("loaded");
+
+    assert_eq!(account.balance, U256::from(9999));
+    assert_eq!(account.nonce, 5);
+
+    // persisted
+    db.clear_host_account_infos();
+    account = db.basic(address).expect("account").expect("loaded");
+
+    assert_eq!(account.balance, U256::from(9999));
+    assert_eq!(account.nonce, 5);
+}
