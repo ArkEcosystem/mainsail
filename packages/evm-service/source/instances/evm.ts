@@ -39,7 +39,7 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.codeAt(address);
 	}
 
-	public async storageAt(address: string, slot: string): Promise<string> {
+	public async storageAt(address: string, slot: number): Promise<string> {
 		return this.#evm.storageAt(address, slot);
 	}
 

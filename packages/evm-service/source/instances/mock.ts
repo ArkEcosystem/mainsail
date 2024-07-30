@@ -35,7 +35,7 @@ export class MockInstance implements Contracts.Evm.Instance {
 		return "";
 	}
 
-	public async storageAt(address: string, slot: string): Promise<string> {
+	public async storageAt(address: string, slot: number): Promise<string> {
 		return "";
 	}
 
