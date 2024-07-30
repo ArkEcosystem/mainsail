@@ -1,6 +1,6 @@
 use std::{collections::HashMap, str::FromStr};
 
-use mainsail_evm_core::db::CommitKey;
+use mainsail_evm_core::{db::CommitKey, state_changes::AccountChange};
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{Address, Bytes, SpecId, B256, U256};
@@ -84,12 +84,6 @@ pub struct BlockContext {
 pub struct AccountUpdateContext {
     pub commit_key: CommitKey,
     pub changes: HashMap<Address, AccountChange>,
-}
-
-#[derive(Debug)]
-pub struct AccountChange {
-    pub nonce: u64,
-    pub balance: U256,
 }
 
 #[derive(Debug)]
@@ -215,7 +209,9 @@ impl TryFrom<JsAccountUpdateContext> for AccountUpdateContext {
             );
         }
 
-        println!("changes {:#?}", changes);
+        if changes.len() < 10 {
+            println!("changes {:#?}", changes);
+        }
 
         Ok(AccountUpdateContext {
             commit_key: value.commit_key.try_into()?,

@@ -1,21 +1,17 @@
 use std::collections::HashMap;
 
-use revm::{
-    db::AccountStatus,
-    primitives::{ExecutionResult, B256},
-    DatabaseRef, TransitionAccount,
-};
+use revm::{db::AccountStatus, primitives::B256, DatabaseRef, TransitionAccount};
 
 use crate::{
     db::{CommitKey, Error, PendingCommit, PersistentDB},
-    state_changes,
+    state_changes::{self, StateExecutionResult},
 };
 
 #[derive(Debug, Default)]
 pub struct StateCommit {
     pub key: CommitKey,
     pub change_set: state_changes::StateChangeset,
-    pub results: HashMap<B256, ExecutionResult>,
+    pub results: HashMap<B256, StateExecutionResult>,
 }
 
 pub fn build_commit(
@@ -76,9 +72,6 @@ pub(crate) fn merge_host_account_infos(
         db.get_host_account_infos_cloned()
     };
 
-    // TODO: here we could potentially also check for host balance changes caused by contracts
-    // and pass it back to the main process.
-
     let mut transition_accounts = Vec::with_capacity(host.len());
 
     for (address, account) in host {
@@ -112,6 +105,8 @@ pub(crate) fn merge_host_account_infos(
             // );
 
             info.nonce = account.nonce;
+            info.balance = account.balance;
+
             Some(info)
         });
 

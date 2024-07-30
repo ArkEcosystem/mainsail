@@ -6,7 +6,7 @@ use ctx::{
 };
 use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
-    state_commit, state_hash,
+    state_changes, state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsObject, JsString};
 use napi_derive::napi;
@@ -48,9 +48,9 @@ impl EvmInner {
         let result = self.transact_evm(tx_ctx.into());
 
         Ok(match result {
-            Ok(r) => TxViewResult {
-                success: r.is_success(),
-                output: r.into_output(),
+            Ok(ResultAndState { result, .. }) => TxViewResult {
+                success: result.is_success(),
+                output: result.into_output(),
             },
             Err(_) => TxViewResult {
                 success: false,
@@ -244,7 +244,7 @@ impl EvmInner {
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
-    ) -> std::result::Result<ExecutionResult, EVMError<mainsail_evm_core::db::Error>> {
+    ) -> std::result::Result<ResultAndState, EVMError<mainsail_evm_core::db::Error>> {
         let mut state_builder = State::builder().with_bundle_update();
 
         if let Some(commit_key) = ctx.block_context.as_ref().map(|b| b.commit_key) {
@@ -299,12 +299,13 @@ impl EvmInner {
 
                         let state_db = evm.db_mut();
 
-                        state_db.commit(state);
+                        state_db.commit(state.clone());
 
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
-                        pending_commit
-                            .results
-                            .insert(ctx.tx_hash.expect("tx hash"), result.clone());
+                        pending_commit.results.insert(
+                            ctx.tx_hash.expect("tx hash"),
+                            state_changes::map_state_execution_result(&result, &state),
+                        );
                         pending_commit.transitions.add_transitions(
                             state_db
                                 .transition_state
@@ -317,7 +318,7 @@ impl EvmInner {
                     }
                 }
 
-                Ok(result)
+                Ok(ResultAndState { state, result })
             }
             Err(err) => Err(err),
         }
@@ -339,7 +340,9 @@ impl EvmInner {
     }
 }
 
-fn map_execution_result(result: ExecutionResult) -> TxReceipt {
+fn map_execution_result(result: ResultAndState) -> TxReceipt {
+    let ResultAndState { result, state } = result;
+
     match result {
         ExecutionResult::Success {
             gas_used,
@@ -355,6 +358,7 @@ fn map_execution_result(result: ExecutionResult) -> TxReceipt {
                 deployed_contract_address: None,
                 logs: Some(logs),
                 output: Some(output),
+                changes: Some(state_changes::map_state_execution_result_changes(&state)),
             },
             revm::primitives::Output::Create(output, address) => TxReceipt {
                 gas_used,
@@ -363,6 +367,7 @@ fn map_execution_result(result: ExecutionResult) -> TxReceipt {
                 deployed_contract_address: address.map(|address| address.to_string()),
                 logs: Some(logs),
                 output: Some(output),
+                changes: Some(state_changes::map_state_execution_result_changes(&state)),
             },
         },
         ExecutionResult::Revert { gas_used, output } => TxReceipt {
@@ -372,6 +377,7 @@ fn map_execution_result(result: ExecutionResult) -> TxReceipt {
             deployed_contract_address: None,
             logs: None,
             output: Some(output),
+            changes: None,
         },
         ExecutionResult::Halt { gas_used, .. } => TxReceipt {
             gas_used,
@@ -380,6 +386,7 @@ fn map_execution_result(result: ExecutionResult) -> TxReceipt {
             deployed_contract_address: None,
             logs: None,
             output: None,
+            changes: None,
         },
     }
 }

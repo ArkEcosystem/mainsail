@@ -5,7 +5,10 @@ use rayon::slice::ParallelSliceMut;
 use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 use serde::{Deserialize, Serialize};
 
-use crate::{state_changes, state_commit::StateCommit};
+use crate::{
+    state_changes::{self, AccountChange, StateExecutionResult},
+    state_commit::StateCommit,
+};
 
 #[derive(Debug)]
 struct AddressWrapper(Address);
@@ -45,6 +48,7 @@ pub struct TinyReceipt {
     pub gas_used: u64,
     pub success: bool,
     pub deployed_contract: Option<Address>,
+    pub changes: Option<HashMap<Address, AccountChange>>,
 }
 
 // txHash -> receipt
@@ -69,7 +73,7 @@ pub struct CommitKey(pub u64, pub u64);
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,
-    pub results: HashMap<B256, ExecutionResult>,
+    pub results: HashMap<B256, StateExecutionResult>,
     pub transitions: TransitionState,
 }
 
@@ -300,7 +304,7 @@ impl PersistentDB {
         &self,
         key: CommitKey,
         change_set: &mut state_changes::StateChangeset,
-        results: &HashMap<B256, ExecutionResult>,
+        results: &HashMap<B256, StateExecutionResult>,
     ) -> Result<(), Error> {
         assert!(!self.is_height_committed(key.0));
 
@@ -369,8 +373,8 @@ impl PersistentDB {
 
             // Finalize commit
             let mut commit_receipts = HashMap::new();
-            for (k, v) in results {
-                let deployed_contract = match &v {
+            for (k, StateExecutionResult { result, changes }) in results {
+                let deployed_contract = match &result {
                     ExecutionResult::Success { output, .. } => match output {
                         Output::Create(_, address) => address.clone(),
                         _ => None,
@@ -381,9 +385,10 @@ impl PersistentDB {
                 commit_receipts.insert(
                     k.clone(),
                     TinyReceipt {
-                        gas_used: v.gas_used(),
-                        success: v.is_success(),
+                        gas_used: result.gas_used(),
+                        success: result.is_success(),
                         deployed_contract,
+                        changes: changes.to_owned(),
                     },
                 );
             }

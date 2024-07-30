@@ -9,6 +9,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	private readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
@@ -65,8 +68,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			recipient = walletRepository.findByAddress(transaction.data.recipientId);
 		}
 
-		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data);
-		await this.#updateEvmAccountInfoHost(commitKey, sender, walletRepository);
+		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data, result);
+		await this.#updateEvmAccountInfoHost(commitKey, walletRepository);
+		await this.#applyWalletChangesFromEvm(walletRepository, result);
 
 		return { gasUsed: result.gasUsed, receipt: result.receipt };
 	}
@@ -76,7 +80,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		sender: Contracts.State.Wallet,
 		recipient: Contracts.State.Wallet | undefined,
 		transaction: Contracts.Crypto.TransactionData,
+		result: Contracts.Transactions.TransactionApplyResult,
 	): Promise<void> {
+		// Vote
 		if (
 			transaction.type === Contracts.Crypto.TransactionType.Vote &&
 			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
@@ -110,53 +116,68 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 				validator.setAttribute("validatorVoteBalance", voteBalance);
 			}
-		} else {
-			// Update vote balance of the sender's validator
+
+			// nothing else to update
+			return;
+		}
+
+		// EVM Call
+		if (
+			transaction.type === Contracts.Crypto.TransactionType.EvmCall &&
+			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
+		) {
 			if (sender.hasVoted()) {
-				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-					sender.getAttribute("vote"),
-				);
-
-				let amount: BigNumber = transaction.amount;
-				if (
-					transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
-					transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
-				) {
-					AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
-
-					amount = transaction.asset.payments.reduce(
-						(previous, current) => previous.plus(current.amount),
-						BigNumber.ZERO,
-					);
-				}
-
-				const total: BigNumber = amount.plus(transaction.fee);
-
-				const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
-
-				// General case : sender validator vote balance reduced by amount + fees (or increased if revert)
-				validator.setAttribute("validatorVoteBalance", voteBalance.minus(total));
+				// Reduce vote balance by consumed fee (TODO: can be removed once evm deducts fee as it will be handled by 'changes')
+				const feeConsumed = this.gasFeeCalculator.calculateConsumed(transaction.fee, Number(result.gasUsed));
+				const validator = await walletRepository.findByPublicKey(sender.getAttribute("vote"));
+				const voteBalance = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
+				validator.setAttribute("validatorVoteBalance", voteBalance.minus(feeConsumed));
 			}
 
-			if (
-				transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
-				transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
-			) {
-				AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
+			if (result.receipt?.changes) {
+				for (const [address, change] of Object.entries(result.receipt.changes)) {
+					const wallet = walletRepository.findByAddress(address);
+					if (wallet.hasVoted()) {
+						const voteChange = BigNumber.make(change.balance).minus(wallet.getBalance());
+						if (voteChange.isZero()) {
+							continue;
+						}
 
-				// go through all payments and update recipients validators vote balance
-				for (const { recipientId, amount } of transaction.asset.payments) {
-					const recipientWallet: Contracts.State.Wallet = walletRepository.findByAddress(recipientId);
-					if (recipientWallet.hasVoted()) {
-						const vote = recipientWallet.getAttribute("vote");
-						const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(vote);
-						const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
-						validator.setAttribute("validatorVoteBalance", voteBalance.plus(amount));
+						const vote = wallet.getAttribute("vote");
+						console.log(
+							`updating vote balance from evm change voter=${address} oldBalance=${wallet.getBalance().toBigInt()} newBalance=${change.balance} diff=${voteChange}`,
+						);
+
+						const validator = await walletRepository.findByPublicKey(vote);
+						const voteBalance = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
+						validator.setAttribute("validatorVoteBalance", voteBalance.plus(voteChange));
 					}
 				}
 			}
 
-			// Update vote balance of recipient's validator
+			// nothing else to update
+			return;
+		}
+
+		// MultiPayment
+		if (
+			transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
+			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
+		) {
+			AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
+
+			// go through all payments and update recipients validators vote balance
+			for (const { recipientId, amount } of transaction.asset.payments) {
+				const recipientWallet: Contracts.State.Wallet = walletRepository.findByAddress(recipientId);
+				if (recipientWallet.hasVoted()) {
+					const vote = recipientWallet.getAttribute("vote");
+					const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(vote);
+					const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
+					validator.setAttribute("validatorVoteBalance", voteBalance.plus(amount));
+				}
+			}
+		} else {
+			// Update vote balance of recipient's validator (recipient cannot be a contract)
 			if (recipient && recipient.hasVoted()) {
 				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
 					recipient.getAttribute("vote"),
@@ -166,16 +187,53 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				validator.setAttribute("validatorVoteBalance", voteBalance.plus(transaction.amount));
 			}
 		}
+
+		// Update vote balance of the sender's validator
+		if (sender.hasVoted()) {
+			const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+				sender.getAttribute("vote"),
+			);
+
+			const total: BigNumber = transaction.amount.plus(transaction.fee);
+			const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
+
+			// General case : sender validator vote balance reduced by amount + fees (or increased if revert)
+			validator.setAttribute("validatorVoteBalance", voteBalance.minus(total));
+		}
 	}
 
 	async #updateEvmAccountInfoHost(
 		commitKey: Contracts.Evm.CommitKey,
-		sender: Contracts.State.Wallet,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
 		await this.evm.updateAccountInfo({
 			commitKey,
 			walletRepository,
 		});
+	}
+
+	async #applyWalletChangesFromEvm(
+		walletRepository: Contracts.State.WalletRepository,
+		result: Contracts.Transactions.TransactionApplyResult,
+	): Promise<void> {
+		if (!result.receipt?.changes) {
+			return;
+		}
+
+		// Update balances of all accounts that were changes as part of evm execution
+		for (const [address, change] of Object.entries(result.receipt.changes)) {
+			const wallet = walletRepository.findByAddress(address);
+
+			const diff = BigNumber.make(change.balance).minus(wallet.getBalance());
+			if (diff.isZero()) {
+				continue;
+			}
+
+			console.log(
+				`applying balance update from evm address=${address} oldBalance=${wallet.getBalance().toBigInt()} newBalance=${change.balance} diff=${diff}`,
+			);
+
+			wallet.setBalance(BigNumber.make(change.balance));
+		}
 	}
 }

@@ -1,9 +1,10 @@
-use mainsail_evm_core::db::TinyReceipt;
+use mainsail_evm_core::{db::TinyReceipt, state_changes::AccountChange};
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
-use revm::primitives::{AccountInfo, Bytes, Log};
+use revm::primitives::{AccountInfo, Address, Bytes, Log};
+use std::collections::HashMap;
 
-use crate::utils;
+use crate::{ctx::JsAccountChange, utils};
 
 #[napi(object)]
 pub struct JsProcessResult {
@@ -51,10 +52,9 @@ pub struct JsTransactionReceipt {
     pub gas_refunded: JsBigInt,
     pub success: bool,
     pub deployed_contract_address: Option<JsString>,
-
-    // TODO: typing
     pub logs: serde_json::Value,
     pub output: Option<JsBuffer>,
+    pub changes: Option<HashMap<String, JsAccountChange>>,
 }
 
 #[derive(Default)]
@@ -62,10 +62,10 @@ pub struct TxReceipt {
     pub gas_used: u64,
     pub gas_refunded: u64,
     pub success: bool,
-    // TODO: expose additional data needed to JS
     pub deployed_contract_address: Option<String>,
     pub logs: Option<Vec<Log>>,
     pub output: Option<Bytes>,
+    pub changes: Option<HashMap<Address, AccountChange>>,
 }
 
 impl From<TinyReceipt> for TxReceipt {
@@ -77,6 +77,7 @@ impl From<TinyReceipt> for TxReceipt {
             deployed_contract_address: value.deployed_contract.map(|a| a.to_string()),
             logs: None,
             output: None,
+            changes: value.changes,
         }
     }
 }
@@ -95,6 +96,23 @@ impl JsTransactionReceipt {
                 None
             };
 
+        let mut changes = Default::default();
+        if let Some(inner) = receipt.changes {
+            let mut values = HashMap::with_capacity(inner.len());
+
+            for (address, change) in inner {
+                values.insert(
+                    address.to_string(),
+                    JsAccountChange {
+                        balance: utils::convert_u256_to_bigint(node_env, change.balance)?,
+                        nonce: node_env.create_bigint_from_u64(change.nonce)?,
+                    },
+                );
+            }
+
+            changes = Some(values);
+        }
+
         Ok(JsTransactionReceipt {
             gas_used: node_env.create_bigint_from_u64(receipt.gas_used)?,
             gas_refunded: node_env.create_bigint_from_u64(receipt.gas_refunded)?,
@@ -110,6 +128,7 @@ impl JsTransactionReceipt {
                     .unwrap()
                     .into_raw()
             }),
+            changes,
         })
     }
 }

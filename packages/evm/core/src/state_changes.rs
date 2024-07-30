@@ -1,7 +1,12 @@
+use std::collections::HashMap;
+
 use revm::{
     db::{states::StorageSlot, BundleState, OriginalValuesKnown},
-    primitives::{AccountInfo, Address, Bytecode, B256, KECCAK_EMPTY, U256},
+    primitives::{
+        Account, AccountInfo, Address, Bytecode, ExecutionResult, B256, KECCAK_EMPTY, U256,
+    },
 };
+use serde::{Deserialize, Serialize};
 
 /// Loosely based on https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/changes.rs and https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/bundle_state.rs#L449
 //
@@ -82,5 +87,49 @@ pub fn bundle_into_change_set(bundle_state: BundleState) -> StateChangeset {
         accounts,
         storage,
         contracts,
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct StateExecutionResult {
+    pub changes: Option<HashMap<Address, AccountChange>>,
+    pub result: ExecutionResult,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct AccountChange {
+    pub nonce: u64,
+    pub balance: U256,
+}
+
+pub fn map_state_execution_result_changes(
+    state: &HashMap<Address, Account>,
+) -> HashMap<Address, AccountChange> {
+    let mut changes = HashMap::with_capacity(state.len());
+
+    for (k, v) in state {
+        changes.insert(
+            k.to_owned(),
+            AccountChange {
+                nonce: v.info.nonce,
+                balance: v.info.balance,
+            },
+        );
+    }
+
+    changes
+}
+
+pub fn map_state_execution_result(
+    result: &ExecutionResult,
+    state: &HashMap<Address, Account>,
+) -> StateExecutionResult {
+    StateExecutionResult {
+        changes: if result.is_success() {
+            Some(map_state_execution_result_changes(state))
+        } else {
+            None
+        },
+        result: result.clone(),
     }
 }

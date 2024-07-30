@@ -76,6 +76,12 @@ export interface TransactionReceipt {
 	readonly deployedContractAddress?: string;
 	readonly logs: any;
 	readonly output?: Buffer;
+	readonly changes?: Record<string, AccountChange>;
+}
+
+export interface AccountChange {
+	readonly nonce: bigint;
+	readonly balance: bigint;
 }
 
 // Supported EVM specs
