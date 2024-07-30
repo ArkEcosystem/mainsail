@@ -211,6 +211,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const forgerWallet = await walletRepository.findByPublicKey(unit.getBlock().data.generatorPublicKey);
 
+		// TODO: sync reward update to evm
 		for (const validatorMutator of this.validatorMutators) {
 			await validatorMutator.apply(walletRepository, forgerWallet, block.data);
 		}
