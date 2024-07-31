@@ -21,6 +21,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
+	@inject(Identifiers.State.Service)
+	private readonly stateService!: Contracts.State.Service;
+
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
@@ -220,10 +223,27 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			return;
 		}
 
+		const dirtyWallets = Object.fromEntries(
+			[...walletRepository.getDirtyWallets()].map((w) => [w.getAddress(), w]),
+		);
+
+		const baseWalletRepository = this.stateService.getStore().walletRepository;
+
 		// Update balances of all accounts that were changes as part of evm execution
 		for (const [address, change] of Object.entries(result.receipt.changes)) {
-			const wallet = walletRepository.findByAddress(address);
+			const wallet = dirtyWallets[address] ?? walletRepository.findByAddress(address);
 
+			// Check change against original wallet to cover the case where the transaction fee
+			// subtraction on the host gets overwritten (TODO: might be possible to obsolete this by handling fees directly in EVM)
+			const hasOriginal = baseWalletRepository.hasByAddress(address);
+			if (hasOriginal) {
+				const original = baseWalletRepository.findByAddress(address);
+				if (original.getBalance().isEqualTo(change.balance)) {
+					continue;
+				}
+			}
+
+			// Apply balance change from EVM (if any)
 			const diff = BigNumber.make(change.balance).minus(wallet.getBalance());
 			if (diff.isZero()) {
 				continue;
