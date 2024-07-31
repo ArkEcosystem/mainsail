@@ -184,7 +184,7 @@ export class Validator implements Contracts.Validator.Validator {
 		this.txPoolWorker.setFailedTransactions(failedTransactions);
 
 		return {
-			stateHash: await validator.getEvm().stateHash(previousBlock.header.stateHash),
+			stateHash: await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash),
 			transactions: candidateTransactions,
 		};
 	}

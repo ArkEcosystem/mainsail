@@ -469,8 +469,11 @@ describe<{
 	});
 
 	it("should return state hash", async ({ instance }) => {
-		const hash = await instance.stateHash("0000000000000000000000000000000000000000000000000000000000000000");
-		assert.equal(hash, "dac7965a57e662c4fe4f2a69213893eec7dd9c0c1650ebf058659dc6fa017720");
+		const hash = await instance.stateHash(
+			{ height: BigInt(0), round: BigInt(0) },
+			"0000000000000000000000000000000000000000000000000000000000000000",
+		);
+		assert.equal(hash, "45824321caf5042cc40f2ce797fabb7e36b7765f6f98d66ed5f52b14b6d74994");
 	});
 });
 

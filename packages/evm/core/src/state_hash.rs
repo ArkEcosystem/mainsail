@@ -1,5 +1,6 @@
 use rayon::slice::ParallelSliceMut;
 use revm::primitives::{keccak256, B256};
+use serde::Serialize;
 
 use crate::{
     db::{PendingCommit, PersistentDB},
@@ -12,16 +13,53 @@ pub fn calculate(
     pending_commit: PendingCommit,
     current_hash: B256,
 ) -> Result<B256, crate::db::Error> {
+    let committed_hashes = db.get_committed_hashes(pending_commit.key.0)?;
     let state_commit = build_commit(db, pending_commit, false)?;
 
-    Ok(calculate_state_hash(current_hash, &state_commit)?)
+    calculate_state_hash(current_hash, &state_commit, committed_hashes)
 }
 
-fn calculate_state_hash(current_hash: B256, state: &StateCommit) -> Result<B256, crate::db::Error> {
-    let commit_hash = keccak256(bincode::serialize(&prepare(state))?);
-    let result = keccak256([current_hash.as_slice(), commit_hash.as_slice()].concat());
+fn calculate_state_hash(
+    current_hash: B256,
+    state: &StateCommit,
+    committed_hashes: Option<(B256, B256, B256)>,
+) -> Result<B256, crate::db::Error> {
+    let (accounts_hash, contracts_hash, storage_hash) =
+        if let Some(committed_hashes) = committed_hashes {
+            committed_hashes
+        } else {
+            let state_changes = prepare(state);
+
+            (
+                calculate_accounts_hash(&state_changes)?,
+                calculate_contracts_hash(&state_changes)?,
+                calculate_storage_hash(&state_changes)?,
+            )
+        };
+
+    let result = keccak256(
+        [
+            current_hash.as_slice(),
+            accounts_hash.as_slice(),
+            contracts_hash.as_slice(),
+            storage_hash.as_slice(),
+        ]
+        .concat(),
+    );
 
     Ok(result)
+}
+
+pub fn calculate_accounts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
+    calculate_hash(&state_changes.accounts)
+}
+
+pub fn calculate_contracts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
+    calculate_hash(&state_changes.contracts)
+}
+
+pub fn calculate_storage_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
+    calculate_hash(&state_changes.storage)
 }
 
 fn prepare(state: &StateCommit) -> StateChangeset {
@@ -36,11 +74,18 @@ fn prepare(state: &StateCommit) -> StateChangeset {
     c
 }
 
+fn calculate_hash<T>(value: &T) -> Result<B256, crate::db::Error>
+where
+    T: Serialize,
+{
+    Ok(keccak256(bincode::serialize(value)?))
+}
+
 #[test]
 fn test_calculate_state_hash() {
-    let result = calculate_state_hash(B256::ZERO, &Default::default()).expect("ok");
+    let result = calculate_state_hash(B256::ZERO, &Default::default(), None).expect("ok");
     assert_eq!(
         result,
-        revm::primitives::b256!("dac7965a57e662c4fe4f2a69213893eec7dd9c0c1650ebf058659dc6fa017720")
+        revm::primitives::b256!("45824321caf5042cc40f2ce797fabb7e36b7765f6f98d66ed5f52b14b6d74994")
     );
 }

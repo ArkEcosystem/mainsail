@@ -12,7 +12,7 @@ export interface Instance extends CommitHandler {
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	updateAccountInfo(context: AccountUpdateContext): Promise<void>;
-	stateHash(currentHash: string): Promise<string>;
+	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	mode(): EvmMode;
 }
 

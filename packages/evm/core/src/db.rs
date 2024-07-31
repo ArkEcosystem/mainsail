@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     state_changes::{self, AccountChange, StateExecutionResult},
     state_commit::StateCommit,
+    state_hash,
 };
 
 #[derive(Debug)]
@@ -53,7 +54,12 @@ pub struct TinyReceipt {
 
 // txHash -> receipt
 #[derive(Serialize, Deserialize)]
-struct CommitReceipts(HashMap<B256, TinyReceipt>);
+struct CommitReceipts {
+    accounts_hash: B256,
+    storage_hash: B256,
+    contracts_hash: B256,
+    tx_receipts: HashMap<B256, TinyReceipt>,
+}
 
 struct InnerStorage {
     accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
@@ -372,7 +378,7 @@ impl PersistentDB {
             }
 
             // Finalize commit
-            let mut commit_receipts = HashMap::new();
+            let mut tx_receipts = HashMap::new();
             for (k, StateExecutionResult { result, changes }) in results {
                 let deployed_contract = match &result {
                     ExecutionResult::Success { output, .. } => match output {
@@ -382,7 +388,7 @@ impl PersistentDB {
                     _ => None,
                 };
 
-                commit_receipts.insert(
+                tx_receipts.insert(
                     k.clone(),
                     TinyReceipt {
                         gas_used: result.gas_used(),
@@ -393,9 +399,16 @@ impl PersistentDB {
                 );
             }
 
-            inner
-                .commits
-                .put(rwtxn, &key.0, &CommitReceipts(commit_receipts))?;
+            inner.commits.put(
+                rwtxn,
+                &key.0,
+                &CommitReceipts {
+                    accounts_hash: state_hash::calculate_accounts_hash(&change_set)?,
+                    contracts_hash: state_hash::calculate_contracts_hash(&change_set)?,
+                    storage_hash: state_hash::calculate_storage_hash(&change_set)?,
+                    tx_receipts,
+                },
+            )?;
 
             Ok(())
         };
@@ -428,8 +441,23 @@ impl PersistentDB {
         let inner = self.inner.borrow();
 
         match inner.commits.get(&rtxn, &height)? {
-            Some(receipts) => Ok((true, receipts.0.get(&tx_hash).cloned())),
+            Some(receipts) => Ok((true, receipts.tx_receipts.get(&tx_hash).cloned())),
             None => Ok((false, None)),
+        }
+    }
+
+    pub fn get_committed_hashes(&self, height: u64) -> Result<Option<(B256, B256, B256)>, Error> {
+        let env = self.env.clone();
+        let rtxn = env.read_txn().expect("read");
+        let inner = self.inner.borrow();
+
+        match inner.commits.get(&rtxn, &height)? {
+            Some(receipts) => Ok(Some((
+                receipts.accounts_hash,
+                receipts.contracts_hash,
+                receipts.storage_hash,
+            ))),
+            None => Ok(None),
         }
     }
 }

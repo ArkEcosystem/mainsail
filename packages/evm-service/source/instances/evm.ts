@@ -47,8 +47,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
 	}
 
-	public async stateHash(currentHash: string): Promise<string> {
-		return this.#evm.stateHash(currentHash);
+	public async stateHash(commitKey: Contracts.Evm.CommitKey, currentHash: string): Promise<string> {
+		return this.#evm.stateHash(commitKey, currentHash);
 	}
 
 	public mode(): Contracts.Evm.EvmMode {
