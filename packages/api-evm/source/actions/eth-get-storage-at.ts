@@ -19,7 +19,7 @@ export class EthGetStorageAtAction implements Contracts.Api.RPC.Action {
 
 		prefixItems: [
 			{ $ref: "address" },
-			{ $ref: "prefixedHex" },
+			{ $ref: "prefixedHex" }, // TODO: Check length
 			{ enum: ["latest", "finalized", "safe"], type: "string" },
 		],
 		type: "array",
@@ -29,7 +29,7 @@ export class EthGetStorageAtAction implements Contracts.Api.RPC.Action {
 		const [address, slot] = parameters;
 
 		try {
-			return await this.evm.storageAt(address, BigInt(Number.parseInt(slot.replace("0x", ""), 16)));
+			return await this.evm.storageAt(address, BigInt(slot));
 		} catch (error) {
 			console.log(error);
 		}
