@@ -8,7 +8,7 @@ use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
     state_commit, state_hash,
 };
-use napi::{bindgen_prelude::*, JsObject, JsString};
+use napi::{bindgen_prelude::*, JsObject, JsString, JsBigInt};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
@@ -498,10 +498,10 @@ impl JsEvmWrapper {
         &mut self,
         node_env: Env,
         address: JsString,
-        slot: JsString,
+        slot: JsBigInt,
     ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
-        let slot = utils::convert_string_to_u256(slot)?;
+        let slot = utils::convert_bigint_to_u256(slot)?;
         node_env.execute_tokio_future(
             Self::storage_at_async(self.evm.clone(), address, slot),
             |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),

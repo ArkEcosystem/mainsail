@@ -16,10 +16,12 @@ pub(crate) fn convert_string_to_b256(js_str: JsString) -> anyhow::Result<B256> {
     )?)
 }
 
-pub(crate) fn convert_string_to_u256(js_str: JsString) -> anyhow::Result<U256> {
-    Ok(U256::from_be_slice(
-        &Bytes::from_str(js_str.into_utf8()?.as_str()?)?.as_ref()[..],
-    ))
+pub(crate) fn convert_bigint_to_u256(mut js_bigint: JsBigInt) -> anyhow::Result<U256> {
+    let (_, words) = js_bigint.get_words()?;
+
+    let bytes: Vec<u8> = words.iter().flat_map(|word| word.to_le_bytes()).collect();
+
+    U256::try_from_le_slice(&bytes[..]).ok_or_else(|| anyhow::anyhow!("invalid bigint"))
 }
 
 pub(crate) fn convert_u256_to_bigint(
