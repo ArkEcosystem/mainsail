@@ -13,21 +13,19 @@ export class EthGetStorageAtAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
-
-		maxItems: 3,
-		minItems: 3,
-
-		prefixItems: [
-			{ $ref: "address" },
-			{ $ref: "prefixedHex" },
-			{ enum: ["latest", "finalized", "safe"], type: "string" },
-		],
+		maxItems: 0,
 		type: "array",
 	};
 
 	public async handle(parameters: [string, string, BlockTag]): Promise<any> {
-		const [address] = parameters;
+		const [address, slotKey] = parameters;
 
-		return await this.evm.storageAt(address, Number.parseInt(parameters[1].replace("0x", ""), 16));
+		// TODO: ensure 0x prefix, 32 byte length, etc.
+
+		return await this.evm.storageAt(
+			address,
+			slotKey,
+			// ignore tag, we always return LATEST
+		);
 	}
 }

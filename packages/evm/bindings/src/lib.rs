@@ -498,10 +498,10 @@ impl JsEvmWrapper {
         &mut self,
         node_env: Env,
         address: JsString,
-        slot: u32,
+        slot: JsString,
     ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
-        let slot = U256::from(slot);
+        let slot = utils::convert_string_to_u256(slot)?;
         node_env.execute_tokio_future(
             Self::storage_at_async(self.evm.clone(), address, slot),
             |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
