@@ -62,6 +62,6 @@ describe<{
 
 		assert.equal(await action.handle(["0x0000000000", "0x0", "latest"]), "0x0");
 		spyStorageAt.calledOnce();
-		spyStorageAt.calledWith("0x0000000000", 0);
+		spyStorageAt.calledWith("0x0000000000", BigInt(0));
 	});
 });
