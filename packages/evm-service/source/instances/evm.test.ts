@@ -489,7 +489,7 @@ describe<{
 		const [sender] = wallets;
 
 		// empty
-		let slot = await instance.storageAt(sender.address, "");
+		let slot = await instance.storageAt(sender.address, BigInt(0));
 		assert.equal(slot, ethers.ZeroHash);
 
 		// deploy erc20
@@ -510,7 +510,7 @@ describe<{
 			ethers.concat([ethers.zeroPadValue(sender.address, 32), ethers.zeroPadValue(ethers.toBeHex(0, 32), 32)]),
 		);
 
-		slot = await instance.storageAt(receipt.deployedContractAddress!, storageKey);
+		slot = await instance.storageAt(receipt.deployedContractAddress!, BigInt(storageKey));
 
 		assert.equal(slot, "0x00000000000000000000000000000000000000000052b7d2dcc80cd2e4000000");
 
