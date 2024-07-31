@@ -39,6 +39,7 @@ fn calculate_state_hash(
 
     let result = keccak256(
         [
+            state.key.0.to_le_bytes().as_slice(),
             current_hash.as_slice(),
             accounts_hash.as_slice(),
             contracts_hash.as_slice(),
@@ -62,6 +63,13 @@ pub fn calculate_storage_hash(state_changes: &StateChangeset) -> Result<B256, cr
     calculate_hash(&state_changes.storage)
 }
 
+fn calculate_hash<T>(value: &T) -> Result<B256, crate::db::Error>
+where
+    T: Serialize,
+{
+    Ok(keccak256(bincode::serialize(value)?))
+}
+
 fn prepare(state: &StateCommit) -> StateChangeset {
     let mut c = state.change_set.clone();
 
@@ -74,18 +82,11 @@ fn prepare(state: &StateCommit) -> StateChangeset {
     c
 }
 
-fn calculate_hash<T>(value: &T) -> Result<B256, crate::db::Error>
-where
-    T: Serialize,
-{
-    Ok(keccak256(bincode::serialize(value)?))
-}
-
 #[test]
 fn test_calculate_state_hash() {
     let result = calculate_state_hash(B256::ZERO, &Default::default(), None).expect("ok");
     assert_eq!(
         result,
-        revm::primitives::b256!("45824321caf5042cc40f2ce797fabb7e36b7765f6f98d66ed5f52b14b6d74994")
+        revm::primitives::b256!("d704de6546d2278905030a0c9f180a649964dbae8112f250a72a01629ec25f83")
     );
 }
