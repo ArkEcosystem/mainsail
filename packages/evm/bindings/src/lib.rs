@@ -6,7 +6,8 @@ use ctx::{
 };
 use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
-    state_changes, state_commit, state_hash,
+    state_changes::{self, AccountChange},
+    state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsObject, JsString};
 use napi_derive::napi;
@@ -71,7 +72,7 @@ impl EvmInner {
         }
     }
 
-    pub fn update_account_info(
+    pub fn update_account_change(
         &mut self,
         account_update_ctx: AccountUpdateContext,
     ) -> std::result::Result<(), EVMError<String>> {
@@ -89,12 +90,11 @@ impl EvmInner {
             .get_or_insert_with(|| PendingCommit::new(account_update_ctx.commit_key));
 
         for (account, change) in account_update_ctx.changes {
-            self.persistent_db.upsert_host_account_info(
+            self.persistent_db.upsert_host_account_change(
                 account,
-                AccountInfo {
+                AccountChange {
                     nonce: change.nonce,
                     balance: change.balance,
-                    ..Default::default()
                 },
             );
         }
@@ -343,7 +343,7 @@ impl EvmInner {
         let pending = self.pending_commit.take();
 
         if pending.is_none() {
-            self.persistent_db.clear_host_account_infos();
+            self.persistent_db.clear_host_account_changes();
         }
 
         pending
@@ -351,7 +351,7 @@ impl EvmInner {
 
     fn drop_pending_commit(&mut self) {
         self.pending_commit.take();
-        self.persistent_db.clear_host_account_infos();
+        self.persistent_db.clear_host_account_changes();
     }
 }
 
@@ -442,14 +442,14 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
-    pub fn update_account_info(
+    pub fn update_account_change(
         &mut self,
         node_env: Env,
         account_update_ctx: JsAccountUpdateContext,
     ) -> Result<JsObject> {
         let account_update_ctx = AccountUpdateContext::try_from(account_update_ctx)?;
         node_env.execute_tokio_future(
-            Self::update_account_info_async(self.evm.clone(), account_update_ctx),
+            Self::update_account_change_async(self.evm.clone(), account_update_ctx),
             |_, _| Ok(()),
         )
     }
@@ -521,12 +521,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn update_account_info_async(
+    async fn update_account_change_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         account_update_ctx: AccountUpdateContext,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.update_account_info(account_update_ctx);
+        let result = lock.update_account_change(account_update_ctx);
 
         match result {
             Ok(_) => Result::Ok(()),

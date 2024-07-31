@@ -19,7 +19,7 @@ pub fn build_commit(
     mut pending_commit: PendingCommit,
     is_commit_to_db: bool,
 ) -> Result<StateCommit, crate::db::Error> {
-    merge_host_account_infos(db, &mut pending_commit, is_commit_to_db)?;
+    merge_host_account_changes(db, &mut pending_commit, is_commit_to_db)?;
 
     let PendingCommit {
         key,
@@ -61,15 +61,15 @@ pub fn commit_to_db(
     }
 }
 
-pub(crate) fn merge_host_account_infos(
+pub(crate) fn merge_host_account_changes(
     db: &mut PersistentDB,
     pending: &mut PendingCommit,
     take_on_commit: bool,
 ) -> Result<(), crate::db::Error> {
     let host = if take_on_commit {
-        db.take_host_account_infos()
+        db.take_host_account_changes()
     } else {
-        db.get_host_account_infos_cloned()
+        db.get_host_account_changes_cloned()
     };
 
     let mut transition_accounts = Vec::with_capacity(host.len());

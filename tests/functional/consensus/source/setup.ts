@@ -55,7 +55,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	// TODO: get rid of mock
 	sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
 		onCommit: async () => {},
-		updateAccountInfo: async () => {},
+		updateAccountChange: async () => {},
 		stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
 	});
 

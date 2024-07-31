@@ -67,8 +67,8 @@ struct InnerStorage {
     contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
     storage: heed::Database<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>,
 
-    // AccountInfo from host transactions for things like 'nonce', etc.
-    host_account_infos: HashMap<Address, AccountInfo>,
+    // Account changes from host transactions for 'balance', 'nonce', etc.
+    host_account_changes: HashMap<Address, AccountChange>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -158,28 +158,28 @@ impl PersistentDB {
                 commits,
                 contracts,
                 storage,
-                host_account_infos: Default::default(),
+                host_account_changes: Default::default(),
             }),
         })
     }
 
-    pub fn upsert_host_account_info(&mut self, address: Address, info: AccountInfo) {
+    pub fn upsert_host_account_change(&mut self, address: Address, change: AccountChange) {
         self.inner
             .borrow_mut()
-            .host_account_infos
-            .insert(address, info);
+            .host_account_changes
+            .insert(address, change);
     }
 
-    pub fn take_host_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
-        std::mem::take(&mut self.inner.borrow_mut().host_account_infos)
+    pub fn take_host_account_changes(&mut self) -> HashMap<Address, AccountChange> {
+        std::mem::take(&mut self.inner.borrow_mut().host_account_changes)
     }
 
-    pub fn get_host_account_infos_cloned(&self) -> HashMap<Address, AccountInfo> {
-        self.inner.borrow().host_account_infos.clone()
+    pub fn get_host_account_changes_cloned(&self) -> HashMap<Address, AccountChange> {
+        self.inner.borrow().host_account_changes.clone()
     }
 
-    pub fn clear_host_account_infos(&mut self) {
-        self.inner.borrow_mut().host_account_infos.clear();
+    pub fn clear_host_account_changes(&mut self) {
+        self.inner.borrow_mut().host_account_changes.clear();
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -235,7 +235,7 @@ impl DatabaseRef for PersistentDB {
         };
 
         // Always take host if provided
-        if let Some(host) = inner.host_account_infos.get(&address) {
+        if let Some(host) = inner.host_account_changes.get(&address) {
             basic.nonce = host.nonce;
             basic.balance = host.balance; // TODO checks
         }
@@ -839,12 +839,11 @@ fn test_host_account_info() {
     assert_eq!(account.nonce, 0);
 
     // overwrite
-    db.upsert_host_account_info(
+    db.upsert_host_account_change(
         address,
-        AccountInfo {
+        AccountChange {
             nonce: 3,
             balance: U256::from(12345),
-            ..Default::default()
         },
     );
 
@@ -854,7 +853,7 @@ fn test_host_account_info() {
     assert_eq!(account.nonce, 3);
 
     // reset
-    db.clear_host_account_infos();
+    db.clear_host_account_changes();
 
     account = db.basic(address).expect("account").expect("loaded");
 
@@ -862,12 +861,11 @@ fn test_host_account_info() {
     assert_eq!(account.nonce, 0);
 
     // commit
-    db.upsert_host_account_info(
+    db.upsert_host_account_change(
         address,
-        AccountInfo {
+        AccountChange {
             nonce: 5,
             balance: U256::from(9999),
-            ..Default::default()
         },
     );
 
@@ -889,7 +887,7 @@ fn test_host_account_info() {
     assert_eq!(account.nonce, 5);
 
     // persisted
-    db.clear_host_account_infos();
+    db.clear_host_account_changes();
     account = db.basic(address).expect("account").expect("loaded");
 
     assert_eq!(account.balance, U256::from(9999));

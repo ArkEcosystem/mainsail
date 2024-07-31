@@ -447,7 +447,7 @@ describe<{
 					).values(),
 			}) as Contracts.State.WalletRepository;
 
-		await instance.updateAccountInfo({
+		await instance.updateAccountChange({
 			commitKey,
 			walletRepository: getWalletRepository([{ address: sender.address, nonce: 1 }]),
 		});
@@ -458,7 +458,7 @@ describe<{
 		info = await instance.getAccountInfo(sender.address);
 		assert.equal(info.nonce, 1n);
 
-		await instance.updateAccountInfo({
+		await instance.updateAccountChange({
 			commitKey,
 			walletRepository: getWalletRepository([{ address: sender.address, nonce: 2 }]),
 		});

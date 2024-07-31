@@ -206,7 +206,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		commitKey: Contracts.Evm.CommitKey,
 		walletRepository: Contracts.State.WalletRepository,
 	): Promise<void> {
-		await this.evm.updateAccountInfo({
+		await this.evm.updateAccountChange({
 			commitKey,
 			walletRepository,
 		});

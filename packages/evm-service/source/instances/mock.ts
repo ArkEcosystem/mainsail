@@ -20,7 +20,7 @@ export class MockInstance implements Contracts.Evm.Instance {
 		};
 	}
 
-	public async updateAccountInfo(context: Contracts.Evm.AccountUpdateContext): Promise<void> {}
+	public async updateAccountChange(context: Contracts.Evm.AccountUpdateContext): Promise<void> {}
 	public async getAccountInfo(address: string): Promise<Contracts.Evm.AccountInfo> {
 		return { balance: 0n, nonce: 0n };
 	}

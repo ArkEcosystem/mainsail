@@ -11,7 +11,7 @@ export interface Instance extends CommitHandler {
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
-	updateAccountInfo(context: AccountUpdateContext): Promise<void>;
+	updateAccountChange(context: AccountUpdateContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	mode(): EvmMode;
 }
