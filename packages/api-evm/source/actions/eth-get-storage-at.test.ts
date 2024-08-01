@@ -55,6 +55,14 @@ describe<{
 		);
 		assert.defined(validator.validate("jsonRpc_eth_getStorageAt", [1]).errors);
 		assert.defined(validator.validate("jsonRpc_eth_getStorageAt", {}).errors);
+		assert.equal(
+			validator.validate("jsonRpc_eth_getStorageAt", [
+				"0x0000000000000000000000000000000000000000",
+				"0x00000000000000000000000000000000000000000000000000000000000000000",
+				"latest",
+			]).errors[0].message,
+			"must NOT have more than 66 characters",
+		);
 	});
 
 	it("should return code", async ({ action, evm }) => {
