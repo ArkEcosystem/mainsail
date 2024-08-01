@@ -70,6 +70,10 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		validate: async () => true,
 		getEvm: () => ({
 			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+			updateAccountChange: async () => {},
+		}),
+		getWalletRepository: () => ({
+			findByPublicKey: async () => ({ increaseBalance: () => {} }),
 		}),
 	};
 	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);

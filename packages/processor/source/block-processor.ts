@@ -75,8 +75,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
-			await this.#verifyStateHash(block);
 			await this.#applyBlockToForger(unit);
+			await this.#verifyStateHash(block);
 
 			processResult.success = true;
 		} catch (error) {
@@ -214,10 +214,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const forgerWallet = await walletRepository.findByPublicKey(unit.getBlock().data.generatorPublicKey);
 
-		// TODO: sync reward update to evm
 		for (const validatorMutator of this.validatorMutators) {
 			await validatorMutator.apply(walletRepository, forgerWallet, block.data);
 		}
+
+		await this.evm.updateAccountChange({
+			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			dirtyWallets: [forgerWallet],
+		});
 	}
 
 	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {

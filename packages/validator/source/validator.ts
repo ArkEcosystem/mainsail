@@ -183,6 +183,18 @@ export class Validator implements Contracts.Validator.Validator {
 
 		this.txPoolWorker.setFailedTransactions(failedTransactions);
 
+		// Apply validator reward before calculating state hash
+		const validatorWallet = await validator.getWalletRepository().findByPublicKey(generatorPublicKey);
+		const validatorReward = BigNumber.make(milestone.reward).plus(
+			candidateTransactions.reduce((acc, tx) => acc.plus(tx.data.fee), Utils.BigNumber.ZERO),
+		);
+		validatorWallet.increaseBalance(validatorReward);
+
+		await validator.getEvm().updateAccountChange({
+			commitKey,
+			dirtyWallets: [validatorWallet],
+		});
+
 		return {
 			stateHash: await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash),
 			transactions: candidateTransactions,

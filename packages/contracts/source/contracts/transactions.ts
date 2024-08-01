@@ -92,6 +92,7 @@ export interface TransactionValidatorContext {
 
 export interface TransactionValidator {
 	getEvm(): Instance;
+	getWalletRepository(): WalletRepository;
 	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionValidatorResult>;
 }
 
