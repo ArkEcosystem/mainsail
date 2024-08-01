@@ -124,6 +124,7 @@ export interface WalletRepository {
 	sizeOfIndex(index: string): number;
 
 	setDirtyWallet(wallet: Wallet): void;
+	takeDirtyWalletsFromTransaction(): ReadonlyArray<Wallet>;
 	getDirtyWallets(): IterableIterator<Wallet>;
 
 	commitChanges(): void;

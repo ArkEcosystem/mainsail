@@ -211,7 +211,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	): Promise<void> {
 		await this.evm.updateAccountChange({
 			commitKey,
-			walletRepository,
+			dirtyWallets: walletRepository.takeDirtyWalletsFromTransaction(),
 		});
 	}
 
@@ -223,15 +223,11 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			return;
 		}
 
-		const dirtyWallets = Object.fromEntries(
-			[...walletRepository.getDirtyWallets()].map((w) => [w.getAddress(), w]),
-		);
-
 		const baseWalletRepository = this.stateService.getStore().walletRepository;
 
 		// Update balances of all accounts that were changes as part of evm execution
 		for (const [address, change] of Object.entries(result.receipt.changes)) {
-			const wallet = dirtyWallets[address] ?? walletRepository.findByAddress(address);
+			const wallet = walletRepository.findByAddress(address);
 
 			// Check change against original wallet to cover the case where the transaction fee
 			// subtraction on the host gets overwritten (TODO: might be possible to obsolete this by handling fees directly in EVM)

@@ -101,6 +101,10 @@ export class WalletRepository implements Contracts.State.WalletRepository {
 
 	public setDirtyWallet(wallet: Contracts.State.Wallet): void {}
 
+	public takeDirtyWalletsFromTransaction(): ReadonlyArray<Contracts.State.Wallet> {
+		return [];
+	}
+
 	public getDirtyWallets(): IterableIterator<Contracts.State.Wallet> {
 		return [].values();
 	}

@@ -27,18 +27,24 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	}
 
 	public async updateAccountChange(context: Contracts.Evm.AccountUpdateContext): Promise<void> {
-		// NOTE: the assumption is that 'getDirtyWallets' only returns native wallets (i.e. evm-call modifications are excluded)
-		// TODO: reduce wallets to current tx
-		const dirtyWallets = [...context.walletRepository.getDirtyWallets()];
+		const changes = {};
+
+		// Only keep wallets with balance / nonce changes
+		for (const wallet of context.dirtyWallets) {
+			const changeSet = Object.keys(wallet.changesToJson().set);
+			for (const change of changeSet) {
+				if (change === "balance" || change === "nonce") {
+					changes[wallet.getAddress()] = {
+						balance: wallet.getBalance().toBigInt(),
+						nonce: wallet.getNonce().toBigInt(),
+					};
+				}
+			}
+		}
 
 		return this.#evm.updateAccountChange({
 			commitKey: context.commitKey,
-			changes: Object.fromEntries(
-				dirtyWallets.map((w) => [
-					w.getAddress(),
-					{ balance: w.getBalance().toBigInt(), nonce: w.getNonce().toBigInt() },
-				]),
-			),
+			changes,
 		});
 	}
 

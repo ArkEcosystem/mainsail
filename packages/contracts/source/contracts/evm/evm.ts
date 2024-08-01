@@ -1,5 +1,5 @@
 import { CommitHandler } from "../crypto/commit.js";
-import { WalletRepository } from "../state/wallets.js";
+import { Wallet } from "../state/wallets.js";
 
 export enum EvmMode {
 	Ephemeral,
@@ -35,7 +35,7 @@ export interface AccountInfo {
 
 export interface AccountUpdateContext {
 	readonly commitKey: CommitKey;
-	readonly walletRepository: WalletRepository;
+	readonly dirtyWallets: ReadonlyArray<Wallet>;
 }
 
 export interface TransactionContext {

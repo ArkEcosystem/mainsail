@@ -10,6 +10,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 	readonly #forgetIndexes: Record<string, Set<string>> = {};
 	readonly #indexOffset: Record<string, number> = {};
 	readonly #dirtyWallets = new Set<Contracts.State.Wallet>();
+	readonly #dirtyWalletsFromTransaction = new Set<Contracts.State.Wallet>();
 
 	@postConstruct()
 	public initialize(): void {
@@ -115,6 +116,12 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		return this.#originalWalletRepository.sizeOfIndex(index) + this.#indexOffset[index];
 	}
 
+	public takeDirtyWalletsFromTransaction(): ReadonlyArray<Contracts.State.Wallet> {
+		const wallets = [...this.#dirtyWalletsFromTransaction.values()];
+		this.#dirtyWalletsFromTransaction.clear();
+		return wallets;
+	}
+
 	public getDirtyWallets(): IterableIterator<Contracts.State.Wallet> {
 		return this.#dirtyWallets.values();
 	}
@@ -148,6 +155,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 	public setDirtyWallet(wallet: Contracts.State.Wallet): void {
 		this.#dirtyWallets.add(wallet);
+		this.#dirtyWalletsFromTransaction.add(wallet);
 	}
 
 	public commitChanges(): void {

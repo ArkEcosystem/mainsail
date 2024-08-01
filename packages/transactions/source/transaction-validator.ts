@@ -69,7 +69,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 	async #updateEvmAccountInfoHost(commitKey: Contracts.Evm.CommitKey): Promise<void> {
 		await this.evm.updateAccountChange({
 			commitKey,
-			walletRepository: this.#walletRepository,
+			dirtyWallets: this.#walletRepository.takeDirtyWalletsFromTransaction(),
 		});
 	}
 }

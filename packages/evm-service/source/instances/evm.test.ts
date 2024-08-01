@@ -440,6 +440,14 @@ describe<{
 				getDirtyWallets: () =>
 					new Set(
 						wallets.map((w) => ({
+							changesToJson: (): Contracts.State.WalletChange => ({
+								address: w.address,
+								set: {
+									balance: {},
+									nonce: {},
+								},
+								forget: [],
+							}),
 							getAddress: () => w.address,
 							getBalance: () => BigNumber.make(w.balance ?? BigInt(0)),
 							getNonce: () => BigNumber.make(w.nonce),
@@ -449,7 +457,7 @@ describe<{
 
 		await instance.updateAccountChange({
 			commitKey,
-			walletRepository: getWalletRepository([{ address: sender.address, nonce: 1 }]),
+			dirtyWallets: [...getWalletRepository([{ address: sender.address, nonce: 1 }]).getDirtyWallets()],
 		});
 		await instance.onCommit(commitKey as any);
 
@@ -460,7 +468,7 @@ describe<{
 
 		await instance.updateAccountChange({
 			commitKey,
-			walletRepository: getWalletRepository([{ address: sender.address, nonce: 2 }]),
+			dirtyWallets: [...getWalletRepository([{ address: sender.address, nonce: 2 }]).getDirtyWallets()],
 		});
 		await instance.onCommit(commitKey as any);
 
