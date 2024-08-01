@@ -12,6 +12,8 @@ export interface Instance extends CommitHandler {
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	updateAccountInfo(context: AccountUpdateContext): Promise<void>;
 	stateHash(currentHash: string): Promise<string>;
+	codeAt(address: string): Promise<string>;
+	storageAt(address: string, slot: bigint): Promise<string>;
 	mode(): EvmMode;
 }
 

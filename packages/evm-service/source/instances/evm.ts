@@ -35,6 +35,14 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
 	}
 
+	public async codeAt(address: string): Promise<string> {
+		return this.#evm.codeAt(address);
+	}
+
+	public async storageAt(address: string, slot: bigint): Promise<string> {
+		return this.#evm.storageAt(address, slot);
+	}
+
 	public async stateHash(currentHash: string): Promise<string> {
 		return this.#evm.stateHash(currentHash);
 	}
