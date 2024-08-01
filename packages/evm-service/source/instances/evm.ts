@@ -43,8 +43,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		}
 
 		return this.#evm.updateAccountChange({
-			commitKey: context.commitKey,
 			changes,
+			commitKey: context.commitKey,
 		});
 	}
 

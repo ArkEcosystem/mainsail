@@ -186,7 +186,7 @@ export class Validator implements Contracts.Validator.Validator {
 		// Apply validator reward before calculating state hash
 		const validatorWallet = await validator.getWalletRepository().findByPublicKey(generatorPublicKey);
 		const validatorReward = BigNumber.make(milestone.reward).plus(
-			candidateTransactions.reduce((acc, tx) => acc.plus(tx.data.fee), Utils.BigNumber.ZERO),
+			candidateTransactions.reduce((accumulator, tx) => accumulator.plus(tx.data.fee), Utils.BigNumber.ZERO),
 		);
 		validatorWallet.increaseBalance(validatorReward);
 
