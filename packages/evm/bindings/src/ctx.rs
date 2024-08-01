@@ -209,9 +209,9 @@ impl TryFrom<JsAccountUpdateContext> for AccountUpdateContext {
             );
         }
 
-        if changes.len() < 10 {
-            println!("changes {:#?}", changes);
-        }
+        // if changes.len() < 10 {
+        //     println!("changes {:#?}", changes);
+        // }
 
         Ok(AccountUpdateContext {
             commit_key: value.commit_key.try_into()?,
