@@ -57,6 +57,14 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.stateHash(commitKey, currentHash);
 	}
 
+	public async codeAt(address: string): Promise<string> {
+		return this.#evm.codeAt(address);
+	}
+
+	public async storageAt(address: string, slot: bigint): Promise<string> {
+		return this.#evm.storageAt(address, slot);
+	}
+
 	public mode(): Contracts.Evm.EvmMode {
 		return Contracts.Evm.EvmMode.Persistent;
 	}

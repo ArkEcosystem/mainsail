@@ -13,6 +13,8 @@ export interface Instance extends CommitHandler {
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	updateAccountChange(context: AccountUpdateContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
+	codeAt(address: string): Promise<string>;
+	storageAt(address: string, slot: bigint): Promise<string>;
 	mode(): EvmMode;
 }
 
