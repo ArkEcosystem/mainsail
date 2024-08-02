@@ -1,6 +1,7 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
-import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
+import { Identifiers as EvmDevelopmentIdentifiers } from "@mainsail/evm-development";
+import { EvmCalls, Transfers, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
 import { addTransactionsToPool, getWallets, isTransactionCommitted, waitBlock } from "./utils.js";
@@ -67,5 +68,47 @@ describe<{
 		// Check final balance
 		const balanceAfter = await EvmCalls.getErc20BalanceOf(context, erc20Address, randomWallet.address);
 		assert.equal(balanceAfter, ethers.parseEther("1234"));
+	});
+
+	it.only("should accept native transfer", async (context) => {
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const nativeContractAddress = context.sandbox.app.get<string>(
+			EvmDevelopmentIdentifiers.Contracts.Addresses.Native,
+		);
+
+		// Fund contract with 100 native DARK
+		const fundTx = await Transfers.makeTransfer(context, {
+			recipient: nativeContractAddress,
+			amount: ethers.parseEther("100").toString(),
+		});
+		await addTransactionsToPool(context, [fundTx]);
+		await waitBlock(context);
+		await isTransactionCommitted(context, fundTx);
+
+		const contractBalance = await EvmCalls.getNativeContractBalance(context, nativeContractAddress);
+		assert.equal(contractBalance, ethers.parseEther("100"));
+
+		// Transfer 1 native DARK
+		const amount = ethers.parseEther("1");
+		const payload = EvmCalls.encodeNativeTransfer(randomWallet.address, amount);
+		const tx = await EvmCalls.makeEvmCall(context, { payload, recipient: nativeContractAddress });
+
+		await addTransactionsToPool(context, [tx]);
+		await waitBlock(context);
+		await isTransactionCommitted(context, tx);
+
+		// Native balance is updated in EVM and wallet state
+		const nativeBalanceAfter = await EvmCalls.getNativeBalanceOf(
+			context,
+			nativeContractAddress,
+			randomWallet.address,
+		);
+		assert.equal(nativeBalanceAfter, amount);
+
+		const { walletRepository } = context.sandbox.app
+			.get<Contracts.State.Service>(Identifiers.State.Service)
+			.getStore();
+		assert.equal(walletRepository.findByAddress(randomWallet.address).getBalance(), amount);
 	});
 });

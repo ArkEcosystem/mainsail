@@ -18,7 +18,7 @@ export const makeEvmCall = async (
 
 	fee = fee ?? "5";
 
-	if (!payload) {
+	if (payload === undefined) {
 		const senderRecipient = await getAddressByPublicKey({ sandbox }, sender.publicKey);
 		payload = encodeErc20Transfer(senderRecipient, ethers.parseEther("1"));
 	}
@@ -79,6 +79,60 @@ export const getErc20BalanceOf = async (
 	});
 
 	const [balance] = iface.decodeFunctionResult("balanceOf", result.output!);
+	return balance;
+};
+
+export const encodeNativeTransfer = (recipient: string, amount: BigNumberish): string => {
+	const iface = new ethers.Interface(ContractAbis.NATIVE.abi.abi);
+	return iface.encodeFunctionData("transfer", [recipient, amount]).slice(2);
+};
+
+export const encodeNativeTransferBatch = (recipients: string[], amounts: BigNumberish[]): string => {
+	const iface = new ethers.Interface(ContractAbis.NATIVE.abi.abi);
+	return iface.encodeFunctionData("batchTransfer", [recipients, amounts]).slice(2);
+};
+
+export const encodeNativeTransferMsgValue = (recipient: string): string => {
+	const iface = new ethers.Interface(ContractAbis.NATIVE.abi.abi);
+	return iface.encodeFunctionData("transferMsgValue", [recipient]).slice(2);
+};
+
+export const getNativeBalanceOf = async (
+	context: Context,
+	nativeContractAddress: string,
+	walletAddress: string,
+): Promise<BigNumberish> => {
+	const iface = new ethers.Interface(ContractAbis.NATIVE.abi.abi);
+
+	const payload = iface.encodeFunctionData("balanceOf", [walletAddress]).slice(2);
+
+	const result = await callViewFunction(context, {
+		caller: ethers.ZeroAddress,
+		data: Buffer.from(ethers.getBytes(`0x${payload}`)),
+		recipient: nativeContractAddress,
+	});
+
+	const [balance] = iface.decodeFunctionResult("balanceOf", result.output!);
+	return balance;
+};
+
+export const getNativeContractBalance = async (
+	context: Context,
+	nativeContractAddress: string,
+): Promise<BigNumberish> => {
+	const iface = new ethers.Interface(ContractAbis.NATIVE.abi.abi);
+
+	const payload = iface.encodeFunctionData("contractBalance", []).slice(2);
+
+	const result = await callViewFunction(context, {
+		caller: ethers.ZeroAddress,
+		data: Buffer.from(ethers.getBytes(`0x${payload}`)),
+		recipient: nativeContractAddress,
+	});
+
+	console.log("getNativeContractBalance", result);
+
+	const [balance] = iface.decodeFunctionResult("contractBalance", result.output!);
 	return balance;
 };
 

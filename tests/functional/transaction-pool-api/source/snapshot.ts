@@ -157,6 +157,19 @@ export class Snapshot {
 							receipt.sender,
 							gasFeeCalculator.calculateConsumed(transaction.data.fee, Number(receipt.receipt.gasUsed)),
 						);
+
+						if (receipt.receipt.changes) {
+							for (const [account, change] of Object.entries(receipt.receipt.changes)) {
+								const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, account);
+								console.log(
+									"receipt change",
+									account,
+									wallet.getBalance(),
+									change,
+									wallet.getBalance().minus(change.balance),
+								);
+							}
+						}
 					}
 				} else {
 					// Take amount and fee from sender (for non evm-calls)
