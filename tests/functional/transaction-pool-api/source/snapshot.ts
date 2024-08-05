@@ -17,7 +17,10 @@ export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 
 export class Snapshot {
 	private balances: Record<string, BigNumber> = {};
-	private receipts: Record<string, { sender: string; receipt: Contracts.Evm.TransactionReceipt }[]> = {};
+	private receipts: Record<
+		string,
+		{ sender: string; receipt: Contracts.Evm.TransactionReceipt; balanceSnapshot: Record<string, BigNumber> }[]
+	> = {};
 
 	public constructor(public sandbox: Sandbox) {
 		this.listenForEvmEvents();
@@ -30,7 +33,7 @@ export class Snapshot {
 		);
 
 		const listener = {
-			handle: ({
+			handle: async ({
 				data,
 			}: {
 				data: { receipt: Contracts.Evm.TransactionReceipt; sender: string; transactionId: string };
@@ -43,7 +46,13 @@ export class Snapshot {
 					this.receipts[transactionId] = [];
 				}
 
-				this.receipts[transactionId].push({ sender, receipt });
+				const balanceSnapshot = {};
+				for (const [account, _] of Object.entries(receipt.changes ?? {})) {
+					const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, account);
+					balanceSnapshot[account] = wallet.getBalance();
+				}
+
+				this.receipts[transactionId].push({ sender, receipt, balanceSnapshot });
 			},
 		};
 
@@ -52,6 +61,7 @@ export class Snapshot {
 
 	public async add(addressOrPublicKey: string): Promise<void> {
 		const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
+
 		this.balances[wallet.getAddress()] = wallet.getBalance();
 	}
 
@@ -138,7 +148,7 @@ export class Snapshot {
 		};
 
 		const negativeBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
-			await updateBalanceDelta(addressOrPublicKey, amount.times(-1));
+			await updateBalanceDelta(addressOrPublicKey, amount.isNegative() ? amount : amount.times(-1));
 		};
 
 		for (const block of blocks) {
@@ -149,35 +159,55 @@ export class Snapshot {
 			);
 
 			for (const transaction of block.transactions) {
-				const receipts = this.receipts[transaction.id!];
-				if (receipts && receipts.length) {
-					// Apply consumed gas from any receipts
-					for (const receipt of receipts) {
-						await negativeBalanceChange(
-							receipt.sender,
-							gasFeeCalculator.calculateConsumed(transaction.data.fee, Number(receipt.receipt.gasUsed)),
-						);
+				if (
+					transaction.type === Contracts.Crypto.TransactionType.EvmCall &&
+					transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
+				) {
+					const receipts = this.receipts[transaction.id!];
 
-						if (receipt.receipt.changes) {
-							for (const [account, change] of Object.entries(receipt.receipt.changes)) {
-								const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, account);
-								console.log(
-									"receipt change",
-									account,
-									wallet.getBalance(),
-									change,
-									wallet.getBalance().minus(change.balance),
-								);
+					// Apply consumed gas from any receipts
+					if (receipts && receipts.length) {
+						// Apply consumed gas from any receipts
+						for (const receipt of receipts) {
+							// The changes also include consumed gas (if any)
+							const consumedGas = gasFeeCalculator.calculateConsumed(
+								transaction.data.fee,
+								Number(receipt.receipt.gasUsed),
+							);
+
+							await negativeBalanceChange(receipt.sender, consumedGas);
+
+							if (receipt.receipt.changes) {
+								for (const [account, change] of Object.entries(receipt.receipt.changes)) {
+									const wallet = await getWalletByAddressOrPublicKey(
+										{ sandbox: this.sandbox },
+										account,
+									);
+
+									const walletBalance = receipt.balanceSnapshot[account] ?? wallet.getBalance();
+
+									const diff = walletBalance.minus(change.balance);
+
+									if (diff.isZero()) {
+										continue;
+									} else if (diff.isNegative()) {
+										await negativeBalanceChange(account, diff);
+									} else {
+										await positiveBalanceChange(account, diff);
+									}
+								}
 							}
 						}
 					}
-				} else {
-					// Take amount and fee from sender (for non evm-calls)
-					await negativeBalanceChange(
-						transaction.data.senderPublicKey,
-						transaction.data.amount.plus(transaction.data.fee),
-					);
+
+					continue;
 				}
+
+				// Take amount and fee from sender (for non evm-calls)
+				await negativeBalanceChange(
+					transaction.data.senderPublicKey,
+					transaction.data.amount.plus(transaction.data.fee),
+				);
 
 				// Add amount to recipient
 				if (transaction.data.recipientId) {

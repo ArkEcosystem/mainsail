@@ -141,7 +141,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				for (const [address, change] of Object.entries(result.receipt.changes)) {
 					const wallet = walletRepository.findByAddress(address);
 					if (wallet.hasVoted()) {
-						const voteChange = BigNumber.make(change.balance).minus(wallet.getBalance());
+						const voteChange = wallet.getBalance().minus(change.balance);
 						if (voteChange.isZero()) {
 							continue;
 						}
@@ -227,8 +227,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 		// Update balances of all accounts that were changes as part of evm execution
 		for (const [address, change] of Object.entries(result.receipt.changes)) {
-			const wallet = walletRepository.findByAddress(address);
-
 			// Check change against original wallet to cover the case where the transaction fee
 			// subtraction on the host gets overwritten (TODO: might be possible to obsolete this by handling fees directly in EVM)
 			const hasOriginal = baseWalletRepository.hasByAddress(address);
@@ -238,6 +236,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 					continue;
 				}
 			}
+
+			const wallet = walletRepository.findByAddress(address);
 
 			// Apply balance change from EVM (if any)
 			const diff = BigNumber.make(change.balance).minus(wallet.getBalance());

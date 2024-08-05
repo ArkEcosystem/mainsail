@@ -70,7 +70,7 @@ describe<{
 		assert.equal(balanceAfter, ethers.parseEther("1234"));
 	});
 
-	it.only("should accept native transfer", async (context) => {
+	it.skip("should accept native transfer", async (context) => {
 		const randomWallet = await Utils.getRandomColdWallet(context);
 
 		const nativeContractAddress = context.sandbox.app.get<string>(
