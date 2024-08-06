@@ -11,7 +11,7 @@
 		"build": "pnpm run clean && pnpm run build-napi",
 		"build-napi": "napi build --platform --cargo-cwd bindings --release",
 		"build-napi:debug": "napi build --platform --cargo-cwd bindings",
-		"clean": "del index.js index.d.ts evm.*.node",
+		"clean": "del index.js index.d.ts evm.*.node target",
 		"prepublishOnly": "napi prepublish -t pnpm",
 		"release": "pnpm publish --access public",
 		"test": "cargo test --release",
