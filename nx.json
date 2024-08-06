@@ -1,6 +1,6 @@
 {
 	"namedInputs": {
-		"default": ["{projectRoot}/source/**/!(*.test).ts"],
+		"default": ["{projectRoot}/source/**/!(*.test).ts", "{projectRoot}/**/*.rs", "{projectRoot}/**/Cargo.toml"],
 		"production": ["default"]
 	},
 	"tasksRunnerOptions": {
@@ -16,7 +16,12 @@
 		"build": {
 			"dependsOn": ["^build"],
 			"inputs": ["default"],
-			"outputs": ["{projectRoot}/distribution"]
+			"outputs": [
+				"{projectRoot}/distribution",
+				"{projectRoot}/index.d.ts",
+				"{projectRoot}/index.js",
+				"{projectRoot}/evm.*.node"
+			]
 		}
 	},
 	"$schema": "./node_modules/nx/schemas/nx-schema.json"
