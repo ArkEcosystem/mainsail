@@ -8,7 +8,7 @@ use mainsail_evm_core::{
     db::{CommitKey, PendingCommit, PersistentDB},
     state_commit, state_hash,
 };
-use napi::{bindgen_prelude::*, JsObject, JsString, JsBigInt};
+use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
 use result::{TxReceipt, TxViewResult};
 use revm::{
@@ -238,7 +238,14 @@ impl EvmInner {
             .as_ref()
             .is_some_and(|pending| pending.key != commit_key)
         {
-            return Err(EVMError::Database("invalid commit key".into()));
+            return Err(EVMError::Database(
+                format!(
+                    "invalid commit key: {:#?} - {:#?}",
+                    self.pending_commit.as_ref().map(|c| c.key),
+                    commit_key
+                )
+                .into(),
+            ));
         }
 
         let outcome = match self.take_pending_commit() {
@@ -261,13 +268,26 @@ impl EvmInner {
 
     pub fn state_hash(
         &mut self,
+        commit_key: CommitKey,
         current_hash: B256,
     ) -> std::result::Result<String, EVMError<String>> {
-        let result = state_hash::calculate(
-            &mut self.persistent_db,
-            self.pending_commit.clone().unwrap_or_default(),
-            current_hash,
-        );
+        if self
+            .pending_commit
+            .as_ref()
+            .is_some_and(|pending| pending.key != commit_key)
+        {
+            self.drop_pending_commit();
+        }
+
+        let pending_commit = self
+            .pending_commit
+            .get_or_insert_with(|| PendingCommit {
+                key: commit_key,
+                ..Default::default()
+            })
+            .clone();
+
+        let result = state_hash::calculate(&mut self.persistent_db, pending_commit, current_hash);
 
         match result {
             Ok(result) => Ok(result.encode_hex()),
@@ -511,10 +531,16 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<string>")]
-    pub fn state_hash(&mut self, node_env: Env, current_hash: JsString) -> Result<JsObject> {
+    pub fn state_hash(
+        &mut self,
+        node_env: Env,
+        commit_key: JsCommitKey,
+        current_hash: JsString,
+    ) -> Result<JsObject> {
+        let commit_key = CommitKey::try_from(commit_key)?;
         let current_hash = utils::convert_string_to_b256(current_hash)?;
         node_env.execute_tokio_future(
-            Self::state_hash_async(self.evm.clone(), current_hash),
+            Self::state_hash_async(self.evm.clone(), commit_key, current_hash),
             |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
         )
     }
@@ -610,10 +636,11 @@ impl JsEvmWrapper {
 
     async fn state_hash_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        commit_key: CommitKey,
         current_hash: B256,
     ) -> Result<String> {
         let mut lock = evm.lock().await;
-        let result = lock.state_hash(current_hash);
+        let result = lock.state_hash(commit_key, current_hash);
 
         match result {
             Ok(result) => Result::Ok(result),

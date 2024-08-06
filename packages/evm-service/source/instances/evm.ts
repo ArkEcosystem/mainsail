@@ -43,8 +43,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.storageAt(address, slot);
 	}
 
-	public async stateHash(currentHash: string): Promise<string> {
-		return this.#evm.stateHash(currentHash);
+	public async stateHash(commitKey: Contracts.Evm.CommitKey, currentHash: string): Promise<string> {
+		return this.#evm.stateHash(commitKey, currentHash);
 	}
 
 	public mode(): Contracts.Evm.EvmMode {

@@ -188,7 +188,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const previousBlock = this.stateService.getStore().getLastBlock();
-		const stateHash = await this.evm.stateHash(previousBlock.header.stateHash);
+		const stateHash = await this.evm.stateHash(
+			{ height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			previousBlock.header.stateHash,
+		);
 
 		if (block.header.stateHash !== stateHash) {
 			throw new Error(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
