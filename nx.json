@@ -1,6 +1,11 @@
 {
 	"namedInputs": {
-		"default": ["{projectRoot}/source/**/!(*.test).ts", "{projectRoot}/**/*.rs", "{projectRoot}/**/Cargo.toml"],
+		"default": [
+			"{projectRoot}/source/**/!(*.test).ts",
+			"{projectRoot}/core/**/*.rs",
+			"{projectRoot}/bindings/**/*.rs",
+			"{projectRoot}/**/Cargo.toml"
+		],
 		"production": ["default"]
 	},
 	"tasksRunnerOptions": {
