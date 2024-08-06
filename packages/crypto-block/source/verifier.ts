@@ -56,7 +56,9 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			}
 
 			if (blockData.totalGasUsed > constants.block.maxGasLimit && blockData.height > 0) {
-				result.errors.push("Invalid total gas used");
+				result.errors.push(
+					`Total gas used ${blockData.totalGasUsed} exceeds max gas limit ${constants.block.maxGasLimit}`,
+				);
 			}
 
 			if (block.transactions.length !== blockData.numberOfTransactions) {

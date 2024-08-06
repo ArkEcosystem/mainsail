@@ -178,7 +178,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	): void {
 		const totalGas = block.header.totalGasUsed;
 		if (totalGas !== processorResult.gasUsed) {
-			throw new Error("Consumed gas mismatch");
+			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
 		}
 	}
 
