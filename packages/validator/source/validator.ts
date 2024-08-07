@@ -155,21 +155,16 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			try {
+				const gasLimit = transaction.data.asset?.evmCall?.gasLimit || 0;
+
+				if (gasLeft - gasLimit < 0) {
+					break;
+				}
+
 				const result = await validator.validate(
 					{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorPublicKey, timestamp },
 					transaction,
 				);
-
-				// We received transactions from the pool without taking gas usage into account yet.
-				// Therefore only include transactions that fit into the block.
-				if (gasLeft - result.gasUsed < 0) {
-					if (gasLeft >= 21_000) {
-						continue; // another transaction potentially still fits
-					}
-
-					// block is full
-					break;
-				}
 
 				gasLeft -= result.gasUsed;
 
