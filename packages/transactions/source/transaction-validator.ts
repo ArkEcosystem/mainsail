@@ -69,6 +69,16 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 		return { gasUsed: result.gasUsed };
 	}
 
+	public async restorePreviousEvmSenderNonce(
+		commitKey: Contracts.Evm.CommitKey,
+		senderPublicKey: string,
+	): Promise<void> {
+		const sender = await this.#walletRepository.findByPublicKey(senderPublicKey);
+		sender.decreaseNonce();
+
+		await this.#updateEvmAccountInfoHost(commitKey, sender);
+	}
+
 	async #updateEvmAccountInfoHost(commitKey: Contracts.Evm.CommitKey, sender: Contracts.State.Wallet): Promise<void> {
 		await this.evm.updateAccountInfo({
 			account: sender.getAddress(),

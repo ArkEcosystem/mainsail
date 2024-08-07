@@ -167,7 +167,10 @@ export class Validator implements Contracts.Validator.Validator {
 						continue; // another transaction potentially still fits
 					}
 
-					// block is full
+					// block is full, but since the evm execution happened the nonce was also increased and must be
+					// reverted in order to produce a correct state hash.
+					await validator.restorePreviousEvmSenderNonce(commitKey, transaction.data.senderPublicKey);
+
 					break;
 				}
 

@@ -56,6 +56,12 @@ struct CommitReceipts {
     tx_receipts: HashMap<B256, TinyReceipt>,
 }
 
+#[derive(Clone, Debug, Default)]
+pub struct HostAccountChange {
+    pub nonce: u64,
+    pub touched: bool,
+}
+
 struct InnerStorage {
     accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
     commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
@@ -63,7 +69,7 @@ struct InnerStorage {
     storage: heed::Database<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>,
 
     // AccountInfo from host transactions for things like 'nonce', etc.
-    host_account_infos: HashMap<Address, AccountInfo>,
+    host_account_infos: HashMap<Address, HostAccountChange>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -158,18 +164,35 @@ impl PersistentDB {
         })
     }
 
-    pub fn upsert_host_account_info(&mut self, address: Address, info: AccountInfo) {
-        self.inner
-            .borrow_mut()
-            .host_account_infos
-            .insert(address, info);
+    pub fn upsert_host_account_info(&mut self, address: Address, info: HostAccountChange) {
+        let mut needs_deletion = false;
+
+        let host_accounts = &mut self.inner.borrow_mut().host_account_infos;
+
+        host_accounts
+            .entry(address)
+            .and_modify(|e| {
+                // if nonce is reverted by host and account hasn't been touched delete the info
+                if e.nonce < info.nonce && !info.touched {
+                    needs_deletion = true;
+                    return;
+                }
+
+                e.nonce = info.nonce;
+                e.touched = true;
+            })
+            .or_insert_with(|| info);
+
+        if needs_deletion {
+            host_accounts.remove(&address);
+        }
     }
 
-    pub fn take_host_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
+    pub fn take_host_account_infos(&mut self) -> HashMap<Address, HostAccountChange> {
         std::mem::take(&mut self.inner.borrow_mut().host_account_infos)
     }
 
-    pub fn get_host_account_infos_cloned(&self) -> HashMap<Address, AccountInfo> {
+    pub fn get_host_account_infos_cloned(&self) -> HashMap<Address, HostAccountChange> {
         self.inner.borrow().host_account_infos.clone()
     }
 
