@@ -3729,6 +3729,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-transaction-evm-call
       '@mainsail/crypto-transaction-multi-payment':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction-multi-payment
@@ -3765,12 +3768,18 @@ importers:
       '@mainsail/database':
         specifier: workspace:*
         version: link:../../../packages/database
-      '@mainsail/evm':
+      '@mainsail/evm-api-worker':
         specifier: workspace:*
-        version: link:../../../packages/evm
+        version: link:../../../packages/evm-api-worker
+      '@mainsail/evm-development':
+        specifier: workspace:*
+        version: link:../../../packages/evm-development
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../../../packages/evm-gas-fee
+      '@mainsail/evm-service':
+        specifier: workspace:*
+        version: link:../../../packages/evm-service
       '@mainsail/fees':
         specifier: workspace:*
         version: link:../../../packages/fees

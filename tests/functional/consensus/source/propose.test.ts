@@ -1,5 +1,5 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
@@ -16,6 +16,8 @@ import {
 	snoozeForBlock,
 	snoozeForRound,
 } from "./utils.js";
+import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
+import { EvmCalls } from "@mainsail/test-transaction-builders";
 
 describe<{
 	nodes: Sandbox[];
@@ -414,6 +416,35 @@ describe<{
 			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockId),
 			Array.from({ length: totalNodes }).fill(undefined),
 		);
+
+		// // Next block
+		await snoozeForBlock(nodes, 2);
+		await assertBockHeight(nodes, 2);
+		await assertBockRound(nodes, 0);
+	});
+
+	it("should propose block with evm calls", async ({ nodes, validators }) => {
+		const node0 = nodes[0];
+
+		const stubPropose = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		stubPropose.callsFake(async () => {
+			const context = makeTransactionBuilderContext(node0, nodes, validators);
+
+			const transactions: Contracts.Crypto.Transaction[] = [];
+			for (let i = 0; i < 150; i++) {
+				transactions.push(await EvmCalls.makeEvmCall(context, { nonceOffset: i }));
+			}
+
+			const proposal = await makeCustomProposal({ node: node0, validators }, transactions);
+
+			void node0.app
+				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
+				.process(proposal);
+
+			stubPropose.restore();
+		});
+
+		await runMany(nodes);
 
 		// // Next block
 		await snoozeForBlock(nodes, 2);

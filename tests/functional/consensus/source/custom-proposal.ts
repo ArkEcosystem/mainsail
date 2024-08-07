@@ -28,7 +28,17 @@ export const makeCustomProposal = async (
 	const proposer = node.app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validators[0].consensusPublicKey)!;
-	const gasLimits = node.app.get<Contracts.Evm.GasLimits>(Identifiers.Evm.Gas.Limits);
+
+	const stateService = node.app.get<Contracts.State.Service>(Identifiers.State.Service);
+	const previousBlock = stateService.getStore().getLastBlock();
+
+	const cryptoConfiguration = node.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	const milestone = cryptoConfiguration.getMilestone();
+
+	const transactionValidatorFactory = node.app.get<Contracts.Transactions.TransactionValidatorFactory>(
+		Identifiers.Transaction.Validator.Factory,
+	);
+	const transactionValidator = transactionValidatorFactory();
 
 	// 2)
 	const round = node.app.get<Consensus>(Identifiers.Consensus.Service).getRound();
@@ -51,14 +61,36 @@ export const makeCustomProposal = async (
 	const payloadBuffers: Buffer[] = [];
 	const transactionBuffers: Buffer[] = [];
 
+	const commitKey = {
+		height: BigInt(emptyBlock.header.height),
+		round: BigInt(round),
+	};
+
 	let payloadLength = transactions.length * 2;
 	for (const transaction of transactions) {
+		let result = { gasUsed: 0 };
+
+		try {
+			result = await transactionValidator.validate(
+				{
+					commitKey,
+					gasLimit: milestone.block.maxGasLimit,
+					generatorPublicKey: validators[0].publicKey,
+					timestamp: emptyBlock.header.timestamp,
+				},
+				transaction,
+			);
+		} catch (ex) {
+			const gasLimits = node.app.get<Contracts.Evm.GasLimits>(Identifiers.Evm.Gas.Limits);
+			result = { gasUsed: gasLimits.of(transaction) };
+		}
+
 		const { data, serialized } = transaction;
 		Utils.assert.defined<string>(data.id);
 
 		totals.amount = totals.amount.plus(data.amount);
 		totals.fee = totals.fee.plus(data.fee);
-		totals.gasUsed += gasLimits.of(transaction);
+		totals.gasUsed += result.gasUsed;
 
 		payloadBuffers.push(Buffer.from(data.id, "hex"));
 
@@ -70,11 +102,18 @@ export const makeCustomProposal = async (
 		payloadLength += serialized.length;
 	}
 
+	const stateHash = await transactionValidator.getEvm().stateHash(commitKey, previousBlock.header.stateHash);
+
 	const hashFactory = node.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const hashSize = node.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
 
+	let byteOffset = 1 + 6 + 4 + 4 + hashSize; // see headerSize
+
+	// stateHash
+	Buffer.from(stateHash, "hex").copy(blockBuffer, byteOffset);
+	byteOffset += hashSize;
+
 	// numberOfTransactions
-	let byteOffset = 1 + 6 + 4 + 4 + hashSize + hashSize; // see headerSize
 	blockBuffer.writeUint16LE(transactions.length, byteOffset);
 	byteOffset += 2;
 
