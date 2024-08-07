@@ -25,14 +25,14 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"better-sqlite3": "9.4.3",
+		"better-sqlite3": "11.1.2",
 		"fs-extra": "11.2.0",
 		"joi": "17.12.2"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@types/better-sqlite3": "7.6.9",
+		"@types/better-sqlite3": "7.6.11",
 		"@types/fs-extra": "11.0.4",
 		"tmp": "0.2.3",
 		"uvu": "^0.5.6"

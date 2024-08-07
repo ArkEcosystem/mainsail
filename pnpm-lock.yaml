@@ -3367,8 +3367,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       better-sqlite3:
-        specifier: 9.4.3
-        version: 9.4.3
+        specifier: 11.1.2
+        version: 11.1.2
       fs-extra:
         specifier: 11.2.0
         version: 11.2.0
@@ -3383,8 +3383,8 @@ importers:
         specifier: workspace:*
         version: link:../utils
       '@types/better-sqlite3':
-        specifier: 7.6.9
-        version: 7.6.9
+        specifier: 7.6.11
+        version: 7.6.11
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
@@ -4996,8 +4996,8 @@ packages:
     resolution: {integrity: sha512-qaGV9ltJP0EO25YfFUPhxRVK0evXFIAGicsVXuRim4Ed9cjPxYhNnNJ49SFmbeLgtxpslIkX317IgpfcHPVj/A==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
 
-  '@types/better-sqlite3@7.6.9':
-    resolution: {integrity: sha512-FvktcujPDj9XKMJQWFcl2vVl7OdRIqsSRX9b0acWwTmwLK9CF2eqo/FRcmMLNpugKoX/avA6pb7TorDLmpgTnQ==}
+  '@types/better-sqlite3@7.6.11':
+    resolution: {integrity: sha512-i8KcD3PgGtGBLl3+mMYA8PdKkButvPyARxA7IQAd6qeslht13qxb1zzO8dRCtE7U3IoJS782zDBAeoKiM695kg==}
 
   '@types/bn.js@5.1.5':
     resolution: {integrity: sha512-V46N0zwKRF5Q00AZ6hWtN0T8gGmDUaUzLWQvHFo5yThtVwK/VCenFY3wXVbOvNfajEpsTfQM4IN9k/d6gUVX3A==}
@@ -5649,6 +5649,9 @@ packages:
 
   before-after-hook@2.2.3:
     resolution: {integrity: sha512-NzUnlZexiaH/46WDhANlyR2bXRopNg4F/zuSA3OpZnllCUgRaOF2znDioDWrmbNVsuZk6l9pMquQB38cfBZwkQ==}
+
+  better-sqlite3@11.1.2:
+    resolution: {integrity: sha512-gujtFwavWU4MSPT+h9B+4pkvZdyOUkH54zgLdIrMmmmd4ZqiBIrRNBzNzYVFO417xo882uP5HBu4GjOfaSrIQw==}
 
   better-sqlite3@9.4.3:
     resolution: {integrity: sha512-ud0bTmD9O3uWJGuXDltyj3R47Nz0OHX8iqPOT5PMspGqlu/qQFn+5S2eFBUCrySpavTjFXbi4EgrfVvPAHlImw==}
@@ -12180,7 +12183,7 @@ snapshots:
       '@tufjs/canonical-json': 1.0.0
       minimatch: 9.0.5
 
-  '@types/better-sqlite3@7.6.9':
+  '@types/better-sqlite3@7.6.11':
     dependencies:
       '@types/node': 20.11.16
 
@@ -12886,10 +12889,16 @@ snapshots:
 
   before-after-hook@2.2.3: {}
 
+  better-sqlite3@11.1.2:
+    dependencies:
+      bindings: 1.5.0
+      prebuild-install: 7.1.2
+
   better-sqlite3@9.4.3:
     dependencies:
       bindings: 1.5.0
       prebuild-install: 7.1.2
+    optional: true
 
   big-number@2.0.0: {}
 
