@@ -5,7 +5,7 @@ use ctx::{
     JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
 };
 use mainsail_evm_core::{
-    db::{CommitKey, HostAccountChange, PendingCommit, PersistentDB},
+    db::{CommitKey, PendingCommit, PersistentDB},
     state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
@@ -129,7 +129,7 @@ impl EvmInner {
 
         self.persistent_db.upsert_host_account_info(
             account_update_ctx.account,
-            HostAccountChange {
+            AccountInfo {
                 nonce: account_update_ctx.nonce,
                 ..Default::default()
             },

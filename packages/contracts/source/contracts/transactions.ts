@@ -93,7 +93,6 @@ export interface TransactionValidatorContext {
 export interface TransactionValidator {
 	getEvm(): Instance;
 	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionValidatorResult>;
-	restorePreviousEvmSenderNonce(commitKey: CommitKey, senderPublicKey: string): Promise<void>;
 }
 
 export interface TransactionValidatorResult {
