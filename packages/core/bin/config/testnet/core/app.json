@@ -46,6 +46,9 @@
 			"package": "@mainsail/evm-gas-fee"
 		},
 		{
+			"package": "@mainsail/evm-consensus"
+		},
+		{
 			"package": "@mainsail/evm-development"
 		},
 		{
