@@ -42,10 +42,16 @@ export class Deployer {
 			validatorAddress: this.#deployerAddress,
 		};
 
+		const activeValidaotrs = this.configuration.getMilestone(1).activeValidators; // TODO update on milestone change
+
+		const constructorArgs = new ethers.AbiCoder().encode(["uint8"], [activeValidaotrs]).slice(2);
 		const result = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
-			data: Buffer.from(ethers.getBytes(CONSENSUS.abi.bytecode)),
+			data: Buffer.concat([
+				Buffer.from(ethers.getBytes(CONSENSUS.abi.bytecode)),
+				Buffer.from(constructorArgs, "hex"),
+			]),
 			gasLimit: BigInt(10_000_000),
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
@@ -59,6 +65,8 @@ export class Deployer {
 			`Deployed Consensus contract from ${this.#deployerAddress} to ${result.receipt.deployedContractAddress}`,
 		);
 
+		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(this.#deployerAddress);
+
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
 			.toConstantValue(result.receipt.deployedContractAddress!);
@@ -70,5 +78,5 @@ export class Deployer {
 	// TODO: update sort
 
 	#nonce = 0;
-	#generateTxHash = () => sha256(Buffer.from(`deployertx-${this.#nonce++}`, "utf8")).slice(2);
+	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 }

@@ -24,28 +24,28 @@ export class Deployer {
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
-	#genesisAddress!: string;
+	#deployerAddress!: string;
 
 	public async deploy(): Promise<void> {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
-		this.#genesisAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
+		this.#deployerAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
 		const milestone = this.configuration.getMilestone(0);
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
-		const commitKey = { height: BigInt(2 ** 32 + 1), round: BigInt(0) };
+		const commitKey = { height: BigInt(2 ** 32), round: BigInt(0) };
 		const blockContext = {
 			commitKey,
 			gasLimit: BigInt(milestone.block.maxGasLimit),
 			timestamp: BigInt(genesisBlock.block.timestamp),
-			validatorAddress: this.#genesisAddress,
+			validatorAddress: this.#deployerAddress,
 		};
 
 		const result = await this.evm.process({
 			blockContext,
-			caller: this.#genesisAddress,
+			caller: this.#deployerAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(2_000_000),
 			specId: milestone.evmSpec,
@@ -57,7 +57,7 @@ export class Deployer {
 		}
 
 		this.logger.info(
-			`Deployed ERC20 dummy contract from ${this.#genesisAddress} to ${result.receipt.deployedContractAddress}`,
+			`Deployed ERC20 dummy contract from ${this.#deployerAddress} to ${result.receipt.deployedContractAddress}`,
 		);
 
 		const recipients = [
@@ -87,7 +87,7 @@ export class Deployer {
 
 			const { receipt } = await this.evm.process({
 				blockContext,
-				caller: this.#genesisAddress,
+				caller: this.#deployerAddress,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				gasLimit: BigInt(100_000),
 				recipient: erc20ContractAddress,
@@ -102,5 +102,5 @@ export class Deployer {
 	}
 
 	#nonce = 0;
-	#generateTxHash = () => sha256(Buffer.from(`deployertx-${this.#nonce++}`, "utf8")).slice(2);
+	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 }
