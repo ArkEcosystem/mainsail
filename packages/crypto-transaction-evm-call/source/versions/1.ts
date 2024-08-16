@@ -41,7 +41,7 @@ export class EvmCallTransaction extends Transaction {
 					type: "object",
 					unevaluatedProperties: false,
 				},
-				fee: { bignumber: { maximum: 1000, minimum: 5 } },
+				fee: { bignumber: { maximum: 1000, minimum: 0 } },
 				recipientId: { $ref: "address" },
 				type: { transactionType: Contracts.Crypto.TransactionType.EvmCall },
 			},

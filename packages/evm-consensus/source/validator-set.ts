@@ -14,6 +14,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.State.ValidatorWallet.Factory)
+	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
+
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -25,7 +28,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
-			this.#buildActiveValidators(unit.store);
+			await this.#buildActiveValidators(unit.store);
 		}
 	}
 
@@ -57,7 +60,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		await this.#updateActiveValidators();
 
 		const { activeValidators } = this.configuration.getMilestone();
-		const validators = await this.#getActiveValidators();
+		const validators = await this.#getActiveValidators(store);
 		if (validators.length < activeValidators) {
 			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
 		}
@@ -81,7 +84,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		const iface = new ethers.Interface(CONSENSUS.abi.abi);
 		const data = iface.encodeFunctionData("updateActiveValidators").slice(2);
-		console.log(data);
 
 		const result = await this.evm.view({
 			recipient: consensusContractAddress,
@@ -90,20 +92,19 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			data: Buffer.from(data, "hex"),
 		});
 
-		console.log(result);
 		if (!result.success) {
+			console.log(result);
 			this.app.terminate("updateActiveValidators failed");
 		}
 	}
 
-	async #getActiveValidators(): Promise<any> {
+	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWallet[]> {
 		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
 		const { activeValidators, evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(CONSENSUS.abi.abi);
-		const data = iface.encodeFunctionData("getTopValidators", [activeValidators]).slice(2);
-		console.log(data);
+		const data = iface.encodeFunctionData("getActiveValidators", [activeValidators]).slice(2);
 
 		const result = await this.evm.view({
 			recipient: consensusContractAddress,
@@ -112,9 +113,39 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			data: Buffer.from(data, "hex"),
 		});
 
-		console.log(result);
+		// console.log(result);
+		if (!result.success) {
+			this.app.terminate("getActiveValidators failed");
+		}
 
-		const [validators] = iface.decodeFunctionResult("getTopValidators", result.output!);
-		return validators;
+		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
+		const [validators] = iface.decodeFunctionResult("getActiveValidators", result.output!);
+
+		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
+		for (let i = 0; i < validators.length; i++) {
+			const validator = validators[i];
+
+			const [addr, [voteBalance, validatorPublicKey]] = validator;
+
+			const wallet = store.walletRepository.findByAddress(addr);
+			const validatorWallet = this.validatorWalletFactory(wallet);
+			validatorWallet.getWallet().setAttribute("validatorVoteBalance", Utils.BigNumber.make(voteBalance));
+			validatorWallet.getWallet().setAttribute("validatorPublicKey", validatorPublicKey.slice(2));
+
+			validatorWallet.setRank(i + 1);
+			validatorWallet.setApproval(
+				Utils.validatorCalculator.calculateApproval(validatorWallet.getVoteBalance(), totalSupply),
+			);
+
+			store.walletRepository.setOnIndex(
+				Contracts.State.WalletIndexes.Validators,
+				validatorPublicKey.slice(2),
+				validatorWallet.getWallet(),
+			);
+
+			validatorWallets.push(validatorWallet);
+		}
+
+		return validatorWallets;
 	}
 }

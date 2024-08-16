@@ -1,6 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import seedrandom from "seedrandom";
 
 @injectable()
 export class Selector implements Contracts.Proposer.Selector {
@@ -27,16 +28,16 @@ export class Selector implements Contracts.Proposer.Selector {
 		return result;
 	}
 
+	// TODO: move to contract?
 	#updateValidatorMatrix(unit: Contracts.Processor.ProcessableUnit): void {
-		//		const seed = this.#calculateSeed(unit.store);
-		const rng = unit.store.getTotalRound(); //seedrandom(seed);
+		const rng = seedrandom(`${unit.store.getTotalRound()}`);
 
 		const { activeValidators } = this.configuration.getMilestone();
 		const matrix = [...Array.from({ length: activeValidators }).keys()];
 
 		// Based on https://stackoverflow.com/a/12646864
 		for (let index = matrix.length - 1; index > 0; index--) {
-			const index_ = Math.floor(rng * (index + 1));
+			const index_ = Math.floor(rng() * (index + 1));
 			[matrix[index], matrix[index_]] = [matrix[index_], matrix[index]];
 		}
 

@@ -176,6 +176,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		block: Contracts.Crypto.Block,
 		processorResult: Contracts.Processor.BlockProcessorResult,
 	): void {
+		// TODO: get rid of check for genesis block by calculating correct gas during creation
+		if (block.header.height === 0) {
+			return;
+		}
+
 		const totalGas = block.header.totalGasUsed;
 		if (totalGas !== processorResult.gasUsed) {
 			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
