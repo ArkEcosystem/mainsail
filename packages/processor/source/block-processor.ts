@@ -104,10 +104,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		this.#setConfigurationHeight(unit);
 		await unit.store.onCommit(unit);
+		await this.evm.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
-		await this.evm.onCommit(unit);
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
 
