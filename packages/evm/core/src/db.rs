@@ -226,7 +226,22 @@ impl DatabaseRef for PersistentDB {
 
         let mut basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
             Some(account) => account,
-            None => AccountInfo::default(),
+
+            None => {
+                // TODO: pass data on bootstrap from milestones when processing up genesis block commit instead
+                if address == revm::primitives::address!("bb9c8764c621Bf41625DE36036DF89cC99970740")
+                {
+                    let genesis_balance =
+                        revm::primitives::U256::from(124999999999999999999999959i128);
+                    revm::primitives::AccountInfo {
+                        balance: genesis_balance,
+
+                        ..Default::default()
+                    }
+                } else {
+                    AccountInfo::default()
+                }
+            }
         };
 
         // Always take host nonce if provided
