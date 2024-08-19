@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { ContractAbis } from "@mainsail/evm-consensus";
 import { Utils } from "@mainsail/kernel";
@@ -86,11 +85,13 @@ export class GenesisBlockGenerator extends Generator {
 	): Promise<Contracts.Crypto.Transaction> {
 		return await (
 			await this.app
-				.resolve(TransferBuilder)
+				.resolve(EvmCallBuilder)
 				.network(pubKeyHash)
-				.nonce(nonce.toFixed(0))
 				.recipientId(recipient.address)
+				.nonce(nonce.toFixed(0))
 				.amount(amount)
+				.payload("")
+				.gasLimit(21_000)
 				.sign(sender.passphrase)
 		).build();
 	}
@@ -149,12 +150,7 @@ export class GenesisBlockGenerator extends Generator {
 		const consensusContractAddress = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459";
 
 		for (const [index, sender] of senders.entries()) {
-			const data = iface
-				.encodeFunctionData("vote", [
-					sender.address,
-					ethers.parseEther("100") /* TODO: use sender.balance directly */,
-				])
-				.slice(2);
+			const data = iface.encodeFunctionData("vote", [sender.address]).slice(2);
 
 			result[index] = await (
 				await this.app
