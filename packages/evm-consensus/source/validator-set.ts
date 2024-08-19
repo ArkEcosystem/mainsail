@@ -126,6 +126,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			const validator = validators[i];
 
 			const [addr, [voteBalance, validatorPublicKey]] = validator;
+			// console.log(addr, voteBalance, validatorPublicKey);
 
 			const wallet = store.walletRepository.findByAddress(addr);
 			const validatorWallet = this.validatorWalletFactory(wallet);

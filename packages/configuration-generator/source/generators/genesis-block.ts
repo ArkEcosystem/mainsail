@@ -150,7 +150,10 @@ export class GenesisBlockGenerator extends Generator {
 
 		for (const [index, sender] of senders.entries()) {
 			const data = iface
-				.encodeFunctionData("vote", [sender.address, ethers.parseEther("100") /* TODO */])
+				.encodeFunctionData("vote", [
+					sender.address,
+					ethers.parseEther("100") /* TODO: use sender.balance directly */,
+				])
 				.slice(2);
 
 			result[index] = await (
