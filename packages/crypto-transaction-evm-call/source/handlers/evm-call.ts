@@ -71,6 +71,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				gasLimit: BigInt(evmCall.gasLimit),
+				value: transaction.data.amount.toBigInt(),
 				recipient: transaction.data.recipientId,
 				sequence: transaction.data.sequence,
 				specId: evmSpec,

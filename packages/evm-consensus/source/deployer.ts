@@ -48,6 +48,7 @@ export class Deployer {
 		const result = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
+			value: 0n,
 			data: Buffer.concat([
 				Buffer.from(ethers.getBytes(CONSENSUS.abi.bytecode)),
 				Buffer.from(constructorArgs, "hex"),

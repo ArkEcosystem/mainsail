@@ -188,11 +188,16 @@ impl EvmInner {
                                     ..Default::default()
                                 });
                             }
+                            revm::primitives::InvalidTransaction::LackOfFundForMaxFee {
+                                fee,
+                                balance,
+                            } => {
+                                todo!("lack of funds (fee={} balance={})", fee, balance);
+                            }
                             // revm::primitives::InvalidTransaction::PriorityFeeGreaterThanMaxFee => todo!(),
                             // revm::primitives::InvalidTransaction::GasPriceLessThanBasefee => todo!(),
                             // revm::primitives::InvalidTransaction::CallerGasLimitMoreThanBlock => todo!(),
                             // revm::primitives::InvalidTransaction::RejectCallerWithCode => todo!(),
-                            // revm::primitives::InvalidTransaction::LackOfFundForMaxFee { fee, balance } => todo!(),
                             // revm::primitives::InvalidTransaction::OverflowPaymentInTransaction => todo!(),
                             // revm::primitives::InvalidTransaction::NonceOverflowInTransaction => todo!(),
                             // revm::primitives::InvalidTransaction::NonceTooHigh { tx, state } => todo!(),
@@ -333,6 +338,7 @@ impl EvmInner {
             .modify_tx_env(|tx_env| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
                 tx_env.caller = ctx.caller;
+                tx_env.value = ctx.value;
                 tx_env.transact_to = match ctx.recipient {
                     Some(recipient) => revm::primitives::TransactTo::Call(recipient),
                     None => revm::primitives::TransactTo::Create,
