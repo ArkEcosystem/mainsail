@@ -1,14 +1,14 @@
 {
-    "address": "0x5ffb35686Dc10F24a38C2E8523B873997572E237",
+    "address": "0x4ED0C6E41D4E0907ef75d3579688c19d8859A7a9",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "359404fad34cb78d1f449fb6062c8fbb2f458d6f52dd350eca2bf88c97053c3a",
-        "publicKey": "8614e6cfcabcfe32fe3d0bb6a7d8bac09725ef51861eaf7d894b744cf896c9a82fcb3fe6827b2a105891217b19a7df70"
+        "privateKey": "38ded7e3cfb83b40b78ec1cef835aa4e723ebcb64540afbcb9a7d2741317e06f",
+        "publicKey": "9302b6d26c127a4456d42625ec2dc705e7b532002448b36c1e70b8acf8b34440efc2e0608a73135a4e7f9cc444266a91"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "fff1f82edb2e910a8cc163bb32d99d89e94dc57e0fdff9f0199ac71a93dd4164",
-        "publicKey": "020183793ff2e5a98833fe7cb064a3efb32ca7dfeae8efcb9278b9f9d882a537eb"
+        "privateKey": "875f4ae006cc3e49dd8d0a047ddfbc27e897e49501b2e2d57d281a27229b1f98",
+        "publicKey": "02a95bd7de3ffac0cd6d21d6c42319f65c65a6e2e84277a6734d7bec6dc209f855"
     },
-    "passphrase": "spend sphere used amused trust prepare program pelican two lawsuit train case bless ice need ensure detect loan install assist moon always source jungle"
+    "passphrase": "acquire solar audit glide air crouch rare vacuum camera found legal silk lonely travel laundry defense window escape prefer alien please rubber tape sweet"
 }
