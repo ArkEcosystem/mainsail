@@ -14,6 +14,9 @@ export class Deployer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -30,6 +33,11 @@ export class Deployer {
 	public async deploy(): Promise<void> {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
+
+		await this.evm.initializeGenesis({
+			account: await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey),
+			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
+		});
 
 		const milestone = this.configuration.getMilestone(0);
 

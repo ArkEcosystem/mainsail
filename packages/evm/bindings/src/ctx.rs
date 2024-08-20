@@ -44,6 +44,12 @@ pub struct JsAccountUpdateContext {
 }
 
 #[napi(object)]
+pub struct JsGenesisContext {
+    pub account: JsString,
+    pub initial_supply: JsBigInt,
+}
+
+#[napi(object)]
 pub struct JsCommitKey {
     pub height: JsBigInt,
     pub round: JsBigInt,
@@ -82,6 +88,12 @@ pub struct AccountUpdateContext {
     pub commit_key: CommitKey,
     pub account: Address,
     pub nonce: u64,
+}
+
+#[derive(Debug)]
+pub struct GenesisContext {
+    pub account: Address,
+    pub initial_supply: U256,
 }
 
 #[derive(Debug)]
@@ -204,6 +216,17 @@ impl TryFrom<JsAccountUpdateContext> for AccountUpdateContext {
             commit_key: value.commit_key.try_into()?,
             account: utils::create_address_from_js_string(value.account)?,
             nonce: value.nonce.get_u64()?.0,
+        })
+    }
+}
+
+impl TryFrom<JsGenesisContext> for GenesisContext {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsGenesisContext) -> Result<Self, Self::Error> {
+        Ok(GenesisContext {
+            account: utils::create_address_from_js_string(value.account)?,
+            initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
         })
     }
 }

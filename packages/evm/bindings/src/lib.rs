@@ -1,11 +1,11 @@
 use std::{path::PathBuf, sync::Arc};
 
 use ctx::{
-    AccountUpdateContext, ExecutionContext, JsAccountUpdateContext, JsCommitKey,
-    JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
+    AccountUpdateContext, ExecutionContext, GenesisContext, JsAccountUpdateContext, JsCommitKey,
+    JsGenesisContext, JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
 };
 use mainsail_evm_core::{
-    db::{CommitKey, PendingCommit, PersistentDB},
+    db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
     state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
@@ -96,6 +96,18 @@ impl EvmInner {
                 format!("storage lookup failed: {}", err).into(),
             )),
         }
+    }
+
+    pub fn initialize_genesis(
+        &mut self,
+        genesis_ctx: GenesisContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        self.persistent_db.set_genesis_info(GenesisInfo {
+            account: genesis_ctx.account,
+            initial_supply: genesis_ctx.initial_supply,
+        });
+
+        Ok(())
     }
 
     pub fn get_account_info(
@@ -482,6 +494,19 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
+    pub fn initialize_genesis(
+        &mut self,
+        node_env: Env,
+        genesis_ctx: JsGenesisContext,
+    ) -> Result<JsObject> {
+        let genesis_ctx = GenesisContext::try_from(genesis_ctx)?;
+        node_env.execute_tokio_future(
+            Self::initialize_genesis_async(self.evm.clone(), genesis_ctx),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<void>")]
     pub fn update_account_info(
         &mut self,
         node_env: Env,
@@ -591,6 +616,19 @@ impl JsEvmWrapper {
     ) -> Result<()> {
         let mut lock = evm.lock().await;
         let result = lock.update_account_info(account_update_ctx);
+
+        match result {
+            Ok(_) => Result::Ok(()),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn initialize_genesis_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        genesis_ctx: GenesisContext,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.initialize_genesis(genesis_ctx);
 
         match result {
             Ok(_) => Result::Ok(()),
