@@ -29,8 +29,6 @@ export class GenesisBlockGenerator extends Generator {
 		validatorsMnemonics: string[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
 	): Promise<Contracts.Crypto.CommitData> {
-		const premineWallet = await this.createWallet();
-
 		const genesisWallet = await this.createWallet(genesisMnemonic);
 
 		const validators = await Promise.all(
@@ -42,7 +40,7 @@ export class GenesisBlockGenerator extends Generator {
 		if (options.distribute) {
 			transactions = transactions.concat(
 				...(await this.#createTransferTransactions(
-					premineWallet,
+					genesisWallet,
 					validators,
 					options.premine,
 					options.pubKeyHash,
@@ -51,7 +49,7 @@ export class GenesisBlockGenerator extends Generator {
 		} else {
 			transactions = transactions.concat(
 				await this.#createTransferTransaction(
-					premineWallet,
+					genesisWallet,
 					genesisWallet,
 					options.premine,
 					options.pubKeyHash,
@@ -67,7 +65,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		transactions = [...transactions, ...validatorTransactions];
 
-		const genesis = await this.#createGenesisCommit(premineWallet.keys, transactions, options);
+		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
 
 		return {
 			block: genesis.block.data,

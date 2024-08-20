@@ -21,16 +21,11 @@ export class Deployer {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
-
-	#deployerAddress!: string;
+	#deployerAddress = "0x0000000000000000000000000000000000000002";
 
 	public async deploy(): Promise<void> {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
-
-		this.#deployerAddress = await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey);
 
 		const milestone = this.configuration.getMilestone(0);
 
