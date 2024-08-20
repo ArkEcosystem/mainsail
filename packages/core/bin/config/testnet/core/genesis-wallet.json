@@ -1,14 +1,14 @@
 {
-    "address": "0x4ED0C6E41D4E0907ef75d3579688c19d8859A7a9",
+    "address": "0x2a1d3721a7F4c6169dd56B3FE228bF9084946c7C",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "38ded7e3cfb83b40b78ec1cef835aa4e723ebcb64540afbcb9a7d2741317e06f",
-        "publicKey": "9302b6d26c127a4456d42625ec2dc705e7b532002448b36c1e70b8acf8b34440efc2e0608a73135a4e7f9cc444266a91"
+        "privateKey": "553acc39facd788a7c38c84c4e651000483e50b8f80dd3eab87334f9098873d2",
+        "publicKey": "88ca4b17e50a658abee733b2205698288d08d1d0978b4463e03ec7446c416a7036e7d3ee7d6e3f6e903e6ec53c203855"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "875f4ae006cc3e49dd8d0a047ddfbc27e897e49501b2e2d57d281a27229b1f98",
-        "publicKey": "02a95bd7de3ffac0cd6d21d6c42319f65c65a6e2e84277a6734d7bec6dc209f855"
+        "privateKey": "6226c979ef69c37c4c99f676240a0a13c1cea10971d6f91a8d0a6d178e0deb7d",
+        "publicKey": "03d059951e177b01e5366f9e12e267dc77a89bd234f20d783f8cae5fbc5fe55a87"
     },
-    "passphrase": "acquire solar audit glide air crouch rare vacuum camera found legal silk lonely travel laundry defense window escape prefer alien please rubber tape sweet"
+    "passphrase": "beach such prefer fragile photo ghost million evidence verify swift away economy wait monkey loyal frost orange turkey hobby potato make pluck valley address"
 }
