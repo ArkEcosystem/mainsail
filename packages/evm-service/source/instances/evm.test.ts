@@ -43,6 +43,7 @@ describe<{
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
 		const { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
@@ -64,6 +65,7 @@ describe<{
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
 		let { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailGlobals.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
@@ -77,6 +79,7 @@ describe<{
 		const encodedCall = iface.encodeFunctionData("emitGlobals");
 		({ receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(ethers.getBytes(encodedCall)),
 			recipient: "0x69230f08D82f095aCB9BE4B21043B502b712D3C1",
 			txHash: getRandomTxHash(),
@@ -114,6 +117,7 @@ describe<{
 
 		let { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
@@ -139,6 +143,7 @@ describe<{
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
 		({ receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			txHash: getRandomTxHash(),
@@ -160,6 +165,7 @@ describe<{
 
 		let { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
@@ -171,6 +177,7 @@ describe<{
 
 		({ receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from("0xdead", "hex"),
 			recipient: contractAddress,
 			txHash: getRandomTxHash(),
@@ -190,6 +197,7 @@ describe<{
 		let { receipt } = await instance.process({
 			blockContext: { ...blockContext, commitKey },
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
 			...deployConfig,
@@ -212,6 +220,7 @@ describe<{
 			async () =>
 				await instance.process({
 					blockContext: { ...blockContext, commitKey: commitKey1 },
+					value: 0n,
 					caller: sender.address,
 					data: Buffer.from(
 						ethers.getBytes(
@@ -228,6 +237,7 @@ describe<{
 		await assert.resolves(async () => {
 			await instance.process({
 				blockContext: { ...blockContext, commitKey: commitKey2 },
+				value: 0n,
 				caller: sender.address,
 				data: Buffer.from(
 					ethers.getBytes(iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("2")])),
@@ -257,6 +267,7 @@ describe<{
 			async () =>
 				await instance.process({
 					caller: "badsender_",
+					value: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 					txHash: getRandomTxHash(),
@@ -272,6 +283,7 @@ describe<{
 		const txHash = getRandomTxHash();
 		let { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash,
@@ -287,6 +299,7 @@ describe<{
 
 		({ receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash,
@@ -307,6 +320,7 @@ describe<{
 
 		await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash,
@@ -320,6 +334,7 @@ describe<{
 		await assert.rejects(async () => {
 			await instance.process({
 				caller: sender.address,
+				value: 0n,
 				data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 				blockContext: { ...blockContext, commitKey },
 				txHash: randomTxHash,
@@ -333,6 +348,7 @@ describe<{
 
 		let { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 			txHash: getRandomTxHash(),
@@ -354,6 +370,7 @@ describe<{
 		const transferEncodedCall = iface.encodeFunctionData("transfer", [recipient.address, amount]);
 		({ receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
@@ -363,6 +380,7 @@ describe<{
 
 		({ receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
@@ -372,6 +390,7 @@ describe<{
 
 		({ receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(ethers.getBytes(transferEncodedCall)),
 			recipient: contractAddress,
 			blockContext: { ...blockContext, commitKey: { height: BigInt(1), round: BigInt(0) } },
@@ -396,6 +415,7 @@ describe<{
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
 		const { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			blockContext: { ...blockContext, commitKey },
 			txHash: getRandomTxHash(),
@@ -414,6 +434,7 @@ describe<{
 			async () =>
 				instance.process({
 					caller: sender.address,
+					value: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 					txHash: getRandomTxHash(),
@@ -477,6 +498,7 @@ describe<{
 		// deployed code
 		const { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
@@ -486,6 +508,19 @@ describe<{
 
 		code = await instance.codeAt(receipt.deployedContractAddress!);
 		assert.equal(code.slice(0, 16), MainsailERC20.bytecode.slice(0, 16));
+	});
+
+	it("should panic when transferring value without funds", async ({ instance }) => {
+		const [sender] = wallets;
+
+		await instance.process({
+			caller: sender.address,
+			value: 2n,
+			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			...deployConfig,
+		});
 	});
 
 	it("should return storage", async ({ instance }) => {
@@ -498,6 +533,7 @@ describe<{
 		// deploy erc20
 		const { receipt } = await instance.process({
 			caller: sender.address,
+			value: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },

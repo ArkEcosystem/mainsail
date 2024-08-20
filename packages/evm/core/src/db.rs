@@ -78,9 +78,16 @@ pub struct PendingCommit {
     pub transitions: TransitionState,
 }
 
+#[derive(Debug)]
+pub struct GenesisInfo {
+    pub account: Address,
+    pub initial_supply: U256,
+}
+
 pub struct PersistentDB {
     env: heed::Env,
     inner: RefCell<InnerStorage>,
+    genesis_info: Option<GenesisInfo>,
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -155,7 +162,12 @@ impl PersistentDB {
                 storage,
                 host_account_infos: Default::default(),
             }),
+            genesis_info: None,
         })
+    }
+
+    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
+        self.genesis_info.replace(genesis_info);
     }
 
     pub fn upsert_host_account_info(&mut self, address: Address, info: AccountInfo) {
@@ -226,7 +238,13 @@ impl DatabaseRef for PersistentDB {
 
         let mut basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
             Some(account) => account,
-            None => AccountInfo::default(),
+            None => match &self.genesis_info {
+                Some(genesis) if genesis.account == address => revm::primitives::AccountInfo {
+                    balance: genesis.initial_supply,
+                    ..Default::default()
+                },
+                _ => AccountInfo::default(),
+            },
         };
 
         // Always take host nonce if provided
