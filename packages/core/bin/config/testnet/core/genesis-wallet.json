@@ -1,14 +1,14 @@
 {
-	"address": "0xdA0Bd28933B948D68ec2248E84cDEb2B1fed07DE",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "68214cdbb8037777becb1853d60be03d7c39344cf7334755306a677908c46e6e",
-		"publicKey": "92e9d9eb7109ffc48292cce67289502baaad058f2708634f7fd44716e25a8e4335a85a2e349085da2a1738d7618be9a3"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "0d94de404f5d4d5aa3b9fb4725c855fc1d489f3eb5de9762600084bc307cfb2d",
-		"publicKey": "0315361dbcc2045ff2a4769691fc74d4367c682f9f4ba65a8a5a26a1381a09ff7a"
-	},
-	"passphrase": "absurd destroy glad payment sell squirrel toast payment settle enforce worry camp venture repeat rain travel pencil banana alarm recipe gun obscure permit curious"
+    "address": "0x2a1d3721a7F4c6169dd56B3FE228bF9084946c7C",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "553acc39facd788a7c38c84c4e651000483e50b8f80dd3eab87334f9098873d2",
+        "publicKey": "88ca4b17e50a658abee733b2205698288d08d1d0978b4463e03ec7446c416a7036e7d3ee7d6e3f6e903e6ec53c203855"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "6226c979ef69c37c4c99f676240a0a13c1cea10971d6f91a8d0a6d178e0deb7d",
+        "publicKey": "03d059951e177b01e5366f9e12e267dc77a89bd234f20d783f8cae5fbc5fe55a87"
+    },
+    "passphrase": "beach such prefer fragile photo ghost million evidence verify swift away economy wait monkey loyal frost orange turkey hobby potato make pluck valley address"
 }

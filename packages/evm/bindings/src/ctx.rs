@@ -13,6 +13,7 @@ pub struct JsTransactionContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<JsString>,
     pub gas_limit: JsBigInt,
+    pub value: JsBigInt,
     pub data: JsBuffer,
     pub tx_hash: JsString,
     pub block_context: JsBlockContext,
@@ -43,6 +44,12 @@ pub struct JsAccountUpdateContext {
 }
 
 #[napi(object)]
+pub struct JsGenesisContext {
+    pub account: JsString,
+    pub initial_supply: JsBigInt,
+}
+
+#[napi(object)]
 pub struct JsCommitKey {
     pub height: JsBigInt,
     pub round: JsBigInt,
@@ -54,6 +61,7 @@ pub struct TxContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub gas_limit: u64,
+    pub value: U256,
     pub data: Bytes,
     pub tx_hash: B256,
     pub block_context: BlockContext,
@@ -83,10 +91,17 @@ pub struct AccountUpdateContext {
 }
 
 #[derive(Debug)]
+pub struct GenesisContext {
+    pub account: Address,
+    pub initial_supply: U256,
+}
+
+#[derive(Debug)]
 pub struct ExecutionContext {
     pub caller: Address,
     pub recipient: Option<Address>,
     pub gas_limit: Option<u64>,
+    pub value: U256,
     pub data: Bytes,
     pub tx_hash: Option<B256>,
     pub block_context: Option<BlockContext>,
@@ -99,6 +114,7 @@ impl From<TxViewContext> for ExecutionContext {
             caller: value.caller,
             recipient: Some(value.recipient),
             gas_limit: None,
+            value: U256::ZERO,
             data: value.data,
             tx_hash: None,
             block_context: None,
@@ -113,6 +129,7 @@ impl From<TxContext> for ExecutionContext {
             caller: value.caller,
             recipient: value.recipient,
             gas_limit: Some(value.gas_limit),
+            value: value.value,
             data: value.data,
             tx_hash: Some(value.tx_hash),
             block_context: Some(value.block_context),
@@ -161,6 +178,7 @@ impl TryFrom<JsTransactionContext> for TxContext {
             recipient,
             gas_limit: value.gas_limit.try_into()?,
             caller: utils::create_address_from_js_string(value.caller)?,
+            value: utils::convert_bigint_to_u256(value.value)?,
             data: Bytes::from(buf.as_ref().to_owned()),
             tx_hash: B256::try_from(
                 &Bytes::from_str(value.tx_hash.into_utf8()?.as_str()?)?.as_ref()[..],
@@ -198,6 +216,17 @@ impl TryFrom<JsAccountUpdateContext> for AccountUpdateContext {
             commit_key: value.commit_key.try_into()?,
             account: utils::create_address_from_js_string(value.account)?,
             nonce: value.nonce.get_u64()?.0,
+        })
+    }
+}
+
+impl TryFrom<JsGenesisContext> for GenesisContext {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsGenesisContext) -> Result<Self, Self::Error> {
+        Ok(GenesisContext {
+            account: utils::create_address_from_js_string(value.account)?,
+            initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
         })
     }
 }

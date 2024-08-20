@@ -2,7 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
-import { ByteBuffer } from "@mainsail/utils";
+import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class EvmCallTransaction extends Transaction {
@@ -20,7 +20,7 @@ export class EvmCallTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "evmCall",
 			properties: {
-				amount: { bignumber: { maximum: 0, minimum: 0 } },
+				amount: { bignumber: { maximum: undefined, minimum: 0 } },
 				asset: {
 					properties: {
 						evmCall: {
@@ -41,7 +41,7 @@ export class EvmCallTransaction extends Transaction {
 					type: "object",
 					unevaluatedProperties: false,
 				},
-				fee: { bignumber: { maximum: 1000, minimum: 5 } },
+				fee: { bignumber: { maximum: 1000, minimum: 0 } },
 				recipientId: { $ref: "address" },
 				type: { transactionType: Contracts.Crypto.TransactionType.EvmCall },
 			},
@@ -55,6 +55,7 @@ export class EvmCallTransaction extends Transaction {
 		const { evmCall } = data.asset;
 
 		return (
+			32 + // amount
 			1 + // recipient marker
 			(data.recipientId ? addressSize : 0) + // recipient
 			4 + // gas limit
@@ -73,8 +74,10 @@ export class EvmCallTransaction extends Transaction {
 		const payloadBytes = Buffer.from(data.asset.evmCall.payload, "hex");
 
 		const buff: ByteBuffer = ByteBuffer.fromSize(
-			1 + (data.recipientId ? addressSize : 0) + 4 + 4 + payloadBytes.byteLength,
+			32 + 1 + (data.recipientId ? addressSize : 0) + 4 + 4 + payloadBytes.byteLength,
 		);
+
+		buff.writeUint256(data.amount.toBigInt());
 
 		if (data.recipientId) {
 			buff.writeUint8(1);
@@ -92,6 +95,8 @@ export class EvmCallTransaction extends Transaction {
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data, addressFactory, addressSerializer } = this;
+
+		data.amount = BigNumber.make(buf.readUint256());
 
 		const recipientMarker = buf.readUint8();
 		if (recipientMarker === 1) {

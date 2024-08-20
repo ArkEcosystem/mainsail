@@ -22,6 +22,13 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.process(txContext);
 	}
 
+	public async initializeGenesis(commit: Contracts.Evm.GenesisInfo): Promise<void> {
+		return this.#evm.initializeGenesis({
+			account: commit.account,
+			initialSupply: commit.initialSupply,
+		});
+	}
+
 	public async getAccountInfo(address: string): Promise<Contracts.Evm.AccountInfo> {
 		return this.#evm.getAccountInfo(address);
 	}
