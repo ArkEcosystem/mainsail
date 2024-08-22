@@ -59,9 +59,16 @@ pub fn apply_rewards(
         .build();
 
     state.increment_balances(rewards)?;
-    println!("transition state {:#?}", state.transition_state.take());
+
+    if let Some(transition_state) = state.transition_state.take() {
+        // println!("transition state {:#?}", transition_state);
+        pending
+            .transitions
+            .add_transitions(transition_state.transitions.into_iter().collect());
+    }
 
     pending.cache = std::mem::take(&mut state.cache);
+    // println!("cache {:#?}", pending.cache.accounts);
 
     Ok(())
 }
@@ -82,4 +89,31 @@ pub fn commit_to_db(
             _ => Err(err),
         },
     }
+}
+
+#[test]
+fn test_apply_rewards() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+    let mut pending = PendingCommit::default();
+
+    let account1 = revm::primitives::address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+    let account2 = revm::primitives::address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
+
+    let mut rewards = HashMap::<Address, u128>::new();
+    rewards.insert(account1, 1234);
+    rewards.insert(account2, 0);
+
+    let result = self::apply_rewards(&mut db, &mut pending, rewards);
+    assert!(result.is_ok());
+
+    assert!(pending.cache.accounts.contains_key(&account1));
+    assert!(!pending.cache.accounts.contains_key(&account2));
+
+    assert!(pending.transitions.transitions.contains_key(&account1));
+    assert!(!pending.transitions.transitions.contains_key(&account2));
 }
