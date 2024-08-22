@@ -61,9 +61,6 @@ struct InnerStorage {
     commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
     contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
     storage: heed::Database<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>,
-
-    // AccountInfo from host transactions for things like 'nonce', etc.
-    host_account_infos: HashMap<Address, AccountInfo>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -160,7 +157,6 @@ impl PersistentDB {
                 commits,
                 contracts,
                 storage,
-                host_account_infos: Default::default(),
             }),
             genesis_info: None,
         })
@@ -168,25 +164,6 @@ impl PersistentDB {
 
     pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
         self.genesis_info.replace(genesis_info);
-    }
-
-    pub fn upsert_host_account_info(&mut self, address: Address, info: AccountInfo) {
-        self.inner
-            .borrow_mut()
-            .host_account_infos
-            .insert(address, info);
-    }
-
-    pub fn take_host_account_infos(&mut self) -> HashMap<Address, AccountInfo> {
-        std::mem::take(&mut self.inner.borrow_mut().host_account_infos)
-    }
-
-    pub fn get_host_account_infos_cloned(&self) -> HashMap<Address, AccountInfo> {
-        self.inner.borrow().host_account_infos.clone()
-    }
-
-    pub fn clear_host_account_infos(&mut self) {
-        self.inner.borrow_mut().host_account_infos.clear();
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -236,7 +213,7 @@ impl DatabaseRef for PersistentDB {
         let txn = self.env.read_txn()?;
         let inner = self.inner.borrow();
 
-        let mut basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
+        let basic = match inner.accounts.get(&txn, &AddressWrapper(address))? {
             Some(account) => account,
             None => match &self.genesis_info {
                 Some(genesis) if genesis.account == address => revm::primitives::AccountInfo {
@@ -246,11 +223,6 @@ impl DatabaseRef for PersistentDB {
                 _ => AccountInfo::default(),
             },
         };
-
-        // Always take host nonce if provided
-        if let Some(host) = inner.host_account_infos.get(&address) {
-            basic.nonce = host.nonce;
-        }
 
         Ok(basic.into())
     }

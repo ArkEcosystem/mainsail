@@ -1,10 +1,6 @@
 use std::collections::HashMap;
 
-use revm::{
-    db::AccountStatus,
-    primitives::{ExecutionResult, B256},
-    DatabaseRef, TransitionAccount,
-};
+use revm::primitives::{ExecutionResult, B256};
 
 use crate::{
     db::{CommitKey, Error, PendingCommit, PersistentDB},
@@ -20,10 +16,12 @@ pub struct StateCommit {
 
 pub fn build_commit(
     db: &mut PersistentDB,
-    mut pending_commit: PendingCommit,
+    pending_commit: PendingCommit,
     is_commit_to_db: bool,
 ) -> Result<StateCommit, crate::db::Error> {
-    merge_host_account_infos(db, &mut pending_commit, is_commit_to_db)?;
+    let _ = is_commit_to_db;
+    let _ = db;
+    //merge_host_account_infos(db, &mut pending_commit, is_commit_to_db)?;
 
     let PendingCommit {
         key,
@@ -65,60 +63,60 @@ pub fn commit_to_db(
     }
 }
 
-pub(crate) fn merge_host_account_infos(
-    db: &mut PersistentDB,
-    pending: &mut PendingCommit,
-    take_on_commit: bool,
-) -> Result<(), crate::db::Error> {
-    let host = if take_on_commit {
-        db.take_host_account_infos()
-    } else {
-        db.get_host_account_infos_cloned()
-    };
+// pub(crate) fn merge_host_account_infos(
+//     db: &mut PersistentDB,
+//     pending: &mut PendingCommit,
+//     take_on_commit: bool,
+// ) -> Result<(), crate::db::Error> {
+//     let host = if take_on_commit {
+//         db.take_host_account_infos()
+//     } else {
+//         db.get_host_account_infos_cloned()
+//     };
 
-    // TODO: here we could potentially also check for host balance changes caused by contracts
-    // and pass it back to the main process.
+//     // TODO: here we could potentially also check for host balance changes caused by contracts
+//     // and pass it back to the main process.
 
-    let mut transition_accounts = Vec::with_capacity(host.len());
+//     let mut transition_accounts = Vec::with_capacity(host.len());
 
-    for (address, account) in host {
-        let mut transition_account = TransitionAccount::default();
-        transition_account.status = AccountStatus::Changed;
-        transition_account.previous_status = AccountStatus::LoadedEmptyEIP161;
+//     for (address, account) in host {
+//         let mut transition_account = TransitionAccount::default();
+//         transition_account.status = AccountStatus::Changed;
+//         transition_account.previous_status = AccountStatus::LoadedEmptyEIP161;
 
-        match pending.cache.accounts.get(&address) {
-            Some(cached) => {
-                transition_account.info = cached.account_info().clone();
-                transition_account.status = cached.status;
-            }
-            None => {
-                // Fetch it from heed
-                match db.basic_ref(address)? {
-                    Some(account) => {
-                        transition_account.info = Some(account);
-                    }
-                    None => {
-                        println!("insert not-existing account");
-                    }
-                }
-            }
-        }
+//         match pending.cache.accounts.get(&address) {
+//             Some(cached) => {
+//                 transition_account.info = cached.account_info().clone();
+//                 transition_account.status = cached.status;
+//             }
+//             None => {
+//                 // Fetch it from heed
+//                 match db.basic_ref(address)? {
+//                     Some(account) => {
+//                         transition_account.info = Some(account);
+//                     }
+//                     None => {
+//                         println!("insert not-existing account");
+//                     }
+//                 }
+//             }
+//         }
 
-        // Update account in the state cache with host information
-        transition_account.info.as_mut().and_then(|info| {
-            // println!(
-            //     "updating nonce {} {} => {}",
-            //     address, info.nonce, account.nonce
-            // );
+//         // Update account in the state cache with host information
+//         transition_account.info.as_mut().and_then(|info| {
+//             // println!(
+//             //     "updating nonce {} {} => {}",
+//             //     address, info.nonce, account.nonce
+//             // );
 
-            info.nonce = account.nonce;
-            Some(info)
-        });
+//             info.nonce = account.nonce;
+//             Some(info)
+//         });
 
-        transition_accounts.push((address, transition_account));
-    }
+//         transition_accounts.push((address, transition_account));
+//     }
 
-    pending.transitions.add_transitions(transition_accounts);
+//     pending.transitions.add_transitions(transition_accounts);
 
-    Ok(())
-}
+//     Ok(())
+// }

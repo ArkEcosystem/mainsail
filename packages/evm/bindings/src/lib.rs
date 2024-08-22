@@ -1,8 +1,8 @@
 use std::{path::PathBuf, sync::Arc};
 
 use ctx::{
-    AccountUpdateContext, ExecutionContext, GenesisContext, JsAccountUpdateContext, JsCommitKey,
-    JsGenesisContext, JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
+    ExecutionContext, GenesisContext, JsCommitKey, JsGenesisContext, JsTransactionContext,
+    JsTransactionViewContext, TxContext, TxViewContext,
 };
 use mainsail_evm_core::{
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
@@ -120,34 +120,6 @@ impl EvmInner {
                 format!("account lookup failed: {}", err).into(),
             )),
         }
-    }
-
-    pub fn update_account_info(
-        &mut self,
-        account_update_ctx: AccountUpdateContext,
-    ) -> std::result::Result<(), EVMError<String>> {
-        // Drop pending state on key change
-        if self
-            .pending_commit
-            .as_ref()
-            .is_some_and(|pending| pending.key != account_update_ctx.commit_key)
-        {
-            self.drop_pending_commit();
-        }
-
-        // Update pending state
-        self.pending_commit
-            .get_or_insert_with(|| PendingCommit::new(account_update_ctx.commit_key));
-
-        self.persistent_db.upsert_host_account_info(
-            account_update_ctx.account,
-            AccountInfo {
-                nonce: account_update_ctx.nonce,
-                ..Default::default()
-            },
-        );
-
-        Ok(())
     }
 
     pub fn process(
@@ -398,18 +370,11 @@ impl EvmInner {
     }
 
     fn take_pending_commit(&mut self) -> Option<PendingCommit> {
-        let pending = self.pending_commit.take();
-
-        if pending.is_none() {
-            self.persistent_db.clear_host_account_infos();
-        }
-
-        pending
+        self.pending_commit.take()
     }
 
     fn drop_pending_commit(&mut self) {
-        self.pending_commit.take();
-        self.persistent_db.clear_host_account_infos();
+        self.take_pending_commit();
     }
 }
 
@@ -506,19 +471,6 @@ impl JsEvmWrapper {
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn update_account_info(
-        &mut self,
-        node_env: Env,
-        account_update_ctx: JsAccountUpdateContext,
-    ) -> Result<JsObject> {
-        let account_update_ctx = AccountUpdateContext::try_from(account_update_ctx)?;
-        node_env.execute_tokio_future(
-            Self::update_account_info_async(self.evm.clone(), account_update_ctx),
-            |_, _| Ok(()),
-        )
-    }
-
     #[napi(ts_return_type = "Promise<JsAccountInfo>")]
     pub fn get_account_info(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
@@ -606,19 +558,6 @@ impl JsEvmWrapper {
 
         match result {
             Ok(account) => Result::Ok(account),
-            Err(err) => Result::Err(serde::de::Error::custom(err)),
-        }
-    }
-
-    async fn update_account_info_async(
-        evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        account_update_ctx: AccountUpdateContext,
-    ) -> Result<()> {
-        let mut lock = evm.lock().await;
-        let result = lock.update_account_info(account_update_ctx);
-
-        match result {
-            Ok(_) => Result::Ok(()),
             Err(err) => Result::Err(serde::de::Error::custom(err)),
         }
     }

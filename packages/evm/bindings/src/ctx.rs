@@ -37,13 +37,6 @@ pub struct JsBlockContext {
 }
 
 #[napi(object)]
-pub struct JsAccountUpdateContext {
-    pub commit_key: JsCommitKey,
-    pub account: JsString,
-    pub nonce: JsBigInt,
-}
-
-#[napi(object)]
 pub struct JsGenesisContext {
     pub account: JsString,
     pub initial_supply: JsBigInt,
@@ -82,12 +75,6 @@ pub struct BlockContext {
     pub gas_limit: U256,
     pub timestamp: U256,
     pub validator_address: Address,
-}
-#[derive(Debug)]
-pub struct AccountUpdateContext {
-    pub commit_key: CommitKey,
-    pub account: Address,
-    pub nonce: u64,
 }
 
 #[derive(Debug)]
@@ -205,18 +192,6 @@ impl TryFrom<JsTransactionViewContext> for TxViewContext {
         };
 
         Ok(tx_ctx)
-    }
-}
-
-impl TryFrom<JsAccountUpdateContext> for AccountUpdateContext {
-    type Error = anyhow::Error;
-
-    fn try_from(value: JsAccountUpdateContext) -> Result<Self, Self::Error> {
-        Ok(AccountUpdateContext {
-            commit_key: value.commit_key.try_into()?,
-            account: utils::create_address_from_js_string(value.account)?,
-            nonce: value.nonce.get_u64()?.0,
-        })
     }
 }
 

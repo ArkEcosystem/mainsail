@@ -16,7 +16,6 @@ export interface Instance extends CommitHandler {
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
-	updateAccountInfo(context: AccountUpdateContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
