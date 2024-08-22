@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use revm::primitives::{ExecutionResult, B256};
+use revm::{
+    db::WrapDatabaseRef,
+    primitives::{Address, ExecutionResult, B256},
+};
 
 use crate::{
     db::{CommitKey, Error, PendingCommit, PersistentDB},
@@ -21,7 +24,6 @@ pub fn build_commit(
 ) -> Result<StateCommit, crate::db::Error> {
     let _ = is_commit_to_db;
     let _ = db;
-    //merge_host_account_infos(db, &mut pending_commit, is_commit_to_db)?;
 
     let PendingCommit {
         key,
@@ -45,6 +47,25 @@ pub fn build_commit(
     })
 }
 
+pub fn apply_rewards(
+    db: &mut PersistentDB,
+    pending: &mut PendingCommit,
+    rewards: HashMap<Address, u128>,
+) -> Result<(), crate::db::Error> {
+    let mut state = revm::State::builder()
+        .with_bundle_update()
+        .with_cached_prestate(std::mem::take(&mut pending.cache))
+        .with_database(WrapDatabaseRef(&db))
+        .build();
+
+    state.increment_balances(rewards)?;
+    println!("transition state {:#?}", state.transition_state.take());
+
+    pending.cache = std::mem::take(&mut state.cache);
+
+    Ok(())
+}
+
 pub fn commit_to_db(
     db: &mut PersistentDB,
     pending_commit: PendingCommit,
@@ -62,61 +83,3 @@ pub fn commit_to_db(
         },
     }
 }
-
-// pub(crate) fn merge_host_account_infos(
-//     db: &mut PersistentDB,
-//     pending: &mut PendingCommit,
-//     take_on_commit: bool,
-// ) -> Result<(), crate::db::Error> {
-//     let host = if take_on_commit {
-//         db.take_host_account_infos()
-//     } else {
-//         db.get_host_account_infos_cloned()
-//     };
-
-//     // TODO: here we could potentially also check for host balance changes caused by contracts
-//     // and pass it back to the main process.
-
-//     let mut transition_accounts = Vec::with_capacity(host.len());
-
-//     for (address, account) in host {
-//         let mut transition_account = TransitionAccount::default();
-//         transition_account.status = AccountStatus::Changed;
-//         transition_account.previous_status = AccountStatus::LoadedEmptyEIP161;
-
-//         match pending.cache.accounts.get(&address) {
-//             Some(cached) => {
-//                 transition_account.info = cached.account_info().clone();
-//                 transition_account.status = cached.status;
-//             }
-//             None => {
-//                 // Fetch it from heed
-//                 match db.basic_ref(address)? {
-//                     Some(account) => {
-//                         transition_account.info = Some(account);
-//                     }
-//                     None => {
-//                         println!("insert not-existing account");
-//                     }
-//                 }
-//             }
-//         }
-
-//         // Update account in the state cache with host information
-//         transition_account.info.as_mut().and_then(|info| {
-//             // println!(
-//             //     "updating nonce {} {} => {}",
-//             //     address, info.nonce, account.nonce
-//             // );
-
-//             info.nonce = account.nonce;
-//             Some(info)
-//         });
-
-//         transition_accounts.push((address, transition_account));
-//     }
-
-//     pending.transitions.add_transitions(transition_accounts);
-
-//     Ok(())
-// }

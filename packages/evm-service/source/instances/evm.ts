@@ -33,6 +33,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.getAccountInfo(address);
 	}
 
+	public async updateRewardsAndVotes(context: Contracts.Evm.UpdateRewardsAndVotesContext): Promise<void> {
+		return this.#evm.updateRewardsAndVotes(context);
+	}
+
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const { height, round } = unit;
 		await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });

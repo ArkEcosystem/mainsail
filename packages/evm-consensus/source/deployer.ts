@@ -83,9 +83,6 @@ export class Deployer {
 		await this.evm.onCommit(commitKey as any);
 	}
 
-	// TODO: update votes
-	// TODO: update sort
-
 	#nonce = 0;
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 }
