@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Verifier } from "@mainsail/crypto-transaction";
 import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
 import { BigNumber } from "@mainsail/utils";
-import { Verifier } from "@mainsail/crypto-transaction";
 
 import { Context, MultiPaymentOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey, getRandomColdWallet, getRandomFundedWallet } from "./utils.js";

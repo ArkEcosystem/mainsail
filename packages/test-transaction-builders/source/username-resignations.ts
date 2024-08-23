@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Verifier } from "@mainsail/crypto-transaction";
 import { UsernameResignationBuilder } from "@mainsail/crypto-transaction-username-resignation";
 import { BigNumber } from "@mainsail/utils";
-import { Verifier } from "@mainsail/crypto-transaction";
 
 import { Context, UsernameResignationOptions } from "./types.js";
 import { makeUsernameRegistration } from "./username-registrations.js";

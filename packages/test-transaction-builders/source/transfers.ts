@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { Verifier } from "@mainsail/crypto-transaction";
+import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { BigNumber } from "@mainsail/utils";
 
 import { makeMultiSignatureRegistration } from "./multi-signature-registrations.js";

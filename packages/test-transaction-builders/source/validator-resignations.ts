@@ -1,7 +1,7 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Verifier } from "@mainsail/crypto-transaction";
 import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
 import { BigNumber } from "@mainsail/utils";
-import { Verifier } from "@mainsail/crypto-transaction";
 
 import { Context, ValidatorResignationOptions } from "./types.js";
 import { buildSignedTransaction, getRandomFundedWallet } from "./utils.js";
