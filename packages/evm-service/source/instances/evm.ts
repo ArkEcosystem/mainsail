@@ -26,6 +26,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.initializeGenesis({
 			account: commit.account,
 			initialSupply: commit.initialSupply,
+			deployerAccount: commit.deployerAccount,
+			validatorContract: commit.validatorContract,
 		});
 	}
 

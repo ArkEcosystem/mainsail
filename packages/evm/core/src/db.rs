@@ -75,16 +75,18 @@ pub struct PendingCommit {
     pub transitions: TransitionState,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct GenesisInfo {
     pub account: Address,
+    pub deployer_account: Address,
+    pub validator_contract: Address,
     pub initial_supply: U256,
 }
 
 pub struct PersistentDB {
     env: heed::Env,
     inner: RefCell<InnerStorage>,
-    genesis_info: Option<GenesisInfo>,
+    pub genesis_info: Option<GenesisInfo>,
 }
 
 #[derive(thiserror::Error, Debug)]

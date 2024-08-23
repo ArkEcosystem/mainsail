@@ -8,6 +8,8 @@ export enum EvmMode {
 
 export interface GenesisInfo {
 	readonly account: string;
+	readonly deployerAccount: string;
+	readonly validatorContract: string;
 	readonly initialSupply: bigint;
 }
 

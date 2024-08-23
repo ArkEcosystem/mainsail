@@ -39,6 +39,8 @@ pub struct JsBlockContext {
 #[napi(object)]
 pub struct JsGenesisContext {
     pub account: JsString,
+    pub deployer_account: JsString,
+    pub validator_contract: JsString,
     pub initial_supply: JsBigInt,
 }
 
@@ -89,6 +91,8 @@ pub struct BlockContext {
 #[derive(Debug)]
 pub struct GenesisContext {
     pub account: Address,
+    pub deployer_account: Address,
+    pub validator_contract: Address,
     pub initial_supply: U256,
 }
 
@@ -219,6 +223,8 @@ impl TryFrom<JsGenesisContext> for GenesisContext {
     fn try_from(value: JsGenesisContext) -> Result<Self, Self::Error> {
         Ok(GenesisContext {
             account: utils::create_address_from_js_string(value.account)?,
+            validator_contract: utils::create_address_from_js_string(value.validator_contract)?,
+            deployer_account: utils::create_address_from_js_string(value.deployer_account)?,
             initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
         })
     }

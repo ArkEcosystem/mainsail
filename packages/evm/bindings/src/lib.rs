@@ -105,6 +105,8 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         self.persistent_db.set_genesis_info(GenesisInfo {
             account: genesis_ctx.account,
+            deployer_account: genesis_ctx.deployer_account,
+            validator_contract: genesis_ctx.validator_contract,
             initial_supply: genesis_ctx.initial_supply,
         });
 
@@ -119,6 +121,13 @@ impl EvmInner {
             key: ctx.commit_key,
             ..Default::default()
         });
+
+        let genesis_info = self
+            .persistent_db
+            .genesis_info
+            .as_ref()
+            .expect("genesis info")
+            .clone();
 
         let mut rewards = HashMap::<Address, u128>::new();
         rewards.insert(ctx.validator_address, ctx.block_reward);
@@ -152,11 +161,8 @@ impl EvmInner {
                         timestamp: ctx.timestamp,
                         validator_address: ctx.validator_address,
                     }),
-                    caller: revm::primitives::address!("0000000000000000000000000000000000000001"),
-                    // TODO: consensus contract is hardcoded
-                    recipient: Some(revm::primitives::address!(
-                        "522B3294E6d06aA25Ad0f1B8891242E335D3B459"
-                    )),
+                    caller: genesis_info.deployer_account,
+                    recipient: Some(genesis_info.validator_contract),
                     data: revm::primitives::Bytes::from(calldata.0),
                     value: U256::ZERO,
                     gas_limit: Some(u64::MAX),
