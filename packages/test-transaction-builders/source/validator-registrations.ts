@@ -1,6 +1,7 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
 import { BigNumber } from "@mainsail/utils";
+import { Verifier } from "@mainsail/crypto-transaction";
 
 import { makeMultiSignatureRegistration } from "./multi-signature-registrations.js";
 import { makeTransfer } from "./transfers.js";
@@ -12,11 +13,15 @@ import {
 	getRandomConsensusKeyPair,
 	getRandomFundedWallet,
 } from "./utils.js";
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 export const makeValidatorRegistration = async (
 	context: Context,
 	options: ValidatorRegistrationOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	context.sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
@@ -31,6 +36,9 @@ export const makeValidatorRegistration = async (
 		.resolve(ValidatorRegistrationBuilder)
 		.fee(BigNumber.make(fee).toFixed())
 		.publicKeyAsset(validatorPublicKey);
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };

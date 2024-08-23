@@ -1,14 +1,19 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
+import { Verifier } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
 import { Context, MultiPaymentOptions, MultiSignatureOptions } from "./types.js";
 import { buildSignedTransaction, getRandomColdWallet, getRandomFundedWallet, getRandomSignature } from "./utils.js";
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 export const makeMultiSignatureRegistration = async (
 	context: Context,
 	options: MultiSignatureOptions,
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	context.sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
@@ -38,6 +43,9 @@ export const makeMultiSignatureRegistration = async (
 			builder.data.signatures![index] = participantSignatureOverwrite[index];
 		}
 	}
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return buildSignedTransaction(sandbox, builder, sender, { ...options, participantSignatures });
 };

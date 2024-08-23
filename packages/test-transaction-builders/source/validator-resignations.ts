@@ -1,15 +1,20 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
 import { BigNumber } from "@mainsail/utils";
+import { Verifier } from "@mainsail/crypto-transaction";
 
 import { Context, ValidatorResignationOptions } from "./types.js";
 import { buildSignedTransaction, getRandomFundedWallet } from "./utils.js";
 import { makeValidatorRegistration } from "./validator-registrations.js";
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 export const makeValidatorResignation = async (
 	context: Context,
 	options: ValidatorResignationOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	context.sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
@@ -20,6 +25,9 @@ export const makeValidatorResignation = async (
 	fee = fee ?? "2500000000";
 
 	const builder = app.resolve(ValidatorResignationBuilder).fee(BigNumber.make(fee).toFixed());
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };

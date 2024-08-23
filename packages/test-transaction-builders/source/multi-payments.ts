@@ -1,14 +1,19 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
 import { BigNumber } from "@mainsail/utils";
+import { Verifier } from "@mainsail/crypto-transaction";
 
 import { Context, MultiPaymentOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey, getRandomColdWallet, getRandomFundedWallet } from "./utils.js";
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 export const makeMultiPayment = async (
 	context: Context,
 	options: MultiPaymentOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	context.sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
@@ -38,6 +43,9 @@ export const makeMultiPayment = async (
 
 	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getMilestone().multiPaymentLimit =
 		originalMultiPaymentLimit;
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
