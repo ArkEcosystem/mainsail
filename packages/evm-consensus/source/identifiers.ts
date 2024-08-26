@@ -8,5 +8,6 @@ export const Identifiers = {
 		Addresses: {
 			Deployer: Symbol.for("Evm.Consensus<Internal.Addresses.Deployer>"),
 		},
+		GenesisInfo: Symbol.for("Evm.Consensus<Internal.GenesisInfo>"),
 	},
 };

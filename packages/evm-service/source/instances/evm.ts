@@ -26,6 +26,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.initializeGenesis({
 			account: commit.account,
 			initialSupply: commit.initialSupply,
+			deployerAccount: commit.deployerAccount,
+			validatorContract: commit.validatorContract,
 		});
 	}
 
@@ -33,8 +35,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.getAccountInfo(address);
 	}
 
-	public async updateAccountInfo(context: Contracts.Evm.AccountUpdateContext): Promise<void> {
-		return this.#evm.updateAccountInfo(context);
+	public async updateRewardsAndVotes(context: Contracts.Evm.UpdateRewardsAndVotesContext): Promise<void> {
+		return this.#evm.updateRewardsAndVotes(context);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {

@@ -34,10 +34,16 @@ export class Deployer {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
-		await this.evm.initializeGenesis({
+		const validatorContractAddress = ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 0 });
+
+		const genesisInfo = {
 			account: await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey),
 			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
-		});
+			deployerAccount: this.#deployerAddress,
+			validatorContract: validatorContractAddress,
+		};
+
+		await this.evm.initializeGenesis(genesisInfo);
 
 		const milestone = this.configuration.getMilestone(0);
 
@@ -74,17 +80,20 @@ export class Deployer {
 			`Deployed Consensus contract from ${this.#deployerAddress} to ${result.receipt.deployedContractAddress}`,
 		);
 
+		if (result.receipt.deployedContractAddress !== validatorContractAddress) {
+			throw new Error("Contract address mismatch");
+		}
+
 		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(this.#deployerAddress);
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
 			.toConstantValue(result.receipt.deployedContractAddress!);
 
+		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
+
 		await this.evm.onCommit(commitKey as any);
 	}
-
-	// TODO: update votes
-	// TODO: update sort
 
 	#nonce = 0;
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);

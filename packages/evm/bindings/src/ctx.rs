@@ -37,16 +37,20 @@ pub struct JsBlockContext {
 }
 
 #[napi(object)]
-pub struct JsAccountUpdateContext {
-    pub commit_key: JsCommitKey,
+pub struct JsGenesisContext {
     pub account: JsString,
-    pub nonce: JsBigInt,
+    pub deployer_account: JsString,
+    pub validator_contract: JsString,
+    pub initial_supply: JsBigInt,
 }
 
 #[napi(object)]
-pub struct JsGenesisContext {
-    pub account: JsString,
-    pub initial_supply: JsBigInt,
+pub struct JsUpdateRewardsAndVotesContext {
+    pub commit_key: JsCommitKey,
+    pub timestamp: JsBigInt,
+    pub block_reward: JsBigInt,
+    pub validator_address: JsString,
+    pub spec_id: JsString,
 }
 
 #[napi(object)]
@@ -83,17 +87,22 @@ pub struct BlockContext {
     pub timestamp: U256,
     pub validator_address: Address,
 }
-#[derive(Debug)]
-pub struct AccountUpdateContext {
-    pub commit_key: CommitKey,
-    pub account: Address,
-    pub nonce: u64,
-}
 
 #[derive(Debug)]
 pub struct GenesisContext {
     pub account: Address,
+    pub deployer_account: Address,
+    pub validator_contract: Address,
     pub initial_supply: U256,
+}
+
+#[derive(Debug)]
+pub struct UpdateRewardsAndVotesContext {
+    pub commit_key: CommitKey,
+    pub timestamp: U256,
+    pub block_reward: u128,
+    pub validator_address: Address,
+    pub spec_id: SpecId,
 }
 
 #[derive(Debug)]
@@ -208,25 +217,29 @@ impl TryFrom<JsTransactionViewContext> for TxViewContext {
     }
 }
 
-impl TryFrom<JsAccountUpdateContext> for AccountUpdateContext {
-    type Error = anyhow::Error;
-
-    fn try_from(value: JsAccountUpdateContext) -> Result<Self, Self::Error> {
-        Ok(AccountUpdateContext {
-            commit_key: value.commit_key.try_into()?,
-            account: utils::create_address_from_js_string(value.account)?,
-            nonce: value.nonce.get_u64()?.0,
-        })
-    }
-}
-
 impl TryFrom<JsGenesisContext> for GenesisContext {
     type Error = anyhow::Error;
 
     fn try_from(value: JsGenesisContext) -> Result<Self, Self::Error> {
         Ok(GenesisContext {
             account: utils::create_address_from_js_string(value.account)?,
+            validator_contract: utils::create_address_from_js_string(value.validator_contract)?,
+            deployer_account: utils::create_address_from_js_string(value.deployer_account)?,
             initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
+        })
+    }
+}
+
+impl TryFrom<JsUpdateRewardsAndVotesContext> for UpdateRewardsAndVotesContext {
+    type Error = anyhow::Error;
+
+    fn try_from(mut value: JsUpdateRewardsAndVotesContext) -> Result<Self, Self::Error> {
+        Ok(UpdateRewardsAndVotesContext {
+            commit_key: value.commit_key.try_into()?,
+            timestamp: U256::from(value.timestamp.get_u64()?.0),
+            validator_address: utils::create_address_from_js_string(value.validator_address)?,
+            block_reward: value.block_reward.get_u128()?.1,
+            spec_id: parse_spec_id(value.spec_id)?,
         })
     }
 }

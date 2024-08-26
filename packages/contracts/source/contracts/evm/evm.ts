@@ -8,6 +8,8 @@ export enum EvmMode {
 
 export interface GenesisInfo {
 	readonly account: string;
+	readonly deployerAccount: string;
+	readonly validatorContract: string;
 	readonly initialSupply: bigint;
 }
 
@@ -16,7 +18,7 @@ export interface Instance extends CommitHandler {
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
-	updateAccountInfo(context: AccountUpdateContext): Promise<void>;
+	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
@@ -71,6 +73,14 @@ export interface BlockContext {
 	readonly gasLimit: bigint;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;
+}
+
+export interface UpdateRewardsAndVotesContext {
+	readonly commitKey: CommitKey;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
+	readonly blockReward: bigint;
+	readonly specId: SpecId;
 }
 
 export interface CommitKey {

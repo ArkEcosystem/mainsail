@@ -65,7 +65,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		}
 
 		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data);
-		await this.#updateEvmAccountInfoHost(commitKey, sender);
 
 		return { gasUsed: result.gasUsed, receipt: result.receipt };
 	}
@@ -166,13 +165,5 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		// 		validator.setAttribute("validatorVoteBalance", voteBalance.plus(transaction.amount));
 		// 	}
 		// }
-	}
-
-	async #updateEvmAccountInfoHost(commitKey: Contracts.Evm.CommitKey, sender: Contracts.State.Wallet): Promise<void> {
-		await this.evm.updateAccountInfo({
-			account: sender.getAddress(),
-			commitKey,
-			nonce: sender.getNonce().toBigInt(),
-		});
 	}
 }

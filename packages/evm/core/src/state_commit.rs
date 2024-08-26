@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
 use revm::{
-    db::AccountStatus,
-    primitives::{ExecutionResult, B256},
-    DatabaseRef, TransitionAccount,
+    db::WrapDatabaseRef,
+    primitives::{Address, ExecutionResult, B256},
 };
 
 use crate::{
@@ -20,10 +19,11 @@ pub struct StateCommit {
 
 pub fn build_commit(
     db: &mut PersistentDB,
-    mut pending_commit: PendingCommit,
+    pending_commit: PendingCommit,
     is_commit_to_db: bool,
 ) -> Result<StateCommit, crate::db::Error> {
-    merge_host_account_infos(db, &mut pending_commit, is_commit_to_db)?;
+    let _ = is_commit_to_db;
+    let _ = db;
 
     let PendingCommit {
         key,
@@ -47,6 +47,32 @@ pub fn build_commit(
     })
 }
 
+pub fn apply_rewards(
+    db: &mut PersistentDB,
+    pending: &mut PendingCommit,
+    rewards: HashMap<Address, u128>,
+) -> Result<(), crate::db::Error> {
+    let mut state = revm::State::builder()
+        .with_bundle_update()
+        .with_cached_prestate(std::mem::take(&mut pending.cache))
+        .with_database(WrapDatabaseRef(&db))
+        .build();
+
+    state.increment_balances(rewards)?;
+
+    if let Some(transition_state) = state.transition_state.take() {
+        // println!("transition state {:#?}", transition_state);
+        pending
+            .transitions
+            .add_transitions(transition_state.transitions.into_iter().collect());
+    }
+
+    pending.cache = std::mem::take(&mut state.cache);
+    // println!("cache {:#?}", pending.cache.accounts);
+
+    Ok(())
+}
+
 pub fn commit_to_db(
     db: &mut PersistentDB,
     pending_commit: PendingCommit,
@@ -65,60 +91,29 @@ pub fn commit_to_db(
     }
 }
 
-pub(crate) fn merge_host_account_infos(
-    db: &mut PersistentDB,
-    pending: &mut PendingCommit,
-    take_on_commit: bool,
-) -> Result<(), crate::db::Error> {
-    let host = if take_on_commit {
-        db.take_host_account_infos()
-    } else {
-        db.get_host_account_infos_cloned()
-    };
+#[test]
+fn test_apply_rewards() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
 
-    // TODO: here we could potentially also check for host balance changes caused by contracts
-    // and pass it back to the main process.
+    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+    let mut pending = PendingCommit::default();
 
-    let mut transition_accounts = Vec::with_capacity(host.len());
+    let account1 = revm::primitives::address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+    let account2 = revm::primitives::address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
 
-    for (address, account) in host {
-        let mut transition_account = TransitionAccount::default();
-        transition_account.status = AccountStatus::Changed;
-        transition_account.previous_status = AccountStatus::LoadedEmptyEIP161;
+    let mut rewards = HashMap::<Address, u128>::new();
+    rewards.insert(account1, 1234);
+    rewards.insert(account2, 0);
 
-        match pending.cache.accounts.get(&address) {
-            Some(cached) => {
-                transition_account.info = cached.account_info().clone();
-                transition_account.status = cached.status;
-            }
-            None => {
-                // Fetch it from heed
-                match db.basic_ref(address)? {
-                    Some(account) => {
-                        transition_account.info = Some(account);
-                    }
-                    None => {
-                        println!("insert not-existing account");
-                    }
-                }
-            }
-        }
+    let result = self::apply_rewards(&mut db, &mut pending, rewards);
+    assert!(result.is_ok());
 
-        // Update account in the state cache with host information
-        transition_account.info.as_mut().and_then(|info| {
-            // println!(
-            //     "updating nonce {} {} => {}",
-            //     address, info.nonce, account.nonce
-            // );
+    assert!(pending.cache.accounts.contains_key(&account1));
+    assert!(!pending.cache.accounts.contains_key(&account2));
 
-            info.nonce = account.nonce;
-            Some(info)
-        });
-
-        transition_accounts.push((address, transition_account));
-    }
-
-    pending.transitions.add_transitions(transition_accounts);
-
-    Ok(())
+    assert!(pending.transitions.transitions.contains_key(&account1));
+    assert!(!pending.transitions.transitions.contains_key(&account2));
 }
