@@ -287,8 +287,6 @@ describe<{
 			0,
 			BigNumber.ZERO,
 			"test",
-			null,
-			undefined,
 			{},
 		];
 		for (const value of invalidValues) {

@@ -1,4 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Verifier } from "@mainsail/crypto-transaction";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { BigNumber } from "@mainsail/utils";
 
@@ -10,11 +11,15 @@ import {
 	getRandomColdWallet,
 	getRandomFundedWallet,
 } from "./utils.js";
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 export const makeTransfer = async (
 	context: Context,
 	options: TransferOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	context.sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
@@ -32,6 +37,9 @@ export const makeTransfer = async (
 		.fee(BigNumber.make(fee).toFixed())
 		.recipientId(recipient)
 		.amount(BigNumber.make(amount).toFixed());
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };

@@ -1,15 +1,20 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Verifier } from "@mainsail/crypto-transaction";
 import { UsernameRegistrationBuilder } from "@mainsail/crypto-transaction-username-registration";
 import { BigNumber } from "@mainsail/utils";
 
 import { Context, UsernameRegistrationOptions } from "./types.js";
 import { makeUsernameResignation } from "./username-resignations.js";
 import { buildSignedTransaction, getRandomFundedWallet, getRandomUsername } from "./utils.js";
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 export const makeUsernameRegistration = async (
 	context: Context,
 	options: UsernameRegistrationOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	context.sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
@@ -20,6 +25,9 @@ export const makeUsernameRegistration = async (
 	username = username ?? getRandomUsername();
 
 	const builder = app.resolve(UsernameRegistrationBuilder).fee(BigNumber.make(fee).toFixed()).usernameAsset(username);
+
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
