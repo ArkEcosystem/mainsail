@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { Providers, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { performance } from "perf_hooks";
@@ -9,6 +10,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "validator")
 	private readonly configuration!: Providers.PluginConfiguration;
+
+	@inject(EvmConsensusIdentifiers.Internal.GenesisInfo)
+	private readonly genesisInfo!: Contracts.Evm.GenesisInfo;
 
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
@@ -130,6 +134,8 @@ export class Validator implements Contracts.Validator.Validator {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
+		await validator.getEvm().initializeGenesis(this.genesisInfo);
+
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
@@ -177,6 +183,15 @@ export class Validator implements Contracts.Validator.Validator {
 		}
 
 		this.txPoolWorker.setFailedTransactions(failedTransactions);
+
+		const validatorWallet = await this.stateService.getStore().walletRepository.findByPublicKey(generatorPublicKey);
+		await validator.getEvm().updateRewardsAndVotes({
+			commitKey,
+			timestamp: BigInt(timestamp),
+			validatorAddress: validatorWallet.getAddress(),
+			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
+			specId: milestone.evmSpec,
+		});
 
 		return {
 			stateHash: await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash),

@@ -445,37 +445,6 @@ describe<{
 		);
 	});
 
-	it("should update account info", async ({ instance }) => {
-		const [sender] = wallets;
-
-		let info = await instance.getAccountInfo(sender.address);
-		assert.equal(info.nonce, 0n);
-
-		let commitKey = { height: BigInt(0), round: BigInt(0) };
-
-		await instance.updateAccountInfo({
-			account: sender.address,
-			nonce: BigInt(1),
-			commitKey,
-		});
-		await instance.onCommit(commitKey as any);
-
-		commitKey = { height: BigInt(1), round: BigInt(0) };
-
-		info = await instance.getAccountInfo(sender.address);
-		assert.equal(info.nonce, 1n);
-
-		await instance.updateAccountInfo({
-			account: sender.address,
-			nonce: BigInt(2),
-			commitKey,
-		});
-		await instance.onCommit(commitKey as any);
-
-		info = await instance.getAccountInfo(sender.address);
-		assert.equal(info.nonce, 2n);
-	});
-
 	it("should return state hash", async ({ instance }) => {
 		const hash = await instance.stateHash(
 			{ height: BigInt(0), round: BigInt(0) },

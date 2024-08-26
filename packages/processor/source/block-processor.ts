@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, optional, tagged } from "@mainsail/container";
+import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -41,9 +41,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Processor.BlockVerifier)
 	private readonly verifier!: Contracts.Processor.Verifier;
 
-	@multiInject(Identifiers.State.ValidatorMutator)
-	private readonly validatorMutators!: Contracts.State.ValidatorMutator[];
-
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
@@ -75,8 +72,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
+			await this.#updateRewardsAndVotes(unit);
 			await this.#verifyStateHash(block);
-			await this.#applyBlockToForger(unit);
 
 			processResult.success = true;
 		} catch (error) {
@@ -213,15 +210,21 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		handler.emitEvents(transaction);
 	}
 
-	async #applyBlockToForger(unit: Contracts.Processor.ProcessableUnit) {
+	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {
+		const milestone = this.configuration.getMilestone();
 		const block = unit.getBlock();
-		const walletRepository = unit.store.walletRepository;
 
-		const forgerWallet = await walletRepository.findByPublicKey(unit.getBlock().data.generatorPublicKey);
+		const validatorWallet = await this.stateService
+			.getStore()
+			.walletRepository.findByPublicKey(block.header.generatorPublicKey);
 
-		for (const validatorMutator of this.validatorMutators) {
-			await validatorMutator.apply(walletRepository, forgerWallet, block.data);
-		}
+		await this.evm.updateRewardsAndVotes({
+			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			timestamp: BigInt(block.header.timestamp),
+			validatorAddress: validatorWallet.getAddress(),
+			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
+			specId: milestone.evmSpec,
+		});
 	}
 
 	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
