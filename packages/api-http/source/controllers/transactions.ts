@@ -103,7 +103,7 @@ export class TransactionsController extends Controller {
 				typeGroups[typeGroup] = {};
 			}
 
-			typeGroups[typeGroup][key] = staticFees[key].toFixed() ?? "0";
+			typeGroups[typeGroup][key] = staticFees[key]?.toFixed() ?? "0";
 		}
 
 		return { data: typeGroups };

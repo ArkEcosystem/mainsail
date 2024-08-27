@@ -7,6 +7,7 @@
 		"multiPayment": "10000000",
 		"validatorResignation": "2500000000",
 		"usernameRegistration": "2500000000",
-		"usernameResignation": "2500000000"
+		"usernameResignation": "2500000000",
+		"evmCall": "0"
 	}
 }

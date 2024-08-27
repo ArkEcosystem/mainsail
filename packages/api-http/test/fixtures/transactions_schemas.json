@@ -289,7 +289,7 @@
 									"$ref": "publicKey"
 								},
 								"maxItems": 16,
-								"minItems": 1,
+								"minItems": 2,
 								"uniqueItems": true
 							}
 						},
@@ -658,6 +658,95 @@
 				"maxItems": 16,
 				"minItems": 1,
 				"uniqueItems": true
+			},
+			"senderPublicKey": {
+				"$ref": "publicKey"
+			}
+		},
+		"10": {
+			"id": {
+				"anyOf": [
+					{
+						"$ref": "transactionId"
+					},
+					{
+						"type": "null"
+					}
+				]
+			},
+			"fee": {
+				"bignumber": {
+					"maximum": 1000,
+					"minimum": 5
+				}
+			},
+			"type": {
+				"transactionType": 10
+			},
+			"asset": {
+				"type": "object",
+				"required": ["evmCall"],
+				"properties": {
+					"evmCall": {
+						"type": "object",
+						"required": ["gasLimit", "payload"],
+						"properties": {
+							"payload": {
+								"bytecode": {}
+							},
+							"gasLimit": {
+								"transactionGasLimit": {}
+							}
+						},
+						"unevaluatedProperties": false
+					}
+				},
+				"unevaluatedProperties": false
+			},
+			"nonce": {
+				"bignumber": {
+					"minimum": 0
+				}
+			},
+			"amount": {
+				"bignumber": {
+					"maximum": 0,
+					"minimum": 0
+				}
+			},
+			"network": {
+				"$ref": "networkByte"
+			},
+			"version": {
+				"enum": [1]
+			},
+			"signature": {
+				"$ref": "alphanumeric"
+			},
+			"typeGroup": {
+				"type": "integer",
+				"minimum": 0
+			},
+			"signatures": {
+				"type": "array",
+				"items": {
+					"type": "string",
+					"allOf": [
+						{
+							"maxLength": 130,
+							"minLength": 130
+						},
+						{
+							"$ref": "alphanumeric"
+						}
+					]
+				},
+				"maxItems": 16,
+				"minItems": 1,
+				"uniqueItems": true
+			},
+			"recipientId": {
+				"$ref": "address"
 			},
 			"senderPublicKey": {
 				"$ref": "publicKey"
