@@ -31,10 +31,10 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 
 				return this.createQueryBuilder()
 					.select(['type_group AS "typeGroup"', "type"])
-					.addSelect("COALESCE(AVG(fee), 0)::int8", "avg")
-					.addSelect("COALESCE(MIN(fee), 0)::int8", "min")
-					.addSelect("COALESCE(MAX(fee), 0)::int8", "max")
-					.addSelect("COALESCE(SUM(fee), 0)::int8", "sum")
+					.addSelect("TRUNC(COALESCE(AVG(fee), 0)::numeri)c", "avg")
+					.addSelect("TRUNC(COALESCE(MIN(fee), 0)::numeri)c", "min")
+					.addSelect("TRUNC(COALESCE(MAX(fee), 0)::numeri)c", "max")
+					.addSelect("TRUNC(COALESCE(SUM(fee), 0)::numeri)c", "sum")
 					.where("timestamp > :age AND fee >= :minFee", { age, minFee })
 					.groupBy("type_group")
 					.addGroupBy("type")
@@ -47,10 +47,10 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 			return this.manager.query<FeeStatistics[]>(
 				`
 				select t_outer.type_group as "typeGroup", t_outer.type as "type", 
-					COALESCE(AVG(fee), 0)::int8 AS "avg",
-					COALESCE(MIN(fee), 0)::int8 AS "min",
-					COALESCE(MIN(fee), 0)::int8 AS "max",
-					COALESCE(MAX(fee), 0)::int8 AS "sum"
+					TRUNC(COALESCE(AVG(fee), 0)::numeric) AS "avg",
+					TRUNC(COALESCE(MIN(fee), 0)::numeric) AS "min",
+					TRUNC(COALESCE(MIN(fee), 0)::numeric) AS "max",
+					TRUNC(COALESCE(MAX(fee), 0)::numeric) AS "sum"
 				from transactions t_outer
 				join lateral (
 					select 1 from transactions t_inner
