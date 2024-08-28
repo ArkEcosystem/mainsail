@@ -1,4 +1,4 @@
-use mainsail_evm_core::db::TinyReceipt;
+use mainsail_evm_core::{db::TinyReceipt, state_changes::AccountUpdate};
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{AccountInfo, Bytes, Log};
@@ -18,11 +18,18 @@ impl JsProcessResult {
 }
 
 #[napi(object)]
-pub struct JsCommitResult {}
+pub struct JsCommitResult {
+    pub dirty_accounts: Vec<JsAccountUpdate>,
+}
 
 impl JsCommitResult {
-    pub fn new(_node_env: &napi::Env) -> anyhow::Result<Self> {
-        Ok(Self {})
+    pub fn new(node_env: &napi::Env, result: CommitResult) -> anyhow::Result<Self> {
+        let mut dirty_accounts = Vec::with_capacity(result.dirty_accounts.len());
+        for item in result.dirty_accounts {
+            dirty_accounts.push(JsAccountUpdate::new(node_env, item)?);
+        }
+
+        Ok(Self { dirty_accounts })
     }
 }
 
@@ -55,6 +62,11 @@ pub struct JsTransactionReceipt {
     // TODO: typing
     pub logs: serde_json::Value,
     pub output: Option<JsBuffer>,
+}
+
+#[derive(Default)]
+pub struct CommitResult {
+    pub dirty_accounts: Vec<AccountUpdate>,
 }
 
 #[derive(Default)]
@@ -125,6 +137,23 @@ impl JsAccountInfo {
         Ok(JsAccountInfo {
             nonce: node_env.create_bigint_from_u64(account_info.nonce)?,
             balance: utils::convert_u256_to_bigint(node_env, account_info.balance)?,
+        })
+    }
+}
+
+#[napi(object)]
+pub struct JsAccountUpdate {
+    pub address: JsString,
+    pub balance: JsBigInt,
+    pub nonce: JsBigInt,
+}
+
+impl JsAccountUpdate {
+    pub fn new(node_env: &napi::Env, account_update: AccountUpdate) -> anyhow::Result<Self> {
+        Ok(JsAccountUpdate {
+            address: node_env.create_string_from_std(account_update.address.to_checksum(None))?,
+            nonce: node_env.create_bigint_from_u64(account_update.nonce)?,
+            balance: utils::convert_u256_to_bigint(node_env, account_update.balance)?,
         })
     }
 }

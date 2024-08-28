@@ -7,7 +7,7 @@ use revm::{
 
 use crate::{
     db::{CommitKey, Error, PendingCommit, PersistentDB},
-    state_changes,
+    state_changes::{self, AccountUpdate},
 };
 
 #[derive(Debug, Default)]
@@ -76,19 +76,38 @@ pub fn apply_rewards(
 pub fn commit_to_db(
     db: &mut PersistentDB,
     pending_commit: PendingCommit,
-) -> Result<(), crate::db::Error> {
+) -> Result<Vec<AccountUpdate>, crate::db::Error> {
     let mut commit = build_commit(db, pending_commit, true)?;
 
     match db.commit(&mut commit) {
-        Ok(_) => Ok(()),
+        Ok(_) => Ok(collect_dirty_accounts(commit)),
         Err(err) => match &err {
             Error::DbFull => {
                 // try to resize the db and attempt another commit on success
-                db.resize().and_then(|_| db.commit(&mut commit))
+                db.resize().and_then(|_| {
+                    db.commit(&mut commit)
+                        .and_then(|_| Ok(collect_dirty_accounts(commit)))
+                })
             }
             _ => Err(err),
         },
     }
+}
+
+fn collect_dirty_accounts(commit: StateCommit) -> Vec<AccountUpdate> {
+    let mut dirty_accounts = Vec::with_capacity(commit.change_set.accounts.len());
+    for (address, account) in commit.change_set.accounts {
+        if let Some(account) = account {
+            dirty_accounts.push(AccountUpdate {
+                address,
+                balance: account.balance,
+                nonce: account.nonce,
+                // TODO: fill contract attributes (voteBalance, etc.) here or only once at end of round?
+            });
+        }
+    }
+
+    dirty_accounts
 }
 
 #[test]

@@ -26,6 +26,16 @@ pub struct StorageChangeset {
     pub storage: Vec<(U256, StorageSlot)>,
 }
 
+pub struct AccountUpdate {
+    pub address: Address,
+    pub balance: U256,
+    pub nonce: u64,
+    // TODO: contract fields? (attributes)
+    // - validatorBlsKey
+    // - voteBalance
+    // - vote
+}
+
 pub fn bundle_into_change_set(bundle_state: BundleState) -> StateChangeset {
     let is_value_known = OriginalValuesKnown::Yes;
 
