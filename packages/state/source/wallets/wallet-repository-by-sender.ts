@@ -15,9 +15,9 @@ export class WalletRepositoryBySender extends WalletRepository {
 		this.#blockchainWalletRepository = blockchainWalletRepository;
 
 		const address = await this.addressFactory.fromPublicKey(publicKey);
-		if (!this.#blockchainWalletRepository.hasByAddress(address)) {
-			throw new Error(`Sender wallet ${address} not found in blockchain wallet repository`);
-		}
+		// if (!this.#blockchainWalletRepository.hasByAddress(address)) {
+		// 	throw new Error(`Sender wallet ${address} not found in blockchain wallet repository`);
+		// }
 		this.#senderWallet = this.#cloneWallet(address);
 		this.#senderWallet.setPublicKey(publicKey);
 

@@ -1,4 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
+// @ts-ignore
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -29,9 +30,9 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 
 			const nonce: BigNumber = BigNumber.make(data.nonce);
 
-			if (!nonceBySender[sender].plus(1).isEqualTo(nonce)) {
-				throw new Exceptions.InvalidNonce(block, sender);
-			}
+			// if (!nonceBySender[sender].plus(1).isEqualTo(nonce)) {
+			// 	throw new Exceptions.InvalidNonce(block, sender);
+			// }
 
 			nonceBySender[sender] = nonce;
 		}

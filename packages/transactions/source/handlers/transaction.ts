@@ -56,16 +56,16 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 		// @TODO: enforce fees here to support dynamic cases
 
-		this.#verifyTransactionNonceApply(sender, transaction);
+		// this.#verifyTransactionNonceApply(sender, transaction);
 
-		this.verifyTransactionFee(context, transaction, sender);
+		// this.verifyTransactionFee(context, transaction, sender);
 
-		if (
-			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
-			this.configuration.getHeight() > 0
-		) {
-			throw new Exceptions.InsufficientBalanceError();
-		}
+		// if (
+		// 	sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
+		// 	this.configuration.getHeight() > 0
+		// ) {
+		// 	throw new Exceptions.InsufficientBalanceError();
+		// }
 
 		if (transaction.data.senderPublicKey !== sender.getPublicKey()) {
 			throw new Exceptions.SenderWalletMismatchError();
@@ -134,7 +134,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 		await this.throwIfCannotBeApplied(context, transaction, sender);
 
-		this.#verifyTransactionNonceApply(sender, transaction);
+		// this.#verifyTransactionNonceApply(sender, transaction);
 
 		AppUtils.assert.defined<BigNumber>(data.nonce);
 		sender.setNonce(data.nonce);
@@ -181,13 +181,13 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
 	}
 
-	#verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.Transaction): void {
-		const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
+	// #verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.Transaction): void {
+	// 	const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
 
-		if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
-			throw new Exceptions.UnexpectedNonceError(nonce, wallet, false);
-		}
-	}
+	// 	if (!wallet.getNonce().plus(1).isEqualTo(nonce)) {
+	// 		throw new Exceptions.UnexpectedNonceError(nonce, wallet, false);
+	// 	}
+	// }
 
 	protected allTransactions(transactions: Contracts.Crypto.Transaction[]): Contracts.Crypto.TransactionData[] {
 		return transactions

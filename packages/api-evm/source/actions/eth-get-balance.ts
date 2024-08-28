@@ -1,10 +1,12 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class EthGetBalanceAction implements Contracts.Api.RPC.Action {
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
 
 	public readonly name: string = "eth_getBalance";
 
@@ -19,14 +21,7 @@ export class EthGetBalanceAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string, string]): Promise<string> {
-		const walletRepository = this.stateService.getStore().walletRepository;
-
-		if (walletRepository.hasByAddress(parameters[0])) {
-			const wallet = walletRepository.findByAddress(parameters[0]);
-
-			return `0x${Number(wallet.getBalance()).toString(16)}`;
-		}
-
-		return `0x0`;
+		const accountInfo = await this.evm.getAccountInfo(parameters[0]);
+		return `0x${Utils.BigNumber.make(accountInfo.balance).toString(16)}`;
 	}
 }
