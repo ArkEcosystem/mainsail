@@ -1,4 +1,4 @@
-use std::{borrow::Cow, cell::RefCell, convert::Infallible, path::PathBuf};
+use std::{borrow::Cow, cell::RefCell, collections::BTreeMap, convert::Infallible, path::PathBuf};
 
 use heed::{EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
@@ -71,7 +71,7 @@ pub struct CommitKey(pub u64, pub u64);
 pub struct PendingCommit {
     pub key: CommitKey,
     pub cache: CacheState,
-    pub results: HashMap<B256, ExecutionResult>,
+    pub results: BTreeMap<B256, ExecutionResult>,
     pub transitions: TransitionState,
 }
 
@@ -296,7 +296,7 @@ impl PersistentDB {
         &self,
         key: CommitKey,
         change_set: &mut state_changes::StateChangeset,
-        results: &HashMap<B256, ExecutionResult>,
+        results: &BTreeMap<B256, ExecutionResult>,
     ) -> Result<(), Error> {
         assert!(!self.is_height_committed(key.0));
 

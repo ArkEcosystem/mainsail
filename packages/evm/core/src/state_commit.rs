@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use alloy_sol_types::SolEvent;
 use revm::{
@@ -15,7 +15,7 @@ use crate::{
 pub struct StateCommit {
     pub key: CommitKey,
     pub change_set: state_changes::StateChangeset,
-    pub results: HashMap<B256, ExecutionResult>,
+    pub results: BTreeMap<B256, ExecutionResult>,
 }
 
 pub fn build_commit(
