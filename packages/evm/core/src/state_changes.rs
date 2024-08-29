@@ -26,6 +26,16 @@ pub struct StorageChangeset {
     pub storage: Vec<(U256, StorageSlot)>,
 }
 
+pub struct AccountUpdate {
+    pub address: Address,
+    pub balance: U256,
+    pub nonce: u64,
+    // Set when commit receipt contains "Voted" event
+    pub vote: Option<Address>,
+    // Set when commit receipt contains "Unvoted" event
+    pub unvote: Option<Address>,
+}
+
 pub fn bundle_into_change_set(bundle_state: BundleState) -> StateChangeset {
     let is_value_known = OriginalValuesKnown::Yes;
 
