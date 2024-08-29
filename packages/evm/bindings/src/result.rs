@@ -146,14 +146,28 @@ pub struct JsAccountUpdate {
     pub address: JsString,
     pub balance: JsBigInt,
     pub nonce: JsBigInt,
+    pub vote: Option<JsString>,
+    pub unvote: Option<JsString>,
 }
 
 impl JsAccountUpdate {
     pub fn new(node_env: &napi::Env, account_update: AccountUpdate) -> anyhow::Result<Self> {
+        let vote = match &account_update.vote {
+            Some(vote) => Some(node_env.create_string_from_std(vote.to_string())?),
+            None => None,
+        };
+
+        let unvote = match &account_update.unvote {
+            Some(unvote) => Some(node_env.create_string_from_std(unvote.to_string())?),
+            None => None,
+        };
+
         Ok(JsAccountUpdate {
             address: node_env.create_string_from_std(account_update.address.to_checksum(None))?,
             nonce: node_env.create_bigint_from_u64(account_update.nonce)?,
             balance: utils::convert_u256_to_bigint(node_env, account_update.balance)?,
+            vote,
+            unvote,
         })
     }
 }

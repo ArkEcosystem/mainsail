@@ -1,12 +1,13 @@
 use std::collections::HashMap;
 
+use alloy_sol_types::SolEvent;
 use revm::{
     db::WrapDatabaseRef,
     primitives::{Address, ExecutionResult, B256},
 };
 
 use crate::{
-    db::{CommitKey, Error, PendingCommit, PersistentDB},
+    db::{CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
     state_changes::{self, AccountUpdate},
 };
 
@@ -77,16 +78,17 @@ pub fn commit_to_db(
     db: &mut PersistentDB,
     pending_commit: PendingCommit,
 ) -> Result<Vec<AccountUpdate>, crate::db::Error> {
+    let genesis_info = db.genesis_info.clone();
     let mut commit = build_commit(db, pending_commit, true)?;
 
     match db.commit(&mut commit) {
-        Ok(_) => Ok(collect_dirty_accounts(commit)),
+        Ok(_) => Ok(collect_dirty_accounts(commit, &genesis_info)),
         Err(err) => match &err {
             Error::DbFull => {
                 // try to resize the db and attempt another commit on success
                 db.resize().and_then(|_| {
                     db.commit(&mut commit)
-                        .and_then(|_| Ok(collect_dirty_accounts(commit)))
+                        .and_then(|_| Ok(collect_dirty_accounts(commit, &genesis_info)))
                 })
             }
             _ => Err(err),
@@ -94,20 +96,78 @@ pub fn commit_to_db(
     }
 }
 
-fn collect_dirty_accounts(commit: StateCommit) -> Vec<AccountUpdate> {
-    let mut dirty_accounts = Vec::with_capacity(commit.change_set.accounts.len());
+fn collect_dirty_accounts(
+    commit: StateCommit,
+    genesis_info: &Option<GenesisInfo>,
+) -> Vec<AccountUpdate> {
+    let mut dirty_accounts = HashMap::with_capacity(commit.change_set.accounts.len());
+
     for (address, account) in commit.change_set.accounts {
         if let Some(account) = account {
-            dirty_accounts.push(AccountUpdate {
+            dirty_accounts.insert(
                 address,
-                balance: account.balance,
-                nonce: account.nonce,
-                // TODO: fill contract attributes (voteBalance, etc.) here or only once at end of round?
-            });
+                AccountUpdate {
+                    address,
+                    balance: account.balance,
+                    nonce: account.nonce,
+                    vote: None,
+                    unvote: None,
+                },
+            );
         }
     }
 
-    dirty_accounts
+    if let Some(info) = genesis_info {
+        for receipt in commit.results.values() {
+            match receipt {
+                ExecutionResult::Success { logs, .. } => {
+                    for log in logs {
+                        match log.address {
+                            _ if log.address == info.validator_contract => {
+                                // Attempt to decode the log as a Voted event
+                                if let Ok(event) = crate::events::Voted::decode_log(&log, true) {
+                                    // println!(
+                                    //     "Voted event (from={:?} to={:?})",
+                                    //     event.data.voter, event.data.validator,
+                                    // );
+
+                                    dirty_accounts.get_mut(&event.voter).and_then(|account| {
+                                        account.vote = Some(event.validator);
+                                        account.unvote = None; // cancel out any previous unvote if one happened in same commit
+                                        Some(account)
+                                    });
+
+                                    break;
+                                }
+
+                                // Attempt to decode the log as a Unvoted event
+                                if let Ok(event) = crate::events::Unvoted::decode_log(&log, true) {
+                                    // println!(
+                                    //     "Unvoted event (from={:?} removed vote={:?})",
+                                    //     event.data.voter, event.data.validator,
+                                    // );
+
+                                    dirty_accounts.get_mut(&event.voter).and_then(|account| {
+                                        account.unvote = Some(event.validator);
+                                        account.vote = None; // cancel out any previous vote if one happened in same commit
+                                        Some(account)
+                                    });
+
+                                    break;
+                                }
+                            }
+                            _ => (), // ignore
+                        }
+                    }
+
+                    //
+                }
+                ExecutionResult::Revert { .. } | ExecutionResult::Halt { .. } => todo!(),
+            }
+        }
+    }
+
+    dirty_accounts.into_values().collect()
 }
 
 #[test]
