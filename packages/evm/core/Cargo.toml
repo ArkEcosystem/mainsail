@@ -17,6 +17,9 @@ bincode = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 
+alloy-sol-types = { version = "0.7.7", default-features = false, features = [
+    "std",
+] }
 heed = { version = "0.20.0", features = [] }
 rayon = "1.10.0"
 
