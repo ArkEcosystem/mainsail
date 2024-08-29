@@ -50,6 +50,13 @@ export class EvmInstance implements Contracts.Evm.Instance {
 				const wallet = walletRepository.findByAddress(account.address);
 				wallet.setBalance(BigNumber.make(account.balance));
 				wallet.setNonce(BigNumber.make(account.nonce));
+
+				if (account.vote) {
+					const votedWallet = walletRepository.findByAddress(account.vote);
+					wallet.setAttribute("vote", votedWallet.getPublicKey());
+				} else if (account.unvote) {
+					wallet.forgetAttribute("vote");
+				}
 			}
 		}
 	}
