@@ -51,10 +51,16 @@ impl EvmInner {
         let result = self.transact_evm(tx_ctx.into());
 
         Ok(match result {
-            Ok(r) => TxViewResult {
-                success: r.is_success(),
-                output: r.into_output(),
-            },
+            Ok(r) => {
+                if !r.is_success() {
+                    println!("view call failed: {:?}", r);
+                }
+
+                TxViewResult {
+                    success: r.is_success(),
+                    output: r.into_output(),
+                }
+            }
             Err(_) => TxViewResult {
                 success: false,
                 output: None,
