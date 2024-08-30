@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-transaction-vote",
-	"version": "0.0.1-evm.1",
+	"version": "0.0.1-evm.2",
 	"description": "Vote transaction for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
