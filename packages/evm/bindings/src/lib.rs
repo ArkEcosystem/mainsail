@@ -124,6 +124,16 @@ impl EvmInner {
         &mut self,
         ctx: UpdateRewardsAndVotesContext,
     ) -> std::result::Result<(), EVMError<String>> {
+        // TODO: call this logic at start of block processor
+        // Drop pending commit on key change
+        if self
+            .pending_commit
+            .as_ref()
+            .is_some_and(|pending| pending.key != ctx.commit_key)
+        {
+            self.drop_pending_commit();
+        }
+
         let mut pending_commit = self.pending_commit.get_or_insert_with(|| PendingCommit {
             key: ctx.commit_key,
             ..Default::default()
