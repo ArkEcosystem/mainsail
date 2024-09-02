@@ -14,6 +14,7 @@ export interface GenesisInfo {
 }
 
 export interface Instance extends CommitHandler {
+	prepareNextCommit(context: PrepareNextCommitContext): Promise<void>;
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
@@ -46,6 +47,10 @@ export interface AccountUpdateContext {
 	readonly account: string;
 	readonly commitKey: CommitKey;
 	readonly nonce: bigint;
+}
+
+export interface PrepareNextCommitContext {
+	readonly commitKey: CommitKey;
 }
 
 export interface TransactionContext {

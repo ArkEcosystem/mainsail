@@ -59,6 +59,16 @@ pub struct JsCommitKey {
     pub round: JsBigInt,
 }
 
+#[napi(object)]
+pub struct JsPrepareNextCommitContext {
+    pub commit_key: JsCommitKey,
+}
+
+#[derive(Debug)]
+pub struct PrepareNextCommitContext {
+    pub commit_key: CommitKey,
+}
+
 #[derive(Debug)]
 pub struct TxContext {
     pub caller: Address,
@@ -155,6 +165,16 @@ impl TryFrom<JsCommitKey> for CommitKey {
             value.height.get_u64()?.0,
             value.round.get_u64()?.0,
         ))
+    }
+}
+
+impl TryFrom<JsPrepareNextCommitContext> for PrepareNextCommitContext {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsPrepareNextCommitContext) -> Result<Self, Self::Error> {
+        Ok(PrepareNextCommitContext {
+            commit_key: value.commit_key.try_into()?,
+        })
     }
 }
 

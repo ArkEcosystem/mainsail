@@ -22,6 +22,8 @@ export class MockInstance implements Contracts.Evm.Instance {
 
 	public async initializeGenesis(commit: Contracts.Evm.GenesisInfo): Promise<void> {}
 
+	public async prepareNextCommit(context: Contracts.Evm.PrepareNextCommitContext): Promise<void> {}
+
 	public async getAccountInfo(address: string): Promise<Contracts.Evm.AccountInfo> {
 		return { balance: 0n, nonce: 0n };
 	}

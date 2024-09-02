@@ -15,6 +15,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		this.#evm = new Evm(this.app.dataPath());
 	}
 
+	public async prepareNextCommit(context: Contracts.Evm.PrepareNextCommitContext): Promise<void> {
+		return this.#evm.prepareNextCommit(context);
+	}
+
 	public async view(viewContext: Contracts.Evm.TransactionViewContext): Promise<Contracts.Evm.ViewResult> {
 		return this.#evm.view(viewContext);
 	}
