@@ -2,8 +2,9 @@ use std::{collections::HashMap, path::PathBuf, sync::Arc, u64};
 
 use ctx::{
     BlockContext, ExecutionContext, GenesisContext, JsCommitKey, JsGenesisContext,
-    JsTransactionContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext, TxContext,
-    TxViewContext, UpdateRewardsAndVotesContext,
+    JsPrepareNextCommitContext, JsTransactionContext, JsTransactionViewContext,
+    JsUpdateRewardsAndVotesContext, PrepareNextCommitContext, TxContext, TxViewContext,
+    UpdateRewardsAndVotesContext,
 };
 use mainsail_evm_core::{
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
@@ -45,6 +46,22 @@ impl EvmInner {
             persistent_db,
             pending_commit: Default::default(),
         }
+    }
+
+    pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
+        if let Some(pending) = self.pending_commit.as_ref() {
+            println!(
+                "discarding existing pending commit {:?} for {:?}",
+                pending.key, ctx.commit_key
+            );
+        }
+
+        self.pending_commit.replace(PendingCommit {
+            key: ctx.commit_key,
+            ..Default::default()
+        });
+
+        Ok(())
     }
 
     pub fn view(&mut self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
@@ -569,6 +586,19 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
+    pub fn prepare_next_commit(
+        &mut self,
+        node_env: Env,
+        ctx: JsPrepareNextCommitContext,
+    ) -> Result<JsObject> {
+        let ctx = PrepareNextCommitContext::try_from(ctx)?;
+        node_env.execute_tokio_future(
+            Self::prepare_next_commit_async(self.evm.clone(), ctx),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<void>")]
     pub fn update_rewards_and_votes(
         &mut self,
         node_env: Env,
@@ -678,6 +708,19 @@ impl JsEvmWrapper {
     ) -> Result<()> {
         let mut lock = evm.lock().await;
         let result = lock.initialize_genesis(genesis_ctx);
+
+        match result {
+            Ok(_) => Result::Ok(()),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn prepare_next_commit_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        ctx: PrepareNextCommitContext,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.prepare_next_commit(ctx);
 
         match result {
             Ok(_) => Result::Ok(()),
