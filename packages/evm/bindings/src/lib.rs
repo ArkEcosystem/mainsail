@@ -141,20 +141,16 @@ impl EvmInner {
         &mut self,
         ctx: UpdateRewardsAndVotesContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        // TODO: call this logic at start of block processor
-        // Drop pending commit on key change
-        if self
-            .pending_commit
-            .as_ref()
-            .is_some_and(|pending| pending.key != ctx.commit_key)
-        {
-            self.drop_pending_commit();
-        }
+        assert!(
+            self.pending_commit
+                .as_ref()
+                .is_some_and(|c| c.key == ctx.commit_key),
+            "update_rewards_and_votes pending commit key mismatch {:?} - {:?}",
+            self.pending_commit.as_ref().map(|c| c.key),
+            ctx.commit_key
+        );
 
-        let mut pending_commit = self.pending_commit.get_or_insert_with(|| PendingCommit {
-            key: ctx.commit_key,
-            ..Default::default()
-        });
+        let mut pending_commit = self.pending_commit.as_mut().expect("ok");
 
         let genesis_info = self
             .persistent_db
@@ -185,7 +181,7 @@ impl EvmInner {
 
                 // encode abi into Bytes
                 let calldata = abi
-                    .encode("updateVoters", voters)
+                    .encode("updateVoters", voters.clone())
                     .expect("encode updateVoters");
 
                 match self.transact_evm(ExecutionContext {
@@ -204,7 +200,10 @@ impl EvmInner {
                     tx_hash: None,
                 }) {
                     Ok(receipt) => {
-                        println!("vote_update {:?}", receipt);
+                        println!(
+                            "vote_update {:?} {:?} {:?}",
+                            ctx.commit_key, receipt, voters
+                        );
                         assert!(receipt.is_success(), "vote_update unsuccessful");
                         Ok(())
                     }
@@ -254,13 +253,8 @@ impl EvmInner {
             }
         }
 
-        // Drop pending commit on key change
-        if self
-            .pending_commit
-            .as_ref()
-            .is_some_and(|pending| pending.key != commit_key)
-        {
-            self.drop_pending_commit();
+        if let Some(pending) = self.pending_commit.as_ref() {
+            assert!(pending.key == commit_key, "pending commit key mismatch");
         }
 
         let gas_limit = tx_ctx.gas_limit;

@@ -135,6 +135,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 		const validator = this.createTransactionValidator();
 		await validator.getEvm().initializeGenesis(this.genesisInfo);
+		await validator.getEvm().prepareNextCommit({ commitKey });
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];

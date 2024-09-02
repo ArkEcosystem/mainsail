@@ -57,6 +57,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		try {
 			const block = unit.getBlock();
 
+			await this.evm.prepareNextCommit({
+				commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			});
+
 			await this.verifier.verify(unit);
 
 			for (const [index, transaction] of unit.getBlock().transactions.entries()) {
