@@ -194,6 +194,8 @@ describe<{
 
 		const commitKey = { height: BigInt(0), round: BigInt(0) };
 
+		await instance.prepareNextCommit({ commitKey });
+
 		let { receipt } = await instance.process({
 			blockContext: { ...blockContext, commitKey },
 			caller: sender.address,
@@ -216,25 +218,24 @@ describe<{
 		const commitKey2 = { height: BigInt(1), round: BigInt(1) };
 
 		// Transfer 1 ARK (1,0)
-		await assert.resolves(
-			async () =>
-				await instance.process({
-					blockContext: { ...blockContext, commitKey: commitKey1 },
-					value: 0n,
-					caller: sender.address,
-					data: Buffer.from(
-						ethers.getBytes(
-							iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("1")]),
-						),
-					),
-					recipient: contractAddress,
-					txHash: getRandomTxHash(),
-					...transferConfig,
-				}),
-		);
+		await assert.resolves(async () => {
+			await instance.prepareNextCommit({ commitKey: commitKey1 });
+			await instance.process({
+				blockContext: { ...blockContext, commitKey: commitKey1 },
+				value: 0n,
+				caller: sender.address,
+				data: Buffer.from(
+					ethers.getBytes(iface.encodeFunctionData("transfer", [recipient.address, ethers.parseEther("1")])),
+				),
+				recipient: contractAddress,
+				txHash: getRandomTxHash(),
+				...transferConfig,
+			});
+		});
 
 		// Transfer 2 ARK (1,1)
 		await assert.resolves(async () => {
+			await instance.prepareNextCommit({ commitKey: commitKey2 });
 			await instance.process({
 				blockContext: { ...blockContext, commitKey: commitKey2 },
 				value: 0n,
@@ -297,6 +298,8 @@ describe<{
 
 		await instance.onCommit(commitKey as any);
 
+		const prevReceipt = receipt;
+
 		({ receipt } = await instance.process({
 			caller: sender.address,
 			value: 0n,
@@ -309,7 +312,8 @@ describe<{
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
-		assert.null(receipt.logs);
+		assert.length(receipt.logs, 1);
+		assert.equal(receipt, prevReceipt);
 	});
 
 	it("should throw when passing non-existent tx hash for committed receipt", async ({ instance }) => {
@@ -482,14 +486,18 @@ describe<{
 	it("should panic when transferring value without funds", async ({ instance }) => {
 		const [sender] = wallets;
 
-		await instance.process({
-			caller: sender.address,
-			value: 2n,
-			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
-			...deployConfig,
-		});
+		await assert.rejects(
+			async () =>
+				await instance.process({
+					caller: sender.address,
+					value: 2n,
+					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+					txHash: getRandomTxHash(),
+					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+					...deployConfig,
+				}),
+			"Panic in async function",
+		);
 	});
 
 	it("should return storage", async ({ instance }) => {
