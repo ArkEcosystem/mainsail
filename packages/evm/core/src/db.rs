@@ -5,7 +5,12 @@ use rayon::slice::ParallelSliceMut;
 use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 use serde::{Deserialize, Serialize};
 
-use crate::{state_changes, state_commit::StateCommit, state_hash};
+use crate::{
+    receipt::{map_execution_result, TxReceipt},
+    state_changes,
+    state_commit::StateCommit,
+    state_hash,
+};
 
 #[derive(Debug)]
 struct AddressWrapper(Address);
@@ -53,7 +58,7 @@ struct CommitReceipts {
     accounts_hash: B256,
     storage_hash: B256,
     contracts_hash: B256,
-    tx_receipts: HashMap<B256, TinyReceipt>,
+    tx_receipts: HashMap<B256, TxReceipt>,
 }
 
 struct InnerStorage {
@@ -366,22 +371,7 @@ impl PersistentDB {
             // Finalize commit
             let mut tx_receipts = HashMap::new();
             for (k, result) in results {
-                let deployed_contract = match &result {
-                    ExecutionResult::Success { output, .. } => match output {
-                        Output::Create(_, address) => address.clone(),
-                        _ => None,
-                    },
-                    _ => None,
-                };
-
-                tx_receipts.insert(
-                    k.clone(),
-                    TinyReceipt {
-                        gas_used: result.gas_used(),
-                        success: result.is_success(),
-                        deployed_contract,
-                    },
-                );
+                tx_receipts.insert(k.clone(), map_execution_result(result.clone()));
             }
 
             inner.commits.put(
@@ -420,7 +410,7 @@ impl PersistentDB {
         &self,
         height: u64,
         tx_hash: B256,
-    ) -> Result<(bool, Option<TinyReceipt>), Error> {
+    ) -> Result<(bool, Option<TxReceipt>), Error> {
         let env = self.env.clone();
         let rtxn = env.read_txn().expect("read");
         let inner = self.inner.borrow();
