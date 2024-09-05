@@ -19,7 +19,7 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 				convertToJsonbSorting(sorting, [
 					{
 						direction: "desc",
-						jsonFieldAccessor: { cast: "bigint", fieldName: "balance", operator: "->>" },
+						jsonFieldAccessor: { cast: "numeric", fieldName: "balance", operator: "->>" },
 						property: "attributes",
 					},
 				]),
@@ -59,7 +59,7 @@ const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting 
 		(item): SortFragment => ({
 			direction: item.direction,
 			jsonFieldAccessor: {
-				cast: "bigint",
+				cast: "numeric",
 				fieldName: item.property.replace("attributes.", ""),
 				operator: "->>",
 			},
