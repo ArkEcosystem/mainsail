@@ -242,10 +242,13 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		const peer = getRandomPeer(peers);
 
+		const heightFrom = index === 0 ? this.stateService.getStore().getLastHeight() + 1 : job.heightFrom;
+		const heightTo = this.#downloadJobs.length === 1 ? this.#calculateHeightTo(peer) : job.heightTo;
+
 		const newJob: DownloadJob = {
 			blocks: [],
-			heightFrom: index === 0 ? this.stateService.getStore().getLastHeight() + 1 : job.heightFrom,
-			heightTo: this.#downloadJobs.length === 1 ? this.#calculateHeightTo(peer) : job.heightTo,
+			heightFrom,
+			heightTo: Math.max(heightFrom, heightTo),
 			peer,
 			peerHeight: peer.header.height - 1,
 			status: JobStatus.Downloading,
