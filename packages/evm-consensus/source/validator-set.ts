@@ -75,14 +75,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
 	}
 
-
 	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWallet[]> {
 		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
-		const { activeValidators, evmSpec } = this.configuration.getMilestone();
+		const {  evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(CONSENSUS.abi.abi);
-		const data = iface.encodeFunctionData("calculateTopValidators", [activeValidators]).slice(2);
+		const data = iface.encodeFunctionData("getTopValidators").slice(2);
 
 		const result = await this.evm.view({
 			caller: deployerAddress,
@@ -92,11 +91,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		});
 
 		if (!result.success) {
-			this.app.terminate("calculateTopValidators failed");
+			this.app.terminate("getTopValidators failed");
 		}
 
 		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
-		const [validators] = iface.decodeFunctionResult("calculateTopValidators", result.output!);
+		const [validators] = iface.decodeFunctionResult("getTopValidators", result.output!);
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [index, validator] of validators.entries()) {
