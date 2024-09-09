@@ -45,6 +45,15 @@ pub struct JsGenesisContext {
 }
 
 #[napi(object)]
+pub struct JsCalculateTopValidatorsContext {
+    pub commit_key: JsCommitKey,
+    pub timestamp: JsBigInt,
+    pub active_validators: JsBigInt,
+    pub validator_address: JsString,
+    pub spec_id: JsString,
+}
+
+#[napi(object)]
 pub struct JsUpdateRewardsAndVotesContext {
     pub commit_key: JsCommitKey,
     pub timestamp: JsBigInt,
@@ -104,6 +113,15 @@ pub struct GenesisContext {
     pub deployer_account: Address,
     pub validator_contract: Address,
     pub initial_supply: U256,
+}
+
+#[derive(Debug)]
+pub struct CalculateTopValidatorsContext {
+    pub commit_key: CommitKey,
+    pub timestamp: U256,
+    pub active_validators: u128,
+	pub validator_address: Address,
+    pub spec_id: SpecId,
 }
 
 #[derive(Debug)]
@@ -246,6 +264,20 @@ impl TryFrom<JsGenesisContext> for GenesisContext {
             validator_contract: utils::create_address_from_js_string(value.validator_contract)?,
             deployer_account: utils::create_address_from_js_string(value.deployer_account)?,
             initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
+        })
+    }
+}
+
+impl TryFrom<JsCalculateTopValidatorsContext> for CalculateTopValidatorsContext {
+    type Error = anyhow::Error;
+
+    fn try_from(mut value: JsCalculateTopValidatorsContext) -> Result<Self, Self::Error> {
+        Ok(CalculateTopValidatorsContext {
+            commit_key: value.commit_key.try_into()?,
+            timestamp: U256::from(value.timestamp.get_u64()?.0),
+            validator_address: utils::create_address_from_js_string(value.validator_address)?,
+            active_validators: value.active_validators.get_u128()?.1,
+            spec_id: parse_spec_id(value.spec_id)?,
         })
     }
 }

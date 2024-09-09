@@ -77,6 +77,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			this.#verifyConsumedAllGas(block, processResult);
 			await this.#updateRewardsAndVotes(unit);
+			await this.#calculateTopValidators(unit);
 			await this.#verifyStateHash(block);
 
 			processResult.success = true;
@@ -226,6 +227,24 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: milestone.evmSpec,
+			timestamp: BigInt(block.header.timestamp),
+			validatorAddress: validatorWallet.getAddress(),
+		});
+	}
+
+	async #calculateTopValidators(unit: Contracts.Processor.ProcessableUnit) {
+		const { activeValidators, evmSpec } = this.configuration.getMilestone();
+
+		const block = unit.getBlock();
+
+		const validatorWallet = await this.stateService
+		.getStore()
+		.walletRepository.findByPublicKey(block.header.generatorPublicKey);
+
+		await this.evm.calculateTopValidators({
+			activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
+			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),
 			validatorAddress: validatorWallet.getAddress(),
 		});

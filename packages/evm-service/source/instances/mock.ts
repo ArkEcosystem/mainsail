@@ -32,6 +32,8 @@ export class MockInstance implements Contracts.Evm.Instance {
 
 	public async updateRewardsAndVotes(context: Contracts.Evm.UpdateRewardsAndVotesContext): Promise<void> {}
 
+	public async calculateTopValidators(context: Contracts.Evm.CalculateTopValidatorsContext): Promise<void> {}
+
 	public async onCommit(_: Contracts.Processor.ProcessableUnit): Promise<void> {}
 
 	public async stateHash(_: Contracts.Evm.CommitKey, __: string): Promise<string> {
