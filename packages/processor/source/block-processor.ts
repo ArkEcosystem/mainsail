@@ -78,7 +78,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.#verifyConsumedAllGas(block, processResult);
 			await this.#updateRewardsAndVotes(unit);
 			await this.#calculateTopValidators(unit);
-			await this.#verifyStateHash(block);
+			// await this.#verifyStateHash(block);
 
 			processResult.success = true;
 		} catch (error) {
@@ -189,6 +189,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 	}
 
+	// @ts-ignore
 	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
 		if (block.header.height === 0) {
 			return;

@@ -168,6 +168,10 @@ impl EvmInner {
 			.encode("calculateTopValidators", a)
 			.expect("encode calculateTopValidators");
 
+			println!(
+				"here calculate_top_validators",
+			);
+
 		match self.transact_evm(ExecutionContext {
 			block_context: Some(BlockContext {
 				commit_key: ctx.commit_key,
@@ -191,9 +195,15 @@ impl EvmInner {
 				assert!(receipt.is_success(), "calculate_top_validators unsuccessful");
 				Ok(())
 			}
-			Err(err) => Err(EVMError::Database(
-				format!("calculate_top_validators failed: {}", err).into(),
-			))
+			Err(err) => {
+				println!(
+					"calculate_top_validators failed: {}",
+					err
+				);
+				Err(EVMError::Database(
+					format!("calculate_top_validators failed: {}", err).into(),
+				))
+			}
 		}
     }
 
