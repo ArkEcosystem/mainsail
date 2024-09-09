@@ -162,15 +162,11 @@ impl EvmInner {
 			.expect("encode abi"),
 		);
 
-		let a: u8 = 3;
 		// encode abi into Bytes
 		let calldata = abi
-			.encode("calculateTopValidators", a)
+			.encode("calculateTopValidators", ctx.active_validators)
 			.expect("encode calculateTopValidators");
 
-			println!(
-				"here calculate_top_validators",
-			);
 
 		match self.transact_evm(ExecutionContext {
 			block_context: Some(BlockContext {
@@ -196,10 +192,6 @@ impl EvmInner {
 				Ok(())
 			}
 			Err(err) => {
-				println!(
-					"calculate_top_validators failed: {}",
-					err
-				);
 				Err(EVMError::Database(
 					format!("calculate_top_validators failed: {}", err).into(),
 				))
