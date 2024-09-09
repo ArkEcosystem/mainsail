@@ -44,6 +44,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.updateRewardsAndVotes(context);
 	}
 
+	public async calculateTopValidators(context: Contracts.Evm.CalculateTopValidatorsContext): Promise<void> {
+		return this.#evm.calculateTopValidators(context);
+	}
+
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const { height, round } = unit;
 		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });

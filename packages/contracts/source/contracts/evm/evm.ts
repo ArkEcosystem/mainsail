@@ -19,6 +19,7 @@ export interface Instance extends CommitHandler {
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
+	calculateTopValidators(context: CalculateTopValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string): Promise<string>;
@@ -80,6 +81,13 @@ export interface BlockContext {
 	readonly validatorAddress: string;
 }
 
+export interface CalculateTopValidatorsContext {
+	readonly commitKey: CommitKey;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
+	readonly activeValidators: bigint;
+	readonly specId: SpecId;
+}
 export interface UpdateRewardsAndVotesContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;
