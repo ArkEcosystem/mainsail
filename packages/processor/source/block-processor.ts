@@ -234,7 +234,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #calculateTopValidators(unit: Contracts.Processor.ProcessableUnit) {
-		const { activeValidators, evmSpec } = this.configuration.getMilestone();
+		if(!Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
+			return;
+		}
+
+		const { activeValidators, evmSpec } = this.configuration.getMilestone(unit.height + 1);
 
 		const block = unit.getBlock();
 
