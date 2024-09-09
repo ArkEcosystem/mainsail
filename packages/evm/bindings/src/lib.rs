@@ -162,9 +162,10 @@ impl EvmInner {
 			.expect("encode abi"),
 		);
 
+		let a: u8 = 3;
 		// encode abi into Bytes
 		let calldata = abi
-			.encode("calculateTopValidators", ctx.active_validators)
+			.encode("calculateTopValidators", a)
 			.expect("encode calculateTopValidators");
 
 		match self.transact_evm(ExecutionContext {
