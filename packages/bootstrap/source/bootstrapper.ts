@@ -18,6 +18,9 @@ export class Bootstrapper {
 	@inject(Identifiers.State.Verifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Validator.Repository)
 	private readonly validatorRepository!: Contracts.Validator.ValidatorRepository;
 
@@ -30,14 +33,12 @@ export class Bootstrapper {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
-	// @inject(Identifiers.ValidatorSet.Service)
-	// private readonly validatorSet!: Contracts.ValidatorSet.Service;
+	@inject(Identifiers.ValidatorSet.Service)
+	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
@@ -55,16 +56,12 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
-	// @inject(Identifiers.Evm.Worker)
-	// private readonly evmWorker!: Contracts.Evm.Worker;
-
 	public async bootstrap(): Promise<void> {
 		try {
 			if (this.apiSync) {
 				await this.apiSync.prepareBootstrap();
 			}
 
-			// await this.#restoreSnapshots();
 
 			await this.#setGenesisCommit();
 			await this.#checkStoredGenesisCommit();
@@ -122,22 +119,11 @@ export class Bootstrapper {
 			await this.#processGenesisBlock();
 		}
 
+		await this.#processBlocks();
+
 		const commit = await this.databaseService.getLastCommit();
 		this.stateService.getStore().setLastBlock(commit.block);
-
-
-
-		// // The initial height is > 0 when restoring a snapshot.
-		// if (this.stateService.getStore().getLastHeight() === 0) {
-		// 	await this.#processGenesisBlock();
-		// } else {
-		// 	const commit = await this.databaseService.getCommit(this.stateService.getStore().getLastHeight());
-		// 	Utils.assert.defined<Contracts.Crypto.Commit>(commit);
-		// 	this.stateService.getStore().setLastBlock(commit.block);
-		// 	this.configuration.setHeight(commit.block.data.height + 1);
-
-		// 	this.validatorSet.restore(this.stateService.getStore());
-		// }
+		await this.validatorSet.restore(this.stateService.getStore());
 	}
 
 	async #processGenesisBlock(): Promise<void> {
@@ -145,6 +131,24 @@ export class Bootstrapper {
 		await this.#processCommit(genesisBlock);
 		this.databaseService.addCommit(genesisBlock);
 		await this.databaseService.persist();
+	}
+
+	async #processBlocks(): Promise<void> {
+		const lastCommit = await this.databaseService.getLastCommit();
+
+		let totalRound = 0;
+
+		for await (const commit of this.databaseService.readCommits(
+			this.stateService.getStore().getLastHeight() + 1,
+			lastCommit.block.data.height,
+		)) {
+			totalRound += commit.block.data.round + 1;
+		}
+
+		this.stateService.getStore().setTotalRoundAndHeight(totalRound, lastCommit.block.data.height);
+		this.configuration.setHeight(lastCommit.block.data.height + 1);
+
+		console.log("Total round", totalRound, "Last height", lastCommit.block.data.height);
 	}
 
 

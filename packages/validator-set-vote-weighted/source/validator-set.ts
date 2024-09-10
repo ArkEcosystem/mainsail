@@ -13,7 +13,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
-	public restore(store: Contracts.State.Store): void {
+	public async restore(store: Contracts.State.Store): Promise<void> {
 		const activeValidators = store.getAttribute<string>("activeValidators").split(",");
 
 		this.#validators = activeValidators.map((address, index) => {

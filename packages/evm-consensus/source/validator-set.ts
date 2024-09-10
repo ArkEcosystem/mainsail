@@ -24,7 +24,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
 
-	public restore(store: Contracts.State.Store): void {}
+	public async restore(store: Contracts.State.Store): Promise<void> {
+		await this.#buildActiveValidators(store);
+	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
@@ -101,7 +103,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		for (const [index, validator] of validators.entries()) {
 			const [addr, [voteBalance, , validatorPublicKey]] = validator;
 
+
 			const wallet = store.walletRepository.findByAddress(addr);
+
+			console.log("Validator", addr, voteBalance, validatorPublicKey, wallet.getPublicKey());
+
+			// wallet.setPublicKey(validatorPublicKey);
+
 			const validatorWallet = this.validatorWalletFactory(wallet);
 			validatorWallet.getWallet().setAttribute("validatorVoteBalance", Utils.BigNumber.make(voteBalance));
 			validatorWallet.getWallet().setAttribute("validatorPublicKey", validatorPublicKey.slice(2));
@@ -120,6 +128,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			validatorWallets.push(validatorWallet);
 		}
 
+		console.log("Getting active validators", validatorWallets);
 		console.log(validatorWallets.map((v) => v.getWallet().getAddress()));
 
 		return validatorWallets;

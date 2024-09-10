@@ -13,7 +13,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
-	public restore(store: Contracts.State.Store): void {
+	public async restore(store: Contracts.State.Store): Promise<void> {
 		this.#buildActiveValidators(store);
 	}
 
