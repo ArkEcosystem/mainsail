@@ -42,8 +42,6 @@ export class Deployer {
 
 		await this.evm.initializeGenesis(genesisInfo);
 
-		console.log("Deploying Consensus contract", genesisInfo);
-
 		const milestone = this.configuration.getMilestone(0);
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
