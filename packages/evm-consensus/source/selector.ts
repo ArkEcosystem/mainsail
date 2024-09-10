@@ -11,7 +11,7 @@ export class Selector implements Contracts.Proposer.Selector {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	private validatorMatrix: number[] = [1, 2, 3];
+	private validatorMatrix: number[] = [...Array.from({ length: 53 }).keys()];
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		// if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
