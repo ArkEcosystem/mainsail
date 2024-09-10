@@ -219,16 +219,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const milestone = this.configuration.getMilestone();
 		const block = unit.getBlock();
 
-		const validatorWallet = await this.stateService
-			.getStore()
-			.walletRepository.findByPublicKey(block.header.generatorPublicKey);
-
 		await this.evm.updateRewardsAndVotes({
 			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
-			validatorAddress: validatorWallet.getAddress(),
+			validatorAddress: block.header.generatorPublicKey,
 		});
 	}
 
@@ -241,16 +237,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const block = unit.getBlock();
 
-		const validatorWallet = await this.stateService
-			.getStore()
-			.walletRepository.findByPublicKey(block.header.generatorPublicKey);
-
 		await this.evm.calculateTopValidators({
 			activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),
-			validatorAddress: validatorWallet.getAddress(),
+			validatorAddress: block.header.generatorPublicKey,
 		});
 	}
 

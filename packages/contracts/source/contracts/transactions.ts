@@ -87,7 +87,7 @@ export interface TransactionValidatorContext {
 	commitKey: CommitKey;
 	gasLimit: number;
 	timestamp: number;
-	generatorPublicKey: string;
+	generatorAddress: string;
 }
 
 export interface TransactionValidator {

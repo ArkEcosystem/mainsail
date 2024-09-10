@@ -5,5 +5,5 @@ export interface Service extends CommitHandler {
 	restore(store: Store): Promise<void>;
 	getActiveValidators(): ValidatorWallet[];
 	getValidator(validatorIndex: number): ValidatorWallet;
-	getValidatorIndexByWalletPublicKey(walletPublicKey: string): number;
+	getValidatorIndexByWalletAddress(walletAddress: string): number;
 }

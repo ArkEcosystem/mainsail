@@ -38,7 +38,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 		);
 		strictEqual(transaction.id, deserialized.id);
 
-		const { commitKey, gasLimit, timestamp, generatorPublicKey } = context;
+		const { commitKey, gasLimit, timestamp, generatorAddress } = context;
 
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 		const result = await handler.apply(
@@ -48,9 +48,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 						commitKey,
 						gasLimit: BigInt(gasLimit),
 						timestamp: BigInt(timestamp),
-						validatorAddress: (
-							await this.#walletRepository.findByPublicKey(generatorPublicKey)
-						).getAddress(),
+						validatorAddress: generatorAddress,
 					},
 					instance: this.evm,
 				},
