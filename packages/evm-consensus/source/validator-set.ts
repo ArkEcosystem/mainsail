@@ -24,7 +24,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
 
-	public restore(store: Contracts.State.Store): void {}
+	public async restore(store: Contracts.State.Store): Promise<void> {
+		await this.#buildActiveValidators(store);
+	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
@@ -46,11 +48,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return this.#validators[index];
 	}
 
-	public getValidatorIndexByWalletPublicKey(walletPublicKey: string): number {
-		const result = this.#indexByAddress.get(walletPublicKey);
+	public getValidatorIndexByWalletAddress(walletAddress: string): number {
+		const result = this.#indexByAddress.get(walletAddress);
 
 		if (result === undefined) {
-			throw new Error(`Validator ${walletPublicKey} not found.`);
+			throw new Error(`Validator ${walletAddress} not found.`);
 		}
 
 		return result;
@@ -67,9 +69,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		this.#indexByAddress = new Map();
 		for (const [index, validator] of this.#validators.entries()) {
-			const walletPublicKey = validator.getWalletPublicKey();
-			Utils.assert.defined<string>(walletPublicKey);
-			this.#indexByAddress.set(walletPublicKey, index);
+			const address = validator.getWallet().getAddress();
+			this.#indexByAddress.set(address, index);
 		}
 
 		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
@@ -101,7 +102,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		for (const [index, validator] of validators.entries()) {
 			const [addr, [voteBalance, , validatorPublicKey]] = validator;
 
+
 			const wallet = store.walletRepository.findByAddress(addr);
+
 			const validatorWallet = this.validatorWalletFactory(wallet);
 			validatorWallet.getWallet().setAttribute("validatorVoteBalance", Utils.BigNumber.make(voteBalance));
 			validatorWallet.getWallet().setAttribute("validatorPublicKey", validatorPublicKey.slice(2));
@@ -120,6 +123,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			validatorWallets.push(validatorWallet);
 		}
 
+		console.log("Getting active validators", validatorWallets);
 		console.log(validatorWallets.map((v) => v.getWallet().getAddress()));
 
 		return validatorWallets;

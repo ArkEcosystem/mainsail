@@ -13,12 +13,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByPublicKey: Map<string, number> = new Map();
 
-	public restore(store: Contracts.State.Store): void {
+	public async restore(store: Contracts.State.Store): Promise<void> {
 		const activeValidators = store.getAttribute<string>("activeValidators").split(",");
 
 		this.#validators = activeValidators.map((address, index) => {
 			const wallet = this.validatorWalletFactory(store.walletRepository.findByAddress(address)!);
-			this.#indexByPublicKey.set(wallet.getWalletPublicKey(), index);
+			this.#indexByPublicKey.set(wallet.getWallet().getAddress(), index);
 			return wallet;
 		});
 	}
@@ -43,7 +43,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return this.#validators[index];
 	}
 
-	public getValidatorIndexByWalletPublicKey(walletPublicKey: string): number {
+	public getValidatorIndexByWalletAddress(walletPublicKey: string): number {
 		const result = this.#indexByPublicKey.get(walletPublicKey);
 
 		if (result === undefined) {
@@ -65,7 +65,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		this.#indexByPublicKey = new Map();
 		for (const [index, validator] of this.#validators.entries()) {
-			const walletPublicKey = validator.getWalletPublicKey();
+			const walletPublicKey = validator.getWallet().getAddress();
 			Utils.assert.defined<string>(walletPublicKey);
 			this.#indexByPublicKey.set(walletPublicKey, index);
 		}
@@ -93,17 +93,17 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			const diff = voteBalanceB.comparedTo(voteBalanceA);
 
 			if (diff === 0) {
-				Utils.assert.defined<string>(a.getWalletPublicKey());
-				Utils.assert.defined<string>(b.getWalletPublicKey());
+				// Utils.assert.defined<string>(a.getWalletPublicKey());
+				// Utils.assert.defined<string>(b.getWalletPublicKey());
 
-				if (a.getWalletPublicKey() === b.getWalletPublicKey()) {
+				if (a.getWallet().getAddress() === b.getWallet().getAddress()) {
 					throw new Error(
 						`The balance and public key of both validators are identical! ` +
-							`Validator "${a.getWalletPublicKey()}" appears twice in the list.`,
+							`Validator "${a.getWallet().getAddress()}" appears twice in the list.`,
 					);
 				}
 
-				return a.getWalletPublicKey()!.localeCompare(b.getWalletPublicKey()!, "en");
+				return a.getWallet().getAddress()!.localeCompare(b.getWallet().getAddress()!, "en");
 			}
 
 			return diff;

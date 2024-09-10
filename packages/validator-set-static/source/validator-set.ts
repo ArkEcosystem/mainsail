@@ -13,7 +13,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByWalletPublicKey: Map<string, number> = new Map();
 
-	public restore(store: Contracts.State.Store): void {
+	public async restore(store: Contracts.State.Store): Promise<void> {
 		this.#buildActiveValidators(store);
 	}
 
@@ -37,7 +37,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return this.#validators[index];
 	}
 
-	public getValidatorIndexByWalletPublicKey(walletPublicKey: string): number {
+	public getValidatorIndexByWalletAddress(walletPublicKey: string): number {
 		const result = this.#indexByWalletPublicKey.get(walletPublicKey);
 
 		if (result === undefined) {
@@ -65,7 +65,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 			this.#validators.push(validator);
 
-			const walletPublicKey = validator.getWalletPublicKey();
+			const walletPublicKey = validator.getWallet().getAddress();
 			Utils.assert.defined<string>(walletPublicKey);
 			this.#indexByWalletPublicKey.set(walletPublicKey, index);
 		}

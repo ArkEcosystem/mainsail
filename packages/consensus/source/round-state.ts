@@ -262,7 +262,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		for (const key of this.#prevotesCount.keys()) {
 			const voters = [...this.#prevotes.values()]
 				.filter((prevote) => prevote.blockId === key)
-				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).getWalletPublicKey());
+				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).getWallet().getAddress());
 
 			this.logger.debug(`Block ${key ?? "null"} prevoted by: ${voters.join(", ")}`);
 		}
@@ -272,7 +272,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		for (const key of this.#precommitsCount.keys()) {
 			const voters = [...this.#precommits.values()]
 				.filter((precommit) => precommit.blockId === key)
-				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).getWalletPublicKey());
+				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).getWallet().getAddress());
 
 			this.logger.debug(`Block ${key ?? "null"} precommitted by: ${voters.join(", ")}`);
 		}

@@ -66,6 +66,11 @@ export class Store implements Contracts.State.Store {
 		return this.getAttribute("height");
 	}
 
+	public setTotalRoundAndHeight(totalRound: number, height: number): void {
+		this.setAttribute("height", height);
+		this.setAttribute("totalRound", totalRound);
+	}
+
 	public getTotalRound(): number {
 		return this.getAttribute("totalRound");
 	}

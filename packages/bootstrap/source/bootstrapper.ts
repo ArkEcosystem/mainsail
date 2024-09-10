@@ -1,6 +1,5 @@
 import { inject, injectable, optional } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Bootstrapper {
@@ -19,6 +18,9 @@ export class Bootstrapper {
 	@inject(Identifiers.State.Verifier)
 	private readonly stateVerifier!: Contracts.State.StateVerifier;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Validator.Repository)
 	private readonly validatorRepository!: Contracts.Validator.ValidatorRepository;
 
@@ -31,8 +33,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
@@ -42,9 +42,6 @@ export class Bootstrapper {
 
 	@inject(Identifiers.State.Service)
 	private stateService!: Contracts.State.Service;
-
-	@inject(Identifiers.State.Snapshot.Service)
-	private snapshotService!: Contracts.State.SnapshotService;
 
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
@@ -59,40 +56,42 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
-	@inject(Identifiers.Evm.Worker)
-	private readonly evmWorker!: Contracts.Evm.Worker;
-
 	public async bootstrap(): Promise<void> {
 		try {
 			if (this.apiSync) {
 				await this.apiSync.prepareBootstrap();
 			}
 
-			await this.#restoreSnapshots();
 
 			await this.#setGenesisCommit();
 			await this.#checkStoredGenesisCommit();
-			await this.#storeGenesisCommit();
 
-			if (this.apiSync) {
-				await this.apiSync.bootstrap();
-			}
+			// if (this.apiSync) {
+			// 	await this.apiSync.bootstrap();
+			// }
 
 			await this.#initState();
 
-			await this.#processBlocks();
 			this.state.setBootstrap(false);
 
 			this.stateVerifier.verifyWalletsConsistency();
 			this.validatorRepository.printLoadedValidators();
 			await this.txPoolWorker.start();
 
-			void this.consensus.run();
+			void this.runConsensus();
 
 			await this.p2pServer.boot();
 			await this.p2pService.boot();
 		} catch (error) {
 			this.logger.error(error.stack);
+		}
+	}
+
+	async runConsensus(): Promise<void> {
+		try {
+			await this.consensus.run();
+		} catch (error) {
+			console.log(error);
 		}
 	}
 
@@ -114,75 +113,44 @@ export class Bootstrapper {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
-	async #storeGenesisCommit(): Promise<void> {
-		if (this.databaseService.isEmpty()) {
-			const genesisBlock = this.stateService.getStore().getGenesisCommit();
-			this.databaseService.addCommit(genesisBlock);
-			await this.databaseService.persist();
+
+	async #initState(): Promise<void> {
+		if(this.databaseService.isEmpty()) {
+			await this.#processGenesisBlock();
 		}
+
+		await this.#processBlocks();
+
+		const commit = await this.databaseService.getLastCommit();
+		this.stateService.getStore().setLastBlock(commit.block);
+		await this.validatorSet.restore(this.stateService.getStore());
 	}
 
 	async #processGenesisBlock(): Promise<void> {
 		const genesisBlock = this.stateService.getStore().getGenesisCommit();
 		await this.#processCommit(genesisBlock);
-	}
-
-	async #restoreSnapshots(): Promise<void> {
-		if (this.databaseService.isEmpty()) {
-			return;
-		}
-
-		const lastCommit = await this.databaseService.getLastCommit();
-		const ledgerHeight = lastCommit.block.data.height;
-
-		let localSnapshots = await this.snapshotService.listSnapshots();
-		localSnapshots = localSnapshots.filter((snapshot) => snapshot <= ledgerHeight);
-
-		if (this.apiSync) {
-			const apiSyncHeight = await this.apiSync.getLastSyncedBlockHeight();
-			localSnapshots = localSnapshots.filter((snapshot) => snapshot <= apiSyncHeight);
-		}
-
-		const localSnapshotHeight = localSnapshots.shift();
-		if (localSnapshotHeight) {
-			await this.stateService.restore(localSnapshotHeight);
-			await this.txPoolWorker.importSnapshot(localSnapshotHeight);
-			await this.evmWorker.importSnapshot(localSnapshotHeight);
-		} else {
-			this.logger.info("Skipping snapshot restoration");
-		}
-	}
-
-	async #initState(): Promise<void> {
-		// The initial height is > 0 when restoring a snapshot.
-		if (this.stateService.getStore().getLastHeight() === 0) {
-			await this.#processGenesisBlock();
-		} else {
-			const commit = await this.databaseService.getCommit(this.stateService.getStore().getLastHeight());
-			Utils.assert.defined<Contracts.Crypto.Commit>(commit);
-			this.stateService.getStore().setLastBlock(commit.block);
-			this.configuration.setHeight(commit.block.data.height + 1);
-
-			this.validatorSet.restore(this.stateService.getStore());
-		}
+		this.databaseService.addCommit(genesisBlock);
+		await this.databaseService.persist();
 	}
 
 	async #processBlocks(): Promise<void> {
 		const lastCommit = await this.databaseService.getLastCommit();
 
+		let totalRound = 0;
+
 		for await (const commit of this.databaseService.readCommits(
 			this.stateService.getStore().getLastHeight() + 1,
 			lastCommit.block.data.height,
 		)) {
-			await this.#processCommit(commit);
-
-			if (commit.block.data.height % 10_000 === 0) {
-				this.logger.info(`Processed blocks: ${commit.block.data.height.toLocaleString()} `);
-
-				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
-			}
+			totalRound += commit.block.data.round + 1;
 		}
+
+		this.stateService.getStore().setTotalRoundAndHeight(totalRound, lastCommit.block.data.height);
+		this.configuration.setHeight(lastCommit.block.data.height + 1);
+
+		console.log("Total round", totalRound, "Last height", lastCommit.block.data.height);
 	}
+
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
 		try {

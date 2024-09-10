@@ -11,9 +11,8 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 	@inject(Identifiers.Cryptography.Hash.Size.SHA256)
 	private readonly hashByteLength!: number;
 
-	@inject(Identifiers.Cryptography.Identity.PublicKey.Size)
-	@tagged("type", "wallet")
-	private readonly generatorPublicKeyByteLength!: number;
+	@inject(Identifiers.Cryptography.Identity.Address.Size)
+	private readonly generatorAddressByteLength!: number;
 
 	public headerSize(): number {
 		return (
@@ -30,7 +29,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 			32 + // reward
 			4 + // payloadLength
 			this.hashByteLength + // payloadHash
-			this.generatorPublicKeyByteLength
+			this.generatorAddressByteLength
 		);
 	}
 
@@ -83,7 +82,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 					type: "hash",
 				},
 				generatorPublicKey: {
-					type: "publicKey",
+					type: "address",
 				},
 			},
 		});
@@ -134,7 +133,7 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 					type: "hash",
 				},
 				generatorPublicKey: {
-					type: "publicKey",
+					type: "address",
 				},
 				transactions: {
 					type: "transactions",

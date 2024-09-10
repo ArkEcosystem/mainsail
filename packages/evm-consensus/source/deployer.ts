@@ -14,9 +14,6 @@ export class Deployer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -37,7 +34,7 @@ export class Deployer {
 		const validatorContractAddress = ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 0 });
 
 		const genesisInfo = {
-			account: await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey),
+			account: genesisBlock.block.generatorPublicKey.slice(2),
 			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
 			deployerAccount: this.#deployerAddress,
 			validatorContract: validatorContractAddress,
