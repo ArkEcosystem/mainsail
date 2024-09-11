@@ -162,7 +162,7 @@ fn collect_dirty_accounts(
 
                     //
                 }
-                ExecutionResult::Revert { .. } | ExecutionResult::Halt { .. } => todo!(),
+                ExecutionResult::Revert { .. } | ExecutionResult::Halt { .. } => (),
             }
         }
     }

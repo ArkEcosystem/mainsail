@@ -438,9 +438,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitflags"
-version = "2.5.0"
+version = "2.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf4b9d6a944f767f8e5e0db018570623c85f3d925ac718db4e06d0187adb21c1"
+checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
 dependencies = [
  "serde",
 ]
@@ -554,9 +554,12 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.99"
+version = "1.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96c51067fd44124faa7f870b4b1c969379ad32b2ba805aa959430ceaa384f695"
+checksum = "b62ac837cdb5cb22e10a256099b4fc502b1dfe560cb282963a974d7abd80e476"
+dependencies = [
+ "shlex",
+]
 
 [[package]]
 name = "cfg-if"
@@ -1343,11 +1346,10 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "heed"
-version = "0.20.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f60d7cff16094be9627830b399c087a25017e93fb3768b87cd656a68ccb1ebe8"
+version = "0.20.5"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=feat/cursor-support#90835c87df8729d198c2c32000dec707544fa6f0"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "byteorder",
  "heed-traits",
  "heed-types",
@@ -1363,14 +1365,12 @@ dependencies = [
 [[package]]
 name = "heed-traits"
 version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb3130048d404c57ce5a1ac61a903696e8fcde7e8c2991e9fcfc1f27c3ef74ff"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=feat/cursor-support#90835c87df8729d198c2c32000dec707544fa6f0"
 
 [[package]]
 name = "heed-types"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cb0d6ba3700c9a57e83c013693e3eddb68a6d9b6781cacafc62a0d992e8ddb3"
+version = "0.20.1"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=feat/cursor-support#90835c87df8729d198c2c32000dec707544fa6f0"
 dependencies = [
  "bincode",
  "byteorder",
@@ -1670,9 +1670,8 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 
 [[package]]
 name = "lmdb-master-sys"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5142795c220effa4c8f4813537bd4c88113a07e45e93100ccb2adc5cec6c7f3"
+version = "0.2.4"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=feat/cursor-support#90835c87df8729d198c2c32000dec707544fa6f0"
 dependencies = [
  "cc",
  "doxygen-rs",
@@ -1761,7 +1760,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfc300228808a0e6aea5a58115c82889240bcf8dab16fc25ad675b33e454b368"
 dependencies = [
  "anyhow",
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "ctor",
  "napi-derive",
  "napi-sys",
@@ -2214,7 +2213,7 @@ checksum = "31b476131c3c86cb68032fdc5cb6d5a1045e3e42d96b69fa599fd77701e1f5bf"
 dependencies = [
  "bit-set",
  "bit-vec",
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "lazy_static",
  "num-traits",
  "rand",
@@ -2432,7 +2431,7 @@ dependencies = [
  "alloy-eips",
  "alloy-primitives",
  "auto_impl",
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "bitvec",
  "c-kzg",
  "cfg-if",
@@ -2582,7 +2581,7 @@ version = "0.38.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "70dc5ec042f7a43c4a73241207cecc9873a06d45debb38b329f8541d85c2730f"
 dependencies = [
- "bitflags 2.5.0",
+ "bitflags 2.6.0",
  "errno",
  "libc",
  "linux-raw-sys",
@@ -2781,12 +2780,13 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.117"
+version = "1.0.128"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "455182ea6142b14f93f4bc5320a2b31c1f266b66a4a5c858b013302a5d8cbfc3"
+checksum = "6ff5456707a1de34e7e37f2a6fd3d3f808c318259cbd01ab6377795054b483d8"
 dependencies = [
  "indexmap",
  "itoa",
+ "memchr",
  "ryu",
  "serde",
 ]
@@ -2853,6 +2853,12 @@ dependencies = [
  "cc",
  "cfg-if",
 ]
+
+[[package]]
+name = "shlex"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "signature"

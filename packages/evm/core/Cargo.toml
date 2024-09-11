@@ -20,7 +20,10 @@ tokio = { workspace = true }
 alloy-sol-types = { version = "0.7.7", default-features = false, features = [
     "std",
 ] }
-heed = { version = "0.20.0", features = [] }
+#heed = { version = "0.20.0", features = [] }
+#heed = { path = "../../../../heed/heed", features = [] }
+heed = { git = "https://github.com/oXtxNt9U/heed.git", branch = "feat/cursor-support", features = [
+] }
 rayon = "1.10.0"
 
 [dev-dependencies]
