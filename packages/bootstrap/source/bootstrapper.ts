@@ -33,7 +33,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
@@ -62,13 +61,12 @@ export class Bootstrapper {
 				await this.apiSync.prepareBootstrap();
 			}
 
-
 			await this.#setGenesisCommit();
 			await this.#checkStoredGenesisCommit();
 
-			// if (this.apiSync) {
-			// 	await this.apiSync.bootstrap();
-			// }
+			if (this.apiSync) {
+				await this.apiSync.bootstrap();
+			}
 
 			await this.#initState();
 
@@ -115,7 +113,7 @@ export class Bootstrapper {
 	}
 
 	async #initState(): Promise<void> {
-		if(this.databaseService.isEmpty()) {
+		if (this.databaseService.isEmpty()) {
 			await this.#processGenesisBlock();
 		}
 
@@ -150,7 +148,6 @@ export class Bootstrapper {
 
 		console.log("Total round", totalRound, "Last height", lastCommit.block.data.height);
 	}
-
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
 		try {
