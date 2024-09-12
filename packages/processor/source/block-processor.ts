@@ -71,6 +71,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				const { gasUsed, receipt } = await this.transactionProcessor.process(unit, transaction);
 				processResult.receipts.set(transaction.id, receipt);
 
+				console.log("Transaction", transaction.id, "gasUsed", gasUsed, "gasRefunded", receipt?.gasRefunded, "success", receipt?.success, "output", receipt?.output, );
+
 				transaction.data.gasUsed = gasUsed;
 				this.#consumeGas(block, processResult, gasUsed);
 			}

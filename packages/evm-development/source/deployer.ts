@@ -3,7 +3,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers, sha256 } from "ethers";
 
-import { ERC20 } from "./contracts.ts/index.js";
+import { ERC20, DirectTransfer } from "./contracts.ts/index.js";
 import { Identifiers as EvmDevelopmentIdentifiers } from "./identifiers.js";
 
 @injectable()
@@ -54,6 +54,24 @@ export class Deployer {
 
 		this.logger.info(
 			`Deployed ERC20 dummy contract from ${this.#deployerAddress} to ${result.receipt.deployedContractAddress}`,
+		);
+
+		const result2 = await this.evm.process({
+			blockContext,
+			caller: this.#deployerAddress,
+			value: 0n,
+			data: Buffer.from(ethers.getBytes(DirectTransfer.abi.bytecode)),
+			gasLimit: BigInt(2_000_000),
+			specId: milestone.evmSpec,
+			txHash: this.#generateTxHash(),
+		});
+
+		if (!result2.receipt.success) {
+			throw new Error("failed to deploy erc20 contract");
+		}
+
+		this.logger.info(
+			`Deployed ERC20 dummy contract from ${this.#deployerAddress} to ${result2.receipt.deployedContractAddress}`,
 		);
 
 		const recipients = [
