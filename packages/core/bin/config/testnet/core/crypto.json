@@ -3213,9 +3213,9 @@
                 "keccak256": true
             },
             "block": {
-                "maxGasLimit": 10000000,
+                "maxGasLimit": 30000000,
                 "maxPayload": 2097152,
-                "maxTransactions": 150,
+                "maxTransactions": 1500,
                 "version": 1
             },
             "epoch": "2024-09-10T00:00:00.000Z",
