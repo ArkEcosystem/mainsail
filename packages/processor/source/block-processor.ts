@@ -1,6 +1,7 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { performance } from "perf_hooks";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -61,7 +62,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			});
 
+			const t1 = performance.now();
+
 			await this.verifier.verify(unit);
+
+			const t2 = performance.now();
 
 			for (const [index, transaction] of unit.getBlock().transactions.entries()) {
 				if (index % 20 === 0) {
@@ -71,16 +76,29 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				const { gasUsed, receipt } = await this.transactionProcessor.process(unit, transaction);
 				processResult.receipts.set(transaction.id, receipt);
 
-				console.log("Transaction", transaction.id, "gasUsed", gasUsed, "gasRefunded", receipt?.gasRefunded, "success", receipt?.success, "output", receipt?.output, );
+				// console.log("Transaction", transaction.id, "gasUsed", gasUsed, "gasRefunded", receipt?.gasRefunded, "success", receipt?.success, "output", receipt?.output, );
 
 				transaction.data.gasUsed = gasUsed;
 				this.#consumeGas(block, processResult, gasUsed);
 			}
 
+			const t3 = performance.now();
+
 			this.#verifyConsumedAllGas(block, processResult);
+
+			const t4 = performance.now();
+
 			await this.#updateRewardsAndVotes(unit);
+
+			const t5 = performance.now();
+
 			await this.#calculateTopValidators(unit);
+
+			const t6 = performance.now();
+
 			await this.#verifyStateHash(block);
+
+			console.log("BlockProcessor", "verify", t2 - t1, "process", t3 - t2, "verifyConsumedAllGas", t4 - t3, "updateRewardsAndVotes", t5 - t4, "calculateTopValidators", t6 - t5);
 
 			processResult.success = true;
 		} catch (error) {
