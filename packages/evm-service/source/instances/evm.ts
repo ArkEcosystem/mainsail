@@ -49,7 +49,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { height, round } = unit;
+		const { height } = unit;
+		const round = unit.getBlock().data.round;
 		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
 
 		if (unit.store) {
