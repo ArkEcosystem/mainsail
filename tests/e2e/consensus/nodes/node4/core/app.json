@@ -16,13 +16,21 @@
 			"package": "@mainsail/crypto-signature-schnorr"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-key-pair-ecdsa"
+=======
+			"package": "@mainsail/crypto-key-pair-schnorr"
+>>>>>>> develop
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-address-keccak256"
+=======
+			"package": "@mainsail/crypto-address-bech32m"
+>>>>>>> develop
 		},
 		{
 			"package": "@mainsail/crypto-wif"
@@ -40,6 +48,7 @@
 			"package": "@mainsail/fees-static"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/evm-service"
 		},
 		{
@@ -49,6 +58,8 @@
 			"package": "@mainsail/evm-development"
 		},
 		{
+=======
+>>>>>>> develop
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
@@ -76,9 +87,12 @@
 			"package": "@mainsail/crypto-transaction-vote"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-transaction-evm-call"
 		},
 		{
+=======
+>>>>>>> develop
 			"package": "@mainsail/crypto-worker"
 		},
 		{
@@ -106,9 +120,12 @@
 			"package": "@mainsail/p2p"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/evm-api-worker"
 		},
 		{
+=======
+>>>>>>> develop
 			"package": "@mainsail/processor"
 		},
 		{
@@ -156,13 +173,21 @@
 			"package": "@mainsail/crypto-signature-schnorr"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-key-pair-ecdsa"
+=======
+			"package": "@mainsail/crypto-key-pair-schnorr"
+>>>>>>> develop
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-address-keccak256"
+=======
+			"package": "@mainsail/crypto-address-bech32m"
+>>>>>>> develop
 		},
 		{
 			"package": "@mainsail/crypto-wif"
@@ -221,13 +246,21 @@
 			"package": "@mainsail/crypto-signature-schnorr"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-key-pair-ecdsa"
+=======
+			"package": "@mainsail/crypto-key-pair-schnorr"
+>>>>>>> develop
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-address-keccak256"
+=======
+			"package": "@mainsail/crypto-address-bech32m"
+>>>>>>> develop
 		},
 		{
 			"package": "@mainsail/crypto-wif"
@@ -242,12 +275,15 @@
 			"package": "@mainsail/fees-static"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/evm-service"
 		},
 		{
 			"package": "@mainsail/evm-gas-fee"
 		},
 		{
+=======
+>>>>>>> develop
 			"package": "@mainsail/crypto-block"
 		},
 		{
@@ -278,9 +314,12 @@
 			"package": "@mainsail/crypto-transaction-vote"
 		},
 		{
+<<<<<<< HEAD
 			"package": "@mainsail/crypto-transaction-evm-call"
 		},
 		{
+=======
+>>>>>>> develop
 			"package": "@mainsail/transactions"
 		},
 		{
@@ -300,6 +339,7 @@
 		},
 		{
 			"package": "@mainsail/api-transaction-pool"
+<<<<<<< HEAD
 		},
 		{
 			"package": "@mainsail/webhooks"
@@ -398,6 +438,8 @@
 		},
 		{
 			"package": "@mainsail/api-evm"
+=======
+>>>>>>> develop
 		}
 	]
 }

@@ -127,7 +127,11 @@ describe<{
 		await assertBlockId(nodes);
 	});
 
+<<<<<<< HEAD
 	it.skip("should re-propose block, if one missed, malicious sends null", async ({ nodes, validators, p2p }) => {
+=======
+	it("should re-propose block, if one missed, malicious sends null", async ({ nodes, validators, p2p }) => {
+>>>>>>> develop
 		const node0 = nodes[0];
 		const stubPrecommit0 = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
@@ -169,7 +173,11 @@ describe<{
 		await assertBlockId(nodes);
 	});
 
+<<<<<<< HEAD
 	it.skip("should re-propose block, if one missed, malicious sends random block id", async ({
+=======
+	it("should re-propose block, if one missed, malicious sends random block id", async ({
+>>>>>>> develop
 		nodes,
 		validators,
 		p2p,
@@ -217,7 +225,11 @@ describe<{
 		await assertBlockId(nodes);
 	});
 
+<<<<<<< HEAD
 	it.skip("should re-propose block, if one missed, malicious sends multiple random block ids", async ({
+=======
+	it("should re-propose block, if one missed, malicious sends multiple random block ids", async ({
+>>>>>>> develop
 		nodes,
 		validators,
 		p2p,

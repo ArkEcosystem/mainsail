@@ -31,7 +31,7 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 				try {
 					await this.serviceProviders.boot(name);
 				} catch (error) {
-					this.logger.error(error.stack);
+					this.logger.error(`${name}: ${error.stack}`);
 					const isRequired: boolean = await serviceProvider.required();
 
 					if (isRequired) {

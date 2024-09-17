@@ -1,4 +1,4 @@
-import { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } from "../contracts.js";
+ import { RepositoryDataSource, WalletRepository, WalletRepositoryExtension } from "../contracts.js";
 import { Wallet } from "../models/wallet.js";
 import { DelegateFilter } from "../search/filters/delegate-filter.js";
 import { WalletFilter } from "../search/filters/index.js";

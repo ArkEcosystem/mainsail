@@ -1,5 +1,9 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+<<<<<<< HEAD
 import { Contracts, Identifiers } from "@mainsail/contracts";
+=======
+import { Identifiers } from "@mainsail/contracts";
+>>>>>>> develop
 import { describe, Sandbox } from "@mainsail/test-framework";
 
 import crypto from "../config/crypto.json";
@@ -16,8 +20,11 @@ import {
 	snoozeForBlock,
 	snoozeForRound,
 } from "./utils.js";
+<<<<<<< HEAD
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
+=======
+>>>>>>> develop
 
 describe<{
 	nodes: Sandbox[];
@@ -422,6 +429,7 @@ describe<{
 		await assertBockHeight(nodes, 2);
 		await assertBockRound(nodes, 0);
 	});
+<<<<<<< HEAD
 
 	it("should propose block with evm calls", async ({ nodes, validators }) => {
 		const node0 = nodes[0];
@@ -451,4 +459,6 @@ describe<{
 		await assertBockHeight(nodes, 2);
 		await assertBockRound(nodes, 0);
 	});
+=======
+>>>>>>> develop
 });
