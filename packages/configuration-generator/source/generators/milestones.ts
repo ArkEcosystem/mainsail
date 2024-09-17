@@ -11,11 +11,13 @@ export class MilestonesGenerator {
 				activeValidators: 0,
 				address: options.address,
 				block: {
+					maxGasLimit: options.maxBlockGasLimit,
 					maxPayload: options.maxBlockPayload,
 					maxTransactions: options.maxTxPerBlock,
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
+				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 				fees: {
 					staticFees: {
 						multiPayment: 10_000_000,
@@ -28,12 +30,28 @@ export class MilestonesGenerator {
 						vote: 100_000_000,
 					},
 				},
+				gas: {
+					maximumGasLimit: 2_000_000,
+					minimumGasFee: 5,
+					minimumGasLimit: 21_000,
+					nativeFeeMultiplier: 100,
+					nativeGasLimits: {
+						multiPayment: 50_000,
+						multiSignature: 50_000,
+						transfer: 21_000,
+						usernameRegistration: 100_000,
+						usernameResignation: 50_000,
+						validatorRegistration: 100_000,
+						validatorResignation: 50_000,
+						vote: 50_000,
+					},
+				},
 				height: 0,
 				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: {
-					decimals: 8,
-					denomination: 1e8,
+					decimals: 18,
+					denomination: 1e18,
 				},
 				timeouts: {
 					blockPrepareTime: options.blockTime / 2,

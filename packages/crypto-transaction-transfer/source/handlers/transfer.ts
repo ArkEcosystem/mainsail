@@ -29,11 +29,11 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
-		return super.throwIfCannotBeApplied(walletRepository, transaction, sender);
+		return super.throwIfCannotBeApplied(context, transaction, sender);
 	}
 
 	public hasVendorField(): boolean {
@@ -41,7 +41,7 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotEnterPool(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
@@ -56,27 +56,33 @@ export class TransferTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(walletRepository, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const result = await super.applyToSender(context, transaction);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Contracts.Crypto.TransactionData = transaction.data;
 
 		const newBalance: BigNumber = sender.getBalance().minus(data.amount);
 		sender.setBalance(newBalance);
+
+		return result;
 	}
 
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		Utils.assert.defined<string>(transaction.data.recipientId);
 
-		const recipient: Contracts.State.Wallet = walletRepository.findByAddress(transaction.data.recipientId);
+		const recipient: Contracts.State.Wallet = context.walletRepository.findByAddress(transaction.data.recipientId);
 
 		recipient.increaseBalance(transaction.data.amount);
+
+		return super.applyToRecipient(context, transaction);
 	}
 }

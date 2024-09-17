@@ -17,7 +17,6 @@ export class GetTransactionsHandler {
 		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
-
 		for (const transaction of await this.poolQuery.getFromHighestPriority().all()) {
 			if (candidateTransactions.length === milestone.block.maxTransactions) {
 				break;

@@ -25,7 +25,7 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
@@ -34,15 +34,15 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.username);
 
-		if (walletRepository.hasByIndex(Contracts.State.WalletIndexes.Usernames, data.asset.username)) {
+		if (context.walletRepository.hasByIndex(Contracts.State.WalletIndexes.Usernames, data.asset.username)) {
 			throw new Exceptions.WalletUsernameAlreadyRegisteredError(data.asset.username);
 		}
 
-		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
+		return super.throwIfCannotBeApplied(context, transaction, wallet);
 	}
 
 	public async throwIfCannotEnterPool(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {
 		AppUtils.assert.defined<Contracts.TransactionPool.Query>(this.poolQuery);
@@ -81,28 +81,35 @@ export class UsernameRegistrationTransactionHandler extends Handlers.Transaction
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		const { data }: Contracts.Crypto.Transaction = transaction;
 
 		AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
 		AppUtils.assert.defined<string>(data.asset.username);
 
-		await super.applyToSender(walletRepository, transaction);
+		const result = await super.applyToSender(context, transaction);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(data.senderPublicKey);
 
 		if (sender.hasAttribute("username")) {
-			walletRepository.forgetOnIndex(Contracts.State.WalletIndexes.Usernames, sender.getAttribute("username"));
+			context.walletRepository.forgetOnIndex(
+				Contracts.State.WalletIndexes.Usernames,
+				sender.getAttribute("username"),
+			);
 		}
 
 		sender.setAttribute("username", data.asset.username);
-		walletRepository.setOnIndex(Contracts.State.WalletIndexes.Usernames, data.asset.username, sender);
+		context.walletRepository.setOnIndex(Contracts.State.WalletIndexes.Usernames, data.asset.username, sender);
+
+		return result;
 	}
 
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {}
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return super.applyToRecipient(context, transaction);
+	}
 }

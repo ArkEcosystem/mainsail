@@ -10,6 +10,11 @@ export class Signature implements Contracts.Crypto.Signature {
 	}
 
 	public async verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
+		// Remove leading byte ('02' / '03') from ECDSA key
+		if (publicKey.byteLength === 33) {
+			publicKey = publicKey.subarray(1);
+		}
+
 		return schnorr.verify(message, signature, publicKey);
 	}
 

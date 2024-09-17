@@ -31,8 +31,6 @@ jobs:
                   restore-keys: ${{ runner.os }}-lerna-
             - name: Install dependencies
               run: pnpm install
-            - name: Build
-              run: pnpm run build
             - name: Check dependencies
               run: pnpm run deps:check
         strategy:

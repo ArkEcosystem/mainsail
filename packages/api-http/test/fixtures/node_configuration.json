@@ -3,29 +3,47 @@
 		"block": {
 			"version": 1,
 			"maxPayload": 2097152,
+			"maxGasLimit": 10000000,
 			"maxTransactions": 150
 		},
-		"epoch": "2023-12-21T00:00:00.000Z",
+		"epoch": "2024-05-31T00:00:00.000Z",
+		"evmSpec": "Shanghai",
+		"gas": {
+			"minimumGasFee": 5,
+			"minimumGasLimit": 21000,
+			"maximumGasLimit": 2000000,
+			"nativeFeeMultiplier": 100,
+			"nativeGasLimits": {
+				"transfer": 21000,
+				"multiPayment": 50000,
+				"multiSignature": 50000,
+				"usernameRegistration": 100000,
+				"usernameResignation": 50000,
+				"validatorRegistration": 100000,
+				"validatorResignation": 50000,
+				"vote": 50000
+			}
+		},
 		"fees": {
 			"staticFees": {
-				"vote": 100000000,
-				"transfer": 10000000,
 				"multiPayment": 10000000,
 				"multiSignature": 500000000,
-				"usernameResignation": 2500000000,
+				"transfer": 10000000,
 				"usernameRegistration": 2500000000,
+				"usernameResignation": 2500000000,
+				"validatorRegistration": 2500000000,
 				"validatorResignation": 2500000000,
-				"validatorRegistration": 2500000000
+				"vote": 100000000
 			}
 		},
 		"height": 0,
 		"reward": "0",
 		"address": {
-			"bech32m": "ark"
+			"keccak256": true
 		},
 		"satoshi": {
-			"decimals": 8,
-			"denomination": 100000000
+			"decimals": 18,
+			"denomination": 1000000000000000000
 		},
 		"timeouts": {
 			"blockTime": 8000,
@@ -42,7 +60,7 @@
 		"version": "0.0.1"
 	},
 	"explorer": "",
-	"nethash": "b780c3dfd55c665a05abee8b6f4e9f882c58ea7542832883588a79e596fccfb3",
+	"nethash": "5f919d94bacac4bf509c65eedd7cd8899da08f7ad97a074bdfc4a2f31d87ac4f",
 	"ports": {},
 	"slip44": 1,
 	"symbol": "TѦ",

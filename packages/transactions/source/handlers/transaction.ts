@@ -17,11 +17,14 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
+	@inject(Identifiers.Evm.Gas.Limits)
+	protected readonly gasLimits!: Contracts.Evm.GasLimits;
+
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	public async verify(
-		walletRepository: Contracts.State.WalletRepository,
+		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
@@ -38,10 +41,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
+		const { walletRepository } = context;
 		const senderWallet: Contracts.State.Wallet = walletRepository.findByAddress(sender.getAddress());
 
 		AppUtils.assert.defined<string>(sender.getPublicKey());
@@ -53,6 +57,8 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		// @TODO: enforce fees here to support dynamic cases
 
 		this.#verifyTransactionNonceApply(sender, transaction);
+
+		this.verifyTransactionFee(context, transaction, sender);
 
 		if (
 			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
@@ -101,24 +107,32 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async apply(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await this.applyToSender(walletRepository, transaction);
-		await this.applyToRecipient(walletRepository, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const senderResult = await this.applyToSender(context, transaction);
+		const recipientResult = await this.applyToRecipient(context, transaction);
+
+		// Merge results; effectively only one is ever set depending on the transaction type.
+		return {
+			gasUsed: senderResult.gasUsed + recipientResult.gasUsed,
+			receipt: recipientResult.receipt,
+		};
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		const data: Contracts.Crypto.TransactionData = transaction.data;
 
-		await this.throwIfCannotBeApplied(walletRepository, transaction, sender);
+		await this.throwIfCannotBeApplied(context, transaction, sender);
 
 		this.#verifyTransactionNonceApply(sender, transaction);
 
@@ -126,8 +140,26 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		sender.setNonce(data.nonce);
 
 		// Subtract fee
-		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
-		sender.setBalance(newBalance);
+		this.applyFeeToSender(transaction, sender);
+
+		// Native gas usage
+		let gasUsed = 0;
+		const isEvmCall =
+			transaction.type === Contracts.Crypto.TransactionType.EvmCall &&
+			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core;
+		if (!isEvmCall) {
+			// TODO: calculate accurate amount (follow-up)
+			gasUsed = this.gasLimits.of(transaction);
+		}
+
+		return { gasUsed };
+	}
+
+	public async applyToRecipient(
+		context: Contracts.Transactions.TransactionHandlerContext,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		return { gasUsed: 0 };
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
@@ -137,7 +169,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async throwIfCannotEnterPool(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {}
 
@@ -166,16 +198,31 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			.map(({ data }) => data);
 	}
 
+	protected verifyTransactionFee(
+		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
+		transaction: Contracts.Crypto.Transaction,
+		sender: Contracts.State.Wallet,
+	): void {
+		if (
+			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
+			this.configuration.getHeight() > 0
+		) {
+			throw new Exceptions.InsufficientBalanceError();
+		}
+	}
+
+	protected applyFeeToSender(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
+		const data: Contracts.Crypto.TransactionData = transaction.data;
+
+		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
+		sender.setBalance(newBalance);
+	}
+
 	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;
 
 	public abstract dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
 
 	public abstract isActivated(): Promise<boolean>;
-
-	public abstract applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<void>;
 }
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;

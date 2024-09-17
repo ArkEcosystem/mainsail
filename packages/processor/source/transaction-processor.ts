@@ -1,28 +1,59 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
 	async process(
-		walletRepository: Contracts.State.WalletRepository,
+		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Processor.TransactionProcessorResult> {
+		const walletRepository = unit.store.walletRepository;
+
+		const milestone = this.configuration.getMilestone(unit.height);
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		if (!(await transactionHandler.verify(walletRepository, transaction))) {
+		const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+			unit.getBlock().data.generatorPublicKey,
+		);
+
+		const commitKey: Contracts.Evm.CommitKey = {
+			height: BigInt(unit.height),
+			round: BigInt(unit.getBlock().data.round),
+		};
+
+		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
+			evm: {
+				blockContext: {
+					commitKey,
+					gasLimit: BigInt(milestone.block.maxGasLimit),
+					timestamp: BigInt(unit.getBlock().data.timestamp),
+					validatorAddress: validator.getAddress(),
+				},
+				instance: this.evm,
+			},
+			walletRepository,
+		};
+
+		if (!(await transactionHandler.verify(transactionHandlerContext, transaction))) {
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		await transactionHandler.apply(walletRepository, transaction);
-
+		const result = await transactionHandler.apply(transactionHandlerContext, transaction);
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
@@ -35,6 +66,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		}
 
 		await this.#updateVoteBalances(walletRepository, sender, recipient, transaction.data);
+		await this.#updateEvmAccountInfoHost(commitKey, sender);
+
+		return { gasUsed: result.gasUsed, receipt: result.receipt };
 	}
 
 	async #updateVoteBalances(
@@ -132,5 +166,13 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				validator.setAttribute("validatorVoteBalance", voteBalance.plus(transaction.amount));
 			}
 		}
+	}
+
+	async #updateEvmAccountInfoHost(commitKey: Contracts.Evm.CommitKey, sender: Contracts.State.Wallet): Promise<void> {
+		await this.evm.updateAccountInfo({
+			account: sender.getAddress(),
+			commitKey,
+			nonce: sender.getNonce().toBigInt(),
+		});
 	}
 }

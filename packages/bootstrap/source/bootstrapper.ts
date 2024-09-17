@@ -59,6 +59,9 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.Evm.Worker)
+	private readonly evmWorker!: Contracts.Evm.Worker;
+
 	public async bootstrap(): Promise<void> {
 		try {
 			if (this.apiSync) {
@@ -111,7 +114,6 @@ export class Bootstrapper {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
-
 	async #storeGenesisCommit(): Promise<void> {
 		if (this.databaseService.isEmpty()) {
 			const genesisBlock = this.stateService.getStore().getGenesisCommit();
@@ -145,6 +147,7 @@ export class Bootstrapper {
 		if (localSnapshotHeight) {
 			await this.stateService.restore(localSnapshotHeight);
 			await this.txPoolWorker.importSnapshot(localSnapshotHeight);
+			await this.evmWorker.importSnapshot(localSnapshotHeight);
 		} else {
 			this.logger.info("Skipping snapshot restoration");
 		}
@@ -185,10 +188,12 @@ export class Bootstrapper {
 		try {
 			const commitState = this.commitStateFactory(commit);
 			const result = await this.blockProcessor.process(commitState);
-			if (result === false) {
+			if (!result.success) {
 				throw new Error(`Block is not processed.`);
 			}
+
 			commitState.setProcessorResult(result);
+
 			await this.blockProcessor.commit(commitState);
 		} catch (error) {
 			await this.app.terminate(`Failed to process block at height ${commit.block.data.height}`, error);

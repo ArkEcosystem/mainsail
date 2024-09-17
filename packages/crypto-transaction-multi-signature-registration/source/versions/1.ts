@@ -60,7 +60,7 @@ export class MultiSignatureRegistrationTransaction extends Transaction {
 				},
 				type: { transactionType: Contracts.Crypto.TransactionType.MultiSignature },
 			},
-			required: ["asset", "signatures"],
+			required: ["asset"],
 		});
 	}
 

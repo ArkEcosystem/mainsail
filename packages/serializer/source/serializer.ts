@@ -69,6 +69,11 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				continue;
 			}
 
+			if (schema.type === "uint256") {
+				this.#writeOptional(schema, result, value, () => result.writeUint256(value));
+				continue;
+			}
+
 			if (schema.type === "bigint") {
 				this.#writeOptional(schema, result, value, () => result.writeUint64(value));
 				continue;
@@ -169,6 +174,13 @@ export class Serializer implements Contracts.Serializer.Serializer {
 
 			if (schema.type === "uint64") {
 				target[property] = this.#readOptional<number>(schema, source, () => +source.readUint64().toString());
+				continue;
+			}
+
+			if (schema.type === "uint256") {
+				target[property] = this.#readOptional<BigNumber>(schema, source, () =>
+					BigNumber.make(source.readUint256()),
+				);
 				continue;
 			}
 

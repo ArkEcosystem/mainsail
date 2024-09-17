@@ -15,11 +15,13 @@ export class MemoryDatabase implements Contracts.Database.DatabaseService {
 
 	// NOTE: genesis block is not part of commits, so start is offset by 1!
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
-		return this.#commits.slice(start, end).map((commit) => commit.block);
+		return this.#commits.slice(Math.max(start, 0), Math.max(start, end)).map((commit) => commit.block);
 	}
 
 	public async findCommitBuffers(start: number, end: number): Promise<Buffer[]> {
-		return this.#commits.slice(start, end).map((commit) => Buffer.from(commit.serialized));
+		return this.#commits
+			.slice(Math.max(start, 0), Math.max(start, end))
+			.map((commit) => Buffer.from(commit.serialized));
 	}
 
 	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {

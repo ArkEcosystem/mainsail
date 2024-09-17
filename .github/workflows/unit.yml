@@ -44,6 +44,8 @@ jobs:
               run: cd packages/api-database && pnpm run test
             - name: Test api-development
               run: cd packages/api-development && pnpm run test
+            - name: Test api-evm
+              run: cd packages/api-evm && pnpm run test
             - name: Test api-http
               run: cd packages/api-http && pnpm run test
             - name: Test api-sync
@@ -112,6 +114,8 @@ jobs:
               run: cd packages/crypto-signature-schnorr-secp256k1 && pnpm run test
             - name: Test crypto-transaction
               run: cd packages/crypto-transaction && pnpm run test
+            - name: Test crypto-transaction-evm-call
+              run: cd packages/crypto-transaction-evm-call && pnpm run test
             - name: Test crypto-transaction-multi-payment
               run: cd packages/crypto-transaction-multi-payment && pnpm run test
             - name: Test crypto-transaction-multi-signature-registration
@@ -137,6 +141,16 @@ jobs:
               run: cd packages/crypto-worker && pnpm run test
             - name: Test database
               run: cd packages/database && pnpm run test
+            - name: Test evm
+              run: cd packages/evm && pnpm run test
+            - name: Test evm-api-worker
+              run: cd packages/evm-api-worker && pnpm run test
+            - name: Test evm-development
+              run: cd packages/evm-development && pnpm run test
+            - name: Test evm-gas-fee
+              run: cd packages/evm-gas-fee && pnpm run test
+            - name: Test evm-service
+              run: cd packages/evm-service && pnpm run test
             - name: Test fees
               run: cd packages/fees && pnpm run test
             - name: Test fees-burn
@@ -171,6 +185,8 @@ jobs:
               run: cd packages/test-runner && pnpm run test
             - name: Test test-transaction-builders
               run: cd packages/test-transaction-builders && pnpm run test
+            - name: Test transaction-pool-broadcaster
+              run: cd packages/transaction-pool-broadcaster && pnpm run test
             - name: Test transaction-pool-service
               run: cd packages/transaction-pool-service && pnpm run test
             - name: Test transaction-pool-worker

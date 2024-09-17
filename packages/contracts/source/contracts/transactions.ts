@@ -1,20 +1,36 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
+import { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
 import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
 
+export type TransactionHandlerContext = {
+	walletRepository: WalletRepository;
+	evm: {
+		instance: Instance;
+		blockContext: BlockContext;
+	};
+};
+
+export interface TransactionApplyResult {
+	gasUsed: number;
+	receipt?: TransactionReceipt;
+}
+
 export interface TransactionHandler {
-	verify(walletRepository: WalletRepository, transaction: Transaction): Promise<boolean>;
+	verify(context: TransactionHandlerContext, transaction: Transaction): Promise<boolean>;
 
-	throwIfCannotBeApplied(walletRepository: WalletRepository, transaction: Transaction, sender: Wallet): Promise<void>;
+	throwIfCannotBeApplied(context: TransactionHandlerContext, transaction: Transaction, sender: Wallet): Promise<void>;
 
-	apply(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	throwIfCannotEnterPool(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 
-	applyToSender(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
+
+	applyToSender(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
+
+	applyToRecipient(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
 	emitEvents(transaction: Transaction): void;
-
-	throwIfCannotEnterPool(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 
 	verifySignatures(
 		wallet: Wallet,
@@ -30,8 +46,6 @@ export interface TransactionHandler {
 	walletAttributes(): ReadonlyArray<{ name: string; type: AttributeType }>;
 
 	isActivated(): Promise<boolean>;
-
-	applyToRecipient(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
 }
 
 export interface TransactionHandlerRegistry {
@@ -69,8 +83,20 @@ export interface TransactionTypeFactory {
 	get(type: number, typeGroup?: number, version?: number): TransactionConstructor;
 }
 
+export interface TransactionValidatorContext {
+	commitKey: CommitKey;
+	gasLimit: number;
+	timestamp: number;
+	generatorPublicKey: string;
+}
+
 export interface TransactionValidator {
-	validate(transaction: Transaction): Promise<void>;
+	getEvm(): Instance;
+	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionValidatorResult>;
+}
+
+export interface TransactionValidatorResult {
+	readonly gasUsed: number;
 }
 
 export type TransactionValidatorFactory = () => TransactionValidator;

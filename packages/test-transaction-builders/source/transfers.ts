@@ -1,4 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Verifier } from "@mainsail/crypto-transaction";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
 import { BigNumber } from "@mainsail/utils";
 
@@ -10,11 +11,15 @@ import {
 	getRandomColdWallet,
 	getRandomFundedWallet,
 } from "./utils.js";
+import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
 export const makeTransfer = async (
 	context: Context,
 	options: TransferOptions = {},
 ): Promise<Contracts.Crypto.Transaction> => {
+	// !! Overwrite verifier to accept invalid schema data
+	context.sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(AcceptAnyTransactionVerifier);
+
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
@@ -33,6 +38,9 @@ export const makeTransfer = async (
 		.recipientId(recipient)
 		.amount(BigNumber.make(amount).toFixed());
 
+	// !! Reset
+	sandbox.app.rebind(Identifiers.Cryptography.Transaction.Verifier).to(Verifier);
+
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
 
@@ -45,7 +53,7 @@ export const makeTransferWithMultiSignature = async (
 	context: Context,
 	options: TransferOptions = {},
 ): Promise<Contracts.Crypto.Transaction[]> => {
-	const randomWallet = await getRandomFundedWallet(context, BigNumber.make(250 * 1e8));
+	const randomWallet = await getRandomFundedWallet(context, BigNumber.WEI.times(250));
 
 	// Register multi sig wallet
 	const participant1 = await getRandomColdWallet(context);
@@ -65,7 +73,7 @@ export const makeTransferWithMultiSignature = async (
 	});
 
 	const fundTx = makeTransfer(context, {
-		amount: BigNumber.make(100 * 1e8),
+		amount: BigNumber.WEI.times(100),
 		nonceOffset: 1,
 		recipient: multiSigwallet.getAddress(),
 		sender: randomWallet,

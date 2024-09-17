@@ -1,5 +1,6 @@
 import { Block, Commit, Transaction } from "./crypto/index.js";
-import { Store, WalletRepository } from "./state/index.js";
+import { TransactionReceipt } from "./evm/evm.js";
+import { Store } from "./state/index.js";
 
 export interface ProcessableUnit {
 	readonly height: number;
@@ -7,8 +8,8 @@ export interface ProcessableUnit {
 	readonly persist: boolean;
 	readonly store: Store;
 	hasProcessorResult(): boolean;
-	getProcessorResult(): boolean;
-	setProcessorResult(processorResult: boolean): void;
+	getProcessorResult(): BlockProcessorResult;
+	setProcessorResult(processorResult: BlockProcessorResult): void;
 	getBlock(): Block;
 	getCommit(): Promise<Commit>;
 }
@@ -18,12 +19,24 @@ export interface Handler {
 }
 
 export interface BlockProcessor {
-	process(unit: ProcessableUnit): Promise<boolean>;
+	process(unit: ProcessableUnit): Promise<BlockProcessorResult>;
 	commit(unit: ProcessableUnit): Promise<void>;
 }
 
+export interface BlockProcessorResult {
+	success: boolean;
+	receipts: Map<string, TransactionReceipt>;
+	gasUsed: number;
+}
+
 export interface TransactionProcessor {
-	process(walletRepository: WalletRepository, transaction: Transaction): Promise<void>;
+	process(unit: ProcessableUnit, transaction: Transaction): Promise<TransactionProcessorResult>;
+}
+
+export interface TransactionProcessorResult {
+	readonly gasUsed: number;
+	// only present for evm-calls, unlike 'gasUsed' which is also present for native transactions
+	readonly receipt?: TransactionReceipt;
 }
 
 export interface Verifier {

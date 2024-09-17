@@ -96,7 +96,7 @@ describe<{
 		assert.equal(result.errors, {
 			0: {
 				message:
-					"Invalid transaction data: data/asset/multiSignature/min must be >= 1, data/asset/multiSignature/min must be >= 1, data/asset/multiSignature/min must be >= 1, data must match a schema in anyOf",
+					"Invalid transaction data: data/asset/multiSignature/publicKeys must NOT have fewer than 2 items, data/asset/multiSignature/publicKeys must NOT have fewer than 2 items, data/asset/multiSignature/publicKeys must NOT have fewer than 2 items, data must match a schema in anyOf",
 				type: "ERR_BAD_DATA",
 			},
 			1: {

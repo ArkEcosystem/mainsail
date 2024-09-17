@@ -188,6 +188,7 @@ describe<{
 		);
 		app.bind(Identifiers.State.Service).toConstantValue({});
 		app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
+		app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
 		app.bind(Identifiers.Cryptography.Validator).to(Validator);

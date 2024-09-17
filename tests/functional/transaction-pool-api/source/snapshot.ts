@@ -1,4 +1,4 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers, Events } from "@mainsail/contracts";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
 
@@ -17,8 +17,38 @@ export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 
 export class Snapshot {
 	private balances: Record<string, BigNumber> = {};
+	private receipts: Record<string, { sender: string; receipt: Contracts.Evm.TransactionReceipt }[]> = {};
 
-	public constructor(public sandbox: Sandbox) {}
+	public constructor(public sandbox: Sandbox) {
+		this.listenForEvmEvents();
+	}
+
+	private listenForEvmEvents() {
+		const event = Events.EvmEvent.TransactionReceipt;
+		const eventDispatcher = this.sandbox.app.get<Contracts.Kernel.EventDispatcher>(
+			Identifiers.Services.EventDispatcher.Service,
+		);
+
+		const listener = {
+			handle: ({
+				data,
+			}: {
+				data: { receipt: Contracts.Evm.TransactionReceipt; sender: string; transactionId: string };
+			}) => {
+				const { sender, receipt, transactionId } = data;
+
+				console.log("got receipt", sender, transactionId, receipt);
+
+				if (!this.receipts[transactionId]) {
+					this.receipts[transactionId] = [];
+				}
+
+				this.receipts[transactionId].push({ sender, receipt });
+			},
+		};
+
+		eventDispatcher.listen(event, listener);
+	}
 
 	public async add(addressOrPublicKey: string): Promise<void> {
 		const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
@@ -74,11 +104,18 @@ export class Snapshot {
 			}
 		}
 
+		if (!allValid) {
+			process.exit(1);
+		}
+
 		assert.true(allValid);
 	}
 
 	private async collectBalanceDeltas(): Promise<Record<string, BigNumber>> {
 		const database = this.sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+		const gasFeeCalculator = this.sandbox.app.get<Contracts.Evm.GasFeeCalculator>(
+			Identifiers.Evm.Gas.FeeCalculator,
+		);
 
 		const balanceDeltas: Record<string, BigNumber> = {};
 		if (database.isEmpty()) {
@@ -112,11 +149,22 @@ export class Snapshot {
 			);
 
 			for (const transaction of block.transactions) {
-				// Take amount and fee from sender
-				await negativeBalanceChange(
-					transaction.data.senderPublicKey,
-					transaction.data.amount.plus(transaction.data.fee),
-				);
+				const receipts = this.receipts[transaction.id!];
+				if (receipts && receipts.length) {
+					// Apply consumed gas from any receipts
+					for (const receipt of receipts) {
+						await negativeBalanceChange(
+							receipt.sender,
+							gasFeeCalculator.calculateConsumed(transaction.data.fee, Number(receipt.receipt.gasUsed)),
+						);
+					}
+				} else {
+					// Take amount and fee from sender (for non evm-calls)
+					await negativeBalanceChange(
+						transaction.data.senderPublicKey,
+						transaction.data.amount.plus(transaction.data.fee),
+					);
+				}
 
 				// Add amount to recipient
 				if (transaction.data.recipientId) {

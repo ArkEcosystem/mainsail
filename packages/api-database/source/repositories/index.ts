@@ -3,6 +3,7 @@ export { makeBlockRepository } from "./block-repository.js";
 export { makeConfigurationRepository } from "./configuration-repository.js";
 export { makePeerRepository } from "./peer-repository.js";
 export { makePluginRepository } from "./plugin-repository.js";
+export { makeReceiptRepository } from "./receipt-repository.js";
 export { makeStateRepository } from "./state-repository.js";
 export { makeTransactionRepository } from "./transaction-repository.js";
 export { makeTransactionTypeRepository } from "./transaction-type-repository.js";

@@ -35,14 +35,16 @@ describe<{
 		assert.equal(configManager.getMilestones(), [
 			{
 				activeValidators: 0,
-				address: { bech32m: "ark" },
-				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				address: { keccak256: true },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
+				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
+				evmSpec: cryptoJson.milestones[0].evmSpec,
 				fees: cryptoJson.milestones[0].fees,
 				height: 0,
 				multiPaymentLimit: 256,
 				reward: "0",
-				satoshi: { decimals: 8, denomination: 100_000_000 },
+				satoshi: { decimals: 18, denomination: 1e18 },
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,
@@ -54,14 +56,16 @@ describe<{
 			},
 			{
 				activeValidators: 53,
-				address: { bech32m: "ark" },
-				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				address: { keccak256: true },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
+				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
+				evmSpec: cryptoJson.milestones[0].evmSpec,
 				fees: cryptoJson.milestones[0].fees,
 				height: 1,
 				multiPaymentLimit: 256,
 				reward: "0",
-				satoshi: { decimals: 8, denomination: 100_000_000 },
+				satoshi: { decimals: 18, denomination: 1e18 },
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,
@@ -73,14 +77,16 @@ describe<{
 			},
 			{
 				activeValidators: 53,
-				address: { bech32m: "ark" },
-				block: { maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
+				address: { keccak256: true },
+				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
+				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
+				evmSpec: cryptoJson.milestones[0].evmSpec,
 				fees: cryptoJson.milestones[0].fees,
 				height: 75_600,
 				multiPaymentLimit: 256,
-				reward: "200000000",
-				satoshi: { decimals: 8, denomination: 100_000_000 },
+				reward: "2000000000000000000",
+				satoshi: { decimals: 18, denomination: 1e18 },
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,
@@ -182,7 +188,7 @@ describe<{
 	it("getNextMilestoneByKey - should get the next milestone with a given key", ({ configManager }) => {
 		// configManager.setConfig(devnet);
 		const expected = {
-			data: "200000000",
+			data: "2000000000000000000",
 			found: true,
 			height: 75_600,
 		};

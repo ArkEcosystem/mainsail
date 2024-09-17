@@ -12,11 +12,12 @@ export type EnvironmentOptions = {
 export type MilestoneOptions = {
 	validators: number;
 	maxBlockPayload: number;
+	maxBlockGasLimit: number;
 	maxTxPerBlock: number;
 	blockTime: number;
 	epoch: Date;
 	vendorFieldLength: number;
-	address: { bech32m: string } | { base58: number };
+	address: { bech32m: string } | { base58: number } | { keccak256: boolean };
 };
 
 export type NetworkOptions = {

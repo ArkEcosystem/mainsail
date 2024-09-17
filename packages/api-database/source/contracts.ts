@@ -6,6 +6,7 @@ import {
 	Configuration,
 	Peer,
 	Plugin,
+	Receipt,
 	State,
 	Transaction,
 	TransactionType,
@@ -73,7 +74,7 @@ export type FeeStatistics = {
 };
 
 export type TransactionRepositoryExtension = {
-	findManyByCritera(
+	findManyByCriteria(
 		walletRepository: WalletRepository,
 		transactionCriteria: Criteria.OrTransactionCriteria,
 		sorting: Sorting,
@@ -89,11 +90,20 @@ export type ValidatorRoundRepositoryExtension = {};
 export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
 export type PluginRepositoryExtension = {};
 export type PluginRepository = ExtendedRepository<Plugin> & PluginRepositoryExtension;
+export type ReceiptRepositoryExtension = {
+	findManyByCriteria(
+		criteria: Criteria.OrReceiptCriteria,
+		sorting: Sorting,
+		pagination: Pagination,
+		options?: Options,
+	): Promise<ResultsPage<Receipt>>;
+};
+export type ReceiptRepository = ExtendedRepository<Receipt> & ReceiptRepositoryExtension;
 export type StateRepositoryExtension = {};
 export type StateRepository = ExtendedRepository<State> & StateRepositoryExtension;
 
 export type WalletRepositoryExtension = {
-	findManyByCritera(
+	findManyByCriteria(
 		walletCriteria: Criteria.OrWalletCriteria,
 		sorting: Sorting,
 		pagination: Pagination,
@@ -113,6 +123,7 @@ export type ApiNodeRepositoryFactory = (customDataSource?: RepositoryDataSource)
 export type BlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => BlockRepository;
 export type ConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => ConfigurationRepository;
 export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
+export type ReceiptRepositoryFactory = (customDataSource?: RepositoryDataSource) => ReceiptRepository;
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;
 export type TransactionTypeRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionTypeRepository;
 export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryDataSource) => ValidatorRoundRepository;

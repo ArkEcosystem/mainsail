@@ -75,7 +75,7 @@ export class MultiPaymentTransaction extends Transaction {
 
 		return (
 			2 + // number of payments
-			payments.length * 8 + // amounts
+			payments.length * 32 + // amounts
 			payments.length * this.addressSize // recipients
 		);
 	}
@@ -91,7 +91,7 @@ export class MultiPaymentTransaction extends Transaction {
 		buff.writeUint16(payments.length);
 
 		for (const payment of payments) {
-			buff.writeUint64(payment.amount.toBigInt());
+			buff.writeUint256(payment.amount.toBigInt());
 			buff.writeBytes(await this.addressFactory.toBuffer(payment.recipientId));
 		}
 
@@ -106,7 +106,7 @@ export class MultiPaymentTransaction extends Transaction {
 		let totalPaymentsAmount = BigNumber.ZERO;
 		for (let index = 0; index < total; index++) {
 			const payment = {
-				amount: BigNumber.make(buf.readUint64().toString()),
+				amount: BigNumber.make(buf.readUint256()),
 				recipientId: await this.addressFactory.fromBuffer(this.addressSerializer.deserialize(buf)),
 			};
 

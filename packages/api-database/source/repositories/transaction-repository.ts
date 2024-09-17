@@ -14,7 +14,7 @@ import { makeExtendedRepository } from "./repository-extension.js";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): TransactionRepository =>
 	makeExtendedRepository<Transaction, TransactionRepositoryExtension>(Transaction, dataSource, {
-		async findManyByCritera(
+		async findManyByCriteria(
 			walletRepository: WalletRepository,
 			transactionCriteria: Criteria.OrTransactionCriteria,
 			sorting: Sorting,
@@ -31,10 +31,10 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 
 				return this.createQueryBuilder()
 					.select(['type_group AS "typeGroup"', "type"])
-					.addSelect("COALESCE(AVG(fee), 0)::int8", "avg")
-					.addSelect("COALESCE(MIN(fee), 0)::int8", "min")
-					.addSelect("COALESCE(MAX(fee), 0)::int8", "max")
-					.addSelect("COALESCE(SUM(fee), 0)::int8", "sum")
+					.addSelect("TRUNC(COALESCE(AVG(fee), 0)::numeric", "avg")
+					.addSelect("TRUNC(COALESCE(MIN(fee), 0)::numeric", "min")
+					.addSelect("TRUNC(COALESCE(MAX(fee), 0)::numeric", "max")
+					.addSelect("TRUNC(COALESCE(SUM(fee), 0)::numeric", "sum")
 					.where("timestamp > :age AND fee >= :minFee", { age, minFee })
 					.groupBy("type_group")
 					.addGroupBy("type")
@@ -46,11 +46,11 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 			// no days parameter, take the stats from each type for its last 20 txs
 			return this.manager.query<FeeStatistics[]>(
 				`
-				select t_outer.type_group as "typeGroup", t_outer.type as "type", 
-					COALESCE(AVG(fee), 0)::int8 AS "avg",
-					COALESCE(MIN(fee), 0)::int8 AS "min",
-					COALESCE(MIN(fee), 0)::int8 AS "max",
-					COALESCE(MAX(fee), 0)::int8 AS "sum"
+				select t_outer.type_group as "typeGroup", t_outer.type as "type",
+					TRUNC(COALESCE(AVG(fee), 0)::numeric) AS "avg",
+					TRUNC(COALESCE(MIN(fee), 0)::numeric) AS "min",
+					TRUNC(COALESCE(MIN(fee), 0)::numeric) AS "max",
+					TRUNC(COALESCE(MAX(fee), 0)::numeric) AS "sum"
 				from transactions t_outer
 				join lateral (
 					select 1 from transactions t_inner

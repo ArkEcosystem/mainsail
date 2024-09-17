@@ -66,6 +66,12 @@ export class ApiContext {
 		)();
 	}
 
+	public get receiptsRepository(): ApiDatabaseContracts.ReceiptRepository {
+		return this.app.get<ApiDatabaseContracts.ReceiptRepositoryFactory>(
+			ApiDatabaseIdentifiers.ReceiptRepositoryFactory,
+		)();
+	}
+
 	public get configurationRepository(): ApiDatabaseContracts.ConfigurationRepository {
 		return this.app.get<ApiDatabaseContracts.ConfigurationRepositoryFactory>(
 			ApiDatabaseIdentifiers.ConfigurationRepositoryFactory,
@@ -98,6 +104,8 @@ export const prepareSandbox = async (context: { sandbox: Sandbox }): Promise<Api
 		.bind(Identifiers.ServiceProvider.Configuration)
 		.to(Providers.PluginConfiguration)
 		.inSingletonScope();
+
+	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		error: (message) => console.log(message),

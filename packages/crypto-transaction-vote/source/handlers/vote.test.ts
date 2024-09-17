@@ -78,6 +78,7 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.emitter);
 		context.sandbox.app.bind(Identifiers.TransactionPool.Query).toConstantValue(context.poolQuery);
+		context.sandbox.app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({});
 
 		context.handler = context.sandbox.app.resolve(VoteTransactionHandler);
 
@@ -118,7 +119,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
-				walletRepository,
+				{ walletRepository },
 				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -139,7 +140,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -161,7 +162,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -182,7 +183,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -204,7 +205,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
-				walletRepository,
+				{ walletRepository },
 				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.Transaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -229,7 +230,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
-				walletRepository,
+				{ walletRepository },
 				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.Transaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -249,7 +250,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.Transaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -269,7 +270,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.Transaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -291,7 +292,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.Transaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -313,7 +314,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotBeApplied(
-				walletRepository,
+				{ walletRepository },
 				getTransaction(["secondValidatorPublicKey"], ["validatorPublicKey"]) as Contracts.Crypto.Transaction,
 				wallet as Contracts.State.Wallet,
 			),
@@ -331,7 +332,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction([], []) as Contracts.Crypto.Transaction,
 					wallet as Contracts.State.Wallet,
 				),
@@ -347,7 +348,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction(
 						["ValidatorPublicKey", "secondValidatorPublicKey"],
 						[],
@@ -366,7 +367,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotBeApplied(
-					walletRepository,
+					{ walletRepository },
 					getTransaction(
 						[],
 						["ValidatorPublicKey", "secondValidatorPublicKey"],
@@ -424,7 +425,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.throwIfCannotEnterPool(
-				walletRepository,
+				{ walletRepository },
 				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 			),
 		);
@@ -438,7 +439,7 @@ describe<{
 		await assert.rejects(
 			() =>
 				handler.throwIfCannotEnterPool(
-					walletRepository,
+					{ walletRepository },
 					getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 				),
 			Exceptions.PoolError,
@@ -453,7 +454,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.applyToSender(
-				walletRepository,
+				{ walletRepository },
 				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 			),
 		);
@@ -469,7 +470,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.applyToSender(
-				walletRepository,
+				{ walletRepository },
 				getTransaction([], ["validatorPublicKey"]) as Contracts.Crypto.Transaction,
 			),
 		);
@@ -485,7 +486,7 @@ describe<{
 
 		await assert.resolves(() =>
 			handler.applyToSender(
-				walletRepository,
+				{ walletRepository },
 				getTransaction(["validatorPublicKey"], ["secondValidatorPublicKey"]) as Contracts.Crypto.Transaction,
 			),
 		);
@@ -499,7 +500,7 @@ describe<{
 	it("applyToRecipient - should pass", async ({ handler, walletRepository }) => {
 		await assert.resolves(() =>
 			handler.applyToRecipient(
-				walletRepository,
+				{ walletRepository },
 				getTransaction(["validatorPublicKey"], []) as Contracts.Crypto.Transaction,
 			),
 		);

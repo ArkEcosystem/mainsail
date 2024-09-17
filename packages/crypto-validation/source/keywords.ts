@@ -1,7 +1,8 @@
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 import { AnySchemaObject, FuncKeywordDefinition } from "ajv";
 
-export const makeKeywords = () => {
+export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	const maxBytes: FuncKeywordDefinition = {
 		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
 		errors: false,
@@ -18,7 +19,7 @@ export const makeKeywords = () => {
 		// @ts-ignore
 		compile: (schema) => (data, parentSchema: AnySchemaObject) => {
 			const minimum = schema.minimum !== undefined ? schema.minimum : 0;
-			const maximum = schema.maximum !== undefined ? schema.maximum : "9223372036854775807"; // 8 byte maximum
+			const maximum = schema.maximum !== undefined ? schema.maximum : BigNumber.UINT256_MAX;
 
 			if (data !== 0 && !data) {
 				return false;

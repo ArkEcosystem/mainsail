@@ -170,6 +170,32 @@ describe<{
 		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
 	});
 
+	it("should broadcast satisfied webhook condition with nested key", async ({ database, listener }) => {
+		const spyOnPost = stub(Utils.http, "post").resolvedValue({
+			statusCode: 200,
+		});
+		const spyOnDispatch = stub(eventDispatcher, "dispatch");
+
+		webhook.conditions = [
+			{
+				condition: "eq",
+				key: "some.nested.prop",
+				value: 1,
+			},
+		];
+		database.create(webhook);
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Created);
+
+		spyOnDispatch.reset();
+		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
+
+		spyOnPost.calledOnce();
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledOnce();
+		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
+	});
+
 	it("should not broadcast if webhook condition is not satisfied", async ({ database, listener }) => {
 		const spyOnPost = stub(Utils.http, "post");
 

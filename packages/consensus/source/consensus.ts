@@ -280,7 +280,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#step === Contracts.Consensus.Step.Propose ||
 			this.#isInvalidRoundState(roundState) ||
 			!proposal ||
-			!roundState.getProcessorResult()
+			!roundState.getProcessorResult().success
 		) {
 			return;
 		}
@@ -347,7 +347,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrecommit = true;
 		const block = roundState.getBlock();
 
-		if (!roundState.getProcessorResult()) {
+		if (!roundState.getProcessorResult().success) {
 			this.logger.info(
 				`Block ${block.data.id} on height ${this.#height} received +2/3 precommits but is invalid`,
 			);
@@ -574,13 +574,13 @@ export class Consensus implements Contracts.Consensus.Service {
 				await proposal.deserializeData();
 
 				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
-					roundState.setProcessorResult(false);
+					roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 					return;
 				}
 
 				roundState.setProcessorResult(await this.processor.process(roundState));
 			} catch {
-				roundState.setProcessorResult(false);
+				roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 			}
 		}
 	}

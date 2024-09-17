@@ -14,6 +14,7 @@ import { Listeners } from "./contracts.js";
 interface DeferredSync {
 	block: Models.Block;
 	transactions: Models.Transaction[];
+	receipts: Models.Receipt[];
 	validatorRound?: Models.ValidatorRound;
 	wallets: Models.Wallet[];
 	newMilestones?: Record<string, any>;
@@ -40,6 +41,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
 	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.ReceiptRepositoryFactory)
+	private readonly receiptRepositoryFactory!: ApiDatabaseContracts.ReceiptRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.StateRepositoryFactory)
 	private readonly stateRepositoryFactory!: ApiDatabaseContracts.StateRepositoryFactory;
@@ -115,6 +119,28 @@ export class Sync implements Contracts.ApiSync.Service {
 			proof,
 		} = commit;
 
+		const transactionReceipts: Models.Receipt[] = [];
+		if (unit.hasProcessorResult()) {
+			const processResult = unit.getProcessorResult();
+			const { receipts } = processResult;
+
+			for (const transaction of transactions) {
+				const receipt = receipts.get(transaction.id);
+				if (receipt) {
+					transactionReceipts.push({
+						blockHeight: header.height.toFixed(),
+						deployedContractAddress: receipt.deployedContractAddress,
+						gasRefunded: Number(receipt.gasRefunded),
+						gasUsed: Number(receipt.gasUsed),
+						id: transaction.id,
+						logs: receipt.logs,
+						output: receipt.output,
+						success: receipt.success,
+					});
+				}
+			}
+		}
+
 		const dirtyWallets = [...unit.store.walletRepository.getDirtyWallets()];
 
 		const deferredSync: DeferredSync = {
@@ -130,13 +156,17 @@ export class Sync implements Contracts.ApiSync.Service {
 				reward: header.reward.toFixed(),
 				round: header.round,
 				signature: proof.signature,
+				stateHash: header.stateHash,
 				timestamp: header.timestamp.toFixed(),
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
+				totalGasUsed: header.totalGasUsed,
 				validatorRound: Utils.roundCalculator.calculateRound(header.height, this.configuration).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,
 			},
+
+			receipts: transactionReceipts,
 
 			transactions: transactions.map(({ data }) => ({
 				amount: data.amount.toFixed(),
@@ -301,6 +331,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const configurationRepository = this.configurationRepositoryFactory(entityManager);
 			const stateRepository = this.stateRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
+			const receiptRepository = this.receiptRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 
@@ -321,6 +352,10 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			for (const batch of chunk(deferred.transactions, 256)) {
 				await transactionRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+			}
+
+			for (const batch of chunk(deferred.receipts, 256)) {
+				await receiptRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
 			}
 
 			if (deferred.validatorRound) {
@@ -365,6 +400,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
 			const stateRepository = this.stateRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
+			const receiptRepository = this.receiptRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
 
@@ -374,6 +410,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					blockRepository,
 					stateRepository,
 					transactionRepository,
+					receiptRepository,
 					validatorRoundRepository,
 					walletRepository,
 				].map((repo) => repo.clear()),

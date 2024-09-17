@@ -1,0 +1,24 @@
+[package]
+name = "mainsail_evm_core"
+rust-version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+version.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+ethers-contract = { workspace = true }
+ethers-core = { workspace = true }
+ethers-providers = { workspace = true }
+revm = { workspace = true }
+serde = { workspace = true }
+bincode = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+
+heed = { version = "0.20.0", features = [] }
+rayon = "1.10.0"
+
+[dev-dependencies]
+tempfile = "3"

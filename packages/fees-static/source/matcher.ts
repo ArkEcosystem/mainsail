@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { FeeRegistry } from "@mainsail/fees";
-import { BigNumber } from "@mainsail/utils";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
@@ -23,10 +23,23 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 	}
 
 	#throwIfCannot(action: string, transaction: Contracts.Crypto.Transaction): void {
-		const feeString = this.#formatSatoshi(transaction.data.fee);
+		// TODO: generalize to all native tx types
+		if (transaction.data.type === Contracts.Crypto.TransactionType.EvmCall) {
+			const { gas: gasConfig } = this.configuration.getMilestone();
+			if (transaction.data.fee.isLessThan(gasConfig.minimumGasFee)) {
+				this.logger.notice(
+					`${transaction.id} not eligible for ${action} (fee ${transaction.data.fee} < ${gasConfig.minimumGasFee})`,
+				);
 
+				throw new Exceptions.TransactionFeeTooLowError(transaction);
+			}
+
+			return undefined;
+		}
+
+		const feeString = Utils.formatCurrency(this.configuration, transaction.data.fee);
 		const staticFee = this.feeRegistry.get(transaction.key, transaction.data.version);
-		const staticFeeString = this.#formatSatoshi(staticFee);
+		const staticFeeString = Utils.formatCurrency(this.configuration, staticFee);
 
 		if (transaction.data.fee.isEqualTo(staticFee)) {
 			this.logger.debug(`${transaction.id} eligible for ${action} (fee ${feeString} = ${staticFeeString})`);
@@ -43,16 +56,5 @@ export class FeeMatcher implements Contracts.TransactionPool.FeeMatcher {
 		this.logger.notice(`${transaction.id} not eligible for ${action} (fee ${feeString} > ${staticFeeString})`);
 
 		throw new Exceptions.TransactionFeeTooHighError(transaction);
-	}
-
-	#formatSatoshi(amount: BigNumber): string {
-		const { decimals, denomination } = this.configuration.getMilestone().satoshi;
-
-		const localeString = (+amount / denomination).toLocaleString("en", {
-			maximumFractionDigits: decimals,
-			minimumFractionDigits: 0,
-		});
-
-		return `${localeString} ${this.configuration.get("network.client.symbol")}`;
 	}
 }

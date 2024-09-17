@@ -54,3 +54,9 @@ export interface MultiSignatureOptions extends TransactionOptions {
 	min?: number;
 	participantSignatureOverwrite?: { [index: number]: string };
 }
+
+export interface EvmCallOptions extends TransactionOptions {
+	gasLimit?: number;
+	payload?: string;
+	recipient?: string;
+}

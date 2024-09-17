@@ -95,6 +95,7 @@ describe<{
 				ValidatorResignation: 7,
 				UsernameRegistration: 8,
 				UsernameResignation: 9,
+				EvmCall: 10,
 			},
 		});
 	});

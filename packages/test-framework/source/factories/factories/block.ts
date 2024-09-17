@@ -48,19 +48,23 @@ export const registerBlockFactory = async (
 			}
 		}
 
-		const totals: { amount: BigNumber; fee: BigNumber } = {
+		const gasLimits = app.get<Contracts.Evm.GasLimits>(Identifiers.Evm.Gas.Limits);
+		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
+			gasUsed: 0,
 		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
-		let payloadLength = transactions.length * 4;
+		let payloadLength = transactions.length * 2;
 
-		for (const { data, serialized } of transactions) {
+		for (const transaction of transactions) {
+			const { data, serialized } = transaction;
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
+			totals.gasUsed += gasLimits.of(transaction);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -90,9 +94,11 @@ export const registerBlockFactory = async (
 					previousBlock: previousBlock.id,
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
+					stateHash: "TODO",
 					timestamp: options.timestamp || dayjs().valueOf(),
 					totalAmount: BigNumber.make(totals.amount),
 					totalFee: BigNumber.make(totals.fee),
+					totalGasUsed: totals.gasUsed,
 					transactions: transactionData,
 					version: 1,
 				},

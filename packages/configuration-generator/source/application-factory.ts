@@ -2,21 +2,24 @@ import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressBech32m } from "@mainsail/crypto-address-bech32m";
+import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
-import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
+import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoMessages } from "@mainsail/crypto-messages";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
+import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypto-transaction-evm-call";
 import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
 import { ServiceProvider as CoreCryptoTransactionUsernameRegistration } from "@mainsail/crypto-transaction-username-registration";
 import { ServiceProvider as CoreCryptoTransactionValidatorRegistration } from "@mainsail/crypto-transaction-validator-registration";
 import { ServiceProvider as CoreCryptoTransactionVote } from "@mainsail/crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
+import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as CoreFees } from "@mainsail/fees";
 import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { Application } from "@mainsail/kernel";
@@ -38,7 +41,7 @@ import {
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 
 export const makeApplication = async (configurationPath: string, options: Record<string, any> = {}) => {
-	options = { address: "bech32m", bech32mPrefix: "ark", name: "mainsail", ...options };
+	options = { address: "keccak256", name: "mainsail", ...options };
 
 	const app = new Application(new Container());
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
@@ -51,7 +54,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoValidation).register();
 	await app.resolve(CoreCryptoHashBcrypto).register();
 	await app.resolve(CoreCryptoSignatureSchnorr).register();
-	await app.resolve(CoreCryptoKeyPairSchnorr).register();
+	await app.resolve(CoreCryptoKeyPairEcdsa).register();
 
 	let addressMilestone;
 
@@ -66,6 +69,11 @@ export const makeApplication = async (configurationPath: string, options: Record
 			addressMilestone = { bech32m: options.bech32mPrefix };
 			break;
 		}
+		case "keccak256": {
+			await app.resolve(CoreCryptoAddressKeccak256).register();
+			addressMilestone = { keccak256: true };
+			break;
+		}
 		default: {
 			throw new Exceptions.NotImplemented(options.addressFormat, "makeApplication");
 		}
@@ -76,9 +84,11 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoConsensus).register();
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();
+	await app.resolve(CoreEvmGasFee).register();
 	await app.resolve(CoreFees).register();
 	await app.resolve(CoreFeesStatic).register();
 	await app.resolve(CoreCryptoTransaction).register();
+	await app.resolve(CoreCryptoTransactionEvmCall).register();
 	await app.resolve(CoreCryptoTransactionValidatorRegistration).register();
 	await app.resolve(CoreCryptoTransactionUsernameRegistration).register();
 	await app.resolve(CoreCryptoTransactionTransfer).register();

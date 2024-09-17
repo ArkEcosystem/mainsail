@@ -1,0 +1,38 @@
+{
+	"name": "@mainsail/evm",
+	"version": "0.0.1-alpha.20",
+	"description": "EVM for the Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"main": "index.js",
+	"types": "index.d.ts",
+	"scripts": {
+		"artifacts": "napi artifacts",
+		"build": "pnpm run clean && pnpm run build-napi",
+		"build-napi": "napi build --platform --cargo-cwd bindings --release",
+		"build-napi:debug": "napi build --platform --cargo-cwd bindings",
+		"clean": "del index.js index.d.ts evm.*.node target",
+		"prepublishOnly": "napi prepublish -t pnpm",
+		"release": "pnpm publish --access public",
+		"test": "cargo test --release",
+		"version": "napi version "
+	},
+	"devDependencies": {
+		"@napi-rs/cli": "^2.18.4"
+	},
+	"engines": {
+		"node": ">=20.x"
+	},
+	"napi": {
+		"name": "evm",
+		"triples": {
+			"defaults": false,
+			"additional": [
+				"aarch64-unknown-linux-gnu",
+				"aarch64-unknown-linux-musl",
+				"x86_64-unknown-linux-gnu",
+				"x86_64-unknown-linux-musl"
+			]
+		}
+	}
+}

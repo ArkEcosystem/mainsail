@@ -53,7 +53,9 @@ describe<{
 
 	it("#make - should make a block with transactions", async ({ factory }) => {
 		const block = await factory.make(blockDataWithTransactions, [
+			// @ts-ignore
 			{ data: blockDataWithTransactions.transactions[0] },
+			// @ts-ignore
 			{ data: blockDataWithTransactions.transactions[1] },
 		]);
 
@@ -157,6 +159,7 @@ describe<{
 	});
 
 	it("#fromData - should throw on invalid transaction data", async ({ factory }) => {
+		// @ts-ignore
 		delete blockDataWithTransactionsClone.transactions[0].id;
 
 		await assert.rejects(

@@ -11,6 +11,7 @@ export type TransactionOptions = {
 	nonce?: string;
 	fee?: string;
 	timestamp?: number;
+	recipientId?: string;
 	senderPublicKey?: string;
 	passphrase?: string;
 	passphrases?: string[];
@@ -43,6 +44,10 @@ export type MultiPaymentOptions = TransactionOptions & {
 		amount: string;
 		recipientId: string;
 	}[];
+};
+
+export type EvmCallOptions = TransactionOptions & {
+	evmCall?: Contracts.Crypto.EvmCallAsset;
 };
 
 export interface Identity {

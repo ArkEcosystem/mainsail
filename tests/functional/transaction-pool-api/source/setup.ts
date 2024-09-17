@@ -1,7 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Bootstrap, Providers } from "@mainsail/kernel";
+import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { resolve } from "path";
+import { dirSync } from "tmp";
 
 import { MemoryDatabase } from "./database.js";
 import { PoolWorker } from "./pool-worker.js";
@@ -17,7 +18,8 @@ const setup = async () => {
 	sandbox.app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	sandbox.app
 		.bind(Identifiers.Services.EventDispatcher.Service)
-		.toConstantValue({ dispatch: () => {}, listen: () => {} });
+		.to(Services.Events.MemoryEventDispatcher)
+		.inSingletonScope();
 
 	sandbox.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		clear: async () => {},
@@ -41,6 +43,9 @@ const setup = async () => {
 		broadcastTransactions: async () => {},
 	});
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).to(PoolWorker).inSingletonScope();
+	sandbox.app.bind(Identifiers.Evm.Worker).toConstantValue({
+		onCommit: async () => {},
+	});
 
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
@@ -53,8 +58,8 @@ const setup = async () => {
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-
-	sandbox.app.bind("path.data").toConstantValue("");
+	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
+	//sandbox.app.bind("path.data").toConstantValue(resolve(import.meta.dirname, "../paths/data"));
 	sandbox.app.bind("path.config").toConstantValue(resolve(import.meta.dirname, "../paths/config"));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -83,14 +88,17 @@ const setup = async () => {
 		"@mainsail/crypto-validation",
 		"@mainsail/crypto-hash-bcrypto",
 		"@mainsail/crypto-signature-schnorr",
-		"@mainsail/crypto-key-pair-schnorr",
+		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-consensus-bls12-381",
-		"@mainsail/crypto-address-bech32m",
+		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
 		"@mainsail/fees",
 		"@mainsail/fees-static",
+		"@mainsail/evm-service",
+		"@mainsail/evm-gas-fee",
+		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-username-registration",
 		"@mainsail/crypto-transaction-username-resignation",
@@ -100,6 +108,7 @@ const setup = async () => {
 		"@mainsail/crypto-transaction-multi-signature-registration",
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
+		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",

@@ -22,6 +22,9 @@ export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
+	@inject(Identifiers.Evm.Gas.Limits)
+	private readonly gasLimits!: Contracts.Evm.GasLimits;
+
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
@@ -189,23 +192,27 @@ export class GenesisBlockGenerator extends Generator {
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.GenesisBlockOptions,
 	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
-		const totals: { amount: BigNumber; fee: BigNumber } = {
+		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 			amount: BigNumber.ZERO,
 			fee: BigNumber.ZERO,
+			gasUsed: 0,
 		};
 
 		const payloadBuffers: Buffer[] = [];
 
 		// The initial payload length takes the overhead for each serialized transaction into account
-		// which is a uint32 per transaction to store the individual length.
-		let payloadLength = transactions.length * 4;
+		// which is a uint16 per transaction to store the individual length.
+		let payloadLength = transactions.length * 2;
 
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
-		for (const { serialized, data } of transactions) {
+		for (const transaction of transactions) {
+			const { serialized, data } = transaction;
+
 			Utils.assert.defined<string>(data.id);
 
 			totals.amount = totals.amount.plus(data.amount);
 			totals.fee = totals.fee.plus(data.fee);
+			totals.gasUsed += this.gasLimits.of(transaction);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -227,9 +234,11 @@ export class GenesisBlockGenerator extends Generator {
 					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 					reward: BigNumber.ZERO,
 					round: 0,
+					stateHash: "0000000000000000000000000000000000000000000000000000000000000000",
 					timestamp: dayjs(options.epoch).valueOf(),
 					totalAmount: totals.amount,
 					totalFee: totals.fee,
+					totalGasUsed: totals.gasUsed,
 					transactions: transactionData,
 					version: 1,
 				},
@@ -250,7 +259,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		const verified = await this.blockVerifier.verify(genesis.block);
 		if (!verified.verified) {
-			throw new Error("failed to generate genesis block");
+			throw new Error(`failed to generate genesis block: ${JSON.stringify(verified.errors)}`);
 		}
 	}
 }

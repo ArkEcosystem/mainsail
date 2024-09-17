@@ -40,7 +40,7 @@ export const buildValidatorAndVoteWallets = async (
 		const voter = await walletRepo.findByPublicKey(voterKeys[index]);
 		const totalBalance = BigNumber.make(index + 1)
 			.times(1000)
-			.times(BigNumber.SATOSHI);
+			.times(BigNumber.WEI);
 		voter.setBalance(totalBalance);
 		voter.setPublicKey(`v${delegateKey}`);
 		voter.setAttribute("vote", delegateKey);

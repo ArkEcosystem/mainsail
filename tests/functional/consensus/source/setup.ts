@@ -2,6 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Bootstrap, Providers, Services } from "@mainsail/kernel";
 import { Sandbox } from "@mainsail/test-framework";
 import { join } from "path";
+import { dirSync } from "tmp";
 
 import { ValidatorsJson } from "./contracts.js";
 import { MemoryDatabase } from "./database.js";
@@ -48,6 +49,9 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		setFailedTransactions: () => {},
 		onCommit: async () => {},
 	});
+	sandbox.app.bind(Identifiers.Evm.Worker).toConstantValue({
+		onCommit: async () => {},
+	});
 
 	sandbox.app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	sandbox.app
@@ -59,7 +63,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	await sandbox.app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	sandbox.app.bind("path.data").toConstantValue("");
+	sandbox.app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
 	sandbox.app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
 	sandbox.app.bind("path.cache").toConstantValue("");
 	sandbox.app.bind("path.log").toConstantValue("");
@@ -86,14 +90,17 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-validation",
 		"@mainsail/crypto-hash-bcrypto",
 		"@mainsail/crypto-signature-schnorr",
-		"@mainsail/crypto-key-pair-schnorr",
+		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-consensus-bls12-381",
-		"@mainsail/crypto-address-bech32m",
+		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
 		"@mainsail/fees",
 		"@mainsail/fees-static",
+		"@mainsail/evm-service",
+		"@mainsail/evm-gas-fee",
+		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-username-registration",
 		"@mainsail/crypto-transaction-username-resignation",
@@ -103,6 +110,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-transaction-multi-signature-registration",
 		"@mainsail/crypto-transaction-transfer",
 		"@mainsail/crypto-transaction-vote",
+		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
 		"@mainsail/transactions",
 		"@mainsail/crypto-messages",
@@ -113,7 +121,13 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/consensus",
 	];
 
-	const options = {};
+	const options = {
+		"@mainsail/state": {
+			snapshots: {
+				enabled: false,
+			},
+		},
+	};
 
 	for (const packageId of packages) {
 		await loadPlugin(sandbox, packageId, options);

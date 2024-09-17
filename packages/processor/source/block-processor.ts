@@ -1,4 +1,4 @@
-import { inject, injectable, multiInject, optional } from "@mainsail/container";
+import { inject, injectable, multiInject, optional, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -15,6 +15,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
+
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Processor.TransactionProcessor)
 	private readonly transactionProcessor!: Contracts.Processor.TransactionProcessor;
@@ -43,12 +47,19 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.Evm.Worker)
+	private readonly evmWorker!: Contracts.Evm.Worker;
+
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
-	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<boolean> {
+	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
+		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
+
 		try {
+			const block = unit.getBlock();
+
 			await this.verifier.verify(unit);
 
 			for (const [index, transaction] of unit.getBlock().transactions.entries()) {
@@ -56,18 +67,24 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					await Utils.sleep(0);
 				}
 
-				await this.transactionProcessor.process(unit.store.walletRepository, transaction);
+				const { gasUsed, receipt } = await this.transactionProcessor.process(unit, transaction);
+				processResult.receipts.set(transaction.id, receipt);
+
+				transaction.data.gasUsed = gasUsed;
+				this.#consumeGas(block, processResult, gasUsed);
 			}
 
+			this.#verifyConsumedAllGas(block, processResult);
+			await this.#verifyStateHash(block);
 			await this.#applyBlockToForger(unit);
 
-			return true;
+			processResult.success = true;
 		} catch (error) {
 			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().data, error });
 			this.logger.error(`Cannot process block because: ${error.message}`);
 		}
 
-		return false;
+		return processResult;
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -90,7 +107,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
 		await this.stateService.onCommit(unit);
+		await this.evm.onCommit(unit);
 		await this.txPoolWorker.onCommit(unit);
+		await this.evmWorker.onCommit(unit);
 
 		if (this.apiSync) {
 			await this.apiSync.onCommit(unit);
@@ -108,8 +127,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
 		if (!this.state.isBootstrap()) {
+			const block = unit.getBlock();
 			this.logger.info(
-				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${unit.getBlock().data.numberOfTransactions.toLocaleString()} tx(s) committed`,
+				`Block ${unit.height.toLocaleString()}/${unit.round.toLocaleString()} with ${block.data.numberOfTransactions.toLocaleString()} tx(s) committed (gasUsed=${block.data.totalGasUsed.toLocaleString()})`,
 			);
 		}
 	}
@@ -135,6 +155,46 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
 
 			void this.#emit(Events.CryptoEvent.MilestoneChanged);
+		}
+	}
+
+	#consumeGas(
+		block: Contracts.Crypto.Block,
+		processorResult: Contracts.Processor.BlockProcessorResult,
+		gasUsed: number,
+	): void {
+		const totalGas = block.header.totalGasUsed;
+
+		if (processorResult.gasUsed + gasUsed > totalGas) {
+			throw new Error("Cannot consume more gas");
+		}
+
+		processorResult.gasUsed += gasUsed;
+	}
+
+	#verifyConsumedAllGas(
+		block: Contracts.Crypto.Block,
+		processorResult: Contracts.Processor.BlockProcessorResult,
+	): void {
+		const totalGas = block.header.totalGasUsed;
+		if (totalGas !== processorResult.gasUsed) {
+			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
+		}
+	}
+
+	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
+		if (block.header.height === 0) {
+			return;
+		}
+
+		const previousBlock = this.stateService.getStore().getLastBlock();
+		const stateHash = await this.evm.stateHash(
+			{ height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			previousBlock.header.stateHash,
+		);
+
+		if (block.header.stateHash !== stateHash) {
+			throw new Error(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
 		}
 	}
 

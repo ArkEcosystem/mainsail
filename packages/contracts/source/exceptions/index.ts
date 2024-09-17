@@ -10,6 +10,7 @@ export * from "./p2p.js";
 export * from "./plugins.js";
 export * from "./pool.js";
 export * from "./processor.js";
+export * from "./rpc.js";
 export * from "./runtime.js";
 export * from "./state.js";
 export * from "./validation.js";

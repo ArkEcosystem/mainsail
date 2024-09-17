@@ -21,7 +21,16 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
+		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
+			milestones: [
+				// @ts-ignore
+				{
+					address: {
+						bech32m: "ark",
+					},
+				},
+			],
+		});
 
 		await context.sandbox.app.resolve(CoreValidation).register();
 		context.validator = context.sandbox.app.get(Identifiers.Cryptography.Validator);

@@ -131,6 +131,18 @@ export const Identifiers = {
 			Block: Symbol("Database<Storage.Block>"),
 		},
 	},
+	Evm: {
+		Gas: {
+			FeeCalculator: Symbol("Evm<Gas.FeeCalculator>"),
+			Limits: Symbol("Evm<Gas.Limits>"),
+		},
+		Instance: Symbol("Evm<Instance>"),
+		State: Symbol("Evm<State>"),
+		Worker: Symbol("Evm<Worker>"),
+		WorkerSubprocess: {
+			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
+		},
+	},
 	Fee: {
 		Matcher: Symbol("Fee<Matcher>"),
 		Registry: Symbol("Fee<Registry>"),

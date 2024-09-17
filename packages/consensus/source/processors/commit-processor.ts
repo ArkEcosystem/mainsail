@@ -36,7 +36,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 
 			const result = await this.processor.process(commitState);
 
-			if (result === false) {
+			if (!result.success) {
 				return Contracts.Consensus.ProcessorResult.Invalid;
 			}
 

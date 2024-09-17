@@ -12,7 +12,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	async #registerKeywords(): Promise<void> {
-		for (const keyword of Object.values(makeKeywords())) {
+		for (const keyword of Object.values(
+			makeKeywords(this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)),
+		)) {
 			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addKeyword(keyword);
 		}
 	}

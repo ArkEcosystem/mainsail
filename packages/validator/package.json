@@ -41,6 +41,7 @@
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
+		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",

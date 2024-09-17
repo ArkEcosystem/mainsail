@@ -26,7 +26,7 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 	}
 
 	public async throwIfCannotBeApplied(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
@@ -43,14 +43,14 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 			throw new Exceptions.InsufficientBalanceError();
 		}
 
-		return super.throwIfCannotBeApplied(walletRepository, transaction, wallet);
+		return super.throwIfCannotBeApplied(context, transaction, wallet);
 	}
 
 	public async applyToSender(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
-		await super.applyToSender(walletRepository, transaction);
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
+		const result = await super.applyToSender(context, transaction);
 
 		AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.data.asset?.payments);
 
@@ -58,21 +58,27 @@ export class MultiPaymentTransactionHandler extends Handlers.TransactionHandler 
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const sender: Contracts.State.Wallet = await walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
+			transaction.data.senderPublicKey,
+		);
 
 		sender.decreaseBalance(totalPaymentsAmount);
+
+		return result;
 	}
 
 	public async applyToRecipient(
-		walletRepository: Contracts.State.WalletRepository,
+		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	): Promise<Contracts.Transactions.TransactionApplyResult> {
 		AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.data.asset?.payments);
 
 		for (const payment of transaction.data.asset.payments) {
-			const recipient: Contracts.State.Wallet = walletRepository.findByAddress(payment.recipientId);
+			const recipient: Contracts.State.Wallet = context.walletRepository.findByAddress(payment.recipientId);
 
 			recipient.increaseBalance(payment.amount);
 		}
+
+		return super.applyToRecipient(context, transaction);
 	}
 }

@@ -26,7 +26,7 @@ export class TransactionsController extends Controller {
 		const options = this.getListingOptions();
 
 		const walletRepository = this.walletRepositoryFactory();
-		const transactions = await this.transactionRepositoryFactory().findManyByCritera(
+		const transactions = await this.transactionRepositoryFactory().findManyByCriteria(
 			walletRepository,
 			criteria,
 			sorting,
@@ -103,7 +103,7 @@ export class TransactionsController extends Controller {
 				typeGroups[typeGroup] = {};
 			}
 
-			typeGroups[typeGroup][key] = staticFees[key].toFixed() ?? "0";
+			typeGroups[typeGroup][key] = staticFees[key]?.toFixed() ?? "0";
 		}
 
 		return { data: typeGroups };

@@ -29,6 +29,7 @@
 		"sort": "sort-package-json \"package.json\" \"packages/*/package.json\"",
 		"test:integration": "lerna run test:integration --parallel",
 		"test:unit": "lerna run test --parallel",
+		"version": "lerna version --no-git-tag-version --yes",
 		"workflows:unit": "node scripts/generate-unit-workflow.js"
 	},
 	"devDependencies": {

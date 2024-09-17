@@ -158,7 +158,7 @@ export class Application implements Contracts.Kernel.Application {
 		return false;
 	}
 
-	public async terminate(reason?: string, error?: Error): Promise<void> {
+	public async terminate(reason?: string, error?: Error): Promise<never> {
 		this.#booted = false;
 
 		if (this.#terminating) {
