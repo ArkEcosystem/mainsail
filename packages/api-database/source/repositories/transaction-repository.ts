@@ -46,7 +46,7 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 			// no days parameter, take the stats from each type for its last 20 txs
 			return this.manager.query<FeeStatistics[]>(
 				`
-				select t_outer.type_group as "typeGroup", t_outer.type as "type", 
+				select t_outer.type_group as "typeGroup", t_outer.type as "type",
 					TRUNC(COALESCE(AVG(fee), 0)::numeric) AS "avg",
 					TRUNC(COALESCE(MIN(fee), 0)::numeric) AS "min",
 					TRUNC(COALESCE(MIN(fee), 0)::numeric) AS "max",
