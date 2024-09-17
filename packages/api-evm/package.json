@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/api-evm",
-	"version": "0.0.1-evm.2",
+	"version": "0.0.1-alpha.20",
 	"description": "Ethereum JSON-RPC compatible API for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
