@@ -62,9 +62,6 @@ export class ConfigurationGenerator {
 		writeOptions?: Contracts.NetworkGenerator.WriteOptions,
 	): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
-			address: {
-				bech32m: "ark",
-			},
 			blockTime: 8000,
 			coreDBHost: "localhost",
 			coreDBPort: 5432,

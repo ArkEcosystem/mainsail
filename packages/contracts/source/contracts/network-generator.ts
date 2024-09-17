@@ -17,7 +17,6 @@ export type MilestoneOptions = {
 	blockTime: number;
 	epoch: Date;
 	vendorFieldLength: number;
-	address: { bech32m: string } | { base58: number } | { keccak256: boolean };
 };
 
 export type NetworkOptions = {

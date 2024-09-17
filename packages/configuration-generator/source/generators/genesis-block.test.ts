@@ -18,7 +18,6 @@ describe<{
 			milestones: [
 				{
 					reward: "0",
-					address: { bech32m: "ark" },
 					block: { version: 1, maxPayload: 2097152, maxTransactions: 150 },
 					blockTime: 8000,
 					height: 0,
