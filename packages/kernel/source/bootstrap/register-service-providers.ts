@@ -35,7 +35,7 @@ export class RegisterServiceProviders implements Contracts.Kernel.Bootstrapper {
 					await serviceProviders.register(name);
 				}
 			} catch (error) {
-				console.error(error.stack);
+				this.logger.error(`${name}: ${error.stack}`);
 
 				// Determine if the plugin is required to decide how to handle errors.
 				const isRequired: boolean = await serviceProvider.required();
