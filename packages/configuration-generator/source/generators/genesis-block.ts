@@ -1,9 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
-import { UsernameRegistrationBuilder } from "@mainsail/crypto-transaction-username-registration";
-import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
-import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -61,9 +58,9 @@ export class GenesisBlockGenerator extends Generator {
 		}
 
 		const validatorTransactions = [
-			...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
-			...(await this.#buildUsernameTransactions(validators, options.pubKeyHash)),
-			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
+			// ...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
+			// ...(await this.#buildUsernameTransactions(validators, options.pubKeyHash)),
+			// ...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
 		];
 
 		transactions = [...transactions, ...validatorTransactions];
@@ -112,56 +109,56 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
-	async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
-		const result: Contracts.Crypto.Transaction[] = [];
+	// async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+	// 	const result: Contracts.Crypto.Transaction[] = [];
 
-		for (const [index, sender] of senders.entries()) {
-			result[index] = await (
-				await this.app
-					.resolve(ValidatorRegistrationBuilder)
-					.network(pubKeyHash)
-					.nonce("1") // validator registration tx is always the first one from sender
-					.publicKeyAsset(sender.consensusKeys.publicKey)
-					.sign(sender.passphrase)
-			).build();
-		}
+	// 	for (const [index, sender] of senders.entries()) {
+	// 		result[index] = await (
+	// 			await this.app
+	// 				.resolve(ValidatorRegistrationBuilder)
+	// 				.network(pubKeyHash)
+	// 				.nonce("1") // validator registration tx is always the first one from sender
+	// 				.publicKeyAsset(sender.consensusKeys.publicKey)
+	// 				.sign(sender.passphrase)
+	// 		).build();
+	// 	}
 
-		return result;
-	}
+	// 	return result;
+	// }
 
-	async #buildUsernameTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
-		const result: Contracts.Crypto.Transaction[] = [];
+	// async #buildUsernameTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+	// 	const result: Contracts.Crypto.Transaction[] = [];
 
-		for (const [index, sender] of senders.entries()) {
-			result[index] = await (
-				await this.app
-					.resolve(UsernameRegistrationBuilder)
-					.network(pubKeyHash)
-					.nonce("2") // username registration tx is always the 2nd one from sender
-					.usernameAsset(`genesis_${index + 1}`)
-					.sign(sender.passphrase)
-			).build();
-		}
+	// 	for (const [index, sender] of senders.entries()) {
+	// 		result[index] = await (
+	// 			await this.app
+	// 				.resolve(UsernameRegistrationBuilder)
+	// 				.network(pubKeyHash)
+	// 				.nonce("2") // username registration tx is always the 2nd one from sender
+	// 				.usernameAsset(`genesis_${index + 1}`)
+	// 				.sign(sender.passphrase)
+	// 		).build();
+	// 	}
 
-		return result;
-	}
+	// 	return result;
+	// }
 
-	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
-		const result: Contracts.Crypto.Transaction[] = [];
+	// async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+	// 	const result: Contracts.Crypto.Transaction[] = [];
 
-		for (const [index, sender] of senders.entries()) {
-			result[index] = await (
-				await this.app
-					.resolve(VoteBuilder)
-					.network(pubKeyHash)
-					.nonce("3") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
-					.votesAsset([sender.keys.publicKey])
-					.sign(sender.passphrase)
-			).build();
-		}
+	// 	for (const [index, sender] of senders.entries()) {
+	// 		result[index] = await (
+	// 			await this.app
+	// 				.resolve(VoteBuilder)
+	// 				.network(pubKeyHash)
+	// 				.nonce("3") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
+	// 				.votesAsset([sender.keys.publicKey])
+	// 				.sign(sender.passphrase)
+	// 		).build();
+	// 	}
 
-		return result;
-	}
+	// 	return result;
+	// }
 
 	async #createGenesisCommit(
 		premineKeys: Contracts.Crypto.KeyPair,
