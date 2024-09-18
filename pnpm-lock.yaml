@@ -2568,6 +2568,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*

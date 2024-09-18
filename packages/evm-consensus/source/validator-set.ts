@@ -113,7 +113,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			specId: evmSpec,
 		});
 
-		// console.log(result);
 		if (!result.success) {
 			this.app.terminate("calculateTopValidators failed");
 		}
@@ -124,7 +123,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [index, validator] of validators.entries()) {
 			const [addr, [voteBalance, , validatorPublicKey]] = validator;
-			// console.log(addr, voteBalance, validatorPublicKey);
 
 			const wallet = store.walletRepository.findByAddress(addr);
 			const validatorWallet = this.validatorWalletFactory(wallet);
