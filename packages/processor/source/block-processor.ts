@@ -219,11 +219,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			.walletRepository.findByPublicKey(block.header.generatorPublicKey);
 
 		await this.evm.updateRewardsAndVotes({
+			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
+			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
 			validatorAddress: validatorWallet.getAddress(),
-			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
-			specId: milestone.evmSpec,
 		});
 	}
 

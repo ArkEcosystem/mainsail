@@ -38,8 +38,8 @@ export class Deployer {
 
 		const genesisInfo = {
 			account: await this.addressFactory.fromPublicKey(genesisBlock.block.generatorPublicKey),
-			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
 			deployerAccount: this.#deployerAddress,
+			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
 			validatorContract: validatorContractAddress,
 		};
 

@@ -186,11 +186,11 @@ export class Validator implements Contracts.Validator.Validator {
 
 		const validatorWallet = await this.stateService.getStore().walletRepository.findByPublicKey(generatorPublicKey);
 		await validator.getEvm().updateRewardsAndVotes({
+			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
 			commitKey,
+			specId: milestone.evmSpec,
 			timestamp: BigInt(timestamp),
 			validatorAddress: validatorWallet.getAddress(),
-			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
-			specId: milestone.evmSpec,
 		});
 
 		return {
