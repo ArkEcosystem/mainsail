@@ -24,8 +24,7 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"seedrandom": "^3.0.5"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"@types/seedrandom": "^3.0.8",

@@ -93,7 +93,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 					type: "hash",
 				},
 				generatorPublicKey: {
-					type: "publicKey",
+					type: "address",
 				},
 			},
 		});

@@ -26,7 +26,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		const milestone = this.configuration.getMilestone(unit.height);
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
-		const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+		const validator: Contracts.State.Wallet = walletRepository.findByAddress(
 			unit.getBlock().data.generatorPublicKey,
 		);
 

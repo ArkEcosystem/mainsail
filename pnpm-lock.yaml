@@ -2447,9 +2447,6 @@ importers:
       ethers:
         specifier: ^6.11.0
         version: 6.13.1
-      seedrandom:
-        specifier: ^3.0.5
-        version: 3.0.5
     devDependencies:
       '@types/seedrandom':
         specifier: ^3.0.8
@@ -3112,9 +3109,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      seedrandom:
-        specifier: ^3.0.5
-        version: 3.0.5
     devDependencies:
       '@types/seedrandom':
         specifier: ^3.0.8
@@ -10769,9 +10763,6 @@ packages:
 
   secure-json-parse@2.7.0:
     resolution: {integrity: sha512-6aU+Rwsezw7VR8/nyvKTx8QpWH9FrcYiXXlqC4z5d5XQBDRqtbfsRjnwGyqbi3gddNtWHuEk9OANUotL26qKUw==}
-
-  seedrandom@3.0.5:
-    resolution: {integrity: sha512-8OwmbklUNzwezjGInmZ+2clQmExQPvomqjL7LFqOYqtmuxRgQYqOD3mHaU+MvZn5FLUeVxVfQjwLZW/n/JFuqg==}
 
   semver-compare@1.0.0:
     resolution: {integrity: sha512-YM3/ITh2MJ5MtzaM429anh+x2jiLVjqILF4m4oyQB18W7Ggea7BfqdH/wGMK7dDiMghv/6WG7znWMwUDzJiXow==}
@@ -20182,8 +20173,6 @@ snapshots:
       node-gyp-build: 4.8.1
 
   secure-json-parse@2.7.0: {}
-
-  seedrandom@3.0.5: {}
 
   semver-compare@1.0.0: {}
 

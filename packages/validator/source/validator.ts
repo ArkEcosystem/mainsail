@@ -57,18 +57,18 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	public async prepareBlock(
-		generatorPublicKey: string,
+		generatorAddress: string,
 		round: number,
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateService.getStore().getLastBlock();
 		const height = previousBlock.header.height + 1;
 
-		const { stateHash, transactions } = await this.#getTransactionsForForging(generatorPublicKey, timestamp, {
+		const { stateHash, transactions } = await this.#getTransactionsForForging(generatorAddress, timestamp, {
 			height: BigInt(height),
 			round: BigInt(round),
 		});
-		return this.#makeBlock(round, generatorPublicKey, stateHash, transactions, timestamp);
+		return this.#makeBlock(round, generatorAddress, stateHash, transactions, timestamp);
 	}
 
 	public async propose(
@@ -127,7 +127,7 @@ export class Validator implements Contracts.Validator.Validator {
 	}
 
 	async #getTransactionsForForging(
-		generatorPublicKey: string,
+		generatorAddress: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
 	): Promise<{ stateHash: string; transactions: Contracts.Crypto.Transaction[] }> {
@@ -169,7 +169,7 @@ export class Validator implements Contracts.Validator.Validator {
 				}
 
 				const result = await validator.validate(
-					{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorPublicKey, timestamp },
+					{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
 					transaction,
 				);
 
@@ -185,13 +185,12 @@ export class Validator implements Contracts.Validator.Validator {
 
 		this.txPoolWorker.setFailedTransactions(failedTransactions);
 
-		const validatorWallet = await this.stateService.getStore().walletRepository.findByPublicKey(generatorPublicKey);
 		await validator.getEvm().updateRewardsAndVotes({
 			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
 			commitKey,
 			specId: milestone.evmSpec,
 			timestamp: BigInt(timestamp),
-			validatorAddress: validatorWallet.getAddress(),
+			validatorAddress: generatorAddress,
 		});
 
 		if (Utils.roundCalculator.isNewRound(previousBlock.header.height + 2, this.cryptoConfiguration)) {
@@ -202,7 +201,7 @@ export class Validator implements Contracts.Validator.Validator {
 				commitKey,
 				specId: milestone.evmSpec,
 				timestamp: BigInt(timestamp),
-				validatorAddress: validatorWallet.getAddress(),
+				validatorAddress: generatorAddress,
 			});
 		}
 

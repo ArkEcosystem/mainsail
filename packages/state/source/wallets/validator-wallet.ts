@@ -8,12 +8,6 @@ export class ValidatorWallet implements Contracts.State.ValidatorWallet {
 		return this.wallet;
 	}
 
-	public getWalletPublicKey(): string {
-		const publicKey = this.wallet.getPublicKey();
-		Utils.assert.defined<string>(publicKey);
-		return publicKey;
-	}
-
 	public getConsensusPublicKey(): string {
 		return this.wallet.getAttribute<string>("validatorPublicKey");
 	}
@@ -55,6 +49,6 @@ export class ValidatorWallet implements Contracts.State.ValidatorWallet {
 			return this.wallet.getAttribute<string>("username");
 		}
 
-		return this.getWalletPublicKey();
+		return this.getWallet().getAddress();
 	}
 }
