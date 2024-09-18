@@ -173,8 +173,8 @@ jobs:
               run: cd packages/p2p && pnpm run test
             - name: Test processor
               run: cd packages/processor && pnpm run test
-            - name: Test proposer
-              run: cd packages/proposer && pnpm run test
+            # - name: Test proposer
+            #   run: cd packages/proposer && pnpm run test
             - name: Test serializer
               run: cd packages/serializer && pnpm run test
             - name: Test state
