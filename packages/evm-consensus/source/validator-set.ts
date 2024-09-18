@@ -78,7 +78,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWallet[]> {
 		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
-		const {  evmSpec } = this.configuration.getMilestone();
+		const { evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(CONSENSUS.abi.abi);
 		const data = iface.encodeFunctionData("getTopValidators").slice(2);

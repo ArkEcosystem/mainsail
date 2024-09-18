@@ -69,7 +69,8 @@ export class Deployer {
 		await this.evm.onCommit({
 			...commitKey,
 			getBlock: () => ({ data: { round: BigInt(0) } }),
-		} as any);	}
+		} as any);
+	}
 
 	private async ensureFunds(
 		erc20ContractAddress: string,

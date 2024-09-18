@@ -233,7 +233,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #calculateTopValidators(unit: Contracts.Processor.ProcessableUnit) {
-		if(!Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
+		if (!Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			return;
 		}
 
@@ -242,8 +242,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		const validatorWallet = await this.stateService
-		.getStore()
-		.walletRepository.findByPublicKey(block.header.generatorPublicKey);
+			.getStore()
+			.walletRepository.findByPublicKey(block.header.generatorPublicKey);
 
 		await this.evm.calculateTopValidators({
 			activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
