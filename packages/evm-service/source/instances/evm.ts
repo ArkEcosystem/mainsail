@@ -1,7 +1,7 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
 import { Evm } from "@mainsail/evm";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance {
