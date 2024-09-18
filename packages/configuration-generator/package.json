@@ -44,6 +44,7 @@
 		"@mainsail/crypto-transaction-vote": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/fees": "workspace:*",
 		"@mainsail/fees-static": "workspace:*",
@@ -54,6 +55,7 @@
 		"bip39": "3.1.0",
 		"dayjs": "1.11.10",
 		"envfile": "7.1.0",
+		"ethers": "^6.11.0",
 		"fs-extra": "11.2.0"
 	},
 	"devDependencies": {

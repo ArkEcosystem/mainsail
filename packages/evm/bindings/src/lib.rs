@@ -1,11 +1,11 @@
 use std::{path::PathBuf, sync::Arc};
 
 use ctx::{
-    AccountUpdateContext, ExecutionContext, JsAccountUpdateContext, JsCommitKey,
-    JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
+    AccountUpdateContext, ExecutionContext, GenesisContext, JsAccountUpdateContext, JsCommitKey,
+    JsGenesisContext, JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
 };
 use mainsail_evm_core::{
-    db::{CommitKey, PendingCommit, PersistentDB},
+    db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
     state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
@@ -98,6 +98,18 @@ impl EvmInner {
         }
     }
 
+    pub fn initialize_genesis(
+        &mut self,
+        genesis_ctx: GenesisContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        self.persistent_db.set_genesis_info(GenesisInfo {
+            account: genesis_ctx.account,
+            initial_supply: genesis_ctx.initial_supply,
+        });
+
+        Ok(())
+    }
+
     pub fn get_account_info(
         &mut self,
         address: Address,
@@ -188,11 +200,16 @@ impl EvmInner {
                                     ..Default::default()
                                 });
                             }
+                            revm::primitives::InvalidTransaction::LackOfFundForMaxFee {
+                                fee,
+                                balance,
+                            } => {
+                                todo!("lack of funds (fee={} balance={})", fee, balance);
+                            }
                             // revm::primitives::InvalidTransaction::PriorityFeeGreaterThanMaxFee => todo!(),
                             // revm::primitives::InvalidTransaction::GasPriceLessThanBasefee => todo!(),
                             // revm::primitives::InvalidTransaction::CallerGasLimitMoreThanBlock => todo!(),
                             // revm::primitives::InvalidTransaction::RejectCallerWithCode => todo!(),
-                            // revm::primitives::InvalidTransaction::LackOfFundForMaxFee { fee, balance } => todo!(),
                             // revm::primitives::InvalidTransaction::OverflowPaymentInTransaction => todo!(),
                             // revm::primitives::InvalidTransaction::NonceOverflowInTransaction => todo!(),
                             // revm::primitives::InvalidTransaction::NonceTooHigh { tx, state } => todo!(),
@@ -331,8 +348,9 @@ impl EvmInner {
                 block_env.difficulty = U256::ZERO;
             })
             .modify_tx_env(|tx_env| {
-                tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 100_000);
+                tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
                 tx_env.caller = ctx.caller;
+                tx_env.value = ctx.value;
                 tx_env.transact_to = match ctx.recipient {
                     Some(recipient) => revm::primitives::TransactTo::Call(recipient),
                     None => revm::primitives::TransactTo::Create,
@@ -476,6 +494,19 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
+    pub fn initialize_genesis(
+        &mut self,
+        node_env: Env,
+        genesis_ctx: JsGenesisContext,
+    ) -> Result<JsObject> {
+        let genesis_ctx = GenesisContext::try_from(genesis_ctx)?;
+        node_env.execute_tokio_future(
+            Self::initialize_genesis_async(self.evm.clone(), genesis_ctx),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<void>")]
     pub fn update_account_info(
         &mut self,
         node_env: Env,
@@ -585,6 +616,19 @@ impl JsEvmWrapper {
     ) -> Result<()> {
         let mut lock = evm.lock().await;
         let result = lock.update_account_info(account_update_ctx);
+
+        match result {
+            Ok(_) => Result::Ok(()),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn initialize_genesis_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        genesis_ctx: GenesisContext,
+    ) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.initialize_genesis(genesis_ctx);
 
         match result {
             Ok(_) => Result::Ok(()),

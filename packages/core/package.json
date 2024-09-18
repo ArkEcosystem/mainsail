@@ -76,6 +76,7 @@
 		"@mainsail/crypto-worker": "workspace:*",
 		"@mainsail/database": "workspace:*",
 		"@mainsail/evm-api-worker": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",

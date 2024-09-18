@@ -6,9 +6,15 @@ export enum EvmMode {
 	Persistent,
 }
 
+export interface GenesisInfo {
+	readonly account: string;
+	readonly initialSupply: bigint;
+}
+
 export interface Instance extends CommitHandler {
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
+	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	updateAccountInfo(context: AccountUpdateContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
@@ -45,6 +51,7 @@ export interface TransactionContext {
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
 	readonly gasLimit: bigint;
+	readonly value: bigint;
 	readonly data: Buffer;
 	readonly blockContext: BlockContext;
 	readonly txHash: string;

@@ -1,7 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
@@ -77,95 +76,96 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		recipient: Contracts.State.Wallet | undefined,
 		transaction: Contracts.Crypto.TransactionData,
 	): Promise<void> {
-		if (
-			transaction.type === Contracts.Crypto.TransactionType.Vote &&
-			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
-		) {
-			AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.votes);
-			AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.unvotes);
+		return;
+		// if (
+		// 	transaction.type === Contracts.Crypto.TransactionType.Vote &&
+		// 	transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
+		// ) {
+		// 	AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.votes);
+		// 	AppUtils.assert.defined<Contracts.Crypto.TransactionAsset>(transaction.asset?.unvotes);
 
-			const senderValidatorAmount = sender.getBalance();
+		// 	const senderValidatorAmount = sender.getBalance();
 
-			if (transaction.asset.unvotes.length > 0) {
-				const unvote: string = transaction.asset.unvotes[0];
-				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(unvote);
+		// 	if (transaction.asset.unvotes.length > 0) {
+		// 		const unvote: string = transaction.asset.unvotes[0];
+		// 		const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(unvote);
 
-				// unvote also changes vote balance by fee
-				const voteBalanceChange: BigNumber = senderValidatorAmount.plus(transaction.fee);
+		// 		// unvote also changes vote balance by fee
+		// 		const voteBalanceChange: BigNumber = senderValidatorAmount.plus(transaction.fee);
 
-				const voteBalance: BigNumber = validator
-					.getAttribute("validatorVoteBalance", BigNumber.ZERO)
-					.minus(voteBalanceChange);
+		// 		const voteBalance: BigNumber = validator
+		// 			.getAttribute("validatorVoteBalance", BigNumber.ZERO)
+		// 			.minus(voteBalanceChange);
 
-				validator.setAttribute("validatorVoteBalance", voteBalance);
-			}
+		// 		validator.setAttribute("validatorVoteBalance", voteBalance);
+		// 	}
 
-			if (transaction.asset.votes.length > 0) {
-				const vote: string = transaction.asset.votes[0];
-				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(vote);
+		// 	if (transaction.asset.votes.length > 0) {
+		// 		const vote: string = transaction.asset.votes[0];
+		// 		const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(vote);
 
-				const voteBalance: BigNumber = validator
-					.getAttribute("validatorVoteBalance", BigNumber.ZERO)
-					.plus(senderValidatorAmount);
+		// 		const voteBalance: BigNumber = validator
+		// 			.getAttribute("validatorVoteBalance", BigNumber.ZERO)
+		// 			.plus(senderValidatorAmount);
 
-				validator.setAttribute("validatorVoteBalance", voteBalance);
-			}
-		} else {
-			// Update vote balance of the sender's validator
-			if (sender.hasVoted()) {
-				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-					sender.getAttribute("vote"),
-				);
+		// 		validator.setAttribute("validatorVoteBalance", voteBalance);
+		// 	}
+		// } else {
+		// 	// Update vote balance of the sender's validator
+		// 	if (sender.hasVoted()) {
+		// 		const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+		// 			sender.getAttribute("vote"),
+		// 		);
 
-				let amount: BigNumber = transaction.amount;
-				if (
-					transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
-					transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
-				) {
-					AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
+		// 		let amount: BigNumber = transaction.amount;
+		// 		if (
+		// 			transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
+		// 			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
+		// 		) {
+		// 			AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
 
-					amount = transaction.asset.payments.reduce(
-						(previous, current) => previous.plus(current.amount),
-						BigNumber.ZERO,
-					);
-				}
+		// 			amount = transaction.asset.payments.reduce(
+		// 				(previous, current) => previous.plus(current.amount),
+		// 				BigNumber.ZERO,
+		// 			);
+		// 		}
 
-				const total: BigNumber = amount.plus(transaction.fee);
+		// 		const total: BigNumber = amount.plus(transaction.fee);
 
-				const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
+		// 		const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
 
-				// General case : sender validator vote balance reduced by amount + fees (or increased if revert)
-				validator.setAttribute("validatorVoteBalance", voteBalance.minus(total));
-			}
+		// 		// General case : sender validator vote balance reduced by amount + fees (or increased if revert)
+		// 		validator.setAttribute("validatorVoteBalance", voteBalance.minus(total));
+		// 	}
 
-			if (
-				transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
-				transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
-			) {
-				AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
+		// 	if (
+		// 		transaction.type === Contracts.Crypto.TransactionType.MultiPayment &&
+		// 		transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core
+		// 	) {
+		// 		AppUtils.assert.defined<Contracts.Crypto.MultiPaymentItem[]>(transaction.asset?.payments);
 
-				// go through all payments and update recipients validators vote balance
-				for (const { recipientId, amount } of transaction.asset.payments) {
-					const recipientWallet: Contracts.State.Wallet = walletRepository.findByAddress(recipientId);
-					if (recipientWallet.hasVoted()) {
-						const vote = recipientWallet.getAttribute("vote");
-						const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(vote);
-						const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
-						validator.setAttribute("validatorVoteBalance", voteBalance.plus(amount));
-					}
-				}
-			}
+		// 		// go through all payments and update recipients validators vote balance
+		// 		for (const { recipientId, amount } of transaction.asset.payments) {
+		// 			const recipientWallet: Contracts.State.Wallet = walletRepository.findByAddress(recipientId);
+		// 			if (recipientWallet.hasVoted()) {
+		// 				const vote = recipientWallet.getAttribute("vote");
+		// 				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(vote);
+		// 				const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
+		// 				validator.setAttribute("validatorVoteBalance", voteBalance.plus(amount));
+		// 			}
+		// 		}
+		// 	}
 
-			// Update vote balance of recipient's validator
-			if (recipient && recipient.hasVoted()) {
-				const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-					recipient.getAttribute("vote"),
-				);
-				const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
+		// 	// Update vote balance of recipient's validator
+		// 	if (recipient && recipient.hasVoted()) {
+		// 		const validator: Contracts.State.Wallet = await walletRepository.findByPublicKey(
+		// 			recipient.getAttribute("vote"),
+		// 		);
+		// 		const voteBalance: BigNumber = validator.getAttribute("validatorVoteBalance", BigNumber.ZERO);
 
-				validator.setAttribute("validatorVoteBalance", voteBalance.plus(transaction.amount));
-			}
-		}
+		// 		validator.setAttribute("validatorVoteBalance", voteBalance.plus(transaction.amount));
+		// 	}
+		// }
 	}
 
 	async #updateEvmAccountInfoHost(commitKey: Contracts.Evm.CommitKey, sender: Contracts.State.Wallet): Promise<void> {
