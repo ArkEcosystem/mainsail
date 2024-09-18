@@ -225,12 +225,12 @@ export class GenesisBlockGenerator extends Generator {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
 					generatorPublicKey: await this.app
-					.getTagged<Contracts.Crypto.AddressFactory>(
-						Identifiers.Cryptography.Identity.Address.Factory,
-						"type",
-						"wallet",
-					)
-					.fromPublicKey(keys.publicKey),
+						.getTagged<Contracts.Crypto.AddressFactory>(
+							Identifiers.Cryptography.Identity.Address.Factory,
+							"type",
+							"wallet",
+						)
+						.fromPublicKey(keys.publicKey),
 					height: 0,
 					numberOfTransactions: transactions.length,
 					payloadHash: (

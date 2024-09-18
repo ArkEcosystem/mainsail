@@ -23,9 +23,7 @@ export class Selector implements Contracts.Proposer.Selector {
 		const { activeValidators } = this.configuration.getMilestone();
 
 		const offset = (this.stateService.getStore().getTotalRound() + round) % activeValidators;
-		const result = this.validatorMatrix[
-			offset % activeValidators
-		];
+		const result = this.validatorMatrix[offset % activeValidators];
 		Utils.assert.defined<number>(result);
 		return result;
 	}

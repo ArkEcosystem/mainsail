@@ -499,7 +499,9 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.getWallet().getAddress());
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(
+				validator.getWallet().getAddress(),
+			);
 			if (roundState.hasPrevote(validatorIndex)) {
 				continue;
 			}
@@ -518,7 +520,9 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.getWallet().getAddress());
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(
+				validator.getWallet().getAddress(),
+			);
 			if (roundState.hasPrecommit(validatorIndex)) {
 				continue;
 			}

@@ -1,14 +1,14 @@
 {
-    "address": "0x708C4161e02D76CAd13AFA3Bee88f0868C1D7F0E",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "2fe8279bbefd69204317c2e1ea9fc84902f04f3e1c0d785bd2c85431bd27173e",
-        "publicKey": "8a9284722af2c82aaa2b763bca87bb30f118d75738fc90d769aef7bc0fe883cebde26c9fe03cd2df90f656fa5d4dd046"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "9a6df916b1e5702b83e13549b22967a0ea07ea9325e1951cdd587880931cb7fd",
-        "publicKey": "032fbce79c900ebb1de3a97121569646a70a2721c0da5c042d8dbcd92947b51d7b"
-    },
-    "passphrase": "happy soda mask inch panic such degree solve umbrella music alert rent bubble tonight exhibit fitness dust occur model better alpha initial address midnight"
+	"address": "0x708C4161e02D76CAd13AFA3Bee88f0868C1D7F0E",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "2fe8279bbefd69204317c2e1ea9fc84902f04f3e1c0d785bd2c85431bd27173e",
+		"publicKey": "8a9284722af2c82aaa2b763bca87bb30f118d75738fc90d769aef7bc0fe883cebde26c9fe03cd2df90f656fa5d4dd046"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "9a6df916b1e5702b83e13549b22967a0ea07ea9325e1951cdd587880931cb7fd",
+		"publicKey": "032fbce79c900ebb1de3a97121569646a70a2721c0da5c042d8dbcd92947b51d7b"
+	},
+	"passphrase": "happy soda mask inch panic such degree solve umbrella music alert rent bubble tonight exhibit fitness dust occur model better alpha initial address midnight"
 }

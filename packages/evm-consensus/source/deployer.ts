@@ -35,8 +35,8 @@ export class Deployer {
 
 		const genesisInfo = {
 			account: genesisBlock.block.generatorPublicKey.slice(2),
-			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
 			deployerAccount: this.#deployerAddress,
+			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
 			validatorContract: validatorContractAddress,
 		};
 
