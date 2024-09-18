@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 import { Deployer } from "./deployer.js";
-import { ValidatorSet } from "./validator-set.js";
 import { Selector } from "./selector.js";
+import { ValidatorSet } from "./validator-set.js";
 
 export * as ContractAbis from "./contracts.ts/index.js";
 export { Identifiers } from "./identifiers.js";

@@ -1,10 +1,10 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { ethers } from "ethers";
+
 import { CONSENSUS } from "./contracts.ts/index.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
-
-import { ethers } from "ethers";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
@@ -86,10 +86,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const data = iface.encodeFunctionData("updateActiveValidators").slice(2);
 
 		const result = await this.evm.view({
-			recipient: consensusContractAddress,
 			caller: deployerAddress,
-			specId: evmSpec,
 			data: Buffer.from(data, "hex"),
+			recipient: consensusContractAddress,
+			specId: evmSpec,
 		});
 
 		if (!result.success) {
@@ -107,10 +107,10 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const data = iface.encodeFunctionData("getActiveValidators", [activeValidators]).slice(2);
 
 		const result = await this.evm.view({
-			recipient: consensusContractAddress,
 			caller: deployerAddress,
-			specId: evmSpec,
 			data: Buffer.from(data, "hex"),
+			recipient: consensusContractAddress,
+			specId: evmSpec,
 		});
 
 		// console.log(result);
@@ -122,9 +122,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const [validators] = iface.decodeFunctionResult("getActiveValidators", result.output!);
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
-		for (let i = 0; i < validators.length; i++) {
-			const validator = validators[i];
-
+		for (const [index, validator] of validators.entries()) {
 			const [addr, [voteBalance, validatorPublicKey]] = validator;
 			// console.log(addr, voteBalance, validatorPublicKey);
 
@@ -133,7 +131,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			validatorWallet.getWallet().setAttribute("validatorVoteBalance", Utils.BigNumber.make(voteBalance));
 			validatorWallet.getWallet().setAttribute("validatorPublicKey", validatorPublicKey.slice(2));
 
-			validatorWallet.setRank(i + 1);
+			validatorWallet.setRank(index + 1);
 			validatorWallet.setApproval(
 				Utils.validatorCalculator.calculateApproval(validatorWallet.getVoteBalance(), totalSupply),
 			);

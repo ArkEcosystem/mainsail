@@ -52,18 +52,18 @@ export class Deployer {
 
 		const activeValidaotrs = this.configuration.getMilestone(1).activeValidators; // TODO update on milestone change
 
-		const constructorArgs = new ethers.AbiCoder().encode(["uint8"], [activeValidaotrs]).slice(2);
+		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [activeValidaotrs]).slice(2);
 		const result = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
-			value: 0n,
 			data: Buffer.concat([
 				Buffer.from(ethers.getBytes(CONSENSUS.abi.bytecode)),
-				Buffer.from(constructorArgs, "hex"),
+				Buffer.from(constructorArguments, "hex"),
 			]),
 			gasLimit: BigInt(10_000_000),
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
+			value: 0n,
 		});
 
 		if (!result.receipt.success) {

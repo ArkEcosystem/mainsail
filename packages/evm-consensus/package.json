@@ -25,8 +25,8 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"seedrandom": "^3.0.5",
-		"ethers": "^6.11.0"
+		"ethers": "^6.11.0",
+		"seedrandom": "^3.0.5"
 	},
 	"devDependencies": {
 		"@types/seedrandom": "^3.0.8",
