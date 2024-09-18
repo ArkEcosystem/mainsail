@@ -14,10 +14,12 @@ export interface GenesisInfo {
 }
 
 export interface Instance extends CommitHandler {
+	prepareNextCommit(context: PrepareNextCommitContext): Promise<void>;
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
+	calculateTopValidators(context: CalculateTopValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string): Promise<string>;
@@ -48,6 +50,10 @@ export interface AccountUpdateContext {
 	readonly nonce: bigint;
 }
 
+export interface PrepareNextCommitContext {
+	readonly commitKey: CommitKey;
+}
+
 export interface TransactionContext {
 	readonly caller: string;
 	/** Omit recipient when deploying a contract */
@@ -75,6 +81,13 @@ export interface BlockContext {
 	readonly validatorAddress: string;
 }
 
+export interface CalculateTopValidatorsContext {
+	readonly commitKey: CommitKey;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
+	readonly activeValidators: bigint;
+	readonly specId: SpecId;
+}
 export interface UpdateRewardsAndVotesContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;

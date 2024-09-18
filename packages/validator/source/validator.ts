@@ -135,6 +135,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 		const validator = this.createTransactionValidator();
 		await validator.getEvm().initializeGenesis(this.genesisInfo);
+		await validator.getEvm().prepareNextCommit({ commitKey });
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
@@ -192,6 +193,18 @@ export class Validator implements Contracts.Validator.Validator {
 			timestamp: BigInt(timestamp),
 			validatorAddress: validatorWallet.getAddress(),
 		});
+
+		if (Utils.roundCalculator.isNewRound(previousBlock.header.height + 2, this.cryptoConfiguration)) {
+			const { activeValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.height + 2);
+
+			await validator.getEvm().calculateTopValidators({
+				activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
+				commitKey,
+				specId: milestone.evmSpec,
+				timestamp: BigInt(timestamp),
+				validatorAddress: validatorWallet.getAddress(),
+			});
+		}
 
 		return {
 			stateHash: await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash),

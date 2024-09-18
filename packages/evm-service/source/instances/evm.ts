@@ -15,6 +15,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		this.#evm = new Evm(this.app.dataPath());
 	}
 
+	public async prepareNextCommit(context: Contracts.Evm.PrepareNextCommitContext): Promise<void> {
+		return this.#evm.prepareNextCommit(context);
+	}
+
 	public async view(viewContext: Contracts.Evm.TransactionViewContext): Promise<Contracts.Evm.ViewResult> {
 		return this.#evm.view(viewContext);
 	}
@@ -40,8 +44,13 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.updateRewardsAndVotes(context);
 	}
 
+	public async calculateTopValidators(context: Contracts.Evm.CalculateTopValidatorsContext): Promise<void> {
+		return this.#evm.calculateTopValidators(context);
+	}
+
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { height, round } = unit;
+		const { height } = unit;
+		const round = unit.getBlock().data.round;
 		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
 
 		if (unit.store) {

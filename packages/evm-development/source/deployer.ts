@@ -66,7 +66,10 @@ export class Deployer {
 			.toConstantValue(result.receipt.deployedContractAddress!);
 
 		await this.ensureFunds(result.receipt.deployedContractAddress!, recipients, blockContext);
-		await this.evm.onCommit(commitKey as any);
+		await this.evm.onCommit({
+			...commitKey,
+			getBlock: () => ({ data: { round: BigInt(0) } }),
+		} as any);
 	}
 
 	private async ensureFunds(

@@ -92,7 +92,10 @@ export class Deployer {
 
 		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
 
-		await this.evm.onCommit(commitKey as any);
+		await this.evm.onCommit({
+			...commitKey,
+			getBlock: () => ({ data: { round: BigInt(0) } }),
+		} as any);
 	}
 
 	#nonce = 0;
