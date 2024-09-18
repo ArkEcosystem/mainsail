@@ -104,7 +104,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { activeValidators, evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(CONSENSUS.abi.abi);
-		const data = iface.encodeFunctionData("getActiveValidators", [activeValidators]).slice(2);
+		const data = iface.encodeFunctionData("calculateTopValidators", [activeValidators]).slice(2);
 
 		const result = await this.evm.view({
 			caller: deployerAddress,
@@ -115,15 +115,15 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		// console.log(result);
 		if (!result.success) {
-			this.app.terminate("getActiveValidators failed");
+			this.app.terminate("calculateTopValidators failed");
 		}
 
 		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
-		const [validators] = iface.decodeFunctionResult("getActiveValidators", result.output!);
+		const [validators] = iface.decodeFunctionResult("calculateTopValidators", result.output!);
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [index, validator] of validators.entries()) {
-			const [addr, [voteBalance, validatorPublicKey]] = validator;
+			const [addr, [voteBalance, , validatorPublicKey]] = validator;
 			// console.log(addr, voteBalance, validatorPublicKey);
 
 			const wallet = store.walletRepository.findByAddress(addr);

@@ -22,13 +22,16 @@ export class MockInstance implements Contracts.Evm.Instance {
 
 	public async initializeGenesis(commit: Contracts.Evm.GenesisInfo): Promise<void> {}
 
-	public async updateAccountInfo(context: Contracts.Evm.AccountUpdateContext): Promise<void> {}
 	public async getAccountInfo(address: string): Promise<Contracts.Evm.AccountInfo> {
 		return { balance: 0n, nonce: 0n };
 	}
 
 	public async configure(height: bigint, round: bigint): Promise<void> {}
+
+	public async updateRewardsAndVotes(context: Contracts.Evm.UpdateRewardsAndVotesContext): Promise<void> {}
+
 	public async onCommit(_: Contracts.Processor.ProcessableUnit): Promise<void> {}
+
 	public async stateHash(_: Contracts.Evm.CommitKey, __: string): Promise<string> {
 		return "";
 	}

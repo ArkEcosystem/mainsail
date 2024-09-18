@@ -1,8 +1,9 @@
-use std::{path::PathBuf, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, sync::Arc, u64};
 
 use ctx::{
-    AccountUpdateContext, ExecutionContext, GenesisContext, JsAccountUpdateContext, JsCommitKey,
-    JsGenesisContext, JsTransactionContext, JsTransactionViewContext, TxContext, TxViewContext,
+    BlockContext, ExecutionContext, GenesisContext, JsCommitKey, JsGenesisContext,
+    JsTransactionContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext, TxContext,
+    TxViewContext, UpdateRewardsAndVotesContext,
 };
 use mainsail_evm_core::{
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
@@ -104,10 +105,84 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         self.persistent_db.set_genesis_info(GenesisInfo {
             account: genesis_ctx.account,
+            deployer_account: genesis_ctx.deployer_account,
+            validator_contract: genesis_ctx.validator_contract,
             initial_supply: genesis_ctx.initial_supply,
         });
 
         Ok(())
+    }
+
+    pub fn update_rewards_and_votes(
+        &mut self,
+        ctx: UpdateRewardsAndVotesContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        let mut pending_commit = self.pending_commit.get_or_insert_with(|| PendingCommit {
+            key: ctx.commit_key,
+            ..Default::default()
+        });
+
+        let genesis_info = self
+            .persistent_db
+            .genesis_info
+            .as_ref()
+            .expect("genesis info")
+            .clone();
+
+        let mut rewards = HashMap::<Address, u128>::new();
+        rewards.insert(ctx.validator_address, ctx.block_reward);
+
+        match state_commit::apply_rewards(&mut self.persistent_db, &mut pending_commit, rewards) {
+            Ok(_) => {
+                // call into consensus contract to update votes
+                let voters = pending_commit
+                    .cache
+                    .accounts
+                    .keys()
+                    .map(|k| ethers_core::types::Address::from_slice(k.0.as_slice()))
+                    .collect::<Vec<ethers_core::types::Address>>();
+
+                let abi = ethers_contract::BaseContract::from(
+                    ethers_core::abi::parse_abi(&[
+                        "function updateVoters(address[] calldata voters) external",
+                    ])
+                    .expect("encode abi"),
+                );
+
+                // encode abi into Bytes
+                let calldata = abi
+                    .encode("updateVoters", voters)
+                    .expect("encode updateVoters");
+
+                match self.transact_evm(ExecutionContext {
+                    block_context: Some(BlockContext {
+                        commit_key: ctx.commit_key,
+                        gas_limit: U256::MAX,
+                        timestamp: ctx.timestamp,
+                        validator_address: ctx.validator_address,
+                    }),
+                    caller: genesis_info.deployer_account,
+                    recipient: Some(genesis_info.validator_contract),
+                    data: revm::primitives::Bytes::from(calldata.0),
+                    value: U256::ZERO,
+                    gas_limit: Some(u64::MAX),
+                    spec_id: ctx.spec_id,
+                    tx_hash: None,
+                }) {
+                    Ok(receipt) => {
+                        println!("vote_update {:?}", receipt);
+                        assert!(receipt.is_success(), "vote_update unsuccessful");
+                        Ok(())
+                    }
+                    Err(err) => Err(EVMError::Database(
+                        format!("vote_update failed: {}", err).into(),
+                    )),
+                }
+            }
+            Err(err) => Err(EVMError::Database(
+                format!("apply_rewards failed: {}", err).into(),
+            )),
+        }
     }
 
     pub fn get_account_info(
@@ -120,34 +195,6 @@ impl EvmInner {
                 format!("account lookup failed: {}", err).into(),
             )),
         }
-    }
-
-    pub fn update_account_info(
-        &mut self,
-        account_update_ctx: AccountUpdateContext,
-    ) -> std::result::Result<(), EVMError<String>> {
-        // Drop pending state on key change
-        if self
-            .pending_commit
-            .as_ref()
-            .is_some_and(|pending| pending.key != account_update_ctx.commit_key)
-        {
-            self.drop_pending_commit();
-        }
-
-        // Update pending state
-        self.pending_commit
-            .get_or_insert_with(|| PendingCommit::new(account_update_ctx.commit_key));
-
-        self.persistent_db.upsert_host_account_info(
-            account_update_ctx.account,
-            AccountInfo {
-                nonce: account_update_ctx.nonce,
-                ..Default::default()
-            },
-        );
-
-        Ok(())
     }
 
     pub fn process(
@@ -376,9 +423,11 @@ impl EvmInner {
                         state_db.commit(state);
 
                         pending_commit.cache = std::mem::take(&mut state_db.cache);
-                        pending_commit
-                            .results
-                            .insert(ctx.tx_hash.expect("tx hash"), result.clone());
+
+                        if let Some(tx_hash) = ctx.tx_hash {
+                            pending_commit.results.insert(tx_hash, result.clone());
+                        }
+
                         pending_commit.transitions.add_transitions(
                             state_db
                                 .transition_state
@@ -398,18 +447,11 @@ impl EvmInner {
     }
 
     fn take_pending_commit(&mut self) -> Option<PendingCommit> {
-        let pending = self.pending_commit.take();
-
-        if pending.is_none() {
-            self.persistent_db.clear_host_account_infos();
-        }
-
-        pending
+        self.pending_commit.take()
     }
 
     fn drop_pending_commit(&mut self) {
-        self.pending_commit.take();
-        self.persistent_db.clear_host_account_infos();
+        self.take_pending_commit();
     }
 }
 
@@ -507,14 +549,14 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
-    pub fn update_account_info(
+    pub fn update_rewards_and_votes(
         &mut self,
         node_env: Env,
-        account_update_ctx: JsAccountUpdateContext,
+        ctx: JsUpdateRewardsAndVotesContext,
     ) -> Result<JsObject> {
-        let account_update_ctx = AccountUpdateContext::try_from(account_update_ctx)?;
+        let ctx = UpdateRewardsAndVotesContext::try_from(ctx)?;
         node_env.execute_tokio_future(
-            Self::update_account_info_async(self.evm.clone(), account_update_ctx),
+            Self::update_rewards_and_votes_async(self.evm.clone(), ctx),
             |_, _| Ok(()),
         )
     }
@@ -610,12 +652,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn update_account_info_async(
+    async fn initialize_genesis_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        account_update_ctx: AccountUpdateContext,
+        genesis_ctx: GenesisContext,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.update_account_info(account_update_ctx);
+        let result = lock.initialize_genesis(genesis_ctx);
 
         match result {
             Ok(_) => Result::Ok(()),
@@ -623,12 +665,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn initialize_genesis_async(
+    async fn update_rewards_and_votes_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        genesis_ctx: GenesisContext,
+        ctx: UpdateRewardsAndVotesContext,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.initialize_genesis(genesis_ctx);
+        let result = lock.update_rewards_and_votes(ctx);
 
         match result {
             Ok(_) => Result::Ok(()),
