@@ -5,7 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 
 import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder.js";
-import { TransactionOptions, TransferOptions } from "../types.js";
+import { EvmCallOptions,TransactionOptions, TransferOptions } from "../types.js";
 import { generateApp } from "./generate-app.js";
 
 const AMOUNT = 1;
