@@ -69,10 +69,10 @@ describe<{
 		assert.undefined(validator.validate("evmCall", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber, equal 0", ({ validator }) => {
+	it("#getSchema - amount should be bigNumber", ({ validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validValues = [0, "0", BigNumber.ZERO];
+		const validValues = [0, "0", BigNumber.ZERO, 1, "1", BigNumber.ONE];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -82,7 +82,7 @@ describe<{
 			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, 1, BigNumber.ONE, "test", null, {}];
+		const invalidValues = [-1, 1.1, "test", null, {}];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -94,10 +94,10 @@ describe<{
 		}
 	});
 
-	it("#getSchema - fee should be integer, min 5", ({ validator }) => {
+	it("#getSchema - fee should be integer, min 0, max 1000", ({ validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validValues = [5, 6, 1000];
+		const validValues = [0, 5, 6, 1000, BigNumber.ZERO, BigNumber.ONE, BigNumber.make(1000)];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -107,7 +107,7 @@ describe<{
 			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, 0, "test", null, undefined, {}, , BigNumber.ZERO, BigNumber.ONE];
+		const invalidValues = [-1, 1.1, "test", null, undefined, {}, BigNumber.make(1001)];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
