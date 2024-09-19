@@ -27,17 +27,11 @@ describe<{
 					maxTxPerBlock: 100,
 					validators: 53,
 					vendorFieldLength: 255,
-					address: {
-						bech32m: "ark",
-					},
 				})
 				.generate(),
 			[
 				{
 					activeValidators: 0,
-					address: {
-						bech32m: "ark",
-					},
 					block: {
 						maxPayload: 2000,
 						maxGasLimit: 1000,

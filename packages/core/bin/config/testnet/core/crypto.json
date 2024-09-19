@@ -3209,9 +3209,6 @@
 	"milestones": [
 		{
 			"activeValidators": 0,
-			"address": {
-				"keccak256": true
-			},
 			"block": {
 				"maxGasLimit": 10000000,
 				"maxPayload": 2097152,

@@ -24,8 +24,6 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-address-base58": "workspace:*",
-		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-commit": "workspace:*",
@@ -35,7 +33,6 @@
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-messages": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
-		"@mainsail/crypto-signature-schnorr-secp256k1": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",

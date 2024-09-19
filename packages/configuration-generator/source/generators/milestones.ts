@@ -9,7 +9,6 @@ export class MilestonesGenerator {
 		this.#data = [
 			{
 				activeValidators: 0,
-				address: options.address,
 				block: {
 					maxGasLimit: options.maxBlockGasLimit,
 					maxPayload: options.maxBlockPayload,

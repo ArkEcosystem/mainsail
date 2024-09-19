@@ -1,7 +1,5 @@
 import { Container } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
-import { ServiceProvider as CoreCryptoAddressBech32m } from "@mainsail/crypto-address-bech32m";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
@@ -51,30 +49,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoHashBcrypto).register();
 	await app.resolve(CoreCryptoSignatureSchnorr).register();
 	await app.resolve(CoreCryptoKeyPairEcdsa).register();
-
-	let addressMilestone;
-
-	switch (options.address) {
-		case "base58": {
-			await app.resolve(CoreCryptoAddressBase58).register();
-			addressMilestone = { base58: options.base58Prefix };
-			break;
-		}
-		case "bech32m": {
-			await app.resolve(CoreCryptoAddressBech32m).register();
-			addressMilestone = { bech32m: options.bech32mPrefix };
-			break;
-		}
-		case "keccak256": {
-			await app.resolve(CoreCryptoAddressKeccak256).register();
-			addressMilestone = { keccak256: true };
-			break;
-		}
-		default: {
-			throw new Exceptions.NotImplemented(options.addressFormat, "makeApplication");
-		}
-	}
-
+	await app.resolve(CoreCryptoAddressKeccak256).register();
 	await app.resolve(CryptoMessages).register();
 	await app.resolve(CryptoCommit).register();
 	await app.resolve(CoreCryptoConsensus).register();
@@ -90,7 +65,6 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 		milestones: [
 			{
-				address: addressMilestone,
 				height: 0,
 				timeouts: {
 					blockPrepareTime: 4000,
