@@ -180,6 +180,7 @@ impl EvmInner {
             value: U256::ZERO,
             nonce: None,
             gas_limit: Some(u64::MAX),
+            gas_price: None,
             spec_id: ctx.spec_id,
             tx_hash: None,
         }) {
@@ -260,6 +261,7 @@ impl EvmInner {
                     value: U256::ZERO,
                     nonce: None,
                     gas_limit: Some(u64::MAX),
+                    gas_price: None,
                     spec_id: ctx.spec_id,
                     tx_hash: None,
                 }) {
@@ -491,6 +493,7 @@ impl EvmInner {
             })
             .modify_tx_env(|tx_env| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
+                tx_env.gas_price = ctx.gas_price.unwrap_or_else(|| U256::ZERO);
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
                 tx_env.nonce = ctx.nonce;

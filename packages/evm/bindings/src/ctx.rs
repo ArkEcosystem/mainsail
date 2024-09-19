@@ -13,6 +13,7 @@ pub struct JsTransactionContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<JsString>,
     pub gas_limit: JsBigInt,
+    pub gas_price: Option<JsBigInt>,
     pub value: JsBigInt,
     pub nonce: Option<JsBigInt>,
     pub data: JsBuffer,
@@ -85,6 +86,7 @@ pub struct TxContext {
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub gas_limit: u64,
+    pub gas_price: Option<U256>,
     pub value: U256,
     pub nonce: Option<u64>,
     pub data: Bytes,
@@ -140,6 +142,7 @@ pub struct ExecutionContext {
     pub caller: Address,
     pub recipient: Option<Address>,
     pub gas_limit: Option<u64>,
+    pub gas_price: Option<U256>,
     pub value: U256,
     pub nonce: Option<u64>,
     pub data: Bytes,
@@ -154,6 +157,7 @@ impl From<TxViewContext> for ExecutionContext {
             caller: value.caller,
             recipient: Some(value.recipient),
             gas_limit: None,
+            gas_price: None,
             value: U256::ZERO,
             nonce: None,
             data: value.data,
@@ -170,6 +174,7 @@ impl From<TxContext> for ExecutionContext {
             caller: value.caller,
             recipient: value.recipient,
             gas_limit: Some(value.gas_limit),
+            gas_price: value.gas_price,
             value: value.value,
             nonce: value.nonce,
             data: value.data,
@@ -232,9 +237,16 @@ impl TryFrom<JsTransactionContext> for TxContext {
             None
         };
 
+        let gas_price = if let Some(gas_price) = value.gas_price {
+            Some(utils::convert_bigint_to_u256(gas_price)?)
+        } else {
+            None
+        };
+
         let tx_ctx = TxContext {
             recipient,
             gas_limit: value.gas_limit.try_into()?,
+            gas_price,
             caller: utils::create_address_from_js_string(value.caller)?,
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce,
