@@ -38,9 +38,6 @@
 		},
 		"height": 0,
 		"reward": "0",
-		"address": {
-			"keccak256": true
-		},
 		"satoshi": {
 			"decimals": 18,
 			"denomination": 1000000000000000000
