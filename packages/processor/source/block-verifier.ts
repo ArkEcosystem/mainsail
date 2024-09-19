@@ -5,7 +5,7 @@ import {
 	ChainedVerifier,
 	GeneratorVerifier,
 	IncompatibleTransactionsVerifier,
-	NonceVerifier,
+	//NonceVerifier,
 	TimestampVerifier,
 	VerifyBlockVerifier,
 } from "./verifiers/index.js";
@@ -26,6 +26,6 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 
 		await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit);
 
-		await this.app.resolve(NonceVerifier).execute(unit);
+		//await this.app.resolve(NonceVerifier).execute(unit);
 	}
 }

@@ -29,7 +29,7 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 
 			const nonce: BigNumber = BigNumber.make(data.nonce);
 
-			if (!nonceBySender[sender].plus(1).isEqualTo(nonce)) {
+			if (!nonceBySender[sender].isEqualTo(nonce)) {
 				throw new Exceptions.InvalidNonce(block, sender);
 			}
 
