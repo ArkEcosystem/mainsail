@@ -35,7 +35,6 @@ describe<{
 		assert.equal(configManager.getMilestones(), [
 			{
 				activeValidators: 0,
-				address: { keccak256: true },
 				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
@@ -56,7 +55,6 @@ describe<{
 			},
 			{
 				activeValidators: 53,
-				address: { keccak256: true },
 				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
@@ -77,7 +75,6 @@ describe<{
 			},
 			{
 				activeValidators: 53,
-				address: { keccak256: true },
 				block: { maxPayload: 2_097_152, maxGasLimit: 10_000_000, maxTransactions: 150, version: 1 },
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
