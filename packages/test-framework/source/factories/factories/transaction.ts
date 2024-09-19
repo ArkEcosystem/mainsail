@@ -1,280 +1,261 @@
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
-import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
-import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
-import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
-import { BigNumber } from "@mainsail/utils";
+import { Contracts } from "@mainsail/contracts";
 
-import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder.js";
-import {
-	EvmCallOptions,
-	MultiPaymentOptions,
-	MultiSignatureOptions,
-	TransactionOptions,
-	TransferOptions,
-	ValidatorRegistrationOptions,
-	ValidatorResignationOptions,
-	VoteOptions,
-} from "../types.js";
-import { generateApp } from "./generate-app.js";
 
-const AMOUNT = 1;
-const FEE = 1;
 
-interface EntityOptions<T extends TransactionBuilder<T>> {
-	entity: TransactionBuilder<T>;
-	options: TransactionOptions;
-}
 
-const sign = async <T extends TransactionBuilder<T>>({
-	entity,
-	options,
-}: EntityOptions<T>): Promise<TransactionBuilder<T>> => entity.sign(options.passphrase || secrets[0]);
+// const AMOUNT = 1;
+// const FEE = 1;
 
-const multiSign = async <T extends TransactionBuilder<T>>({
-	entity,
-	options,
-}: EntityOptions<T>): Promise<TransactionBuilder<T>> => {
-	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
+// interface EntityOptions<T extends TransactionBuilder<T>> {
+// 	entity: TransactionBuilder<T>;
+// 	options: TransactionOptions;
+// }
 
-	for (const [index, passphrase] of passphrases.entries()) {
-		await entity.multiSign(passphrase, index);
-	}
+// const sign = async <T extends TransactionBuilder<T>>({
+// 	entity,
+// 	options,
+// }: EntityOptions<T>): Promise<TransactionBuilder<T>> => entity.sign(options.passphrase || secrets[0]);
 
-	return entity;
-};
+// const multiSign = async <T extends TransactionBuilder<T>>({
+// 	entity,
+// 	options,
+// }: EntityOptions<T>): Promise<TransactionBuilder<T>> => {
+// 	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
-const applyModifiers = <T extends TransactionBuilder<T>>(
-	entity: TransactionBuilder<T>,
-	options: TransactionOptions,
-): TransactionBuilder<T> => {
-	entity.fee(BigNumber.make(options.fee || FEE).toFixed());
+// 	for (const [index, passphrase] of passphrases.entries()) {
+// 		await entity.multiSign(passphrase, index);
+// 	}
 
-	if (options.version) {
-		entity.version(options.version);
-	}
+// 	return entity;
+// };
 
-	if (entity.data.version && options.nonce) {
-		entity.nonce(options.nonce);
-	}
+// const applyModifiers = <T extends TransactionBuilder<T>>(
+// 	entity: TransactionBuilder<T>,
+// 	options: TransactionOptions,
+// ): TransactionBuilder<T> => {
+// 	entity.fee(BigNumber.make(options.fee || FEE).toFixed());
 
-	if (options.timestamp) {
-		entity.data.timestamp = options.timestamp;
-	}
+// 	if (options.version) {
+// 		entity.version(options.version);
+// 	}
 
-	if (options.senderPublicKey) {
-		entity.senderPublicKey(options.senderPublicKey);
-	}
+// 	if (entity.data.version && options.nonce) {
+// 		entity.nonce(options.nonce);
+// 	}
 
-	if (options.recipientId) {
-		entity.recipientId(options.recipientId);
-	}
+// 	if (options.timestamp) {
+// 		entity.data.timestamp = options.timestamp;
+// 	}
 
-	return entity;
-};
+// 	if (options.senderPublicKey) {
+// 		entity.senderPublicKey(options.senderPublicKey);
+// 	}
 
-export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {
-		const transferBuilder = app.resolve(TransferBuilder);
+// 	if (options.recipientId) {
+// 		entity.recipientId(options.recipientId);
+// 	}
 
-		return applyModifiers(
-			transferBuilder
-				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
-				.recipientId(
-					options.recipientId ||
-						(await app
-							.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-							.fromMnemonic(secrets[0])),
-				),
-			options,
-		);
-	});
+// 	return entity;
+// };
 
-	factory
-		.get("Transfer")
-		.state("vendorField", ({ entity, options }) => entity.vendorField(options.vendorField || "Hello World"));
+// export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+// 	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {
+// 		const transferBuilder = app.resolve(TransferBuilder);
 
-	// @ts-ignore
-	factory.get("Transfer").state("sign", sign);
-	// @ts-ignore
-	factory.get("Transfer").state("multiSign", multiSign);
-};
+// 		return applyModifiers(
+// 			transferBuilder
+// 				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
+// 				.recipientId(
+// 					options.recipientId ||
+// 						(await app
+// 							.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+// 							.fromMnemonic(secrets[0])),
+// 				),
+// 			options,
+// 		);
+// 	});
 
-export const registerValidatorRegistrationFactory = (
-	factory: FactoryBuilder,
-	app: Contracts.Kernel.Application,
-): void => {
-	factory.set("ValidatorRegistration", async ({ options }: { options: ValidatorRegistrationOptions }) =>
-		applyModifiers(
-			app.resolve(ValidatorRegistrationBuilder).publicKeyAsset(options.publicKey || "a".repeat(96)),
-			options,
-		),
-	);
+// 	factory
+// 		.get("Transfer")
+// 		.state("vendorField", ({ entity, options }) => entity.vendorField(options.vendorField || "Hello World"));
 
-	// @ts-ignore
-	factory.get("ValidatorRegistration").state("sign", sign);
-};
+// 	// @ts-ignore
+// 	factory.get("Transfer").state("sign", sign);
+// 	// @ts-ignore
+// 	factory.get("Transfer").state("multiSign", multiSign);
+// };
 
-export const registerValidatorResignationFactory = (
-	factory: FactoryBuilder,
-	app: Contracts.Kernel.Application,
-): void => {
-	factory.set("ValidatorResignation", async ({ options }: { options: ValidatorResignationOptions }) =>
-		applyModifiers(app.resolve(ValidatorResignationBuilder), options),
-	);
-	// @ts-ignore
-	factory.get("ValidatorResignation").state("sign", sign);
-};
+// export const registerValidatorRegistrationFactory = (
+// 	factory: FactoryBuilder,
+// 	app: Contracts.Kernel.Application,
+// ): void => {
+// 	factory.set("ValidatorRegistration", async ({ options }: { options: ValidatorRegistrationOptions }) =>
+// 		applyModifiers(
+// 			app.resolve(ValidatorRegistrationBuilder).publicKeyAsset(options.publicKey || "a".repeat(96)),
+// 			options,
+// 		),
+// 	);
 
-export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("Vote", async ({ options }: { options: VoteOptions }) =>
-		applyModifiers(
-			app
-				.resolve(VoteBuilder)
-				.votesAsset([
-					options.publicKey ||
-						(await app
-							.getTagged<Contracts.Crypto.PublicKeyFactory>(
-								Identifiers.Cryptography.Identity.PublicKey.Factory,
-								"type",
-								"wallet",
-							)
-							.fromMnemonic(secrets[1])),
-				]),
-			options,
-		),
-	);
+// 	// @ts-ignore
+// 	factory.get("ValidatorRegistration").state("sign", sign);
+// };
 
-	// @ts-ignore
-	factory.get("Vote").state("sign", sign);
-	// @ts-ignore
-	factory.get("Vote").state("multiSign", multiSign);
-};
+// export const registerValidatorResignationFactory = (
+// 	factory: FactoryBuilder,
+// 	app: Contracts.Kernel.Application,
+// ): void => {
+// 	factory.set("ValidatorResignation", async ({ options }: { options: ValidatorResignationOptions }) =>
+// 		applyModifiers(app.resolve(ValidatorResignationBuilder), options),
+// 	);
+// 	// @ts-ignore
+// 	factory.get("ValidatorResignation").state("sign", sign);
+// };
 
-export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("Unvote", async ({ options }: { options: VoteOptions }) =>
-		applyModifiers(
-			app
-				.resolve(VoteBuilder)
-				.unvotesAsset([
-					options.publicKey ||
-						(await app
-							.getTagged<Contracts.Crypto.PublicKeyFactory>(
-								Identifiers.Cryptography.Identity.PublicKey.Factory,
-								"type",
-								"wallet",
-							)
-							.fromMnemonic(secrets[1])),
-				]),
-			options,
-		),
-	);
+// export const registerVoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+// 	factory.set("Vote", async ({ options }: { options: VoteOptions }) =>
+// 		applyModifiers(
+// 			app
+// 				.resolve(VoteBuilder)
+// 				.votesAsset([
+// 					options.publicKey ||
+// 						(await app
+// 							.getTagged<Contracts.Crypto.PublicKeyFactory>(
+// 								Identifiers.Cryptography.Identity.PublicKey.Factory,
+// 								"type",
+// 								"wallet",
+// 							)
+// 							.fromMnemonic(secrets[1])),
+// 				]),
+// 			options,
+// 		),
+// 	);
 
-	// @ts-ignore
-	factory.get("Unvote").state("sign", sign);
-	// @ts-ignore
-	factory.get("Unvote").state("multiSign", multiSign);
-};
+// 	// @ts-ignore
+// 	factory.get("Vote").state("sign", sign);
+// 	// @ts-ignore
+// 	factory.get("Vote").state("multiSign", multiSign);
+// };
 
-export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("MultiSignature", async ({ options }: { options: MultiSignatureOptions }) => {
-		const publicKeyFactory = app.getTagged<Contracts.Crypto.PublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKey.Factory,
-			"type",
-			"wallet",
-		);
+// export const registerUnvoteFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+// 	factory.set("Unvote", async ({ options }: { options: VoteOptions }) =>
+// 		applyModifiers(
+// 			app
+// 				.resolve(VoteBuilder)
+// 				.unvotesAsset([
+// 					options.publicKey ||
+// 						(await app
+// 							.getTagged<Contracts.Crypto.PublicKeyFactory>(
+// 								Identifiers.Cryptography.Identity.PublicKey.Factory,
+// 								"type",
+// 								"wallet",
+// 							)
+// 							.fromMnemonic(secrets[1])),
+// 				]),
+// 			options,
+// 		),
+// 	);
 
-		const publicKeys: string[] = options.publicKeys || [
-			await publicKeyFactory.fromMnemonic(secrets[0]),
-			await publicKeyFactory.fromMnemonic(secrets[1]),
-			await publicKeyFactory.fromMnemonic(secrets[2]),
-		];
+// 	// @ts-ignore
+// 	factory.get("Unvote").state("sign", sign);
+// 	// @ts-ignore
+// 	factory.get("Unvote").state("multiSign", multiSign);
+// };
 
-		return applyModifiers(
-			app
-				.resolve(MultiSignatureBuilder)
-				.multiSignatureAsset({
-					min: options.min || 2,
-					publicKeys,
-				})
-				.senderPublicKey(publicKeys[0]),
-			options,
-		);
-	});
+// export const registerMultiSignature = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+// 	factory.set("MultiSignature", async ({ options }: { options: MultiSignatureOptions }) => {
+// 		const publicKeyFactory = app.getTagged<Contracts.Crypto.PublicKeyFactory>(
+// 			Identifiers.Cryptography.Identity.PublicKey.Factory,
+// 			"type",
+// 			"wallet",
+// 		);
 
-	// @ts-ignore
-	factory.get("MultiSignature").state("sign", sign);
-	// @ts-ignore
-	factory.get("MultiSignature").state("multiSign", multiSign);
-};
+// 		const publicKeys: string[] = options.publicKeys || [
+// 			await publicKeyFactory.fromMnemonic(secrets[0]),
+// 			await publicKeyFactory.fromMnemonic(secrets[1]),
+// 			await publicKeyFactory.fromMnemonic(secrets[2]),
+// 		];
 
-export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application) => {
-	factory.set("MultiPayment", async ({ options }: { options: MultiPaymentOptions }) => {
-		const builder = app.resolve(MultiPaymentBuilder);
+// 		return applyModifiers(
+// 			app
+// 				.resolve(MultiSignatureBuilder)
+// 				.multiSignatureAsset({
+// 					min: options.min || 2,
+// 					publicKeys,
+// 				})
+// 				.senderPublicKey(publicKeys[0]),
+// 			options,
+// 		);
+// 	});
 
-		const payments = options.payments || [
-			{
-				amount: AMOUNT.toString(),
-				recipientId: await app
-					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-					.fromMnemonic(secrets[0]),
-			},
-			{
-				amount: AMOUNT.toString(),
-				recipientId: await app
-					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-					.fromMnemonic(secrets[1]),
-			},
-		];
+// 	// @ts-ignore
+// 	factory.get("MultiSignature").state("sign", sign);
+// 	// @ts-ignore
+// 	factory.get("MultiSignature").state("multiSign", multiSign);
+// };
 
-		for (const payment of payments) {
-			builder.addPayment(payment.recipientId, payment.amount);
-		}
+// export const registerMultiPaymentFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application) => {
+// 	factory.set("MultiPayment", async ({ options }: { options: MultiPaymentOptions }) => {
+// 		const builder = app.resolve(MultiPaymentBuilder);
 
-		applyModifiers(builder, options);
+// 		const payments = options.payments || [
+// 			{
+// 				amount: AMOUNT.toString(),
+// 				recipientId: await app
+// 					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+// 					.fromMnemonic(secrets[0]),
+// 			},
+// 			{
+// 				amount: AMOUNT.toString(),
+// 				recipientId: await app
+// 					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+// 					.fromMnemonic(secrets[1]),
+// 			},
+// 		];
 
-		return builder;
-	});
+// 		for (const payment of payments) {
+// 			builder.addPayment(payment.recipientId, payment.amount);
+// 		}
 
-	// @ts-ignore
-	factory.get("MultiPayment").state("sign", sign);
-	// @ts-ignore
-	factory.get("MultiPayment").state("multiSign", multiSign);
-};
+// 		applyModifiers(builder, options);
 
-export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
-		const builder = app.resolve(EvmCallBuilder);
+// 		return builder;
+// 	});
 
-		builder.payload(options.evmCall?.payload ?? "");
-		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);
+// 	// @ts-ignore
+// 	factory.get("MultiPayment").state("sign", sign);
+// 	// @ts-ignore
+// 	factory.get("MultiPayment").state("multiSign", multiSign);
+// };
 
-		applyModifiers(builder, options);
+// export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+// 	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
+// 		const builder = app.resolve(EvmCallBuilder);
 
-		return builder;
-	});
+// 		builder.payload(options.evmCall?.payload ?? "");
+// 		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);
 
-	// @ts-ignore
-	factory.get("EvmCall").state("sign", sign);
-};
+// 		applyModifiers(builder, options);
+
+// 		return builder;
+// 	});
+
+// 	// @ts-ignore
+// 	factory.get("EvmCall").state("sign", sign);
+// };
 
 export const registerTransactionFactory = async (
 	factory: FactoryBuilder,
 	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
-	const app = await generateApp(config);
+	// const app = await generateApp(config);
 
-	registerTransferFactory(factory, app);
-	registerValidatorRegistrationFactory(factory, app);
-	registerValidatorResignationFactory(factory, app);
-	registerVoteFactory(factory, app);
-	registerUnvoteFactory(factory, app);
-	registerMultiSignature(factory, app);
-	registerMultiPaymentFactory(factory, app);
-	registerEvmCallFactory(factory, app);
+	// registerTransferFactory(factory, app);
+	// registerValidatorRegistrationFactory(factory, app);
+	// registerValidatorResignationFactory(factory, app);
+	// registerVoteFactory(factory, app);
+	// registerUnvoteFactory(factory, app);
+	// registerMultiSignature(factory, app);
+	// registerMultiPaymentFactory(factory, app);
+	// registerEvmCallFactory(factory, app);
 };

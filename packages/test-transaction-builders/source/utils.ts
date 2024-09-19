@@ -1,6 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
-import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
+import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { Sandbox } from "@mainsail/test-framework";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -186,7 +186,7 @@ export const getRandomFundedWallet = async (
 
 	const fundTx = await (
 		await app
-			.resolve(TransferBuilder)
+			.resolve(EvmCallBuilder)
 			.fee(BigNumber.make("10000000").toFixed())
 			.recipientId(recipient)
 			.amount(BigNumber.make(amount).toFixed())

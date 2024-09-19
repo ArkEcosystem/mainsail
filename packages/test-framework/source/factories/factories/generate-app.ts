@@ -10,12 +10,6 @@ import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreEvmCallTransaction } from "@mainsail/crypto-transaction-evm-call";
-import { ServiceProvider as CoreMultiPaymentTransaction } from "@mainsail/crypto-transaction-multi-payment";
-import { ServiceProvider as CoreMultiSignatureRegistrationTransaction } from "@mainsail/crypto-transaction-multi-signature-registration";
-import { ServiceProvider as CoreTransferTransaction } from "@mainsail/crypto-transaction-transfer";
-import { ServiceProvider as CoreValidatorRegistrationTransaction } from "@mainsail/crypto-transaction-validator-registration";
-import { ServiceProvider as CoreValidatorResignationTransaction } from "@mainsail/crypto-transaction-validator-resignation";
-import { ServiceProvider as CoreVoteTransaction } from "@mainsail/crypto-transaction-vote";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
@@ -48,12 +42,6 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreFees).register();
 	await sandbox.app.resolve(CoreFeesStatic).register();
 	await sandbox.app.resolve(CoreCryptoTransaction).register();
-	await sandbox.app.resolve(CoreTransferTransaction).register();
-	await sandbox.app.resolve(CoreVoteTransaction).register();
-	await sandbox.app.resolve(CoreValidatorRegistrationTransaction).register();
-	await sandbox.app.resolve(CoreValidatorResignationTransaction).register();
-	await sandbox.app.resolve(CoreMultiSignatureRegistrationTransaction).register();
-	await sandbox.app.resolve(CoreMultiPaymentTransaction).register();
 	await sandbox.app.resolve(CoreEvmCallTransaction).register();
 	await sandbox.app.resolve(CoreCryptoBlock).register();
 	await sandbox.app.resolve(CoreCryptoMessages).register();
