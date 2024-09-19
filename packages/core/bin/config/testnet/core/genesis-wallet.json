@@ -1,14 +1,14 @@
 {
-    "address": "0xb386c996a71Ab44eFd9cF3a73608F75E572EB3A8",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "2b778c091883f48f845b66e4297bb6b58f270fac87f73bcabd2f0e758cad4208",
-        "publicKey": "8e501cce294cceffcbd014032f065c76c8cf73a7f37b96a64d6fdb5a93d39af8704d2fa44d865b7186b78728cc97aff7"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "770029ce6009148693960720c86b8f1965fec2f6f45d3f4c3faca957671824f8",
-        "publicKey": "02cea9267d41d9f91a1932d3a1b2d06c5b21a585023bd62ef6b3008d3681a5d425"
-    },
-    "passphrase": "kingdom sight curious fancy settle deliver cluster gift valve delay abandon team snack knock confirm cage require between steel nerve fee various funny luxury"
+	"address": "0xb386c996a71Ab44eFd9cF3a73608F75E572EB3A8",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "2b778c091883f48f845b66e4297bb6b58f270fac87f73bcabd2f0e758cad4208",
+		"publicKey": "8e501cce294cceffcbd014032f065c76c8cf73a7f37b96a64d6fdb5a93d39af8704d2fa44d865b7186b78728cc97aff7"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "770029ce6009148693960720c86b8f1965fec2f6f45d3f4c3faca957671824f8",
+		"publicKey": "02cea9267d41d9f91a1932d3a1b2d06c5b21a585023bd62ef6b3008d3681a5d425"
+	},
+	"passphrase": "kingdom sight curious fancy settle deliver cluster gift valve delay abandon team snack knock confirm cage require between steel nerve fee various funny luxury"
 }
