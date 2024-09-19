@@ -2983,6 +2983,9 @@ importers:
         specifier: 17.12.2
         version: 17.12.2
     devDependencies:
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
