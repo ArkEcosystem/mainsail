@@ -76,6 +76,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				specId: evmSpec,
 				txHash: transaction.id,
 				value: transaction.data.amount.toBigInt(),
+				nonce: transaction.data.nonce.toBigInt(),
 			});
 
 			// Subtract native fee from sender based on actual consumed gas
