@@ -235,21 +235,21 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 // 	factory.get("MultiPayment").state("multiSign", multiSign);
 // };
 
-// export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-// 	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
-// 		const builder = app.resolve(EvmCallBuilder);
+export const registerEvmCallFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+	factory.set("EvmCall", async ({ options }: { options: EvmCallOptions }) => {
+		const builder = app.resolve(EvmCallBuilder);
 
-// 		builder.payload(options.evmCall?.payload ?? "");
-// 		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);
+		builder.payload(options.evmCall?.payload ?? "");
+		builder.gasLimit(options.evmCall?.gasLimit ?? 21_000);
 
-// 		applyModifiers(builder, options);
+		applyModifiers(builder, options);
 
-// 		return builder;
-// 	});
+		return builder;
+	});
 
-// 	// @ts-ignore
-// 	factory.get("EvmCall").state("sign", sign);
-// };
+	// @ts-ignore
+	factory.get("EvmCall").state("sign", sign);
+};
 
 export const registerTransactionFactory = async (
 	factory: FactoryBuilder,
@@ -264,5 +264,5 @@ export const registerTransactionFactory = async (
 	// registerUnvoteFactory(factory, app);
 	// registerMultiSignature(factory, app);
 	// registerMultiPaymentFactory(factory, app);
-	// registerEvmCallFactory(factory, app);
+	registerEvmCallFactory(factory, app);
 };

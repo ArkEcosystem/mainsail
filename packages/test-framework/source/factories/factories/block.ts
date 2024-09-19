@@ -77,8 +77,8 @@ export const registerBlockFactory = async (
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
 					generatorPublicKey: await app
-						.getTagged<Contracts.Crypto.PublicKeyFactory>(
-							Identifiers.Cryptography.Identity.PublicKey.Factory,
+						.getTagged<Contracts.Crypto.AddressFactory>(
+							Identifiers.Cryptography.Identity.Address.Factory,
 							"type",
 							"wallet",
 						)

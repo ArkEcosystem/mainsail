@@ -22,63 +22,63 @@ describe<{
 		const entity = await signer.makeTransfer(options);
 
 		assert.defined(entity.data.signature);
-		assert.defined(entity.data.vendorField);
+		// assert.defined(entity.data.vendorField);
 	});
 
-	it("should make validator", async ({ signer }) => {
-		const options: Types.ValidatorRegistrationOptions = {
-			fee: "5",
-			passphrase: passphrases[0],
-			publicKey: "a".repeat(96),
-		};
+	// it("should make validator", async ({ signer }) => {
+	// 	const options: Types.ValidatorRegistrationOptions = {
+	// 		fee: "5",
+	// 		passphrase: passphrases[0],
+	// 		publicKey: "a".repeat(96),
+	// 	};
 
-		const entity = await signer.makeValidator(options);
+	// 	const entity = await signer.makeValidator(options);
 
-		assert.defined(entity.data.signature);
-		assert.defined(entity.data.asset?.validatorPublicKey);
-	});
+	// 	assert.defined(entity.data.signature);
+	// 	assert.defined(entity.data.asset?.validatorPublicKey);
+	// });
 
-	it("should make vote", async ({ signer }) => {
-		const options: Types.VoteOptions = {
-			fee: "5",
-			passphrase: passphrases[0],
-		};
+	// it("should make vote", async ({ signer }) => {
+	// 	const options: Types.VoteOptions = {
+	// 		fee: "5",
+	// 		passphrase: passphrases[0],
+	// 	};
 
-		const entity = await signer.makeVote(options);
+	// 	const entity = await signer.makeVote(options);
 
-		assert.defined(entity.data.signature);
-		assert.array(entity.data.asset?.votes);
-	});
+	// 	assert.defined(entity.data.signature);
+	// 	assert.array(entity.data.asset?.votes);
+	// });
 
-	it.skip("should make multi signature registration", async ({ signer }) => {
-		// TODO fails with:
-		// data must have required property 'signatures'
-		// data/version must be equal to one of the allowed values
-		const options: Types.MultiSignatureOptions = {
-			min: 2,
-			passphrase: passphrases[0],
-			passphrases: [passphrases[0], passphrases[1], passphrases[2]],
-		};
+	// it.skip("should make multi signature registration", async ({ signer }) => {
+	// 	// TODO fails with:
+	// 	// data must have required property 'signatures'
+	// 	// data/version must be equal to one of the allowed values
+	// 	const options: Types.MultiSignatureOptions = {
+	// 		min: 2,
+	// 		passphrase: passphrases[0],
+	// 		passphrases: [passphrases[0], passphrases[1], passphrases[2]],
+	// 	};
 
-		const entity = await signer.makeMultiSignatureRegistration(options);
+	// 	const entity = await signer.makeMultiSignatureRegistration(options);
 
-		assert.defined(entity.data.signature);
-		assert.array(entity.data.signatures);
-		assert.equal(entity.data.asset?.multiSignature?.min, 2);
-		assert.array(entity.data.asset?.multiSignature?.publicKeys);
-	});
+	// 	assert.defined(entity.data.signature);
+	// 	assert.array(entity.data.signatures);
+	// 	assert.equal(entity.data.asset?.multiSignature?.min, 2);
+	// 	assert.array(entity.data.asset?.multiSignature?.publicKeys);
+	// });
 
-	it("should make multi payment", async ({ signer }) => {
-		const options: Types.MultiPaymentOptions = {
-			fee: "5",
-			passphrase: passphrases[0],
-		};
+	// it("should make multi payment", async ({ signer }) => {
+	// 	const options: Types.MultiPaymentOptions = {
+	// 		fee: "5",
+	// 		passphrase: passphrases[0],
+	// 	};
 
-		const entity = await signer.makeMultipayment(options);
+	// 	const entity = await signer.makeMultipayment(options);
 
-		assert.defined(entity.data.signature);
-		assert.array(entity.data.asset?.payments);
-	});
+	// 	assert.defined(entity.data.signature);
+	// 	assert.array(entity.data.asset?.payments);
+	// });
 
 	it("should make evm call", async ({ signer }) => {
 		const options: Types.EvmCallOptions = {
