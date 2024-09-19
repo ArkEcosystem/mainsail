@@ -31,9 +31,9 @@
 		"joi": "17.12.2"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
