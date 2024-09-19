@@ -1,5 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Configuration } from "@mainsail/crypto-config";
 import {
 	extendSchema,
 	InternalTransactionType,
@@ -16,19 +17,11 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import { AddressFactory } from "../../../crypto-address-base58/source/address.factory";
-import { Configuration } from "@mainsail/crypto-config";
 import { HashFactory } from "../../../crypto-hash-bcrypto/source/hash.factory";
 import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
 import { Signature } from "../../../crypto-signature-schnorr/source/signature";
-import { MultiPaymentTransactionHandler } from "../../../crypto-transaction-multi-payment/source/handlers";
-import { MultiSignatureRegistrationTransactionHandler } from "../../../crypto-transaction-multi-signature-registration/source/handlers";
-import { TransferTransactionHandler } from "../../../crypto-transaction-transfer/source/handlers";
-import { UsernameRegistrationTransactionHandler } from "../../../crypto-transaction-username-registration/source/handlers";
-import { UsernameResignationTransactionHandler } from "../../../crypto-transaction-username-resignation/source/handlers";
-import { ValidatorRegistrationTransactionHandler } from "../../../crypto-transaction-validator-registration/source/handlers";
-import { ValidatorResignationTransactionHandler } from "../../../crypto-transaction-validator-resignation/source/handlers";
-import { VoteTransactionHandler } from "../../../crypto-transaction-vote/source/handlers";
+import { EvmCallTransactionHandler } from "../../../crypto-transaction-evm-call/source/handlers";
 import { describe, getAttributeRepository } from "../../../test-framework/source";
 import { Validator } from "../../../validation/source/validator";
 import { ServiceProvider } from "../service-provider";
@@ -36,8 +29,8 @@ import { TransactionHandlerProvider } from "./handler-provider";
 import { TransactionHandlerRegistry } from "./handler-registry";
 import { TransactionHandler, TransactionHandlerConstructor } from "./transaction";
 
-const NUMBER_OF_REGISTERED_CORE_HANDLERS = 8;
-const NUMBER_OF_ACTIVE_CORE_HANDLERS = 8;
+const NUMBER_OF_REGISTERED_CORE_HANDLERS = 1;
+const NUMBER_OF_ACTIVE_CORE_HANDLERS = 1;
 
 const TEST_TRANSACTION_TYPE = 100;
 const DEPENDANT_TEST_TRANSACTION_TYPE = 101;
@@ -186,9 +179,11 @@ describe<{
 		app.bind<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
 			getAttributeRepository(),
 		);
+		app.bind(Identifiers.State.State).toConstantValue({});
 		app.bind(Identifiers.State.Service).toConstantValue({});
 		app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
 		app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({});
+		app.bind(Identifiers.Evm.Gas.FeeCalculator).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);
 		app.bind(Identifiers.Cryptography.Validator).to(Validator);
@@ -203,16 +198,7 @@ describe<{
 		app.bind(Identifiers.Cryptography.Hash.Factory).to(HashFactory);
 		app.bind(Identifiers.Cryptography.Identity.PublicKey.Size).toConstantValue(32);
 		app.bind(Identifiers.Cryptography.Signature.Size).toConstantValue(64);
-
-		app.bind(Identifiers.Transaction.Handler.Instances).to(TransferTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorRegistrationTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(ValidatorResignationTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(VoteTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(MultiSignatureRegistrationTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(MultiPaymentTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(UsernameRegistrationTransactionHandler);
-		app.bind(Identifiers.Transaction.Handler.Instances).to(UsernameResignationTransactionHandler);
-
+		app.bind(Identifiers.Transaction.Handler.Instances).to(EvmCallTransactionHandler);
 		app.bind(Identifiers.Transaction.Handler.Provider).to(TransactionHandlerProvider).inSingletonScope();
 		app.bind(Identifiers.Transaction.Handler.Registry).to(TransactionHandlerRegistry).inSingletonScope();
 		app.bind(Identifiers.Transaction.Handler.Constructors).toDynamicValue(
@@ -236,40 +222,10 @@ describe<{
 			Promise.all([
 				transactionHandlerRegistry.getRegisteredHandlerByType(
 					InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.Transfer,
+						Contracts.Crypto.TransactionType.EvmCall,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.ValidatorRegistration,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.Vote,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.MultiSignature,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.MultiPayment,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-				),
-				transactionHandlerRegistry.getRegisteredHandlerByType(
-					InternalTransactionType.from(
-						Contracts.Crypto.TransactionType.ValidatorRegistration,
-						Contracts.Crypto.TransactionTypeGroup.Core,
-					),
-				),
+				)
 			]),
 		);
 	});
