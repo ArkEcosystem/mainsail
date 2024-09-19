@@ -115,9 +115,8 @@ const setup = async () => {
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
-		"@mainsail/validator-set-static",
+		"@mainsail/evm-consensus",
 		"@mainsail/validator",
-		"@mainsail/proposer",
 		"@mainsail/consensus",
 	];
 

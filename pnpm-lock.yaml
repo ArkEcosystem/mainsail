@@ -4037,6 +4037,9 @@ importers:
       '@mainsail/evm-api-worker':
         specifier: workspace:*
         version: link:../../../packages/evm-api-worker
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../../../packages/evm-consensus
       '@mainsail/evm-development':
         specifier: workspace:*
         version: link:../../../packages/evm-development
@@ -4061,9 +4064,6 @@ importers:
       '@mainsail/processor':
         specifier: workspace:*
         version: link:../../../packages/processor
-      '@mainsail/proposer':
-        specifier: workspace:*
-        version: link:../../../packages/proposer
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../../../packages/serializer

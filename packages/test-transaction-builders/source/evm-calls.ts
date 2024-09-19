@@ -13,7 +13,7 @@ export const makeEvmCall = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, recipient, fee, gasLimit, payload } = options;
+	let { amount, sender, recipient, fee, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
 	fee = fee ?? "5";
@@ -24,12 +24,17 @@ export const makeEvmCall = async (
 	}
 
 	recipient = recipient ?? sandbox.app.get<string>(EvmDevelopmentIdentifiers.Contracts.Addresses.Erc20);
-	const builder = app
-		.resolve(EvmCallBuilder)
-		.fee(BigNumber.make(fee).toFixed())
-		.recipientId(recipient)
-		.gasLimit(gasLimit ?? 100_000)
-		.payload(payload);
+	let builder = app.resolve(EvmCallBuilder).fee(BigNumber.make(fee).toFixed());
+
+	if (amount) {
+		builder = builder.amount(amount.toString());
+	}
+
+	if (recipient) {
+		builder = builder.recipientId(recipient);
+	}
+
+	builder = builder.gasLimit(gasLimit ?? 100_000).payload(payload);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
