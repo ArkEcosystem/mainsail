@@ -28,7 +28,6 @@
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
-		"@mainsail/crypto-address-bech32m": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
