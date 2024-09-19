@@ -73,6 +73,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				gasLimit: BigInt(evmCall.gasLimit),
 				nonce: transaction.data.nonce.toBigInt(),
 				gasPrice: transaction.data.fee.toBigInt(),
+				nonce: transaction.data.nonce.toBigInt(),
 				recipient: transaction.data.recipientId,
 				sequence: transaction.data.sequence,
 				specId: evmSpec,
