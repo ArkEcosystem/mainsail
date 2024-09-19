@@ -70,14 +70,8 @@ jobs:
               run: cd packages/core && pnpm run test
             - name: Test crypto-address-base58
               run: cd packages/crypto-address-base58 && pnpm run test
-            - name: Test crypto-address-bech32
-              run: cd packages/crypto-address-bech32 && pnpm run test
-            - name: Test crypto-address-bech32m
-              run: cd packages/crypto-address-bech32m && pnpm run test
             - name: Test crypto-address-keccak256
               run: cd packages/crypto-address-keccak256 && pnpm run test
-            - name: Test crypto-address-ss58
-              run: cd packages/crypto-address-ss58 && pnpm run test
             - name: Test crypto-block
               run: cd packages/crypto-block && pnpm run test
             - name: Test crypto-commit
@@ -88,10 +82,6 @@ jobs:
               run: cd packages/crypto-consensus-bls12-381 && pnpm run test
             - name: Test crypto-hash-bcrypto
               run: cd packages/crypto-hash-bcrypto && pnpm run test
-            - name: Test crypto-hash-noble
-              run: cd packages/crypto-hash-noble && pnpm run test
-            - name: Test crypto-hash-wasm
-              run: cd packages/crypto-hash-wasm && pnpm run test
             - name: Test crypto-key-pair-bls12-381
               run: cd packages/crypto-key-pair-bls12-381 && pnpm run test
             - name: Test crypto-key-pair-ecdsa
@@ -104,14 +94,8 @@ jobs:
               run: cd packages/crypto-messages && pnpm run test
             - name: Test crypto-signature-bls12-381
               run: cd packages/crypto-signature-bls12-381 && pnpm run test
-            - name: Test crypto-signature-ecdsa
-              run: cd packages/crypto-signature-ecdsa && pnpm run test
-            - name: Test crypto-signature-ed25519
-              run: cd packages/crypto-signature-ed25519 && pnpm run test
             - name: Test crypto-signature-schnorr
               run: cd packages/crypto-signature-schnorr && pnpm run test
-            - name: Test crypto-signature-schnorr-secp256k1
-              run: cd packages/crypto-signature-schnorr-secp256k1 && pnpm run test
             - name: Test crypto-transaction
               run: cd packages/crypto-transaction && pnpm run test
             - name: Test crypto-transaction-evm-call
