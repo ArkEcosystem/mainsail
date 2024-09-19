@@ -1,6 +1,7 @@
 import { Contracts } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
+import { BigNumberish } from "ethers";
 
 export interface Context {
 	sandbox: Sandbox;
@@ -59,4 +60,5 @@ export interface EvmCallOptions extends TransactionOptions {
 	gasLimit?: number;
 	payload?: string;
 	recipient?: string;
+	amount?: BigNumberish;
 }
