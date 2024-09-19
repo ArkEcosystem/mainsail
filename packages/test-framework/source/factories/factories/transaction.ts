@@ -1,90 +1,97 @@
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
+import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
+import { BigNumber } from "@mainsail/utils";
 
+import secrets from "../../internal/passphrases.json";
 import { FactoryBuilder } from "../factory-builder.js";
+import {
+	TransactionOptions,
+	TransferOptions,
+} from "../types.js";
+import { generateApp } from "./generate-app.js";
 
+const AMOUNT = 1;
+const FEE = 1;
 
+interface EntityOptions<T extends TransactionBuilder<T>> {
+	entity: TransactionBuilder<T>;
+	options: TransactionOptions;
+}
 
-// const AMOUNT = 1;
-// const FEE = 1;
+const sign = async <T extends TransactionBuilder<T>>({
+	entity,
+	options,
+}: EntityOptions<T>): Promise<TransactionBuilder<T>> => entity.sign(options.passphrase || secrets[0]);
 
-// interface EntityOptions<T extends TransactionBuilder<T>> {
-// 	entity: TransactionBuilder<T>;
-// 	options: TransactionOptions;
-// }
+const multiSign = async <T extends TransactionBuilder<T>>({
+	entity,
+	options,
+}: EntityOptions<T>): Promise<TransactionBuilder<T>> => {
+	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
-// const sign = async <T extends TransactionBuilder<T>>({
-// 	entity,
-// 	options,
-// }: EntityOptions<T>): Promise<TransactionBuilder<T>> => entity.sign(options.passphrase || secrets[0]);
+	for (const [index, passphrase] of passphrases.entries()) {
+		await entity.multiSign(passphrase, index);
+	}
 
-// const multiSign = async <T extends TransactionBuilder<T>>({
-// 	entity,
-// 	options,
-// }: EntityOptions<T>): Promise<TransactionBuilder<T>> => {
-// 	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
+	return entity;
+};
 
-// 	for (const [index, passphrase] of passphrases.entries()) {
-// 		await entity.multiSign(passphrase, index);
-// 	}
+const applyModifiers = <T extends TransactionBuilder<T>>(
+	entity: TransactionBuilder<T>,
+	options: TransactionOptions,
+): TransactionBuilder<T> => {
+	entity.fee(BigNumber.make(options.fee || FEE).toFixed());
 
-// 	return entity;
-// };
+	if (options.version) {
+		entity.version(options.version);
+	}
 
-// const applyModifiers = <T extends TransactionBuilder<T>>(
-// 	entity: TransactionBuilder<T>,
-// 	options: TransactionOptions,
-// ): TransactionBuilder<T> => {
-// 	entity.fee(BigNumber.make(options.fee || FEE).toFixed());
+	if (entity.data.version && options.nonce) {
+		entity.nonce(options.nonce);
+	}
 
-// 	if (options.version) {
-// 		entity.version(options.version);
-// 	}
+	if (options.timestamp) {
+		entity.data.timestamp = options.timestamp;
+	}
 
-// 	if (entity.data.version && options.nonce) {
-// 		entity.nonce(options.nonce);
-// 	}
+	if (options.senderPublicKey) {
+		entity.senderPublicKey(options.senderPublicKey);
+	}
 
-// 	if (options.timestamp) {
-// 		entity.data.timestamp = options.timestamp;
-// 	}
+	if (options.recipientId) {
+		entity.recipientId(options.recipientId);
+	}
 
-// 	if (options.senderPublicKey) {
-// 		entity.senderPublicKey(options.senderPublicKey);
-// 	}
+	return entity;
+};
 
-// 	if (options.recipientId) {
-// 		entity.recipientId(options.recipientId);
-// 	}
+export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
+	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {
+		const transferBuilder = app.resolve(EvmCallBuilder);
 
-// 	return entity;
-// };
+		return applyModifiers(
+			transferBuilder
+				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
+				.recipientId(
+					options.recipientId ||
+						(await app
+							.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+							.fromMnemonic(secrets[0])),
+				),
+			options,
+		);
+	});
 
-// export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.Kernel.Application): void => {
-// 	factory.set("Transfer", async ({ options }: { options: TransferOptions }) => {
-// 		const transferBuilder = app.resolve(TransferBuilder);
+	factory
+		.get("Transfer")
+		.state("vendorField", ({ entity, options }) => entity.vendorField(options.vendorField || "Hello World"));
 
-// 		return applyModifiers(
-// 			transferBuilder
-// 				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
-// 				.recipientId(
-// 					options.recipientId ||
-// 						(await app
-// 							.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-// 							.fromMnemonic(secrets[0])),
-// 				),
-// 			options,
-// 		);
-// 	});
-
-// 	factory
-// 		.get("Transfer")
-// 		.state("vendorField", ({ entity, options }) => entity.vendorField(options.vendorField || "Hello World"));
-
-// 	// @ts-ignore
-// 	factory.get("Transfer").state("sign", sign);
-// 	// @ts-ignore
-// 	factory.get("Transfer").state("multiSign", multiSign);
-// };
+	// @ts-ignore
+	factory.get("Transfer").state("sign", sign);
+	// @ts-ignore
+	factory.get("Transfer").state("multiSign", multiSign);
+};
 
 // export const registerValidatorRegistrationFactory = (
 // 	factory: FactoryBuilder,
@@ -248,9 +255,9 @@ export const registerTransactionFactory = async (
 	factory: FactoryBuilder,
 	config: Contracts.Crypto.NetworkConfigPartial,
 ): Promise<void> => {
-	// const app = await generateApp(config);
+	const app = await generateApp(config);
 
-	// registerTransferFactory(factory, app);
+	registerTransferFactory(factory, app);
 	// registerValidatorRegistrationFactory(factory, app);
 	// registerValidatorResignationFactory(factory, app);
 	// registerVoteFactory(factory, app);
