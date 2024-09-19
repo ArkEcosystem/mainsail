@@ -79,7 +79,7 @@ export class GenesisBlockGenerator extends Generator {
 		recipient: Wallet,
 		amount: string,
 		pubKeyHash: number,
-		nonce = 1,
+		nonce = 0,
 	): Promise<Contracts.Crypto.Transaction> {
 		return await (
 			await this.app
@@ -105,7 +105,7 @@ export class GenesisBlockGenerator extends Generator {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, recipient] of recipients.entries()) {
-			result.push(await this.#createTransferTransaction(sender, recipient, amount, pubKeyHash, index + 1));
+			result.push(await this.#createTransferTransaction(sender, recipient, amount, pubKeyHash, index));
 		}
 
 		return result;
@@ -129,7 +129,7 @@ export class GenesisBlockGenerator extends Generator {
 					.resolve(EvmCallBuilder)
 					.network(pubKeyHash)
 					.recipientId(consensusContractAddress)
-					.nonce("1") // validator registration tx is always the first one from sender
+					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
 					.gasLimit(500_000)
 					.sign(sender.passphrase)
@@ -155,7 +155,7 @@ export class GenesisBlockGenerator extends Generator {
 					.resolve(EvmCallBuilder)
 					.network(pubKeyHash)
 					.recipientId(consensusContractAddress)
-					.nonce("2") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
+					.nonce("1") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
 					.payload(data)
 					.gasLimit(200_000)
 					.sign(sender.passphrase)

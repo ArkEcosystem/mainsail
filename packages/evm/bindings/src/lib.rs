@@ -1,7 +1,10 @@
 use std::{collections::HashMap, path::PathBuf, sync::Arc, u64};
 
 use ctx::{
-    BlockContext, CalculateTopValidatorsContext, ExecutionContext, GenesisContext, JsCalculateTopValidatorsContext, JsCommitKey, JsGenesisContext, JsPrepareNextCommitContext, JsTransactionContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext
+    BlockContext, CalculateTopValidatorsContext, ExecutionContext, GenesisContext,
+    JsCalculateTopValidatorsContext, JsCommitKey, JsGenesisContext, JsPrepareNextCommitContext,
+    JsTransactionContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
+    PrepareNextCommitContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
 use mainsail_evm_core::{
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
@@ -134,7 +137,7 @@ impl EvmInner {
         Ok(())
     }
 
-	pub fn calculate_top_validators(
+    pub fn calculate_top_validators(
         &mut self,
         ctx: CalculateTopValidatorsContext,
     ) -> std::result::Result<(), EVMError<String>> {
@@ -147,56 +150,54 @@ impl EvmInner {
             ctx.commit_key
         );
 
-		let genesis_info = self
-		.persistent_db
-		.genesis_info
-		.as_ref()
-		.expect("genesis info")
-		.clone();
+        let genesis_info = self
+            .persistent_db
+            .genesis_info
+            .as_ref()
+            .expect("genesis info")
+            .clone();
 
+        let abi = ethers_contract::BaseContract::from(
+            ethers_core::abi::parse_abi(&["function calculateTopValidators(uint8 n) external"])
+                .expect("encode abi"),
+        );
 
-		let abi = ethers_contract::BaseContract::from(
-			ethers_core::abi::parse_abi(&[
-				"function calculateTopValidators(uint8 n) external",
-			])
-			.expect("encode abi"),
-		);
+        // encode abi into Bytes
+        let calldata = abi
+            .encode("calculateTopValidators", ctx.active_validators)
+            .expect("encode calculateTopValidators");
 
-		// encode abi into Bytes
-		let calldata = abi
-			.encode("calculateTopValidators", ctx.active_validators)
-			.expect("encode calculateTopValidators");
-
-
-		match self.transact_evm(ExecutionContext {
-			block_context: Some(BlockContext {
-				commit_key: ctx.commit_key,
-				gas_limit: U256::MAX,
-				timestamp: ctx.timestamp,
-				validator_address: ctx.validator_address,
-			}),
-			caller: genesis_info.deployer_account,
-			recipient: Some(genesis_info.validator_contract),
-			data: revm::primitives::Bytes::from(calldata.0),
-			value: U256::ZERO,
-			gas_limit: Some(u64::MAX),
-			spec_id: ctx.spec_id,
-			tx_hash: None,
-		}) {
-			Ok(receipt) => {
-				println!(
-					"calculate_top_validators {:?} {:?}",
-					ctx.commit_key, receipt
-				);
-				assert!(receipt.is_success(), "calculate_top_validators unsuccessful");
-				Ok(())
-			}
-			Err(err) => {
-				Err(EVMError::Database(
-					format!("calculate_top_validators failed: {}", err).into(),
-				))
-			}
-		}
+        match self.transact_evm(ExecutionContext {
+            block_context: Some(BlockContext {
+                commit_key: ctx.commit_key,
+                gas_limit: U256::MAX,
+                timestamp: ctx.timestamp,
+                validator_address: ctx.validator_address,
+            }),
+            caller: genesis_info.deployer_account,
+            recipient: Some(genesis_info.validator_contract),
+            data: revm::primitives::Bytes::from(calldata.0),
+            value: U256::ZERO,
+            nonce: None,
+            gas_limit: Some(u64::MAX),
+            spec_id: ctx.spec_id,
+            tx_hash: None,
+        }) {
+            Ok(receipt) => {
+                println!(
+                    "calculate_top_validators {:?} {:?}",
+                    ctx.commit_key, receipt
+                );
+                assert!(
+                    receipt.is_success(),
+                    "calculate_top_validators unsuccessful"
+                );
+                Ok(())
+            }
+            Err(err) => Err(EVMError::Database(
+                format!("calculate_top_validators failed: {}", err).into(),
+            )),
+        }
     }
 
     pub fn update_rewards_and_votes(
@@ -257,6 +258,7 @@ impl EvmInner {
                     recipient: Some(genesis_info.validator_contract),
                     data: revm::primitives::Bytes::from(calldata.0),
                     value: U256::ZERO,
+                    nonce: None,
                     gas_limit: Some(u64::MAX),
                     spec_id: ctx.spec_id,
                     tx_hash: None,
@@ -491,6 +493,7 @@ impl EvmInner {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
+                tx_env.nonce = ctx.nonce;
                 tx_env.transact_to = match ctx.recipient {
                     Some(recipient) => revm::primitives::TransactTo::Call(recipient),
                     None => revm::primitives::TransactTo::Create,
@@ -797,7 +800,7 @@ impl JsEvmWrapper {
         }
     }
 
-	async fn calculate_top_validators_async(
+    async fn calculate_top_validators_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         ctx: CalculateTopValidatorsContext,
     ) -> Result<()> {

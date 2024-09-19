@@ -74,7 +74,13 @@ describe<{
 
 		assert.true(receipt.success);
 		assert.equal(receipt.deployedContractAddress, "0x69230f08D82f095aCB9BE4B21043B502b712D3C1");
-		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+		await instance.onCommit({
+			height: BigInt(0),
+			round: BigInt(0),
+			getBlock: () => ({
+				data: { height: BigInt(0), round: BigInt(0) },
+			}),
+		} as any);
 
 		const encodedCall = iface.encodeFunctionData("emitGlobals");
 		({ receipt } = await instance.process({
@@ -124,7 +130,13 @@ describe<{
 			...deployConfig,
 		});
 
-		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+		await instance.onCommit({
+			height: BigInt(0),
+			round: BigInt(0),
+			getBlock: () => ({
+				data: { height: BigInt(0), round: BigInt(0) },
+			}),
+		} as any);
 
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
@@ -151,7 +163,13 @@ describe<{
 			...transferConfig,
 		}));
 
-		await instance.onCommit({ height: BigInt(1), round: BigInt(0) } as any);
+		await instance.onCommit({
+			height: BigInt(1),
+			round: BigInt(0),
+			getBlock: () => ({
+				data: { height: BigInt(1), round: BigInt(0) },
+			}),
+		} as any);
 
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 52_222n);
@@ -208,7 +226,12 @@ describe<{
 		const contractAddress = receipt.deployedContractAddress;
 		assert.defined(contractAddress);
 
-		await instance.onCommit(commitKey as any);
+		await instance.onCommit({
+			...commitKey,
+			getBlock: () => ({
+				data: { ...commitKey },
+			}),
+		} as any);
 
 		//
 
@@ -250,9 +273,25 @@ describe<{
 		});
 
 		// Commit (1,0) fails since it was overwritten
-		await assert.rejects(async () => instance.onCommit(commitKey1 as any), "invalid commit key");
+		await assert.rejects(
+			async () =>
+				instance.onCommit({
+					...commitKey1,
+					getBlock: () => ({
+						data: { ...commitKey1 },
+					}),
+				} as any),
+			"invalid commit key",
+		);
 		// Commit (1,1) succeeds
-		await assert.resolves(async () => instance.onCommit(commitKey2 as any));
+		await assert.resolves(async () =>
+			instance.onCommit({
+				...commitKey2,
+				getBlock: () => ({
+					data: { ...commitKey2 },
+				}),
+			} as any),
+		);
 
 		// Balance updated correctly
 		const balance = await getBalance(instance, contractAddress!, recipient.address);
@@ -260,7 +299,16 @@ describe<{
 	});
 
 	it("should not throw when commit is empty", async ({ instance }) => {
-		await assert.resolves(async () => await instance.onCommit({ height: 0, round: 0 } as any));
+		await assert.resolves(
+			async () =>
+				await instance.onCommit({
+					height: 0,
+					round: 0,
+					getBlock: () => ({
+						data: { height: 0, round: 0 },
+					}),
+				} as any),
+		);
 	});
 
 	it("should throw on invalid tx context caller", async ({ instance }) => {
@@ -296,7 +344,12 @@ describe<{
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 		assert.length(receipt.logs, 1);
 
-		await instance.onCommit(commitKey as any);
+		await instance.onCommit({
+			...commitKey,
+			getBlock: () => ({
+				data: { ...commitKey },
+			}),
+		} as any);
 
 		const prevReceipt = receipt;
 
@@ -312,8 +365,7 @@ describe<{
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
-		assert.length(receipt.logs, 1);
-		assert.equal(receipt, prevReceipt);
+		assert.empty(receipt.logs);
 	});
 
 	it("should throw when passing non-existent tx hash for committed receipt", async ({ instance }) => {
@@ -331,7 +383,12 @@ describe<{
 			...deployConfig,
 		});
 
-		await instance.onCommit(commitKey as any);
+		await instance.onCommit({
+			...commitKey,
+			getBlock: () => ({
+				data: { ...commitKey },
+			}),
+		} as any);
 
 		const randomTxHash = getRandomTxHash();
 
@@ -359,7 +416,13 @@ describe<{
 			...deployConfig,
 		});
 
-		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+		await instance.onCommit({
+			height: BigInt(0),
+			round: BigInt(0),
+			getBlock: () => ({
+				data: { height: BigInt(0), round: BigInt(0) },
+			}),
+		} as any);
 
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
@@ -406,7 +469,13 @@ describe<{
 		const balanceBefore = await getBalance(instance, contractAddress!, recipient.address);
 		assert.equal(ethers.parseEther("0"), balanceBefore);
 
-		await instance.onCommit({ height: BigInt(1), round: BigInt(0) } as any);
+		await instance.onCommit({
+			height: BigInt(1),
+			round: BigInt(0),
+			getBlock: () => ({
+				data: { height: BigInt(1), round: BigInt(0) },
+			}),
+		} as any);
 
 		// Balance updated correctly
 		const balanceAfteer = await getBalance(instance, contractAddress!, recipient.address);
@@ -477,7 +546,14 @@ describe<{
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 			...deployConfig,
 		});
-		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
+		await instance.onCommit({
+			height: BigInt(0),
+			round: BigInt(0),
+			getBlock: () => ({
+				data: { height: BigInt(0), round: BigInt(0) },
+			}),
+		} as any);
 
 		code = await instance.codeAt(receipt.deployedContractAddress!);
 		assert.equal(code.slice(0, 16), MainsailERC20.bytecode.slice(0, 16));
@@ -516,7 +592,14 @@ describe<{
 			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 			...deployConfig,
 		});
-		await instance.onCommit({ height: BigInt(0), round: BigInt(0) } as any);
+
+		await instance.onCommit({
+			height: BigInt(0),
+			round: BigInt(0),
+			getBlock: () => ({
+				data: { height: BigInt(0), round: BigInt(0) },
+			}),
+		} as any);
 
 		// look up slot containing user balance
 		//
