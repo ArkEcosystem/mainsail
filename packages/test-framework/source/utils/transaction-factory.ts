@@ -120,7 +120,6 @@ export class TransactionFactory {
 	// 	return this;
 	// }
 
-
 	public withFee(fee: number): TransactionFactory {
 		this.#fee = BigNumber.make(fee);
 

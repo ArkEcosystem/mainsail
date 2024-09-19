@@ -225,7 +225,7 @@ describe<{
 						Contracts.Crypto.TransactionType.EvmCall,
 						Contracts.Crypto.TransactionTypeGroup.Core,
 					),
-				)
+				),
 			]),
 		);
 	});
