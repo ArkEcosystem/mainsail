@@ -1725,6 +1725,9 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
