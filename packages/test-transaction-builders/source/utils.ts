@@ -84,7 +84,7 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 		const nonce = await getNonceByPublicKey(sandbox, multiSigPublicKey);
 
 		const { multiSigKeys, nonceOffset = 0 } = options;
-		builder = builder.nonce(nonce.plus(1 + nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
+		builder = builder.nonce(nonce.plus(nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
 
 		for (const [index, participant] of multiSigKeys.entries()) {
 			builder = await builder.multiSignWithKeyPair(participant, index);
@@ -92,7 +92,7 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	} else {
 		const nonce = await getNonceByPublicKey(sandbox, keyPair.publicKey);
 		const { nonceOffset = 0 } = options;
-		builder = await builder.nonce(nonce.plus(1 + nonceOffset).toString()).signWithKeyPair(keyPair);
+		builder = await builder.nonce(nonce.plus(nonceOffset).toString()).signWithKeyPair(keyPair);
 	}
 
 	const transaction = await builder.build();
