@@ -71,12 +71,12 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				caller: sender.getAddress(),
 				data: Buffer.from(evmCall.payload, "hex"),
 				gasLimit: BigInt(evmCall.gasLimit),
+				nonce: transaction.data.nonce.toBigInt(),
 				recipient: transaction.data.recipientId,
 				sequence: transaction.data.sequence,
 				specId: evmSpec,
 				txHash: transaction.id,
 				value: transaction.data.amount.toBigInt(),
-				nonce: transaction.data.nonce.toBigInt(),
 			});
 
 			// Subtract native fee from sender based on actual consumed gas
