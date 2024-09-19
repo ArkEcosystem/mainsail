@@ -8,7 +8,6 @@ async function run() {
 	const configCore = path.join(paths.config, "core");
 	console.log(paths, configCore);
 
-
 	const app = await makeApplication(configCore, {});
 	const generator = app.get(Identifiers.ConfigurationGenerator);
 
