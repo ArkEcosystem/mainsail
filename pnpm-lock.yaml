@@ -646,18 +646,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
-      '@mainsail/crypto-transaction-username-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-registration
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../crypto-transaction-vote
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -912,30 +900,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
-      '@mainsail/crypto-transaction-username-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-registration
-      '@mainsail/crypto-transaction-username-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-resignation
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../crypto-transaction-vote
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1330,9 +1294,9 @@ importers:
       '@mainsail/crypto-signature-schnorr':
         specifier: workspace:*
         version: link:../crypto-signature-schnorr
-      '@mainsail/crypto-transaction-transfer':
+      '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
-        version: link:../crypto-transaction-transfer
+        version: link:../crypto-transaction-evm-call
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1761,9 +1725,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -1975,323 +1936,6 @@ importers:
       ethers:
         specifier: ^6.11.0
         version: 6.13.1
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-multi-payment:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      ajv:
-        specifier: 8.12.0
-        version: 8.12.0
-    devDependencies:
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-multi-signature-registration:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-transfer:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-username-registration:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-username-resignation:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-username-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-registration
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-validator-registration:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../crypto-consensus-bls12-381
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-validator-resignation:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/crypto-transaction-vote:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      ajv:
-        specifier: 8.12.0
-        version: 8.12.0
-    devDependencies:
-      '@mainsail/crypto-address-bech32m':
-        specifier: workspace:*
-        version: link:../crypto-address-bech32m
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
-        specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../crypto-validation
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../validation
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
@@ -3226,24 +2870,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../crypto-transaction-vote
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
@@ -3372,30 +2998,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../crypto-transaction-transfer
-      '@mainsail/crypto-transaction-username-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-registration
-      '@mainsail/crypto-transaction-username-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-username-resignation
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../crypto-transaction-vote
       '@mainsail/evm-development':
         specifier: workspace:*
         version: link:../evm-development
@@ -3827,30 +3429,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction-evm-call
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-transfer
-      '@mainsail/crypto-transaction-username-registration':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-username-registration
-      '@mainsail/crypto-transaction-username-resignation':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-username-resignation
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-vote
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation
@@ -3998,30 +3576,6 @@ importers:
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction-evm-call
-      '@mainsail/crypto-transaction-multi-payment':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-multi-payment
-      '@mainsail/crypto-transaction-multi-signature-registration':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-multi-signature-registration
-      '@mainsail/crypto-transaction-transfer':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-transfer
-      '@mainsail/crypto-transaction-username-registration':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-username-registration
-      '@mainsail/crypto-transaction-username-resignation':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-username-resignation
-      '@mainsail/crypto-transaction-validator-registration':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-validator-registration
-      '@mainsail/crypto-transaction-validator-resignation':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-validator-resignation
-      '@mainsail/crypto-transaction-vote':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-vote
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../../../packages/crypto-validation

@@ -1,11 +1,5 @@
 import { inject, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { MultiPaymentBuilder } from "@mainsail/crypto-transaction-multi-payment";
-import { MultiSignatureBuilder } from "@mainsail/crypto-transaction-multi-signature-registration";
-import { TransferBuilder } from "@mainsail/crypto-transaction-transfer";
-import { ValidatorRegistrationBuilder } from "@mainsail/crypto-transaction-validator-registration";
-import { ValidatorResignationBuilder } from "@mainsail/crypto-transaction-validator-resignation";
-import { VoteBuilder } from "@mainsail/crypto-transaction-vote";
 import { Utils as AppUtils, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
@@ -23,8 +17,8 @@ export class TransactionFactory {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+	// @inject(Identifiers.Cryptography.Identity.Address.Factory)
+	// private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
 	@tagged("type", "wallet")
@@ -56,87 +50,75 @@ export class TransactionFactory {
 		return new TransactionFactory(app);
 	}
 
-	public async transfer(
-		recipientId?: string,
-		amount: BigNumber = BigNumber.WEI.times(2),
-		vendorField?: string,
-	): Promise<TransactionFactory> {
-		const builder = new TransferBuilder()
-			.amount(amount.toFixed())
-			.recipientId(recipientId || (await this.addressFactory.fromMnemonic(defaultPassphrase)));
+	// public async transfer(
+	// 	recipientId?: string,
+	// 	amount: BigNumber = BigNumber.WEI.times(2),
+	// 	vendorField?: string,
+	// ): Promise<TransactionFactory> {
+	// 	const builder = new TransferBuilder()
+	// 		.amount(amount.toFixed())
+	// 		.recipientId(recipientId || (await this.addressFactory.fromMnemonic(defaultPassphrase)));
 
-		if (vendorField) {
-			builder.vendorField(vendorField);
-		}
+	// 	if (vendorField) {
+	// 		builder.vendorField(vendorField);
+	// 	}
 
-		this.builder = builder;
+	// 	this.builder = builder;
 
-		return this;
-	}
+	// 	return this;
+	// }
 
-	public validatorRegistration(): TransactionFactory {
-		const builder = new ValidatorRegistrationBuilder();
+	// public validatorRegistration(): TransactionFactory {
+	// 	const builder = new ValidatorRegistrationBuilder();
 
-		this.builder = builder;
+	// 	this.builder = builder;
 
-		return this;
-	}
+	// 	return this;
+	// }
 
-	public validatorResignation(): TransactionFactory {
-		this.builder = new ValidatorResignationBuilder();
+	// public validatorResignation(): TransactionFactory {
+	// 	this.builder = new ValidatorResignationBuilder();
 
-		return this;
-	}
+	// 	return this;
+	// }
 
-	public vote(publicKey: string): TransactionFactory {
-		this.builder = new VoteBuilder().votesAsset([publicKey]);
+	// public vote(publicKey: string): TransactionFactory {
+	// 	this.builder = new VoteBuilder().votesAsset([publicKey]);
 
-		return this;
-	}
+	// 	return this;
+	// }
 
-	public unvote(publicKey: string): TransactionFactory {
-		this.builder = new VoteBuilder().unvotesAsset([publicKey]);
+	// public unvote(publicKey: string): TransactionFactory {
+	// 	this.builder = new VoteBuilder().unvotesAsset([publicKey]);
 
-		return this;
-	}
+	// 	return this;
+	// }
 
-	public async multiSignature(participants?: string[], min?: number): Promise<TransactionFactory> {
-		let passphrases: string[] | undefined;
-		if (!participants) {
-			passphrases = [secrets[0], secrets[1], secrets[2]];
-		}
+	// public async multiSignature(participants?: string[], min?: number): Promise<TransactionFactory> {
+	// 	let passphrases: string[] | undefined;
+	// 	if (!participants) {
+	// 		passphrases = [secrets[0], secrets[1], secrets[2]];
+	// 	}
 
-		participants = participants || [
-			await this.publicKeyFactory.fromMnemonic(secrets[0]),
-			await this.publicKeyFactory.fromMnemonic(secrets[1]),
-			await this.publicKeyFactory.fromMnemonic(secrets[2]),
-		];
+	// 	participants = participants || [
+	// 		await this.publicKeyFactory.fromMnemonic(secrets[0]),
+	// 		await this.publicKeyFactory.fromMnemonic(secrets[1]),
+	// 		await this.publicKeyFactory.fromMnemonic(secrets[2]),
+	// 	];
 
-		this.builder = new MultiSignatureBuilder().multiSignatureAsset({
-			min: min || participants.length,
-			publicKeys: participants,
-		});
+	// 	this.builder = new MultiSignatureBuilder().multiSignatureAsset({
+	// 		min: min || participants.length,
+	// 		publicKeys: participants,
+	// 	});
 
-		if (passphrases) {
-			this.withPassphraseList(passphrases);
-		}
+	// 	if (passphrases) {
+	// 		this.withPassphraseList(passphrases);
+	// 	}
 
-		this.withSenderPublicKey(participants[0]);
+	// 	this.withSenderPublicKey(participants[0]);
 
-		return this;
-	}
-
-	public multiPayment(payments: Array<{ recipientId: string; amount: string }>): TransactionFactory {
-		const builder = new MultiPaymentBuilder();
-
-		for (const payment of payments) {
-			builder.addPayment(payment.recipientId, payment.amount);
-		}
-
-		this.builder = builder;
-
-		return this;
-	}
+	// 	return this;
+	// }
 
 	public withFee(fee: number): TransactionFactory {
 		this.#fee = BigNumber.make(fee);
@@ -271,13 +253,13 @@ export class TransactionFactory {
 				}
 			}
 
-			if (
-				this.builder.constructor.name === "ValidatorRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
-				// always remember the previous username instead generating a new one on each iteration
-				!this.builder.data.asset.validator.username
-			) {
-				this.builder = new ValidatorRegistrationBuilder();
-			}
+			// if (
+			// 	this.builder.constructor.name === "ValidatorRegistrationBuilder" && // @FIXME: when we use any of the "withPassphrase*" methods the builder will
+			// 	// always remember the previous username instead generating a new one on each iteration
+			// 	!this.builder.data.asset.validator.username
+			// ) {
+			// 	// this.builder = new ValidatorRegistrationBuilder();
+			// }
 
 			if (this.#version) {
 				this.builder.version(this.#version);

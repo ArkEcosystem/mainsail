@@ -6,7 +6,7 @@ import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
-import { ServiceProvider as CoreCryptoTransactionTransfer } from "@mainsail/crypto-transaction-transfer";
+import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypto-transaction-evm-call";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreFees } from "@mainsail/fees";
@@ -41,7 +41,7 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreFees).register();
 	await context.sandbox.app.resolve(CoreFeesStatic).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
-	await context.sandbox.app.resolve(CoreCryptoTransactionTransfer).register();
+	await context.sandbox.app.resolve(CoreCryptoTransactionEvmCall).register();
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Serializer).to(Serializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.IDFactory).to(IDFactory);

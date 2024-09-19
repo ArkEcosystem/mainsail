@@ -62,18 +62,18 @@ describe<{
 
 	const blockOriginal = {
 		blockSignature: "123",
-		generatorPublicKey: "a".repeat(66),
+		generatorPublicKey: "0x" + "A".repeat(40),
 		height: 0,
 		id: "1".repeat(64),
 		numberOfTransactions: 0,
 		payloadHash: "123",
 		previousBlock: "0".repeat(64),
-		stateHash: "0".repeat(64),
 		reward: 0,
+		stateHash: "0".repeat(64),
 		timestamp: 0,
-		totalGasUsed: 0,
 		totalAmount: 0,
 		totalFee: 0,
+		totalGasUsed: 0,
 		version: 1,
 	};
 
@@ -149,7 +149,7 @@ describe<{
 		}
 
 		// NOT OK
-		for (const height of ["0", "1", 0.12, 1.234, -1.0, -0.23, null, undefined]) {
+		for (const height of ["0", "1", 0.12, 1.234, -1, -0.23, null, undefined]) {
 			assert.true(
 				validator
 					.validate("blockHeader", {

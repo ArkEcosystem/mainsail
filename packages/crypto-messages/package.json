@@ -37,7 +37,6 @@
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-signature-schnorr": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/crypto-transaction-transfer": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/fees": "workspace:*",

@@ -24,6 +24,9 @@ describe<{
 					height: 0,
 					// @ts-ignore
 					gas: {
+						maximumGasLimit: 2000000,
+						minimumGasFee: 5,
+						minimumGasLimit: 21000,
 						nativeGasLimits: {
 							transfer: 21000,
 							multiPayment: 50000,
