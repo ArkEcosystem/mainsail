@@ -1,7 +1,7 @@
 import { Commands, Contracts, Identifiers as CliIdentifiers, Services } from "@mainsail/cli";
 import { ConfigurationGenerator, Identifiers, makeApplication } from "@mainsail/configuration-generator";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts as AppContracts, Exceptions, Identifiers as AppIdentifiers } from "@mainsail/contracts";
+import { Contracts as AppContracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import envPaths from "env-paths";
 import Joi from "joi";
 import path from "path";
@@ -285,28 +285,8 @@ export class Command extends Commands.Command {
 	}
 
 	#convertFlags(options: Flags): AppContracts.NetworkGenerator.Options {
-		let address;
-		switch (options.address) {
-			case "base58": {
-				address = { base58: options.base58Prefix };
-				break;
-			}
-			case "bech32m": {
-				address = { bech32m: options.bech32mPrefix };
-				break;
-			}
-			case "keccak256": {
-				address = { keccak256: true };
-				break;
-			}
-			default: {
-				throw new Exceptions.NotImplemented(options.address, "#convertFlags");
-			}
-		}
-
 		return {
 			...options,
-			address,
 			peers: options.peers.replace(" ", "").split(","),
 			rewardAmount: options.rewardAmount.toString(),
 		};
