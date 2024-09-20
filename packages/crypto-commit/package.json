@@ -39,8 +39,6 @@
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
-		"@mainsail/fees": "workspace:*",
-		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"uvu": "^0.5.6"

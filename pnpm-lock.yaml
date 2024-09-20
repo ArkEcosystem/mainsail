@@ -649,12 +649,6 @@ importers:
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../evm-gas-fee
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -897,12 +891,6 @@ importers:
       '@mainsail/evm-state':
         specifier: workspace:*
         version: link:../evm-state
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1138,12 +1126,6 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
@@ -1208,12 +1190,6 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
@@ -1528,12 +1504,6 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
@@ -2016,94 +1986,6 @@ importers:
   packages/evm/npm/linux-x64-gnu: {}
 
   packages/evm/npm/linux-x64-musl: {}
-
-  packages/fees:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/fees-burn:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.12.2
-        version: 17.12.2
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/fees-managed:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 17.12.2
-        version: 17.12.2
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/fees-static:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
 
   packages/kernel:
     dependencies:
@@ -2588,12 +2470,6 @@ importers:
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../evm-gas-fee
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -3121,12 +2997,6 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../../../packages/fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../../../packages/fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel
@@ -3262,12 +3132,6 @@ importers:
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../../../packages/evm-service
-      '@mainsail/fees':
-        specifier: workspace:*
-        version: link:../../../packages/fees
-      '@mainsail/fees-static':
-        specifier: workspace:*
-        version: link:../../../packages/fees-static
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../../../packages/kernel

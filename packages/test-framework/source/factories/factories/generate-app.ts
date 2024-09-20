@@ -13,8 +13,6 @@ import { ServiceProvider as CoreEvmCallTransaction } from "@mainsail/crypto-tran
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
-import { ServiceProvider as CoreFees } from "@mainsail/fees";
-import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
@@ -39,8 +37,6 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 	await sandbox.app.resolve(CoreCryptoConsensus).register();
 	await sandbox.app.resolve(CoreEvmGasFee).register();
-	await sandbox.app.resolve(CoreFees).register();
-	await sandbox.app.resolve(CoreFeesStatic).register();
 	await sandbox.app.resolve(CoreCryptoTransaction).register();
 	await sandbox.app.resolve(CoreEvmCallTransaction).register();
 	await sandbox.app.resolve(CoreCryptoBlock).register();
