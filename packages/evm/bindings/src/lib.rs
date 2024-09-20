@@ -351,6 +351,10 @@ impl EvmInner {
                                     ..Default::default()
                                 });
                             }
+                            revm::primitives::InvalidTransaction::NonceTooHigh { .. }
+                            | revm::primitives::InvalidTransaction::NonceTooLow { .. } => {
+                                return Err(EVMError::Transaction(err));
+                            }
                             revm::primitives::InvalidTransaction::LackOfFundForMaxFee {
                                 fee,
                                 balance,
@@ -363,8 +367,6 @@ impl EvmInner {
                             // revm::primitives::InvalidTransaction::RejectCallerWithCode => todo!(),
                             // revm::primitives::InvalidTransaction::OverflowPaymentInTransaction => todo!(),
                             // revm::primitives::InvalidTransaction::NonceOverflowInTransaction => todo!(),
-                            // revm::primitives::InvalidTransaction::NonceTooHigh { tx, state } => todo!(),
-                            // revm::primitives::InvalidTransaction::NonceTooLow { tx, state } => todo!(),
                             // revm::primitives::InvalidTransaction::CreateInitCodeSizeLimit => todo!(),
                             // revm::primitives::InvalidTransaction::InvalidChainId => todo!(),
                             // revm::primitives::InvalidTransaction::AccessListNotSupported => todo!(),
