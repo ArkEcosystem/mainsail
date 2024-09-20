@@ -63,6 +63,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		}
 
 		this.#validators = validators.slice(0, activeValidators);
+		this.#indexByAddress = new Map(this.#validators.map((validator, index) => [validator.address, index]));
 	}
 
 	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWallet[]> {
@@ -92,7 +93,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
-				blsPublicKey,
+				blsPublicKey: blsPublicKey.slice(2),
 				voteBalance,
 			}
 

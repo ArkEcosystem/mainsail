@@ -446,7 +446,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.logger.info(`Found registered proposer: ${roundState.proposer}`);
+		this.logger.info(`Found registered proposer: ${roundState.proposer.address}`);
 
 		this.#proposalPromise = this.#makeProposal(roundState, registeredProposer);
 	}
