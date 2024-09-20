@@ -57,7 +57,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 			for (const proposal of proposals) {
 				const validator = this.validatorSet.getValidator(proposal.validatorIndex);
 				void this.proposalStorage.put(
-					`${proposal.round}-${validator.getConsensusPublicKey()}`,
+					`${proposal.round}-${validator.blsPublicKey}`,
 					proposal.toData(),
 				);
 			}
@@ -70,7 +70,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		await this.prevoteStorage.transaction(() => {
 			for (const prevote of prevotes) {
 				const validator = this.validatorSet.getValidator(prevote.validatorIndex);
-				void this.prevoteStorage.put(`${prevote.round}-${validator.getConsensusPublicKey()}`, prevote.toData());
+				void this.prevoteStorage.put(`${prevote.round}-${validator.blsPublicKey}`, prevote.toData());
 			}
 		});
 
@@ -82,7 +82,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 			for (const precommit of precommits) {
 				const validator = this.validatorSet.getValidator(precommit.validatorIndex);
 				void this.precommitStorage.put(
-					`${precommit.round}-${validator.getConsensusPublicKey()}`,
+					`${precommit.round}-${validator.blsPublicKey}`,
 					precommit.toData(),
 				);
 			}

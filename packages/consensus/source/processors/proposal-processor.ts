@@ -115,7 +115,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		return this.consensusSignature.verify(
 			Buffer.from(proposal.signature, "hex"),
 			await this.messageSerializer.serializeProposal(proposal.toSerializableData(), { includeSignature: false }),
-			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).getConsensusPublicKey(), "hex"),
+			Buffer.from(this.validatorSet.getValidator(proposal.validatorIndex).blsPublicKey, "hex"),
 		);
 	}
 }

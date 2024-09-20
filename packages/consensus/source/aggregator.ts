@@ -43,7 +43,7 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 	): Promise<boolean> {
 		const validatorPublicKeys: Buffer[] = signature.validators
 			.map((v, index) =>
-				v ? Buffer.from(this.validatorSet.getValidator(index).getConsensusPublicKey(), "hex") : undefined,
+				v ? Buffer.from(this.validatorSet.getValidator(index).blsPublicKey, "hex") : undefined,
 			)
 			.filter((item): item is Buffer => !!item);
 

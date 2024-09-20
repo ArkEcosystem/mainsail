@@ -33,8 +33,8 @@ export class RoundController extends Controller {
 			validators: orderedValidators.map((validator) => ({
 				wallet: validator.toString(),
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-				rank: validator.getVoteBalance().toFixed(),
-				voteBalance: validator.getRank(),
+				// rank: validator.getVoteBalance().toFixed(),
+				voteBalance: validator.voteBalance.toFixed(),
 			})),
 		};
 	}

@@ -1,11 +1,11 @@
 import { AggregatedSignature, Commit, Precommit, Prevote, Proposal } from "../crypto/index.js";
 import { ProcessableUnit } from "../processor.js";
-import { ValidatorWalletOld } from "../state/index.js";
+import { ValidatorWallet } from "../state/index.js";
 import { Step } from "./enums.js";
 
 export interface RoundState extends ProcessableUnit {
 	readonly validators: string[];
-	readonly proposer: ValidatorWalletOld;
+	readonly proposer: ValidatorWallet;
 	getProposal(): Proposal | undefined;
 	hasProposal(): boolean;
 	hasPrevote(validatorIndex: number): boolean;
@@ -23,7 +23,7 @@ export interface RoundState extends ProcessableUnit {
 	getPrecommit(validatorIndex: number): Precommit | undefined;
 	getPrevotes(): Prevote[];
 	getPrecommits(): Precommit[];
-	getValidator(consensusPublicKey: string): ValidatorWalletOld;
+	getValidator(consensusPublicKey: string): ValidatorWallet;
 	getValidatorsSignedPrevote(): readonly boolean[];
 	getValidatorsSignedPrecommit(): readonly boolean[];
 	aggregatePrevotes(): Promise<AggregatedSignature>;

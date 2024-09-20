@@ -57,7 +57,7 @@ export class PrevoteProcessor extends AbstractProcessor implements Contracts.Con
 			"verify",
 			Buffer.from(prevote.signature, "hex"),
 			await this.serializer.serializePrevoteForSignature(prevote),
-			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).getConsensusPublicKey(), "hex"),
+			Buffer.from(this.validatorSet.getValidator(prevote.validatorIndex).blsPublicKey, "hex"),
 		);
 	}
 }

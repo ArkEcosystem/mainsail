@@ -33,10 +33,10 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<number, Contracts.Crypto.Precommit>();
 	#precommitsCount = new Map<string | undefined, number>();
-	#validators = new Map<string, Contracts.State.ValidatorWalletOld>();
+	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 	#validatorsSignedPrevote: boolean[] = [];
 	#validatorsSignedPrecommit: boolean[] = [];
-	#proposer!: Contracts.State.ValidatorWalletOld;
+	#proposer!: Contracts.State.ValidatorWallet;
 
 	#commit: Contracts.Crypto.Commit | undefined;
 	#store!: Contracts.State.Store;
@@ -62,7 +62,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return [...this.#validators.keys()];
 	}
 
-	public get proposer(): Contracts.State.ValidatorWalletOld {
+	public get proposer(): Contracts.State.ValidatorWallet {
 		return this.#proposer;
 	}
 
@@ -76,7 +76,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 		const validators = this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
-			const consensusPublicKey = validator.getConsensusPublicKey();
+			const consensusPublicKey = validator.blsPublicKey;
 			this.#validators.set(consensusPublicKey, validator);
 			this.#validatorsSignedPrecommit.push(false);
 			this.#validatorsSignedPrevote.push(false);
@@ -89,9 +89,9 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this;
 	}
 
-	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWalletOld {
+	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWallet{
 		const validator = this.#validators.get(consensusPublicKey);
-		Utils.assert.defined<Contracts.State.ValidatorWalletOld>(validator);
+		Utils.assert.defined<Contracts.State.ValidatorWallet>(validator);
 		return validator;
 	}
 
@@ -262,7 +262,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		for (const key of this.#prevotesCount.keys()) {
 			const voters = [...this.#prevotes.values()]
 				.filter((prevote) => prevote.blockId === key)
-				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).getWallet().getAddress());
+				.map((prevote) => this.validatorSet.getValidator(prevote.validatorIndex).address);
 
 			this.logger.debug(`Block ${key ?? "null"} prevoted by: ${voters.join(", ")}`);
 		}
@@ -272,7 +272,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		for (const key of this.#precommitsCount.keys()) {
 			const voters = [...this.#precommits.values()]
 				.filter((precommit) => precommit.blockId === key)
-				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).getWallet().getAddress());
+				.map((precommit) => this.validatorSet.getValidator(precommit.validatorIndex).address);
 
 			this.logger.debug(`Block ${key ?? "null"} precommitted by: ${voters.join(", ")}`);
 		}

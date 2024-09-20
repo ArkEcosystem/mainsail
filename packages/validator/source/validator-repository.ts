@@ -40,9 +40,9 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		const resigned: string[] = [];
 		const notRegistered: string[] = [];
 
-		for (const consensusPublicKey of this.#validators.keys()) {
+		for (const blsPublicKey of this.#validators.keys()) {
 			const validator = validators.find(
-				(validator) => validator.getAttribute("validatorPublicKey") === consensusPublicKey,
+				(validator) => validator.getAttribute("validatorPublicKey") === blsPublicKey,
 			);
 
 			if (validator) {
@@ -51,7 +51,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 				}
 				if (
 					activeValidators.some(
-						(activeValidator) => activeValidator.getConsensusPublicKey() === consensusPublicKey,
+						(activeValidator) => activeValidator.blsPublicKey === blsPublicKey,
 					)
 				) {
 					active.push(validator.toString());
@@ -59,7 +59,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 					standBy.push(validator.toString());
 				}
 			} else {
-				notRegistered.push(consensusPublicKey);
+				notRegistered.push(blsPublicKey);
 			}
 		}
 

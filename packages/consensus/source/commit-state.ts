@@ -12,7 +12,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#store!: Contracts.State.Store;
 	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
-	#validators = new Map<string, Contracts.State.ValidatorWalletOld>();
+	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 
 	@postConstruct()
 	public initialize(): void {
@@ -44,7 +44,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 
 		const validators = this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
-			const consensusPublicKey = validator.getConsensusPublicKey();
+			const consensusPublicKey = validator.blsPublicKey;
 			this.#validators.set(consensusPublicKey, validator);
 		}
 
