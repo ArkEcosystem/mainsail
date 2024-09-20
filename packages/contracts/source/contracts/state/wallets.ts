@@ -62,20 +62,6 @@ export interface Wallet extends Omit<StateRepository, "fromJson" | "commitChange
 	toString(): string;
 }
 
-export interface ValidatorWalletOld {
-	getWallet(): Wallet;
-	getConsensusPublicKey(): string;
-	getVoteBalance(): BigNumber;
-	getRank(): number;
-	setRank(rank: number): void;
-	unsetRank(): void;
-	getApproval(): number;
-	setApproval(approval: number): void;
-	unsetApproval(): void;
-	isResigned(): boolean;
-	toString(): string;
-}
-
 export interface ValidatorWallet {
 	address: string;
 	blsPublicKey: string;
@@ -83,8 +69,6 @@ export interface ValidatorWallet {
 }
 
 export type WalletFactory = (address: string, walletRepository: WalletRepository, wallet?: Wallet) => Wallet;
-
-export type ValidatorWalletFactory = (wallet: Wallet) => ValidatorWalletOld;
 
 export interface WalletValidatorAttributes {
 	username: string;
