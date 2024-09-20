@@ -167,6 +167,10 @@ impl EvmInner {
             .encode("calculateTopValidators", ctx.active_validators)
             .expect("encode calculateTopValidators");
 
+        let nonce = self
+            .get_account_nonce(genesis_info.deployer_account)
+            .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
+
         match self.transact_evm(ExecutionContext {
             block_context: Some(BlockContext {
                 commit_key: ctx.commit_key,
@@ -178,7 +182,7 @@ impl EvmInner {
             recipient: Some(genesis_info.validator_contract),
             data: revm::primitives::Bytes::from(calldata.0),
             value: U256::ZERO,
-            nonce: None,
+            nonce: Some(nonce),
             gas_limit: Some(u64::MAX),
             gas_price: None,
             spec_id: ctx.spec_id,
@@ -248,6 +252,12 @@ impl EvmInner {
                     .encode("updateVoters", voters.clone())
                     .expect("encode updateVoters");
 
+                let nonce = self
+                    .get_account_nonce(genesis_info.deployer_account)
+                    .map_err(|err| {
+                        EVMError::Database(format!("get_account_nonce: {err}").into())
+                    })?;
+
                 match self.transact_evm(ExecutionContext {
                     block_context: Some(BlockContext {
                         commit_key: ctx.commit_key,
@@ -259,7 +269,7 @@ impl EvmInner {
                     recipient: Some(genesis_info.validator_contract),
                     data: revm::primitives::Bytes::from(calldata.0),
                     value: U256::ZERO,
-                    nonce: None,
+                    nonce: Some(nonce),
                     gas_limit: Some(u64::MAX),
                     gas_price: None,
                     spec_id: ctx.spec_id,
@@ -274,12 +284,12 @@ impl EvmInner {
                         Ok(())
                     }
                     Err(err) => Err(EVMError::Database(
-                        format!("vote_update failed: {}", err).into(),
+                        format!("vote_update failed: {err}").into(),
                     )),
                 }
             }
             Err(err) => Err(EVMError::Database(
-                format!("apply_rewards failed: {}", err).into(),
+                format!("apply_rewards failed: {err}").into(),
             )),
         }
     }
@@ -543,6 +553,27 @@ impl EvmInner {
             }
             Err(err) => Err(err),
         }
+    }
+
+    fn get_account_nonce(
+        &mut self,
+        account: Address,
+    ) -> std::result::Result<u64, mainsail_evm_core::db::Error> {
+        if let Some(pending) = &self.pending_commit {
+            if pending.cache.accounts.contains_key(&account) {
+                if let Some(cache) = pending.cache.accounts.get(&account) {
+                    if let Some(account) = &cache.account {
+                        return Ok(account.info.nonce);
+                    }
+                }
+            }
+        }
+
+        if let Some(account_info) = self.persistent_db.basic(account)? {
+            return Ok(account_info.nonce);
+        }
+
+        return Ok(Default::default());
     }
 
     fn take_pending_commit(&mut self) -> Option<PendingCommit> {
