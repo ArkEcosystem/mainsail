@@ -15,7 +15,7 @@ pub struct JsTransactionContext {
     pub gas_limit: JsBigInt,
     pub gas_price: Option<JsBigInt>,
     pub value: JsBigInt,
-    pub nonce: Option<JsBigInt>,
+    pub nonce: JsBigInt,
     pub data: JsBuffer,
     pub tx_hash: JsString,
     pub block_context: JsBlockContext,
@@ -88,7 +88,7 @@ pub struct TxContext {
     pub gas_limit: u64,
     pub gas_price: Option<U256>,
     pub value: U256,
-    pub nonce: Option<u64>,
+    pub nonce: u64,
     pub data: Bytes,
     pub tx_hash: B256,
     pub block_context: BlockContext,
@@ -176,7 +176,7 @@ impl From<TxContext> for ExecutionContext {
             gas_limit: Some(value.gas_limit),
             gas_price: value.gas_price,
             value: value.value,
-            nonce: value.nonce,
+            nonce: Some(value.nonce),
             data: value.data,
             tx_hash: Some(value.tx_hash),
             block_context: Some(value.block_context),
@@ -231,12 +231,6 @@ impl TryFrom<JsTransactionContext> for TxContext {
             None
         };
 
-        let nonce = if let Some(nonce) = value.nonce {
-            Some(nonce.get_u64()?.0)
-        } else {
-            None
-        };
-
         let gas_price = if let Some(gas_price) = value.gas_price {
             Some(utils::convert_bigint_to_u256(gas_price)?)
         } else {
@@ -249,7 +243,7 @@ impl TryFrom<JsTransactionContext> for TxContext {
             gas_price,
             caller: utils::create_address_from_js_string(value.caller)?,
             value: utils::convert_bigint_to_u256(value.value)?,
-            nonce,
+            nonce: value.nonce.get_u64()?.0,
             data: Bytes::from(buf.as_ref().to_owned()),
             tx_hash: B256::try_from(
                 &Bytes::from_str(value.tx_hash.into_utf8()?.as_str()?)?.as_ref()[..],

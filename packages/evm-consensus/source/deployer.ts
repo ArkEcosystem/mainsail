@@ -56,6 +56,8 @@ export class Deployer {
 		const activeValidaotrs = this.configuration.getMilestone(1).activeValidators; // TODO update on milestone change
 
 		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [activeValidaotrs]).slice(2);
+		const nonce = BigInt(this.#nonce);
+
 		const result = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
@@ -64,6 +66,7 @@ export class Deployer {
 				Buffer.from(constructorArguments, "hex"),
 			]),
 			gasLimit: BigInt(10_000_000),
+			nonce,
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
 			value: 0n,

@@ -61,7 +61,7 @@ export interface TransactionContext {
 	readonly gasLimit: bigint;
 	readonly value: bigint;
 	readonly gasPrice?: bigint;
-	readonly nonce?: bigint;
+	readonly nonce: bigint;
 	readonly data: Buffer;
 	readonly blockContext: BlockContext;
 	readonly txHash: string;
