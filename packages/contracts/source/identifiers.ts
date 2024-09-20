@@ -143,11 +143,6 @@ export const Identifiers = {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
 		},
 	},
-	Fee: {
-		Matcher: Symbol("Fee<Matcher>"),
-		Registry: Symbol("Fee<Registry>"),
-		Type: Symbol("Fee<Type>"),
-	},
 	P2P: {
 		ApiNode: {
 			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),

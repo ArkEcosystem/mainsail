@@ -11,9 +11,6 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.State.Service)
 	private readonly stateService!: Contracts.State.Service;
 
-	@inject(Identifiers.Fee.Matcher)
-	private readonly feeMatcher!: Contracts.TransactionPool.FeeMatcher;
-
 	@inject(Identifiers.TransactionPool.Storage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
 
@@ -114,7 +111,8 @@ export class Service implements Contracts.TransactionPool.Service {
 			});
 
 			try {
-				await this.feeMatcher.throwIfCannotEnterPool(transaction);
+				// TODO: Check if can enter pool
+				// await this.feeMatcher.throwIfCannotEnterPool(transaction);
 				await this.#addTransactionToMempool(transaction);
 				this.logger.debug(`tx ${transaction.id} added to pool`);
 
