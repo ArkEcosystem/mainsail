@@ -1,7 +1,7 @@
 {
 	"genesisBlock": {
 		"block": {
-			"generatorPublicKey": "0xb386c996a71Ab44eFd9cF3a73608F75E572EB3A8",
+			"generatorAddress": "0xb386c996a71Ab44eFd9cF3a73608F75E572EB3A8",
 			"height": 0,
 			"numberOfTransactions": 159,
 			"payloadHash": "8b07dae144aa79796c760325fcf7c47f7c62dea8dfa9de4d629461dc4c7511d0",

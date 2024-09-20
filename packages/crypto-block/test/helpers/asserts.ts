@@ -12,7 +12,7 @@ export const assertBlockData = (assert, data1, data2) => {
 		"reward",
 		"payloadLength",
 		"payloadHash",
-		"generatorPublicKey",
+		"generatorAddress",
 	];
 	for (const field of blockFields) {
 		assert.equal(data1[field].toString(), data2[field].toString());

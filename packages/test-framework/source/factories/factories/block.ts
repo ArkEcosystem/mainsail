@@ -76,7 +76,7 @@ export const registerBlockFactory = async (
 		const commit = {
 			block: await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					generatorPublicKey: await app
+					generatorAddress: await app
 						.getTagged<Contracts.Crypto.AddressFactory>(
 							Identifiers.Cryptography.Identity.Address.Factory,
 							"type",

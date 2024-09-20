@@ -29,7 +29,7 @@ export class FutureBlock extends ValidatorException {
 export class InvalidGenerator extends ValidatorException {
 	public constructor(block: Block, expectedValidator: string) {
 		super(
-			`Block ${block.data.id} has invalid generator. Block generator is ${block.data.generatorPublicKey} instead ${expectedValidator}.`,
+			`Block ${block.data.id} has invalid generator. Block generator is ${block.data.generatorAddress} instead ${expectedValidator}.`,
 		);
 	}
 }

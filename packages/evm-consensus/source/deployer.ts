@@ -34,7 +34,7 @@ export class Deployer {
 		const validatorContractAddress = ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 0 });
 
 		const genesisInfo = {
-			account: genesisBlock.block.generatorPublicKey.slice(2),
+			account: genesisBlock.block.generatorAddress.slice(2),
 			deployerAccount: this.#deployerAddress,
 			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
 			validatorContract: validatorContractAddress,
