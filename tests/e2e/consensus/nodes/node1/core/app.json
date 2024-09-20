@@ -34,12 +34,6 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
-		},
-		{
 			"package": "@mainsail/evm-service"
 		},
 		{
@@ -147,12 +141,6 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
-		},
-		{
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
@@ -192,12 +180,6 @@
 		},
 		{
 			"package": "@mainsail/serializer"
-		},
-		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
 		},
 		{
 			"package": "@mainsail/evm-service"
@@ -272,12 +254,6 @@
 		},
 		{
 			"package": "@mainsail/serializer"
-		},
-		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
 		},
 		{
 			"package": "@mainsail/crypto-block"
