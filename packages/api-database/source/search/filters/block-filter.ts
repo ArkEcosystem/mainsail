@@ -89,10 +89,10 @@ export class BlockFilter {
 						value: c,
 					}));
 				}
-				case "generatorPublicKey": {
-					return handleOrCriteria(criteria.generatorPublicKey, async (c) => ({
+				case "generatorAddress": {
+					return handleOrCriteria(criteria.generatorAddress, async (c) => ({
 						op: "equal",
-						property: "generatorPublicKey",
+						property: "generatorAddress",
 						value: c,
 					}));
 				}

@@ -59,7 +59,7 @@ export interface Setup {
 export const setUpDefaults = {
 	getBlockRewards: [
 		{
-			generatorPublicKey: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
+			generatorAddress: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
 			rewards: BigNumber.make(10_000),
 		},
 	],

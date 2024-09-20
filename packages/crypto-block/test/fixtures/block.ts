@@ -2,7 +2,7 @@ import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 export const blockData: Contracts.Crypto.BlockData = {
-	generatorPublicKey: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
+	generatorAddress: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
 	height: 2,
 	id: "b60bd8c5c7c74dc5fdf971b1c5392e859aa6ca08e57f98e44e65faa7fd0e4684",
 	numberOfTransactions: 0,
@@ -21,7 +21,7 @@ export const blockData: Contracts.Crypto.BlockData = {
 };
 
 export const blockDataJson: Contracts.Crypto.BlockJson = {
-	generatorPublicKey: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
+	generatorAddress: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
 	height: 2,
 	id: "b60bd8c5c7c74dc5fdf971b1c5392e859aa6ca08e57f98e44e65faa7fd0e4684",
 	numberOfTransactions: 0,
@@ -43,7 +43,7 @@ export const serialized =
 	"0174ba618a8c0102000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855b559f4fbb75c378cdd3dd7ccbfeff9c5c2094e55";
 
 export const blockDataWithTransactions: Contracts.Crypto.BlockData = {
-	generatorPublicKey: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
+	generatorAddress: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
 	height: 2,
 	id: "e209b9ef8abbc3881f69dea663a767ff01c831ab5144f53e2248bbca91a6aa8c",
 	numberOfTransactions: 2,
@@ -97,7 +97,7 @@ export const blockDataWithTransactions: Contracts.Crypto.BlockData = {
 };
 
 export const blockDataWithTransactionsJson: Contracts.Crypto.BlockJson = {
-	generatorPublicKey: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
+	generatorAddress: "0xB559F4FbB75c378CDd3Dd7CcbFeff9c5c2094E55",
 	height: 2,
 	id: "e209b9ef8abbc3881f69dea663a767ff01c831ab5144f53e2248bbca91a6aa8c",
 	numberOfTransactions: 2,

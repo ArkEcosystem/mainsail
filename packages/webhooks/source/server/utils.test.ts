@@ -10,7 +10,7 @@ describe("Utils", ({ it, assert }) => {
 		conditions: [
 			{
 				condition: "eq",
-				key: "generatorPublicKey",
+				key: "generatorAddress",
 				value: "test-generator",
 			},
 			{

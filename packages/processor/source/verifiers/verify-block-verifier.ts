@@ -25,7 +25,7 @@ export class VerifyBlockVerifier implements Contracts.Processor.Handler {
 		let verification: Contracts.Crypto.BlockVerification = await this.blockVerifier.verify(block);
 
 		const validator: Contracts.State.Wallet = unit.store.walletRepository.findByAddress(
-			unit.getBlock().data.generatorPublicKey,
+			unit.getBlock().data.generatorAddress,
 		);
 
 		if (verification.containsMultiSignatures) {

@@ -17,7 +17,7 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 	blockHeader: {
 		$id: "blockHeader",
 		properties: {
-			generatorPublicKey: { $ref: "address" },
+			generatorAddress: { $ref: "address" },
 			height: { minimum: 0, type: "integer" },
 			id: { $ref: "blockId" },
 			numberOfTransactions: { minimum: 0, type: "integer" },
@@ -42,7 +42,7 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 			"totalAmount",
 			"totalFee",
 			"reward",
-			"generatorPublicKey",
+			"generatorAddress",
 		],
 		type: "object",
 	},

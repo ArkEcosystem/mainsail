@@ -14,7 +14,7 @@ export class BlockResource implements Contracts.Api.Resource {
 		const blockData: Contracts.Crypto.BlockData = block.data;
 		const generator: Contracts.State.Wallet = await this.stateService
 			.getStore()
-			.walletRepository.findByPublicKey(blockData.generatorPublicKey);
+			.walletRepository.findByPublicKey(blockData.generatorAddress);
 
 		return {
 			forged: {

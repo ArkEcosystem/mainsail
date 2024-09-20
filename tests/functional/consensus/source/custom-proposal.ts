@@ -75,7 +75,7 @@ export const makeCustomProposal = async (
 				{
 					commitKey,
 					gasLimit: milestone.block.maxGasLimit,
-					generatorPublicKey: validators[0].publicKey,
+					generatorAddress: validators[0].publicKey,
 					timestamp: emptyBlock.header.timestamp,
 				},
 				transaction,
@@ -145,12 +145,12 @@ export const makeCustomProposal = async (
 	blockBuffer.fill(payloadHash, byteOffset, byteOffset + hashSize);
 	byteOffset += hashSize;
 
-	const generatorPublicKeySize = node.app.getTagged<number>(
+	const generatorAddressSize = node.app.getTagged<number>(
 		Identifiers.Cryptography.Identity.PublicKey.Size,
 		"type",
 		"wallet",
 	);
-	byteOffset += generatorPublicKeySize; // skip generatorPublicKey
+	byteOffset += generatorAddressSize; // skip generatorAddress
 
 	if (byteOffset !== blockBuffer.byteLength) {
 		throw new Error("block not empty");

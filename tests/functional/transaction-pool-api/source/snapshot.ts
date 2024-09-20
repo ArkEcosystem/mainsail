@@ -248,7 +248,7 @@ export class Snapshot {
 
 			// Validator balance
 			await positiveBalanceChange(
-				block.header.generatorPublicKey,
+				block.header.generatorAddress,
 				block.header.reward.plus(totalValidatorFeeReward),
 			);
 		}

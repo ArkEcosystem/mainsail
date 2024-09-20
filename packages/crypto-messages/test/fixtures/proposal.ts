@@ -6,7 +6,7 @@ export const validatorMnemonic =
 
 export const blockData: Contracts.Crypto.BlockData = {
 	id: "3b76ae07ded37bbab2d56302f7ab09f302ec1a815a53c80ee9805d9c8c8eca19",
-	generatorPublicKey: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
+	generatorAddress: "2a453fefde568a298d26d4a3eaa66585ce6652d0dc59bd955be40746f7197a9d",
 	height: 2,
 	round: 1,
 	numberOfTransactions: 2,

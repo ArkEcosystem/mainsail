@@ -86,7 +86,7 @@ export class Block {
 		nullable: false,
 		type: "varchar",
 	})
-	public readonly generatorPublicKey!: string;
+	public readonly generatorAddress!: string;
 
 	@Column({
 		nullable: false,

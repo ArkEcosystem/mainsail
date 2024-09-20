@@ -56,7 +56,7 @@ describe<{
 			match({
 				genesisBlock: {
 					block: {
-						generatorPublicKey: match.string,
+						generatorAddress: match.string,
 						height: 0,
 						id: match.string,
 						numberOfTransactions: match.number,
@@ -356,7 +356,7 @@ describe<{
 			match({
 				genesisBlock: {
 					block: {
-						generatorPublicKey: match.string,
+						generatorAddress: match.string,
 						height: 0,
 						id: match.string,
 						numberOfTransactions: match.number,

@@ -44,7 +44,7 @@ describeSkip<{
 			data: {
 				blockSignature:
 					"3045022100e7385c6ea42bd950f7f6ab8c8619cf2f66a41d8f8f185b0bc99af032cb25f30d02200b6210176a6cedfdcbe483167fd91c21d740e0e4011d24d679c601fdd46b0de9",
-				generatorPublicKey: "026c598170201caf0357f202ff14f365a3b09322071e347873869f58d776bfc565",
+				generatorAddress: "026c598170201caf0357f202ff14f365a3b09322071e347873869f58d776bfc565",
 				height: 2,
 				id: "17882607875259085966",
 				numberOfTransactions: 0,

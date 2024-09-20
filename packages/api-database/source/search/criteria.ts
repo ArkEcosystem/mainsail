@@ -25,7 +25,7 @@ export type BlockCriteria = {
 	reward?: OrNumericCriteria<number | string>;
 	payloadLength?: OrNumericCriteria<number>;
 	payloadHash?: OrEqualCriteria<string>;
-	generatorPublicKey?: OrEqualCriteria<string>;
+	generatorAddress?: OrEqualCriteria<string>;
 };
 
 export type OrBlockCriteria = OrCriteria<BlockCriteria>;

@@ -224,7 +224,7 @@ export class GenesisBlockGenerator extends Generator {
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					generatorPublicKey: await this.app
+					generatorAddress: await this.app
 						.getTagged<Contracts.Crypto.AddressFactory>(
 							Identifiers.Cryptography.Identity.Address.Factory,
 							"type",

@@ -62,7 +62,7 @@ describe<{
 
 	const blockOriginal = {
 		blockSignature: "123",
-		generatorPublicKey: "0x" + "A".repeat(40),
+		generatorAddress: "0x" + "A".repeat(40),
 		height: 0,
 		id: "1".repeat(64),
 		numberOfTransactions: 0,
@@ -105,7 +105,7 @@ describe<{
 			"totalAmount",
 			"totalFee",
 			"reward",
-			"generatorPublicKey",
+			"generatorAddress",
 		];
 
 		for (const field of requiredFields) {
@@ -117,23 +117,23 @@ describe<{
 		}
 	});
 
-	it("blockHeader - generatorPublicKey should be publicKey", ({ validator }) => {
+	it("blockHeader - generatorAddress should be publicKey", ({ validator }) => {
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					generatorPublicKey: "a".repeat(63),
+					generatorAddress: "a".repeat(63),
 				})
-				.error.includes("generatorPublicKey"),
+				.error.includes("generatorAddress"),
 		);
 
 		assert.true(
 			validator
 				.validate("blockHeader", {
 					...blockOriginal,
-					generatorPublicKey: "a".repeat(65),
+					generatorAddress: "a".repeat(65),
 				})
-				.error.includes("generatorPublicKey"),
+				.error.includes("generatorAddress"),
 		);
 	});
 

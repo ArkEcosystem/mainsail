@@ -224,7 +224,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.header.timestamp),
-			validatorAddress: block.header.generatorPublicKey,
+			validatorAddress: block.header.generatorAddress,
 		});
 	}
 
@@ -242,7 +242,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: evmSpec,
 			timestamp: BigInt(block.header.timestamp),
-			validatorAddress: block.header.generatorPublicKey,
+			validatorAddress: block.header.generatorAddress,
 		});
 	}
 
