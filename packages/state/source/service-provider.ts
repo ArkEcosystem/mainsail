@@ -13,7 +13,7 @@ import { SnapshotService } from "./snapshots/snapshot-service.js";
 import { State } from "./state.js";
 import { StateVerifier } from "./state-verifier.js";
 import { Store } from "./store.js";
-import { validatorWalletFactory, walletFactory } from "./wallets/factory.js";
+import { walletFactory } from "./wallets/factory.js";
 import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -70,8 +70,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				async (walletRepository: WalletRepository, publicKey: string) =>
 					await container.resolve(WalletRepositoryBySender).configure(walletRepository, publicKey),
 		);
-
-		this.app.bind(Identifiers.State.ValidatorWallet.Factory).toFactory(() => validatorWalletFactory);
 
 		this.app.bind(Identifiers.State.Store.Factory).toFactory(
 			({ container }) =>

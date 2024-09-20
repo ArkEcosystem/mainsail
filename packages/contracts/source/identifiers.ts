@@ -252,9 +252,6 @@ export const Identifiers = {
 			Factory: Symbol("State<Store<Factory>>"),
 		},
 		ValidatorMutator: Symbol("State<ValidatorMutator>"),
-		ValidatorWallet: {
-			Factory: Symbol("State<ValidatorWallet<Factory>>"),
-		},
 		Verifier: Symbol("State<Verifier>"),
 		Wallet: {
 			Attributes: Symbol("State<Wallet<Attributes>>"),

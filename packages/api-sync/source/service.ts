@@ -224,8 +224,8 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		return {
 			...Utils.roundCalculator.calculateRound(height, this.configuration),
-			validators: validatorWallets.map((v) => v.getWallet().getAddress()),
-			votes: validatorWallets.map((v) => v.getVoteBalance().toFixed()),
+			validators: validatorWallets.map((v) => v.address),
+			votes: validatorWallets.map((v) => v.voteBalance.toFixed()),
 		};
 	}
 

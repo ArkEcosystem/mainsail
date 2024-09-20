@@ -62,7 +62,7 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 				continue;
 			}
 
-			const validatorPublicKey = this.validatorSet.getValidator(index).getConsensusPublicKey();
+			const validatorPublicKey = this.validatorSet.getValidator(index).blsPublicKey;
 			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
 		}
 

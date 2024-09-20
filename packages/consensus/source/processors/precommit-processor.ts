@@ -60,7 +60,7 @@ export class PrecommitProcessor extends AbstractProcessor implements Contracts.C
 			"verify",
 			Buffer.from(precommit.signature, "hex"),
 			await this.serializer.serializePrecommitForSignature(precommit),
-			Buffer.from(this.validatorSet.getValidator(precommit.validatorIndex).getConsensusPublicKey(), "hex"),
+			Buffer.from(this.validatorSet.getValidator(precommit.validatorIndex).blsPublicKey, "hex"),
 		);
 	}
 }

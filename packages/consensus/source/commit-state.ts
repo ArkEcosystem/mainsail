@@ -44,7 +44,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 
 		const validators = this.validatorSet.getActiveValidators();
 		for (const validator of validators) {
-			const consensusPublicKey = validator.getConsensusPublicKey();
+			const consensusPublicKey = validator.blsPublicKey;
 			this.#validators.set(consensusPublicKey, validator);
 		}
 

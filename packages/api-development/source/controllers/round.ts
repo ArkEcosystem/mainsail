@@ -31,10 +31,11 @@ export class RoundController extends Controller {
 			...Utils.roundCalculator.calculateRound(height, this.configuration),
 			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
-				wallet: validator.toString(),
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-				rank: validator.getVoteBalance().toFixed(),
-				voteBalance: validator.getRank(),
+				// rank: validator.getVoteBalance().toFixed(),
+				voteBalance: validator.voteBalance.toFixed(),
+
+				wallet: validator.toString(),
 			})),
 		};
 	}

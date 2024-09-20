@@ -203,7 +203,9 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
-		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer}`);
+		this.logger.info(
+			`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer.address}`,
+		);
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.RoundStarted, this.getState());
 
@@ -440,13 +442,13 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		const registeredProposer = this.validatorsRepository.getValidator(roundState.proposer.getConsensusPublicKey());
+		const registeredProposer = this.validatorsRepository.getValidator(roundState.proposer.blsPublicKey);
 
 		if (registeredProposer === undefined) {
 			return;
 		}
 
-		this.logger.info(`Found registered proposer: ${roundState.proposer}`);
+		this.logger.info(`Found registered proposer: ${roundState.proposer.address}`);
 
 		this.#proposalPromise = this.#makeProposal(roundState, registeredProposer);
 	}
@@ -466,7 +468,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			);
 
 			return await registeredProposer.propose(
-				this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.getWallet().getAddress()),
+				this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
 				this.#round,
 				this.#validValue.round,
 				block,
@@ -475,7 +477,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		const block = await registeredProposer.prepareBlock(
-			roundState.proposer.getWallet().getAddress(),
+			roundState.proposer.address,
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
 		);
@@ -484,7 +486,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block.data);
 
 		return registeredProposer.propose(
-			this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.getWallet().getAddress()),
+			this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
 			this.#round,
 			undefined,
 			block,
@@ -494,14 +496,12 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorSet.getActiveValidators()) {
-			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
+			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
 			if (localValidator === undefined) {
 				continue;
 			}
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(
-				validator.getWallet().getAddress(),
-			);
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
 			if (roundState.hasPrevote(validatorIndex)) {
 				continue;
 			}
@@ -515,14 +515,12 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
 		for (const validator of this.validatorSet.getActiveValidators()) {
-			const localValidator = this.validatorsRepository.getValidator(validator.getConsensusPublicKey());
+			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
 			if (localValidator === undefined) {
 				continue;
 			}
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(
-				validator.getWallet().getAddress(),
-			);
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
 			if (roundState.hasPrecommit(validatorIndex)) {
 				continue;
 			}

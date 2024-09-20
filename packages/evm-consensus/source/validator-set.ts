@@ -14,9 +14,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.State.ValidatorWallet.Factory)
-	private readonly validatorWalletFactory!: Contracts.State.ValidatorWalletFactory;
-
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -66,14 +63,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		}
 
 		this.#validators = validators.slice(0, activeValidators);
-
-		this.#indexByAddress = new Map();
-		for (const [index, validator] of this.#validators.entries()) {
-			const address = validator.getWallet().getAddress();
-			this.#indexByAddress.set(address, index);
-		}
-
-		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
+		this.#indexByAddress = new Map(this.#validators.map((validator, index) => [validator.address, index]));
 	}
 
 	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWallet[]> {
@@ -95,35 +85,23 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			this.app.terminate("getTopValidators failed");
 		}
 
-		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
 		const [validators] = iface.decodeFunctionResult("getTopValidators", result.output!);
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
-		for (const [index, validator] of validators.entries()) {
-			const [addr, [voteBalance, , validatorPublicKey]] = validator;
+		for (const [, validator] of validators.entries()) {
+			const [address, [voteBalance, , blsPublicKey]] = validator;
 
-			const wallet = store.walletRepository.findByAddress(addr);
-
-			const validatorWallet = this.validatorWalletFactory(wallet);
-			validatorWallet.getWallet().setAttribute("validatorVoteBalance", Utils.BigNumber.make(voteBalance));
-			validatorWallet.getWallet().setAttribute("validatorPublicKey", validatorPublicKey.slice(2));
-
-			validatorWallet.setRank(index + 1);
-			validatorWallet.setApproval(
-				Utils.validatorCalculator.calculateApproval(validatorWallet.getVoteBalance(), totalSupply),
-			);
-
-			store.walletRepository.setOnIndex(
-				Contracts.State.WalletIndexes.Validators,
-				validatorPublicKey.slice(2),
-				validatorWallet.getWallet(),
-			);
+			const validatorWallet: Contracts.State.ValidatorWallet = {
+				address,
+				blsPublicKey: blsPublicKey.slice(2),
+				voteBalance,
+			};
 
 			validatorWallets.push(validatorWallet);
 		}
 
 		console.log("Getting active validators", validatorWallets);
-		console.log(validatorWallets.map((v) => v.getWallet().getAddress()));
+		console.log(validatorWallets.map((v) => v));
 
 		return validatorWallets;
 	}
