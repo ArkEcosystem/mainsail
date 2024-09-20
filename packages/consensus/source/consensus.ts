@@ -203,7 +203,9 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		const roundState = this.roundStateRepository.getRoundState(this.#height, this.#round);
-		this.logger.info(`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer.address}`);
+		this.logger.info(
+			`>> Starting new round: ${this.#height}/${this.#round} with proposer: ${roundState.proposer.address}`,
+		);
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.RoundStarted, this.getState());
 
@@ -499,9 +501,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(
-				validator.address,
-			);
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
 			if (roundState.hasPrevote(validatorIndex)) {
 				continue;
 			}
@@ -520,9 +520,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(
-				validator.address,
-			);
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
 			if (roundState.hasPrecommit(validatorIndex)) {
 				continue;
 			}

@@ -89,7 +89,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this;
 	}
 
-	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWallet{
+	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWallet {
 		const validator = this.#validators.get(consensusPublicKey);
 		Utils.assert.defined<Contracts.State.ValidatorWallet>(validator);
 		return validator;

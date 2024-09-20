@@ -88,14 +88,14 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const [validators] = iface.decodeFunctionResult("getTopValidators", result.output!);
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
-		for (const [,validator] of validators.entries()) {
-			const [address, [voteBalance,,blsPublicKey]] = validator;
+		for (const [, validator] of validators.entries()) {
+			const [address, [voteBalance, , blsPublicKey]] = validator;
 
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
 				blsPublicKey: blsPublicKey.slice(2),
 				voteBalance,
-			}
+			};
 
 			validatorWallets.push(validatorWallet);
 		}
