@@ -12,7 +12,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#store!: Contracts.State.Store;
 	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
-	#validators = new Map<string, Contracts.State.ValidatorWallet>();
+	#validators = new Map<string, Contracts.State.ValidatorWalletOld>();
 
 	@postConstruct()
 	public initialize(): void {

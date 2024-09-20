@@ -33,10 +33,10 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<number, Contracts.Crypto.Precommit>();
 	#precommitsCount = new Map<string | undefined, number>();
-	#validators = new Map<string, Contracts.State.ValidatorWallet>();
+	#validators = new Map<string, Contracts.State.ValidatorWalletOld>();
 	#validatorsSignedPrevote: boolean[] = [];
 	#validatorsSignedPrecommit: boolean[] = [];
-	#proposer!: Contracts.State.ValidatorWallet;
+	#proposer!: Contracts.State.ValidatorWalletOld;
 
 	#commit: Contracts.Crypto.Commit | undefined;
 	#store!: Contracts.State.Store;
@@ -62,7 +62,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return [...this.#validators.keys()];
 	}
 
-	public get proposer(): Contracts.State.ValidatorWallet {
+	public get proposer(): Contracts.State.ValidatorWalletOld {
 		return this.#proposer;
 	}
 
@@ -89,9 +89,9 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this;
 	}
 
-	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWallet {
+	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWalletOld {
 		const validator = this.#validators.get(consensusPublicKey);
-		Utils.assert.defined<Contracts.State.ValidatorWallet>(validator);
+		Utils.assert.defined<Contracts.State.ValidatorWalletOld>(validator);
 		return validator;
 	}
 

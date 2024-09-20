@@ -21,7 +21,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	#validators: Contracts.State.ValidatorWallet[] = [];
+	#validators: Contracts.State.ValidatorWalletOld[] = [];
 	#indexByAddress: Map<string, number> = new Map();
 
 	public async restore(store: Contracts.State.Store): Promise<void> {
@@ -34,7 +34,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		}
 	}
 
-	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
+	public getActiveValidators(): Contracts.State.ValidatorWalletOld[] {
 		const { activeValidators } = this.configuration.getMilestone();
 
 		if (this.#validators.length !== activeValidators) {
@@ -44,7 +44,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return this.#validators.slice(0, activeValidators);
 	}
 
-	public getValidator(index: number): Contracts.State.ValidatorWallet {
+	public getValidator(index: number): Contracts.State.ValidatorWalletOld {
 		return this.#validators[index];
 	}
 
@@ -76,7 +76,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		store.setAttribute("activeValidators", this.#validators.map((v) => v.getWallet().getAddress()).join(","));
 	}
 
-	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWallet[]> {
+	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWalletOld[]> {
 		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
 		const { evmSpec } = this.configuration.getMilestone();
@@ -98,7 +98,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const totalSupply = Utils.supplyCalculator.calculateSupply(store.getLastHeight(), this.configuration);
 		const [validators] = iface.decodeFunctionResult("getTopValidators", result.output!);
 
-		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
+		const validatorWallets: Contracts.State.ValidatorWalletOld[] = [];
 		for (const [index, validator] of validators.entries()) {
 			const [addr, [voteBalance, , validatorPublicKey]] = validator;
 
