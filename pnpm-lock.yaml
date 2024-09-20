@@ -921,9 +921,6 @@ importers:
       '@mainsail/processor':
         specifier: workspace:*
         version: link:../processor
-      '@mainsail/proposer':
-        specifier: workspace:*
-        version: link:../proposer
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
@@ -2473,25 +2470,6 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/proposer:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-    devDependencies:
-      '@types/seedrandom':
-        specifier: ^3.0.8
-        version: 3.0.8
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
   packages/serializer:
     dependencies:
       '@mainsail/container':
@@ -3158,9 +3136,6 @@ importers:
       '@mainsail/processor':
         specifier: workspace:*
         version: link:../../../packages/processor
-      '@mainsail/proposer':
-        specifier: workspace:*
-        version: link:../../../packages/proposer
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../../../packages/serializer
