@@ -51,7 +51,6 @@
 		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-worker": "workspace:*",
-		"@mainsail/validator-set-static": "workspace:*",
 		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@types/tmp": "0.2.6",

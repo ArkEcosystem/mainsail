@@ -951,12 +951,6 @@ importers:
       '@mainsail/validator':
         specifier: workspace:*
         version: link:../validator
-      '@mainsail/validator-set-static':
-        specifier: workspace:*
-        version: link:../validator-set-static
-      '@mainsail/validator-set-vote-weighted':
-        specifier: workspace:*
-        version: link:../validator-set-vote-weighted
       '@mainsail/webhooks':
         specifier: workspace:*
         version: link:../webhooks
@@ -3032,47 +3026,6 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/validator-set-static:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
-  packages/validator-set-vote-weighted:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-    devDependencies:
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      '@types/sinon':
-        specifier: ^17.0.3
-        version: 17.0.3
-      sinon:
-        specifier: ^17.0.1
-        version: 17.0.2
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
   packages/webhooks:
     dependencies:
       '@hapi/boom':
@@ -3238,9 +3191,6 @@ importers:
       '@mainsail/validator':
         specifier: workspace:*
         version: link:../../../packages/validator
-      '@mainsail/validator-set-static':
-        specifier: workspace:*
-        version: link:../../../packages/validator-set-static
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
@@ -3382,9 +3332,6 @@ importers:
       '@mainsail/validator':
         specifier: workspace:*
         version: link:../../../packages/validator
-      '@mainsail/validator-set-static':
-        specifier: workspace:*
-        version: link:../../../packages/validator-set-static
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6
