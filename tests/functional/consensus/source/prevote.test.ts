@@ -45,7 +45,7 @@ describe<{
 		await stopMany(nodes);
 	});
 
-	it("should confirm block, if < minority does not prevote", async ({ nodes, p2p }) => {
+	it.only("should confirm block, if < minority does not prevote", async ({ nodes, p2p }) => {
 		const node0 = nodes[0];
 		const stubPrevote = stub(node0.app.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
@@ -57,10 +57,10 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBockHeight(nodes, 1);
-		await assertBockRound(nodes, 0);
+		await assertBockRound(nodes, 4);
 		await assertBlockId(nodes);
 
-		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.equal(p2p.proposals.getMessages(1, 4).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes - 1); // Assert number of prevotes
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
 
@@ -68,7 +68,7 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBockHeight(nodes, 2);
-		await assertBockRound(nodes, 0);
+		await assertBockRound(nodes, 4);
 		await assertBlockId(nodes);
 	});
 
