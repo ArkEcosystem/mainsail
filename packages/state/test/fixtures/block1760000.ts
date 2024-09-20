@@ -12,7 +12,7 @@ export default {
 	reward: BigNumber.make("200000000"),
 	payloadLength: 224,
 	payloadHash: "de56269cae3ab156f6979b94a04c30b82ed7d6f9a97d162583c98215c18c65db",
-	generatorPublicKey: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
+	generatorAddress: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
 	blockSignature:
 		"30450221008c59bd2379061ad3539b73284fc0bbb57dbc97efd54f55010ba3f198c04dde7402202e482126b3084c6313c1378d686df92a3e2ef5581323de11e74fe07eeab339f3",
 	transactions: [

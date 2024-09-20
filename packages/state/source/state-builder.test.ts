@@ -11,7 +11,7 @@ import { WalletRepository } from "./wallets";
 const getBlockRewardsDefault = setUpDefaults.getBlockRewards[0];
 const getSentTransactionDefault = setUpDefaults.getSentTransaction[0];
 
-const generatorKey = getBlockRewardsDefault.generatorPublicKey;
+const generatorKey = getBlockRewardsDefault.generatorAddress;
 const senderKey = getSentTransactionDefault.senderPublicKey;
 
 let restoreDefaultSentTransactions: () => void;

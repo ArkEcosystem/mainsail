@@ -8,7 +8,7 @@ describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) =>
 		conditions: [
 			{
 				condition: "eq",
-				key: "generatorPublicKey",
+				key: "generatorAddress",
 				value: "test-generator",
 			},
 			{

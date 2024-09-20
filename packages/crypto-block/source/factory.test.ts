@@ -149,12 +149,12 @@ describe<{
 	it("#fromData - should throw on invalid input data - required block property is missing", async ({ factory }) => {
 		const partialBlock = {
 			...blockDataClone,
-			generatorPublicKey: undefined,
+			generatorAddress: undefined,
 		} as unknown as Contracts.Crypto.BlockData;
 
 		await assert.rejects(
 			() => factory.fromData(partialBlock),
-			" Invalid data: must have required property 'generatorPublicKey': undefined",
+			" Invalid data: must have required property 'generatorAddress': undefined",
 		);
 	});
 

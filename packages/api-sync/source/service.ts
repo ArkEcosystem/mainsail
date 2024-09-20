@@ -146,7 +146,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const deferredSync: DeferredSync = {
 			block: {
 				commitRound: proof.round,
-				generatorPublicKey: header.generatorAddress,
+				generatorAddress: header.generatorAddress,
 				height: header.height.toFixed(),
 				id: header.id,
 				numberOfTransactions: header.numberOfTransactions,

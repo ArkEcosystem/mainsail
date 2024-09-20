@@ -137,7 +137,7 @@
 // 		context.baseBlock = {
 // 			data: {
 // 				height: 2,
-// 				generatorPublicKey: "026c598170201caf0357f202ff14f365a3b09322071e347873869f58d776bfc565",
+// 				generatorAddress: "026c598170201caf0357f202ff14f365a3b09322071e347873869f58d776bfc565",
 // 				id: "17882607875259085966",
 // 				blockSignature:
 // 					"3045022100e7385c6ea42bd950f7f6ab8c8619cf2f66a41d8f8f185b0bc99af032cb25f30d02200b6210176a6cedfdcbe483167fd91c21d740e0e4011d24d679c601fdd46b0de9",
@@ -164,7 +164,7 @@
 // 		context.chainedBlock = {
 // 			data: {
 // 				height: 3,
-// 				generatorPublicKey: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
+// 				generatorAddress: "038082dad560a22ea003022015e3136b21ef1ffd9f2fd50049026cbe8e2258ca17",
 // 				id: "7242383292164246617",
 // 				blockSignature:
 // 					"304402204087bb1d2c82b9178b02b9b3f285de260cdf0778643064fe6c7aef27321d49520220594c57009c1fca543350126d277c6adeb674c00685a464c3e4bf0d634dc37e39",

@@ -63,7 +63,7 @@ const orContainsCriteria = (value: any) => orCriteria(containsCriteria(value));
 
 export const blockCriteriaSchemas = {
 	blockSignature: orEqualCriteria(Joi.string().hex()),
-	generatorPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
+	generatorAddress: orEqualCriteria(Joi.string().hex().length(66)),
 	height: orNumericCriteria(Joi.number().integer().min(0)),
 	id: orEqualCriteria(blockId),
 	numberOfTransactions: orNumericCriteria(Joi.number().integer().min(0)),

@@ -18,7 +18,7 @@ describe<{
 	it("should create a single block", async ({ factoryBuilder }) => {
 		const entity = await factoryBuilder.get("Block").make<Contracts.Crypto.Commit>();
 
-		assert.string(entity.block.data.generatorPublicKey);
+		assert.string(entity.block.data.generatorAddress);
 		assert.number(entity.block.data.height);
 		assert.string(entity.block.data.id);
 		assert.number(entity.block.data.numberOfTransactions);
@@ -45,7 +45,7 @@ describe<{
 
 		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.Commit>();
 
-		assert.string(entity.block.data.generatorPublicKey);
+		assert.string(entity.block.data.generatorAddress);
 		assert.number(entity.block.data.height);
 		assert.string(entity.block.data.id);
 		assert.number(entity.block.data.numberOfTransactions);
@@ -68,7 +68,7 @@ describe<{
 
 		const entity = await factoryBuilder.get("Block").withOptions(options).make<Contracts.Crypto.Commit>();
 
-		assert.string(entity.block.data.generatorPublicKey);
+		assert.string(entity.block.data.generatorAddress);
 		assert.number(entity.block.data.height);
 		assert.string(entity.block.data.id);
 		assert.number(entity.block.data.numberOfTransactions);

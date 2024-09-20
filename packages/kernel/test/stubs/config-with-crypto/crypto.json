@@ -10,7 +10,7 @@
 		"reward": "0",
 		"payloadLength": 3296,
 		"payloadHash": "a0851cf9f0b1b2357323fbbe76569bf762e7fdf9dff513aab81429af8639030d",
-		"generatorPublicKey": "de640f8b64277f312762d06016921b05bc0cb0607fa1d22bab349f5e030d69d5",
+		"generatorAddress": "de640f8b64277f312762d06016921b05bc0cb0607fa1d22bab349f5e030d69d5",
 		"blockSignature": "aa2b7c9a271a40f86f4da1746e7f96d35dfa311579b4319318db5739249cf5d5b471ae306328ead2dba9295c182a6d8740a22ac87af8104b7f28d39f4be5e065",
 		"id": "da8c6b0d9e8310853ad3d8aace94c03bea99f65a45412b81ed003b042135446f",
 		"transactions": [

@@ -54,21 +54,21 @@ describe<{
 		await assertBockHeight(nodes, 1);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
+		assert.equal((await getLastCommit(nodes[0])).block.data.generatorAddress, validators[0].publicKey);
 
 		await snoozeForBlock(nodes);
 
 		await assertBockHeight(nodes, 2);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
+		assert.equal((await getLastCommit(nodes[0])).block.data.generatorAddress, validators[0].publicKey);
 
 		await snoozeForBlock(nodes);
 
 		await assertBockHeight(nodes, 3);
 		await assertBockRound(nodes, 0);
 		await assertBlockId(nodes);
-		assert.equal((await getLastCommit(nodes[0])).block.data.generatorPublicKey, validators[0].publicKey);
+		assert.equal((await getLastCommit(nodes[0])).block.data.generatorAddress, validators[0].publicKey);
 	});
 
 	it("#missing propose - should not accept block", async ({ nodes }) => {

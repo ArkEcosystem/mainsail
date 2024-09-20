@@ -55,7 +55,7 @@ export class Controller extends AbstractController {
 
 		const enriched: Promise<EnrichedBlock | null>[] = [];
 		for (const block of resultPage.results) {
-			enriched.push(this.enrichBlock(block, state, generators[block.generatorPublicKey]));
+			enriched.push(this.enrichBlock(block, state, generators[block.generatorAddress]));
 		}
 
 		// @ts-ignore
@@ -87,7 +87,7 @@ export class Controller extends AbstractController {
 					generator = await this.walletRepositoryFactory()
 						.createQueryBuilder()
 						.select()
-						.where("public_key = :publicKey", { publicKey: block.generatorPublicKey })
+						.where("public_key = :publicKey", { publicKey: block.generatorAddress })
 						.getOneOrFail();
 				})(),
 			);
