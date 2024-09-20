@@ -38,11 +38,13 @@ export class Deployer {
 			validatorAddress: this.#deployerAddress,
 		};
 
+		const nonce = BigInt(this.#nonce);
 		const result = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
 			data: Buffer.from(ethers.getBytes(ERC20.abi.bytecode)),
 			gasLimit: BigInt(2_000_000),
+			nonce,
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
 			value: 0n,
@@ -84,11 +86,14 @@ export class Deployer {
 		for (const recipient of recipients) {
 			const encodedCall = iface.encodeFunctionData("transfer", [recipient, amount]);
 
+			const nonce = BigInt(this.#nonce);
+
 			const { receipt } = await this.evm.process({
 				blockContext,
 				caller: this.#deployerAddress,
 				data: Buffer.from(ethers.getBytes(encodedCall)),
 				gasLimit: BigInt(100_000),
+				nonce,
 				recipient: erc20ContractAddress,
 				specId: milestone.evmSpec,
 				txHash: this.#generateTxHash(),
