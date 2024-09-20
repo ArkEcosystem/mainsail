@@ -1,6 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
-import { Transfers } from "@mainsail/test-transaction-builders";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
@@ -15,35 +14,6 @@ export const getAddressByPublicKey = async (sandbox: Sandbox, publicKey: string)
 	return app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(publicKey);
-};
-
-export const getRandomFundedWallet = async (
-	context: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
-	funder: Contracts.Crypto.KeyPair,
-	amount?: BigNumber,
-): Promise<Contracts.Crypto.KeyPair> => {
-	const {
-		sandbox: { app },
-	} = context;
-
-	const seed = Date.now().toString();
-
-	const randomKeyPair = await app
-		.getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")
-		.fromMnemonic(seed);
-
-	const recipient = await app
-		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-		.fromPublicKey(randomKeyPair.publicKey);
-
-	amount = amount ?? BigNumber.make("10000000000");
-
-	const fundTx = await Transfers.makeTransfer(context, { amount, recipient, sender: funder });
-
-	await addTransactionsToPool(context, [fundTx]);
-	await waitBlock(context);
-
-	return randomKeyPair;
 };
 
 export const getRandomSignature = async (sandbox: Sandbox): Promise<string> => {
