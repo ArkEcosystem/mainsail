@@ -3181,6 +3181,9 @@ importers:
       '@mainsail/evm-api-worker':
         specifier: workspace:*
         version: link:../../../packages/evm-api-worker
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../../../packages/evm-consensus
       '@mainsail/evm-development':
         specifier: workspace:*
         version: link:../../../packages/evm-development
@@ -3238,9 +3241,6 @@ importers:
       '@mainsail/validator':
         specifier: workspace:*
         version: link:../../../packages/validator
-      '@mainsail/validator-set-static':
-        specifier: workspace:*
-        version: link:../../../packages/validator-set-static
       '@types/tmp':
         specifier: 0.2.6
         version: 0.2.6

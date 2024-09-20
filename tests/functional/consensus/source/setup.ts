@@ -40,8 +40,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		saveState: async () => {},
 	});
 
-	sandbox.app.bind(Identifiers.Proposer.Selector).to(Selector).inSingletonScope();
-
 	sandbox.app.bind(Identifiers.Database.Service).to(MemoryDatabase).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
@@ -104,11 +102,11 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",
+		"@mainsail/evm-consensus",
 		"@mainsail/transactions",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
 		"@mainsail/processor",
-		"@mainsail/validator-set-static",
 		"@mainsail/validator",
 		"@mainsail/consensus",
 	];
@@ -124,6 +122,8 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	for (const packageId of packages) {
 		await loadPlugin(sandbox, packageId, options);
 	}
+
+	sandbox.app.rebind(Identifiers.Proposer.Selector).to(Selector).inSingletonScope();
 
 	return sandbox;
 };

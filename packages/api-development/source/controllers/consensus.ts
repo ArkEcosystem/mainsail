@@ -70,7 +70,7 @@ export class ConsensusController extends Controller {
 					})),
 
 				// validators: validators.map((v) => ({
-				// 	index: this.validatorSet.getValidatorIndexByWalletPublicKey(v.getWalletPublicKey()),
+				// 	index: this.validatorSet.getValidatorIndexByWalletAddress(v.getWalletAddress()),
 				// 	walletPublicKey: v.toString(),
 				// })),
 			},

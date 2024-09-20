@@ -66,11 +66,11 @@ export const makeProposal = async (
 
 	await sleep(1); // Sleep to avoid same timestamp
 
-	const block = await proposer.prepareBlock(validator.publicKey, round, timestamp);
+	const block = await proposer.prepareBlock(validator.address, round, timestamp);
 	const proposal = await proposer.propose(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		round,
 		undefined,
 		block,
@@ -98,7 +98,7 @@ export const makePrevote = async (
 	return await proposer.prevote(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		height,
 		round,
 		blockId,
@@ -123,7 +123,7 @@ export const makePrecommit = async (
 	return await proposer.precommit(
 		node.app
 			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletPublicKey(validator.publicKey),
+			.getValidatorIndexByWalletAddress(validator.address),
 		height,
 		round,
 		blockId,
