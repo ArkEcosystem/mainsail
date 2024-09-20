@@ -1,8 +1,7 @@
 import { injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/contracts";
 import { TransactionRegistry } from "@mainsail/crypto-transaction";
 import { Providers } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 
 import { EvmCallTransactionHandler } from "./handlers/index.js";
 import { EvmCallTransaction } from "./versions/1.js";
@@ -13,8 +12,6 @@ export * from "./versions/index.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.#registerFees();
-
 		this.#registerType();
 
 		this.#registerHandler();
@@ -22,17 +19,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public requiredByWorker(): boolean {
 		return true;
-	}
-
-	#registerFees(): void {
-		// TODO
-		this.app.get<Contracts.Fee.FeeRegistry>(Identifiers.Fee.Registry).set(
-			EvmCallTransaction.key,
-			{
-				managed: BigNumber.make("100"),
-				static: BigNumber.make("2500000000"),
-			}[this.app.get<string>(Identifiers.Fee.Type)]!,
-		);
 	}
 
 	#registerType(): void {

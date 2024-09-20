@@ -49,8 +49,6 @@
 		"@mainsail/consensus-storage": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/fees": "workspace:*",
-		"@mainsail/fees-static": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-worker": "workspace:*",
 		"@mainsail/crypto-transaction-evm-call": "workspace:*",

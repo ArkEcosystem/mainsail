@@ -10,8 +10,6 @@ import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
-import { ServiceProvider as CoreFees } from "@mainsail/fees";
-import { ServiceProvider as CoreFeesStatic } from "@mainsail/fees-static";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
@@ -37,8 +35,6 @@ export const prepareSandbox = async (context) => {
 	await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
-	await context.sandbox.app.resolve(CoreFees).register();
-	await context.sandbox.app.resolve(CoreFeesStatic).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();
 	await context.sandbox.app.resolve(CoreCryptoBlock).register();
 	await context.sandbox.app.resolve(CoreCryptoMessages).register();
