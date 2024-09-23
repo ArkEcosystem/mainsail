@@ -6,7 +6,6 @@ import {
 	CommitHandler,
 	ForgetPeerHandler,
 	GetTransactionsHandler,
-	ImportSnapshotHandler,
 	ReloadWebhooksHandler,
 	SetPeerHandler,
 	StartHandler,
@@ -30,10 +29,6 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 
 	public async start(): Promise<void> {
 		await this.#app.resolve(StartHandler).handle();
-	}
-
-	public async importSnapshot(height: number): Promise<void> {
-		await this.#app.resolve(ImportSnapshotHandler).handle(height);
 	}
 
 	public async commit(data: {

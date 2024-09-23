@@ -1,24 +1,13 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 
 @injectable()
 export class Service implements Contracts.State.Service {
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "state")
-	private readonly configuration!: Providers.PluginConfiguration;
-
-	@inject(Identifiers.State.State)
-	private readonly state!: Contracts.State.State;
-
 	@inject(Identifiers.State.Store.Factory)
 	private readonly storeFactory!: Contracts.State.StoreFactory;
 
 	@inject(Identifiers.State.WalletRepository.BySender.Factory)
 	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
-
-	@inject(Identifiers.State.Snapshot.Service)
-	private readonly snapshotService!: Contracts.State.SnapshotService;
 
 	#baseStore!: Contracts.State.Store;
 
@@ -44,25 +33,5 @@ export class Service implements Contracts.State.Service {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		unit.store.commitChanges();
-
-		if (this.state.isBootstrap() || !this.configuration.getRequired("snapshots.enabled")) {
-			return;
-		}
-
-		await this.export(unit.height);
-	}
-
-	public async export(height: number): Promise<void> {
-		if (
-			this.configuration.getRequired<boolean>("snapshots.enabled") &&
-			height % this.configuration.getRequired<number>("snapshots.interval") === 0
-		) {
-			await this.snapshotService.export(this.#baseStore);
-		}
-	}
-
-	public async restore(height: number): Promise<void> {
-		this.#baseStore = this.storeFactory();
-		await this.snapshotService.import(height, this.#baseStore);
 	}
 }
