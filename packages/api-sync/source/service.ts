@@ -141,7 +141,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 		}
 
-		const dirtyWallets = [...unit.store.walletRepository.getDirtyWallets()];
+		const dirtyWallets: Contracts.State.Wallet[] = [];
 
 		const deferredSync: DeferredSync = {
 			block: {

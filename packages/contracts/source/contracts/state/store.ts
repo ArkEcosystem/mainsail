@@ -1,10 +1,6 @@
 import { Block, Commit, CommitHandler } from "../crypto/index.js";
-import { WalletRepository } from "./wallets.js";
-
 
 export interface Store extends CommitHandler {
-	readonly walletRepository: WalletRepository;
-
 	getGenesisCommit(): Commit;
 	setGenesisCommit(block: Commit): void;
 

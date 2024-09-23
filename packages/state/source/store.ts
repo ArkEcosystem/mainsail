@@ -7,8 +7,6 @@ export class Store implements Contracts.State.Store {
 	@inject(Identifiers.State.AttributeRepository)
 	private readonly attributeRepository!: Contracts.State.AttributeRepository;
 
-	@inject(Identifiers.State.WalletRepository.Base.Factory)
-	private readonly walletRepositoryFactory!: Contracts.State.WalletRepositoryFactory;
 
 	@inject(Identifiers.State.StateRepository.Factory)
 	protected readonly createStateRepository!: Contracts.State.StateRepositoryFactory;
@@ -18,7 +16,6 @@ export class Store implements Contracts.State.Store {
 	#originalStore?: Store;
 
 	#repository!: Contracts.State.StateRepository;
-	#walletRepository!: Contracts.State.WalletRepository;
 
 	configure(store?: Store): Store {
 		if (store) {
@@ -27,21 +24,16 @@ export class Store implements Contracts.State.Store {
 			this.#lastBlock = store.#lastBlock;
 
 			this.#repository = this.createStateRepository(this.attributeRepository, store.#repository);
-			this.#walletRepository = this.walletRepositoryFactory(store.#walletRepository);
 		} else {
 			this.#repository = this.createStateRepository(this.attributeRepository, undefined, {
 				height: 0,
 				totalRound: 0,
 			});
-			this.#walletRepository = this.walletRepositoryFactory();
 		}
 
 		return this;
 	}
 
-	public get walletRepository(): Contracts.State.WalletRepository {
-		return this.#walletRepository;
-	}
 
 	public getGenesisCommit(): Contracts.Crypto.Commit {
 		Utils.assert.defined<Contracts.Crypto.Commit>(this.#genesisBlock);
@@ -87,10 +79,6 @@ export class Store implements Contracts.State.Store {
 		return this.#repository.getAttribute(key);
 	}
 
-	public getWalletRepository(): Contracts.State.WalletRepository {
-		return this.#walletRepository;
-	}
-
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		this.setLastBlock(unit.getBlock());
 		this.setAttribute("height", unit.height);
@@ -103,7 +91,6 @@ export class Store implements Contracts.State.Store {
 			this.#originalStore.#genesisBlock = this.#genesisBlock;
 
 			this.#repository.commitChanges();
-			this.#walletRepository.commitChanges();
 		}
 	}
 }

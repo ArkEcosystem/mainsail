@@ -3,12 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class ValidatorRepository implements Contracts.Validator.ValidatorRepository {
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
-	@inject(Identifiers.ValidatorSet.Service)
-	private readonly validatorSetService!: Contracts.ValidatorSet.Service;
-
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -32,32 +26,10 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 
 		this.logger.info(`A total of ${this.#validators.size} validators(s) were found this node:`);
 
-		const validators = this.stateService.getStore().walletRepository.allValidators();
-		const activeValidators = this.validatorSetService.getActiveValidators();
-
 		const active: string[] = [];
 		const standBy: string[] = [];
 		const resigned: string[] = [];
 		const notRegistered: string[] = [];
-
-		for (const blsPublicKey of this.#validators.keys()) {
-			const validator = validators.find(
-				(validator) => validator.getAttribute("validatorPublicKey") === blsPublicKey,
-			);
-
-			if (validator) {
-				if (validator.hasAttribute("validatorResigned")) {
-					resigned.push(validator.toString());
-				}
-				if (activeValidators.some((activeValidator) => activeValidator.blsPublicKey === blsPublicKey)) {
-					active.push(validator.toString());
-				} else {
-					standBy.push(validator.toString());
-				}
-			} else {
-				notRegistered.push(blsPublicKey);
-			}
-		}
 
 		this.logger.info(`Active validators (${active.length}): [${active}]`);
 		this.logger.info(`Stand by validators (${standBy.length}): [${standBy}]`);

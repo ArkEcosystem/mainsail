@@ -1,7 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class NonceVerifier implements Contracts.Processor.Handler {
@@ -9,31 +7,31 @@ export class NonceVerifier implements Contracts.Processor.Handler {
 	protected readonly app!: Contracts.Kernel.Application;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const block = unit.getBlock();
+		// const block = unit.getBlock();
 
-		const nonceBySender = {};
+		// const nonceBySender = {};
 
-		for (const transaction of block.transactions) {
-			const data = transaction.data;
+		// for (const transaction of block.transactions) {
+		// 	const data = transaction.data;
 
-			Utils.assert.defined<string>(data.senderPublicKey);
+		// 	Utils.assert.defined<string>(data.senderPublicKey);
 
-			const sender: string = data.senderPublicKey;
+		// 	const sender: string = data.senderPublicKey;
 
-			if (nonceBySender[sender] === undefined) {
-				const wallet = await unit.store.walletRepository.findByPublicKey(sender);
-				nonceBySender[sender] = wallet.getNonce();
-			}
+		// 	if (nonceBySender[sender] === undefined) {
+		// 		const wallet = await unit.store.walletRepository.findByPublicKey(sender);
+		// 		nonceBySender[sender] = wallet.getNonce();
+		// 	}
 
-			Utils.assert.defined<string>(data.nonce);
+		// 	Utils.assert.defined<string>(data.nonce);
 
-			const nonce: BigNumber = BigNumber.make(data.nonce);
+		// 	const nonce: BigNumber = BigNumber.make(data.nonce);
 
-			if (!nonceBySender[sender].isEqualTo(nonce)) {
-				throw new Exceptions.InvalidNonce(block, sender);
-			}
+		// 	if (!nonceBySender[sender].isEqualTo(nonce)) {
+		// 		throw new Exceptions.InvalidNonce(block, sender);
+		// 	}
 
-			nonceBySender[sender] = nonce;
-		}
+		// 	nonceBySender[sender] = nonce;
+		// }
 	}
 }

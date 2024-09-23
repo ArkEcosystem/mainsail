@@ -1,11 +1,8 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class EthGetBalanceAction implements Contracts.Api.RPC.Action {
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
 	public readonly name: string = "eth_getBalance";
 
 	public readonly schema = {
@@ -19,13 +16,14 @@ export class EthGetBalanceAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string, string]): Promise<string> {
-		const walletRepository = this.stateService.getStore().walletRepository;
+		// TODO: Fix
+		// const walletRepository = this.stateService.getStore().walletRepository;
 
-		if (walletRepository.hasByAddress(parameters[0])) {
-			const wallet = walletRepository.findByAddress(parameters[0]);
+		// if (walletRepository.hasByAddress(parameters[0])) {
+		// 	const wallet = walletRepository.findByAddress(parameters[0]);
 
-			return `0x${Number(wallet.getBalance()).toString(16)}`;
-		}
+		// 	return `0x${Number(wallet.getBalance()).toString(16)}`;
+		// }
 
 		return `0x0`;
 	}

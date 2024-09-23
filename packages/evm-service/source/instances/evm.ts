@@ -1,7 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Evm } from "@mainsail/evm";
-import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance {
@@ -51,23 +50,7 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const { height } = unit;
 		const round = unit.getBlock().data.round;
-		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
-
-		if (unit.store) {
-			const walletRepository = unit.store.walletRepository;
-			for (const account of result.dirtyAccounts) {
-				const wallet = walletRepository.findByAddress(account.address);
-				wallet.setBalance(BigNumber.make(account.balance));
-				wallet.setNonce(BigNumber.make(account.nonce));
-
-				if (account.vote) {
-					const votedWallet = walletRepository.findByAddress(account.vote);
-					wallet.setAttribute("vote", votedWallet.getPublicKey());
-				} else if (account.unvote) {
-					wallet.forgetAttribute("vote");
-				}
-			}
-		}
+		await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
 	}
 
 	public async codeAt(address: string): Promise<string> {
