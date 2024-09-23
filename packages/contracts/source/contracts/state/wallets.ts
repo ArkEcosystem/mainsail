@@ -1,7 +1,7 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { BlockData, MultiSignatureAsset } from "../crypto/index.js";
-import { StateRepository, StateRepositoryChange } from "./repository.js";
+import { StateRepository } from "./repository.js";
 
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
@@ -23,10 +23,6 @@ export enum WalletIndexes {
 	Usernames = "usernames",
 	Resignations = "resignations",
 	Validators = "validators",
-}
-
-export interface WalletChange extends StateRepositoryChange {
-	address: string;
 }
 
 export interface Wallet extends Omit<StateRepository, "toJson"| "fromJson" | "commitChanges" | "changesToJson"> {
@@ -54,7 +50,6 @@ export interface Wallet extends Omit<StateRepository, "toJson"| "fromJson" | "co
 	getOriginal(): Wallet;
 
 	commitChanges(walletRepository: WalletRepository): void;
-
 }
 
 export interface ValidatorWallet {
@@ -75,16 +70,6 @@ export interface WalletValidatorAttributes {
 }
 
 export type WalletMultiSignatureAttributes = MultiSignatureAsset & { legacy?: boolean };
-
-export type WalletRepositoryChange = {
-	wallets: WalletChange[];
-	indexes: {
-		[index: string]: {
-			forgets: string[];
-			sets: Record<string, string>;
-		};
-	};
-};
 
 export interface WalletRepository {
 	allByAddress(): ReadonlyArray<Wallet>;

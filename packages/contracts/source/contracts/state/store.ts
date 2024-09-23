@@ -1,11 +1,6 @@
 import { Block, Commit, CommitHandler } from "../crypto/index.js";
-import { StateRepositoryChange } from "./repository.js";
-import { WalletRepository, WalletRepositoryChange } from "./wallets.js";
+import { WalletRepository } from "./wallets.js";
 
-export type StoreChange = {
-	walletRepository: WalletRepositoryChange;
-	store: StateRepositoryChange;
-};
 
 export interface Store extends CommitHandler {
 	readonly walletRepository: WalletRepository;

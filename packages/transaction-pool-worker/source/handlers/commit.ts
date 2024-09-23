@@ -21,14 +21,14 @@ export class CommitHandler {
 	public async handle(data: {
 		block: string;
 		failedTransactions: string[];
-		store: Contracts.State.StoreChange;
 	}): Promise<void> {
 		try {
 			const store = this.stateService.createStoreClone();
 
 			store.commitChanges();
 
-			this.configuration.setHeight(store.getLastHeight() + 1);
+			// TODO: Pass height
+			this.configuration.setHeight(1);
 
 			const block = await this.blockFactory.fromHex(data.block);
 			store.setLastBlock(block);

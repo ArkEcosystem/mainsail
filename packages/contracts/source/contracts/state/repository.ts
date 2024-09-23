@@ -1,13 +1,4 @@
-import { JsonObject } from "type-fest";
-
 import { AttributeRepository } from "./attributes.js";
-
-export interface StateRepositoryChange {
-	set: {
-		[key: string]: JsonObject;
-	};
-	forget: string[];
-}
 
 export interface StateRepository {
 	isChanged(): boolean;
@@ -20,12 +11,6 @@ export interface StateRepository {
 
 	isClone(): boolean;
 	commitChanges(): void;
-
-	toJson(): JsonObject;
-	fromJson(data: JsonObject): StateRepository;
-
-	changesToJson(): StateRepositoryChange;
-	applyChanges(changes: StateRepositoryChange): void;
 }
 
 export interface StateRepositoryFactory {

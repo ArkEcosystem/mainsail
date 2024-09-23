@@ -1,15 +1,11 @@
-import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers, Utils } from "@mainsail/kernel";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 
-import { factory, jsonFactory } from "./attributes/index.js";
+import { factory } from "./attributes/index.js";
 
 @injectable()
 export class StateRepository implements Contracts.State.StateRepository {
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "state")
-	private readonly configuration!: Providers.PluginConfiguration;
-
 	protected readonly attributes = new Map<string, Contracts.State.Attribute<unknown>>();
 
 	protected attributeRepository!: Contracts.State.AttributeRepository;
@@ -18,7 +14,6 @@ export class StateRepository implements Contracts.State.StateRepository {
 
 	readonly #setAttributes = new Set<string>();
 	readonly #forgetAttributes = new Set<string>();
-	#skipUnknownAttributes = false;
 
 	public configure(
 		attributeRepository: Contracts.State.AttributeRepository,
@@ -32,8 +27,6 @@ export class StateRepository implements Contracts.State.StateRepository {
 			const attribute = factory(this.attributeRepository.getAttributeType(key), value);
 			this.attributes.set(key, attribute);
 		}
-
-		this.#skipUnknownAttributes = this.configuration.getRequired<boolean>("snapshots.skipUnknownAttributes");
 
 		return this;
 	}
@@ -123,78 +116,6 @@ export class StateRepository implements Contracts.State.StateRepository {
 				this.#originalRepository.setAttribute(attributeName, this.attributes.get(attributeName)!.get());
 			}
 		}
-	}
-
-	public changesToJson(): Contracts.State.StateRepositoryChange {
-		const set = {};
-		const forget: string[] = [];
-
-		for (const name of this.#forgetAttributes) {
-			if (this.#setAttributes.has(name)) {
-				continue;
-			}
-
-			forget.push(name);
-		}
-
-		for (const name of this.#setAttributes) {
-			set[name] = this.getAttributeHolder(name).toJson();
-		}
-
-		return {
-			forget,
-			set,
-		};
-	}
-
-	public applyChanges(data: Contracts.State.StateRepositoryChange): void {
-		for (const name of data.forget) {
-			if (!this.attributeRepository.has(name)) {
-				continue;
-			}
-
-			this.forgetAttribute(name);
-			this.#forgetAttributes.add(name);
-		}
-
-		for (const [name, value] of Object.entries(data.set)) {
-			// Skip attributes that are not registered
-			if (!this.attributeRepository.has(name)) {
-				continue;
-			}
-
-			this.attributes.set(name, jsonFactory(this.attributeRepository.getAttributeType(name), value));
-			this.#setAttributes.add(name);
-		}
-	}
-
-	public toJson(): Contracts.Types.JsonObject {
-		const result = {};
-
-		for (const name of this.attributeRepository.getAttributeNames()) {
-			if (this.hasAttribute(name)) {
-				result[name] = this.getAttributeHolder(name).toJson();
-			}
-		}
-
-		return result;
-	}
-
-	public fromJson(data: Contracts.Types.JsonObject): StateRepository {
-		if (this.isChanged()) {
-			throw new Error("Cannot restore to a changed repository.");
-		}
-
-		for (const [key, value] of Object.entries(data)) {
-			if (this.#skipUnknownAttributes && !this.attributeRepository.has(key)) {
-				continue;
-			}
-
-			const attribute = jsonFactory(this.attributeRepository.getAttributeType(key), value);
-			this.attributes.set(key, attribute);
-		}
-
-		return this;
 	}
 
 	protected getAttributeHolder<T>(key: string): Contracts.State.Attribute<T> {

@@ -147,11 +147,6 @@ export class Wallet implements Contracts.State.Wallet {
 		this.walletRepository = walletRepository;
 	}
 
-	public applyChanges(data: Contracts.State.WalletChange): void {
-		this.#repository.applyChanges(data);
-		this.walletRepository.setDirtyWallet(this);
-	}
-
 	public toString(): string {
 		if (this.hasAttribute("username")) {
 			return this.getAttribute<string>("username");

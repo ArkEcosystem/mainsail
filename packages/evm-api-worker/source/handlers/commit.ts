@@ -15,13 +15,12 @@ export class CommitHandler {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(data: { block: string; store: Contracts.State.StoreChange }): Promise<void> {
+	public async handle(data: { block: string; }): Promise<void> {
 		try {
 			const store = this.stateService.createStoreClone();
 
-			store.commitChanges();
-
-			this.configuration.setHeight(store.getLastHeight() + 1);
+			// TODO: Set height
+			this.configuration.setHeight(1);
 
 			const block = await this.blockFactory.fromHex(data.block);
 			store.setLastBlock(block);
