@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable,  tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { strictEqual } from "assert";
@@ -12,18 +12,8 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
-
-	#walletRepository!: Contracts.State.WalletRepository;
-
-	@postConstruct()
-	public initialize(): void {
-		this.#walletRepository = this.stateService.createStoreClone().walletRepository;
-	}
 
 	public getEvm(): Contracts.Evm.Instance {
 		return this.evm;
@@ -52,7 +42,6 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 					},
 					instance: this.evm,
 				},
-				walletRepository: this.#walletRepository,
 			},
 			transaction,
 		);

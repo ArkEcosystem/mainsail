@@ -71,24 +71,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-		const sender: Contracts.State.Wallet = await context.walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
-
-		//const data: Contracts.Crypto.TransactionData = transaction.data;
-
-		await this.throwIfCannotBeApplied(transaction, sender);
-
-		//this.#verifyTransactionNonceApply(sender, transaction);
-
-		// AppUtils.assert.defined<BigNumber>(data.nonce);
-		// sender.setNonce(data.nonce);
-
-		// Subtract fee
-		// this.applyFeeToSender(transaction, sender);
-
 		return { gasUsed: 0 };
 	}
 
@@ -135,7 +117,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	protected verifyTransactionFee(
-		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): void {

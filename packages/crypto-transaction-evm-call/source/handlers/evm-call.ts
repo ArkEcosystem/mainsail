@@ -17,6 +17,9 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
@@ -60,13 +63,14 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		const { evmCall } = transaction.data.asset;
 
 		const { evmSpec } = this.configuration.getMilestone();
-		const sender = await context.walletRepository.findByPublicKey(transaction.data.senderPublicKey);
+
+		const address = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
 
 		try {
 			const { instance, blockContext } = context.evm;
 			const { receipt } = await instance.process({
 				blockContext,
-				caller: sender.getAddress(),
+				caller: address,
 				data: Buffer.from(evmCall.payload, "hex"),
 				gasLimit: BigInt(evmCall.gasLimit),
 				gasPrice: transaction.data.fee.toBigInt(),
@@ -89,7 +93,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 				void this.#emit(Events.EvmEvent.TransactionReceipt, {
 					receipt,
-					sender: sender.getAddress(),
+					sender: address,
 					transactionId: transaction.id,
 				});
 			}
@@ -101,7 +105,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	protected verifyTransactionFee(
-		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): void {

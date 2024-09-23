@@ -43,7 +43,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 				},
 				instance: this.evm,
 			},
-			walletRepository,
 		};
 
 		if (!(await transactionHandler.verify(transaction))) {

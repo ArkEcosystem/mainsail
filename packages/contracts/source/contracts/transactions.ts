@@ -1,11 +1,10 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
 import { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
-import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
+import { AttributeType, Wallet } from "./state/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
 
 export type TransactionHandlerContext = {
-	walletRepository: WalletRepository;
 	evm: {
 		instance: Instance;
 		blockContext: BlockContext;
