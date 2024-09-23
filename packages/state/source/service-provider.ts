@@ -6,7 +6,6 @@ import { AttributeRepository } from "./attributes/index.js";
 import { stateRepositoryFactory } from "./factory.js";
 import { Service } from "./service.js";
 import { State } from "./state.js";
-import { StateVerifier } from "./state-verifier.js";
 import { Store } from "./store.js";
 import { walletFactory } from "./wallets/factory.js";
 import { IndexSet, WalletRepository, WalletRepositoryClone } from "./wallets/index.js";
@@ -70,7 +69,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.State.Service).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.State.State).to(State).inSingletonScope();
-		this.app.bind(Identifiers.State.Verifier).to(StateVerifier);
 	}
 
 	public configSchema(): Joi.AnySchema {

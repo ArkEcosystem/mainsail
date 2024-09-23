@@ -15,9 +15,6 @@ export class Bootstrapper {
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
-	@inject(Identifiers.State.Verifier)
-	private readonly stateVerifier!: Contracts.State.StateVerifier;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -72,7 +69,6 @@ export class Bootstrapper {
 
 			this.state.setBootstrap(false);
 
-			this.stateVerifier.verifyWalletsConsistency();
 			this.validatorRepository.printLoadedValidators();
 			await this.txPoolWorker.start();
 
