@@ -6,9 +6,6 @@ export class Service implements Contracts.State.Service {
 	@inject(Identifiers.State.Store.Factory)
 	private readonly storeFactory!: Contracts.State.StoreFactory;
 
-	@inject(Identifiers.State.WalletRepository.BySender.Factory)
-	private readonly walletRepositoryBySenderFactory!: Contracts.State.WalletRepositoryBySenderFactory;
-
 	#baseStore!: Contracts.State.Store;
 
 	@postConstruct()
@@ -25,10 +22,6 @@ export class Service implements Contracts.State.Service {
 	// The base store is only updated when a block is committed in onCommit method
 	public createStoreClone(): Contracts.State.Store {
 		return this.storeFactory(this.#baseStore);
-	}
-
-	public async createWalletRepositoryBySender(publicKey: string): Promise<Contracts.State.WalletRepository> {
-		return this.walletRepositoryBySenderFactory(this.#baseStore.walletRepository, publicKey);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {

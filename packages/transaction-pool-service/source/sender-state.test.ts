@@ -47,7 +47,6 @@ describe<{
 		context.walletRepository = {};
 
 		context.stateService = {
-			createWalletRepositoryBySender: () => context.walletRepository,
 		};
 
 		context.container = new Container();

@@ -9,7 +9,7 @@ import { State } from "./state.js";
 import { StateVerifier } from "./state-verifier.js";
 import { Store } from "./store.js";
 import { walletFactory } from "./wallets/factory.js";
-import { IndexSet, WalletRepository, WalletRepositoryBySender, WalletRepositoryClone } from "./wallets/index.js";
+import { IndexSet, WalletRepository, WalletRepositoryClone } from "./wallets/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -58,12 +58,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					walletRepository
 						? container.resolve(WalletRepositoryClone).configure(walletRepository)
 						: container.resolve(WalletRepository),
-		);
-
-		this.app.bind(Identifiers.State.WalletRepository.BySender.Factory).toFactory(
-			({ container }) =>
-				async (walletRepository: WalletRepository, publicKey: string) =>
-					await container.resolve(WalletRepositoryBySender).configure(walletRepository, publicKey),
 		);
 
 		this.app.bind(Identifiers.State.Store.Factory).toFactory(

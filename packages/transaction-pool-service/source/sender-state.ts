@@ -14,9 +14,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.State.Service)
-	private stateService!: Contracts.State.Service;
-
 	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
@@ -30,7 +27,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	#corrupt = false;
 
 	public async configure(publicKey): Promise<SenderState> {
-		this.#walletRepository = await this.stateService.createWalletRepositoryBySender(publicKey);
 		return this;
 	}
 
