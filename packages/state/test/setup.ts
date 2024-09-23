@@ -279,13 +279,6 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);
 
-	@injectable()
-	class MockValidatorMutator implements Contracts.State.ValidatorMutator {
-		public apply = spy();
-		public revert = spy();
-	}
-
-	sandbox.app.bind(Identifiers.State.ValidatorMutator).to(MockValidatorMutator).inSingletonScope();
 
 	sandbox.app.bind(Identifiers.Proposer.Selector).to(Selector);
 

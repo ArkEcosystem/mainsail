@@ -114,18 +114,6 @@ export class Wallet implements Contracts.State.Wallet {
 		this.walletRepository.setDirtyWallet(this);
 	}
 
-	public isValidator(): boolean {
-		return this.hasAttribute("validatorPublicKey");
-	}
-
-	public hasVoted(): boolean {
-		return this.hasAttribute("vote");
-	}
-
-	public hasMultiSignature(): boolean {
-		return this.hasAttribute("multiSignature");
-	}
-
 	public clone(walletRepository: Contracts.State.WalletRepository): Contracts.State.Wallet {
 		return this.createWalletFactory(this.address, walletRepository, this);
 	}

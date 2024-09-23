@@ -25,8 +25,7 @@ export enum WalletIndexes {
 	Validators = "validators",
 }
 
-export interface Wallet extends Omit<StateRepository, "toJson"| "fromJson" | "commitChanges" | "changesToJson"> {
-	// TODO: Use one form set / increase
+export interface Wallet extends Omit<StateRepository, "commitChanges"> {
 	getAddress(): string;
 
 	getPublicKey(): string | undefined;
@@ -41,10 +40,6 @@ export interface Wallet extends Omit<StateRepository, "toJson"| "fromJson" | "co
 	setNonce(nonce: BigNumber): void;
 	increaseNonce(): void;
 	decreaseNonce(): void;
-
-	isValidator(): boolean;
-	hasVoted(): boolean;
-	hasMultiSignature(): boolean;
 
 	clone(walletRepository: WalletRepository): Wallet;
 	getOriginal(): Wallet;

@@ -4,8 +4,6 @@ import Joi from "joi";
 
 import { AttributeRepository } from "./attributes/index.js";
 import { stateRepositoryFactory } from "./factory.js";
-import { AttributeMutator } from "./mutators/attribute.js";
-import { BalanceMutator } from "./mutators/balance.js";
 import { Service } from "./service.js";
 import { State } from "./state.js";
 import { StateVerifier } from "./state-verifier.js";
@@ -79,9 +77,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.State.Service).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.State.State).to(State).inSingletonScope();
 		this.app.bind(Identifiers.State.Verifier).to(StateVerifier);
-
-		this.app.bind(Identifiers.State.ValidatorMutator).to(AttributeMutator);
-		this.app.bind(Identifiers.State.ValidatorMutator).to(BalanceMutator);
 	}
 
 	public configSchema(): Joi.AnySchema {

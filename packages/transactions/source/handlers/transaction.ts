@@ -29,14 +29,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		const senderWallet: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-			transaction.data.senderPublicKey,
-		);
-
-		if (senderWallet.hasMultiSignature()) {
-			return this.verifySignatures(senderWallet, transaction.data);
-		}
-
 		return this.verifier.verifyHash(transaction.data);
 	}
 
@@ -69,40 +61,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 		if (transaction.data.senderPublicKey !== sender.getPublicKey()) {
 			throw new Exceptions.SenderWalletMismatchError();
-		}
-
-		// Prevent legacy multi signatures from being used
-		const isMultiSignatureRegistration: boolean =
-			transaction.type === Contracts.Crypto.TransactionType.MultiSignature &&
-			transaction.typeGroup === Contracts.Crypto.TransactionTypeGroup.Core;
-
-		if (sender.hasMultiSignature()) {
-			AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
-			// Ensure the database wallet already has a multi signature, in case we checked a pool wallet.
-			const databaseSender: Contracts.State.Wallet = await walletRepository.findByPublicKey(
-				transaction.data.senderPublicKey,
-			);
-
-			if (!databaseSender.hasMultiSignature()) {
-				throw new Exceptions.MissingMultiSignatureOnSenderError();
-			}
-
-			if (databaseSender.hasAttribute("multiSignature.legacy")) {
-				throw new Exceptions.LegacyMultiSignatureError();
-			}
-
-			if (
-				!(await this.verifySignatures(
-					databaseSender,
-					transaction.data,
-					databaseSender.getAttribute("multiSignature"),
-				))
-			) {
-				throw new Exceptions.InvalidMultiSignaturesError();
-			}
-		} else if (transaction.data.signatures && !isMultiSignatureRegistration) {
-			throw new Exceptions.UnsupportedMultiSignatureRegistrationTransactionError();
 		}
 	}
 

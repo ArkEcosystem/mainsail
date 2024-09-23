@@ -37,7 +37,7 @@ export class ValidatorsController extends Controller {
 			wallet = walletRepository.findByUsername(walletId);
 		}
 
-		if (!wallet || !wallet.isValidator()) {
+		if (!wallet) {
 			return notFound("Wallet not found");
 		}
 

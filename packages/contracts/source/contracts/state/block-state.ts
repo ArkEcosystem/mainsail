@@ -1,4 +1,4 @@
-import { Block, BlockData, TransactionData } from "../crypto/index.js";
+import { Block, TransactionData } from "../crypto/index.js";
 import { Wallet, WalletRepository } from "./wallets.js";
 
 export interface BlockState {
@@ -12,8 +12,4 @@ export interface VoteBalanceMutator {
 		recipient: Wallet,
 		transaction: TransactionData,
 	): Promise<void>;
-}
-
-export interface ValidatorMutator {
-	apply(walletRepository: WalletRepository, wallet: Wallet, block: BlockData): Promise<void>;
 }
