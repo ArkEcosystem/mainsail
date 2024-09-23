@@ -2385,15 +2385,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      fs-extra:
-        specifier: 11.2.0
-        version: 11.2.0
       joi:
         specifier: 17.12.2
         version: 17.12.2
-      pumpify:
-        specifier: 2.0.1
-        version: 2.0.1
     devDependencies:
       '@mainsail/crypto-config':
         specifier: workspace:*
