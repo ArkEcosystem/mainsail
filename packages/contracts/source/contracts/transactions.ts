@@ -18,7 +18,7 @@ export interface TransactionApplyResult {
 }
 
 export interface TransactionHandler {
-	verify(context: TransactionHandlerContext, transaction: Transaction): Promise<boolean>;
+	verify(transaction: Transaction): Promise<boolean>;
 
 	throwIfCannotBeApplied(context: TransactionHandlerContext, transaction: Transaction, sender: Wallet): Promise<void>;
 

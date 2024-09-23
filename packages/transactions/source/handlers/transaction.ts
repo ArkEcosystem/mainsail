@@ -24,7 +24,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	public async verify(
-		{ walletRepository }: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);

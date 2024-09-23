@@ -46,7 +46,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			walletRepository,
 		};
 
-		if (!(await transactionHandler.verify(transactionHandlerContext, transaction))) {
+		if (!(await transactionHandler.verify(transaction))) {
 			throw new Exceptions.InvalidSignatureError();
 		}
 
