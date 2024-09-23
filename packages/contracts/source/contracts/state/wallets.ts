@@ -1,5 +1,4 @@
 import { BigNumber } from "@mainsail/utils";
-import { JsonObject } from "type-fest";
 
 import { BlockData, MultiSignatureAsset } from "../crypto/index.js";
 import { StateRepository, StateRepositoryChange } from "./repository.js";
@@ -30,7 +29,7 @@ export interface WalletChange extends StateRepositoryChange {
 	address: string;
 }
 
-export interface Wallet extends Omit<StateRepository, "fromJson" | "commitChanges" | "changesToJson"> {
+export interface Wallet extends Omit<StateRepository, "toJson"| "fromJson" | "commitChanges" | "changesToJson"> {
 	// TODO: Use one form set / increase
 	getAddress(): string;
 
@@ -54,12 +53,8 @@ export interface Wallet extends Omit<StateRepository, "fromJson" | "commitChange
 	clone(walletRepository: WalletRepository): Wallet;
 	getOriginal(): Wallet;
 
-	fromJson(data: JsonObject): Wallet;
 	commitChanges(walletRepository: WalletRepository): void;
 
-	changesToJson(): WalletChange;
-
-	toString(): string;
 }
 
 export interface ValidatorWallet {
@@ -116,9 +111,6 @@ export interface WalletRepository {
 	getDirtyWallets(): IterableIterator<Wallet>;
 
 	commitChanges(): void;
-
-	changesToJson(): WalletRepositoryChange;
-	applyChanges(changes: WalletRepositoryChange): void;
 }
 
 export type WalletRepositoryFactory = (originalWalletRepository?: WalletRepository) => WalletRepository;

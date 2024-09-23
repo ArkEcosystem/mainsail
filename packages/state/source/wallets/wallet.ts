@@ -147,36 +147,6 @@ export class Wallet implements Contracts.State.Wallet {
 		this.walletRepository = walletRepository;
 	}
 
-	public toJson(): Contracts.Types.JsonObject {
-		return {
-			address: this.address,
-			...this.#repository.toJson(),
-		};
-	}
-
-	public fromJson(json: Contracts.Types.JsonObject): Wallet {
-		const jsonClone = { ...json };
-		delete jsonClone.address;
-		this.#repository.fromJson(jsonClone);
-
-		if (!this.#repository.hasAttribute("balance")) {
-			throw new Error(`Attribute "balance" is not set for wallet: ${this.address}`);
-		}
-
-		if (!this.#repository.hasAttribute("nonce")) {
-			throw new Error(`Attribute "nonce" is not set for wallet: ${this.address}`);
-		}
-
-		return this;
-	}
-
-	public changesToJson(): Contracts.State.WalletChange {
-		return {
-			address: this.address,
-			...this.#repository.changesToJson(),
-		};
-	}
-
 	public applyChanges(data: Contracts.State.WalletChange): void {
 		this.#repository.applyChanges(data);
 		this.walletRepository.setDirtyWallet(this);

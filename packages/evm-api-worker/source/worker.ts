@@ -52,7 +52,6 @@ export class Worker implements Contracts.Evm.Worker {
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.ipcSubprocess.sendRequest("commit", {
 			block: unit.getBlock().serialized,
-			store: unit.store.changesToJson(),
 		});
 	}
 

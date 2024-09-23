@@ -106,24 +106,4 @@ export class Store implements Contracts.State.Store {
 			this.#walletRepository.commitChanges();
 		}
 	}
-
-	public toJson(): Contracts.Types.JsonObject {
-		return this.#repository.toJson();
-	}
-
-	public fromJson(data: Contracts.Types.JsonObject): void {
-		this.#repository.fromJson(data);
-	}
-
-	public changesToJson(): Contracts.State.StoreChange {
-		return {
-			store: this.#repository.changesToJson(),
-			walletRepository: this.#walletRepository.changesToJson(),
-		};
-	}
-
-	public applyChanges(data: Contracts.State.StoreChange): void {
-		this.#repository.applyChanges(data.store);
-		this.#walletRepository.applyChanges(data.walletRepository);
-	}
 }
