@@ -32,19 +32,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async throwIfCannotBeApplied(
-		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
-		const { walletRepository } = context;
-		const senderWallet: Contracts.State.Wallet = walletRepository.findByAddress(sender.getAddress());
-
-		AppUtils.assert.defined<string>(sender.getPublicKey());
-
-		if (!walletRepository.hasByPublicKey(sender.getPublicKey()!) && senderWallet.getBalance().isZero()) {
-			throw new Exceptions.ColdWalletError();
-		}
-
 		// @TODO: enforce fees here to support dynamic cases
 
 		//this.#verifyTransactionNonceApply(sender, transaction);
@@ -89,7 +79,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 		//const data: Contracts.Crypto.TransactionData = transaction.data;
 
-		await this.throwIfCannotBeApplied(context, transaction, sender);
+		await this.throwIfCannotBeApplied(transaction, sender);
 
 		//this.#verifyTransactionNonceApply(sender, transaction);
 

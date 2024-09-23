@@ -20,7 +20,7 @@ export interface TransactionApplyResult {
 export interface TransactionHandler {
 	verify(transaction: Transaction): Promise<boolean>;
 
-	throwIfCannotBeApplied(context: TransactionHandlerContext, transaction: Transaction, sender: Wallet): Promise<void>;
+	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet): Promise<void>;
 
 	throwIfCannotEnterPool(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
 

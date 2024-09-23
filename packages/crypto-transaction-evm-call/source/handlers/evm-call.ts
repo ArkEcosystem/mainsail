@@ -30,11 +30,10 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotBeApplied(
-		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 		wallet: Contracts.State.Wallet,
 	): Promise<void> {
-		return super.throwIfCannotBeApplied(context, transaction, wallet);
+		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
 	public async throwIfCannotEnterPool(
