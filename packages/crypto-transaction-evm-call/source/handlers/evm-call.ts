@@ -37,7 +37,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	}
 
 	public async throwIfCannotEnterPool(
-		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {}
 

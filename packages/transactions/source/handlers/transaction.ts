@@ -106,7 +106,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public async throwIfCannotEnterPool(
-		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {}
 
