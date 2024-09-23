@@ -1,5 +1,4 @@
 export * from "./attributes.js";
-export * from "./block-state.js";
 export * from "./index-set.js";
 export * from "./repository.js";
 export * from "./service.js";
