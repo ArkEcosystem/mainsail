@@ -22,7 +22,7 @@ export interface TransactionHandler {
 
 	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet): Promise<void>;
 
-	throwIfCannotEnterPool(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
+	throwIfCannotEnterPool(transaction: Transaction): Promise<void>;
 
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
