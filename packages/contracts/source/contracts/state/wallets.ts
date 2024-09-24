@@ -1,15 +1,9 @@
 import { BigNumber } from "@mainsail/utils";
 
 import { BlockData, MultiSignatureAsset } from "../crypto/index.js";
-import { StateRepository } from "./repository.js";
 
-// @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
-
-export interface Wallet extends Omit<StateRepository, "commitChanges"> {
+export interface Wallet {
 	getAddress(): string;
-
-	getPublicKey(): string | undefined;
-	setPublicKey(publicKey: string): void;
 
 	getBalance(): BigNumber;
 	setBalance(balance: BigNumber): void;
@@ -20,8 +14,6 @@ export interface Wallet extends Omit<StateRepository, "commitChanges"> {
 	setNonce(nonce: BigNumber): void;
 	increaseNonce(): void;
 	decreaseNonce(): void;
-
-	getOriginal(): Wallet;
 }
 
 export interface ValidatorWallet {

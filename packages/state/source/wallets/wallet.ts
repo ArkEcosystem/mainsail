@@ -11,46 +11,18 @@ export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributeRepository!: Contracts.State.AttributeRepository;
 
 	protected address!: string;
-	protected walletRepository!: any;
-	protected originalWallet?: Wallet;
+	protected balance = BigNumber.ZERO;
+	protected nonce = BigNumber.ZERO;
 
 	#repository!: Contracts.State.StateRepository;
 
-	public init(address: string, walletRepository: any, originalWallet?: Wallet): Wallet {
+	public init(address: string): Wallet {
 		this.address = address;
-		this.walletRepository = walletRepository;
-		this.originalWallet = originalWallet;
-
-		if (originalWallet) {
-			this.#repository = this.createStateRepository(this.attributeRepository, originalWallet.#repository);
-		} else {
-			this.#repository = this.createStateRepository(this.attributeRepository, undefined, {
-				balance: BigNumber.ZERO,
-				nonce: BigNumber.ZERO,
-			});
-		}
-
 		return this;
-	}
-
-	public isChanged(): boolean {
-		return this.#repository.isChanged();
 	}
 
 	public getAddress(): string {
 		return this.address;
-	}
-
-	public getPublicKey(): string | undefined {
-		if (!this.hasAttribute("publicKey")) {
-			return undefined;
-		}
-
-		return this.getAttribute<string>("publicKey");
-	}
-
-	public setPublicKey(publicKey: string): void {
-		this.setAttribute("publicKey", publicKey);
 	}
 
 	public getBalance(): BigNumber {
@@ -58,7 +30,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public setBalance(balance: BigNumber): void {
-		this.setAttribute("balance", balance);
+		this.balance = balance;
 	}
 
 	public getNonce(): BigNumber {
@@ -66,7 +38,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public setNonce(nonce: BigNumber): void {
-		this.setAttribute("nonce", nonce);
+		this.nonce = nonce;
 	}
 
 	public increaseBalance(balance: BigNumber): Contracts.State.Wallet {
@@ -99,35 +71,5 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public getAttributes(): Record<string, any> {
 		return this.#repository.getAttributes();
-	}
-
-	public setAttribute<T>(key: string, value: T): void {
-		this.#repository.setAttribute<T>(key, value);
-		this.walletRepository.setDirtyWallet(this);
-	}
-
-	public forgetAttribute(key: string): void {
-		this.#repository.forgetAttribute(key);
-		this.walletRepository.setDirtyWallet(this);
-	}
-
-	public isClone(): boolean {
-		return !!this.originalWallet;
-	}
-
-	public getOriginal(): Contracts.State.Wallet {
-		if (this.originalWallet) {
-			return this.originalWallet;
-		}
-
-		throw new Error("This is not a clone wallet");
-	}
-
-	public toString(): string {
-		if (this.hasAttribute("username")) {
-			return this.getAttribute<string>("username");
-		}
-
-		return this.address;
 	}
 }

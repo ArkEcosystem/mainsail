@@ -48,9 +48,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			throw new Exceptions.InsufficientBalanceError();
 		}
 
-		if (transaction.data.senderPublicKey !== sender.getPublicKey()) {
-			throw new Exceptions.SenderWalletMismatchError();
-		}
+		// if (transaction.data.senderPublicKey !== sender.getPublicKey()) {
+		// 	throw new Exceptions.SenderWalletMismatchError();
+		// }
 	}
 
 	public async apply(
@@ -94,9 +94,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,
 		transaction: Contracts.Crypto.TransactionData,
-		multiSignature?: Contracts.Crypto.MultiSignatureAsset,
+		multiSignature: Contracts.Crypto.MultiSignatureAsset,
 	): Promise<boolean> {
-		return this.verifier.verifySignatures(transaction, multiSignature || wallet.getAttribute("multiSignature"));
+		return this.verifier.verifySignatures(transaction, multiSignature);
 	}
 
 	// #verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.Transaction): void {

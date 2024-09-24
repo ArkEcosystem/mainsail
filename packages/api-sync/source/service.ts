@@ -190,10 +190,10 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			wallets: dirtyWallets.map((wallet) => ({
 				address: wallet.getAddress(),
-				attributes: wallet.getAttributes(),
+				attributes: [],
 				balance: wallet.getBalance().toFixed(),
 				nonce: wallet.getNonce().toFixed(),
-				publicKey: wallet.getPublicKey()!,
+				publicKey: "",
 				updated_at: header.height.toFixed(),
 			})),
 
