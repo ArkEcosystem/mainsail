@@ -1,5 +1,4 @@
 export * from "./attributes.js";
-export * from "./index-set.js";
 export * from "./repository.js";
 export * from "./service.js";
 export * from "./state.js";

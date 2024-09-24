@@ -1,3 +1,2 @@
-export * from "./index-set.js";
 export * from "./wallet.js";
 export * from "./wallet-index.js";

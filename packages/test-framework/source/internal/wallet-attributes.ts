@@ -1,5 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Attributes, Wallets } from "@mainsail/state";
+import { Attributes } from "@mainsail/state";
 
 export function getAttributeRepository(): Contracts.State.AttributeRepository {
 	const attributes = new Attributes.AttributeRepository();
@@ -16,11 +16,3 @@ export function getAttributeRepository(): Contracts.State.AttributeRepository {
 	return attributes;
 }
 
-export function getIndexSet(): Contracts.State.IndexSet {
-	const indexSet = new Wallets.IndexSet();
-	indexSet.set(Contracts.State.WalletIndexes.Addresses);
-	indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
-	indexSet.set(Contracts.State.WalletIndexes.Usernames);
-	indexSet.set(Contracts.State.WalletIndexes.Validators);
-	return indexSet;
-}

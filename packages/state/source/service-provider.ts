@@ -8,20 +8,9 @@ import { Service } from "./service.js";
 import { State } from "./state.js";
 import { Store } from "./store.js";
 import { walletFactory } from "./wallets/factory.js";
-import { IndexSet } from "./wallets/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		// Register indexes
-		this.app.bind(Identifiers.State.WalletRepository.IndexSet).to(IndexSet).inSingletonScope();
-		const indexSet = this.app.get<Contracts.State.IndexSet>(Identifiers.State.WalletRepository.IndexSet);
-		indexSet.set(Contracts.State.WalletIndexes.Addresses);
-		indexSet.set(Contracts.State.WalletIndexes.PublicKeys);
-		indexSet.set(Contracts.State.WalletIndexes.Usernames);
-		indexSet.set(Contracts.State.WalletIndexes.Validators);
-		// TODO: remove resignations index
-		indexSet.set(Contracts.State.WalletIndexes.Resignations);
-
 		this.app.bind(Identifiers.State.AttributeRepository).to(AttributeRepository).inSingletonScope();
 		const stateAttributeRepository = this.app.get<Contracts.State.AttributeRepository>(
 			Identifiers.State.AttributeRepository,
