@@ -17,7 +17,7 @@ export class CommitHandler {
 
 	public async handle(data: { block: string; }): Promise<void> {
 		try {
-			const store = this.stateService.createStoreClone();
+			const store = this.stateService.getStore();
 
 			// TODO: Set height
 			this.configuration.setHeight(1);

@@ -43,7 +43,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	@postConstruct()
 	public initialize(): void {
-		this.#store = this.stateService.createStoreClone();
+		this.#store = this.stateService.getStore();
 	}
 
 	public get height(): number {

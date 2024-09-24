@@ -16,7 +16,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 
 	@postConstruct()
 	public initialize(): void {
-		this.#store = this.stateService.createStoreClone();
+		this.#store = this.stateService.getStore();
 	}
 
 	public get height(): number {

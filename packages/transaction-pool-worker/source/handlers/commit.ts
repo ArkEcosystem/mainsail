@@ -23,7 +23,7 @@ export class CommitHandler {
 		failedTransactions: string[];
 	}): Promise<void> {
 		try {
-			const store = this.stateService.createStoreClone();
+			const store = this.stateService.getStore();
 
 			// TODO: Pass height
 			this.configuration.setHeight(1);

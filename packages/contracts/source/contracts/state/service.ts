@@ -3,5 +3,4 @@ import { Store } from "./store.js";
 
 export interface Service extends CommitHandler {
 	getStore(): Store;
-	createStoreClone(): Store;
 }
