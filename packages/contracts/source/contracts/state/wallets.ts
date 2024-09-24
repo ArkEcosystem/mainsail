@@ -41,10 +41,7 @@ export interface Wallet extends Omit<StateRepository, "commitChanges"> {
 	increaseNonce(): void;
 	decreaseNonce(): void;
 
-	clone(walletRepository: WalletRepository): Wallet;
 	getOriginal(): Wallet;
-
-	commitChanges(walletRepository: WalletRepository): void;
 }
 
 export interface ValidatorWallet {

@@ -123,28 +123,7 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 		this.#dirtyWallets.add(wallet);
 	}
 
-	public commitChanges(): void {
-		// Merge clones to originals
-		for (const wallet of this.#dirtyWallets.values()) {
-			wallet.commitChanges(this.#originalWalletRepository);
-		}
-
-		for (const indexName of this.indexSet.all()) {
-			// Update indexes
-			for (const [key, wallet] of this.getIndex(indexName).entries()) {
-				this.#originalWalletRepository.setOnIndex(
-					indexName,
-					key,
-					wallet.isClone() ? wallet.getOriginal() : wallet,
-				);
-			}
-
-			// Remove from forget indexes
-			for (const key of this.#getForgetSet(indexName).values()) {
-				this.#originalWalletRepository.forgetOnIndex(indexName, key);
-			}
-		}
-	}
+	public commitChanges(): void {}
 
 	#findByIndex(index: string, key: string): Contracts.State.Wallet | undefined {
 		const localIndex = this.getIndex(index);
@@ -158,9 +137,6 @@ export class WalletRepositoryClone extends WalletRepository implements Contracts
 
 			const localAddressIndex = this.getIndex(Contracts.State.WalletIndexes.Addresses);
 
-			if (!localAddressIndex.has(originalWallet.getAddress())) {
-				localAddressIndex.set(originalWallet.getAddress(), originalWallet.clone(this));
-			}
 
 			return localAddressIndex.get(originalWallet.getAddress())!;
 		}
