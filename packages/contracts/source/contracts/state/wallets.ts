@@ -50,7 +50,7 @@ export interface ValidatorWallet {
 	voteBalance: number;
 }
 
-export type WalletFactory = (address: string, walletRepository: WalletRepository, wallet?: Wallet) => Wallet;
+export type WalletFactory = (address: string, walletRepository: any, wallet?: Wallet) => Wallet;
 
 export interface WalletValidatorAttributes {
 	username: string;
@@ -62,39 +62,6 @@ export interface WalletValidatorAttributes {
 }
 
 export type WalletMultiSignatureAttributes = MultiSignatureAsset & { legacy?: boolean };
-
-export interface WalletRepository {
-	allByAddress(): ReadonlyArray<Wallet>;
-	allByPublicKey(): ReadonlyArray<Wallet>;
-	allValidators(): ReadonlyArray<Wallet>;
-	allByIndex(indexName: string): ReadonlyArray<Wallet>;
-
-	findByAddress(address: string): Wallet;
-	findByPublicKey(publicKey: string): Promise<Wallet>;
-	findByUsername(username: string): Wallet;
-	findByIndex(index: string, key: string): Wallet;
-
-	hasByAddress(address: string): boolean;
-	hasByPublicKey(publicKey: string): boolean;
-	hasByUsername(username: string): boolean;
-	hasByIndex(indexName: string, key: string): boolean;
-
-	getIndex(name: string): WalletIndex;
-	setOnIndex(index: string, key: string, wallet: Wallet): void;
-	forgetOnIndex(index: string, key: string): void;
-	sizeOfIndex(index: string): number;
-
-	setDirtyWallet(wallet: Wallet): void;
-	getDirtyWallets(): IterableIterator<Wallet>;
-
-	commitChanges(): void;
-}
-
-export type WalletRepositoryFactory = (originalWalletRepository?: WalletRepository) => WalletRepository;
-export type WalletRepositoryBySenderFactory = (
-	originalWalletRepository: WalletRepository,
-	publicKey: string,
-) => Promise<WalletRepository>;
 
 export enum SearchScope {
 	Wallets,

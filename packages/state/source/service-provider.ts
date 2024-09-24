@@ -8,7 +8,7 @@ import { Service } from "./service.js";
 import { State } from "./state.js";
 import { Store } from "./store.js";
 import { walletFactory } from "./wallets/factory.js";
-import { IndexSet, WalletRepository, WalletRepositoryClone } from "./wallets/index.js";
+import { IndexSet } from "./wallets/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -51,13 +51,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.State.Wallet.Factory).toFactory(walletFactory);
 
-		this.app.bind(Identifiers.State.WalletRepository.Base.Factory).toFactory(
-			({ container }) =>
-				(walletRepository: WalletRepository) =>
-					walletRepository
-						? container.resolve(WalletRepositoryClone).configure(walletRepository)
-						: container.resolve(WalletRepository),
-		);
 
 		this.app.bind(Identifiers.State.Store.Factory).toFactory(
 			({ container }) =>

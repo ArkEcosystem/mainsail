@@ -14,12 +14,12 @@ export class Wallet implements Contracts.State.Wallet {
 	protected readonly attributeRepository!: Contracts.State.AttributeRepository;
 
 	protected address!: string;
-	protected walletRepository!: Contracts.State.WalletRepository;
+	protected walletRepository!: any;
 	protected originalWallet?: Wallet;
 
 	#repository!: Contracts.State.StateRepository;
 
-	public init(address: string, walletRepository: Contracts.State.WalletRepository, originalWallet?: Wallet): Wallet {
+	public init(address: string, walletRepository: any, originalWallet?: Wallet): Wallet {
 		this.address = address;
 		this.walletRepository = walletRepository;
 		this.originalWallet = originalWallet;
@@ -114,10 +114,6 @@ export class Wallet implements Contracts.State.Wallet {
 		this.walletRepository.setDirtyWallet(this);
 	}
 
-	public clone(walletRepository: Contracts.State.WalletRepository): Contracts.State.Wallet {
-		return this.createWalletFactory(this.address, walletRepository, this);
-	}
-
 	public isClone(): boolean {
 		return !!this.originalWallet;
 	}
@@ -128,11 +124,6 @@ export class Wallet implements Contracts.State.Wallet {
 		}
 
 		throw new Error("This is not a clone wallet");
-	}
-
-	public commitChanges(walletRepository: Contracts.State.WalletRepository): void {
-		this.#repository.commitChanges();
-		this.walletRepository = walletRepository;
 	}
 
 	public toString(): string {
