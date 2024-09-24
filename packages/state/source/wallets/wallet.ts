@@ -4,9 +4,6 @@ import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Wallet implements Contracts.State.Wallet {
-	@inject(Identifiers.State.Wallet.Factory)
-	protected readonly createWalletFactory!: Contracts.State.WalletFactory;
-
 	@inject(Identifiers.State.StateRepository.Factory)
 	protected readonly createStateRepository!: Contracts.State.StateRepositoryFactory;
 

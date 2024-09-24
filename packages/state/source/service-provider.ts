@@ -7,7 +7,6 @@ import { stateRepositoryFactory } from "./factory.js";
 import { Service } from "./service.js";
 import { State } from "./state.js";
 import { Store } from "./store.js";
-import { walletFactory } from "./wallets/factory.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -37,9 +36,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		walletAttributeRepository.set("validatorApproval", Contracts.State.AttributeType.Number);
 		walletAttributeRepository.set("validatorResigned", Contracts.State.AttributeType.Boolean);
 		walletAttributeRepository.set("vote", Contracts.State.AttributeType.String);
-
-		this.app.bind(Identifiers.State.Wallet.Factory).toFactory(walletFactory);
-
 
 		this.app.bind(Identifiers.State.Store.Factory).toFactory(
 			({ container }) =>

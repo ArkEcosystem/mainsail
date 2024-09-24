@@ -50,8 +50,6 @@ export interface ValidatorWallet {
 	voteBalance: number;
 }
 
-export type WalletFactory = (address: string, walletRepository: any, wallet?: Wallet) => Wallet;
-
 export interface WalletValidatorAttributes {
 	username: string;
 	voteBalance: BigNumber;

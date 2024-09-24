@@ -248,13 +248,6 @@ export const Identifiers = {
 		},
 		Wallet: {
 			Attributes: Symbol("State<Wallet<Attributes>>"),
-			Factory: Symbol("State<Wallet<Factory>>"),
-		},
-		WalletRepository: {
-			Base: {
-				Factory: Symbol("State<WalletRepository<Base<Factory>>>"),
-			},
-			IndexSet: Symbol("State<WalletRepository<IndexSet>>"),
 		},
 	},
 	Transaction: {
