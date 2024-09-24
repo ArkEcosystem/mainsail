@@ -46,8 +46,7 @@ describeSkip<{
 
 		context.walletRepository = {};
 
-		context.stateService = {
-		};
+		context.stateService = {};
 
 		context.container = new Container();
 		context.container.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);

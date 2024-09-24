@@ -188,6 +188,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: data.version,
 			})),
 
+			// eslint-disable-next-line sonarjs/no-empty-collection
 			wallets: dirtyWallets.map((wallet) => ({
 				address: wallet.getAddress(),
 				attributes: [],

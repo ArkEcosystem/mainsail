@@ -23,9 +23,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
-	public async verify(
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<boolean> {
+	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
 		return this.verifier.verifyHash(transaction.data);
@@ -83,9 +81,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
 
-	public async throwIfCannotEnterPool(
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {}
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.Transaction): Promise<void> {}
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,
@@ -112,10 +108,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			.map(({ data }) => data);
 	}
 
-	protected verifyTransactionFee(
-		transaction: Contracts.Crypto.Transaction,
-		sender: Contracts.State.Wallet,
-	): void {
+	protected verifyTransactionFee(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
 		if (
 			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
 			this.configuration.getHeight() > 0

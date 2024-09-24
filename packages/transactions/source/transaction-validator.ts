@@ -1,4 +1,4 @@
-import { inject, injectable,  tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 import { strictEqual } from "assert";

@@ -8,8 +8,6 @@ export class ThrowIfCannotEnterPoolAction extends TransactionTriggerAction {
 		const handler: Contracts.Transactions.TransactionHandler = arguments_.handler;
 		const transaction: Contracts.Crypto.Transaction = arguments_.transaction;
 
-		return handler.throwIfCannotEnterPool(
-			transaction,
-		);
+		return handler.throwIfCannotEnterPool(transaction);
 	}
 }

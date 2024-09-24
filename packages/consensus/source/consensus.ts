@@ -563,7 +563,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			);
 		}
 
-		this.logger.info(`Completed consensus bootstrap for ${this.#height}/${this.#round}/${this.stateStore.getTotalRound()}`);
+		this.logger.info(
+			`Completed consensus bootstrap for ${this.#height}/${this.#round}/${this.stateStore.getTotalRound()}`,
+		);
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
 	}

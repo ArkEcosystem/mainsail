@@ -24,10 +24,7 @@ export class WorkerScriptHandler implements Contracts.Evm.WorkerScriptHandler {
 		await this.#app.resolve(SetPeerCountHandler).handle(peerCount);
 	}
 
-	public async commit(data: {
-		block: string;
-		failedTransactions: string[];
-	}): Promise<void> {
+	public async commit(data: { block: string; failedTransactions: string[] }): Promise<void> {
 		await this.#app.resolve(CommitHandler).handle(data);
 	}
 }

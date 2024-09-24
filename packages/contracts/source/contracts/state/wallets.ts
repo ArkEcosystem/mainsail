@@ -19,4 +19,3 @@ export interface ValidatorWallet {
 	blsPublicKey: string;
 	voteBalance: number;
 }
-

@@ -7,9 +7,7 @@ import { Controller } from "./controller.js";
 export class ValidatorsController extends Controller {
 	public index(request: Hapi.Request) {
 		// const wallets = this.getWalletRepository().allValidators();
-
 		// const pagination = this.getQueryPagination(request.query);
-
 		// return this.toPagination(
 		// 	{
 		// 		results: wallets.slice(pagination.offset, pagination.offset + pagination.limit),
@@ -22,9 +20,7 @@ export class ValidatorsController extends Controller {
 
 	public async show(request: Hapi.Request): Promise<any> {
 		// const walletId = request.params.id as string;
-
 		// let wallet: Contracts.State.Wallet | undefined;
-
 		// const walletRepository = this.getWalletRepository();
 		// if (walletRepository.hasByAddress(walletId)) {
 		// 	wallet = walletRepository.findByAddress(walletId);
@@ -33,11 +29,9 @@ export class ValidatorsController extends Controller {
 		// } else if (walletRepository.hasByUsername(walletId)) {
 		// 	wallet = walletRepository.findByUsername(walletId);
 		// }
-
 		// if (!wallet) {
 		// 	return notFound("Wallet not found");
 		// }
-
 		// return this.toResource(wallet, WalletResource, true);
 	}
 }

@@ -39,9 +39,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public async throwIfCannotEnterPool(
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {}
+	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.Transaction): Promise<void> {}
 
 	public async applyToSender(
 		context: Contracts.Transactions.TransactionHandlerContext,
@@ -104,10 +102,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	protected verifyTransactionFee(
-		transaction: Contracts.Crypto.Transaction,
-		sender: Contracts.State.Wallet,
-	): void {
+	protected verifyTransactionFee(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
 		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
 
 		const maxFee = this.gasFeeCalculator.calculate(transaction);

@@ -18,12 +18,8 @@ export class CommitHandler {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(data: {
-		block: string;
-		failedTransactions: string[];
-	}): Promise<void> {
+	public async handle(data: { block: string; failedTransactions: string[] }): Promise<void> {
 		try {
-
 			// TODO: Pass height
 			this.configuration.setHeight(1);
 

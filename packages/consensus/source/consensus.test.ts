@@ -253,9 +253,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			proposer,
 		});
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
 		await consensus.startRound(0);
@@ -315,9 +313,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			proposer,
 		});
 
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
 
 		const lockProof = {
@@ -479,9 +475,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorsRepositoryGetValidator = stub(validatorsRepository, "getValidator").returnValueOnce(
 			validator,
 		);
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -536,9 +530,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorSetGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyValidatorsRepositoryGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
 		const spyPrevoteProcess = spy(prevoteProcessor, "process");
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -594,9 +586,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorSetGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyValidatorsRepositoryGetValidator = stub(validatorsRepository, "getValidator").returnValue([validator]);
 		const spyPrevoteProcess = spy(prevoteProcessor, "process");
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -657,9 +647,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorSetGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyValidatorsRepositoryGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
 		const spyPrevoteProcess = spy(prevoteProcessor, "process");
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -723,9 +711,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		const spyValidatorSetGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyValidatorsRepositoryGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyPrevoteProcess = spy(prevoteProcessor, "process");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -870,9 +856,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
 		const spyPrecommitProcess = spy(precommitProcessor, "process");
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyLoggerInfo = spy(logger, "info");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -961,9 +945,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyPrecommitProcess = spy(precommitProcessor, "process");
 
 		roundState.getProcessorResult = () => ({ success: true });
@@ -1207,9 +1189,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyPrecommitProcess = spy(precommitProcessor, "process");
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
@@ -1561,9 +1541,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		const spyValidatorSetGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyValidatorsRepositoryGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyPrevoteProcess = spy(prevoteProcessor, "process");
 
 		await consensus.onTimeoutPropose(1, 0);
@@ -1638,9 +1616,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue(precommit);
 		const spyGetActiveValidators = stub(validatorSet, "getActiveValidators").returnValue([proposer]);
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue(validator);
-		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(
-			1,
-		);
+		const getValidatorIndexByWalletAddress = stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 		const spyPrevoteProcess = spy(precommitProcessor, "process");
 
 		consensus.setStep(Contracts.Consensus.Step.Prevote);
