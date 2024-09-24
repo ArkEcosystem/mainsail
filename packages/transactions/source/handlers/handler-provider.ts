@@ -7,9 +7,6 @@ import { TransactionHandlerConstructor } from "./transaction.js";
 
 @injectable()
 export class TransactionHandlerProvider implements Contracts.Transactions.TransactionHandlerProvider {
-	@inject(Identifiers.State.Wallet.Attributes)
-	private readonly attributeRepository!: Contracts.State.AttributeRepository;
-
 	@inject(Identifiers.Transaction.Handler.Constructors)
 	private readonly handlerConstructors!: TransactionHandlerConstructor[];
 
@@ -52,12 +49,6 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 		for (const dependency of handler.dependencies()) {
 			if (this.#hasOtherHandler(dependency) === false) {
 				throw new Exceptions.UnsatisfiedDependencyError(internalType);
-			}
-		}
-
-		for (const attribute of handler.walletAttributes()) {
-			if (!this.attributeRepository.has(attribute.name)) {
-				this.attributeRepository.set(attribute.name, attribute.type);
 			}
 		}
 

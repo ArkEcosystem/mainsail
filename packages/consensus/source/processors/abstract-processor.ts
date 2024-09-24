@@ -11,8 +11,8 @@ export class AbstractProcessor {
 	@inject(Identifiers.Consensus.CommitLock)
 	protected readonly commitLock!: Contracts.Kernel.Lock;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
@@ -24,7 +24,7 @@ export class AbstractProcessor {
 	protected isRoundInBounds(message: { round: number }): boolean {
 		const earliestTime =
 			Utils.timestampCalculator.calculateMinimalTimestamp(
-				this.stateService.getStore().getLastBlock(),
+				this.stateStore.getLastBlock(),
 				message.round,
 				this.cryptoConfiguration,
 			) - 500; // Allow time drift between nodes

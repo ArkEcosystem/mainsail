@@ -7,7 +7,6 @@ import {
 	IncompatibleTransactionsVerifier,
 	//NonceVerifier,
 	TimestampVerifier,
-	VerifyBlockVerifier,
 } from "./verifiers/index.js";
 
 @injectable()
@@ -21,8 +20,6 @@ export class BlockVerifier implements Contracts.Processor.Verifier {
 		await this.app.resolve(TimestampVerifier).execute(unit);
 
 		await this.app.resolve(GeneratorVerifier).execute(unit);
-
-		await this.app.resolve(VerifyBlockVerifier).execute(unit);
 
 		await this.app.resolve(IncompatibleTransactionsVerifier).execute(unit);
 

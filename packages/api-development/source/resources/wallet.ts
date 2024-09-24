@@ -14,13 +14,13 @@ export class WalletResource implements Contracts.Api.Resource {
 	private getWalletResource(wallet: Contracts.State.Wallet): Object {
 		return {
 			address: wallet.getAddress(),
-			publicKey: wallet.getPublicKey(),
-			username: wallet.hasAttribute("username") ? wallet.getAttribute("username") : undefined,
+			// publicKey: wallet.getPublicKey(),
+			// username: wallet.hasAttribute("username") ? wallet.getAttribute("username") : undefined,
 			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
 			balance: wallet.getBalance(),
 			nonce: wallet.getNonce(),
 			// eslint-disable-next-line sort-keys-fix/sort-keys-fix
-			attributes: wallet.getAttributes(),
+			// attributes: wallet.getAttributes(),
 		};
 	}
 }

@@ -1,7 +1,6 @@
 import { CommitHandler, Transaction } from "../crypto/index.js";
 import { EventListener } from "../kernel/index.js";
 import { EventCallback, Subprocess } from "../kernel/ipc.js";
-import { StoreChange } from "../state/index.js";
 import { KeyValuePair } from "../types/index.js";
 
 export interface WorkerFlags extends KeyValuePair {}
@@ -9,7 +8,7 @@ export interface WorkerFlags extends KeyValuePair {}
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
 	getTransactions(): Promise<string[]>;
-	commit(data: { block: string; failedTransactions: string[]; store: StoreChange }): Promise<void>;
+	commit(data: { block: string; failedTransactions: string[] }): Promise<void>;
 	setPeer(ip: string): Promise<void>;
 	forgetPeer(ip: string): Promise<void>;
 	start(): Promise<void>;

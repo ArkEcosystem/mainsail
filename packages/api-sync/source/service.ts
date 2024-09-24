@@ -60,8 +60,8 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -141,7 +141,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 		}
 
-		const dirtyWallets = [...unit.store.walletRepository.getDirtyWallets()];
+		const dirtyWallets: Contracts.State.Wallet[] = [];
 
 		const deferredSync: DeferredSync = {
 			block: {
@@ -188,12 +188,13 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: data.version,
 			})),
 
+			// eslint-disable-next-line sonarjs/no-empty-collection
 			wallets: dirtyWallets.map((wallet) => ({
 				address: wallet.getAddress(),
-				attributes: wallet.getAttributes(),
+				attributes: [],
 				balance: wallet.getBalance().toFixed(),
 				nonce: wallet.getNonce().toFixed(),
-				publicKey: wallet.getPublicKey()!,
+				publicKey: "",
 				updated_at: header.height.toFixed(),
 			})),
 
@@ -248,7 +249,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	async #bootstrapState(): Promise<void> {
-		const genesisCommit = this.stateService.getStore().getGenesisCommit();
+		const genesisCommit = this.stateStore.getGenesisCommit();
 		await this.stateRepositoryFactory()
 			.createQueryBuilder()
 			.insert()

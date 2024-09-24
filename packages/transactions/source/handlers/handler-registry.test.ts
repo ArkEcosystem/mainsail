@@ -22,7 +22,7 @@ import { KeyPairFactory } from "../../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../../crypto-key-pair-schnorr/source/public";
 import { Signature } from "../../../crypto-signature-schnorr/source/signature";
 import { EvmCallTransactionHandler } from "../../../crypto-transaction-evm-call/source/handlers";
-import { describe, getAttributeRepository } from "../../../test-framework/source";
+import { describe } from "../../../test-framework/source";
 import { Validator } from "../../../validation/source/validator";
 import { ServiceProvider } from "../service-provider";
 import { TransactionHandlerProvider } from "./handler-provider";
@@ -176,11 +176,8 @@ describe<{
 
 		app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 
-		app.bind<Contracts.State.AttributeRepository>(Identifiers.State.Wallet.Attributes).toConstantValue(
-			getAttributeRepository(),
-		);
 		app.bind(Identifiers.State.State).toConstantValue({});
-		app.bind(Identifiers.State.Service).toConstantValue({});
+		app.bind(Identifiers.State.Store).toConstantValue({});
 		app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
 		app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({});
 		app.bind(Identifiers.Evm.Gas.FeeCalculator).toConstantValue({});

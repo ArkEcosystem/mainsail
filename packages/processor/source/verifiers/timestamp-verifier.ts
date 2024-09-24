@@ -8,8 +8,8 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -26,7 +26,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 		if (
 			unit.getBlock().data.timestamp <
 			Utils.timestampCalculator.calculateMinimalTimestamp(
-				this.stateService.getStore().getLastBlock(),
+				this.stateStore.getLastBlock(),
 				unit.getBlock().data.round,
 				this.configuration,
 			)

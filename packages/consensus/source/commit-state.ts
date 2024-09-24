@@ -1,23 +1,14 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class CommitState implements Contracts.Processor.ProcessableUnit {
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	#store!: Contracts.State.Store;
 	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
-
-	@postConstruct()
-	public initialize(): void {
-		this.#store = this.stateService.createStoreClone();
-	}
 
 	public get height(): number {
 		return this.#commit.block.data.height;
@@ -33,10 +24,6 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 
 	public get validators(): string[] {
 		return [...this.#validators.keys()];
-	}
-
-	public get store(): Contracts.State.Store {
-		return this.#store;
 	}
 
 	public configure(commit: Contracts.Crypto.Commit): CommitState {

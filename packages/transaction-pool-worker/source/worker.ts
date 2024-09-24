@@ -56,7 +56,6 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		await this.ipcSubprocess.sendRequest("commit", {
 			block: unit.getBlock().serialized,
 			failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
-			store: unit.store.changesToJson(),
 		});
 	}
 

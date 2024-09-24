@@ -24,9 +24,6 @@
 	"dependencies": {
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/crypto-transaction-evm-call": "workspace:*",
-		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ethers": "^6.11.0"

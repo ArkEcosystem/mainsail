@@ -1,12 +1,10 @@
 import { Block, Commit, Transaction } from "./crypto/index.js";
 import { TransactionReceipt } from "./evm/evm.js";
-import { Store } from "./state/index.js";
 
 export interface ProcessableUnit {
 	readonly height: number;
 	readonly round: number;
 	readonly persist: boolean;
-	readonly store: Store;
 	hasProcessorResult(): boolean;
 	getProcessorResult(): BlockProcessorResult;
 	setProcessorResult(processorResult: BlockProcessorResult): void;

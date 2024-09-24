@@ -14,9 +14,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.State.Service)
-	private stateService!: Contracts.State.Service;
-
 	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
@@ -26,11 +23,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	#walletRepository!: Contracts.State.WalletRepository;
 	#corrupt = false;
 
 	public async configure(publicKey): Promise<SenderState> {
-		this.#walletRepository = await this.stateService.createWalletRepositoryBySender(publicKey);
 		return this;
 	}
 
@@ -61,7 +56,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			await this.triggers.call("verifyTransaction", {
 				handler,
 				transaction,
-				walletRepository: this.#walletRepository,
 			})
 		) {
 			if (this.#corrupt) {
@@ -72,12 +66,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 				await this.triggers.call("throwIfCannotEnterPool", {
 					handler,
 					transaction,
-					walletRepository: this.#walletRepository,
 				});
 				await this.triggers.call("applyTransaction", {
 					handler,
 					transaction,
-					walletRepository: this.#walletRepository,
 				});
 			} catch (error) {
 				throw new Exceptions.TransactionFailedToApplyError(transaction, error);

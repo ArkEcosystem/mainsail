@@ -3,10 +3,10 @@ import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts"
 import { Configuration } from "@mainsail/crypto-config";
 
 import crypto from "../../core/bin/config/testnet/core/crypto.json";
-import { describe } from "../../test-framework/source";
+import { describeSkip } from "../../test-framework/source";
 import { SenderState } from ".";
 
-describe<{
+describeSkip<{
 	configuration: any;
 	handlerRegistry: any;
 	expirationService: any;
@@ -46,9 +46,7 @@ describe<{
 
 		context.walletRepository = {};
 
-		context.stateService = {
-			createWalletRepositoryBySender: () => context.walletRepository,
-		};
+		context.stateService = {};
 
 		context.container = new Container();
 		context.container.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);

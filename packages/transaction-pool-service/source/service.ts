@@ -8,8 +8,8 @@ export class Service implements Contracts.TransactionPool.Service {
 	@tagged("plugin", "transaction-pool-service")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.TransactionPool.Storage)
 	private readonly storage!: Contracts.TransactionPool.Storage;
@@ -104,7 +104,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			this.storage.addTransaction({
-				height: this.stateService.getStore().getLastHeight(),
+				height: this.stateStore.getLastHeight(),
 				id: transaction.id,
 				senderPublicKey: transaction.data.senderPublicKey,
 				serialized: transaction.serialized,
@@ -145,7 +145,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			let previouslyStoredFailures = 0;
 
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-			const lastHeight: number = this.stateService.getStore().getLastHeight();
+			const lastHeight: number = this.stateStore.getLastHeight();
 			const expiredHeight: number = lastHeight - maxTransactionAge;
 
 			for (const { height, id, serialized } of this.storage.getAllTransactions()) {
@@ -205,7 +205,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	async #removeOldTransactions(): Promise<void> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-		const lastHeight: number = this.stateService.getStore().getLastHeight();
+		const lastHeight: number = this.stateStore.getLastHeight();
 		const expiredHeight: number = lastHeight - maxTransactionAge;
 
 		for (const { senderPublicKey, id } of this.storage.getOldTransactions(expiredHeight)) {

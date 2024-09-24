@@ -15,9 +15,6 @@ export class Bootstrapper {
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
-	@inject(Identifiers.State.Verifier)
-	private readonly stateVerifier!: Contracts.State.StateVerifier;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -39,8 +36,8 @@ export class Bootstrapper {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.State.Service)
-	private stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly blockProcessor!: Contracts.Processor.BlockProcessor;
@@ -72,7 +69,6 @@ export class Bootstrapper {
 
 			this.state.setBootstrap(false);
 
-			this.stateVerifier.verifyWalletsConsistency();
 			this.validatorRepository.printLoadedValidators();
 			await this.txPoolWorker.start();
 
@@ -97,7 +93,7 @@ export class Bootstrapper {
 		const genesisBlockJson = this.configuration.get("genesisBlock");
 		const genesisBlock = await this.commitFactory.fromJson(genesisBlockJson);
 
-		this.stateService.getStore().setGenesisCommit(genesisBlock);
+		this.stateStore.setGenesisCommit(genesisBlock);
 	}
 
 	async #checkStoredGenesisCommit(): Promise<void> {
@@ -107,7 +103,7 @@ export class Bootstrapper {
 			return;
 		}
 
-		if (this.stateService.getStore().getGenesisCommit().block.data.id !== genesisCommit.block.data.id) {
+		if (this.stateStore.getGenesisCommit().block.data.id !== genesisCommit.block.data.id) {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
@@ -120,12 +116,12 @@ export class Bootstrapper {
 		await this.#processBlocks();
 
 		const commit = await this.databaseService.getLastCommit();
-		this.stateService.getStore().setLastBlock(commit.block);
-		await this.validatorSet.restore(this.stateService.getStore());
+		this.stateStore.setLastBlock(commit.block);
+		await this.validatorSet.restore();
 	}
 
 	async #processGenesisBlock(): Promise<void> {
-		const genesisBlock = this.stateService.getStore().getGenesisCommit();
+		const genesisBlock = this.stateStore.getGenesisCommit();
 		await this.#processCommit(genesisBlock);
 		this.databaseService.addCommit(genesisBlock);
 		await this.databaseService.persist();
@@ -137,13 +133,13 @@ export class Bootstrapper {
 		let totalRound = 0;
 
 		for await (const commit of this.databaseService.readCommits(
-			this.stateService.getStore().getLastHeight() + 1,
+			this.stateStore.getLastHeight() + 1,
 			lastCommit.block.data.height,
 		)) {
 			totalRound += commit.block.data.round + 1;
 		}
 
-		this.stateService.getStore().setTotalRoundAndHeight(totalRound, lastCommit.block.data.height);
+		this.stateStore.setTotalRoundAndHeight(totalRound, lastCommit.block.data.height);
 		this.configuration.setHeight(lastCommit.block.data.height + 1);
 
 		console.log("Total round", totalRound, "Last height", lastCommit.block.data.height);

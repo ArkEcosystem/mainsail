@@ -7,8 +7,8 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	public canExpire(transaction: Contracts.Crypto.Transaction): boolean {
 		return !!transaction.data.expiration;
@@ -16,7 +16,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 
 	public async isExpired(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		if (this.canExpire(transaction)) {
-			return (await this.getExpirationHeight(transaction)) <= this.stateService.getStore().getLastHeight() + 1;
+			return (await this.getExpirationHeight(transaction)) <= this.stateStore.getLastHeight() + 1;
 		}
 
 		return false;

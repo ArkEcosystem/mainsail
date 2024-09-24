@@ -47,14 +47,12 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreTransactions).register();
 	await context.sandbox.app.resolve(CoreCryptoBlock).register();
 
-	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
-		getStore: () => ({
-			getLastBlock: () => ({
-				data: {
-					height: 1,
-					id: "0000000000000000000000000000000000000000000000000000000000000000",
-				},
-			}),
+	context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({
+		getLastBlock: () => ({
+			data: {
+				height: 1,
+				id: "0000000000000000000000000000000000000000000000000000000000000000",
+			},
 		}),
 	});
 };

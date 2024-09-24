@@ -7,8 +7,8 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
@@ -21,8 +21,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	public getNextBlockTimestamp(commitTime: number): number {
 		return Math.max(
 			commitTime + this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime,
-			this.stateService.getStore().getLastBlock().data.timestamp +
-				this.cryptoConfiguration.getMilestone().timeouts.blockTime,
+			this.stateStore.getLastBlock().data.timestamp + this.cryptoConfiguration.getMilestone().timeouts.blockTime,
 		);
 	}
 

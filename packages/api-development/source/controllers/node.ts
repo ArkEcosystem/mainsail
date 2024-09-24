@@ -13,7 +13,7 @@ export class NodeController extends Controller {
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async status(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-		const lastBlock = this.stateService.getStore().getLastBlock();
+		const lastBlock = this.stateStore.getLastBlock();
 		const networkHeight = this.p2pService.getNetworkHeight();
 
 		return {
@@ -30,7 +30,7 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				constants: this.configuration.getMilestone(this.stateService.getStore().getLastHeight()),
+				constants: this.configuration.getMilestone(this.stateStore.getLastHeight()),
 				core: {
 					version: this.app.version(),
 				},

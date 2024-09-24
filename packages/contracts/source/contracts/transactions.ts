@@ -1,11 +1,10 @@
 import { MultiSignatureAsset, Transaction, TransactionConstructor, TransactionData } from "./crypto/index.js";
 import { BlockContext, CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
-import { AttributeType, Wallet, WalletRepository } from "./state/index.js";
+import { Wallet } from "./state/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
 
 export type TransactionHandlerContext = {
-	walletRepository: WalletRepository;
 	evm: {
 		instance: Instance;
 		blockContext: BlockContext;
@@ -18,11 +17,11 @@ export interface TransactionApplyResult {
 }
 
 export interface TransactionHandler {
-	verify(context: TransactionHandlerContext, transaction: Transaction): Promise<boolean>;
+	verify(transaction: Transaction): Promise<boolean>;
 
-	throwIfCannotBeApplied(context: TransactionHandlerContext, transaction: Transaction, sender: Wallet): Promise<void>;
+	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet): Promise<void>;
 
-	throwIfCannotEnterPool(context: TransactionHandlerContext, transaction: Transaction): Promise<void>;
+	throwIfCannotEnterPool(transaction: Transaction): Promise<void>;
 
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
@@ -42,8 +41,6 @@ export interface TransactionHandler {
 	getConstructor(): TransactionConstructor;
 
 	dependencies(): ReadonlyArray<TransactionHandlerConstructor>;
-
-	walletAttributes(): ReadonlyArray<{ name: string; type: AttributeType }>;
 
 	isActivated(): Promise<boolean>;
 }

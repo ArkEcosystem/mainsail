@@ -21,13 +21,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#validators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
 
-	public async restore(store: Contracts.State.Store): Promise<void> {
-		await this.#buildActiveValidators(store);
+	public async restore(): Promise<void> {
+		await this.#buildActiveValidators();
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
-			await this.#buildActiveValidators(unit.store);
+			await this.#buildActiveValidators();
 		}
 	}
 
@@ -55,9 +55,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		return result;
 	}
 
-	async #buildActiveValidators(store: Contracts.State.Store): Promise<void> {
+	async #buildActiveValidators(): Promise<void> {
 		const { activeValidators } = this.configuration.getMilestone();
-		const validators = await this.#getActiveValidators(store);
+		const validators = await this.#getActiveValidators();
 		if (validators.length < activeValidators) {
 			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
 		}
@@ -66,7 +66,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		this.#indexByAddress = new Map(this.#validators.map((validator, index) => [validator.address, index]));
 	}
 
-	async #getActiveValidators(store: Contracts.State.Store): Promise<Contracts.State.ValidatorWallet[]> {
+	async #getActiveValidators(): Promise<Contracts.State.ValidatorWallet[]> {
 		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
 		const { evmSpec } = this.configuration.getMilestone();

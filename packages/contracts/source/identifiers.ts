@@ -237,30 +237,8 @@ export const Identifiers = {
 		},
 	},
 	State: {
-		AttributeRepository: Symbol("State<AttributeRepository>"),
-		Service: Symbol("State<Service>"),
 		State: Symbol("State<State>"),
-		StateRepository: {
-			Factory: Symbol("State<StateRepository<Factory>>"),
-		},
-		Store: {
-			Factory: Symbol("State<Store<Factory>>"),
-		},
-		ValidatorMutator: Symbol("State<ValidatorMutator>"),
-		Verifier: Symbol("State<Verifier>"),
-		Wallet: {
-			Attributes: Symbol("State<Wallet<Attributes>>"),
-			Factory: Symbol("State<Wallet<Factory>>"),
-		},
-		WalletRepository: {
-			Base: {
-				Factory: Symbol("State<WalletRepository<Base<Factory>>>"),
-			},
-			BySender: {
-				Factory: Symbol("State<WalletRepository<BySender<Factory>>>"),
-			},
-			IndexSet: Symbol("State<WalletRepository<IndexSet>>"),
-		},
+		Store: Symbol("State<Store>"),
 	},
 	Transaction: {
 		Handler: {

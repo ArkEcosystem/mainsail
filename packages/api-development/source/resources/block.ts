@@ -1,20 +1,14 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class BlockResource implements Contracts.Api.Resource {
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
-
 	public raw(resource: Contracts.Crypto.Block): object {
 		return JSON.parse(JSON.stringify(resource));
 	}
 
 	public async transform(block: Contracts.Crypto.Block): Promise<object> {
 		const blockData: Contracts.Crypto.BlockData = block.data;
-		const generator: Contracts.State.Wallet = await this.stateService
-			.getStore()
-			.walletRepository.findByPublicKey(blockData.generatorAddress);
 
 		return {
 			forged: {
@@ -23,11 +17,12 @@ export class BlockResource implements Contracts.Api.Resource {
 				reward: blockData.reward.toFixed(),
 				total: blockData.reward.plus(blockData.totalFee).toFixed(),
 			},
-			generator: {
-				address: generator.getAddress(),
-				publicKey: generator.getPublicKey(),
-				username: generator.hasAttribute("username") ? generator.getAttribute("username") : undefined,
-			},
+			// TODO: Fix
+			// generator: {
+			// 	address: generator.getAddress(),
+			// 	publicKey: generator.getPublicKey(),
+			// 	username: generator.hasAttribute("username") ? generator.getAttribute("username") : undefined,
+			// },
 			height: +blockData.height,
 			id: blockData.id,
 			payload: {

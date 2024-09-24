@@ -32,7 +32,7 @@ describe<{
 			}),
 		};
 
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue(workerPool);
 
 		context.proposal = context.sandbox.app.resolve(Proposal).initialize({

@@ -43,7 +43,6 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
-		"@mainsail/state": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
