@@ -8,24 +8,20 @@ describe<{
 	sandbox: Sandbox;
 	action: EthBlockNumberAction;
 	validator: Validator;
-	state: any;
+	store: any;
 }>("EthBlockNumberAction", ({ beforeEach, it, assert }) => {
 	let height = 0;
 
 	beforeEach(async (context) => {
-		context.state = {
-			getStore() {
-				return {
-					getLastHeight() {
-						return height;
-					},
-				};
+		context.store = {
+			getLastHeight() {
+				return height;
 			},
 		};
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.state);
+		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(context.store);
 
 		context.action = context.sandbox.app.resolve(EthBlockNumberAction);
 		context.validator = context.sandbox.app.resolve(Validator);
@@ -49,7 +45,7 @@ describe<{
 		assert.defined(validator.validate("jsonRpc_eth_blockNumber", {}).errors);
 	});
 
-	it("should return true", async ({ action, state }) => {
+	it("should return true", async ({ action }) => {
 		assert.equal(await action.handle([]), "0x0");
 
 		height = 1;
