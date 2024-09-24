@@ -5,26 +5,6 @@ import { StateRepository } from "./repository.js";
 
 // @TODO review all interfaces in here and document them properly. Remove ones that are no longer needed.
 
-export interface WalletIndex {
-	has(key: string): boolean;
-	get(key: string): Wallet | undefined;
-	set(key: string, wallet: Wallet): void;
-	forget(key: string): void;
-	entries(): ReadonlyArray<[string, Wallet]>;
-	values(): ReadonlyArray<Wallet>;
-	keys(): string[];
-	size(): number;
-	clear(): void;
-}
-
-export enum WalletIndexes {
-	Addresses = "addresses",
-	PublicKeys = "publicKeys",
-	Usernames = "usernames",
-	Resignations = "resignations",
-	Validators = "validators",
-}
-
 export interface Wallet extends Omit<StateRepository, "commitChanges"> {
 	getAddress(): string;
 
