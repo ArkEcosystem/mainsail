@@ -25,8 +25,6 @@ export class CommitHandler {
 		try {
 			const store = this.stateService.createStoreClone();
 
-			store.commitChanges();
-
 			// TODO: Pass height
 			this.configuration.setHeight(1);
 
