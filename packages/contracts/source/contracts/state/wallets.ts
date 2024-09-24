@@ -1,7 +1,5 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { BlockData, MultiSignatureAsset } from "../crypto/index.js";
-
 export interface Wallet {
 	getAddress(): string;
 
@@ -22,26 +20,3 @@ export interface ValidatorWallet {
 	voteBalance: number;
 }
 
-export interface WalletValidatorAttributes {
-	username: string;
-	voteBalance: BigNumber;
-	rank?: number;
-	lastBlock?: BlockData;
-	round?: number;
-	resigned?: boolean;
-}
-
-export type WalletMultiSignatureAttributes = MultiSignatureAsset & { legacy?: boolean };
-
-export enum SearchScope {
-	Wallets,
-	Validators,
-	Locks,
-	Entities,
-}
-
-export interface SearchContext<T = any> {
-	query: Record<string, string[]>;
-	entries: ReadonlyArray<T>;
-	defaultOrder: string[];
-}
