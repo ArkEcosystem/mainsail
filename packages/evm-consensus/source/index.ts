@@ -12,17 +12,8 @@ export { Identifiers } from "./identifiers.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		// REPLACES: validator-set-vote-weighted package
-		this.app
-			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
-			.set("activeValidators", Contracts.State.AttributeType.String);
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 
-		// REPLACES: proposer package
-		// TODO: Replace string with better structure
-		this.app
-			.get<Contracts.State.AttributeRepository>(Identifiers.State.AttributeRepository)
-			.set("validatorMatrix", Contracts.State.AttributeType.String);
 		this.app.bind(Identifiers.Proposer.Selector).to(Selector).inSingletonScope();
 	}
 

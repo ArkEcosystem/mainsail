@@ -83,10 +83,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
 
-	public walletAttributes(): ReadonlyArray<{ name: string; type: Contracts.State.AttributeType }> {
-		return [];
-	}
-
 	public async throwIfCannotEnterPool(
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<void> {}

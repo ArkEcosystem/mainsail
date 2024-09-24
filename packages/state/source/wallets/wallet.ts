@@ -1,20 +1,12 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Wallet implements Contracts.State.Wallet {
-	@inject(Identifiers.State.StateRepository.Factory)
-	protected readonly createStateRepository!: Contracts.State.StateRepositoryFactory;
-
-	@inject(Identifiers.State.Wallet.Attributes)
-	protected readonly attributeRepository!: Contracts.State.AttributeRepository;
-
 	protected address!: string;
 	protected balance = BigNumber.ZERO;
 	protected nonce = BigNumber.ZERO;
-
-	#repository!: Contracts.State.StateRepository;
 
 	public init(address: string): Wallet {
 		this.address = address;
@@ -26,7 +18,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getBalance(): BigNumber {
-		return this.getAttribute("balance");
+		return this.balance;
 	}
 
 	public setBalance(balance: BigNumber): void {
@@ -34,7 +26,7 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	public getNonce(): BigNumber {
-		return this.getAttribute<BigNumber>("nonce");
+		return this.nonce;
 	}
 
 	public setNonce(nonce: BigNumber): void {
@@ -59,17 +51,5 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public decreaseNonce(): void {
 		this.setNonce(this.getNonce().minus(BigNumber.ONE));
-	}
-
-	public hasAttribute(key: string): boolean {
-		return this.#repository.hasAttribute(key);
-	}
-
-	public getAttribute<T>(key: string, defaultValue?: T): T {
-		return this.#repository.getAttribute<T>(key, defaultValue);
-	}
-
-	public getAttributes(): Record<string, any> {
-		return this.#repository.getAttributes();
 	}
 }
