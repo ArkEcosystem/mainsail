@@ -117,7 +117,7 @@ export class Bootstrapper {
 
 		const commit = await this.databaseService.getLastCommit();
 		this.stateStore.setLastBlock(commit.block);
-		await this.validatorSet.restore(this.stateStore);
+		await this.validatorSet.restore();
 	}
 
 	async #processGenesisBlock(): Promise<void> {

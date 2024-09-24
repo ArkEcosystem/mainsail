@@ -3,9 +3,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class CommitState implements Contracts.Processor.ProcessableUnit {
-	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
-
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
@@ -27,10 +24,6 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 
 	public get validators(): string[] {
 		return [...this.#validators.keys()];
-	}
-
-	public get store(): Contracts.State.Store {
-		return this.stateStore;
 	}
 
 	public configure(commit: Contracts.Crypto.Commit): CommitState {

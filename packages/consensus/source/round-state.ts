@@ -10,9 +10,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
-
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
@@ -58,10 +55,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public get proposer(): Contracts.State.ValidatorWallet {
 		return this.#proposer;
-	}
-
-	public get store(): Contracts.State.Store {
-		return this.stateStore;
 	}
 
 	public configure(height: number, round: number): RoundState {
