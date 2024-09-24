@@ -8,9 +8,8 @@ describe("getHeaders", ({ it, assert }) => {
 	const version = "3.0.9";
 	const height = 387;
 	const store = { getLastHeight: () => height, isStarted: () => true };
-	const stateService = { getStore: () => store };
 	const appGet = {
-		[Identifiers.State.Service]: stateService,
+		[Identifiers.State.Store]: store,
 	};
 	const app = {
 		get: (key) => appGet[key],

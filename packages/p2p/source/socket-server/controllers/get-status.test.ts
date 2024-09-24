@@ -15,12 +15,11 @@ describe<{
 	controller: GetStatusController;
 }>("GetStatusController", ({ it, assert, beforeEach, stub }) => {
 	const store = { getLastBlock: () => {} };
-	const stateService = { getStore: () => store };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(stateService);
+		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(store);
 
 		context.controller = context.sandbox.app.resolve(GetStatusControllerProxy);
 	});

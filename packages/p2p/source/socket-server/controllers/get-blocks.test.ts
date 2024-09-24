@@ -6,15 +6,12 @@ import { GetBlocksController } from "./get-blocks";
 describe<{
 	sandbox: Sandbox;
 	controller: GetBlocksController;
-}>("GetBlocksController", ({ it, assert, beforeEach, spy, match, stub }) => {
+}>("GetBlocksController", ({ it, assert, beforeEach, stub }) => {
 	const logger = { debug: () => {}, info: () => {}, warning: () => {} };
 	const database = { findCommitBuffers: () => {} };
 	const store = {
 		getLastDownloadedBlock: () => {},
 		getLastHeight: () => {},
-	};
-	const stateService = {
-		getStore: () => store,
 	};
 
 	beforeEach((context) => {
@@ -22,7 +19,7 @@ describe<{
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.sandbox.app.bind(Identifiers.Database.Service).toConstantValue(database);
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(stateService);
+		context.sandbox.app.bind(Identifiers.State.Store).toConstantValue(store);
 
 		context.controller = context.sandbox.app.resolve(GetBlocksController);
 	});
