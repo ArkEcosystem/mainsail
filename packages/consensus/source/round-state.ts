@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
@@ -10,8 +10,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
@@ -39,12 +39,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#proposer!: Contracts.State.ValidatorWallet;
 
 	#commit: Contracts.Crypto.Commit | undefined;
-	#store!: Contracts.State.Store;
-
-	@postConstruct()
-	public initialize(): void {
-		this.#store = this.stateService.getStore();
-	}
 
 	public get height(): number {
 		return this.#height;
@@ -67,7 +61,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	public get store(): Contracts.State.Store {
-		return this.#store;
+		return this.stateStore;
 	}
 
 	public configure(height: number, round: number): RoundState {

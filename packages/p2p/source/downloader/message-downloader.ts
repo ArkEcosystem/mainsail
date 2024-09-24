@@ -57,8 +57,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
@@ -70,9 +70,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	public initialize(): void {
 		this.events.listen(Events.BlockEvent.Applied, {
 			handle: () => {
-				const store = this.stateService.getStore();
-				this.#downloadsByHeight.delete(store.getLastHeight());
-				this.#fullDownloadsByHeight.delete(store.getLastHeight());
+				this.#downloadsByHeight.delete(this.stateStore.getLastHeight());
+				this.#fullDownloadsByHeight.delete(this.stateStore.getLastHeight());
 			},
 		});
 	}

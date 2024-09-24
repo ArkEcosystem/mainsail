@@ -3,8 +3,8 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class CommitHandler {
-	@inject(Identifiers.State.Service)
-	protected readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	protected readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -17,13 +17,11 @@ export class CommitHandler {
 
 	public async handle(data: { block: string; }): Promise<void> {
 		try {
-			const store = this.stateService.getStore();
-
 			// TODO: Set height
 			this.configuration.setHeight(1);
 
 			const block = await this.blockFactory.fromHex(data.block);
-			store.setLastBlock(block);
+			this.stateStore.setLastBlock(block);
 		} catch (error) {
 			throw new Error(`Failed to commit block: ${error.message}`);
 		}

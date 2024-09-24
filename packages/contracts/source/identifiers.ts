@@ -237,18 +237,8 @@ export const Identifiers = {
 		},
 	},
 	State: {
-		AttributeRepository: Symbol("State<AttributeRepository>"),
-		Service: Symbol("State<Service>"),
 		State: Symbol("State<State>"),
-		StateRepository: {
-			Factory: Symbol("State<StateRepository<Factory>>"),
-		},
-		Store: {
-			Factory: Symbol("State<Store<Factory>>"),
-		},
-		Wallet: {
-			Attributes: Symbol("State<Wallet<Attributes>>"),
-		},
+		Store: Symbol("State<Store>"),
 	},
 	Transaction: {
 		Handler: {

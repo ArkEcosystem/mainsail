@@ -11,8 +11,8 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Database.Service)
 	private readonly database!: Contracts.Database.DatabaseService;
@@ -24,7 +24,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 		const requestBlockHeight: number = request.payload.fromHeight;
 		const requestBlockLimit: number = request.payload.limit;
 
-		const lastHeight: number = this.stateService.getStore().getLastHeight();
+		const lastHeight: number = this.stateStore.getLastHeight();
 		if (requestBlockHeight > lastHeight) {
 			return { blocks: [] };
 		}

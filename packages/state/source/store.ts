@@ -41,7 +41,6 @@ export class Store implements Contracts.State.Store {
 		return this.#totalRound;
 	}
 
-
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		this.setLastBlock(unit.getBlock());
 		this.#height = unit.height;

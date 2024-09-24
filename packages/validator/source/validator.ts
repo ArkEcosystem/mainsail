@@ -29,8 +29,8 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly messagesFactory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.State.Service)
-	protected readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	protected readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Transaction.Validator.Factory)
 	private readonly createTransactionValidator!: Contracts.Transactions.TransactionValidatorFactory;
@@ -61,7 +61,7 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		timestamp: number,
 	): Promise<Contracts.Crypto.Block> {
-		const previousBlock = this.stateService.getStore().getLastBlock();
+		const previousBlock = this.stateStore.getLastBlock();
 		const height = previousBlock.header.height + 1;
 
 		const { stateHash, transactions } = await this.#getTransactionsForForging(generatorAddress, timestamp, {
@@ -140,7 +140,7 @@ export class Validator implements Contracts.Validator.Validator {
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		const failedTransactions: Contracts.Crypto.Transaction[] = [];
 
-		const previousBlock = this.stateService.getStore().getLastBlock();
+		const previousBlock = this.stateStore.getLastBlock();
 		const milestone = this.cryptoConfiguration.getMilestone();
 		let gasLeft = milestone.block.maxGasLimit;
 
@@ -224,7 +224,7 @@ export class Validator implements Contracts.Validator.Validator {
 			gasUsed: 0,
 		};
 
-		const previousBlock = this.stateService.getStore().getLastBlock();
+		const previousBlock = this.stateStore.getLastBlock();
 		const height = previousBlock.header.height + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(height);
 

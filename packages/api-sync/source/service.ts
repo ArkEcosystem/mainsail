@@ -60,8 +60,8 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -248,7 +248,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	async #bootstrapState(): Promise<void> {
-		const genesisCommit = this.stateService.getStore().getGenesisCommit();
+		const genesisCommit = this.stateStore.getGenesisCommit();
 		await this.stateRepositoryFactory()
 			.createQueryBuilder()
 			.insert()

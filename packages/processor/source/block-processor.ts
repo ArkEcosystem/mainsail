@@ -4,8 +4,8 @@ import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
-	@inject(Identifiers.State.Service)
-	private readonly stateService!: Contracts.State.Service;
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -109,7 +109,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.evm.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
-		await this.stateService.onCommit(unit);
+		await this.stateStore.onCommit(unit);
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
 
@@ -194,7 +194,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
-		const previousBlock = this.stateService.getStore().getLastBlock();
+		const previousBlock = this.stateStore.getLastBlock();
 		const stateHash = await this.evm.stateHash(
 			{ height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			previousBlock.header.stateHash,
