@@ -1907,9 +1907,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
     devDependencies:
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
@@ -2341,9 +2338,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
@@ -2385,13 +2379,7 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
-      joi:
-        specifier: 17.12.2
-        version: 17.12.2
     devDependencies:
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2473,9 +2461,6 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../state
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -2571,15 +2556,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../crypto-transaction-evm-call
-      '@mainsail/evm-development':
-        specifier: workspace:*
-        version: link:../evm-development
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework

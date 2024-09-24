@@ -25,11 +25,9 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"joi": "17.12.2"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/pumpify": "1.4.4",
