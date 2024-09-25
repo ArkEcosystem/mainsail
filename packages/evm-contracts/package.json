@@ -1,21 +1,21 @@
 {
-    "name": "@mainsail/evm-contracts",
-    "version": "0.0.1-evm.1",
-    "description": "EVM contracts support for the Mainsail blockchain",
-    "license": "GPL-3.0-only",
-    "contributors": [],
-    "type": "module",
-    "files": [
-        "/distribution"
-    ],
-    "scripts": {
-        "build": "forge build",
-        "clean": "forge clean",
-        "test": "forge test -vvv"
-    },
-    "dependencies": {},
-    "devDependencies": {},
-    "engines": {
-        "node": ">=20.x"
-    }
+	"name": "@mainsail/evm-contracts",
+	"version": "0.0.1-evm.1",
+	"description": "EVM contracts support for the Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"type": "module",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "forge build",
+		"clean": "forge clean",
+		"test": "forge test -vvv"
+	},
+	"dependencies": {},
+	"devDependencies": {},
+	"engines": {
+		"node": ">=20.x"
+	}
 }
