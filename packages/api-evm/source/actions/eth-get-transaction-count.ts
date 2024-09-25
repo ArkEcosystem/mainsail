@@ -23,6 +23,6 @@ export class EthGetTransactionCount implements Contracts.Api.RPC.Action {
 		const [address] = parameters;
 		const accountInfo =  await this.evm.getAccountInfo(address);
 
-		return `0x${Number(accountInfo.nonce.toString(16))}`;
+		return `0x${accountInfo.nonce.toString(16)}`;
 	}
 }
