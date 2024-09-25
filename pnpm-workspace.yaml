@@ -3,3 +3,4 @@ packages:
     - "tests/**"
     - "!tests/e2e/**"
     - "!packages/evm-development/solidity"
+    - "!packages/evm-contracts"
