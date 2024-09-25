@@ -1,2 +1,3 @@
-export { ApplyTransactionAction } from "./apply-transaction.js";
-export { VerifyTransactionAction } from "./verify-transaction.js";
+export * from "./apply-transaction.js";
+export * from "./throw-if-cannot-be-applied.js";
+export * from "./verify-transaction.js";
