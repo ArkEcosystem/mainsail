@@ -32,13 +32,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		return true;
 	}
 
-	public async throwIfCannotBeApplied(
-		transaction: Contracts.Crypto.Transaction,
-		wallet: Contracts.State.Wallet,
-	): Promise<void> {
-		return super.throwIfCannotBeApplied(transaction, wallet);
-	}
-
 	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
