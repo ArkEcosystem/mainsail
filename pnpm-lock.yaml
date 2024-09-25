@@ -1858,6 +1858,8 @@ importers:
         specifier: '>=5.4.0'
         version: 5.4.2
 
+  packages/evm-contracts/lib/forge-std: {}
+
   packages/evm-development:
     dependencies:
       '@mainsail/container':
