@@ -1,0 +1,34 @@
+name: EVM Contracts
+
+on:
+    pull_request:
+        types:
+            - ready_for_review
+            - synchronize
+            - opened
+    push:
+        branches:
+            - main
+            - develop
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    name: Contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run tests
+        working-directory: packages/evm-contracts
+        run: |
+          forge test -vvv
