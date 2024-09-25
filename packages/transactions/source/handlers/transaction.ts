@@ -25,7 +25,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 		return this.verifier.verifyHash(transaction.data);
 	}
 
@@ -80,8 +79,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
-
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.Transaction): Promise<void> {}
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,

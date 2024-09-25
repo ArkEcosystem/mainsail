@@ -21,8 +21,6 @@ export interface TransactionHandler {
 
 	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet): Promise<void>;
 
-	throwIfCannotEnterPool(transaction: Transaction): Promise<void>;
-
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
 	applyToSender(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
