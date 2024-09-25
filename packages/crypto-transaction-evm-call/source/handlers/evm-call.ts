@@ -39,17 +39,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		return super.throwIfCannotBeApplied(transaction, wallet);
 	}
 
-	public async applyToSender(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		await super.applyToSender(context, transaction);
-
-		// Taken from receipt in applyToRecipient
-		return { gasUsed: 0 };
-	}
-
-	public async applyToRecipient(
+	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Transactions.TransactionApplyResult> {

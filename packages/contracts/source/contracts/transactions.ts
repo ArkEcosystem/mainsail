@@ -23,10 +23,6 @@ export interface TransactionHandler {
 
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
-	applyToSender(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
-
-	applyToRecipient(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
-
 	emitEvents(transaction: Transaction): void;
 
 	verifySignatures(

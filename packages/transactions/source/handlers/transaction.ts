@@ -50,34 +50,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		// }
 	}
 
-	public async apply(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		const senderResult = await this.applyToSender(context, transaction);
-		const recipientResult = await this.applyToRecipient(context, transaction);
-
-		// Merge results; effectively only one is ever set depending on the transaction type.
-		return {
-			gasUsed: senderResult.gasUsed + recipientResult.gasUsed,
-			receipt: recipientResult.receipt,
-		};
-	}
-
-	public async applyToSender(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		return { gasUsed: 0 };
-	}
-
-	public async applyToRecipient(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		return { gasUsed: 0 };
-	}
-
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
 
 	public async verifySignatures(
@@ -120,6 +92,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
 		sender.setBalance(newBalance);
 	}
+
+	public abstract apply(
+		context: Contracts.Transactions.TransactionHandlerContext,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<Contracts.Transactions.TransactionApplyResult>;
 
 	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;
 
