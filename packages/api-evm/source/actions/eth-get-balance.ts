@@ -23,8 +23,6 @@ export class EthGetBalanceAction implements Contracts.Api.RPC.Action {
 		const [address] = parameters;
 		const accountInfo =  await this.evm.getAccountInfo(address);
 
-		console.log(accountInfo);
-
 		return `0x${Number(accountInfo.balance.toString(16))}`;
 
 	}

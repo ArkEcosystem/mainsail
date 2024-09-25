@@ -1,8 +1,12 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class EthGetTransactionCount implements Contracts.Api.RPC.Action {
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	public readonly name: string = "eth_getTransactionCount";
 
 	public readonly schema = {
@@ -16,15 +20,9 @@ export class EthGetTransactionCount implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string, string]): Promise<string> {
-		// TODO: Fix
-		// const walletRepository = this.stateService.getStore().walletRepository;
+		const [address] = parameters;
+		const accountInfo =  await this.evm.getAccountInfo(address);
 
-		// if (walletRepository.hasByAddress(parameters[0])) {
-		// 	const wallet = walletRepository.findByAddress(parameters[0]);
-
-		// 	return `0x${Number(wallet.getNonce()).toString(16)}`;
-		// }
-
-		return `0x0`;
+		return `0x${Number(accountInfo.nonce.toString(16))}`;
 	}
 }
