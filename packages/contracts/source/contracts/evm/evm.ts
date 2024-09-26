@@ -44,6 +44,16 @@ export interface AccountInfo {
 	readonly balance: bigint;
 }
 
+export interface AccountUpdate {
+	readonly address: string;
+	readonly balance: bigint;
+	readonly nonce: bigint;
+
+	// TODO: pass contract specific info for wallet table?
+	// readonly vote?: string;
+	// readonly unvote?: string;
+}
+
 export interface AccountUpdateContext {
 	readonly account: string;
 	readonly commitKey: CommitKey;

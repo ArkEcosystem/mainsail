@@ -1,5 +1,5 @@
 import { Block, Commit, Transaction } from "./crypto/index.js";
-import { TransactionReceipt } from "./evm/evm.js";
+import { AccountUpdate, TransactionReceipt } from "./evm/evm.js";
 
 export interface ProcessableUnit {
 	readonly height: number;
@@ -8,6 +8,8 @@ export interface ProcessableUnit {
 	hasProcessorResult(): boolean;
 	getProcessorResult(): BlockProcessorResult;
 	setProcessorResult(processorResult: BlockProcessorResult): void;
+	setAccountUpdates(accounts: Array<AccountUpdate>): void;
+	getAccountUpdates(): Array<AccountUpdate>;
 	getBlock(): Block;
 	getCommit(): Promise<Commit>;
 }

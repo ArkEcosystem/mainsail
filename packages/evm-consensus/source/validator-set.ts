@@ -94,7 +94,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
 				blsPublicKey: blsPublicKey.slice(2),
-				voteBalance,
+				voteBalance: Utils.BigNumber.make(voteBalance),
 			};
 
 			validatorWallets.push(validatorWallet);

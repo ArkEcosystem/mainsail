@@ -50,7 +50,13 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const { height } = unit;
 		const round = unit.getBlock().data.round;
-		await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
+
+		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
+
+		for (const account of result.dirtyAccounts) {
+			console.log(account);
+		}
+		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 
 	public async codeAt(address: string): Promise<string> {
