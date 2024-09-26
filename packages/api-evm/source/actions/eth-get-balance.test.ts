@@ -1,35 +1,29 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation";
 
-import { describeSkip, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { EthGetBalanceAction } from "./index.js";
 
-describeSkip<{
+describe<{
 	sandbox: Sandbox;
 	action: EthGetBalanceAction;
 	validator: Validator;
-	state: any;
+	evm: any;
 }>("EthGetBalanceAction", ({ beforeEach, it, assert }) => {
-	let balance = 0;
-	let hasByAddress = true;
+	let balance = BigInt(0);
+	const nonce = BigInt(0);
 
 	beforeEach(async (context) => {
-		const walletRepository = {
-			findByAddress: (address: string) => ({
-				getBalance: () => balance,
-			}),
-			hasByAddress: (address: string) => hasByAddress,
-		};
-
-		context.state = {
-			getStore: () => ({
-				walletRepository,
+		context.evm = {
+			getAccountInfo: () => ({
+				balance,
+				nonce,
 			}),
 		};
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.state);
+		context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
 
 		context.action = context.sandbox.app.resolve(EthGetBalanceAction);
 		context.validator = context.sandbox.app.resolve(Validator);
@@ -64,10 +58,7 @@ describeSkip<{
 	it("should return true", async ({ action }) => {
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x0");
 
-		balance = 20;
+		balance = BigInt(20);
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x14");
-
-		hasByAddress = false;
-		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x0");
 	});
 });
