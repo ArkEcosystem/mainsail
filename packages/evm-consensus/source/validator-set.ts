@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers } from "ethers";
 
