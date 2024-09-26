@@ -643,9 +643,6 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
-      '@mainsail/evm-consensus':
-        specifier: workspace:*
-        version: link:../evm-consensus
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
