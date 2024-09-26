@@ -52,10 +52,6 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		const round = unit.getBlock().data.round;
 
 		const result = await this.#evm.commit({ height: BigInt(height), round: BigInt(round) });
-
-		for (const account of result.dirtyAccounts) {
-			console.log(account);
-		}
 		unit.setAccountUpdates(result.dirtyAccounts);
 	}
 
