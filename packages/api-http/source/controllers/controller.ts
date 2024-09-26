@@ -87,7 +87,7 @@ export class Controller extends AbstractController {
 					generator = await this.walletRepositoryFactory()
 						.createQueryBuilder()
 						.select()
-						.where("public_key = :publicKey", { publicKey: block.generatorAddress })
+						.where("address = :address", { address: block.generatorAddress })
 						.getOneOrFail();
 				})(),
 			);

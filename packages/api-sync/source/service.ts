@@ -141,7 +141,12 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 		}
 
-		const dirtyWallets: Contracts.State.Wallet[] = [];
+		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
+		// temporary workaround for API to find validator wallets
+		const activeValidators = this.validatorSet.getActiveValidators().reduce((acc, curr) => {
+			acc[curr.address] = curr;
+			return acc;
+		}, {});
 
 		const deferredSync: DeferredSync = {
 			block: {
@@ -188,12 +193,14 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: data.version,
 			})),
 
-			// eslint-disable-next-line sonarjs/no-empty-collection
-			wallets: dirtyWallets.map((wallet) => ({
-				address: wallet.getAddress(),
-				attributes: [],
-				balance: wallet.getBalance().toFixed(),
-				nonce: wallet.getNonce().toFixed(),
+			wallets: accountUpdates.map((account) => ({
+				address: account.address,
+				// temporary workaround
+				attributes: activeValidators[account.address]
+					? { validatorPublicKey: activeValidators[account.address].blsPublicKey }
+					: [],
+				balance: Utils.BigNumber.make(account.balance).toFixed(),
+				nonce: Utils.BigNumber.make(account.nonce).toFixed(),
 				publicKey: "",
 				updated_at: header.height.toFixed(),
 			})),
