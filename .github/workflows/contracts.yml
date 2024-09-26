@@ -29,6 +29,6 @@ jobs:
                   version: nightly
 
             - name: Run tests
-              working-directory: packages/evm-contracts
+              working-directory: contracts
               run: |
                   forge test -vvv

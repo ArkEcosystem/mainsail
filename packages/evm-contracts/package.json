@@ -1,17 +1,20 @@
 {
 	"name": "@mainsail/evm-contracts",
 	"version": "0.0.1-evm.1",
-	"description": "EVM contracts support for the Mainsail blockchain",
+	"description": "EVM Contract ABIs for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"type": "module",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
 	"files": [
 		"/distribution"
 	],
 	"scripts": {
-		"build": "forge build",
-		"clean": "forge clean",
-		"test": "forge test -vvv"
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"release": "pnpm publish --access public"
 	},
 	"dependencies": {},
 	"devDependencies": {},

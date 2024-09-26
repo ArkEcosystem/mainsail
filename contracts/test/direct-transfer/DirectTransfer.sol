@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std/Test.sol";
-import {DirectTransfer} from "../src/DirectTransfer.sol";
+import {Test, console} from "@forge-std/Test.sol";
+import {DirectTransfer} from "@contracts/direct-transfer/DirectTransfer.sol";
 
 contract DirectTransferTest is Test {
 	DirectTransfer public directTransfer;
