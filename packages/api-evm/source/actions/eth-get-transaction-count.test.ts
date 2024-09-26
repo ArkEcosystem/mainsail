@@ -8,28 +8,22 @@ describeSkip<{
 	sandbox: Sandbox;
 	action: EthGetTransactionCount;
 	validator: Validator;
-	state: any;
+	evm: any;
 }>("EthGetTransactionCount", ({ beforeEach, it, assert }) => {
-	let nonce = 0;
-	let hasByAddress = true;
+	const balance = BigInt(0);
+	let nonce = BigInt(0);
 
 	beforeEach(async (context) => {
-		const walletRepository = {
-			findByAddress: (address: string) => ({
-				getNonce: () => nonce,
-			}),
-			hasByAddress: (address: string) => hasByAddress,
-		};
-
-		context.state = {
-			getStore: () => ({
-				walletRepository,
-			}),
-		};
+		context.evm = {
+			getAccountInfo: () => ({
+					balance,
+					nonce,
+				})
+		}
 
 		context.sandbox = new Sandbox();
 
-		context.sandbox.app.bind(Identifiers.State.Service).toConstantValue(context.state);
+		context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
 
 		context.action = context.sandbox.app.resolve(EthGetTransactionCount);
 		context.validator = context.sandbox.app.resolve(Validator);
@@ -66,10 +60,7 @@ describeSkip<{
 	it("should return true", async ({ action }) => {
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x0");
 
-		nonce = 20;
+		nonce = BigInt(20);
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x14");
-
-		hasByAddress = false;
-		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x0");
 	});
 });
