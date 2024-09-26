@@ -25,7 +25,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	#corrupt = false;
 
-	public async configure(publicKey): Promise<SenderState> {
+	public async configure(address: string): Promise<SenderState> {
 		return this;
 	}
 
