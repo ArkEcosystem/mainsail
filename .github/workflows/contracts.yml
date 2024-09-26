@@ -16,7 +16,7 @@ env:
 
 jobs:
     check:
-        name: Contracts
+        name: contracts
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
