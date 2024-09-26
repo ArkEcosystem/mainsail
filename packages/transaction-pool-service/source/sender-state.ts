@@ -1,9 +1,13 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
+import { Wallets } from "@mainsail/state";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
 	private readonly configuration!: Providers.PluginConfiguration;
@@ -24,8 +28,11 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	#corrupt = false;
+	#wallet!: Contracts.State.Wallet;
 
 	public async configure(address: string): Promise<SenderState> {
+		this.#wallet = await this.app.resolve(Wallets.Wallet).init(address);
+
 		return this;
 	}
 
@@ -63,6 +70,11 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			}
 
 			try {
+				await this.triggers.call("throwIfCannotBeApplied", {
+					handler,
+					sender: this.#wallet,
+					transaction,
+				});
 				await this.triggers.call("applyTransaction", {
 					handler,
 					transaction,

@@ -2615,6 +2615,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
       better-sqlite3:
         specifier: 11.2.1
         version: 11.2.1

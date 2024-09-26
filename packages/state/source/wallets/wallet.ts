@@ -1,15 +1,23 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class Wallet implements Contracts.State.Wallet {
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	protected address!: string;
 	protected balance = BigNumber.ZERO;
 	protected nonce = BigNumber.ZERO;
 
-	public init(address: string): Wallet {
+	public async init(address: string): Promise<Wallet> {
 		this.address = address;
+
+		const accountInfo = await this.evm.getAccountInfo(address);
+		this.balance = BigNumber.make(accountInfo.balance);
+		this.nonce = BigNumber.make(accountInfo.nonce);
 		return this;
 	}
 
