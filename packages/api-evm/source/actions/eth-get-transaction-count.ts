@@ -21,7 +21,7 @@ export class EthGetTransactionCount implements Contracts.Api.RPC.Action {
 
 	public async handle(parameters: [string, string]): Promise<string> {
 		const [address] = parameters;
-		const accountInfo =  await this.evm.getAccountInfo(address);
+		const accountInfo = await this.evm.getAccountInfo(address);
 
 		return `0x${accountInfo.nonce.toString(16)}`;
 	}

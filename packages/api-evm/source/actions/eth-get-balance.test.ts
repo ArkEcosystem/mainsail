@@ -16,10 +16,10 @@ describe<{
 	beforeEach(async (context) => {
 		context.evm = {
 			getAccountInfo: () => ({
-					balance,
-					nonce,
-				})
-		}
+				balance,
+				nonce,
+			}),
+		};
 
 		context.sandbox = new Sandbox();
 
