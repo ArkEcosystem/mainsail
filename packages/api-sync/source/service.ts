@@ -143,9 +143,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
 		// temporary workaround for API to find validator wallets
-		const activeValidators = this.validatorSet.getActiveValidators().reduce((acc, curr) => {
-			acc[curr.address] = curr;
-			return acc;
+		const activeValidators = this.validatorSet.getActiveValidators().reduce((accumulator, current) => {
+			accumulator[current.address] = current;
+			return accumulator;
 		}, {});
 
 		const deferredSync: DeferredSync = {
