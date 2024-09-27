@@ -74,9 +74,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		if (!senderMempool) {
 			senderMempool = await this.createSenderMempool.call(this, address);
 			this.#senderMempools.set(address, senderMempool);
-			this.logger.debug(
-				`${address} state created`,
-			);
+			this.logger.debug(`${address} state created`);
 		}
 
 		try {

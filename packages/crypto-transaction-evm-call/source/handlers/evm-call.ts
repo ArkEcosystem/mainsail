@@ -80,7 +80,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-
 	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
 		if (this.state.isBootstrap()) {
 			return;

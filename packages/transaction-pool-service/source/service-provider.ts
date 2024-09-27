@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ThrowIfCannotBeAppliedAction,VerifyTransactionAction } from "./actions/index.js";
+import { ThrowIfCannotBeAppliedAction, VerifyTransactionAction } from "./actions/index.js";
 import { ExpirationService } from "./expiration-service.js";
 import { Mempool } from "./mempool.js";
 import { Processor } from "./processor.js";

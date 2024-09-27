@@ -39,7 +39,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		}
 
 		if (
-			sender.getBalance().minus(transaction.data.amount).minus(this.gasFeeCalculator.calculate(transaction)).isNegative() &&
+			sender
+				.getBalance()
+				.minus(transaction.data.amount)
+				.minus(this.gasFeeCalculator.calculate(transaction))
+				.isNegative() &&
 			this.configuration.getHeight() > 0
 		) {
 			throw new Exceptions.InsufficientBalanceError();

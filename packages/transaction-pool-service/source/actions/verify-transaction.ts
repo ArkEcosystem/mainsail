@@ -1,6 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
-import { Services,Types  } from "@mainsail/kernel";
-
+import { Services, Types } from "@mainsail/kernel";
 
 export class VerifyTransactionAction extends Services.Triggers.Action {
 	public async execute(arguments_: Types.ActionArguments): Promise<boolean> {

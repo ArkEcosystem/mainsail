@@ -213,7 +213,10 @@ export class Service implements Contracts.TransactionPool.Service {
 		const expiredHeight: number = lastHeight - maxTransactionAge;
 
 		for (const { senderPublicKey, id } of this.storage.getOldTransactions(expiredHeight)) {
-			const removedTransactions = await this.mempool.removeTransaction(await this.addressFactory.fromPublicKey(senderPublicKey), id);
+			const removedTransactions = await this.mempool.removeTransaction(
+				await this.addressFactory.fromPublicKey(senderPublicKey),
+				id,
+			);
 
 			for (const removedTransaction of removedTransactions) {
 				this.storage.removeTransaction(removedTransaction.id);

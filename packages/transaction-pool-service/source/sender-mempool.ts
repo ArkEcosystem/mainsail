@@ -51,7 +51,11 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 					this.configuration.getRequired<number>("maxTransactionsPerSender");
 				if (this.#transactions.length >= maxTransactionsPerSender) {
 					const allowedSenders: string[] = this.configuration.getOptional<string[]>("allowedSenders", []);
-					if (!allowedSenders.includes(await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey))) {
+					if (
+						!allowedSenders.includes(
+							await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
+						)
+					) {
 						throw new Exceptions.SenderExceededMaximumTransactionCountError(
 							transaction,
 							maxTransactionsPerSender,
