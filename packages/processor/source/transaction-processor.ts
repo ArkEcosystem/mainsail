@@ -1,12 +1,18 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
+
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
+	@inject(Identifiers.Services.Log.Service)
+	protected readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
@@ -46,7 +52,15 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		}
 
 		const result = await transactionHandler.apply(transactionHandlerContext, transaction);
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+		Utils.assert.defined<Contracts.Evm.TransactionReceipt>(result.receipt);
+
+		const feeConsumed = this.gasFeeCalculator.calculateConsumed(
+			transaction.data.fee,
+			Number(result.receipt.gasUsed),
+		);
+		this.logger.debug(
+			`executed EVM call (success=${result.receipt.success}, gasUsed=${result.receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${result.receipt.deployedContractAddress})`,
+		);
 
 		return { gasUsed: result.gasUsed, receipt: result.receipt };
 	}

@@ -58,21 +58,12 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				value: transaction.data.amount.toBigInt(),
 			});
 
-			if (instance.mode() === Contracts.Evm.EvmMode.Persistent && !this.state.isBootstrap()) {
-				const feeConsumed = this.gasFeeCalculator.calculateConsumed(
-					transaction.data.fee,
-					Number(receipt.gasUsed),
-				);
-				this.logger.debug(
-					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.deployedContractAddress})`,
-				);
 
-				void this.#emit(Events.EvmEvent.TransactionReceipt, {
-					receipt,
-					sender: address,
-					transactionId: transaction.id,
-				});
-			}
+			void this.#emit(Events.EvmEvent.TransactionReceipt, {
+				receipt,
+				sender: address,
+				transactionId: transaction.id,
+			});
 
 			return { gasUsed: Number(receipt.gasUsed), receipt };
 		} catch (error) {

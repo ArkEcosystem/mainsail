@@ -13,7 +13,7 @@ export type TransactionHandlerContext = {
 
 export interface TransactionApplyResult {
 	gasUsed: number;
-	receipt?: TransactionReceipt;
+	receipt: TransactionReceipt;
 }
 
 export interface TransactionHandler {
