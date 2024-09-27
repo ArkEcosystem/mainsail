@@ -26,7 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/kernel": "workspace:*"
-		},
+	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/utils": "workspace:*",

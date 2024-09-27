@@ -58,7 +58,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				value: transaction.data.amount.toBigInt(),
 			});
 
-
 			void this.#emit(Events.EvmEvent.TransactionReceipt, {
 				receipt,
 				sender: address,
