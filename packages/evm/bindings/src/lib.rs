@@ -8,12 +8,13 @@ use ctx::{
 };
 use mainsail_evm_core::{
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
+    receipt::{map_execution_result, TxReceipt},
     state_changes::AccountUpdate,
     state_commit, state_hash,
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{CommitResult, TxReceipt, TxViewResult};
+use result::{CommitResult, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
     primitives::{
@@ -320,7 +321,7 @@ impl EvmInner {
 
         if committed {
             match receipt {
-                Some(receipt) => return Ok(receipt.into()),
+                Some(receipt) => return Ok(receipt),
                 None => {
                     return Err(EVMError::Database(
                         "found commit, but tx hash is missing".into(),
@@ -584,51 +585,6 @@ impl EvmInner {
 
     fn drop_pending_commit(&mut self) {
         self.take_pending_commit();
-    }
-}
-
-fn map_execution_result(result: ExecutionResult) -> TxReceipt {
-    match result {
-        ExecutionResult::Success {
-            gas_used,
-            gas_refunded,
-            output,
-            logs,
-            ..
-        } => match output {
-            revm::primitives::Output::Call(output) => TxReceipt {
-                gas_used,
-                gas_refunded,
-                success: true,
-                deployed_contract_address: None,
-                logs: Some(logs),
-                output: Some(output),
-            },
-            revm::primitives::Output::Create(output, address) => TxReceipt {
-                gas_used,
-                gas_refunded,
-                success: true,
-                deployed_contract_address: address.map(|address| address.to_string()),
-                logs: Some(logs),
-                output: Some(output),
-            },
-        },
-        ExecutionResult::Revert { gas_used, output } => TxReceipt {
-            gas_used,
-            success: false,
-            gas_refunded: 0,
-            deployed_contract_address: None,
-            logs: None,
-            output: Some(output),
-        },
-        ExecutionResult::Halt { gas_used, .. } => TxReceipt {
-            gas_used,
-            success: false,
-            gas_refunded: 0,
-            deployed_contract_address: None,
-            logs: None,
-            output: None,
-        },
     }
 }
 

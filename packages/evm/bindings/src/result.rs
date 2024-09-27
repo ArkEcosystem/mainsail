@@ -1,7 +1,7 @@
-use mainsail_evm_core::{db::TinyReceipt, state_changes::AccountUpdate};
+use mainsail_evm_core::{receipt::TxReceipt, state_changes::AccountUpdate};
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
-use revm::primitives::{AccountInfo, Bytes, Log};
+use revm::primitives::{AccountInfo, Bytes};
 
 use crate::utils;
 
@@ -67,30 +67,6 @@ pub struct JsTransactionReceipt {
 #[derive(Default)]
 pub struct CommitResult {
     pub dirty_accounts: Vec<AccountUpdate>,
-}
-
-#[derive(Default)]
-pub struct TxReceipt {
-    pub gas_used: u64,
-    pub gas_refunded: u64,
-    pub success: bool,
-    // TODO: expose additional data needed to JS
-    pub deployed_contract_address: Option<String>,
-    pub logs: Option<Vec<Log>>,
-    pub output: Option<Bytes>,
-}
-
-impl From<TinyReceipt> for TxReceipt {
-    fn from(value: TinyReceipt) -> Self {
-        Self {
-            gas_used: value.gas_used,
-            gas_refunded: 0,
-            success: value.success,
-            deployed_contract_address: value.deployed_contract.map(|a| a.to_string()),
-            logs: None,
-            output: None,
-        }
-    }
 }
 
 pub struct TxViewResult {
