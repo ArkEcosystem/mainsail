@@ -92,10 +92,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	protected applyFeeToSender(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		// Fee is taken after EVM execution to take the actual consumed gas into account
-	}
-
 	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
 		if (this.state.isBootstrap()) {
 			return;

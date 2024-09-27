@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
@@ -84,13 +83,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		) {
 			throw new Exceptions.InsufficientBalanceError();
 		}
-	}
-
-	protected applyFeeToSender(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		const data: Contracts.Crypto.TransactionData = transaction.data;
-
-		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
-		sender.setBalance(newBalance);
 	}
 
 	public abstract apply(
