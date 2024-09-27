@@ -104,6 +104,7 @@ impl EvmInner {
                     Bytecode::LegacyRaw(code) => code,
                     Bytecode::LegacyAnalyzed(code) => code.original_bytes(),
                     Bytecode::Eof(code) => code.raw.clone(),
+                    Bytecode::Eip7702(code) => code.raw.clone(),
                 })
             }
             None => Ok(Default::default()),
