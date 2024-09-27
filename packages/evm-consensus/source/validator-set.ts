@@ -1,9 +1,9 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers } from "ethers";
 
-import { CONSENSUS } from "./contracts.ts/index.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
 @injectable()
@@ -71,7 +71,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
 		const { evmSpec } = this.configuration.getMilestone();
 
-		const iface = new ethers.Interface(CONSENSUS.abi.abi);
+		const iface = new ethers.Interface(ConsensusAbi.abi);
 		const data = iface.encodeFunctionData("getTopValidators").slice(2);
 
 		const result = await this.evm.view({

@@ -37,7 +37,7 @@
 		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-wif": "workspace:*",
-		"@mainsail/evm-consensus": "workspace:*",
+		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
