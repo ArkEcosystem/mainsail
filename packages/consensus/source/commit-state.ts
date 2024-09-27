@@ -9,6 +9,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#commit!: Contracts.Crypto.Commit;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
+	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
 
 	public get height(): number {
 		return this.#commit.block.data.height;
@@ -56,6 +57,14 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 		}
 
 		return this.#processorResult;
+	}
+
+	public getAccountUpdates(): Array<Contracts.Evm.AccountUpdate> {
+		return this.#accountUpdates;
+	}
+
+	public setAccountUpdates(accounts: Array<Contracts.Evm.AccountUpdate>): void {
+		this.#accountUpdates = accounts;
 	}
 
 	public async getCommit(): Promise<Contracts.Crypto.Commit> {

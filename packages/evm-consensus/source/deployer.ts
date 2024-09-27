@@ -1,9 +1,9 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers, sha256 } from "ethers";
 
-import { CONSENSUS } from "./contracts.ts/index.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
 // TODO: extract "evm-deployer" package to manage nonce, etc. when deploying protocol contracts.
@@ -62,7 +62,7 @@ export class Deployer {
 			blockContext,
 			caller: this.#deployerAddress,
 			data: Buffer.concat([
-				Buffer.from(ethers.getBytes(CONSENSUS.abi.bytecode)),
+				Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object)),
 				Buffer.from(constructorArguments, "hex"),
 			]),
 			gasLimit: BigInt(10_000_000),
@@ -95,6 +95,7 @@ export class Deployer {
 		await this.evm.onCommit({
 			...commitKey,
 			getBlock: () => ({ data: { round: BigInt(0) } }),
+			setAccountUpdates: () => ({}),
 		} as any);
 	}
 
