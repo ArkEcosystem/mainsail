@@ -31,10 +31,12 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
+		if (!sender.getNonce().isEqualTo(transaction.data.nonce)) {
+			throw new Exceptions.UnexpectedNonceError(transaction.data.nonce, sender);
+		}
+
+
 		// @TODO: enforce fees here to support dynamic cases
-
-		//this.#verifyTransactionNonceApply(sender, transaction);
-
 		//this.verifyTransactionFee(context, transaction, sender);
 
 		if (
@@ -58,14 +60,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	): Promise<boolean> {
 		return this.verifier.verifySignatures(transaction, multiSignature);
 	}
-
-	// #verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.Transaction): void {
-	// 	const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
-
-	// 	if (!wallet.getNonce().isEqualTo(nonce)) {
-	// 		throw new Exceptions.UnexpectedNonceError(nonce, wallet, false);
-	// 	}
-	// }
 
 	protected allTransactions(transactions: Contracts.Crypto.Transaction[]): Contracts.Crypto.TransactionData[] {
 		return transactions
