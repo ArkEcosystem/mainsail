@@ -7,6 +7,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	private readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
@@ -35,20 +38,12 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			throw new Exceptions.UnexpectedNonceError(transaction.data.nonce, sender);
 		}
 
-
-		// @TODO: enforce fees here to support dynamic cases
-		//this.verifyTransactionFee(context, transaction, sender);
-
 		if (
-			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
+			sender.getBalance().minus(transaction.data.amount).minus(this.gasFeeCalculator.calculate(transaction)).isNegative() &&
 			this.configuration.getHeight() > 0
 		) {
 			throw new Exceptions.InsufficientBalanceError();
 		}
-
-		// if (transaction.data.senderPublicKey !== sender.getPublicKey()) {
-		// 	throw new Exceptions.SenderWalletMismatchError();
-		// }
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
