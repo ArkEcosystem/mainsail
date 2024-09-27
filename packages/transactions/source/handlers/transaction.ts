@@ -8,7 +8,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	protected readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Evm.Gas.FeeCalculator)
-	private readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
 
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
@@ -63,15 +63,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 					data.type === this.getConstructor().type && data.typeGroup === this.getConstructor().typeGroup,
 			)
 			.map(({ data }) => data);
-	}
-
-	protected verifyTransactionFee(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		if (
-			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
-			this.configuration.getHeight() > 0
-		) {
-			throw new Exceptions.InsufficientBalanceError();
-		}
 	}
 
 	public abstract apply(

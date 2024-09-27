@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
@@ -10,9 +10,6 @@ import { EvmCallTransaction } from "../versions/index.js";
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
-
-	@inject(Identifiers.Evm.Gas.FeeCalculator)
-	private readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -83,14 +80,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		}
 	}
 
-	protected verifyTransactionFee(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
-
-		const maxFee = this.gasFeeCalculator.calculate(transaction);
-		if (sender.getBalance().minus(maxFee).isNegative() && this.configuration.getHeight() > 0) {
-			throw new Exceptions.InsufficientBalanceError();
-		}
-	}
 
 	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {
 		if (this.state.isBootstrap()) {
