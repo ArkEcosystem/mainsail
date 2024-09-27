@@ -18,6 +18,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
 	@inject(Identifiers.TransactionPool.ExpirationService)
 	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
 
@@ -75,13 +78,12 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 					sender: this.#wallet,
 					transaction,
 				});
-				await this.triggers.call("applyTransaction", {
-					handler,
-					transaction,
-				});
 			} catch (error) {
 				throw new Exceptions.TransactionFailedToApplyError(transaction, error);
 			}
+
+			this.#wallet.increaseNonce();
+			this.#wallet.decreaseBalance(transaction.data.amount.plus(this.gasFeeCalculator.calculate(transaction)));
 		} else {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
