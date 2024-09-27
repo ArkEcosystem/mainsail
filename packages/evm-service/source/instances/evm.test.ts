@@ -378,7 +378,7 @@ describe<{
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
-		assert.empty(receipt.logs);
+		assert.equal(receipt.logs, prevReceipt.logs);
 	});
 
 	it("should throw when passing non-existent tx hash for committed receipt", async ({ instance }) => {
