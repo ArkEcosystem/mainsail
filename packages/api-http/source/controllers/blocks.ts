@@ -31,11 +31,11 @@ export class BlocksController extends Controller {
 			return this.toPagination(blocks, BlockResource, request.query.transform);
 		}
 
-		const generatorAddresss = blocks.results.map(({ generatorAddress }) => generatorAddress);
+		const generatorAddresses = blocks.results.map(({ generatorAddress }) => generatorAddress);
 		const generators = await this.walletRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("public_key IN (:...publicKeys)", { publicKeys: generatorAddresss })
+			.where("address IN (:...addresses)", { addresses: generatorAddresses })
 			.getMany();
 
 		return this.toPagination(

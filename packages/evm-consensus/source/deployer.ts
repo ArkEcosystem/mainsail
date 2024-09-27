@@ -95,6 +95,7 @@ export class Deployer {
 		await this.evm.onCommit({
 			...commitKey,
 			getBlock: () => ({ data: { round: BigInt(0) } }),
+			setAccountUpdates: () => ({}),
 		} as any);
 	}
 

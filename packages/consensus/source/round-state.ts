@@ -26,6 +26,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#round = 0;
 	#proposal?: Contracts.Crypto.Proposal;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
+	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
 	#prevotes = new Map<number, Contracts.Crypto.Prevote>();
 	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<number, Contracts.Crypto.Precommit>();
@@ -149,6 +150,14 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		}
 
 		return this.#processorResult;
+	}
+
+	public getAccountUpdates(): Array<Contracts.Evm.AccountUpdate> {
+		return this.#accountUpdates;
+	}
+
+	public setAccountUpdates(accounts: Array<Contracts.Evm.AccountUpdate>): void {
+		this.#accountUpdates = accounts;
 	}
 
 	public hasPrevote(validatorIndex: number): boolean {

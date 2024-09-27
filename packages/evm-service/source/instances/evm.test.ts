@@ -82,6 +82,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(0), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		const encodedCall = iface.encodeFunctionData("emitGlobals");
@@ -140,6 +141,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(0), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		assert.true(receipt.success);
@@ -174,6 +176,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(1), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		assert.true(receipt.success);
@@ -239,6 +242,7 @@ describe<{
 			getBlock: () => ({
 				data: { ...commitKey },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		//
@@ -290,6 +294,7 @@ describe<{
 					getBlock: () => ({
 						data: { ...commitKey1 },
 					}),
+					setAccountUpdates: () => {},
 				} as any),
 			"invalid commit key",
 		);
@@ -300,6 +305,7 @@ describe<{
 				getBlock: () => ({
 					data: { ...commitKey2 },
 				}),
+				setAccountUpdates: () => {},
 			} as any),
 		);
 
@@ -317,6 +323,7 @@ describe<{
 					getBlock: () => ({
 						data: { height: 0, round: 0 },
 					}),
+					setAccountUpdates: () => {},
 				} as any),
 		);
 	});
@@ -361,6 +368,7 @@ describe<{
 			getBlock: () => ({
 				data: { ...commitKey },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		const prevReceipt = receipt;
@@ -402,6 +410,7 @@ describe<{
 			getBlock: () => ({
 				data: { ...commitKey },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		const randomTxHash = getRandomTxHash();
@@ -438,6 +447,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(0), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		assert.true(receipt.success);
@@ -494,6 +504,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(1), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		// Balance updated correctly
@@ -575,6 +586,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(0), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		code = await instance.codeAt(receipt.deployedContractAddress!);
@@ -621,6 +633,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(0), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		await assert.rejects(
@@ -662,6 +675,7 @@ describe<{
 			getBlock: () => ({
 				data: { height: BigInt(0), round: BigInt(0) },
 			}),
+			setAccountUpdates: () => {},
 		} as any);
 
 		// look up slot containing user balance
