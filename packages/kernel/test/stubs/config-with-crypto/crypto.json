@@ -1831,7 +1831,6 @@
 			"epoch": "2022-03-10T00:00:00.000Z",
 			"evmSpec": "Shanghai",
 			"height": 1,
-			"multiPaymentLimit": 256,
 			"reward": "0",
 			"satoshi": {
 				"decimals": 8,
@@ -1853,7 +1852,6 @@
 			"epoch": "2022-03-10T00:00:00.000Z",
 			"evmSpec": "Shanghai",
 			"height": 75600,
-			"multiPaymentLimit": 256,
 			"reward": "200000000",
 			"satoshi": {
 				"decimals": 8,

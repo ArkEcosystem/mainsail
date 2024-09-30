@@ -79,7 +79,6 @@ describe<{
 						blockTime: 9000,
 						epoch: match.string,
 						height: 0,
-						multiPaymentLimit: 256,
 						reward: "0",
 						satoshi: match.object,
 						vendorFieldLength: 255,
@@ -379,7 +378,6 @@ describe<{
 						blockTime: 9000,
 						epoch: match.string,
 						height: 0,
-						multiPaymentLimit: 256,
 						reward: "0", // TODO: Check
 						satoshi: match.object,
 						vendorFieldLength: 64,
