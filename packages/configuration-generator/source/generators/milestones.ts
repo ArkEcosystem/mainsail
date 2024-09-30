@@ -17,18 +17,6 @@ export class MilestonesGenerator {
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
 				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
-				fees: {
-					staticFees: {
-						multiPayment: 10_000_000,
-						multiSignature: 500_000_000,
-						transfer: 10_000_000,
-						usernameRegistration: 2_500_000_000,
-						usernameResignation: 2_500_000_000,
-						validatorRegistration: 2_500_000_000,
-						validatorResignation: 2_500_000_000,
-						vote: 100_000_000,
-					},
-				},
 				gas: {
 					maximumGasLimit: 2_000_000,
 					minimumGasFee: 5,

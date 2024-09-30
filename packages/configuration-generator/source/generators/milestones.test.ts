@@ -53,18 +53,6 @@ describe<{
 						maximumGasLimit: 2_000_000,
 						nativeFeeMultiplier: 100,
 					},
-					fees: {
-						staticFees: {
-							multiPayment: 10_000_000,
-							multiSignature: 500_000_000,
-							transfer: 10_000_000,
-							usernameRegistration: 2_500_000_000,
-							usernameResignation: 2_500_000_000,
-							validatorRegistration: 2_500_000_000,
-							validatorResignation: 2_500_000_000,
-							vote: 100_000_000,
-						},
-					},
 					height: 0,
 					reward: "0",
 					satoshi: {
