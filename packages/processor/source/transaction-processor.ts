@@ -53,10 +53,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 		const receipt = await transactionHandler.apply(transactionHandlerContext, transaction);
 
-		const feeConsumed = this.gasFeeCalculator.calculateConsumed(
-			transaction.data.fee,
-			Number(receipt.gasUsed),
-		);
+		const feeConsumed = this.gasFeeCalculator.calculateConsumed(transaction.data.fee, Number(receipt.gasUsed));
 		this.logger.debug(
 			`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.deployedContractAddress})`,
 		);

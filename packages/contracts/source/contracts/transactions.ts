@@ -81,5 +81,4 @@ export interface TransactionValidator {
 	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionReceipt>;
 }
 
-
 export type TransactionValidatorFactory = () => TransactionValidator;
