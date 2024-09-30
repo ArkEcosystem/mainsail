@@ -2,7 +2,7 @@ import { Selectors } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { EphemeralInstance, EvmInstance, MockInstance } from "./instances/index.js";
+import { EphemeralInstance, EvmInstance } from "./instances/index.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -17,12 +17,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.to(EphemeralInstance)
 			.inRequestScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("instance", "ephemeral"));
-
-		this.app
-			.bind(Identifiers.Evm.Instance)
-			.to(MockInstance)
-			.inSingletonScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("instance", "mock"));
 	}
 
 	public async boot(): Promise<void> {}
