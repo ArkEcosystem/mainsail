@@ -26,7 +26,7 @@ describe<{
 					gas: {
 						maximumGasLimit: 2000000,
 						minimumGasFee: 5,
-						minimumGasLimit: 21000
+						minimumGasLimit: 21000,
 					},
 				},
 			],
