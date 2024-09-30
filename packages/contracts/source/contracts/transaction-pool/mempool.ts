@@ -4,13 +4,13 @@ import { SenderMempool } from "./sender-mempool.js";
 export interface Mempool {
 	getSize(): number;
 
-	hasSenderMempool(senderPublicKey: string): boolean;
-	getSenderMempool(senderPublicKey: string): SenderMempool;
+	hasSenderMempool(address: string): boolean;
+	getSenderMempool(address: string): SenderMempool;
 	getSenderMempools(): Iterable<SenderMempool>;
 
 	addTransaction(transaction: Transaction): Promise<void>;
-	removeTransaction(senderPublicKey: string, id: string): Promise<Transaction[]>;
-	removeForgedTransaction(senderPublicKey: string, id: string): Promise<Transaction[]>;
+	removeTransaction(address: string, id: string): Promise<Transaction[]>;
+	removeForgedTransaction(address: string, id: string): Promise<Transaction[]>;
 
 	fixInvalidStates(): Promise<Transaction[]>;
 

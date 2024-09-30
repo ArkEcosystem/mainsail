@@ -2562,6 +2562,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/state':
+        specifier: workspace:*
+        version: link:../state
       better-sqlite3:
         specifier: 11.2.1
         version: 11.2.1
@@ -2624,13 +2627,13 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
     devDependencies:
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       dayjs:
         specifier: 1.11.10
         version: 1.11.10

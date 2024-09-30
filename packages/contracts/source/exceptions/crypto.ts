@@ -217,10 +217,9 @@ export class AlreadyRegisteredError extends Exception {
 }
 
 export class UnexpectedNonceError extends Exception {
-	public constructor(txNonce: any, sender: Wallet, reversal: boolean) {
-		const action: string = reversal ? "revert" : "apply";
+	public constructor(txNonce: any, sender: Wallet) {
 		super(
-			`Cannot ${action} a transaction with nonce ${txNonce.toFixed()}: the ` +
+			`Cannot apply a transaction with nonce ${txNonce.toFixed()}: the ` +
 				`sender ${sender.getAddress()} has nonce ${sender.getNonce().toFixed()}.`,
 		);
 	}

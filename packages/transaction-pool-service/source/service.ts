@@ -8,6 +8,10 @@ export class Service implements Contracts.TransactionPool.Service {
 	@tagged("plugin", "transaction-pool-service")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	@tagged("type", "wallet")
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
@@ -65,7 +69,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			for (const transaction of block.transactions) {
 				const transactions = await this.mempool.removeForgedTransaction(
-					transaction.data.senderPublicKey,
+					await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
 					transaction.id,
 				);
 
@@ -78,7 +82,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			for (const transaction of failedTransactions) {
 				const transactions = await this.mempool.removeTransaction(
-					transaction.data.senderPublicKey,
+					await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
 					transaction.id,
 				);
 
@@ -209,7 +213,10 @@ export class Service implements Contracts.TransactionPool.Service {
 		const expiredHeight: number = lastHeight - maxTransactionAge;
 
 		for (const { senderPublicKey, id } of this.storage.getOldTransactions(expiredHeight)) {
-			const removedTransactions = await this.mempool.removeTransaction(senderPublicKey, id);
+			const removedTransactions = await this.mempool.removeTransaction(
+				await this.addressFactory.fromPublicKey(senderPublicKey),
+				id,
+			);
 
 			for (const removedTransaction of removedTransactions) {
 				this.storage.removeTransaction(removedTransaction.id);
@@ -224,7 +231,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		for (const transaction of await this.poolQuery.getAll().all()) {
 			if (await this.expirationService.isExpired(transaction)) {
 				const removedTransactions = await this.mempool.removeTransaction(
-					transaction.data.senderPublicKey,
+					await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
 					transaction.id,
 				);
 
@@ -245,7 +252,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		const transaction = await this.poolQuery.getFromLowestPriority().first();
 
 		const removedTransactions = await this.mempool.removeTransaction(
-			transaction.data.senderPublicKey,
+			await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
 			transaction.id,
 		);
 

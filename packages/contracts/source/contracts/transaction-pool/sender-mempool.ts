@@ -12,4 +12,4 @@ export interface SenderMempool {
 	removeForgedTransaction(id: string): Transaction | undefined;
 }
 
-export type SenderMempoolFactory = (publicKey: string) => Promise<SenderMempool>;
+export type SenderMempoolFactory = (address: string) => Promise<SenderMempool>;

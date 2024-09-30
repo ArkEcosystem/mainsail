@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 import { Handlers } from "@mainsail/transactions";
@@ -10,9 +10,6 @@ import { EvmCallTransaction } from "../versions/index.js";
 export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
-
-	@inject(Identifiers.Evm.Gas.FeeCalculator)
-	private readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -32,26 +29,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		return true;
 	}
 
-	public async throwIfCannotBeApplied(
-		transaction: Contracts.Crypto.Transaction,
-		wallet: Contracts.State.Wallet,
-	): Promise<void> {
-		return super.throwIfCannotBeApplied(transaction, wallet);
-	}
-
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.Transaction): Promise<void> {}
-
-	public async applyToSender(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		await super.applyToSender(context, transaction);
-
-		// Taken from receipt in applyToRecipient
-		return { gasUsed: 0 };
-	}
-
-	public async applyToRecipient(
+	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Transactions.TransactionApplyResult> {
@@ -80,39 +58,16 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				value: transaction.data.amount.toBigInt(),
 			});
 
-			if (instance.mode() === Contracts.Evm.EvmMode.Persistent && !this.state.isBootstrap()) {
-				const feeConsumed = this.gasFeeCalculator.calculateConsumed(
-					transaction.data.fee,
-					Number(receipt.gasUsed),
-				);
-				this.logger.debug(
-					`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.deployedContractAddress})`,
-				);
-
-				void this.#emit(Events.EvmEvent.TransactionReceipt, {
-					receipt,
-					sender: address,
-					transactionId: transaction.id,
-				});
-			}
+			void this.#emit(Events.EvmEvent.TransactionReceipt, {
+				receipt,
+				sender: address,
+				transactionId: transaction.id,
+			});
 
 			return { gasUsed: Number(receipt.gasUsed), receipt };
 		} catch (error) {
 			return this.app.terminate("invalid EVM call", error);
 		}
-	}
-
-	protected verifyTransactionFee(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
-
-		const maxFee = this.gasFeeCalculator.calculate(transaction);
-		if (sender.getBalance().minus(maxFee).isNegative() && this.configuration.getHeight() > 0) {
-			throw new Exceptions.InsufficientBalanceError();
-		}
-	}
-
-	protected applyFeeToSender(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		// Fee is taken after EVM execution to take the actual consumed gas into account
 	}
 
 	async #emit<T>(event: Contracts.Kernel.EventName, data?: T): Promise<void> {

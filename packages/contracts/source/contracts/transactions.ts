@@ -13,7 +13,7 @@ export type TransactionHandlerContext = {
 
 export interface TransactionApplyResult {
 	gasUsed: number;
-	receipt?: TransactionReceipt;
+	receipt: TransactionReceipt;
 }
 
 export interface TransactionHandler {
@@ -21,13 +21,7 @@ export interface TransactionHandler {
 
 	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet): Promise<void>;
 
-	throwIfCannotEnterPool(transaction: Transaction): Promise<void>;
-
 	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
-
-	applyToSender(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
-
-	applyToRecipient(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
 
 	emitEvents(transaction: Transaction): void;
 
