@@ -32,7 +32,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	public async apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
+	): Promise<Contracts.Evm.TransactionReceipt> {
 		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
 		Utils.assert.defined<string>(transaction.id);
 
@@ -64,7 +64,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 				transactionId: transaction.id,
 			});
 
-			return { gasUsed: Number(receipt.gasUsed), receipt };
+			return receipt;
 		} catch (error) {
 			return this.app.terminate("invalid EVM call", error);
 		}

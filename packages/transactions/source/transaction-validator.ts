@@ -22,7 +22,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 	public async validate(
 		context: Contracts.Transactions.TransactionValidatorContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionValidatorResult> {
+	): Promise<Contracts.Evm.TransactionReceipt> {
 		const deserialized: Contracts.Crypto.Transaction = await this.transactionFactory.fromBytes(
 			transaction.serialized,
 		);
@@ -31,7 +31,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 		const { commitKey, gasLimit, timestamp, generatorAddress } = context;
 
 		const handler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
-		const result = await handler.apply(
+		const receipt = await handler.apply(
 			{
 				evm: {
 					blockContext: {
@@ -48,6 +48,6 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
 
-		return { gasUsed: result.gasUsed };
+		return receipt;
 	}
 }

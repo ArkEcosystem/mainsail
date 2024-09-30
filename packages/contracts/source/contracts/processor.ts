@@ -30,13 +30,7 @@ export interface BlockProcessorResult {
 }
 
 export interface TransactionProcessor {
-	process(unit: ProcessableUnit, transaction: Transaction): Promise<TransactionProcessorResult>;
-}
-
-export interface TransactionProcessorResult {
-	readonly gasUsed: number;
-	// only present for evm-calls, unlike 'gasUsed' which is also present for native transactions
-	readonly receipt?: TransactionReceipt;
+	process(unit: ProcessableUnit, transaction: Transaction): Promise<TransactionReceipt>;
 }
 
 export interface Verifier {

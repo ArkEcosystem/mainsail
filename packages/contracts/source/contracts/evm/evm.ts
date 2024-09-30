@@ -2,7 +2,6 @@ import { CommitHandler } from "../crypto/commit.js";
 
 export enum EvmMode {
 	Ephemeral,
-	Mock,
 	Persistent,
 }
 

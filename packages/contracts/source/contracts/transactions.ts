@@ -11,17 +11,12 @@ export type TransactionHandlerContext = {
 	};
 };
 
-export interface TransactionApplyResult {
-	gasUsed: number;
-	receipt: TransactionReceipt;
-}
-
 export interface TransactionHandler {
 	verify(transaction: Transaction): Promise<boolean>;
 
 	throwIfCannotBeApplied(transaction: Transaction, sender: Wallet): Promise<void>;
 
-	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionApplyResult>;
+	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionReceipt>;
 
 	emitEvents(transaction: Transaction): void;
 
@@ -83,11 +78,7 @@ export interface TransactionValidatorContext {
 
 export interface TransactionValidator {
 	getEvm(): Instance;
-	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionValidatorResult>;
-}
-
-export interface TransactionValidatorResult {
-	readonly gasUsed: number;
+	validate(context: TransactionValidatorContext, transaction: Transaction): Promise<TransactionReceipt>;
 }
 
 export type TransactionValidatorFactory = () => TransactionValidator;

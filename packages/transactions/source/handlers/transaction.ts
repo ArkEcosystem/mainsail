@@ -72,7 +72,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	public abstract apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult>;
+	): Promise<Contracts.Evm.TransactionReceipt>;
 
 	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;
 
