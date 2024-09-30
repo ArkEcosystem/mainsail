@@ -66,7 +66,6 @@ describe<{
 						},
 					},
 					height: 0,
-					multiPaymentLimit: 256,
 					reward: "0",
 					satoshi: {
 						decimals: 18,

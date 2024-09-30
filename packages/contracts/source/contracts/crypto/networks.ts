@@ -62,7 +62,6 @@ export type Milestone = {
 	evmSpec: SpecId;
 	gas: MilestoneGas;
 	fees: Fees;
-	multiPaymentLimit: number;
 	reward: string;
 	satoshi: MilestoneSatoshi;
 	timeouts: MilestoneTimeouts;
