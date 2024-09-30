@@ -26,17 +26,7 @@ describe<{
 					gas: {
 						maximumGasLimit: 2000000,
 						minimumGasFee: 5,
-						minimumGasLimit: 21000,
-						nativeGasLimits: {
-							transfer: 21000,
-							multiPayment: 50000,
-							multiSignature: 50000,
-							usernameRegistration: 100000,
-							usernameResignation: 50000,
-							validatorRegistration: 100000,
-							validatorResignation: 50000,
-							vote: 50000,
-						},
+						minimumGasLimit: 21000
 					},
 				},
 			],

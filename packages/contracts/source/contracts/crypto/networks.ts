@@ -51,7 +51,6 @@ export type MilestoneGas = {
 	maximumGasLimit: number;
 	minimumGasFee: number;
 	nativeFeeMultiplier: number;
-	nativeGasLimits: Record<string, number>;
 };
 
 export type Milestone = {

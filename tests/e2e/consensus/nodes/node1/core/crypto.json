@@ -356,17 +356,7 @@
 				"maximumGasLimit": 2000000,
 				"minimumGasFee": 5,
 				"minimumGasLimit": 21000,
-				"nativeFeeMultiplier": 100,
-				"nativeGasLimits": {
-					"multiPayment": 50000,
-					"multiSignature": 50000,
-					"transfer": 21000,
-					"usernameRegistration": 100000,
-					"usernameResignation": 50000,
-					"validatorRegistration": 100000,
-					"validatorResignation": 50000,
-					"vote": 50000
-				}
+				"nativeFeeMultiplier": 100
 			},
 			"height": 0,
 			"multiPaymentLimit": 256,
