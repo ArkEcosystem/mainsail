@@ -173,9 +173,9 @@ export class Validator implements Contracts.Validator.Validator {
 					transaction,
 				);
 
-				gasLeft -= result.gasUsed;
+				gasLeft -= Number(result.gasUsed);
 
-				transaction.data.gasUsed = result.gasUsed;
+				transaction.data.gasUsed = Number(result.gasUsed);
 				candidateTransactions.push(transaction);
 			} catch (error) {
 				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);

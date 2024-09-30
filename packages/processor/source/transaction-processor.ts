@@ -26,7 +26,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Processor.TransactionProcessorResult> {
+	): Promise<Contracts.Evm.TransactionReceipt> {
 		const milestone = this.configuration.getMilestone(unit.height);
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
@@ -51,17 +51,16 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		const result = await transactionHandler.apply(transactionHandlerContext, transaction);
-		Utils.assert.defined<Contracts.Evm.TransactionReceipt>(result.receipt);
+		const receipt = await transactionHandler.apply(transactionHandlerContext, transaction);
 
 		const feeConsumed = this.gasFeeCalculator.calculateConsumed(
 			transaction.data.fee,
-			Number(result.receipt.gasUsed),
+			Number(receipt.gasUsed),
 		);
 		this.logger.debug(
-			`executed EVM call (success=${result.receipt.success}, gasUsed=${result.receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${result.receipt.deployedContractAddress})`,
+			`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.deployedContractAddress})`,
 		);
 
-		return { gasUsed: result.gasUsed, receipt: result.receipt };
+		return receipt;
 	}
 }
