@@ -42,6 +42,9 @@ describe("Signature", ({ assert, it }) => {
 
 		const signatureBuffer = Buffer.concat([Buffer.from(sig.r, "hex"), Buffer.from(sig.s, "hex")]);
 		const publicKey = secp256k1.recover(message, signatureBuffer, sig.v - 27, true);
-		assert.equal(publicKey, "03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f");
+		assert.equal(
+			publicKey,
+			Buffer.from("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f", "hex"),
+		);
 	});
 });
