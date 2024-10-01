@@ -12,12 +12,10 @@ on:
     push:
         branches:
             - "develop"
-    pull_request:
-        types: [ready_for_review, synchronize, opened]
 
 jobs:
     build:
-        # if: "contains(github.event.head_commit.message, 'release:')"
+        if: "contains(github.event.head_commit.message, 'release:')"
 
         strategy:
             fail-fast: false
@@ -91,7 +89,7 @@ jobs:
 
     publish:
         name: Publish
-        # if: "contains(github.event.head_commit.message, 'release:')"
+        if: "contains(github.event.head_commit.message, 'release:')"
         runs-on: ubuntu-latest
         needs:
             - build
@@ -150,7 +148,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release --no-bail -- --publish-branch=develop --tag=evm --no-git-checks
+                  pnpm run release -- --publish-branch=develop --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
