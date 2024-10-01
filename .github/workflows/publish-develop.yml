@@ -150,7 +150,7 @@ jobs:
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=develop --tag=evm --no-git-checks
+                  pnpm run release --no-bail -- --publish-branch=develop --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
