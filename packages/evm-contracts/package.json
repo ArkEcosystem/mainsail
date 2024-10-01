@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm-contracts",
-	"version": "0.0.1-evm.1",
+	"version": "0.0.1-evm.3",
 	"description": "EVM Contract ABIs for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -16,8 +16,6 @@
 		"clean": "del distribution",
 		"release": "pnpm publish --access public"
 	},
-	"dependencies": {},
-	"devDependencies": {},
 	"engines": {
 		"node": ">=20.x"
 	}

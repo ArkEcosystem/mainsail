@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm-consensus",
-	"version": "0.0.1-evm.1",
+	"version": "0.0.1-evm.3",
 	"description": "EVM development support for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
