@@ -33,9 +33,8 @@ export class Store implements Contracts.State.Store {
 		return this.#height;
 	}
 
-	public setTotalRoundAndHeight(totalRound: number, height: number): void {
+	public setTotalRound(totalRound: number): void {
 		this.#totalRound = totalRound;
-		this.#height = height;
 	}
 
 	public getTotalRound(): number {

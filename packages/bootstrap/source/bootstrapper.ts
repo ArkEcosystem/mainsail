@@ -136,10 +136,10 @@ export class Bootstrapper {
 			this.stateStore.getLastHeight() + 1,
 			lastCommit.block.data.height,
 		)) {
-			totalRound += commit.block.data.round + 1;
+			totalRound += commit.proof.round + 1;
 		}
 
-		this.stateStore.setTotalRoundAndHeight(totalRound, lastCommit.block.data.height);
+		this.stateStore.setTotalRound(totalRound);
 		this.configuration.setHeight(lastCommit.block.data.height + 1);
 
 		console.log("Total round", totalRound, "Last height", lastCommit.block.data.height);
