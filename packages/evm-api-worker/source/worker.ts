@@ -50,9 +50,7 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await this.ipcSubprocess.sendRequest("commit", {
-			block: unit.getBlock().serialized,
-		});
+		await this.ipcSubprocess.sendRequest("commit", unit.height);
 	}
 
 	public async setPeerCount(peerCount: number): Promise<void> {
@@ -63,7 +61,7 @@ export class Worker implements Contracts.Evm.Worker {
 		await this.ipcSubprocess.sendRequest("importSnapshot", height);
 	}
 
-	public async commit(data: { block: string }): Promise<void> {
-		await this.ipcSubprocess.sendRequest("commit", data);
+	public async commit(height: number): Promise<void> {
+		await this.ipcSubprocess.sendRequest("commit", height);
 	}
 }

@@ -9,19 +9,11 @@ export class CommitHandler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Cryptography.Block.Factory)
-	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
-
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(data: { block: string }): Promise<void> {
-		try {
-			const block = await this.blockFactory.fromHex(data.block);
-			this.stateStore.setLastBlock(block);
-			this.configuration.setHeight(block.data.height + 1);
-		} catch (error) {
-			throw new Error(`Failed to commit block: ${error.message}`);
-		}
+	public async handle(height: number): Promise<void> {
+		this.stateStore.setHeight(height);
+		this.configuration.setHeight(height + 1);
 	}
 }
