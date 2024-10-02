@@ -141,8 +141,6 @@ export class Bootstrapper {
 
 		this.stateStore.setTotalRound(totalRound);
 		this.configuration.setHeight(lastCommit.block.data.height + 1);
-
-		console.log("Total round", totalRound, "Last height", lastCommit.block.data.height);
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
