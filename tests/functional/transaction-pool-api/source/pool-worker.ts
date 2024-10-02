@@ -45,7 +45,6 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 		await this.transactionPoolMempool.fixInvalidStates();
 		this.#failedTransactions = [];
 	}
-	public async importSnapshot(height: number): Promise<void> {}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {
 		const response: string[] = await this.app.resolve(GetTransactionsHandler).handle();

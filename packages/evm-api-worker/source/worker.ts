@@ -56,8 +56,4 @@ export class Worker implements Contracts.Evm.Worker {
 	public async setPeerCount(peerCount: number): Promise<void> {
 		await this.ipcSubprocess.sendRequest("setPeerCount", peerCount);
 	}
-
-	public async importSnapshot(height: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("importSnapshot", height);
-	}
 }
