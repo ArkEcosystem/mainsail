@@ -9,23 +9,24 @@ export class Store implements Contracts.State.Store {
 	#height = 0;
 	#totalRound = 0;
 
+	public setGenesisCommit(block: Contracts.Crypto.Commit): void {
+		this.#genesisBlock = block;
+	}
+
 	public getGenesisCommit(): Contracts.Crypto.Commit {
 		Utils.assert.defined<Contracts.Crypto.Commit>(this.#genesisBlock);
 
 		return this.#genesisBlock;
 	}
 
-	public setGenesisCommit(block: Contracts.Crypto.Commit): void {
-		this.#genesisBlock = block;
+	public setLastBlock(block: Contracts.Crypto.Block): void {
+		this.#height = block.data.height;
+		this.#lastBlock = block;
 	}
 
 	public getLastBlock(): Contracts.Crypto.Block {
 		Utils.assert.defined<Contracts.Crypto.Block>(this.#lastBlock);
 		return this.#lastBlock;
-	}
-
-	public setLastBlock(block: Contracts.Crypto.Block): void {
-		this.#lastBlock = block;
 	}
 
 	public getLastHeight(): number {
@@ -43,7 +44,6 @@ export class Store implements Contracts.State.Store {
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		this.setLastBlock(unit.getBlock());
-		this.#height = unit.height;
 		this.#totalRound += unit.round + 1;
 	}
 }
