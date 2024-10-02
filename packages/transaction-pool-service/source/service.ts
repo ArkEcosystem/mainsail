@@ -57,7 +57,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async commit(block: Contracts.Crypto.Block, failedTransactionIds: string[]): Promise<void> {
+	public async commit(transactions: {transaction: Contracts.Crypto.Transaction, gasUsed: number}[], failedTransactionIds: string[]): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
@@ -67,16 +67,16 @@ export class Service implements Contracts.TransactionPool.Service {
 				failedTransactionIds.map(async (id) => await this.poolQuery.getAll().whereId(id).first()),
 			);
 
-			for (const transaction of block.transactions) {
-				const transactions = await this.mempool.removeForgedTransaction(
-					await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
-					transaction.id,
+			for (const forged of transactions) {
+				const removedTransactions = await this.mempool.removeForgedTransaction(
+					await this.addressFactory.fromPublicKey(forged.transaction.data.senderPublicKey),
+					forged.transaction.id,
 				);
 
-				for (const forgedTransaction of transactions) {
+				for (const transaction of removedTransactions) {
 					this.storage.removeTransaction(transaction.id);
 					this.logger.debug(`Removed forged tx ${transaction.id}`);
-					void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, forgedTransaction.data);
+					void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 				}
 			}
 

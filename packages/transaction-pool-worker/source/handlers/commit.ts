@@ -12,6 +12,9 @@ export class CommitHandler {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
@@ -21,8 +24,10 @@ export class CommitHandler {
 			this.stateStore.setHeight(height);
 			this.configuration.setHeight(height + 1);
 
-
-			// await this.transactionPoolService.commit(block, data.failedTransactions);
+			await this.transactionPoolService.commit(await Promise.all(transactions.map(async (data) => ({
+					gasUsed: data.gasUsed,
+					transaction: await this.transactionFactory.fromHex(data.transaction),
+				}))), failedTransactions);
 
 			if (this.configuration.isNewMilestone()) {
 				void this.transactionPoolService.reAddTransactions();

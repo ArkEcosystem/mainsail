@@ -55,14 +55,15 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const receipts = unit.getProcessorResult().receipts;
 
-		await this.ipcSubprocess.sendRequest("commit", {
-			failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
-			height: unit.height,
-			transactions: unit.getBlock().transactions.map((transaction) => ({
+		await this.ipcSubprocess.sendRequest("commit",
+			unit.height,
+			unit.getBlock().transactions.map((transaction) => ({
 				gasUsed:  Number(receipts.get(transaction.id)!.gasUsed),
 				transaction: transaction.serialized.toString("hex"),
 			})),
-		});
+			this.#failedTransactions.map((transaction) => transaction.id),
+
+		);
 	}
 
 	public async start(): Promise<void> {
