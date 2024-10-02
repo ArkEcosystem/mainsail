@@ -20,11 +20,11 @@ export class CommitHandler {
 
 	public async handle(data: { block: string; failedTransactions: string[] }): Promise<void> {
 		try {
-			// TODO: Pass height
-			this.configuration.setHeight(1);
 
 			const block = await this.blockFactory.fromHex(data.block);
 			this.stateStore.setLastBlock(block);
+			this.configuration.setHeight(block.data.height + 1);
+
 
 			await this.transactionPoolService.commit(block, data.failedTransactions);
 

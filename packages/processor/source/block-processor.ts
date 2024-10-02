@@ -151,12 +151,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	#setConfigurationHeight(unit: Contracts.Processor.ProcessableUnit): void {
 		// NOTE: The configuration is always set to the next height. To height which is going to be proposed.
 		this.configuration.setHeight(unit.height + 1);
-
-		if (this.configuration.isNewMilestone()) {
-			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
-
-			void this.#emit(Events.CryptoEvent.MilestoneChanged);
-		}
 	}
 
 	#consumeGas(

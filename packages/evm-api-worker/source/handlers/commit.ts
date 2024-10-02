@@ -17,11 +17,9 @@ export class CommitHandler {
 
 	public async handle(data: { block: string }): Promise<void> {
 		try {
-			// TODO: Set height
-			this.configuration.setHeight(1);
-
 			const block = await this.blockFactory.fromHex(data.block);
 			this.stateStore.setLastBlock(block);
+			this.configuration.setHeight(block.data.height + 1);
 		} catch (error) {
 			throw new Error(`Failed to commit block: ${error.message}`);
 		}
