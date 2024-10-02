@@ -80,4 +80,10 @@ export interface Signature {
 	deserialize(buffer: ByteBuffer): Buffer;
 
 	aggregate(signatures: Buffer[]): Promise<string>;
+
+	signRecoverable(message: Buffer, privateKey: Buffer): Promise<string>;
+
+	verifyRecoverable(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
+
+	recoverPublicKey(message: Buffer, signature: Buffer): string;
 }

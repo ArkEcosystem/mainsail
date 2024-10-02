@@ -1,7 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
-import { Utils } from "@mainsail/kernel";
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
@@ -12,83 +11,54 @@ export class EvmCallTransaction extends Transaction {
 	@inject(Identifiers.Cryptography.Identity.Address.Size)
 	private readonly addressSize!: number;
 
-	public static typeGroup: number = Contracts.Crypto.TransactionTypeGroup.Core;
-	public static type: number = Contracts.Crypto.TransactionType.EvmCall;
+	public static type: number = 0;
 	public static key = "evmCall";
 
 	public static getSchema(): Contracts.Crypto.TransactionSchema {
 		return extendSchema(transactionBaseSchema, {
 			$id: "evmCall",
 			properties: {
-				amount: { bignumber: { maximum: undefined, minimum: 0 } },
-				asset: {
-					properties: {
-						evmCall: {
-							properties: {
-								gasLimit: {
-									transactionGasLimit: {},
-								},
-								payload: {
-									bytecode: {},
-								},
-							},
-							required: ["gasLimit", "payload"],
-							type: "object",
-							unevaluatedProperties: false,
-						},
-					},
-					required: ["evmCall"],
-					type: "object",
-					unevaluatedProperties: false,
-				},
-				fee: { bignumber: { maximum: 1000, minimum: 0 } },
-				recipientId: { $ref: "address" },
-				type: { transactionType: Contracts.Crypto.TransactionType.EvmCall },
+				value: { bignumber: { maximum: undefined, minimum: 0 } },
+				gasPrice: { bignumber: { maximum: 1000, minimum: 0 } },
+				gasLimit: { transactionGasLimit: {} },
+				data: { bytecode: {} },
+				recipientAddress: { $ref: "address" },
+				type: { enum: [0] }, // refers to ethereum tx type
 			},
-			required: ["asset"],
+			required: ["gasPrice", "gasLimit", "type"],
 		});
 	}
 
 	public assetSize(): number {
-		const { addressSize, data } = this;
-		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(data.asset?.evmCall);
-		const { evmCall } = data.asset;
-
 		return (
-			32 + // amount
+			32 + // value
 			1 + // recipient marker
-			(data.recipientId ? addressSize : 0) + // recipient
-			4 + // gas limit
+			(this.data.recipientAddress ? this.addressSize : 0) + // recipient
 			4 + // payload length
-			Buffer.byteLength(evmCall.payload, "hex")
+			Buffer.byteLength(this.data.data, "hex")
 		);
 	}
 
 	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
 		const { addressSize, addressFactory, addressSerializer, data } = this;
 
-		Utils.assert.defined<Contracts.Crypto.TransactionAsset>(data.asset);
-		Utils.assert.defined<number>(data.asset.evmCall?.gasLimit);
-		Utils.assert.defined<string>(data.asset.evmCall?.payload);
-
-		const payloadBytes = Buffer.from(data.asset.evmCall.payload, "hex");
+		const dataBytes = Buffer.from(data.data, "hex");
 
 		const buff: ByteBuffer = ByteBuffer.fromSize(
-			32 + 1 + (data.recipientId ? addressSize : 0) + 4 + 4 + payloadBytes.byteLength,
+			32 + 1 + (data.recipientAddress ? addressSize : 0) + 4 + dataBytes.byteLength,
 		);
 
-		buff.writeUint256(data.amount.toBigInt());
+		buff.writeUint256(data.value.toBigInt());
 
-		if (data.recipientId) {
+		if (data.recipientAddress) {
 			buff.writeUint8(1);
-			addressSerializer.serialize(buff, await addressFactory.toBuffer(data.recipientId));
+			addressSerializer.serialize(buff, await addressFactory.toBuffer(data.recipientAddress));
 		} else {
 			buff.writeUint8(0);
 		}
 
-		buff.writeUint32(data.asset.evmCall.gasLimit);
-		buff.writeUint32(payloadBytes.byteLength);
-		buff.writeBytes(payloadBytes);
+		buff.writeUint32(dataBytes.byteLength);
+		buff.writeBytes(dataBytes);
 
 		return buff;
 	}
@@ -96,22 +66,16 @@ export class EvmCallTransaction extends Transaction {
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data, addressFactory, addressSerializer } = this;
 
-		data.amount = BigNumber.make(buf.readUint256());
+		data.value = BigNumber.make(buf.readUint256());
 
 		const recipientMarker = buf.readUint8();
 		if (recipientMarker === 1) {
-			data.recipientId = await addressFactory.fromBuffer(addressSerializer.deserialize(buf));
+			data.recipientAddress = await addressFactory.fromBuffer(addressSerializer.deserialize(buf));
 		}
 
-		const gasLimit = buf.readUint32();
-		const payloadLength = buf.readUint32();
-		const payload = buf.readBytes(payloadLength);
+		const dataLength = buf.readUint32();
+		const dataBytes = buf.readBytes(dataLength);
 
-		data.asset = {
-			evmCall: {
-				gasLimit,
-				payload: payload.toString("hex"),
-			},
-		};
+		data.data = dataBytes.toString("hex");
 	}
 }

@@ -30,8 +30,8 @@ export const signedSchema = (schema: Contracts.Crypto.TransactionSchema): Contra
 		$id: `${schema.$id}Signed`,
 		anyOf: [
 			extendSchema(schemaToExtend, { required: ["id", "signature"] }),
-			extendSchema(schemaToExtend, { required: ["id", "signature", "signatures"] }),
-			extendSchema(schemaToExtend, { required: ["id", "signatures"] }),
+			// extendSchema(schemaToExtend, { required: ["id", "signature", "signatures"] }),
+			// extendSchema(schemaToExtend, { required: ["id", "signatures"] }),
 		],
 		type: "object",
 	};

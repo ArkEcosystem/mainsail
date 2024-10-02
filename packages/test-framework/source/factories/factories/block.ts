@@ -33,14 +33,14 @@ export const registerBlockFactory = async (
 			);
 
 			const genesisAddresses = (previousBlock.transactions ?? [])
-				.map((transaction) => transaction.recipientId)
+				.map((transaction) => transaction.recipientAddress)
 				.filter((address: string | undefined) => !!address);
 
 			for (let index = 0; index < options.transactionsCount; index++) {
 				transactions.push(
 					await signer.makeTransfer({
 						amount: ((options.amount || 2) + index).toString(),
-						fee: (options.fee || 1).toString(),
+						gasPrice: options.fee || 1,
 						passphrase: secrets[0],
 						recipientId: genesisAddresses[Math.floor(Math.random() * genesisAddresses.length)],
 					}),
@@ -48,10 +48,9 @@ export const registerBlockFactory = async (
 			}
 		}
 
-		const gasLimits = app.get<Contracts.Evm.GasLimits>(Identifiers.Evm.Gas.Limits);
-		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
-			amount: BigNumber.ZERO,
-			fee: BigNumber.ZERO,
+		const totals: { value: BigNumber; gasPrice: BigNumber; gasUsed: number } = {
+			value: BigNumber.ZERO,
+			gasPrice: BigNumber.ZERO,
 			gasUsed: 0,
 		};
 		const payloadBuffers: Buffer[] = [];
@@ -62,9 +61,9 @@ export const registerBlockFactory = async (
 			const { data, serialized } = transaction;
 			Utils.assert.defined<string>(data.id);
 
-			totals.amount = totals.amount.plus(data.amount);
-			totals.fee = totals.fee.plus(data.fee);
-			totals.gasUsed += gasLimits.of(transaction);
+			totals.value = totals.value.plus(data.value);
+			totals.gasPrice = totals.gasPrice.plus(data.gasPrice);
+			totals.gasUsed += data.gasLimit;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -96,8 +95,8 @@ export const registerBlockFactory = async (
 					round: 0,
 					stateHash: "TODO",
 					timestamp: options.timestamp || dayjs().valueOf(),
-					totalAmount: BigNumber.make(totals.amount),
-					totalFee: BigNumber.make(totals.fee),
+					totalAmount: BigNumber.make(totals.value),
+					totalFee: BigNumber.make(totals.gasPrice),
 					totalGasUsed: totals.gasUsed,
 					transactions: transactionData,
 					version: 1,

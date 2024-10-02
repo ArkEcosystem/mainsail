@@ -21,9 +21,6 @@ export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
-	@inject(Identifiers.Evm.Gas.Limits)
-	private readonly gasLimits!: Contracts.Evm.GasLimits;
-
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
@@ -85,10 +82,11 @@ export class GenesisBlockGenerator extends Generator {
 			await this.app
 				.resolve(EvmCallBuilder)
 				.network(pubKeyHash)
-				.recipientId(recipient.address)
+				.recipientAddress(recipient.address)
 				.nonce(nonce.toFixed(0))
-				.amount(amount)
+				.value(amount)
 				.payload("")
+				.gasPrice(0)
 				.gasLimit(21_000)
 				.sign(sender.passphrase)
 		).build();
@@ -128,9 +126,10 @@ export class GenesisBlockGenerator extends Generator {
 				await this.app
 					.resolve(EvmCallBuilder)
 					.network(pubKeyHash)
-					.recipientId(consensusContractAddress)
+					.recipientAddress(consensusContractAddress)
 					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
+					.gasPrice(0)
 					.gasLimit(500_000)
 					.sign(sender.passphrase)
 			).build();
@@ -154,9 +153,10 @@ export class GenesisBlockGenerator extends Generator {
 				await this.app
 					.resolve(EvmCallBuilder)
 					.network(pubKeyHash)
-					.recipientId(consensusContractAddress)
+					.recipientAddress(consensusContractAddress)
 					.nonce("1") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
 					.payload(data)
+					.gasPrice(0)
 					.gasLimit(200_000)
 					.sign(sender.passphrase)
 			).build();
@@ -212,9 +212,9 @@ export class GenesisBlockGenerator extends Generator {
 
 			Utils.assert.defined<string>(data.id);
 
-			totals.amount = totals.amount.plus(data.amount);
-			totals.fee = totals.fee.plus(data.fee);
-			totals.gasUsed += this.gasLimits.of(transaction);
+			totals.amount = totals.amount.plus(data.value);
+			totals.fee = totals.fee.plus(data.gasPrice);
+			totals.gasUsed += data.gasLimit;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);
@@ -257,11 +257,11 @@ export class GenesisBlockGenerator extends Generator {
 	}
 
 	async #ensureValidGenesisBlock(genesis: Contracts.Crypto.Commit): Promise<void> {
-		if (
-			!(await Promise.all(
-				genesis.block.transactions.map((transaction) => this.transactionVerifier.verifyHash(transaction.data)),
-			))
-		) {
+		const verifiedTransactions = await Promise.all(
+			genesis.block.transactions.map((transaction) => this.transactionVerifier.verifyHash(transaction.data)),
+		);
+
+		if (verifiedTransactions.some((v) => v === false)) {
 			throw new Error("genesis block contains invalid transactions");
 		}
 

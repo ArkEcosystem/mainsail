@@ -14,9 +14,6 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
-
 	public dependencies(): ReadonlyArray<Handlers.TransactionHandlerConstructor> {
 		return [];
 	}
@@ -33,34 +30,31 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		Utils.assert.defined<Contracts.Crypto.EvmCallAsset>(transaction.data.asset?.evmCall);
 		Utils.assert.defined<string>(transaction.id);
-
-		const { evmCall } = transaction.data.asset;
 
 		const { evmSpec } = this.configuration.getMilestone();
 
-		const address = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
+		const { senderAddress } = transaction.data;
 
 		try {
 			const { instance, blockContext } = context.evm;
 			const { receipt } = await instance.process({
 				blockContext,
-				caller: address,
-				data: Buffer.from(evmCall.payload, "hex"),
-				gasLimit: BigInt(evmCall.gasLimit),
-				gasPrice: transaction.data.fee.toBigInt(),
+				caller: senderAddress,
+				data: Buffer.from(transaction.data.data, "hex"),
+				gasLimit: BigInt(transaction.data.gasLimit),
+				gasPrice: BigInt(transaction.data.gasPrice),
 				nonce: transaction.data.nonce.toBigInt(),
-				recipient: transaction.data.recipientId,
+				recipient: transaction.data.recipientAddress,
 				sequence: transaction.data.sequence,
 				specId: evmSpec,
 				txHash: transaction.id,
-				value: transaction.data.amount.toBigInt(),
+				value: transaction.data.value.toBigInt(),
 			});
 
 			void this.#emit(Events.EvmEvent.TransactionReceipt, {
 				receipt,
-				sender: address,
+				sender: senderAddress,
 				transactionId: transaction.id,
 			});
 

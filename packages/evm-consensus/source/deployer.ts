@@ -34,7 +34,7 @@ export class Deployer {
 		const validatorContractAddress = ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 0 });
 
 		const genesisInfo = {
-			account: genesisBlock.block.generatorAddress.slice(2),
+			account: genesisBlock.block.generatorAddress,
 			deployerAccount: this.#deployerAddress,
 			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
 			validatorContract: validatorContractAddress,
@@ -53,9 +53,9 @@ export class Deployer {
 			validatorAddress: this.#deployerAddress,
 		};
 
-		const activeValidaotrs = this.configuration.getMilestone(1).activeValidators; // TODO update on milestone change
+		const activeValidators = this.configuration.getMilestone(1).activeValidators; // TODO update on milestone change
 
-		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [activeValidaotrs]).slice(2);
+		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [activeValidators]).slice(2);
 		const nonce = BigInt(this.#nonce);
 
 		const result = await this.evm.process({

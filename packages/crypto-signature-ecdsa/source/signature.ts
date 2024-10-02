@@ -6,7 +6,7 @@ import { secp256k1 } from "bcrypto";
 @injectable()
 export class Signature implements Contracts.Crypto.Signature {
 	@inject(Identifiers.Cryptography.Signature.Size)
-	private readonly signatureSize!: Function;
+	private readonly signatureSize!: number;
 
 	public async sign(message: Buffer, privateKey: Buffer): Promise<string> {
 		return secp256k1.signatureExport(secp256k1.sign(message, privateKey)).toString("hex");
@@ -55,10 +55,29 @@ export class Signature implements Contracts.Crypto.Signature {
 	}
 
 	public deserialize(buffer: ByteBuffer): Buffer {
-		return buffer.readBytes(this.signatureSize(buffer));
+		return buffer.readBytes(this.signatureSize);
 	}
 
 	public async aggregate(signatures: Buffer[]): Promise<string> {
 		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
+	}
+
+	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<string> {
+		const [signature, recoverId] = secp256k1.signRecoverable(message, privateKey);
+		return Buffer.concat([signature, Buffer.from([recoverId])]).toString("hex");
+	}
+
+	public async verifyRecoverable(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
+		const signatureRS = signature.subarray(0, 64);
+		if (!secp256k1.isLowS(signatureRS)) {
+			return false;
+		}
+
+		return secp256k1.verify(message, signatureRS, publicKey);
+	}
+
+	public recoverPublicKey(message: Buffer, signature: Buffer): string {
+		const v = signature.readUint8(64);
+		return secp256k1.recover(message, signature.subarray(0, 64), v, true).toString("hex");
 	}
 }

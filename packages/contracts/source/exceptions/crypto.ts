@@ -1,5 +1,4 @@
 import { Wallet } from "../contracts/state/wallets.js";
-import { InternalTransactionType } from "../contracts/transactions.js";
 import { Exception } from "./base.js";
 
 export class Bip38CompressionError extends Exception {
@@ -193,25 +192,25 @@ export class DuplicateParticipantInMultiSignatureError extends Exception {
 }
 
 export class InvalidTransactionTypeError extends Exception {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: number) {
 		super(`Transaction type ${type.toString()} does not exist.`);
 	}
 }
 
 export class DeactivatedTransactionHandlerError extends Exception {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: number) {
 		super(`Transaction type ${type.toString()} is deactivated.`);
 	}
 }
 
 export class UnsatisfiedDependencyError extends Exception {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: number) {
 		super(`Transaction type ${type.toString()} is missing required dependencies`);
 	}
 }
 
 export class AlreadyRegisteredError extends Exception {
-	public constructor(type: InternalTransactionType) {
+	public constructor(type: number) {
 		super(`Transaction type ${type.toString()} is already registered`);
 	}
 }

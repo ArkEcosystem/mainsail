@@ -1,7 +1,6 @@
 export * from "./builders.js";
 export * from "./deserializer.js";
 export * from "./factory.js";
-export * from "./internal-transaction-type.js";
 export * from "./registry.js";
 export * from "./serializer.js";
 export * from "./service-provider.js";

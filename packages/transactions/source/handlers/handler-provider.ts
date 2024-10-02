@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { InternalTransactionType, TransactionConstructor } from "@mainsail/crypto-transaction";
+import { TransactionConstructor } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 
 import { TransactionHandlerConstructor } from "./transaction.js";
@@ -9,9 +9,6 @@ import { TransactionHandlerConstructor } from "./transaction.js";
 export class TransactionHandlerProvider implements Contracts.Transactions.TransactionHandlerProvider {
 	@inject(Identifiers.Transaction.Handler.Constructors)
 	private readonly handlerConstructors!: TransactionHandlerConstructor[];
-
-	@inject(Identifiers.Cryptography.Transaction.Registry)
-	private readonly transactionRegistry!: Contracts.Crypto.TransactionRegistry;
 
 	#registered = false;
 	#handlerDependencyLookup = new Set<TransactionConstructor>();
@@ -35,33 +32,25 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 		this.#handlerDependencyLookup.add(transactionConstructor);
 
 		Utils.assert.defined<number>(transactionConstructor.type);
-		Utils.assert.defined<number>(transactionConstructor.typeGroup);
 
-		const internalType = InternalTransactionType.from(
-			transactionConstructor.type,
-			transactionConstructor.typeGroup,
-		);
-
-		if (this.#hasOtherHandlerHandling(handlerConstructor, internalType, transactionConstructor.version)) {
-			throw new Exceptions.AlreadyRegisteredError(internalType);
+		if (
+			this.#hasOtherHandlerHandling(
+				handlerConstructor,
+				transactionConstructor.type,
+				transactionConstructor.version,
+			)
+		) {
+			throw new Exceptions.AlreadyRegisteredError(transactionConstructor.type);
 		}
 
 		for (const dependency of handler.dependencies()) {
 			if (this.#hasOtherHandler(dependency) === false) {
-				throw new Exceptions.UnsatisfiedDependencyError(internalType);
+				throw new Exceptions.UnsatisfiedDependencyError(transactionConstructor.type);
 			}
-		}
-
-		if (transactionConstructor.typeGroup !== Contracts.Crypto.TransactionTypeGroup.Core) {
-			this.transactionRegistry.registerTransactionType(transactionConstructor);
 		}
 	}
 
-	#hasOtherHandlerHandling(
-		handlerConstructor: TransactionHandlerConstructor,
-		internalType: Contracts.Transactions.InternalTransactionType,
-		version: number,
-	) {
+	#hasOtherHandlerHandling(handlerConstructor: TransactionHandlerConstructor, internalType: number, version: number) {
 		for (const otherHandlerConstructor of this.handlerConstructors) {
 			if (otherHandlerConstructor === handlerConstructor) {
 				continue;
@@ -71,14 +60,8 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 			const otherTransactionConstructor = otherHandler.getConstructor();
 
 			Utils.assert.defined<number>(otherTransactionConstructor.type);
-			Utils.assert.defined<number>(otherTransactionConstructor.typeGroup);
 
-			const otherInternalType = InternalTransactionType.from(
-				otherTransactionConstructor.type,
-				otherTransactionConstructor.typeGroup,
-			);
-
-			if (otherInternalType === internalType && otherTransactionConstructor.version === version) {
+			if (otherTransactionConstructor.type === internalType && otherTransactionConstructor.version === version) {
 				return true;
 			}
 		}
@@ -89,11 +72,6 @@ export class TransactionHandlerProvider implements Contracts.Transactions.Transa
 	#hasOtherHandler(dependencyConstructor: TransactionHandlerConstructor) {
 		const dependency = new dependencyConstructor().getConstructor();
 
-		return [...this.#handlerDependencyLookup].some(
-			(handler) =>
-				handler.type === dependency.type &&
-				handler.typeGroup === dependency.typeGroup &&
-				handler.version === dependency.version,
-		);
+		return [...this.#handlerDependencyLookup].some((handler) => handler.type === dependency.type);
 	}
 }

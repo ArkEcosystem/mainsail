@@ -86,7 +86,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			}
 
 			this.#wallet.increaseNonce();
-			this.#wallet.decreaseBalance(transaction.data.amount.plus(this.gasFeeCalculator.calculate(transaction)));
+			this.#wallet.decreaseBalance(transaction.data.value.plus(this.gasFeeCalculator.calculate(transaction)));
 		} else {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
@@ -94,6 +94,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public revert(transaction: Contracts.Crypto.Transaction): void {
 		this.#wallet.decreaseNonce();
-		this.#wallet.increaseBalance(transaction.data.amount.plus(this.gasFeeCalculator.calculate(transaction)));
+		this.#wallet.increaseBalance(transaction.data.value.plus(this.gasFeeCalculator.calculate(transaction)));
 	}
 }

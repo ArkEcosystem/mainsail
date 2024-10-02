@@ -208,7 +208,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		for (const transaction of await this.poolQuery.getAll().all()) {
 			if (await this.expirationService.isExpired(transaction)) {
 				const removedTransactions = await this.mempool.removeTransaction(
-					await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
+					transaction.data.senderAddress,
 					transaction.id,
 				);
 
@@ -229,7 +229,7 @@ export class Service implements Contracts.TransactionPool.Service {
 		const transaction = await this.poolQuery.getFromLowestPriority().first();
 
 		const removedTransactions = await this.mempool.removeTransaction(
-			await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
+			transaction.data.senderAddress,
 			transaction.id,
 		);
 
@@ -257,8 +257,8 @@ export class Service implements Contracts.TransactionPool.Service {
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
 			const lowest = await this.poolQuery.getFromLowestPriority().first();
-			if (transaction.data.fee.isLessThanEqual(lowest.data.fee)) {
-				throw new Exceptions.TransactionPoolFullError(transaction, lowest.data.fee);
+			if (Utils.BigNumber.make(transaction.data.gasPrice).isLessThanEqual(lowest.data.gasPrice)) {
+				throw new Exceptions.TransactionPoolFullError(transaction, lowest.data.gasPrice);
 			}
 
 			await this.#removeLowestPriorityTransaction();

@@ -8,10 +8,6 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@tagged("plugin", "transaction-pool-service")
 	private readonly configuration!: Providers.PluginConfiguration;
 
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	@tagged("type", "wallet")
-	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
-
 	@inject(Identifiers.TransactionPool.SenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
@@ -51,11 +47,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 					this.configuration.getRequired<number>("maxTransactionsPerSender");
 				if (this.#transactions.length >= maxTransactionsPerSender) {
 					const allowedSenders: string[] = this.configuration.getOptional<string[]>("allowedSenders", []);
-					if (
-						!allowedSenders.includes(
-							await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
-						)
-					) {
+					if (!allowedSenders.includes(transaction.data.senderAddress)) {
 						throw new Exceptions.SenderExceededMaximumTransactionCountError(
 							transaction,
 							maxTransactionsPerSender,

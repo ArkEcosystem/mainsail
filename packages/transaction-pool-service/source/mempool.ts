@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
@@ -8,10 +8,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	@inject(Identifiers.TransactionPool.SenderMempool.Factory)
 	private readonly createSenderMempool!: Contracts.TransactionPool.SenderMempoolFactory;
-
-	@inject(Identifiers.Cryptography.Identity.Address.Factory)
-	@tagged("type", "wallet")
-	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
 
@@ -36,7 +32,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	}
 
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		const address = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
+		const address = transaction.data.senderAddress;
 
 		let senderMempool = this.#senderMempools.get(address);
 		if (!senderMempool) {

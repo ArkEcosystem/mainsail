@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class ExpirationService implements Contracts.TransactionPool.ExpirationService {
@@ -11,7 +10,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	private readonly stateStore!: Contracts.State.Store;
 
 	public canExpire(transaction: Contracts.Crypto.Transaction): boolean {
-		return !!transaction.data.expiration;
+		return false;
 	}
 
 	public async isExpired(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
@@ -23,8 +22,6 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 	}
 
 	public async getExpirationHeight(transaction: Contracts.Crypto.Transaction): Promise<number> {
-		Utils.assert.defined<number>(transaction.data.expiration);
-
-		return transaction.data.expiration;
+		return 0;
 	}
 }

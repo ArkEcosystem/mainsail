@@ -1,5 +1,3 @@
-import { BigNumber } from "@mainsail/utils";
-
 import { Transaction } from "../contracts/crypto/transactions.js";
 import { Exception } from "./base.js";
 
@@ -67,13 +65,11 @@ export class SenderExceededMaximumTransactionCountError extends PoolError {
 }
 
 export class TransactionPoolFullError extends PoolError {
-	public readonly required: BigNumber;
+	public readonly required: number;
 
-	public constructor(transaction: Transaction, required: BigNumber) {
+	public constructor(transaction: Transaction, required: number) {
 		super(
-			`tx ${
-				transaction.id
-			} fee ${transaction.data.fee.toString()} is lower than ${required.toString()} already in pool`,
+			`tx ${transaction.id} fee ${transaction.data.gasPrice} is lower than ${required} already in pool`,
 			"ERR_POOL_FULL",
 		);
 		this.required = required;

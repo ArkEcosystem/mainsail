@@ -18,23 +18,23 @@ export const schemas = {
 
 export const transactionBaseSchema: SchemaObject = {
 	properties: {
-		amount: { bignumber: { maximum: 0, minimum: 0 } },
-		fee: { bignumber: { minimum: 0 } }, // Fee matcher checks the minimum fee
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
 		network: { $ref: "networkByte" },
+		value: { bignumber: { maximum: undefined, minimum: 0 } },
+		gasPrice: { bignumber: { minimum: 0 } },
+		gasLimit: { transactionGasLimit: {} },
 		nonce: { bignumber: { minimum: 0 } },
+		senderAddress: { $ref: "address" },
 		senderPublicKey: { $ref: "publicKey" },
-		signature: { $ref: "alphanumeric" },
-		signatures: {
-			items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
-			maxItems: 16,
-			minItems: 1,
-			type: "array",
-			uniqueItems: true,
-		},
-		typeGroup: { minimum: 0, type: "integer" },
-		version: { enum: [1] },
+		signature: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
+		// signatures: {
+		// 	items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
+		// 	maxItems: 16,
+		// 	minItems: 1,
+		// 	type: "array",
+		// 	uniqueItems: true,
+		// },
 	},
-	required: ["type", "senderPublicKey", "fee", "amount", "nonce"],
+	required: ["type", "senderAddress", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 	type: "object",
 };

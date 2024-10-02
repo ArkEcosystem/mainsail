@@ -210,14 +210,14 @@ export class Snapshot {
 				if (receipts && receipts.length) {
 					for (const receipt of receipts) {
 						const consumedGas = gasFeeCalculator.calculateConsumed(
-							transaction.data.fee,
+							transaction.data.gasPrice,
 							Number(receipt.receipt.gasUsed),
 						);
 						console.log(
 							"found receipt with",
 							receipt.sender,
 							receipt.receipt.gasUsed,
-							transaction.data.fee,
+							transaction.data.gasPrice,
 							consumedGas,
 						);
 

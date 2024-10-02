@@ -19,14 +19,11 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
-	@inject(Identifiers.Evm.Gas.Limits)
-	protected readonly gasLimits!: Contracts.Evm.GasLimits;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+		AppUtils.assert.defined<string>(transaction.data.senderAddress);
 		return this.verifier.verifyHash(transaction.data);
 	}
 
@@ -41,7 +38,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		if (
 			sender
 				.getBalance()
-				.minus(transaction.data.amount)
+				.minus(transaction.data.value)
 				.minus(this.gasFeeCalculator.calculate(transaction))
 				.isNegative() &&
 			this.configuration.getHeight() > 0
@@ -61,12 +58,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	}
 
 	protected allTransactions(transactions: Contracts.Crypto.Transaction[]): Contracts.Crypto.TransactionData[] {
-		return transactions
-			.filter(
-				({ data }) =>
-					data.type === this.getConstructor().type && data.typeGroup === this.getConstructor().typeGroup,
-			)
-			.map(({ data }) => data);
+		return transactions.filter(({ data }) => data.type === this.getConstructor().type).map(({ data }) => data);
 	}
 
 	public abstract apply(

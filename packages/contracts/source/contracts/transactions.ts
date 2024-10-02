@@ -39,11 +39,11 @@ export interface TransactionHandlerRegistry {
 
 	getRegisteredHandlers(): TransactionHandler[];
 
-	getRegisteredHandlerByType(internalType: InternalTransactionType, version?: number): TransactionHandler;
+	getRegisteredHandlerByType(type: number, version?: number): TransactionHandler;
 
 	getActivatedHandlers(): Promise<TransactionHandler[]>;
 
-	getActivatedHandlerByType(internalType: InternalTransactionType, version?: number): Promise<TransactionHandler>;
+	getActivatedHandlerByType(type: number, version?: number): Promise<TransactionHandler>;
 
 	getActivatedHandlerForData(transactionData: TransactionData): Promise<TransactionHandler>;
 }
@@ -54,15 +54,8 @@ export interface TransactionHandlerProvider {
 	registerHandlers(): void;
 }
 
-// @TODO: move this out of contracts, it's an implementation
-export interface InternalTransactionType {
-	// private constructor(public readonly type: number, public readonly typeGroup: number) {}
-
-	toString(): string;
-}
-
 export interface TransactionTypeFactory {
-	initialize(transactionTypes: Map<InternalTransactionType, Map<number, TransactionConstructor>>);
+	initialize(transactionTypes: Map<number, TransactionConstructor>);
 
 	create(data: TransactionData): Transaction;
 

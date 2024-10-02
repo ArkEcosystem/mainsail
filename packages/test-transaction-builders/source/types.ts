@@ -46,10 +46,6 @@ export interface UsernameRegistrationOptions extends TransactionOptions {
 
 export interface UsernameResignationOptions extends TransactionOptions {}
 
-export interface MultiPaymentOptions extends TransactionOptions {
-	payments?: Contracts.Crypto.MultiPaymentItem[];
-}
-
 export interface MultiSignatureOptions extends TransactionOptions {
 	participants: Contracts.Crypto.KeyPair[];
 	min?: number;

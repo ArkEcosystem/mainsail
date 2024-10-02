@@ -5,7 +5,6 @@ import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
 	readonly id: string;
-	readonly typeGroup: number;
 	readonly type: number;
 	readonly key: string;
 
@@ -15,92 +14,68 @@ export interface Transaction {
 	assetSize(): number;
 	serialize(options?: SerializeOptions): Promise<ByteBuffer>;
 	deserialize(buf: ByteBuffer): Promise<void>;
-
-	hasVendorField(): boolean;
 }
 
 export type TransactionSchema = Record<string, any>;
 
-export interface TransactionAsset {
-	[custom: string]: any;
-
-	signature?: {
-		publicKey: string;
-	};
-	validatorPublicKey?: string;
-	username?: string;
-	votes?: string[];
-	unvotes?: string[];
-	multiSignatureLegacy?: MultiSignatureLegacyAsset;
-	multiSignature?: MultiSignatureAsset;
-	payments?: MultiPaymentItem[];
-	evmCall?: EvmCallAsset;
-}
-
-export interface EvmCallAsset {
-	payload: string;
-	gasLimit: number;
+export interface EcdsaSignature {
+	r: string;
+	s: string;
+	v: number;
 }
 
 export interface TransactionData {
-	version: number;
 	network: number;
-
-	typeGroup: number;
 	type: number;
-	timestamp: number;
-	nonce: BigNumber;
+
+	senderAddress: string;
 	senderPublicKey: string;
+	recipientAddress?: string;
 
-	fee: BigNumber;
-	amount: BigNumber;
+	value: BigNumber;
 
-	expiration?: number;
-	recipientId?: string;
+	gasLimit: number;
+	gasPrice: number;
 
-	asset?: TransactionAsset;
-	vendorField?: string;
+	nonce: BigNumber;
+	data: string;
 
 	id: string;
-	signature?: string;
-	signatures?: string[];
+	timestamp: number;
 
-	blockId?: string;
-	blockHeight?: number;
+	signature?: string;
+
 	sequence?: number;
 	gasUsed?: number;
+	blockId?: string;
+	blockHeight?: number;
 }
 
 export interface TransactionJson {
-	version?: number;
 	network?: number;
-
-	typeGroup?: number;
 	type: number;
 
-	timestamp?: number;
-	nonce?: string;
+	senderAddress: string;
 	senderPublicKey: string;
+	recipientAddress?: string;
 
-	fee: string;
-	amount: string;
+	value: string;
 
-	expiration?: number;
-	recipientId?: string;
+	gasLimit: number;
+	gasPrice: number;
 
-	asset?: TransactionAsset;
-	vendorField?: string | undefined;
+	nonce: string;
+	data: string;
 
 	id?: string;
-	signature?: string;
-	signatures?: string[];
+	timestamp?: number;
 
-	blockId?: string;
+	signature?: string;
+
 	sequence?: number;
-}
-export interface MultiPaymentItem {
-	amount: BigNumber;
-	recipientId: string;
+	gasUsed?: number;
+	blockId?: string;
+	blockHeight?: number;
 }
 
 export interface MultiSignatureLegacyAsset {
@@ -112,11 +87,6 @@ export interface MultiSignatureLegacyAsset {
 export interface MultiSignatureAsset {
 	min: number;
 	publicKeys: string[];
-}
-
-export interface VoteAsset {
-	votes: string[];
-	unvotes: string[];
 }
 
 export interface SerializeOptions {
