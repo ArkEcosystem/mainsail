@@ -134,7 +134,7 @@ export class Bootstrapper {
 		let totalRound = 0;
 
 		for await (const commit of this.databaseService.readCommits(
-			this.stateStore.getLastHeight() + 1,
+			this.stateStore.getHeight() + 1,
 			lastCommit.block.data.height,
 		)) {
 			totalRound += commit.proof.round + 1;

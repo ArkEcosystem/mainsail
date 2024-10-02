@@ -150,12 +150,12 @@ export const addTransactionsToPool = async (
 export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
 	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
 
-	let currentHeight = state.getStore().getLastHeight();
+	let currentHeight = state.getStore().getHeight();
 	const targetHeight = currentHeight + count;
 
 	do {
 		await sleep(200);
-		currentHeight = state.getStore().getLastHeight();
+		currentHeight = state.getStore().getHeight();
 	} while (currentHeight < targetHeight);
 };
 

@@ -29,7 +29,7 @@ export class Store implements Contracts.State.Store {
 		return this.#lastBlock;
 	}
 
-	public getLastHeight(): number {
+	public getHeight(): number {
 		return this.#height;
 	}
 

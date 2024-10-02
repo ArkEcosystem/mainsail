@@ -4,7 +4,7 @@ export interface Store extends CommitHandler {
 	getGenesisCommit(): Commit;
 	setGenesisCommit(block: Commit): void;
 
-	getLastHeight(): number;
+	getHeight(): number;
 	getLastBlock(): Block;
 	setLastBlock(block: Block): void;
 
