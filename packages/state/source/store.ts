@@ -29,6 +29,11 @@ export class Store implements Contracts.State.Store {
 		return this.#lastBlock;
 	}
 
+	// Set height is used on workers, because last block is not transferred
+	public setHeight(height: number): void {
+		this.#height = height;
+	}
+
 	public getHeight(): number {
 		return this.#height;
 	}
