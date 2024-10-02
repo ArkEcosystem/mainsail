@@ -71,8 +71,6 @@ export class Configuration implements Contracts.Crypto.Configuration {
 		this.#height = value;
 
 		if (this.isNewMilestone()) {
-			console.trace();
-
 			this.logger.notice(`Milestone change: ${JSON.stringify(this.getMilestoneDiff())}`);
 
 			void this.events.dispatch(Events.CryptoEvent.MilestoneChanged);
