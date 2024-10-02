@@ -60,8 +60,4 @@ export class Worker implements Contracts.Evm.Worker {
 	public async importSnapshot(height: number): Promise<void> {
 		await this.ipcSubprocess.sendRequest("importSnapshot", height);
 	}
-
-	public async commit(height: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("commit", height);
-	}
 }

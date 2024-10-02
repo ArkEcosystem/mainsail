@@ -17,7 +17,7 @@ export type WorkerSubprocess = Subprocess<WorkerScriptHandler>;
 
 export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
-export interface Worker extends WorkerScriptHandler, CommitHandler, EventListener {
+export interface Worker extends Omit<WorkerScriptHandler, "commit">, CommitHandler, EventListener {
 	getQueueSize(): number;
 	kill(): Promise<number>;
 }
