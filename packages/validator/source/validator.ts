@@ -183,8 +183,6 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 		}
 
-		this.txPoolWorker.setFailedTransactions(failedTransactions);
-
 		await validator.getEvm().updateRewardsAndVotes({
 			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
 			commitKey,

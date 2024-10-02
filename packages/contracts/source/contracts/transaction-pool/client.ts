@@ -1,6 +1,5 @@
-import { CommitHandler, Transaction } from "../crypto/index.js";
+import { CommitHandler } from "../crypto/index.js";
 export interface Client extends CommitHandler {
-	setFailedTransactions(transactions: Transaction[]): void;
 	getTransactionBytes(): Promise<Buffer[]>;
 	getStatus(): Promise<{ height: number; version: string }>;
 }

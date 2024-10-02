@@ -18,7 +18,7 @@ export class CommitHandler {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(height: number, transactions: {transaction: string, gasUsed: number}[], failedTransactions: string[] ): Promise<void> {
+	public async handle(height: number, transactions: {transaction: string, gasUsed: number}[] ): Promise<void> {
 		try {
 
 			this.stateStore.setHeight(height);
@@ -27,7 +27,7 @@ export class CommitHandler {
 			await this.transactionPoolService.commit(await Promise.all(transactions.map(async (data) => ({
 					gasUsed: data.gasUsed,
 					transaction: await this.transactionFactory.fromHex(data.transaction),
-				}))), failedTransactions);
+				}))));
 
 			if (this.configuration.isNewMilestone()) {
 				void this.transactionPoolService.reAddTransactions();

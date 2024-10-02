@@ -12,7 +12,6 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
 
 	#booted = false;
-	#failedTransactions: Contracts.Crypto.Transaction[] = [];
 
 	@postConstruct()
 	public initialize(): void {
@@ -48,9 +47,6 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
-	public setFailedTransactions(transactions: Contracts.Crypto.Transaction[]): void {
-		this.#failedTransactions = [...this.#failedTransactions, ...transactions];
-	}
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const receipts = unit.getProcessorResult().receipts;
@@ -61,8 +57,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 				gasUsed:  Number(receipts.get(transaction.id)!.gasUsed),
 				transaction: transaction.serialized.toString("hex"),
 			})),
-			this.#failedTransactions.map((transaction) => transaction.id),
-
+			[]
 		);
 	}
 
