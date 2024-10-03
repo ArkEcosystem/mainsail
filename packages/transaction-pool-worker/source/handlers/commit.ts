@@ -18,7 +18,6 @@ export class CommitHandler {
 	public async handle(height: number, sendersAddresses: string[] ): Promise<void> {
 		try {
 			this.stateStore.setHeight(height);
-			this.configuration.setHeight(height + 1);
 
 			if (this.configuration.isNewMilestone()) {
 				void this.transactionPoolService.reAddTransactions();

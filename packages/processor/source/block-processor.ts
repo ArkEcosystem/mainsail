@@ -104,7 +104,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
-		this.#setConfigurationHeight(unit);
 		await this.evm.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
@@ -146,11 +145,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				);
 			}
 		}
-	}
-
-	#setConfigurationHeight(unit: Contracts.Processor.ProcessableUnit): void {
-		// NOTE: The configuration is always set to the next height. To height which is going to be proposed.
-		this.configuration.setHeight(unit.height + 1);
 	}
 
 	#consumeGas(
