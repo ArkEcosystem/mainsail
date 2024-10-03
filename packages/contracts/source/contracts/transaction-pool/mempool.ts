@@ -12,7 +12,5 @@ export interface Mempool {
 	removeTransaction(address: string, id: string): Promise<Transaction[]>;
 	reAddTransactions(addresses: string[]): Promise<Transaction[]>;
 
-	fixInvalidStates(): Promise<Transaction[]>;
-
 	flush(): void;
 }

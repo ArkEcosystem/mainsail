@@ -184,7 +184,6 @@ export class Service implements Contracts.TransactionPool.Service {
 		await this.#removeOldTransactions();
 		await this.#removeExpiredTransactions();
 		await this.#removeLowestPriorityTransactions();
-		await this.#fixInvalidStates();
 	}
 
 	async #removeOldTransactions(): Promise<void> {
@@ -251,17 +250,6 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 	}
 
-	async #fixInvalidStates(): Promise<void> {
-		const transactions = await this.mempool.fixInvalidStates();
-
-		for (const transaction of transactions) {
-			this.storage.removeTransaction(transaction.id);
-			this.logger.debug(`Removed invalid tx ${transaction.id}`);
-
-			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
-		}
-	}
-
 	async #addTransactionToMempool(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
@@ -276,7 +264,6 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			await this.#removeLowestPriorityTransaction();
-			await this.#fixInvalidStates();
 		}
 
 		await this.mempool.addTransaction(transaction);
