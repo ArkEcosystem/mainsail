@@ -12,25 +12,18 @@ export class CommitHandler {
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
-	@inject(Identifiers.Cryptography.Transaction.Factory)
-	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
-
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	public async handle(height: number, transactions: {transaction: string, gasUsed: number}[] ): Promise<void> {
+	public async handle(height: number, sendersAddresses: string[] ): Promise<void> {
 		try {
-
 			this.stateStore.setHeight(height);
 			this.configuration.setHeight(height + 1);
 
-			await this.transactionPoolService.commit(await Promise.all(transactions.map(async (data) => ({
-					gasUsed: data.gasUsed,
-					transaction: await this.transactionFactory.fromHex(data.transaction),
-				}))));
-
 			if (this.configuration.isNewMilestone()) {
 				void this.transactionPoolService.reAddTransactions();
+			} else {
+				await this.transactionPoolService.commit(sendersAddresses);
 			}
 		} catch (error) {
 			throw new Error(`Failed to commit block: ${error.message}`);

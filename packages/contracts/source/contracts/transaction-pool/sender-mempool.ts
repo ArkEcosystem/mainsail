@@ -10,6 +10,7 @@ export interface SenderMempool {
 	addTransaction(transaction: Transaction): Promise<void>;
 	removeTransaction(id: string): Transaction[];
 	removeForgedTransaction(id: string): Transaction | undefined;
+	reAddTransactions(): Promise<Transaction[]>;
 }
 
 export type SenderMempoolFactory = (address: string) => Promise<SenderMempool>;

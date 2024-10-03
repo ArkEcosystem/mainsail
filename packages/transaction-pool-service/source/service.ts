@@ -57,26 +57,23 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async commit(transactions: {transaction: Contracts.Crypto.Transaction, gasUsed: number}[]): Promise<void> {
+	public async commit(sendersAddresses: string[]): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
 			}
 
-			for (const forged of transactions) {
-				const removedTransactions = await this.mempool.removeForgedTransaction(
-					await this.addressFactory.fromPublicKey(forged.transaction.data.senderPublicKey),
-					forged.transaction.id,
-				);
+			const removedTransactions = await this.mempool.reAddTransactions(sendersAddresses);
 
-				for (const transaction of removedTransactions) {
-					this.storage.removeTransaction(transaction.id);
-					this.logger.debug(`Removed forged tx ${transaction.id}`);
-					void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
-				}
+
+			for (const transaction of removedTransactions) {
+				this.storage.removeTransaction(transaction.id);
+				this.logger.debug(`Removed forged tx ${transaction.id}`);
+				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 
-			await this.#cleanUp();
+			// TODO: ENABLE
+			// await this.#cleanUp();
 		});
 	}
 

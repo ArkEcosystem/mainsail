@@ -9,6 +9,9 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
 
 	#booted = false;
@@ -49,15 +52,15 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const receipts = unit.getProcessorResult().receipts;
+		const sendersAddresses: Set<string> = new Set();
+
+		for(const transaction of unit.getBlock().transactions) {
+			sendersAddresses.add(await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey));
+		};
 
 		await this.ipcSubprocess.sendRequest("commit",
 			unit.height,
-			unit.getBlock().transactions.map((transaction) => ({
-				gasUsed:  Number(receipts.get(transaction.id)!.gasUsed),
-				transaction: transaction.serialized.toString("hex"),
-			})),
-			[]
+			[...sendersAddresses.keys()],
 		);
 	}
 

@@ -90,4 +90,21 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 		return undefined;
 	}
+
+	public async reAddTransactions(): Promise<Contracts.Crypto.Transaction[]> {
+		await this.senderState.reset();
+
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		const transactions = this.#transactions.splice(0, this.#transactions.length);
+		for (const transaction of transactions) {
+			try {
+				await this.addTransaction(transaction);
+			}  catch {
+				removedTransactions.push(transaction);
+			}
+		}
+
+		return removedTransactions;
+	}
 }

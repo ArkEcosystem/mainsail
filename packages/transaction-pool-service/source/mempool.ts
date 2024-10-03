@@ -117,6 +117,21 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return [transaction];
 	}
 
+	public async reAddTransactions(addresses: string[]): Promise<Contracts.Crypto.Transaction[]> {
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const address of addresses) {
+			const senderMempool = this.#senderMempools.get(address);
+			if (!senderMempool) {
+				continue;
+			}
+
+			removedTransactions.push(...await senderMempool.reAddTransactions());
+		}
+
+		return removedTransactions;
+	}
+
 	public flush(): void {
 		this.#senderMempools.clear();
 	}

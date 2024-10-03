@@ -11,6 +11,7 @@ export interface Mempool {
 	addTransaction(transaction: Transaction): Promise<void>;
 	removeTransaction(address: string, id: string): Promise<Transaction[]>;
 	removeForgedTransaction(address: string, id: string): Promise<Transaction[]>;
+	reAddTransactions(addresses: string[]): Promise<Transaction[]>;
 
 	fixInvalidStates(): Promise<Transaction[]>;
 
