@@ -1,9 +1,18 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject,injectable } from "@mainsail/container";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class Store implements Contracts.State.Store {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#genesisBlock?: Contracts.Crypto.Commit;
 	#lastBlock?: Contracts.Crypto.Block;
 	#height = 0;
@@ -20,8 +29,8 @@ export class Store implements Contracts.State.Store {
 	}
 
 	public setLastBlock(block: Contracts.Crypto.Block): void {
-		this.#height = block.data.height;
 		this.#lastBlock = block;
+		this.setHeight(block.data.height);
 	}
 
 	public getLastBlock(): Contracts.Crypto.Block {
@@ -32,6 +41,12 @@ export class Store implements Contracts.State.Store {
 	// Set height is used on workers, because last block is not transferred
 	public setHeight(height: number): void {
 		this.#height = height;
+		this.configuration.setHeight(height + 1);
+
+		if (this.configuration.isNewMilestone()) {
+			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
+			void this.events.dispatch(Events.CryptoEvent.MilestoneChanged);
+		}
 	}
 
 	public getHeight(): number {
