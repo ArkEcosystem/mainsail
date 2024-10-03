@@ -7,11 +7,16 @@ describe<{
 	sandbox: Sandbox;
 	store: Store;
 	logger: any;
+	eventDispatcher: any;
 	cryptoConfiguration: any;
 }>("Store", ({ it, beforeEach, assert, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.logger = {
 			notice: () => {},
+		};
+
+		context.eventDispatcher = {
+			dispatch: () => {},
 		};
 
 		context.cryptoConfiguration = {
@@ -23,6 +28,7 @@ describe<{
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.cryptoConfiguration);
 		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
 			getRequired: () => false, //snapshots.skipUnknownAttributes
@@ -32,7 +38,7 @@ describe<{
 	});
 
 	it("#initialize - should set height and totalRound", ({ store }) => {
-		assert.equal(store.getLastHeight(), 0);
+		assert.equal(store.getHeight(), 0);
 		assert.equal(store.getTotalRound(), 0);
 	});
 
