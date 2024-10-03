@@ -72,8 +72,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 
-			// TODO: ENABLE
-			// await this.#cleanUp();
+			await this.#cleanUp();
 		});
 	}
 
