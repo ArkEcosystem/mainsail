@@ -79,18 +79,6 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		return this.#transactions.splice(index, this.#transactions.length - index).reverse();
 	}
 
-	public removeForgedTransaction(id: string): Contracts.Crypto.Transaction | undefined {
-		if (this.#transactions.length === 0) {
-			throw new Error("No transactions in sender mempool");
-		}
-
-		if (this.#transactions[0].id === id) {
-			return this.#transactions.shift();
-		}
-
-		return undefined;
-	}
-
 	public async reAddTransactions(): Promise<Contracts.Crypto.Transaction[]> {
 		await this.senderState.reset();
 

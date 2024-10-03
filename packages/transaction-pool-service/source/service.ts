@@ -68,7 +68,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			for (const transaction of removedTransactions) {
 				this.storage.removeTransaction(transaction.id);
-				this.logger.debug(`Removed forged tx ${transaction.id}`);
+				this.logger.debug(`Removed tx ${transaction.id}`);
 				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 

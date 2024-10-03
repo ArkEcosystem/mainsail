@@ -99,24 +99,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return transactions;
 	}
 
-	public async removeForgedTransaction(address: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
-		const senderMempool = this.#senderMempools.get(address);
-		if (!senderMempool) {
-			return [];
-		}
-
-		const transaction = senderMempool.removeForgedTransaction(id);
-
-		if (!transaction) {
-			this.#brokenSenders.add(address);
-			return [];
-		}
-
-		await this.#removeDisposableMempool(address);
-
-		return [transaction];
-	}
-
 	public async reAddTransactions(addresses: string[]): Promise<Contracts.Crypto.Transaction[]> {
 		const removedTransactions: Contracts.Crypto.Transaction[] = [];
 
