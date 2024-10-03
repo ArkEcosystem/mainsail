@@ -78,7 +78,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		}
 		const transactions = this.#transactions.splice(index, this.#transactions.length - index).reverse();
 
-		for(const transaction of transactions) {
+		for (const transaction of transactions) {
 			this.senderState.revert(transaction);
 		}
 
@@ -94,7 +94,7 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		for (const transaction of transactions) {
 			try {
 				await this.addTransaction(transaction);
-			}  catch {
+			} catch {
 				removedTransactions.push(transaction);
 			}
 		}

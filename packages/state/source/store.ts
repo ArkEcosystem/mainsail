@@ -1,4 +1,4 @@
-import { inject,injectable } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 

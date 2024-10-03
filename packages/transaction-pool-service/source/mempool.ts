@@ -59,7 +59,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 
 		const transactions = senderMempool.removeTransaction(id);
-		this.#removeDisposableMempool(address)
+		this.#removeDisposableMempool(address);
 
 		return transactions;
 	}
@@ -73,7 +73,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 				continue;
 			}
 
-			removedTransactions.push(...await senderMempool.reAddTransactions());
+			removedTransactions.push(...(await senderMempool.reAddTransactions()));
 		}
 
 		return removedTransactions;

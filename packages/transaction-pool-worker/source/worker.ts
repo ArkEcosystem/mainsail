@@ -50,18 +50,14 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
-
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const sendersAddresses: Set<string> = new Set();
 
-		for(const transaction of unit.getBlock().transactions) {
+		for (const transaction of unit.getBlock().transactions) {
 			sendersAddresses.add(await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey));
-		};
+		}
 
-		await this.ipcSubprocess.sendRequest("commit",
-			unit.height,
-			[...sendersAddresses.keys()],
-		);
+		await this.ipcSubprocess.sendRequest("commit", unit.height, [...sendersAddresses.keys()]);
 	}
 
 	public async start(): Promise<void> {

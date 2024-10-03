@@ -65,7 +65,6 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			const removedTransactions = await this.mempool.reAddTransactions(sendersAddresses);
 
-
 			for (const transaction of removedTransactions) {
 				this.storage.removeTransaction(transaction.id);
 				this.logger.debug(`Removed tx ${transaction.id}`);
