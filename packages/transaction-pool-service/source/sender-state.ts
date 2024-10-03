@@ -91,4 +91,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
 	}
+
+	public revert(transaction: Contracts.Crypto.Transaction): void {
+		this.#wallet.decreaseNonce();
+		this.#wallet.increaseBalance(transaction.data.amount.plus(this.gasFeeCalculator.calculate(transaction)));
+	}
 }

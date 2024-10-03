@@ -76,7 +76,13 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		if (index === -1) {
 			return [];
 		}
-		return this.#transactions.splice(index, this.#transactions.length - index).reverse();
+		const transactions = this.#transactions.splice(index, this.#transactions.length - index).reverse();
+
+		for(const transaction of transactions) {
+			this.senderState.revert(transaction);
+		}
+
+		return transactions;
 	}
 
 	public async reAddTransactions(): Promise<Contracts.Crypto.Transaction[]> {
