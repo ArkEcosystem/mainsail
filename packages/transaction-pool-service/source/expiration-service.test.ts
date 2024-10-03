@@ -15,7 +15,7 @@ describe<{
 }>("ExpirationService", ({ it, assert, stub, beforeAll }) => {
 	beforeAll((context) => {
 		context.configuration = { getRequired: () => {} };
-		context.store = { getLastHeight: () => {} };
+		context.store = { getHeight: () => {} };
 		context.app = { get: () => {} };
 
 		context.container = new Container();
@@ -60,7 +60,7 @@ describe<{
 	});
 
 	it("isExpired - should return true if transaction expired when checking v2 transaction with expiration field", async (context) => {
-		stub(context.store, "getLastHeight").returnValue(100);
+		stub(context.store, "getHeight").returnValue(100);
 
 		const transaction = { data: { expiration: 50 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
@@ -70,7 +70,7 @@ describe<{
 	});
 
 	it("isExpired - should return false if transaction not expired when checking v2 transaction with expiration field", async (context) => {
-		stub(context.store, "getLastHeight").returnValue(100);
+		stub(context.store, "getHeight").returnValue(100);
 
 		const transaction = { data: { expiration: 150 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
@@ -80,7 +80,7 @@ describe<{
 	});
 
 	it("isExpired - should return true if transaction expires in next block when checking v2 transaciton with expiration field", async (context) => {
-		stub(context.store, "getLastHeight").returnValue(100);
+		stub(context.store, "getHeight").returnValue(100);
 
 		const transaction = { data: { expiration: 101 } } as Contracts.Crypto.Transaction;
 		const expirationService = context.container.resolve(ExpirationService);
