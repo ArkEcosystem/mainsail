@@ -253,6 +253,10 @@ export const Identifiers = {
 		},
 	},
 	TransactionPool: {
+		API: {
+			HTTP: Symbol.for("API<TransactionPool.HTTP>"),
+			HTTPS: Symbol.for("API<TransactionPool.HTTPS>"),
+		},
 		Broadcaster: Symbol("TransactionPoolBroadcaster<Broadcaster>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
@@ -273,7 +277,7 @@ export const Identifiers = {
 		Worker: Symbol("TransactionPool<Worker>"),
 		WorkerSubprocess: {
 			Factory: Symbol("TransactionPool<WorkerSubprocess.Factory>"),
-		},
+		}
 	},
 	Validator: {
 		Repository: Symbol("Validator<Repository>"),

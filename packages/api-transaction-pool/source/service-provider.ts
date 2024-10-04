@@ -1,16 +1,16 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
+import { Identifiers } from "@mainsail/contracts";
 
 import Handlers from "./handlers.js";
-import { Identifiers as ApiTransactionPoolIdentifiers } from "./identifiers.js";
 import { Server } from "./server.js";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected httpIdentifier(): symbol {
-		return ApiTransactionPoolIdentifiers.HTTP;
+		return Identifiers.TransactionPool.API.HTTP;
 	}
 
 	protected httpsIdentifier(): symbol {
-		return ApiTransactionPoolIdentifiers.HTTPS;
+		return Identifiers.TransactionPool.API.HTTPS;
 	}
 
 	protected getServerConstructor(): ServerConstructor<Server> {
@@ -20,6 +20,8 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected getHandlers(): any {
 		return Handlers;
 	}
+
+	public async boot(): Promise<void> {}
 
 	protected getPlugins(): any[] {
 		const config = this.config().get<any>("plugins");
