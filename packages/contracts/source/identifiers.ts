@@ -132,6 +132,10 @@ export const Identifiers = {
 		},
 	},
 	Evm: {
+		API: {
+			HTTP: Symbol.for("Evm<API.HTTP>"),
+			HTTPS: Symbol.for("Evm<API.HTTPS>"),
+		},
 		Gas: {
 			FeeCalculator: Symbol("Evm<Gas.FeeCalculator>"),
 			Limits: Symbol("Evm<Gas.Limits>"),
@@ -254,8 +258,8 @@ export const Identifiers = {
 	},
 	TransactionPool: {
 		API: {
-			HTTP: Symbol.for("API<TransactionPool.HTTP>"),
-			HTTPS: Symbol.for("API<TransactionPool.HTTPS>"),
+			HTTP: Symbol.for("TransactionPool<API.HTTP>"),
+			HTTPS: Symbol.for("TransactionPool<API.HTTPS>"),
 		},
 		Broadcaster: Symbol("TransactionPoolBroadcaster<Broadcaster>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),

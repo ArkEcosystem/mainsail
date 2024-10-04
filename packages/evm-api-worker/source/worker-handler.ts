@@ -2,7 +2,7 @@ import { Container } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 
-import { CommitHandler, SetPeerCountHandler } from "./handlers/index.js";
+import { CommitHandler, SetPeerCountHandler, StartHandler } from "./handlers/index.js";
 
 export class WorkerScriptHandler implements Contracts.Evm.WorkerScriptHandler {
 	// @ts-ignore
@@ -18,6 +18,10 @@ export class WorkerScriptHandler implements Contracts.Evm.WorkerScriptHandler {
 		// eslint-disable-next-line @typescript-eslint/await-thenable
 		await app.boot();
 		this.#app = app;
+	}
+
+	public async start(height: number): Promise<void> {
+		await this.#app.resolve(StartHandler).handle(height);
 	}
 
 	public async setPeerCount(peerCount: number): Promise<void> {

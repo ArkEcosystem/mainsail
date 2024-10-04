@@ -49,6 +49,10 @@ export class Worker implements Contracts.Evm.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
+	public async start(height: number): Promise<void> {
+		await this.ipcSubprocess.sendRequest("start", height);
+	}
+
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.ipcSubprocess.sendRequest("commit", unit.height);
 	}
