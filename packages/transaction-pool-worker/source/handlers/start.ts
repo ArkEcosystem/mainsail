@@ -2,10 +2,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-interface Server {
-	boot(): Promise<void>;
-}
-
 @injectable()
 export class StartHandler {
 	@inject(Identifiers.Application.Instance)
@@ -26,11 +22,11 @@ export class StartHandler {
 		await this.transactionPoolService.reAddTransactions();
 
 		if (this.configuration.get("server.http.enabled")) {
-			await this.app.get<Server>(Identifiers.TransactionPool.API.HTTP).boot();
+			await this.app.get<Contracts.Api.Server>(Identifiers.TransactionPool.API.HTTP).boot();
 		}
 
 		if (this.configuration.get("server.https.enabled")) {
-			await this.app.get<Server>(Identifiers.TransactionPool.API.HTTPS).boot();
+			await this.app.get<Contracts.Api.Server>(Identifiers.TransactionPool.API.HTTPS).boot();
 		}
 	}
 }
