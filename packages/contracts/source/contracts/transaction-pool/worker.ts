@@ -11,7 +11,7 @@ export interface WorkerScriptHandler {
 	commit(height: number, sendersAddresses: string[]): Promise<void>;
 	setPeer(ip: string): Promise<void>;
 	forgetPeer(ip: string): Promise<void>;
-	start(): Promise<void>;
+	start(height: number): Promise<void>;
 	reloadWebhooks(): Promise<void>;
 }
 
