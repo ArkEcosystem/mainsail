@@ -33,6 +33,8 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Handlers;
 	}
 
+	public async boot(): Promise<void> {}
+
 	protected getPlugins(): any[] {
 		const config = this.config().get<any>("plugins");
 
