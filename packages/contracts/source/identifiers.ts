@@ -277,7 +277,7 @@ export const Identifiers = {
 		Worker: Symbol("TransactionPool<Worker>"),
 		WorkerSubprocess: {
 			Factory: Symbol("TransactionPool<WorkerSubprocess.Factory>"),
-		}
+		},
 	},
 	Validator: {
 		Repository: Symbol("Validator<Repository>"),
