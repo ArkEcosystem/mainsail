@@ -132,6 +132,10 @@ export const Identifiers = {
 		},
 	},
 	Evm: {
+		API: {
+			HTTP: Symbol.for("Evm<API.HTTP>"),
+			HTTPS: Symbol.for("Evm<API.HTTPS>"),
+		},
 		Gas: {
 			FeeCalculator: Symbol("Evm<Gas.FeeCalculator>"),
 			Limits: Symbol("Evm<Gas.Limits>"),

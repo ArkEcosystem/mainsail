@@ -1,5 +1,5 @@
 import { AbstractServiceProvider, Plugins, ServerConstructor } from "@mainsail/api-common";
-import { Contracts } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import Joi from "joi";
 
 import {
@@ -14,16 +14,15 @@ import {
 	Web3ClientVersionAction,
 } from "./actions/index.js";
 import Handlers from "./handlers.js";
-import { Identifiers as ApiIdentifiers } from "./identifiers.js";
 import { Server } from "./server.js";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected httpIdentifier(): symbol {
-		return ApiIdentifiers.HTTP;
+		return Identifiers.Evm.API.HTTP;
 	}
 
 	protected httpsIdentifier(): symbol {
-		return ApiIdentifiers.HTTPS;
+		return Identifiers.Evm.API.HTTPS;
 	}
 
 	protected getServerConstructor(): ServerConstructor<Server> {
