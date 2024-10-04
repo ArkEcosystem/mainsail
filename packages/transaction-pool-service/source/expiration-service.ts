@@ -16,7 +16,7 @@ export class ExpirationService implements Contracts.TransactionPool.ExpirationSe
 
 	public async isExpired(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		if (this.canExpire(transaction)) {
-			return (await this.getExpirationHeight(transaction)) <= this.stateStore.getLastHeight() + 1;
+			return (await this.getExpirationHeight(transaction)) <= this.stateStore.getHeight() + 1;
 		}
 
 		return false;

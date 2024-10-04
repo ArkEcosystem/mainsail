@@ -100,9 +100,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 			validatorWallets.push(validatorWallet);
 		}
 
-		console.log("Getting active validators", validatorWallets);
-		console.log(validatorWallets.map((v) => v));
-
 		return validatorWallets;
 	}
 }

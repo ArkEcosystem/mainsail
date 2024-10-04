@@ -8,7 +8,7 @@ export interface WorkerFlags extends KeyValuePair {}
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
 	setPeerCount(peerCount: number): Promise<void>;
-	commit(data: { block: string }): Promise<void>;
+	commit(height: number): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;
@@ -17,7 +17,7 @@ export type WorkerSubprocess = Subprocess<WorkerScriptHandler>;
 
 export type WorkerSubprocessFactory = () => WorkerSubprocess;
 
-export interface Worker extends WorkerScriptHandler, CommitHandler, EventListener {
+export interface Worker extends Omit<WorkerScriptHandler, "commit">, CommitHandler, EventListener {
 	getQueueSize(): number;
 	kill(): Promise<number>;
 }

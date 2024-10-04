@@ -14,7 +14,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
-	readonly #brokenSenders = new Set<string>();
 
 	public getSize(): number {
 		return [...this.#senderMempools.values()].reduce((sum, p) => sum + p.getSize(), 0);
@@ -36,37 +35,6 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return this.#senderMempools.values();
 	}
 
-	public async fixInvalidStates(): Promise<Contracts.Crypto.Transaction[]> {
-		const removedTransactions: Contracts.Crypto.Transaction[] = [];
-
-		for (const address of this.#brokenSenders) {
-			const transactionsForReadd = [...this.getSenderMempool(address).getFromEarliest()];
-
-			const newSenderMempool = await this.createSenderMempool.call(this, address);
-
-			for (let index = 0; index < transactionsForReadd.length; index++) {
-				const transaction = transactionsForReadd[index];
-
-				try {
-					await newSenderMempool.addTransaction(transaction);
-				} catch {
-					transactionsForReadd.slice(index).map((tx) => {
-						removedTransactions.push(tx);
-					});
-					break;
-				}
-			}
-
-			this.#senderMempools.delete(address);
-			if (newSenderMempool.getSize()) {
-				this.#senderMempools.set(address, newSenderMempool);
-			}
-		}
-
-		this.#brokenSenders.clear();
-		return removedTransactions;
-	}
-
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		const address = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
 
@@ -80,7 +48,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		try {
 			await senderMempool.addTransaction(transaction);
 		} finally {
-			await this.#removeDisposableMempool(address);
+			this.#removeDisposableMempool(address);
 		}
 	}
 
@@ -91,37 +59,31 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		}
 
 		const transactions = senderMempool.removeTransaction(id);
-
-		if (transactions.length > 0 && !(await this.#removeDisposableMempool(address))) {
-			this.#brokenSenders.add(address);
-		}
+		this.#removeDisposableMempool(address);
 
 		return transactions;
 	}
 
-	public async removeForgedTransaction(address: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
-		const senderMempool = this.#senderMempools.get(address);
-		if (!senderMempool) {
-			return [];
+	public async reAddTransactions(addresses: string[]): Promise<Contracts.Crypto.Transaction[]> {
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const address of addresses) {
+			const senderMempool = this.#senderMempools.get(address);
+			if (!senderMempool) {
+				continue;
+			}
+
+			removedTransactions.push(...(await senderMempool.reAddTransactions()));
 		}
 
-		const transaction = senderMempool.removeForgedTransaction(id);
-
-		if (!transaction) {
-			this.#brokenSenders.add(address);
-			return [];
-		}
-
-		await this.#removeDisposableMempool(address);
-
-		return [transaction];
+		return removedTransactions;
 	}
 
 	public flush(): void {
 		this.#senderMempools.clear();
 	}
 
-	async #removeDisposableMempool(address: string): Promise<boolean> {
+	#removeDisposableMempool(address: string): boolean {
 		const senderMempool = this.#senderMempools.get(address);
 
 		if (senderMempool && senderMempool.isDisposable()) {

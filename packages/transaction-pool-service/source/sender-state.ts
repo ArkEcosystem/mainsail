@@ -35,8 +35,11 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public async configure(address: string): Promise<SenderState> {
 		this.#wallet = await this.app.resolve(Wallets.Wallet).init(address);
-
 		return this;
+	}
+
+	public async reset(): Promise<void> {
+		this.#wallet = await this.app.resolve(Wallets.Wallet).init(this.#wallet.getAddress());
 	}
 
 	public async apply(transaction: Contracts.Crypto.Transaction): Promise<void> {
@@ -87,5 +90,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		} else {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
+	}
+
+	public revert(transaction: Contracts.Crypto.Transaction): void {
+		this.#wallet.decreaseNonce();
+		this.#wallet.increaseBalance(transaction.data.amount.plus(this.gasFeeCalculator.calculate(transaction)));
 	}
 }

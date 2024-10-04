@@ -104,7 +104,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
-		this.#setConfigurationHeight(unit);
 		await this.evm.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
@@ -145,17 +144,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
 				);
 			}
-		}
-	}
-
-	#setConfigurationHeight(unit: Contracts.Processor.ProcessableUnit): void {
-		// NOTE: The configuration is always set to the next height. To height which is going to be proposed.
-		this.configuration.setHeight(unit.height + 1);
-
-		if (this.configuration.isNewMilestone()) {
-			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
-
-			void this.#emit(Events.CryptoEvent.MilestoneChanged);
 		}
 	}
 

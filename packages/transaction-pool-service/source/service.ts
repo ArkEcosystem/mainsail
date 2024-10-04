@@ -57,40 +57,18 @@ export class Service implements Contracts.TransactionPool.Service {
 		return this.mempool.getSize();
 	}
 
-	public async commit(block: Contracts.Crypto.Block, failedTransactionIds: string[]): Promise<void> {
+	public async commit(sendersAddresses: string[]): Promise<void> {
 		await this.#lock.runExclusive(async () => {
 			if (this.#disposed) {
 				return;
 			}
 
-			const failedTransactions = await Promise.all(
-				failedTransactionIds.map(async (id) => await this.poolQuery.getAll().whereId(id).first()),
-			);
+			const removedTransactions = await this.mempool.reAddTransactions(sendersAddresses);
 
-			for (const transaction of block.transactions) {
-				const transactions = await this.mempool.removeForgedTransaction(
-					await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
-					transaction.id,
-				);
-
-				for (const forgedTransaction of transactions) {
-					this.storage.removeTransaction(transaction.id);
-					this.logger.debug(`Removed forged tx ${transaction.id}`);
-					void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, forgedTransaction.data);
-				}
-			}
-
-			for (const transaction of failedTransactions) {
-				const transactions = await this.mempool.removeTransaction(
-					await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
-					transaction.id,
-				);
-
-				for (const forgedTransaction of transactions) {
-					this.storage.removeTransaction(transaction.id);
-					this.logger.debug(`Removed tx ${transaction.id}`);
-					void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, forgedTransaction.data);
-				}
+			for (const transaction of removedTransactions) {
+				this.storage.removeTransaction(transaction.id);
+				this.logger.debug(`Removed tx ${transaction.id}`);
+				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
 			}
 
 			await this.#cleanUp();
@@ -108,7 +86,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			this.storage.addTransaction({
-				height: this.stateStore.getLastHeight(),
+				height: this.stateStore.getHeight(),
 				id: transaction.id,
 				senderPublicKey: transaction.data.senderPublicKey,
 				serialized: transaction.serialized,
@@ -149,7 +127,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			let previouslyStoredFailures = 0;
 
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-			const lastHeight: number = this.stateStore.getLastHeight();
+			const lastHeight: number = this.stateStore.getHeight();
 			const expiredHeight: number = lastHeight - maxTransactionAge;
 
 			for (const { height, id, serialized } of this.storage.getAllTransactions()) {
@@ -204,12 +182,11 @@ export class Service implements Contracts.TransactionPool.Service {
 		await this.#removeOldTransactions();
 		await this.#removeExpiredTransactions();
 		await this.#removeLowestPriorityTransactions();
-		await this.#fixInvalidStates();
 	}
 
 	async #removeOldTransactions(): Promise<void> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
-		const lastHeight: number = this.stateStore.getLastHeight();
+		const lastHeight: number = this.stateStore.getHeight();
 		const expiredHeight: number = lastHeight - maxTransactionAge;
 
 		for (const { senderPublicKey, id } of this.storage.getOldTransactions(expiredHeight)) {
@@ -271,17 +248,6 @@ export class Service implements Contracts.TransactionPool.Service {
 		}
 	}
 
-	async #fixInvalidStates(): Promise<void> {
-		const transactions = await this.mempool.fixInvalidStates();
-
-		for (const transaction of transactions) {
-			this.storage.removeTransaction(transaction.id);
-			this.logger.debug(`Removed invalid tx ${transaction.id}`);
-
-			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.data);
-		}
-	}
-
 	async #addTransactionToMempool(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
@@ -296,7 +262,6 @@ export class Service implements Contracts.TransactionPool.Service {
 			}
 
 			await this.#removeLowestPriorityTransaction();
-			await this.#fixInvalidStates();
 		}
 
 		await this.mempool.addTransaction(transaction);

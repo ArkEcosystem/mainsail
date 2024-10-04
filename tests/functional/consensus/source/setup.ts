@@ -46,7 +46,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 
 	sandbox.app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactionBytes: async () => [],
-		setFailedTransactions: () => {},
 		onCommit: async () => {},
 	});
 	sandbox.app.bind(Identifiers.Evm.Worker).toConstantValue({

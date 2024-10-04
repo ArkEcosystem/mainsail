@@ -70,8 +70,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	public initialize(): void {
 		this.events.listen(Events.BlockEvent.Applied, {
 			handle: () => {
-				this.#downloadsByHeight.delete(this.stateStore.getLastHeight());
-				this.#fullDownloadsByHeight.delete(this.stateStore.getLastHeight());
+				this.#downloadsByHeight.delete(this.stateStore.getHeight());
+				this.#fullDownloadsByHeight.delete(this.stateStore.getHeight());
 			},
 		});
 	}
