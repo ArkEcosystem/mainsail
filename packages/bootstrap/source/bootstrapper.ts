@@ -52,6 +52,9 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.Evm.Worker)
+	private readonly evmWorker!: Contracts.Evm.Worker;
+
 	public async bootstrap(): Promise<void> {
 		try {
 			if (this.apiSync) {
@@ -71,6 +74,7 @@ export class Bootstrapper {
 
 			this.validatorRepository.printLoadedValidators();
 			await this.txPoolWorker.start(this.stateStore.getHeight());
+			await this.evmWorker.start(this.stateStore.getHeight());
 
 			void this.runConsensus();
 
