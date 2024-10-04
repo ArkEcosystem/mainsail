@@ -253,6 +253,10 @@ export const Identifiers = {
 		},
 	},
 	TransactionPool: {
+		API: {
+			HTTP: Symbol.for("API<TransactionPool.HTTP>"),
+			HTTPS: Symbol.for("API<TransactionPool.HTTPS>"),
+		},
 		Broadcaster: Symbol("TransactionPoolBroadcaster<Broadcaster>"),
 		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
