@@ -9,6 +9,7 @@ export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
 	setPeerCount(peerCount: number): Promise<void>;
 	commit(height: number): Promise<void>;
+	start(height: number): Promise<void>;
 }
 
 export type WorkerFactory = () => Worker;
