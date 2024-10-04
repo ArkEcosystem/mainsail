@@ -70,7 +70,7 @@ export class Bootstrapper {
 			this.state.setBootstrap(false);
 
 			this.validatorRepository.printLoadedValidators();
-			await this.txPoolWorker.start();
+			await this.txPoolWorker.start(this.stateStore.getHeight());
 
 			void this.runConsensus();
 
