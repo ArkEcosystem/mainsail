@@ -26,6 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
+		"ethers": "6.11.0",
 		"ajv": "8.12.0"
 	},
 	"devDependencies": {
