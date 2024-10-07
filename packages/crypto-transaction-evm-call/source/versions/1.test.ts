@@ -49,18 +49,15 @@ describe<{
 	});
 
 	const transactionOriginal = {
-		amount: 0,
-		asset: {
-			evmCall: {
-				gasLimit: 21_000,
-				payload: "00",
-			},
-		},
+		value: 0,
+		gasPrice: 5,
+		gasLimit: 21000,
 		fee: 5,
 		nonce: 1,
 		recipientId: ethers.ZeroAddress,
 		senderPublicKey: "a".repeat(66),
-		type: Contracts.Crypto.TransactionType.EvmCall,
+		senderAddress: "0x" + "a".repeat(40),
+		type: 0,
 	};
 
 	it("#getSchema - should be valid", ({ validator }) => {
@@ -69,14 +66,14 @@ describe<{
 		assert.undefined(validator.validate("evmCall", transactionOriginal).error);
 	});
 
-	it("#getSchema - amount should be bigNumber", ({ validator }) => {
+	it("#getSchema - value should be bigNumber", ({ validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
 		const validValues = [0, "0", BigNumber.ZERO, 1, "1", BigNumber.ONE];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
-				amount: value,
+				value,
 			};
 
 			assert.undefined(validator.validate("evmCall", transaction).error);
@@ -87,41 +84,41 @@ describe<{
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
-				amount: value,
+				value,
 			};
 
-			assert.true(validator.validate("evmCall", transaction).error.includes("amount"));
+			assert.true(validator.validate("evmCall", transaction).error.includes("value"));
 		}
 	});
 
-	it("#getSchema - fee should be integer, min 0, max 1000", ({ validator }) => {
+	it("#getSchema - gasPrice should be integer, min 0, max 1000", ({ validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validValues = [0, 5, 6, 1000, BigNumber.ZERO, BigNumber.ONE, BigNumber.make(1000)];
+		const validValues = [0, 5, 6, 1000];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
-				fee: value,
+				gasPrice: value,
 			};
 
 			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, "test", null, undefined, {}, BigNumber.make(1001)];
+		const invalidValues = [-1, 1.1, "test", null, undefined, {}];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
-				fee: value,
+				gasPrice: value,
 			};
 
-			assert.true(validator.validate("evmCall", transaction).error.includes("fee"));
+			assert.true(validator.validate("evmCall", transaction).error.includes("gasPrice"));
 		}
 	});
 
 	it("#getSchema - type should be evmCall", ({ validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validValues = [Contracts.Crypto.TransactionType.EvmCall];
+		const validValues = [0];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -156,7 +153,7 @@ describe<{
 
 		const transaction = {
 			...transactionOriginal,
-			recipientId: undefined,
+			recipientAddress: undefined,
 		};
 
 		assert.undefined(validator.validate("evmCall", transaction).error);

@@ -1607,12 +1607,15 @@ importers:
         specifier: 6.11.0
         version: 6.11.0
     devDependencies:
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
       '@mainsail/crypto-config':
         specifier: workspace:*
         version: link:../crypto-config
-      '@mainsail/crypto-key-pair-schnorr':
+      '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-key-pair-schnorr
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
