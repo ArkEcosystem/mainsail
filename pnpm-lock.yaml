@@ -1117,9 +1117,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr
+        version: link:../crypto-signature-ecdsa
       '@mainsail/crypto-transaction-evm-call':
         specifier: workspace:*
         version: link:../crypto-transaction-evm-call
@@ -1181,9 +1181,9 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr
+        version: link:../crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1495,9 +1495,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr
+        version: link:../crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -1898,9 +1898,9 @@ importers:
       '@mainsail/crypto-key-pair-ecdsa':
         specifier: workspace:*
         version: link:../crypto-key-pair-ecdsa
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr
+        version: link:../crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2409,9 +2409,9 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr
+        version: link:../crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
@@ -2800,9 +2800,9 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../crypto-signature-schnorr
+        version: link:../crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction

@@ -6,7 +6,7 @@ import { ServiceProvider as CoreConsensusBls12381 } from "@mainsail/crypto-conse
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
-import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
@@ -33,7 +33,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 
-	await context.sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
+	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
 	await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 
 	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
