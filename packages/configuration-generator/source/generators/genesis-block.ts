@@ -261,7 +261,7 @@ export class GenesisBlockGenerator extends Generator {
 			genesis.block.transactions.map((transaction) => this.transactionVerifier.verifyHash(transaction.data)),
 		);
 
-		if (verifiedTransactions.some((v) => v === false)) {
+		if (verifiedTransactions.includes(false)) {
 			throw new Error("genesis block contains invalid transactions");
 		}
 

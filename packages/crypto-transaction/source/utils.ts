@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Utils as AppUtils } from "@mainsail/kernel";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { encodeRlp, toBeArray } from "ethers";
 
 @injectable()

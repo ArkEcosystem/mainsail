@@ -49,9 +49,9 @@ export const registerBlockFactory = async (
 		}
 
 		const totals: { value: BigNumber; gasPrice: BigNumber; gasUsed: number } = {
-			value: BigNumber.ZERO,
 			gasPrice: BigNumber.ZERO,
 			gasUsed: 0,
+			value: BigNumber.ZERO,
 		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];

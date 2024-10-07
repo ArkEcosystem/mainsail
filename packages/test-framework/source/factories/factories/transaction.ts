@@ -24,16 +24,14 @@ const sign = async <T extends TransactionBuilder<T>>({
 const multiSign = async <T extends TransactionBuilder<T>>({
 	entity,
 	options,
-}: EntityOptions<T>): Promise<TransactionBuilder<T>> => {
+}: EntityOptions<T>): Promise<TransactionBuilder<T>> =>
 	//	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
 	// for (const [index, passphrase] of passphrases.entries()) {
 	// 	await entity.multiSign(passphrase, index);
 	// }
 
-	return entity;
-};
-
+	entity;
 const applyModifiers = <T extends TransactionBuilder<T>>(
 	entity: TransactionBuilder<T>,
 	options: TransactionOptions,

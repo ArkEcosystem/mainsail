@@ -18,12 +18,12 @@ export class EvmCallTransaction extends Transaction {
 		return extendSchema(transactionBaseSchema, {
 			$id: "evmCall",
 			properties: {
-				value: { bignumber: { maximum: undefined, minimum: 0 } },
-				gasPrice: { bignumber: { maximum: 1000, minimum: 0 } },
-				gasLimit: { transactionGasLimit: {} },
 				data: { bytecode: {} },
+				gasLimit: { transactionGasLimit: {} },
+				gasPrice: { bignumber: { maximum: 1000, minimum: 0 } },
 				recipientAddress: { $ref: "address" },
-				type: { enum: [0] }, // refers to ethereum tx type
+				type: { enum: [0] },
+				value: { bignumber: { maximum: undefined, minimum: 0 } }, // refers to ethereum tx type
 			},
 			required: ["gasPrice", "gasLimit", "type"],
 		});

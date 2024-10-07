@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { strictEqual } from "assert";
 import { Utils as AppUtils } from "@mainsail/kernel";
+import { strictEqual } from "assert";
 
 @injectable()
 export class TransactionValidator implements Contracts.Transactions.TransactionValidator {

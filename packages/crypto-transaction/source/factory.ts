@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Utils as AppUtils } from "@mainsail/kernel";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
 export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
