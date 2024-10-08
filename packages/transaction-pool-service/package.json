@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/transaction-pool-service",
-	"version": "0.0.1-evm.3",
+	"version": "0.0.1-evm.4",
 	"description": "Transaction Pool Service for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],

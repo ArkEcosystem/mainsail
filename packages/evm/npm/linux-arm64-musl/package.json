@@ -1,21 +1,21 @@
 {
-	"name": "@mainsail/evm-linux-arm64-musl",
-	"version": "0.0.1-evm.3",
-	"os": [
-		"linux"
-	],
-	"cpu": [
-		"arm64"
-	],
-	"main": "evm.linux-arm64-musl.node",
-	"files": [
-		"evm.linux-arm64-musl.node"
-	],
-	"license": "MIT",
-	"engines": {
-		"node": ">= 10"
-	},
-	"libc": [
-		"musl"
-	]
+  "name": "@mainsail/evm-linux-arm64-musl",
+  "version": "0.0.1-evm.4",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "main": "evm.linux-arm64-musl.node",
+  "files": [
+    "evm.linux-arm64-musl.node"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  },
+  "libc": [
+    "musl"
+  ]
 }
