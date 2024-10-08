@@ -10,7 +10,7 @@ describe<{
 		context.transaction = {
 			data: {
 				amount: BigNumber.make(100),
-				fee: BigNumber.make(900),
+				gasPrice: 900,
 				id: "dummy-tx-id",
 				network: 30,
 				nonce: BigNumber.make(1),

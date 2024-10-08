@@ -16,7 +16,6 @@ describe<{
 	it("Transfer - should create a builder", async ({ factoryBuilder }) => {
 		const transaction: Contracts.Crypto.Transaction = await factoryBuilder.get("Transfer").make();
 		assert.undefined(transaction.data.signature);
-		assert.undefined(transaction.data.signatures);
 	});
 
 	it("Transfer - should create a builder with options", async ({ factoryBuilder }) => {
@@ -37,19 +36,6 @@ describe<{
 			.make();
 
 		assert.undefined(transaction.data.signature);
-		assert.undefined(transaction.data.signatures);
-		assert.defined(transaction.data.vendorField);
-	});
-
-	it("Transfer - should create a builder with vendor field", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
-			.get("Transfer")
-			.withStates("vendorField")
-			.make();
-
-		assert.undefined(transaction.data.signature);
-		assert.undefined(transaction.data.signatures);
-		assert.defined(transaction.data.vendorField);
 	});
 
 	it("Transfer - should sign it with a single passphrase", async ({ factoryBuilder }) => {
@@ -59,17 +45,6 @@ describe<{
 			.make();
 
 		assert.defined(transaction.data.signature);
-		assert.undefined(transaction.data.signatures);
-	});
-
-	it("Transfer - should sign it with multiple passphrases", async ({ factoryBuilder }) => {
-		const transaction: Contracts.Crypto.Transaction = await factoryBuilder
-			.get("Transfer")
-			.withStates("sign", "multiSign")
-			.make();
-
-		assert.defined(transaction.data.signature);
-		assert.defined(transaction.data.signatures);
 	});
 
 	// it("ValidatorRegistration - should create a signature builder", async ({ factoryBuilder }) => {
