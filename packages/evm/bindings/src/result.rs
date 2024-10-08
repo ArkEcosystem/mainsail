@@ -91,7 +91,7 @@ impl JsTransactionReceipt {
             logs: receipt
                 .logs
                 .map(|l| serde_json::to_value(l).unwrap())
-                .unwrap_or_else(|| serde_json::Value::Null),
+                .unwrap_or_else(|| serde_json::Value::Null), // TODO: check if null is correct
             output: receipt.output.map(|o| {
                 node_env
                     .create_buffer_with_data(Into::<Vec<u8>>::into(o))
