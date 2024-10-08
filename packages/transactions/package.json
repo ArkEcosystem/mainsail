@@ -28,9 +28,6 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
-		"@mainsail/crypto-config": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.11.10",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

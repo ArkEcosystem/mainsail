@@ -2656,15 +2656,6 @@ importers:
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      dayjs:
-        specifier: 1.11.10
-        version: 1.11.10
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
