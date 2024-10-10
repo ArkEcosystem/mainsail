@@ -213,7 +213,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				// temporary workaround
 				attributes: activeValidators[account.address]
 					? { validatorPublicKey: activeValidators[account.address].blsPublicKey }
-					: [],
+					: {},
 				balance: Utils.BigNumber.make(account.balance).toFixed(),
 				nonce: Utils.BigNumber.make(account.nonce).toFixed(),
 				publicKey: addressToPublicKey[account.address] ?? "",
@@ -401,7 +401,19 @@ export class Sync implements Contracts.ApiSync.Service {
 					.execute();
 			}
 
-			await walletRepository.upsert(deferred.wallets, ["address"]);
+			await walletRepository
+				.createQueryBuilder()
+				.insert()
+				.values(deferred.wallets)
+				.onConflict(
+					`("address") DO UPDATE SET 
+	balance = COALESCE(EXCLUDED.balance, "Wallet".balance),
+	nonce = COALESCE(EXCLUDED.nonce, "Wallet".nonce),
+	updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
+    public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
+    attributes = "Wallet".attributes || EXCLUDED.attributes`,
+				)
+				.execute();
 		});
 
 		const t1 = performance.now();
