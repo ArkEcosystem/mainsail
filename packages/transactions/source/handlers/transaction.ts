@@ -57,10 +57,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		return this.verifier.verifySignatures(transaction, multiSignature);
 	}
 
-	protected allTransactions(transactions: Contracts.Crypto.Transaction[]): Contracts.Crypto.TransactionData[] {
-		return transactions.filter(({ data }) => data.type === this.getConstructor().type).map(({ data }) => data);
-	}
-
 	public abstract apply(
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,

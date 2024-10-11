@@ -17,7 +17,7 @@ export class TransactionTypeFactory implements Contracts.Transactions.Transactio
 	}
 
 	public create(data: Contracts.Crypto.TransactionData): Contracts.Crypto.Transaction {
-		const instance: Contracts.Crypto.Transaction = this.app.resolve(this.get(data.type, 0, 1));
+		const instance: Contracts.Crypto.Transaction = this.app.resolve(this.get(0, 0, 0));
 		instance.data = data;
 
 		return instance;

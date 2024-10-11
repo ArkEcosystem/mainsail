@@ -5,7 +5,6 @@ import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
 	readonly id: string;
-	readonly type: number;
 	readonly key: string;
 
 	data: TransactionData;
@@ -26,7 +25,6 @@ export interface EcdsaSignature {
 
 export interface TransactionData {
 	network: number;
-	type: number;
 
 	senderAddress: string;
 	senderPublicKey: string;
@@ -53,7 +51,6 @@ export interface TransactionData {
 
 export interface TransactionJson {
 	network?: number;
-	type: number;
 
 	senderAddress: string;
 	senderPublicKey: string;

@@ -3,15 +3,12 @@ import { Contracts } from "@mainsail/contracts";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { BigNumber } from "@mainsail/utils";
 
-import { EvmCallTransaction } from "./versions/1.js";
-
 @injectable()
 export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {
 	@postConstruct()
 	public postConstruct() {
 		this.initializeData();
 
-		this.data.type = EvmCallTransaction.type;
 		this.data.value = BigNumber.ZERO;
 		this.data.senderAddress = "";
 		this.data.gasLimit = 1_000_000;

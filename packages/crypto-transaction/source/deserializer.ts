@@ -38,7 +38,6 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 	public deserializeCommon(transaction: Contracts.Crypto.TransactionData, buf: ByteBuffer): void {
 		transaction.network = buf.readUint8();
-		transaction.type = buf.readUint8();
 		transaction.nonce = BigNumber.make(buf.readUint64());
 		transaction.gasPrice = buf.readUint32();
 		transaction.gasLimit = buf.readUint32();

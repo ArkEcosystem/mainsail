@@ -22,10 +22,9 @@ export class EvmCallTransaction extends Transaction {
 				gasLimit: { transactionGasLimit: {} },
 				gasPrice: { bignumber: { maximum: 1000, minimum: 0 } },
 				recipientAddress: { $ref: "address" },
-				type: { enum: [0] },
-				value: { bignumber: { maximum: undefined, minimum: 0 } }, // refers to ethereum tx type
+				value: { bignumber: { maximum: undefined, minimum: 0 } },
 			},
-			required: ["gasPrice", "gasLimit", "type"],
+			required: ["gasPrice", "gasLimit"],
 		});
 	}
 

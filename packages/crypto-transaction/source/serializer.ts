@@ -24,7 +24,6 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	public commonSize(transaction: Contracts.Crypto.Transaction): number {
 		return (
 			1 + // network
-			1 + // type
 			8 + // nonce
 			4 + // gasLimit
 			4 // gasPrice in gwei
@@ -89,7 +88,6 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 
 	#serializeCommon(transaction: Contracts.Crypto.TransactionData, buff: ByteBuffer): void {
 		buff.writeUint8(transaction.network || this.configuration.get("network.pubKeyHash"));
-		buff.writeUint8(transaction.type);
 		buff.writeUint64(transaction.nonce.toBigInt());
 		buff.writeUint32(transaction.gasPrice);
 		buff.writeUint32(transaction.gasLimit);

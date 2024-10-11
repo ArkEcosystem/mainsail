@@ -129,7 +129,6 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			senderAddress: this.data.senderAddress,
 			senderPublicKey: this.data.senderPublicKey,
 			signature: this.data.signature,
-			type: this.data.type,
 		} as Contracts.Crypto.TransactionData;
 
 		// if (Array.isArray(this.data.signatures)) {

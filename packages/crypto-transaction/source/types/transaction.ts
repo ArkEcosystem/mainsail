@@ -10,7 +10,6 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
 
-	public static type: number | undefined = undefined;
 	public static key: string | undefined = undefined;
 
 	public data!: Contracts.Crypto.TransactionData;
@@ -18,10 +17,6 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 
 	public get id(): string {
 		return this.data.id;
-	}
-
-	public get type(): number {
-		return this.data.type;
 	}
 
 	public get key(): string {

@@ -14,7 +14,7 @@ describe<{
 	it("should make transfer", async ({ signer }) => {
 		const options: Types.TransferOptions = {
 			amount: "100",
-			fee: "5",
+			gasPrice: 5,
 			passphrase: passphrases[0],
 			vendorField: "dummy",
 		};

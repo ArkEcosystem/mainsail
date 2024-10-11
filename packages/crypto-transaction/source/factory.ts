@@ -38,7 +38,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	}
 
 	public async fromJson(json: Contracts.Crypto.TransactionJson): Promise<Contracts.Crypto.Transaction> {
-		return this.fromData(this.transactionTypeFactory.get(json.type, 0, 0).getData(json));
+		return this.fromData(this.transactionTypeFactory.get(0, 0, 0).getData(json));
 	}
 
 	public async fromData(

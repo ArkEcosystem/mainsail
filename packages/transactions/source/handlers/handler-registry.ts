@@ -25,15 +25,9 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.Transa
 	}
 
 	public getRegisteredHandlerByType(internalType: number, version = 0): TransactionHandler {
-		for (const handler of this.handlers) {
-			const transactionConstructor = handler.getConstructor();
-			Utils.assert.defined<number>(transactionConstructor.type);
-			if (transactionConstructor.type === internalType) {
-				return handler;
-			}
-		}
-
-		throw new Exceptions.InvalidTransactionTypeError(internalType);
+		const [handler] = this.handlers;
+		Utils.assert.defined<TransactionHandler>(handler);
+		return handler;
 	}
 
 	public async getActivatedHandlers(): Promise<TransactionHandler[]> {
@@ -56,6 +50,6 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.Transa
 	public async getActivatedHandlerForData(
 		transactionData: Contracts.Crypto.TransactionData,
 	): Promise<TransactionHandler> {
-		return this.getActivatedHandlerByType(transactionData.type, 0);
+		return this.getActivatedHandlerByType(0, 0);
 	}
 }

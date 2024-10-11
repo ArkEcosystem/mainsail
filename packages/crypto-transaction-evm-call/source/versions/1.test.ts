@@ -115,39 +115,6 @@ describe<{
 		}
 	});
 
-	it("#getSchema - type should be evmCall", ({ validator }) => {
-		validator.addSchema(EvmCallTransaction.getSchema());
-
-		const validValues = [0];
-		for (const value of validValues) {
-			const transaction = {
-				...transactionOriginal,
-				type: value,
-			};
-
-			assert.undefined(validator.validate("evmCall", transaction).error);
-		}
-
-		const invalidValues = [
-			-1,
-			1.1,
-			Contracts.Crypto.TransactionType.Vote,
-			BigNumber.ZERO,
-			"test",
-			null,
-			undefined,
-			{},
-		];
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				type: value,
-			};
-
-			assert.true(validator.validate("evmCall", transaction).error.includes("type"));
-		}
-	});
-
 	it("#getSchema - recipient should be optional", ({ validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 

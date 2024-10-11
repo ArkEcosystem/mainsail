@@ -101,9 +101,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.data);
 			} catch (error) {
 				this.storage.removeTransaction(transaction.id);
-				this.logger.warning(
-					`tx ${transaction.id} (type: ${transaction.type}) failed to enter pool: ${error.message}`,
-				);
+				this.logger.warning(`tx ${transaction.id} failed to enter pool: ${error.message}`);
 
 				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.data);
 

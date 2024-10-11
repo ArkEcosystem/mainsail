@@ -162,45 +162,4 @@ describe<{
 		assert.length(result, 1);
 		assert.equal(result[0].id, context.sender1Transaction200.id);
 	});
-
-	it("whereType - should filter transactions by type", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).all();
-
-		assert.length(result, 1);
-		assert.equal(result[0].id, context.sender1Transaction200.id);
-	});
-
-	it("has - should return true when there are matching transactions", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).has();
-
-		assert.true(result);
-	});
-
-	it("has - should return false when there are no matching transactions", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).has();
-
-		assert.false(result);
-	});
-
-	it("first - should return first matching transaction", async (context) => {
-		const queryIterable = new QueryIterable([
-			context.sender1Transaction100,
-			context.sender1Transaction200,
-			context.sender2Transaction100,
-			context.sender2Transaction200,
-		]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).first();
-
-		assert.equal(result.id, context.sender1Transaction200.id);
-	});
-
-	it("first - should throw where there are no matching transactions", (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const check = () => queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).first();
-
-		assert.rejects(check);
-	});
 });

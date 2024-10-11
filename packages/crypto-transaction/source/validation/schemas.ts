@@ -35,6 +35,6 @@ export const transactionBaseSchema: SchemaObject = {
 		// 	uniqueItems: true,
 		// },
 	},
-	required: ["type", "senderAddress", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
+	required: ["senderAddress", "senderPublicKey", "gasPrice", "gasLimit", "value", "nonce"],
 	type: "object",
 };

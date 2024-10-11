@@ -95,7 +95,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		data: Contracts.Crypto.TransactionData,
 		strict: boolean,
 	): Promise<Contracts.Crypto.SchemaValidationResult> {
-		const transactionType = this.transactionTypeFactory.get(data.type, 0, 1);
+		const transactionType = this.transactionTypeFactory.get(0, 0, 0);
 
 		if (!transactionType) {
 			throw new Error("Unknown transaction type");
