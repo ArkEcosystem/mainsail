@@ -1,14 +1,14 @@
 {
-    "address": "0x16DC266f16221ec709BC050dedd77bc0584f90F4",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "3dd71596e3d97a2ad991954ff6bf3edd71c9d0fcdb3b5906819711cf8b84c530",
-        "publicKey": "91c8fc5e2a014dbd537eed5b2bceff624a850b7f2e6341df7b0019ab0944d3aa3231ecc4f6e44ebb7017230a8f556667"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "e2b657bd78aa4de40de105fe74ee2ed0efe22792b562af4939df8b440d038feb",
-        "publicKey": "02660b7905cd6dfa8ab32615beea9d7dd01b940295199661e229e5a8ab42dcb6d1"
-    },
-    "passphrase": "liberty smile miracle ride design rent crop lift hand citizen sorry mechanic switch then quote light nature scissors together reveal genuine knife horse comic"
+	"address": "0x16DC266f16221ec709BC050dedd77bc0584f90F4",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "3dd71596e3d97a2ad991954ff6bf3edd71c9d0fcdb3b5906819711cf8b84c530",
+		"publicKey": "91c8fc5e2a014dbd537eed5b2bceff624a850b7f2e6341df7b0019ab0944d3aa3231ecc4f6e44ebb7017230a8f556667"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "e2b657bd78aa4de40de105fe74ee2ed0efe22792b562af4939df8b440d038feb",
+		"publicKey": "02660b7905cd6dfa8ab32615beea9d7dd01b940295199661e229e5a8ab42dcb6d1"
+	},
+	"passphrase": "liberty smile miracle ride design rent crop lift hand citizen sorry mechanic switch then quote light nature scissors together reveal genuine knife horse comic"
 }
