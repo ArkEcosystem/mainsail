@@ -299,8 +299,8 @@ contract Consensus {
 	}
 
 	function vote(address addr) external {
-		require(isValidatorRegistered(addr), "must vote for validator");
-		require(_votes[msg.sender].validator == address(0), "TODO: already voted");
+		require(isValidatorRegistered(addr), "Must vote for validator");
+		require(_votes[msg.sender].validator == address(0), "Already voted");
 
 		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance});
 		// TODO: safe math
