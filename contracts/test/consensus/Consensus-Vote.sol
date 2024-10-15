@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, ValidatorData, Validator} from "@contracts/consensus/Consensus.sol";
+import {Consensus, ValidatorData, Validator, Unvoted, Voted} from "@contracts/consensus/Consensus.sol";
 
 contract ConsensusTest is Test {
 	Consensus public consensus;
@@ -38,6 +38,8 @@ contract ConsensusTest is Test {
 
 		// Vote
 		vm.startPrank(voterAddr);
+		vm.expectEmit(address(consensus));
+		emit Voted(voterAddr, addr);
 		consensus.vote(addr);
 		vm.stopPrank();
 
@@ -85,6 +87,8 @@ contract ConsensusTest is Test {
 
 		// Unvote
 		vm.startPrank(voterAddr);
+		vm.expectEmit(address(consensus));
+		emit Unvoted(voterAddr, addr);
 		consensus.unvote();
 		vm.stopPrank();
 

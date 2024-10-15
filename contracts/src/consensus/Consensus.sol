@@ -311,10 +311,10 @@ contract Consensus {
 		Vote storage voter = _votes[msg.sender];
 		require(voter.validator != address(0), "TODO: not voted");
 
+		emit Unvoted(msg.sender, voter.validator);
+
 		_registeredValidatorData[voter.validator].voteBalance -= voter.balance;
 		delete _votes[msg.sender];
-
-		emit Unvoted(msg.sender, voter.validator);
 	}
 
 	function updateVoters(address[] calldata voters) external {
