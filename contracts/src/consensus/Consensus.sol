@@ -1,6 +1,7 @@
 pragma solidity ^0.8.27;
 
 struct ValidatorData {
+	uint256 votersCount;
 	uint256 voteBalance;
 	bool isResigned;
 	bytes bls12_381_public_key; // 96 bits
@@ -206,6 +207,7 @@ contract Consensus {
 		_checkBls12_381PublicKey(bls12_381_public_key);
 
 		ValidatorData memory validator = ValidatorData({
+			votersCount: 0,
 			voteBalance: 0,
 			isResigned: false,
 			bls12_381_public_key: bls12_381_public_key
@@ -297,14 +299,30 @@ contract Consensus {
 	}
 
 	function vote(address addr) external {
-		require(isValidatorRegistered(addr), "must vote for validator");
-		require(_votes[msg.sender].validator == address(0), "TODO: already voted");
+		require(isValidatorRegistered(addr), "Must vote for validator");
+		require(_votes[msg.sender].validator == address(0), "Already voted");
+
+		ValidatorData storage validatorData = _registeredValidatorData[addr];
+		require(!validatorData.isResigned, "Must vote for unresigned validator");
 
 		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance});
+
 		// TODO: safe math
-		_registeredValidatorData[addr].voteBalance += msg.sender.balance;
+		validatorData.voteBalance += msg.sender.balance;
+		validatorData.votersCount += 1;
 
 		emit Voted(msg.sender, addr);
+	}
+
+	function unvote() external {
+		Vote storage voter = _votes[msg.sender];
+		require(voter.validator != address(0), "TODO: not voted");
+
+		emit Unvoted(msg.sender, voter.validator);
+
+		_registeredValidatorData[voter.validator].voteBalance -= voter.balance;
+		_registeredValidatorData[voter.validator].votersCount -= 1;
+		delete _votes[msg.sender];
 	}
 
 	function updateVoters(address[] calldata voters) external {

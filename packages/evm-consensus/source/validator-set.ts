@@ -89,7 +89,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [, validator] of validators.entries()) {
-			const [address, [voteBalance, , blsPublicKey]] = validator;
+			const [address, [, voteBalance, , blsPublicKey]] = validator;
 
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
