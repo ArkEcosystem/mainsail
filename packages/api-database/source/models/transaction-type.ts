@@ -6,24 +6,6 @@ import { Column, Entity } from "typeorm";
 export class TransactionType {
 	@Column({
 		primary: true,
-		type: "smallint",
-	})
-	public type!: number;
-
-	@Column({
-		primary: true,
-		type: "integer",
-	})
-	public typeGroup!: number;
-
-	@Column({
-		primary: true,
-		type: "smallint",
-	})
-	public version!: number;
-
-	@Column({
-		nullable: false,
 		type: "varchar",
 	})
 	public key!: string;

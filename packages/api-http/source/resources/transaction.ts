@@ -24,27 +24,25 @@ export class TransactionResource implements Contracts.Api.Resource {
 		}
 
 		return {
-			amount: resource.amount,
-			asset: resource.asset,
-			blockId: resource.blockId,
-			confirmations,
-
-			fee: resource.fee,
 			id: resource.id,
 			nonce: resource.nonce,
 
-			recipient: resource.recipientId,
+			amount: resource.amount,
+			blockId: resource.blockId,
+			confirmations,
+
+			recipient: resource.recipientAddress,
 			senderPublicKey: resource.senderPublicKey,
+			senderAddress: resource.senderAddress,
+
+			gasPrice: resource.gasPrice,
+			gasLimit: resource.gasLimit,
+			data: resource.data,
 
 			signature: resource.signature,
 			signatures: resource.signatures,
 
 			timestamp: resource.timestamp ? +resource.timestamp : undefined,
-
-			type: resource.type,
-			typeGroup: resource.typeGroup,
-			vendorField: resource.vendorField,
-			version: resource.version,
 		};
 	}
 }
