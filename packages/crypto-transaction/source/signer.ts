@@ -1,6 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { numberToHex } from "@mainsail/utils";
 
 @injectable()
 export class Signer {
@@ -21,7 +20,10 @@ export class Signer {
 		}
 
 		const hash: Buffer = await this.utils.toHash(transaction, options);
-		const signature: string = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
+		const signature: string = await this.signatureFactory.signRecoverable(
+			hash,
+			Buffer.from(keys.privateKey, "hex"),
+		);
 
 		if (!transaction.signature && !options.excludeMultiSignature) {
 			transaction.signature = signature;
@@ -35,21 +37,22 @@ export class Signer {
 		keys: Contracts.Crypto.KeyPair,
 		index = -1,
 	): Promise<string> {
-		if (!transaction.signatures) {
-			transaction.signatures = [];
-		}
+		// if (!transaction.signatures) {
+		// 	transaction.signatures = [];
+		// }
 
-		index = index === -1 ? transaction.signatures.length : index;
+		// index = index === -1 ? transaction.signatures.length : index;
 
-		const hash: Buffer = await this.utils.toHash(transaction, {
-			excludeMultiSignature: true,
-			excludeSignature: true,
-		});
+		// const hash: Buffer = await this.utils.toHash(transaction, {
+		// 	excludeMultiSignature: true,
+		// 	excludeSignature: true,
+		// });
 
-		const signature: string = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
-		const indexedSignature = `${numberToHex(index)}${signature}`;
-		transaction.signatures.push(indexedSignature);
+		// const signature: string = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
+		// const indexedSignature = `${numberToHex(index)}${signature}`;
+		// transaction.signatures.push(indexedSignature);
 
-		return indexedSignature;
+		//return indexedSignature;
+		return "TODO";
 	}
 }

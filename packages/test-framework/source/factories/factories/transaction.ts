@@ -9,7 +9,7 @@ import { EvmCallOptions, TransactionOptions, TransferOptions } from "../types.js
 import { generateApp } from "./generate-app.js";
 
 const AMOUNT = 1;
-const FEE = 1;
+const GAS_PRICE = 1;
 
 interface EntityOptions<T extends TransactionBuilder<T>> {
 	entity: TransactionBuilder<T>;
@@ -24,27 +24,21 @@ const sign = async <T extends TransactionBuilder<T>>({
 const multiSign = async <T extends TransactionBuilder<T>>({
 	entity,
 	options,
-}: EntityOptions<T>): Promise<TransactionBuilder<T>> => {
-	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
+}: EntityOptions<T>): Promise<TransactionBuilder<T>> =>
+	//	const passphrases: string[] = options.passphrases || [secrets[0], secrets[1], secrets[2]];
 
-	for (const [index, passphrase] of passphrases.entries()) {
-		await entity.multiSign(passphrase, index);
-	}
+	// for (const [index, passphrase] of passphrases.entries()) {
+	// 	await entity.multiSign(passphrase, index);
+	// }
 
-	return entity;
-};
-
+	entity;
 const applyModifiers = <T extends TransactionBuilder<T>>(
 	entity: TransactionBuilder<T>,
 	options: TransactionOptions,
 ): TransactionBuilder<T> => {
-	entity.fee(BigNumber.make(options.fee || FEE).toFixed());
+	entity.gasPrice(options.gasPrice || GAS_PRICE);
 
-	if (options.version) {
-		entity.version(options.version);
-	}
-
-	if (entity.data.version && options.nonce) {
+	if (options.nonce) {
 		entity.nonce(options.nonce);
 	}
 
@@ -52,12 +46,12 @@ const applyModifiers = <T extends TransactionBuilder<T>>(
 		entity.data.timestamp = options.timestamp;
 	}
 
-	if (options.senderPublicKey) {
-		entity.senderPublicKey(options.senderPublicKey);
+	if (options.senderAddress) {
+		entity.senderAddress(options.senderAddress);
 	}
 
-	if (options.recipientId) {
-		entity.recipientId(options.recipientId);
+	if (options.recipientAddress) {
+		entity.recipientAddress(options.recipientAddress);
 	}
 
 	return entity;
@@ -69,9 +63,9 @@ export const registerTransferFactory = (factory: FactoryBuilder, app: Contracts.
 
 		return applyModifiers(
 			transferBuilder
-				.amount(BigNumber.make(options.amount || AMOUNT).toFixed())
-				.recipientId(
-					options.recipientId ||
+				.value(BigNumber.make(options.amount || AMOUNT).toFixed())
+				.recipientAddress(
+					options.recipientAddress ||
 						(await app
 							.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 							.fromMnemonic(secrets[0])),

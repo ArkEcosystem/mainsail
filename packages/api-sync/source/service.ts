@@ -188,25 +188,26 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			receipts: transactionReceipts,
 
-			transactions: transactions.map(({ data }) => ({
-				amount: data.amount.toFixed(),
-				asset: data.asset,
-				blockHeight: header.height.toFixed(),
-				blockId: header.id,
-				fee: data.fee.toFixed(),
-				id: data.id as unknown as string,
-				nonce: data.nonce.toFixed(),
-				recipientId: data.recipientId,
-				senderPublicKey: data.senderPublicKey,
-				sequence: data.sequence as unknown as number,
-				signature: data.signature,
-				signatures: data.signatures,
-				timestamp: header.timestamp.toFixed(),
-				type: data.type,
-				typeGroup: data.typeGroup,
-				vendorField: data.vendorField,
-				version: data.version,
-			})),
+			transactions: [], // TODO
+			// transactions: transactions.map(({ data }) => ({
+			// 	amount: data.amount.toFixed(),
+			// 	asset: {}, // TODO
+			// 	blockHeight: header.height.toFixed(),
+			// 	blockId: header.id,
+			// 	fee: data.fee.toFixed(),
+			// 	id: data.id as unknown as string,
+			// 	nonce: data.nonce.toFixed(),
+			// 	recipientId: data.recipientId,
+			// 	senderPublicKey: data.senderPublicKey,
+			// 	sequence: data.sequence as unknown as number,
+			// 	signature: data.signature,
+			// 	signatures: data.signatures,
+			// 	timestamp: header.timestamp.toFixed(),
+			// 	type: data.type,
+			// 	typeGroup: data.typeGroup,
+			// 	vendorField: data.vendorField,
+			// 	version: data.version,
+			// })),
 
 			wallets: accountUpdates.map((account) => ({
 				address: account.address,

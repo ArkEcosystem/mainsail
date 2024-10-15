@@ -1,6 +1,5 @@
 import { inject, injectable, multiInject, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { InternalTransactionType } from "@mainsail/crypto-transaction";
 import { Utils } from "@mainsail/kernel";
 
 import { TransactionHandlerProvider } from "./handler-provider.js";
@@ -25,24 +24,10 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.Transa
 		return this.handlers;
 	}
 
-	public getRegisteredHandlerByType(
-		internalType: Contracts.Transactions.InternalTransactionType,
-		version = 1,
-	): TransactionHandler {
-		for (const handler of this.handlers) {
-			const transactionConstructor = handler.getConstructor();
-			Utils.assert.defined<number>(transactionConstructor.type);
-			Utils.assert.defined<number>(transactionConstructor.typeGroup);
-			const handlerInternalType = InternalTransactionType.from(
-				transactionConstructor.type,
-				transactionConstructor.typeGroup,
-			);
-			if (handlerInternalType === internalType && transactionConstructor.version === version) {
-				return handler;
-			}
-		}
-
-		throw new Exceptions.InvalidTransactionTypeError(internalType);
+	public getRegisteredHandlerByType(internalType: number, version = 0): TransactionHandler {
+		const [handler] = this.handlers;
+		Utils.assert.defined<TransactionHandler>(handler);
+		return handler;
 	}
 
 	public async getActivatedHandlers(): Promise<TransactionHandler[]> {
@@ -54,10 +39,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.Transa
 		return activated.map(([handler, _]) => handler);
 	}
 
-	public async getActivatedHandlerByType(
-		internalType: Contracts.Transactions.InternalTransactionType,
-		version = 1,
-	): Promise<TransactionHandler> {
+	public async getActivatedHandlerByType(internalType: number, version = 0): Promise<TransactionHandler> {
 		const handler = this.getRegisteredHandlerByType(internalType, version);
 		if (await handler.isActivated()) {
 			return handler;
@@ -68,7 +50,6 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.Transa
 	public async getActivatedHandlerForData(
 		transactionData: Contracts.Crypto.TransactionData,
 	): Promise<TransactionHandler> {
-		const internalType = InternalTransactionType.from(transactionData.type, transactionData.typeGroup);
-		return this.getActivatedHandlerByType(internalType, transactionData.version);
+		return this.getActivatedHandlerByType(0, 0);
 	}
 }

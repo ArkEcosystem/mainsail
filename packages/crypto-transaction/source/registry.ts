@@ -1,7 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
-import { InternalTransactionType } from "./internal-transaction-type.js";
 import { Transaction } from "./types/index.js";
 import { signedSchema, strictSchema } from "./validation/utils.js";
 
@@ -15,10 +14,7 @@ export class TransactionRegistry implements Contracts.Crypto.TransactionRegistry
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
-	readonly #transactionTypes: Map<
-		Contracts.Transactions.InternalTransactionType,
-		Map<number, TransactionConstructor>
-	> = new Map();
+	readonly #transactionTypes: Map<number, TransactionConstructor> = new Map();
 
 	readonly #transactionSchemas = new Map<string, Contracts.Crypto.TransactionSchema>();
 
@@ -28,76 +24,35 @@ export class TransactionRegistry implements Contracts.Crypto.TransactionRegistry
 	}
 
 	public registerTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
-		const { typeGroup, type } = constructor;
+		const { type } = constructor;
 
-		if (type === undefined || typeGroup === undefined) {
+		if (type === undefined) {
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.InternalTransactionType = InternalTransactionType.from(
-			type,
-			typeGroup,
-		);
-
-		for (const registeredConstructors of this.#transactionTypes.values()) {
-			if (registeredConstructors.size > 0) {
-				const first = [...registeredConstructors.values()][0];
-				if (
-					first.key === constructor.key &&
-					// TODO: Check type
-					// @ts-ignore
-					InternalTransactionType.from(first.type, first.typeGroup) !== internalType
-				) {
-					// TODO: Check type
-					// @ts-ignore
-					throw new Exceptions.TransactionKeyAlreadyRegisteredError(first.key);
-				}
-
-				for (const registeredConstructor of registeredConstructors.values()) {
-					if (registeredConstructor === constructor) {
-						throw new Exceptions.TransactionAlreadyRegisteredError(constructor.name);
-					}
-				}
+		for (const registeredConstructor of this.#transactionTypes.values()) {
+			if (registeredConstructor === constructor) {
+				throw new Exceptions.TransactionAlreadyRegisteredError(constructor.name);
 			}
 		}
 
-		if (!this.#transactionTypes.has(internalType)) {
-			this.#transactionTypes.set(internalType, new Map());
-		} else if (this.#transactionTypes.get(internalType)?.has(constructor.version)) {
-			throw new Exceptions.TransactionVersionAlreadyRegisteredError(constructor.name, constructor.version);
-		}
-
-		this.#transactionTypes.get(internalType)!.set(constructor.version, constructor);
+		this.#transactionTypes.set(type, constructor);
 		this.#updateSchemas(constructor.getSchema());
 	}
 
 	public deregisterTransactionType(constructor: Contracts.Crypto.TransactionConstructor): void {
-		const { typeGroup, type, version } = constructor;
+		const { type } = constructor;
 
-		if (type === undefined || typeGroup === undefined) {
+		if (type === undefined) {
 			throw new TypeError();
 		}
 
-		const internalType: Contracts.Transactions.InternalTransactionType = InternalTransactionType.from(
-			type,
-			typeGroup,
-		);
-		if (!this.#transactionTypes.has(internalType)) {
-			throw new Exceptions.UnkownTransactionError(internalType.toString());
+		if (!this.#transactionTypes.has(type)) {
+			throw new Exceptions.UnkownTransactionError(type.toString());
 		}
 
 		this.#updateSchemas(constructor.getSchema(), true);
-
-		const constructors = this.#transactionTypes.get(internalType)!;
-		if (!constructors.has(version)) {
-			throw new Exceptions.UnkownTransactionError(internalType.toString());
-		}
-
-		constructors.delete(version);
-
-		if (constructors.size === 0) {
-			this.#transactionTypes.delete(internalType);
-		}
+		this.#transactionTypes.delete(type);
 	}
 
 	#updateSchemas(schema: Contracts.Crypto.TransactionSchema, remove?: boolean): void {

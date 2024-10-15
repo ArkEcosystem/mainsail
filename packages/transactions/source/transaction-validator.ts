@@ -46,7 +46,7 @@ export class TransactionValidator implements Contracts.Transactions.TransactionV
 			transaction,
 		);
 
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+		AppUtils.assert.defined<string>(transaction.data.senderAddress);
 
 		return receipt;
 	}

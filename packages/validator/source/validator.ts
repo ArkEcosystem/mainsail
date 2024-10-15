@@ -162,7 +162,7 @@ export class Validator implements Contracts.Validator.Validator {
 			}
 
 			try {
-				const gasLimit = transaction.data.asset?.evmCall?.gasLimit || 0;
+				const gasLimit = transaction.data.gasLimit;
 
 				if (gasLeft - gasLimit < 0) {
 					break;
@@ -238,8 +238,8 @@ export class Validator implements Contracts.Validator.Validator {
 			Utils.assert.defined<string>(data.id);
 			Utils.assert.defined<number>(data.gasUsed);
 
-			totals.amount = totals.amount.plus(data.amount);
-			totals.fee = totals.fee.plus(data.fee);
+			totals.amount = totals.amount.plus(data.value);
+			totals.fee = totals.fee.plus(data.gasPrice);
 			totals.gasUsed += data.gasUsed;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));

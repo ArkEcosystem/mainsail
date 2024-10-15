@@ -50,22 +50,6 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 		return this.wherePredicate(async (t) => t.id === id);
 	}
 
-	public whereType(type: Contracts.Crypto.TransactionType | number): QueryIterable {
-		return this.wherePredicate(async (t) => t.type === type);
-	}
-
-	public whereTypeGroup(typeGroup: Contracts.Crypto.TransactionTypeGroup | number): QueryIterable {
-		return this.wherePredicate(async (t) => t.typeGroup === typeGroup);
-	}
-
-	public whereVersion(version: number): QueryIterable {
-		return this.wherePredicate(async (t) => t.data.version === version);
-	}
-
-	public whereKind(transaction: Contracts.Crypto.Transaction): QueryIterable {
-		return this.wherePredicate(async (t) => t.type === transaction.type && t.typeGroup === transaction.typeGroup);
-	}
-
 	async #satisfiesPredicates(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		if (this.predicates.length === 0) {
 			return true;
@@ -104,8 +88,9 @@ export class Query implements Contracts.TransactionPool.Query {
 		return new QueryIterable(
 			[...this.mempool.getSenderMempools()]
 				.flatMap((senderMempool) => [...senderMempool.getFromLatest()])
-				.sort((a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
-					a.data.fee.comparedTo(b.data.fee),
+				.sort(
+					(a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
+						a.data.gasPrice - b.data.gasPrice,
 				),
 		);
 	}
@@ -114,8 +99,9 @@ export class Query implements Contracts.TransactionPool.Query {
 		return new QueryIterable(
 			[...this.mempool.getSenderMempools()]
 				.flatMap((senderMempool) => [...senderMempool.getFromEarliest()])
-				.sort((a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
-					b.data.fee.comparedTo(a.data.fee),
+				.sort(
+					(a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
+						b.data.gasPrice - a.data.gasPrice,
 				),
 		);
 	}

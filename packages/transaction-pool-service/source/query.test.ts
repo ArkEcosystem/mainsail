@@ -28,7 +28,7 @@ describe<{
 		context.sender1Transaction100 = {
 			data: {
 				amount: BigNumber.make(100),
-				fee: BigNumber.make(100),
+				gasPrice: 100,
 				nonce: BigNumber.make(1),
 				senderPublicKey: "sender-public-key",
 				type: 1,
@@ -44,7 +44,7 @@ describe<{
 		context.sender1Transaction200 = {
 			data: {
 				amount: BigNumber.make(100),
-				fee: BigNumber.make(200),
+				gasPrice: 200,
 				nonce: BigNumber.make(2),
 				senderPublicKey: "sender-public-key",
 				type: 1,
@@ -60,7 +60,7 @@ describe<{
 		context.sender2Transaction100 = {
 			data: {
 				amount: BigNumber.make(100),
-				fee: BigNumber.make(300),
+				gasPrice: 300,
 				nonce: BigNumber.make(3),
 				senderPublicKey: "sender-public-key",
 				type: 1,
@@ -76,7 +76,7 @@ describe<{
 		context.sender2Transaction200 = {
 			data: {
 				amount: BigNumber.make(100),
-				fee: BigNumber.make(400),
+				gasPrice: 400,
 				nonce: BigNumber.make(4),
 				senderPublicKey: "sender-public-key",
 				type: 1,
@@ -161,93 +161,5 @@ describe<{
 
 		assert.length(result, 1);
 		assert.equal(result[0].id, context.sender1Transaction200.id);
-	});
-
-	it("whereType - should filter transactions by type", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).all();
-
-		assert.length(result, 1);
-		assert.equal(result[0].id, context.sender1Transaction200.id);
-	});
-
-	it("whereTypeGroup - should filter transactions by typeGroup", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereTypeGroup(Contracts.Crypto.TransactionTypeGroup.Core).all();
-
-		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
-	});
-
-	it("whereVersion - should filter transactions by version", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereVersion(2).all();
-
-		assert.equal(result, [context.sender1Transaction100, context.sender1Transaction200]);
-	});
-
-	it("whereKind - should filter transactions by type and typeGroup", async (context) => {
-		const queryIterable = new QueryIterable([
-			context.sender1Transaction100,
-			context.sender1Transaction200,
-			context.sender2Transaction100,
-			context.sender2Transaction200,
-		]);
-		const result = await queryIterable.whereKind(context.sender1Transaction200).all();
-
-		assert.equal(
-			result.map((t) => t.id),
-			[context.sender1Transaction200.id, context.sender2Transaction200.id],
-		);
-	});
-
-	it("can chain multiple predicates", async (context) => {
-		const queryIterable = new QueryIterable([
-			context.sender1Transaction100,
-			context.sender1Transaction200,
-			context.sender2Transaction100,
-			context.sender2Transaction200,
-		]);
-		const result = await queryIterable
-			.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration)
-			.whereTypeGroup(Contracts.Crypto.TransactionTypeGroup.Core)
-			.all();
-
-		assert.equal(
-			result.map((t) => t.id),
-			[context.sender1Transaction200.id, context.sender2Transaction200.id],
-		);
-	});
-
-	it("has - should return true when there are matching transactions", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).has();
-
-		assert.true(result);
-	});
-
-	it("has - should return false when there are no matching transactions", async (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).has();
-
-		assert.false(result);
-	});
-
-	it("first - should return first matching transaction", async (context) => {
-		const queryIterable = new QueryIterable([
-			context.sender1Transaction100,
-			context.sender1Transaction200,
-			context.sender2Transaction100,
-			context.sender2Transaction200,
-		]);
-		const result = await queryIterable.whereType(Contracts.Crypto.TransactionType.ValidatorRegistration).first();
-
-		assert.equal(result.id, context.sender1Transaction200.id);
-	});
-
-	it("first - should throw where there are no matching transactions", (context) => {
-		const queryIterable = new QueryIterable([context.sender1Transaction100, context.sender1Transaction200]);
-		const check = () => queryIterable.whereType(Contracts.Crypto.TransactionType.Vote).first();
-
-		assert.rejects(check);
 	});
 });

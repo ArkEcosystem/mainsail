@@ -179,7 +179,6 @@ describe<{
 		app.bind(Identifiers.State.State).toConstantValue({});
 		app.bind(Identifiers.State.Store).toConstantValue({});
 		app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
-		app.bind(Identifiers.Evm.Gas.Limits).toConstantValue({});
 		app.bind(Identifiers.Evm.Gas.FeeCalculator).toConstantValue({});
 
 		app.bind(Identifiers.Cryptography.Transaction.Registry).to(TransactionRegistry);

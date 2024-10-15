@@ -29,4 +29,16 @@ export class Signature implements Contracts.Crypto.Signature {
 	public async aggregate(signatures: Buffer[]): Promise<string> {
 		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
 	}
+
+	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<string> {
+		throw new Exceptions.NotImplemented(this.constructor.name, "signRecoverable");
+	}
+
+	public async verifyRecoverable(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
+		throw new Exceptions.NotImplemented(this.constructor.name, "verifyRecoverable");
+	}
+
+	public recoverPublicKey(message: Buffer, signature: Buffer): string {
+		throw new Exceptions.NotImplemented(this.constructor.name, "recoverPublicKey");
+	}
 }

@@ -8,7 +8,7 @@ import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consens
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairEcdsa } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as CryptoMessages } from "@mainsail/crypto-messages";
-import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypto-transaction-evm-call";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
@@ -45,7 +45,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoConfig).register();
 	await app.resolve(CoreCryptoValidation).register();
 	await app.resolve(CoreCryptoHashBcrypto).register();
-	await app.resolve(CoreCryptoSignatureSchnorr).register();
+	await app.resolve(CoreCryptoSignatureEcdsa).register();
 	await app.resolve(CoreCryptoKeyPairEcdsa).register();
 	await app.resolve(CoreCryptoAddressKeccak256).register();
 	await app.resolve(CryptoMessages).register();

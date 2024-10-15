@@ -81,8 +81,7 @@ export const makeCustomProposal = async (
 				transaction,
 			);
 		} catch (ex) {
-			const gasLimits = node.app.get<Contracts.Evm.GasLimits>(Identifiers.Evm.Gas.Limits);
-			result = { gasUsed: gasLimits.of(transaction) };
+			result = { gasUsed: transaction.gasLimit };
 		}
 
 		const { data, serialized } = transaction;

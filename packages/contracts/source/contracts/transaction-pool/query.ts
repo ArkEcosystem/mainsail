@@ -1,4 +1,4 @@
-import { Transaction, TransactionType, TransactionTypeGroup } from "../crypto/index.js";
+import { Transaction } from "../crypto/index.js";
 
 export type QueryPredicate = (transaction: Transaction) => Promise<boolean>;
 
@@ -12,10 +12,6 @@ export interface Query {
 export interface QueryIterable {
 	wherePredicate(predicate: QueryPredicate): QueryIterable;
 	whereId(id: string): QueryIterable;
-	whereType(type: TransactionType | number): QueryIterable;
-	whereTypeGroup(typeGroup: TransactionTypeGroup | number): QueryIterable;
-	whereVersion(version: number): QueryIterable;
-	whereKind(transaction: Transaction): QueryIterable;
 
 	has(): Promise<boolean>;
 	first(): Promise<Transaction>;

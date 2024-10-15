@@ -59,7 +59,9 @@ export class Deployer {
 		);
 
 		const recipients = [
-			...new Set(genesisBlock.block.transactions.map(({ recipientId }) => recipientId!).filter(Boolean)),
+			...new Set(
+				genesisBlock.block.transactions.map(({ recipientAddress }) => recipientAddress!).filter(Boolean),
+			),
 		];
 
 		this.app.bind(EvmDevelopmentIdentifiers.Wallets.Funded).toConstantValue(recipients);

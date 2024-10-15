@@ -10,9 +10,6 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
 
-	public static type: number | undefined = undefined;
-	public static typeGroup: number | undefined = undefined;
-	public static version = 1;
 	public static key: string | undefined = undefined;
 
 	public data!: Contracts.Crypto.TransactionData;
@@ -20,14 +17,6 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 
 	public get id(): string {
 		return this.data.id;
-	}
-
-	public get type(): number {
-		return this.data.type;
-	}
-
-	public get typeGroup(): number {
-		return this.data.typeGroup;
 	}
 
 	public get key(): string {
@@ -40,8 +29,7 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 
 	public static getData(json: Contracts.Crypto.TransactionJson): Contracts.Crypto.TransactionData {
 		const data: Contracts.Crypto.TransactionData = { ...json } as unknown as Contracts.Crypto.TransactionData;
-		data.amount = BigNumber.make(data.amount);
-		data.fee = BigNumber.make(data.fee);
+		data.value = BigNumber.make(data.value);
 		data.nonce = BigNumber.make(data.nonce);
 		return data;
 	}

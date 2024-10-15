@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
-import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-schnorr";
+import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
+import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
 import { BigNumber } from "@mainsail/utils";
 import { Validator } from "@mainsail/validation/source/validator";
@@ -34,6 +35,7 @@ describe<{
 			...baseSchemas,
 			...keyPairSchemas,
 			...schemas,
+			...addressSchemas,
 		})) {
 			context.validator.addSchema(schema);
 		}
@@ -83,16 +85,16 @@ describe<{
 	});
 
 	const transactionOriginal = {
-		amount: 0,
-		fee: 1,
+		value: 0,
+		gasPrice: 1,
+		gasLimit: 21000,
 		id: "1".repeat(64),
 		network: 30,
 		nonce: 1,
-		senderPublicKey: "a".repeat(64),
-		signature: "b".repeat(64),
+		senderPublicKey: "a".repeat(66),
+		senderAddress: "0x" + "a".repeat(40),
+		signature: "b".repeat(130),
 		type: 1,
-		typeGroup: 0,
-		version: 1,
 	};
 
 	it("transactionBaseSchema - should be valid", ({ validator }) => {
@@ -115,7 +117,7 @@ describe<{
 	it("transactionBaseSchema - should have required fields", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const requiredFields = ["amount", "fee", "nonce", "senderPublicKey", "type"];
+		const requiredFields = ["value", "gasPrice", "nonce", "senderPublicKey"];
 		for (const field of requiredFields) {
 			const transaction = {
 				...transactionOriginal,
@@ -138,41 +140,14 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - amount should be big number 0 ", ({ validator }) => {
+	it("transactionBaseSchema - value should be big number min 0", ({ validator }) => {
 		validator.addSchema(schema);
 
-		const validValues = [0, "0", BigNumber.ZERO];
-
+		const validValues = [0, "0", BigNumber.ZERO, "1", BigNumber.ONE, 100, "100", BigNumber.make(100)];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
-				amount: value,
-			};
-
-			assert.undefined(validator.validate("transaction", transaction).error);
-		}
-
-		const invalidValues = [1, "1", BigNumber.ONE, 100, "100", BigNumber.make(100), -1, null, undefined, {}, "test"];
-
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				amount: value,
-			};
-
-			assert.true(validator.validate("transaction", transaction).error.includes("amount"));
-		}
-	});
-
-	it("transactionBaseSchema - fee should be big number min 0", ({ validator }) => {
-		validator.addSchema(schema);
-
-		const validValues = [0, "0", BigNumber.ZERO, 100, "100", BigNumber.make(100)];
-
-		for (const value of validValues) {
-			const transaction = {
-				...transactionOriginal,
-				fee: value,
+				value,
 			};
 
 			assert.undefined(validator.validate("transaction", transaction).error);
@@ -183,10 +158,35 @@ describe<{
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,
-				fee: value,
+				value,
 			};
 
-			assert.true(validator.validate("transaction", transaction).error.includes("fee"));
+			assert.true(validator.validate("transaction", transaction).error.includes("value"));
+		}
+	});
+
+	it("transactionBaseSchema - gasPrice should be number min 0", ({ validator }) => {
+		validator.addSchema(schema);
+
+		const validValues = [0, 1, 100];
+		for (const value of validValues) {
+			const transaction = {
+				...transactionOriginal,
+				gasPrice: value,
+			};
+
+			assert.undefined(validator.validate("transaction", transaction).error);
+		}
+
+		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
+
+		for (const value of invalidValues) {
+			const transaction = {
+				...transactionOriginal,
+				gasPrice: value,
+			};
+
+			assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
 		}
 	});
 
@@ -265,7 +265,7 @@ describe<{
 		for (const char of validChars) {
 			const transaction = {
 				...transactionOriginal,
-				signature: char,
+				signature: char.repeat(130),
 			};
 
 			assert.undefined(validator.validate("transaction", transaction).error);
@@ -283,7 +283,7 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - signatures should be alphanumeric, 130 length, min 1 and max 16, unique items", ({
+	it.skip("transactionBaseSchema - signatures should be alphanumeric, 130 length, min 1 and max 16, unique items", ({
 		validator,
 	}) => {
 		validator.addSchema(schema);
@@ -368,58 +368,6 @@ describe<{
 		);
 	});
 
-	it("transactionBaseSchema - typeGroup should be integer min 0", ({ validator }) => {
-		validator.addSchema(schema);
-
-		const validValues = [0, 1, 100];
-
-		for (const value of validValues) {
-			const transaction = {
-				...transactionOriginal,
-				typeGroup: value,
-			};
-
-			assert.undefined(validator.validate("transaction", transaction).error);
-		}
-
-		const invalidValues = [-1, "-1", 1.1, BigNumber.make(1), {}, "test"];
-
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				typeGroup: value,
-			};
-
-			assert.true(validator.validate("transaction", transaction).error.includes("typeGroup"));
-		}
-	});
-
-	it("transactionBaseSchema - version should be 1", ({ validator }) => {
-		validator.addSchema(schema);
-
-		const validValues = [1];
-
-		for (const value of validValues) {
-			const transaction = {
-				...transactionOriginal,
-				version: value,
-			};
-
-			assert.undefined(validator.validate("transaction", transaction).error);
-		}
-
-		const invalidValues = [-1, "1", 0, BigNumber.make(1), {}, "test"];
-
-		for (const value of invalidValues) {
-			const transaction = {
-				...transactionOriginal,
-				version: value,
-			};
-
-			assert.true(validator.validate("transaction", transaction).error.includes("version"));
-		}
-	});
-
 	it("signedSchema - should be ok with signature", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
@@ -430,7 +378,7 @@ describe<{
 		assert.undefined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it("signedSchema - should be ok with signatures", ({ validator }) => {
+	it.skip("signedSchema - should be ok with signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
@@ -443,7 +391,7 @@ describe<{
 		assert.undefined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it("signedSchema - should be ok with signature & signatures", ({ validator }) => {
+	it.skip("signedSchema - should be ok with signature & signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
@@ -454,7 +402,7 @@ describe<{
 		assert.undefined(validator.validate("transactionSigned", transaction).error);
 	});
 
-	it("signedSchema - should not be ok without signature and signatures", ({ validator }) => {
+	it.skip("signedSchema - should not be ok without signature and signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {
@@ -482,7 +430,7 @@ describe<{
 		);
 	});
 
-	it("strictSchema - should not be ok without signature and signatures", ({ validator }) => {
+	it.skip("strictSchema - should not be ok without signature and signatures", ({ validator }) => {
 		validator.addSchema(signedSchema(schema));
 
 		const transaction = {

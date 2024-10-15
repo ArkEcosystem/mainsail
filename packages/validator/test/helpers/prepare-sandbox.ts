@@ -6,10 +6,11 @@ import { ServiceProvider as CoreConsensusBls12381 } from "@mainsail/crypto-conse
 import { ServiceProvider as CoreCryptoHashBcrypto } from "@mainsail/crypto-hash-bcrypto";
 import { ServiceProvider as CoreCryptoKeyPairSchnorr } from "@mainsail/crypto-key-pair-schnorr";
 import { ServiceProvider as CoreCryptoMessages } from "@mainsail/crypto-messages";
-import { ServiceProvider as CoreCryptoSignatureSchnorr } from "@mainsail/crypto-signature-schnorr";
+import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
+import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
@@ -33,7 +34,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 
 	await context.sandbox.app.resolve(CoreCryptoHashBcrypto).register();
 
-	await context.sandbox.app.resolve(CoreCryptoSignatureSchnorr).register();
+	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
 	await context.sandbox.app.resolve(CoreCryptoKeyPairSchnorr).register();
 
 	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
@@ -69,22 +70,24 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		validate: async () => true,
 		getEvm: () => ({
 			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+			initializeGenesis: async () => {},
+			prepareNextCommit: async () => {},
+			updateRewardsAndVotes: async () => {},
 		}),
 	};
 	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);
 
 	context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue(() => {});
+	context.sandbox.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue({});
 
-	context.sandbox.app.bind(Identifiers.State.Service).toConstantValue({
-		getStore: () => ({
-			getLastBlock: () => ({
-				header: {
-					height: 1,
-					id: "0000000000000000000000000000000000000000000000000000000000000000",
-					previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-					stateHash: "0000000000000000000000000000000000000000000000000000000000000000",
-				},
-			}),
+	context.sandbox.app.bind(Identifiers.State.Store).toConstantValue({
+		getLastBlock: () => ({
+			header: {
+				height: 1,
+				id: "0000000000000000000000000000000000000000000000000000000000000000",
+				previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
+				stateHash: "0000000000000000000000000000000000000000000000000000000000000000",
+			},
 		}),
 	});
 
