@@ -28,6 +28,12 @@ contract ConsensusTest is Test {
 		assertEq(validator.data.votersCount, 0);
 	}
 
+	function deregisterValidator(address addr) internal {
+		vm.startPrank(addr);
+		consensus.deregisterValidator();
+		vm.stopPrank();
+	}
+
 	function test_vote() public {
 		// Register validator
 		address addr = address(1);
@@ -87,6 +93,19 @@ contract ConsensusTest is Test {
 	function test_vote_prevent_for_unregistered_validator() public {
 		vm.expectRevert("Must vote for validator");
 		consensus.vote(address(1));
+	}
+
+	function test_vote_prevent_for_resigned_validator() public {
+		// Register validator
+		address addr = address(1);
+		registerValidator(addr);
+		deregisterValidator(addr);
+
+		// Prepare voter
+		address voterAddr = address(2);
+		vm.startPrank(voterAddr);
+		vm.expectRevert("Must vote for unresigned validator");
+		consensus.vote(addr);
 	}
 
 	function test_unvote_and_vote_in_same_block() public {

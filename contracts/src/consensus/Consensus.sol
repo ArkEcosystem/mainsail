@@ -302,10 +302,14 @@ contract Consensus {
 		require(isValidatorRegistered(addr), "Must vote for validator");
 		require(_votes[msg.sender].validator == address(0), "Already voted");
 
+		ValidatorData storage validatorData = _registeredValidatorData[addr];
+		require(!validatorData.isResigned, "Must vote for unresigned validator");
+
 		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance});
+
 		// TODO: safe math
-		_registeredValidatorData[addr].voteBalance += msg.sender.balance;
-		_registeredValidatorData[addr].votersCount += 1;
+		validatorData.voteBalance += msg.sender.balance;
+		validatorData.votersCount += 1;
 
 		emit Voted(msg.sender, addr);
 	}
