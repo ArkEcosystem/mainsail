@@ -25,6 +25,7 @@ contract ConsensusTest is Test {
 		Validator memory validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 0 ether);
+		assertEq(validator.data.votersCount, 0);
 	}
 
 	function test_vote() public {
@@ -47,6 +48,7 @@ contract ConsensusTest is Test {
 		Validator memory validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 100 ether);
+		assertEq(validator.data.votersCount, 1);
 		assertEq(voterAddr.balance, 100 ether);
 
 		// Update vote should correctly update the vote balance
@@ -61,6 +63,7 @@ contract ConsensusTest is Test {
 		validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 90 ether);
+		assertEq(validator.data.votersCount, 1);
 		assertEq(voterAddr.balance, 90 ether);
 	}
 
@@ -80,6 +83,7 @@ contract ConsensusTest is Test {
 		Validator memory validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 100 ether);
+		assertEq(validator.data.votersCount, 1);
 		assertEq(voterAddr.balance, 100 ether);
 
 		// Let say voter has 90 eth after some tx
@@ -96,6 +100,7 @@ contract ConsensusTest is Test {
 		validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 0 ether);
+		assertEq(validator.data.votersCount, 0);
 		assertEq(voterAddr.balance, 90 ether);
 	}
 }

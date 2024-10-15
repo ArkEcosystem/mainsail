@@ -1,6 +1,7 @@
 pragma solidity ^0.8.27;
 
 struct ValidatorData {
+	uint256 votersCount;
 	uint256 voteBalance;
 	bool isResigned;
 	bytes bls12_381_public_key; // 96 bits
@@ -206,6 +207,7 @@ contract Consensus {
 		_checkBls12_381PublicKey(bls12_381_public_key);
 
 		ValidatorData memory validator = ValidatorData({
+			votersCount: 0,
 			voteBalance: 0,
 			isResigned: false,
 			bls12_381_public_key: bls12_381_public_key
@@ -303,6 +305,7 @@ contract Consensus {
 		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance});
 		// TODO: safe math
 		_registeredValidatorData[addr].voteBalance += msg.sender.balance;
+		_registeredValidatorData[addr].votersCount += 1;
 
 		emit Voted(msg.sender, addr);
 	}
@@ -314,6 +317,7 @@ contract Consensus {
 		emit Unvoted(msg.sender, voter.validator);
 
 		_registeredValidatorData[voter.validator].voteBalance -= voter.balance;
+		_registeredValidatorData[voter.validator].votersCount -= 1;
 		delete _votes[msg.sender];
 	}
 
