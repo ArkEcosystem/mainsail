@@ -73,6 +73,45 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 	}
 
+	function test_vote_allow_self_vote() public {
+		// Register validator
+		address addr = address(1);
+		registerValidator(addr);
+
+		// Prepare voter
+		address voterAddr = addr;
+		vm.deal(voterAddr, 100 ether);
+
+		// Vote
+		vm.startPrank(voterAddr);
+		vm.expectEmit(address(consensus));
+		emit Voted(voterAddr, addr);
+		consensus.vote(addr);
+		vm.stopPrank();
+
+		// Assert voteBalance and voter balance
+		Validator memory validator = consensus.getValidator(addr);
+		assertEq(validator.addr, addr);
+		assertEq(validator.data.voteBalance, 100 ether);
+		assertEq(validator.data.votersCount, 1);
+		assertEq(voterAddr.balance, 100 ether);
+
+		// Update vote should correctly update the vote balance
+		// Let say voter has 90 eth at the end of the block
+		vm.deal(voterAddr, 90 ether);
+
+		address[] memory voters = new address[](1);
+		voters[0] = voterAddr;
+		consensus.updateVoters(voters);
+
+		// Assert voteBalance and voter balance
+		validator = consensus.getValidator(addr);
+		assertEq(validator.addr, addr);
+		assertEq(validator.data.voteBalance, 90 ether);
+		assertEq(validator.data.votersCount, 1);
+		assertEq(voterAddr.balance, 90 ether);
+	}
+
 	function test_vote_prevent_double_vote() public {
 		// Register validator
 		address addr = address(1);
