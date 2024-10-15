@@ -234,4 +234,6 @@ contract ConsensusTest is Test {
 		assertEq(validator.data.votersCount, 0);
 		assertEq(voterAddr.balance, 80 ether);
 	}
+
+	// TODO: Test multiple votes
 }
