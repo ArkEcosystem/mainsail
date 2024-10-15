@@ -192,14 +192,14 @@ export class Sync implements Contracts.ApiSync.Service {
 				amount: data.value.toFixed(),
 				blockHeight: header.height.toFixed(),
 				blockId: header.id,
-				gasPrice: data.gasPrice,
-				gasLimit: data.gasLimit,
 				data: data.data,
+				gasLimit: data.gasLimit,
+				gasPrice: data.gasPrice,
 				id: data.id as unknown as string,
 				nonce: data.nonce.toFixed(),
 				recipientAddress: data.recipientAddress,
-				senderPublicKey: data.senderPublicKey,
 				senderAddress: data.senderAddress,
+				senderPublicKey: data.senderPublicKey,
 				sequence: data.sequence as unknown as number,
 				signature: data.signature,
 				signatures: undefined, //data.signatures,
@@ -297,9 +297,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			types.push({ key, schema: constructor.getSchema().properties });
 		}
 
-		types.sort((a, b) => {
-			return a.key.localeCompare(b.key, undefined, { sensitivity: "base" });
-		});
+		types.sort((a, b) => a.key.localeCompare(b.key, undefined, { sensitivity: "base" }));
 
 		await this.transactionTypeRepositoryFactory().upsert(types, ["key"]);
 	}
