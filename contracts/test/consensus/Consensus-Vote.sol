@@ -11,10 +11,7 @@ contract ConsensusTest is Test {
 		consensus = new Consensus();
 	}
 
-	function test_vote() public {
-		// Register validator
-		address addr = address(1);
-
+	function registerValidator(address addr) internal {
 		bytes32 h = keccak256(abi.encode(addr));
 		bytes memory validatorKey = new bytes(48);
 		for (uint256 j = 0; j < 32; j++) {
@@ -25,10 +22,15 @@ contract ConsensusTest is Test {
 		consensus.registerValidator(validatorKey);
 		vm.stopPrank();
 
-		// Assert validator
 		Validator memory validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 0 ether);
+	}
+
+	function vote() public {
+		// Register validator
+		address addr = address(1);
+		registerValidator(addr);
 
 		// Prepare voter
 		address voterAddr = address(2);
@@ -39,11 +41,10 @@ contract ConsensusTest is Test {
 		consensus.vote(addr);
 		vm.stopPrank();
 
-		// Assert validator
-		validator = consensus.getValidator(addr);
+		// Assert voteBalance and voter balance
+		Validator memory validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 100 ether);
-		// Assert voter balance
 		assertEq(voterAddr.balance, 100 ether);
 
 		// Update vote should correctly update the vote balance
@@ -54,11 +55,43 @@ contract ConsensusTest is Test {
 		voters[0] = voterAddr;
 		consensus.updateVoters(voters);
 
-		// Assert validator
+		// Assert voteBalance and voter balance
 		validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);
 		assertEq(validator.data.voteBalance, 90 ether);
-		// Assert voter balance
+		assertEq(voterAddr.balance, 90 ether);
+	}
+
+	function unvote_and_vote_in_same_block() public {
+		// Register validator
+		address addr = address(1);
+		registerValidator(addr);
+
+		// Vote
+		address voterAddr = address(2);
+		vm.deal(voterAddr, 100 ether);
+		vm.startPrank(voterAddr);
+		consensus.vote(addr);
+		vm.stopPrank();
+
+		// Assert voteBalance and voter balance
+		Validator memory validator = consensus.getValidator(addr);
+		assertEq(validator.addr, addr);
+		assertEq(validator.data.voteBalance, 100 ether);
+		assertEq(voterAddr.balance, 100 ether);
+
+		// Let say voter has 90 eth after some tx
+		vm.deal(voterAddr, 90 ether);
+
+		// Unvote
+		vm.startPrank(voterAddr);
+		consensus.unvote();
+		vm.stopPrank();
+
+		// Assert voteBalance and voter balance
+		validator = consensus.getValidator(addr);
+		assertEq(validator.addr, addr);
+		assertEq(validator.data.voteBalance, 0 ether);
 		assertEq(voterAddr.balance, 90 ether);
 	}
 }
