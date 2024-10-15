@@ -8,7 +8,13 @@ export const bufferTransformer = {
 	},
 	to: (value: any): any => {
 		if (typeof value === "string") {
-			return Buffer.from(value.startsWith("0x") ? value.slice(2) : value, "hex");
+			value = value.startsWith("0x") ? value.slice(2) : value;
+
+			if (value === "") {
+				return null;
+			}
+
+			return Buffer.from(value, "hex");
 		}
 
 		return value;

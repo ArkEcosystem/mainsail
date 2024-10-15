@@ -51,41 +51,16 @@ export class TransactionsController extends Controller {
 		return this.respondEnrichedTransaction(transaction, request);
 	}
 
-	public async types(request: Hapi.Request) {
-		const rows = await this.transactionTypeRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.addOrderBy("type", "ASC")
-			.addOrderBy("type_group", "ASC")
-			.getMany();
-
-		const typeGroups: Record<string | number, Record<string, number>> = {};
-
-		for (const { type, typeGroup, key } of rows) {
-			if (typeGroups[typeGroup] === undefined) {
-				typeGroups[typeGroup] = {};
-			}
-
-			typeGroups[typeGroup][key[0].toUpperCase() + key.slice(1)] = type;
-		}
-
-		return { data: typeGroups };
-	}
-
 	public async schemas(request: Hapi.Request) {
 		const transactionTypes = await this.getTransactionTypes();
 
-		const schemasByType: Record<string, Record<string, any>> = {};
+		const schemasByKey: Record<string, any> = {};
 
-		for (const { type, typeGroup, schema } of transactionTypes) {
-			if (schemasByType[typeGroup] === undefined) {
-				schemasByType[typeGroup] = {};
-			}
-
-			schemasByType[typeGroup][type] = schema;
+		for (const { key, schema } of transactionTypes) {
+			schemasByKey[key] = schema;
 		}
 
-		return { data: schemasByType };
+		return { data: schemasByKey };
 	}
 
 	// TODO: Remove endpoint
@@ -96,12 +71,7 @@ export class TransactionsController extends Controller {
 	}
 
 	private async getTransactionTypes(): Promise<Models.TransactionType[]> {
-		return this.transactionTypeRepositoryFactory()
-			.createQueryBuilder()
-			.select()
-			.addOrderBy("type", "ASC")
-			.addOrderBy("type_group", "ASC")
-			.getMany();
+		return this.transactionTypeRepositoryFactory().createQueryBuilder().select().addOrderBy("key", "ASC").getMany();
 	}
 
 	private async respondEnrichedTransaction(transaction: Models.Transaction | null, request: Hapi.Request) {

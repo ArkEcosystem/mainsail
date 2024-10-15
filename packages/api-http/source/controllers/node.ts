@@ -62,26 +62,15 @@ export class NodeController extends Controller {
 		const transactionTypes = await this.transactionTypeRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.addOrderBy("type", "ASC")
-			.addOrderBy("type_group", "ASC")
+			.addOrderBy("key", "ASC")
 			.getMany();
 
-		const results = await this.transactionRepositoryFactory().getFeeStatistics(
-			genesisTimestamp,
-			request.query.days,
-		);
+		const result = await this.transactionRepositoryFactory().getFeeStatistics(genesisTimestamp, request.query.days);
 
-		const groupedByTypeGroup = {};
+		const grouped = {};
+
 		for (const transactionType of transactionTypes) {
-			if (!groupedByTypeGroup[transactionType.typeGroup]) {
-				groupedByTypeGroup[transactionType.typeGroup] = {};
-			}
-
-			const result = results.find(
-				({ type, typeGroup }) => type === transactionType.type && typeGroup === transactionType.typeGroup,
-			);
-
-			groupedByTypeGroup[transactionType.typeGroup][transactionType.key] = {
+			grouped[transactionType.key] = {
 				avg: result?.avg ?? "0",
 				max: result?.max ?? "0",
 				min: result?.min ?? "0",
@@ -89,7 +78,7 @@ export class NodeController extends Controller {
 			};
 		}
 
-		return { data: groupedByTypeGroup, meta: { days: request.query.days } };
+		return { data: grouped, meta: { days: request.query.days } };
 	}
 
 	public async configuration(request: Hapi.Request) {
