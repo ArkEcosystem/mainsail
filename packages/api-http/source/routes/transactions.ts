@@ -50,12 +50,6 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
-		handler: (request: Hapi.Request) => controller.types(request),
-		method: "GET",
-		path: "/transactions/types",
-	});
-
-	server.route({
 		handler: (request: Hapi.Request) => controller.schemas(request),
 		method: "GET",
 		path: "/transactions/schemas",
