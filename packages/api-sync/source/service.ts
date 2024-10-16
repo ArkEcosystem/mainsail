@@ -16,7 +16,7 @@ interface DeferredSync {
 	transactions: Models.Transaction[];
 	receipts: Models.Receipt[];
 	validatorRound?: Models.ValidatorRound;
-	wallets: Models.Wallet[];
+	wallets: Array<Array<any>>;
 	newMilestones?: Record<string, any>;
 }
 
@@ -155,13 +155,74 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 		}
 
-		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
-
-		// temporary workaround for API to find validator wallets
 		const activeValidators = this.validatorSet.getActiveValidators().reduce((accumulator, current) => {
 			accumulator[current.address] = current;
 			return accumulator;
 		}, {});
+
+		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
+
+		const validatorAttributes = (address: string) => {
+			const activeValidator = activeValidators[address];
+			const isBlockValidator = header.generatorAddress === address;
+
+			return {
+				...(activeValidator
+					? {
+							validatorPublicKey: activeValidator.blsPublicKey,
+							// TODO: update via trigger
+							// validatorApproval
+							// validatorRank
+							validatorVoteBalance: activeValidator.voteBalance.toFixed(),
+						}
+					: {}),
+				...(isBlockValidator
+					? {
+							validatorLastBlock: {
+								height: header.height,
+								id: header.id,
+								timestamp: header.timestamp,
+							},
+							// incrementally applied in UPSERT below
+							validatorForgedFees: header.totalFee.toFixed(),
+							validatorForgedRewards: header.totalAmount.toFixed(),
+							validatorForgedTotal: header.totalFee.plus(header.totalAmount).toFixed(),
+							validatorProducedBlocks: 1,
+						}
+					: {}),
+			};
+		};
+
+		const wallets = accountUpdates.map((account) => {
+			const attributes = {
+				...validatorAttributes(account.address),
+				...(account.vote ? { vote: account.vote } : {}),
+				...(account.unvote ? { vote: account.unvote } : {}),
+			};
+
+			return [
+				account.address,
+				addressToPublicKey[account.address] ?? "",
+				Utils.BigNumber.make(account.balance).toFixed(),
+				Utils.BigNumber.make(account.nonce).toFixed(),
+				attributes,
+				header.height.toFixed(),
+			];
+		});
+
+		const blockValidator = accountUpdates.find((a) => a.address === header.generatorAddress);
+		if (!blockValidator) {
+			wallets.push([
+				header.generatorAddress,
+				"",
+				"-1",
+				"-1",
+				{
+					...validatorAttributes(header.generatorAddress),
+				},
+				header.height.toFixed(),
+			]);
+		}
 
 		const deferredSync: DeferredSync = {
 			block: {
@@ -208,17 +269,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: data.version,
 			})),
 
-			wallets: accountUpdates.map((account) => ({
-				address: account.address,
-				// temporary workaround
-				attributes: activeValidators[account.address]
-					? { validatorPublicKey: activeValidators[account.address].blsPublicKey }
-					: {},
-				balance: Utils.BigNumber.make(account.balance).toFixed(),
-				nonce: Utils.BigNumber.make(account.nonce).toFixed(),
-				publicKey: addressToPublicKey[account.address] ?? "",
-				updated_at: header.height.toFixed(),
-			})),
+			wallets,
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
@@ -401,19 +452,52 @@ export class Sync implements Contracts.ApiSync.Service {
 					.execute();
 			}
 
-			await walletRepository
-				.createQueryBuilder()
-				.insert()
-				.values(deferred.wallets)
-				.onConflict(
-					`("address") DO UPDATE SET 
-	balance = COALESCE(EXCLUDED.balance, "Wallet".balance),
-	nonce = COALESCE(EXCLUDED.nonce, "Wallet".nonce),
-	updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
-    public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
-    attributes = "Wallet".attributes || EXCLUDED.attributes`,
-				)
-				.execute();
+			for (const batch of chunk(deferred.wallets, 256)) {
+				const batchParamLength = 6;
+				const placeholders = batch
+					.map(
+						(_, index) =>
+							`($${index * batchParamLength + 1},$${index * batchParamLength + 2},$${index * batchParamLength + 3},$${index * batchParamLength + 4},$${index * batchParamLength + 5},$${index * batchParamLength + 6})`,
+					)
+					.join(", ");
+
+				const parameters = batch.flat();
+
+				await walletRepository.query(
+					`
+	INSERT INTO wallets AS "Wallet" (address, public_key, balance, nonce, attributes, updated_at)
+	VALUES ${placeholders}
+	ON CONFLICT ("address") DO UPDATE SET 
+		balance = COALESCE(NULLIF(EXCLUDED.balance, '-1'), "Wallet".balance),
+		nonce = COALESCE(NULLIF(EXCLUDED.nonce, '-1'), "Wallet".nonce),
+		updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
+		public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
+		attributes = jsonb_strip_nulls(jsonb_build_object(
+			-- if any unvote is present, it will overwrite the previous vote
+			'vote',
+			CASE 
+				WHEN EXCLUDED.attributes->>'unvote' IS NOT NULL THEN NULL 
+				ELSE COALESCE(EXCLUDED.attributes->>'vote', "Wallet".attributes->>'vote')
+			END,
+
+			'validatorPublicKey',
+			COALESCE(EXCLUDED.attributes->>'validatorPublicKey', "Wallet".attributes->>'validatorPublicKey'),
+			'validatorVoteBalance',
+			COALESCE((EXCLUDED.attributes->>'validatorVoteBalance')::text, ("Wallet".attributes->>'validatorVoteBalance')::text),
+			'validatorLastBlock',
+			COALESCE(EXCLUDED.attributes->>'validatorLastBlock', "Wallet".attributes->>'validatorLastBlock'),
+			'validatorForgedFees',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedFees')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedFees')::numeric, 0)::numeric)::text, '0'),
+			'validatorForgedRewards',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedRewards')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedRewards')::numeric, 0)::numeric)::text, '0'),
+			'validatorForgedTotal',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedTotal')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedTotal')::numeric, 0)::numeric)::text, '0'),
+			'validatorProducedBlocks',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorProducedBlocks')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorProducedBlocks')::numeric, 0)::numeric)::text, '0')
+					))`,
+					parameters,
+				);
+			}
 		});
 
 		const t1 = performance.now();
