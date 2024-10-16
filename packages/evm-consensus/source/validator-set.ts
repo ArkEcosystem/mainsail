@@ -21,9 +21,8 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#topValidators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
 
-	#allValidators:  Map<string, Contracts.State.ValidatorWallet> = new Map();
+	#allValidators: Map<string, Contracts.State.ValidatorWallet> = new Map();
 	#dirtyValidators: Contracts.State.ValidatorWallet[] = [];
-
 
 	public async restore(): Promise<void> {
 		await this.#buildActiveValidators();
@@ -89,7 +88,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const validators = await this.#getAllValidators();
 		for (const validator of validators) {
 			const currentValidator = this.#allValidators.get(validator.address);
-			if (!currentValidator || !currentValidator.voteBalance.isEqualTo(validator.voteBalance) || currentValidator.isResigned !== validator.isResigned || currentValidator.votersCount !== validator.votersCount || currentValidator.blsPublicKey !== validator.blsPublicKey) {
+			if (
+				!currentValidator ||
+				!currentValidator.voteBalance.isEqualTo(validator.voteBalance) ||
+				currentValidator.isResigned !== validator.isResigned ||
+				currentValidator.votersCount !== validator.votersCount ||
+				currentValidator.blsPublicKey !== validator.blsPublicKey
+			) {
 				this.#dirtyValidators.push(validator);
 			}
 		}
