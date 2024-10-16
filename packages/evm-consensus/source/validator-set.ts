@@ -18,7 +18,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	#validators: Contracts.State.ValidatorWallet[] = [];
+	#topValidators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
 
 	public async restore(): Promise<void> {
@@ -34,15 +34,15 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	public getActiveValidators(): Contracts.State.ValidatorWallet[] {
 		const { activeValidators } = this.configuration.getMilestone();
 
-		if (this.#validators.length !== activeValidators) {
-			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
+		if (this.#topValidators.length !== activeValidators) {
+			throw new Exceptions.NotEnoughActiveValidatorsError(this.#topValidators.length, activeValidators);
 		}
 
-		return this.#validators.slice(0, activeValidators);
+		return this.#topValidators.slice(0, activeValidators);
 	}
 
 	public getValidator(index: number): Contracts.State.ValidatorWallet {
-		return this.#validators[index];
+		return this.#topValidators[index];
 	}
 
 	public getValidatorIndexByWalletAddress(walletAddress: string): number {
@@ -59,11 +59,11 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { activeValidators } = this.configuration.getMilestone();
 		const validators = await this.#getActiveValidators();
 		if (validators.length < activeValidators) {
-			throw new Exceptions.NotEnoughActiveValidatorsError(this.#validators.length, activeValidators);
+			throw new Exceptions.NotEnoughActiveValidatorsError(this.#topValidators.length, activeValidators);
 		}
 
-		this.#validators = validators.slice(0, activeValidators);
-		this.#indexByAddress = new Map(this.#validators.map((validator, index) => [validator.address, index]));
+		this.#topValidators = validators.slice(0, activeValidators);
+		this.#indexByAddress = new Map(this.#topValidators.map((validator, index) => [validator.address, index]));
 	}
 
 	async #getActiveValidators(): Promise<Contracts.State.ValidatorWallet[]> {
@@ -89,12 +89,14 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [, validator] of validators.entries()) {
-			const [address, [, voteBalance, , blsPublicKey]] = validator;
+			const [address, [votersCount, voteBalance, isResigned, blsPublicKey]] = validator;
 
 			const validatorWallet: Contracts.State.ValidatorWallet = {
 				address,
 				blsPublicKey: blsPublicKey.slice(2),
+				isResigned,
 				voteBalance: Utils.BigNumber.make(voteBalance),
+				votersCount,
 			};
 
 			validatorWallets.push(validatorWallet);
@@ -102,4 +104,41 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		return validatorWallets;
 	}
+
+	// async #getAllValidators(): Promise<Contracts.State.ValidatorWallet[]> {
+	// 	const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+	// 	const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
+	// 	const { evmSpec } = this.configuration.getMilestone();
+
+	// 	const iface = new ethers.Interface(ConsensusAbi.abi);
+	// 	const data = iface.encodeFunctionData("getAllValidators").slice(2);
+
+	// 	const result = await this.evm.view({
+	// 		caller: deployerAddress,
+	// 		data: Buffer.from(data, "hex"),
+	// 		recipient: consensusContractAddress,
+	// 		specId: evmSpec,
+	// 	});
+
+	// 	if (!result.success) {
+	// 		this.app.terminate("getAllValidators failed");
+	// 	}
+
+	// 	const [validators] = iface.decodeFunctionResult("getAllValidators", result.output!);
+
+	// 	const validatorWallets: Contracts.State.ValidatorWallet[] = [];
+	// 	for (const [, validator] of validators.entries()) {
+	// 		const [address, [votersCount, voteBalance, isResigned, blsPublicKey]] = validator;
+
+	// 		const validatorWallet: Contracts.State.ValidatorWallet = {
+	// 			address,
+	// 			blsPublicKey: blsPublicKey.slice(2),
+	// 			voteBalance: Utils.BigNumber.make(voteBalance),
+	// 		};
+
+	// 		validatorWallets.push(validatorWallet);
+	// 	}
+
+	// 	return validatorWallets;
+	// }
 }
