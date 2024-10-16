@@ -28,9 +28,9 @@ contract ConsensusTest is Test {
 		assertEq(validator.data.votersCount, 0);
 	}
 
-	function deregisterValidator(address addr) internal {
+	function resignValidator(address addr) internal {
 		vm.startPrank(addr);
-		consensus.deregisterValidator();
+		consensus.resignValidator();
 		vm.stopPrank();
 	}
 
@@ -138,7 +138,7 @@ contract ConsensusTest is Test {
 		// Register validator
 		address addr = address(1);
 		registerValidator(addr);
-		deregisterValidator(addr);
+		resignValidator(addr);
 
 		// Prepare voter
 		address voterAddr = address(2);
