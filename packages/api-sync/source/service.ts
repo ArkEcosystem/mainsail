@@ -155,7 +155,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 		}
 
-		const activeValidators = this.validatorSet.getActiveValidators().reduce((accumulator, current) => {
+		const dirtyValidators = this.validatorSet.getDirtyValidators().reduce((accumulator, current) => {
 			accumulator[current.address] = current;
 			return accumulator;
 		}, {});
@@ -163,30 +163,31 @@ export class Sync implements Contracts.ApiSync.Service {
 		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
 
 		const validatorAttributes = (address: string) => {
-			const activeValidator = activeValidators[address];
+			const dirtyValidator = dirtyValidators[address];
 			const isBlockValidator = header.generatorAddress === address;
 
 			return {
-				...(activeValidator
+				...(dirtyValidator
 					? {
-							validatorPublicKey: activeValidator.blsPublicKey,
-							// TODO: update via trigger
-							// validatorApproval
-							// validatorRank
-							validatorVoteBalance: activeValidator.voteBalance.toFixed(),
+							validatorPublicKey: dirtyValidator.blsPublicKey,
+							validatorVoteBalance: dirtyValidator.voteBalance,
+							validatorResigned: dirtyValidator.isResigned,
+							// updated at end of db transaction
+							// - validatorRank
+							// - validatorApproval
 						}
 					: {}),
 				...(isBlockValidator
 					? {
+							// incrementally applied in UPSERT below
+							validatorForgedFees: header.totalFee.toFixed(),
+							validatorForgedRewards: header.totalAmount.toFixed(),
+							validatorForgedTotal: header.totalFee.plus(header.totalAmount).toFixed(),
 							validatorLastBlock: {
 								height: header.height,
 								id: header.id,
 								timestamp: header.timestamp,
 							},
-							// incrementally applied in UPSERT below
-							validatorForgedFees: header.totalFee.toFixed(),
-							validatorForgedRewards: header.totalAmount.toFixed(),
-							validatorForgedTotal: header.totalFee.plus(header.totalAmount).toFixed(),
 							validatorProducedBlocks: 1,
 						}
 					: {}),
@@ -196,8 +197,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const wallets = accountUpdates.map((account) => {
 			const attributes = {
 				...validatorAttributes(account.address),
-				...(account.vote ? { vote: account.vote } : {}),
-				...(account.unvote ? { vote: account.unvote } : {}),
+				...(account.unvote ? { unvote: account.unvote } : account.vote ? { vote: account.vote } : {}),
 			};
 
 			return [
@@ -210,6 +210,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			];
 		});
 
+		// The block validator might not be "dirty" when no rewards have been distributed,
+		// thus ensure it is manually inserted.
 		const blockValidator = accountUpdates.find((a) => a.address === header.generatorAddress);
 		if (!blockValidator) {
 			wallets.push([
@@ -453,11 +455,11 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 
 			for (const batch of chunk(deferred.wallets, 256)) {
-				const batchParamLength = 6;
+				const batchParameterLength = 6;
 				const placeholders = batch
 					.map(
 						(_, index) =>
-							`($${index * batchParamLength + 1},$${index * batchParamLength + 2},$${index * batchParamLength + 3},$${index * batchParamLength + 4},$${index * batchParamLength + 5},$${index * batchParamLength + 6})`,
+							`($${index * batchParameterLength + 1},$${index * batchParameterLength + 2},$${index * batchParameterLength + 3},$${index * batchParameterLength + 4},$${index * batchParameterLength + 5},$${index * batchParameterLength + 6})`,
 					)
 					.join(", ");
 
@@ -482,6 +484,8 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			'validatorPublicKey',
 			COALESCE(EXCLUDED.attributes->>'validatorPublicKey', "Wallet".attributes->>'validatorPublicKey'),
+			'validatorResigned',
+			COALESCE(EXCLUDED.attributes->>'validatorResigned', "Wallet".attributes->>'validatorResigned'),			
 			'validatorVoteBalance',
 			COALESCE((EXCLUDED.attributes->>'validatorVoteBalance')::text, ("Wallet".attributes->>'validatorVoteBalance')::text),
 			'validatorLastBlock',
@@ -498,6 +502,9 @@ export class Sync implements Contracts.ApiSync.Service {
 					parameters,
 				);
 			}
+
+			// TODO: only update when round changes?
+			await entityManager.query("SELECT update_validator_ranks();", []);
 		});
 
 		const t1 = performance.now();
