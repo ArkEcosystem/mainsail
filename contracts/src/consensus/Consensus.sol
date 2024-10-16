@@ -234,52 +234,6 @@ contract Consensus {
 		_resignedValidators.push(msg.sender);
 	}
 
-	function performValidatorResignations() external {
-		// TODO: optimize removal from activeValidators array
-		uint256[] memory indexesToRemove = new uint256[](_resignedValidators.length);
-
-		for (uint256 i = 0; i < _resignedValidators.length; i++) {
-			address addr = _resignedValidators[i];
-			ValidatorData storage validator = _registeredValidatorData[addr];
-			require(validator.isResigned, "Validator is not resigned");
-
-			bytes32 bls_public_key_hash = keccak256(validator.bls12_381_public_key);
-
-			_registeredValidatorsCount--;
-			delete _hasRegisteredValidator[addr];
-			delete _registeredValidatorData[addr];
-			delete _registeredPublicKeys[bls_public_key_hash];
-
-			// find index
-			for (uint256 j = 0; i < _registeredValidators.length - 1; j++) {
-				if (_registeredValidators[j] != addr) {
-					continue;
-				}
-
-				indexesToRemove[i] = j;
-				break;
-			}
-		}
-
-		// Sort indexes in descending order to avoid shifting issues
-		for (uint256 i = 0; i < indexesToRemove.length; i++) {
-			for (uint256 j = i + 1; j < indexesToRemove.length; j++) {
-				if (indexesToRemove[i] < indexesToRemove[j]) {
-					(indexesToRemove[i], indexesToRemove[j]) = (indexesToRemove[j], indexesToRemove[i]);
-				}
-			}
-		}
-
-		for (uint256 i = 0; i < indexesToRemove.length; i++) {
-			uint256 index = indexesToRemove[i];
-			_registeredValidators[index] = _registeredValidators[_registeredValidators.length - 1];
-			_registeredValidators.pop();
-		}
-
-		// clear resigned validators
-		delete _resignedValidators;
-	}
-
 	function isValidatorRegistered(address addr) public view returns (bool) {
 		return _hasRegisteredValidator[addr];
 	}
