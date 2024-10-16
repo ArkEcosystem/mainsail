@@ -18,6 +18,7 @@ struct Vote {
 }
 
 event ValidatorRegistered(address addr, bytes bls12_381_public_key);
+event ValidatorResigned(address addr);
 
 event Voted(address voter, address validator);
 event Unvoted(address voter, address validator);
@@ -56,8 +57,6 @@ contract Consensus {
 	mapping(address => address) private _topValidators;
 	uint256 private _topValidatorsCount = 0;
 	address[] private _calculatedTopValidators;
-
-	address[] private _resignedValidators;
 
 	constructor() {
 		_owner = msg.sender;
@@ -224,14 +223,15 @@ contract Consensus {
 		emit ValidatorRegistered(msg.sender, bls12_381_public_key);
 	}
 
-	function deregisterValidator() external {
-		require(isValidatorRegistered(msg.sender), "Caller not a validator");
+	function resignValidator() external {
+		require(isValidatorRegistered(msg.sender), "Caller is not a validator");
 
 		ValidatorData storage validator = _registeredValidatorData[msg.sender];
 		require(!validator.isResigned, "Validator is already resigned");
 
 		validator.isResigned = true;
-		_resignedValidators.push(msg.sender);
+
+		emit ValidatorResigned(msg.sender);
 	}
 
 	function isValidatorRegistered(address addr) public view returns (bool) {
