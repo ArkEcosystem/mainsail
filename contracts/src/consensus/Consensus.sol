@@ -46,6 +46,7 @@ contract Consensus {
 	address immutable _owner;
 
 	uint256 private _registeredValidatorsCount = 0;
+	uint256 private _resignedValidatorsCount = 0;
 	mapping(address => ValidatorData) private _registeredValidatorData;
 	mapping(address => bool) private _hasRegisteredValidator;
 	mapping(bytes32 => bool) private _registeredPublicKeys;
@@ -90,23 +91,33 @@ contract Consensus {
 		shuffle();
 		deleteTopValidators();
 
-		uint8 top = uint8(_clamp(n, 0, _registeredValidators.length));
+		_head = address(0);
+
+		uint8 top = uint8(_clamp(n, 0, _registeredValidatorsCount - _resignedValidatorsCount)); // TODO: Use new method that returns registered validators
 		if (top == 0) {
 			return;
 		}
 
-		_head = _registeredValidators[0];
-		_topValidatorsCount = 1;
-
-		for (uint i = 1; i < _registeredValidators.length; i++) {
+		for (uint i = 0; i < _registeredValidators.length; i++) {
 			address addr = _registeredValidators[i];
+
+			ValidatorData storage data = _registeredValidatorData[addr];
+			if(data.isResigned) {
+				continue;
+			}
+
+			if(_head == address(0)) {
+				_head = addr;
+				_topValidatorsCount = 1;
+				continue;
+			}
+
 
 			if (_topValidatorsCount < top) {
 				insertTopValidator(addr, top);
 				continue;
 			}
 
-			ValidatorData storage data = _registeredValidatorData[addr];
 			ValidatorData storage headData = _registeredValidatorData[_head];
 
 			if (_isGreater(Validator({addr: addr, data: data}), Validator({addr: _head, data: headData}))) {
@@ -230,6 +241,7 @@ contract Consensus {
 		require(!validator.isResigned, "Validator is already resigned");
 
 		validator.isResigned = true;
+		_resignedValidatorsCount += 1;
 
 		emit ValidatorResigned(msg.sender);
 	}
