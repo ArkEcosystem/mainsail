@@ -45,4 +45,31 @@ contract ConsensusTest is Base {
 		assertEq(validator.data.votersCount, 0);
 		assertEq(validator.data.isResigned, true);
 	}
+
+	function test_validator_resignation_revert_if_caller_is_not_validator() public {
+		vm.expectRevert("Caller is not a validator");
+		consensus.resignValidator();
+	}
+
+	function test_validator_resignation_revert_if_resigned() public {
+		assertEq(consensus.registeredValidatorsCount(), 0);
+		address addr = address(1);
+
+		// Act
+		vm.startPrank(addr);
+		consensus.registerValidator(prepareBLSKey(addr));
+		vm.stopPrank();
+
+		// Assert
+		assertEq(consensus.registeredValidatorsCount(), 1);
+
+		// Act
+		vm.startPrank(addr);
+		vm.expectEmit(address(consensus));
+		emit ValidatorResigned(addr);
+		consensus.resignValidator();
+
+		vm.expectRevert("Validator is already resigned");
+		consensus.resignValidator();
+	}
 }
