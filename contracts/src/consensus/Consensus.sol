@@ -204,6 +204,10 @@ contract Consensus {
 		return _registeredValidatorsCount;
 	}
 
+	function resignedValidatorsCount() public view returns (uint256) {
+		return _resignedValidatorsCount;
+	}
+
 	function activeValidatorsCount() public view returns (uint256) {
 		return _calculatedTopValidators.length;
 	}
