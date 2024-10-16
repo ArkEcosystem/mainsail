@@ -32,6 +32,15 @@ contract ConsensusTest is Test {
 		vm.startPrank(addr);
 		consensus.registerValidator(prepareBLSKey(addr));
 		vm.stopPrank();
+
+		assertEq(consensus.registeredValidatorsCount(), 1);
+
+		Validator memory validator = consensus.getValidator(addr);
+		assertEq(validator.addr, addr);
+		assertEq(validator.data.bls12_381_public_key, prepareBLSKey(addr));
+		assertEq(validator.data.voteBalance, 0);
+		assertEq(validator.data.votersCount, 0);
+		assertEq(validator.data.isResigned, false);
 	}
 
 	function test_validator_registration_revert_if_caller_is_owner() public {
@@ -51,7 +60,6 @@ contract ConsensusTest is Test {
 
 		vm.expectRevert("Validator is already registered");
 		consensus.registerValidator(prepareBLSKey(address(2)));
-		vm.stopPrank();
 	}
 
 	function test_validator_registration_revert_if_bls_key_is_already_registered() public {
@@ -65,7 +73,6 @@ contract ConsensusTest is Test {
 		vm.startPrank(address(2));
 		vm.expectRevert("BLS12-381 key is already registered");
 		consensus.registerValidator(prepareBLSKey(addr));
-		vm.stopPrank();
 	}
 
 	function test_validator_registration_revert_if_bls_key_length_is_invalid() public {
