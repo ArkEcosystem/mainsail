@@ -17,6 +17,8 @@ struct Vote {
 	uint256 balance;
 }
 
+event ValidatorRegistered(address addr, bytes bls12_381_public_key);
+
 event Voted(address voter, address validator);
 event Unvoted(address voter, address validator);
 event VoteSwapped(address voter, address previousValidator, address newValidator);
@@ -218,6 +220,8 @@ contract Consensus {
 		_registeredValidatorData[msg.sender] = validator;
 		_registeredPublicKeys[bls_public_key_hash] = true;
 		_registeredValidators.push(msg.sender);
+
+		emit ValidatorRegistered(msg.sender, bls12_381_public_key);
 	}
 
 	function deregisterValidator() external {
