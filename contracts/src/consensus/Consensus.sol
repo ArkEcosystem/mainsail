@@ -217,11 +217,7 @@ contract Consensus {
 		_hasRegisteredValidator[msg.sender] = true;
 		_registeredValidatorData[msg.sender] = validator;
 		_registeredPublicKeys[bls_public_key_hash] = true;
-
-		// TODO
-		// if (_registeredValidatorsCount < MIN_VALIDATORS) {
 		_registeredValidators.push(msg.sender);
-		// }
 	}
 
 	function deregisterValidator() external {
