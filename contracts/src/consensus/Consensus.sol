@@ -76,6 +76,17 @@ contract Consensus {
 		}
 	}
 
+	function getAllValidators() public view returns (Validator[] memory) {
+        Validator[] memory result = new Validator[](_registeredValidators.length);
+        for (uint i = 0; i < _registeredValidators.length; i++) {
+            address addr = _registeredValidators[i];
+            ValidatorData storage data = _registeredValidatorData[addr];
+            result[i] = Validator({addr: addr, data: data});
+        }
+
+        return result;
+    }
+
 	function deleteTopValidators() internal {
 		address next = _head;
 
