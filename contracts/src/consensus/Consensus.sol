@@ -198,7 +198,7 @@ contract Consensus {
 
 	function registerValidator(bytes calldata bls12_381_public_key) external {
 		require(msg.sender != _owner, "Invalid caller");
-		require(!_hasRegisteredValidator[msg.sender], "ValidatorData is already registered");
+		require(!_hasRegisteredValidator[msg.sender], "Validator is already registered");
 
 		bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
 

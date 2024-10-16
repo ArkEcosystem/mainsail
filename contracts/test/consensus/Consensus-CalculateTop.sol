@@ -57,7 +57,6 @@ contract ConsensusTest is Test {
 		assertEq(validators.length, activeValidators);
 		assertEq(validators[activeValidators - 1].addr, highest);
 
-		console.logString("RESET");
 		consensus.calculateTopValidators(uint8(activeValidators));
 
 		validators = consensus.getTopValidators();
