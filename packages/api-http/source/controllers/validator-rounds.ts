@@ -59,17 +59,14 @@ export class ValidatorRoundsController extends Controller {
 			return Boom.notFound("Round not found");
 		}
 
-		const response: { address: string, votes: string }[] = [];
-		for(let index = 0; index < round.validators.length; index++) {
+		const response: { address: string; votes: string }[] = [];
+		for (let index = 0; index < round.validators.length; index++) {
 			response.push({
 				address: round.validators[index],
 				votes: round.votes[index] ?? "0",
 			});
 		}
 
-		return this.respondWithCollection(
-			response,
-			RoundResource,
-		);
+		return this.respondWithCollection(response, RoundResource);
 	}
 }
