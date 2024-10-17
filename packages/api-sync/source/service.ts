@@ -501,7 +501,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			'validatorVotersCount',
 			COALESCE(EXCLUDED.attributes->'validatorVotersCount', "Wallet".attributes->'validatorVotersCount'),
 			'validatorLastBlock',
-			COALESCE(EXCLUDED.attributes->>'validatorLastBlock', "Wallet".attributes->>'validatorLastBlock'),
+			COALESCE((EXCLUDED.attributes->>'validatorLastBlock')::jsonb, ("Wallet".attributes->>'validatorLastBlock')::jsonb),
 			'validatorForgedFees',
 			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedFees')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedFees')::numeric, 0)::numeric)::text, '0'),
 			'validatorForgedRewards',
@@ -509,7 +509,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			'validatorForgedTotal',
 			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedTotal')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedTotal')::numeric, 0)::numeric)::text, '0'),
 			'validatorProducedBlocks',
-			NULLIF((COALESCE(("Wallet".attributes->>'validatorProducedBlocks')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorProducedBlocks')::numeric, 0)::numeric)::text, '0')
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorProducedBlocks')::integer, 0)::integer + COALESCE((EXCLUDED.attributes->>'validatorProducedBlocks')::integer, 0)::integer)::integer, 0)
 					))`,
 					parameters,
 				);
