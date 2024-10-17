@@ -8,17 +8,20 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
             RETURNS VOID AS $$
             BEGIN
                 WITH all_validators AS (
-                    SELECT address, (attributes->>'validatorVoteBalance')::numeric AS vote_balance
+                    SELECT 
+                        address,
+                        (attributes->>'validatorVoteBalance')::numeric AS vote_balance,
+                        COALESCE((attributes->>'validatorResigned')::boolean, FALSE) AS is_resigned
                     FROM wallets
-                    WHERE attributes ? 'validatorPublicKey' AND COALESCE((attributes->>'validatorResigned')::boolean, FALSE) IS NOT TRUE
+                    WHERE attributes ? 'validatorPublicKey'
                 ),
                 ranking AS (
                     SELECT
                         address,
                         vote_balance,
-                        ROW_NUMBER() OVER (ORDER BY vote_balance DESC, address ASC) AS rank
+                        ROW_NUMBER() OVER (ORDER BY is_resigned ASC, vote_balance DESC, address ASC) AS rank
                     FROM all_validators
-                    ORDER BY 2 DESC, 1 ASC
+                    ORDER BY is_resigned ASC, vote_balance DESC, address ASC
                 )
                 UPDATE wallets
                 SET 
