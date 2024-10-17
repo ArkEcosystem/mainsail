@@ -160,7 +160,12 @@ export class Sync implements Contracts.ApiSync.Service {
 			return accumulator;
 		}, {});
 
-		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
+		const accountUpdates: Record<string, Contracts.Evm.AccountUpdate> = unit
+			.getAccountUpdates()
+			.reduce((accumulator, current) => {
+				accumulator[current.address] = current;
+				return accumulator;
+			}, {});
 
 		const validatorAttributes = (address: string) => {
 			const dirtyValidator = dirtyValidators[address];
@@ -194,7 +199,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			};
 		};
 
-		const wallets = accountUpdates.map((account) => {
+		const wallets = Object.values(accountUpdates).map((account) => {
 			const attributes = {
 				...validatorAttributes(account.address),
 				...(account.unvote ? { unvote: account.unvote } : account.vote ? { vote: account.vote } : {}),
@@ -210,20 +215,24 @@ export class Sync implements Contracts.ApiSync.Service {
 			];
 		});
 
-		// The block validator might not be "dirty" when no rewards have been distributed,
-		// thus ensure it is manually inserted.
-		const blockValidator = accountUpdates.find((a) => a.address === header.generatorAddress);
-		if (!blockValidator) {
-			wallets.push([
-				header.generatorAddress,
-				"",
-				"-1",
-				"-1",
-				{
-					...validatorAttributes(header.generatorAddress),
-				},
-				header.height.toFixed(),
-			]);
+		// The block validator/dirty validators might not be part of the account updates if no rewards have been distributed,
+		// thus ensure they are manually inserted.
+		for (const validatorAddress of [
+			header.generatorAddress,
+			...Object.values<Contracts.State.ValidatorWallet>(dirtyValidators).map((v) => v.address),
+		]) {
+			if (!accountUpdates[validatorAddress]) {
+				wallets.push([
+					validatorAddress,
+					"",
+					"-1",
+					"-1",
+					{
+						...validatorAttributes(validatorAddress),
+					},
+					header.height.toFixed(),
+				]);
+			}
 		}
 
 		const deferredSync: DeferredSync = {
@@ -485,7 +494,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			'validatorPublicKey',
 			COALESCE(EXCLUDED.attributes->>'validatorPublicKey', "Wallet".attributes->>'validatorPublicKey'),
 			'validatorResigned',
-			COALESCE(EXCLUDED.attributes->>'validatorResigned', "Wallet".attributes->>'validatorResigned'),			
+			COALESCE(EXCLUDED.attributes->'validatorResigned', "Wallet".attributes->'validatorResigned'),
 			'validatorVoteBalance',
 			COALESCE((EXCLUDED.attributes->>'validatorVoteBalance')::text, ("Wallet".attributes->>'validatorVoteBalance')::text),
 			'validatorLastBlock',
