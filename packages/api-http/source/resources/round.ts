@@ -3,13 +3,13 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class RoundResource implements Contracts.Api.Resource {
-	public raw(resource: { publicKey: string; votes: string }): object {
+	public raw(resource: { address: string; votes: string }): object {
 		return resource;
 	}
 
-	public transform(resource: { publicKey: string; votes: string }): object {
+	public transform(resource: { address: string; votes: string }): object {
 		return {
-			publicKey: resource.publicKey,
+			address: resource.address,
 			votes: resource.votes,
 		};
 	}
