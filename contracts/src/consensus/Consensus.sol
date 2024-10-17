@@ -63,6 +63,11 @@ contract Consensus {
 		_owner = msg.sender;
 	}
 
+	modifier onlyOwner() {
+        require(msg.sender == _owner, "Caller is not the contract owner");
+        _;
+    }
+
 	function shuffle() internal {
 		uint256 n = _registeredValidators.length;
 		for (uint256 i = n - 1; i > 0; i--) {
@@ -87,7 +92,7 @@ contract Consensus {
 		_topValidatorsCount = 0;
 	}
 
-	function calculateTopValidators(uint8 n) external {
+	function calculateTopValidators(uint8 n) external onlyOwner {
 		shuffle();
 		deleteTopValidators();
 

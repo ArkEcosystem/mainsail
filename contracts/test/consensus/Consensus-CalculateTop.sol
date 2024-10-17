@@ -24,6 +24,13 @@ contract ConsensusTest is Base {
 		assertEq(validators[0].addr, addr);
 	}
 
+	function test_should_allow_only_caller() public {
+		address addr = address(1);
+		vm.startPrank(addr);
+		vm.expectRevert("Caller is not the contract owner");
+		consensus.calculateTopValidators(1);
+	}
+
 	function test_should_ignore_resigned_validators() public {
 		address addr = address(1);
 
