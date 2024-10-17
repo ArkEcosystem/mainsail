@@ -41,8 +41,8 @@ export class BlocksController extends Controller {
 		return this.toPagination(
 			await this.enrichBlockResult(blocks, {
 				generators: generators.reduce((accumulator, current) => {
-					Utils.assert.defined<string>(current.publicKey);
-					accumulator[current.publicKey] = current;
+					Utils.assert.defined<string>(current.address);
+					accumulator[current.address] = current;
 					return accumulator;
 				}, {}),
 			}),

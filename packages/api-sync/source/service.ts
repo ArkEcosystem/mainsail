@@ -16,7 +16,7 @@ interface DeferredSync {
 	transactions: Models.Transaction[];
 	receipts: Models.Receipt[];
 	validatorRound?: Models.ValidatorRound;
-	wallets: Models.Wallet[];
+	wallets: Array<Array<any>>;
 	newMilestones?: Record<string, any>;
 }
 
@@ -155,13 +155,86 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 		}
 
-		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
-
-		// temporary workaround for API to find validator wallets
-		const activeValidators = this.validatorSet.getActiveValidators().reduce((accumulator, current) => {
+		const dirtyValidators = this.validatorSet.getDirtyValidators().reduce((accumulator, current) => {
 			accumulator[current.address] = current;
 			return accumulator;
 		}, {});
+
+		const accountUpdates: Record<string, Contracts.Evm.AccountUpdate> = unit
+			.getAccountUpdates()
+			.reduce((accumulator, current) => {
+				accumulator[current.address] = current;
+				return accumulator;
+			}, {});
+
+		const validatorAttributes = (address: string) => {
+			const dirtyValidator = dirtyValidators[address];
+			const isBlockValidator = header.generatorAddress === address;
+
+			return {
+				...(dirtyValidator
+					? {
+							validatorPublicKey: dirtyValidator.blsPublicKey,
+							validatorResigned: dirtyValidator.isResigned,
+							validatorVoteBalance: dirtyValidator.voteBalance,
+							validatorVotersCount: dirtyValidator.votersCount,
+							// updated at end of db transaction
+							// - validatorRank
+							// - validatorApproval
+						}
+					: {}),
+				...(isBlockValidator
+					? {
+							// incrementally applied in UPSERT below
+							validatorForgedFees: header.totalFee.toFixed(),
+							validatorForgedRewards: header.totalAmount.toFixed(),
+							validatorForgedTotal: header.totalFee.plus(header.totalAmount).toFixed(),
+							validatorLastBlock: {
+								height: header.height,
+								id: header.id,
+								timestamp: header.timestamp,
+							},
+							validatorProducedBlocks: 1,
+						}
+					: {}),
+			};
+		};
+
+		const wallets = Object.values(accountUpdates).map((account) => {
+			const attributes = {
+				...validatorAttributes(account.address),
+				...(account.unvote ? { unvote: account.unvote } : account.vote ? { vote: account.vote } : {}),
+			};
+
+			return [
+				account.address,
+				addressToPublicKey[account.address] ?? "",
+				Utils.BigNumber.make(account.balance).toFixed(),
+				Utils.BigNumber.make(account.nonce).toFixed(),
+				attributes,
+				header.height.toFixed(),
+			];
+		});
+
+		// The block validator/dirty validators might not be part of the account updates if no rewards have been distributed,
+		// thus ensure they are manually inserted.
+		for (const validatorAddress of [
+			header.generatorAddress,
+			...Object.values<Contracts.State.ValidatorWallet>(dirtyValidators).map((v) => v.address),
+		]) {
+			if (!accountUpdates[validatorAddress]) {
+				wallets.push([
+					validatorAddress,
+					"",
+					"-1",
+					"-1",
+					{
+						...validatorAttributes(validatorAddress),
+					},
+					header.height.toFixed(),
+				]);
+			}
+		}
 
 		const deferredSync: DeferredSync = {
 			block: {
@@ -208,17 +281,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: data.version,
 			})),
 
-			wallets: accountUpdates.map((account) => ({
-				address: account.address,
-				// temporary workaround
-				attributes: activeValidators[account.address]
-					? { validatorPublicKey: activeValidators[account.address].blsPublicKey }
-					: {},
-				balance: Utils.BigNumber.make(account.balance).toFixed(),
-				nonce: Utils.BigNumber.make(account.nonce).toFixed(),
-				publicKey: addressToPublicKey[account.address] ?? "",
-				updated_at: header.height.toFixed(),
-			})),
+			wallets,
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
@@ -401,19 +464,58 @@ export class Sync implements Contracts.ApiSync.Service {
 					.execute();
 			}
 
-			await walletRepository
-				.createQueryBuilder()
-				.insert()
-				.values(deferred.wallets)
-				.onConflict(
-					`("address") DO UPDATE SET 
-	balance = COALESCE(EXCLUDED.balance, "Wallet".balance),
-	nonce = COALESCE(EXCLUDED.nonce, "Wallet".nonce),
-	updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
-    public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
-    attributes = "Wallet".attributes || EXCLUDED.attributes`,
-				)
-				.execute();
+			for (const batch of chunk(deferred.wallets, 256)) {
+				const batchParameterLength = 6;
+				const placeholders = batch
+					.map(
+						(_, index) =>
+							`($${index * batchParameterLength + 1},$${index * batchParameterLength + 2},$${index * batchParameterLength + 3},$${index * batchParameterLength + 4},$${index * batchParameterLength + 5},$${index * batchParameterLength + 6})`,
+					)
+					.join(", ");
+
+				const parameters = batch.flat();
+
+				await walletRepository.query(
+					`
+	INSERT INTO wallets AS "Wallet" (address, public_key, balance, nonce, attributes, updated_at)
+	VALUES ${placeholders}
+	ON CONFLICT ("address") DO UPDATE SET 
+		balance = COALESCE(NULLIF(EXCLUDED.balance, '-1'), "Wallet".balance),
+		nonce = COALESCE(NULLIF(EXCLUDED.nonce, '-1'), "Wallet".nonce),
+		updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
+		public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
+		attributes = jsonb_strip_nulls(jsonb_build_object(
+			-- if any unvote is present, it will overwrite the previous vote
+			'vote',
+			CASE 
+				WHEN EXCLUDED.attributes->>'unvote' IS NOT NULL THEN NULL 
+				ELSE COALESCE(EXCLUDED.attributes->>'vote', "Wallet".attributes->>'vote')
+			END,
+
+			'validatorPublicKey',
+			COALESCE(EXCLUDED.attributes->>'validatorPublicKey', "Wallet".attributes->>'validatorPublicKey'),
+			'validatorResigned',
+			COALESCE(EXCLUDED.attributes->'validatorResigned', "Wallet".attributes->'validatorResigned'),
+			'validatorVoteBalance',
+			COALESCE((EXCLUDED.attributes->>'validatorVoteBalance')::text, ("Wallet".attributes->>'validatorVoteBalance')::text),
+			'validatorVotersCount',
+			COALESCE(EXCLUDED.attributes->'validatorVotersCount', "Wallet".attributes->'validatorVotersCount'),
+			'validatorLastBlock',
+			COALESCE((EXCLUDED.attributes->>'validatorLastBlock')::jsonb, ("Wallet".attributes->>'validatorLastBlock')::jsonb),
+			'validatorForgedFees',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedFees')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedFees')::numeric, 0)::numeric)::text, '0'),
+			'validatorForgedRewards',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedRewards')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedRewards')::numeric, 0)::numeric)::text, '0'),
+			'validatorForgedTotal',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorForgedTotal')::numeric, 0)::numeric + COALESCE((EXCLUDED.attributes->>'validatorForgedTotal')::numeric, 0)::numeric)::text, '0'),
+			'validatorProducedBlocks',
+			NULLIF((COALESCE(("Wallet".attributes->>'validatorProducedBlocks')::integer, 0)::integer + COALESCE((EXCLUDED.attributes->>'validatorProducedBlocks')::integer, 0)::integer)::integer, 0)
+					))`,
+					parameters,
+				);
+			}
+
+			await entityManager.query("SELECT update_validator_ranks();", []);
 		});
 
 		const t1 = performance.now();
