@@ -73,6 +73,11 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 	}
 
+	function test_vote_revert_if_caller_is_owner() public {
+		vm.expectRevert("Caller is the contract owner");
+		consensus.vote(address(1));
+	}
+
 	function test_vote_allow_self_vote() public {
 		// Register validator
 		address addr = address(1);
@@ -130,8 +135,11 @@ contract ConsensusTest is Test {
 	}
 
 	function test_vote_prevent_for_unregistered_validator() public {
+		address addr = address(1);
+
+		vm.startPrank(addr);
 		vm.expectRevert("Must vote for validator");
-		consensus.vote(address(1));
+		consensus.vote(addr);
 	}
 
 	function test_vote_prevent_for_resigned_validator() public {

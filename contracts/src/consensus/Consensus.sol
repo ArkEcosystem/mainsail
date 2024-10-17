@@ -68,6 +68,11 @@ contract Consensus {
         _;
     }
 
+	modifier preventOwner() {
+        require(msg.sender != _owner, "Caller is the contract owner");
+        _;
+    }
+
 	function shuffle() internal {
 		uint256 n = _registeredValidators.length;
 		for (uint256 i = n - 1; i > 0; i--) {
@@ -228,8 +233,7 @@ contract Consensus {
 		return _calculatedTopValidators.length;
 	}
 
-	function registerValidator(bytes calldata bls12_381_public_key) external {
-		require(msg.sender != _owner, "Invalid caller");
+	function registerValidator(bytes calldata bls12_381_public_key) external preventOwner {
 		require(!_hasRegisteredValidator[msg.sender], "Validator is already registered");
 
 		bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
@@ -284,7 +288,7 @@ contract Consensus {
 		_registeredValidatorData[_validator.addr] = _validator.data;
 	}
 
-	function vote(address addr) external {
+	function vote(address addr) external preventOwner {
 		require(isValidatorRegistered(addr), "Must vote for validator");
 		require(_votes[msg.sender].validator == address(0), "Already voted");
 
