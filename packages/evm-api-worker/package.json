@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm-api-worker",
-	"version": "0.0.1-evm.4",
+	"version": "0.0.1-evm.5",
 	"description": "EVM API worker for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
