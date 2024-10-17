@@ -88,23 +88,9 @@ export class TransactionsController extends Controller {
 		return { data: schemasByType };
 	}
 
+	// TODO: Remove endpoint
 	public async fees(request: Hapi.Request) {
-		const configuration = await this.getConfiguration();
-		const {
-			fees: { staticFees },
-		} = configuration.activeMilestones;
-
-		const transactionTypes = await this.getTransactionTypes();
-
 		const typeGroups: Record<string | number, Record<string, number>> = {};
-
-		for (const { typeGroup, key } of transactionTypes) {
-			if (typeGroups[typeGroup] === undefined) {
-				typeGroups[typeGroup] = {};
-			}
-
-			typeGroups[typeGroup][key] = staticFees[key]?.toFixed() ?? "0";
-		}
 
 		return { data: typeGroups };
 	}

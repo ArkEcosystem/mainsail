@@ -52,6 +52,9 @@ export class Bootstrapper {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.Evm.Worker)
+	private readonly evmWorker!: Contracts.Evm.Worker;
+
 	public async bootstrap(): Promise<void> {
 		try {
 			if (this.apiSync) {
@@ -70,7 +73,8 @@ export class Bootstrapper {
 			this.state.setBootstrap(false);
 
 			this.validatorRepository.printLoadedValidators();
-			await this.txPoolWorker.start();
+			await this.txPoolWorker.start(this.stateStore.getHeight());
+			await this.evmWorker.start(this.stateStore.getHeight());
 
 			void this.runConsensus();
 
@@ -111,12 +115,13 @@ export class Bootstrapper {
 	async #initState(): Promise<void> {
 		if (this.databaseService.isEmpty()) {
 			await this.#processGenesisBlock();
+		} else {
+			await this.#processBlocks();
+
+			const commit = await this.databaseService.getLastCommit();
+			this.stateStore.setLastBlock(commit.block);
 		}
 
-		await this.#processBlocks();
-
-		const commit = await this.databaseService.getLastCommit();
-		this.stateStore.setLastBlock(commit.block);
 		await this.validatorSet.restore();
 	}
 
@@ -133,16 +138,13 @@ export class Bootstrapper {
 		let totalRound = 0;
 
 		for await (const commit of this.databaseService.readCommits(
-			this.stateStore.getLastHeight() + 1,
+			this.stateStore.getHeight() + 1,
 			lastCommit.block.data.height,
 		)) {
-			totalRound += commit.block.data.round + 1;
+			totalRound += commit.proof.round + 1;
 		}
 
-		this.stateStore.setTotalRoundAndHeight(totalRound, lastCommit.block.data.height);
-		this.configuration.setHeight(lastCommit.block.data.height + 1);
-
-		console.log("Total round", totalRound, "Last height", lastCommit.block.data.height);
+		this.stateStore.setTotalRound(totalRound);
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {

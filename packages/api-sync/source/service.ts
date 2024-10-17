@@ -27,6 +27,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -119,29 +122,46 @@ export class Sync implements Contracts.ApiSync.Service {
 			proof,
 		} = commit;
 
+		const addressToPublicKey: Record<string, string> = {};
+		const publicKeyToAddress: Record<string, string> = {};
 		const transactionReceipts: Models.Receipt[] = [];
-		if (unit.hasProcessorResult()) {
-			const processResult = unit.getProcessorResult();
-			const { receipts } = processResult;
 
-			for (const transaction of transactions) {
-				const receipt = receipts.get(transaction.id);
-				if (receipt) {
-					transactionReceipts.push({
-						blockHeight: header.height.toFixed(),
-						deployedContractAddress: receipt.deployedContractAddress,
-						gasRefunded: Number(receipt.gasRefunded),
-						gasUsed: Number(receipt.gasUsed),
-						id: transaction.id,
-						logs: receipt.logs,
-						output: receipt.output,
-						success: receipt.success,
-					});
-				}
+		let receipts: Map<string, Contracts.Evm.TransactionReceipt> | undefined;
+
+		if (unit.hasProcessorResult()) {
+			receipts = unit.getProcessorResult().receipts;
+		}
+
+		for (const transaction of transactions) {
+			const { senderPublicKey } = transaction.data;
+			if (!publicKeyToAddress[senderPublicKey]) {
+				const address = await this.addressFactory.fromPublicKey(senderPublicKey);
+				publicKeyToAddress[senderPublicKey] = address;
+				addressToPublicKey[address] = senderPublicKey;
+			}
+
+			const receipt = receipts?.get(transaction.id);
+			if (receipt) {
+				transactionReceipts.push({
+					blockHeight: header.height.toFixed(),
+					deployedContractAddress: receipt.deployedContractAddress,
+					gasRefunded: Number(receipt.gasRefunded),
+					gasUsed: Number(receipt.gasUsed),
+					id: transaction.id,
+					logs: receipt.logs,
+					output: receipt.output,
+					success: receipt.success,
+				});
 			}
 		}
 
-		const dirtyWallets: Contracts.State.Wallet[] = [];
+		const accountUpdates: Array<Contracts.Evm.AccountUpdate> = unit.getAccountUpdates();
+
+		// temporary workaround for API to find validator wallets
+		const activeValidators = this.validatorSet.getActiveValidators().reduce((accumulator, current) => {
+			accumulator[current.address] = current;
+			return accumulator;
+		}, {});
 
 		const deferredSync: DeferredSync = {
 			block: {
@@ -188,13 +208,15 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: data.version,
 			})),
 
-			// eslint-disable-next-line sonarjs/no-empty-collection
-			wallets: dirtyWallets.map((wallet) => ({
-				address: wallet.getAddress(),
-				attributes: [],
-				balance: wallet.getBalance().toFixed(),
-				nonce: wallet.getNonce().toFixed(),
-				publicKey: "",
+			wallets: accountUpdates.map((account) => ({
+				address: account.address,
+				// temporary workaround
+				attributes: activeValidators[account.address]
+					? { validatorPublicKey: activeValidators[account.address].blsPublicKey }
+					: {},
+				balance: Utils.BigNumber.make(account.balance).toFixed(),
+				nonce: Utils.BigNumber.make(account.nonce).toFixed(),
+				publicKey: addressToPublicKey[account.address] ?? "",
 				updated_at: header.height.toFixed(),
 			})),
 
@@ -379,7 +401,19 @@ export class Sync implements Contracts.ApiSync.Service {
 					.execute();
 			}
 
-			await walletRepository.upsert(deferred.wallets, ["address"]);
+			await walletRepository
+				.createQueryBuilder()
+				.insert()
+				.values(deferred.wallets)
+				.onConflict(
+					`("address") DO UPDATE SET 
+	balance = COALESCE(EXCLUDED.balance, "Wallet".balance),
+	nonce = COALESCE(EXCLUDED.nonce, "Wallet".nonce),
+	updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
+    public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
+    attributes = "Wallet".attributes || EXCLUDED.attributes`,
+				)
+				.execute();
 		});
 
 		const t1 = performance.now();

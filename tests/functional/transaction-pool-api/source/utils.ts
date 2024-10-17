@@ -109,12 +109,12 @@ export const waitBlock = async ({ sandbox }: { sandbox: Sandbox }, count: number
 
 	let remainingTransactions = await query.getAll().all();
 
-	let currentHeight = state.getStore().getLastHeight();
+	let currentHeight = state.getStore().getHeight();
 	let targetHeight = currentHeight + count;
 
 	do {
 		await sleep(100);
-		currentHeight = state.getStore().getLastHeight();
+		currentHeight = state.getStore().getHeight();
 		remainingTransactions = await query.getAll().all();
 
 		if (remainingTransactions.length > 0) {
@@ -227,7 +227,7 @@ export const isTransactionCommitted = async (
 	{ id }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
 	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
-	const currentHeight = state.getStore().getLastHeight();
+	const currentHeight = state.getStore().getHeight();
 
 	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 	const forgedBlocks = await database.findBlocks(

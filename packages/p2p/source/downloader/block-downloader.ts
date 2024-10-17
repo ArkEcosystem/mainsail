@@ -94,7 +94,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	#getLastRequestedBlockHeight(): number {
 		const latestJob = this.#downloadJobs.at(-1);
 		if (latestJob === undefined) {
-			return this.stateStore.getLastHeight();
+			return this.stateStore.getHeight();
 		}
 
 		return latestJob.heightTo;
@@ -213,7 +213,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#handleMissingBlocks(job: DownloadJob): void {
-		const configuration = this.configuration.getMilestone(this.stateStore.getLastHeight() + 1);
+		const configuration = this.configuration.getMilestone(this.stateStore.getHeight() + 1);
 
 		const size = job.blocks.reduce((size, block) => size + block.length, 0);
 
@@ -242,7 +242,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		const peer = getRandomPeer(peers);
 
-		const heightFrom = index === 0 ? this.stateStore.getLastHeight() + 1 : job.heightFrom;
+		const heightFrom = index === 0 ? this.stateStore.getHeight() + 1 : job.heightFrom;
 		const heightTo = this.#downloadJobs.length === 1 ? this.#calculateHeightTo(peer) : job.heightTo;
 
 		const newJob: DownloadJob = {

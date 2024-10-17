@@ -9,10 +9,12 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
 	private ipcSubprocess!: Contracts.TransactionPool.WorkerSubprocess;
 
 	#booted = false;
-	#failedTransactions: Contracts.Crypto.Transaction[] = [];
 
 	@postConstruct()
 	public initialize(): void {
@@ -48,23 +50,18 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		return this.ipcSubprocess.getQueueSize();
 	}
 
-	public setFailedTransactions(transactions: Contracts.Crypto.Transaction[]): void {
-		this.#failedTransactions = [...this.#failedTransactions, ...transactions];
-	}
-
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await this.ipcSubprocess.sendRequest("commit", {
-			block: unit.getBlock().serialized,
-			failedTransactions: this.#failedTransactions.map((transaction) => transaction.id),
-		});
+		const sendersAddresses: Set<string> = new Set();
+
+		for (const transaction of unit.getBlock().transactions) {
+			sendersAddresses.add(await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey));
+		}
+
+		await this.ipcSubprocess.sendRequest("commit", unit.height, [...sendersAddresses.keys()]);
 	}
 
-	public async start(): Promise<void> {
-		await this.ipcSubprocess.sendRequest("start");
-	}
-
-	public async importSnapshot(height: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("importSnapshot", height);
+	public async start(height: number): Promise<void> {
+		await this.ipcSubprocess.sendRequest("start", height);
 	}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {

@@ -15,11 +15,14 @@ bincode = { version = "1.3.3" }
 ethers-contract = { version = "2.0.13" }
 ethers-core = { version = "2.0.13" }
 ethers-providers = { version = "2.0.13" }
-revm = { version = "11.0.0", features = ["ethersdb", "serde", "serde-json"] }
-serde = { version = "1.0.195", features = ["derive"] }
-serde_json = "1.0.111"
+revm = { version = "14.0.3", features = ["ethersdb", "serde", "serde-json"] }
+alloy-sol-types = { version = "0.8.5", default-features = false, features = [
+    "std",
+] }
+serde = { version = "1.0.209", features = ["derive"] }
+serde_json = "1.0.127"
 thiserror = { version = "1.0" }
-tokio = { version = "1.38.0" }
+tokio = { version = "1.40.0" }
 
 [profile.release]
 lto = true

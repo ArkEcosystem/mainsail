@@ -15,6 +15,6 @@ export class EthBlockNumberAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: []): Promise<string> {
-		return `0x${this.stateStore.getLastHeight().toString(16)}`;
+		return `0x${this.stateStore.getHeight().toString(16)}`;
 	}
 }

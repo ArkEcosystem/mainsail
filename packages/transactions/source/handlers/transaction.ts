@@ -1,12 +1,14 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export abstract class TransactionHandler implements Contracts.Transactions.TransactionHandler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
 
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
@@ -25,7 +27,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
-
 		return this.verifier.verifyHash(transaction.data);
 	}
 
@@ -33,55 +34,23 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
 	): Promise<void> {
-		// @TODO: enforce fees here to support dynamic cases
-
-		//this.#verifyTransactionNonceApply(sender, transaction);
-
-		//this.verifyTransactionFee(context, transaction, sender);
+		if (!sender.getNonce().isEqualTo(transaction.data.nonce)) {
+			throw new Exceptions.UnexpectedNonceError(transaction.data.nonce, sender);
+		}
 
 		if (
-			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
+			sender
+				.getBalance()
+				.minus(transaction.data.amount)
+				.minus(this.gasFeeCalculator.calculate(transaction))
+				.isNegative() &&
 			this.configuration.getHeight() > 0
 		) {
 			throw new Exceptions.InsufficientBalanceError();
 		}
-
-		// if (transaction.data.senderPublicKey !== sender.getPublicKey()) {
-		// 	throw new Exceptions.SenderWalletMismatchError();
-		// }
-	}
-
-	public async apply(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		const senderResult = await this.applyToSender(context, transaction);
-		const recipientResult = await this.applyToRecipient(context, transaction);
-
-		// Merge results; effectively only one is ever set depending on the transaction type.
-		return {
-			gasUsed: senderResult.gasUsed + recipientResult.gasUsed,
-			receipt: recipientResult.receipt,
-		};
-	}
-
-	public async applyToSender(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		return { gasUsed: 0 };
-	}
-
-	public async applyToRecipient(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Transactions.TransactionApplyResult> {
-		return { gasUsed: 0 };
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}
-
-	public async throwIfCannotEnterPool(transaction: Contracts.Crypto.Transaction): Promise<void> {}
 
 	public async verifySignatures(
 		wallet: Contracts.State.Wallet,
@@ -90,14 +59,6 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	): Promise<boolean> {
 		return this.verifier.verifySignatures(transaction, multiSignature);
 	}
-
-	// #verifyTransactionNonceApply(wallet: Contracts.State.Wallet, transaction: Contracts.Crypto.Transaction): void {
-	// 	const nonce: BigNumber = transaction.data.nonce || BigNumber.ZERO;
-
-	// 	if (!wallet.getNonce().isEqualTo(nonce)) {
-	// 		throw new Exceptions.UnexpectedNonceError(nonce, wallet, false);
-	// 	}
-	// }
 
 	protected allTransactions(transactions: Contracts.Crypto.Transaction[]): Contracts.Crypto.TransactionData[] {
 		return transactions
@@ -108,21 +69,10 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			.map(({ data }) => data);
 	}
 
-	protected verifyTransactionFee(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		if (
-			sender.getBalance().minus(transaction.data.amount).minus(transaction.data.fee).isNegative() &&
-			this.configuration.getHeight() > 0
-		) {
-			throw new Exceptions.InsufficientBalanceError();
-		}
-	}
-
-	protected applyFeeToSender(transaction: Contracts.Crypto.Transaction, sender: Contracts.State.Wallet): void {
-		const data: Contracts.Crypto.TransactionData = transaction.data;
-
-		const newBalance: BigNumber = sender.getBalance().minus(data.fee);
-		sender.setBalance(newBalance);
-	}
+	public abstract apply(
+		context: Contracts.Transactions.TransactionHandlerContext,
+		transaction: Contracts.Crypto.Transaction,
+	): Promise<Contracts.Evm.TransactionReceipt>;
 
 	public abstract getConstructor(): Contracts.Crypto.TransactionConstructor;
 

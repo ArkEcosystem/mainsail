@@ -30,7 +30,7 @@ export class NodeController extends Controller {
 
 		return {
 			data: {
-				constants: this.configuration.getMilestone(this.stateStore.getLastHeight()),
+				constants: this.configuration.getMilestone(this.stateStore.getHeight()),
 				core: {
 					version: this.app.version(),
 				},

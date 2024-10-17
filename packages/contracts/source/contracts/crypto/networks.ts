@@ -1,5 +1,4 @@
 import { SpecId } from "../evm/evm.js";
-import { Fees } from "../fees.js";
 import { CommitJson } from "./commit.js";
 
 export type NetworkConfig = {
@@ -51,7 +50,6 @@ export type MilestoneGas = {
 	maximumGasLimit: number;
 	minimumGasFee: number;
 	nativeFeeMultiplier: number;
-	nativeGasLimits: Record<string, number>;
 };
 
 export type Milestone = {
@@ -62,8 +60,6 @@ export type Milestone = {
 	epoch: string;
 	evmSpec: SpecId;
 	gas: MilestoneGas;
-	fees: Fees;
-	multiPaymentLimit: number;
 	reward: string;
 	satoshi: MilestoneSatoshi;
 	timeouts: MilestoneTimeouts;

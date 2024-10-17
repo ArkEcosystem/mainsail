@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
-import { ContractAbis } from "@mainsail/evm-consensus";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -114,7 +114,7 @@ export class GenesisBlockGenerator extends Generator {
 	async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
-		const iface = new ethers.Interface(ContractAbis.CONSENSUS.abi.abi);
+		const iface = new ethers.Interface(ConsensusAbi.abi);
 
 		// TODO: move to constant (can be calculated based on deployer address + nonce)
 		const consensusContractAddress = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459";
@@ -142,7 +142,7 @@ export class GenesisBlockGenerator extends Generator {
 	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
-		const iface = new ethers.Interface(ContractAbis.CONSENSUS.abi.abi);
+		const iface = new ethers.Interface(ConsensusAbi.abi);
 
 		// TODO: move to constant (can be calculated based on deployer address + nonce)
 		const consensusContractAddress = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459";

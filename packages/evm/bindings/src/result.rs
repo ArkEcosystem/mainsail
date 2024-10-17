@@ -1,7 +1,7 @@
-use mainsail_evm_core::{db::TinyReceipt, state_changes::AccountUpdate};
+use mainsail_evm_core::{receipt::TxReceipt, state_changes::AccountUpdate};
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
-use revm::primitives::{AccountInfo, Bytes, Log};
+use revm::primitives::{AccountInfo, Bytes};
 
 use crate::utils;
 
@@ -69,30 +69,6 @@ pub struct CommitResult {
     pub dirty_accounts: Vec<AccountUpdate>,
 }
 
-#[derive(Default)]
-pub struct TxReceipt {
-    pub gas_used: u64,
-    pub gas_refunded: u64,
-    pub success: bool,
-    // TODO: expose additional data needed to JS
-    pub deployed_contract_address: Option<String>,
-    pub logs: Option<Vec<Log>>,
-    pub output: Option<Bytes>,
-}
-
-impl From<TinyReceipt> for TxReceipt {
-    fn from(value: TinyReceipt) -> Self {
-        Self {
-            gas_used: value.gas_used,
-            gas_refunded: 0,
-            success: value.success,
-            deployed_contract_address: value.deployed_contract.map(|a| a.to_string()),
-            logs: None,
-            output: None,
-        }
-    }
-}
-
 pub struct TxViewResult {
     pub success: bool,
     pub output: Option<Bytes>,
@@ -115,7 +91,7 @@ impl JsTransactionReceipt {
             logs: receipt
                 .logs
                 .map(|l| serde_json::to_value(l).unwrap())
-                .unwrap_or_else(|| serde_json::Value::Null),
+                .unwrap_or_else(|| serde_json::Value::Null), // TODO: check if null is correct
             output: receipt.output.map(|o| {
                 node_env
                     .create_buffer_with_data(Into::<Vec<u8>>::into(o))

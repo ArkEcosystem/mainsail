@@ -2,7 +2,6 @@ import { CommitHandler } from "../crypto/commit.js";
 
 export enum EvmMode {
 	Ephemeral,
-	Mock,
 	Persistent,
 }
 
@@ -42,6 +41,16 @@ export interface CommitResult {}
 export interface AccountInfo {
 	readonly nonce: bigint;
 	readonly balance: bigint;
+}
+
+export interface AccountUpdate {
+	readonly address: string;
+	readonly balance: bigint;
+	readonly nonce: bigint;
+
+	// TODO: pass contract specific info for wallet table?
+	// readonly vote?: string;
+	// readonly unvote?: string;
 }
 
 export interface AccountUpdateContext {

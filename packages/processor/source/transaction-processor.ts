@@ -1,12 +1,18 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils as AppUtils } from "@mainsail/kernel";
+import { Utils } from "@mainsail/kernel";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
+
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
+	@inject(Identifiers.Services.Log.Service)
+	protected readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Application.Instance)
 	public readonly app!: Contracts.Kernel.Application;
@@ -20,7 +26,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Processor.TransactionProcessorResult> {
+	): Promise<Contracts.Evm.TransactionReceipt> {
 		const milestone = this.configuration.getMilestone(unit.height);
 		const transactionHandler = await this.handlerRegistry.getActivatedHandlerForData(transaction.data);
 
@@ -45,9 +51,13 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			throw new Exceptions.InvalidSignatureError();
 		}
 
-		const result = await transactionHandler.apply(transactionHandlerContext, transaction);
-		AppUtils.assert.defined<string>(transaction.data.senderPublicKey);
+		const receipt = await transactionHandler.apply(transactionHandlerContext, transaction);
 
-		return { gasUsed: result.gasUsed, receipt: result.receipt };
+		const feeConsumed = this.gasFeeCalculator.calculateConsumed(transaction.data.fee, Number(receipt.gasUsed));
+		this.logger.debug(
+			`executed EVM call (success=${receipt.success}, gasUsed=${receipt.gasUsed} paidNativeFee=${Utils.formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.deployedContractAddress})`,
+		);
+
+		return receipt;
 	}
 }

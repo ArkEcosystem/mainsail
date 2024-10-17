@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/transaction-pool-service",
-	"version": "0.0.1-alpha.20",
+	"version": "0.0.1-evm.4",
 	"description": "Transaction Pool Service for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -25,6 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/state": "workspace:*",
 		"better-sqlite3": "11.2.1",
 		"fs-extra": "11.2.0",
 		"joi": "17.12.2"

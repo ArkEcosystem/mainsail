@@ -1,0 +1,22 @@
+{
+	"name": "@mainsail/evm-contracts",
+	"version": "0.0.1-evm.4",
+	"description": "EVM Contract ABIs for the Mainsail blockchain",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"type": "module",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "pnpm run clean && tsc",
+		"build:watch": "pnpm run clean && tsc -w",
+		"clean": "del distribution",
+		"release": "pnpm publish --access public"
+	},
+	"engines": {
+		"node": ">=20.x"
+	}
+}

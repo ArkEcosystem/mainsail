@@ -7,7 +7,7 @@ describe("getHeaders", ({ it, assert }) => {
 	let port = 4007;
 	const version = "3.0.9";
 	const height = 387;
-	const store = { getLastHeight: () => height, isStarted: () => true };
+	const store = { getHeight: () => height, isStarted: () => true };
 	const appGet = {
 		[Identifiers.State.Store]: store,
 	};

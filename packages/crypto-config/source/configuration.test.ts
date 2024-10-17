@@ -39,9 +39,7 @@ describe<{
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
 				evmSpec: cryptoJson.milestones[0].evmSpec,
-				fees: cryptoJson.milestones[0].fees,
 				height: 0,
-				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: { decimals: 18, denomination: 1e18 },
 				timeouts: {
@@ -59,9 +57,7 @@ describe<{
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
 				evmSpec: cryptoJson.milestones[0].evmSpec,
-				fees: cryptoJson.milestones[0].fees,
 				height: 1,
-				multiPaymentLimit: 256,
 				reward: "0",
 				satoshi: { decimals: 18, denomination: 1e18 },
 				timeouts: {
@@ -79,9 +75,7 @@ describe<{
 				gas: cryptoJson.milestones[0].gas,
 				epoch: cryptoJson.milestones[0].epoch,
 				evmSpec: cryptoJson.milestones[0].evmSpec,
-				fees: cryptoJson.milestones[0].fees,
 				height: 75_600,
-				multiPaymentLimit: 256,
 				reward: "2000000000000000000",
 				satoshi: { decimals: 18, denomination: 1e18 },
 				timeouts: {

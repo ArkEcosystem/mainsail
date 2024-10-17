@@ -68,11 +68,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					await Utils.sleep(0);
 				}
 
-				const { gasUsed, receipt } = await this.transactionProcessor.process(unit, transaction);
+				const receipt = await this.transactionProcessor.process(unit, transaction);
 				processResult.receipts.set(transaction.id, receipt);
 
-				transaction.data.gasUsed = gasUsed;
-				this.#consumeGas(block, processResult, gasUsed);
+				transaction.data.gasUsed = Number(receipt.gasUsed);
+				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
@@ -104,11 +104,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 		}
 
-		this.#setConfigurationHeight(unit);
+		await this.stateStore.onCommit(unit);
 		await this.evm.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 		await this.proposerSelector.onCommit(unit);
-		await this.stateStore.onCommit(unit);
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
 
@@ -145,17 +144,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					`Starting validator round ${roundInfo.round} at height ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
 				);
 			}
-		}
-	}
-
-	#setConfigurationHeight(unit: Contracts.Processor.ProcessableUnit): void {
-		// NOTE: The configuration is always set to the next height. To height which is going to be proposed.
-		this.configuration.setHeight(unit.height + 1);
-
-		if (this.configuration.isNewMilestone()) {
-			this.logger.notice(`Milestone change: ${JSON.stringify(this.configuration.getMilestoneDiff())}`);
-
-			void this.#emit(Events.CryptoEvent.MilestoneChanged);
 		}
 	}
 

@@ -17,5 +17,5 @@ export interface Wallet {
 export interface ValidatorWallet {
 	address: string;
 	blsPublicKey: string;
-	voteBalance: number;
+	voteBalance: BigNumber;
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/core",
-	"version": "0.0.1-alpha.20",
+	"version": "0.0.1-evm.4",
 	"description": "Core CLI commands for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -61,6 +61,7 @@
 		"@mainsail/database": "workspace:*",
 		"@mainsail/evm-api-worker": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
+		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",

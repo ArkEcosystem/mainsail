@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/transactions",
-	"version": "0.0.1-alpha.20",
+	"version": "0.0.1-evm.4",
 	"description": "Transaction Services for Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -25,11 +25,11 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-config": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10",
 		"uvu": "^0.5.6"
 	},

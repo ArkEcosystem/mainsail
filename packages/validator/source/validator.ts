@@ -138,7 +138,7 @@ export class Validator implements Contracts.Validator.Validator {
 		await validator.getEvm().prepareNextCommit({ commitKey });
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
-		const failedTransactions: Contracts.Crypto.Transaction[] = [];
+		const failedSenders: Set<string> = new Set();
 
 		const previousBlock = this.stateStore.getLastBlock();
 		const milestone = this.cryptoConfiguration.getMilestone();
@@ -157,7 +157,7 @@ export class Validator implements Contracts.Validator.Validator {
 			const transaction = await this.transactionFactory.fromBytes(bytes);
 			transaction.data.sequence = candidateTransactions.length;
 
-			if (failedTransactions.some((t) => t.data.senderPublicKey === transaction.data.senderPublicKey)) {
+			if (failedSenders.has(transaction.data.senderPublicKey)) {
 				continue;
 			}
 
@@ -173,17 +173,15 @@ export class Validator implements Contracts.Validator.Validator {
 					transaction,
 				);
 
-				gasLeft -= result.gasUsed;
+				gasLeft -= Number(result.gasUsed);
 
-				transaction.data.gasUsed = result.gasUsed;
+				transaction.data.gasUsed = Number(result.gasUsed);
 				candidateTransactions.push(transaction);
 			} catch (error) {
 				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
-				failedTransactions.push(transaction);
+				failedSenders.add(transaction.data.senderPublicKey);
 			}
 		}
-
-		this.txPoolWorker.setFailedTransactions(failedTransactions);
 
 		await validator.getEvm().updateRewardsAndVotes({
 			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),

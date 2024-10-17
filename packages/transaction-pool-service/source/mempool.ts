@@ -14,18 +14,17 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	readonly #senderMempools = new Map<string, Contracts.TransactionPool.SenderMempool>();
-	readonly #brokenSenders = new Set<string>();
 
 	public getSize(): number {
 		return [...this.#senderMempools.values()].reduce((sum, p) => sum + p.getSize(), 0);
 	}
 
-	public hasSenderMempool(senderPublicKey: string): boolean {
-		return this.#senderMempools.has(senderPublicKey);
+	public hasSenderMempool(address: string): boolean {
+		return this.#senderMempools.has(address);
 	}
 
-	public getSenderMempool(senderPublicKey: string): Contracts.TransactionPool.SenderMempool {
-		const senderMempool = this.#senderMempools.get(senderPublicKey);
+	public getSenderMempool(address: string): Contracts.TransactionPool.SenderMempool {
+		const senderMempool = this.#senderMempools.get(address);
 		if (!senderMempool) {
 			throw new Error("Unknown sender");
 		}
@@ -36,97 +35,60 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		return this.#senderMempools.values();
 	}
 
-	public async fixInvalidStates(): Promise<Contracts.Crypto.Transaction[]> {
-		const removedTransactions: Contracts.Crypto.Transaction[] = [];
-
-		for (const senderPublicKey of this.#brokenSenders) {
-			const transactionsForReadd = [...this.getSenderMempool(senderPublicKey).getFromEarliest()];
-
-			const newSenderMempool = await this.createSenderMempool.call(this, senderPublicKey);
-
-			for (let index = 0; index < transactionsForReadd.length; index++) {
-				const transaction = transactionsForReadd[index];
-
-				try {
-					await newSenderMempool.addTransaction(transaction);
-				} catch {
-					transactionsForReadd.slice(index).map((tx) => {
-						removedTransactions.push(tx);
-					});
-					break;
-				}
-			}
-
-			this.#senderMempools.delete(senderPublicKey);
-			if (newSenderMempool.getSize()) {
-				this.#senderMempools.set(senderPublicKey, newSenderMempool);
-			}
-		}
-
-		this.#brokenSenders.clear();
-		return removedTransactions;
-	}
-
 	public async addTransaction(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		let senderMempool = this.#senderMempools.get(transaction.data.senderPublicKey);
+		const address = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
+
+		let senderMempool = this.#senderMempools.get(address);
 		if (!senderMempool) {
-			senderMempool = await this.createSenderMempool.call(this, transaction.data.senderPublicKey);
-			this.#senderMempools.set(transaction.data.senderPublicKey, senderMempool);
-			this.logger.debug(
-				`${await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey)} state created`,
-			);
+			senderMempool = await this.createSenderMempool.call(this, address);
+			this.#senderMempools.set(address, senderMempool);
+			this.logger.debug(`${address} state created`);
 		}
 
 		try {
 			await senderMempool.addTransaction(transaction);
 		} finally {
-			await this.#removeDisposableMempool(transaction.data.senderPublicKey);
+			this.#removeDisposableMempool(address);
 		}
 	}
 
-	public async removeTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
-		const senderMempool = this.#senderMempools.get(senderPublicKey);
+	public async removeTransaction(address: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
+		const senderMempool = this.#senderMempools.get(address);
 		if (!senderMempool) {
 			return [];
 		}
 
 		const transactions = senderMempool.removeTransaction(id);
-
-		if (transactions.length > 0 && !(await this.#removeDisposableMempool(senderPublicKey))) {
-			this.#brokenSenders.add(senderPublicKey);
-		}
+		this.#removeDisposableMempool(address);
 
 		return transactions;
 	}
 
-	public async removeForgedTransaction(senderPublicKey: string, id: string): Promise<Contracts.Crypto.Transaction[]> {
-		const senderMempool = this.#senderMempools.get(senderPublicKey);
-		if (!senderMempool) {
-			return [];
+	public async reAddTransactions(addresses: string[]): Promise<Contracts.Crypto.Transaction[]> {
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const address of addresses) {
+			const senderMempool = this.#senderMempools.get(address);
+			if (!senderMempool) {
+				continue;
+			}
+
+			removedTransactions.push(...(await senderMempool.reAddTransactions()));
 		}
 
-		const transaction = senderMempool.removeForgedTransaction(id);
-
-		if (!transaction) {
-			this.#brokenSenders.add(senderPublicKey);
-			return [];
-		}
-
-		await this.#removeDisposableMempool(senderPublicKey);
-
-		return [transaction];
+		return removedTransactions;
 	}
 
 	public flush(): void {
 		this.#senderMempools.clear();
 	}
 
-	async #removeDisposableMempool(senderPublicKey: string): Promise<boolean> {
-		const senderMempool = this.#senderMempools.get(senderPublicKey);
+	#removeDisposableMempool(address: string): boolean {
+		const senderMempool = this.#senderMempools.get(address);
 
 		if (senderMempool && senderMempool.isDisposable()) {
-			this.#senderMempools.delete(senderPublicKey);
-			this.logger.debug(`${await this.addressFactory.fromPublicKey(senderPublicKey)} state disposed`);
+			this.#senderMempools.delete(address);
+			this.logger.debug(`${address} state disposed`);
 
 			return true;
 		}

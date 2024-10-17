@@ -14,7 +14,7 @@ describe<{
 
 	beforeEach(async (context) => {
 		context.store = {
-			getLastHeight() {
+			getHeight() {
 				return height;
 			},
 		};

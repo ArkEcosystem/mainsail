@@ -340,36 +340,13 @@
 			},
 			"epoch": "2024-09-19T00:00:00.000Z",
 			"evmSpec": "Shanghai",
-			"fees": {
-				"staticFees": {
-					"multiPayment": 10000000,
-					"multiSignature": 500000000,
-					"transfer": 10000000,
-					"usernameRegistration": 2500000000,
-					"usernameResignation": 2500000000,
-					"validatorRegistration": 2500000000,
-					"validatorResignation": 2500000000,
-					"vote": 100000000
-				}
-			},
 			"gas": {
 				"maximumGasLimit": 2000000,
 				"minimumGasFee": 5,
 				"minimumGasLimit": 21000,
-				"nativeFeeMultiplier": 100,
-				"nativeGasLimits": {
-					"multiPayment": 50000,
-					"multiSignature": 50000,
-					"transfer": 21000,
-					"usernameRegistration": 100000,
-					"usernameResignation": 50000,
-					"validatorRegistration": 100000,
-					"validatorResignation": 50000,
-					"vote": 50000
-				}
+				"nativeFeeMultiplier": 100
 			},
 			"height": 0,
-			"multiPaymentLimit": 256,
 			"reward": "0",
 			"satoshi": {
 				"decimals": 18,

@@ -24,7 +24,7 @@ export class RoundController extends Controller {
 			(_, index) => activeValidators[this.proposerSelector.getValidatorIndex(index)],
 		);
 
-		const height = this.stateStore.getLastHeight();
+		const height = this.stateStore.getHeight();
 
 		return {
 			height,

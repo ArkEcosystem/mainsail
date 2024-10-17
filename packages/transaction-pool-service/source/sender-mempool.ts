@@ -8,6 +8,10 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 	@tagged("plugin", "transaction-pool-service")
 	private readonly configuration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	@tagged("type", "wallet")
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
 	@inject(Identifiers.TransactionPool.SenderState)
 	private readonly senderState!: Contracts.TransactionPool.SenderState;
 
@@ -17,8 +21,8 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 	readonly #transactions: Contracts.Crypto.Transaction[] = [];
 
-	public async configure(publicKey: string): Promise<SenderMempool> {
-		await this.senderState.configure(publicKey);
+	public async configure(address: string): Promise<SenderMempool> {
+		await this.senderState.configure(address);
 		return this;
 	}
 
@@ -47,7 +51,11 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 					this.configuration.getRequired<number>("maxTransactionsPerSender");
 				if (this.#transactions.length >= maxTransactionsPerSender) {
 					const allowedSenders: string[] = this.configuration.getOptional<string[]>("allowedSenders", []);
-					if (!allowedSenders.includes(transaction.data.senderPublicKey)) {
+					if (
+						!allowedSenders.includes(
+							await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey),
+						)
+					) {
 						throw new Exceptions.SenderExceededMaximumTransactionCountError(
 							transaction,
 							maxTransactionsPerSender,
@@ -68,18 +76,29 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 		if (index === -1) {
 			return [];
 		}
-		return this.#transactions.splice(index, this.#transactions.length - index).reverse();
+		const transactions = this.#transactions.splice(index, this.#transactions.length - index).reverse();
+
+		for (const transaction of transactions) {
+			this.senderState.revert(transaction);
+		}
+
+		return transactions;
 	}
 
-	public removeForgedTransaction(id: string): Contracts.Crypto.Transaction | undefined {
-		if (this.#transactions.length === 0) {
-			throw new Error("No transactions in sender mempool");
+	public async reAddTransactions(): Promise<Contracts.Crypto.Transaction[]> {
+		await this.senderState.reset();
+
+		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+
+		const transactions = this.#transactions.splice(0, this.#transactions.length);
+		for (const transaction of transactions) {
+			try {
+				await this.addTransaction(transaction);
+			} catch {
+				removedTransactions.push(transaction);
+			}
 		}
 
-		if (this.#transactions[0].id === id) {
-			return this.#transactions.shift();
-		}
-
-		return undefined;
+		return removedTransactions;
 	}
 }
