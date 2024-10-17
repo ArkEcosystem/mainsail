@@ -311,7 +311,7 @@ contract Consensus {
 		delete _votes[msg.sender];
 	}
 
-	function updateVoters(address[] calldata voters) external {
+	function updateVoters(address[] calldata voters) external onlyOwner {
 		// TODO: limit number of voters per update?
 		for (uint i = 0; i < voters.length; i++) {
 			_updateVoter(voters[i]);
