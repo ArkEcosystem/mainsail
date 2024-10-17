@@ -10,12 +10,12 @@ import { Controller } from "./controller.js";
 @injectable()
 export class ValidatorRoundsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.ValidatorRoundRepositoryFactory)
-	private readonly validatorRoundepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
+	private readonly validatorRoundRepositoryFactory!: ApiDatabaseContracts.ValidatorRoundRepositoryFactory;
 
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);
 
-		const [validatorRounds, totalCount] = await this.validatorRoundepositoryFactory()
+		const [validatorRounds, totalCount] = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.addOrderBy("round", "DESC")
@@ -35,7 +35,7 @@ export class ValidatorRoundsController extends Controller {
 	}
 
 	public async show(request: Hapi.Request) {
-		const validatorRounds = await this.validatorRoundepositoryFactory()
+		const validatorRounds = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.where("round = :round", { round: request.params.round })
@@ -49,7 +49,7 @@ export class ValidatorRoundsController extends Controller {
 	}
 
 	public async delegates(request: Hapi.Request) {
-		const round = await this.validatorRoundepositoryFactory()
+		const round = await this.validatorRoundRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.where("round = :round", { round: request.params.id })
