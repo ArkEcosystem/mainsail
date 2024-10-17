@@ -62,8 +62,8 @@ export class ValidatorRoundsController extends Controller {
 		const validatorWallets = await this.walletRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("public_key IN (:...publicKeys)", { publicKeys: round.validators })
-			.orderBy("public_key", "ASC")
+			.where("address IN (:...addresses)", { addresses: round.validators })
+			.orderBy("address", "ASC")
 			.getMany();
 
 		const indexLookup = round.validators.reduce((accumulator, key, index) => {
@@ -71,12 +71,12 @@ export class ValidatorRoundsController extends Controller {
 			return accumulator;
 		}, {});
 
-		validatorWallets.sort((a, b) => indexLookup[a.publicKey!] - indexLookup[b.publicKey!]);
+		validatorWallets.sort((a, b) => indexLookup[a.address!] - indexLookup[b.address!]);
 
 		return this.respondWithCollection(
 			validatorWallets.map((wallet) => ({
-				publicKey: wallet.publicKey,
-				votes: round.votes[indexLookup[wallet.publicKey!]] ?? "0",
+				address: wallet.address,
+				votes: round.votes[indexLookup[wallet.address!]] ?? "0",
 			})),
 			RoundResource,
 		);
