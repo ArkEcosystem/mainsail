@@ -177,6 +177,7 @@ export class Sync implements Contracts.ApiSync.Service {
 							validatorPublicKey: dirtyValidator.blsPublicKey,
 							validatorResigned: dirtyValidator.isResigned,
 							validatorVoteBalance: dirtyValidator.voteBalance,
+							validatorVotersCount: dirtyValidator.votersCount,
 							// updated at end of db transaction
 							// - validatorRank
 							// - validatorApproval
@@ -497,6 +498,8 @@ export class Sync implements Contracts.ApiSync.Service {
 			COALESCE(EXCLUDED.attributes->'validatorResigned', "Wallet".attributes->'validatorResigned'),
 			'validatorVoteBalance',
 			COALESCE((EXCLUDED.attributes->>'validatorVoteBalance')::text, ("Wallet".attributes->>'validatorVoteBalance')::text),
+			'validatorVotersCount',
+			COALESCE(EXCLUDED.attributes->'validatorVotersCount', "Wallet".attributes->'validatorVotersCount'),
 			'validatorLastBlock',
 			COALESCE(EXCLUDED.attributes->>'validatorLastBlock', "Wallet".attributes->>'validatorLastBlock'),
 			'validatorForgedFees',
@@ -512,7 +515,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				);
 			}
 
-			// TODO: only update when round changes?
 			await entityManager.query("SELECT update_validator_ranks();", []);
 		});
 
