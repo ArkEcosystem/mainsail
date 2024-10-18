@@ -33,7 +33,7 @@ contract ConsensusTest is Base {
 	}
 
 	function test_validator_registration_revert_if_caller_is_owner() public {
-		vm.expectRevert("Invalid caller");
+		vm.expectRevert("Caller is the contract owner");
 		consensus.registerValidator(prepareBLSKey(address(1)));
 	}
 

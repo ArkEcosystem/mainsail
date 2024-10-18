@@ -36,7 +36,6 @@ contract ConsensusTest is Base {
 		consensus.resignValidator();
 		vm.stopPrank();
 
-
 		assertEq(consensus.registeredValidatorsCount(), 1);
 		validator = consensus.getValidator(addr);
 		assertEq(validator.addr, addr);

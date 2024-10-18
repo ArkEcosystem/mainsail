@@ -63,6 +63,16 @@ contract Consensus {
 		_owner = msg.sender;
 	}
 
+	modifier onlyOwner() {
+		require(msg.sender == _owner, "Caller is not the contract owner");
+		_;
+	}
+
+	modifier preventOwner() {
+		require(msg.sender != _owner, "Caller is the contract owner");
+		_;
+	}
+
 	function shuffle() internal {
 		uint256 n = _registeredValidators.length;
 		for (uint256 i = n - 1; i > 0; i--) {
@@ -87,7 +97,7 @@ contract Consensus {
 		_topValidatorsCount = 0;
 	}
 
-	function calculateTopValidators(uint8 n) external {
+	function calculateTopValidators(uint8 n) external onlyOwner {
 		shuffle();
 		deleteTopValidators();
 
@@ -102,16 +112,15 @@ contract Consensus {
 			address addr = _registeredValidators[i];
 
 			ValidatorData storage data = _registeredValidatorData[addr];
-			if(data.isResigned) {
+			if (data.isResigned) {
 				continue;
 			}
 
-			if(_head == address(0)) {
+			if (_head == address(0)) {
 				_head = addr;
 				_topValidatorsCount = 1;
 				continue;
 			}
-
 
 			if (_topValidatorsCount < top) {
 				insertTopValidator(addr, top);
@@ -201,15 +210,15 @@ contract Consensus {
 	}
 
 	function getAllValidators() public view returns (Validator[] memory) {
-        Validator[] memory result = new Validator[](_registeredValidators.length);
-        for (uint i = 0; i < _registeredValidators.length; i++) {
-            address addr = _registeredValidators[i];
-            ValidatorData storage data = _registeredValidatorData[addr];
-            result[i] = Validator({addr: addr, data: data});
-        }
+		Validator[] memory result = new Validator[](_registeredValidators.length);
+		for (uint i = 0; i < _registeredValidators.length; i++) {
+			address addr = _registeredValidators[i];
+			ValidatorData storage data = _registeredValidatorData[addr];
+			result[i] = Validator({addr: addr, data: data});
+		}
 
-        return result;
-    }
+		return result;
+	}
 
 	function registeredValidatorsCount() public view returns (uint256) {
 		return _registeredValidatorsCount;
@@ -223,8 +232,7 @@ contract Consensus {
 		return _calculatedTopValidators.length;
 	}
 
-	function registerValidator(bytes calldata bls12_381_public_key) external {
-		require(msg.sender != _owner, "Invalid caller");
+	function registerValidator(bytes calldata bls12_381_public_key) external preventOwner {
 		require(!_hasRegisteredValidator[msg.sender], "Validator is already registered");
 
 		bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
@@ -279,7 +287,7 @@ contract Consensus {
 		_registeredValidatorData[_validator.addr] = _validator.data;
 	}
 
-	function vote(address addr) external {
+	function vote(address addr) external preventOwner {
 		require(isValidatorRegistered(addr), "Must vote for validator");
 		require(_votes[msg.sender].validator == address(0), "Already voted");
 
@@ -306,7 +314,7 @@ contract Consensus {
 		delete _votes[msg.sender];
 	}
 
-	function updateVoters(address[] calldata voters) external {
+	function updateVoters(address[] calldata voters) external onlyOwner {
 		// TODO: limit number of voters per update?
 		for (uint i = 0; i < voters.length; i++) {
 			_updateVoter(voters[i]);
