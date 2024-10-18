@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-hash-bcrypto",
-	"version": "0.0.1-evm.5",
+	"version": "0.0.1-evm.6",
 	"description": "Hashing powered by bcrypto for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
