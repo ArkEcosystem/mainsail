@@ -192,7 +192,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 	}
 
-		function test_unvote_and_vote_in_different_blocks() public {
+	function test_unvote_and_vote_in_different_blocks() public {
 		// Register validator
 		address addr = address(1);
 		registerValidator(addr);

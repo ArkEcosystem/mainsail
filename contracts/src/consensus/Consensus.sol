@@ -64,14 +64,14 @@ contract Consensus {
 	}
 
 	modifier onlyOwner() {
-        require(msg.sender == _owner, "Caller is not the contract owner");
-        _;
-    }
+		require(msg.sender == _owner, "Caller is not the contract owner");
+		_;
+	}
 
 	modifier preventOwner() {
-        require(msg.sender != _owner, "Caller is the contract owner");
-        _;
-    }
+		require(msg.sender != _owner, "Caller is the contract owner");
+		_;
+	}
 
 	function shuffle() internal {
 		uint256 n = _registeredValidators.length;
@@ -112,16 +112,15 @@ contract Consensus {
 			address addr = _registeredValidators[i];
 
 			ValidatorData storage data = _registeredValidatorData[addr];
-			if(data.isResigned) {
+			if (data.isResigned) {
 				continue;
 			}
 
-			if(_head == address(0)) {
+			if (_head == address(0)) {
 				_head = addr;
 				_topValidatorsCount = 1;
 				continue;
 			}
-
 
 			if (_topValidatorsCount < top) {
 				insertTopValidator(addr, top);
@@ -211,15 +210,15 @@ contract Consensus {
 	}
 
 	function getAllValidators() public view returns (Validator[] memory) {
-        Validator[] memory result = new Validator[](_registeredValidators.length);
-        for (uint i = 0; i < _registeredValidators.length; i++) {
-            address addr = _registeredValidators[i];
-            ValidatorData storage data = _registeredValidatorData[addr];
-            result[i] = Validator({addr: addr, data: data});
-        }
+		Validator[] memory result = new Validator[](_registeredValidators.length);
+		for (uint i = 0; i < _registeredValidators.length; i++) {
+			address addr = _registeredValidators[i];
+			ValidatorData storage data = _registeredValidatorData[addr];
+			result[i] = Validator({addr: addr, data: data});
+		}
 
-        return result;
-    }
+		return result;
+	}
 
 	function registeredValidatorsCount() public view returns (uint256) {
 		return _registeredValidatorsCount;

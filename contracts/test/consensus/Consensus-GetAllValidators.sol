@@ -6,31 +6,29 @@ import {Consensus, ValidatorData, Validator} from "@contracts/consensus/Consensu
 import {Base} from "./Base.sol";
 
 contract ConsensusTest is Base {
-    Consensus public consensus;
+	Consensus public consensus;
 
-    function setUp() public {
-        consensus = new Consensus();
-    }
+	function setUp() public {
+		consensus = new Consensus();
+	}
 
+	function test_200_validators() public {
+		vm.pauseGasMetering();
+		assertEq(consensus.registeredValidatorsCount(), 0);
 
-    function test_200_validators() public {
-        vm.pauseGasMetering();
-        assertEq(consensus.registeredValidatorsCount(), 0);
+		uint256 n = 200;
+		for (uint256 i = 0; i < n; i++) {
+			address addr = address(uint160(i + 1));
 
-
-        uint256 n = 200;
-        for (uint256 i = 0; i < n; i++) {
-            address addr = address(uint160(i + 1));
-
-            vm.startPrank(addr);
+			vm.startPrank(addr);
 			consensus.registerValidator(prepareBLSKey(addr));
-            consensus.vote(addr);
-            vm.stopPrank();
-        }
+			consensus.vote(addr);
+			vm.stopPrank();
+		}
 
-        vm.resumeGasMetering();
+		vm.resumeGasMetering();
 
-        Validator[] memory validators = consensus.getAllValidators();
-        assertEq(validators.length, n);
-    }
+		Validator[] memory validators = consensus.getAllValidators();
+		assertEq(validators.length, n);
+	}
 }
