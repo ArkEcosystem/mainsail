@@ -111,12 +111,6 @@ export class BlocksController extends Controller {
 		);
 	}
 
-	private getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
-		const asHeight = Number(idOrHeight);
-		// NOTE: This assumes all block ids are sha256 and never a valid nubmer below this threshold.
-		return asHeight && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
-	}
-
 	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request) {
 		return this.respondWithResource(await this.enrichBlock(block), BlockResource, request.query.transform);
 	}

@@ -120,4 +120,10 @@ export class Controller extends AbstractController {
 	): Promise<EnrichedTransaction> {
 		return { ...transaction, state: state ? state : await this.getState() };
 	}
+
+	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
+		const asHeight = Number(idOrHeight);
+		// NOTE: This assumes all block ids are sha256 and never a valid number below this threshold.
+		return !isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
+	}
 }

@@ -1,10 +1,6 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import {
-	Contracts as ApiDatabaseContracts,
-	Identifiers as ApiDatabaseIdentifiers,
-	Search,
-} from "@mainsail/api-database";
+import { Contracts as ApiDatabaseContracts, Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { BigNumber, validatorSetUnpack } from "@mainsail/utils";
 
@@ -32,12 +28,16 @@ export class CommitsController extends Controller {
 			.createQueryBuilder()
 			.select()
 			.where("round = :validatorRound", { validatorRound: block.validatorRound })
-			.getOneOrFail();
+			.getOne();
 
-		// map bitmask -> indexes -> round.validators
-		const packed = BigNumber.make(block.validatorSet).toBigInt();
-		const unpacked = validatorSetUnpack(packed, round.validators.length);
-		const validators = unpacked.filter(Boolean).map((_, index) => round.validators[index]);
+		let validators: string[] = [];
+
+		if (round) {
+			// map bitmask -> indexes -> round.validators
+			const packed = BigNumber.make(block.validatorSet).toBigInt();
+			const unpacked = validatorSetUnpack(packed, round.validators.length);
+			validators = unpacked.filter(Boolean).map((_, index) => round.validators[index]);
+		}
 
 		return {
 			data: {
@@ -46,11 +46,5 @@ export class CommitsController extends Controller {
 				validators,
 			},
 		};
-	}
-
-	private getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
-		const asHeight = Number(idOrHeight);
-		// NOTE: This assumes all block ids are sha256 and never a valid nubmer below this threshold.
-		return asHeight && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
 	}
 }
