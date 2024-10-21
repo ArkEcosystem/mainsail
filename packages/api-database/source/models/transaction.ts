@@ -1,4 +1,5 @@
 import { Column, Entity } from "typeorm";
+
 import { bufferTransformer } from "../transformers/buffer.js";
 
 @Entity({
@@ -84,7 +85,7 @@ export class Transaction {
 		transformer: bufferTransformer,
 		type: "bytea",
 	})
-	public readonly data: Buffer | undefined;
+	public readonly data: string | undefined;
 
 	@Column({
 		default: undefined,

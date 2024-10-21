@@ -52,6 +52,7 @@ export type TransactionCriteria = {
 	amount?: OrNumericCriteria<string>;
 	fee?: OrNumericCriteria<string>;
 	asset?: OrContainsCriteria<Record<string, any>>;
+	data?: OrEqualCriteria<string>;
 };
 
 export type OrTransactionCriteria = OrCriteria<TransactionCriteria>;

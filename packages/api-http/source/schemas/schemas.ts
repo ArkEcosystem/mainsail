@@ -89,6 +89,7 @@ export const transactionCriteriaSchemas = {
 	recipientId: orEqualCriteria(address),
 	senderId: orEqualCriteria(address),
 	senderPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
+	data: orEqualCriteria(Joi.string().hex().max(10)),
 	sequence: orNumericCriteria(Joi.number().integer().positive()),
 	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
 	type: orEqualCriteria(Joi.number().integer().min(0)),

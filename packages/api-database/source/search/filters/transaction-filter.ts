@@ -90,6 +90,10 @@ export class TransactionFilter {
 					return handleOrCriteria(criteria.fee, async (c) =>
 						// @ts-ignore
 						handleComparisonCriteria("fee", c),
+				case "data": {
+					return handleOrCriteria(criteria.data, async (c) =>
+						// @ts-ignore
+						this.handleDataCritera(c),
 					);
 				}
 				default: {
@@ -146,23 +150,12 @@ export class TransactionFilter {
 		};
 	}
 
-	// private static async handleAssetCriteria(criteria: TransactionCriteria): Promise<Expression<Transaction>> {
-	// 	let castLimit = 5;
+	private static async handleDataCritera(criteria: EqualCriteria<string>): Promise<Expression<Transaction>> {
+		criteria = criteria.startsWith("0x") ? criteria.slice(2) : criteria;
+		criteria = `\\x${criteria}`;
 
-	// 	const getCastValues = (value: unknown): unknown[] => {
-	// 		if (Array.isArray(value)) {
-	// 			let castValues: Array<unknown>[] = [[]];
-
-	// 			for (const item of value) {
-	// 				const itemCastValues = getCastValues(item);
-
-	// 				castValues = castValues.flatMap((castValue) =>
-	// 					itemCastValues.map((itemCastValue) => [...castValue, itemCastValue]),
-	// 				);
-	// 			}
-
-	// 			return castValues;
-	// 		}
+		return { op: "functionSig", property: "data", value: criteria };
+	}
 
 	// 		if (typeof value === "object" && value !== null) {
 	// 			let castValues: object[] = [{}];

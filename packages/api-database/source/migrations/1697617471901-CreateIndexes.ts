@@ -26,6 +26,11 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX transactions_nonce_asc_sequence_desc ON transactions(nonce ASC, sequence DESC);
             CREATE INDEX transactions_timestamp_asc_sequence_desc ON transactions(timestamp ASC, sequence DESC);
 
+            CREATE INDEX transactions_function_sig_address ON transactions(
+                  SUBSTRING(data FROM 1 FOR 4),
+                  recipient_address
+            );
+
             CREATE INDEX blocks_number_of_transactions ON blocks(number_of_transactions);
             CREATE INDEX blocks_reward ON blocks(reward);
             CREATE INDEX blocks_total_amount ON blocks(total_amount);
@@ -65,6 +70,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_gas_price_asc_sequence_desc;
             DROP INDEX transactions_nonce_asc_sequence_desc;
             DROP INDEX transactions_timestamp_asc_sequence_desc;
+            DROP INDEX transactions_function_sig_address;
 
             DROP INDEX blocks_number_of_transactions;
             DROP INDEX blocks_reward;
