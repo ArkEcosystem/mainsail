@@ -12,7 +12,7 @@ export const orderBy = Joi.alternatives().try(
 	Joi.array().items(Joi.string().regex(/^[._a-z]{1,40}:(asc|desc)$/i)),
 );
 
-export const address = Joi.string().alphanum(); /* TODO .length(34); */
+export const address = Joi.string().alphanum().max(96);
 
 export const delegateIdentifier = Joi.string()
 	.regex(/^[\w!$&.@]+$/)
@@ -81,15 +81,17 @@ export const transactionCriteriaSchemas = {
 	amount: orNumericCriteria(Joi.number().integer().min(0)),
 	asset: orContainsCriteria(Joi.object()),
 	blockId: orEqualCriteria(blockId),
+	data: orEqualCriteria(
+		Joi.alternatives().try(Joi.string().valid("0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
+	),
 	gasFee: orNumericCriteria(Joi.number().integer().min(0)),
 	gasPrice: orNumericCriteria(Joi.number().integer().min(0)),
 	id: orEqualCriteria(Joi.string().hex().length(64)),
 	nonce: orNumericCriteria(Joi.number().integer().positive()),
 	recipientId: orEqualCriteria(address),
+	senderAddress: orEqualCriteria(Joi.string().hex().length(42)),
 	senderId: orEqualCriteria(address),
 	senderPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
-	senderAddress: orEqualCriteria(Joi.string().hex().length(42)),
-	data: orEqualCriteria(Joi.string().hex().max(10)),
 	sequence: orNumericCriteria(Joi.number().integer().positive()),
 	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
 };

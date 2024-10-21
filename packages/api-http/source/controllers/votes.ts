@@ -47,7 +47,7 @@ export class VotesController extends Controller {
 			.createQueryBuilder()
 			.select()
 			.where("id = :id", { id: request.params.id })
-			.andWhere("SUBSTRING(data FROM 1 FOR 4) = :data", { data: FunctionSigs.Vote })
+			.andWhere("SUBSTRING(data FROM 1 FOR 4) = :data", { data: `\\x${FunctionSigs.Vote.slice(2)}` })
 			.getOne();
 
 		if (!transaction) {
