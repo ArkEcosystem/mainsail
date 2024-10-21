@@ -11,7 +11,7 @@ export const bufferTransformer = {
 			value = value.startsWith("0x") ? value.slice(2) : value;
 
 			if (value === "") {
-				return null;
+				return Buffer.alloc(0);
 			}
 
 			return Buffer.from(value, "hex");
