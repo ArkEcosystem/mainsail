@@ -53,12 +53,10 @@ const numericCriteria = (value: any) =>
 		Joi.object().keys({ to: value }),
 		Joi.object().keys({ from: value, to: value }),
 	);
-const likeCriteria = (value: any) => value;
 const containsCriteria = (value: any) => value;
 const orCriteria = (criteria: any) => Joi.alternatives().try(criteria, Joi.array().items(criteria));
 const orEqualCriteria = (value: any) => orCriteria(equalCriteria(value));
 const orNumericCriteria = (value: any) => orCriteria(numericCriteria(value));
-const orLikeCriteria = (value: any) => orCriteria(likeCriteria(value));
 const orContainsCriteria = (value: any) => orCriteria(containsCriteria(value));
 
 export const blockCriteriaSchemas = {
@@ -83,17 +81,15 @@ export const transactionCriteriaSchemas = {
 	amount: orNumericCriteria(Joi.number().integer().min(0)),
 	asset: orContainsCriteria(Joi.object()),
 	blockId: orEqualCriteria(blockId),
-	fee: orNumericCriteria(Joi.number().integer().min(0)),
+	gasFee: orNumericCriteria(Joi.number().integer().min(0)),
+	gasPrice: orNumericCriteria(Joi.number().integer().min(0)),
 	id: orEqualCriteria(Joi.string().hex().length(64)),
 	nonce: orNumericCriteria(Joi.number().integer().positive()),
 	recipientId: orEqualCriteria(address),
 	senderId: orEqualCriteria(address),
 	senderPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
+	senderAddress: orEqualCriteria(Joi.string().hex().length(42)),
 	data: orEqualCriteria(Joi.string().hex().max(10)),
 	sequence: orNumericCriteria(Joi.number().integer().positive()),
 	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
-	type: orEqualCriteria(Joi.number().integer().min(0)),
-	typeGroup: orEqualCriteria(Joi.number().integer().min(0)),
-	vendorField: orLikeCriteria(Joi.string().max(255, "utf8")),
-	version: orEqualCriteria(Joi.number().integer().positive()),
 };

@@ -74,22 +74,30 @@ export class TransactionFilter {
 						this.handleSenderPublicKeyCriteria(c),
 					);
 				}
-				// case "senderAddress": {
-				// 	return handleOrCriteria(criteria.senderAddress, async (c) =>
-				// 		// @ts-ignore
-				// 		this.handleSenderPublicKeyCriteria(c),
-				// 	);
-				// }
+				case "senderAddress": {
+					return handleOrCriteria(criteria.senderAddress, async (c) =>
+						// @ts-ignore
+						this.handleSenderAddressCritera(c),
+					);
+				}
 				case "amount": {
 					return handleOrCriteria(criteria.amount, async (c) =>
 						// @ts-ignore
 						handleComparisonCriteria("amount", c),
 					);
 				}
-				case "fee": {
-					return handleOrCriteria(criteria.fee, async (c) =>
+				case "gasFee": {
+					return handleOrCriteria(criteria.gasFee, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("fee", c),
+						handleComparisonCriteria("gasFee", c),
+					);
+				}
+				case "gasPrice": {
+					return handleOrCriteria(criteria.gasPrice, async (c) =>
+						// @ts-ignore
+						handleComparisonCriteria("gasPrice", c),
+					);
+				}
 				case "data": {
 					return handleOrCriteria(criteria.data, async (c) =>
 						// @ts-ignore
@@ -140,6 +148,10 @@ export class TransactionFilter {
 		return { op: "equal", property: "senderPublicKey", value: criteria };
 	}
 
+	private static async handleSenderAddressCritera(criteria: EqualCriteria<string>): Promise<Expression<Transaction>> {
+		return { op: "equal", property: "senderAddress", value: criteria };
+	}
+
 	private static async handleRecipientAddressCriteria(
 		criteria: EqualCriteria<string>,
 	): Promise<Expression<Transaction>> {
@@ -156,48 +168,4 @@ export class TransactionFilter {
 
 		return { op: "functionSig", property: "data", value: criteria };
 	}
-
-	// 		if (typeof value === "object" && value !== null) {
-	// 			let castValues: object[] = [{}];
-
-	// 			for (const key of Object.keys(value)) {
-	// 				const propertyCastValues = getCastValues(value[key]);
-
-	// 				castValues = castValues.flatMap((castValue) =>
-	// 					propertyCastValues.map((propertyCastValue) => ({ ...castValue, [key]: propertyCastValue })),
-	// 				);
-	// 			}
-
-	// 			return castValues;
-	// 		}
-
-	// 		if (typeof value === "string" && String(Number(value)) === value) {
-	// 			if (castLimit === 0) {
-	// 				throw new Error("Asset cast property limit reached");
-	// 			}
-	// 			castLimit--;
-
-	// 			return [value, Number(value)];
-	// 		}
-
-	// 		if (value === "true" || value === "false") {
-	// 			if (castLimit === 0) {
-	// 				throw new Error("Asset cast property limit reached");
-	// 			}
-	// 			castLimit--;
-
-	// 			return [value, value === "true"];
-	// 		}
-
-	// 		return [value];
-	// 	};
-
-	// 	const expressions: Expression<Transaction>[] = getCastValues(criteria).map((c) => ({
-	// 		op: "contains",
-	// 		property: "asset",
-	// 		value: c,
-	// 	}));
-
-	// 	return { expressions, op: "or" };
-	// }
 }

@@ -30,11 +30,11 @@ export class ReceiptsController extends Controller {
 
 		// in this context, recipient always refers to a contract
 		if (criteria.recipient) {
-			query.andWhere("transaction.recipientId = :recipient", { recipient: criteria.recipient });
+			query.andWhere("transaction.recipientAddress = :recipient", { recipient: criteria.recipient });
 		}
 
 		if (criteria.sender) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.senderPublicKey = wallet.publicKey").andWhere(
+			query.innerJoin(Models.Wallet, "wallet", "transaction.senderAddress = wallet.address").andWhere(
 				new ApiDatabaseContracts.Brackets((qb) => {
 					qb.where("wallet.publicKey = :sender", { sender: criteria.sender }).orWhere(
 						"wallet.address = :sender",
@@ -73,7 +73,7 @@ export class ReceiptsController extends Controller {
 			.where("receipt.deployedContractAddress IS NOT NULL");
 
 		if (criteria.sender) {
-			query.innerJoin(Models.Wallet, "wallet", "transaction.senderPublicKey = wallet.publicKey").andWhere(
+			query.innerJoin(Models.Wallet, "wallet", "transaction.senderAddress = wallet.address").andWhere(
 				new ApiDatabaseContracts.Brackets((qb) => {
 					qb.where("wallet.publicKey = :sender", { sender: criteria.sender }).orWhere(
 						"wallet.address = :sender",
