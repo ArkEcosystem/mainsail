@@ -67,7 +67,7 @@ export class DelegatesController extends Controller {
 			{
 				...criteria,
 				attributes: {
-					vote: delegate.publicKey,
+					vote: delegate.address,
 				},
 			},
 			sorting,
@@ -88,7 +88,7 @@ export class DelegatesController extends Controller {
 
 		const criteria: Search.Criteria.BlockCriteria = {
 			...request.query,
-			generatorAddress: delegate.publicKey,
+			generatorAddress: delegate.address,
 		};
 
 		const pagination = this.getListingPage(request);
@@ -99,7 +99,7 @@ export class DelegatesController extends Controller {
 		const state = await this.getState();
 
 		return this.toPagination(
-			await this.enrichBlockResult(blocks, { generators: { [delegate.publicKey]: delegate }, state }),
+			await this.enrichBlockResult(blocks, { generators: { [delegate.address]: delegate }, state }),
 			BlockResource,
 			request.query.transform,
 		);

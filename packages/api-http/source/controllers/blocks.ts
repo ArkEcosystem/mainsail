@@ -41,8 +41,8 @@ export class BlocksController extends Controller {
 		return this.toPagination(
 			await this.enrichBlockResult(blocks, {
 				generators: generators.reduce((accumulator, current) => {
-					Utils.assert.defined<string>(current.publicKey);
-					accumulator[current.publicKey] = current;
+					Utils.assert.defined<string>(current.address);
+					accumulator[current.address] = current;
 					return accumulator;
 				}, {}),
 			}),
@@ -109,12 +109,6 @@ export class BlocksController extends Controller {
 			TransactionResource,
 			request.query.transform,
 		);
-	}
-
-	private getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
-		const asHeight = Number(idOrHeight);
-		// NOTE: This assumes all block ids are sha256 and never a valid nubmer below this threshold.
-		return asHeight && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
 	}
 
 	private async respondEnrichedBlock(block: Models.Block | null, request: Hapi.Request) {

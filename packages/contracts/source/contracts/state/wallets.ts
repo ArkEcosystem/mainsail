@@ -18,4 +18,6 @@ export interface ValidatorWallet {
 	address: string;
 	blsPublicKey: string;
 	voteBalance: BigNumber;
+	votersCount: number;
+	isResigned: boolean;
 }

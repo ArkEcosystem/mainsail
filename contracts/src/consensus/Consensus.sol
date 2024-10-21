@@ -1,6 +1,7 @@
 pragma solidity ^0.8.27;
 
 struct ValidatorData {
+	uint256 votersCount;
 	uint256 voteBalance;
 	bool isResigned;
 	bytes bls12_381_public_key; // 96 bits
@@ -15,6 +16,9 @@ struct Vote {
 	address validator;
 	uint256 balance;
 }
+
+event ValidatorRegistered(address addr, bytes bls12_381_public_key);
+event ValidatorResigned(address addr);
 
 event Voted(address voter, address validator);
 event Unvoted(address voter, address validator);
@@ -42,6 +46,7 @@ contract Consensus {
 	address immutable _owner;
 
 	uint256 private _registeredValidatorsCount = 0;
+	uint256 private _resignedValidatorsCount = 0;
 	mapping(address => ValidatorData) private _registeredValidatorData;
 	mapping(address => bool) private _hasRegisteredValidator;
 	mapping(bytes32 => bool) private _registeredPublicKeys;
@@ -54,10 +59,18 @@ contract Consensus {
 	uint256 private _topValidatorsCount = 0;
 	address[] private _calculatedTopValidators;
 
-	address[] private _resignedValidators;
-
 	constructor() {
 		_owner = msg.sender;
+	}
+
+	modifier onlyOwner() {
+		require(msg.sender == _owner, "Caller is not the contract owner");
+		_;
+	}
+
+	modifier preventOwner() {
+		require(msg.sender != _owner, "Caller is the contract owner");
+		_;
 	}
 
 	function shuffle() internal {
@@ -84,27 +97,36 @@ contract Consensus {
 		_topValidatorsCount = 0;
 	}
 
-	function calculateTopValidators(uint8 n) external {
+	function calculateTopValidators(uint8 n) external onlyOwner {
 		shuffle();
 		deleteTopValidators();
 
-		uint8 top = uint8(_clamp(n, 0, _registeredValidators.length));
+		_head = address(0);
+
+		uint8 top = uint8(_clamp(n, 0, _registeredValidatorsCount - _resignedValidatorsCount)); // TODO: Use new method that returns registered validators
 		if (top == 0) {
 			return;
 		}
 
-		_head = _registeredValidators[0];
-		_topValidatorsCount = 1;
-
-		for (uint i = 1; i < _registeredValidators.length; i++) {
+		for (uint i = 0; i < _registeredValidators.length; i++) {
 			address addr = _registeredValidators[i];
+
+			ValidatorData storage data = _registeredValidatorData[addr];
+			if (data.isResigned) {
+				continue;
+			}
+
+			if (_head == address(0)) {
+				_head = addr;
+				_topValidatorsCount = 1;
+				continue;
+			}
 
 			if (_topValidatorsCount < top) {
 				insertTopValidator(addr, top);
 				continue;
 			}
 
-			ValidatorData storage data = _registeredValidatorData[addr];
 			ValidatorData storage headData = _registeredValidatorData[_head];
 
 			if (_isGreater(Validator({addr: addr, data: data}), Validator({addr: _head, data: headData}))) {
@@ -187,17 +209,31 @@ contract Consensus {
 		return result;
 	}
 
+	function getAllValidators() public view returns (Validator[] memory) {
+		Validator[] memory result = new Validator[](_registeredValidators.length);
+		for (uint i = 0; i < _registeredValidators.length; i++) {
+			address addr = _registeredValidators[i];
+			ValidatorData storage data = _registeredValidatorData[addr];
+			result[i] = Validator({addr: addr, data: data});
+		}
+
+		return result;
+	}
+
 	function registeredValidatorsCount() public view returns (uint256) {
 		return _registeredValidatorsCount;
+	}
+
+	function resignedValidatorsCount() public view returns (uint256) {
+		return _resignedValidatorsCount;
 	}
 
 	function activeValidatorsCount() public view returns (uint256) {
 		return _calculatedTopValidators.length;
 	}
 
-	function registerValidator(bytes calldata bls12_381_public_key) external {
-		require(msg.sender != _owner, "Invalid caller");
-		require(!_hasRegisteredValidator[msg.sender], "ValidatorData is already registered");
+	function registerValidator(bytes calldata bls12_381_public_key) external preventOwner {
+		require(!_hasRegisteredValidator[msg.sender], "Validator is already registered");
 
 		bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
 
@@ -206,6 +242,7 @@ contract Consensus {
 		_checkBls12_381PublicKey(bls12_381_public_key);
 
 		ValidatorData memory validator = ValidatorData({
+			votersCount: 0,
 			voteBalance: 0,
 			isResigned: false,
 			bls12_381_public_key: bls12_381_public_key
@@ -215,67 +252,21 @@ contract Consensus {
 		_hasRegisteredValidator[msg.sender] = true;
 		_registeredValidatorData[msg.sender] = validator;
 		_registeredPublicKeys[bls_public_key_hash] = true;
-
-		// TODO
-		// if (_registeredValidatorsCount < MIN_VALIDATORS) {
 		_registeredValidators.push(msg.sender);
-		// }
+
+		emit ValidatorRegistered(msg.sender, bls12_381_public_key);
 	}
 
-	function deregisterValidator() external {
-		require(isValidatorRegistered(msg.sender), "Caller not a validator");
+	function resignValidator() external {
+		require(isValidatorRegistered(msg.sender), "Caller is not a validator");
 
 		ValidatorData storage validator = _registeredValidatorData[msg.sender];
 		require(!validator.isResigned, "Validator is already resigned");
 
 		validator.isResigned = true;
-		_resignedValidators.push(msg.sender);
-	}
+		_resignedValidatorsCount += 1;
 
-	function performValidatorResignations() external {
-		// TODO: optimize removal from activeValidators array
-		uint256[] memory indexesToRemove = new uint256[](_resignedValidators.length);
-
-		for (uint256 i = 0; i < _resignedValidators.length; i++) {
-			address addr = _resignedValidators[i];
-			ValidatorData storage validator = _registeredValidatorData[addr];
-			require(validator.isResigned, "Validator is not resigned");
-
-			bytes32 bls_public_key_hash = keccak256(validator.bls12_381_public_key);
-
-			_registeredValidatorsCount--;
-			delete _hasRegisteredValidator[addr];
-			delete _registeredValidatorData[addr];
-			delete _registeredPublicKeys[bls_public_key_hash];
-
-			// find index
-			for (uint256 j = 0; i < _registeredValidators.length - 1; j++) {
-				if (_registeredValidators[j] != addr) {
-					continue;
-				}
-
-				indexesToRemove[i] = j;
-				break;
-			}
-		}
-
-		// Sort indexes in descending order to avoid shifting issues
-		for (uint256 i = 0; i < indexesToRemove.length; i++) {
-			for (uint256 j = i + 1; j < indexesToRemove.length; j++) {
-				if (indexesToRemove[i] < indexesToRemove[j]) {
-					(indexesToRemove[i], indexesToRemove[j]) = (indexesToRemove[j], indexesToRemove[i]);
-				}
-			}
-		}
-
-		for (uint256 i = 0; i < indexesToRemove.length; i++) {
-			uint256 index = indexesToRemove[i];
-			_registeredValidators[index] = _registeredValidators[_registeredValidators.length - 1];
-			_registeredValidators.pop();
-		}
-
-		// clear resigned validators
-		delete _resignedValidators;
+		emit ValidatorResigned(msg.sender);
 	}
 
 	function isValidatorRegistered(address addr) public view returns (bool) {
@@ -296,18 +287,34 @@ contract Consensus {
 		_registeredValidatorData[_validator.addr] = _validator.data;
 	}
 
-	function vote(address addr) external {
-		require(isValidatorRegistered(addr), "must vote for validator");
-		require(_votes[msg.sender].validator == address(0), "TODO: already voted");
+	function vote(address addr) external preventOwner {
+		require(isValidatorRegistered(addr), "Must vote for validator");
+		require(_votes[msg.sender].validator == address(0), "Already voted");
+
+		ValidatorData storage validatorData = _registeredValidatorData[addr];
+		require(!validatorData.isResigned, "Must vote for unresigned validator");
 
 		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance});
+
 		// TODO: safe math
-		_registeredValidatorData[addr].voteBalance += msg.sender.balance;
+		validatorData.voteBalance += msg.sender.balance;
+		validatorData.votersCount += 1;
 
 		emit Voted(msg.sender, addr);
 	}
 
-	function updateVoters(address[] calldata voters) external {
+	function unvote() external {
+		Vote storage voter = _votes[msg.sender];
+		require(voter.validator != address(0), "TODO: not voted");
+
+		emit Unvoted(msg.sender, voter.validator);
+
+		_registeredValidatorData[voter.validator].voteBalance -= voter.balance;
+		_registeredValidatorData[voter.validator].votersCount -= 1;
+		delete _votes[msg.sender];
+	}
+
+	function updateVoters(address[] calldata voters) external onlyOwner {
 		// TODO: limit number of voters per update?
 		for (uint i = 0; i < voters.length; i++) {
 			_updateVoter(voters[i]);
