@@ -64,11 +64,11 @@ export class Bootstrapper {
 			await this.#setGenesisCommit();
 			await this.#checkStoredGenesisCommit();
 
+			await this.#initState();
+
 			if (this.apiSync) {
 				await this.apiSync.bootstrap();
 			}
-
-			await this.#initState();
 
 			this.state.setBootstrap(false);
 

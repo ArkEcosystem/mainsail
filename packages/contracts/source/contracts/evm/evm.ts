@@ -18,6 +18,8 @@ export interface Instance extends CommitHandler {
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
+	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
+	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	calculateTopValidators(context: CalculateTopValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
@@ -84,6 +86,16 @@ export interface TransactionViewContext {
 	readonly specId: SpecId;
 }
 
+export interface GetAccountsResult {
+	readonly nextOffset?: bigint;
+	readonly accounts: AccountUpdate[];
+}
+
+export interface GetReceiptsResult {
+	readonly nextOffset?: bigint;
+	readonly receipts: TransactionReceipt[];
+}
+
 export interface BlockContext {
 	readonly commitKey: CommitKey;
 	readonly gasLimit: bigint;
@@ -118,6 +130,10 @@ export interface TransactionReceipt {
 	readonly deployedContractAddress?: string;
 	readonly logs: any;
 	readonly output?: Buffer;
+
+	// Only present when reading receipts explicitly via `get_receipts`
+	readonly blockHeight?: bigint;
+	readonly txHash?: string;
 }
 
 // Supported EVM specs

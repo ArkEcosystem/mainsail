@@ -44,7 +44,7 @@ type HeedHeight = heed::types::U64<heed::byteorder::LittleEndian>;
 type StorageEntry = (U256, U256);
 
 // txHash -> receipt
-#[derive(Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 struct CommitReceipts {
     accounts_hash: B256,
     storage_hash: B256,
@@ -164,6 +164,65 @@ impl PersistentDB {
         self.genesis_info.replace(genesis_info);
     }
 
+    pub fn get_accounts(
+        &self,
+        offset: u64,
+        limit: u64,
+    ) -> Result<(Option<u64>, Vec<state_changes::AccountUpdate>), Error> {
+        let tx_env = self.env.read_txn()?;
+        let iter = self
+            .inner
+            .borrow()
+            .accounts
+            .iter(&tx_env)?
+            .skip(offset as usize);
+
+        self.get_items(
+            iter,
+            |item| match item {
+                Some(item) => {
+                    let (address, info) = item?;
+                    Ok(Some(state_changes::AccountUpdate {
+                        address: address.0,
+                        balance: info.balance,
+                        nonce: info.nonce,
+                        ..Default::default()
+                    }))
+                }
+                None => Ok(None),
+            },
+            offset,
+            limit,
+        )
+    }
+
+    pub fn get_receipts(
+        &self,
+        offset: u64,
+        limit: u64,
+    ) -> Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>), Error> {
+        let tx_env = self.env.read_txn()?;
+        let iter = self
+            .inner
+            .borrow()
+            .commits
+            .iter(&tx_env)?
+            .skip(offset as usize);
+
+        self.get_items(
+            iter,
+            |item| match item {
+                Some(item) => {
+                    let (height, CommitReceipts { tx_receipts, .. }) = item?;
+                    Ok(Some((height, tx_receipts.into_iter().collect())))
+                }
+                None => Ok(None),
+            },
+            offset,
+            limit,
+        )
+    }
+
     pub fn resize(&self) -> Result<(), Error> {
         let info = self.env.info();
 
@@ -176,6 +235,42 @@ impl PersistentDB {
         unsafe { self.env.resize(next_map_size)? };
 
         Ok(())
+    }
+
+    fn get_items<T, I, F>(
+        &self,
+        mut iter: impl Iterator<Item = I>,
+        map: F,
+        offset: u64,
+        limit: u64,
+    ) -> Result<(Option<u64>, Vec<T>), Error>
+    where
+        F: Fn(Option<I>) -> Result<Option<T>, Error>,
+    {
+        let limit = limit as usize;
+        let mut items = Vec::with_capacity(limit);
+
+        loop {
+            let item = map(iter.next())?;
+            let Some(item) = item else {
+                break;
+            };
+
+            items.push(item);
+
+            if items.len() == limit {
+                break;
+            }
+        }
+
+        let next = if items.len() == limit {
+            // return next offset as there might be more to read
+            Some(offset + items.len() as u64)
+        } else {
+            None
+        };
+
+        Ok((next, items))
     }
 }
 
@@ -785,4 +880,162 @@ fn test_resize_on_commit() {
     let env = unsafe { env_builder.open(path.path().join("evm.mdb")) }.expect("ok");
     let db = PersistentDB::new_with_env(env).expect("open");
     assert_eq!(db.env.info().map_size, MAP_SIZE_UNIT);
+}
+
+#[test]
+fn test_read_accounts() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+
+    let addresses = [
+        address!("27b1fdb04752bbc536007a920d24acb045561c26"),
+        address!("3599689E6292b81B2d85451025146515070129Bb"),
+        address!("42712D45473476b98452f434e72461577D686318"),
+        address!("52908400098527886E0F7030069857D2E4169EE7"),
+        address!("5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"),
+        address!("6549f4939460DE12611948b3f82b88C3C8975323"),
+        address!("66f9664f97F2b50F62D13eA064982f936dE76657"),
+        address!("8617E340B3D01FA5F11F306F4090FD50E238070D"),
+        address!("88021160C5C792225E4E5452585947470010289D"),
+        address!("D1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"),
+        address!("dbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB"),
+        address!("de709f2102306220921060314715629080e2fb77"),
+        address!("fB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"),
+    ];
+
+    {
+        let mut wtxn = db.env.write_txn().unwrap();
+
+        for (index, address) in addresses.iter().enumerate() {
+            db.inner
+                .borrow_mut()
+                .accounts
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(*address),
+                    &AccountInfo {
+                        balance: U256::from(index),
+                        nonce: index as u64,
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+        }
+        wtxn.commit().unwrap();
+    }
+
+    const LIMIT: u64 = 5;
+    let mut offset = 0;
+
+    let mut read = 0;
+
+    loop {
+        let (next, accounts) = db.get_accounts(offset, LIMIT).unwrap();
+        for account in accounts {
+            println!("{:?}", account);
+            read += 1;
+        }
+
+        if next.is_none() {
+            break;
+        }
+
+        match next {
+            Some(next) => {
+                offset = next;
+            }
+            None => {
+                break;
+            }
+        }
+    }
+
+    assert_eq!(read, addresses.len());
+}
+
+#[test]
+fn test_read_receipts() {
+    let path = tempfile::Builder::new()
+        .prefix("evm.mdb")
+        .tempdir()
+        .unwrap();
+
+    let db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+
+    let target_height = 100;
+    let mut total_receipts = 0;
+
+    {
+        let mut wtxn = db.env.write_txn().unwrap();
+
+        fn random_b256(seed: u64, offset: u64) -> B256 {
+            use std::collections::hash_map::DefaultHasher;
+            use std::hash::{Hash, Hasher};
+            let mut hasher = DefaultHasher::new();
+            seed.hash(&mut hasher);
+
+            B256::from(U256::from(hasher.finish() + offset))
+        }
+
+        for i in 0..target_height {
+            let height = (i + 1) as u64;
+
+            let receipts: HashMap<B256, TxReceipt> = HashMap::from([
+                (random_b256(height, 0), TxReceipt::default()),
+                (random_b256(height, 1), TxReceipt::default()),
+                (random_b256(height, 2), TxReceipt::default()),
+                (random_b256(height, 3), TxReceipt::default()),
+            ]);
+
+            total_receipts += receipts.len();
+
+            db.inner
+                .borrow_mut()
+                .commits
+                .put(
+                    &mut wtxn,
+                    &height,
+                    &CommitReceipts {
+                        tx_receipts: receipts,
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+        }
+        wtxn.commit().unwrap();
+    }
+
+    const LIMIT: u64 = 7;
+    let mut offset = 0;
+
+    let mut read_height = 0;
+    let mut read_receipts = 0;
+
+    loop {
+        let (next, items) = db.get_receipts(offset, LIMIT).unwrap();
+        for (height, receipts) in items {
+            read_height = height;
+            read_receipts += receipts.len();
+        }
+
+        if next.is_none() {
+            break;
+        }
+
+        match next {
+            Some(next) => {
+                offset = next;
+            }
+            None => {
+                break;
+            }
+        }
+    }
+
+    assert_eq!(read_height, target_height);
+    assert_eq!(read_receipts, total_receipts);
 }

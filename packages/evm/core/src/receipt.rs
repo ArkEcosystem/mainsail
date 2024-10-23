@@ -1,7 +1,7 @@
 use revm::primitives::{Bytes, ExecutionResult, Log};
 use serde::{Deserialize, Serialize};
 
-#[derive(Default, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct TxReceipt {
     pub gas_used: u64,
     pub gas_refunded: u64,

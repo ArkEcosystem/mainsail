@@ -308,6 +308,33 @@ impl EvmInner {
         }
     }
 
+    pub fn get_accounts(
+        &mut self,
+        offset: u64,
+        limit: u64,
+    ) -> std::result::Result<(Option<u64>, Vec<AccountUpdate>), EVMError<String>> {
+        match self.persistent_db.get_accounts(offset, limit) {
+            Ok((next_offset, accounts)) => Ok((next_offset, accounts)),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading accounts: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn get_receipts(
+        &mut self,
+        offset: u64,
+        limit: u64,
+    ) -> std::result::Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>), EVMError<String>>
+    {
+        match self.persistent_db.get_receipts(offset, limit) {
+            Ok((next_offset, receipts)) => Ok((next_offset, receipts)),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading receipts: {}", err).into(),
+            )),
+        }
+    }
+
     pub fn process(
         &mut self,
         tx_ctx: TxContext,
@@ -685,6 +712,38 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsGetAccounts>")]
+    pub fn get_accounts(
+        &mut self,
+        node_env: Env,
+        offset: JsBigInt,
+        limit: JsBigInt,
+    ) -> Result<JsObject> {
+        let offset = offset.get_u64()?.0;
+        let limit = limit.get_u64()?.0;
+
+        node_env.execute_tokio_future(
+            Self::get_accounts_async(self.evm.clone(), offset, limit),
+            |&mut node_env, result| Ok(result::JsGetAccounts::new(&node_env, result.0, result.1)?),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<JsGetReceipts>")]
+    pub fn get_receipts(
+        &mut self,
+        node_env: Env,
+        offset: JsBigInt,
+        limit: JsBigInt,
+    ) -> Result<JsObject> {
+        let offset = offset.get_u64()?.0;
+        let limit = limit.get_u64()?.0;
+
+        node_env.execute_tokio_future(
+            Self::get_receipts_async(self.evm.clone(), offset, limit),
+            |&mut node_env, result| Ok(result::JsGetReceipts::new(&node_env, result.0, result.1)?),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<string>")]
     pub fn code_at(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
@@ -870,6 +929,34 @@ impl JsEvmWrapper {
     ) -> Result<String> {
         let mut lock = evm.lock().await;
         let result = lock.state_hash(commit_key, current_hash);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_accounts_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        offset: u64,
+        limit: u64,
+    ) -> Result<(Option<u64>, Vec<AccountUpdate>)> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_accounts(offset, limit);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_receipts_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        offset: u64,
+        limit: u64,
+    ) -> Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>)> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_receipts(offset, limit);
 
         match result {
             Ok(result) => Result::Ok(result),

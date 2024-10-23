@@ -51,6 +51,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		);
 	}
 
+	public async findCommits(start: number, end: number): Promise<Contracts.Crypto.Commit[]> {
+		return await this.#map<Contracts.Crypto.Commit>(
+			await this.findCommitBuffers(start, end),
+			async (block: Buffer) => await this.commitFactory.fromBytes(block),
+		);
+	}
+
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
 			const data = this.#get(height);

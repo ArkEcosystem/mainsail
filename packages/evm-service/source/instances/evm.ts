@@ -39,6 +39,14 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.getAccountInfo(address);
 	}
 
+	public async getAccounts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetAccountsResult> {
+		return this.#evm.getAccounts(offset, limit);
+	}
+
+	public async getReceipts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetReceiptsResult> {
+		return this.#evm.getReceipts(offset, limit);
+	}
+
 	public async updateRewardsAndVotes(context: Contracts.Evm.UpdateRewardsAndVotesContext): Promise<void> {
 		return this.#evm.updateRewardsAndVotes(context);
 	}

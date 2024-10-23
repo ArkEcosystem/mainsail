@@ -8,6 +8,7 @@ export interface DatabaseService {
 	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 	readCommits(start: number, end: number): AsyncGenerator<Commit>;
 	findBlocks(start: number, end: number): Promise<Block[]>;
+	findCommits(start: number, end: number): Promise<Commit[]>;
 
 	getLastCommit(): Promise<Commit>;
 	addCommit(block: Commit): void;

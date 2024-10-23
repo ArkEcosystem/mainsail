@@ -10,6 +10,7 @@ import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
+import { Restore } from "./restore.js";
 
 interface DeferredSync {
 	block: Models.Block;
@@ -98,6 +99,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	public async bootstrap(): Promise<void> {
+		await this.app.resolve(Restore).restore();
+
+		process.exit(1);
 		await this.#bootstrapConfiguration();
 		await this.#bootstrapState();
 		await this.#bootstrapTransactionTypes();
@@ -357,16 +361,12 @@ export class Sync implements Contracts.ApiSync.Service {
 			const constructor = handler.getConstructor();
 
 			const type: number | undefined = constructor.type;
-			const typeGroup: number | undefined = constructor.typeGroup;
-			const version: number | undefined = constructor.version;
 			const key: string | undefined = constructor.key;
 
 			Utils.assert.defined<number>(type);
-			Utils.assert.defined<number>(typeGroup);
-			Utils.assert.defined<number>(version);
 			Utils.assert.defined<string>(key);
 
-			types.push({ key, schema: constructor.getSchema().properties, type, typeGroup, version });
+			types.push({ key, schema: constructor.getSchema().properties, type, typeGroup: 0, version: 0 });
 		}
 
 		types.sort((a, b) => {

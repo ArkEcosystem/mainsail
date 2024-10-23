@@ -26,6 +26,7 @@ pub struct StorageChangeset {
     pub storage: Vec<(U256, StorageSlot)>,
 }
 
+#[derive(Default, Debug)]
 pub struct AccountUpdate {
     pub address: Address,
     pub balance: U256,

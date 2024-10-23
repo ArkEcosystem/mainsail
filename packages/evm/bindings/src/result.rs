@@ -1,7 +1,7 @@
 use mainsail_evm_core::{receipt::TxReceipt, state_changes::AccountUpdate};
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
-use revm::primitives::{AccountInfo, Bytes};
+use revm::primitives::{AccountInfo, Bytes, B256};
 
 use crate::utils;
 
@@ -54,6 +54,9 @@ impl JsViewResult {
 
 #[napi(object)]
 pub struct JsTransactionReceipt {
+    pub block_height: Option<JsBigInt>,
+    pub tx_hash: Option<JsString>,
+
     pub gas_used: JsBigInt,
     pub gas_refunded: JsBigInt,
     pub success: bool,
@@ -98,6 +101,8 @@ impl JsTransactionReceipt {
                     .unwrap()
                     .into_raw()
             }),
+            block_height: None,
+            tx_hash: None,
         })
     }
 }
@@ -144,6 +149,71 @@ impl JsAccountUpdate {
             balance: utils::convert_u256_to_bigint(node_env, account_update.balance)?,
             vote,
             unvote,
+        })
+    }
+}
+
+#[napi(object)]
+pub struct JsGetAccounts {
+    pub next_offset: Option<JsBigInt>,
+    pub accounts: Vec<JsAccountUpdate>,
+}
+
+impl JsGetAccounts {
+    pub fn new(
+        node_env: &napi::Env,
+        next_offset: Option<u64>,
+        accounts: Vec<AccountUpdate>,
+    ) -> anyhow::Result<Self> {
+        let next_offset = match next_offset {
+            Some(next_offset) => Some(node_env.create_bigint_from_u64(next_offset)?),
+            None => None,
+        };
+
+        let mut mapped = Vec::with_capacity(accounts.len());
+        for account in accounts {
+            mapped.push(JsAccountUpdate::new(node_env, account)?);
+        }
+
+        Ok(JsGetAccounts {
+            next_offset,
+            accounts: mapped,
+        })
+    }
+}
+
+#[napi(object)]
+pub struct JsGetReceipts {
+    pub next_offset: Option<JsBigInt>,
+    pub receipts: Vec<JsTransactionReceipt>,
+}
+
+impl JsGetReceipts {
+    pub fn new(
+        node_env: &napi::Env,
+        next_offset: Option<u64>,
+        receipts_by_height: Vec<(u64, Vec<(B256, TxReceipt)>)>,
+    ) -> anyhow::Result<Self> {
+        let next_offset = match next_offset {
+            Some(next_offset) => Some(node_env.create_bigint_from_u64(next_offset)?),
+            None => None,
+        };
+
+        let mut mapped = vec![];
+        for (height, tx_receipts) in receipts_by_height {
+            for (hash, tx_receipt) in tx_receipts {
+                let mut receipt = JsTransactionReceipt::new(node_env, tx_receipt)?;
+
+                receipt.block_height = Some(node_env.create_bigint_from_u64(height)?);
+                receipt.tx_hash = Some(node_env.create_string_from_std(hash.to_string())?);
+
+                mapped.push(receipt);
+            }
+        }
+
+        Ok(JsGetReceipts {
+            next_offset,
+            receipts: mapped,
         })
     }
 }
