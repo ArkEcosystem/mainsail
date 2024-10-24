@@ -117,10 +117,10 @@ export class Restore {
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const context: RestoreContext = {
+				addressToPublicKey: {},
 				blockRepository: this.blockRepositoryFactory(entityManager),
 				configurationRepository: this.configurationRepositoryFactory(entityManager),
 				entityManager,
-				addressToPublicKey: {},
 				lastHeight: 0,
 				mostRecentCommit,
 				publicKeyToAddress: {},
@@ -346,8 +346,8 @@ export class Restore {
 												timestamp: validatorAttributes.lastBlock.timestamp,
 											}
 										: {},
-									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorProducedBlocks: validatorAttributes.producedBlocks,
+									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorResigned: validatorAttributes.isResigned,
 									validatorVoteBalance: validatorAttributes.voteBalance,
 									validatorVotersCount: validatorAttributes.votersCount,
