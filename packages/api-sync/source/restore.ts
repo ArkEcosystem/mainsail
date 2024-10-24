@@ -117,24 +117,24 @@ export class Restore {
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const context: RestoreContext = {
-				entityManager,
 				blockRepository: this.blockRepositoryFactory(entityManager),
 				configurationRepository: this.configurationRepositoryFactory(entityManager),
+				entityManager,
+				addressToPublicKey: {},
+				lastHeight: 0,
+				mostRecentCommit,
+				publicKeyToAddress: {},
+				receiptRepository: this.receiptRepositoryFactory(entityManager),
 				stateRepository: this.stateRepositoryFactory(entityManager),
+
+				totalSupply: Utils.BigNumber.ZERO,
+
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
-				receiptRepository: this.receiptRepositoryFactory(entityManager),
+				userAttributes: {},
+				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
-
-				mostRecentCommit,
-
-				lastHeight: 0,
-				totalSupply: Utils.BigNumber.ZERO,
-				addressToPublicKey: {},
-				publicKeyToAddress: {},
-				validatorAttributes: {},
-				userAttributes: {},
 			};
 
 			// The restore keeps a long-lived postgres transaction while it ingests all data.
@@ -299,12 +299,12 @@ export class Restore {
 		for (const validator of validators) {
 			context.validatorAttributes[validator.address] = {
 				blsPublicKey: validator.blsPublicKey,
-				voteBalance: validator.voteBalance,
-				votersCount: validator.votersCount,
 				isResigned: validator.isResigned,
 				producedBlocks: 0,
 				totalForgedFees: Utils.BigNumber.ZERO,
 				totalForgedRewards: Utils.BigNumber.ZERO,
+				voteBalance: validator.voteBalance,
+				votersCount: validator.votersCount,
 			};
 		}
 
@@ -331,16 +331,9 @@ export class Restore {
 
 				accounts.push({
 					address: account.address,
-					publicKey: context.addressToPublicKey[account.address] ?? "",
-					balance: Utils.BigNumber.make(account.balance).toFixed(),
-					nonce: Utils.BigNumber.make(account.nonce).toFixed(),
 					attributes: {
 						...(validatorAttributes
 							? {
-									validatorPublicKey: validatorAttributes.blsPublicKey,
-									validatorResigned: validatorAttributes.isResigned,
-									validatorVoteBalance: validatorAttributes.voteBalance,
-									validatorVotersCount: validatorAttributes.votersCount,
 									validatorForgedFees: validatorAttributes.totalForgedFees.toFixed(),
 									validatorForgedRewards: validatorAttributes.totalForgedRewards.toFixed(),
 									validatorForgedTotal: validatorAttributes.totalForgedFees
@@ -353,7 +346,11 @@ export class Restore {
 												timestamp: validatorAttributes.lastBlock.timestamp,
 											}
 										: {},
+									validatorPublicKey: validatorAttributes.blsPublicKey,
 									validatorProducedBlocks: validatorAttributes.producedBlocks,
+									validatorResigned: validatorAttributes.isResigned,
+									validatorVoteBalance: validatorAttributes.voteBalance,
+									validatorVotersCount: validatorAttributes.votersCount,
 
 									// updated at end of db transaction
 									// - validatorRank
@@ -367,6 +364,9 @@ export class Restore {
 								}
 							: {}),
 					},
+					balance: Utils.BigNumber.make(account.balance).toFixed(),
+					nonce: Utils.BigNumber.make(account.nonce).toFixed(),
+					publicKey: context.addressToPublicKey[account.address] ?? "",
 					updated_at: "0",
 				});
 			}
@@ -397,11 +397,11 @@ export class Restore {
 				Utils.assert.defined(receipt.blockHeight);
 
 				receipts.push({
-					id: receipt.txHash,
 					blockHeight: Utils.BigNumber.make(receipt.blockHeight).toFixed(),
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
+					id: receipt.txHash,
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
@@ -483,8 +483,8 @@ export class Restore {
 			.insert()
 			.orIgnore()
 			.values({
-				id: 1,
 				height: context.lastHeight.toFixed(),
+				id: 1,
 				supply: context.totalSupply.toFixed(),
 			})
 			.execute();
