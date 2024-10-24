@@ -99,12 +99,15 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	public async bootstrap(): Promise<void> {
-		await this.app.resolve(Restore).restore();
-
-		process.exit(1);
-		await this.#bootstrapConfiguration();
-		await this.#bootstrapState();
-		await this.#bootstrapTransactionTypes();
+		// if our database is empty, we sync all blocks from scratch
+		const [blocks] = await this.dataSource.query("select count(1) from blocks");
+		if (blocks.count === "0") {
+			await this.#bootstrapRestore();
+		} else {
+			await this.#bootstrapConfiguration();
+			await this.#bootstrapState();
+			await this.#bootstrapTransactionTypes();
+		}
 
 		await this.listeners.bootstrap();
 
@@ -322,6 +325,10 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	public async getLastSyncedBlockHeight(): Promise<number> {
 		return (await this.blockRepositoryFactory().getLatestHeight()) ?? 0;
+	}
+
+	async #bootstrapRestore(): Promise<void> {
+		await this.app.resolve(Restore).restore();
 	}
 
 	async #bootstrapConfiguration(): Promise<void> {
