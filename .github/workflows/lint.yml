@@ -44,6 +44,11 @@ jobs:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: ${{ runner.os }}-pnpm-
 
+            - name: Install Foundry
+              uses: foundry-rs/foundry-toolchain@v1
+              with:
+                  version: nightly
+
             - name: Install dependencies
               run: pnpm install
 
@@ -55,6 +60,11 @@ jobs:
 
             - name: Prettier
               run: pnpm run prettier
+
+            - name: Forge Format
+              working-directory: contracts
+              run: |
+                  forge fmt
 
             - uses: stefanzweifel/git-auto-commit-action@v5
               with:
