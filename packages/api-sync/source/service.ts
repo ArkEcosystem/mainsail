@@ -461,7 +461,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					`
 	INSERT INTO wallets AS "Wallet" (address, public_key, balance, nonce, attributes, updated_at)
 	VALUES ${placeholders}
-	ON CONFLICT ("address") DO UPDATE SET 
+	ON CONFLICT ("address") DO UPDATE SET
 		balance = COALESCE(NULLIF(EXCLUDED.balance, '-1'), "Wallet".balance),
 		nonce = COALESCE(NULLIF(EXCLUDED.nonce, '-1'), "Wallet".nonce),
 		updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
@@ -469,8 +469,8 @@ export class Sync implements Contracts.ApiSync.Service {
 		attributes = jsonb_strip_nulls(jsonb_build_object(
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',
-			CASE 
-				WHEN EXCLUDED.attributes->>'unvote' IS NOT NULL THEN NULL 
+			CASE
+				WHEN EXCLUDED.attributes->>'unvote' IS NOT NULL THEN NULL
 				ELSE COALESCE(EXCLUDED.attributes->>'vote', "Wallet".attributes->>'vote')
 			END,
 
