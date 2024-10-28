@@ -471,4 +471,110 @@ contract ConsensusTest is Test {
 		allVoters = consensus.getVoters();
 		assertEq(allVoters.length, 0);
 	}
+
+	function test_multiple_voted_same_validator() public {
+		// Assert voters
+		assertEq(consensus.getVotersCount(), 0);
+		VoteResult[] memory allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
+
+		// Register validators
+		address validatorAddr1 = address(1);
+		registerValidator(validatorAddr1);
+
+		// Vote 1
+		address voterAddr1 = address(11);
+		vm.deal(voterAddr1, 100 ether);
+		vm.startPrank(voterAddr1);
+		consensus.vote(validatorAddr1);
+		vm.stopPrank();
+
+		// Vote 2
+		address voterAddr2 = address(12);
+		vm.deal(voterAddr2, 100 ether);
+		vm.startPrank(voterAddr2);
+		consensus.vote(validatorAddr1);
+		vm.stopPrank();
+
+		// Vote 3
+		address voterAddr3 = address(13);
+		vm.deal(voterAddr3, 100 ether);
+		vm.startPrank(voterAddr3);
+		consensus.vote(validatorAddr1);
+		vm.stopPrank();
+
+		// Assert validators 1
+		Validator memory validator1 = consensus.getValidator(validatorAddr1);
+		assertEq(validator1.addr, validatorAddr1);
+		assertEq(validator1.data.voteBalance, 300 ether);
+		assertEq(validator1.data.votersCount, 3);
+
+		// Assert voters
+		assertEq(consensus.getVotersCount(), 3);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 3);
+		assertEq(allVoters[0].voter, voterAddr1);
+		assertEq(allVoters[0].validator, validatorAddr1);
+		assertEq(allVoters[1].voter, voterAddr2);
+		assertEq(allVoters[1].validator, validatorAddr1);
+		assertEq(allVoters[2].voter, voterAddr3);
+		assertEq(allVoters[2].validator, validatorAddr1);
+
+		// UNVOTE
+		// Middle voter
+		vm.startPrank(voterAddr2);
+		consensus.unvote();
+		vm.stopPrank();
+
+		// Assert validators 1
+		validator1 = consensus.getValidator(validatorAddr1);
+		assertEq(validator1.addr, validatorAddr1);
+		assertEq(validator1.data.voteBalance, 200 ether);
+		assertEq(validator1.data.votersCount, 2);
+
+		// Assert voters
+		assertEq(consensus.getVotersCount(), 2);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 2);
+		assertEq(allVoters[0].voter, voterAddr1);
+		assertEq(allVoters[0].validator, validatorAddr1);
+		assertEq(allVoters[1].voter, voterAddr3);
+		assertEq(allVoters[1].validator, validatorAddr1);
+
+		// UNVOTE
+		// Last voter
+		vm.startPrank(voterAddr3);
+		consensus.unvote();
+		vm.stopPrank();
+
+		// Assert validators 1
+		validator1 = consensus.getValidator(validatorAddr1);
+		assertEq(validator1.addr, validatorAddr1);
+		assertEq(validator1.data.voteBalance, 100 ether);
+		assertEq(validator1.data.votersCount, 1);
+
+		// Assert voters
+		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr1);
+		assertEq(allVoters[0].validator, validatorAddr1);
+
+		// UNVOTE
+		// First voter
+		vm.startPrank(voterAddr1);
+		consensus.unvote();
+		vm.stopPrank();
+
+		// Assert validators 1
+		validator1 = consensus.getValidator(validatorAddr1);
+		assertEq(validator1.addr, validatorAddr1);
+		assertEq(validator1.data.voteBalance, 0 ether);
+		assertEq(validator1.data.votersCount, 0);
+
+		// Assert voters
+		assertEq(consensus.getVotersCount(), 0);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
+	}
 }
