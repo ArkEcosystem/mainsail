@@ -15,6 +15,8 @@ struct Validator {
 struct Vote {
 	address validator;
 	uint256 balance;
+	address prev;
+	address next;
 }
 
 event ValidatorRegistered(address addr, bytes bls12_381_public_key);
@@ -296,7 +298,7 @@ contract Consensus {
 		ValidatorData storage validatorData = _registeredValidatorData[addr];
 		require(!validatorData.isResigned, "Must vote for unresigned validator");
 
-		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance});
+		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance, prev: address(0), next: address(0)});
 
 		// TODO: safe math
 		validatorData.voteBalance += msg.sender.balance;
