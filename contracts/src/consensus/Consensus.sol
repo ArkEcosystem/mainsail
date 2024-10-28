@@ -303,7 +303,7 @@ contract Consensus {
 		return _votersCount;
 	}
 
-	function getVoters() public view returns (VoteResult[] memory) {
+	function getVoters() public view onlyOwner returns (VoteResult[] memory) {
 		VoteResult[] memory result = new VoteResult[](_votersCount);
 
 		address next = _votersHead;

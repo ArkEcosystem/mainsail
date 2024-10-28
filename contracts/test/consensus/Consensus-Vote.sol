@@ -97,6 +97,13 @@ contract ConsensusTest is Test {
 		consensus.vote(address(1));
 	}
 
+	function test_get_voters_revert_if_caller_is_not_owner() public {
+		vm.startPrank(address(1));
+
+		vm.expectRevert("Caller is not the contract owner");
+		consensus.getVoters();
+	}
+
 	function test_vote_allow_self_vote() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
