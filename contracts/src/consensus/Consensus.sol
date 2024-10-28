@@ -54,7 +54,7 @@ contract Consensus {
 
 	mapping(address => Vote) private _votes;
 
-	address private _head;
+	address private _topValidatorsHead;
 	mapping(address => address) private _topValidators;
 	uint256 private _topValidatorsCount = 0;
 	address[] private _calculatedTopValidators;
@@ -87,7 +87,7 @@ contract Consensus {
 	}
 
 	function deleteTopValidators() internal {
-		address next = _head;
+		address next = _topValidatorsHead;
 
 		while (next != address(0)) {
 			address current = next;
@@ -101,7 +101,7 @@ contract Consensus {
 		shuffle();
 		deleteTopValidators();
 
-		_head = address(0);
+		_topValidatorsHead = address(0);
 
 		uint8 top = uint8(_clamp(n, 0, _registeredValidatorsCount - _resignedValidatorsCount)); // TODO: Use new method that returns registered validators
 		if (top == 0) {
@@ -116,8 +116,8 @@ contract Consensus {
 				continue;
 			}
 
-			if (_head == address(0)) {
-				_head = addr;
+			if (_topValidatorsHead == address(0)) {
+				_topValidatorsHead = addr;
 				_topValidatorsCount = 1;
 				continue;
 			}
@@ -127,14 +127,16 @@ contract Consensus {
 				continue;
 			}
 
-			ValidatorData storage headData = _registeredValidatorData[_head];
+			ValidatorData storage headData = _registeredValidatorData[_topValidatorsHead];
 
-			if (_isGreater(Validator({addr: addr, data: data}), Validator({addr: _head, data: headData}))) {
+			if (
+				_isGreater(Validator({addr: addr, data: data}), Validator({addr: _topValidatorsHead, data: headData}))
+			) {
 				insertTopValidator(addr, top);
 			}
 		}
 
-		address next = _head;
+		address next = _topValidatorsHead;
 		delete _calculatedTopValidators;
 		_calculatedTopValidators = new address[](top);
 		for (uint i = 0; i < top; i++) {
@@ -148,14 +150,14 @@ contract Consensus {
 
 		if (
 			_isGreater(
-				Validator({addr: _head, data: _registeredValidatorData[_head]}),
+				Validator({addr: _topValidatorsHead, data: _registeredValidatorData[_topValidatorsHead]}),
 				Validator({addr: addr, data: data})
 			)
 		) {
 			insertHead(addr);
 		} else {
-			address current = _topValidators[_head];
-			address previous = _head;
+			address current = _topValidators[_topValidatorsHead];
+			address previous = _topValidatorsHead;
 
 			while (true) {
 				if (current == address(0)) {
@@ -179,16 +181,16 @@ contract Consensus {
 		}
 
 		if (_topValidatorsCount > top) {
-			address next = _topValidators[_head];
-			delete _topValidators[_head];
-			_head = next;
+			address next = _topValidators[_topValidatorsHead];
+			delete _topValidators[_topValidatorsHead];
+			_topValidatorsHead = next;
 			_topValidatorsCount--;
 		}
 	}
 
 	function insertHead(address addr) internal {
-		_topValidators[addr] = _head;
-		_head = addr;
+		_topValidators[addr] = _topValidatorsHead;
+		_topValidatorsHead = addr;
 		_topValidatorsCount++;
 	}
 
