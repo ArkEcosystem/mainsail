@@ -54,7 +54,8 @@ contract Consensus {
 	mapping(bytes32 => bool) private _registeredPublicKeys;
 	address[] private _registeredValidators;
 
-	mapping(address => Vote) private _votes;
+	mapping(address => Vote) private _voters;
+	uint256 private _votersCount = 0;
 
 	address private _topValidatorsHead;
 	mapping(address => address) private _topValidators;
@@ -293,12 +294,12 @@ contract Consensus {
 
 	function vote(address addr) external preventOwner {
 		require(isValidatorRegistered(addr), "Must vote for validator");
-		require(_votes[msg.sender].validator == address(0), "Already voted");
+		require(_voters[msg.sender].validator == address(0), "Already voted");
 
 		ValidatorData storage validatorData = _registeredValidatorData[addr];
 		require(!validatorData.isResigned, "Must vote for unresigned validator");
 
-		_votes[msg.sender] = Vote({validator: addr, balance: msg.sender.balance, prev: address(0), next: address(0)});
+		_voters[msg.sender] = Vote({validator: addr, balance: msg.sender.balance, prev: address(0), next: address(0)});
 
 		// TODO: safe math
 		validatorData.voteBalance += msg.sender.balance;
@@ -308,14 +309,14 @@ contract Consensus {
 	}
 
 	function unvote() external {
-		Vote storage voter = _votes[msg.sender];
+		Vote storage voter = _voters[msg.sender];
 		require(voter.validator != address(0), "TODO: not voted");
 
 		emit Unvoted(msg.sender, voter.validator);
 
 		_registeredValidatorData[voter.validator].voteBalance -= voter.balance;
 		_registeredValidatorData[voter.validator].votersCount -= 1;
-		delete _votes[msg.sender];
+		delete _voters[msg.sender];
 	}
 
 	function updateVoters(address[] calldata voters) external onlyOwner {
@@ -326,7 +327,7 @@ contract Consensus {
 	}
 
 	function _updateVoter(address addr) private {
-		Vote storage voter = _votes[addr];
+		Vote storage voter = _voters[addr];
 		if (voter.validator == address(0)) {
 			return;
 		}
