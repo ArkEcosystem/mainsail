@@ -19,6 +19,11 @@ struct Vote {
 	address next;
 }
 
+struct VoteResult {
+	address voter;
+	address validator;
+}
+
 event ValidatorRegistered(address addr, bytes bls12_381_public_key);
 event ValidatorResigned(address addr);
 
@@ -298,6 +303,21 @@ contract Consensus {
 		return _votersCount;
 	}
 
+	function getVoters() public view returns (VoteResult[] memory) {
+		VoteResult[] memory result = new VoteResult[](_votersCount);
+
+		address next = _votersHead;
+		uint256 i = 0;
+
+		while (next != address(0)) {
+			Vote storage voter = _voters[next];
+			result[i++] = VoteResult({voter: next, validator: voter.validator});
+			next = voter.next;
+		}
+
+		return result;
+	}
+
 	function vote(address addr) external preventOwner {
 		require(isValidatorRegistered(addr), "Must vote for validator");
 		require(_voters[msg.sender].validator == address(0), "Already voted");
@@ -332,6 +352,20 @@ contract Consensus {
 
 		_registeredValidatorData[voter.validator].voteBalance -= voter.balance;
 		_registeredValidatorData[voter.validator].votersCount -= 1;
+
+		if (_votersHead == _votersTail) {
+			_votersHead = address(0);
+			_votersTail = address(0);
+		} else if (_votersTail == msg.sender) {
+			_voters[voter.prev].next = address(0);
+			_votersTail = voter.prev;
+		} else if (_votersHead == msg.sender) {
+			_voters[_votersTail].prev = address(0);
+			_votersHead = _voters[_votersHead].next;
+		} else {
+			_voters[voter.prev].next = voter.next;
+			_voters[voter.next].prev = voter.prev;
+		}
 		delete _voters[msg.sender];
 
 		_votersCount--;

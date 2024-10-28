@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, ValidatorData, Validator, Unvoted, Voted} from "@contracts/consensus/Consensus.sol";
+import {Consensus, ValidatorData, Validator, Unvoted, Voted, VoteResult} from "@contracts/consensus/Consensus.sol";
 
 contract ConsensusTest is Test {
 	Consensus public consensus;
@@ -37,6 +37,8 @@ contract ConsensusTest is Test {
 	function test_vote() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
+		VoteResult[] memory allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
 
 		// Register validator
 		address addr = address(1);
@@ -62,6 +64,10 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr);
+		assertEq(allVoters[0].validator, addr);
 
 		// Update vote should correctly update the vote balance
 		// Let say voter has 90 eth at the end of the block
@@ -80,6 +86,10 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr);
+		assertEq(allVoters[0].validator, addr);
 	}
 
 	function test_vote_revert_if_caller_is_owner() public {
@@ -90,6 +100,8 @@ contract ConsensusTest is Test {
 	function test_vote_allow_self_vote() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
+		VoteResult[] memory allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
 
 		// Register validator
 		address addr = address(1);
@@ -115,6 +127,10 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr);
+		assertEq(allVoters[0].validator, voterAddr);
 
 		// Update vote should correctly update the vote balance
 		// Let say voter has 90 eth at the end of the block
@@ -133,6 +149,10 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr);
+		assertEq(allVoters[0].validator, voterAddr);
 	}
 
 	function test_vote_prevent_double_vote() public {
@@ -176,6 +196,8 @@ contract ConsensusTest is Test {
 	function test_unvote_and_vote_in_same_block() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
+		VoteResult[] memory allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
 
 		// Register validator
 		address addr = address(1);
@@ -197,6 +219,10 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr);
+		assertEq(allVoters[0].validator, addr);
 
 		// Let say voter has 90 eth after some tx
 		vm.deal(voterAddr, 90 ether);
@@ -217,11 +243,15 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
 	}
 
 	function test_unvote_and_vote_in_different_blocks() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
+		VoteResult[] memory allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
 
 		// Register validator
 		address addr = address(1);
@@ -243,6 +273,10 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr);
+		assertEq(allVoters[0].validator, addr);
 
 		// Update vote should correctly update the vote balance
 		// Let say voter has 90 eth at the end of the block
@@ -260,6 +294,10 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr);
+		assertEq(allVoters[0].validator, addr);
 
 		// Let say voter has 80 eth after some tx
 		vm.deal(voterAddr, 80 ether);
@@ -280,6 +318,8 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 80 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
+		allVoters = consensus.getVoters();
+		assertEq(allVoters.length, 0);
 	}
 
 	// TODO: Test multiple votes
