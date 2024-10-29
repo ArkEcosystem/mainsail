@@ -107,7 +107,6 @@ contract Consensus {
 		_topValidatorsCount = 0;
 	}
 
-	// TODO: cap 'n' to sensitive maximum or tie it to milestone (which is updated on milestone change)
 	function calculateTopValidators(uint8 n) external onlyOwner {
 		shuffle();
 		deleteTopValidators();
