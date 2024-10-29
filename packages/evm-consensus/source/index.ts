@@ -2,6 +2,7 @@ import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
+import { ConsensusContractInteractor } from "./consensus-interactor.js";
 import { Deployer } from "./deployer.js";
 import { Selector } from "./selector.js";
 import { ValidatorSet } from "./validator-set.js";
@@ -14,6 +15,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 
 		this.app.bind(Identifiers.Proposer.Selector).to(Selector).inSingletonScope();
+		this.app.bind(Identifiers.Evm.Interactor.Consensus).to(ConsensusContractInteractor);
 	}
 
 	public async boot(): Promise<void> {

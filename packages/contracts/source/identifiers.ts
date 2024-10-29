@@ -146,6 +146,9 @@ export const Identifiers = {
 		WorkerSubprocess: {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
 		},
+		Interactor: {
+			Consensus: Symbol("Evm<Interactor.Consensus>"),
+		},
 	},
 	P2P: {
 		ApiNode: {

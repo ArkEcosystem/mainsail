@@ -26,6 +26,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"ethers": "^6.11.0"
 	},
 	"devDependencies": {
