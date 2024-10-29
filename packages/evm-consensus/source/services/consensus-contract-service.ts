@@ -5,11 +5,7 @@ import { BigNumber } from "@mainsail/utils";
 import { ethers } from "ethers";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
-
-type Vote = {
-	voterAddress: string;
-	validatorAddress: string;
-};
+import { AsyncVotesIterator } from "./votes-iterator.js";
 
 @injectable()
 export class ConsensusContractService implements Contracts.Evm.ConsensusContractService {
@@ -125,7 +121,7 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		return Number(voters);
 	}
 
-	getVotes(): AsyncIterable<Vote> {
+	getVotes(): AsyncIterable<Contracts.Evm.Vote> {
 		return this.app.resolve(AsyncVotesIterator);
 	}
 }
