@@ -103,7 +103,7 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
-		const data = iface.encodeFunctionData("getVotersCount").slice(2);
+		const data = iface.encodeFunctionData("getVotesCount").slice(2);
 
 		const result = await this.evm.view({
 			caller: deployerAddress,
@@ -113,10 +113,10 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		});
 
 		if (!result.success) {
-			await this.app.terminate("getVotersCount failed");
+			await this.app.terminate("getVotesCount failed");
 		}
 
-		const [voters] = iface.decodeFunctionResult("getVotersCount", result.output!);
+		const [voters] = iface.decodeFunctionResult("getVotesCount", result.output!);
 
 		return Number(voters);
 	}

@@ -48,7 +48,7 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
-		const data = iface.encodeFunctionData("getVoters", [this.#address, VOTES_PER_REQUEST]).slice(2);
+		const data = iface.encodeFunctionData("getVotes", [this.#address, VOTES_PER_REQUEST]).slice(2);
 
 		const result = await this.evm.view({
 			caller: deployerAddress,
@@ -58,10 +58,10 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 		});
 
 		if (!result.success) {
-			await this.app.terminate("getVoters failed");
+			await this.app.terminate("getVotes failed");
 		}
 
-		const [votes] = iface.decodeFunctionResult("getVoters", result.output!);
+		const [votes] = iface.decodeFunctionResult("getVotes", result.output!);
 
 		return votes.map((vote: string[]) => ({ validatorAddress: vote[1], voterAddress: vote[0] }));
 	}
