@@ -1,3 +1,4 @@
+export * from "./contract-service.js";
 export * from "./evm.js";
 export * from "./gas-fee.js";
 export * from "./state.js";

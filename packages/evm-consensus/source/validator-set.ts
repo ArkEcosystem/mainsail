@@ -2,15 +2,13 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-import { ConsensusContractInteractor } from "./consensus-interactor.js";
-
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Evm.Interactor.Consensus)
-	private readonly consensusContractInteractor!: ConsensusContractInteractor;
+	@inject(Identifiers.Evm.ContractService.Consensus)
+	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
 
 	#topValidators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
@@ -21,8 +19,12 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	public async restore(): Promise<void> {
 		await this.#buildActiveValidators();
 
-		const validators = await this.consensusContractInteractor.getAllValidators();
+		const validators = await this.consensusContractService.getAllValidators();
 		this.#allValidators = new Map(validators.map((validator) => [validator.address, validator]));
+
+		for await (const a of this.consensusContractService.getVotes()) {
+			console.log(a);
+		}
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -67,7 +69,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	async #buildActiveValidators(): Promise<void> {
 		const { activeValidators } = this.configuration.getMilestone();
-		const validators = await this.consensusContractInteractor.getActiveValidators();
+		const validators = await this.consensusContractService.getActiveValidators();
 		if (validators.length < activeValidators) {
 			throw new Exceptions.NotEnoughActiveValidatorsError(this.#topValidators.length, activeValidators);
 		}
@@ -79,7 +81,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	async #calculateChangedValidators(): Promise<void> {
 		this.#dirtyValidators = [];
 
-		const validators = await this.consensusContractInteractor.getAllValidators();
+		const validators = await this.consensusContractService.getAllValidators();
 		for (const validator of validators) {
 			const currentValidator = this.#allValidators.get(validator.address);
 			if (

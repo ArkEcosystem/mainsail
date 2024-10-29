@@ -136,6 +136,9 @@ export const Identifiers = {
 			HTTP: Symbol.for("Evm<API.HTTP>"),
 			HTTPS: Symbol.for("Evm<API.HTTPS>"),
 		},
+		ContractService: {
+			Consensus: Symbol("Evm<ContractService.Consensus>"),
+		},
 		Gas: {
 			FeeCalculator: Symbol("Evm<Gas.FeeCalculator>"),
 			Limits: Symbol("Evm<Gas.Limits>"),
@@ -145,9 +148,6 @@ export const Identifiers = {
 		Worker: Symbol("Evm<Worker>"),
 		WorkerSubprocess: {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
-		},
-		Interactor: {
-			Consensus: Symbol("Evm<Interactor.Consensus>"),
 		},
 	},
 	P2P: {
