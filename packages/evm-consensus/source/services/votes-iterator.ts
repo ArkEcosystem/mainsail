@@ -5,6 +5,8 @@ import { ethers } from "ethers";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
+const VOTES_PER_REQUEST = 10_000;
+
 @injectable()
 export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 	@inject(Identifiers.Application.Instance)
@@ -34,7 +36,7 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 			}
 
 			this.#index = 0;
-			this.#address = this.#votes[this.#votes.length - 1].voterAddress;
+			this.#address = this.#votes.at(-1)!.voterAddress;
 		}
 
 		return { done: false, value: this.#votes[this.#index++] };
@@ -46,7 +48,7 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
-		const data = iface.encodeFunctionData("getVoters", [this.#address, 10]).slice(2);
+		const data = iface.encodeFunctionData("getVoters", [this.#address, VOTES_PER_REQUEST]).slice(2);
 
 		const result = await this.evm.view({
 			caller: deployerAddress,
