@@ -584,4 +584,70 @@ contract ConsensusTest is Test {
 		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 	}
+
+	function test_pagination() public {
+		// Assert voters
+		assertEq(consensus.getVotersCount(), 0);
+		VoteResult[] memory allVoters = consensus.getVoters(address(0), 10);
+		assertEq(allVoters.length, 0);
+
+		// Register validators
+		address validatorAddr1 = address(1);
+		registerValidator(validatorAddr1);
+
+		// Vote 1
+		address voterAddr1 = address(11);
+		vm.deal(voterAddr1, 100 ether);
+		vm.startPrank(voterAddr1);
+		consensus.vote(validatorAddr1);
+		vm.stopPrank();
+
+		// Vote 2
+		address voterAddr2 = address(12);
+		vm.deal(voterAddr2, 100 ether);
+		vm.startPrank(voterAddr2);
+		consensus.vote(validatorAddr1);
+		vm.stopPrank();
+
+		// Vote 3
+		address voterAddr3 = address(13);
+		vm.deal(voterAddr3, 100 ether);
+		vm.startPrank(voterAddr3);
+		consensus.vote(validatorAddr1);
+		vm.stopPrank();
+
+		// Assert voters
+		assertEq(consensus.getVotersCount(), 3);
+
+		allVoters = consensus.getVoters(address(0), 10);
+		assertEq(allVoters.length, 3);
+		assertEq(allVoters[0].voter, voterAddr1);
+		assertEq(allVoters[1].voter, voterAddr2);
+		assertEq(allVoters[2].voter, voterAddr3);
+
+		allVoters = consensus.getVoters(address(0), 2);
+		assertEq(allVoters.length, 2);
+		assertEq(allVoters[0].voter, voterAddr1);
+		assertEq(allVoters[1].voter, voterAddr2);
+
+		allVoters = consensus.getVoters(address(0), 1);
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr1);
+
+		allVoters = consensus.getVoters(address(0), 0);
+		assertEq(allVoters.length, 0);
+
+		allVoters = consensus.getVoters(voterAddr1, 10);
+		assertEq(allVoters.length, 2);
+		assertEq(allVoters[0].voter, voterAddr2);
+		assertEq(allVoters[1].voter, voterAddr3);
+
+		allVoters = consensus.getVoters(voterAddr1, 1);
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr2);
+
+		allVoters = consensus.getVoters(voterAddr2, 10);
+		assertEq(allVoters.length, 1);
+		assertEq(allVoters[0].voter, voterAddr3);
+	}
 }

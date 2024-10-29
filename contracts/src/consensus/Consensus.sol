@@ -306,23 +306,32 @@ contract Consensus {
 	}
 
 	function getVoters(address addr, uint256 count) public view onlyOwner returns (VoteResult[] memory) {
-		VoteResult[] memory result = new VoteResult[](_votersCount);
+		VoteResult[] memory voters = new VoteResult[](_clamp(count, 0, _votersCount));
 
 		address next = _votersHead;
 
-		if (addr != address(0) && _voters[addr].validator != address(0)) {
-			next = addr;
+		if (addr != address(0)) {
+			next = _voters[addr].next;
 		}
 
 		uint256 i = 0;
-
 		while (next != address(0) && i < count) {
 			Vote storage voter = _voters[next];
-			result[i++] = VoteResult({voter: next, validator: voter.validator});
+			voters[i++] = VoteResult({voter: next, validator: voter.validator});
 			next = voter.next;
 		}
 
-		return result;
+		if (voters.length == i) {
+			return voters;
+		}
+
+		// Slice array to remove empty elements
+		VoteResult[] memory slice = new VoteResult[](i);
+		for (uint j = 0; j < i; j++) {
+			slice[j] = voters[j];
+		}
+
+		return slice;
 	}
 
 	function vote(address addr) external preventOwner {
