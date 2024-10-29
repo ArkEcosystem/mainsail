@@ -21,10 +21,6 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		const validators = await this.consensusContractService.getAllValidators();
 		this.#allValidators = new Map(validators.map((validator) => [validator.address, validator]));
-
-		for await (const a of this.consensusContractService.getVotes()) {
-			console.log(a);
-		}
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
