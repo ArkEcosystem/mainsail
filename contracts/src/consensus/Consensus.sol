@@ -305,15 +305,18 @@ contract Consensus {
 		return _votersCount;
 	}
 
-	// TODO: allow passing limit to cap maximum number of returned items in case voter counts is very high
-	// the caller can paginate to retrieve all items.
-	function getVoters() public view onlyOwner returns (VoteResult[] memory) {
+	function getVoters(address addr, uint256 count) public view onlyOwner returns (VoteResult[] memory) {
 		VoteResult[] memory result = new VoteResult[](_votersCount);
 
 		address next = _votersHead;
+
+		if (addr != address(0) && _voters[addr].validator != address(0)) {
+			next = addr;
+		}
+
 		uint256 i = 0;
 
-		while (next != address(0)) {
+		while (next != address(0) && i < count) {
 			Vote storage voter = _voters[next];
 			result[i++] = VoteResult({voter: next, validator: voter.validator});
 			next = voter.next;

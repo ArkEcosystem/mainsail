@@ -37,7 +37,7 @@ contract ConsensusTest is Test {
 	function test_vote() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		VoteResult[] memory allVoters = consensus.getVoters();
+		VoteResult[] memory allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 
 		// Register validator
@@ -64,7 +64,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr);
 		assertEq(allVoters[0].validator, addr);
@@ -86,7 +86,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr);
 		assertEq(allVoters[0].validator, addr);
@@ -101,13 +101,13 @@ contract ConsensusTest is Test {
 		vm.startPrank(address(1));
 
 		vm.expectRevert("Caller is not the contract owner");
-		consensus.getVoters();
+		consensus.getVoters(address(0), 10);
 	}
 
 	function test_vote_allow_self_vote() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		VoteResult[] memory allVoters = consensus.getVoters();
+		VoteResult[] memory allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 
 		// Register validator
@@ -134,7 +134,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr);
 		assertEq(allVoters[0].validator, voterAddr);
@@ -156,7 +156,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr);
 		assertEq(allVoters[0].validator, voterAddr);
@@ -203,7 +203,7 @@ contract ConsensusTest is Test {
 	function test_unvote_and_vote_in_same_block() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		VoteResult[] memory allVoters = consensus.getVoters();
+		VoteResult[] memory allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 
 		// Register validator
@@ -226,7 +226,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr);
 		assertEq(allVoters[0].validator, addr);
@@ -250,14 +250,14 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 	}
 
 	function test_unvote_and_vote_in_different_blocks() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		VoteResult[] memory allVoters = consensus.getVoters();
+		VoteResult[] memory allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 
 		// Register validator
@@ -280,7 +280,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 100 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr);
 		assertEq(allVoters[0].validator, addr);
@@ -301,7 +301,7 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 90 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr);
 		assertEq(allVoters[0].validator, addr);
@@ -325,14 +325,14 @@ contract ConsensusTest is Test {
 		assertEq(voterAddr.balance, 80 ether);
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 	}
 
 	function test_multiple_voted_different_validators() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		VoteResult[] memory allVoters = consensus.getVoters();
+		VoteResult[] memory allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 
 		// Register validators
@@ -382,7 +382,7 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 3);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 3);
 		assertEq(allVoters[0].voter, voterAddr1);
 		assertEq(allVoters[0].validator, validatorAddr1);
@@ -415,7 +415,7 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 2);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 2);
 		assertEq(allVoters[0].voter, voterAddr1);
 		assertEq(allVoters[0].validator, validatorAddr1);
@@ -446,7 +446,7 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr1);
 		assertEq(allVoters[0].validator, validatorAddr1);
@@ -475,14 +475,14 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 	}
 
 	function test_multiple_voted_same_validator() public {
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		VoteResult[] memory allVoters = consensus.getVoters();
+		VoteResult[] memory allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 
 		// Register validators
@@ -518,7 +518,7 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 3);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 3);
 		assertEq(allVoters[0].voter, voterAddr1);
 		assertEq(allVoters[0].validator, validatorAddr1);
@@ -541,7 +541,7 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 2);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 2);
 		assertEq(allVoters[0].voter, voterAddr1);
 		assertEq(allVoters[0].validator, validatorAddr1);
@@ -562,7 +562,7 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 1);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 1);
 		assertEq(allVoters[0].voter, voterAddr1);
 		assertEq(allVoters[0].validator, validatorAddr1);
@@ -581,7 +581,7 @@ contract ConsensusTest is Test {
 
 		// Assert voters
 		assertEq(consensus.getVotersCount(), 0);
-		allVoters = consensus.getVoters();
+		allVoters = consensus.getVoters(address(0), 10);
 		assertEq(allVoters.length, 0);
 	}
 }
