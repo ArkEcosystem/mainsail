@@ -107,6 +107,7 @@ contract Consensus {
 		_topValidatorsCount = 0;
 	}
 
+	// TODO: cap 'n' to sensitive maximum or tie it to milestone (which is updated on milestone change)
 	function calculateTopValidators(uint8 n) external onlyOwner {
 		shuffle();
 		deleteTopValidators();
@@ -221,6 +222,8 @@ contract Consensus {
 		return result;
 	}
 
+	// TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
+	// the caller can paginate to retrieve all items.
 	function getAllValidators() public view returns (Validator[] memory) {
 		Validator[] memory result = new Validator[](_registeredValidators.length);
 		for (uint i = 0; i < _registeredValidators.length; i++) {
@@ -303,6 +306,8 @@ contract Consensus {
 		return _votersCount;
 	}
 
+	// TODO: allow passing limit to cap maximum number of returned items in case voter counts is very high
+	// the caller can paginate to retrieve all items.
 	function getVoters() public view onlyOwner returns (VoteResult[] memory) {
 		VoteResult[] memory result = new VoteResult[](_votersCount);
 
