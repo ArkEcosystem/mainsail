@@ -303,11 +303,11 @@ contract Consensus {
         _registeredValidatorData[_validator.addr] = _validator.data;
     }
 
-    function getVotersCount() public view returns (uint256) {
+    function getVotesCount() public view returns (uint256) {
         return _votersCount;
     }
 
-    function getVoters(address addr, uint256 count) public view onlyOwner returns (VoteResult[] memory) {
+    function getVotes(address addr, uint256 count) public view onlyOwner returns (VoteResult[] memory) {
         VoteResult[] memory voters = new VoteResult[](_clamp(count, 0, _votersCount));
 
         address next = _votersHead;
