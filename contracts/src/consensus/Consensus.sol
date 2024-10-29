@@ -348,11 +348,6 @@ contract Consensus {
 		Vote storage voter = _voters[msg.sender];
 		require(voter.validator != address(0), "TODO: not voted");
 
-		emit Unvoted(msg.sender, voter.validator);
-
-		_registeredValidatorData[voter.validator].voteBalance -= voter.balance;
-		_registeredValidatorData[voter.validator].votersCount -= 1;
-
 		if (_votersHead == _votersTail) {
 			_votersHead = address(0);
 			_votersTail = address(0);
@@ -366,6 +361,14 @@ contract Consensus {
 			_voters[voter.prev].next = voter.next;
 			_voters[voter.next].prev = voter.prev;
 		}
+
+		emit Unvoted(msg.sender, voter.validator);
+
+		ValidatorData storage validatorData = _registeredValidatorData[voter.validator];
+
+		validatorData.voteBalance -= voter.balance;
+		validatorData.votersCount -= 1;
+
 		delete _voters[msg.sender];
 
 		_votersCount--;
