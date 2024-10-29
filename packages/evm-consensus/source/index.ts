@@ -2,9 +2,9 @@ import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import { ConsensusContractService } from "./services/consensus-contract-service.js";
 import { Deployer } from "./deployer.js";
 import { Selector } from "./selector.js";
+import { ConsensusContractService } from "./services/consensus-contract-service.js";
 import { ValidatorSet } from "./validator-set.js";
 
 export { Identifiers } from "./identifiers.js";
