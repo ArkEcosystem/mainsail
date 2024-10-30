@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, ValidatorRound, ValidatorRoundValidator} from "@contracts/consensus/Consensus.sol";
+import {Consensus, Round} from "@contracts/consensus/Consensus.sol";
 
 contract ConsensusTest is Test {
     Consensus public consensus;
@@ -12,7 +12,7 @@ contract ConsensusTest is Test {
     }
 
     function test_getValidatorRounds() public view {
-        ValidatorRound[] memory validatorRounds = consensus.getValidatorRounds();
+        Round[] memory rounds = consensus.getValidatorRounds();
         assertEq(consensus.getValidatorRounds().length, 0);
     }
 }

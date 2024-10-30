@@ -12,6 +12,16 @@ struct Validator {
     ValidatorData data;
 }
 
+struct RoundValidator {
+    address validatorAddress;
+    uint256 voteBalance;
+}
+
+struct Round {
+    uint256 round;
+    RoundValidator[] validators;
+}
+
 struct Vote {
     address validator;
     uint256 balance;
@@ -22,16 +32,6 @@ struct Vote {
 struct VoteResult {
     address voter;
     address validator;
-}
-
-struct ValidatorRoundValidator {
-    address validatorAddress;
-    uint256 voteBalance;
-}
-
-struct ValidatorRound {
-    uint256 round;
-    ValidatorRoundValidator[] validators;
 }
 
 event ValidatorRegistered(address addr, bytes bls12_381_public_key);
@@ -82,7 +82,7 @@ contract Consensus {
     uint256 private _topValidatorsCount = 0;
     address[] private _calculatedTopValidators;
 
-    ValidatorRoundValidator[][] private _validatorRounds;
+    RoundValidator[][] private _validatorRounds;
 
     constructor() {
         _owner = msg.sender;
@@ -415,10 +415,10 @@ contract Consensus {
 
     // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
     // the caller can paginate to retrieve all items.
-    function getValidatorRounds() public view onlyOwner returns (ValidatorRound[] memory) {
-        ValidatorRound[] memory result = new ValidatorRound[](_validatorRounds.length);
+    function getValidatorRounds() public view onlyOwner returns (Round[] memory) {
+        Round[] memory result = new Round[](_validatorRounds.length);
         for (uint256 i = 0; i < _validatorRounds.length; i++) {
-            result[i] = ValidatorRound({round: i, validators: _validatorRounds[i]});
+            result[i] = Round({round: i, validators: _validatorRounds[i]});
         }
 
         return result;
