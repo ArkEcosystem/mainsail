@@ -28,7 +28,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.getRoundsCount(), 1);
         Round[] memory rounds = consensus.getRounds(0, 10);
         assertEq(rounds.length, 1);
-        assertEq(rounds[0].round, 0);
+        assertEq(rounds[0].round, 1);
         assertEq(rounds[0].validators.length, 1);
         assertEq(rounds[0].validators[0].addr, addr);
     }
