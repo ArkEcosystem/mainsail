@@ -428,7 +428,7 @@ contract Consensus {
 
         Round[] memory result = new Round[](total);
         for (uint256 i = 0; i < total; i++) {
-            result[offset + i] = Round({round: offset + i + 1, validators: _rounds[i]});
+            result[i] = Round({round: offset + i + 1, validators: _rounds[offset + i]});
         }
 
         return result;
