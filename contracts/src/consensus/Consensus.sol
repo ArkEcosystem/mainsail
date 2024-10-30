@@ -160,7 +160,7 @@ contract Consensus {
             }
         }
 
-        // TODO: update _rounds
+        RoundValidator[] storage round = _rounds.push();
 
         address next = _topValidatorsHead;
         delete _calculatedTopValidators;
@@ -168,6 +168,9 @@ contract Consensus {
         for (uint256 i = 0; i < top; i++) {
             _calculatedTopValidators[i] = next;
             next = _topValidators[next];
+            round.push(
+                RoundValidator({validatorAddress: next, voteBalance: _registeredValidatorData[next].voteBalance})
+            );
         }
     }
 

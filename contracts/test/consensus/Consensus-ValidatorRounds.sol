@@ -3,8 +3,9 @@ pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
 import {Consensus, Round} from "@contracts/consensus/Consensus.sol";
+import {Base} from "./Base.sol";
 
-contract ConsensusTest is Test {
+contract ConsensusTest is Base {
     Consensus public consensus;
 
     function setUp() public {
@@ -12,7 +13,20 @@ contract ConsensusTest is Test {
     }
 
     function test_getValidatorRounds() public view {
-        Round[] memory rounds = consensus.getValidatorRounds();
         assertEq(consensus.getValidatorRounds().length, 0);
+    }
+
+    function test_should_return_round_with_one_validator() public {
+        address addr = address(1);
+        vm.startPrank(addr);
+        consensus.registerValidator(prepareBLSKey(addr));
+        vm.stopPrank();
+
+        consensus.calculateTopValidators(1);
+
+        Round[] memory rounds = consensus.getValidatorRounds();
+        assertEq(rounds.length, 1);
+        assertEq(rounds[0].round, 0);
+        assertEq(rounds[0].validators.length, 1);
     }
 }
