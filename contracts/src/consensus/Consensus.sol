@@ -13,7 +13,7 @@ struct Validator {
 }
 
 struct RoundValidator {
-    address validatorAddress;
+    address addr;
     uint256 voteBalance;
 }
 
@@ -167,10 +167,8 @@ contract Consensus {
         _calculatedTopValidators = new address[](top);
         for (uint256 i = 0; i < top; i++) {
             _calculatedTopValidators[i] = next;
+            round.push(RoundValidator({addr: next, voteBalance: _registeredValidatorData[next].voteBalance}));
             next = _topValidators[next];
-            round.push(
-                RoundValidator({validatorAddress: next, voteBalance: _registeredValidatorData[next].voteBalance})
-            );
         }
     }
 
@@ -420,12 +418,17 @@ contract Consensus {
         return _rounds.length;
     }
 
-    // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
-    // the caller can paginate to retrieve all items.
-    function getRounds() public view onlyOwner returns (Round[] memory) {
-        Round[] memory result = new Round[](_rounds.length);
-        for (uint256 i = 0; i < _rounds.length; i++) {
-            result[i] = Round({round: i, validators: _rounds[i]});
+    function getRounds(uint256 offset, uint256 count) public view onlyOwner returns (Round[] memory) {
+        uint256 total = count;
+        if (offset >= _rounds.length) {
+            total = 0;
+        } else if (offset + count > _rounds.length) {
+            total = _rounds.length - offset;
+        }
+
+        Round[] memory result = new Round[](total);
+        for (uint256 i = 0; i < total; i++) {
+            result[offset + i] = Round({round: i, validators: _rounds[i]});
         }
 
         return result;
