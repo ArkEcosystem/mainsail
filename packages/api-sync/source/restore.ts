@@ -391,11 +391,13 @@ export class Restore {
 	async #ingestReceipts(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const receipts: Models.Receipt[] = [];
 		const BATCH_SIZE = 1000n;
 		let offset: bigint | undefined = 0n;
 
+		let totalReceipts = 0;
+
 		do {
+			const receipts: Models.Receipt[] = [];
 			const result = await this.evm.getReceipts(offset ?? 0n, BATCH_SIZE);
 
 			for (const receipt of result.receipts) {
@@ -414,15 +416,16 @@ export class Restore {
 				});
 			}
 
+			for (const batch of chunk(receipts, 256)) {
+				await context.receiptRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+			}
+
 			offset = result.nextOffset;
+			totalReceipts += receipts.length;
 		} while (offset);
 
-		for (const batch of chunk(receipts, 256)) {
-			await context.receiptRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
-		}
-
 		const t1 = performance.now();
-		this.logger.info(`Restored ${receipts.length.toLocaleString()} receipts in ${t1 - t0}ms`);
+		this.logger.info(`Restored ${totalReceipts.toLocaleString()} receipts in ${t1 - t0}ms`);
 	}
 
 	async #ingestValidatorRounds(context: RestoreContext): Promise<void> {
