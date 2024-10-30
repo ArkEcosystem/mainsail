@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { BigNumber } from "@mainsail/utils";
 import { ethers } from "ethers";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
@@ -64,8 +65,8 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 		const [results] = iface.decodeFunctionResult("getRounds", result.output!);
 
 		const validatorRounds: Contracts.Evm.ValidatorRound[] = [];
-		for (const [, validatorRound] of results.entries()) {
-			const [round, [validators]] = validatorRound;
+		for (const validatorRound of results) {
+			const [round, validators] = validatorRound;
 
 			validatorRounds.push({
 				round,
@@ -75,7 +76,7 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 
 					return {
 						address: validatorAddress,
-						voteBalance,
+						voteBalance: BigNumber.make(voteBalance),
 					};
 				}),
 			});

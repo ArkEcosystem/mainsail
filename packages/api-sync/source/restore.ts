@@ -455,7 +455,7 @@ export class Restore {
 
 			for (const validator of validators) {
 				validatorAddresses.push(validator.address);
-				votes.push(Utils.BigNumber.make(validator.voteBalance).toFixed());
+				votes.push(validator.voteBalance.toFixed());
 			}
 
 			validatorRounds.push({
