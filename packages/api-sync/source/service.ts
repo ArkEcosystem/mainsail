@@ -268,26 +268,23 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			receipts: transactionReceipts,
 
-			transactions: [], // TODO
-			// transactions: transactions.map(({ data }) => ({
-			// 	amount: data.amount.toFixed(),
-			// 	asset: {}, // TODO
-			// 	blockHeight: header.height.toFixed(),
-			// 	blockId: header.id,
-			// 	fee: data.fee.toFixed(),
-			// 	id: data.id as unknown as string,
-			// 	nonce: data.nonce.toFixed(),
-			// 	recipientId: data.recipientId,
-			// 	senderPublicKey: data.senderPublicKey,
-			// 	sequence: data.sequence as unknown as number,
-			// 	signature: data.signature,
-			// 	signatures: data.signatures,
-			// 	timestamp: header.timestamp.toFixed(),
-			// 	type: data.type,
-			// 	typeGroup: data.typeGroup,
-			// 	vendorField: data.vendorField,
-			// 	version: data.version,
-			// })),
+			transactions: transactions.map(({ data }) => ({
+				amount: data.value.toFixed(),
+				blockHeight: header.height.toFixed(),
+				blockId: header.id,
+				data: data.data,
+				gasLimit: data.gasLimit,
+				gasPrice: data.gasPrice,
+				id: data.id as unknown as string,
+				nonce: data.nonce.toFixed(),
+				recipientAddress: data.recipientAddress,
+				senderAddress: data.senderAddress,
+				senderPublicKey: data.senderPublicKey,
+				sequence: data.sequence as unknown as number,
+				signature: data.signature,
+				signatures: undefined, //data.signatures,
+				timestamp: header.timestamp.toFixed(),
+			})),
 
 			wallets,
 
@@ -367,28 +364,16 @@ export class Sync implements Contracts.ApiSync.Service {
 		for (const handler of transactionHandlers) {
 			const constructor = handler.getConstructor();
 
-			const type: number | undefined = constructor.type;
 			const key: string | undefined = constructor.key;
 
-			Utils.assert.defined<number>(type);
 			Utils.assert.defined<string>(key);
 
-			types.push({ key, schema: constructor.getSchema().properties, type, typeGroup: 0, version: 0 });
+			types.push({ key, schema: constructor.getSchema().properties });
 		}
 
-		types.sort((a, b) => {
-			if (a.type !== b.type) {
-				return a.type - b.type;
-			}
+		types.sort((a, b) => a.key.localeCompare(b.key, undefined, { sensitivity: "base" }));
 
-			if (a.typeGroup !== b.typeGroup) {
-				return a.typeGroup - b.typeGroup;
-			}
-
-			return a.version - b.version;
-		});
-
-		await this.transactionTypeRepositoryFactory().upsert(types, ["type", "typeGroup", "version"]);
+		await this.transactionTypeRepositoryFactory().upsert(types, ["key"]);
 	}
 
 	async #queueDeferredSync(deferredSync: DeferredSync): Promise<void> {
@@ -487,7 +472,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					`
 	INSERT INTO wallets AS "Wallet" (address, public_key, balance, nonce, attributes, updated_at)
 	VALUES ${placeholders}
-	ON CONFLICT ("address") DO UPDATE SET 
+	ON CONFLICT ("address") DO UPDATE SET
 		balance = COALESCE(NULLIF(EXCLUDED.balance, '-1'), "Wallet".balance),
 		nonce = COALESCE(NULLIF(EXCLUDED.nonce, '-1'), "Wallet".nonce),
 		updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
@@ -495,8 +480,8 @@ export class Sync implements Contracts.ApiSync.Service {
 		attributes = jsonb_strip_nulls(jsonb_build_object(
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',
-			CASE 
-				WHEN EXCLUDED.attributes->>'unvote' IS NOT NULL THEN NULL 
+			CASE
+				WHEN EXCLUDED.attributes->>'unvote' IS NOT NULL THEN NULL
 				ELSE COALESCE(EXCLUDED.attributes->>'vote', "Wallet".attributes->>'vote')
 			END,
 

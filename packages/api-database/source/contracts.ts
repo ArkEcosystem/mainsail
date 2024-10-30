@@ -65,8 +65,6 @@ export type TransactionTypeRepositoryExtension = {};
 export type TransactionTypeRepository = ExtendedRepository<TransactionType> & TransactionTypeRepositoryExtension;
 
 export type FeeStatistics = {
-	type: number;
-	typeGroup: number;
 	avg: string;
 	min: string;
 	max: string;
@@ -82,7 +80,7 @@ export type TransactionRepositoryExtension = {
 		options?: Options,
 	): Promise<ResultsPage<Transaction>>;
 
-	getFeeStatistics(genesisTimestamp: number, days?: number, minFee?: number): Promise<FeeStatistics[]>;
+	getFeeStatistics(genesisTimestamp: number, days?: number, minFee?: number): Promise<FeeStatistics | undefined>;
 };
 export type TransactionRepository = ExtendedRepository<Transaction> & TransactionRepositoryExtension;
 

@@ -1,58 +1,8 @@
 {
-	"1": {
-		"transfer": {
-			"avg": "10000000",
-			"max": "10000000",
-			"min": "10000000",
-			"sum": "10000000"
-		},
-		"validatorRegistration": {
-			"avg": "0",
-			"max": "0",
-			"min": "0",
-			"sum": "0"
-		},
-		"vote": {
-			"avg": "0",
-			"max": "0",
-			"min": "0",
-			"sum": "0"
-		},
-		"multiSignature": {
-			"avg": "500000000",
-			"max": "500000000",
-			"min": "500000000",
-			"sum": "500000000"
-		},
-		"multiPayment": {
-			"avg": "0",
-			"max": "0",
-			"min": "0",
-			"sum": "0"
-		},
-		"validatorResignation": {
-			"avg": "0",
-			"max": "0",
-			"min": "0",
-			"sum": "0"
-		},
-		"usernameRegistration": {
-			"avg": "0",
-			"max": "0",
-			"min": "0",
-			"sum": "0"
-		},
-		"usernameResignation": {
-			"avg": "0",
-			"max": "0",
-			"min": "0",
-			"sum": "0"
-		},
-		"evmCall": {
-			"avg": "0",
-			"max": "0",
-			"min": "0",
-			"sum": "0"
-		}
+	"evmCall": {
+		"avg": "5",
+		"max": "5",
+		"min": "5",
+		"sum": "10"
 	}
 }

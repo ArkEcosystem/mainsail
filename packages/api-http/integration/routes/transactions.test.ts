@@ -45,21 +45,21 @@ describe<{
 		);
 	});
 
-	it("/transactions?type", async () => {
+	it("/transactions?data", async () => {
 		await apiContext.transactionRepository.save(transactions);
 
 		const testCases = [
 			{
-				path: "/transactions?type=0",
+				path: "/transactions?data=0x",
 				result: [...transactions]
-					.filter((tx) => tx.type === 0)
+					.filter((tx) => tx.data === "")
 					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
 			},
-			{ path: "/transactions?type=1", result: [] },
+			{ path: "/transactions?data=88888888", result: [] },
 			{
-				path: "/transactions?type=4",
+				path: "/transactions?data=6dd7d8ea",
 				result: [...transactions]
-					.filter((tx) => tx.type === 4)
+					.filter((tx) => tx.data.startsWith("0x6dd7d8ea"))
 					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
 			},
 		];
@@ -78,26 +78,6 @@ describe<{
 		const { statusCode, data } = await request(`/transactions/${id}`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, transactions[transactions.length - 1]);
-	});
-
-	it("/transactions/types", async () => {
-		await apiContext.transactionTypeRepository.save(transactionTypes);
-
-		const { statusCode, data } = await request(`/transactions/types`, options);
-		assert.equal(statusCode, 200);
-		assert.equal(data.data, {
-			"1": {
-				Transfer: 0,
-				ValidatorRegistration: 2,
-				Vote: 3,
-				MultiSignature: 4,
-				MultiPayment: 6,
-				ValidatorResignation: 7,
-				UsernameRegistration: 8,
-				UsernameResignation: 9,
-				EvmCall: 10,
-			},
-		});
 	});
 
 	it("/transactions/schemas", async () => {

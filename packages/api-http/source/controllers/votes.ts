@@ -6,7 +6,7 @@ import {
 	Search,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { FunctionSigs } from "@mainsail/evm-contracts";
 
 import { TransactionResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
@@ -19,8 +19,7 @@ export class VotesController extends Controller {
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = {
 			...request.query,
-			type: Contracts.Crypto.TransactionType.Vote,
-			typeGroup: Contracts.Crypto.TransactionTypeGroup.Core,
+			data: FunctionSigs.Vote,
 		};
 
 		const pagination = this.getListingPage(request);
@@ -48,8 +47,7 @@ export class VotesController extends Controller {
 			.createQueryBuilder()
 			.select()
 			.where("id = :id", { id: request.params.id })
-			.andWhere("type = :type", { type: Contracts.Crypto.TransactionType.Vote })
-			.andWhere("type_group = :typeGroup", { typeGroup: Contracts.Crypto.TransactionTypeGroup.Core })
+			.andWhere("SUBSTRING(data FROM 1 FOR 4) = :data", { data: `\\x${FunctionSigs.Vote.slice(2)}` })
 			.getOne();
 
 		if (!transaction) {

@@ -1,23 +1,19 @@
 [
 	{
-		"id": "3b08e13ba7ce26d8ee6de200b6cfb7ca90c583115e547c1b2ba7472a104a49b6",
-		"version": 1,
-		"type": 3,
-		"typeGroup": 1,
-		"blockId": "f99740cb19bbf7c85d78664532ef867ed36481655ed08868df3ab9657aae46e4",
+		"id": "e0065080cf56db13b9fbf533e88e4bbf5d8dd1a835974a6ad8bc91f4c330efe0",
+		"blockId": "c2e37569db79379446bed974c72551397fd6bad352699e653d67fbcabfdcb66b",
 		"blockHeight": "60",
 		"sequence": 0,
-		"timestamp": "1696396878929",
-		"nonce": "10",
-		"senderPublicKey": "ac9a09dd85af1203cb5054d3f258e469ff831bf0ff1ee2cd90d6a46e52d11bae",
-		"recipientId": null,
-		"vendorField": null,
+		"timestamp": "1728618018574",
+		"nonce": "1",
+		"senderPublicKey": "02c4f61cdfe658963152d4243ade6c8e51584f44f4aa4f99eb6a2fc65963c05ad3",
+		"senderAddress": "0x6DF1492c168d0818f65FaEAA4F7b4Dc6d5a73607",
+		"recipientAddress": "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459",
 		"amount": "0",
-		"fee": "100000000",
-		"asset": {
-			"votes": ["4724580539e22dde52d257f3e39e6fa9911659ddcc31b8b2971b5ed20e10e873"],
-			"unvotes": []
-		},
-		"signature": "219488e7d81f6133df7d978787278fe39633064111e687557764f7e45af75f4905e0a54325e4ac3ffce39f9a9aeb75ca758420e88abe7531173edaebfc74cbb1"
+		"gasPrice": "0",
+		"gasLimit": "200000",
+		"data": "0x6dd7d8ea0000000000000000000000006df1492c168d0818f65faeaa4f7b4dc6d5a73607",
+		"signature": "ed00a08529b14053cabe409572189a398968afae3682be0ef2be8adb33f598f00e9f6cfd2ccbe892313cb70d9a204421b20e17ff3808de9981bb8d93e5cfb85501",
+		"signatures": null
 	}
 ]

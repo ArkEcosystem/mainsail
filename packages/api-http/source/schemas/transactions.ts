@@ -15,7 +15,6 @@ export const transactionCriteriaSchemaObject = {
 	),
 	recipientId: walletAddressSchema,
 	senderPublicKey: walletPublicKeySchema,
-	vendorField: Joi.string().max(256),
 };
 
 export const transactionParamSchema = transactionIdSchema;
@@ -24,10 +23,9 @@ export const transactionSortingSchema = Schemas.createSortingSchema(transactionC
 export const transactionQueryLevelOptions = [
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "version" },
 	{ allowSecondOrderBy: true, asc: true, desc: true, diverse: true, field: "timestamp" },
-	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "type" },
 	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "amount" },
-	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "fee" },
-	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "typeGroup" },
+	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "gasFee" },
+	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "gasLimit" },
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "nonce" },
 	{ allowSecondOrderBy: false, asc: false, desc: false, diverse: true, field: "id" },
 	{ allowSecondOrderBy: false, asc: false, desc: false, diverse: true, field: "blockId" },

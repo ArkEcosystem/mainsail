@@ -96,7 +96,7 @@ describe<{
 
 		await apiContext.transactionTypeRepository.save(transactionTypes);
 		await apiContext.transactionRepository.save(
-			transactions.map((tx) => ({ ...tx, timestamp: Math.floor(new Date().getTime()) })),
+			transactions.map((tx) => ({ ...tx, gasPrice: "5", timestamp: Math.floor(new Date().getTime()) })),
 		);
 
 		const { statusCode, data } = await request(`/node/fees`, options);

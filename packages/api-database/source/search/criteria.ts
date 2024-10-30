@@ -46,12 +46,11 @@ export type TransactionCriteria = {
 	timestamp?: OrNumericCriteria<number>;
 	nonce?: OrNumericCriteria<string>;
 	senderPublicKey?: OrEqualCriteria<string>;
-	type?: OrEqualCriteria<number>;
-	typeGroup?: OrEqualCriteria<number>;
-	vendorField?: OrLikeCriteria<string>;
+	senderAddress?: OrEqualCriteria<string>;
 	amount?: OrNumericCriteria<string>;
-	fee?: OrNumericCriteria<string>;
-	asset?: OrContainsCriteria<Record<string, any>>;
+	gasPrice?: OrNumericCriteria<number>;
+	gasFee?: OrNumericCriteria<number>;
+	data?: OrEqualCriteria<string>;
 };
 
 export type OrTransactionCriteria = OrCriteria<TransactionCriteria>;

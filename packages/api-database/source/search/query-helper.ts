@@ -125,6 +125,13 @@ export class QueryHelper<TEntity> {
 				const parameters = { [parameter]: expression.attribute };
 				return { parameters, query };
 			}
+			case "functionSig": {
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `SUBSTRING(${column} FROM 1 FOR 4) = :${parameter}`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
 			default: {
 				throw new Error(`Unexpected expression`);
 			}

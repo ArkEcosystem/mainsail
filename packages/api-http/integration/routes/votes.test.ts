@@ -32,7 +32,7 @@ describe<{
 	});
 
 	it("/votes", async () => {
-		await apiContext.transactionRepository.save(transactions);
+		await apiContext.transactionRepository.save(transactions.filter((tx) => !tx.data.startsWith("0x6dd7d8ea")));
 		await apiContext.transactionRepository.save(votes);
 
 		const { statusCode, data } = await request("/votes", options);
