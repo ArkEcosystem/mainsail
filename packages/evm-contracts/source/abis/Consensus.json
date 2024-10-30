@@ -997,10 +997,7 @@
 			}
 		},
 		"settings": {
-			"remappings": [
-				"@contracts/=src/",
-				"@forge-std/=forge-std/src/"
-			],
+			"remappings": ["@contracts/=src/", "@forge-std/=forge-std/src/"],
 			"optimizer": {
 				"enabled": true,
 				"runs": 200

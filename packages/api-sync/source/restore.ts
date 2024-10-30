@@ -447,8 +447,8 @@ export class Restore {
 				validatorRounds.push({
 					round,
 					roundHeight,
-					votes,
 					validators: validatorAddresses,
+					votes,
 				});
 			}
 
