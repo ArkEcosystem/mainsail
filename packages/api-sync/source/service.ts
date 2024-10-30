@@ -37,6 +37,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.DatabaseService;
+
 	@inject(ApiDatabaseIdentifiers.Migrations)
 	private readonly migrations!: ApiDatabaseContracts.Migrations;
 
@@ -458,12 +461,25 @@ export class Sync implements Contracts.ApiSync.Service {
 	}
 
 	async #resetDatabaseIfNecessary(): Promise<void> {
+		const lastHeight = this.databaseService.isEmpty()
+			? 0
+			: (await this.databaseService.getLastCommit()).block.header.height;
+
+		const [blocks] = await this.dataSource.query(
+			"select coalesce(max(height), 0)::bigint as max_height, count(1) as count from blocks",
+		);
+		const blocksOk = blocks.count !== "0" && blocks.max_height === lastHeight.toFixed();
+
 		const forcedTruncateDatabase = this.pluginConfiguration.getOptional<boolean>("truncateDatabase", false);
-		if (!forcedTruncateDatabase) {
+		this.logger.info(
+			`checking for database reset (forced=${forcedTruncateDatabase}, db.blocks=${blocks.count}, db.height=${blocks.max_height}, storage.height=${lastHeight})`,
+		);
+
+		if (blocksOk && !forcedTruncateDatabase) {
 			return;
 		}
 
-		this.logger.warning(`resetting API database and state to genesis block for full resync`);
+		this.logger.warning(`resetting API database and state to genesis block for full restore`);
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
