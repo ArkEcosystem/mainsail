@@ -244,25 +244,22 @@ export class Restore {
 						context.addressToPublicKey[address] = senderPublicKey;
 					}
 
-					// TODO adjust according to api refactor PR
 					transactions.push({
 						amount: data.value.toFixed(),
-						asset: {},
 						blockHeight: block.header.height.toFixed(),
 						blockId: block.header.id,
-						fee: data.gasPrice.toFixed(),
+						data: data.data,
+						gasLimit: data.gasLimit,
+						gasPrice: data.gasPrice,
 						id: data.id as unknown as string,
 						nonce: data.nonce.toFixed(),
-						recipientId: data.recipientAddress,
+						recipientAddress: data.recipientAddress,
+						senderAddress: data.senderAddress,
 						senderPublicKey: data.senderPublicKey,
 						sequence: data.sequence as unknown as number,
 						signature: data.signature,
-						signatures: undefined,
+						signatures: undefined, //data.signatures,
 						timestamp: block.header.timestamp.toFixed(),
-						type: 0,
-						typeGroup: 0,
-						vendorField: undefined,
-						version: 0,
 					});
 				}
 
@@ -439,28 +436,16 @@ export class Restore {
 		for (const handler of transactionHandlers) {
 			const constructor = handler.getConstructor();
 
-			const type: number | undefined = constructor.type;
 			const key: string | undefined = constructor.key;
 
-			Utils.assert.defined<number>(type);
 			Utils.assert.defined<string>(key);
 
-			types.push({ key, schema: constructor.getSchema().properties, type, typeGroup: 0, version: 0 });
+			types.push({ key, schema: constructor.getSchema().properties });
 		}
 
-		types.sort((a, b) => {
-			if (a.type !== b.type) {
-				return a.type - b.type;
-			}
+		types.sort((a, b) => a.key.localeCompare(b.key, undefined, { sensitivity: "base" }));
 
-			if (a.typeGroup !== b.typeGroup) {
-				return a.typeGroup - b.typeGroup;
-			}
-
-			return a.version - b.version;
-		});
-
-		await context.transactionTypeRepository.upsert(types, ["type", "typeGroup", "version"]);
+		await context.transactionTypeRepository.upsert(types, ["key"]);
 	}
 
 	async #ingestConfiguration(context: RestoreContext): Promise<void> {
