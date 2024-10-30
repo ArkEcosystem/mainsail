@@ -12,10 +12,7 @@ contract ConsensusTest is Test {
     }
 
     function test_getValidatorRounds() public view {
-        ValidatorRound[] memory validatorRounds = new ValidatorRound[](0);
-
-        validatorRounds = consensus.getValidatorRounds();
-
-        assertEq(validatorRounds.length, 0);
+        ValidatorRound[] memory validatorRounds = consensus.getValidatorRounds();
+        assertEq(consensus.getValidatorRounds().length, 0);
     }
 }

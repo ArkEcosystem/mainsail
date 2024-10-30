@@ -82,7 +82,7 @@ contract Consensus {
     uint256 private _topValidatorsCount = 0;
     address[] private _calculatedTopValidators;
 
-    ValidatorRound[] private _validatorRounds;
+    ValidatorRoundValidator[][] private _validatorRounds;
 
     constructor() {
         _owner = msg.sender;
@@ -418,8 +418,7 @@ contract Consensus {
     function getValidatorRounds() public view onlyOwner returns (ValidatorRound[] memory) {
         ValidatorRound[] memory result = new ValidatorRound[](_validatorRounds.length);
         for (uint256 i = 0; i < _validatorRounds.length; i++) {
-            ValidatorRound storage data = _validatorRounds[i];
-            result[i] = data;
+            result[i] = ValidatorRound({round: i, validators: _validatorRounds[i]});
         }
 
         return result;
