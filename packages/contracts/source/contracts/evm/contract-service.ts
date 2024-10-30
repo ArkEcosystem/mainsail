@@ -21,5 +21,5 @@ export interface ConsensusContractService {
 	getAllValidators(): Promise<ValidatorWallet[]>;
 	getVotesCount(): Promise<number>;
 	getVotes(): AsyncIterable<Vote>;
-	getValidatorRounds(): Promise<ValidatorRound[]>;
+	getValidatorRounds(): AsyncIterable<ValidatorRound>;
 }

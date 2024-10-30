@@ -432,27 +432,11 @@ export class Restore {
 		const t0 = performance.now();
 
 		let totalRounds = 0;
+		let validatorRounds: Models.ValidatorRound[] = [];
 
-		const rounds = await this.consensusContractService.getValidatorRounds();
-
-		for (const batch of chunk(rounds, 256)) {
-			const validatorRounds: Models.ValidatorRound[] = [];
-
-			for (const { round, roundHeight, validators } of batch) {
-				const validatorAddresses: string[] = [];
-				const votes: string[] = [];
-
-				for (const validator of validators) {
-					validatorAddresses.push(validator.address);
-					votes.push(Utils.BigNumber.make(validator.voteBalance).toFixed());
-				}
-
-				validatorRounds.push({
-					round,
-					roundHeight,
-					validators: validatorAddresses,
-					votes,
-				});
+		const insert = async () => {
+			if (validatorRounds.length === 0) {
+				return;
 			}
 
 			await context.validatorRoundRepository
@@ -462,8 +446,32 @@ export class Restore {
 				.values(validatorRounds)
 				.execute();
 
-			totalRounds += validatorRounds.length;
+			validatorRounds = [];
+		};
+
+		for await (const { round, roundHeight, validators } of this.consensusContractService.getValidatorRounds()) {
+			const validatorAddresses: string[] = [];
+			const votes: string[] = [];
+
+			for (const validator of validators) {
+				validatorAddresses.push(validator.address);
+				votes.push(Utils.BigNumber.make(validator.voteBalance).toFixed());
+			}
+
+			validatorRounds.push({
+				round,
+				roundHeight,
+				validators: validatorAddresses,
+				votes,
+			});
+			totalRounds += 1;
+
+			if (validatorRounds.length === 256) {
+				await insert();
+			}
 		}
+
+		await insert();
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${totalRounds.toLocaleString()} validator rounds in ${t1 - t0}ms`);
