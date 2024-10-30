@@ -82,7 +82,7 @@ contract Consensus {
     uint256 private _topValidatorsCount = 0;
     address[] private _calculatedTopValidators;
 
-    RoundValidator[][] private _validatorRounds;
+    RoundValidator[][] private _rounds;
 
     constructor() {
         _owner = msg.sender;
@@ -160,7 +160,7 @@ contract Consensus {
             }
         }
 
-        // TODO: update _validatorRounds
+        // TODO: update _rounds
 
         address next = _topValidatorsHead;
         delete _calculatedTopValidators;
@@ -416,9 +416,9 @@ contract Consensus {
     // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
     // the caller can paginate to retrieve all items.
     function getValidatorRounds() public view onlyOwner returns (Round[] memory) {
-        Round[] memory result = new Round[](_validatorRounds.length);
-        for (uint256 i = 0; i < _validatorRounds.length; i++) {
-            result[i] = Round({round: i, validators: _validatorRounds[i]});
+        Round[] memory result = new Round[](_rounds.length);
+        for (uint256 i = 0; i < _rounds.length; i++) {
+            result[i] = Round({round: i, validators: _rounds[i]});
         }
 
         return result;
