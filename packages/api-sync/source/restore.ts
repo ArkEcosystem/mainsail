@@ -104,6 +104,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
+	@inject(Identifiers.Evm.ContractService.Consensus)
+	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
+
 	public async restore(): Promise<void> {
 		const mostRecentCommit = await this.databaseService.getLastCommit();
 		Utils.assert.defined<Contracts.Crypto.Commit>(mostRecentCommit);
@@ -279,7 +282,7 @@ export class Restore {
 
 			if (currentHeight % 10_000 === 0 || currentHeight + BATCH_SIZE > mostRecentCommit.block.header.height) {
 				const t1 = performance.now();
-				this.logger.info(`Restored blocks: ${currentHeight.toLocaleString()} elapsed: ${t1 - t0}ms`);
+				this.logger.info(`Restored blocks: ${context.lastHeight.toLocaleString()} elapsed: ${t1 - t0}ms`);
 				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
 			}
 
@@ -305,10 +308,16 @@ export class Restore {
 			};
 		}
 
-		// TODO: Consensus.sol#getAllVoters
+		let totalVotes = 0;
+		for await (const votes of this.consensusContractService.getVotes()) {
+			context.userAttributes[votes.voterAddress] = {
+				vote: votes.validatorAddress,
+			};
+			totalVotes++;
+		}
 
 		const t1 = performance.now();
-		this.logger.info(`Read validators from contract ${t1 - t0}ms`);
+		this.logger.info(`Read ${validators.length} validators and ${totalVotes} votes from contract ${t1 - t0}ms`);
 	}
 
 	async #ingestWallets(context: RestoreContext): Promise<void> {
