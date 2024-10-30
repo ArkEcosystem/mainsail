@@ -97,6 +97,48 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		return validatorWallets;
 	}
 
+	async getValidatorRounds(): Promise<Contracts.Evm.ValidatorRound[]> {
+		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
+		const { evmSpec } = this.configuration.getMilestone();
+
+		const iface = new ethers.Interface(ConsensusAbi.abi);
+		const data = iface.encodeFunctionData("getValidatorRounds").slice(2);
+
+		const result = await this.evm.view({
+			caller: deployerAddress,
+			data: Buffer.from(data, "hex"),
+			recipient: consensusContractAddress,
+			specId: evmSpec,
+		});
+
+		if (!result.success) {
+			await this.app.terminate("getValidatorRounds failed");
+		}
+
+		const [results] = iface.decodeFunctionResult("getValidatorRounds", result.output!);
+
+		const validatorRounds: Contracts.Evm.ValidatorRound[] = [];
+		for (const [, validatorRound] of results.entries()) {
+			const [round, [validators]] = validatorRound;
+
+			validatorRounds.push({
+				round,
+				roundHeight: round, // TODO
+				validators: validators.map((validator) => {
+					const [validatorAddress, voteBalance] = validator;
+
+					return {
+						address: validatorAddress,
+						voteBalance,
+					};
+				}),
+			});
+		}
+
+		return validatorRounds;
+	}
+
 	async getVotesCount(): Promise<number> {
 		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
 		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
