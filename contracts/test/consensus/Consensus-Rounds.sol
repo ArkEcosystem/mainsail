@@ -13,7 +13,8 @@ contract ConsensusTest is Base {
     }
 
     function test_getValidatorRounds() public view {
-        assertEq(consensus.getValidatorRounds().length, 0);
+        assertEq(consensus.getRoundsCount(), 0);
+        assertEq(consensus.getRounds().length, 0);
     }
 
     function test_should_return_round_with_one_validator() public {
@@ -24,7 +25,8 @@ contract ConsensusTest is Base {
 
         consensus.calculateTopValidators(1);
 
-        Round[] memory rounds = consensus.getValidatorRounds();
+        assertEq(consensus.getRoundsCount(), 1);
+        Round[] memory rounds = consensus.getRounds();
         assertEq(rounds.length, 1);
         assertEq(rounds[0].round, 0);
         assertEq(rounds[0].validators.length, 1);

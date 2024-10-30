@@ -416,9 +416,13 @@ contract Consensus {
         }
     }
 
+    function getRoundsCount() public view returns (uint256) {
+        return _rounds.length;
+    }
+
     // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
     // the caller can paginate to retrieve all items.
-    function getValidatorRounds() public view onlyOwner returns (Round[] memory) {
+    function getRounds() public view onlyOwner returns (Round[] memory) {
         Round[] memory result = new Round[](_rounds.length);
         for (uint256 i = 0; i < _rounds.length; i++) {
             result[i] = Round({round: i, validators: _rounds[i]});
