@@ -24,6 +24,16 @@ struct VoteResult {
     address validator;
 }
 
+struct ValidatorRoundValidator {
+    address validatorAddress;
+    uint256 voteBalance;
+}
+
+struct ValidatorRound {
+    uint256 round;
+    ValidatorRoundValidator[] validators;
+}
+
 event ValidatorRegistered(address addr, bytes bls12_381_public_key);
 
 event ValidatorResigned(address addr);
@@ -71,6 +81,8 @@ contract Consensus {
     mapping(address => address) private _topValidators;
     uint256 private _topValidatorsCount = 0;
     address[] private _calculatedTopValidators;
+
+    ValidatorRound[] private _validatorRounds;
 
     constructor() {
         _owner = msg.sender;
@@ -147,6 +159,8 @@ contract Consensus {
                 insertTopValidator(addr, top);
             }
         }
+
+        // TODO: update _validatorRounds
 
         address next = _topValidatorsHead;
         delete _calculatedTopValidators;
@@ -397,6 +411,18 @@ contract Consensus {
         for (uint256 i = 0; i < voters.length; i++) {
             _updateVoter(voters[i]);
         }
+    }
+
+    // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
+    // the caller can paginate to retrieve all items.
+    function getValidatorRounds() public view onlyOwner returns (ValidatorRound[] memory) {
+        ValidatorRound[] memory result = new ValidatorRound[](_validatorRounds.length);
+        for (uint256 i = 0; i < _validatorRounds.length; i++) {
+            ValidatorRound storage data = _validatorRounds[i];
+            result[i] = data;
+        }
+
+        return result;
     }
 
     function _updateVoter(address addr) private {
