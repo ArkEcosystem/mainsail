@@ -428,13 +428,42 @@ export class Restore {
 	async #ingestValidatorRounds(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const validatorRounds: Models.ValidatorRound[] = [];
+		let totalRounds = 0;
 
-		// TODO: we don't persist validator rounds yet
-		this.logger.warning("TODO: ingestValidatorRounds");
+		const rounds = await this.consensusContractService.getValidatorRounds();
+
+		for (const batch of chunk(rounds, 256)) {
+			const validatorRounds: Models.ValidatorRound[] = [];
+
+			for (const { round, roundHeight, validators } of batch) {
+				const validatorAddresses: string[] = [];
+				const votes: string[] = [];
+
+				for (const validator of validators) {
+					validatorAddresses.push(validator.address);
+					votes.push(Utils.BigNumber.make(validator.voteBalance).toFixed());
+				}
+
+				validatorRounds.push({
+					round,
+					roundHeight,
+					votes,
+					validators: validatorAddresses,
+				});
+			}
+
+			await context.validatorRoundRepository
+				.createQueryBuilder()
+				.insert()
+				.orIgnore()
+				.values(validatorRounds)
+				.execute();
+
+			totalRounds += validatorRounds.length;
+		}
 
 		const t1 = performance.now();
-		this.logger.info(`Restored ${validatorRounds.length.toLocaleString()} validator rounds in ${t1 - t0}ms`);
+		this.logger.info(`Restored ${totalRounds.toLocaleString()} validator rounds in ${t1 - t0}ms`);
 	}
 
 	async #ingestTransactionTypes(context: RestoreContext): Promise<void> {
