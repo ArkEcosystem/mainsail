@@ -3,7 +3,7 @@ import { Exceptions, Identifiers } from "@mainsail/contracts";
 import crypto from "../../../core/bin/config/testnet/core/crypto.json";
 import { Configuration } from "../../../crypto-config/distribution/index";
 import { describe, Sandbox } from "../../../test-framework/source";
-import { calculateRound, isNewRound } from "./round-calculator";
+import { calculateRound, calculateRoundInfoByRound, isNewRound } from "./round-calculator";
 
 type Context = {
 	configuration: Configuration;
@@ -18,6 +18,41 @@ const setup = (context: Context) => {
 
 	context.configuration.setConfig(crypto);
 };
+
+describe<Context>("Round Calculator - calculateRoundInfoByRound", ({ assert, beforeEach, it, stub }) => {
+	beforeEach(setup);
+
+	it("dynamic delegate count - should calculate the correct with dynamic delegate count", ({ configuration }) => {
+		const milestones = [
+			{ activeValidators: 0, height: 0 },
+			{ activeValidators: 53, height: 1 },
+			{ activeValidators: 53, height: 54 },
+		];
+
+		const config = { ...crypto, milestones };
+		configuration.setConfig(config);
+
+		const testVector = [
+			// Round 0
+			{ activeValidators: 0, nextRound: 1, round: 0, roundHeight: 0 },
+			// Round 1
+			{ activeValidators: 53, nextRound: 1, round: 1, roundHeight: 1 },
+			// Round 2
+			{ activeValidators: 53, nextRound: 2, round: 2, roundHeight: 54 },
+			// Round 3
+			{ activeValidators: 53, nextRound: 3, round: 3, roundHeight: 107 },
+		];
+
+		for (const { round, roundHeight, nextRound, activeValidators } of testVector) {
+			const result = calculateRoundInfoByRound(round, configuration);
+			assert.is(result.round, round);
+			assert.is(result.roundHeight, roundHeight);
+			assert.true(isNewRound(result.roundHeight, configuration));
+			assert.is(result.nextRound, nextRound);
+			assert.is(result.maxValidators, activeValidators);
+		}
+	});
+});
 
 describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it, stub }) => {
 	beforeEach(setup);

@@ -81,3 +81,30 @@ export const calculateRound = (
 
 	return result;
 };
+
+export const calculateRoundInfoByRound = (
+	round: number,
+	configuration: Contracts.Crypto.Configuration,
+): Contracts.Shared.RoundInfo => {
+	// Genesis round requires special treatment
+	if (round === 0) {
+		return { maxValidators: 0, nextRound: 1, round: 0, roundHeight: 0 };
+	}
+
+	const milestones = configuration.getMilestones();
+
+	let roundHeight = 1;
+	let maxValidators = 0;
+	for (let index = 1; index < milestones.length - 1; index++) {
+		const milestone = milestones[index];
+		maxValidators = milestone.activeValidators;
+		roundHeight += (round - 1) * milestone.activeValidators;
+	}
+
+	return {
+		maxValidators,
+		nextRound: round,
+		round,
+		roundHeight,
+	};
+};

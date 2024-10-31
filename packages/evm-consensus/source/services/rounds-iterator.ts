@@ -1,6 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import { ethers } from "ethers";
 
@@ -68,9 +69,12 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 		for (const validatorRound of results) {
 			const [round, validators] = validatorRound;
 
+			const roundNumber = Number(round);
+
 			validatorRounds.push({
-				round,
-				roundHeight: round, // TODO calculate round height
+				round: roundNumber,
+				roundHeight: Utils.roundCalculator.calculateRoundInfoByRound(roundNumber, this.configuration)
+					.roundHeight,
 				validators: validators.map((validator) => {
 					const [validatorAddress, voteBalance] = validator;
 
