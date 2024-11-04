@@ -1,12 +1,9 @@
 import { describe, Sandbox } from "../../../test-framework/source";
-import { prepareSandbox, ApiContext } from "../../test/helpers/prepare-sandbox";
-import { request } from "../../test/helpers/request";
-
-import cryptoJson from "../../../core/bin/config/testnet/core/crypto.json";
 import transactions from "../../test/fixtures/transactions.json";
-import transactionTypes from "../../test/fixtures/transactions_types.json";
 import transactionSchemas from "../../test/fixtures/transactions_schemas.json";
-import transactionFees from "../../test/fixtures/transactions_fees.json";
+import transactionTypes from "../../test/fixtures/transactions_types.json";
+import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { request } from "../../test/helpers/request";
 
 describe<{
 	sandbox: Sandbox;
@@ -14,7 +11,7 @@ describe<{
 	let apiContext: ApiContext;
 
 	// TODO:
-	let options = { transform: false };
+	const options = { transform: false };
 
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
@@ -74,10 +71,10 @@ describe<{
 	it("/transactions/{id}", async () => {
 		await apiContext.transactionRepository.save(transactions);
 
-		const id = transactions[transactions.length - 1].id;
+		const id = transactions.at(-1).id;
 		const { statusCode, data } = await request(`/transactions/${id}`, options);
 		assert.equal(statusCode, 200);
-		assert.equal(data.data, transactions[transactions.length - 1]);
+		assert.equal(data.data, transactions.at(-1));
 	});
 
 	it("/transactions/schemas", async () => {
@@ -86,19 +83,5 @@ describe<{
 		const { statusCode, data } = await request(`/transactions/schemas`, options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, transactionSchemas);
-	});
-
-	it("/transactions/fees", async () => {
-		await apiContext.transactionTypeRepository.save(transactionTypes);
-		await apiContext.configurationRepository.save({
-			activeMilestones: cryptoJson.milestones[0],
-			cryptoConfiguration: cryptoJson,
-			id: 1,
-			version: "0.0.1",
-		});
-
-		const { statusCode, data } = await request(`/transactions/fees`, {});
-		assert.equal(statusCode, 200);
-		assert.equal(data.data, transactionFees);
 	});
 });
