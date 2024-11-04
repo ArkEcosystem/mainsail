@@ -1,4 +1,4 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
@@ -20,6 +20,12 @@ export class GenesisBlockGenerator extends Generator {
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
+
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "ephemeral")
+	private readonly evm!: Contracts.Evm.Instance;
+
+	#deployerAddress = "0x0000000000000000000000000000000000000001";
 
 	async generate(
 		genesisMnemonic: string,
@@ -61,6 +67,14 @@ export class GenesisBlockGenerator extends Generator {
 		];
 
 		transactions = [...transactions, ...validatorTransactions];
+
+		const genesisInfo = {
+			account: genesisWallet.address,
+			deployerAccount: this.#deployerAddress,
+			initialSupply: Utils.BigNumber.make(options.premine).toBigInt(),
+			validatorContract: ethers.getCreateAddress({ from: genesisWallet.address, nonce: 0 }),
+		};
+		await this.evm.initializeGenesis(genesisInfo);
 
 		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
 
@@ -212,9 +226,31 @@ export class GenesisBlockGenerator extends Generator {
 
 			Utils.assert.defined<string>(data.id);
 
+			const { receipt } = await this.evm.process({
+				blockContext: {
+					commitKey: {
+						height: BigInt(0),
+						round: BigInt(0),
+					},
+					gasLimit: BigInt(30_000_000),
+					timestamp: BigInt(dayjs(options.epoch).valueOf()),
+					validatorAddress: this.#deployerAddress,
+				},
+				caller: transaction.data.senderAddress,
+				data: Buffer.from(transaction.data.data, "hex"),
+				gasLimit: BigInt(transaction.data.gasLimit),
+				gasPrice: BigInt(transaction.data.gasPrice),
+				nonce: transaction.data.nonce.toBigInt(),
+				recipient: transaction.data.recipientAddress,
+				sequence: transaction.data.sequence,
+				specId: Contracts.Evm.SpecId.SHANGHAI,
+				txHash: transaction.id,
+				value: transaction.data.value.toBigInt(),
+			});
+
 			totals.amount = totals.amount.plus(data.value);
 			totals.fee = totals.fee.plus(data.gasPrice);
-			totals.gasUsed += data.gasLimit;
+			totals.gasUsed += Number(receipt.gasUsed);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);

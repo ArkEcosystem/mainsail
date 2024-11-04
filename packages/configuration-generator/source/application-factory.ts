@@ -40,6 +40,11 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	// Used for evm instance
+	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
+		existsSync: () => true,
+	});
+	app.rebind("path.data").toConstantValue("./tmp");
 
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();
