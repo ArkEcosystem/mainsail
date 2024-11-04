@@ -19,9 +19,9 @@ export class ConfigurationController extends AbstractController {
 		return {
 			data: {
 				// constants: configuration.activeMilestones,
-				// core: {
-				// 	version: configuration.version,
-				// },
+				core: {
+					version: this.app.version(),
+				},
 				// explorer: network.client.explorer,
 				// nethash: network.nethash,
 				// slip44: network.slip44,
