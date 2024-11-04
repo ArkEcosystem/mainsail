@@ -5,7 +5,7 @@ import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
-import { ethers } from "ethers";
+import { ethers, sha256 } from "ethers";
 
 import { Wallet } from "../contracts.js";
 import { Generator } from "./generator.js";
@@ -22,7 +22,7 @@ export class GenesisBlockGenerator extends Generator {
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "ephemeral")
+	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
 	#deployerAddress = "0x0000000000000000000000000000000000000001";
@@ -68,14 +68,7 @@ export class GenesisBlockGenerator extends Generator {
 
 		transactions = [...transactions, ...validatorTransactions];
 
-		const genesisInfo = {
-			account: genesisWallet.address,
-			deployerAccount: this.#deployerAddress,
-			initialSupply: Utils.BigNumber.make(options.premine).toBigInt(),
-			validatorContract: ethers.getCreateAddress({ from: genesisWallet.address, nonce: 0 }),
-		};
-		await this.evm.initializeGenesis(genesisInfo);
-
+		await this.#prepareEvm(genesisWallet.address, options);
 		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
 
 		return {
@@ -83,6 +76,54 @@ export class GenesisBlockGenerator extends Generator {
 			proof: genesis.proof,
 			serialized: genesis.serialized,
 		};
+	}
+
+	async #prepareEvm(genesisWalletAddress: string, options: Contracts.NetworkGenerator.GenesisBlockOptions) {
+		const genesisInfo = {
+			account: genesisWalletAddress,
+			deployerAccount: this.#deployerAddress,
+			initialSupply: Utils.BigNumber.make(options.premine).toBigInt(),
+			validatorContract: ethers.getCreateAddress({ from: genesisWalletAddress, nonce: 0 }),
+		};
+		await this.evm.initializeGenesis(genesisInfo);
+
+		const activeValidators = 53;
+
+		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [activeValidators]).slice(2);
+		const nonce = BigInt(0);
+
+		// Commit Key chosen in a way such that it does not conflict with blocks.
+		const commitKey = { height: BigInt(2 ** 32 + 1), round: BigInt(0) };
+		const blockContext = {
+			commitKey,
+			gasLimit: BigInt(30_000_000),
+			timestamp: BigInt(dayjs(options.epoch).valueOf()),
+			validatorAddress: this.#deployerAddress,
+		};
+
+		const result = await this.evm.process({
+			blockContext,
+			caller: this.#deployerAddress,
+			data: Buffer.concat([
+				Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object)),
+				Buffer.from(constructorArguments, "hex"),
+			]),
+			gasLimit: BigInt(10_000_000),
+			nonce,
+			specId: Contracts.Evm.SpecId.SHANGHAI,
+			txHash: sha256(Buffer.from(`tx-${this.#deployerAddress}-${0}`, "utf8")).slice(2),
+			value: 0n,
+		});
+
+		if (!result.receipt.success) {
+			throw new Error("failed to deploy Consensus contract");
+		}
+
+		await this.evm.onCommit({
+			...commitKey,
+			getBlock: () => ({ data: { round: BigInt(0) } }),
+			setAccountUpdates: () => ({}),
+		} as any);
 	}
 
 	async #createTransferTransaction(

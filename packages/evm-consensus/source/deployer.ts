@@ -26,6 +26,8 @@ export class Deployer {
 
 	// Deploy consensus contract (TODO: change to another address?)
 	#deployerAddress = "0x0000000000000000000000000000000000000001";
+	#nonce = 0;
+	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 
 	public async deploy(): Promise<void> {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
@@ -98,7 +100,4 @@ export class Deployer {
 			setAccountUpdates: () => ({}),
 		} as any);
 	}
-
-	#nonce = 0;
-	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 }
