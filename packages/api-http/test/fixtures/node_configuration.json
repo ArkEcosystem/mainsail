@@ -39,11 +39,7 @@
 	"slip44": 1,
 	"symbol": "TѦ",
 	"token": "ARK",
-	"transactionPool": {
-		"dynamicFees": {
-			"enabled": false
-		}
-	},
+	"transactionPool": {},
 	"version": 30,
 	"wif": 186
 }

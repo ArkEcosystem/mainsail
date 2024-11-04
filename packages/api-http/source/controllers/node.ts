@@ -102,9 +102,6 @@ export class NodeController extends Controller {
 				symbol: network.client.symbol,
 				token: network.client.token,
 				transactionPool: {
-					dynamicFees: transactionPoolConfiguration.dynamicFees?.enabled
-						? transactionPoolConfiguration.dynamicFees
-						: { enabled: false },
 					maxTransactionAge: transactionPoolConfiguration.maxTransactionAge,
 					maxTransactionBytes: transactionPoolConfiguration.maxTransactionBytes,
 					maxTransactionsInPool: transactionPoolConfiguration.maxTransactionsInPool,
