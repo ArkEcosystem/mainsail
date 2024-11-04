@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { AbstractController } from "@mainsail/api-common";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
 @injectable()
@@ -10,23 +10,16 @@ export class ConfigurationController extends AbstractController {
 	@tagged("plugin", "transaction-pool-service")
 	private readonly pluginConfiguration!: Providers.PluginConfiguration;
 
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
+
 	public async configuration(request: Hapi.Request) {
-		// const configuration = await this.getConfiguration();
-
-		// const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
-		// const network = cryptoConfiguration.network;
-
 		return {
 			data: {
-				// constants: configuration.activeMilestones,
 				core: {
 					version: this.app.version(),
 				},
-				// explorer: network.client.explorer,
-				// nethash: network.nethash,
-				// slip44: network.slip44,
-				// symbol: network.client.symbol,
-				// token: network.client.token,
+				height: this.stateStore.getHeight(),
 				transactionPool: {
 					maxTransactionAge: this.pluginConfiguration.get("maxTransactionAge"),
 					maxTransactionBytes: this.pluginConfiguration.get("maxTransactionBytes"),
@@ -34,8 +27,6 @@ export class ConfigurationController extends AbstractController {
 					maxTransactionsPerRequest: this.pluginConfiguration.get("maxTransactionsPerRequest"),
 					maxTransactionsPerSender: this.pluginConfiguration.get("maxTransactionsPerSender"),
 				},
-				// version: network.pubKeyHash,
-				// wif: network.wif,
 			},
 		};
 	}
