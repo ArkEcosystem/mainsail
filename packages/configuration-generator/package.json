@@ -48,8 +48,8 @@
 		"dayjs": "1.11.10",
 		"envfile": "7.1.0",
 		"ethers": "^6.11.0",
-		"tmp": "0.2.3",
-		"fs-extra": "11.2.0"
+		"fs-extra": "11.2.0",
+		"tmp": "0.2.3"
 	},
 	"devDependencies": {
 		"@types/env-paths": "2.1.0",
