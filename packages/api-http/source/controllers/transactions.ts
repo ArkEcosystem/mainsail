@@ -63,13 +63,6 @@ export class TransactionsController extends Controller {
 		return { data: schemasByKey };
 	}
 
-	// TODO: Remove endpoint
-	public async fees(request: Hapi.Request) {
-		const typeGroups: Record<string | number, Record<string, number>> = {};
-
-		return { data: typeGroups };
-	}
-
 	private async getTransactionTypes(): Promise<Models.TransactionType[]> {
 		return this.transactionTypeRepositoryFactory().createQueryBuilder().select().addOrderBy("key", "ASC").getMany();
 	}
