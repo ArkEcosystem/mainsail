@@ -18,6 +18,7 @@ import { ServiceProvider as EvmService } from "@mainsail/evm-service";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { dirSync, setGracefulCleanup } from "tmp";
 
 import { ConfigurationGenerator } from "./configuration-generator.js";
 import { ConfigurationWriter } from "./configuration-writer.js";
@@ -44,7 +45,8 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
 		existsSync: () => true,
 	});
-	app.rebind("path.data").toConstantValue("./tmp");
+	setGracefulCleanup();
+	app.rebind("path.data").toConstantValue(dirSync().name);
 
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();

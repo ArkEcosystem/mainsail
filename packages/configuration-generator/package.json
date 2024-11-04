@@ -48,6 +48,7 @@
 		"dayjs": "1.11.10",
 		"envfile": "7.1.0",
 		"ethers": "^6.11.0",
+		"tmp": "0.2.3",
 		"fs-extra": "11.2.0"
 	},
 	"devDependencies": {
@@ -55,7 +56,6 @@
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
 		"env-paths": "3.0.0",
-		"tmp": "0.2.3",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
