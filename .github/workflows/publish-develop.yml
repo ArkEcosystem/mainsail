@@ -119,13 +119,6 @@ jobs:
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   restore-keys: ${{ runner.os }}-pnpm-
 
-            - name: Cache lerna
-              uses: actions/cache@v4
-              with:
-                  key: ${{ runner.os }}-lerna
-                  path: ./.cache
-                  restore-keys: ${{ runner.os }}-lerna-
-
             - name: Install dependencies
               run: pnpm install
 
