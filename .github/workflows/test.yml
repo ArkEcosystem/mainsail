@@ -51,9 +51,9 @@ jobs:
             - name: Cache lerna
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-lerna
+                  key: lerna-${{ runner.os }}-${{ github.run_id }}
                   path: ./.cache
-                  restore-keys: ${{ runner.os }}-lerna-
+                  restore-keys: lerna-${{ runner.os }}
 
             - name: Install dependencies
               run: pnpm install
@@ -96,9 +96,9 @@ jobs:
             - name: Cache lerna
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-lerna
+                  key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: ${{ runner.os }}-lerna-
+                  restore-keys: lerna-${{ runner.os }}-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -279,9 +279,9 @@ jobs:
             - name: Cache lerna
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-lerna
+                  key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: ${{ runner.os }}-lerna-
+                  restore-keys: lerna-${{ runner.os }}-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -330,9 +330,9 @@ jobs:
             - name: Cache lerna
               uses: actions/cache@v4
               with:
-                  key: ${{ runner.os }}-lerna
+                  key: lerna-${{ runner.os }}
                   path: ./.cache
-                  restore-keys: ${{ runner.os }}-lerna-
+                  restore-keys: lerna-${{ runner.os }}-
             - name: Install dependencies
               run: pnpm install
             - name: Build
