@@ -13,7 +13,7 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvents } from "@mainsail/kernel/source/services/events";
 import { ServiceProvider as CoreTriggers } from "@mainsail/kernel/source/services/triggers";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { Sandbox } from "@mainsail/test-framework";
+import { Sandbox } from "../../../test-framework/source";
 import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync } from "tmp";

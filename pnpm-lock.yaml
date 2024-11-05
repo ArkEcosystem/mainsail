@@ -1922,9 +1922,6 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/test-framework':
-        specifier: workspace:*
-        version: link:../test-framework
       '@mainsail/transactions':
         specifier: workspace:*
         version: link:../transactions
