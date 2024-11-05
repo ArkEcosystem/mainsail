@@ -14,9 +14,11 @@ import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypt
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
+import { ServiceProvider as EvmService } from "@mainsail/evm-service";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
+import { dirSync, setGracefulCleanup } from "tmp";
 
 import { ConfigurationGenerator } from "./configuration-generator.js";
 import { ConfigurationWriter } from "./configuration-writer.js";
@@ -39,6 +41,12 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	// Used for evm instance
+	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
+		existsSync: () => true,
+	});
+	setGracefulCleanup();
+	app.rebind("path.data").toConstantValue(dirSync().name);
 
 	await app.resolve(CoreSerializer).register();
 	await app.resolve(CoreValidation).register();
@@ -56,6 +64,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreEvmGasFee).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreCryptoTransactionEvmCall).register();
+	await app.resolve(EvmService).register();
 
 	// @ts-ignore
 	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({

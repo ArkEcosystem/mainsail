@@ -1,11 +1,11 @@
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
-import { ethers } from "ethers";
+import { ethers, sha256 } from "ethers";
 
 import { Wallet } from "../contracts.js";
 import { Generator } from "./generator.js";
@@ -20,6 +20,12 @@ export class GenesisBlockGenerator extends Generator {
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
+
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
+	#deployerAddress = "0x0000000000000000000000000000000000000001";
 
 	async generate(
 		genesisMnemonic: string,
@@ -56,12 +62,12 @@ export class GenesisBlockGenerator extends Generator {
 
 		const validatorTransactions = [
 			...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
-			// ...(await this.#buildUsernameTransactions(validators, options.pubKeyHash)),
 			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
 		];
 
 		transactions = [...transactions, ...validatorTransactions];
 
+		await this.#prepareEvm(genesisWallet.address, validatorsMnemonics.length, options);
 		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
 
 		return {
@@ -69,6 +75,56 @@ export class GenesisBlockGenerator extends Generator {
 			proof: genesis.proof,
 			serialized: genesis.serialized,
 		};
+	}
+
+	async #prepareEvm(
+		genesisWalletAddress: string,
+		validatorsCount: number,
+		options: Contracts.NetworkGenerator.GenesisBlockOptions,
+	) {
+		const genesisInfo = {
+			account: genesisWalletAddress,
+			deployerAccount: this.#deployerAddress,
+			initialSupply: Utils.BigNumber.make(options.premine).toBigInt(),
+			validatorContract: ethers.getCreateAddress({ from: genesisWalletAddress, nonce: 0 }),
+		};
+		await this.evm.initializeGenesis(genesisInfo);
+
+		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [validatorsCount]).slice(2);
+		const nonce = BigInt(0);
+
+		// Commit Key chosen in a way such that it does not conflict with blocks.
+		const commitKey = { height: BigInt(2 ** 32 + 1), round: BigInt(0) };
+		const blockContext = {
+			commitKey,
+			gasLimit: BigInt(30_000_000),
+			timestamp: BigInt(dayjs(options.epoch).valueOf()),
+			validatorAddress: this.#deployerAddress,
+		};
+
+		const result = await this.evm.process({
+			blockContext,
+			caller: this.#deployerAddress,
+			data: Buffer.concat([
+				Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object)),
+				Buffer.from(constructorArguments, "hex"),
+			]),
+			gasLimit: BigInt(10_000_000),
+			nonce,
+			specId: Contracts.Evm.SpecId.SHANGHAI,
+			txHash: sha256(Buffer.from(`tx-${this.#deployerAddress}-${0}`, "utf8")).slice(2),
+			value: 0n,
+		});
+
+		if (!result.receipt.success) {
+			throw new Error("failed to deploy Consensus contract");
+		}
+
+		await this.evm.onCommit({
+			...commitKey,
+			getBlock: () => ({ data: { round: BigInt(0) } }),
+			setAccountUpdates: () => ({}),
+		} as any);
 	}
 
 	async #createTransferTransaction(
@@ -212,9 +268,31 @@ export class GenesisBlockGenerator extends Generator {
 
 			Utils.assert.defined<string>(data.id);
 
+			const { receipt } = await this.evm.process({
+				blockContext: {
+					commitKey: {
+						height: BigInt(0),
+						round: BigInt(0),
+					},
+					gasLimit: BigInt(30_000_000),
+					timestamp: BigInt(dayjs(options.epoch).valueOf()),
+					validatorAddress: this.#deployerAddress,
+				},
+				caller: transaction.data.senderAddress,
+				data: Buffer.from(transaction.data.data, "hex"),
+				gasLimit: BigInt(transaction.data.gasLimit),
+				gasPrice: BigInt(transaction.data.gasPrice),
+				nonce: transaction.data.nonce.toBigInt(),
+				recipient: transaction.data.recipientAddress,
+				sequence: transaction.data.sequence,
+				specId: Contracts.Evm.SpecId.SHANGHAI,
+				txHash: transaction.id,
+				value: transaction.data.value.toBigInt(),
+			});
+
 			totals.amount = totals.amount.plus(data.value);
 			totals.fee = totals.fee.plus(data.gasPrice);
-			totals.gasUsed += data.gasLimit;
+			totals.gasUsed += Number(receipt.gasUsed);
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
 			transactionData.push(data);

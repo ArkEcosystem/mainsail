@@ -1,14 +1,14 @@
 {
-	"address": "0x16DC266f16221ec709BC050dedd77bc0584f90F4",
+	"address": "0xf4AeE54f771AD2De5d86593c3163B23Ea763352A",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "3dd71596e3d97a2ad991954ff6bf3edd71c9d0fcdb3b5906819711cf8b84c530",
-		"publicKey": "91c8fc5e2a014dbd537eed5b2bceff624a850b7f2e6341df7b0019ab0944d3aa3231ecc4f6e44ebb7017230a8f556667"
+		"privateKey": "40b3b95eca148e605026f5ec2505cbad6a09c45f6d8e7274937024c6e0bcc962",
+		"publicKey": "984bc5bda0b740859e812a36c9cea41cac0eedf88f42395405979d4df53e451bb59766701140d217150ab7f27675d428"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "e2b657bd78aa4de40de105fe74ee2ed0efe22792b562af4939df8b440d038feb",
-		"publicKey": "02660b7905cd6dfa8ab32615beea9d7dd01b940295199661e229e5a8ab42dcb6d1"
+		"privateKey": "401d37bb7622e40e9a1ef107db58a5d8f4b0d8069529ece442b0703360032ddc",
+		"publicKey": "03552880424e864adb8c306d5de8998789044e5a1c894504f5edc2d1cfca9556ae"
 	},
-	"passphrase": "liberty smile miracle ride design rent crop lift hand citizen sorry mechanic switch then quote light nature scissors together reveal genuine knife horse comic"
+	"passphrase": "shop sleep coil chimney hope story electric kingdom polar point hub puzzle wife wet cave present luggage hill denial tide stage shoulder ahead globe"
 }
