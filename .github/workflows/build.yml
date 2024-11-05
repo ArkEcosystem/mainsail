@@ -12,7 +12,7 @@ on:
             - develop
 
 jobs:
-    unit:
+    build:
         strategy:
             matrix:
                 node-version:
