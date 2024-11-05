@@ -84,7 +84,6 @@ export class NodeController extends Controller {
 	public async configuration(request: Hapi.Request) {
 		const configuration = await this.getConfiguration();
 		const plugins = await this.getPlugins();
-		const transactionPoolConfiguration = plugins["@mainsail/transaction-pool"]?.configuration ?? {};
 
 		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
 		const network = cryptoConfiguration.network;
@@ -101,16 +100,6 @@ export class NodeController extends Controller {
 				slip44: network.slip44,
 				symbol: network.client.symbol,
 				token: network.client.token,
-				transactionPool: {
-					dynamicFees: transactionPoolConfiguration.dynamicFees?.enabled
-						? transactionPoolConfiguration.dynamicFees
-						: { enabled: false },
-					maxTransactionAge: transactionPoolConfiguration.maxTransactionAge,
-					maxTransactionBytes: transactionPoolConfiguration.maxTransactionBytes,
-					maxTransactionsInPool: transactionPoolConfiguration.maxTransactionsInPool,
-					maxTransactionsPerRequest: transactionPoolConfiguration.maxTransactionsPerRequest,
-					maxTransactionsPerSender: transactionPoolConfiguration.maxTransactionsPerSender,
-				},
 				version: network.pubKeyHash,
 				wif: network.wif,
 			},
