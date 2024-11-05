@@ -1,12 +1,10 @@
 name: CI
 
 on:
-    push:
-        branches:
-            - "main"
-            - "develop"
-    pull_request:
-        types: [ready_for_review, synchronize, opened]
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
 
 jobs:
     e2e:

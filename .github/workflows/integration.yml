@@ -1,5 +1,17 @@
+name: CI
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+
 jobs:
     integration:
+        strategy:
+            matrix:
+                node-version:
+                    - 20.x
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-integration
@@ -51,18 +63,3 @@ jobs:
 
             - name: Test api-http
               run: cd packages/api-http && pnpm run test:integration
-        strategy:
-            matrix:
-                node-version:
-                    - 20.x
-name: CI
-on:
-    pull_request:
-        types:
-            - ready_for_review
-            - synchronize
-            - opened
-    push:
-        branches:
-            - main
-            - develop
