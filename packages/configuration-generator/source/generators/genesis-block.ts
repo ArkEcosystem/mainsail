@@ -62,13 +62,12 @@ export class GenesisBlockGenerator extends Generator {
 
 		const validatorTransactions = [
 			...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
-			// ...(await this.#buildUsernameTransactions(validators, options.pubKeyHash)),
 			...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
 		];
 
 		transactions = [...transactions, ...validatorTransactions];
 
-		await this.#prepareEvm(genesisWallet.address, options);
+		await this.#prepareEvm(genesisWallet.address, validatorsMnemonics.length, options);
 		const genesis = await this.#createGenesisCommit(genesisWallet.keys, transactions, options);
 
 		return {
@@ -78,7 +77,11 @@ export class GenesisBlockGenerator extends Generator {
 		};
 	}
 
-	async #prepareEvm(genesisWalletAddress: string, options: Contracts.NetworkGenerator.GenesisBlockOptions) {
+	async #prepareEvm(
+		genesisWalletAddress: string,
+		validatorsCount: number,
+		options: Contracts.NetworkGenerator.GenesisBlockOptions,
+	) {
 		const genesisInfo = {
 			account: genesisWalletAddress,
 			deployerAccount: this.#deployerAddress,
@@ -87,9 +90,7 @@ export class GenesisBlockGenerator extends Generator {
 		};
 		await this.evm.initializeGenesis(genesisInfo);
 
-		const activeValidators = 53;
-
-		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [activeValidators]).slice(2);
+		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [validatorsCount]).slice(2);
 		const nonce = BigInt(0);
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
