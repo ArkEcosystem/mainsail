@@ -123,11 +123,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const publicKeyToAddress: Record<string, string> = {};
 		const transactionReceipts: Models.Receipt[] = [];
 
-		let receipts: Map<string, Contracts.Evm.TransactionReceipt> | undefined;
-
-		if (unit.hasProcessorResult()) {
-			receipts = unit.getProcessorResult().receipts;
-		}
+		const receipts = unit.getProcessorResult().receipts;
 
 		for (const transaction of transactions) {
 			const { senderPublicKey } = transaction.data;
