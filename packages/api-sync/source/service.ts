@@ -471,13 +471,11 @@ export class Sync implements Contracts.ApiSync.Service {
 			`checking for database reset (forced=${forcedTruncateDatabase}, db.blocks=${blocks.count}, db.height=${blocks.max_height}, storage.height=${lastHeight})`,
 		);
 
-		console.log("lastHeight", lastHeight);
-
 		if (blocksOk && !forcedTruncateDatabase) {
 			return;
 		}
 
-		this.logger.warning(`resetting API database and state to genesis block for full restore`);
+		this.logger.warning(`Clearing API database for full restore.`);
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
