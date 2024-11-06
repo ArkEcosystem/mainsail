@@ -405,7 +405,7 @@ export class Restore {
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
-					id: receipt.txHash,
+					id: receipt.txHash.slice(2),
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
