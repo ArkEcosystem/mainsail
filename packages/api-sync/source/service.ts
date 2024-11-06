@@ -475,7 +475,9 @@ export class Sync implements Contracts.ApiSync.Service {
 			return;
 		}
 
-		this.logger.warning(`Clearing API database for full restore.`);
+		if (lastHeight !== 0 || blocks.count !== "0") {
+			this.logger.warning(`Clearing API database for full restore.`);
+		}
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
