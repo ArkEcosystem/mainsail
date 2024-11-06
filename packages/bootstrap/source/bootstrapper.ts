@@ -57,10 +57,6 @@ export class Bootstrapper {
 
 	public async bootstrap(): Promise<void> {
 		try {
-			if (this.apiSync) {
-				await this.apiSync.prepareBootstrap();
-			}
-
 			await this.#setGenesisCommit();
 			await this.#checkStoredGenesisCommit();
 

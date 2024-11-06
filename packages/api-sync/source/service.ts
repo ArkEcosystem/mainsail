@@ -87,13 +87,11 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.ApiSync.Listener)
 	private readonly listeners!: Listeners;
 
-	public async prepareBootstrap(): Promise<void> {
+	public async bootstrap(): Promise<void> {
 		await this.migrations.run();
 		await this.#resetDatabaseIfNecessary();
 		this.#queue = await this.createQueue();
-	}
 
-	public async bootstrap(): Promise<void> {
 		// if our database is empty, we sync all blocks from scratch
 		const [blocks] = await this.dataSource.query("select count(1) from blocks");
 		if (blocks.count === "0" && !this.databaseService.isEmpty()) {
