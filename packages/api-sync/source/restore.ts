@@ -74,9 +74,6 @@ export class Restore {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
-	@inject(Identifiers.ValidatorSet.Service)
-	private readonly validatorSet!: Contracts.ValidatorSet.Service;
-
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
@@ -293,8 +290,7 @@ export class Restore {
 	async #ingestConsensusData(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		// Consensus.sol#getAllValidators
-		const validators = this.validatorSet.getAllValidators();
+		const validators = await this.consensusContractService.getAllValidators();
 
 		for (const validator of validators) {
 			context.validatorAttributes[validator.address] = {
