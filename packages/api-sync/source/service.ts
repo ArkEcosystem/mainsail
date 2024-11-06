@@ -96,7 +96,7 @@ export class Sync implements Contracts.ApiSync.Service {
 	public async bootstrap(): Promise<void> {
 		// if our database is empty, we sync all blocks from scratch
 		const [blocks] = await this.dataSource.query("select count(1) from blocks");
-		if (blocks.count === "0") {
+		if (blocks.count === "0" && !this.databaseService.isEmpty()) {
 			await this.#bootstrapRestore();
 		}
 
@@ -474,6 +474,8 @@ export class Sync implements Contracts.ApiSync.Service {
 		this.logger.info(
 			`checking for database reset (forced=${forcedTruncateDatabase}, db.blocks=${blocks.count}, db.height=${blocks.max_height}, storage.height=${lastHeight})`,
 		);
+
+		console.log("lastHeight", lastHeight);
 
 		if (blocksOk && !forcedTruncateDatabase) {
 			return;
