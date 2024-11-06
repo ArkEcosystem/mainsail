@@ -400,6 +400,11 @@ export class Restore {
 				Utils.assert.defined(receipt.txHash);
 				Utils.assert.defined(receipt.blockHeight);
 
+				// Initial deployment receipts
+				if (receipt.blockHeight >= BigInt(2 ** 32)) {
+					continue;
+				}
+
 				receipts.push({
 					blockHeight: Utils.BigNumber.make(receipt.blockHeight).toFixed(),
 					deployedContractAddress: receipt.deployedContractAddress,
