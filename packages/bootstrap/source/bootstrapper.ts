@@ -111,10 +111,9 @@ export class Bootstrapper {
 		if (this.databaseService.isEmpty()) {
 			await this.#processGenesisBlock();
 		} else {
-			await this.#processBlocks();
-
 			const commit = await this.databaseService.getLastCommit();
 			this.stateStore.setLastBlock(commit.block);
+			this.stateStore.setTotalRound(this.databaseService.getState().totalRound);
 		}
 
 		await this.validatorSet.restore();
@@ -125,21 +124,6 @@ export class Bootstrapper {
 		await this.#processCommit(genesisBlock);
 		this.databaseService.addCommit(genesisBlock);
 		await this.databaseService.persist();
-	}
-
-	async #processBlocks(): Promise<void> {
-		const lastCommit = await this.databaseService.getLastCommit();
-
-		let totalRound = 0;
-
-		for await (const commit of this.databaseService.readCommits(
-			this.stateStore.getHeight(),
-			lastCommit.block.data.height,
-		)) {
-			totalRound += commit.proof.round + 1;
-		}
-
-		this.stateStore.setTotalRound(totalRound);
 	}
 
 	async #processCommit(commit: Contracts.Crypto.Commit): Promise<void> {
