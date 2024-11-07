@@ -105,18 +105,18 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
 		this.#cache.set(commit.block.data.height, commit);
+
+		this.#state.height = commit.block.data.height;
+		this.#state.totalRound += commit.proof.round + 1;
 	}
 
 	async persist(): Promise<void> {
 		await this.rootDb.transaction(() => {
-			const state = this.stateStorage.get("state");
-
 			for (const [height, commit] of this.#cache.entries()) {
 				void this.blockStorage.put(height, Buffer.from(commit.serialized, "hex"));
-				state.height = height;
 			}
 
-			void this.stateStorage.put("state", state);
+			void this.stateStorage.put("state", this.#state);
 		});
 
 		await this.rootDb.flushed;
