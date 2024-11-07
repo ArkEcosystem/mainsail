@@ -30,6 +30,10 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		this.#state = this.stateStorage.get("state");
 	}
 
+	public getState(): Contracts.Database.State {
+		return this.#state;
+	}
+
 	public isEmpty(): boolean {
 		return this.#cache.size === 0 && this.blockStorage.getKeysCount() === 0;
 	}
