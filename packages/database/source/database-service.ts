@@ -16,16 +16,18 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-	#cache = new Map<number, Buffer>();
+	#cache = new Map<number, Contracts.Crypto.Commit>();
+	#state = { height: 0, totalRound: 0 };
 
 	public async initialize(): Promise<void> {
 		if (this.isEmpty()) {
 			await this.rootDb.transaction(() => {
-				void this.stateStorage.put("state", { height: 0, totalRound: 0 });
+				void this.stateStorage.put("state", this.#state);
 			});
-
 			await this.rootDb.flushed;
 		}
+
+		this.#state = this.stateStorage.get("state");
 	}
 
 	public isEmpty(): boolean {
@@ -93,7 +95,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 
 		if (this.#cache.size > 0) {
-			return await this.commitFactory.fromBytes([...this.#cache.values()].pop()!);
+			return [...this.#cache.values()].pop()!;
 		}
 
 		return await this.commitFactory.fromBytes(
@@ -102,15 +104,15 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
-		this.#cache.set(commit.block.data.height, Buffer.from(commit.serialized, "hex"));
+		this.#cache.set(commit.block.data.height, commit);
 	}
 
 	async persist(): Promise<void> {
 		await this.rootDb.transaction(() => {
 			const state = this.stateStorage.get("state");
 
-			for (const [height, block] of this.#cache.entries()) {
-				void this.blockStorage.put(height, block);
+			for (const [height, commit] of this.#cache.entries()) {
+				void this.blockStorage.put(height, Buffer.from(commit.serialized, "hex"));
 				state.height = height;
 			}
 
@@ -124,7 +126,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	#get(height: number): Buffer {
 		if (this.#cache.has(height)) {
-			return this.#cache.get(height)!;
+			return Buffer.from(this.#cache.get(height)!.serialized, "hex");
 		}
 
 		return this.blockStorage.get(height);
