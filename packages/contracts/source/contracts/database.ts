@@ -2,6 +2,7 @@ import { Block } from "./crypto/block.js";
 import { Commit } from "./crypto/commit.js";
 
 export interface DatabaseService {
+	initialize(): Promise<void>;
 	isEmpty(): boolean;
 
 	getCommit(height: number): Promise<Commit | undefined>;

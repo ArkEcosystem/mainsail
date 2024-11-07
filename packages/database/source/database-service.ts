@@ -4,13 +4,29 @@ import * as lmdb from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
+	@inject(Identifiers.Database.Root)
+	private readonly rootDb!: lmdb.RootDatabase;
+
 	@inject(Identifiers.Database.Storage.Block)
 	private readonly blockStorage!: lmdb.Database;
+
+	@inject(Identifiers.Database.Storage.State)
+	private readonly stateStorage!: lmdb.Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
 	#cache = new Map<number, Buffer>();
+
+	public async initialize(): Promise<void> {
+		if (this.isEmpty()) {
+			await this.rootDb.transaction(() => {
+				void this.stateStorage.put("state", { height: 0, totalRound: 0 });
+			});
+
+			await this.rootDb.flushed;
+		}
+	}
 
 	public isEmpty(): boolean {
 		return this.#cache.size === 0 && this.blockStorage.getKeysCount() === 0;
@@ -90,13 +106,18 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	async persist(): Promise<void> {
-		await this.blockStorage.transaction(() => {
+		await this.rootDb.transaction(() => {
+			const state = this.stateStorage.get("state");
+
 			for (const [height, block] of this.#cache.entries()) {
 				void this.blockStorage.put(height, block);
+				state.height = height;
 			}
+
+			void this.stateStorage.put("state", state);
 		});
 
-		await this.blockStorage.flushed;
+		await this.rootDb.flushed;
 
 		this.#cache.clear();
 	}
