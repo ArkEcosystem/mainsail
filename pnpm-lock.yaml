@@ -736,8 +736,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       lmdb:
-        specifier: 3.0.4
-        version: 3.0.4
+        specifier: 3.1.4
+        version: 3.1.4
     devDependencies:
       uvu:
         specifier: ^0.5.6
@@ -1774,8 +1774,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       lmdb:
-        specifier: 3.0.4
-        version: 3.0.4
+        specifier: 3.1.4
+        version: 3.1.4
     devDependencies:
       '@types/tmp':
         specifier: 0.2.6
@@ -3568,33 +3568,33 @@ packages:
     resolution: {integrity: sha512-0hZxUPKnHwehUO2xC4ldtdX9bW0W1UosxebDIQlZL2STnZnA2IFmIk2lJVUyFW+cmTPQzV93jfS0i69T9Z+teg==}
     engines: {node: ^14.17.0 || >=16.0.0}
 
-  '@lmdb/lmdb-darwin-arm64@3.0.4':
-    resolution: {integrity: sha512-+pdk9UW9E6W1accZJ7aEN+y7SQlvxb+/k7hic8andt/ok7iGr0rsmuzIQGRhx1LX1DqXlP9+ogJwepbcBYWsFQ==}
+  '@lmdb/lmdb-darwin-arm64@3.1.4':
+    resolution: {integrity: sha512-bXwBegGNDGAlshGqUmV8MxVFPsqEpU2yWWxoJ4AA4UkEd7gA1Rzh7KtvM5Tww0dQfp5t+P/SjNV3vjpAgof+uA==}
     cpu: [arm64]
     os: [darwin]
 
-  '@lmdb/lmdb-darwin-x64@3.0.4':
-    resolution: {integrity: sha512-1VgW4VH5rW7YslsUAIw06Nwe4cfpk0N0kcZMR/EH1DMdAT9g8CJHcF29ock3eqFJsGsU5F+/D/EwEO310oXdIg==}
+  '@lmdb/lmdb-darwin-x64@3.1.4':
+    resolution: {integrity: sha512-cb1/yeoUfWhVWqo8VImUWo6bXVn57AHPX98VqIkpfRw5Yh0z2DHPBZmsELb1OLJKeikAAOyxM+vPWRJYtAg9rw==}
     cpu: [x64]
     os: [darwin]
 
-  '@lmdb/lmdb-linux-arm64@3.0.4':
-    resolution: {integrity: sha512-IcDuTZOO/Oig/YtSK9scE83CWRteM7R7oTC2LRieeBI1vNTwnkL4Zte3sW2v7QMfb96Q+o+CkKN8hNhUxwN8hw==}
+  '@lmdb/lmdb-linux-arm64@3.1.4':
+    resolution: {integrity: sha512-Hs1cmv8SKEkczsiQbRYVeqI7vzpJ0LI29RyeaVNDDFJxzoua7IcuyG0wSXu12kpXlGTTLVOh1Wp4rK79Ixpxmg==}
     cpu: [arm64]
     os: [linux]
 
-  '@lmdb/lmdb-linux-arm@3.0.4':
-    resolution: {integrity: sha512-AocrkB2bRs1H3o2WiXpLp0GK69lHn/pJbLLSBNuwykRx4ze2a6DLDTw6Nek5sdnp1+LU6MUvpHFrnOfNUm+N1w==}
+  '@lmdb/lmdb-linux-arm@3.1.4':
+    resolution: {integrity: sha512-9O3kU6i7crV0vi+ImbZG6SkD+T8sxjbugq4pY424tjV8X/EjSfs1E0n25We5Z7qpJFxZSJZKsv40tJlz1w4pLg==}
     cpu: [arm]
     os: [linux]
 
-  '@lmdb/lmdb-linux-x64@3.0.4':
-    resolution: {integrity: sha512-PpHksYJlEYwUUCcY+K5IohSkdovXx0zdy8+7TcK4bdzNc+ntODB7NiV2PgcrBEB1pgM0HINzOUtztY1UkkkXVQ==}
+  '@lmdb/lmdb-linux-x64@3.1.4':
+    resolution: {integrity: sha512-e/xPxFjSBzuN7/nb5WBYO1t9X1NBiNYy+gvWB3rb95K2W5qJU9fnjx+CNFp7ucvQZWF08EsVzMBa7eXKGGmHjg==}
     cpu: [x64]
     os: [linux]
 
-  '@lmdb/lmdb-win32-x64@3.0.4':
-    resolution: {integrity: sha512-UCnLqrww4sOQ5Khj9g5NE/j2dK8Fq3LMh7zDP9FYGE55Uwh1PA4PQnW88e8Y+Q7tyIV7/jdbqiQ+TzESRL43vA==}
+  '@lmdb/lmdb-win32-x64@3.1.4':
+    resolution: {integrity: sha512-mUcWgKmpbquKaDEcJ+FBtJpcqHvJW2Ce+GKMP/B/Hm9IxGjUfGs0aGlax2Nh/mjzXx/7qfwyCGD8y+KXfDuMsA==}
     cpu: [x64]
     os: [win32]
 
@@ -7261,8 +7261,8 @@ packages:
     resolution: {integrity: sha512-RmAl7su35BFd/xoMamRjpIE4j3v+L28o8CT5YhAXQJm1fD+1l9ngXY8JAQRJ+tFK2i5njvi0iRUKV09vPwA0iA==}
     engines: {node: '>=6'}
 
-  lmdb@3.0.4:
-    resolution: {integrity: sha512-2w9rvXNpLkgtv0n6iGMVC0p1WkpHhJ+b5LImBIjXqxRAY+ABEofXZ8UPLDG/L7QPySNwgHGYL97JyFapYbhXWg==}
+  lmdb@3.1.4:
+    resolution: {integrity: sha512-M3P0HBm0e6SUCrWqMf+wjs5LTRQekh1TtC10e3NjCfLECCXLRXHFROG2kErdyyv2MQ5335Qvb3KQKCSLUuwUDg==}
     hasBin: true
 
   load-json-file@4.0.0:
@@ -7763,10 +7763,6 @@ packages:
       encoding:
         optional: true
 
-  node-gyp-build-optional-packages@5.1.1:
-    resolution: {integrity: sha512-+P72GAjVAbTxjjwUmwjVrqrdZROD4nf8KgpBoDxqXXTiYZZt/ud60dE5yvCSr9lRO8e8yv6kgJIC0K0PfZFVQw==}
-    hasBin: true
-
   node-gyp-build-optional-packages@5.2.2:
     resolution: {integrity: sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw==}
     hasBin: true
@@ -8040,8 +8036,8 @@ packages:
     resolution: {integrity: sha512-ANIvzobt1rls2BDny5fWZ3ZVKyD6nscLvfFRpQgfWsythlcsVUC9kL0zq6j2Z5z9wwp1kd7wpsD/T9qNPVLCaQ==}
     engines: {node: '>=18'}
 
-  ordered-binary@1.5.1:
-    resolution: {integrity: sha512-5VyHfHY3cd0iza71JepYG50My+YUbrFtGoUz2ooEydPyPM7Aai/JW098juLr+RG6+rDJuzNNTsEQu2DZa1A41A==}
+  ordered-binary@1.5.3:
+    resolution: {integrity: sha512-oGFr3T+pYdTGJ+YFEILMpS3es+GiIbs9h/XQrclBXUtd44ey7XwfsMzM31f64I1SQOawDoDr/D823kNCADI8TA==}
 
   os-tmpdir@1.0.2:
     resolution: {integrity: sha512-D2FR03Vir7FIu45XBY20mTb+/ZSWB00sjU9jdQXt83gDrI4Ztz5Fs7/yy74g2N5SVQY4xY1qDr4rNddwYRVX0g==}
@@ -10625,22 +10621,22 @@ snapshots:
       - nx
       - supports-color
 
-  '@lmdb/lmdb-darwin-arm64@3.0.4':
+  '@lmdb/lmdb-darwin-arm64@3.1.4':
     optional: true
 
-  '@lmdb/lmdb-darwin-x64@3.0.4':
+  '@lmdb/lmdb-darwin-x64@3.1.4':
     optional: true
 
-  '@lmdb/lmdb-linux-arm64@3.0.4':
+  '@lmdb/lmdb-linux-arm64@3.1.4':
     optional: true
 
-  '@lmdb/lmdb-linux-arm@3.0.4':
+  '@lmdb/lmdb-linux-arm@3.1.4':
     optional: true
 
-  '@lmdb/lmdb-linux-x64@3.0.4':
+  '@lmdb/lmdb-linux-x64@3.1.4':
     optional: true
 
-  '@lmdb/lmdb-win32-x64@3.0.4':
+  '@lmdb/lmdb-win32-x64@3.1.4':
     optional: true
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
@@ -14937,20 +14933,20 @@ snapshots:
       - zen-observable
       - zenObservable
 
-  lmdb@3.0.4:
+  lmdb@3.1.4:
     dependencies:
       msgpackr: 1.10.2
       node-addon-api: 6.1.0
-      node-gyp-build-optional-packages: 5.1.1
-      ordered-binary: 1.5.1
+      node-gyp-build-optional-packages: 5.2.2
+      ordered-binary: 1.5.3
       weak-lru-cache: 1.2.2
     optionalDependencies:
-      '@lmdb/lmdb-darwin-arm64': 3.0.4
-      '@lmdb/lmdb-darwin-x64': 3.0.4
-      '@lmdb/lmdb-linux-arm': 3.0.4
-      '@lmdb/lmdb-linux-arm64': 3.0.4
-      '@lmdb/lmdb-linux-x64': 3.0.4
-      '@lmdb/lmdb-win32-x64': 3.0.4
+      '@lmdb/lmdb-darwin-arm64': 3.1.4
+      '@lmdb/lmdb-darwin-x64': 3.1.4
+      '@lmdb/lmdb-linux-arm': 3.1.4
+      '@lmdb/lmdb-linux-arm64': 3.1.4
+      '@lmdb/lmdb-linux-x64': 3.1.4
+      '@lmdb/lmdb-win32-x64': 3.1.4
 
   load-json-file@4.0.0:
     dependencies:
@@ -15572,14 +15568,9 @@ snapshots:
     optionalDependencies:
       encoding: 0.1.13
 
-  node-gyp-build-optional-packages@5.1.1:
-    dependencies:
-      detect-libc: 2.0.3
-
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
       detect-libc: 2.0.3
-    optional: true
 
   node-gyp-build@4.8.1: {}
 
@@ -16035,7 +16026,7 @@ snapshots:
       string-width: 7.2.0
       strip-ansi: 7.1.0
 
-  ordered-binary@1.5.1: {}
+  ordered-binary@1.5.3: {}
 
   os-tmpdir@1.0.2: {}
 
