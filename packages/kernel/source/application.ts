@@ -162,10 +162,7 @@ export class Application implements Contracts.Kernel.Application {
 		this.#booted = false;
 
 		if (this.#terminating) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warning(
-				"Force application termination. Graceful shutdown was interrupted.",
-			);
-			exit(1);
+			return new Promise(() => {});
 		}
 		this.#terminating = true;
 
