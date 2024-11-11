@@ -22,19 +22,17 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
 	async process(commit: Contracts.Crypto.Commit): Promise<Contracts.Consensus.ProcessorResult> {
-		return await this.commitLock.runNonExclusive(async (): Promise<Contracts.Consensus.ProcessorResult> => {
-			if (!this.#hasValidHeight(commit)) {
-				return Contracts.Consensus.ProcessorResult.Skipped;
-			}
+		if (!this.#hasValidHeight(commit)) {
+			return Contracts.Consensus.ProcessorResult.Skipped;
+		}
 
-			const commitState = this.commitStateFactory(commit);
+		const commitState = this.commitStateFactory(commit);
 
-			await this.getConsensus().handleCommitState(commitState);
+		await this.getConsensus().handleCommitState(commitState);
 
-			return commitState.getProcessorResult().success
-				? Contracts.Consensus.ProcessorResult.Accepted
-				: Contracts.Consensus.ProcessorResult.Invalid;
-		});
+		return commitState.getProcessorResult().success
+			? Contracts.Consensus.ProcessorResult.Accepted
+			: Contracts.Consensus.ProcessorResult.Invalid;
 	}
 
 	async hasValidSignature(commit: Contracts.Crypto.Commit): Promise<boolean> {
