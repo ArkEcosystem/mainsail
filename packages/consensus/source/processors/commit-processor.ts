@@ -9,9 +9,6 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Processor.BlockProcessor)
-	private readonly processor!: Contracts.Processor.BlockProcessor;
-
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
@@ -25,32 +22,19 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	private readonly commitStateFactory!: Contracts.Consensus.CommitStateFactory;
 
 	async process(commit: Contracts.Crypto.Commit): Promise<Contracts.Consensus.ProcessorResult> {
-		let promise: Promise<void> | undefined;
-
-		const result = await this.commitLock.runNonExclusive(async (): Promise<Contracts.Consensus.ProcessorResult> => {
+		return await this.commitLock.runNonExclusive(async (): Promise<Contracts.Consensus.ProcessorResult> => {
 			if (!this.#hasValidHeight(commit)) {
 				return Contracts.Consensus.ProcessorResult.Skipped;
 			}
 
 			const commitState = this.commitStateFactory(commit);
 
-			const result = await this.processor.process(commitState);
+			await this.getConsensus().handleCommitState(commitState);
 
-			if (!result.success) {
-				return Contracts.Consensus.ProcessorResult.Invalid;
-			}
-
-			commitState.setProcessorResult(result);
-
-			promise = this.getConsensus().handleCommitState(commitState);
-
-			return Contracts.Consensus.ProcessorResult.Accepted;
+			return commitState.getProcessorResult().success
+				? Contracts.Consensus.ProcessorResult.Accepted
+				: Contracts.Consensus.ProcessorResult.Invalid;
 		});
-
-		// Execute outside the lock, to avoid deadlocks.
-		// We want to make sure that the block is handled before we return the result to block downloader. This is different from the other processors.
-		await promise;
-		return result;
 	}
 
 	async hasValidSignature(commit: Contracts.Crypto.Commit): Promise<boolean> {

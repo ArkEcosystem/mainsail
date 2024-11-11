@@ -185,6 +185,8 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
+			await this.#processBlock(commitState);
+
 			await this.onMajorityPrecommit(commitState);
 		});
 	}
@@ -584,6 +586,16 @@ export class Consensus implements Contracts.Consensus.Service {
 				roundState.setProcessorResult(await this.processor.process(roundState));
 			} catch {
 				roundState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
+			}
+		}
+	}
+
+	async #processBlock(commitState: Contracts.Processor.ProcessableUnit): Promise<void> {
+		if (!commitState.hasProcessorResult()) {
+			try {
+				commitState.setProcessorResult(await this.processor.process(commitState));
+			} catch {
+				commitState.setProcessorResult({ gasUsed: 0, receipts: new Map(), success: false });
 			}
 		}
 	}
