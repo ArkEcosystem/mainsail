@@ -4,13 +4,35 @@ import * as lmdb from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
+	@inject(Identifiers.Database.Root)
+	private readonly rootDb!: lmdb.RootDatabase;
+
 	@inject(Identifiers.Database.Storage.Block)
 	private readonly blockStorage!: lmdb.Database;
+
+	@inject(Identifiers.Database.Storage.State)
+	private readonly stateStorage!: lmdb.Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-	#cache = new Map<number, Buffer>();
+	#cache = new Map<number, Contracts.Crypto.Commit>();
+	#state = { height: 0, totalRound: 0 };
+
+	public async initialize(): Promise<void> {
+		if (this.isEmpty()) {
+			await this.rootDb.transaction(() => {
+				void this.stateStorage.put("state", this.#state);
+			});
+			await this.rootDb.flushed;
+		}
+
+		this.#state = this.stateStorage.get("state");
+	}
+
+	public getState(): Contracts.Database.State {
+		return this.#state;
+	}
 
 	public isEmpty(): boolean {
 		return this.#cache.size === 0 && this.blockStorage.getKeysCount() === 0;
@@ -77,7 +99,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 
 		if (this.#cache.size > 0) {
-			return await this.commitFactory.fromBytes([...this.#cache.values()].pop()!);
+			return [...this.#cache.values()].pop()!;
 		}
 
 		return await this.commitFactory.fromBytes(
@@ -86,24 +108,29 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
-		this.#cache.set(commit.block.data.height, Buffer.from(commit.serialized, "hex"));
+		this.#cache.set(commit.block.data.height, commit);
+
+		this.#state.height = commit.block.data.height;
+		this.#state.totalRound += commit.proof.round + 1;
 	}
 
 	async persist(): Promise<void> {
-		await this.blockStorage.transaction(() => {
-			for (const [height, block] of this.#cache.entries()) {
-				void this.blockStorage.put(height, block);
+		await this.rootDb.transaction(() => {
+			for (const [height, commit] of this.#cache.entries()) {
+				void this.blockStorage.put(height, Buffer.from(commit.serialized, "hex"));
 			}
+
+			void this.stateStorage.put("state", this.#state);
 		});
 
-		await this.blockStorage.flushed;
+		await this.rootDb.flushed;
 
 		this.#cache.clear();
 	}
 
 	#get(height: number): Buffer {
 		if (this.#cache.has(height)) {
-			return this.#cache.get(height)!;
+			return Buffer.from(this.#cache.get(height)!.serialized, "hex");
 		}
 
 		return this.blockStorage.get(height);

@@ -16,9 +16,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return true;
 	}
 
+	public async boot(): Promise<void> {
+		await this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).initialize();
+	}
+
 	public async dispose(): Promise<void> {
 		await this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).persist();
-
 		await this.app.get<RootDatabase>(Identifiers.Database.Root).close();
 	}
 
@@ -30,5 +33,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		});
 		this.app.bind(Identifiers.Database.Root).toConstantValue(rootStorage);
 		this.app.bind(Identifiers.Database.Storage.Block).toConstantValue(rootStorage.openDB({ name: "blocks" }));
+		this.app.bind(Identifiers.Database.Storage.State).toConstantValue(rootStorage.openDB({ name: "state" }));
 	}
 }
