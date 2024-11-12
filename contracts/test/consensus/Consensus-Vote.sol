@@ -97,6 +97,11 @@ contract ConsensusTest is Test {
         consensus.vote(address(1));
     }
 
+    function test_unvote_revert_if_did_not_vote() public {
+        vm.expectRevert("Must vote for validator before unvote");
+        consensus.unvote();
+    }
+
     function test_get_voters_revert_if_caller_is_not_owner() public {
         vm.startPrank(address(1));
 

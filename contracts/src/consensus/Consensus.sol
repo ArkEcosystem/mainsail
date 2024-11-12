@@ -388,7 +388,7 @@ contract Consensus {
 
     function _unvote() internal returns (address) {
         Vote storage voter = _voters[msg.sender];
-        require(voter.validator != address(0), "TODO: not voted");
+        require(voter.validator != address(0), "Must vote for validator before unvote");
 
         if (_votersHead == _votersTail) {
             _votersHead = address(0);
