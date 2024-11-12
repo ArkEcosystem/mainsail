@@ -231,8 +231,16 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	#replyJob(job: DownloadJob) {
 		const index = this.#downloadJobs.indexOf(job);
+		if (index === -1) {
+			return; // Job was already removed
+		}
 
-		const peers = this.repository.getPeers().filter((peer) => peer.header.height > job.heightTo);
+		const isFirstJob = index === 0;
+
+		const heightFrom = isFirstJob ? this.stateStore.getHeight() + 1 : job.heightFrom;
+		const peers = this.repository
+			.getPeers()
+			.filter((peer) => peer.header.height > Math.max(heightFrom, job.heightTo));
 
 		if (peers.length === 0) {
 			// Remove higher jobs, because peer is no longer available
@@ -244,7 +252,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		const newJob: DownloadJob = {
 			blocks: [],
-			heightFrom: index === 0 ? this.stateStore.getHeight() + 1 : job.heightFrom,
+			heightFrom: heightFrom,
 			heightTo: this.#downloadJobs.length === 1 ? this.#calculateHeightTo(peer) : job.heightTo,
 			peer,
 			peerHeight: peer.header.height - 1,
