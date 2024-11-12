@@ -162,7 +162,7 @@ contract ConsensusTest is Test {
         assertEq(allVoters[0].validator, voterAddr);
     }
 
-    function test_vote_prevent_double_vote() public {
+    function test_vote_prevent_double_vote_same_voter() public {
         // Register validator
         address addr = address(1);
         registerValidator(addr);
@@ -175,7 +175,7 @@ contract ConsensusTest is Test {
         emit Voted(voterAddr, addr);
         consensus.vote(addr);
 
-        vm.expectRevert("Already voted");
+        vm.expectRevert("Already voted for this validator");
         consensus.vote(addr);
     }
 
@@ -198,6 +198,75 @@ contract ConsensusTest is Test {
         vm.startPrank(voterAddr);
         vm.expectRevert("Must vote for unresigned validator");
         consensus.vote(addr);
+    }
+
+    function test_swap_vote() public {
+        // Assert voters
+        assertEq(consensus.getVotesCount(), 0);
+        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        assertEq(allVoters.length, 0);
+
+        // Register validator
+        address validatorAddr1 = address(1);
+        registerValidator(validatorAddr1);
+
+        address validatorAddr2 = address(2);
+        registerValidator(validatorAddr2);
+
+        // Vote
+        address voterAddr = address(3);
+        vm.deal(voterAddr, 100 ether);
+        vm.startPrank(voterAddr);
+        consensus.vote(validatorAddr1);
+        vm.stopPrank();
+
+        // Assert validator 1
+        Validator memory validator1 = consensus.getValidator(validatorAddr1);
+        assertEq(validator1.addr, validatorAddr1);
+        assertEq(validator1.data.voteBalance, 100 ether);
+        assertEq(validator1.data.votersCount, 1);
+        // Assert validator 2
+        Validator memory validator2 = consensus.getValidator(validatorAddr2);
+        assertEq(validator2.addr, validatorAddr2);
+        assertEq(validator2.data.voteBalance, 0 ether);
+        assertEq(validator2.data.votersCount, 0);
+
+        // Assert voter balance
+        assertEq(voterAddr.balance, 100 ether);
+        // Assert voters
+        assertEq(consensus.getVotesCount(), 1);
+        allVoters = consensus.getVotes(address(0), 10);
+        assertEq(allVoters.length, 1);
+        assertEq(allVoters[0].voter, voterAddr);
+        assertEq(allVoters[0].validator, validatorAddr1);
+
+        // Let say voter has 90 eth after some tx
+        vm.deal(voterAddr, 90 ether);
+
+        // Swap Vote
+        vm.startPrank(voterAddr);
+        consensus.vote(validatorAddr2);
+        vm.stopPrank();
+
+        // Assert validator 1
+        validator1 = consensus.getValidator(validatorAddr1);
+        assertEq(validator1.addr, validatorAddr1);
+        assertEq(validator1.data.voteBalance, 0 ether);
+        assertEq(validator1.data.votersCount, 0);
+        // Assert validator 2
+        validator2 = consensus.getValidator(validatorAddr2);
+        assertEq(validator2.addr, validatorAddr2);
+        assertEq(validator2.data.voteBalance, 90 ether);
+        assertEq(validator2.data.votersCount, 1);
+
+        // Assert voter balance
+        assertEq(voterAddr.balance, 90 ether);
+        // Assert voters
+        assertEq(consensus.getVotesCount(), 1);
+        allVoters = consensus.getVotes(address(0), 10);
+        assertEq(allVoters.length, 1);
+        assertEq(allVoters[0].voter, voterAddr);
+        assertEq(allVoters[0].validator, validatorAddr2);
     }
 
     function test_unvote_and_vote_in_same_block() public {

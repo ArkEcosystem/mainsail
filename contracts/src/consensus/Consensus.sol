@@ -353,10 +353,16 @@ contract Consensus {
 
     function vote(address addr) external preventOwner {
         require(isValidatorRegistered(addr), "Must vote for validator");
-        require(_voters[msg.sender].validator == address(0), "Already voted");
 
         ValidatorData storage validatorData = _registeredValidatorData[addr];
         require(!validatorData.isResigned, "Must vote for unresigned validator");
+
+        Vote storage voter = _voters[msg.sender];
+        require(voter.validator != addr, "Already voted for this validator");
+
+        if (voter.validator != address(0)) {
+            _unvote();
+        }
 
         _voters[msg.sender] = Vote({validator: addr, balance: msg.sender.balance, prev: address(0), next: address(0)});
 
@@ -370,7 +376,6 @@ contract Consensus {
         }
         _votersCount++;
 
-        // TODO: safe math
         validatorData.voteBalance += msg.sender.balance;
         validatorData.votersCount += 1;
 
@@ -378,6 +383,10 @@ contract Consensus {
     }
 
     function unvote() external {
+        emit Unvoted(msg.sender, _unvote());
+    }
+
+    function _unvote() internal returns (address) {
         Vote storage voter = _voters[msg.sender];
         require(voter.validator != address(0), "TODO: not voted");
 
@@ -395,7 +404,7 @@ contract Consensus {
             _voters[voter.next].prev = voter.prev;
         }
 
-        emit Unvoted(msg.sender, voter.validator);
+        address validatorAddr = voter.validator;
 
         ValidatorData storage validatorData = _registeredValidatorData[voter.validator];
 
@@ -405,6 +414,8 @@ contract Consensus {
         delete _voters[msg.sender];
 
         _votersCount--;
+
+        return validatorAddr;
     }
 
     function updateVoters(address[] calldata voters) external onlyOwner {
