@@ -1,14 +1,14 @@
 {
-	"address": "0xf4AeE54f771AD2De5d86593c3163B23Ea763352A",
+	"address": "0xb361D04964305E9975e3CD26F732e2329b759441",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "40b3b95eca148e605026f5ec2505cbad6a09c45f6d8e7274937024c6e0bcc962",
-		"publicKey": "984bc5bda0b740859e812a36c9cea41cac0eedf88f42395405979d4df53e451bb59766701140d217150ab7f27675d428"
+		"privateKey": "2e26c093afef3b31fe06e1db3d1bccd3f14f85c876ff1657e9771827515ef81e",
+		"publicKey": "b2a6f5b03983785fe9a742526eb7ec541ba6011df57c10f5be834aa84366f6066481010352099b0e3429f739020efa78"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "401d37bb7622e40e9a1ef107db58a5d8f4b0d8069529ece442b0703360032ddc",
-		"publicKey": "03552880424e864adb8c306d5de8998789044e5a1c894504f5edc2d1cfca9556ae"
+		"privateKey": "a20ce11b3b1510ba1d07e728c87e4601e3d14d9961f48a0afec3a1c75be39350",
+		"publicKey": "0218ea719209036ae1d668194dd3dfbbd4ad6d30af8b241c32030e71b4554c6734"
 	},
-	"passphrase": "shop sleep coil chimney hope story electric kingdom polar point hub puzzle wife wet cave present luggage hill denial tide stage shoulder ahead globe"
+	"passphrase": "claim amount electric achieve amazing tobacco matrix foot such fish reject only dignity hazard mask lonely sentence fatal lava talk ship flock olive outer"
 }
