@@ -217,6 +217,8 @@ contract ConsensusTest is Test {
         address voterAddr = address(3);
         vm.deal(voterAddr, 100 ether);
         vm.startPrank(voterAddr);
+        vm.expectEmit(address(consensus));
+        emit Voted(voterAddr, validatorAddr1);
         consensus.vote(validatorAddr1);
         vm.stopPrank();
 
@@ -245,6 +247,8 @@ contract ConsensusTest is Test {
 
         // Swap Vote
         vm.startPrank(voterAddr);
+        vm.expectEmit(address(consensus));
+        emit Voted(voterAddr, validatorAddr2);
         consensus.vote(validatorAddr2);
         vm.stopPrank();
 
