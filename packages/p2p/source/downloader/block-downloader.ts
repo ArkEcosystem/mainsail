@@ -61,7 +61,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			(peers = peers.filter((peer) => peer.header.height > this.#getLastRequestedBlockHeight())) &&
 			peers.length > 0
 		) {
-			void this.download(getRandomPeer(peers));
+			this.download(getRandomPeer(peers));
 		}
 	}
 
@@ -232,7 +232,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	#replyJob(job: DownloadJob) {
 		const index = this.#downloadJobs.indexOf(job);
 
-		const peers = this.repository.getPeers().filter((peer) => peer.header.height >= job.heightTo);
+		const peers = this.repository.getPeers().filter((peer) => peer.header.height > job.heightTo);
 
 		if (peers.length === 0) {
 			// Remove higher jobs, because peer is no longer available
