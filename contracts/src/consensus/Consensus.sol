@@ -56,6 +56,8 @@ error VoteResignedValidator();
 error VoteSameValidator();
 error MissingVote();
 
+error InvalidRange(uint256 min, uint256 max);
+
 // Voter calls vote funtion
 // Vote function includes valdiator address and balance, whole balance is added to the validator voteBalance
 // Voter can unvote, whole balance is removed from validator voteBalance
@@ -507,7 +509,10 @@ contract Consensus {
     }
 
     function _clamp(uint256 value, uint256 min, uint256 max) internal pure returns (uint256) {
-        require(min <= max, "Minimum should be less than or equal to maximum");
+        if (min > max) {
+            revert InvalidRange(min, max);
+        }
+
         if (value < min) {
             return min;
         } else if (value > max) {
