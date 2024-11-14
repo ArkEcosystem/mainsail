@@ -10,7 +10,11 @@ import {
     Voted,
     VoteResult,
     CallerIsNotOwner,
-    CallerIsOwner
+    CallerIsOwner,
+    ValidatorNotRegistered,
+    VoteResignedValidator,
+    VoteSameValidator,
+    MissingVote
 } from "@contracts/consensus/Consensus.sol";
 
 contract ConsensusTest is Test {
@@ -107,7 +111,7 @@ contract ConsensusTest is Test {
     }
 
     function test_unvote_revert_if_did_not_vote() public {
-        vm.expectRevert("Must vote for validator before unvote");
+        vm.expectRevert(MissingVote.selector);
         consensus.unvote();
     }
 
@@ -189,7 +193,7 @@ contract ConsensusTest is Test {
         emit Voted(voterAddr, addr);
         consensus.vote(addr);
 
-        vm.expectRevert("Already voted for this validator");
+        vm.expectRevert(VoteSameValidator.selector);
         consensus.vote(addr);
     }
 
@@ -197,7 +201,7 @@ contract ConsensusTest is Test {
         address addr = address(1);
 
         vm.startPrank(addr);
-        vm.expectRevert("Must vote for validator");
+        vm.expectRevert(ValidatorNotRegistered.selector);
         consensus.vote(addr);
     }
 
@@ -210,7 +214,7 @@ contract ConsensusTest is Test {
         // Prepare voter
         address voterAddr = address(2);
         vm.startPrank(voterAddr);
-        vm.expectRevert("Must vote for unresigned validator");
+        vm.expectRevert(VoteResignedValidator.selector);
         consensus.vote(addr);
     }
 

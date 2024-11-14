@@ -46,10 +46,15 @@ error CallerIsNotOwner();
 error CallerIsOwner();
 error CallerIsNotValidator();
 
+error ValidatorNotRegistered();
 error ValidatorAlreadyRegistered();
 error ValidatorAlreadyResigned();
 error BlsKeyAlreadyRegistered();
 error BlsKeyIsInvalid();
+
+error VoteResignedValidator();
+error VoteSameValidator();
+error MissingVote();
 
 // Voter calls vote funtion
 // Vote function includes valdiator address and balance, whole balance is added to the validator voteBalance
@@ -153,13 +158,19 @@ contract Consensus {
     }
 
     function vote(address addr) external preventOwner {
-        require(isValidatorRegistered(addr), "Must vote for validator");
+        if (!isValidatorRegistered(addr)) {
+            revert ValidatorNotRegistered();
+        }
 
         ValidatorData storage validatorData = _validatorsData[addr];
-        require(!validatorData.isResigned, "Must vote for unresigned validator");
+        if (validatorData.isResigned) {
+            revert VoteResignedValidator();
+        }
 
         Vote storage voter = _voters[msg.sender];
-        require(voter.validator != addr, "Already voted for this validator");
+        if (voter.validator == addr) {
+            revert VoteSameValidator();
+        }
 
         if (voter.validator != address(0)) {
             _unvote();
@@ -265,7 +276,10 @@ contract Consensus {
     }
 
     function getValidator(address _addr) external view returns (Validator memory) {
-        require((isValidatorRegistered(_addr)), "ValidatorData doesn't exists");
+        if (!isValidatorRegistered(_addr)) {
+            revert ValidatorNotRegistered();
+        }
+
         return Validator({addr: _addr, data: _validatorsData[_addr]});
     }
 
@@ -428,7 +442,9 @@ contract Consensus {
 
     function _unvote() internal returns (address) {
         Vote storage voter = _voters[msg.sender];
-        require(voter.validator != address(0), "Must vote for validator before unvote");
+        if (voter.validator == address(0)) {
+            revert MissingVote();
+        }
 
         if (_votersHead == _votersTail) {
             _votersHead = address(0);
