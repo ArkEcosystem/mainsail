@@ -199,7 +199,7 @@ contract Consensus {
             }
 
             if (_activeValidatorsCount < top) {
-                _insertTopValidator(addr, top);
+                _insertValidator(addr, top);
                 continue;
             }
 
@@ -210,7 +210,7 @@ contract Consensus {
                     Validator({addr: addr, data: data}), Validator({addr: _activeValidatorsHead, data: headData})
                 )
             ) {
-                _insertTopValidator(addr, top);
+                _insertValidator(addr, top);
             }
         }
 
@@ -351,7 +351,7 @@ contract Consensus {
         _activeValidatorsCount = 0;
     }
 
-    function _insertTopValidator(address addr, uint8 top) internal {
+    function _insertValidator(address addr, uint8 top) internal {
         ValidatorData memory data = _validatorsData[addr];
 
         if (
