@@ -205,8 +205,7 @@ contract Consensus {
         }
     }
 
-    // TODO: rename to calculateActiveValidators
-    function calculateTopValidators(uint8 n) external onlyOwner {
+    function calculateActiveValidators(uint8 n) external onlyOwner {
         _shuffle();
         _deleteActiveValidators();
 
@@ -284,8 +283,7 @@ contract Consensus {
         return Validator({addr: _addr, data: _validatorsData[_addr]});
     }
 
-    // TODO: Rename to getActiveValidators
-    function getTopValidators() external view returns (Validator[] memory) {
+    function getActiveValidators() external view returns (Validator[] memory) {
         Validator[] memory result = new Validator[](_activeValidators.length);
         for (uint256 i = 0; i < _activeValidators.length; i++) {
             address addr = _activeValidators[i];

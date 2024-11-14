@@ -18,8 +18,8 @@ contract ConsensusTest is Base {
         consensus.registerValidator(prepareBLSKey(addr));
         vm.stopPrank();
 
-        consensus.calculateTopValidators(1);
-        Validator[] memory validators = consensus.getTopValidators();
+        consensus.calculateActiveValidators(1);
+        Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, 1);
         assertEq(validators[0].addr, addr);
     }
@@ -28,7 +28,7 @@ contract ConsensusTest is Base {
         address addr = address(1);
         vm.startPrank(addr);
         vm.expectRevert(CallerIsNotOwner.selector);
-        consensus.calculateTopValidators(1);
+        consensus.calculateActiveValidators(1);
     }
 
     function test_should_ignore_resigned_validators() public {
@@ -39,8 +39,8 @@ contract ConsensusTest is Base {
         consensus.resignValidator();
         vm.stopPrank();
 
-        consensus.calculateTopValidators(1);
-        Validator[] memory validators = consensus.getTopValidators();
+        consensus.calculateActiveValidators(1);
+        Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, 0);
     }
 
@@ -79,14 +79,14 @@ contract ConsensusTest is Base {
 
         uint160 activeValidators = 53;
 
-        consensus.calculateTopValidators(uint8(activeValidators));
-        Validator[] memory validators = consensus.getTopValidators();
+        consensus.calculateActiveValidators(uint8(activeValidators));
+        Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, activeValidators);
         assertEq(validators[activeValidators - 1].addr, highest);
 
-        consensus.calculateTopValidators(uint8(activeValidators));
+        consensus.calculateActiveValidators(uint8(activeValidators));
 
-        validators = consensus.getTopValidators();
+        validators = consensus.getActiveValidators();
         assertEq(validators.length, activeValidators);
         assertEq(validators[activeValidators - 1].addr, highest);
     }
