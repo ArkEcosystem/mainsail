@@ -175,7 +175,7 @@ contract Consensus {
     // TODO: rename to calculateActiveValidators
     function calculateTopValidators(uint8 n) external onlyOwner {
         _shuffle();
-        _deleteTopValidators();
+        _deleteActiveValidators();
 
         _activeValidatorsHead = address(0);
 
@@ -340,7 +340,7 @@ contract Consensus {
         }
     }
 
-    function _deleteTopValidators() internal {
+    function _deleteActiveValidators() internal {
         address next = _activeValidatorsHead;
 
         while (next != address(0)) {
