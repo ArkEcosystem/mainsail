@@ -44,11 +44,12 @@ event Unvoted(address voter, address validator);
 
 error CallerIsNotOwner();
 error CallerIsOwner();
-error CallerIsNotValidator();
 
+error CallerIsNotValidator();
 error ValidatorNotRegistered();
 error ValidatorAlreadyRegistered();
 error ValidatorAlreadyResigned();
+
 error BlsKeyAlreadyRegistered();
 error BlsKeyIsInvalid();
 
