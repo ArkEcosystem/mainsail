@@ -1,14 +1,14 @@
 {
-	"address": "0xb361D04964305E9975e3CD26F732e2329b759441",
+	"address": "0x3Fd606cF66051BF39F0d6bD493Be7f0DB90423F3",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "2e26c093afef3b31fe06e1db3d1bccd3f14f85c876ff1657e9771827515ef81e",
-		"publicKey": "b2a6f5b03983785fe9a742526eb7ec541ba6011df57c10f5be834aa84366f6066481010352099b0e3429f739020efa78"
+		"privateKey": "572074591b588e42374162a5429d4123f12933dfa096f8cb145393681a32b492",
+		"publicKey": "87e7b44da1e6faa2a92ec57366108af5679db7950db830bdb03598a2f1f46b5443aa366813d97a3849799cb0610864a0"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "a20ce11b3b1510ba1d07e728c87e4601e3d14d9961f48a0afec3a1c75be39350",
-		"publicKey": "0218ea719209036ae1d668194dd3dfbbd4ad6d30af8b241c32030e71b4554c6734"
+		"privateKey": "f41f98c318af8072d49d88f574cb197db399a0d2cea902469c1b5b2013a2ffb1",
+		"publicKey": "0215496492589b1b97dcd7dd513639c99dd24831eba45f3bac7c82840328bed649"
 	},
-	"passphrase": "claim amount electric achieve amazing tobacco matrix foot such fish reject only dignity hazard mask lonely sentence fatal lava talk ship flock olive outer"
+	"passphrase": "exhibit crop nasty produce crater story parade runway stadium pave matrix early action debate spot suit north annual shell airport reveal inspire such wrist"
 }
