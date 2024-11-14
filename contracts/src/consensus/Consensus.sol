@@ -55,30 +55,25 @@ event Unvoted(address voter, address validator);
 // Block is processed: Original wallet balance: 100, new wallet balance: 88, difference 12
 // This process will only work fine if we pass the new wallet balance (88) and keep track of voteBalances in EVM contract.
 
-struct Node {
-    address addr;
-    address next;
-}
-
 contract Consensus {
-    address immutable _owner;
+    address private immutable _owner;
 
-    uint256 private _registeredValidatorsCount = 0;
-    uint256 private _resignedValidatorsCount = 0;
     mapping(address => ValidatorData) private _registeredValidatorData;
     mapping(address => bool) private _hasRegisteredValidator;
     mapping(bytes32 => bool) private _registeredPublicKeys;
     address[] private _registeredValidators;
+    uint256 private _registeredValidatorsCount = 0;
+    uint256 private _resignedValidatorsCount = 0;
 
     mapping(address => Vote) private _voters;
     uint256 private _votersCount = 0;
     address private _votersHead = address(0);
     address private _votersTail = address(0);
 
-    address private _topValidatorsHead;
     mapping(address => address) private _topValidators;
-    uint256 private _topValidatorsCount = 0;
     address[] private _calculatedTopValidators;
+    uint256 private _topValidatorsCount = 0;
+    address private _topValidatorsHead;
 
     RoundValidator[][] private _rounds;
 
