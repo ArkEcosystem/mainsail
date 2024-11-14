@@ -81,6 +81,7 @@ contract Consensus {
         _owner = msg.sender;
     }
 
+    // Modifiers
     modifier onlyOwner() {
         require(msg.sender == _owner, "Caller is not the contract owner");
         _;
@@ -91,30 +92,87 @@ contract Consensus {
         _;
     }
 
-    function shuffle() internal {
-        uint256 n = _registeredValidators.length;
-        for (uint256 i = n - 1; i > 0; i--) {
-            // Get a random index between 0 and i (inclusive)
-            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, i))) % (i + 1);
+    // External functions
+    function registerValidator(bytes calldata bls12_381_public_key) external preventOwner {
+        require(!_hasRegisteredValidator[msg.sender], "Validator is already registered");
 
-            // Swap elements at index i and j
-            address temp = _registeredValidators[i];
-            _registeredValidators[i] = _registeredValidators[j];
-            _registeredValidators[j] = temp;
+        bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
+
+        require(!_registeredPublicKeys[bls_public_key_hash], "BLS12-381 key is already registered");
+
+        _checkBls12_381PublicKey(bls12_381_public_key);
+
+        ValidatorData memory validator = ValidatorData({
+            votersCount: 0,
+            voteBalance: 0,
+            isResigned: false,
+            bls12_381_public_key: bls12_381_public_key
+        });
+
+        _registeredValidatorsCount++;
+        _hasRegisteredValidator[msg.sender] = true;
+        _registeredValidatorData[msg.sender] = validator;
+        _registeredPublicKeys[bls_public_key_hash] = true;
+        _registeredValidators.push(msg.sender);
+
+        emit ValidatorRegistered(msg.sender, bls12_381_public_key);
+    }
+
+    function resignValidator() external {
+        require(isValidatorRegistered(msg.sender), "Caller is not a validator");
+
+        ValidatorData storage validator = _registeredValidatorData[msg.sender];
+        require(!validator.isResigned, "Validator is already resigned");
+
+        validator.isResigned = true;
+        _resignedValidatorsCount += 1;
+
+        emit ValidatorResigned(msg.sender);
+    }
+
+    function vote(address addr) external preventOwner {
+        require(isValidatorRegistered(addr), "Must vote for validator");
+
+        ValidatorData storage validatorData = _registeredValidatorData[addr];
+        require(!validatorData.isResigned, "Must vote for unresigned validator");
+
+        Vote storage voter = _voters[msg.sender];
+        require(voter.validator != addr, "Already voted for this validator");
+
+        if (voter.validator != address(0)) {
+            _unvote();
+        }
+
+        _voters[msg.sender] = Vote({validator: addr, balance: msg.sender.balance, prev: address(0), next: address(0)});
+
+        if (_votersHead == address(0)) {
+            _votersHead = msg.sender;
+            _votersTail = msg.sender;
+        } else {
+            _voters[_votersTail].next = msg.sender;
+            _voters[msg.sender].prev = _votersTail;
+            _votersTail = msg.sender;
+        }
+        _votersCount++;
+
+        validatorData.voteBalance += msg.sender.balance;
+        validatorData.votersCount += 1;
+
+        emit Voted(msg.sender, addr);
+    }
+
+    function unvote() external {
+        emit Unvoted(msg.sender, _unvote());
+    }
+
+    function updateVoters(address[] calldata voters) external onlyOwner {
+        // TODO: limit number of voters per update?
+        for (uint256 i = 0; i < voters.length; i++) {
+            _updateVoter(voters[i]);
         }
     }
 
-    function deleteTopValidators() internal {
-        address next = _topValidatorsHead;
-
-        while (next != address(0)) {
-            address current = next;
-            next = _topValidators[current];
-            delete _topValidators[current];
-        }
-        _topValidatorsCount = 0;
-    }
-
+    // TODO: rename to calculateActiveValidators
     function calculateTopValidators(uint8 n) external onlyOwner {
         shuffle();
         deleteTopValidators();
@@ -163,6 +221,130 @@ contract Consensus {
             round.push(RoundValidator({addr: next, voteBalance: _registeredValidatorData[next].voteBalance}));
             next = _topValidators[next];
         }
+    }
+
+    // External functions that are view
+    function registeredValidatorsCount() external view returns (uint256) {
+        return _registeredValidatorsCount;
+    }
+
+    function resignedValidatorsCount() external view returns (uint256) {
+        return _resignedValidatorsCount;
+    }
+
+    function activeValidatorsCount() external view returns (uint256) {
+        return _calculatedTopValidators.length;
+    }
+
+    function isValidatorRegistered(address addr) public view returns (bool) {
+        return _hasRegisteredValidator[addr];
+    }
+
+    function getValidator(address _addr) external view returns (Validator memory) {
+        require((isValidatorRegistered(_addr)), "ValidatorData doesn't exists");
+        return Validator({addr: _addr, data: _registeredValidatorData[_addr]});
+    }
+
+    // TODO: Rename to getActiveValidators
+    function getTopValidators() external view returns (Validator[] memory) {
+        Validator[] memory result = new Validator[](_calculatedTopValidators.length);
+        for (uint256 i = 0; i < _calculatedTopValidators.length; i++) {
+            address addr = _calculatedTopValidators[i];
+            ValidatorData storage data = _registeredValidatorData[addr];
+            result[i] = Validator({addr: addr, data: data});
+        }
+
+        return result;
+    }
+
+    // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
+    // the caller can paginate to retrieve all items.
+    function getAllValidators() external view returns (Validator[] memory) {
+        Validator[] memory result = new Validator[](_registeredValidators.length);
+        for (uint256 i = 0; i < _registeredValidators.length; i++) {
+            address addr = _registeredValidators[i];
+            ValidatorData storage data = _registeredValidatorData[addr];
+            result[i] = Validator({addr: addr, data: data});
+        }
+
+        return result;
+    }
+
+    function getVotesCount() external view returns (uint256) {
+        return _votersCount;
+    }
+
+    function getVotes(address addr, uint256 count) external view onlyOwner returns (VoteResult[] memory) {
+        VoteResult[] memory voters = new VoteResult[](_clamp(count, 0, _votersCount));
+
+        address next = _votersHead;
+
+        if (addr != address(0)) {
+            next = _voters[addr].next;
+        }
+
+        uint256 i = 0;
+        while (next != address(0) && i < count) {
+            Vote storage voter = _voters[next];
+            voters[i++] = VoteResult({voter: next, validator: voter.validator});
+            next = voter.next;
+        }
+
+        if (voters.length == i) {
+            return voters;
+        }
+
+        // Slice array to remove empty elements
+        VoteResult[] memory slice = new VoteResult[](i);
+        for (uint256 j = 0; j < i; j++) {
+            slice[j] = voters[j];
+        }
+
+        return slice;
+    }
+
+    function getRoundsCount() external view returns (uint256) {
+        return _rounds.length;
+    }
+
+    function getRounds(uint256 offset, uint256 count) external view onlyOwner returns (Round[] memory) {
+        uint256 total = count;
+        if (offset >= _rounds.length) {
+            total = 0;
+        } else if (offset + count > _rounds.length) {
+            total = _rounds.length - offset;
+        }
+
+        Round[] memory result = new Round[](total);
+        for (uint256 i = 0; i < total; i++) {
+            result[i] = Round({round: offset + i + 1, validators: _rounds[offset + i]});
+        }
+
+        return result;
+    }
+
+    function shuffle() internal {
+        uint256 n = _registeredValidators.length;
+        for (uint256 i = n - 1; i > 0; i--) {
+            // Get a random index between 0 and i (inclusive)
+            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, i))) % (i + 1);
+
+            // Swap elements at index i and j
+            address temp = _registeredValidators[i];
+            _registeredValidators[i] = _registeredValidators[j];
+            _registeredValidators[j] = temp;
+        }
+    }
+
+    function deleteTopValidators() internal {
+        address next = _topValidatorsHead;
+
+        while (next != address(0)) {
+            address current = next;
+            next = _topValidators[current];
+            delete _topValidators[current];
+        }
+        _topValidatorsCount = 0;
     }
 
     function insertTopValidator(address addr, uint8 top) internal {
@@ -220,163 +402,14 @@ contract Consensus {
         _topValidatorsCount++;
     }
 
-    function getTopValidators() public view returns (Validator[] memory) {
-        Validator[] memory result = new Validator[](_calculatedTopValidators.length);
-        for (uint256 i = 0; i < _calculatedTopValidators.length; i++) {
-            address addr = _calculatedTopValidators[i];
-            ValidatorData storage data = _registeredValidatorData[addr];
-            result[i] = Validator({addr: addr, data: data});
-        }
-
-        return result;
-    }
-
-    // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
-    // the caller can paginate to retrieve all items.
-    function getAllValidators() public view returns (Validator[] memory) {
-        Validator[] memory result = new Validator[](_registeredValidators.length);
-        for (uint256 i = 0; i < _registeredValidators.length; i++) {
-            address addr = _registeredValidators[i];
-            ValidatorData storage data = _registeredValidatorData[addr];
-            result[i] = Validator({addr: addr, data: data});
-        }
-
-        return result;
-    }
-
-    function registeredValidatorsCount() public view returns (uint256) {
-        return _registeredValidatorsCount;
-    }
-
-    function resignedValidatorsCount() public view returns (uint256) {
-        return _resignedValidatorsCount;
-    }
-
-    function activeValidatorsCount() public view returns (uint256) {
-        return _calculatedTopValidators.length;
-    }
-
-    function registerValidator(bytes calldata bls12_381_public_key) external preventOwner {
-        require(!_hasRegisteredValidator[msg.sender], "Validator is already registered");
-
-        bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
-
-        require(!_registeredPublicKeys[bls_public_key_hash], "BLS12-381 key is already registered");
-
-        _checkBls12_381PublicKey(bls12_381_public_key);
-
-        ValidatorData memory validator = ValidatorData({
-            votersCount: 0,
-            voteBalance: 0,
-            isResigned: false,
-            bls12_381_public_key: bls12_381_public_key
-        });
-
-        _registeredValidatorsCount++;
-        _hasRegisteredValidator[msg.sender] = true;
-        _registeredValidatorData[msg.sender] = validator;
-        _registeredPublicKeys[bls_public_key_hash] = true;
-        _registeredValidators.push(msg.sender);
-
-        emit ValidatorRegistered(msg.sender, bls12_381_public_key);
-    }
-
-    function resignValidator() external {
-        require(isValidatorRegistered(msg.sender), "Caller is not a validator");
-
-        ValidatorData storage validator = _registeredValidatorData[msg.sender];
-        require(!validator.isResigned, "Validator is already resigned");
-
-        validator.isResigned = true;
-        _resignedValidatorsCount += 1;
-
-        emit ValidatorResigned(msg.sender);
-    }
-
-    function isValidatorRegistered(address addr) public view returns (bool) {
-        return _hasRegisteredValidator[addr];
-    }
-
     function _checkBls12_381PublicKey(bytes calldata publicKey) private pure {
         require(publicKey.length == 48, "BLS12-381 publicKey length is invalid");
     }
 
-    function getValidator(address _addr) public view returns (Validator memory) {
-        require((isValidatorRegistered(_addr)), "ValidatorData doesn't exists");
-        return Validator({addr: _addr, data: _registeredValidatorData[_addr]});
-    }
-
+    // TODO: Remove
     function updateValidator(Validator calldata _validator) public {
         require(isValidatorRegistered(_validator.addr), "ValidatorData doesn't exists");
         _registeredValidatorData[_validator.addr] = _validator.data;
-    }
-
-    function getVotesCount() public view returns (uint256) {
-        return _votersCount;
-    }
-
-    function getVotes(address addr, uint256 count) public view onlyOwner returns (VoteResult[] memory) {
-        VoteResult[] memory voters = new VoteResult[](_clamp(count, 0, _votersCount));
-
-        address next = _votersHead;
-
-        if (addr != address(0)) {
-            next = _voters[addr].next;
-        }
-
-        uint256 i = 0;
-        while (next != address(0) && i < count) {
-            Vote storage voter = _voters[next];
-            voters[i++] = VoteResult({voter: next, validator: voter.validator});
-            next = voter.next;
-        }
-
-        if (voters.length == i) {
-            return voters;
-        }
-
-        // Slice array to remove empty elements
-        VoteResult[] memory slice = new VoteResult[](i);
-        for (uint256 j = 0; j < i; j++) {
-            slice[j] = voters[j];
-        }
-
-        return slice;
-    }
-
-    function vote(address addr) external preventOwner {
-        require(isValidatorRegistered(addr), "Must vote for validator");
-
-        ValidatorData storage validatorData = _registeredValidatorData[addr];
-        require(!validatorData.isResigned, "Must vote for unresigned validator");
-
-        Vote storage voter = _voters[msg.sender];
-        require(voter.validator != addr, "Already voted for this validator");
-
-        if (voter.validator != address(0)) {
-            _unvote();
-        }
-
-        _voters[msg.sender] = Vote({validator: addr, balance: msg.sender.balance, prev: address(0), next: address(0)});
-
-        if (_votersHead == address(0)) {
-            _votersHead = msg.sender;
-            _votersTail = msg.sender;
-        } else {
-            _voters[_votersTail].next = msg.sender;
-            _voters[msg.sender].prev = _votersTail;
-            _votersTail = msg.sender;
-        }
-        _votersCount++;
-
-        validatorData.voteBalance += msg.sender.balance;
-        validatorData.votersCount += 1;
-
-        emit Voted(msg.sender, addr);
-    }
-
-    function unvote() external {
-        emit Unvoted(msg.sender, _unvote());
     }
 
     function _unvote() internal returns (address) {
@@ -409,33 +442,6 @@ contract Consensus {
         _votersCount--;
 
         return validatorAddr;
-    }
-
-    function updateVoters(address[] calldata voters) external onlyOwner {
-        // TODO: limit number of voters per update?
-        for (uint256 i = 0; i < voters.length; i++) {
-            _updateVoter(voters[i]);
-        }
-    }
-
-    function getRoundsCount() public view returns (uint256) {
-        return _rounds.length;
-    }
-
-    function getRounds(uint256 offset, uint256 count) public view onlyOwner returns (Round[] memory) {
-        uint256 total = count;
-        if (offset >= _rounds.length) {
-            total = 0;
-        } else if (offset + count > _rounds.length) {
-            total = _rounds.length - offset;
-        }
-
-        Round[] memory result = new Round[](total);
-        for (uint256 i = 0; i < total; i++) {
-            result[i] = Round({round: offset + i + 1, validators: _rounds[offset + i]});
-        }
-
-        return result;
     }
 
     function _updateVoter(address addr) private {
