@@ -77,4 +77,21 @@ contract ConsensusTest is Base {
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(address(2)));
     }
+
+    function test_updateBlsPublicKey_revert_on_second_update() public {
+        address addr = address(1);
+        vm.startPrank(addr);
+        consensus.registerValidator(prepareBLSKey(addr));
+
+        vm.expectEmit(address(consensus));
+        emit ValidatorUpdated(addr, prepareBLSKey(address(2)));
+        consensus.updateValidator(prepareBLSKey(address(2)));
+
+        Validator memory validator = consensus.getValidator(addr);
+        assertEq(validator.addr, addr);
+        assertEq(validator.data.blsPublicKey, prepareBLSKey(address(2)));
+
+        vm.expectRevert(BlsKeyAlreadyRegistered.selector);
+        consensus.updateValidator(prepareBLSKey(address(2)));
+    }
 }

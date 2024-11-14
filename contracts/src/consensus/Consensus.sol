@@ -121,12 +121,7 @@ contract Consensus {
             revert ValidatorAlreadyRegistered();
         }
 
-        bytes32 blsPublicKeyHash = keccak256(blsPublicKey);
-        if (_blsPublicKeys[blsPublicKeyHash]) {
-            revert BlsKeyAlreadyRegistered();
-        }
-
-        _checkBls12_381PublicKey(blsPublicKey);
+        _verifyAndRegisterBlsPublicKey(blsPublicKey);
 
         ValidatorData memory validator =
             ValidatorData({votersCount: 0, voteBalance: 0, isResigned: false, blsPublicKey: blsPublicKey});
@@ -134,7 +129,6 @@ contract Consensus {
         _validatorsCount++;
         _hasValidator[msg.sender] = true;
         _validatorsData[msg.sender] = validator;
-        _blsPublicKeys[blsPublicKeyHash] = true;
         _validators.push(msg.sender);
 
         emit ValidatorRegistered(msg.sender, blsPublicKey);
@@ -145,11 +139,7 @@ contract Consensus {
             revert ValidatorNotRegistered();
         }
 
-        bytes32 blsPublicKeyHash = keccak256(blsPublicKey);
-        if (_blsPublicKeys[blsPublicKeyHash]) {
-            revert BlsKeyAlreadyRegistered();
-        }
-        _checkBls12_381PublicKey(blsPublicKey);
+        _verifyAndRegisterBlsPublicKey(blsPublicKey);
 
         _validatorsData[msg.sender].blsPublicKey = blsPublicKey;
 
@@ -502,6 +492,17 @@ contract Consensus {
         }
 
         voter.balance = addr.balance;
+    }
+
+    function _verifyAndRegisterBlsPublicKey(bytes calldata blsPublicKey) internal {
+        bytes32 blsPublicKeyHash = keccak256(blsPublicKey);
+        if (_blsPublicKeys[blsPublicKeyHash]) {
+            revert BlsKeyAlreadyRegistered();
+        }
+
+        _checkBls12_381PublicKey(blsPublicKey);
+
+        _blsPublicKeys[blsPublicKeyHash] = true;
     }
 
     // Internal pure functions
