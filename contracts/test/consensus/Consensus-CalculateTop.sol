@@ -82,11 +82,16 @@ contract ConsensusTest is Base {
         consensus.calculateActiveValidators(uint8(activeValidators));
         Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, activeValidators);
+
+        assertEq(validators[activeValidators - 1].addr, address(0xAE)); // Shuffled address
+        validators = sortValidators(validators);
         assertEq(validators[activeValidators - 1].addr, highest);
 
         consensus.calculateActiveValidators(uint8(activeValidators));
 
         validators = consensus.getActiveValidators();
+        assertEq(validators[activeValidators - 1].addr, address(0xAE)); // Shuffled address
+        validators = sortValidators(validators);
         assertEq(validators.length, activeValidators);
         assertEq(validators[activeValidators - 1].addr, highest);
     }

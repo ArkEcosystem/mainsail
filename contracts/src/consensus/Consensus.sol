@@ -224,7 +224,7 @@ contract Consensus {
     }
 
     function calculateActiveValidators(uint8 n) external onlyOwner {
-        _shuffle();
+        _shuffle(_validators);
         _deleteActiveValidators();
 
         _activeValidatorsHead = address(0);
@@ -274,6 +274,8 @@ contract Consensus {
             round.push(RoundValidator({addr: next, voteBalance: _validatorsData[next].voteBalance}));
             next = _activeValidatorsMap[next];
         }
+
+        _shuffle(_activeValidators);
     }
 
     // External functions that are view
@@ -377,16 +379,16 @@ contract Consensus {
     }
 
     // Internal functions
-    function _shuffle() internal {
-        uint256 n = _validators.length;
+    function _shuffle(address[] storage _array) internal {
+        uint256 n = _array.length;
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
 
             // Swap elements at index i and j
-            address temp = _validators[i];
-            _validators[i] = _validators[j];
-            _validators[j] = temp;
+            address temp = _array[i];
+            _array[i] = _array[j];
+            _array[j] = temp;
         }
     }
 
