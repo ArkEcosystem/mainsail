@@ -70,10 +70,10 @@ contract Consensus {
     address private _votersHead = address(0);
     address private _votersTail = address(0);
 
-    mapping(address => address) private _topValidators;
-    address[] private _calculatedTopValidators;
-    uint256 private _topValidatorsCount = 0;
-    address private _topValidatorsHead;
+    mapping(address => address) private _activeValidatorsMap;
+    address[] private _activeValidators;
+    uint256 private _activeValidatorsCount = 0;
+    address private _activeValidatorsHead;
 
     RoundValidator[][] private _rounds;
 
@@ -177,7 +177,7 @@ contract Consensus {
         _shuffle();
         _deleteTopValidators();
 
-        _topValidatorsHead = address(0);
+        _activeValidatorsHead = address(0);
 
         uint8 top = uint8(_clamp(n, 0, _registeredValidatorsCount - _resignedValidatorsCount)); // TODO: Use new method that returns registered validators
         if (top == 0) {
@@ -192,34 +192,37 @@ contract Consensus {
                 continue;
             }
 
-            if (_topValidatorsHead == address(0)) {
-                _topValidatorsHead = addr;
-                _topValidatorsCount = 1;
+            if (_activeValidatorsHead == address(0)) {
+                _activeValidatorsHead = addr;
+                _activeValidatorsCount = 1;
                 continue;
             }
 
-            if (_topValidatorsCount < top) {
+            if (_activeValidatorsCount < top) {
                 _insertTopValidator(addr, top);
                 continue;
             }
 
-            ValidatorData storage headData = _registeredValidatorData[_topValidatorsHead];
+            ValidatorData storage headData = _registeredValidatorData[_activeValidatorsHead];
 
-            if (_isGreater(Validator({addr: addr, data: data}), Validator({addr: _topValidatorsHead, data: headData})))
-            {
+            if (
+                _isGreater(
+                    Validator({addr: addr, data: data}), Validator({addr: _activeValidatorsHead, data: headData})
+                )
+            ) {
                 _insertTopValidator(addr, top);
             }
         }
 
         RoundValidator[] storage round = _rounds.push();
 
-        address next = _topValidatorsHead;
-        delete _calculatedTopValidators;
-        _calculatedTopValidators = new address[](top);
+        address next = _activeValidatorsHead;
+        delete _activeValidators;
+        _activeValidators = new address[](top);
         for (uint256 i = 0; i < top; i++) {
-            _calculatedTopValidators[i] = next;
+            _activeValidators[i] = next;
             round.push(RoundValidator({addr: next, voteBalance: _registeredValidatorData[next].voteBalance}));
-            next = _topValidators[next];
+            next = _activeValidatorsMap[next];
         }
     }
 
@@ -233,7 +236,7 @@ contract Consensus {
     }
 
     function activeValidatorsCount() external view returns (uint256) {
-        return _calculatedTopValidators.length;
+        return _activeValidators.length;
     }
 
     function isValidatorRegistered(address addr) public view returns (bool) {
@@ -247,9 +250,9 @@ contract Consensus {
 
     // TODO: Rename to getActiveValidators
     function getTopValidators() external view returns (Validator[] memory) {
-        Validator[] memory result = new Validator[](_calculatedTopValidators.length);
-        for (uint256 i = 0; i < _calculatedTopValidators.length; i++) {
-            address addr = _calculatedTopValidators[i];
+        Validator[] memory result = new Validator[](_activeValidators.length);
+        for (uint256 i = 0; i < _activeValidators.length; i++) {
+            address addr = _activeValidators[i];
             ValidatorData storage data = _registeredValidatorData[addr];
             result[i] = Validator({addr: addr, data: data});
         }
@@ -338,14 +341,14 @@ contract Consensus {
     }
 
     function _deleteTopValidators() internal {
-        address next = _topValidatorsHead;
+        address next = _activeValidatorsHead;
 
         while (next != address(0)) {
             address current = next;
-            next = _topValidators[current];
-            delete _topValidators[current];
+            next = _activeValidatorsMap[current];
+            delete _activeValidatorsMap[current];
         }
-        _topValidatorsCount = 0;
+        _activeValidatorsCount = 0;
     }
 
     function _insertTopValidator(address addr, uint8 top) internal {
@@ -353,14 +356,14 @@ contract Consensus {
 
         if (
             _isGreater(
-                Validator({addr: _topValidatorsHead, data: _registeredValidatorData[_topValidatorsHead]}),
+                Validator({addr: _activeValidatorsHead, data: _registeredValidatorData[_activeValidatorsHead]}),
                 Validator({addr: addr, data: data})
             )
         ) {
             _insertHead(addr);
         } else {
-            address current = _topValidators[_topValidatorsHead];
-            address previous = _topValidatorsHead;
+            address current = _activeValidatorsMap[_activeValidatorsHead];
+            address previous = _activeValidatorsHead;
 
             while (true) {
                 if (current == address(0)) {
@@ -379,28 +382,28 @@ contract Consensus {
                 }
 
                 previous = current;
-                current = _topValidators[current];
+                current = _activeValidatorsMap[current];
             }
         }
 
-        if (_topValidatorsCount > top) {
-            address next = _topValidators[_topValidatorsHead];
-            delete _topValidators[_topValidatorsHead];
-            _topValidatorsHead = next;
-            _topValidatorsCount--;
+        if (_activeValidatorsCount > top) {
+            address next = _activeValidatorsMap[_activeValidatorsHead];
+            delete _activeValidatorsMap[_activeValidatorsHead];
+            _activeValidatorsHead = next;
+            _activeValidatorsCount--;
         }
     }
 
     function _insertHead(address addr) internal {
-        _topValidators[addr] = _topValidatorsHead;
-        _topValidatorsHead = addr;
-        _topValidatorsCount++;
+        _activeValidatorsMap[addr] = _activeValidatorsHead;
+        _activeValidatorsHead = addr;
+        _activeValidatorsCount++;
     }
 
     function _insertAfter(address prev, address addr) internal {
-        _topValidators[addr] = _topValidators[prev];
-        _topValidators[prev] = addr;
-        _topValidatorsCount++;
+        _activeValidatorsMap[addr] = _activeValidatorsMap[prev];
+        _activeValidatorsMap[prev] = addr;
+        _activeValidatorsCount++;
     }
 
     function _unvote() internal returns (address) {
