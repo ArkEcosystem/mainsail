@@ -147,8 +147,6 @@ contract Consensus {
             revert CallerIsNotValidator();
         }
 
-        // TODO: Prevent double resignation
-
         ValidatorData storage validator = _validatorsData[msg.sender];
         if (validator.isResigned) {
             revert ValidatorAlreadyResigned();
@@ -214,7 +212,7 @@ contract Consensus {
 
         _activeValidatorsHead = address(0);
 
-        uint8 top = uint8(_clamp(n, 0, _validatorsCount - _resignedValidatorsCount)); // TODO: Use new method that returns registered validators
+        uint8 top = uint8(_clamp(n, 0, _validatorsCount - _resignedValidatorsCount));
         if (top == 0) {
             return;
         }
@@ -298,8 +296,6 @@ contract Consensus {
         return result;
     }
 
-    // TODO: allow passing limit to cap maximum number of returned items in case validator count is very high.
-    // the caller can paginate to retrieve all items.
     function getAllValidators() external view returns (Validator[] memory) {
         Validator[] memory result = new Validator[](_validators.length);
         for (uint256 i = 0; i < _validators.length; i++) {
