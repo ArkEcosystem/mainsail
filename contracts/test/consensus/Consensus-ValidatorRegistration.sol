@@ -2,7 +2,14 @@
 pragma solidity ^0.8.13;
 
 import {
-    Consensus, ValidatorData, Validator, ValidatorRegistered, CallerIsOwner
+    Consensus,
+    ValidatorData,
+    Validator,
+    ValidatorRegistered,
+    CallerIsOwner,
+    ValidatorAlreadyRegistered,
+    BlsKeyAlreadyRegistered,
+    BlsKeyIsInvalid
 } from "@contracts/consensus/Consensus.sol";
 import {Base} from "./Base.sol";
 
@@ -45,7 +52,7 @@ contract ConsensusTest is Base {
         vm.startPrank(addr);
         consensus.registerValidator(prepareBLSKey(addr));
 
-        vm.expectRevert("Validator is already registered");
+        vm.expectRevert(ValidatorAlreadyRegistered.selector);
         consensus.registerValidator(prepareBLSKey(address(2)));
     }
 
@@ -56,7 +63,7 @@ contract ConsensusTest is Base {
         consensus.registerValidator(prepareBLSKey(addr));
 
         vm.startPrank(address(2));
-        vm.expectRevert("BLS12-381 key is already registered");
+        vm.expectRevert(BlsKeyAlreadyRegistered.selector);
         consensus.registerValidator(prepareBLSKey(addr));
     }
 
@@ -64,13 +71,13 @@ contract ConsensusTest is Base {
         address addr = address(1);
         vm.startPrank(addr);
 
-        vm.expectRevert("BLS12-381 publicKey length is invalid");
+        vm.expectRevert(BlsKeyIsInvalid.selector);
         consensus.registerValidator(prepareBLSKey(addr, 46));
-        vm.expectRevert("BLS12-381 publicKey length is invalid");
+        vm.expectRevert(BlsKeyIsInvalid.selector);
         consensus.registerValidator(prepareBLSKey(addr, 47));
-        vm.expectRevert("BLS12-381 publicKey length is invalid");
+        vm.expectRevert(BlsKeyIsInvalid.selector);
         consensus.registerValidator(prepareBLSKey(addr, 49));
-        vm.expectRevert("BLS12-381 publicKey length is invalid");
+        vm.expectRevert(BlsKeyIsInvalid.selector);
         consensus.registerValidator(prepareBLSKey(addr, 50));
     }
 }

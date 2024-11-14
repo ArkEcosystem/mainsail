@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {Consensus, ValidatorData, Validator, ValidatorResigned} from "@contracts/consensus/Consensus.sol";
+import {
+    Consensus,
+    ValidatorData,
+    Validator,
+    ValidatorResigned,
+    ValidatorAlreadyResigned,
+    CallerIsNotValidator
+} from "@contracts/consensus/Consensus.sol";
 import {Base} from "./Base.sol";
 
 contract ConsensusTest is Base {
@@ -46,7 +53,7 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_resignation_revert_if_caller_is_not_validator() public {
-        vm.expectRevert("Caller is not a validator");
+        vm.expectRevert(CallerIsNotValidator.selector);
         consensus.resignValidator();
     }
 
@@ -68,7 +75,7 @@ contract ConsensusTest is Base {
         emit ValidatorResigned(addr);
         consensus.resignValidator();
 
-        vm.expectRevert("Validator is already resigned");
+        vm.expectRevert(ValidatorAlreadyResigned.selector);
         consensus.resignValidator();
     }
 }

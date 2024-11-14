@@ -44,6 +44,12 @@ event Unvoted(address voter, address validator);
 
 error CallerIsNotOwner();
 error CallerIsOwner();
+error CallerIsNotValidator();
+
+error ValidatorAlreadyRegistered();
+error ValidatorAlreadyResigned();
+error BlsKeyAlreadyRegistered();
+error BlsKeyIsInvalid();
 
 // Voter calls vote funtion
 // Vote function includes valdiator address and balance, whole balance is added to the validator voteBalance
@@ -101,11 +107,14 @@ contract Consensus {
 
     // External functions
     function registerValidator(bytes calldata bls12_381_public_key) external preventOwner {
-        require(!_hasValidator[msg.sender], "Validator is already registered");
+        if (_hasValidator[msg.sender]) {
+            revert ValidatorAlreadyRegistered();
+        }
 
         bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
-
-        require(!_blsPublicKeys[bls_public_key_hash], "BLS12-381 key is already registered");
+        if (_blsPublicKeys[bls_public_key_hash]) {
+            revert BlsKeyAlreadyRegistered();
+        }
 
         _checkBls12_381PublicKey(bls12_381_public_key);
 
@@ -126,10 +135,16 @@ contract Consensus {
     }
 
     function resignValidator() external {
-        require(isValidatorRegistered(msg.sender), "Caller is not a validator");
+        if (!isValidatorRegistered(msg.sender)) {
+            revert CallerIsNotValidator();
+        }
+
+        // TODO: Prevent double resignation
 
         ValidatorData storage validator = _validatorsData[msg.sender];
-        require(!validator.isResigned, "Validator is already resigned");
+        if (validator.isResigned) {
+            revert ValidatorAlreadyResigned();
+        }
 
         validator.isResigned = true;
         _resignedValidatorsCount += 1;
@@ -173,7 +188,6 @@ contract Consensus {
     }
 
     function updateVoters(address[] calldata voters) external onlyOwner {
-        // TODO: limit number of voters per update?
         for (uint256 i = 0; i < voters.length; i++) {
             _updateVoter(voters[i]);
         }
@@ -463,7 +477,9 @@ contract Consensus {
 
     // Internal pure functions
     function _checkBls12_381PublicKey(bytes calldata publicKey) internal pure {
-        require(publicKey.length == 48, "BLS12-381 publicKey length is invalid");
+        if (publicKey.length != 48) {
+            revert BlsKeyIsInvalid();
+        }
     }
 
     function _isGreater(Validator memory validatorA, Validator memory validatorB) internal pure returns (bool) {
