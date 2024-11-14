@@ -406,12 +406,6 @@ contract Consensus {
         require(publicKey.length == 48, "BLS12-381 publicKey length is invalid");
     }
 
-    // TODO: Remove
-    function updateValidator(Validator calldata _validator) public {
-        require(isValidatorRegistered(_validator.addr), "ValidatorData doesn't exists");
-        _registeredValidatorData[_validator.addr] = _validator.data;
-    }
-
     function _unvote() internal returns (address) {
         Vote storage voter = _voters[msg.sender];
         require(voter.validator != address(0), "Must vote for validator before unvote");
@@ -444,7 +438,7 @@ contract Consensus {
         return validatorAddr;
     }
 
-    function _updateVoter(address addr) private {
+    function _updateVoter(address addr) internal {
         Vote storage voter = _voters[addr];
         if (voter.validator == address(0)) {
             return;
@@ -469,7 +463,7 @@ contract Consensus {
         return validatorA.data.voteBalance > validatorB.data.voteBalance;
     }
 
-    function _clamp(uint256 value, uint256 min, uint256 max) private pure returns (uint256) {
+    function _clamp(uint256 value, uint256 min, uint256 max) internal pure returns (uint256) {
         require(min <= max, "Minimum should be less than or equal to maximum");
         if (value < min) {
             return min;
