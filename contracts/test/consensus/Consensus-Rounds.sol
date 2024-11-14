@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, Round} from "@contracts/consensus/Consensus.sol";
+import {Consensus, Round, CallerIsNotOwner} from "@contracts/consensus/Consensus.sol";
 import {Base} from "./Base.sol";
 
 contract ConsensusTest is Base {
@@ -15,7 +15,7 @@ contract ConsensusTest is Base {
     function test_revert_if_caller_is_not_owner() public {
         vm.startPrank(address(1));
 
-        vm.expectRevert("Caller is not the contract owner");
+        vm.expectRevert(CallerIsNotOwner.selector);
         consensus.getRounds(0, 10);
     }
 

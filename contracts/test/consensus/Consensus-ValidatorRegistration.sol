@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {Consensus, ValidatorData, Validator, ValidatorRegistered} from "@contracts/consensus/Consensus.sol";
+import {
+    Consensus, ValidatorData, Validator, ValidatorRegistered, CallerIsOwner
+} from "@contracts/consensus/Consensus.sol";
 import {Base} from "./Base.sol";
 
 contract ConsensusTest is Base {
@@ -33,7 +35,7 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_registration_revert_if_caller_is_owner() public {
-        vm.expectRevert("Caller is the contract owner");
+        vm.expectRevert(CallerIsOwner.selector);
         consensus.registerValidator(prepareBLSKey(address(1)));
     }
 

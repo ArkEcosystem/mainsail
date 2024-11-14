@@ -2,7 +2,16 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, ValidatorData, Validator, Unvoted, Voted, VoteResult} from "@contracts/consensus/Consensus.sol";
+import {
+    Consensus,
+    ValidatorData,
+    Validator,
+    Unvoted,
+    Voted,
+    VoteResult,
+    CallerIsNotOwner,
+    CallerIsOwner
+} from "@contracts/consensus/Consensus.sol";
 
 contract ConsensusTest is Test {
     Consensus public consensus;
@@ -93,7 +102,7 @@ contract ConsensusTest is Test {
     }
 
     function test_vote_revert_if_caller_is_owner() public {
-        vm.expectRevert("Caller is the contract owner");
+        vm.expectRevert(CallerIsOwner.selector);
         consensus.vote(address(1));
     }
 
@@ -105,7 +114,7 @@ contract ConsensusTest is Test {
     function test_get_voters_revert_if_caller_is_not_owner() public {
         vm.startPrank(address(1));
 
-        vm.expectRevert("Caller is not the contract owner");
+        vm.expectRevert(CallerIsNotOwner.selector);
         consensus.getVotes(address(0), 10);
     }
 

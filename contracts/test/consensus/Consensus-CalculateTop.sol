@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, ValidatorData, Validator} from "@contracts/consensus/Consensus.sol";
+import {Consensus, ValidatorData, Validator, CallerIsNotOwner} from "@contracts/consensus/Consensus.sol";
 import {Base} from "./Base.sol";
 
 contract ConsensusTest is Base {
@@ -27,7 +27,7 @@ contract ConsensusTest is Base {
     function test_should_allow_only_caller() public {
         address addr = address(1);
         vm.startPrank(addr);
-        vm.expectRevert("Caller is not the contract owner");
+        vm.expectRevert(CallerIsNotOwner.selector);
         consensus.calculateTopValidators(1);
     }
 

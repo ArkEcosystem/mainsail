@@ -2,7 +2,9 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, ValidatorData, Validator, Unvoted, Voted} from "@contracts/consensus/Consensus.sol";
+import {
+    Consensus, ValidatorData, Validator, Unvoted, Voted, CallerIsNotOwner
+} from "@contracts/consensus/Consensus.sol";
 
 contract ConsensusTest is Test {
     Consensus public consensus;
@@ -15,7 +17,7 @@ contract ConsensusTest is Test {
         address addr = address(1);
         vm.startPrank(addr);
         address[] memory voters = new address[](0);
-        vm.expectRevert("Caller is not the contract owner");
+        vm.expectRevert(CallerIsNotOwner.selector);
         consensus.updateVoters(voters);
     }
 }

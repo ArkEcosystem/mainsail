@@ -42,6 +42,9 @@ event Voted(address voter, address validator);
 
 event Unvoted(address voter, address validator);
 
+error CallerIsNotOwner();
+error CallerIsOwner();
+
 // Voter calls vote funtion
 // Vote function includes valdiator address and balance, whole balance is added to the validator voteBalance
 // Voter can unvote, whole balance is removed from validator voteBalance
@@ -83,12 +86,16 @@ contract Consensus {
 
     // Modifiers
     modifier onlyOwner() {
-        require(msg.sender == _owner, "Caller is not the contract owner");
+        if (msg.sender != _owner) {
+            revert CallerIsNotOwner();
+        }
         _;
     }
 
     modifier preventOwner() {
-        require(msg.sender != _owner, "Caller is the contract owner");
+        if (msg.sender == _owner) {
+            revert CallerIsOwner();
+        }
         _;
     }
 
