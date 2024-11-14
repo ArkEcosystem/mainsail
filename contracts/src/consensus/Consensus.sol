@@ -36,6 +36,8 @@ struct VoteResult {
 
 event ValidatorRegistered(address addr, bytes bls12_381_public_key);
 
+event ValidatorUpdated(address addr, bytes bls12_381_public_key);
+
 event ValidatorResigned(address addr);
 
 event Voted(address voter, address validator);
@@ -140,6 +142,22 @@ contract Consensus {
         _validators.push(msg.sender);
 
         emit ValidatorRegistered(msg.sender, bls12_381_public_key);
+    }
+
+    function updateValidator(bytes calldata bls12_381_public_key) external preventOwner {
+        if (!isValidatorRegistered(msg.sender)) {
+            revert ValidatorNotRegistered();
+        }
+
+        bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
+        if (_blsPublicKeys[bls_public_key_hash]) {
+            revert BlsKeyAlreadyRegistered();
+        }
+        _checkBls12_381PublicKey(bls12_381_public_key);
+
+        _validatorsData[msg.sender].bls12_381_public_key = bls12_381_public_key;
+
+        emit ValidatorUpdated(msg.sender, bls12_381_public_key);
     }
 
     function resignValidator() external {
