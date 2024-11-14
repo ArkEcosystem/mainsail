@@ -20,7 +20,7 @@ export interface Instance extends CommitHandler {
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
-	calculateTopValidators(context: CalculateTopValidatorsContext): Promise<void>;
+	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string): Promise<string>;
@@ -103,7 +103,7 @@ export interface BlockContext {
 	readonly validatorAddress: string;
 }
 
-export interface CalculateTopValidatorsContext {
+export interface CalculateActiveValidatorsContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;

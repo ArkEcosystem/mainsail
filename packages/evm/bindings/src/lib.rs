@@ -1,8 +1,8 @@
 use std::{collections::HashMap, path::PathBuf, sync::Arc, u64};
 
 use ctx::{
-    BlockContext, CalculateTopValidatorsContext, ExecutionContext, GenesisContext,
-    JsCalculateTopValidatorsContext, JsCommitKey, JsGenesisContext, JsPrepareNextCommitContext,
+    BlockContext, CalculateActiveValidatorsContext, ExecutionContext, GenesisContext,
+    JsCalculateActiveValidatorsContext, JsCommitKey, JsGenesisContext, JsPrepareNextCommitContext,
     JsTransactionContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
     PrepareNextCommitContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
@@ -139,15 +139,15 @@ impl EvmInner {
         Ok(())
     }
 
-    pub fn calculate_top_validators(
+    pub fn calculate_active_validators(
         &mut self,
-        ctx: CalculateTopValidatorsContext,
+        ctx: CalculateActiveValidatorsContext,
     ) -> std::result::Result<(), EVMError<String>> {
         assert!(
             self.pending_commit
                 .as_ref()
                 .is_some_and(|c| c.key == ctx.commit_key),
-            "calculate_top_validators pending commit key mismatch {:?} - {:?}",
+            "calculate_active_validators pending commit key mismatch {:?} - {:?}",
             self.pending_commit.as_ref().map(|c| c.key),
             ctx.commit_key
         );
@@ -160,14 +160,14 @@ impl EvmInner {
             .clone();
 
         let abi = ethers_contract::BaseContract::from(
-            ethers_core::abi::parse_abi(&["function calculateTopValidators(uint8 n) external"])
+            ethers_core::abi::parse_abi(&["function calculateActiveValidators(uint8 n) external"])
                 .expect("encode abi"),
         );
 
         // encode abi into Bytes
         let calldata = abi
-            .encode("calculateTopValidators", ctx.active_validators)
-            .expect("encode calculateTopValidators");
+            .encode("calculateActiveValidators", ctx.active_validators)
+            .expect("encode calculateActiveValidators");
 
         let nonce = self
             .get_account_nonce(genesis_info.deployer_account)
@@ -192,17 +192,17 @@ impl EvmInner {
         }) {
             Ok(receipt) => {
                 println!(
-                    "calculate_top_validators {:?} {:?}",
+                    "calculate_active_validators {:?} {:?}",
                     ctx.commit_key, receipt
                 );
                 assert!(
                     receipt.is_success(),
-                    "calculate_top_validators unsuccessful"
+                    "calculate_active_validators unsuccessful"
                 );
                 Ok(())
             }
             Err(err) => Err(EVMError::Database(
-                format!("calculate_top_validators failed: {}", err).into(),
+                format!("calculate_active_validators failed: {}", err).into(),
             )),
         }
     }
@@ -678,14 +678,14 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
-    pub fn calculate_top_validators(
+    pub fn calculate_active_validators(
         &mut self,
         node_env: Env,
-        ctx: JsCalculateTopValidatorsContext,
+        ctx: JsCalculateActiveValidatorsContext,
     ) -> Result<JsObject> {
-        let ctx = CalculateTopValidatorsContext::try_from(ctx)?;
+        let ctx = CalculateActiveValidatorsContext::try_from(ctx)?;
         node_env.execute_tokio_future(
-            Self::calculate_top_validators_async(self.evm.clone(), ctx),
+            Self::calculate_active_validators_async(self.evm.clone(), ctx),
             |_, _| Ok(()),
         )
     }
@@ -852,12 +852,12 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn calculate_top_validators_async(
+    async fn calculate_active_validators_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        ctx: CalculateTopValidatorsContext,
+        ctx: CalculateActiveValidatorsContext,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.calculate_top_validators(ctx);
+        let result = lock.calculate_active_validators(ctx);
 
         match result {
             Ok(_) => Result::Ok(()),

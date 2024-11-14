@@ -51,8 +51,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.updateRewardsAndVotes(context);
 	}
 
-	public async calculateTopValidators(context: Contracts.Evm.CalculateTopValidatorsContext): Promise<void> {
-		return this.#evm.calculateTopValidators(context);
+	public async calculateActiveValidators(context: Contracts.Evm.CalculateActiveValidatorsContext): Promise<void> {
+		return this.#evm.calculateActiveValidators(context);
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {

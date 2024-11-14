@@ -77,7 +77,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			this.#verifyConsumedAllGas(block, processResult);
 			await this.#updateRewardsAndVotes(unit);
-			await this.#calculateTopValidators(unit);
+			await this.#calculateActiveValidators(unit);
 			await this.#verifyStateHash(block);
 
 			processResult.success = true;
@@ -210,7 +210,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 	}
 
-	async #calculateTopValidators(unit: Contracts.Processor.ProcessableUnit) {
+	async #calculateActiveValidators(unit: Contracts.Processor.ProcessableUnit) {
 		if (!Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			return;
 		}
@@ -219,7 +219,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const block = unit.getBlock();
 
-		await this.evm.calculateTopValidators({
+		await this.evm.calculateActiveValidators({
 			activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			specId: evmSpec,
