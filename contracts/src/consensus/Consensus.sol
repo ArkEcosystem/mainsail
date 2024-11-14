@@ -323,6 +323,7 @@ contract Consensus {
         return result;
     }
 
+    // Internal functions
     function shuffle() internal {
         uint256 n = _registeredValidators.length;
         for (uint256 i = n - 1; i > 0; i--) {
@@ -402,10 +403,6 @@ contract Consensus {
         _topValidatorsCount++;
     }
 
-    function _checkBls12_381PublicKey(bytes calldata publicKey) private pure {
-        require(publicKey.length == 48, "BLS12-381 publicKey length is invalid");
-    }
-
     function _unvote() internal returns (address) {
         Vote storage voter = _voters[msg.sender];
         require(voter.validator != address(0), "Must vote for validator before unvote");
@@ -453,6 +450,11 @@ contract Consensus {
         }
 
         voter.balance = addr.balance;
+    }
+
+    // Internal pure functions
+    function _checkBls12_381PublicKey(bytes calldata publicKey) internal pure {
+        require(publicKey.length == 48, "BLS12-381 publicKey length is invalid");
     }
 
     function _isGreater(Validator memory validatorA, Validator memory validatorB) internal pure returns (bool) {
