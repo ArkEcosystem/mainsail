@@ -295,12 +295,12 @@ contract Consensus {
         return _hasValidator[addr];
     }
 
-    function getValidator(address _addr) external view returns (Validator memory) {
-        if (!isValidatorRegistered(_addr)) {
+    function getValidator(address addr) external view returns (Validator memory) {
+        if (!isValidatorRegistered(addr)) {
             revert ValidatorNotRegistered();
         }
 
-        return Validator({addr: _addr, data: _validatorsData[_addr]});
+        return Validator({addr: addr, data: _validatorsData[addr]});
     }
 
     function getActiveValidators() external view returns (Validator[] memory) {
@@ -379,16 +379,16 @@ contract Consensus {
     }
 
     // Internal functions
-    function _shuffle(address[] storage _array) internal {
-        uint256 n = _array.length;
+    function _shuffle(address[] storage array) internal {
+        uint256 n = array.length;
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
 
             // Swap elements at index i and j
-            address temp = _array[i];
-            _array[i] = _array[j];
-            _array[j] = temp;
+            address temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
         }
     }
 
