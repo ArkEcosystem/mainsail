@@ -174,8 +174,8 @@ contract Consensus {
 
     // TODO: rename to calculateActiveValidators
     function calculateTopValidators(uint8 n) external onlyOwner {
-        shuffle();
-        deleteTopValidators();
+        _shuffle();
+        _deleteTopValidators();
 
         _topValidatorsHead = address(0);
 
@@ -199,7 +199,7 @@ contract Consensus {
             }
 
             if (_topValidatorsCount < top) {
-                insertTopValidator(addr, top);
+                _insertTopValidator(addr, top);
                 continue;
             }
 
@@ -207,7 +207,7 @@ contract Consensus {
 
             if (_isGreater(Validator({addr: addr, data: data}), Validator({addr: _topValidatorsHead, data: headData})))
             {
-                insertTopValidator(addr, top);
+                _insertTopValidator(addr, top);
             }
         }
 
@@ -324,7 +324,7 @@ contract Consensus {
     }
 
     // Internal functions
-    function shuffle() internal {
+    function _shuffle() internal {
         uint256 n = _registeredValidators.length;
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
@@ -337,7 +337,7 @@ contract Consensus {
         }
     }
 
-    function deleteTopValidators() internal {
+    function _deleteTopValidators() internal {
         address next = _topValidatorsHead;
 
         while (next != address(0)) {
@@ -348,7 +348,7 @@ contract Consensus {
         _topValidatorsCount = 0;
     }
 
-    function insertTopValidator(address addr, uint8 top) internal {
+    function _insertTopValidator(address addr, uint8 top) internal {
         ValidatorData memory data = _registeredValidatorData[addr];
 
         if (
@@ -357,14 +357,14 @@ contract Consensus {
                 Validator({addr: addr, data: data})
             )
         ) {
-            insertHead(addr);
+            _insertHead(addr);
         } else {
             address current = _topValidators[_topValidatorsHead];
             address previous = _topValidatorsHead;
 
             while (true) {
                 if (current == address(0)) {
-                    insertAfter(previous, addr);
+                    _insertAfter(previous, addr);
                     break;
                 }
 
@@ -374,7 +374,7 @@ contract Consensus {
                         Validator({addr: addr, data: data})
                     )
                 ) {
-                    insertAfter(previous, addr);
+                    _insertAfter(previous, addr);
                     break;
                 }
 
@@ -391,13 +391,13 @@ contract Consensus {
         }
     }
 
-    function insertHead(address addr) internal {
+    function _insertHead(address addr) internal {
         _topValidators[addr] = _topValidatorsHead;
         _topValidatorsHead = addr;
         _topValidatorsCount++;
     }
 
-    function insertAfter(address prev, address addr) internal {
+    function _insertAfter(address prev, address addr) internal {
         _topValidators[addr] = _topValidators[prev];
         _topValidators[prev] = addr;
         _topValidatorsCount++;
