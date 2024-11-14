@@ -121,8 +121,8 @@ contract Consensus {
             revert ValidatorAlreadyRegistered();
         }
 
-        bytes32 bls_public_key_hash = keccak256(blsPublicKey);
-        if (_blsPublicKeys[bls_public_key_hash]) {
+        bytes32 blsPublicKeyHash = keccak256(blsPublicKey);
+        if (_blsPublicKeys[blsPublicKeyHash]) {
             revert BlsKeyAlreadyRegistered();
         }
 
@@ -134,7 +134,7 @@ contract Consensus {
         _validatorsCount++;
         _hasValidator[msg.sender] = true;
         _validatorsData[msg.sender] = validator;
-        _blsPublicKeys[bls_public_key_hash] = true;
+        _blsPublicKeys[blsPublicKeyHash] = true;
         _validators.push(msg.sender);
 
         emit ValidatorRegistered(msg.sender, blsPublicKey);
@@ -145,8 +145,8 @@ contract Consensus {
             revert ValidatorNotRegistered();
         }
 
-        bytes32 bls_public_key_hash = keccak256(blsPublicKey);
-        if (_blsPublicKeys[bls_public_key_hash]) {
+        bytes32 blsPublicKeyHash = keccak256(blsPublicKey);
+        if (_blsPublicKeys[blsPublicKeyHash]) {
             revert BlsKeyAlreadyRegistered();
         }
         _checkBls12_381PublicKey(blsPublicKey);
