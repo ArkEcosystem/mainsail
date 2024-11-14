@@ -42,8 +42,6 @@ event Voted(address voter, address validator);
 
 event Unvoted(address voter, address validator);
 
-event VoteSwapped(address voter, address previousValidator, address newValidator);
-
 // Voter calls vote funtion
 // Vote function includes valdiator address and balance, whole balance is added to the validator voteBalance
 // Voter can unvote, whole balance is removed from validator voteBalance
