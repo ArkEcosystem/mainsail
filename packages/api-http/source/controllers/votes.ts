@@ -19,7 +19,7 @@ export class VotesController extends Controller {
 	public async index(request: Hapi.Request) {
 		const criteria: Search.Criteria.TransactionCriteria = {
 			...request.query,
-			data: FunctionSigs.Vote,
+			data: FunctionSigs.ConsensusV1.Vote,
 		};
 
 		const pagination = this.getListingPage(request);
@@ -47,7 +47,7 @@ export class VotesController extends Controller {
 			.createQueryBuilder()
 			.select()
 			.where("id = :id", { id: request.params.id })
-			.andWhere("SUBSTRING(data FROM 1 FOR 4) = :data", { data: `\\x${FunctionSigs.Vote.slice(2)}` })
+			.andWhere("SUBSTRING(data FROM 1 FOR 4) = :data", { data: `\\x${FunctionSigs.ConsensusV1.Vote.slice(2)}` })
 			.getOne();
 
 		if (!transaction) {

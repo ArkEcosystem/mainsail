@@ -98,7 +98,7 @@ export class WalletsController extends Controller {
 		}
 
 		return this.getTransactions(request, {
-			data: FunctionSigs.Vote,
+			data: FunctionSigs.ConsensusV1.Vote,
 			senderPublicKey: wallet.publicKey,
 		});
 	}
