@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Validator} from "@contracts/consensus/Consensus.sol";
+import {Validator} from "@contracts/consensus/ConsensusV1.sol";
 
 contract Base is Test {
     function prepareBLSKey(address addr, uint8 lenght) public pure returns (bytes memory) {

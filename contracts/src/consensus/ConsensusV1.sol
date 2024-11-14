@@ -74,7 +74,7 @@ error InvalidRange(uint256 min, uint256 max);
 // Block is processed: Original wallet balance: 100, new wallet balance: 88, difference 12
 // This process will only work fine if we pass the new wallet balance (88) and keep track of voteBalances in EVM contract.
 
-contract Consensus {
+contract ConsensusV1 {
     address private immutable _owner;
 
     mapping(address => ValidatorData) private _validatorsData;

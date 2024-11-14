@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
 import {
-    Consensus,
+    ConsensusV1,
     ValidatorData,
     Validator,
     Unvoted,
@@ -15,13 +15,13 @@ import {
     VoteResignedValidator,
     VoteSameValidator,
     MissingVote
-} from "@contracts/consensus/Consensus.sol";
+} from "@contracts/consensus/ConsensusV1.sol";
 
 contract ConsensusTest is Test {
-    Consensus public consensus;
+    ConsensusV1 public consensus;
 
     function setUp() public {
-        consensus = new Consensus();
+        consensus = new ConsensusV1();
     }
 
     function registerValidator(address addr) internal {

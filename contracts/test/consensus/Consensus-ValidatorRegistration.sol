@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {
-    Consensus,
+    ConsensusV1,
     ValidatorData,
     Validator,
     ValidatorRegistered,
@@ -10,14 +10,14 @@ import {
     ValidatorAlreadyRegistered,
     BlsKeyAlreadyRegistered,
     BlsKeyIsInvalid
-} from "@contracts/consensus/Consensus.sol";
+} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 
 contract ConsensusTest is Base {
-    Consensus public consensus;
+    ConsensusV1 public consensus;
 
     function setUp() public {
-        consensus = new Consensus();
+        consensus = new ConsensusV1();
     }
 
     function test_validator_registration_pass() public {

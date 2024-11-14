@@ -2,14 +2,14 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Consensus, ValidatorData, Validator} from "@contracts/consensus/Consensus.sol";
+import {ConsensusV1, ValidatorData, Validator} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 
 contract ConsensusTest is Base {
-    Consensus public consensus;
+    ConsensusV1 public consensus;
 
     function setUp() public {
-        consensus = new Consensus();
+        consensus = new ConsensusV1();
     }
 
     function test_200_validators() public {
