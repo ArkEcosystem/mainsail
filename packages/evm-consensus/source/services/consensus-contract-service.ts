@@ -26,7 +26,7 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
-		const data = iface.encodeFunctionData("getTopValidators").slice(2);
+		const data = iface.encodeFunctionData("getActiveValidators").slice(2);
 
 		const result = await this.evm.view({
 			caller: deployerAddress,
@@ -36,10 +36,10 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		});
 
 		if (!result.success) {
-			await this.app.terminate("getTopValidators failed");
+			await this.app.terminate("getActiveValidators failed");
 		}
 
-		const [validators] = iface.decodeFunctionResult("getTopValidators", result.output!);
+		const [validators] = iface.decodeFunctionResult("getActiveValidators", result.output!);
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const [, validator] of validators.entries()) {
