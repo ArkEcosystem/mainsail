@@ -75,6 +75,6 @@ contract ConsensusTest is Base {
 
         Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
-        assertEq(validator.data.bls12_381_public_key, prepareBLSKey(address(2)));
+        assertEq(validator.data.blsPublicKey, prepareBLSKey(address(2)));
     }
 }

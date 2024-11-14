@@ -4,7 +4,7 @@ struct ValidatorData {
     uint256 votersCount;
     uint256 voteBalance;
     bool isResigned;
-    bytes bls12_381_public_key; // 96 bits
+    bytes blsPublicKey; // 96 bits
 }
 
 struct Validator {
@@ -34,9 +34,9 @@ struct VoteResult {
     address validator;
 }
 
-event ValidatorRegistered(address addr, bytes bls12_381_public_key);
+event ValidatorRegistered(address addr, bytes blsPublicKey);
 
-event ValidatorUpdated(address addr, bytes bls12_381_public_key);
+event ValidatorUpdated(address addr, bytes blsPublicKey);
 
 event ValidatorResigned(address addr);
 
@@ -116,24 +116,20 @@ contract Consensus {
     }
 
     // External functions
-    function registerValidator(bytes calldata bls12_381_public_key) external preventOwner {
+    function registerValidator(bytes calldata blsPublicKey) external preventOwner {
         if (_hasValidator[msg.sender]) {
             revert ValidatorAlreadyRegistered();
         }
 
-        bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
+        bytes32 bls_public_key_hash = keccak256(blsPublicKey);
         if (_blsPublicKeys[bls_public_key_hash]) {
             revert BlsKeyAlreadyRegistered();
         }
 
-        _checkBls12_381PublicKey(bls12_381_public_key);
+        _checkBls12_381PublicKey(blsPublicKey);
 
-        ValidatorData memory validator = ValidatorData({
-            votersCount: 0,
-            voteBalance: 0,
-            isResigned: false,
-            bls12_381_public_key: bls12_381_public_key
-        });
+        ValidatorData memory validator =
+            ValidatorData({votersCount: 0, voteBalance: 0, isResigned: false, blsPublicKey: blsPublicKey});
 
         _validatorsCount++;
         _hasValidator[msg.sender] = true;
@@ -141,23 +137,23 @@ contract Consensus {
         _blsPublicKeys[bls_public_key_hash] = true;
         _validators.push(msg.sender);
 
-        emit ValidatorRegistered(msg.sender, bls12_381_public_key);
+        emit ValidatorRegistered(msg.sender, blsPublicKey);
     }
 
-    function updateValidator(bytes calldata bls12_381_public_key) external preventOwner {
+    function updateValidator(bytes calldata blsPublicKey) external preventOwner {
         if (!isValidatorRegistered(msg.sender)) {
             revert ValidatorNotRegistered();
         }
 
-        bytes32 bls_public_key_hash = keccak256(bls12_381_public_key);
+        bytes32 bls_public_key_hash = keccak256(blsPublicKey);
         if (_blsPublicKeys[bls_public_key_hash]) {
             revert BlsKeyAlreadyRegistered();
         }
-        _checkBls12_381PublicKey(bls12_381_public_key);
+        _checkBls12_381PublicKey(blsPublicKey);
 
-        _validatorsData[msg.sender].bls12_381_public_key = bls12_381_public_key;
+        _validatorsData[msg.sender].blsPublicKey = blsPublicKey;
 
-        emit ValidatorUpdated(msg.sender, bls12_381_public_key);
+        emit ValidatorUpdated(msg.sender, blsPublicKey);
     }
 
     function resignValidator() external {
