@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, ERC1967ProxyAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers, sha256 } from "ethers";
 
@@ -24,7 +24,6 @@ export class Deployer {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	// Deploy consensus contract (TODO: change to another address?)
 	#deployerAddress = "0x0000000000000000000000000000000000000001";
 	#nonce = 0;
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
@@ -33,13 +32,11 @@ export class Deployer {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
-		const validatorContractAddress = ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 0 });
-
 		const genesisInfo = {
 			account: genesisBlock.block.generatorAddress,
 			deployerAccount: this.#deployerAddress,
 			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
-			validatorContract: validatorContractAddress,
+			validatorContract: ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
 		};
 
 		await this.evm.initializeGenesis(genesisInfo);
@@ -55,42 +52,65 @@ export class Deployer {
 			validatorAddress: this.#deployerAddress,
 		};
 
-		const activeValidators = this.configuration.getMilestone(1).activeValidators; // TODO update on milestone change
-
-		const constructorArguments = new ethers.AbiCoder().encode(["uint8"], [activeValidators]).slice(2);
-		const nonce = BigInt(this.#nonce);
-
-		const result = await this.evm.process({
+		// CONSENSUS
+		const consensusResult = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
-			data: Buffer.concat([
-				Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object)),
-				Buffer.from(constructorArguments, "hex"),
-			]),
+			data: Buffer.concat([Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object))]),
 			gasLimit: BigInt(10_000_000),
-			nonce,
+			nonce: BigInt(this.#nonce++),
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
 			value: 0n,
 		});
 
-		if (!result.receipt.success) {
+		if (!consensusResult.receipt.success) {
 			throw new Error("failed to deploy Consensus contract");
 		}
 
-		this.logger.info(
-			`Deployed Consensus contract from ${this.#deployerAddress} to ${result.receipt.deployedContractAddress}`,
-		);
-
-		if (result.receipt.deployedContractAddress !== validatorContractAddress) {
+		if (
+			consensusResult.receipt.deployedContractAddress !==
+			ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 0 })
+		) {
 			throw new Error("Contract address mismatch");
 		}
+
+		this.logger.info(
+			`Deployed Consensus contract from ${this.#deployerAddress} to ${consensusResult.receipt.deployedContractAddress}`,
+		);
+
+		// PROXY
+		const proxyResult = await this.evm.process({
+			blockContext,
+			caller: this.#deployerAddress,
+			data: Buffer.concat([Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object))]),
+			gasLimit: BigInt(10_000_000),
+			nonce: BigInt(this.#nonce++),
+			specId: milestone.evmSpec,
+			txHash: this.#generateTxHash(),
+			value: 0n,
+		});
+
+		if (!proxyResult.receipt.success) {
+			throw new Error("failed to deploy Consensus contract");
+		}
+
+		if (
+			proxyResult.receipt.deployedContractAddress !==
+			ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 1 })
+		) {
+			throw new Error("Contract address mismatch");
+		}
+
+		this.logger.info(
+			`Deployed Consensus PROXY contract from ${this.#deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
+		);
 
 		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(this.#deployerAddress);
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
-			.toConstantValue(result.receipt.deployedContractAddress!);
+			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
 
 		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
 
