@@ -10,6 +10,9 @@ contract ConsensusTest is Base {
     ConsensusV1 public consensus;
 
     function setUp() public {
+        console.logBytes(ConsensusV1.initialize.selector);
+        console.log("TEST");
+
         bytes memory data = abi.encode(ConsensusV1.initialize.selector);
         address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
         consensus = ConsensusV1(proxy);

@@ -58,7 +58,7 @@ export class Deployer {
 			caller: this.#deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object))]),
 			gasLimit: BigInt(10_000_000),
-			nonce: BigInt(this.#nonce++),
+			nonce: BigInt(0),
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
 			value: 0n,
@@ -79,20 +79,34 @@ export class Deployer {
 			`Deployed Consensus contract from ${this.#deployerAddress} to ${consensusResult.receipt.deployedContractAddress}`,
 		);
 
-		// PROXY
+		// Logic contract initializer function ABI
+		const logicInterface = new ethers.Interface(ConsensusAbi.abi);
+		// Encode the initializer call
+		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
+		// Prepare the constructor arguments for the proxy contract
+		const proxyConstructorArguments = new ethers.AbiCoder()
+			.encode(["address", "bytes"], [consensusResult.receipt.deployedContractAddress, initializerCalldata])
+			.slice(2);
+
 		const proxyResult = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
-			data: Buffer.concat([Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object))]),
+			data: Buffer.concat([
+				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
+				Buffer.from(proxyConstructorArguments, "hex"),
+			]),
 			gasLimit: BigInt(10_000_000),
-			nonce: BigInt(this.#nonce++),
+			nonce: BigInt(1),
 			specId: milestone.evmSpec,
 			txHash: this.#generateTxHash(),
 			value: 0n,
 		});
 
 		if (!proxyResult.receipt.success) {
-			throw new Error("failed to deploy Consensus contract");
+			console.log(proxyResult.receipt);
+			console.log(proxyResult.receipt.output);
+
+			throw new Error("failed to deploy Consensus PROXY contract");
 		}
 
 		if (
