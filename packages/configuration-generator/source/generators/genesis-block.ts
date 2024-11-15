@@ -1,7 +1,7 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, ERC1967ProxyAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -103,7 +103,7 @@ export class GenesisBlockGenerator extends Generator {
 			validatorAddress: this.#deployerAddress,
 		};
 
-		const result = await this.evm.process({
+		const consensusResult = await this.evm.process({
 			blockContext,
 			caller: this.#deployerAddress,
 			data: Buffer.concat([
@@ -117,8 +117,35 @@ export class GenesisBlockGenerator extends Generator {
 			value: 0n,
 		});
 
-		if (!result.receipt.success) {
+		if (!consensusResult.receipt.success) {
 			throw new Error("failed to deploy Consensus contract");
+		}
+
+		// Logic contract initializer function ABI
+		const logicInterface = new ethers.Interface(ConsensusAbi.abi);
+		// Encode the initializer call
+		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
+		// Prepare the constructor arguments for the proxy contract
+		const proxyConstructorArguments = new ethers.AbiCoder()
+			.encode(["address", "bytes"], [consensusResult.receipt.deployedContractAddress, initializerCalldata])
+			.slice(2);
+
+		const proxyResult = await this.evm.process({
+			blockContext,
+			caller: this.#deployerAddress,
+			data: Buffer.concat([
+				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
+				Buffer.from(proxyConstructorArguments, "hex"),
+			]),
+			gasLimit: BigInt(10_000_000),
+			nonce: BigInt(1),
+			specId: Contracts.Evm.SpecId.SHANGHAI,
+			txHash: sha256(Buffer.from(`tx-${this.#deployerAddress}-${1}`, "utf8")).slice(2),
+			value: 0n,
+		});
+
+		if (!proxyResult.receipt.success) {
+			throw new Error("failed to deploy Consensus PROXY contract");
 		}
 
 		await this.evm.onCommit({
