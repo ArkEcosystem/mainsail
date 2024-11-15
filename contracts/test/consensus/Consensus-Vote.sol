@@ -16,13 +16,15 @@ import {
     VoteSameValidator,
     MissingVote
 } from "@contracts/consensus/ConsensusV1.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Test {
     ConsensusV1 public consensus;
 
     function setUp() public {
-        consensus = new ConsensusV1();
-        consensus.initialize();
+        bytes memory data = abi.encode(ConsensusV1.initialize.selector);
+        address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
+        consensus = ConsensusV1(proxy);
     }
 
     function registerValidator(address addr) internal {

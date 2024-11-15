@@ -272,6 +272,10 @@ contract ConsensusV1 is UUPSUpgradeable, Initializable {
     }
 
     // External functions that are view
+    function version() external pure returns (uint256) {
+        return 1;
+    }
+
     function registeredValidatorsCount() external view returns (uint256) {
         return _validatorsCount;
     }
