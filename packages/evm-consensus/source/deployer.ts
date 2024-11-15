@@ -103,9 +103,6 @@ export class Deployer {
 		});
 
 		if (!proxyResult.receipt.success) {
-			console.log(proxyResult.receipt);
-			console.log(proxyResult.receipt.output);
-
 			throw new Error("failed to deploy Consensus PROXY contract");
 		}
 
