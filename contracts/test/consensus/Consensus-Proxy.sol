@@ -27,8 +27,13 @@ contract ConsensusTest is Base {
         consensus.initialize();
     }
 
+    function test_shoudl_have_valid_UPGRADE_INTERFACE_VERSION() public {
+        assertEq(consensus.UPGRADE_INTERFACE_VERSION(), "5.0.0");
+    }
+
     function test_proxy_should_update() public {
         assertEq(consensus.version(), 1);
+        assertEq(consensus.UPGRADE_INTERFACE_VERSION(), "5.0.0");
         consensus.upgradeToAndCall(address(new ConsensusVTest()), bytes(""));
 
         // Cast proxy to new contract
