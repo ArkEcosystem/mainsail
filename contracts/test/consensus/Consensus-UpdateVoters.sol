@@ -16,6 +16,7 @@ contract ConsensusTest is Test {
 
     function setUp() public {
         consensus = new ConsensusV1();
+        consensus.initialize();
     }
 
     function test_updateVoters_should_allow_only_caller() public {

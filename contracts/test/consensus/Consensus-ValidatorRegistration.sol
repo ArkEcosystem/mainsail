@@ -18,6 +18,7 @@ contract ConsensusTest is Base {
 
     function setUp() public {
         consensus = new ConsensusV1();
+        consensus.initialize();
     }
 
     function test_validator_registration_pass() public {

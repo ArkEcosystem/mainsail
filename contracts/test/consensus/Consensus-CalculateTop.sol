@@ -10,6 +10,7 @@ contract ConsensusTest is Base {
 
     function setUp() public {
         consensus = new ConsensusV1();
+        consensus.initialize();
     }
 
     function test_should_work_with_one_validator() public {

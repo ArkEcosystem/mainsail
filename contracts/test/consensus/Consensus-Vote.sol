@@ -22,6 +22,7 @@ contract ConsensusTest is Test {
 
     function setUp() public {
         consensus = new ConsensusV1();
+        consensus.initialize();
     }
 
     function registerValidator(address addr) internal {
