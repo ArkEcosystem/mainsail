@@ -26,6 +26,7 @@ export class GenesisBlockGenerator extends Generator {
 	private readonly evm!: Contracts.Evm.Instance;
 
 	#deployerAddress = "0x0000000000000000000000000000000000000001";
+	#consensusProxyContractAddress = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1";
 
 	async generate(
 		genesisMnemonic: string,
@@ -170,9 +171,6 @@ export class GenesisBlockGenerator extends Generator {
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
-		// TODO: move to constant (can be calculated based on deployer address + nonce)
-		const consensusContractAddress = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459";
-
 		for (const [index, sender] of senders.entries()) {
 			const data = iface
 				.encodeFunctionData("registerValidator", [Buffer.from(sender.consensusKeys.publicKey, "hex")])
@@ -182,7 +180,7 @@ export class GenesisBlockGenerator extends Generator {
 				await this.app
 					.resolve(EvmCallBuilder)
 					.network(pubKeyHash)
-					.recipientAddress(consensusContractAddress)
+					.recipientAddress(this.#consensusProxyContractAddress)
 					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
 					.gasPrice(0)
@@ -199,9 +197,6 @@ export class GenesisBlockGenerator extends Generator {
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
-		// TODO: move to constant (can be calculated based on deployer address + nonce)
-		const consensusContractAddress = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459";
-
 		for (const [index, sender] of senders.entries()) {
 			const data = iface.encodeFunctionData("vote", [sender.address]).slice(2);
 
@@ -209,7 +204,7 @@ export class GenesisBlockGenerator extends Generator {
 				await this.app
 					.resolve(EvmCallBuilder)
 					.network(pubKeyHash)
-					.recipientAddress(consensusContractAddress)
+					.recipientAddress(this.#consensusProxyContractAddress)
 					.nonce("1") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
 					.payload(data)
 					.gasPrice(0)
