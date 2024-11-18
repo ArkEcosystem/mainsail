@@ -90,6 +90,7 @@ contract ConsensusTest is Base {
         validators = sortValidators(validators);
         assertEq(validators[activeValidators - 1].addr, highest);
 
+        // Seccond attempt shoudl return the same result
         consensus.calculateActiveValidators(uint8(activeValidators));
 
         validators = consensus.getActiveValidators();

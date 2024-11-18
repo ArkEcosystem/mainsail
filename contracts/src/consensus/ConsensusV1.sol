@@ -279,6 +279,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             tmpValidators[i] = next;
             next = _activeValidatorsMap[next];
         }
+        _shuffleMem(tmpValidators);
 
         // Fill round & _activeValidators
         RoundValidator[] storage round = _rounds.push();
@@ -290,8 +291,6 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             _activeValidators[i] = addr;
             round.push(RoundValidator({addr: addr, voteBalance: _validatorsData[addr].voteBalance}));
         }
-
-        _shuffle(_activeValidators);
     }
 
     // External functions that are view
@@ -400,6 +399,19 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
 
     // Internal functions
     function _shuffle(address[] storage array) internal {
+        uint256 n = array.length;
+        for (uint256 i = n - 1; i > 0; i--) {
+            // Get a random index between 0 and i (inclusive)
+            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
+
+            // Swap elements at index i and j
+            address temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
+    function _shuffleMem(address[] memory array) internal view {
         uint256 n = array.length;
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
