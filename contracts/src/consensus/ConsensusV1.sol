@@ -228,7 +228,6 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
         }
     }
 
-    // TODO: Check uint8
     function calculateActiveValidators(uint8 n) external onlyOwner {
         _minValidators = n;
 
