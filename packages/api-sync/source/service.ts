@@ -382,16 +382,15 @@ export class Sync implements Contracts.ApiSync.Service {
 					.execute();
 			}
 
-			if (deferred.newMilestones) {
-				await configurationRepository
-					.createQueryBuilder()
-					.update()
-					.set({
-						activeMilestones: deferred.newMilestones,
-					})
-					.where("id = :id", { id: 1 })
-					.execute();
-			}
+			await configurationRepository
+				.createQueryBuilder()
+				.update()
+				.set({
+					version: this.app.version(),
+					...(deferred.newMilestones ? { activeMilestones: deferred.newMilestones } : {}),
+				})
+				.where("id = :id", { id: 1 })
+				.execute();
 
 			for (const batch of chunk(deferred.wallets, 256)) {
 				const batchParameterLength = 6;
