@@ -65,6 +65,11 @@ error MissingVote();
 
 error InvalidRange(uint256 min, uint256 max);
 
+// Validators:
+// - Registered -> All validators that are registered including resigned validators
+// - Active -> Top N validators with the highest vote balance, that participate in the consensus
+// - Resigned -> Validators that resigned from the consensus
+
 // Voter calls vote funtion
 // Vote function includes valdiator address and balance, whole balance is added to the validator voteBalance
 // Voter can unvote, whole balance is removed from validator voteBalance
