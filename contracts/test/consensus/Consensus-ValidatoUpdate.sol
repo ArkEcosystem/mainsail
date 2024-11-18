@@ -16,8 +16,6 @@ import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Base {
-    ConsensusV1 public consensus;
-
     function setUp() public {
         bytes memory data = abi.encode(ConsensusV1.initialize.selector);
         address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));

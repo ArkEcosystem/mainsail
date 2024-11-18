@@ -16,38 +16,14 @@ import {
     VoteSameValidator,
     MissingVote
 } from "@contracts/consensus/ConsensusV1.sol";
+import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-contract ConsensusTest is Test {
-    ConsensusV1 public consensus;
-
+contract ConsensusTest is Base {
     function setUp() public {
         bytes memory data = abi.encode(ConsensusV1.initialize.selector);
         address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
         consensus = ConsensusV1(proxy);
-    }
-
-    function registerValidator(address addr) internal {
-        bytes32 h = keccak256(abi.encode(addr));
-        bytes memory validatorKey = new bytes(48);
-        for (uint256 j = 0; j < 32; j++) {
-            validatorKey[j] = h[j];
-        }
-
-        vm.startPrank(addr);
-        consensus.registerValidator(validatorKey);
-        vm.stopPrank();
-
-        Validator memory validator = consensus.getValidator(addr);
-        assertEq(validator.addr, addr);
-        assertEq(validator.data.voteBalance, 0 ether);
-        assertEq(validator.data.votersCount, 0);
-    }
-
-    function resignValidator(address addr) internal {
-        vm.startPrank(addr);
-        consensus.resignValidator();
-        vm.stopPrank();
     }
 
     function test_vote() public {

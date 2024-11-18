@@ -2,9 +2,11 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {Validator} from "@contracts/consensus/ConsensusV1.sol";
+import {ConsensusV1, Validator} from "@contracts/consensus/ConsensusV1.sol";
 
 contract Base is Test {
+    ConsensusV1 public consensus;
+
     function prepareBLSKey(address addr, uint8 lenght) public pure returns (bytes memory) {
         bytes32 h = keccak256(abi.encode(addr));
         bytes memory validatorKey = new bytes(lenght);
@@ -39,5 +41,28 @@ contract Base is Test {
         }
 
         return validatorA.data.voteBalance > validatorB.data.voteBalance;
+    }
+
+    function registerValidator(address addr) internal {
+        bytes32 h = keccak256(abi.encode(addr));
+        bytes memory validatorKey = new bytes(48);
+        for (uint256 j = 0; j < 32; j++) {
+            validatorKey[j] = h[j];
+        }
+
+        vm.startPrank(addr);
+        consensus.registerValidator(validatorKey);
+        vm.stopPrank();
+
+        Validator memory validator = consensus.getValidator(addr);
+        assertEq(validator.addr, addr);
+        assertEq(validator.data.voteBalance, 0 ether);
+        assertEq(validator.data.votersCount, 0);
+    }
+
+    function resignValidator(address addr) internal {
+        vm.startPrank(addr);
+        consensus.resignValidator();
+        vm.stopPrank();
     }
 }

@@ -1,14 +1,11 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {Test, console} from "@forge-std/Test.sol";
 import {ConsensusV1, ValidatorData, Validator, CallerIsNotOwner} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Base {
-    ConsensusV1 public consensus;
-
     function setUp() public {
         bytes memory data = abi.encode(ConsensusV1.initialize.selector);
         address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
@@ -17,6 +14,8 @@ contract ConsensusTest is Base {
 
     function test_should_work_with_one_validator() public {
         address addr = address(1);
+        registerValidator(addr);
+
         vm.startPrank(addr);
         consensus.registerValidator(prepareBLSKey(addr));
         vm.stopPrank();
