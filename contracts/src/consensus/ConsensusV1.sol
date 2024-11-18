@@ -170,7 +170,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             revert ValidatorAlreadyResigned();
         }
 
-        if (_validatorsCount - _resignedValidatorsCount <= _minValidators) {
+        if (_validatorsCount - _resignedValidatorsCount - 1 <= _minValidators) {
             revert BellowMinValidators();
         }
 

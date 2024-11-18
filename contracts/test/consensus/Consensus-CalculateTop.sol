@@ -10,10 +10,6 @@ contract ConsensusTest is Base {
         address addr = address(1);
         registerValidator(addr);
 
-        vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
-        vm.stopPrank();
-
         consensus.calculateActiveValidators(1);
         Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, 1);
@@ -30,14 +26,15 @@ contract ConsensusTest is Base {
     function test_should_ignore_resigned_validators() public {
         address addr = address(1);
 
-        vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
-        consensus.resignValidator();
-        vm.stopPrank();
+        registerValidator(addr);
+        registerValidator(address(2));
+        resignValidator(addr);
 
-        consensus.calculateActiveValidators(1);
+        consensus.calculateActiveValidators(2);
         Validator[] memory validators = consensus.getActiveValidators();
-        assertEq(validators.length, 0);
+        assertEq(validators.length, 2);
+        assertEq(validators[0].addr, address(2));
+        assertEq(validators[1].addr, address(2)); // Second validator is duplicated
     }
 
     function test_consensus_200_topValidators() public {

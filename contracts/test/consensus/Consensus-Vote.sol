@@ -182,10 +182,11 @@ contract ConsensusTest is Base {
         // Register validator
         address addr = address(1);
         registerValidator(addr);
+        registerValidator(address(2));
         resignValidator(addr);
 
         // Prepare voter
-        address voterAddr = address(2);
+        address voterAddr = address(3);
         vm.startPrank(voterAddr);
         vm.expectRevert(VoteResignedValidator.selector);
         consensus.vote(addr);

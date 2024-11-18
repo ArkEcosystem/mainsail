@@ -18,12 +18,11 @@ contract ConsensusTest is Base {
         address addr = address(1);
 
         // Act
-        vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
-        vm.stopPrank();
+        registerValidator(addr);
+        registerValidator(address(2)); // Add another validator to allow resign
 
         // Assert
-        assertEq(consensus.registeredValidatorsCount(), 1);
+        assertEq(consensus.registeredValidatorsCount(), 2);
         Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -38,7 +37,7 @@ contract ConsensusTest is Base {
         consensus.resignValidator();
         vm.stopPrank();
 
-        assertEq(consensus.registeredValidatorsCount(), 1);
+        assertEq(consensus.registeredValidatorsCount(), 2);
         validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
@@ -57,12 +56,11 @@ contract ConsensusTest is Base {
         address addr = address(1);
 
         // Act
-        vm.startPrank(addr);
-        consensus.registerValidator(prepareBLSKey(addr));
-        vm.stopPrank();
+        registerValidator(addr);
+        registerValidator(address(2)); // Add another validator to allow resign
 
         // Assert
-        assertEq(consensus.registeredValidatorsCount(), 1);
+        assertEq(consensus.registeredValidatorsCount(), 2);
 
         // Act
         vm.startPrank(addr);
