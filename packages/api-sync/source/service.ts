@@ -94,7 +94,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		// if our database is empty, we sync all blocks from scratch
 		const [blocks] = await this.dataSource.query("select count(1) from blocks");
-		if (blocks.count === "0" && !this.databaseService.isEmpty()) {
+		if (blocks.count === "0") {
 			await this.#bootstrapRestore();
 		}
 

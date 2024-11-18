@@ -74,6 +74,9 @@ export class Restore {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
+
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
@@ -105,7 +108,9 @@ export class Restore {
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
 
 	public async restore(): Promise<void> {
-		const mostRecentCommit = await this.databaseService.getLastCommit();
+		const mostRecentCommit = await (this.databaseService.isEmpty()
+			? this.stateStore.getGenesisCommit()
+			: this.databaseService.getLastCommit());
 		Utils.assert.defined<Contracts.Crypto.Commit>(mostRecentCommit);
 
 		this.logger.info(
@@ -127,7 +132,9 @@ export class Restore {
 				receiptRepository: this.receiptRepositoryFactory(entityManager),
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
-				totalSupply: Utils.BigNumber.ZERO,
+				totalSupply: this.databaseService.isEmpty()
+					? this.stateStore.getGenesisCommit().block.data.totalAmount
+					: Utils.BigNumber.ZERO,
 
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
