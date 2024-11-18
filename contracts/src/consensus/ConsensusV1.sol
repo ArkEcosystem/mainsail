@@ -90,19 +90,19 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     mapping(address => bool) private _hasValidator;
     mapping(bytes32 => bool) private _blsPublicKeys;
     address[] private _validators;
-    uint256 private _validatorsCount = 0;
-    uint256 private _resignedValidatorsCount = 0;
+    uint256 private _validatorsCount; // Default 0
+    uint256 private _resignedValidatorsCount; // Default 0
 
     mapping(address => Vote) private _voters;
-    address private _votersHead = address(0);
-    address private _votersTail = address(0);
-    uint256 private _votersCount = 0;
+    address private _votersHead; // Default address(0)
+    address private _votersTail; // Default address(0)
+    uint256 private _votersCount; // Default 0
 
     mapping(address => address) private _activeValidatorsMap;
     address[] private _activeValidators;
-    address private _activeValidatorsHead;
-    uint256 private _activeValidatorsCount = 0;
-    uint256 private _minValidators = 1;
+    address private _activeValidatorsHead; // Default address(0)
+    uint256 private _activeValidatorsCount; // Default 0
+    uint256 private _minValidators; // Default 1
 
     RoundValidator[][] private _rounds;
 
@@ -124,6 +124,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     // Initializers
     function initialize() public initializer {
         _owner = msg.sender;
+        _minValidators = 1;
     }
 
     // Overrides
@@ -170,7 +171,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             revert ValidatorAlreadyResigned();
         }
 
-        if (_validatorsCount - _resignedValidatorsCount - 1 <= _minValidators) {
+        if (_validatorsCount - _resignedValidatorsCount <= _minValidators) {
             revert BellowMinValidators();
         }
 
