@@ -3,9 +3,16 @@ pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
 import {ConsensusV1, Validator} from "@contracts/consensus/ConsensusV1.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract Base is Test {
     ConsensusV1 public consensus;
+
+    function setUp() public {
+        bytes memory data = abi.encode(ConsensusV1.initialize.selector);
+        address proxy = address(new ERC1967Proxy(address(new ConsensusV1()), data));
+        consensus = ConsensusV1(proxy);
+    }
 
     function prepareBLSKey(address addr, uint8 lenght) public pure returns (bytes memory) {
         bytes32 h = keccak256(abi.encode(addr));
