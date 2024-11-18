@@ -219,7 +219,7 @@ export class UnexpectedNonceError extends Exception {
 	public constructor(txNonce: any, sender: Wallet) {
 		super(
 			`Cannot apply a transaction with nonce ${txNonce.toFixed()}: the ` +
-				`sender ${sender.getAddress()} has nonce ${sender.getNonce().toFixed()}.`,
+				`sender ${sender.getAddress()} has nonce ${sender.getNonce().toFixed()}${sender.getNonce().isZero() ? " (this might be due to a wrong signature)" : ""}.`,
 		);
 	}
 }
