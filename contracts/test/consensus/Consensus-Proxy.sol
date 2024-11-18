@@ -27,7 +27,7 @@ contract ConsensusTest is Base {
         consensus.initialize();
     }
 
-    function test_shoudl_have_valid_UPGRADE_INTERFACE_VERSION() public {
+    function test_shoudl_have_valid_UPGRADE_INTERFACE_VERSION() public view {
         assertEq(consensus.UPGRADE_INTERFACE_VERSION(), "5.0.0");
     }
 

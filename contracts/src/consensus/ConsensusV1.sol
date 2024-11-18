@@ -54,6 +54,7 @@ error CallerIsNotValidator();
 error ValidatorNotRegistered();
 error ValidatorAlreadyRegistered();
 error ValidatorAlreadyResigned();
+error BellowMinValidators();
 
 error BlsKeyAlreadyRegistered();
 error BlsKeyIsInvalid();
@@ -96,6 +97,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     address[] private _activeValidators;
     address private _activeValidatorsHead;
     uint256 private _activeValidatorsCount = 0;
+    uint256 private _minValidators = 1;
 
     RoundValidator[][] private _rounds;
 
@@ -161,6 +163,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
         ValidatorData storage validator = _validatorsData[msg.sender];
         if (validator.isResigned) {
             revert ValidatorAlreadyResigned();
+        }
+
+        if (_validatorsCount - _resignedValidatorsCount <= _minValidators) {
+            revert BellowMinValidators();
         }
 
         validator.isResigned = true;
@@ -285,7 +291,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     }
 
     function activeValidatorsCount() external view returns (uint256) {
-        return _activeValidators.length;
+        return _activeValidatorsCount;
     }
 
     function isValidatorRegistered(address addr) public view returns (bool) {
