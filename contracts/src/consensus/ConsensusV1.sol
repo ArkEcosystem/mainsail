@@ -227,6 +227,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
         }
     }
 
+    // TODO: Check uint8
     function calculateActiveValidators(uint8 n) external onlyOwner {
         _minValidators = n;
 
@@ -270,15 +271,24 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             }
         }
 
-        RoundValidator[] storage round = _rounds.push();
-
+        // Prepare temp array. Used when top < _minValidators
         address next = _activeValidatorsHead;
-        delete _activeValidators;
-        _activeValidators = new address[](top);
+        address[] memory tmpValidators = new address[](top);
+
         for (uint256 i = 0; i < top; i++) {
-            _activeValidators[i] = next;
-            round.push(RoundValidator({addr: next, voteBalance: _validatorsData[next].voteBalance}));
+            tmpValidators[i] = next;
             next = _activeValidatorsMap[next];
+        }
+
+        // Fill round & _activeValidators
+        RoundValidator[] storage round = _rounds.push();
+        delete _activeValidators;
+        _activeValidators = new address[](_minValidators);
+
+        for (uint256 i = 0; i < _minValidators; i++) {
+            address addr = tmpValidators[i % top];
+            _activeValidators[i] = addr;
+            round.push(RoundValidator({addr: addr, voteBalance: _validatorsData[addr].voteBalance}));
         }
 
         _shuffle(_activeValidators);
