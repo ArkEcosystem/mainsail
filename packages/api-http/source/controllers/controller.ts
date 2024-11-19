@@ -58,9 +58,9 @@ export class Controller extends AbstractController {
 			.whereInIds(ids)
 			.getMany();
 
-		return receipts.reduce((acc, curr) => {
-			acc[curr.id] = curr;
-			return acc;
+		return receipts.reduce((accumulator, current) => {
+			accumulator[current.id] = current;
+			return accumulator;
 		}, {});
 	}
 
@@ -147,7 +147,7 @@ export class Controller extends AbstractController {
 			receipt !== undefined ? receipt : this.getReceipts([transaction.id]),
 		]);
 
-		return { ...transaction, state: _state, receipt: receipt ?? receipts?.[transaction.id] ?? undefined };
+		return { ...transaction, receipt: receipt ?? receipts?.[transaction.id] ?? undefined, state: _state };
 	}
 
 	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {
