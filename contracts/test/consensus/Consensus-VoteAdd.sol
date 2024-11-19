@@ -15,6 +15,7 @@ import {
     VoteResignedValidator,
     VoteSameValidator,
     AlreadyVoted,
+    ImportIsNotAllowed,
     MissingVote
 } from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
@@ -130,6 +131,16 @@ contract ConsensusTest is Base {
         address addr = address(1);
         vm.startPrank(addr);
         vm.expectRevert(CallerIsNotOwner.selector);
+        consensus.addVote(addr, addr);
+    }
+
+    function test_add_vote_revert_if_round_already_calculated() public {
+        address addr = address(1);
+        consensus.addValidator(addr, prepareBLSKey(addr), false);
+
+        consensus.calculateActiveValidators(1);
+
+        vm.expectRevert(ImportIsNotAllowed.selector);
         consensus.addVote(addr, addr);
     }
 

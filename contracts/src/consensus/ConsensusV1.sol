@@ -67,6 +67,7 @@ error MissingVote();
 
 error InvalidRange(uint256 min, uint256 max);
 error InvalidParameters();
+error ImportIsNotAllowed();
 
 // Validators:
 // - Registered -> All validators that are registered including resigned validators
@@ -135,6 +136,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
 
     // External functions
     function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
+        if (_rounds.length > 0) {
+            revert ImportIsNotAllowed();
+        }
+
         if (_hasValidator[addr]) {
             revert ValidatorAlreadyRegistered();
         }
@@ -164,6 +169,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     }
 
     function addVote(address voter, address validator) external onlyOwner {
+        if (_rounds.length > 0) {
+            revert ImportIsNotAllowed();
+        }
+
         if (!isValidatorRegistered(validator)) {
             revert ValidatorNotRegistered();
         }
