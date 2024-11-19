@@ -9,6 +9,7 @@ type AnyTransaction = Partial<T_AND> & Pick<T_OR, keyof T_OR>;
 
 export interface EnrichedTransaction extends AnyTransaction {
 	state: Models.State;
+	receipt?: Models.Receipt;
 }
 
 @injectable()
@@ -43,6 +44,13 @@ export class TransactionResource implements Contracts.Api.Resource {
 			signatures: resource.signatures,
 
 			timestamp: resource.timestamp ? +resource.timestamp : undefined,
+
+			...(resource.receipt
+				? {
+						success: resource.receipt.success,
+						gasUsed: resource.receipt.gasUsed,
+					}
+				: {}),
 		};
 	}
 }

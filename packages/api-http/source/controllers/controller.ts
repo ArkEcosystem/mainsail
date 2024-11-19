@@ -23,6 +23,9 @@ export class Controller extends AbstractController {
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
 	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.ReceiptRepositoryFactory)
+	protected readonly receiptRepositoryFactory!: ApiDatabaseContracts.ReceiptRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	protected readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
@@ -45,6 +48,20 @@ export class Controller extends AbstractController {
 		const configuration = await configurationRepository.createQueryBuilder().getOne();
 
 		return configuration ?? ({} as Models.Configuration);
+	}
+
+	protected async getReceipts(ids: string[]): Promise<Record<string, Models.Receipt>> {
+		const receiptRepository = this.receiptRepositoryFactory();
+		const receipts = await receiptRepository
+			.createQueryBuilder()
+			.select(["Receipt.id", "Receipt.success", "Receipt.gasUsed", "Receipt.deployedContractAddress"])
+			.whereInIds(ids)
+			.getMany();
+
+		return receipts.reduce((acc, curr) => {
+			acc[curr.id] = curr;
+			return acc;
+		}, {});
 	}
 
 	protected async enrichBlockResult(
@@ -107,18 +124,30 @@ export class Controller extends AbstractController {
 		resultPage: Search.ResultsPage<Models.Transaction>,
 		context?: { state?: Models.State },
 	): Promise<Search.ResultsPage<EnrichedTransaction>> {
-		const state = context?.state ?? (await this.getState());
+		const [state, receipts] = await Promise.all([
+			context?.state ?? this.getState(),
+			this.getReceipts(resultPage.results.map((tx) => tx.id)),
+		]);
+
 		return {
 			...resultPage,
-			results: await Promise.all(resultPage.results.map((tx) => this.enrichTransaction(tx, state))),
+			results: await Promise.all(
+				resultPage.results.map((tx) => this.enrichTransaction(tx, state, receipts[tx.id] ?? null)),
+			),
 		};
 	}
 
 	protected async enrichTransaction(
 		transaction: Models.Transaction,
 		state?: Models.State,
+		receipt?: Models.Receipt | null,
 	): Promise<EnrichedTransaction> {
-		return { ...transaction, state: state ? state : await this.getState() };
+		const [_state, receipts] = await Promise.all([
+			state ? state : this.getState(),
+			receipt !== undefined ? receipt : this.getReceipts([transaction.id]),
+		]);
+
+		return { ...transaction, state: _state, receipt: receipt ?? receipts?.[transaction.id] ?? undefined };
 	}
 
 	protected getBlockCriteriaByIdOrHeight(idOrHeight: string): Search.Criteria.OrBlockCriteria {

@@ -1,11 +1,6 @@
 import Hapi from "@hapi/hapi";
-import {
-	Contracts as ApiDatabaseContracts,
-	Identifiers as ApiDatabaseIdentifiers,
-	Models,
-	Search,
-} from "@mainsail/api-database";
-import { inject, injectable } from "@mainsail/container";
+import { Contracts as ApiDatabaseContracts, Models, Search } from "@mainsail/api-database";
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 import { ReceiptResource } from "../resources/index.js";
@@ -13,9 +8,6 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class ReceiptsController extends Controller {
-	@inject(ApiDatabaseIdentifiers.ReceiptRepositoryFactory)
-	private readonly receiptRepositoryFactory!: ApiDatabaseContracts.ReceiptRepositoryFactory;
-
 	public async index(request: Hapi.Request) {
 		const pagination = this.getQueryPagination(request.query);
 		const criteria: Search.Criteria.ReceiptCriteria = request.query;
