@@ -131,6 +131,35 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // External functions
+    function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
+        if (_hasValidator[addr]) {
+            revert ValidatorAlreadyRegistered();
+        }
+
+        if (_blsPublicKeys[keccak256(blsPublicKey)]) {
+            revert BlsKeyAlreadyRegistered();
+        }
+
+        // Allow empty blsPublicKey for imports
+        if (blsPublicKey.length != 0) {
+            _verifyAndRegisterBlsPublicKey(blsPublicKey);
+        }
+
+        ValidatorData memory validator =
+            ValidatorData({votersCount: 0, voteBalance: 0, isResigned: isResigned, blsPublicKey: blsPublicKey});
+
+        _validatorsCount++;
+        _hasValidator[addr] = true;
+        _validatorsData[addr] = validator;
+        _validators.push(addr);
+
+        if (isResigned) {
+            _resignedValidatorsCount++;
+        }
+
+        emit ValidatorRegistered(addr, blsPublicKey);
+    }
+
     function registerValidator(bytes calldata blsPublicKey) external preventOwner {
         if (_hasValidator[msg.sender]) {
             revert ValidatorAlreadyRegistered();
