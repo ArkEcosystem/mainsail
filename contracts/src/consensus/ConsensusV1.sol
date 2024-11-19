@@ -62,6 +62,7 @@ error BlsKeyIsInvalid();
 
 error VoteResignedValidator();
 error VoteSameValidator();
+error AlreadyVoted();
 error MissingVote();
 
 error InvalidRange(uint256 min, uint256 max);
@@ -160,6 +161,35 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
         }
 
         emit ValidatorRegistered(addr, blsPublicKey);
+    }
+
+    function addVote(address voter, address validator) external onlyOwner {
+        if (!isValidatorRegistered(validator)) {
+            revert ValidatorNotRegistered();
+        }
+
+        Vote storage voterData = _voters[voter];
+        if (voterData.validator != address(0)) {
+            revert AlreadyVoted();
+        }
+
+        _voters[voter] = Vote({validator: validator, balance: voter.balance, prev: address(0), next: address(0)});
+
+        if (_votersHead == address(0)) {
+            _votersHead = voter;
+            _votersTail = voter;
+        } else {
+            _voters[_votersTail].next = voter;
+            _voters[voter].prev = _votersTail;
+            _votersTail = voter;
+        }
+        _votersCount++;
+
+        ValidatorData storage validatorData = _validatorsData[validator];
+        validatorData.voteBalance += voter.balance;
+        validatorData.votersCount += 1;
+
+        emit Voted(voter, validator);
     }
 
     function registerValidator(bytes calldata blsPublicKey) external preventOwner {
