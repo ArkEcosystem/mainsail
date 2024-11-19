@@ -38,8 +38,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					// TODO: length depends on hash size...
-					id: Joi.string().hex() /* .length(64), */,
+					id: Joi.string().hex().length(64),
 				}),
 				query: Joi.object({
 					transform: Joi.bool().default(true),

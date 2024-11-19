@@ -33,6 +33,19 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	});
 
 	server.route({
+		handler: (request: Hapi.Request) => controller.show(request),
+		method: "GET",
+		options: {
+			validate: {
+				params: Joi.object({
+					id: Joi.string().hex().length(64),
+				}),
+			},
+		},
+		path: "/receipts/{id}",
+	});
+
+	server.route({
 		handler: (request: Hapi.Request) => controller.contracts(request),
 		method: "GET",
 		options: {

@@ -1,4 +1,5 @@
 import Hapi from "@hapi/hapi";
+import Boom from "@hapi/boom";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
@@ -61,6 +62,20 @@ export class ReceiptsController extends Controller {
 			ReceiptResource,
 			false,
 		);
+	}
+
+	public async show(request: Hapi.Request) {
+		const receipt = await this.receiptRepositoryFactory()
+			.createQueryBuilder()
+			.select()
+			.where("id = :id", { id: request.params.id })
+			.getOne();
+
+		if (!receipt) {
+			return Boom.notFound();
+		}
+
+		return this.toResource(receipt, ReceiptResource, false);
 	}
 
 	public async contracts(request: Hapi.Request) {
