@@ -1,5 +1,5 @@
-import Hapi from "@hapi/hapi";
 import Boom from "@hapi/boom";
+import Hapi from "@hapi/hapi";
 import {
 	Contracts as ApiDatabaseContracts,
 	Identifiers as ApiDatabaseIdentifiers,
