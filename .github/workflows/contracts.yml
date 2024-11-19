@@ -26,6 +26,11 @@ jobs:
               with:
                   version: nightly
 
+            - name: Build
+              working-directory: contracts
+              run: |
+                  forge build
+
             - name: Run tests
               working-directory: contracts
               run: |
