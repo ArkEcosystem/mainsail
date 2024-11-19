@@ -37,6 +37,34 @@ contract ConsensusTest is Base {
         assertEq(validators[1].addr, address(2)); // Second validator is duplicated
     }
 
+    // Inverted order
+    function test_should_ignore_resigned_validators_2() public {
+        address addr = address(1);
+
+        registerValidator(addr);
+        registerValidator(address(2));
+        resignValidator(address(2));
+
+        consensus.calculateActiveValidators(2);
+        Validator[] memory validators = consensus.getActiveValidators();
+        assertEq(validators.length, 2);
+        assertEq(validators[0].addr, addr);
+        assertEq(validators[1].addr, addr); // Second validator is duplicated
+    }
+
+    function test_should_ignore_validators_without_bls_public_key() public {
+        address addr = address(1);
+
+        registerValidator(addr);
+        consensus.addValidator(address(2), new bytes(0), false);
+
+        consensus.calculateActiveValidators(2);
+        Validator[] memory validators = consensus.getActiveValidators();
+        assertEq(validators.length, 2);
+        assertEq(validators[0].addr, addr);
+        assertEq(validators[1].addr, addr); // Second validator is duplicated
+    }
+
     function test_consensus_200_topValidators() public {
         vm.pauseGasMetering();
         assertEq(consensus.registeredValidatorsCount(), 0);
