@@ -74,5 +74,7 @@ contract ConsensusTest is Base {
         consensus.registerValidator(prepareBLSKey(addr, 49));
         vm.expectRevert(BlsKeyIsInvalid.selector);
         consensus.registerValidator(prepareBLSKey(addr, 50));
+        vm.expectRevert(BlsKeyIsInvalid.selector);
+        consensus.registerValidator(new bytes(0));
     }
 }
