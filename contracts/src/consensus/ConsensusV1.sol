@@ -55,6 +55,7 @@ error ValidatorNotRegistered();
 error ValidatorAlreadyRegistered();
 error ValidatorAlreadyResigned();
 error BellowMinValidators();
+error NoActiveValidators();
 
 error BlsKeyAlreadyRegistered();
 error BlsKeyIsInvalid();
@@ -64,6 +65,7 @@ error VoteSameValidator();
 error MissingVote();
 
 error InvalidRange(uint256 min, uint256 max);
+error InvalidParameters();
 
 // Validators:
 // - Registered -> All validators that are registered including resigned validators
@@ -257,18 +259,21 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
         }
     }
 
-    // TODO: Check active validators & top
     function calculateActiveValidators(uint8 n) external onlyOwner {
+        if (n == 0) {
+            revert InvalidParameters();
+        }
+
         _minValidators = n;
 
         _shuffle(_validators);
         _deleteActiveValidators();
 
         _activeValidatorsHead = address(0);
-
         uint8 top = uint8(_clamp(n, 0, _validatorsCount - _resignedValidatorsCount));
+
         if (top == 0) {
-            return;
+            revert NoActiveValidators();
         }
 
         for (uint256 i = 0; i < _validators.length; i++) {
@@ -300,6 +305,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             ) {
                 _insertValidator(addr, top);
             }
+        }
+
+        if (_activeValidatorsCount == 0) {
+            revert NoActiveValidators();
         }
 
         // Prepare temp array. Used when _activeValidatorsCount < _minValidators
@@ -431,6 +440,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     // Internal functions
     function _shuffle(address[] storage array) internal {
         uint256 n = array.length;
+        if (n == 0) {
+            return;
+        }
+
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
@@ -444,6 +457,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
 
     function _shuffleMem(address[] memory array) internal view {
         uint256 n = array.length;
+        if (n == 0) {
+            return;
+        }
+
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);

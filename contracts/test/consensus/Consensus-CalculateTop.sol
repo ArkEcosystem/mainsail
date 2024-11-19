@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {ConsensusV1, ValidatorData, Validator, CallerIsNotOwner} from "@contracts/consensus/ConsensusV1.sol";
+import {
+    ConsensusV1,
+    ValidatorData,
+    Validator,
+    CallerIsNotOwner,
+    InvalidParameters,
+    NoActiveValidators
+} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -20,6 +27,32 @@ contract ConsensusTest is Base {
         address addr = address(1);
         vm.startPrank(addr);
         vm.expectRevert(CallerIsNotOwner.selector);
+        consensus.calculateActiveValidators(1);
+    }
+
+    function test_should_revert_with_0_parameter() public {
+        registerValidator(address(1));
+
+        vm.expectRevert(InvalidParameters.selector);
+        consensus.calculateActiveValidators(0);
+    }
+
+    function test_should_revert_without_validators() public {
+        vm.expectRevert(NoActiveValidators.selector);
+        consensus.calculateActiveValidators(1);
+    }
+
+    function test_should_revert_with_only_resigned_validators() public {
+        consensus.addValidator(address(2), prepareBLSKey(address(2)), true);
+
+        vm.expectRevert(NoActiveValidators.selector);
+        consensus.calculateActiveValidators(1);
+    }
+
+    function test_should_revert_with_only_validators_without_public_key() public {
+        consensus.addValidator(address(1), new bytes(0), false);
+
+        vm.expectRevert(NoActiveValidators.selector);
         consensus.calculateActiveValidators(1);
     }
 
