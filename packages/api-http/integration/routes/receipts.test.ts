@@ -73,6 +73,40 @@ describe<{
 		}
 	});
 
+	it("/receipts/{id}", async () => {
+		await apiContext.transactionRepository.save(receiptTransactions);
+		await apiContext.receiptsRepository.save(receipts);
+		await apiContext.walletRepository.save(receiptWallets);
+
+		const testCases = [
+			{
+				id: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+				statusCode: 404,
+				result: null,
+			},
+			{
+				id: receipts[0].id,
+				result: receipts[0],
+			},
+			{
+				id: receipts[receipts.length - 1].id,
+				result: receipts[receipts.length - 1],
+			},
+		];
+
+		for (const { id, statusCode: expectedStatusCode = 200, result } of testCases) {
+			try {
+				const { statusCode, data } = await request(`/receipts/${id}`, options);
+
+				assert.equal(statusCode, expectedStatusCode);
+				assert.equal(data, result);
+			} catch (ex) {
+				assert.equal(expectedStatusCode, 404);
+				assert.equal(ex.message, "Response code 404 (Not Found)");
+			}
+		}
+	});
+
 	it("/receipts/contracts", async () => {
 		let { statusCode, data } = await request("/receipts", options);
 		assert.equal(statusCode, 200);
