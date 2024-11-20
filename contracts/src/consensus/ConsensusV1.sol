@@ -62,6 +62,7 @@ error BlsKeyIsInvalid();
 
 error VoteResignedValidator();
 error VoteSameValidator();
+error VoteValidatorWithoutBlsPublicKey();
 error AlreadyVoted();
 error MissingVote();
 
@@ -259,6 +260,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
         ValidatorData storage validatorData = _validatorsData[addr];
         if (validatorData.isResigned) {
             revert VoteResignedValidator();
+        }
+
+        if (validatorData.blsPublicKey.length == 0) {
+            revert VoteValidatorWithoutBlsPublicKey();
         }
 
         Vote storage voter = _voters[msg.sender];

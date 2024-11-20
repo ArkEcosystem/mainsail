@@ -14,6 +14,7 @@ import {
     ValidatorNotRegistered,
     VoteResignedValidator,
     VoteSameValidator,
+    VoteValidatorWithoutBlsPublicKey,
     MissingVote
 } from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
@@ -175,6 +176,15 @@ contract ConsensusTest is Base {
 
         vm.startPrank(addr);
         vm.expectRevert(ValidatorNotRegistered.selector);
+        consensus.vote(addr);
+    }
+
+    function test_vote_prevent_for_validator_without_bls_key() public {
+        address addr = address(1);
+        consensus.addValidator(addr, new bytes(0), false);
+
+        vm.startPrank(addr);
+        vm.expectRevert(VoteValidatorWithoutBlsPublicKey.selector);
         consensus.vote(addr);
     }
 
