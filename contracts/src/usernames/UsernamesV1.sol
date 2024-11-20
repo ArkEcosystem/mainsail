@@ -8,11 +8,13 @@ error CallerIsNotOwner();
 error CallerIsOwner();
 
 error InvalidUsername();
+error TakenUsername();
 
 contract UsernamesV1 is Initializable, UUPSUpgradeable {
     address private _owner;
 
     mapping(address => string) private _usernames;
+    mapping(bytes32 => bool) private _usernameExists;
 
     // Modifiers
     modifier onlyOwner() {
@@ -53,7 +55,14 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
             revert InvalidUsername();
         }
 
+        bytes32 usernameHash = keccak256(b);
+
+        if (_usernameExists[usernameHash]) {
+            revert TakenUsername();
+        }
+
         _usernames[msg.sender] = username;
+        _usernameExists[usernameHash] = true;
     }
 
     // External functions that are view

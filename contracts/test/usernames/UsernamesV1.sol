@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {UsernamesV1, InvalidUsername, CallerIsOwner} from "@contracts/usernames/UsernamesV1.sol";
+import {UsernamesV1, CallerIsOwner, InvalidUsername, TakenUsername} from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract UsernamesTest is Test {
@@ -53,6 +53,15 @@ contract UsernamesTest is Test {
         vm.startPrank(address(1));
         vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("");
+    }
+
+    function test_register_username_revert_if_taken() public {
+        vm.startPrank(address(1));
+        usernames.registerUsername("test");
+
+        vm.startPrank(address(2));
+        vm.expectRevert(TakenUsername.selector);
+        usernames.registerUsername("test");
     }
 
     function test_register_username_rever_if_greater_than_20() public {
