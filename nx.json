@@ -2,6 +2,7 @@
 	"namedInputs": {
 		"default": [
 			"{projectRoot}/source/**/!(*.test).ts",
+			"{projectRoot}/source/**/*.json",
 			"{projectRoot}/core/**/*.rs",
 			"{projectRoot}/bindings/**/*.rs",
 			"{projectRoot}/**/Cargo.toml"
