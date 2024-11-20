@@ -103,8 +103,7 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
                 return false;
             }
 
-            // cannot contain two or more consecutive underscores
-            // TODO: Check
+            // No need to care out ot bound access at i + 1, because previous test already check that latest character is not underscore
             if (username[i] == 0x5F && username[i + 1] == 0x5F) {
                 return false;
             }
