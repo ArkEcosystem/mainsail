@@ -19,6 +19,15 @@ contract UsernamesTest is Test {
     }
 
     function test_register_username_should_pass() public {
+        // Verify usernames exists
+        assertFalse(usernames.isUsernameRegistered("test"));
+        assertFalse(usernames.isUsernameRegistered("te_st"));
+        assertFalse(usernames.isUsernameRegistered("t_e_s_t"));
+        assertFalse(usernames.isUsernameRegistered("0123456789"));
+        assertFalse(usernames.isUsernameRegistered("abcdefghijeklmnopqrs"));
+        assertFalse(usernames.isUsernameRegistered("tuvwxyz"));
+
+        // Register usernames
         vm.startPrank(address(1));
         usernames.registerUsername("test");
         assertEq(usernames.getUsername(address(1)), "test");
@@ -42,15 +51,27 @@ contract UsernamesTest is Test {
         vm.startPrank(address(6));
         usernames.registerUsername("tuvwxyz");
         assertEq(usernames.getUsername(address(6)), "tuvwxyz");
+
+        // Verify usernames exists
+        assertTrue(usernames.isUsernameRegistered("test"));
+        assertTrue(usernames.isUsernameRegistered("te_st"));
+        assertTrue(usernames.isUsernameRegistered("t_e_s_t"));
+        assertTrue(usernames.isUsernameRegistered("0123456789"));
+        assertTrue(usernames.isUsernameRegistered("abcdefghijeklmnopqrs"));
+        assertTrue(usernames.isUsernameRegistered("tuvwxyz"));
     }
 
     function test_register_username_should_allow_update() public {
         vm.startPrank(address(1));
         usernames.registerUsername("test");
         assertEq(usernames.getUsername(address(1)), "test");
+        assertTrue(usernames.isUsernameRegistered("test"));
 
         usernames.registerUsername("test2");
         assertEq(usernames.getUsername(address(1)), "test2");
+
+        assertFalse(usernames.isUsernameRegistered("test"));
+        assertTrue(usernames.isUsernameRegistered("test2"));
 
         // Prevent user to use new username
         vm.startPrank(address(2));
@@ -61,6 +82,9 @@ contract UsernamesTest is Test {
         vm.startPrank(address(2));
         usernames.registerUsername("test");
         assertEq(usernames.getUsername(address(2)), "test");
+
+        assertTrue(usernames.isUsernameRegistered("test"));
+        assertTrue(usernames.isUsernameRegistered("test2"));
     }
 
     function test_register_username_rever_if_owner() public {
@@ -137,5 +161,12 @@ contract UsernamesTest is Test {
             vm.expectRevert(InvalidUsername.selector);
             usernames.registerUsername(string(c));
         }
+    }
+
+    function test_is_username_registered_should_work_with_any_string() public view {
+        assertFalse(usernames.isUsernameRegistered(""));
+        assertFalse(usernames.isUsernameRegistered("abcd"));
+        assertFalse(usernames.isUsernameRegistered("ABCD"));
+        assertFalse(usernames.isUsernameRegistered("!@#$%^&*()+{}|:\"<>?`-=[]\\;',./"));
     }
 }

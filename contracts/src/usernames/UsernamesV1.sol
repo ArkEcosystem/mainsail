@@ -75,6 +75,10 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
         return _usernames[user];
     }
 
+    function isUsernameRegistered(string memory username) external view returns (bool) {
+        return _usernameExists[keccak256(bytes(username))];
+    }
+
     // Internal functions
     function _verifyUsername(bytes memory username) internal pure returns (bool) {
         // Check username length
