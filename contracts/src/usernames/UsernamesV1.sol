@@ -11,6 +11,10 @@ error InvalidUsername();
 error TakenUsername();
 error UsernameNotRegistered();
 
+event UsernameRegistered(address addr, string username);
+
+event UsernameResigned(address addr, string username);
+
 contract UsernamesV1 is Initializable, UUPSUpgradeable {
     address private _owner;
 
@@ -48,18 +52,7 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
             revert InvalidUsername();
         }
 
-        bytes32 usernameHash = keccak256(b);
-        if (_usernameExists[usernameHash]) {
-            revert TakenUsername();
-        }
-
-        // If user already has a username
-        if (bytes(_usernames[user]).length > 0) {
-            _usernameExists[keccak256(bytes(_usernames[user]))] = false; // Remove old username
-        }
-
-        _usernames[user] = username;
-        _usernameExists[usernameHash] = true;
+        _registerUsername(user, username, b);
     }
 
     function registerUsername(string memory username) external preventOwner {
@@ -69,25 +62,17 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
             revert InvalidUsername();
         }
 
-        bytes32 usernameHash = keccak256(b);
-        if (_usernameExists[usernameHash]) {
-            revert TakenUsername();
-        }
-
-        // If user already has a username
-        if (bytes(_usernames[msg.sender]).length > 0) {
-            _usernameExists[keccak256(bytes(_usernames[msg.sender]))] = false; // Remove old username
-        }
-
-        _usernames[msg.sender] = username;
-        _usernameExists[usernameHash] = true;
+        _registerUsername(msg.sender, username, b);
     }
 
     function resignUsername() external {
+        string memory username = _usernames[msg.sender];
         // If user already has a username
-        if (bytes(_usernames[msg.sender]).length > 0) {
+        if (bytes(username).length > 0) {
             _usernameExists[keccak256(bytes(_usernames[msg.sender]))] = false;
             delete _usernames[msg.sender];
+
+            emit UsernameResigned(msg.sender, username);
         } else {
             revert UsernameNotRegistered();
         }
@@ -146,5 +131,22 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
         }
 
         return true;
+    }
+
+    function _registerUsername(address user, string memory username, bytes memory b) internal {
+        bytes32 usernameHash = keccak256(b);
+        if (_usernameExists[usernameHash]) {
+            revert TakenUsername();
+        }
+
+        // If user already has a username
+        if (bytes(_usernames[user]).length > 0) {
+            _usernameExists[keccak256(bytes(_usernames[user]))] = false; // Remove old username
+        }
+
+        _usernames[user] = username;
+        _usernameExists[usernameHash] = true;
+
+        emit UsernameRegistered(user, username);
     }
 }

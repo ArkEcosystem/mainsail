@@ -8,7 +8,9 @@ import {
     CallerIsNotOwner,
     InvalidUsername,
     TakenUsername,
-    UsernameNotRegistered
+    UsernameNotRegistered,
+    UsernameRegistered,
+    UsernameResigned
 } from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -90,6 +92,12 @@ contract UsernamesTest is Test {
         assertTrue(usernames.isUsernameRegistered("-.%!@"));
     }
 
+    function test_add_username_should_emit() public {
+        vm.expectEmit(address(usernames));
+        emit UsernameRegistered(address(1), "test");
+        usernames.addUsername(address(1), "test");
+    }
+
     function test_add_username_should_allow_update() public {
         usernames.addUsername(address(1), "test");
         assertEq(usernames.getUsername(address(1)), "test");
@@ -158,6 +166,13 @@ contract UsernamesTest is Test {
         assertTrue(usernames.isUsernameRegistered("0123456789"));
         assertTrue(usernames.isUsernameRegistered("abcdefghijeklmnopqrs"));
         assertTrue(usernames.isUsernameRegistered("tuvwxyz"));
+    }
+
+    function test_register_username_should_emit() public {
+        vm.startPrank(address(1));
+        vm.expectEmit(address(usernames));
+        emit UsernameRegistered(address(1), "test");
+        usernames.registerUsername("test");
     }
 
     function test_register_username_should_allow_update() public {
@@ -275,8 +290,10 @@ contract UsernamesTest is Test {
         assertTrue(usernames.isUsernameRegistered("test"));
 
         // Resign
+        vm.expectEmit(address(usernames));
+        emit UsernameResigned(addr, "test");
         usernames.resignUsername();
-        assertEq(usernames.getUsername(address(1)), "");
+        assertEq(usernames.getUsername(addr), "");
         assertFalse(usernames.isUsernameRegistered("test"));
     }
 
