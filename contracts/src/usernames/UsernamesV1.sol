@@ -12,6 +12,8 @@ error InvalidUsername();
 contract UsernamesV1 is Initializable, UUPSUpgradeable {
     address private _owner;
 
+    mapping(address => string) private _usernames;
+
     // Modifiers
     modifier onlyOwner() {
         if (msg.sender != _owner) {
@@ -50,8 +52,16 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
         if (!_verifyUsername(b)) {
             revert InvalidUsername();
         }
+
+        _usernames[msg.sender] = username;
     }
 
+    // External functions that are view
+    function getUsername(address user) external view returns (string memory) {
+        return _usernames[user];
+    }
+
+    // Internal functions
     function _verifyUsername(bytes memory username) internal pure returns (bool) {
         // Check username length
         if (username.length < 1 || username.length > 20) {

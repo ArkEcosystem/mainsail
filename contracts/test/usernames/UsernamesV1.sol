@@ -14,24 +14,34 @@ contract UsernamesTest is Test {
         usernames = UsernamesV1(proxy);
     }
 
+    function test_get_username_should_return_empty_string() public view {
+        assertEq(usernames.getUsername(address(1)), "");
+    }
+
     function test_register_username_should_pass() public {
         vm.startPrank(address(1));
         usernames.registerUsername("test");
+        assertEq(usernames.getUsername(address(1)), "test");
 
         vm.startPrank(address(2));
         usernames.registerUsername("te_st");
+        assertEq(usernames.getUsername(address(2)), "te_st");
 
         vm.startPrank(address(3));
         usernames.registerUsername("t_e_s_t");
+        assertEq(usernames.getUsername(address(3)), "t_e_s_t");
 
         vm.startPrank(address(4));
         usernames.registerUsername("0123456789");
+        assertEq(usernames.getUsername(address(4)), "0123456789");
 
         vm.startPrank(address(5));
         usernames.registerUsername("abcdefghijeklmnopqrs");
+        assertEq(usernames.getUsername(address(5)), "abcdefghijeklmnopqrs");
 
         vm.startPrank(address(6));
         usernames.registerUsername("tuvwxyz");
+        assertEq(usernames.getUsername(address(6)), "tuvwxyz");
     }
 
     function test_register_username_rever_if_owner() public {
