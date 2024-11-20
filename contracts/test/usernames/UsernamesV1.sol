@@ -44,6 +44,25 @@ contract UsernamesTest is Test {
         assertEq(usernames.getUsername(address(6)), "tuvwxyz");
     }
 
+    function test_register_username_should_allow_update() public {
+        vm.startPrank(address(1));
+        usernames.registerUsername("test");
+        assertEq(usernames.getUsername(address(1)), "test");
+
+        usernames.registerUsername("test2");
+        assertEq(usernames.getUsername(address(1)), "test2");
+
+        // Prevent user to use new username
+        vm.startPrank(address(2));
+        vm.expectRevert(TakenUsername.selector);
+        usernames.registerUsername("test2");
+
+        // Allow user to update to reuse old username
+        vm.startPrank(address(2));
+        usernames.registerUsername("test");
+        assertEq(usernames.getUsername(address(2)), "test");
+    }
+
     function test_register_username_rever_if_owner() public {
         vm.expectRevert(CallerIsOwner.selector);
         usernames.registerUsername("test");

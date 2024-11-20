@@ -61,6 +61,11 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
             revert TakenUsername();
         }
 
+        // If user already has a username
+        if (bytes(_usernames[msg.sender]).length > 0) {
+            _usernameExists[keccak256(bytes(_usernames[msg.sender]))] = false; // Remove old username
+        }
+
         _usernames[msg.sender] = username;
         _usernameExists[usernameHash] = true;
     }
