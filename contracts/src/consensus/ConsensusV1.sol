@@ -56,15 +56,20 @@ error ValidatorNotRegistered();
 error ValidatorAlreadyRegistered();
 error ValidatorAlreadyResigned();
 error BellowMinValidators();
+error NoActiveValidators();
 
 error BlsKeyAlreadyRegistered();
 error BlsKeyIsInvalid();
 
 error VoteResignedValidator();
 error VoteSameValidator();
+error VoteValidatorWithoutBlsPublicKey();
+error AlreadyVoted();
 error MissingVote();
 
 error InvalidRange(uint256 min, uint256 max);
+error InvalidParameters();
+error ImportIsNotAllowed();
 
 // Validators:
 // - Registered -> All validators that are registered including resigned validators
@@ -132,6 +137,72 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // External functions
+    function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
+        if (_rounds.length > 0) {
+            revert ImportIsNotAllowed();
+        }
+
+        if (_hasValidator[addr]) {
+            revert ValidatorAlreadyRegistered();
+        }
+
+        if (_blsPublicKeys[keccak256(blsPublicKey)]) {
+            revert BlsKeyAlreadyRegistered();
+        }
+
+        // Allow empty blsPublicKey for imports
+        if (blsPublicKey.length != 0) {
+            _verifyAndRegisterBlsPublicKey(blsPublicKey);
+        }
+
+        ValidatorData memory validator =
+            ValidatorData({votersCount: 0, voteBalance: 0, isResigned: isResigned, blsPublicKey: blsPublicKey});
+
+        _validatorsCount++;
+        _hasValidator[addr] = true;
+        _validatorsData[addr] = validator;
+        _validators.push(addr);
+
+        if (isResigned) {
+            _resignedValidatorsCount++;
+        }
+
+        emit ValidatorRegistered(addr, blsPublicKey);
+    }
+
+    function addVote(address voter, address validator) external onlyOwner {
+        if (_rounds.length > 0) {
+            revert ImportIsNotAllowed();
+        }
+
+        if (!isValidatorRegistered(validator)) {
+            revert ValidatorNotRegistered();
+        }
+
+        Vote storage voterData = _voters[voter];
+        if (voterData.validator != address(0)) {
+            revert AlreadyVoted();
+        }
+
+        _voters[voter] = Vote({validator: validator, balance: voter.balance, prev: address(0), next: address(0)});
+
+        if (_votersHead == address(0)) {
+            _votersHead = voter;
+            _votersTail = voter;
+        } else {
+            _voters[_votersTail].next = voter;
+            _voters[voter].prev = _votersTail;
+            _votersTail = voter;
+        }
+        _votersCount++;
+
+        ValidatorData storage validatorData = _validatorsData[validator];
+        validatorData.voteBalance += voter.balance;
+        validatorData.votersCount += 1;
+
+        emit Voted(voter, validator);
+    }
+
     function registerValidator(bytes calldata blsPublicKey) external preventOwner {
         if (_hasValidator[msg.sender]) {
             revert ValidatorAlreadyRegistered();
@@ -192,6 +263,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             revert VoteResignedValidator();
         }
 
+        if (validatorData.blsPublicKey.length == 0) {
+            revert VoteValidatorWithoutBlsPublicKey();
+        }
+
         Vote storage voter = _voters[msg.sender];
         if (voter.validator == addr) {
             revert VoteSameValidator();
@@ -230,23 +305,28 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     }
 
     function calculateActiveValidators(uint8 n) external onlyOwner {
+        if (n == 0) {
+            revert InvalidParameters();
+        }
+
         _minValidators = n;
 
         _shuffle(_validators);
         _deleteActiveValidators();
 
         _activeValidatorsHead = address(0);
-
         uint8 top = uint8(_clamp(n, 0, _validatorsCount - _resignedValidatorsCount));
+
         if (top == 0) {
-            return;
+            revert NoActiveValidators();
         }
 
         for (uint256 i = 0; i < _validators.length; i++) {
             address addr = _validators[i];
 
             ValidatorData storage data = _validatorsData[addr];
-            if (data.isResigned) {
+
+            if (data.isResigned || data.blsPublicKey.length == 0) {
                 continue;
             }
 
@@ -272,11 +352,15 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
             }
         }
 
-        // Prepare temp array. Used when top < _minValidators
-        address next = _activeValidatorsHead;
-        address[] memory tmpValidators = new address[](top);
+        if (_activeValidatorsCount == 0) {
+            revert NoActiveValidators();
+        }
 
-        for (uint256 i = 0; i < top; i++) {
+        // Prepare temp array. Used when _activeValidatorsCount < _minValidators
+        address next = _activeValidatorsHead;
+        address[] memory tmpValidators = new address[](_activeValidatorsCount);
+
+        for (uint256 i = 0; i < _activeValidatorsCount; i++) {
             tmpValidators[i] = next;
             next = _activeValidatorsMap[next];
         }
@@ -288,7 +372,7 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
         _activeValidators = new address[](_minValidators);
 
         for (uint256 i = 0; i < _minValidators; i++) {
-            address addr = tmpValidators[i % top];
+            address addr = tmpValidators[i % _activeValidatorsCount];
             _activeValidators[i] = addr;
             round.push(RoundValidator({addr: addr, voteBalance: _validatorsData[addr].voteBalance}));
         }
@@ -401,6 +485,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
     // Internal functions
     function _shuffle(address[] storage array) internal {
         uint256 n = array.length;
+        if (n == 0) {
+            return;
+        }
+
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
@@ -414,6 +502,10 @@ contract ConsensusV1 is Initializable, UUPSUpgradeable {
 
     function _shuffleMem(address[] memory array) internal view {
         uint256 n = array.length;
+        if (n == 0) {
+            return;
+        }
+
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
             uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);

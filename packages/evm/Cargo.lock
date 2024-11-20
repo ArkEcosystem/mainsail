@@ -565,9 +565,12 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.99"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96c51067fd44124faa7f870b4b1c969379ad32b2ba805aa959430ceaa384f695"
+checksum = "fd9de9f2205d5ef3fd67e685b0df337994ddd4495e2a28d185500d0e1edfea47"
+dependencies = [
+ "shlex",
+]
 
 [[package]]
 name = "cfg-if"
@@ -1378,9 +1381,8 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "heed"
-version = "0.20.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f60d7cff16094be9627830b399c087a25017e93fb3768b87cd656a68ccb1ebe8"
+version = "0.20.5"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=mainsail#75ff3ac01fa861ba123266cfab28f182d3edf1b5"
 dependencies = [
  "bitflags 2.6.0",
  "byteorder",
@@ -1398,14 +1400,12 @@ dependencies = [
 [[package]]
 name = "heed-traits"
 version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb3130048d404c57ce5a1ac61a903696e8fcde7e8c2991e9fcfc1f27c3ef74ff"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=mainsail#75ff3ac01fa861ba123266cfab28f182d3edf1b5"
 
 [[package]]
 name = "heed-types"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cb0d6ba3700c9a57e83c013693e3eddb68a6d9b6781cacafc62a0d992e8ddb3"
+version = "0.20.1"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=mainsail#75ff3ac01fa861ba123266cfab28f182d3edf1b5"
 dependencies = [
  "bincode",
  "byteorder",
@@ -1706,9 +1706,8 @@ checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
 
 [[package]]
 name = "lmdb-master-sys"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5142795c220effa4c8f4813537bd4c88113a07e45e93100ccb2adc5cec6c7f3"
+version = "0.2.4"
+source = "git+https://github.com/oXtxNt9U/heed.git?branch=mainsail#75ff3ac01fa861ba123266cfab28f182d3edf1b5"
 dependencies = [
  "cc",
  "doxygen-rs",
@@ -2894,6 +2893,12 @@ dependencies = [
  "cc",
  "cfg-if",
 ]
+
+[[package]]
+name = "shlex"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64"
 
 [[package]]
 name = "signature"

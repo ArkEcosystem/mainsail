@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {ConsensusV1, ValidatorData, Validator, CallerIsNotOwner} from "@contracts/consensus/ConsensusV1.sol";
+import {
+    ConsensusV1,
+    ValidatorData,
+    Validator,
+    CallerIsNotOwner,
+    InvalidParameters,
+    NoActiveValidators
+} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -23,6 +30,32 @@ contract ConsensusTest is Base {
         consensus.calculateActiveValidators(1);
     }
 
+    function test_should_revert_with_0_parameter() public {
+        registerValidator(address(1));
+
+        vm.expectRevert(InvalidParameters.selector);
+        consensus.calculateActiveValidators(0);
+    }
+
+    function test_should_revert_without_validators() public {
+        vm.expectRevert(NoActiveValidators.selector);
+        consensus.calculateActiveValidators(1);
+    }
+
+    function test_should_revert_with_only_resigned_validators() public {
+        consensus.addValidator(address(2), prepareBLSKey(address(2)), true);
+
+        vm.expectRevert(NoActiveValidators.selector);
+        consensus.calculateActiveValidators(1);
+    }
+
+    function test_should_revert_with_only_validators_without_public_key() public {
+        consensus.addValidator(address(1), new bytes(0), false);
+
+        vm.expectRevert(NoActiveValidators.selector);
+        consensus.calculateActiveValidators(1);
+    }
+
     function test_should_ignore_resigned_validators() public {
         address addr = address(1);
 
@@ -35,6 +68,34 @@ contract ConsensusTest is Base {
         assertEq(validators.length, 2);
         assertEq(validators[0].addr, address(2));
         assertEq(validators[1].addr, address(2)); // Second validator is duplicated
+    }
+
+    // Inverted order
+    function test_should_ignore_resigned_validators_2() public {
+        address addr = address(1);
+
+        registerValidator(addr);
+        registerValidator(address(2));
+        resignValidator(address(2));
+
+        consensus.calculateActiveValidators(2);
+        Validator[] memory validators = consensus.getActiveValidators();
+        assertEq(validators.length, 2);
+        assertEq(validators[0].addr, addr);
+        assertEq(validators[1].addr, addr); // Second validator is duplicated
+    }
+
+    function test_should_ignore_validators_without_bls_public_key() public {
+        address addr = address(1);
+
+        registerValidator(addr);
+        consensus.addValidator(address(2), new bytes(0), false);
+
+        consensus.calculateActiveValidators(2);
+        Validator[] memory validators = consensus.getActiveValidators();
+        assertEq(validators.length, 2);
+        assertEq(validators[0].addr, addr);
+        assertEq(validators[1].addr, addr); // Second validator is duplicated
     }
 
     function test_consensus_200_topValidators() public {
