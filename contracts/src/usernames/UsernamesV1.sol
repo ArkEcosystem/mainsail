@@ -94,6 +94,10 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
     }
 
     // External functions that are view
+    function version() external pure returns (uint256) {
+        return 1;
+    }
+
     function getUsername(address user) external view returns (string memory) {
         return _usernames[user];
     }

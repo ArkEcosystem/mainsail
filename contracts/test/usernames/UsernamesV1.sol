@@ -320,4 +320,8 @@ contract UsernamesTest is Test {
         assertFalse(usernames.isUsernameRegistered("ABCD"));
         assertFalse(usernames.isUsernameRegistered("!@#$%^&*()+{}|:\"<>?`-=[]\\;',./"));
     }
+
+    function test_version_should_return_1() public view {
+        assertEq(usernames.version(), 1);
+    }
 }
