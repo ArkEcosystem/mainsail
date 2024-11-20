@@ -2,7 +2,13 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {UsernamesV1, CallerIsOwner, InvalidUsername, TakenUsername} from "@contracts/usernames/UsernamesV1.sol";
+import {
+    UsernamesV1,
+    CallerIsOwner,
+    CallerIsNotOwner,
+    InvalidUsername,
+    TakenUsername
+} from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract UsernamesTest is Test {
@@ -12,6 +18,98 @@ contract UsernamesTest is Test {
         bytes memory data = abi.encode(UsernamesV1.initialize.selector);
         address proxy = address(new ERC1967Proxy(address(new UsernamesV1()), data));
         usernames = UsernamesV1(proxy);
+    }
+
+    function test_add_username_should_revert_if_not_owner() public {
+        vm.startPrank(address(1));
+        vm.expectRevert(CallerIsNotOwner.selector);
+        usernames.addUsername(address(1), "test");
+    }
+
+    function test_add_username_should_revert_if_username_existst() public {
+        usernames.addUsername(address(1), "test");
+
+        vm.expectRevert(TakenUsername.selector);
+        usernames.addUsername(address(2), "test");
+    }
+
+    function test_add_username_should_revert_if_username_is_empty_or_longer_than_20() public {
+        vm.expectRevert(InvalidUsername.selector);
+        usernames.addUsername(address(1), "");
+        vm.expectRevert(InvalidUsername.selector);
+        usernames.addUsername(address(1), "000000000000000000000"); // 21 chars
+    }
+
+    function test_add_username_should_pass() public {
+        // Verify usernames exists
+        assertFalse(usernames.isUsernameRegistered("test"));
+        assertFalse(usernames.isUsernameRegistered("te_st"));
+        assertFalse(usernames.isUsernameRegistered("t_e_s_t"));
+        assertFalse(usernames.isUsernameRegistered("0123456789"));
+        assertFalse(usernames.isUsernameRegistered("abcdefghijeklmnopqrs"));
+        assertFalse(usernames.isUsernameRegistered("tuvwxyz"));
+        assertFalse(usernames.isUsernameRegistered("00000000000000000000")); // 20 chars
+        // EXTRA
+        assertFalse(usernames.isUsernameRegistered("TEST"));
+        assertFalse(usernames.isUsernameRegistered("-.%!@"));
+
+        // Register usernames
+        usernames.addUsername(address(1), "test");
+        usernames.addUsername(address(2), "te_st");
+        usernames.addUsername(address(3), "t_e_s_t");
+        usernames.addUsername(address(4), "0123456789");
+        usernames.addUsername(address(5), "abcdefghijeklmnopqrs");
+        usernames.addUsername(address(6), "tuvwxyz");
+        usernames.addUsername(address(7), "00000000000000000000"); // 20 chars
+        // EXTRA
+        usernames.addUsername(address(8), "TEST");
+        usernames.addUsername(address(9), "-.%!@");
+
+        // Verify usernames exists
+        assertEq(usernames.getUsername(address(1)), "test");
+        assertEq(usernames.getUsername(address(2)), "te_st");
+        assertEq(usernames.getUsername(address(3)), "t_e_s_t");
+        assertEq(usernames.getUsername(address(4)), "0123456789");
+        assertEq(usernames.getUsername(address(5)), "abcdefghijeklmnopqrs");
+        assertEq(usernames.getUsername(address(6)), "tuvwxyz");
+        assertEq(usernames.getUsername(address(7)), "00000000000000000000"); // 20 chars
+        // EXTRA
+        assertEq(usernames.getUsername(address(8)), "TEST");
+        assertEq(usernames.getUsername(address(9)), "-.%!@");
+
+        assertTrue(usernames.isUsernameRegistered("test"));
+        assertTrue(usernames.isUsernameRegistered("te_st"));
+        assertTrue(usernames.isUsernameRegistered("t_e_s_t"));
+        assertTrue(usernames.isUsernameRegistered("0123456789"));
+        assertTrue(usernames.isUsernameRegistered("abcdefghijeklmnopqrs"));
+        assertTrue(usernames.isUsernameRegistered("tuvwxyz"));
+        assertTrue(usernames.isUsernameRegistered("00000000000000000000")); // 20 chars
+        // EXTRA
+        assertTrue(usernames.isUsernameRegistered("TEST"));
+        assertTrue(usernames.isUsernameRegistered("-.%!@"));
+    }
+
+    function test_add_username_should_allow_update() public {
+        usernames.addUsername(address(1), "test");
+        assertEq(usernames.getUsername(address(1)), "test");
+        assertTrue(usernames.isUsernameRegistered("test"));
+
+        usernames.addUsername(address(1), "test2");
+        assertEq(usernames.getUsername(address(1)), "test2");
+
+        assertFalse(usernames.isUsernameRegistered("test"));
+        assertTrue(usernames.isUsernameRegistered("test2"));
+
+        // Prevent user to use new username
+        vm.expectRevert(TakenUsername.selector);
+        usernames.addUsername(address(2), "test2");
+
+        // Allow user to update to reuse old username
+        usernames.addUsername(address(2), "test");
+        assertEq(usernames.getUsername(address(2)), "test");
+
+        assertTrue(usernames.isUsernameRegistered("test"));
+        assertTrue(usernames.isUsernameRegistered("test2"));
     }
 
     function test_get_username_should_return_empty_string() public view {

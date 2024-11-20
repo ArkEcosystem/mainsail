@@ -40,6 +40,27 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // External functions
+    function addUsername(address user, string memory username) external onlyOwner {
+        bytes memory b = bytes(username);
+        // Full username verification is intentionally skipped for backwards compatibility
+        if (b.length < 1 || b.length > 20) {
+            revert InvalidUsername();
+        }
+
+        bytes32 usernameHash = keccak256(b);
+        if (_usernameExists[usernameHash]) {
+            revert TakenUsername();
+        }
+
+        // If user already has a username
+        if (bytes(_usernames[user]).length > 0) {
+            _usernameExists[keccak256(bytes(_usernames[user]))] = false; // Remove old username
+        }
+
+        _usernames[user] = username;
+        _usernameExists[usernameHash] = true;
+    }
+
     function registerUsername(string memory username) external preventOwner {
         // Register username
         bytes memory b = bytes(username);
