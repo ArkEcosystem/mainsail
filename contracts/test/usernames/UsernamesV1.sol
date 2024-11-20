@@ -163,6 +163,32 @@ contract UsernamesTest is Test {
         }
     }
 
+    function test_is_username_valid() public view {
+        assertTrue(usernames.isUsernameValid("test"));
+        assertTrue(usernames.isUsernameValid("te_st"));
+        assertTrue(usernames.isUsernameValid("t_e_s_t"));
+        assertTrue(usernames.isUsernameValid("0123456789"));
+        assertTrue(usernames.isUsernameValid("abcdefghijeklmnopqrs"));
+        assertTrue(usernames.isUsernameValid("tuvwxyz"));
+
+        assertFalse(usernames.isUsernameValid("_test"));
+        assertFalse(usernames.isUsernameValid("test_"));
+        assertFalse(usernames.isUsernameValid("te__st"));
+        assertFalse(usernames.isUsernameValid("000000000000000000000")); // 20 chars
+
+        string memory characters = "ABCDEDGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()+{}|:\"<>?`-=[]\\;',./";
+        bytes memory b = bytes(characters);
+
+        for (uint256 i = 0; i < b.length; i++) {
+            bytes memory c = new bytes(3);
+            c[0] = 0x61; // a
+            c[1] = b[i];
+            c[2] = 0x61; // a
+
+            assertFalse(usernames.isUsernameValid(string(c)));
+        }
+    }
+
     function test_is_username_registered_should_work_with_any_string() public view {
         assertFalse(usernames.isUsernameRegistered(""));
         assertFalse(usernames.isUsernameRegistered("abcd"));

@@ -40,13 +40,6 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     // External functions
-
-    // RULES:
-    // minimum length of 1 character
-    // maximum length of 20 characters
-    // only lowercase letters, numbers and underscores are allowed
-    // cannot start or end with underscore
-    // cannot contain two or more consecutive underscores
     function registerUsername(string memory username) external preventOwner {
         // Register username
         bytes memory b = bytes(username);
@@ -79,18 +72,31 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
         return _usernameExists[keccak256(bytes(username))];
     }
 
-    // Internal functions
+    function isUsernameValid(string memory username) external pure returns (bool) {
+        return _verifyUsername(bytes(username));
+    }
+
+    // Internal function
+    // RULES:
+    // minimum length of 1 character
+    // maximum length of 20 characters
+    // only lowercase letters, numbers and underscores are allowed
+    // cannot start or end with underscore
+    // cannot contain two or more consecutive underscores
     function _verifyUsername(bytes memory username) internal pure returns (bool) {
-        // Check username length
+        // minimum length of 1 character
+        // maximum length of 20 characters
         if (username.length < 1 || username.length > 20) {
             return false;
         }
 
+        // cannot start or end with underscore
         if (username[0] == 0x5F || username[username.length - 1] == 0x5F) {
             return false;
         }
 
         for (uint256 i = 0; i < username.length; i++) {
+            // only lowercase letters, numbers and underscores are allowed
             if (
                 !(username[i] >= 0x30 && username[i] <= 0x39) // 0-9
                     && !(username[i] >= 0x61 && username[i] <= 0x7A) // a-z
@@ -99,6 +105,8 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
                 return false;
             }
 
+            // cannot contain two or more consecutive underscores
+            // TODO: Check
             if (username[i] == 0x5F && username[i + 1] == 0x5F) {
                 return false;
             }
