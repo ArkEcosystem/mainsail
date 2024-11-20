@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {UsernamesV1} from "@contracts/usernames/UsernamesV1.sol";
+import {UsernamesV1, InvalidUsername, CallerIsOwner} from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract UsernamesTest is Test {
@@ -35,37 +35,37 @@ contract UsernamesTest is Test {
     }
 
     function test_register_username_rever_if_owner() public {
-        vm.expectRevert();
+        vm.expectRevert(CallerIsOwner.selector);
         usernames.registerUsername("test");
     }
 
     function test_register_username_rever_if_empty() public {
         vm.startPrank(address(1));
-        vm.expectRevert();
+        vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("");
     }
 
     function test_register_username_rever_if_greater_than_20() public {
         vm.startPrank(address(1));
-        vm.expectRevert();
+        vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("000000000000000000000"); // 20 chars
-        vm.expectRevert();
+        vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("0000000000000000000000"); // 21 chars
-        vm.expectRevert();
+        vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("00000000000000000000000"); // 22 chars
     }
 
     function test_register_username_rever_if_starts_or_end_with_underscore() public {
         vm.startPrank(address(1));
-        vm.expectRevert();
+        vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("_test");
-        vm.expectRevert();
+        vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("test_");
     }
 
     function test_register_username_rever_if_contains_2_consecutive_underscores() public {
         vm.startPrank(address(1));
-        vm.expectRevert();
+        vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("te__st");
     }
 
@@ -80,7 +80,7 @@ contract UsernamesTest is Test {
             c[2] = 0x61; // a
 
             vm.startPrank(address(uint160(i)));
-            vm.expectRevert();
+            vm.expectRevert(InvalidUsername.selector);
             usernames.registerUsername(string(c));
         }
     }
@@ -96,7 +96,7 @@ contract UsernamesTest is Test {
             c[2] = 0x61; // a
 
             vm.startPrank(address(uint160(i)));
-            vm.expectRevert();
+            vm.expectRevert(InvalidUsername.selector);
             usernames.registerUsername(string(c));
         }
     }

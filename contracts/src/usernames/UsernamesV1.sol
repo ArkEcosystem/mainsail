@@ -7,6 +7,8 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 error CallerIsNotOwner();
 error CallerIsOwner();
 
+error InvalidUsername();
+
 contract UsernamesV1 is Initializable, UUPSUpgradeable {
     address private _owner;
 
@@ -45,25 +47,35 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
         // Register username
         bytes memory b = bytes(username);
 
+        if (!_verifyUsername(b)) {
+            revert InvalidUsername();
+        }
+    }
+
+    function _verifyUsername(bytes memory username) internal pure returns (bool) {
         // Check username length
-        require(b.length >= 1 && b.length <= 20, "Invalid username length");
-
-        if (b[0] == 0x5F || b[b.length - 1] == 0x5F) {
-            revert("Username cannot start or end with underscore");
+        if (username.length < 1 || username.length > 20) {
+            return false;
         }
 
-        for (uint256 i = 0; i < b.length; i++) {
+        if (username[0] == 0x5F || username[username.length - 1] == 0x5F) {
+            return false;
+        }
+
+        for (uint256 i = 0; i < username.length; i++) {
             if (
-                !(b[i] >= 0x30 && b[i] <= 0x39) // 0-9
-                    && !(b[i] >= 0x61 && b[i] <= 0x7A) // a-z
-                    && !(b[i] == 0x5F) // _
+                !(username[i] >= 0x30 && username[i] <= 0x39) // 0-9
+                    && !(username[i] >= 0x61 && username[i] <= 0x7A) // a-z
+                    && !(username[i] == 0x5F) // _
             ) {
-                revert("Invalid character in username");
+                return false;
             }
 
-            if (b[i] == 0x5F && b[i + 1] == 0x5F) {
-                revert("Username cannot contain two or more consecutive underscores");
+            if (username[i] == 0x5F && username[i + 1] == 0x5F) {
+                return false;
             }
         }
+
+        return true;
     }
 }
