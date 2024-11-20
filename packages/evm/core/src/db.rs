@@ -1,6 +1,9 @@
-use std::{borrow::Cow, cell::RefCell, collections::BTreeMap, convert::Infallible, path::PathBuf};
+use std::{
+    borrow::Cow, cell::RefCell, cmp::Ordering, collections::BTreeMap, convert::Infallible,
+    path::PathBuf,
+};
 
-use heed::{EnvFlags, EnvOpenOptions};
+use heed::{Comparator, EnvFlags, EnvOpenOptions};
 use rayon::slice::ParallelSliceMut;
 use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 use serde::{Deserialize, Serialize};
@@ -41,7 +44,43 @@ impl heed::BytesEncode<'_> for ContractWrapper {
 }
 
 type HeedHeight = heed::types::U64<heed::byteorder::LittleEndian>;
-type StorageEntry = (U256, U256);
+
+#[derive(Debug)]
+struct StorageEntryWrapper(U256, U256);
+impl heed::BytesEncode<'_> for StorageEntryWrapper {
+    type EItem = StorageEntryWrapper;
+
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+        let a = item.0.as_le_bytes();
+        let b = item.1.as_le_bytes();
+
+        let mut combined = Vec::with_capacity(a.len() + b.len());
+        combined.extend_from_slice(a.as_ref());
+        combined.extend_from_slice(b.as_ref());
+
+        Ok(Cow::Owned(combined))
+    }
+}
+
+impl heed::BytesDecode<'_> for StorageEntryWrapper {
+    type DItem = StorageEntryWrapper;
+
+    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
+        let a = U256::from_le_slice(&bytes[0..32]);
+        let b = U256::from_le_slice(&bytes[32..]);
+        Ok(StorageEntryWrapper(a, b))
+    }
+}
+
+enum StorageEntryDupSortCmp {}
+
+impl Comparator for StorageEntryDupSortCmp {
+    fn compare(a: &[u8], b: &[u8]) -> Ordering {
+        // The compared values are tuples of `StorageEntry` and sorted by the first tuple value (=32 byte)
+        // which corresponds to the storage slot location. The second half of the tuple is ignored.
+        a[..32].cmp(&b[..32])
+    }
+}
 
 // txHash -> receipt
 #[derive(Default, Debug, Serialize, Deserialize)]
@@ -56,7 +95,7 @@ struct InnerStorage {
     accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
     commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
     contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
-    storage: heed::Database<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>,
+    storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
 }
 
 // A (height, round) pair used to associate state with a processable unit.
@@ -141,9 +180,10 @@ impl PersistentDB {
 
         let storage = env
             .database_options()
-            .types::<AddressWrapper, heed::types::SerdeBincode<StorageEntry>>()
+            .types::<AddressWrapper, StorageEntryWrapper>()
             .name("storage")
             .flags(heed::DatabaseFlags::DUP_SORT)
+            .dup_sort_comparator::<StorageEntryDupSortCmp>()
             .create(&mut wtxn)?;
 
         wtxn.commit()?;
@@ -336,23 +376,13 @@ impl DatabaseRef for PersistentDB {
         let txn = self.env.read_txn()?;
         let inner = self.inner.borrow_mut();
 
-        let dups = inner
-            .storage
-            .get_duplicates(&txn, &AddressWrapper(address))?;
+        let mut iter = inner.storage.iter(&txn)?;
+        let location = &StorageEntryWrapper(index, U256::ZERO);
 
-        if let Some(mut dups) = dups {
-            while let Some(next) = dups.next() {
-                let (_, value) = next?;
-
-                if value.0 != index {
-                    continue;
-                }
-
-                return Ok(value.1);
-            }
+        match iter.move_on_key_dup(&AddressWrapper(address), &location)? {
+            Some((_, value)) if value.0 == location.0 => Ok(value.1),
+            _ => Ok(U256::ZERO),
         }
-
-        Ok(U256::ZERO)
     }
 
     fn block_hash_ref(&self, _number: u64) -> Result<B256, Self::Error> {
@@ -429,28 +459,58 @@ impl PersistentDB {
                 ref mut storage,
             } in storage.into_iter()
             {
+                let mut iter = inner.storage.iter_mut(rwtxn)?;
                 let address = AddressWrapper(*address);
-                if *wipe_storage {
-                    // wipe any existing storage for address
-                    inner.storage.delete(rwtxn, &address)?;
+
+                if iter.move_on_key(&address)? {
+                    if *wipe_storage {
+                        // wipe all existing storage for address
+                        unsafe { iter.del_current_with_flags(heed::DeleteFlags::NO_DUP_DATA)? };
+                    }
+                }
+
+                if storage.is_empty() {
+                    println!("skipping empty storage from {:?}", address);
+                    continue;
                 }
 
                 storage.par_sort_unstable_by_key(|a| a.0);
 
-                for value in storage
-                    .into_iter()
-                    .filter(|v| v.1.present_value() != U256::ZERO)
-                {
-                    // delete original value at index (if any) then replace it
-                    inner.storage.delete_one_duplicate(
-                        rwtxn,
-                        &address,
-                        &(value.0, value.1.original_value()),
-                    )?;
+                for value in storage.into_iter() {
+                    let new_storage_value = &StorageEntryWrapper(value.0, value.1.present_value());
 
-                    inner
-                        .storage
-                        .put(rwtxn, &address, &(value.0, value.1.present_value()))?;
+                    if let Some((_, iter_value)) =
+                        iter.move_on_key_dup(&address, &new_storage_value)?
+                    {
+                        // overwrite or delete if key matches
+                        if iter_value.0 == value.0 {
+                            if value.1.present_value().is_zero() {
+                                let success = unsafe { iter.del_current()? };
+                                assert!(success);
+                            } else if value.1.present_value() != iter_value.1 {
+                                unsafe {
+                                    // overwrite current position of cursor
+                                    let success = iter.put_current(&address, &new_storage_value)?;
+                                    assert!(success);
+                                }
+                            } else {
+                                // skip unchanged storage
+                            }
+
+                            // cursor matched existing entry, move on to next
+                            continue;
+                        }
+                    }
+
+                    if value.1.present_value() != U256::ZERO {
+                        unsafe {
+                            iter.put_current_with_options(
+                                heed::PutFlags::NO_DUP_DATA,
+                                &address,
+                                &new_storage_value,
+                            )?;
+                        }
+                    }
                 }
             }
 
