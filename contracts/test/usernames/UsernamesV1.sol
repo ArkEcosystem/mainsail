@@ -7,7 +7,8 @@ import {
     CallerIsOwner,
     CallerIsNotOwner,
     InvalidUsername,
-    TakenUsername
+    TakenUsername,
+    UsernameNotRegistered
 } from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -259,6 +260,32 @@ contract UsernamesTest is Test {
             vm.expectRevert(InvalidUsername.selector);
             usernames.registerUsername(string(c));
         }
+    }
+
+    function test_resign_username_should_pass() public {
+        // Test
+        address addr = address(1);
+        vm.startPrank(addr);
+        assertEq(usernames.getUsername(addr), "");
+        assertFalse(usernames.isUsernameRegistered("test"));
+
+        // Register
+        usernames.registerUsername("test");
+        assertEq(usernames.getUsername(addr), "test");
+        assertTrue(usernames.isUsernameRegistered("test"));
+
+        // Resign
+        usernames.resignUsername();
+        assertEq(usernames.getUsername(address(1)), "");
+        assertFalse(usernames.isUsernameRegistered("test"));
+    }
+
+    function test_resign_username_should_revert_if_not_registered() public {
+        // Test
+        address addr = address(1);
+        vm.startPrank(addr);
+        vm.expectRevert(UsernameNotRegistered.selector);
+        usernames.resignUsername();
     }
 
     function test_is_username_valid() public view {

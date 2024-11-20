@@ -9,6 +9,7 @@ error CallerIsOwner();
 
 error InvalidUsername();
 error TakenUsername();
+error UsernameNotRegistered();
 
 contract UsernamesV1 is Initializable, UUPSUpgradeable {
     address private _owner;
@@ -80,6 +81,16 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
 
         _usernames[msg.sender] = username;
         _usernameExists[usernameHash] = true;
+    }
+
+    function resignUsername() external {
+        // If user already has a username
+        if (bytes(_usernames[msg.sender]).length > 0) {
+            _usernameExists[keccak256(bytes(_usernames[msg.sender]))] = false;
+            delete _usernames[msg.sender];
+        } else {
+            revert UsernameNotRegistered();
+        }
     }
 
     // External functions that are view
