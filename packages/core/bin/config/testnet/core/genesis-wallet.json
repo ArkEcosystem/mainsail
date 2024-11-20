@@ -1,14 +1,14 @@
 {
-	"address": "0x7E88E5aBEa1257eC0e180BefEf2aEd9f1Ff03D42",
+	"address": "0xC054c1F2b02f2416ab730C8BC8063a3b77050Eb3",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "1df1ffef9780745ea3d920c397240c9cbbcb397dce4e4df54f2023a2983a1f0e",
-		"publicKey": "b7a8226e15079b7bc00f927a34fa803819f3f326509cd4647d9d459b10d099fdb0074699499e6f8cea37acaf646e39de"
+		"privateKey": "5eb358c1c9af4ccb6ab210c2ca37c968e47195fb0b5fa4c658c172244cdb9886",
+		"publicKey": "9239390d2f084d8852dc8e4b80e876181b215afcc6f1a49e645e04c8de75bcd8e689a9bf4a7294e074e2ff0d55403b71"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "d89f11cdc9497b46047aebff7665cf3dabc7ac1945d1e41e7da33d9ada211f5a",
-		"publicKey": "0209352aeafb10e897eb3d54bd98fd0d7250f4dc09fdb6cb9ed45b0a6876865a91"
+		"privateKey": "78a61416a969acbdc64411d1bb554b6026ca41fd8448225866c3e59a8fe6cf82",
+		"publicKey": "0342fa182a73b716cc50a896c834ff64883cddc1ce60edcdd756b4f9ef99b2899d"
 	},
-	"passphrase": "carbon behave receive bomb ginger wasp reward best code young champion private toy obvious rhythm piece valve axis pledge party grow equip solve police"
+	"passphrase": "length tourist link crash polar aunt any extra doll drama fortune sing control unfold smooth patch soul funny vivid reward prepare share umbrella title"
 }
