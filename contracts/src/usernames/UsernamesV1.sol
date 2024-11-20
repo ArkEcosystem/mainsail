@@ -43,13 +43,11 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
     function registerUsername(string memory username) external preventOwner {
         // Register username
         bytes memory b = bytes(username);
-
         if (!_verifyUsername(b)) {
             revert InvalidUsername();
         }
 
         bytes32 usernameHash = keccak256(b);
-
         if (_usernameExists[usernameHash]) {
             revert TakenUsername();
         }
