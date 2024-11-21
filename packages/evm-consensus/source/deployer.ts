@@ -66,9 +66,7 @@ export class Deployer {
 		return milestone.evmSpec;
 	}
 
-	public async deploy(): Promise<void> {
-		await this.#initialize();
-
+	async #deployConsensusContract(): Promise<string> {
 		// CONSENSUS
 		const consensusResult = await this.evm.process({
 			blockContext: this.#getBlockContext(),
@@ -96,13 +94,17 @@ export class Deployer {
 			`Deployed Consensus contract from ${this.deployerAddress} to ${consensusResult.receipt.deployedContractAddress}`,
 		);
 
+		return consensusResult.receipt.deployedContractAddress!;
+	}
+
+	async #deployConsensusProxy(consensusContractAddress: string): Promise<void> {
 		// Logic contract initializer function ABI
 		const logicInterface = new ethers.Interface(ConsensusAbi.abi);
 		// Encode the initializer call
 		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
 		// Prepare the constructor arguments for the proxy contract
 		const proxyConstructorArguments = new ethers.AbiCoder()
-			.encode(["address", "bytes"], [consensusResult.receipt.deployedContractAddress, initializerCalldata])
+			.encode(["address", "bytes"], [consensusContractAddress, initializerCalldata])
 			.slice(2);
 
 		const proxyResult = await this.evm.process({
@@ -137,6 +139,13 @@ export class Deployer {
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
+	}
+
+	public async deploy(): Promise<void> {
+		await this.#initialize();
+
+		const consensusContractAddress = await this.#deployConsensusContract();
+		await this.#deployConsensusProxy(consensusContractAddress);
 
 		await this.evm.onCommit({
 			...this.#getBlockContext().commitKey,
