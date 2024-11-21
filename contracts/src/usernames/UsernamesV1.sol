@@ -15,6 +15,11 @@ event UsernameRegistered(address addr, string username);
 
 event UsernameResigned(address addr, string username);
 
+struct User {
+    address addr;
+    string username;
+}
+
 contract UsernamesV1 is Initializable, UUPSUpgradeable {
     address private _owner;
 
@@ -93,6 +98,24 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
 
     function isUsernameValid(string memory username) external pure returns (bool) {
         return _verifyUsername(bytes(username));
+    }
+
+    function getUsernames(address[] calldata addresses) external view returns (User[] memory) {
+        User[] memory users = new User[](addresses.length);
+        uint256 count = 0;
+        for (uint256 i = 0; i < addresses.length; i++) {
+            if (bytes(_usernames[addresses[i]]).length != 0) {
+                users[count++] = User(addresses[i], _usernames[addresses[i]]);
+            }
+        }
+
+        // Slice the array to remove empty slots
+        User[] memory result = new User[](count);
+        for (uint256 i = 0; i < count; i++) {
+            result[i] = users[i];
+        }
+
+        return result;
     }
 
     // Internal function

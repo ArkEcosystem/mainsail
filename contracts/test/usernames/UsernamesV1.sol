@@ -10,7 +10,8 @@ import {
     TakenUsername,
     UsernameNotRegistered,
     UsernameRegistered,
-    UsernameResigned
+    UsernameResigned,
+    User
 } from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -340,5 +341,27 @@ contract UsernamesTest is Test {
 
     function test_version_should_return_1() public view {
         assertEq(usernames.version(), 1);
+    }
+
+    function test_get_usernames_should_pass() public {
+        address[] memory addresses = new address[](9);
+        for (uint256 i = 0; i < 9; i++) {
+            addresses[i] = address(uint160(i + 1));
+        }
+
+        assertEq(usernames.getUsernames(addresses).length, 0);
+
+        usernames.addUsername(address(1), "test1");
+        usernames.addUsername(address(2), "test2");
+        usernames.addUsername(address(3), "test3");
+
+        User[] memory users = usernames.getUsernames(addresses);
+        assertEq(users.length, 3);
+        assertEq(users[0].addr, address(1));
+        assertEq(users[0].username, "test1");
+        assertEq(users[1].addr, address(2));
+        assertEq(users[1].username, "test2");
+        assertEq(users[2].addr, address(3));
+        assertEq(users[2].username, "test3");
     }
 }
