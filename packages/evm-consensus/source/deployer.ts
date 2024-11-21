@@ -46,30 +46,37 @@ export class Deployer {
 		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
 	}
 
-	public async deploy(): Promise<void> {
-		await this.#initialize();
-
+	#getBlockContext(): Contracts.Evm.BlockContext {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
 		const milestone = this.configuration.getMilestone(0);
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
-		const blockContext = {
+		return {
 			commitKey: { height: BigInt(2 ** 32 + 1), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
 			timestamp: BigInt(genesisBlock.block.timestamp),
 			validatorAddress: this.deployerAddress,
 		};
+	}
+
+	#getSpecId(): Contracts.Evm.SpecId {
+		const milestone = this.configuration.getMilestone(0);
+		return milestone.evmSpec;
+	}
+
+	public async deploy(): Promise<void> {
+		await this.#initialize();
 
 		// CONSENSUS
 		const consensusResult = await this.evm.process({
-			blockContext,
+			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object))]),
 			gasLimit: BigInt(10_000_000),
 			nonce: BigInt(0),
-			specId: milestone.evmSpec,
+			specId: this.#getSpecId(),
 			txHash: this.#generateTxHash(),
 			value: 0n,
 		});
@@ -99,7 +106,7 @@ export class Deployer {
 			.slice(2);
 
 		const proxyResult = await this.evm.process({
-			blockContext,
+			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
 			data: Buffer.concat([
 				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
@@ -107,7 +114,7 @@ export class Deployer {
 			]),
 			gasLimit: BigInt(10_000_000),
 			nonce: BigInt(1),
-			specId: milestone.evmSpec,
+			specId: this.#getSpecId(),
 			txHash: this.#generateTxHash(),
 			value: 0n,
 		});
@@ -132,7 +139,7 @@ export class Deployer {
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
 
 		await this.evm.onCommit({
-			...blockContext.commitKey,
+			...this.#getBlockContext().commitKey,
 			getBlock: () => ({ data: { round: BigInt(0) } }),
 			setAccountUpdates: () => ({}),
 		} as any);
