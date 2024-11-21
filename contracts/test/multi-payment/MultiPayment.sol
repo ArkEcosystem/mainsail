@@ -2,7 +2,18 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {MultiPayment} from "@contracts/multi-payment/MultiPayment.sol";
+import {
+    MultiPayment,
+    RecipientsAndAmountsMismatch,
+    InvalidValue,
+    FailedToSendEther
+} from "@contracts/multi-payment/MultiPayment.sol";
+
+contract RejectPayments {
+    receive() external payable {
+        revert("Direct payments are not accepted");
+    }
+}
 
 contract MultiPaymentTest is Test {
     MultiPayment public multiPayment;
@@ -32,6 +43,28 @@ contract MultiPaymentTest is Test {
         assertEq(sender.balance, 100 ether);
 
         address payable recipient = payable(address(1));
+        assertEq(recipient.balance, 0);
+
+        address payable[] memory recipients = new address payable[](1);
+        recipients[0] = recipient;
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 40 ether;
+
+        // Act
+        multiPayment.pay{value: 40 ether}(recipients, amounts);
+
+        // Assert
+        assertEq(recipient.balance, 40 ether);
+        assertEq(sender.balance, 60 ether);
+    }
+
+    function test_pay_pass_with_sending_to_address_0() public {
+        address payable sender = payable(address(this));
+        vm.deal(sender, 100 ether);
+        assertEq(sender.balance, 100 ether);
+
+        address payable recipient = payable(address(0));
         assertEq(recipient.balance, 0);
 
         address payable[] memory recipients = new address payable[](1);
@@ -129,5 +162,84 @@ contract MultiPaymentTest is Test {
         for (uint256 i = 0; i < payments; i++) {
             assertEq(recipients[i].balance, 1);
         }
+    }
+
+    function test_pay_fail_with_recipients_and_amounts_mismatch() public {
+        address payable sender = payable(address(this));
+        vm.deal(sender, 100 ether);
+        assertEq(sender.balance, 100 ether);
+
+        address payable recipient = payable(address(1));
+        assertEq(recipient.balance, 0);
+
+        address payable[] memory recipients = new address payable[](1);
+        recipients[0] = recipient;
+
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 40 ether;
+        amounts[1] = 60 ether;
+
+        // Act
+        vm.expectRevert(RecipientsAndAmountsMismatch.selector);
+        multiPayment.pay{value: 100 ether}(recipients, amounts);
+    }
+
+    function test_pay_fail_with_invalid_value() public {
+        address payable sender = payable(address(this));
+        vm.deal(sender, 100 ether);
+        assertEq(sender.balance, 100 ether);
+
+        address payable recipient = payable(address(1));
+        assertEq(recipient.balance, 0);
+
+        address payable[] memory recipients = new address payable[](1);
+        recipients[0] = recipient;
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 40 ether;
+
+        // Act
+        vm.expectRevert(InvalidValue.selector);
+        multiPayment.pay{value: 50 ether}(recipients, amounts);
+    }
+
+    function test_pay_fail_with_failed_to_send_ether() public {
+        address payable sender = payable(address(this));
+        vm.deal(sender, 100 ether);
+        assertEq(sender.balance, 100 ether);
+
+        RejectPayments rejectPayments = new RejectPayments();
+        address payable recipient = payable(address(rejectPayments));
+        assertEq(recipient.balance, 0);
+
+        address payable[] memory recipients = new address payable[](1);
+        recipients[0] = recipient;
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 40 ether;
+
+        // Act
+        recipient = payable(address(0)); // Force recipient to be address(0)
+        vm.expectRevert(FailedToSendEther.selector);
+        multiPayment.pay{value: 40 ether}(recipients, amounts);
+    }
+
+    function test_pay_fail_if_no_enough_balance() public {
+        address payable sender = payable(address(this));
+        vm.deal(sender, 100 ether);
+        assertEq(sender.balance, 100 ether);
+
+        address payable recipient = payable(address(1));
+        assertEq(recipient.balance, 0);
+
+        address payable[] memory recipients = new address payable[](1);
+        recipients[0] = recipient;
+
+        uint256[] memory amounts = new uint256[](1);
+        amounts[0] = 10 ether;
+
+        // Act
+        vm.expectRevert();
+        multiPayment.pay{value: 110 ether}(recipients, amounts);
     }
 }

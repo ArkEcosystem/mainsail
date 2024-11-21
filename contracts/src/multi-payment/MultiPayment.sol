@@ -3,7 +3,6 @@ pragma solidity ^0.8.27;
 
 error RecipientsAndAmountsMismatch();
 error InvalidValue();
-error InvalidRecipient();
 error FailedToSendEther();
 
 contract MultiPayment {
@@ -26,10 +25,6 @@ contract MultiPayment {
 
         // Transfer Ether to each recipient
         for (uint256 i = 0; i < recipients.length; i++) {
-            if (recipients[i] == address(0)) {
-                revert InvalidRecipient();
-            }
-
             // Transfer the specified amount to each recipient
             (bool sent,) = recipients[i].call{value: amounts[i]}("");
             if (!sent) {
