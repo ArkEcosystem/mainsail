@@ -11,7 +11,7 @@ error InvalidUsername();
 error TakenUsername();
 error UsernameNotRegistered();
 
-event UsernameRegistered(address addr, string username);
+event UsernameRegistered(address addr, string username, string previousUsername);
 
 event UsernameResigned(address addr, string username);
 
@@ -162,14 +162,15 @@ contract UsernamesV1 is Initializable, UUPSUpgradeable {
             revert TakenUsername();
         }
 
+        string memory previousUsername = _usernames[user];
         // If user already has a username
-        if (bytes(_usernames[user]).length > 0) {
-            _usernameExists[keccak256(bytes(_usernames[user]))] = false; // Remove old username
+        if (bytes(previousUsername).length > 0) {
+            _usernameExists[keccak256(bytes(previousUsername))] = false; // Remove old username
         }
 
         _usernames[user] = username;
         _usernameExists[usernameHash] = true;
 
-        emit UsernameRegistered(user, username);
+        emit UsernameRegistered(user, username, previousUsername);
     }
 }

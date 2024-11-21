@@ -95,8 +95,12 @@ contract UsernamesTest is Test {
 
     function test_add_username_should_emit() public {
         vm.expectEmit(address(usernames));
-        emit UsernameRegistered(address(1), "test");
+        emit UsernameRegistered(address(1), "test", "");
         usernames.addUsername(address(1), "test");
+
+        vm.expectEmit(address(usernames));
+        emit UsernameRegistered(address(1), "test2", "test");
+        usernames.addUsername(address(1), "test2");
     }
 
     function test_add_username_should_allow_update() public {
@@ -172,8 +176,12 @@ contract UsernamesTest is Test {
     function test_register_username_should_emit() public {
         vm.startPrank(address(1));
         vm.expectEmit(address(usernames));
-        emit UsernameRegistered(address(1), "test");
+        emit UsernameRegistered(address(1), "test", "");
         usernames.registerUsername("test");
+
+        vm.expectEmit(address(usernames));
+        emit UsernameRegistered(address(1), "test2", "test");
+        usernames.registerUsername("test2");
     }
 
     function test_register_username_should_allow_update() public {
