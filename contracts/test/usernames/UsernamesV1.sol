@@ -30,7 +30,7 @@ contract UsernamesTest is Test {
         usernames.addUsername(address(1), "test");
     }
 
-    function test_add_username_should_revert_if_username_existst() public {
+    function test_add_username_should_revert_if_username_exist() public {
         usernames.addUsername(address(1), "test");
 
         vm.expectRevert(TakenUsername.selector);
