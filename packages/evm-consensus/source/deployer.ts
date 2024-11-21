@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ConsensusAbi, ERC1967ProxyAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, ERC1967ProxyAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers, sha256 } from "ethers";
 
@@ -35,6 +35,9 @@ export class Deployer {
 
 		const consensusContractAddress = await this.#deployConsensusContract();
 		await this.#deployConsensusProxy(consensusContractAddress);
+
+		const usernamesContractAddress = await this.#deployUsernamesContract();
+		await this.#deployUsernamesProxy(usernamesContractAddress);
 
 		await this.evm.onCommit({
 			...this.#getBlockContext().commitKey,
@@ -151,6 +154,79 @@ export class Deployer {
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
+			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
+	}
+
+	async #deployUsernamesContract(): Promise<string> {
+		const result = await this.evm.process({
+			blockContext: this.#getBlockContext(),
+			caller: this.deployerAddress,
+			data: Buffer.concat([Buffer.from(ethers.getBytes(UsernamesAbi.bytecode.object))]),
+			gasLimit: BigInt(10_000_000),
+			nonce: BigInt(2),
+			specId: this.#getSpecId(),
+			txHash: this.#generateTxHash(),
+			value: 0n,
+		});
+
+		if (!result.receipt.success) {
+			throw new Error("failed to deploy Usernames contract");
+		}
+
+		if (
+			result.receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 2 })
+		) {
+			throw new Error("Contract address mismatch");
+		}
+
+		this.logger.info(
+			`Deployed Usernames contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
+		);
+
+		return result.receipt.deployedContractAddress!;
+	}
+
+	async #deployUsernamesProxy(usernamesContractAddress: string): Promise<void> {
+		// Logic contract initializer function ABI
+		const logicInterface = new ethers.Interface(UsernamesAbi.abi);
+		// Encode the initializer call
+		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
+		// Prepare the constructor arguments for the proxy contract
+		const proxyConstructorArguments = new ethers.AbiCoder()
+			.encode(["address", "bytes"], [usernamesContractAddress, initializerCalldata])
+			.slice(2);
+
+		const proxyResult = await this.evm.process({
+			blockContext: this.#getBlockContext(),
+			caller: this.deployerAddress,
+			data: Buffer.concat([
+				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
+				Buffer.from(proxyConstructorArguments, "hex"),
+			]),
+			gasLimit: BigInt(10_000_000),
+			nonce: BigInt(3),
+			specId: this.#getSpecId(),
+			txHash: this.#generateTxHash(),
+			value: 0n,
+		});
+
+		if (!proxyResult.receipt.success) {
+			throw new Error("failed to deploy Usernames PROXY contract");
+		}
+
+		if (
+			proxyResult.receipt.deployedContractAddress !==
+			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 })
+		) {
+			throw new Error("Contract address mismatch");
+		}
+
+		this.logger.info(
+			`Deployed Usernames PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
+		);
+
+		this.app
+			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
 	}
 }
