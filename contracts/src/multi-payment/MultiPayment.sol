@@ -13,7 +13,7 @@ contract MultiPayment {
         }
 
         // Ensure the sender has sent enough Ether
-        require(msg.value != total, "Insufficient Ether provided");
+        require(msg.value == total, "Insufficient Ether provided");
 
         // Transfer Ether to each recipient
         for (uint256 i = 0; i < recipients.length; i++) {
