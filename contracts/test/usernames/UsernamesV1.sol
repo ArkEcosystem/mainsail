@@ -202,12 +202,12 @@ contract UsernamesTest is Test {
         assertTrue(usernames.isUsernameRegistered("test2"));
     }
 
-    function test_register_username_rever_if_owner() public {
+    function test_register_username_revert_if_owner() public {
         vm.expectRevert(CallerIsOwner.selector);
         usernames.registerUsername("test");
     }
 
-    function test_register_username_rever_if_empty() public {
+    function test_register_username_revert_if_empty() public {
         vm.startPrank(address(1));
         vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("");
@@ -222,7 +222,7 @@ contract UsernamesTest is Test {
         usernames.registerUsername("test");
     }
 
-    function test_register_username_rever_if_greater_than_20() public {
+    function test_register_username_revert_if_greater_than_20() public {
         vm.startPrank(address(1));
         vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("000000000000000000000"); // 20 chars
@@ -232,7 +232,7 @@ contract UsernamesTest is Test {
         usernames.registerUsername("00000000000000000000000"); // 22 chars
     }
 
-    function test_register_username_rever_if_starts_or_end_with_underscore() public {
+    function test_register_username_revert_if_starts_or_end_with_underscore() public {
         vm.startPrank(address(1));
         vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("_test");
@@ -240,13 +240,13 @@ contract UsernamesTest is Test {
         usernames.registerUsername("test_");
     }
 
-    function test_register_username_rever_if_contains_2_consecutive_underscores() public {
+    function test_register_username_revert_if_contains_2_consecutive_underscores() public {
         vm.startPrank(address(1));
         vm.expectRevert(InvalidUsername.selector);
         usernames.registerUsername("te__st");
     }
 
-    function test_register_username_rever_if_contains_uppercase_charactes() public {
+    function test_register_username_revert_if_contains_uppercase_charactes() public {
         string memory characters = "ABCDEDGHIJKLMNOPQRSTUVWXYZ";
         bytes memory b = bytes(characters);
 
@@ -262,7 +262,7 @@ contract UsernamesTest is Test {
         }
     }
 
-    function test_register_username_rever_if_contains_special_characters() public {
+    function test_register_username_revert_if_contains_special_characters() public {
         string memory characters = "!@#$%^&*()+{}|:\"<>?`-=[]\\;',./";
         bytes memory b = bytes(characters);
 
