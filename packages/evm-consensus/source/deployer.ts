@@ -24,9 +24,11 @@ export class Deployer {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	#deployerAddress = "0x0000000000000000000000000000000000000001";
+	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	private readonly deployerAddress!: string;
+
 	#nonce = 0;
-	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
+	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 
 	public async deploy(): Promise<void> {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
@@ -34,9 +36,9 @@ export class Deployer {
 
 		const genesisInfo = {
 			account: genesisBlock.block.generatorAddress,
-			deployerAccount: this.#deployerAddress,
+			deployerAccount: this.deployerAddress,
 			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
-			validatorContract: ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
+			validatorContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
 		};
 
 		await this.evm.initializeGenesis(genesisInfo);
@@ -49,13 +51,13 @@ export class Deployer {
 			commitKey,
 			gasLimit: BigInt(milestone.block.maxGasLimit),
 			timestamp: BigInt(genesisBlock.block.timestamp),
-			validatorAddress: this.#deployerAddress,
+			validatorAddress: this.deployerAddress,
 		};
 
 		// CONSENSUS
 		const consensusResult = await this.evm.process({
 			blockContext,
-			caller: this.#deployerAddress,
+			caller: this.deployerAddress,
 			data: Buffer.concat([Buffer.from(ethers.getBytes(ConsensusAbi.bytecode.object))]),
 			gasLimit: BigInt(10_000_000),
 			nonce: BigInt(0),
@@ -70,13 +72,13 @@ export class Deployer {
 
 		if (
 			consensusResult.receipt.deployedContractAddress !==
-			ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 0 })
+			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 0 })
 		) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed Consensus contract from ${this.#deployerAddress} to ${consensusResult.receipt.deployedContractAddress}`,
+			`Deployed Consensus contract from ${this.deployerAddress} to ${consensusResult.receipt.deployedContractAddress}`,
 		);
 
 		// Logic contract initializer function ABI
@@ -90,7 +92,7 @@ export class Deployer {
 
 		const proxyResult = await this.evm.process({
 			blockContext,
-			caller: this.#deployerAddress,
+			caller: this.deployerAddress,
 			data: Buffer.concat([
 				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
 				Buffer.from(proxyConstructorArguments, "hex"),
@@ -108,16 +110,14 @@ export class Deployer {
 
 		if (
 			proxyResult.receipt.deployedContractAddress !==
-			ethers.getCreateAddress({ from: this.#deployerAddress, nonce: 1 })
+			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 })
 		) {
 			throw new Error("Contract address mismatch");
 		}
 
 		this.logger.info(
-			`Deployed Consensus PROXY contract from ${this.#deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
+			`Deployed Consensus PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
 		);
-
-		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(this.#deployerAddress);
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
