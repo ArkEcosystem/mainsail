@@ -11,6 +11,21 @@ contract MultiPaymentTest is Test {
         multiPayment = new MultiPayment();
     }
 
+    function test_pay_pass_with_zero_payment() public {
+        address payable sender = payable(address(this));
+        vm.deal(sender, 100 ether);
+        assertEq(sender.balance, 100 ether);
+
+        address payable[] memory recipients = new address payable[](0);
+        uint256[] memory amounts = new uint256[](0);
+
+        // Act
+        multiPayment.pay{value: 0}(recipients, amounts);
+
+        // Assert
+        assertEq(sender.balance, 100 ether);
+    }
+
     function test_pay_pass_with_single_payment() public {
         address payable sender = payable(address(this));
         vm.deal(sender, 100 ether);
@@ -25,10 +40,10 @@ contract MultiPaymentTest is Test {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 40 ether;
 
-        // Send 1 Ether to recipient using the contract's method
+        // Act
         multiPayment.pay{value: 40 ether}(recipients, amounts);
 
-        // Check that recipient received the Ether
+        // Assert
         assertEq(recipient.balance, 40 ether);
         assertEq(sender.balance, 60 ether);
     }
@@ -55,10 +70,10 @@ contract MultiPaymentTest is Test {
         amounts[1] = 20 ether;
         amounts[2] = 30 ether;
 
-        // Send 1 Ether to recipient using the contract's method
+        // Act
         multiPayment.pay{value: 60 ether}(recipients, amounts);
 
-        // Check that recipient received the Ether
+        // Assert
         assertEq(recipient1.balance, 10 ether);
         assertEq(recipient2.balance, 20 ether);
         assertEq(recipient3.balance, 30 ether);
@@ -83,10 +98,10 @@ contract MultiPaymentTest is Test {
         amounts[1] = 20 ether;
         amounts[2] = 30 ether;
 
-        // Send 1 Ether to recipient using the contract's method
+        // Act
         multiPayment.pay{value: 60 ether}(recipients, amounts);
 
-        // Check that recipient received the Ether
+        // Assert
         assertEq(recipient1.balance, 60 ether);
         assertEq(sender.balance, 40 ether);
     }
@@ -106,9 +121,11 @@ contract MultiPaymentTest is Test {
         address payable sender = payable(address(this));
         vm.deal(sender, total);
 
+        // Act
         multiPayment.pay{value: total}(recipients, amounts);
-        assertEq(sender.balance, 0);
 
+        // Assert
+        assertEq(sender.balance, 0);
         for (uint256 i = 0; i < payments; i++) {
             assertEq(recipients[i].balance, 1);
         }

@@ -1,9 +1,16 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.27;
 
+error RecipientsAndAmountsMismatch();
+error InvalidValue();
+error InvalidRecipient();
+error FailedToSendEther();
+
 contract MultiPayment {
     function pay(address payable[] calldata recipients, uint256[] calldata amounts) public payable {
-        require(recipients.length == amounts.length, "Mismatched recipients and amounts");
+        if (recipients.length != amounts.length) {
+            revert RecipientsAndAmountsMismatch();
+        }
 
         uint256 total = 0;
 
@@ -13,15 +20,21 @@ contract MultiPayment {
         }
 
         // Ensure the sender has sent enough Ether
-        require(msg.value == total, "Insufficient Ether provided");
+        if (msg.value != total) {
+            revert InvalidValue();
+        }
 
         // Transfer Ether to each recipient
         for (uint256 i = 0; i < recipients.length; i++) {
-            require(recipients[i] != address(0), "Invalid recipient address");
+            if (recipients[i] == address(0)) {
+                revert InvalidRecipient();
+            }
 
             // Transfer the specified amount to each recipient
             (bool sent,) = recipients[i].call{value: amounts[i]}("");
-            require(sent, "Failed to send Ether");
+            if (!sent) {
+                revert FailedToSendEther();
+            }
         }
     }
 }
