@@ -30,6 +30,19 @@ export class Deployer {
 	#nonce = 0;
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 
+	public async deploy(): Promise<void> {
+		await this.#initialize();
+
+		const consensusContractAddress = await this.#deployConsensusContract();
+		await this.#deployConsensusProxy(consensusContractAddress);
+
+		await this.evm.onCommit({
+			...this.#getBlockContext().commitKey,
+			getBlock: () => ({ data: { round: BigInt(0) } }),
+			setAccountUpdates: () => ({}),
+		} as any);
+	}
+
 	async #initialize(): Promise<void> {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
@@ -139,18 +152,5 @@ export class Deployer {
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
-	}
-
-	public async deploy(): Promise<void> {
-		await this.#initialize();
-
-		const consensusContractAddress = await this.#deployConsensusContract();
-		await this.#deployConsensusProxy(consensusContractAddress);
-
-		await this.evm.onCommit({
-			...this.#getBlockContext().commitKey,
-			getBlock: () => ({ data: { round: BigInt(0) } }),
-			setAccountUpdates: () => ({}),
-		} as any);
 	}
 }
