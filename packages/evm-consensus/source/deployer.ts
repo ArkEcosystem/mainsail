@@ -30,7 +30,7 @@ export class Deployer {
 	#nonce = 0;
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 
-	public async deploy(): Promise<void> {
+	async #initialize(): Promise<void> {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
@@ -43,12 +43,20 @@ export class Deployer {
 
 		await this.evm.initializeGenesis(genesisInfo);
 
+		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
+	}
+
+	public async deploy(): Promise<void> {
+		await this.#initialize();
+
+		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
+		Utils.assert.defined(genesisBlock);
+
 		const milestone = this.configuration.getMilestone(0);
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
-		const commitKey = { height: BigInt(2 ** 32 + 1), round: BigInt(0) };
 		const blockContext = {
-			commitKey,
+			commitKey: { height: BigInt(2 ** 32 + 1), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
 			timestamp: BigInt(genesisBlock.block.timestamp),
 			validatorAddress: this.deployerAddress,
@@ -123,10 +131,8 @@ export class Deployer {
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
 
-		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
-
 		await this.evm.onCommit({
-			...commitKey,
+			...blockContext.commitKey,
 			getBlock: () => ({ data: { round: BigInt(0) } }),
 			setAccountUpdates: () => ({}),
 		} as any);
