@@ -2,15 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {
-    UsernamesV1,
-    InvalidUsername,
-    TakenUsername,
-    UsernameNotRegistered,
-    UsernameRegistered,
-    UsernameResigned,
-    User
-} from "@contracts/usernames/UsernamesV1.sol";
+import {UsernamesV1} from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
@@ -32,14 +24,14 @@ contract UsernamesTest is Test {
     function test_add_username_should_revert_if_username_exist() public {
         usernames.addUsername(address(1), "test");
 
-        vm.expectRevert(TakenUsername.selector);
+        vm.expectRevert(UsernamesV1.TakenUsername.selector);
         usernames.addUsername(address(2), "test");
     }
 
     function test_add_username_should_revert_if_username_is_empty_or_longer_than_20() public {
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.addUsername(address(1), "");
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.addUsername(address(1), "000000000000000000000"); // 21 chars
     }
 
@@ -94,11 +86,11 @@ contract UsernamesTest is Test {
 
     function test_add_username_should_emit() public {
         vm.expectEmit(address(usernames));
-        emit UsernameRegistered(address(1), "test", "");
+        emit UsernamesV1.UsernameRegistered(address(1), "test", "");
         usernames.addUsername(address(1), "test");
 
         vm.expectEmit(address(usernames));
-        emit UsernameRegistered(address(1), "test2", "test");
+        emit UsernamesV1.UsernameRegistered(address(1), "test2", "test");
         usernames.addUsername(address(1), "test2");
     }
 
@@ -114,7 +106,7 @@ contract UsernamesTest is Test {
         assertTrue(usernames.isUsernameRegistered("test2"));
 
         // Prevent user to use new username
-        vm.expectRevert(TakenUsername.selector);
+        vm.expectRevert(UsernamesV1.TakenUsername.selector);
         usernames.addUsername(address(2), "test2");
 
         // Allow user to update to reuse old username
@@ -175,11 +167,11 @@ contract UsernamesTest is Test {
     function test_register_username_should_emit() public {
         vm.startPrank(address(1));
         vm.expectEmit(address(usernames));
-        emit UsernameRegistered(address(1), "test", "");
+        emit UsernamesV1.UsernameRegistered(address(1), "test", "");
         usernames.registerUsername("test");
 
         vm.expectEmit(address(usernames));
-        emit UsernameRegistered(address(1), "test2", "test");
+        emit UsernamesV1.UsernameRegistered(address(1), "test2", "test");
         usernames.registerUsername("test2");
     }
 
@@ -197,7 +189,7 @@ contract UsernamesTest is Test {
 
         // Prevent user to use new username
         vm.startPrank(address(2));
-        vm.expectRevert(TakenUsername.selector);
+        vm.expectRevert(UsernamesV1.TakenUsername.selector);
         usernames.registerUsername("test2");
 
         // Allow user to update to reuse old username
@@ -211,7 +203,7 @@ contract UsernamesTest is Test {
 
     function test_register_username_revert_if_empty() public {
         vm.startPrank(address(1));
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.registerUsername("");
     }
 
@@ -220,31 +212,31 @@ contract UsernamesTest is Test {
         usernames.registerUsername("test");
 
         vm.startPrank(address(2));
-        vm.expectRevert(TakenUsername.selector);
+        vm.expectRevert(UsernamesV1.TakenUsername.selector);
         usernames.registerUsername("test");
     }
 
     function test_register_username_revert_if_greater_than_20() public {
         vm.startPrank(address(1));
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.registerUsername("000000000000000000000"); // 20 chars
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.registerUsername("0000000000000000000000"); // 21 chars
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.registerUsername("00000000000000000000000"); // 22 chars
     }
 
     function test_register_username_revert_if_starts_or_end_with_underscore() public {
         vm.startPrank(address(1));
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.registerUsername("_test");
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.registerUsername("test_");
     }
 
     function test_register_username_revert_if_contains_2_consecutive_underscores() public {
         vm.startPrank(address(1));
-        vm.expectRevert(InvalidUsername.selector);
+        vm.expectRevert(UsernamesV1.InvalidUsername.selector);
         usernames.registerUsername("te__st");
     }
 
@@ -259,7 +251,7 @@ contract UsernamesTest is Test {
             c[2] = 0x61; // a
 
             vm.startPrank(address(uint160(i)));
-            vm.expectRevert(InvalidUsername.selector);
+            vm.expectRevert(UsernamesV1.InvalidUsername.selector);
             usernames.registerUsername(string(c));
         }
     }
@@ -275,7 +267,7 @@ contract UsernamesTest is Test {
             c[2] = 0x61; // a
 
             vm.startPrank(address(uint160(i)));
-            vm.expectRevert(InvalidUsername.selector);
+            vm.expectRevert(UsernamesV1.InvalidUsername.selector);
             usernames.registerUsername(string(c));
         }
     }
@@ -294,7 +286,7 @@ contract UsernamesTest is Test {
 
         // Resign
         vm.expectEmit(address(usernames));
-        emit UsernameResigned(addr, "test");
+        emit UsernamesV1.UsernameResigned(addr, "test");
         usernames.resignUsername();
         assertEq(usernames.getUsername(addr), "");
         assertFalse(usernames.isUsernameRegistered("test"));
@@ -304,7 +296,7 @@ contract UsernamesTest is Test {
         // Test
         address addr = address(1);
         vm.startPrank(addr);
-        vm.expectRevert(UsernameNotRegistered.selector);
+        vm.expectRevert(UsernamesV1.UsernameNotRegistered.selector);
         usernames.resignUsername();
     }
 
@@ -357,7 +349,7 @@ contract UsernamesTest is Test {
         usernames.addUsername(address(2), "test2");
         usernames.addUsername(address(3), "test3");
 
-        User[] memory users = usernames.getUsernames(addresses);
+        UsernamesV1.User[] memory users = usernames.getUsernames(addresses);
         assertEq(users.length, 3);
         assertEq(users[0].addr, address(1));
         assertEq(users[0].username, "test1");

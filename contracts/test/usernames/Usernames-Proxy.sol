@@ -2,14 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {
-    UsernamesV1,
-    InvalidUsername,
-    TakenUsername,
-    UsernameNotRegistered,
-    UsernameRegistered,
-    UsernameResigned
-} from "@contracts/usernames/UsernamesV1.sol";
+import {UsernamesV1} from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
@@ -33,7 +26,7 @@ contract ProxyTest is Test {
         usernames.initialize();
     }
 
-    function test_shoudl_have_valid_UPGRADE_INTERFACE_VERSION() public view {
+    function test_should_have_valid_UPGRADE_INTERFACE_VERSION() public view {
         assertEq(usernames.UPGRADE_INTERFACE_VERSION(), "5.0.0");
     }
 
@@ -54,7 +47,7 @@ contract ProxyTest is Test {
     function test_proxy_should_update_and_perserve_variables() public {
         assertEq(usernames.version(), 1);
 
-        // Register valdiators
+        // Register validators
         usernames.addUsername(address(1), "test");
         usernames.addUsername(address(2), "test2");
 

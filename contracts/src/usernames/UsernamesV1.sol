@@ -4,20 +4,20 @@ pragma solidity ^0.8.27;
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-error InvalidUsername();
-error TakenUsername();
-error UsernameNotRegistered();
-
-event UsernameRegistered(address addr, string username, string previousUsername);
-
-event UsernameResigned(address addr, string username);
-
-struct User {
-    address addr;
-    string username;
-}
-
 contract UsernamesV1 is UUPSUpgradeable, OwnableUpgradeable {
+    error InvalidUsername();
+    error TakenUsername();
+    error UsernameNotRegistered();
+
+    event UsernameRegistered(address addr, string username, string previousUsername);
+
+    event UsernameResigned(address addr, string username);
+
+    struct User {
+        address addr;
+        string username;
+    }
+
     mapping(address => string) private _usernames;
     mapping(bytes32 => bool) private _usernameExists;
 
