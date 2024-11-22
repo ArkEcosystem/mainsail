@@ -2,6 +2,7 @@
 pragma solidity ^0.8.27;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 struct ValidatorData {
     uint256 votersCount;
@@ -47,7 +48,6 @@ event Voted(address voter, address validator);
 
 event Unvoted(address voter, address validator);
 
-error CallerIsNotOwner();
 error CallerIsOwner();
 
 error CallerIsNotValidator();
@@ -88,9 +88,7 @@ error ImportIsNotAllowed();
 // Block is processed: Original wallet balance: 100, new wallet balance: 88, difference 12
 // This process will only work fine if we pass the new wallet balance (88) and keep track of voteBalances in EVM contract.
 
-contract ConsensusV1 is UUPSUpgradeable {
-    address private _owner;
-
+contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     mapping(address => ValidatorData) private _validatorsData;
     mapping(address => bool) private _hasValidator;
     mapping(bytes32 => bool) private _blsPublicKeys;
@@ -111,16 +109,16 @@ contract ConsensusV1 is UUPSUpgradeable {
 
     RoundValidator[][] private _rounds;
 
-    // Modifiers
-    modifier onlyOwner() {
-        if (msg.sender != _owner) {
-            revert CallerIsNotOwner();
-        }
-        _;
-    }
+    // // Modifiers
+    // modifier onlyOwner() {
+    //     if (msg.sender != _owner) {
+    //         revert CallerIsNotOwner();
+    //     }
+    //     _;
+    // }
 
     modifier preventOwner() {
-        if (msg.sender == _owner) {
+        if (msg.sender == owner()) {
             revert CallerIsOwner();
         }
         _;
@@ -128,7 +126,7 @@ contract ConsensusV1 is UUPSUpgradeable {
 
     // Initializers
     function initialize() public initializer {
-        _owner = msg.sender;
+        __Ownable_init(msg.sender);
         _minValidators = 1;
     }
 

@@ -5,12 +5,12 @@ import {
     ConsensusV1,
     ValidatorData,
     Validator,
-    CallerIsNotOwner,
     InvalidParameters,
     NoActiveValidators
 } from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract ConsensusTest is Base {
     function test_should_work_with_one_validator() public {
@@ -26,7 +26,7 @@ contract ConsensusTest is Base {
     function test_should_allow_only_caller() public {
         address addr = address(1);
         vm.startPrank(addr);
-        vm.expectRevert(CallerIsNotOwner.selector);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, addr));
         consensus.calculateActiveValidators(1);
     }
 
