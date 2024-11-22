@@ -211,11 +211,6 @@ contract UsernamesTest is Test {
         assertTrue(usernames.isUsernameRegistered("test2"));
     }
 
-    function test_register_username_revert_if_owner() public {
-        vm.expectRevert(CallerIsOwner.selector);
-        usernames.registerUsername("test");
-    }
-
     function test_register_username_revert_if_empty() public {
         vm.startPrank(address(1));
         vm.expectRevert(InvalidUsername.selector);

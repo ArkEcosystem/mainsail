@@ -24,13 +24,6 @@ contract UsernamesV1 is UUPSUpgradeable, OwnableUpgradeable {
     mapping(address => string) private _usernames;
     mapping(bytes32 => bool) private _usernameExists;
 
-    modifier preventOwner() {
-        if (msg.sender == owner()) {
-            revert CallerIsOwner();
-        }
-        _;
-    }
-
     // Initializers
     function initialize() public initializer {
         __Ownable_init(msg.sender);
@@ -50,7 +43,7 @@ contract UsernamesV1 is UUPSUpgradeable, OwnableUpgradeable {
         _registerUsername(user, username, b);
     }
 
-    function registerUsername(string memory username) external preventOwner {
+    function registerUsername(string memory username) external {
         // Register username
         bytes memory b = bytes(username);
         if (!_verifyUsername(b)) {
