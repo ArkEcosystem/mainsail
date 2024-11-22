@@ -79,11 +79,6 @@ contract ConsensusTest is Base {
         assertEq(allVoters[0].validator, addr);
     }
 
-    function test_vote_revert_if_caller_is_owner() public {
-        vm.expectRevert(CallerIsOwner.selector);
-        consensus.vote(address(1));
-    }
-
     function test_unvote_revert_if_did_not_vote() public {
         vm.expectRevert(MissingVote.selector);
         consensus.unvote();

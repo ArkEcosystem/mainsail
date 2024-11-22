@@ -36,11 +36,6 @@ contract ConsensusTest is Base {
         assertEq(validator.data.isResigned, false);
     }
 
-    function test_validator_registration_revert_if_caller_is_owner() public {
-        vm.expectRevert(CallerIsOwner.selector);
-        consensus.registerValidator(prepareBLSKey(address(1)));
-    }
-
     function test_validator_registration_revert_if_validator_is_already_registered() public {
         address addr = address(1);
 

@@ -109,21 +109,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     RoundValidator[][] private _rounds;
 
-    // // Modifiers
-    // modifier onlyOwner() {
-    //     if (msg.sender != _owner) {
-    //         revert CallerIsNotOwner();
-    //     }
-    //     _;
-    // }
-
-    modifier preventOwner() {
-        if (msg.sender == owner()) {
-            revert CallerIsOwner();
-        }
-        _;
-    }
-
     // Initializers
     function initialize() public initializer {
         __Ownable_init(msg.sender);
@@ -200,7 +185,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit Voted(voter, validator);
     }
 
-    function registerValidator(bytes calldata blsPublicKey) external preventOwner {
+    function registerValidator(bytes calldata blsPublicKey) external {
         if (_hasValidator[msg.sender]) {
             revert ValidatorAlreadyRegistered();
         }
@@ -218,7 +203,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit ValidatorRegistered(msg.sender, blsPublicKey);
     }
 
-    function updateValidator(bytes calldata blsPublicKey) external preventOwner {
+    function updateValidator(bytes calldata blsPublicKey) external {
         if (!isValidatorRegistered(msg.sender)) {
             revert ValidatorNotRegistered();
         }
@@ -250,7 +235,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit ValidatorResigned(msg.sender);
     }
 
-    function vote(address addr) external preventOwner {
+    function vote(address addr) external {
         if (!isValidatorRegistered(addr)) {
             revert ValidatorNotRegistered();
         }
