@@ -2,6 +2,7 @@
 pragma solidity ^0.8.27;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 error CallerIsNotOwner();
 error CallerIsOwner();
@@ -19,22 +20,12 @@ struct User {
     string username;
 }
 
-contract UsernamesV1 is UUPSUpgradeable {
-    address private _owner;
-
+contract UsernamesV1 is UUPSUpgradeable, OwnableUpgradeable {
     mapping(address => string) private _usernames;
     mapping(bytes32 => bool) private _usernameExists;
 
-    // Modifiers
-    modifier onlyOwner() {
-        if (msg.sender != _owner) {
-            revert CallerIsNotOwner();
-        }
-        _;
-    }
-
     modifier preventOwner() {
-        if (msg.sender == _owner) {
+        if (msg.sender == owner()) {
             revert CallerIsOwner();
         }
         _;
@@ -42,7 +33,7 @@ contract UsernamesV1 is UUPSUpgradeable {
 
     // Initializers
     function initialize() public initializer {
-        _owner = msg.sender;
+        __Ownable_init(msg.sender);
     }
 
     // Overrides

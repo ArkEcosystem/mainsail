@@ -14,6 +14,7 @@ import {
     User
 } from "@contracts/usernames/UsernamesV1.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract UsernamesTest is Test {
     UsernamesV1 public usernames;
@@ -26,7 +27,7 @@ contract UsernamesTest is Test {
 
     function test_add_username_should_revert_if_not_owner() public {
         vm.startPrank(address(1));
-        vm.expectRevert(CallerIsNotOwner.selector);
+        vm.expectRevert(abi.encodeWithSelector(OwnableUpgradeable.OwnableUnauthorizedAccount.selector, address(1)));
         usernames.addUsername(address(1), "test");
     }
 
