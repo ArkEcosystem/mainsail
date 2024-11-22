@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.27;
 
-error RecipientsAndAmountsMismatch();
-error InvalidValue();
-error FailedToSendEther();
-
 contract MultiPayment {
+    error RecipientsAndAmountsMismatch();
+    error InvalidValue();
+    error FailedToSendEther();
+
     function pay(address payable[] calldata recipients, uint256[] calldata amounts) public payable {
         if (recipients.length != amounts.length) {
             revert RecipientsAndAmountsMismatch();

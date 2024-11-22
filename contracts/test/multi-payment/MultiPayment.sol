@@ -2,12 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {
-    MultiPayment,
-    RecipientsAndAmountsMismatch,
-    InvalidValue,
-    FailedToSendEther
-} from "@contracts/multi-payment/MultiPayment.sol";
+import {MultiPayment} from "@contracts/multi-payment/MultiPayment.sol";
 
 contract RejectPayments {
     receive() external payable {
@@ -180,7 +175,7 @@ contract MultiPaymentTest is Test {
         amounts[1] = 60 ether;
 
         // Act
-        vm.expectRevert(RecipientsAndAmountsMismatch.selector);
+        vm.expectRevert(MultiPayment.RecipientsAndAmountsMismatch.selector);
         multiPayment.pay{value: 100 ether}(recipients, amounts);
     }
 
@@ -199,7 +194,7 @@ contract MultiPaymentTest is Test {
         amounts[0] = 40 ether;
 
         // Act
-        vm.expectRevert(InvalidValue.selector);
+        vm.expectRevert(MultiPayment.InvalidValue.selector);
         multiPayment.pay{value: 50 ether}(recipients, amounts);
     }
 
@@ -220,7 +215,7 @@ contract MultiPaymentTest is Test {
 
         // Act
         recipient = payable(address(0)); // Force recipient to be address(0)
-        vm.expectRevert(FailedToSendEther.selector);
+        vm.expectRevert(MultiPayment.FailedToSendEther.selector);
         multiPayment.pay{value: 40 ether}(recipients, amounts);
     }
 
