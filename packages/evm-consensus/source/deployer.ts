@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ConsensusAbi, ERC1967ProxyAbi, UsernamesAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, ERC1967ProxyAbi, UsernamesAbi, MultiPaymentAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers, sha256 } from "ethers";
 
@@ -38,6 +38,8 @@ export class Deployer {
 
 		const usernamesContractAddress = await this.#deployUsernamesContract();
 		await this.#deployUsernamesProxy(usernamesContractAddress);
+
+		await this.#deployMultiPaymentsContract();
 
 		await this.evm.onCommit({
 			...this.#getBlockContext().commitKey,
@@ -228,5 +230,34 @@ export class Deployer {
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
+	}
+
+	async #deployMultiPaymentsContract(): Promise<string> {
+		const result = await this.evm.process({
+			blockContext: this.#getBlockContext(),
+			caller: this.deployerAddress,
+			data: Buffer.concat([Buffer.from(ethers.getBytes(MultiPaymentAbi.bytecode.object))]),
+			gasLimit: BigInt(10_000_000),
+			nonce: BigInt(4),
+			specId: this.#getSpecId(),
+			txHash: this.#generateTxHash(),
+			value: 0n,
+		});
+
+		if (!result.receipt.success) {
+			throw new Error("failed to deploy MultiPayments contract");
+		}
+
+		if (
+			result.receipt.deployedContractAddress !== ethers.getCreateAddress({ from: this.deployerAddress, nonce: 4 })
+		) {
+			throw new Error("Contract address mismatch");
+		}
+
+		this.logger.info(
+			`Deployed MultiPayments contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
+		);
+
+		return result.receipt.deployedContractAddress!;
 	}
 }
