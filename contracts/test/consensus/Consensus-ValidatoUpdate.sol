@@ -6,7 +6,6 @@ import {
     ValidatorData,
     Validator,
     ValidatorUpdated,
-    CallerIsOwner,
     ValidatorAlreadyRegistered,
     BlsKeyAlreadyRegistered,
     BlsKeyIsInvalid,

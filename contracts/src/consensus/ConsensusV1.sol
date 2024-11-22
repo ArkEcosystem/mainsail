@@ -48,8 +48,6 @@ event Voted(address voter, address validator);
 
 event Unvoted(address voter, address validator);
 
-error CallerIsOwner();
-
 error CallerIsNotValidator();
 error ValidatorNotRegistered();
 error ValidatorAlreadyRegistered();

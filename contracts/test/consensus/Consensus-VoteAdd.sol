@@ -9,7 +9,6 @@ import {
     Unvoted,
     Voted,
     VoteResult,
-    CallerIsOwner,
     ValidatorNotRegistered,
     VoteResignedValidator,
     VoteSameValidator,
