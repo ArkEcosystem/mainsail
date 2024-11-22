@@ -1,13 +1,7 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {
-    ConsensusV1,
-    ValidatorData,
-    Validator,
-    InvalidParameters,
-    NoActiveValidators
-} from "@contracts/consensus/ConsensusV1.sol";
+import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -18,7 +12,7 @@ contract ConsensusTest is Base {
         registerValidator(addr);
 
         consensus.calculateActiveValidators(1);
-        Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, 1);
         assertEq(validators[0].addr, addr);
     }
@@ -33,26 +27,26 @@ contract ConsensusTest is Base {
     function test_should_revert_with_0_parameter() public {
         registerValidator(address(1));
 
-        vm.expectRevert(InvalidParameters.selector);
+        vm.expectRevert(ConsensusV1.InvalidParameters.selector);
         consensus.calculateActiveValidators(0);
     }
 
     function test_should_revert_without_validators() public {
-        vm.expectRevert(NoActiveValidators.selector);
+        vm.expectRevert(ConsensusV1.NoActiveValidators.selector);
         consensus.calculateActiveValidators(1);
     }
 
     function test_should_revert_with_only_resigned_validators() public {
         consensus.addValidator(address(2), prepareBLSKey(address(2)), true);
 
-        vm.expectRevert(NoActiveValidators.selector);
+        vm.expectRevert(ConsensusV1.NoActiveValidators.selector);
         consensus.calculateActiveValidators(1);
     }
 
     function test_should_revert_with_only_validators_without_public_key() public {
         consensus.addValidator(address(1), new bytes(0), false);
 
-        vm.expectRevert(NoActiveValidators.selector);
+        vm.expectRevert(ConsensusV1.NoActiveValidators.selector);
         consensus.calculateActiveValidators(1);
     }
 
@@ -64,7 +58,7 @@ contract ConsensusTest is Base {
         resignValidator(addr);
 
         consensus.calculateActiveValidators(2);
-        Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, 2);
         assertEq(validators[0].addr, address(2));
         assertEq(validators[1].addr, address(2)); // Second validator is duplicated
@@ -79,7 +73,7 @@ contract ConsensusTest is Base {
         resignValidator(address(2));
 
         consensus.calculateActiveValidators(2);
-        Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, 2);
         assertEq(validators[0].addr, addr);
         assertEq(validators[1].addr, addr); // Second validator is duplicated
@@ -92,7 +86,7 @@ contract ConsensusTest is Base {
         consensus.addValidator(address(2), new bytes(0), false);
 
         consensus.calculateActiveValidators(2);
-        Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, 2);
         assertEq(validators[0].addr, addr);
         assertEq(validators[1].addr, addr); // Second validator is duplicated
@@ -134,7 +128,7 @@ contract ConsensusTest is Base {
         uint160 activeValidators = 53;
 
         consensus.calculateActiveValidators(uint8(activeValidators));
-        Validator[] memory validators = consensus.getActiveValidators();
+        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, activeValidators);
 
         assertEq(validators[activeValidators - 1].addr, address(0xAE)); // Shuffled address

@@ -2,19 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {
-    ConsensusV1,
-    ValidatorData,
-    Validator,
-    Unvoted,
-    Voted,
-    VoteResult,
-    ValidatorNotRegistered,
-    VoteResignedValidator,
-    VoteSameValidator,
-    VoteValidatorWithoutBlsPublicKey,
-    MissingVote
-} from "@contracts/consensus/ConsensusV1.sol";
+import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -23,7 +11,7 @@ contract ConsensusTest is Base {
     function test_vote() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validator
@@ -37,12 +25,12 @@ contract ConsensusTest is Base {
         // Vote
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
-        emit Voted(voterAddr, addr);
+        emit ConsensusV1.Voted(voterAddr, addr);
         consensus.vote(addr);
         vm.stopPrank();
 
         // Assert validator
-        Validator memory validator = consensus.getValidator(addr);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.voteBalance, 100 ether);
         assertEq(validator.data.votersCount, 1);
@@ -79,7 +67,7 @@ contract ConsensusTest is Base {
     }
 
     function test_unvote_revert_if_did_not_vote() public {
-        vm.expectRevert(MissingVote.selector);
+        vm.expectRevert(ConsensusV1.MissingVote.selector);
         consensus.unvote();
     }
 
@@ -93,7 +81,7 @@ contract ConsensusTest is Base {
     function test_vote_allow_self_vote() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validator
@@ -107,12 +95,12 @@ contract ConsensusTest is Base {
         // Vote
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
-        emit Voted(voterAddr, addr);
+        emit ConsensusV1.Voted(voterAddr, addr);
         consensus.vote(addr);
         vm.stopPrank();
 
         // Assert voteBalance
-        Validator memory validator = consensus.getValidator(addr);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.voteBalance, 100 ether);
         assertEq(validator.data.votersCount, 1);
@@ -158,10 +146,10 @@ contract ConsensusTest is Base {
 
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
-        emit Voted(voterAddr, addr);
+        emit ConsensusV1.Voted(voterAddr, addr);
         consensus.vote(addr);
 
-        vm.expectRevert(VoteSameValidator.selector);
+        vm.expectRevert(ConsensusV1.VoteSameValidator.selector);
         consensus.vote(addr);
     }
 
@@ -169,7 +157,7 @@ contract ConsensusTest is Base {
         address addr = address(1);
 
         vm.startPrank(addr);
-        vm.expectRevert(ValidatorNotRegistered.selector);
+        vm.expectRevert(ConsensusV1.ValidatorNotRegistered.selector);
         consensus.vote(addr);
     }
 
@@ -178,7 +166,7 @@ contract ConsensusTest is Base {
         consensus.addValidator(addr, new bytes(0), false);
 
         vm.startPrank(addr);
-        vm.expectRevert(VoteValidatorWithoutBlsPublicKey.selector);
+        vm.expectRevert(ConsensusV1.VoteValidatorWithoutBlsPublicKey.selector);
         consensus.vote(addr);
     }
 
@@ -192,14 +180,14 @@ contract ConsensusTest is Base {
         // Prepare voter
         address voterAddr = address(3);
         vm.startPrank(voterAddr);
-        vm.expectRevert(VoteResignedValidator.selector);
+        vm.expectRevert(ConsensusV1.VoteResignedValidator.selector);
         consensus.vote(addr);
     }
 
     function test_swap_vote() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validator
@@ -214,17 +202,17 @@ contract ConsensusTest is Base {
         vm.deal(voterAddr, 100 ether);
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
-        emit Voted(voterAddr, validatorAddr1);
+        emit ConsensusV1.Voted(voterAddr, validatorAddr1);
         consensus.vote(validatorAddr1);
         vm.stopPrank();
 
         // Assert validator 1
-        Validator memory validator1 = consensus.getValidator(validatorAddr1);
+        ConsensusV1.Validator memory validator1 = consensus.getValidator(validatorAddr1);
         assertEq(validator1.addr, validatorAddr1);
         assertEq(validator1.data.voteBalance, 100 ether);
         assertEq(validator1.data.votersCount, 1);
         // Assert validator 2
-        Validator memory validator2 = consensus.getValidator(validatorAddr2);
+        ConsensusV1.Validator memory validator2 = consensus.getValidator(validatorAddr2);
         assertEq(validator2.addr, validatorAddr2);
         assertEq(validator2.data.voteBalance, 0 ether);
         assertEq(validator2.data.votersCount, 0);
@@ -244,7 +232,7 @@ contract ConsensusTest is Base {
         // Swap Vote
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
-        emit Voted(voterAddr, validatorAddr2);
+        emit ConsensusV1.Voted(voterAddr, validatorAddr2);
         consensus.vote(validatorAddr2);
         vm.stopPrank();
 
@@ -272,7 +260,7 @@ contract ConsensusTest is Base {
     function test_unvote_and_vote_in_same_block() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validator
@@ -287,7 +275,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Assert validator
-        Validator memory validator = consensus.getValidator(addr);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.voteBalance, 100 ether);
         assertEq(validator.data.votersCount, 1);
@@ -306,7 +294,7 @@ contract ConsensusTest is Base {
         // Unvote
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
-        emit Unvoted(voterAddr, addr);
+        emit ConsensusV1.Unvoted(voterAddr, addr);
         consensus.unvote();
         vm.stopPrank();
 
@@ -326,7 +314,7 @@ contract ConsensusTest is Base {
     function test_unvote_and_vote_in_different_blocks() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validator
@@ -341,7 +329,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Assert validator
-        Validator memory validator = consensus.getValidator(addr);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.voteBalance, 100 ether);
         assertEq(validator.data.votersCount, 1);
@@ -381,7 +369,7 @@ contract ConsensusTest is Base {
         // Unvote
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
-        emit Unvoted(voterAddr, addr);
+        emit ConsensusV1.Unvoted(voterAddr, addr);
         consensus.unvote();
         vm.stopPrank();
 
@@ -401,7 +389,7 @@ contract ConsensusTest is Base {
     function test_multiple_voted_different_validators() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validators
@@ -434,17 +422,17 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Assert validators 1
-        Validator memory validator1 = consensus.getValidator(validatorAddr1);
+        ConsensusV1.Validator memory validator1 = consensus.getValidator(validatorAddr1);
         assertEq(validator1.addr, validatorAddr1);
         assertEq(validator1.data.voteBalance, 100 ether);
         assertEq(validator1.data.votersCount, 1);
         // Assert validator 2
-        Validator memory validator2 = consensus.getValidator(validatorAddr2);
+        ConsensusV1.Validator memory validator2 = consensus.getValidator(validatorAddr2);
         assertEq(validator2.addr, validatorAddr2);
         assertEq(validator2.data.voteBalance, 100 ether);
         assertEq(validator2.data.votersCount, 1);
         // Assert validator 3
-        Validator memory validator3 = consensus.getValidator(validatorAddr3);
+        ConsensusV1.Validator memory validator3 = consensus.getValidator(validatorAddr3);
         assertEq(validator3.addr, validatorAddr3);
         assertEq(validator3.data.voteBalance, 100 ether);
         assertEq(validator3.data.votersCount, 1);
@@ -551,7 +539,7 @@ contract ConsensusTest is Base {
     function test_multiple_voted_same_validator() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validators
@@ -580,7 +568,7 @@ contract ConsensusTest is Base {
         vm.stopPrank();
 
         // Assert validators 1
-        Validator memory validator1 = consensus.getValidator(validatorAddr1);
+        ConsensusV1.Validator memory validator1 = consensus.getValidator(validatorAddr1);
         assertEq(validator1.addr, validatorAddr1);
         assertEq(validator1.data.voteBalance, 300 ether);
         assertEq(validator1.data.votersCount, 3);
@@ -657,7 +645,7 @@ contract ConsensusTest is Base {
     function test_pagination() public {
         // Assert voters
         assertEq(consensus.getVotesCount(), 0);
-        VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
+        ConsensusV1.VoteResult[] memory allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
 
         // Register validators

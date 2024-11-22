@@ -1,22 +1,13 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {
-    ConsensusV1,
-    ValidatorData,
-    Validator,
-    ValidatorUpdated,
-    ValidatorAlreadyRegistered,
-    BlsKeyAlreadyRegistered,
-    BlsKeyIsInvalid,
-    CallerIsNotValidator
-} from "@contracts/consensus/ConsensusV1.sol";
+import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Base {
     function test_updateBlsPublicKey_revert_if_caller_is_not_validator() public {
-        vm.expectRevert(CallerIsNotValidator.selector);
+        vm.expectRevert(ConsensusV1.CallerIsNotValidator.selector);
         consensus.resignValidator();
     }
 
@@ -26,7 +17,7 @@ contract ConsensusTest is Base {
 
         consensus.registerValidator(prepareBLSKey(addr));
 
-        vm.expectRevert(BlsKeyAlreadyRegistered.selector);
+        vm.expectRevert(ConsensusV1.BlsKeyAlreadyRegistered.selector);
         consensus.updateValidator(prepareBLSKey(addr));
     }
 
@@ -39,7 +30,7 @@ contract ConsensusTest is Base {
         vm.startPrank(addr2);
         consensus.registerValidator(prepareBLSKey(addr2));
 
-        vm.expectRevert(BlsKeyAlreadyRegistered.selector);
+        vm.expectRevert(ConsensusV1.BlsKeyAlreadyRegistered.selector);
         consensus.updateValidator(prepareBLSKey(addr));
     }
 
@@ -48,13 +39,13 @@ contract ConsensusTest is Base {
         vm.startPrank(addr);
         consensus.registerValidator(prepareBLSKey(addr));
 
-        vm.expectRevert(BlsKeyIsInvalid.selector);
+        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
         consensus.updateValidator(prepareBLSKey(addr, 46));
-        vm.expectRevert(BlsKeyIsInvalid.selector);
+        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
         consensus.updateValidator(prepareBLSKey(addr, 47));
-        vm.expectRevert(BlsKeyIsInvalid.selector);
+        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
         consensus.updateValidator(prepareBLSKey(addr, 49));
-        vm.expectRevert(BlsKeyIsInvalid.selector);
+        vm.expectRevert(ConsensusV1.BlsKeyIsInvalid.selector);
         consensus.updateValidator(prepareBLSKey(addr, 50));
     }
 
@@ -64,10 +55,10 @@ contract ConsensusTest is Base {
         consensus.registerValidator(prepareBLSKey(addr));
 
         vm.expectEmit(address(consensus));
-        emit ValidatorUpdated(addr, prepareBLSKey(address(2)));
+        emit ConsensusV1.ValidatorUpdated(addr, prepareBLSKey(address(2)));
         consensus.updateValidator(prepareBLSKey(address(2)));
 
-        Validator memory validator = consensus.getValidator(addr);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(address(2)));
     }
@@ -78,14 +69,14 @@ contract ConsensusTest is Base {
         consensus.registerValidator(prepareBLSKey(addr));
 
         vm.expectEmit(address(consensus));
-        emit ValidatorUpdated(addr, prepareBLSKey(address(2)));
+        emit ConsensusV1.ValidatorUpdated(addr, prepareBLSKey(address(2)));
         consensus.updateValidator(prepareBLSKey(address(2)));
 
-        Validator memory validator = consensus.getValidator(addr);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(address(2)));
 
-        vm.expectRevert(BlsKeyAlreadyRegistered.selector);
+        vm.expectRevert(ConsensusV1.BlsKeyAlreadyRegistered.selector);
         consensus.updateValidator(prepareBLSKey(address(2)));
     }
 }

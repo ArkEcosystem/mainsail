@@ -1,15 +1,7 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {
-    ConsensusV1,
-    ValidatorData,
-    Validator,
-    ValidatorResigned,
-    ValidatorAlreadyResigned,
-    CallerIsNotValidator,
-    BellowMinValidators
-} from "@contracts/consensus/ConsensusV1.sol";
+import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
@@ -24,7 +16,7 @@ contract ConsensusTest is Base {
 
         // Assert
         assertEq(consensus.registeredValidatorsCount(), 2);
-        Validator memory validator = consensus.getValidator(addr);
+        ConsensusV1.Validator memory validator = consensus.getValidator(addr);
         assertEq(validator.addr, addr);
         assertEq(validator.data.blsPublicKey, prepareBLSKey(addr));
         assertEq(validator.data.voteBalance, 0);
@@ -34,7 +26,7 @@ contract ConsensusTest is Base {
         // Act
         vm.startPrank(addr);
         vm.expectEmit(address(consensus));
-        emit ValidatorResigned(addr);
+        emit ConsensusV1.ValidatorResigned(addr);
         consensus.resignValidator();
         vm.stopPrank();
 
@@ -48,7 +40,7 @@ contract ConsensusTest is Base {
     }
 
     function test_validator_resignation_revert_if_caller_is_not_validator() public {
-        vm.expectRevert(CallerIsNotValidator.selector);
+        vm.expectRevert(ConsensusV1.CallerIsNotValidator.selector);
         consensus.resignValidator();
     }
 
@@ -66,10 +58,10 @@ contract ConsensusTest is Base {
         // Act
         vm.startPrank(addr);
         vm.expectEmit(address(consensus));
-        emit ValidatorResigned(addr);
+        emit ConsensusV1.ValidatorResigned(addr);
         consensus.resignValidator();
 
-        vm.expectRevert(ValidatorAlreadyResigned.selector);
+        vm.expectRevert(ConsensusV1.ValidatorAlreadyResigned.selector);
         consensus.resignValidator();
     }
 
@@ -85,7 +77,7 @@ contract ConsensusTest is Base {
 
         // Act
         vm.startPrank(addr);
-        vm.expectRevert(BellowMinValidators.selector);
+        vm.expectRevert(ConsensusV1.BellowMinValidators.selector);
         consensus.resignValidator();
     }
 
@@ -105,7 +97,7 @@ contract ConsensusTest is Base {
 
         // Test
         vm.startPrank(addr);
-        vm.expectRevert(BellowMinValidators.selector);
+        vm.expectRevert(ConsensusV1.BellowMinValidators.selector);
         consensus.resignValidator();
         vm.stopPrank();
 
@@ -114,7 +106,7 @@ contract ConsensusTest is Base {
 
         // Test
         vm.startPrank(addr);
-        vm.expectRevert(BellowMinValidators.selector);
+        vm.expectRevert(ConsensusV1.BellowMinValidators.selector);
         consensus.resignValidator();
         vm.stopPrank();
 
@@ -124,11 +116,11 @@ contract ConsensusTest is Base {
         // Test
         vm.startPrank(addr);
         vm.expectEmit(address(consensus));
-        emit ValidatorResigned(addr);
+        emit ConsensusV1.ValidatorResigned(addr);
         consensus.resignValidator();
 
         vm.startPrank(address(2));
-        vm.expectRevert(BellowMinValidators.selector);
+        vm.expectRevert(ConsensusV1.BellowMinValidators.selector);
         consensus.resignValidator();
     }
 }

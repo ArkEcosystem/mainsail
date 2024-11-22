@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {ConsensusV1, Round} from "@contracts/consensus/ConsensusV1.sol";
+import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -28,7 +28,7 @@ contract ConsensusTest is Base {
         consensus.calculateActiveValidators(1);
 
         assertEq(consensus.getRoundsCount(), 1);
-        Round[] memory rounds = consensus.getRounds(0, 10);
+        ConsensusV1.Round[] memory rounds = consensus.getRounds(0, 10);
         assertEq(rounds.length, 1);
         assertEq(rounds[0].round, 1);
         assertEq(rounds[0].validators.length, 1);
@@ -41,10 +41,10 @@ contract ConsensusTest is Base {
         consensus.registerValidator(prepareBLSKey(addr));
         vm.stopPrank();
 
-        // Round 1
+        // ConsensusV1.Round 1
         consensus.calculateActiveValidators(1);
         assertEq(consensus.getRoundsCount(), 1);
-        Round[] memory rounds = consensus.getRounds(0, 10);
+        ConsensusV1.Round[] memory rounds = consensus.getRounds(0, 10);
         assertEq(rounds.length, 1);
         assertEq(rounds[0].round, 1);
         assertEq(rounds[0].validators.length, 1);
@@ -58,7 +58,7 @@ contract ConsensusTest is Base {
         consensus.vote(addr);
         vm.stopPrank();
 
-        // Round 2
+        // ConsensusV1.Round 2
         consensus.calculateActiveValidators(1);
         assertEq(consensus.getRoundsCount(), 2);
         rounds = consensus.getRounds(0, 10);
@@ -79,7 +79,7 @@ contract ConsensusTest is Base {
         consensus.vote(addr);
         vm.stopPrank();
 
-        // Round 3
+        // ConsensusV1.Round 3
         consensus.calculateActiveValidators(1);
         assertEq(consensus.getRoundsCount(), 3);
         rounds = consensus.getRounds(0, 10);
@@ -113,7 +113,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.getRoundsCount(), 3);
 
         // Shoudl slice array if count is greater than rounds left
-        Round[] memory rounds = consensus.getRounds(0, 10);
+        ConsensusV1.Round[] memory rounds = consensus.getRounds(0, 10);
         assertEq(rounds.length, 3);
         assertEq(rounds[0].round, 1);
         assertEq(rounds[1].round, 2);

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.13;
 
-import {ConsensusV1, ValidatorData, Validator} from "@contracts/consensus/ConsensusV1.sol";
+import {ConsensusV1} from "@contracts/consensus/ConsensusV1.sol";
 import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
@@ -65,7 +65,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.activeValidatorsCount(), 2);
         assertEq(consensus.getVotesCount(), 1);
         assertEq(consensus.getActiveValidators().length, 2);
-        Validator[] memory validatorsBefore = consensus.getAllValidators();
+        ConsensusV1.Validator[] memory validatorsBefore = consensus.getAllValidators();
         assertEq(validatorsBefore.length, 3);
 
         // Upgrade
@@ -80,7 +80,7 @@ contract ConsensusTest is Base {
         assertEq(consensusNew.activeValidatorsCount(), 2);
         assertEq(consensusNew.getVotesCount(), 1);
         assertEq(consensus.getActiveValidators().length, 2);
-        Validator[] memory validatorsAfter = consensusNew.getAllValidators();
+        ConsensusV1.Validator[] memory validatorsAfter = consensusNew.getAllValidators();
         assertEq(validatorsAfter.length, 3);
 
         // Compare valdiators

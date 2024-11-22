@@ -4,70 +4,6 @@ pragma solidity ^0.8.27;
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-struct ValidatorData {
-    uint256 votersCount;
-    uint256 voteBalance;
-    bool isResigned;
-    bytes blsPublicKey; // 96 bits
-}
-
-struct Validator {
-    address addr;
-    ValidatorData data;
-}
-
-struct RoundValidator {
-    address addr;
-    uint256 voteBalance;
-}
-
-struct Round {
-    uint256 round;
-    RoundValidator[] validators;
-}
-
-struct Vote {
-    address validator;
-    uint256 balance;
-    address prev;
-    address next;
-}
-
-struct VoteResult {
-    address voter;
-    address validator;
-}
-
-event ValidatorRegistered(address addr, bytes blsPublicKey);
-
-event ValidatorUpdated(address addr, bytes blsPublicKey);
-
-event ValidatorResigned(address addr);
-
-event Voted(address voter, address validator);
-
-event Unvoted(address voter, address validator);
-
-error CallerIsNotValidator();
-error ValidatorNotRegistered();
-error ValidatorAlreadyRegistered();
-error ValidatorAlreadyResigned();
-error BellowMinValidators();
-error NoActiveValidators();
-
-error BlsKeyAlreadyRegistered();
-error BlsKeyIsInvalid();
-
-error VoteResignedValidator();
-error VoteSameValidator();
-error VoteValidatorWithoutBlsPublicKey();
-error AlreadyVoted();
-error MissingVote();
-
-error InvalidRange(uint256 min, uint256 max);
-error InvalidParameters();
-error ImportIsNotAllowed();
-
 // Validators:
 // - Registered -> All validators that are registered including resigned validators
 // - Active -> Top N validators with the highest vote balance, that participate in the consensus
@@ -87,6 +23,70 @@ error ImportIsNotAllowed();
 // This process will only work fine if we pass the new wallet balance (88) and keep track of voteBalances in EVM contract.
 
 contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
+    struct ValidatorData {
+        uint256 votersCount;
+        uint256 voteBalance;
+        bool isResigned;
+        bytes blsPublicKey; // 96 bits
+    }
+
+    struct Validator {
+        address addr;
+        ValidatorData data;
+    }
+
+    struct RoundValidator {
+        address addr;
+        uint256 voteBalance;
+    }
+
+    struct Round {
+        uint256 round;
+        RoundValidator[] validators;
+    }
+
+    struct Vote {
+        address validator;
+        uint256 balance;
+        address prev;
+        address next;
+    }
+
+    struct VoteResult {
+        address voter;
+        address validator;
+    }
+
+    event ValidatorRegistered(address addr, bytes blsPublicKey);
+
+    event ValidatorUpdated(address addr, bytes blsPublicKey);
+
+    event ValidatorResigned(address addr);
+
+    event Voted(address voter, address validator);
+
+    event Unvoted(address voter, address validator);
+
+    error CallerIsNotValidator();
+    error ValidatorNotRegistered();
+    error ValidatorAlreadyRegistered();
+    error ValidatorAlreadyResigned();
+    error BellowMinValidators();
+    error NoActiveValidators();
+
+    error BlsKeyAlreadyRegistered();
+    error BlsKeyIsInvalid();
+
+    error VoteResignedValidator();
+    error VoteSameValidator();
+    error VoteValidatorWithoutBlsPublicKey();
+    error AlreadyVoted();
+    error MissingVote();
+
+    error InvalidRange(uint256 min, uint256 max);
+    error InvalidParameters();
+    error ImportIsNotAllowed();
+
     mapping(address => ValidatorData) private _validatorsData;
     mapping(address => bool) private _hasValidator;
     mapping(bytes32 => bool) private _blsPublicKeys;
