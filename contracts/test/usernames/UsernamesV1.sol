@@ -4,8 +4,6 @@ pragma solidity ^0.8.13;
 import {Test, console} from "@forge-std/Test.sol";
 import {
     UsernamesV1,
-    CallerIsOwner,
-    CallerIsNotOwner,
     InvalidUsername,
     TakenUsername,
     UsernameNotRegistered,
