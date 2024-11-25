@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/api-database",
-	"version": "0.0.1-evm.10",
-	"description": "API database for the Mainsail blockchain",
+	"name": "@mainsail/snapshot-legacy",
+	"version": "0.0.1-evm.9",
+	"description": "Mainsail snapshot from V3 legacy state",
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"type": "module",
@@ -19,7 +19,6 @@
 		"test:coverage": "c8 pnpm run test",
 		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
-		"typeorm": "typeorm",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
@@ -29,13 +28,26 @@
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10",
 		"pg": "8.13.1",
-		"typeorm": "0.3.20"
+		"typeorm": "0.3.20",
+		"fs-extra": "11.2.0",
+		"tmp": "0.2.3"
 	},
 	"devDependencies": {
+		"@types/fs-extra": "11.0.4",
+		"@types/pumpify": "1.4.4",
 		"@types/pg": "8.11.10",
+		"@types/tmp": "0.2.6",
+		"@types/env-paths": "2.1.0",
+		"env-paths": "3.0.0",
+		"sinon": "^17.0.1",
 		"uvu": "^0.5.6"
 	},
 	"engines": {
 		"node": ">=20.x"
+	},
+	"arkecosystem": {
+		"core": {
+			"alias": "state"
+		}
 	}
 }
