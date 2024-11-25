@@ -27,17 +27,17 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.10",
-		"pg": "8.13.1",
-		"typeorm": "0.3.20",
 		"fs-extra": "11.2.0",
-		"tmp": "0.2.3"
+		"pg": "8.13.1",
+		"tmp": "0.2.3",
+		"typeorm": "0.3.20"
 	},
 	"devDependencies": {
-		"@types/fs-extra": "11.0.4",
-		"@types/pumpify": "1.4.4",
-		"@types/pg": "8.11.10",
-		"@types/tmp": "0.2.6",
 		"@types/env-paths": "2.1.0",
+		"@types/fs-extra": "11.0.4",
+		"@types/pg": "8.11.10",
+		"@types/pumpify": "1.4.4",
+		"@types/tmp": "0.2.6",
 		"env-paths": "3.0.0",
 		"sinon": "^17.0.1",
 		"uvu": "^0.5.6"

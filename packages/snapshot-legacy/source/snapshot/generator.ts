@@ -1,12 +1,13 @@
+import { createHash } from "node:crypto";
+import { writeFile } from "node:fs/promises";
+
 import { inject, injectable } from "@mainsail/container";
 import { Application, Providers, Utils } from "@mainsail/kernel";
-import { Identifiers as InternalIdentifiers } from "../identifiers.js";
-import { LegacySnapshot, LegacyWallet } from "../interfaces.js";
 import { DataSource } from "typeorm";
 import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
 
-import { createHash } from "node:crypto";
-import { writeFile } from "node:fs/promises";
+import { Identifiers as InternalIdentifiers } from "../identifiers.js";
+import { LegacySnapshot, LegacyWallet } from "../interfaces.js";
 
 interface DatabaseOptions extends PostgresConnectionOptions {
 	readonly v3: {
@@ -55,19 +56,16 @@ export class Generator {
 
 		const hash = createHash("sha256");
 
-		const chainTip = (
-			await dataSource.query(
-				"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(id varchar, height bigint);",
-			)
-		)[0];
-
+		const [chainTip] = await dataSource.query(
+			"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(id varchar, height bigint);",
+		);
 		hash.update(JSON.stringify(chainTip));
 
 		// Loop all wallets
 		const limit = 1000;
 		let offset = 0;
 
-		let wallets: LegacyWallet[] = [];
+		const wallets: LegacyWallet[] = [];
 		for (;;) {
 			const chunk: LegacyWallet[] = await dataSource.query(`
 				SELECT * FROM dblink(
@@ -99,15 +97,15 @@ export class Generator {
 
 			offset += limit;
 
-			if (!chunk.length) {
+			if (chunk.length === 0) {
 				break;
 			}
 		}
 
 		// Write snapshot
 		const snapshot: LegacySnapshot = {
-			hash: hash.digest("hex"),
 			chainTip,
+			hash: hash.digest("hex"),
 			wallets,
 		};
 

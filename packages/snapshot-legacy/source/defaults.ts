@@ -29,9 +29,9 @@ export const defaults = {
 			Environment.get(Constants.EnvironmentVariables.CORE_TOKEN),
 
 		v3: {
-			user: "test_db",
-			password: "test_db",
 			database: "ark_devnet",
+			password: "test_db",
+			user: "test_db",
 		},
 	},
 };
