@@ -38,6 +38,7 @@ export type GenesisBlockOptions = {
 	premine: string;
 	pubKeyHash: number;
 	epoch: Date;
+	legacySnapshotPath?: string;
 };
 
 export type InternalOptions = EnvironmentOptions &

@@ -41,6 +41,18 @@ export class GenesisBlockGenerator extends Generator {
 
 		let transactions: Contracts.Crypto.Transaction[] = [];
 
+		if (options.legacySnapshotPath) {
+			// TODO:
+			// - read snapshot file
+			// - validate content hash
+			// - calculate premine
+			// - caculate state hash by loading snapshot into evm
+			// - include (compressed) snapshot data in genesis block
+			// - omit transactions (since there will be *many* wallets it is inefficient)
+			// - bootstrapper will check for snapshot data, validate it and seed the evm state instead
+			throw new Error("TODO");
+		}
+
 		if (options.distribute) {
 			transactions = transactions.concat(
 				...(await this.#createTransferTransactions(
