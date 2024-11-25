@@ -32,7 +32,7 @@ const EXCEPTIONS = {
 		devDependencies: [],
 	},
 	"@mainsail/configuration-generator": {
-		dependencies: ["@mainsail/crypto-key-pair-ecdsa", "@mainsail/crypto-signature-schnorr-secp256k1"],
+		dependencies: ["@mainsail/crypto-key-pair-ecdsa", "@mainsail/crypto-signature-schnorr-secp256k1", "@mainsail/snapshot-legacy"],
 		devDependencies: [],
 	},
 	"@mainsail/core": {
