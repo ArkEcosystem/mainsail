@@ -65,8 +65,6 @@ export class Peer implements Contracts.P2P.Peer {
 			return;
 		}
 
-		Utils.assert.defined<Contracts.P2P.HeaderData>(this.#header);
-
 		const changed = header.height !== this.#header.height || header.version !== this.#header.version;
 		if (changed) {
 			void this.events.dispatch(Events.PeerEvent.Updated, this);
