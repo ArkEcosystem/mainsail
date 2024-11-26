@@ -17,6 +17,7 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 	protected getEventMapping(): ListenerEventMapping {
 		return {
 			[Events.PeerEvent.Added]: ListenerEvent.OnAdded,
+			[Events.PeerEvent.Updated]: ListenerEvent.OnAdded, // upsert
 			[Events.PeerEvent.Removed]: ListenerEvent.OnRemoved,
 		};
 	}
