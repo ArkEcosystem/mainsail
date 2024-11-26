@@ -10,10 +10,12 @@ describe<{
 }>("Peer", ({ it, assert, beforeEach, each }) => {
 	const ip = "167.184.53.78";
 	const port = 4000;
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
 		context.peer = context.sandbox.app.resolve(Peer).init(ip, port);
 	});

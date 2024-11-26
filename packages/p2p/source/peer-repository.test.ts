@@ -8,11 +8,14 @@ describe<{
 	sandbox: Sandbox;
 	peerRepository: PeerRepository;
 }>("PeerRepository", ({ it, assert, beforeEach }) => {
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 		context.sandbox.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({});
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
 		context.peerRepository = context.sandbox.app.resolve(PeerRepository);
 	});

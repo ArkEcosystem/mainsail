@@ -9,11 +9,13 @@ describe<{
 	controller: GetPeersController;
 }>("GetPeersController", ({ it, assert, beforeEach, stub }) => {
 	const peerRepository = { getPeers: () => {} };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(peerRepository);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 		context.sandbox.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 
 		context.controller = context.sandbox.app.resolve(GetPeersController);

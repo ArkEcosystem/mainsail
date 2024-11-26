@@ -17,12 +17,14 @@ describe<{
 	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
 	const service = { boot: async () => {}, dispose: async () => {} };
 	const peerDisposer = { disposePeers: async () => {} };
+	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
 		context.sandbox = new Sandbox();
 
 		context.sandbox.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.sandbox.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
+		context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
 		context.serviceProvider = context.sandbox.app.resolve(ServiceProvider);
 	});
