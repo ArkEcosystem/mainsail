@@ -43,6 +43,7 @@ export enum PeerEvent {
 	Disconnected = "peer.disconnected",
 	Disconnecting = "peer.disconnecting",
 	Removed = "peer.removed",
+	Updated = "peer.updated",
 }
 
 export enum ConsensusEvent {

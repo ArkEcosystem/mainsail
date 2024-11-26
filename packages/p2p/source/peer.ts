@@ -1,5 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Types, Utils } from "@mainsail/kernel";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -9,6 +9,9 @@ import { getPeerUrl } from "./utils/get-peer-url.js";
 export class Peer implements Contracts.P2P.Peer {
 	@inject(Identifiers.Services.Queue.Factory)
 	private readonly createQueue!: Types.QueueFactory;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	public ip!: string;
 
@@ -54,7 +57,20 @@ export class Peer implements Contracts.P2P.Peer {
 	}
 
 	public set header(header: Contracts.P2P.HeaderData) {
+		const isUpdate = this.#header !== undefined;
+
 		this.#header = header;
+
+		if (!isUpdate) {
+			return;
+		}
+
+		Utils.assert.defined<Contracts.P2P.HeaderData>(this.#header);
+
+		const changed = header.height !== this.#header.height || header.version !== this.#header.version;
+		if (changed) {
+			void this.events.dispatch(Events.PeerEvent.Updated, this);
+		}
 	}
 
 	public recentlyPinged(): boolean {
