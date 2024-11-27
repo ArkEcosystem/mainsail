@@ -33,6 +33,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		});
 		this.app.bind(Identifiers.Database.Root).toConstantValue(rootStorage);
 		this.app.bind(Identifiers.Database.Storage.Block).toConstantValue(rootStorage.openDB({ name: "blocks" }));
+		this.app.bind(Identifiers.Database.Storage.BlockId).toConstantValue(rootStorage.openDB({ name: "block-id" }));
 		this.app.bind(Identifiers.Database.Storage.State).toConstantValue(rootStorage.openDB({ name: "state" }));
 	}
 }

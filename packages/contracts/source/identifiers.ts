@@ -129,6 +129,7 @@ export const Identifiers = {
 		Service: Symbol("Database<Service>"),
 		Storage: {
 			Block: Symbol("Database<Storage.Block>"),
+			BlockId: Symbol("Database<Storage.BlockId>"),
 			State: Symbol("Database<Storage.State>"),
 		},
 	},
