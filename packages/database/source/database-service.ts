@@ -10,6 +10,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.Storage.Block)
 	private readonly blockStorage!: lmdb.Database;
 
+	@inject(Identifiers.Database.Storage.BlockId)
+	private readonly blockIdStorage!: lmdb.Database;
+
 	@inject(Identifiers.Database.Storage.State)
 	private readonly stateStorage!: lmdb.Database;
 
@@ -118,6 +121,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		await this.rootDb.transaction(() => {
 			for (const [height, commit] of this.#cache.entries()) {
 				void this.blockStorage.put(height, Buffer.from(commit.serialized, "hex"));
+				void this.blockIdStorage.put(commit.block.data.id, height);
 			}
 
 			void this.stateStorage.put("state", this.#state);
