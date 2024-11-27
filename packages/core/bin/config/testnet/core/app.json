@@ -259,6 +259,12 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
+			"package": "@mainsail/crypto-messages"
+		},
+		{
+			"package": "@mainsail/crypto-commit"
+		},
+		{
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
@@ -275,6 +281,9 @@
 					"skipUnknownAttributes": true
 				}
 			}
+		},
+		{
+			"package": "@mainsail/database"
 		},
 		{
 			"package": "@mainsail/evm-service"
