@@ -10,6 +10,9 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
+
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
@@ -19,13 +22,15 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 		maxItems: 2,
 		minItems: 2,
 
-		// prefixItems: [{ enum: ["latest", "finalized", "safe"], type: "string" }, { type: "boolean" }],
-		prefixItems: [{ $ref: "prefixedHex" }, { type: "boolean" }],
+		prefixItems: [
+			{ oneOf: [{ $ref: "prefixedHex" }, { enum: ["latest", "finalized", "safe"], type: "string" }] }, // TODO: Extract block tag
+			{ type: "boolean" },
+		],
 		type: "array",
 	};
 
 	public async handle(parameters: [string, boolean]): Promise<object | null> {
-		const height = Number.parseInt(parameters[0]);
+		const height = parameters[0].startsWith("0x") ? Number.parseInt(parameters[0]) : this.stateStore.getHeight();
 		const transactionObject = parameters[1];
 
 		const commit = await this.databaseService.getCommit(height);
