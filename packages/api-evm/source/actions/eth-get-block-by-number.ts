@@ -1,6 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { BlockResource } from "../resources/index.js";
+
 @injectable()
 export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 	public readonly name: string = "eth_getBlockByNumber";
@@ -29,6 +31,6 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 			return null;
 		}
 
-		return commit.block;
+		return new BlockResource().transform(commit.block);
 	}
 }
