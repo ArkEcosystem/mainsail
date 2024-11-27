@@ -2,12 +2,8 @@ import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 
 @injectable()
-export class BlockResource implements Contracts.Api.Resource {
-	public raw(resource: Contracts.Crypto.Block): object {
-		throw new Error("Method not implemented.");
-	}
-
-	public async transform(block: Contracts.Crypto.Block): Promise<object> {
+export class BlockResource {
+	public async transform(block: Contracts.Crypto.Block, transactionObject: boolean): Promise<object> {
 		const blockData: Contracts.Crypto.BlockData = block.data;
 
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
@@ -29,7 +25,9 @@ export class BlockResource implements Contracts.Api.Resource {
 			gasLimit: "0x0", // TODO: Implement gas limit
 			gasUsed: `0x${blockData.totalGasUsed.toString(16)}`,
 			timestamp: `0x${blockData.timestamp.toString(16)}`,
-			transactions: block.transactions.map((transaction) => transaction.id), // TODO: Implement full transactions
+			transactions: transactionObject
+				? block.transactions.map((transaction) => transaction.data)
+				: block.transactions.map((transaction) => transaction.id),
 			uncles: [],
 		};
 		/* eslint-enable sort-keys-fix/sort-keys-fix */

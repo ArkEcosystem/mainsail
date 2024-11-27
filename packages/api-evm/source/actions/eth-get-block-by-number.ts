@@ -23,6 +23,7 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 
 	public async handle(parameters: [string, boolean]): Promise<object | null> {
 		const height = Number.parseInt(parameters[0]);
+		const transactionObject = parameters[1];
 
 		const commit = await this.databaseService.getCommit(height);
 
@@ -31,6 +32,6 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 			return null;
 		}
 
-		return new BlockResource().transform(commit.block);
+		return new BlockResource().transform(commit.block, transactionObject);
 	}
 }
