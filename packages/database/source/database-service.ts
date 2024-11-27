@@ -19,7 +19,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
-	#cache = new Map<number, Contracts.Crypto.Commit>();
+	#blockCache = new Map<number, Contracts.Crypto.Commit>();
+	#blockIdCache = new Map<string, number>();
 	#state = { height: 0, totalRound: 0 };
 
 	public async initialize(): Promise<void> {
@@ -38,7 +39,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public isEmpty(): boolean {
-		return this.#cache.size === 0 && this.blockStorage.getKeysCount() === 0;
+		return this.#blockCache.size === 0 && this.blockStorage.getKeysCount() === 0;
 	}
 
 	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
@@ -116,8 +117,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			throw new Error("Database is empty");
 		}
 
-		if (this.#cache.size > 0) {
-			return [...this.#cache.values()].pop()!;
+		if (this.#blockCache.size > 0) {
+			return [...this.#blockCache.values()].pop()!;
 		}
 
 		return await this.commitFactory.fromBytes(
@@ -126,7 +127,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
-		this.#cache.set(commit.block.data.height, commit);
+		this.#blockCache.set(commit.block.data.height, commit);
+		this.#blockIdCache.set(commit.block.data.id, commit.block.data.height);
 
 		this.#state.height = commit.block.data.height;
 		this.#state.totalRound += commit.proof.round + 1;
@@ -134,7 +136,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	async persist(): Promise<void> {
 		await this.rootDb.transaction(() => {
-			for (const [height, commit] of this.#cache.entries()) {
+			for (const [height, commit] of this.#blockCache.entries()) {
 				void this.blockStorage.put(height, Buffer.from(commit.serialized, "hex"));
 				void this.blockIdStorage.put(commit.block.data.id, height);
 			}
@@ -144,18 +146,22 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		await this.rootDb.flushed;
 
-		this.#cache.clear();
+		this.#blockCache.clear();
 	}
 
 	#get(height: number): Buffer | undefined {
-		if (this.#cache.has(height)) {
-			return Buffer.from(this.#cache.get(height)!.serialized, "hex");
+		if (this.#blockCache.has(height)) {
+			return Buffer.from(this.#blockCache.get(height)!.serialized, "hex");
 		}
 
 		return this.blockStorage.get(height);
 	}
 
 	#getHeightById(id: string): number | undefined {
+		if (this.#blockIdCache.has(id)) {
+			return this.#blockIdCache.get(id);
+		}
+
 		return this.blockIdStorage.get(id);
 	}
 
