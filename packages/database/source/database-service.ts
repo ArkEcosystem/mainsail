@@ -51,6 +51,21 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return undefined;
 	}
 
+	public async getCommitById(id: string): Promise<Contracts.Crypto.Commit | undefined> {
+		const height = this.#getHeightById(id);
+
+		if (height === undefined) {
+			return undefined;
+		}
+
+		const bytes = this.#get(height);
+		if (bytes) {
+			return await this.commitFactory.fromBytes(bytes);
+		}
+
+		return undefined;
+	}
+
 	public async findCommitBuffers(start: number, end: number): Promise<Buffer[]> {
 		const heights: number[] = [];
 
@@ -132,12 +147,16 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		this.#cache.clear();
 	}
 
-	#get(height: number): Buffer {
+	#get(height: number): Buffer | undefined {
 		if (this.#cache.has(height)) {
 			return Buffer.from(this.#cache.get(height)!.serialized, "hex");
 		}
 
 		return this.blockStorage.get(height);
+	}
+
+	#getHeightById(id: string): number | undefined {
+		return this.blockIdStorage.get(id);
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {

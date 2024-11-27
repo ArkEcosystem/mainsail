@@ -12,6 +12,7 @@ export interface DatabaseService {
 
 	getState(): State;
 	getCommit(height: number): Promise<Commit | undefined>;
+	getCommitById(id: string): Promise<Commit | undefined>;
 	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 	readCommits(start: number, end: number): AsyncGenerator<Commit>;
 	findBlocks(start: number, end: number): Promise<Block[]>;
