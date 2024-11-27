@@ -200,13 +200,7 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/state",
-			"options": {
-				"snapshots": {
-					"enabled": false,
-					"skipUnknownAttributes": true
-				}
-			}
+			"package": "@mainsail/state"
 		},
 		{
 			"package": "@mainsail/transaction-pool-service"
@@ -274,13 +268,7 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/state",
-			"options": {
-				"snapshots": {
-					"enabled": false,
-					"skipUnknownAttributes": true
-				}
-			}
+			"package": "@mainsail/state"
 		},
 		{
 			"package": "@mainsail/database"
