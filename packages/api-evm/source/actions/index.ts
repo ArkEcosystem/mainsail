@@ -1,6 +1,7 @@
 export * from "./eth-block-number.js";
 export * from "./eth-call.js";
 export * from "./eth-get-balance.js";
+export * from "./eth-get-block-by-number.js";
 export * from "./eth-get-code.js";
 export * from "./eth-get-storage-at.js";
 export * from "./eth-get-transaction-count.js";
