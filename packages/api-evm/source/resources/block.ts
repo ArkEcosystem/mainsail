@@ -1,10 +1,15 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class BlockResource {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	public async transform(block: Contracts.Crypto.Block, transactionObject: boolean): Promise<object> {
 		const blockData: Contracts.Crypto.BlockData = block.data;
+
+		const milestone = this.configuration.getMilestone(blockData.height);
 
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
@@ -22,7 +27,7 @@ export class BlockResource {
 			totalDifficulty: "0x0",
 			extraData: "0x",
 			size: `0x${blockData.payloadLength.toString(16)}`, // TODO: Implement block size
-			gasLimit: "0x0", // TODO: Implement gas limit
+			gasLimit: `0x${milestone.block.maxGasLimit.toString(16)}`,
 			gasUsed: `0x${blockData.totalGasUsed.toString(16)}`,
 			timestamp: `0x${blockData.timestamp.toString(16)}`,
 			transactions: transactionObject

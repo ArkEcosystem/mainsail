@@ -7,6 +7,9 @@ import { BlockResource } from "../resources/index.js";
 export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 	public readonly name: string = "eth_getBlockByNumber";
 
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
@@ -32,6 +35,6 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 			return null;
 		}
 
-		return new BlockResource().transform(commit.block, transactionObject);
+		return this.app.resolve(BlockResource).transform(commit.block, transactionObject);
 	}
 }
