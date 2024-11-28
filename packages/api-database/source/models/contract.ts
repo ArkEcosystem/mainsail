@@ -25,14 +25,13 @@ export class Contract {
 
 	@Column({
 		nullable: false,
+		type: "varchar",
+	})
+	public readonly activeImplementation!: string;
+
+	@Column({
+		nullable: false,
 		type: "jsonb",
 	})
 	public readonly implementations!: { address: string; abi: Record<string, any> }[];
-
-	@Column({
-		default: undefined,
-		nullable: true,
-		type: "varchar",
-	})
-	public readonly activeImplementation!: string | undefined;
 }
