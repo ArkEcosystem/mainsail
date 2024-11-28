@@ -57,15 +57,16 @@ export class Peer implements Contracts.P2P.Peer {
 	}
 
 	public set header(header: Contracts.P2P.HeaderData) {
-		const isUpdate = this.#header !== undefined;
+		const previousHeader = this.#header;
 
 		this.#header = header;
 
-		if (!isUpdate) {
+		if (previousHeader === undefined) {
 			return;
 		}
 
-		const changed = header.height !== this.#header.height || header.version !== this.#header.version;
+		const changed =
+			previousHeader.height !== this.#header.height || previousHeader.version !== this.#header.version;
 		if (changed) {
 			void this.events.dispatch(Events.PeerEvent.Updated, this);
 		}
