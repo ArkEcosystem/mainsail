@@ -10,9 +10,6 @@ export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
-
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
@@ -22,7 +19,7 @@ export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action {
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ $ref: "prefixedHex" }, { type: "boolean" }],
+		prefixItems: [{ $ref: "prefixedHex" }, { type: "boolean" }], // TODO: Replace prefixedHex with prefixedBlockId
 		type: "array",
 	};
 
