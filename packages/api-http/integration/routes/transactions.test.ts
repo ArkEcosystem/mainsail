@@ -4,6 +4,7 @@ import receiptTransactions from "../../test/fixtures/receipt_transactions.json";
 import transactions from "../../test/fixtures/transactions.json";
 import transactionSchemas from "../../test/fixtures/transactions_schemas.json";
 import transactionTypes from "../../test/fixtures/transactions_types.json";
+import wallets from "../../test/fixtures/wallets.json";
 import { ApiContext, prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { request } from "../../test/helpers/request";
 
@@ -54,6 +55,12 @@ describe<{
 					.filter((tx) => tx.data === "")
 					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
 			},
+			{
+				path: "/transactions?data=",
+				result: [...transactions]
+					.filter((tx) => tx.data === "")
+					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			},
 			{ path: "/transactions?data=88888888", result: [] },
 			{
 				path: "/transactions?data=6dd7d8ea",
@@ -70,6 +77,39 @@ describe<{
 		}
 	});
 
+	it("/transactions?address", async () => {
+		await apiContext.transactionRepository.save(transactions);
+		await apiContext.walletRepository.save(wallets);
+
+		const transaction = transactions[transactions.length - 1];
+		const testCases = [
+			{
+				path: `/transactions?senderAddress=${transaction.senderAddress}`,
+				result: [...transactions]
+					.filter((tx) => tx.senderAddress === transaction.senderAddress)
+					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			},
+			{
+				path: `/transactions?senderId=${transaction.senderAddress}`,
+				result: [...transactions]
+					.filter((tx) => tx.senderAddress === transaction.senderAddress)
+					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			},
+			{
+				path: `/transactions?address=${transaction.recipientAddress}`,
+				result: [...transactions]
+					.filter((tx) => tx.recipientAddress === transaction.recipientAddress)
+					.sort((a, b) => Number(b.blockHeight) - Number(a.blockHeight)),
+			},
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+	});
+	//
 	it("/transactions/{id}", async () => {
 		await apiContext.transactionRepository.save(transactions);
 

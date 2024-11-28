@@ -122,12 +122,12 @@
 		"updated_at": "0"
 	},
 	{
-		"address": "0x5C9b4723b238e30c8331573431EBd46bB9D48919",
-		"publicKey": "0291e54602a0d023b9289e560eea1c267b7769f6e3a40885ea5d450f7b59b0cef2",
+		"address": "0xdB1A9acDd71eb5F846059034EF6D2CB144cCd1A9",
+		"publicKey": "02b428a593af487a7ff7c755a5938ba527132fb850d9118252ec687d9a0b6ce8f7",
 		"balance": "2358490566037735849056603",
 		"nonce": "2",
 		"attributes": {
-			"vote": "0x5C9b4723b238e30c8331573431EBd46bB9D48919",
+			"vote": "0xdB1A9acDd71eb5F846059034EF6D2CB144cCd1A9",
 			"validatorRank": 20,
 			"validatorApproval": 0.0189,
 			"validatorResigned": false,
