@@ -1,8 +1,8 @@
 import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
-export const walletAddressSchema = Joi.string().alphanum(); /* TODO: .length(34); */
-export const walletPublicKeySchema = Joi.string().hex(); /* TODO: .length(66); */
+export const walletAddressSchema = Joi.string().hex({ prefix: true }).length(42);
+export const walletPublicKeySchema = Joi.string().hex({ prefix: false }).length(66);
 export const walletUsernameSchema = Joi.string().max(256);
 
 export const walletId = Joi.alternatives().try(

@@ -29,7 +29,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 			blockId: resource.blockId,
 
 			confirmations,
-			data: resource.data,
+			data: resource.data === "0x" ? "" : resource.data,
 			gasLimit: resource.gasLimit,
 
 			gasPrice: resource.gasPrice,

@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { walletAddressSchema } from "./wallets.js";
 
 // Old
 
@@ -12,7 +13,7 @@ export const orderBy = Joi.alternatives().try(
 	Joi.array().items(Joi.string().regex(/^[._a-z]{1,40}:(asc|desc)$/i)),
 );
 
-export const address = Joi.string().alphanum().max(96);
+export const address = walletAddressSchema;
 
 export const delegateIdentifier = Joi.string()
 	.regex(/^[\w!$&.@]+$/)
@@ -82,14 +83,14 @@ export const transactionCriteriaSchemas = {
 	asset: orContainsCriteria(Joi.object()),
 	blockId: orEqualCriteria(blockId),
 	data: orEqualCriteria(
-		Joi.alternatives().try(Joi.string().valid("0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
+		Joi.alternatives().try(Joi.string().valid("", "0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
 	),
 	gasFee: orNumericCriteria(Joi.number().integer().min(0)),
 	gasPrice: orNumericCriteria(Joi.number().integer().min(0)),
 	id: orEqualCriteria(Joi.string().hex().length(64)),
 	nonce: orNumericCriteria(Joi.number().integer().positive()),
 	recipientId: orEqualCriteria(address),
-	senderAddress: orEqualCriteria(Joi.string().hex().length(42)),
+	senderAddress: orEqualCriteria(address),
 	senderId: orEqualCriteria(address),
 	senderPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
 	sequence: orNumericCriteria(Joi.number().integer().positive()),
