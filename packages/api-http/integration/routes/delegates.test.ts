@@ -87,10 +87,8 @@ describe<{
 		await apiContext.walletRepository.save(delegates);
 		await apiContext.walletRepository.save(wallets);
 
-		const wallet = wallets[wallets.length - 1];
-
 		await assert.rejects(
-			async () => request(`/delegates/${wallet.address}/voters`, options),
+			async () => request(`/delegates/0x0000000000000000000000000000000000000001/voters`, options),
 			"Response code 404 (Not Found)",
 		);
 
@@ -99,7 +97,7 @@ describe<{
 		assert.equal(statusCode, 200);
 		assert.equal(
 			data.data,
-			wallets.filter((wallet) => wallet.attributes.vote === delegate.publicKey),
+			wallets.filter((wallet) => wallet.attributes.vote === delegate.address),
 		);
 	});
 

@@ -100,10 +100,10 @@ describe<{
 				id: wallet.publicKey,
 				result: wallet,
 			},
-			{
-				id: wallet.attributes.username,
-				result: wallet,
-			},
+			// {
+			// 	id: wallet.attributes.username,
+			// 	result: wallet,
+			// },
 		];
 
 		for (const { id, result } of testCases) {

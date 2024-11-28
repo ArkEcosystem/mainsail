@@ -1,14 +1,14 @@
 [
 	{
-		"address": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
-		"publicKey": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+		"address": "0x58712FE2A757d2240510eAc42086601B21EA741A",
+		"publicKey": "023fbcf58a4dcddfda8240fd9e8f92081f058719a3772f3bf3519d7d069ee45e74",
 		"balance": "0",
 		"nonce": "0",
 		"attributes": {
-			"vote": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+			"vote": "0x58712FE2A757d2240510eAc42086601B21EA741A",
 			"nonce": "0",
 			"balance": "13",
-			"publicKey": "9c633b08c5d3b384fdb4edaa30a6f5532216395e0af5d621715ee3417b1d8d54",
+			"publicKey": "023fbcf58a4dcddfda8240fd9e8f92081f058719a3772f3bf3519d7d069ee45e74",
 			"validatorRank": 13,
 			"validatorApproval": 1.8867924528301887,
 			"username": "genesis_13",
