@@ -163,11 +163,11 @@ export class Deployer {
 		);
 
 		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
-			name: "consensus",
-			address: proxyResult.receipt.deployedContractAddress!,
-			proxy: "UUPS",
-			implementations: [{ address: consensusContractAddress, abi: ConsensusAbi.abi }],
 			activeImplementation: consensusContractAddress,
+			address: proxyResult.receipt.deployedContractAddress!,
+			implementations: [{ abi: ConsensusAbi.abi, address: consensusContractAddress }],
+			name: "consensus",
+			proxy: "UUPS",
 		});
 
 		this.app
@@ -244,11 +244,11 @@ export class Deployer {
 		);
 
 		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
-			name: "usernames",
-			address: proxyResult.receipt.deployedContractAddress!,
-			proxy: "UUPS",
-			implementations: [{ address: usernamesContractAddress, abi: UsernamesAbi.abi }],
 			activeImplementation: usernamesContractAddress,
+			address: proxyResult.receipt.deployedContractAddress!,
+			implementations: [{ abi: UsernamesAbi.abi, address: usernamesContractAddress }],
+			name: "usernames",
+			proxy: "UUPS",
 		});
 
 		this.app
@@ -283,9 +283,9 @@ export class Deployer {
 		);
 
 		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
-			name: "multi-payments",
 			address: result.receipt.deployedContractAddress!,
-			implementations: [{ address: result.receipt.deployedContractAddress!, abi: MultiPaymentAbi.abi }],
+			implementations: [{ abi: MultiPaymentAbi.abi, address: result.receipt.deployedContractAddress! }],
+			name: "multi-payments",
 		});
 
 		return result.receipt.deployedContractAddress!;

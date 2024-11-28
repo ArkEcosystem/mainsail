@@ -16,14 +16,14 @@ export class ContractsController extends Controller {
 		const contracts = await contractRepository.createQueryBuilder().orderBy("name").addOrderBy("address").getMany();
 
 		return {
-			data: contracts.reduce((acc, prev) => {
-				acc[prev.name] = {
-					address: prev.address,
-					proxy: prev.proxy,
-					implementations: prev.implementations.map((impl) => impl.address),
-					activeImplementation: prev.activeImplementation,
+			data: contracts.reduce((accumulator, previous) => {
+				accumulator[previous.name] = {
+					activeImplementation: previous.activeImplementation,
+					address: previous.address,
+					implementations: previous.implementations.map((impl) => impl.address),
+					proxy: previous.proxy,
 				};
-				return acc;
+				return accumulator;
 			}, {}),
 		};
 	}

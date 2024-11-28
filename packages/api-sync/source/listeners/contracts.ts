@@ -25,11 +25,11 @@ export class DeployerContracts extends AbstractListener<Contracts.Evm.DeployerCo
 
 	protected mapEventToEntity(event: Contracts.Evm.DeployerContract): Models.Contract {
 		return {
-			name: event.name,
-			address: event.address,
-			proxy: event.proxy,
-			implementations: event.implementations,
 			activeImplementation: event.activeImplementation,
+			address: event.address,
+			implementations: event.implementations,
+			name: event.name,
+			proxy: event.proxy,
 		};
 	}
 

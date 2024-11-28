@@ -3,9 +3,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import * as ApiSyncContracts from "./contracts.js";
 import { ApiNodes } from "./listeners/api-nodes.js";
+import { DeployerContracts } from "./listeners/contracts.js";
 import { Peers } from "./listeners/peers.js";
 import { Plugins } from "./listeners/plugins.js";
-import { DeployerContracts } from "./listeners/contracts.js";
 
 @injectable()
 export class Listeners implements ApiSyncContracts.Listeners {

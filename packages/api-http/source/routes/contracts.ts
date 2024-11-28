@@ -21,8 +21,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					name: Joi.string().min(4).max(15),
 					implementation: address,
+					name: Joi.string().min(4).max(15),
 				}),
 			},
 		},
