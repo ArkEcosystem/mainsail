@@ -1,4 +1,5 @@
 import Joi from "joi";
+
 import { walletAddressSchema } from "./wallets.js";
 
 // Old
