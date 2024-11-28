@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { ethers, sha256 } from "ethers";
@@ -19,6 +19,9 @@ export class Deployer {
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -159,6 +162,14 @@ export class Deployer {
 			`Deployed Consensus PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
 		);
 
+		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
+			name: "consensus",
+			address: proxyResult.receipt.deployedContractAddress!,
+			proxy: "UUPS",
+			implementations: [{ address: consensusContractAddress, abi: ConsensusAbi.abi }],
+			activeImplementation: consensusContractAddress,
+		});
+
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
@@ -232,6 +243,14 @@ export class Deployer {
 			`Deployed Usernames PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
 		);
 
+		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
+			name: "usernames",
+			address: proxyResult.receipt.deployedContractAddress!,
+			proxy: "UUPS",
+			implementations: [{ address: usernamesContractAddress, abi: UsernamesAbi.abi }],
+			activeImplementation: usernamesContractAddress,
+		});
+
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
@@ -262,6 +281,12 @@ export class Deployer {
 		this.logger.info(
 			`Deployed MultiPayments contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
 		);
+
+		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
+			name: "multi-payments",
+			address: result.receipt.deployedContractAddress!,
+			implementations: [{ address: result.receipt.deployedContractAddress!, abi: MultiPaymentAbi.abi }],
+		});
 
 		return result.receipt.deployedContractAddress!;
 	}

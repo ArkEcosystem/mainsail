@@ -4,6 +4,7 @@ import * as ApiNodes from "./routes/api-nodes.js";
 import * as Blockchain from "./routes/blockchain.js";
 import * as Blocks from "./routes/blocks.js";
 import * as Commits from "./routes/commits.js";
+import * as DeployedContracts from "./routes/contracts.js";
 import * as Delegates from "./routes/delegates.js";
 import * as Node from "./routes/node.js";
 import * as Peers from "./routes/peers.js";
@@ -21,6 +22,7 @@ const config = {
 			Blocks,
 			Blockchain,
 			Commits,
+			DeployedContracts,
 			Delegates,
 			Peers,
 			Receipts,

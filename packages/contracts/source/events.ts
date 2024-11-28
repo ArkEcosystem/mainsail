@@ -57,6 +57,10 @@ export enum ConsensusEvent {
 	PrecommitedProposal = "consensus.precommited.proposal",
 }
 
+export enum DeployerEvent {
+	ContractCreated = "deployer.contractCreated",
+}
+
 export enum ApiNodeEvent {
 	Added = "apiNode.added",
 	Removed = "apiNode.removed",

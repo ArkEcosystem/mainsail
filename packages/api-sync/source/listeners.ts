@@ -5,6 +5,7 @@ import * as ApiSyncContracts from "./contracts.js";
 import { ApiNodes } from "./listeners/api-nodes.js";
 import { Peers } from "./listeners/peers.js";
 import { Plugins } from "./listeners/plugins.js";
+import { DeployerContracts } from "./listeners/contracts.js";
 
 @injectable()
 export class Listeners implements ApiSyncContracts.Listeners {
@@ -15,7 +16,7 @@ export class Listeners implements ApiSyncContracts.Listeners {
 
 	public async register(): Promise<void> {
 		// Listen to events before bootstrap, so we can catch all boot events.
-		for (const constructor of [ApiNodes, Peers, Plugins]) {
+		for (const constructor of [ApiNodes, DeployerContracts, Peers, Plugins]) {
 			const listener = this.app.resolve(constructor as interfaces.Newable<ApiSyncContracts.EventListener>);
 			await listener.register();
 			this.#listeners.push(listener);

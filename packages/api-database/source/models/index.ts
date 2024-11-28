@@ -1,5 +1,6 @@
 export * from "./api-node.js";
 export * from "./block.js";
+export * from "./contract.js";
 export * from "./configuration.js";
 export * from "./peer.js";
 export * from "./plugin.js";

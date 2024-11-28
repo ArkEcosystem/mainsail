@@ -9,6 +9,7 @@ import {
 	ApiNode,
 	Block,
 	Configuration,
+	Contract,
 	Peer,
 	Plugin,
 	Receipt,
@@ -22,6 +23,7 @@ import {
 	makeApiNodeRepository,
 	makeBlockRepository,
 	makeConfigurationRepository,
+	makeContractRepository,
 	makePeerRepository,
 	makePluginRepository,
 	makeReceiptRepository,
@@ -62,6 +64,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					ApiNode,
 					Block,
 					Configuration,
+					Contract,
 					Peer,
 					Plugin,
 					Receipt,
@@ -104,6 +107,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeConfigurationRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind(Identifiers.ContractRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeContractRepository(customDataSource ?? dataSource),
 				);
 
 			this.app
