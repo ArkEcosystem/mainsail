@@ -99,7 +99,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/fees-static",
 		"@mainsail/evm-service",
 		"@mainsail/evm-gas-fee",
-		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",

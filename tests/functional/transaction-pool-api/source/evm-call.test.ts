@@ -1,7 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
-import { ContractAbis } from "@mainsail/evm-development";
 import { BigNumber } from "@mainsail/utils";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";

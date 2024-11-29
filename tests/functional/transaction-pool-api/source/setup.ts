@@ -98,7 +98,6 @@ const setup = async () => {
 		"@mainsail/fees-static",
 		"@mainsail/evm-service",
 		"@mainsail/evm-gas-fee",
-		"@mainsail/evm-development",
 		"@mainsail/crypto-transaction",
 		"@mainsail/crypto-transaction-evm-call",
 		"@mainsail/state",

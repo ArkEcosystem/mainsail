@@ -7,7 +7,6 @@ import { ethers, sha256 } from "ethers";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
 // TODO: extract "evm-deployer" package to manage nonce, etc. when deploying protocol contracts.
-// Also see "evm-development" which this code is originally based on.
 
 @injectable()
 export class Deployer {

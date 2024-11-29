@@ -37,7 +37,7 @@ const EXCEPTIONS = {
 	},
 	"@mainsail/core": {
 		dependencies: [
-			'@mainsail/evm-consensus',
+			"@mainsail/evm-consensus",
 			"@mainsail/api-common",
 			"@mainsail/api-database",
 			"@mainsail/api-development",
@@ -83,7 +83,6 @@ const EXCEPTIONS = {
 			"@mainsail/evm-api-worker",
 			"@mainsail/evm-consensus",
 			"@mainsail/evm-contracts",
-			"@mainsail/evm-development",
 			"@mainsail/evm-gas-fee",
 			"@mainsail/evm-service",
 			"@mainsail/evm-state",
