@@ -62,7 +62,6 @@
 		"@mainsail/evm-api-worker": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
-		"@mainsail/evm-development": "workspace:*",
 		"@mainsail/evm-gas-fee": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-state": "workspace:*",

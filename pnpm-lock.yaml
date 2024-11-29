@@ -888,9 +888,6 @@ importers:
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
-      '@mainsail/evm-development':
-        specifier: workspace:*
-        version: link:../evm-development
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../evm-gas-fee
@@ -1841,25 +1838,6 @@ importers:
         version: 0.5.6
 
   packages/evm-contracts: {}
-
-  packages/evm-development:
-    dependencies:
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      ethers:
-        specifier: ^6.11.0
-        version: 6.13.1
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
 
   packages/evm-gas-fee:
     dependencies:
@@ -2933,9 +2911,6 @@ importers:
       '@mainsail/evm-api-worker':
         specifier: workspace:*
         version: link:../../../packages/evm-api-worker
-      '@mainsail/evm-development':
-        specifier: workspace:*
-        version: link:../../../packages/evm-development
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../../../packages/evm-gas-fee
@@ -3068,9 +3043,6 @@ importers:
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../../../packages/evm-consensus
-      '@mainsail/evm-development':
-        specifier: workspace:*
-        version: link:../../../packages/evm-development
       '@mainsail/evm-gas-fee':
         specifier: workspace:*
         version: link:../../../packages/evm-gas-fee
