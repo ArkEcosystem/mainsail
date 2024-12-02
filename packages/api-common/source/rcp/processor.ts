@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers, Exceptions } from "@mainsail/contracts";
 
 import { getRcpId, prepareRcpError } from "./utils.js";
 
@@ -37,7 +37,11 @@ export class Processor implements Contracts.Api.RPC.Processor {
 				jsonrpc: "2.0",
 				result: await action.handle(payload.params),
 			};
-		} catch {
+		} catch (error) {
+			if (error instanceof Exceptions.RpcError) {
+				return prepareRcpError(getRcpId(request), error.code, error.message);
+			}
+
 			return prepareRcpError(getRcpId(request), Contracts.Api.RPC.ErrorCode.InternalError);
 		}
 	}

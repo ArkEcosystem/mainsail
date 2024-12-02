@@ -27,10 +27,11 @@ export const errorMessageMap = {
 export const prepareRcpError = (
 	id: Contracts.Api.RPC.Id,
 	errorCode: Contracts.Api.RPC.ErrorCode,
+	message?: string,
 ): Contracts.Api.RPC.Error => ({
 	error: {
 		code: errorCode,
-		message: errorMessageMap[errorCode],
+		message: message ?? errorMessageMap[errorCode],
 	},
 	id,
 	jsonrpc: "2.0",
