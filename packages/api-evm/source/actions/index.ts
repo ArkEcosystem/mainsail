@@ -6,6 +6,7 @@ export * from "./eth-get-block-by-number.js";
 export * from "./eth-get-code.js";
 export * from "./eth-get-storage-at.js";
 export * from "./eth-get-transaction-count.js";
+export * from "./eth-get-uncle-count-by-block-hash.js";
 export * from "./net-listening.js";
 export * from "./net-peer-count.js";
 export * from "./web3-client-version.js";
