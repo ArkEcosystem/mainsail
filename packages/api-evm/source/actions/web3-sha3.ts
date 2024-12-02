@@ -7,11 +7,14 @@ export class Web3Sha3 implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
-		maxItems: 0,
+		maxItems: 1,
+		minItems: 1,
+
+		prefixItems: [{ $ref: "prefixedHex" }],
 		type: "array",
 	};
 
-	public async handle(parameters: []): Promise<string> {
+	public async handle(parameters: [string]): Promise<string> {
 		return `0x${0}`;
 	}
 }
