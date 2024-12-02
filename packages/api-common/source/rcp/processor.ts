@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers, Exceptions } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 import { getRcpId, prepareRcpError } from "./utils.js";
 
