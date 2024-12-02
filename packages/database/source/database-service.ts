@@ -67,6 +67,10 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return undefined;
 	}
 
+	public hasCommitById(id: string): boolean {
+		return this.#getHeightById(id) !== undefined;
+	}
+
 	public async findCommitBuffers(start: number, end: number): Promise<Buffer[]> {
 		const heights: number[] = [];
 
