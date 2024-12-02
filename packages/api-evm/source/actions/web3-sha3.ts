@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
+import { keccak256 } from "ethers";
 
 @injectable()
 export class Web3Sha3 implements Contracts.Api.RPC.Action {
@@ -15,6 +16,6 @@ export class Web3Sha3 implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [string]): Promise<string> {
-		return `0x${0}`;
+		return `0x${keccak256(parameters[0]).slice(2)}`;
 	}
 }
