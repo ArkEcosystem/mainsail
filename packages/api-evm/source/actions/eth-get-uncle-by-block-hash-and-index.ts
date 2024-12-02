@@ -10,10 +10,10 @@ export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action 
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
-		maxItems: 1,
-		minItems: 1,
+		maxItems: 2,
+		minItems: 2,
 
-		prefixItems: [{ $ref: "prefixedHex" }], // TODO: Replace prefixedHex with prefixedBlockId
+		prefixItems: [{ $ref: "prefixedHex" }, { $ref: "prefixedHex" }], // TODO: Replace prefixedHex with prefixedBlockId
 		type: "array",
 	};
 
