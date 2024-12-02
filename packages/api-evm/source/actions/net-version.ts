@@ -1,8 +1,11 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class NetVersion implements Contracts.Api.RPC.Action {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	public readonly name: string = "net_version";
 
 	public readonly schema = {
@@ -12,6 +15,6 @@ export class NetVersion implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: []): Promise<string> {
-		return "";
+		return this.configuration.get<string>("network.nethash");
 	}
 }
