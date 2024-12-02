@@ -1,8 +1,11 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class EthGetUncleCountByBlockHash implements Contracts.Api.RPC.Action {
+	@inject(Identifiers.Database.Service)
+	private readonly databaseService!: Contracts.Database.DatabaseService;
+
 	public readonly name: string = "eth_getUncleCountByBlockHash";
 
 	public readonly schema = {
@@ -14,7 +17,11 @@ export class EthGetUncleCountByBlockHash implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: []): Promise<string> {
+	public async handle(parameters: [string]): Promise<string> {
+		if (!this.databaseService.hasCommitById(parameters[0])) {
+			throw new Exceptions.RpcError("Block not found");
+		}
+
 		return `0x0`;
 	}
 }
