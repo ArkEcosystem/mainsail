@@ -17,6 +17,7 @@ import {
 	EthGetUncleCountByBlockNumber,
 	NetListeningAction,
 	NetPeerCountAction,
+	NetVersion,
 	Web3ClientVersionAction,
 	Web3Sha3,
 } from "./actions/index.js";
@@ -83,6 +84,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			this.app.resolve(EthGetUncleCountByBlockNumber),
 			this.app.resolve(NetListeningAction),
 			this.app.resolve(NetPeerCountAction),
+			this.app.resolve(NetVersion),
 			this.app.resolve(Web3ClientVersionAction),
 			this.app.resolve(Web3Sha3),
 		];
