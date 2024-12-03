@@ -194,7 +194,7 @@ export class Restore {
 		let currentHeight = 0;
 
 		do {
-			const commits = await this.databaseService.findCommits(
+			const commits = this.databaseService.readCommits(
 				Math.min(currentHeight, mostRecentCommit.block.header.height),
 				Math.min(currentHeight + BATCH_SIZE, mostRecentCommit.block.header.height),
 			);
@@ -202,7 +202,7 @@ export class Restore {
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
 
-			for (const { proof, block } of commits) {
+			for await (const { proof, block } of commits) {
 				blocks.push({
 					commitRound: proof.round,
 					generatorAddress: block.header.generatorAddress,
