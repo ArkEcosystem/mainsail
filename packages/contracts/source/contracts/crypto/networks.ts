@@ -52,6 +52,10 @@ export type MilestoneGas = {
 	nativeFeeMultiplier: number;
 };
 
+export type MilestoneSnapshot = {
+	hash?: string;
+};
+
 export type Milestone = {
 	height: number;
 	activeValidators: number;
@@ -63,6 +67,7 @@ export type Milestone = {
 	reward: string;
 	satoshi: MilestoneSatoshi;
 	timeouts: MilestoneTimeouts;
+	snapshot?: MilestoneSnapshot;
 	vendorFieldLength: number;
 };
 

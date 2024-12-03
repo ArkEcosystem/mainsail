@@ -11,6 +11,7 @@ export * as P2P from "./p2p/index.js";
 export * as Processor from "./processor.js";
 export * as Proposer from "./proposer.js";
 export * as Serializer from "./serializer.js";
+export * as Snapshot from "./snapshot.js";
 export * as Shared from "./shared/index.js";
 export * as State from "./state/index.js";
 export * as TransactionPool from "./transaction-pool/index.js";

@@ -38,7 +38,13 @@ export type GenesisBlockOptions = {
 	premine: string;
 	pubKeyHash: number;
 	epoch: Date;
-	legacySnapshotPath?: string;
+	snapshot?: SnapshotOptions;
+};
+
+export type SnapshotOptions = {
+	path: string;
+	snapshotHash?: string;
+	stateHash?: string;
 };
 
 export type InternalOptions = EnvironmentOptions &
