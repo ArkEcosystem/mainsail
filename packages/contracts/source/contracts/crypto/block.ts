@@ -75,8 +75,6 @@ export interface BlockFactory {
 }
 
 export interface BlockSerializer {
-	headerSize(): number;
-
 	totalSize(block: BlockDataSerializable): number;
 
 	serializeHeader(block: BlockDataSerializable): Promise<Buffer>;

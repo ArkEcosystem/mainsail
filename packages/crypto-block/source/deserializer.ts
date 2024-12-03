@@ -18,8 +18,8 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+	@inject(Identifiers.Cryptography.Block.HeaderSize)
+	private readonly headerSize!: () => number;
 
 	public async deserializeHeader(serialized: Buffer): Promise<Contracts.Crypto.BlockHeader> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -51,7 +51,7 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 		const block = {} as Contracts.Crypto.BlockHeader;
 
 		await this.serializer.deserialize<Contracts.Crypto.BlockData>(buffer, block, {
-			length: this.blockSerializer.headerSize(),
+			length: this.headerSize(),
 			schema: {
 				version: {
 					type: "uint8",

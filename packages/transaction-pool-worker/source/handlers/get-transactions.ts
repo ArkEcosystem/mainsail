@@ -9,12 +9,12 @@ export class GetTransactionsHandler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly blockSerializer!: Contracts.Crypto.BlockSerializer;
+	@inject(Identifiers.Cryptography.Block.HeaderSize)
+	private readonly headerSize!: () => number;
 
 	public async handle(): Promise<string[]> {
 		const milestone = this.configuration.getMilestone();
-		let bytesLeft: number = milestone.block.maxPayload - this.blockSerializer.headerSize();
+		let bytesLeft: number = milestone.block.maxPayload - this.headerSize();
 
 		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
 		for (const transaction of await this.poolQuery.getFromHighestPriority().all()) {
