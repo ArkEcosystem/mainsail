@@ -32,6 +32,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
+
 	@inject(Identifiers.Cryptography.Commit.ProofSize)
 	private readonly proofSize!: () => number;
 
@@ -40,6 +43,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	#commitCache = new Map<number, Contracts.Crypto.Commit>();
 	#blockIdCache = new Map<string, number>();
+	#transactionCache = new Map<string, Contracts.Crypto.Transaction>();
+
 	#state = { height: 0, totalRound: 0 };
 
 	public async initialize(): Promise<void> {
@@ -140,6 +145,20 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		);
 	}
 
+	public async getTransactionById(id: string): Promise<Contracts.Crypto.Transaction | undefined> {
+		if (this.#transactionCache.has(id)) {
+			return this.#transactionCache.get(id);
+		}
+
+		const transactionBytes: Buffer | undefined = this.transactionStorage.get(id);
+
+		if (!transactionBytes) {
+			return undefined;
+		}
+
+		return await this.transactionFactory.fromBytes(transactionBytes);
+	}
+
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
 			const data = this.#readCommitBytes(height);
@@ -169,6 +188,10 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	public addCommit(commit: Contracts.Crypto.Commit): void {
 		this.#commitCache.set(commit.block.data.height, commit);
 		this.#blockIdCache.set(commit.block.data.id, commit.block.data.height);
+
+		for (const tx of commit.block.transactions) {
+			this.#transactionCache.set(tx.id, tx);
+		}
 
 		this.#state.height = commit.block.data.height;
 		this.#state.totalRound += commit.proof.round + 1;
