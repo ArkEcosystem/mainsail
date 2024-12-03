@@ -20,11 +20,20 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.Storage.State)
 	private readonly stateStorage!: lmdb.Database;
 
+	@inject(Identifiers.Database.Storage.Transaction)
+	private readonly transactionStorage!: lmdb.Database;
+
+	@inject(Identifiers.Database.Storage.TransactionIds)
+	private readonly transactionIdsStorage!: lmdb.Database;
+
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
 	@inject(Identifiers.Cryptography.Commit.ProofSize)
 	private readonly proofSize!: () => number;
+
+	@inject(Identifiers.Cryptography.Block.HeaderSize)
+	private readonly headerSize!: () => number;
 
 	#commitCache = new Map<number, Contracts.Crypto.Commit>();
 	#blockIdCache = new Map<string, number>();
@@ -148,10 +157,17 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		await this.rootDb.transaction(() => {
 			for (const [height, commit] of this.#commitCache.entries()) {
 				const proofSize = this.proofSize();
-				const buff = Buffer.from(commit.serialized, "hex");
+				const buff = Buffer.from(commit.serialized, "hex"); // TODO: Slice to reduce buffer size
 
 				void this.commitStorage.put(height, buff.subarray(0, proofSize));
-				void this.blockStorage.put(height, buff.subarray(proofSize));
+				void this.blockStorage.put(height, buff.subarray(proofSize, proofSize + this.headerSize()));
+				void this.transactionIdsStorage.put(
+					height,
+					commit.block.transactions.map((tx) => tx.id),
+				);
+				for (const tx of commit.block.transactions) {
+					void this.transactionStorage.put(tx.id, tx.serialized);
+				}
 				void this.blockIdStorage.put(commit.block.data.id, height);
 			}
 
@@ -183,7 +199,22 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 		const blockBuffer: Buffer | undefined = this.blockStorage.get(height);
 		Utils.assert.defined<Buffer>(blockBuffer);
-		return Buffer.concat([commitBuffer, blockBuffer]);
+
+		const transactionIds: string[] | undefined = this.transactionIdsStorage.get(height);
+		Utils.assert.defined<string[]>(transactionIds);
+
+		const transactions: Buffer[] = [];
+		for (const id of transactionIds) {
+			const transaction: Buffer | undefined = this.transactionStorage.get(id);
+			Utils.assert.defined<Buffer>(transaction);
+
+			const sizeBuff = Buffer.alloc(2);
+			sizeBuff.writeUInt16LE(transaction.length, 0);
+			transactions.push(sizeBuff);
+			transactions.push(transaction);
+		}
+
+		return Buffer.concat([commitBuffer, blockBuffer, ...transactions]);
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
