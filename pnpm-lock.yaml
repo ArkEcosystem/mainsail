@@ -736,8 +736,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       lmdb:
-        specifier: 3.1.4
-        version: 3.1.4
+        specifier: 3.2.0
+        version: 3.2.0
     devDependencies:
       uvu:
         specifier: ^0.5.6
@@ -1771,8 +1771,8 @@ importers:
         specifier: workspace:*
         version: link:../kernel
       lmdb:
-        specifier: 3.1.4
-        version: 3.1.4
+        specifier: 3.2.0
+        version: 3.2.0
     devDependencies:
       '@types/tmp':
         specifier: 0.2.6
@@ -3540,33 +3540,33 @@ packages:
     resolution: {integrity: sha512-0hZxUPKnHwehUO2xC4ldtdX9bW0W1UosxebDIQlZL2STnZnA2IFmIk2lJVUyFW+cmTPQzV93jfS0i69T9Z+teg==}
     engines: {node: ^14.17.0 || >=16.0.0}
 
-  '@lmdb/lmdb-darwin-arm64@3.1.4':
-    resolution: {integrity: sha512-bXwBegGNDGAlshGqUmV8MxVFPsqEpU2yWWxoJ4AA4UkEd7gA1Rzh7KtvM5Tww0dQfp5t+P/SjNV3vjpAgof+uA==}
+  '@lmdb/lmdb-darwin-arm64@3.2.0':
+    resolution: {integrity: sha512-Ca5N6DGDlH/lIycMj2U3FtokNPdUmGyL+htto3G+gexoXYaDE9cbojVgwXd3/Zih9Friqh7l5qZk+LZEVDwJvQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@lmdb/lmdb-darwin-x64@3.1.4':
-    resolution: {integrity: sha512-cb1/yeoUfWhVWqo8VImUWo6bXVn57AHPX98VqIkpfRw5Yh0z2DHPBZmsELb1OLJKeikAAOyxM+vPWRJYtAg9rw==}
+  '@lmdb/lmdb-darwin-x64@3.2.0':
+    resolution: {integrity: sha512-s/MXLuRXxJjQpg0aM/yN3FJh34tqEPo6Zg+FJvc9+gUNpzXzZwBB9MOTYA05WVrvxwtIKxMg7ocLjAH1LQUT3A==}
     cpu: [x64]
     os: [darwin]
 
-  '@lmdb/lmdb-linux-arm64@3.1.4':
-    resolution: {integrity: sha512-Hs1cmv8SKEkczsiQbRYVeqI7vzpJ0LI29RyeaVNDDFJxzoua7IcuyG0wSXu12kpXlGTTLVOh1Wp4rK79Ixpxmg==}
+  '@lmdb/lmdb-linux-arm64@3.2.0':
+    resolution: {integrity: sha512-XRkaZok4AkzMXKLfsdJYVBXYJ/6idDpuLIPGiVjelxKLbZIKB7F+Xp2BDfeelAPdjRbW/qhzF7FNA0u1blz/Og==}
     cpu: [arm64]
     os: [linux]
 
-  '@lmdb/lmdb-linux-arm@3.1.4':
-    resolution: {integrity: sha512-9O3kU6i7crV0vi+ImbZG6SkD+T8sxjbugq4pY424tjV8X/EjSfs1E0n25We5Z7qpJFxZSJZKsv40tJlz1w4pLg==}
+  '@lmdb/lmdb-linux-arm@3.2.0':
+    resolution: {integrity: sha512-e9pljI8rZk1UAaDdi7sGiY0zkqsNAS3a4llOuk2UslAH4UP9vGZfjfCR5D+HKPUPbSEk28adOiNmIUT4N2lTBw==}
     cpu: [arm]
     os: [linux]
 
-  '@lmdb/lmdb-linux-x64@3.1.4':
-    resolution: {integrity: sha512-e/xPxFjSBzuN7/nb5WBYO1t9X1NBiNYy+gvWB3rb95K2W5qJU9fnjx+CNFp7ucvQZWF08EsVzMBa7eXKGGmHjg==}
+  '@lmdb/lmdb-linux-x64@3.2.0':
+    resolution: {integrity: sha512-c8HMb044qzMT/wvk4HzBesRv3wQNeFkUFz6laH3FKVs0+ztM7snuT3izPWdeYhgCLkAiIqshqlcbvzQfPDeg2Q==}
     cpu: [x64]
     os: [linux]
 
-  '@lmdb/lmdb-win32-x64@3.1.4':
-    resolution: {integrity: sha512-mUcWgKmpbquKaDEcJ+FBtJpcqHvJW2Ce+GKMP/B/Hm9IxGjUfGs0aGlax2Nh/mjzXx/7qfwyCGD8y+KXfDuMsA==}
+  '@lmdb/lmdb-win32-x64@3.2.0':
+    resolution: {integrity: sha512-xcrdSOPtpZ4ScWJM2x4g+eWCOctINOcaEWGSvZbmXPFD69SAFywyhqNsB3snAY3assYV0B52PWmiAwXWfijd+g==}
     cpu: [x64]
     os: [win32]
 
@@ -7233,8 +7233,8 @@ packages:
     resolution: {integrity: sha512-RmAl7su35BFd/xoMamRjpIE4j3v+L28o8CT5YhAXQJm1fD+1l9ngXY8JAQRJ+tFK2i5njvi0iRUKV09vPwA0iA==}
     engines: {node: '>=6'}
 
-  lmdb@3.1.4:
-    resolution: {integrity: sha512-M3P0HBm0e6SUCrWqMf+wjs5LTRQekh1TtC10e3NjCfLECCXLRXHFROG2kErdyyv2MQ5335Qvb3KQKCSLUuwUDg==}
+  lmdb@3.2.0:
+    resolution: {integrity: sha512-cDeZAM4mXOwN1IdH93a91qXppn4jXV4NHphg53bqQDRFjJnpYZTgGcjrqpsmm209DtXTvmKMcYJd+XrHybwFZg==}
     hasBin: true
 
   load-json-file@4.0.0:
@@ -7644,8 +7644,8 @@ packages:
     resolution: {integrity: sha512-P0efT1C9jIdVRefqjzOQ9Xml57zpOXnIuS+csaB4MdZbTdmGDLo8XhzBG1N7aO11gKDDkJvBLULeFTo46wwreA==}
     hasBin: true
 
-  msgpackr@1.10.2:
-    resolution: {integrity: sha512-L60rsPynBvNE+8BWipKKZ9jHcSGbtyJYIwjRq0VrIvQ08cRjntGXJYW/tmciZ2IHWIY8WEW32Qa2xbh5+SKBZA==}
+  msgpackr@1.11.2:
+    resolution: {integrity: sha512-F9UngXRlPyWCDEASDpTf6c9uNhGPTqnTeLVt7bN+bU1eajoR/8V9ys2BRaV5C/e5ihE6sJ9uPIKaYt6bFuO32g==}
 
   multimatch@5.0.0:
     resolution: {integrity: sha512-ypMKuglUrZUD99Tk2bUQ+xNQj43lPEfAeX2o9cTteAmShXy2VHDJpuwu1o0xqoKCt9jLVAvwyFKdLTPXKAfJyA==}
@@ -10593,22 +10593,22 @@ snapshots:
       - nx
       - supports-color
 
-  '@lmdb/lmdb-darwin-arm64@3.1.4':
+  '@lmdb/lmdb-darwin-arm64@3.2.0':
     optional: true
 
-  '@lmdb/lmdb-darwin-x64@3.1.4':
+  '@lmdb/lmdb-darwin-x64@3.2.0':
     optional: true
 
-  '@lmdb/lmdb-linux-arm64@3.1.4':
+  '@lmdb/lmdb-linux-arm64@3.2.0':
     optional: true
 
-  '@lmdb/lmdb-linux-arm@3.1.4':
+  '@lmdb/lmdb-linux-arm@3.2.0':
     optional: true
 
-  '@lmdb/lmdb-linux-x64@3.1.4':
+  '@lmdb/lmdb-linux-x64@3.2.0':
     optional: true
 
-  '@lmdb/lmdb-win32-x64@3.1.4':
+  '@lmdb/lmdb-win32-x64@3.2.0':
     optional: true
 
   '@msgpackr-extract/msgpackr-extract-darwin-arm64@3.0.3':
@@ -14905,20 +14905,20 @@ snapshots:
       - zen-observable
       - zenObservable
 
-  lmdb@3.1.4:
+  lmdb@3.2.0:
     dependencies:
-      msgpackr: 1.10.2
+      msgpackr: 1.11.2
       node-addon-api: 6.1.0
       node-gyp-build-optional-packages: 5.2.2
       ordered-binary: 1.5.3
       weak-lru-cache: 1.2.2
     optionalDependencies:
-      '@lmdb/lmdb-darwin-arm64': 3.1.4
-      '@lmdb/lmdb-darwin-x64': 3.1.4
-      '@lmdb/lmdb-linux-arm': 3.1.4
-      '@lmdb/lmdb-linux-arm64': 3.1.4
-      '@lmdb/lmdb-linux-x64': 3.1.4
-      '@lmdb/lmdb-win32-x64': 3.1.4
+      '@lmdb/lmdb-darwin-arm64': 3.2.0
+      '@lmdb/lmdb-darwin-x64': 3.2.0
+      '@lmdb/lmdb-linux-arm': 3.2.0
+      '@lmdb/lmdb-linux-arm64': 3.2.0
+      '@lmdb/lmdb-linux-x64': 3.2.0
+      '@lmdb/lmdb-win32-x64': 3.2.0
 
   load-json-file@4.0.0:
     dependencies:
@@ -15437,7 +15437,7 @@ snapshots:
       '@msgpackr-extract/msgpackr-extract-win32-x64': 3.0.3
     optional: true
 
-  msgpackr@1.10.2:
+  msgpackr@1.11.2:
     optionalDependencies:
       msgpackr-extract: 3.0.3
 
