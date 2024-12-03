@@ -19,6 +19,8 @@ export interface DatabaseService {
 	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 	readCommits(start: number, end: number): AsyncGenerator<Commit>;
 
+	getBlock(height: number): Promise<Block | undefined>;
+	getBlockById(id: string): Promise<Block | undefined>;
 	findBlocks(start: number, end: number): Promise<Block[]>;
 
 	addCommit(block: Commit): void;

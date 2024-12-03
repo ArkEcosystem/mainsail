@@ -29,6 +29,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
 
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+
 	@inject(Identifiers.Cryptography.Commit.ProofSize)
 	private readonly proofSize!: () => number;
 
@@ -103,6 +106,31 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 				}
 			})
 			.filter((block): block is Buffer => !!block);
+	}
+
+	public async getBlock(height: number): Promise<Contracts.Crypto.Block | undefined> {
+		const bytes = this.#readBlockBytes(height);
+
+		if (bytes) {
+			return await this.blockFactory.fromBytes(bytes);
+		}
+
+		return undefined;
+	}
+
+	public async getBlockById(id: string): Promise<Contracts.Crypto.Block | undefined> {
+		const height = this.#getHeightById(id);
+
+		if (height === undefined) {
+			return undefined;
+		}
+
+		const bytes = this.#readBlockBytes(height);
+		if (bytes) {
+			return await this.blockFactory.fromBytes(bytes);
+		}
+
+		return undefined;
 	}
 
 	public async findBlocks(start: number, end: number): Promise<Contracts.Crypto.Block[]> {
@@ -190,8 +218,21 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return;
 		}
 
-		const blockBuffer: Buffer | undefined = this.blockStorage.get(height);
+		const blockBuffer: Buffer | undefined = this.#readBlockBytes(height);
 		Utils.assert.defined<Buffer>(blockBuffer);
+
+		return Buffer.concat([commitBuffer, blockBuffer]);
+	}
+
+	#readBlockBytes(height: number): Buffer | undefined {
+		if (this.#commitCache.has(height)) {
+			return Buffer.from(this.#commitCache.get(height)!.serialized, "hex").subarray(this.proofSize());
+		}
+
+		const blockBuffer: Buffer | undefined = this.blockStorage.get(height);
+		if (!blockBuffer) {
+			return;
+		}
 
 		const transactionIds: string[] | undefined = this.transactionIdsStorage.get(height);
 		Utils.assert.defined<string[]>(transactionIds);
@@ -206,7 +247,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			transactions.push(sizeBuff, transaction);
 		}
 
-		return Buffer.concat([commitBuffer, blockBuffer, ...transactions]);
+		return Buffer.concat([blockBuffer, ...transactions]);
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
