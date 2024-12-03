@@ -33,8 +33,6 @@ export interface CommitProof {
 }
 
 export interface CommitSerializer {
-	proofSize(): number;
-
 	serializeCommitProof(proof: CommitProof): Promise<Buffer>;
 
 	serializeCommit(commit: CommitSerializable): Promise<Buffer>;

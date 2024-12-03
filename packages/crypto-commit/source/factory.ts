@@ -7,16 +7,16 @@ export class CommitFactory implements Contracts.Crypto.CommitFactory {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
-	@inject(Identifiers.Cryptography.Commit.Serializer)
-	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
-
 	@inject(Identifiers.Cryptography.Commit.Deserializer)
 	private readonly commitDeserializer!: Contracts.Crypto.CommitDeserializer;
+
+	@inject(Identifiers.Cryptography.Commit.ProofSize)
+	private readonly proofSize!: () => number;
 
 	public async fromBytes(buff: Buffer): Promise<Contracts.Crypto.Commit> {
 		const buffer = ByteBuffer.fromBuffer(buff);
 
-		const proofBuffer = buffer.readBytes(this.commitSerializer.proofSize());
+		const proofBuffer = buffer.readBytes(this.proofSize());
 		const proof = await this.commitDeserializer.deserializeCommitProof(proofBuffer);
 
 		const block = await this.blockFactory.fromBytes(buffer.getRemainder());

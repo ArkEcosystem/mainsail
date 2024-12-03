@@ -6,15 +6,8 @@ export class Serializer implements Contracts.Crypto.CommitSerializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	@inject(Identifiers.Cryptography.Message.Serializer)
-	private readonly messageSerializer!: Contracts.Crypto.MessageSerializer;
-
-	public proofSize(): number {
-		return (
-			4 + // round
-			+this.messageSerializer.lockProofSize()
-		);
-	}
+	@inject(Identifiers.Cryptography.Commit.ProofSize)
+	private readonly proofSize!: () => number;
 
 	public async serializeCommitProof(commit: Contracts.Crypto.CommitProof): Promise<Buffer> {
 		return this.serializer.serialize<Contracts.Crypto.CommitProof>(commit, {

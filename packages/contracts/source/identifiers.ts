@@ -64,6 +64,7 @@ export const Identifiers = {
 		Commit: {
 			Deserializer: Symbol("Crypto<Commit.Deserializer>"),
 			Factory: Symbol("Crypto<Commit.Factory>"),
+			ProofSize: Symbol("Crypto<Commit.ProofSize>"),
 			Serializer: Symbol("Crypto<Commit.Serializer>"),
 		},
 		Configuration: Symbol("Crypto<Configuration>"),
