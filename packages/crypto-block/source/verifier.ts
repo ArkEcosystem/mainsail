@@ -24,12 +24,13 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 		try {
 			const constants = this.configuration.getMilestone(blockData.height);
 
-			if (blockData.height === 0) {
-				if (blockData.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
-					// TODO: verify snapshot
-					console.log("TODO: verify snapshot");
-					// result.errors.push("Genesis block has invalid previous block");
-				}
+			if (
+				blockData.height === 0 &&
+				blockData.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000"
+			) {
+				// TODO: verify snapshot
+				console.log("TODO: verify snapshot");
+				// result.errors.push("Genesis block has invalid previous block");
 			}
 
 			if (blockData.height !== 0 && !blockData.previousBlock) {

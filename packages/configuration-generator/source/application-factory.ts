@@ -16,8 +16,8 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as EvmService } from "@mainsail/evm-service";
 import { Application } from "@mainsail/kernel";
-import { ServiceProvider as CoreSnapshotLegacyImporter } from "@mainsail/snapshot-legacy-importer";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
+import { ServiceProvider as CoreSnapshotLegacyImporter } from "@mainsail/snapshot-legacy-importer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -45,10 +45,8 @@ export const makeApplication = async (configurationPath: string, options: Record
 	// Used for evm instance
 	const fsExtra = await import("fs-extra/esm");
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
-		readJSONSync: (file: string, options?: Record<string, any>) => {
-			return fsExtra.readJSONSync(file, options);
-		},
 		existsSync: () => true,
+		readJSONSync: (file: string, options?: Record<string, any>) => fsExtra.readJSONSync(file, options),
 	});
 	setGracefulCleanup();
 	app.rebind("path.data").toConstantValue(dirSync().name);
@@ -76,8 +74,8 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
 		milestones: [
 			{
-				height: 0,
 				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
+				height: 0,
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,

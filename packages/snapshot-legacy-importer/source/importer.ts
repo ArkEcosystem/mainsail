@@ -1,10 +1,11 @@
-import { inject, injectable, tagged } from "@mainsail/container";
-import { Utils } from "@mainsail/kernel";
-import { Contracts, Identifiers } from "@mainsail/contracts";
-import { BigNumber } from "@mainsail/utils";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { Interfaces } from "@mainsail/snapshot-legacy";
 import { createHash } from "node:crypto";
+
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { Utils } from "@mainsail/kernel";
+import { Interfaces } from "@mainsail/snapshot-legacy";
+import { BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { ethers, sha256 } from "ethers";
 
@@ -36,10 +37,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		validators: Contracts.Snapshot.ImportedLegacyValidator[];
 		snapshotHash: string;
 	} = {
-		wallets: [],
-		voters: [],
-		validators: [],
 		snapshotHash: "",
+		validators: [],
+		voters: [],
+		wallets: [],
 	};
 
 	public get voters(): Contracts.Snapshot.ImportedLegacyVoter[] {
@@ -96,9 +97,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			wallets.push({
 				arkAddress: wallet.address,
+				balance,
 				ethAddress,
 				publicKey: wallet.publicKey,
-				balance,
 			});
 
 			if (wallet.attributes["vote"]) {
@@ -117,11 +118,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (wallet.attributes["delegate"]) {
 				validators.push({
 					arkAddress: wallet.address,
+					blsPublicKey: "TODO",
 					ethAddress,
-					publicKey: wallet.publicKey,
-					username: wallet.attributes["delegate"]["username"],
 					isResigned: wallet.attributes["delegate"]["isResigned"] ?? false,
-					blsPublicKey: "TODO", // TODO: get actual bls key; for now it gets replaced by the genesis block generator
+					publicKey: wallet.publicKey,
+					username: wallet.attributes["delegate"]["username"], // TODO: get actual bls key; for now it gets replaced by the genesis block generator
 				});
 			}
 		}
@@ -132,10 +133,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		}
 
 		this.#data = {
-			voters,
-			validators,
-			wallets,
 			snapshotHash: calculatedHash,
+			validators,
+			voters,
+			wallets,
 		};
 	}
 
@@ -186,8 +187,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		console.log(deployerAccount);
 
 		return {
-			stateHash,
 			initialTotalSupply: totalSupply,
+			stateHash,
 		};
 	}
 
@@ -252,9 +253,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
-		const vv = this.#data.validators.reduce((acc, curr) => {
-			acc[curr.ethAddress!] = acc;
-			return acc;
+		const vv = this.#data.validators.reduce((accumulator, current) => {
+			accumulator[current.ethAddress!] = accumulator;
+			return accumulator;
 		}, {});
 
 		for (const voter of this.#data.voters) {
@@ -300,13 +301,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				validatorAddress: this.#deployerAddress,
 			},
 			caller: this.#deployerAddress,
+			data: Buffer.from(options.data, "hex"),
+			gasLimit: BigInt(10_000_000),
+			nonce,
 			recipient: this.#consensusProxyContractAddress,
 			specId: evmSpec,
-			gasLimit: BigInt(10_000_000),
-			value: 0n,
 			txHash: this.#generateTxHash(),
-			data: Buffer.from(options.data, "hex"),
-			nonce,
+			value: 0n,
 		} as Contracts.Evm.TransactionContext;
 	}
 

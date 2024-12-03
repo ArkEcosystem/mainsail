@@ -245,14 +245,14 @@ export const Identifiers = {
 			Service: Symbol("Kernel<Validation.Service>"),
 		},
 	},
-	State: {
-		State: Symbol("State<State>"),
-		Store: Symbol("State<Store>"),
-	},
 	Snapshot: {
 		Legacy: {
 			Importer: Symbol("Snapshot<Legacy.Importer>"),
 		},
+	},
+	State: {
+		State: Symbol("State<State>"),
+		Store: Symbol("State<Store>"),
 	},
 	Transaction: {
 		Handler: {
