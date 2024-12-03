@@ -35,5 +35,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Database.Storage.Block).toConstantValue(rootStorage.openDB({ name: "blocks" }));
 		this.app.bind(Identifiers.Database.Storage.BlockId).toConstantValue(rootStorage.openDB({ name: "block-id" }));
 		this.app.bind(Identifiers.Database.Storage.State).toConstantValue(rootStorage.openDB({ name: "state" }));
+		this.app.bind(Identifiers.Database.Storage.Commit).toConstantValue(rootStorage.openDB({ name: "commit" }));
+		this.app
+			.bind(Identifiers.Database.Storage.Transaction)
+			.toConstantValue(rootStorage.openDB({ name: "transaction" }));
+		this.app
+			.bind(Identifiers.Database.Storage.TransactionIds)
+			.toConstantValue(rootStorage.openDB({ name: "transactionIds" }));
 	}
 }

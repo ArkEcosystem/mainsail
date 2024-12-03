@@ -130,10 +130,10 @@ export const Identifiers = {
 		Storage: {
 			Block: Symbol("Database<Storage.Block>"),
 			BlockId: Symbol("Database<Storage.BlockId>"),
-			BockTransactionIds: Symbol("Database<Storage.BockTransactionIds>"),
 			Commit: Symbol("Database<Storage.Commit>"),
 			State: Symbol("Database<Storage.State>"),
 			Transaction: Symbol("Database<Storage.Transaction>"),
+			TransactionIds: Symbol("Database<Storage.TransactionIds>"),
 		},
 	},
 	Evm: {
