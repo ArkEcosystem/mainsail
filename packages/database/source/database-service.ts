@@ -1,11 +1,15 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import * as lmdb from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.Root)
 	private readonly rootDb!: lmdb.RootDatabase;
+
+	@inject(Identifiers.Database.Storage.Commit)
+	private readonly commitStorage!: lmdb.Database;
 
 	@inject(Identifiers.Database.Storage.Block)
 	private readonly blockStorage!: lmdb.Database;
@@ -18,6 +22,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
+
+	@inject(Identifiers.Cryptography.Commit.ProofSize)
+	private readonly proofSize!: () => number;
 
 	#blockCache = new Map<number, Contracts.Crypto.Commit>();
 	#blockIdCache = new Map<string, number>();
@@ -43,7 +50,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
-		const bytes = this.#get(height);
+		const bytes = this.#readCommitBytes(height);
 
 		if (bytes) {
 			return await this.commitFactory.fromBytes(bytes);
@@ -59,7 +66,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		const bytes = this.#get(height);
+		const bytes = this.#readCommitBytes(height);
 		if (bytes) {
 			return await this.commitFactory.fromBytes(bytes);
 		}
@@ -81,7 +88,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return heights
 			.map((height: number) => {
 				try {
-					return this.#get(height);
+					return this.#readCommitBytes(height);
 				} catch {
 					return;
 				}
@@ -105,7 +112,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
-			const data = this.#get(height);
+			const data = this.#readCommitBytes(height);
 
 			if (!data) {
 				throw new Error(`Failed to read commit at height ${height}`);
@@ -125,9 +132,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return [...this.#blockCache.values()].pop()!;
 		}
 
-		return await this.commitFactory.fromBytes(
-			this.blockStorage.getRange({ limit: 1, reverse: true }).asArray[0].value,
-		);
+		const height = this.blockIdStorage.getRange({ limit: 1, reverse: true }).asArray[0].value;
+		return await this.commitFactory.fromBytes(this.#readCommitBytes(height)!);
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
@@ -141,7 +147,11 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	async persist(): Promise<void> {
 		await this.rootDb.transaction(() => {
 			for (const [height, commit] of this.#blockCache.entries()) {
-				void this.blockStorage.put(height, Buffer.from(commit.serialized, "hex"));
+				const proofSize = this.proofSize();
+				const buff = Buffer.from(commit.serialized, "hex");
+
+				void this.commitStorage.put(height, buff.subarray(0, proofSize));
+				void this.blockStorage.put(height, buff.subarray(proofSize));
 				void this.blockIdStorage.put(commit.block.data.id, height);
 			}
 
@@ -153,20 +163,27 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		this.#blockCache.clear();
 	}
 
-	#get(height: number): Buffer | undefined {
-		if (this.#blockCache.has(height)) {
-			return Buffer.from(this.#blockCache.get(height)!.serialized, "hex");
-		}
-
-		return this.blockStorage.get(height);
-	}
-
 	#getHeightById(id: string): number | undefined {
 		if (this.#blockIdCache.has(id)) {
 			return this.#blockIdCache.get(id);
 		}
 
 		return this.blockIdStorage.get(id);
+	}
+
+	#readCommitBytes(height: number): Buffer | undefined {
+		if (this.#blockCache.has(height)) {
+			return Buffer.from(this.#blockCache.get(height)!.serialized, "hex");
+		}
+
+		const commitBuffer: Buffer | undefined = this.commitStorage.get(height);
+		if (!commitBuffer) {
+			return;
+		}
+
+		const blockBuffer: Buffer | undefined = this.blockStorage.get(height);
+		Utils.assert.defined<Buffer>(blockBuffer);
+		return Buffer.concat([commitBuffer, blockBuffer]);
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
