@@ -1,0 +1,314 @@
+import { inject, injectable, tagged } from "@mainsail/container";
+import { Utils } from "@mainsail/kernel";
+import { Contracts, Identifiers } from "@mainsail/contracts";
+import { BigNumber } from "@mainsail/utils";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { Interfaces } from "@mainsail/snapshot-legacy";
+import { createHash } from "node:crypto";
+import { entropyToMnemonic } from "bip39";
+import { ethers, sha256 } from "ethers";
+
+@injectable()
+export class Importer implements Contracts.Snapshot.LegacyImporter {
+	@inject(Identifiers.Services.Filesystem.Service)
+	private readonly fileSystem!: Contracts.Kernel.Filesystem;
+
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
+	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
+	@tagged("type", "consensus")
+	private readonly consensusKeyPairFactory!: Contracts.Crypto.KeyPairFactory;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "evm")
+	private readonly evm!: Contracts.Evm.Instance;
+
+	#deployerAddress = "0x0000000000000000000000000000000000000001";
+	#consensusProxyContractAddress = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1";
+
+	#data: {
+		wallets: Contracts.Snapshot.ImportedLegacyWallet[];
+		voters: Contracts.Snapshot.ImportedLegacyVoter[];
+		validators: Contracts.Snapshot.ImportedLegacyValidator[];
+		snapshotHash: string;
+	} = {
+		wallets: [],
+		voters: [],
+		validators: [],
+		snapshotHash: "",
+	};
+
+	public get voters(): Contracts.Snapshot.ImportedLegacyVoter[] {
+		return this.#data.voters;
+	}
+
+	public get validators(): Contracts.Snapshot.ImportedLegacyValidator[] {
+		return this.#data.validators;
+	}
+
+	public get wallets(): Contracts.Snapshot.ImportedLegacyWallet[] {
+		return this.#data.wallets;
+	}
+
+	public get snapshotHash(): string {
+		return this.#data.snapshotHash;
+	}
+
+	#nonce = 0n;
+
+	public async prepare(snapshotPath: string): Promise<void> {
+		const snapshot = this.fileSystem.readJSONSync<Interfaces.LegacySnapshot>(snapshotPath);
+
+		const hash = createHash("sha256");
+
+		hash.update(JSON.stringify(snapshot.chainTip));
+
+		const wallets: Contracts.Snapshot.ImportedLegacyWallet[] = [];
+		const voters: Contracts.Snapshot.ImportedLegacyVoter[] = [];
+		const validators: Contracts.Snapshot.ImportedLegacyValidator[] = [];
+
+		for (const wallet of snapshot.wallets) {
+			hash.update(JSON.stringify(wallet));
+
+			// the received balance is based on 8 decimals; convert it to WEI (18 decimals)
+			const balance = BigNumber.make(wallet.balance).times(1e10).toBigInt();
+
+			if (balance < 0) {
+				// skip OG genesis wallet
+				console.log(`>> skipping wallet ${wallet.address} with negative balance ${balance}`);
+				continue;
+			}
+
+			if (!wallet.publicKey) {
+				// TODO: support cold wallets without a known public key
+				console.log(`>> skipping cold wallet ${wallet.address} without publicKey`);
+				continue;
+			}
+
+			let ethAddress: string | undefined;
+			if (wallet.publicKey) {
+				ethAddress = await this.addressFactory.fromPublicKey(wallet.publicKey);
+			}
+
+			wallets.push({
+				arkAddress: wallet.address,
+				ethAddress,
+				publicKey: wallet.publicKey,
+				balance,
+			});
+
+			if (wallet.attributes["vote"]) {
+				Utils.assert.defined<string>(wallet.publicKey);
+
+				const vote = await this.addressFactory.fromPublicKey(wallet.attributes["vote"]);
+
+				voters.push({
+					arkAddress: wallet.address,
+					ethAddress,
+					publicKey: wallet.publicKey,
+					vote,
+				});
+			}
+
+			if (wallet.attributes["delegate"]) {
+				validators.push({
+					arkAddress: wallet.address,
+					ethAddress,
+					publicKey: wallet.publicKey,
+					username: wallet.attributes["delegate"]["username"],
+					isResigned: wallet.attributes["delegate"]["isResigned"] ?? false,
+					blsPublicKey: "TODO", // TODO: get actual bls key; for now it gets replaced by the genesis block generator
+				});
+			}
+		}
+
+		const calculatedHash = hash.digest("hex");
+		if (snapshot.hash !== calculatedHash) {
+			throw new Error(`failed to verify snapshot integrity: ${snapshot.hash} - ${calculatedHash}`);
+		}
+
+		this.#data = {
+			voters,
+			validators,
+			wallets,
+			snapshotHash: calculatedHash,
+		};
+	}
+
+	public async import(
+		options: Contracts.Snapshot.LegacyImportOptions,
+	): Promise<Contracts.Snapshot.LegacyImportResult> {
+		const deployerAccount = await this.evm.getAccountInfo(this.#deployerAddress);
+		this.#nonce = deployerAccount.nonce;
+		console.log(deployerAccount);
+
+		// 1) Seed account balances
+		const totalSupply = await this.#seedWallets(options);
+
+		// 2) Seed validators
+		await this.#seedValidators(options);
+
+		// 3) Seed voters
+		await this.#seedVoters(options);
+
+		// 4) Seed usernames
+		await this.#seedUsernames(options);
+
+		// 5) Calculate state hash
+		const stateHash = await this.evm.stateHash(options.commitKey, this.#data.snapshotHash);
+
+		// TODO: call below and ensure state hash matches bootstrap
+
+		// await this.evm.updateRewardsAndVotes({
+		// 	blockReward: 0n,
+		// 	commitKey: options.commitKey,
+		// 	specId: this.configuration.getMilestone().evmSpec,
+		// 	timestamp: BigInt(options.timestamp),
+		// 	validatorAddress: this.#deployerAddress,
+		// });
+
+		// await this.evm.calculateActiveValidators({
+		// 	activeValidators: 53n,
+		// 	commitKey: options.commitKey,
+		// 	specId: this.configuration.getMilestone().evmSpec,
+		// 	timestamp: BigInt(options.timestamp),
+		// 	validatorAddress: this.#deployerAddress,
+		// });
+
+		// const stateHash2 = await this.evm.stateHash(options.commitKey, this.#data.snapshotHash);
+
+		console.log(stateHash);
+		//console.log(stateHash2);
+		console.log(deployerAccount);
+
+		return {
+			stateHash,
+			initialTotalSupply: totalSupply,
+		};
+	}
+
+	async #seedWallets(options: Contracts.Snapshot.LegacyImportOptions): Promise<bigint> {
+		let totalSupply = 0n;
+
+		for (const wallet of this.#data.wallets) {
+			console.log(`seeding wallet ${wallet.ethAddress} (${wallet.arkAddress}) => ${wallet.balance}`);
+
+			Utils.assert.defined(wallet.ethAddress);
+
+			await this.evm.seedAccountInfo(wallet.ethAddress, {
+				balance: wallet.balance,
+				nonce: 0n,
+			});
+
+			totalSupply += wallet.balance;
+		}
+
+		return totalSupply;
+	}
+
+	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
+		const iface = new ethers.Interface(ConsensusAbi.abi);
+
+		for (const validator of this.#data.validators) {
+			Utils.assert.defined(validator.ethAddress);
+
+			if (validator.blsPublicKey === "TODO") {
+				const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
+				const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
+
+				const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
+				validator.blsPublicKey = consensusKeyPair.publicKey;
+			}
+
+			console.log(
+				`seeding validator ${validator.ethAddress} (${validator.username}) => ${validator.blsPublicKey}`,
+			);
+
+			const data = iface
+				.encodeFunctionData("addValidator", [
+					validator.ethAddress,
+					Buffer.from(validator.blsPublicKey, "hex"),
+					validator.isResigned,
+				])
+				.slice(2);
+
+			const result = await this.evm.process(
+				this.#getTransactionContext({
+					...options,
+					data,
+				}),
+			);
+
+			if (!result.receipt.success) {
+				throw new Error("failed to add vote");
+			}
+		}
+	}
+
+	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
+		const iface = new ethers.Interface(ConsensusAbi.abi);
+
+		const vv = this.#data.validators.reduce((acc, curr) => {
+			acc[curr.ethAddress!] = acc;
+			return acc;
+		}, {});
+
+		for (const voter of this.#data.voters) {
+			Utils.assert.defined(voter.ethAddress);
+
+			console.log(`seeding vote ${voter.ethAddress} (${voter.arkAddress}) => ${voter.vote}`);
+
+			if (!vv[voter.vote]) {
+				console.log("!!! skipping voter for non-existent validator", voter.vote);
+				continue;
+			}
+
+			const data = iface.encodeFunctionData("addVote", [voter.ethAddress, voter.vote]).slice(2);
+
+			const result = await this.evm.process(
+				this.#getTransactionContext({
+					...options,
+					data,
+				}),
+			);
+
+			if (!result.receipt.success) {
+				throw new Error("failed to add vote");
+			}
+		}
+	}
+
+	async #seedUsernames(_: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
+		console.log("TODO: seedUsernames");
+	}
+
+	#getTransactionContext(
+		options: Contracts.Snapshot.LegacyImportOptions & { data: string },
+	): Contracts.Evm.TransactionContext {
+		const { evmSpec } = this.configuration.getMilestone();
+		const nonce = this.#nonce;
+
+		return {
+			blockContext: {
+				commitKey: options.commitKey,
+				gasLimit: BigInt(10_000_000),
+				timestamp: BigInt(options.timestamp),
+				validatorAddress: this.#deployerAddress,
+			},
+			caller: this.#deployerAddress,
+			recipient: this.#consensusProxyContractAddress,
+			specId: evmSpec,
+			gasLimit: BigInt(10_000_000),
+			value: 0n,
+			txHash: this.#generateTxHash(),
+			data: Buffer.from(options.data, "hex"),
+			nonce,
+		} as Contracts.Evm.TransactionContext;
+	}
+
+	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
+}

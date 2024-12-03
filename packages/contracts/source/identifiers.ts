@@ -249,6 +249,11 @@ export const Identifiers = {
 		State: Symbol("State<State>"),
 		Store: Symbol("State<Store>"),
 	},
+	Snapshot: {
+		Legacy: {
+			Importer: Symbol("Snapshot<Legacy.Importer>"),
+		},
+	},
 	Transaction: {
 		Handler: {
 			Constructors: Symbol("Transaction<Handler.Constructors>"),
