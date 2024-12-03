@@ -1,4 +1,4 @@
-import { Block, Commit, Transaction } from "./crypto/index.js";
+import { Block, BlockHeader, Commit, Transaction } from "./crypto/index.js";
 
 export interface State {
 	height: number;
@@ -21,6 +21,9 @@ export interface DatabaseService {
 	getBlock(height: number): Promise<Block | undefined>;
 	getBlockById(id: string): Promise<Block | undefined>;
 	findBlocks(start: number, end: number): Promise<Block[]>;
+
+	getBlockHeader(height: number): Promise<BlockHeader | undefined>;
+	getBlockHeaderById(id: string): Promise<BlockHeader | undefined>;
 
 	getTransactionById(id: string): Promise<Transaction | undefined>;
 

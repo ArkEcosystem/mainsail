@@ -32,6 +32,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Cryptography.Block.Factory)
 	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
 
+	@inject(Identifiers.Cryptography.Block.Deserializer)
+	private readonly blockDeserializer!: Contracts.Crypto.BlockDeserializer;
+
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
@@ -133,6 +136,31 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const bytes = this.#readBlockBytes(height);
 		if (bytes) {
 			return await this.blockFactory.fromBytes(bytes);
+		}
+
+		return undefined;
+	}
+
+	public async getBlockHeader(height: number): Promise<Contracts.Crypto.BlockHeader | undefined> {
+		const bytes = this.#readBlockHeaderBytes(height);
+
+		if (bytes) {
+			return await this.blockDeserializer.deserializeHeader(bytes);
+		}
+
+		return undefined;
+	}
+
+	public async getBlockHeaderById(id: string): Promise<Contracts.Crypto.BlockHeader | undefined> {
+		const height = this.#getHeightById(id);
+
+		if (height === undefined) {
+			return undefined;
+		}
+
+		const bytes = this.#readBlockHeaderBytes(height);
+		if (bytes) {
+			return await this.blockDeserializer.deserializeHeader(bytes);
 		}
 
 		return undefined;
@@ -271,6 +299,17 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 
 		return Buffer.concat([blockBuffer, ...transactions]);
+	}
+
+	#readBlockHeaderBytes(height: number): Buffer | undefined {
+		if (this.#commitCache.has(height)) {
+			return Buffer.from(this.#commitCache.get(height)!.serialized, "hex").subarray(
+				this.proofSize(),
+				this.proofSize() + this.headerSize(),
+			);
+		}
+
+		return this.blockStorage.get(height);
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
