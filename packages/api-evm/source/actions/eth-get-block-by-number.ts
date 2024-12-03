@@ -33,13 +33,13 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 		const height = parameters[0].startsWith("0x") ? Number.parseInt(parameters[0]) : this.stateStore.getHeight();
 		const transactionObject = parameters[1];
 
-		const commit = await this.databaseService.getCommit(height);
+		const block = await this.databaseService.getBlock(height);
 
-		if (!commit) {
+		if (!block) {
 			// eslint-disable-next-line unicorn/no-null
 			return null;
 		}
 
-		return this.app.resolve(BlockResource).transform(commit.block, transactionObject);
+		return this.app.resolve(BlockResource).transform(block, transactionObject);
 	}
 }
