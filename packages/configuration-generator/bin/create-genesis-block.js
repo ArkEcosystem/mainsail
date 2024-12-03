@@ -16,6 +16,10 @@ async function run() {
 		symbol: "TѦ",
 		token: "ARK",
 		distribute: true,
+		premine: "0",
+		snapshot: {
+			path: "../../snapshot-19a87c96dbe8ad1be06d33e97cd17f5662eb952c29efd3d8bb00c9c75e7582bc.json",
+		}
 	});
 }
 
