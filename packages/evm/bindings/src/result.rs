@@ -122,6 +122,18 @@ impl JsAccountInfo {
     }
 }
 
+impl TryInto<AccountInfo> for JsAccountInfo {
+    type Error = anyhow::Error;
+
+    fn try_into(self) -> Result<AccountInfo, Self::Error> {
+        Ok(AccountInfo {
+            balance: utils::convert_bigint_to_u256(self.balance)?,
+            nonce: self.nonce.get_u64()?.0,
+            ..Default::default()
+        })
+    }
+}
+
 #[napi(object)]
 pub struct JsAccountUpdate {
     pub address: JsString,
