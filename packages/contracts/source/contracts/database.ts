@@ -14,12 +14,13 @@ export interface DatabaseService {
 
 	getCommit(height: number): Promise<Commit | undefined>;
 	getCommitById(id: string): Promise<Commit | undefined>;
+	getLastCommit(): Promise<Commit>;
 	hasCommitById(id: string): boolean;
 	findCommitBuffers(start: number, end: number): Promise<Buffer[]>;
 	readCommits(start: number, end: number): AsyncGenerator<Commit>;
+
 	findBlocks(start: number, end: number): Promise<Block[]>;
 
-	getLastCommit(): Promise<Commit>;
 	addCommit(block: Commit): void;
 	persist(): Promise<void>;
 }
