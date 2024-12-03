@@ -5,9 +5,9 @@ export interface LegacySnapshot {
 }
 
 export interface LegacyWallet {
-	readonly address: string;
-	readonly publicKey: string;
-	readonly balance: string;
+	readonly address: string; // base58
+	readonly publicKey?: string;
+	readonly balance: string; // ARK - 8 decimals
 	readonly nonce: string;
 	readonly attributes: Record<string, string>;
 }
