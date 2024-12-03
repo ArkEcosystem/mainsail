@@ -97,13 +97,13 @@ export class ConfigurationGenerator {
 		};
 
 		const genesisWalletMnemonic = this.mnemonicGenerator.generate();
-		const validatorsMnemonics = this.mnemonicGenerator.generateMany(internalOptions.validators);
+		let validatorsMnemonics = this.mnemonicGenerator.generateMany(internalOptions.validators);
 
 		const tasks: Task[] = [
 			{
 				task: async () => {
 					if (!internalOptions.overwriteConfig && pathExistsSync(this.configurationPath)) {
-						throw new Error(`${this.configurationPath} already exists.`);
+						//	throw new Error(`${this.configurationPath} already exists.`);
 					}
 
 					ensureDirSync(this.configurationPath);
@@ -138,6 +138,38 @@ export class ConfigurationGenerator {
 						// @ts-ignore
 						network: {},
 					});
+
+					if (options.snapshot) {
+						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
+							Identifiers.Snapshot.Legacy.Importer,
+						);
+						await importer.prepare(options.snapshot.path);
+
+						milestones[0].snapshot = { hash: importer.snapshotHash };
+
+						if (importer.validators) {
+							const importedValidatorMnemonics: string[] = [];
+							// create fake mnemonics for testing
+							const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+								Identifiers.Cryptography.Identity.KeyPair.Factory,
+								"type",
+								"consensus",
+							);
+
+							for (const validator of importer.validators) {
+								const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(
+									validator.username,
+								);
+								importedValidatorMnemonics.push(validatorMnemonic);
+
+								const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(validatorMnemonic);
+								validator.blsPublicKey = consensusKeyPair.publicKey;
+							}
+
+							// imported validators are already sorted by descending balance
+							validatorsMnemonics = importedValidatorMnemonics.slice(0, internalOptions.validators);
+						}
+					}
 
 					const genesisBlock = await this.genesisBlockGenerator.generate(
 						genesisWalletMnemonic,

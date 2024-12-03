@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
-import { generateMnemonic } from "bip39";
+import { entropyToMnemonic, generateMnemonic } from "bip39";
+import { sha256 } from "ethers";
 
 @injectable()
 export class MnemonicGenerator {
@@ -9,5 +10,10 @@ export class MnemonicGenerator {
 
 	generateMany(count: number): string[] {
 		return Array.from({ length: count }, () => this.generate());
+	}
+
+	generateDeterministic(seed: string): string {
+		const entropy = sha256(Buffer.from(seed, "utf8")).slice(2, 34);
+		return entropyToMnemonic(Buffer.from(entropy, "hex"));
 	}
 }

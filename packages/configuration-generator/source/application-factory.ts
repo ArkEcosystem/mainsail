@@ -16,6 +16,7 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as EvmService } from "@mainsail/evm-service";
 import { Application } from "@mainsail/kernel";
+import { ServiceProvider as CoreSnapshotLegacyImporter } from "@mainsail/snapshot-legacy-importer";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -42,7 +43,11 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
 	// Used for evm instance
+	const fsExtra = await import("fs-extra/esm");
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
+		readJSONSync: (file: string, options?: Record<string, any>) => {
+			return fsExtra.readJSONSync(file, options);
+		},
 		existsSync: () => true,
 	});
 	setGracefulCleanup();
@@ -64,6 +69,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreEvmGasFee).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreCryptoTransactionEvmCall).register();
+	await app.resolve(CoreSnapshotLegacyImporter).register();
 	await app.resolve(EvmService).register();
 
 	// @ts-ignore
@@ -71,6 +77,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 		milestones: [
 			{
 				height: 0,
+				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 				timeouts: {
 					blockPrepareTime: 4000,
 					blockTime: 8000,
