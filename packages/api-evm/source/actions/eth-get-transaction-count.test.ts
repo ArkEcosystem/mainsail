@@ -1,10 +1,10 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation";
 
-import { describeSkip, Sandbox } from "../../../test-framework/source";
+import { describe, Sandbox } from "../../../test-framework/source";
 import { EthGetTransactionCount } from "./index.js";
 
-describeSkip<{
+describe<{
 	sandbox: Sandbox;
 	action: EthGetTransactionCount;
 	validator: Validator;
