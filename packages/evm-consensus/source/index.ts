@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
+import { Providers, Utils } from "@mainsail/kernel";
 
 import { Deployer } from "./deployer.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -9,6 +9,7 @@ import { ConsensusContractService } from "./services/consensus-contract-service.
 import { ValidatorSet } from "./validator-set.js";
 
 export { Identifiers } from "./identifiers.js";
+export { Deployer };
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -26,6 +27,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).info("Booting EVM Consensus...");
 
-		await this.app.resolve(Deployer).deploy();
+		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
+		Utils.assert.defined(genesisBlock);
+
+		await this.app.resolve(Deployer).deploy({
+			generatorAddress: genesisBlock.block.generatorAddress,
+			timestamp: genesisBlock.block.timestamp,
+			totalAmount: genesisBlock.block.totalAmount,
+		});
 	}
 }

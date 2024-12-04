@@ -6,7 +6,11 @@ import { ethers, sha256 } from "ethers";
 
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
-// TODO: extract "evm-deployer" package to manage nonce, etc. when deploying protocol contracts.
+export interface GenesisBlockInfo {
+	readonly timestamp: number;
+	readonly totalAmount: string;
+	readonly generatorAddress: string;
+}
 
 @injectable()
 export class Deployer {
@@ -26,10 +30,14 @@ export class Deployer {
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 	private readonly deployerAddress!: string;
 
+	#genesisBlockInfo!: GenesisBlockInfo;
+
 	#nonce = 0;
 	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 
-	public async deploy(): Promise<void> {
+	public async deploy(genesisBlockInfo: GenesisBlockInfo): Promise<void> {
+		this.#genesisBlockInfo = genesisBlockInfo;
+
 		await this.#initialize();
 
 		const consensusContractAddress = await this.#deployConsensusContract();
@@ -48,13 +56,12 @@ export class Deployer {
 	}
 
 	async #initialize(): Promise<void> {
-		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
-		Utils.assert.defined(genesisBlock);
+		Utils.assert.defined(this.#genesisBlockInfo);
 
 		const genesisInfo = {
-			account: genesisBlock.block.generatorAddress,
+			account: this.#genesisBlockInfo.generatorAddress,
 			deployerAccount: this.deployerAddress,
-			initialSupply: Utils.BigNumber.make(genesisBlock.block.totalAmount).toBigInt(),
+			initialSupply: Utils.BigNumber.make(this.#genesisBlockInfo.totalAmount).toBigInt(),
 			validatorContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
 		};
 
@@ -64,16 +71,13 @@ export class Deployer {
 	}
 
 	#getBlockContext(): Contracts.Evm.BlockContext {
-		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
-		Utils.assert.defined(genesisBlock);
-
 		const milestone = this.configuration.getMilestone(0);
 
 		// Commit Key chosen in a way such that it does not conflict with blocks.
 		return {
 			commitKey: { height: BigInt(2 ** 32 + 1), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
-			timestamp: BigInt(genesisBlock.block.timestamp),
+			timestamp: BigInt(this.#genesisBlockInfo.timestamp),
 			validatorAddress: this.deployerAddress,
 		};
 	}

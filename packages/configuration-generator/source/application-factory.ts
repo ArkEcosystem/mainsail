@@ -14,6 +14,7 @@ import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypt
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
+import { ServiceProvider as CoreEvmConsensus } from "@mainsail/evm-consensus";
 import { ServiceProvider as EvmService } from "@mainsail/evm-service";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
@@ -41,7 +42,9 @@ export const makeApplication = async (configurationPath: string, options: Record
 	const app = new Application(new Container());
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
-	app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	app.bind(Identifiers.Services.Log.Service).toConstantValue({
+		info: () => {},
+	});
 	// Used for evm instance
 	const fsExtra = await import("fs-extra/esm");
 	app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({
@@ -65,6 +68,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();
 	await app.resolve(CoreEvmGasFee).register();
+	await app.resolve(CoreEvmConsensus).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreCryptoTransactionEvmCall).register();
 	await app.resolve(CoreSnapshotLegacyImporter).register();
