@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
+import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { Utils } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy";
 import { BigNumber } from "@mainsail/utils";
@@ -11,6 +12,9 @@ import { ethers, sha256 } from "ethers";
 
 @injectable()
 export class Importer implements Contracts.Snapshot.LegacyImporter {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Services.Filesystem.Service)
 	private readonly fileSystem!: Contracts.Kernel.Filesystem;
 
@@ -28,8 +32,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	#deployerAddress = "0x0000000000000000000000000000000000000001";
-	#consensusProxyContractAddress = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1";
+	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	private readonly deployerAddress!: string;
+
+	#consensusProxyContractAddress!: string;
+	#usernamesProxyContractAddress!: string;
 
 	#data: {
 		wallets: Contracts.Snapshot.ImportedLegacyWallet[];
@@ -143,9 +150,17 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
-		const deployerAccount = await this.evm.getAccountInfo(this.#deployerAddress);
+		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
 		console.log(deployerAccount);
+
+		this.#consensusProxyContractAddress = this.app.get<string>(
+			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
+		);
+
+		this.#usernamesProxyContractAddress = this.app.get<string>(
+			EvmConsensusIdentifiers.Contracts.Addresses.Usernames,
+		);
 
 		// 1) Seed account balances
 		const totalSupply = await this.#seedWallets(options);
@@ -241,6 +256,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
+					recipient: this.#consensusProxyContractAddress,
 				}),
 			);
 
@@ -274,6 +290,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
+					recipient: this.#consensusProxyContractAddress,
 				}),
 			);
 
@@ -283,12 +300,37 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		}
 	}
 
-	async #seedUsernames(_: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
-		console.log("TODO: seedUsernames");
+	async #seedUsernames(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
+		const iface = new ethers.Interface(UsernamesAbi.abi);
+
+		for (const validator of this.#data.validators) {
+			if (!validator.username) {
+				continue;
+			}
+
+			console.log(`seeding username ${validator.ethAddress} (${validator.arkAddress}) => ${validator.username}`);
+
+			const data = iface.encodeFunctionData("addUsername", [validator.ethAddress, validator.username]).slice(2);
+
+			const result = await this.evm.process(
+				this.#getTransactionContext({
+					...options,
+					data,
+					recipient: this.#usernamesProxyContractAddress,
+				}),
+			);
+
+			if (!result.receipt.success) {
+				throw new Error("failed to add username");
+			}
+		}
 	}
 
 	#getTransactionContext(
-		options: Contracts.Snapshot.LegacyImportOptions & { data: string },
+		options: Contracts.Snapshot.LegacyImportOptions & {
+			data: string;
+			recipient: string;
+		},
 	): Contracts.Evm.TransactionContext {
 		const { evmSpec } = this.configuration.getMilestone();
 		const nonce = this.#nonce;
@@ -298,18 +340,18 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				commitKey: options.commitKey,
 				gasLimit: BigInt(10_000_000),
 				timestamp: BigInt(options.timestamp),
-				validatorAddress: this.#deployerAddress,
+				validatorAddress: this.deployerAddress,
 			},
-			caller: this.#deployerAddress,
+			caller: this.deployerAddress,
 			data: Buffer.from(options.data, "hex"),
 			gasLimit: BigInt(10_000_000),
 			nonce,
-			recipient: this.#consensusProxyContractAddress,
+			recipient: options.recipient,
 			specId: evmSpec,
 			txHash: this.#generateTxHash(),
 			value: 0n,
 		} as Contracts.Evm.TransactionContext;
 	}
 
-	#generateTxHash = () => sha256(Buffer.from(`tx-${this.#deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
+	#generateTxHash = () => sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).slice(2);
 }

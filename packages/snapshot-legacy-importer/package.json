@@ -25,6 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/evm-contracts": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/snapshot-legacy": "workspace:*",
 		"@mainsail/utils": "workspace:*",
