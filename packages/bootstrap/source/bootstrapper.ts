@@ -96,13 +96,13 @@ export class Bootstrapper {
 	}
 
 	async #checkStoredGenesisCommit(): Promise<void> {
-		const genesisBlok = await this.databaseService.getBlock(0);
+		const genesisBlock = await this.databaseService.getBlock(0);
 
-		if (!genesisBlok) {
+		if (!genesisBlock) {
 			return;
 		}
 
-		if (this.stateStore.getGenesisCommit().block.data.id !== genesisBlok.data.id) {
+		if (this.stateStore.getGenesisCommit().block.data.id !== genesisBlock.data.id) {
 			throw new Error("Block from crypto.json doesn't match stored genesis block");
 		}
 	}
