@@ -87,8 +87,8 @@ export class GenesisBlockGenerator extends Generator {
 			account: genesisWalletAddress,
 			deployerAccount: this.#deployerAddress,
 			initialSupply: Utils.BigNumber.make(options.premine).toBigInt(),
-			validatorContract: ethers.getCreateAddress({ from: genesisWalletAddress, nonce: 1 }),
 			usernameContract: ethers.getCreateAddress({ from: genesisWalletAddress, nonce: 3 }),
+			validatorContract: ethers.getCreateAddress({ from: genesisWalletAddress, nonce: 1 }),
 		};
 		await this.evm.initializeGenesis(genesisInfo);
 

@@ -31,8 +31,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 			account: commit.account,
 			deployerAccount: commit.deployerAccount,
 			initialSupply: commit.initialSupply,
-			validatorContract: commit.validatorContract,
 			usernameContract: commit.usernameContract,
+			validatorContract: commit.validatorContract,
 		});
 	}
 
