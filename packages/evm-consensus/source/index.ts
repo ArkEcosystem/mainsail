@@ -9,7 +9,6 @@ import { ConsensusContractService } from "./services/consensus-contract-service.
 import { ValidatorSet } from "./validator-set.js";
 
 export { Identifiers } from "./identifiers.js";
-export { Deployer };
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -37,3 +36,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		});
 	}
 }
+
+export { Deployer } from "./deployer.js";

@@ -13,8 +13,8 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypto-transaction-evm-call";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
-import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as CoreEvmConsensus } from "@mainsail/evm-consensus";
+import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as EvmService } from "@mainsail/evm-service";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
