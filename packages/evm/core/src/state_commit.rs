@@ -112,6 +112,8 @@ fn collect_dirty_accounts(
                     nonce: account.nonce,
                     vote: None,
                     unvote: None,
+                    username: None,
+                    username_resigned: false,
                 },
             );
         }
@@ -153,6 +155,31 @@ fn collect_dirty_accounts(
                                         Some(account)
                                     });
 
+                                    break;
+                                }
+                            }
+                            _ if log.address == info.username_contract => {
+                                // Attempt to decode log as a UsernameRegistered event
+                                if let Ok(event) =
+                                    crate::events::UsernameRegistered::decode_log(&log, true)
+                                {
+                                    dirty_accounts.get_mut(&event.addr).and_then(|account| {
+                                        account.username = Some(event.username.clone());
+                                        account.username_resigned = false; // cancel out any previous resignation if one happened in same commit
+                                        Some(account)
+                                    });
+                                    break;
+                                }
+
+                                // Attempt to decode log as a UsernameResigned event
+                                if let Ok(event) =
+                                    crate::events::UsernameResigned::decode_log(&log, true)
+                                {
+                                    dirty_accounts.get_mut(&event.addr).and_then(|account| {
+                                        account.username = None; // cancel out any previous registration if one happened in same commit
+                                        account.username_resigned = true;
+                                        Some(account)
+                                    });
                                     break;
                                 }
                             }

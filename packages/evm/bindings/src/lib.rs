@@ -133,6 +133,7 @@ impl EvmInner {
             account: genesis_ctx.account,
             deployer_account: genesis_ctx.deployer_account,
             validator_contract: genesis_ctx.validator_contract,
+            username_contract: genesis_ctx.username_contract,
             initial_supply: genesis_ctx.initial_supply,
         });
 

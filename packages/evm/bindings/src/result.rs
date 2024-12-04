@@ -1,5 +1,5 @@
 use mainsail_evm_core::{receipt::TxReceipt, state_changes::AccountUpdate};
-use napi::{JsBigInt, JsBuffer, JsString};
+use napi::{JsBigInt, JsBoolean, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{AccountInfo, Bytes, B256};
 
@@ -129,6 +129,8 @@ pub struct JsAccountUpdate {
     pub nonce: JsBigInt,
     pub vote: Option<JsString>,
     pub unvote: Option<JsString>,
+    pub username: Option<JsString>,
+    pub username_resigned: JsBoolean,
 }
 
 impl JsAccountUpdate {
@@ -143,12 +145,21 @@ impl JsAccountUpdate {
             None => None,
         };
 
+        let username = match &account_update.username {
+            Some(username) => Some(node_env.create_string_from_std(username.to_string())?),
+            None => None,
+        };
+
+        let username_resigned = node_env.get_boolean(account_update.username_resigned)?;
+
         Ok(JsAccountUpdate {
             address: node_env.create_string_from_std(account_update.address.to_checksum(None))?,
             nonce: node_env.create_bigint_from_u64(account_update.nonce)?,
             balance: utils::convert_u256_to_bigint(node_env, account_update.balance)?,
             vote,
             unvote,
+            username,
+            username_resigned,
         })
     }
 }

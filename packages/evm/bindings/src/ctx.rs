@@ -43,6 +43,7 @@ pub struct JsGenesisContext {
     pub account: JsString,
     pub deployer_account: JsString,
     pub validator_contract: JsString,
+    pub username_contract: JsString,
     pub initial_supply: JsBigInt,
 }
 
@@ -116,6 +117,7 @@ pub struct GenesisContext {
     pub account: Address,
     pub deployer_account: Address,
     pub validator_contract: Address,
+    pub username_contract: Address,
     pub initial_supply: U256,
 }
 
@@ -280,6 +282,7 @@ impl TryFrom<JsGenesisContext> for GenesisContext {
         Ok(GenesisContext {
             account: utils::create_address_from_js_string(value.account)?,
             validator_contract: utils::create_address_from_js_string(value.validator_contract)?,
+            username_contract: utils::create_address_from_js_string(value.username_contract)?,
             deployer_account: utils::create_address_from_js_string(value.deployer_account)?,
             initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
         })

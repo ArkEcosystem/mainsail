@@ -115,6 +115,7 @@ pub struct GenesisInfo {
     pub account: Address,
     pub deployer_account: Address,
     pub validator_contract: Address,
+    pub username_contract: Address,
     pub initial_supply: U256,
 }
 
