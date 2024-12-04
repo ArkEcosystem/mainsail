@@ -18,14 +18,14 @@ export class EthGetBlockTransactionCountByHash implements Contracts.Api.RPC.Acti
 		type: "array",
 	};
 
-	public async handle(parameters: [string]): Promise<object | null> {
-		const block = await this.databaseService.getBlockById(parameters[0].slice(2));
+	public async handle(parameters: [string]): Promise<string | null> {
+		const block = await this.databaseService.getBlockHeaderById(parameters[0].slice(2));
 
 		if (!block) {
 			// eslint-disable-next-line unicorn/no-null
 			return null;
 		}
 
-		return null;
+		return `0x${block.numberOfTransactions.toString(16)}`;
 	}
 }
