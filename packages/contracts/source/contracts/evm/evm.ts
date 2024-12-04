@@ -9,6 +9,7 @@ export interface GenesisInfo {
 	readonly account: string;
 	readonly deployerAccount: string;
 	readonly validatorContract: string;
+	readonly usernameContract: string;
 	readonly initialSupply: bigint;
 }
 
@@ -52,6 +53,8 @@ export interface AccountUpdate {
 
 	readonly vote?: string;
 	readonly unvote?: string;
+	readonly username?: string;
+	readonly usernameResigned: boolean;
 }
 
 export interface AccountUpdateContext {

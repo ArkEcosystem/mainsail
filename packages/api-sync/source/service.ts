@@ -195,6 +195,11 @@ export class Sync implements Contracts.ApiSync.Service {
 			const attributes = {
 				...validatorAttributes(account.address),
 				...(account.unvote ? { unvote: account.unvote } : account.vote ? { vote: account.vote } : {}),
+				...(account.usernameResigned
+					? { usernameResigned: account.usernameResigned }
+					: account.username
+						? { username: account.username }
+						: {}),
 			};
 
 			return [
@@ -418,6 +423,13 @@ export class Sync implements Contracts.ApiSync.Service {
 			CASE
 				WHEN EXCLUDED.attributes->>'unvote' IS NOT NULL THEN NULL
 				ELSE COALESCE(EXCLUDED.attributes->>'vote', "Wallet".attributes->>'vote')
+			END,
+
+			-- if any username is present, it will overwrite the previous username
+			'username',
+			CASE
+				WHEN (EXCLUDED.attributes->>'usernameResigned')::boolean IS TRUE THEN NULL
+				ELSE COALESCE(EXCLUDED.attributes->>'username', "Wallet".attributes->>'username')
 			END,
 
 			'validatorPublicKey',
