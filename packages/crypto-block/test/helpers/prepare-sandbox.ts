@@ -22,6 +22,30 @@ import { Serializer } from "../../source/serializer";
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
 
+	context.sandbox.app.bind(Identifiers.Cryptography.Block.HeaderSize).toFunction(() => {
+		const hashByteLength = context.sandbox.app.get<number>(Identifiers.Cryptography.Hash.Size.SHA256);
+		const generatorAddressByteLength = context.sandbox.app.get<number>(
+			Identifiers.Cryptography.Identity.Address.Size,
+		);
+
+		return (
+			1 + // version
+			6 + // timestamp
+			4 + // height
+			4 + // round
+			hashByteLength + // previousBlock
+			hashByteLength + // stateHash
+			2 + // numberOfTransactions
+			4 + // totalGasUsed
+			32 + // totalAmount
+			32 + // totalFee
+			32 + // reward
+			4 + // payloadLength
+			hashByteLength + // payloadHash
+			generatorAddressByteLength
+		);
+	});
+
 	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
