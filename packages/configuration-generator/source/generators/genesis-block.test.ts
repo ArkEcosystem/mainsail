@@ -19,9 +19,10 @@ describe<{
 				{
 					reward: "0",
 					address: { bech32m: "ark" },
-					block: { version: 1, maxPayload: 2097152, maxTransactions: 150 },
+					block: { version: 1, maxGasLimit: 30_000_000, maxPayload: 2097152, maxTransactions: 150 },
 					blockTime: 8000,
 					height: 0,
+					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 					// @ts-ignore
 					gas: {
 						maximumGasLimit: 2000000,

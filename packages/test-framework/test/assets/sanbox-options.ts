@@ -15,7 +15,7 @@ export const sandboxOptions: SandboxOptions = {
 			maxBlockPayload: 2_097_152,
 			maxTxPerBlock: 150,
 			network: "unitnet",
-			premine: "15300000000000000",
+			premine: "53000000000000000",
 			pubKeyHash: 23,
 			rewardAmount: 200_000_000,
 			rewardHeight: 75_600,
