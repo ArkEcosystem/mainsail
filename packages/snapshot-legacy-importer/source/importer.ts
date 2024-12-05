@@ -150,9 +150,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(
 			`snapshot stats: ${JSON.stringify({
-				wallets: wallets.length,
 				validators: validators.length,
 				voters: voters.length,
+				wallets: wallets.length,
 			})}`,
 		);
 

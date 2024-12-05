@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
-import { Utils as AppUtils } from "@mainsail/kernel";
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
