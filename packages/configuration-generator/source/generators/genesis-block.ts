@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
@@ -23,7 +23,8 @@ export class GenesisBlockGenerator extends Generator {
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
-	private readonly snapshotLegacyImporter!: Contracts.Snapshot.LegacyImporter;
+	@optional()
+	private readonly snapshotLegacyImporter?: Contracts.Snapshot.LegacyImporter;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
@@ -329,6 +330,7 @@ export class GenesisBlockGenerator extends Generator {
 
 	async #buildFromLegacySnapshot(options: Contracts.NetworkGenerator.GenesisBlockOptions) {
 		Utils.assert.defined(options.snapshot);
+		Utils.assert.defined(this.snapshotLegacyImporter);
 
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({

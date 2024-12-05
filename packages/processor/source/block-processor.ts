@@ -10,9 +10,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
-	@inject(Identifiers.Snapshot.Legacy.Importer)
-	private readonly snapshotImporter!: Contracts.Snapshot.LegacyImporter;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -49,6 +46,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.Evm.Worker)
 	private readonly evmWorker!: Contracts.Evm.Worker;
+
+	@inject(Identifiers.Snapshot.Legacy.Importer)
+	@optional()
+	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
@@ -185,6 +186,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		if (!this.state.isBootstrap()) {
 			return;
+		}
+
+		if (!this.snapshotImporter) {
+			throw new Error("snapshot importer not loaded");
 		}
 
 		const milestone = this.configuration.getMilestone();
