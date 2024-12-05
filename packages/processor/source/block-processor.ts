@@ -188,10 +188,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
-		if (!this.snapshotImporter) {
-			throw new Error("snapshot importer not loaded");
-		}
-
 		const milestone = this.configuration.getMilestone();
 
 		// assume snapshot is present if the previous block points to a non-zero hash
@@ -201,6 +197,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 
 			return;
+		}
+
+		if (!this.snapshotImporter) {
+			throw new Error("snapshot importer not loaded");
 		}
 
 		Utils.assert.defined(milestone.snapshot);
