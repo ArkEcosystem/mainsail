@@ -192,7 +192,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			const data = this.#readCommitBytes(height);
 
 			if (!data) {
-				throw new Error(`Failed to read commit at height ${height}`);
+				return;
 			}
 
 			const commit = await this.commitFactory.fromBytes(data);
