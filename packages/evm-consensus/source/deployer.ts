@@ -62,6 +62,8 @@ export class Deployer {
 			account: this.#genesisBlockInfo.generatorAddress,
 			deployerAccount: this.deployerAddress,
 			initialSupply: Utils.BigNumber.make(this.#genesisBlockInfo.totalAmount).toBigInt(),
+
+			usernameContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 3 }), // PROXY Uses nonce 3
 			validatorContract: ethers.getCreateAddress({ from: this.deployerAddress, nonce: 1 }), // PROXY Uses nonce 1
 		};
 

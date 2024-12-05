@@ -8,30 +8,8 @@ export class Serializer implements Contracts.Crypto.BlockSerializer {
 	@tagged("type", "wallet")
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	@inject(Identifiers.Cryptography.Hash.Size.SHA256)
-	private readonly hashByteLength!: number;
-
-	@inject(Identifiers.Cryptography.Identity.Address.Size)
-	private readonly generatorAddressByteLength!: number;
-
-	public headerSize(): number {
-		return (
-			1 + // version
-			6 + // timestamp
-			4 + // height
-			4 + // round
-			this.hashByteLength + // previousBlock
-			this.hashByteLength + // stateHash
-			2 + // numberOfTransactions
-			4 + // totalGasUsed
-			32 + // totalAmount
-			32 + // totalFee
-			32 + // reward
-			4 + // payloadLength
-			this.hashByteLength + // payloadHash
-			this.generatorAddressByteLength
-		);
-	}
+	@inject(Identifiers.Cryptography.Block.HeaderSize)
+	private readonly headerSize!: () => number;
 
 	public totalSize(block: Contracts.Crypto.BlockDataSerializable): number {
 		return this.headerSize() + block.payloadLength;

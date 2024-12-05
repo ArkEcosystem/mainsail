@@ -35,6 +35,10 @@ pub struct AccountUpdate {
     pub vote: Option<Address>,
     // Set when commit receipt contains "Unvoted" event
     pub unvote: Option<Address>,
+    // Set when commit receipt contains "UsernameRegistered" event
+    pub username: Option<String>,
+    // Set when commit receipt contains "UsernameResigned" event
+    pub username_resigned: bool,
 }
 
 pub fn bundle_into_change_set(bundle_state: BundleState) -> StateChangeset {

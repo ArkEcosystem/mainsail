@@ -57,6 +57,7 @@ export const Identifiers = {
 		Block: {
 			Deserializer: Symbol("Crypto<Block.Deserializer>"),
 			Factory: Symbol("Crypto<Block.Factory>"),
+			HeaderSize: Symbol("Crypto<Block.HeaderSize>"),
 			IDFactory: Symbol("Crypto<Block.IDFactory>"),
 			Serializer: Symbol("Crypto<Block.Serializer>"),
 			Verifier: Symbol("Crypto<Block.Verifier>"),
@@ -64,6 +65,7 @@ export const Identifiers = {
 		Commit: {
 			Deserializer: Symbol("Crypto<Commit.Deserializer>"),
 			Factory: Symbol("Crypto<Commit.Factory>"),
+			ProofSize: Symbol("Crypto<Commit.ProofSize>"),
 			Serializer: Symbol("Crypto<Commit.Serializer>"),
 		},
 		Configuration: Symbol("Crypto<Configuration>"),
@@ -130,7 +132,10 @@ export const Identifiers = {
 		Storage: {
 			Block: Symbol("Database<Storage.Block>"),
 			BlockId: Symbol("Database<Storage.BlockId>"),
+			Commit: Symbol("Database<Storage.Commit>"),
 			State: Symbol("Database<Storage.State>"),
+			Transaction: Symbol("Database<Storage.Transaction>"),
+			TransactionIds: Symbol("Database<Storage.TransactionIds>"),
 		},
 	},
 	Evm: {

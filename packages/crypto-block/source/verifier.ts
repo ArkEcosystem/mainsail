@@ -8,11 +8,11 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Cryptography.Block.Serializer)
-	private readonly serializer!: Contracts.Crypto.BlockSerializer;
-
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
+	@inject(Identifiers.Cryptography.Block.HeaderSize)
+	private readonly headerSize!: () => number;
 
 	public async verify(block: Contracts.Crypto.Block): Promise<Contracts.Crypto.BlockVerification> {
 		const blockData: Contracts.Crypto.BlockData = block.data;
@@ -54,8 +54,7 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				result.errors.push("Invalid block version");
 			}
 
-			const headerSize = this.serializer.headerSize();
-			const totalSize = headerSize + block.header.payloadLength;
+			const totalSize = this.headerSize() + block.header.payloadLength;
 			if (totalSize > constants.block.maxPayload) {
 				result.errors.push(`Payload is too large: ${totalSize} > ${constants.block.maxPayload}`);
 			}

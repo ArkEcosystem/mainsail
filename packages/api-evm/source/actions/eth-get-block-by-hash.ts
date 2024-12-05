@@ -26,13 +26,13 @@ export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action {
 	public async handle(parameters: [string, boolean]): Promise<object | null> {
 		const transactionObject = parameters[1];
 
-		const commit = await this.databaseService.getCommitById(parameters[0].slice(2));
+		const block = await this.databaseService.getBlockById(parameters[0].slice(2));
 
-		if (!commit) {
+		if (!block) {
 			// eslint-disable-next-line unicorn/no-null
 			return null;
 		}
 
-		return this.app.resolve(BlockResource).transform(commit.block, transactionObject);
+		return this.app.resolve(BlockResource).transform(block, transactionObject);
 	}
 }

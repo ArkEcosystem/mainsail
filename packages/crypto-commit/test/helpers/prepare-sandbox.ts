@@ -21,6 +21,14 @@ import { Serializer } from "../../source/serializer";
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
 
+	context.sandbox.app.bind(Identifiers.Cryptography.Commit.ProofSize).toFunction(
+		() =>
+			4 + // round
+			context.sandbox.app.getTagged<number>(Identifiers.Cryptography.Signature.Size, "type", "consensus") + // signature
+			1 +
+			8, // validator set bitmap);
+	);
+
 	context.sandbox.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 	context.sandbox.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({ dispatchSync: () => {} });
 	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});

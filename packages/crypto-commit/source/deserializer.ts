@@ -7,8 +7,8 @@ export class Deserializer implements Contracts.Crypto.CommitDeserializer {
 	@inject(Identifiers.Cryptography.Serializer)
 	private readonly serializer!: Contracts.Serializer.Serializer;
 
-	@inject(Identifiers.Cryptography.Commit.Serializer)
-	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
+	@inject(Identifiers.Cryptography.Commit.ProofSize)
+	private readonly proofSize!: () => number;
 
 	public async deserializeCommitProof(serialized: Buffer): Promise<Contracts.Crypto.CommitProof> {
 		const buffer: ByteBuffer = ByteBuffer.fromBuffer(serialized);
@@ -16,7 +16,7 @@ export class Deserializer implements Contracts.Crypto.CommitDeserializer {
 		const proof = {} as Contracts.Crypto.CommitProof;
 
 		await this.serializer.deserialize<Contracts.Crypto.CommitProof>(buffer, proof, {
-			length: this.commitSerializer.proofSize(),
+			length: this.proofSize(),
 			schema: {
 				round: {
 					type: "uint32",

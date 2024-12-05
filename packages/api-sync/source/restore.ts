@@ -5,8 +5,11 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { chunk, validatorSetPack } from "@mainsail/utils";
+import { ethers } from "ethers";
 import { performance } from "perf_hooks";
 
 interface RestoreContext {
@@ -107,6 +110,12 @@ export class Restore {
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
 
+	@inject(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
+	private readonly usernamesContractAddress!: string;
+
+	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	private readonly deployerAddress!: string;
+
 	public async restore(): Promise<void> {
 		const mostRecentCommit = await (this.databaseService.isEmpty()
 			? this.stateStore.getGenesisCommit()
@@ -155,7 +164,7 @@ export class Restore {
 			await this.#ingestBlocksAndTransactions(context);
 
 			// 3) All `accounts` are read from the EVM storage and written to:
-			// - `wallets` table (NOTE: this does not include attributes yet)
+			// - `wallets` table
 			await this.#ingestWallets(context);
 
 			// 4) All `receipts` are read from the EVM storage and written to:
@@ -194,7 +203,7 @@ export class Restore {
 		let currentHeight = 0;
 
 		do {
-			const commits = await this.databaseService.findCommits(
+			const commits = this.databaseService.readCommits(
 				Math.min(currentHeight, mostRecentCommit.block.header.height),
 				Math.min(currentHeight + BATCH_SIZE, mostRecentCommit.block.header.height),
 			);
@@ -202,7 +211,7 @@ export class Restore {
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
 
-			for (const { proof, block } of commits) {
+			for await (const { proof, block } of commits) {
 				blocks.push({
 					commitRound: proof.round,
 					generatorAddress: block.header.generatorAddress,
@@ -338,6 +347,8 @@ export class Restore {
 				const validatorAttributes = context.validatorAttributes[account.address];
 				const userAttributes = context.userAttributes[account.address];
 
+				const username = await this.#readUsername(account.address);
+
 				accounts.push({
 					address: account.address,
 					attributes: {
@@ -369,7 +380,8 @@ export class Restore {
 
 						...(userAttributes
 							? {
-									vote: userAttributes.vote,
+									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
+									...(username ? { username } : {}),
 								}
 							: {}),
 					},
@@ -534,5 +546,30 @@ export class Restore {
 
 	async #updateValidatorRanks(context: RestoreContext): Promise<void> {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
+	}
+
+	async #readUsername(account: string): Promise<string | null> {
+		const iface = new ethers.Interface(UsernamesAbi.abi);
+		const data = iface.encodeFunctionData("getUsername", [account]).slice(2);
+
+		const { evmSpec } = this.configuration.getMilestone(0);
+
+		const result = await this.evm.view({
+			caller: this.deployerAddress,
+			data: Buffer.from(data, "hex"),
+			recipient: this.usernamesContractAddress,
+			specId: evmSpec,
+		});
+
+		if (!result.success) {
+			await this.app.terminate("getUsername failed");
+		}
+
+		const [username] = iface.decodeFunctionResult("getUsername", result.output!);
+		if (!username) {
+			return null;
+		}
+
+		return username;
 	}
 }
