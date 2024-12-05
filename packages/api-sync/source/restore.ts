@@ -5,8 +5,8 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { chunk, validatorSetPack } from "@mainsail/utils";
 import { ethers } from "ethers";
