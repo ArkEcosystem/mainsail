@@ -43,7 +43,9 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
 	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({
-		info: () => {},
+		info: (msg: string) => console.log(msg),
+		warning: (msg: string) => console.log(msg),
+		debug: (msg: string) => console.log(msg),
 	});
 	// Used for evm instance
 	const fsExtra = await import("fs-extra/esm");

@@ -18,6 +18,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@inject(Identifiers.Services.Filesystem.Service)
 	private readonly fileSystem!: Contracts.Kernel.Filesystem;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
@@ -79,6 +82,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const voters: Contracts.Snapshot.ImportedLegacyVoter[] = [];
 		const validators: Contracts.Snapshot.ImportedLegacyValidator[] = [];
 
+		let skippedColdWallets = 0;
+
 		for (const wallet of snapshot.wallets) {
 			hash.update(JSON.stringify(wallet));
 
@@ -87,13 +92,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			if (balance < 0) {
 				// skip OG genesis wallet
-				console.log(`>> skipping wallet ${wallet.address} with negative balance ${balance}`);
+				this.logger.debug(`>> skipping wallet ${wallet.address} with negative balance ${balance.toString()}`);
 				continue;
 			}
 
 			if (!wallet.publicKey) {
 				// TODO: support cold wallets without a known public key
-				console.log(`>> skipping cold wallet ${wallet.address} without publicKey`);
+				skippedColdWallets++;
 				continue;
 			}
 
@@ -125,19 +130,31 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (wallet.attributes["delegate"]) {
 				validators.push({
 					arkAddress: wallet.address,
-					blsPublicKey: "TODO",
+					blsPublicKey: "TODO", // TODO: get actual bls key; for now it gets replaced by the genesis block generator
 					ethAddress,
 					isResigned: wallet.attributes["delegate"]["isResigned"] ?? false,
 					publicKey: wallet.publicKey,
-					username: wallet.attributes["delegate"]["username"], // TODO: get actual bls key; for now it gets replaced by the genesis block generator
+					username: wallet.attributes["delegate"]["username"],
 				});
 			}
+		}
+
+		if (skippedColdWallets > 0) {
+			this.logger.debug(`>> skipped ${skippedColdWallets} cold wallets without publicKey`);
 		}
 
 		const calculatedHash = hash.digest("hex");
 		if (snapshot.hash !== calculatedHash) {
 			throw new Error(`failed to verify snapshot integrity: ${snapshot.hash} - ${calculatedHash}`);
 		}
+
+		this.logger.info(
+			`snapshot stats: ${JSON.stringify({
+				wallets: wallets.length,
+				validators: validators.length,
+				voters: voters.length,
+			})}`,
+		);
 
 		this.#data = {
 			snapshotHash: calculatedHash,
@@ -152,7 +169,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
-		console.log(deployerAccount);
 
 		this.#consensusProxyContractAddress = this.app.get<string>(
 			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
@@ -186,9 +202,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	async #seedWallets(options: Contracts.Snapshot.LegacyImportOptions): Promise<bigint> {
 		let totalSupply = 0n;
 
-		for (const wallet of this.#data.wallets) {
-			console.log(`seeding wallet ${wallet.ethAddress} (${wallet.arkAddress}) => ${wallet.balance}`);
+		this.logger.info(`seeding ${this.#data.wallets.length} wallets`);
 
+		for (const wallet of this.#data.wallets) {
 			Utils.assert.defined(wallet.ethAddress);
 
 			await this.evm.seedAccountInfo(wallet.ethAddress, {
@@ -205,6 +221,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
+		this.logger.info(`seeding ${this.#data.validators.length} validators`);
+
 		for (const validator of this.#data.validators) {
 			Utils.assert.defined(validator.ethAddress);
 
@@ -215,10 +233,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
 				validator.blsPublicKey = consensusKeyPair.publicKey;
 			}
-
-			console.log(
-				`seeding validator ${validator.ethAddress} (${validator.username}) => ${validator.blsPublicKey}`,
-			);
 
 			const data = iface
 				.encodeFunctionData("addValidator", [
@@ -245,18 +259,18 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
 		const iface = new ethers.Interface(ConsensusAbi.abi);
 
-		const vv = this.#data.validators.reduce((accumulator, current) => {
+		const validatorLookup = this.#data.validators.reduce((accumulator, current) => {
 			accumulator[current.ethAddress!] = accumulator;
 			return accumulator;
 		}, {});
 
+		this.logger.info(`seeding ${this.#data.voters.length} voters`);
+
 		for (const voter of this.#data.voters) {
 			Utils.assert.defined(voter.ethAddress);
 
-			console.log(`seeding vote ${voter.ethAddress} (${voter.arkAddress}) => ${voter.vote}`);
-
-			if (!vv[voter.vote]) {
-				console.log("!!! skipping voter for non-existent validator", voter.vote);
+			if (!validatorLookup[voter.vote]) {
+				this.logger.warning(`!!! skipping voter ${voter.arkAddress} for non-existent validator: ${voter.vote}`);
 				continue;
 			}
 
@@ -279,12 +293,12 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	async #seedUsernames(options: Contracts.Snapshot.LegacyImportOptions): Promise<void> {
 		const iface = new ethers.Interface(UsernamesAbi.abi);
 
+		this.logger.info(`seeding ${this.#data.validators.length} usernames`);
+
 		for (const validator of this.#data.validators) {
 			if (!validator.username) {
 				continue;
 			}
-
-			console.log(`seeding username ${validator.ethAddress} (${validator.arkAddress}) => ${validator.username}`);
 
 			const data = iface.encodeFunctionData("addUsername", [validator.ethAddress, validator.username]).slice(2);
 

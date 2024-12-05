@@ -280,7 +280,9 @@ impl EvmInner {
                     Ok(receipt) => {
                         println!(
                             "vote_update {:?} {:?} {:?}",
-                            ctx.commit_key, receipt, voters
+                            ctx.commit_key,
+                            receipt,
+                            voters.len()
                         );
                         assert!(receipt.is_success(), "vote_update unsuccessful");
                         Ok(())

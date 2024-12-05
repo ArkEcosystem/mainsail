@@ -218,8 +218,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			timestamp: block.header.timestamp,
 		});
 
-		this.logger.debug(JSON.stringify(result));
-
 		if (result.stateHash !== block.header.stateHash) {
 			throw new Error("genesis block snapshot state hash mismatch ");
 		}
