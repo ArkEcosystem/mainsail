@@ -1,4 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
+import { Utils as AppUtils } from "@mainsail/kernel";
 import { Contracts, Identifiers, Utils } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
@@ -24,13 +25,19 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 		try {
 			const constants = this.configuration.getMilestone(blockData.height);
 
-			if (
-				blockData.height === 0 &&
-				blockData.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000"
-			) {
-				// TODO: verify snapshot
-				console.log("TODO: verify snapshot");
-				// result.errors.push("Genesis block has invalid previous block");
+			if (blockData.height === 0) {
+				let validPreviousBlock = false;
+				if (constants.snapshot) {
+					AppUtils.assert.defined(constants.snapshot.hash);
+					validPreviousBlock = blockData.previousBlock === constants.snapshot.hash;
+				} else {
+					validPreviousBlock =
+						blockData.previousBlock === "0000000000000000000000000000000000000000000000000000000000000000";
+				}
+
+				if (!validPreviousBlock) {
+					result.errors.push("Genesis block has invalid previous block");
+				}
 			}
 
 			if (blockData.height !== 0 && !blockData.previousBlock) {

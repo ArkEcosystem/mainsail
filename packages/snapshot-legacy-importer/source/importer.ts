@@ -177,30 +177,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		// 5) Calculate state hash
 		const stateHash = await this.evm.stateHash(options.commitKey, this.#data.snapshotHash);
 
-		// TODO: call below and ensure state hash matches bootstrap
-
-		// await this.evm.updateRewardsAndVotes({
-		// 	blockReward: 0n,
-		// 	commitKey: options.commitKey,
-		// 	specId: this.configuration.getMilestone().evmSpec,
-		// 	timestamp: BigInt(options.timestamp),
-		// 	validatorAddress: this.#deployerAddress,
-		// });
-
-		// await this.evm.calculateActiveValidators({
-		// 	activeValidators: 53n,
-		// 	commitKey: options.commitKey,
-		// 	specId: this.configuration.getMilestone().evmSpec,
-		// 	timestamp: BigInt(options.timestamp),
-		// 	validatorAddress: this.#deployerAddress,
-		// });
-
-		// const stateHash2 = await this.evm.stateHash(options.commitKey, this.#data.snapshotHash);
-
-		console.log(stateHash);
-		//console.log(stateHash2);
-		console.log(deployerAccount);
-
 		return {
 			initialTotalSupply: totalSupply,
 			stateHash,

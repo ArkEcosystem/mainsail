@@ -200,7 +200,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		Utils.assert.defined(milestone.snapshot);
 
-		this.logger.debug(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
+		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
 
 		// TODO: fix hardcoded path
 		await this.snapshotImporter.prepare(`./snapshot-${milestone.snapshot.hash}.json`);
@@ -209,32 +209,39 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			throw new Error("imported snapshot hash mismatch");
 		}
 
+		if (this.snapshotImporter.snapshotHash !== block.header.previousBlock) {
+			throw new Error("genesis block previous block hash mismatch ");
+		}
+
 		const result = await this.snapshotImporter.import({
 			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
 			timestamp: block.header.timestamp,
 		});
 
-		console.log(result);
+		this.logger.debug(JSON.stringify(result));
+
+		if (result.stateHash !== block.header.stateHash) {
+			throw new Error("genesis block snapshot state hash mismatch ");
+		}
+
+		if (result.initialTotalSupply !== block.header.totalAmount.toBigInt()) {
+			throw new Error("genesis block snapshot supply mismatch ");
+		}
 	}
 
 	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
-		let previousStateHash: string;
-
 		if (block.header.height === 0) {
-			// previous block of genesis block points to a state hash
-			previousStateHash = block.header.previousBlock;
-		} else {
-			previousStateHash = this.stateStore.getLastBlock().header.stateHash;
+			return;
 		}
 
+		const previousBlock = this.stateStore.getLastBlock();
 		const stateHash = await this.evm.stateHash(
 			{ height: BigInt(block.header.height), round: BigInt(block.header.round) },
-			previousStateHash,
+			previousBlock.header.stateHash,
 		);
 
 		if (block.header.stateHash !== stateHash) {
-			//	throw new Error(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
-			console.log(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
+			throw new Error(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
 		}
 	}
 
