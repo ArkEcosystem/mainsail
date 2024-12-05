@@ -25,9 +25,12 @@
 		"@mainsail/api-database": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/evm-contracts": "workspace:*",
+		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "17.12.2"
+		"joi": "17.12.2",
+		"ethers": "^6.11.0"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

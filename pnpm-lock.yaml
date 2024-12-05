@@ -401,12 +401,21 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../evm-consensus
+      '@mainsail/evm-contracts':
+        specifier: workspace:*
+        version: link:../evm-contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ethers:
+        specifier: ^6.11.0
+        version: 6.13.1
       joi:
         specifier: 17.12.2
         version: 17.12.2
