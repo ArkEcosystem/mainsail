@@ -226,6 +226,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		for (const validator of this.#data.validators) {
 			Utils.assert.defined(validator.ethAddress);
 
+			// TODO: remove this once the actual BLS keys are available
 			if (validator.blsPublicKey === "TODO") {
 				const entropy = sha256(Buffer.from(validator.username, "utf8")).slice(2, 34);
 				const mnemonic = entropyToMnemonic(Buffer.from(entropy, "hex"));
@@ -251,7 +252,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			);
 
 			if (!result.receipt.success) {
-				throw new Error("failed to add vote");
+				throw new Error("failed to add validator");
 			}
 		}
 	}
