@@ -38,30 +38,6 @@ export class EvmCallTransaction extends Transaction {
 		);
 	}
 
-	public async serialize(options?: Contracts.Crypto.SerializeOptions): Promise<ByteBuffer> {
-		const { addressSize, addressFactory, addressSerializer, data } = this;
-
-		const dataBytes = Buffer.from(data.data, "hex");
-
-		const buff: ByteBuffer = ByteBuffer.fromSize(
-			32 + 1 + (data.recipientAddress ? addressSize : 0) + 4 + dataBytes.byteLength,
-		);
-
-		buff.writeUint256(data.value.toBigInt());
-
-		if (data.recipientAddress) {
-			buff.writeUint8(1);
-			addressSerializer.serialize(buff, await addressFactory.toBuffer(data.recipientAddress));
-		} else {
-			buff.writeUint8(0);
-		}
-
-		buff.writeUint32(dataBytes.byteLength);
-		buff.writeBytes(dataBytes);
-
-		return buff;
-	}
-
 	public async deserialize(buf: ByteBuffer): Promise<void> {
 		const { data, addressFactory, addressSerializer } = this;
 

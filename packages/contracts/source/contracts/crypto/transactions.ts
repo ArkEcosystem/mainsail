@@ -11,7 +11,6 @@ export interface Transaction {
 	serialized: Buffer;
 
 	assetSize(): number;
-	serialize(options?: SerializeOptions): Promise<ByteBuffer>;
 	deserialize(buf: ByteBuffer): Promise<void>;
 }
 

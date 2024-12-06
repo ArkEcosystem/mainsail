@@ -11,6 +11,15 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	@tagged("type", "wallet")
 	private readonly signatureSize!: number;
 
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	protected readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
+	@inject(Identifiers.Cryptography.Identity.Address.Serializer)
+	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
+
+	@inject(Identifiers.Cryptography.Identity.Address.Size)
+	private readonly addressSize!: number;
+
 	public commonSize(transaction: Contracts.Crypto.Transaction): number {
 		return (
 			1 + // network
@@ -54,12 +63,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 
 		this.#serializeCommon(transaction.data, buff);
 
-		const serialized: ByteBuffer | undefined = await transaction.serialize(options);
-
-		if (!serialized) {
-			throw new Error();
-		}
-
+		const serialized = await this.#serializeBody(transaction.data);
 		buff.writeBytes(serialized.getResult());
 
 		this.#serializeSignatures(transaction.data, buff, options);
@@ -81,6 +85,30 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		buff.writeUint64(transaction.nonce.toBigInt());
 		buff.writeUint32(transaction.gasPrice);
 		buff.writeUint32(transaction.gasLimit);
+	}
+
+	async #serializeBody(transaction: Contracts.Crypto.TransactionData): Promise<ByteBuffer> {
+		const dataBytes = Buffer.from(transaction.data, "hex");
+
+		const recipient = transaction.recipientAddress;
+
+		const buff: ByteBuffer = ByteBuffer.fromSize(
+			32 + 1 + (recipient ? this.addressSize : 0) + 4 + dataBytes.byteLength,
+		);
+
+		buff.writeUint256(transaction.value.toBigInt());
+
+		if (recipient) {
+			buff.writeUint8(1);
+			this.addressSerializer.serialize(buff, await this.addressFactory.toBuffer(recipient));
+		} else {
+			buff.writeUint8(0);
+		}
+
+		buff.writeUint32(dataBytes.byteLength);
+		buff.writeBytes(dataBytes);
+
+		return buff;
 	}
 
 	#serializeSignatures(
