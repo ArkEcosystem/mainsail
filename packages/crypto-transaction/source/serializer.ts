@@ -7,19 +7,9 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
-	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
-
 	@inject(Identifiers.Cryptography.Signature.Size)
 	@tagged("type", "wallet")
 	private readonly signatureSize!: number;
-
-	public async getBytes(
-		transaction: Contracts.Crypto.TransactionData,
-		options: Contracts.Crypto.SerializeOptions = {},
-	): Promise<Buffer> {
-		return this.serialize(this.transactionTypeFactory.create(transaction), options);
-	}
 
 	public commonSize(transaction: Contracts.Crypto.Transaction): number {
 		return (

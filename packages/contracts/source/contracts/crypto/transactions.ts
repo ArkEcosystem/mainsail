@@ -110,8 +110,6 @@ export interface TransactionSigner {
 }
 
 export interface TransactionSerializer {
-	getBytes(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
-
 	serialize(transaction: Transaction, options?: SerializeOptions): Promise<Buffer>;
 }
 
