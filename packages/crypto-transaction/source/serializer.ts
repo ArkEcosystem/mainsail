@@ -47,11 +47,21 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		return size;
 	}
 
+	public assetSize(transaction: Contracts.Crypto.Transaction): number {
+		return (
+			32 + // value
+			1 + // recipient marker
+			(transaction.data.recipientAddress ? this.addressSize : 0) + // recipient
+			4 + // payload length
+			Buffer.byteLength(transaction.data.data, "hex")
+		);
+	}
+
 	public totalSize(
 		transaction: Contracts.Crypto.Transaction,
 		options: Contracts.Crypto.SerializeOptions = {},
 	): number {
-		return this.commonSize(transaction) + transaction.assetSize() + this.signaturesSize(transaction, options);
+		return this.commonSize(transaction) + this.assetSize(transaction) + this.signaturesSize(transaction, options);
 	}
 
 	public async serialize(

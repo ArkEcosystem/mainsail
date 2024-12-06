@@ -10,7 +10,6 @@ export interface Transaction {
 	data: TransactionData;
 	serialized: Buffer;
 
-	assetSize(): number;
 	deserialize(buf: ByteBuffer): Promise<void>;
 }
 

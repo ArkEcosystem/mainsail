@@ -8,9 +8,6 @@ export class EvmCallTransaction extends Transaction {
 	@inject(Identifiers.Cryptography.Identity.Address.Serializer)
 	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
 
-	@inject(Identifiers.Cryptography.Identity.Address.Size)
-	private readonly addressSize!: number;
-
 	public static type: number = 0;
 	public static key = "evmCall";
 
@@ -26,16 +23,6 @@ export class EvmCallTransaction extends Transaction {
 			},
 			required: ["gasPrice", "gasLimit"],
 		});
-	}
-
-	public assetSize(): number {
-		return (
-			32 + // value
-			1 + // recipient marker
-			(this.data.recipientAddress ? this.addressSize : 0) + // recipient
-			4 + // payload length
-			Buffer.byteLength(this.data.data, "hex")
-		);
 	}
 
 	public async deserialize(buf: ByteBuffer): Promise<void> {

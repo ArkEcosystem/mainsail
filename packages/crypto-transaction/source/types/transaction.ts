@@ -38,6 +38,5 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 		return false;
 	}
 
-	public abstract assetSize(): number;
 	public abstract deserialize(buf: ByteBuffer): Promise<void>;
 }
