@@ -1,7 +1,7 @@
 {
-	"name": "@mainsail/snapshot-legacy",
+	"name": "@mainsail/snapshot-legacy-exporter",
 	"version": "0.0.1-evm.9",
-	"description": "Mainsail snapshot from V3 legacy state",
+	"description": "Mainsail V3 legacy state exporter",
 	"license": "GPL-3.0-only",
 	"contributors": [],
 	"type": "module",

@@ -25,7 +25,7 @@ export class Generator {
 	async #connect(): Promise<DataSource> {
 		const pluginConfig = await this.app
 			.resolve(Providers.PluginConfiguration)
-			.discover("@mainsail/snapshot-legacy", process.cwd());
+			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
 
 		const options = pluginConfig.get<DatabaseOptions>("database");
 		Utils.assert.defined<DatabaseOptions>(options);

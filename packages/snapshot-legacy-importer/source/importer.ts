@@ -5,7 +5,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
-import { Interfaces } from "@mainsail/snapshot-legacy";
+import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { BigNumber } from "@mainsail/utils";
 import { entropyToMnemonic } from "bip39";
 import { ethers, sha256 } from "ethers";

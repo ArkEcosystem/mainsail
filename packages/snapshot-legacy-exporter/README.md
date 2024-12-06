@@ -1,4 +1,4 @@
-# Mainsail - Snapshot Legacy
+# Mainsail - Snapshot Legacy Exporter
 
 ![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 

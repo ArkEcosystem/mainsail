@@ -673,9 +673,9 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/snapshot-legacy':
+      '@mainsail/snapshot-legacy-exporter':
         specifier: workspace:*
-        version: link:../snapshot-legacy
+        version: link:../snapshot-legacy-exporter
       '@mainsail/snapshot-legacy-importer':
         specifier: workspace:*
         version: link:../snapshot-legacy-importer
@@ -2342,7 +2342,7 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/snapshot-legacy:
+  packages/snapshot-legacy-exporter:
     dependencies:
       '@mainsail/container':
         specifier: workspace:*
@@ -2402,9 +2402,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/snapshot-legacy':
+      '@mainsail/snapshot-legacy-exporter':
         specifier: workspace:*
-        version: link:../snapshot-legacy
+        version: link:../snapshot-legacy-exporter
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
