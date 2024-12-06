@@ -104,8 +104,6 @@ export class GenesisBlockGenerator extends Generator {
 		this.#consensusProxyContractAddress = this.app.get<string>(
 			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
 		);
-
-		await this.evm.prepareNextCommit({ commitKey: { height: 0n, round: 0n } });
 	}
 
 	async #createTransferTransaction(

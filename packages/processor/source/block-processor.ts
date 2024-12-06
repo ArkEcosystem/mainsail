@@ -47,10 +47,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Evm.Worker)
 	private readonly evmWorker!: Contracts.Evm.Worker;
 
-	@inject(Identifiers.Snapshot.Legacy.Importer)
-	@optional()
-	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
-
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
@@ -77,10 +73,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 				transaction.data.gasUsed = Number(receipt.gasUsed);
 				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
-			}
-
-			if (block.header.height === 0) {
-				await this.#tryImportSnapshot(block);
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
@@ -176,59 +168,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const totalGas = block.header.totalGasUsed;
 		if (totalGas !== processorResult.gasUsed) {
 			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
-		}
-	}
-
-	async #tryImportSnapshot(block: Contracts.Crypto.Block): Promise<void> {
-		if (block.header.height !== 0) {
-			throw new Error("block for snapshot must genesis block");
-		}
-
-		if (!this.state.isBootstrap()) {
-			return;
-		}
-
-		const milestone = this.configuration.getMilestone();
-
-		// assume snapshot is present if the previous block points to a non-zero hash
-		if (block.header.previousBlock === "0000000000000000000000000000000000000000000000000000000000000000") {
-			if (milestone.snapshot) {
-				throw new Error("previous block set to snapshot but no hash in milestone");
-			}
-
-			return;
-		}
-
-		if (!this.snapshotImporter) {
-			throw new Error("snapshot importer not loaded");
-		}
-
-		Utils.assert.defined(milestone.snapshot);
-
-		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
-
-		// TODO: fix hardcoded path
-		await this.snapshotImporter.prepare(`./snapshot-${milestone.snapshot.hash}.json`);
-
-		if (this.snapshotImporter.snapshotHash !== milestone.snapshot.hash) {
-			throw new Error("imported snapshot hash mismatch");
-		}
-
-		if (this.snapshotImporter.snapshotHash !== block.header.previousBlock) {
-			throw new Error("genesis block previous block hash mismatch ");
-		}
-
-		const result = await this.snapshotImporter.import({
-			commitKey: { height: BigInt(block.header.height), round: BigInt(block.header.round) },
-			timestamp: block.header.timestamp,
-		});
-
-		if (result.stateHash !== block.header.stateHash) {
-			throw new Error("genesis block snapshot state hash mismatch ");
-		}
-
-		if (result.initialTotalSupply !== block.header.totalAmount.toBigInt()) {
-			throw new Error("genesis block snapshot supply mismatch ");
 		}
 	}
 

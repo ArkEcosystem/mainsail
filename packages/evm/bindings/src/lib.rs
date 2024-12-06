@@ -51,6 +51,11 @@ impl EvmInner {
 
     pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
         if let Some(pending) = self.pending_commit.as_ref() {
+            // do not replace any pending commit, while still in bootstrapping phase.
+            if pending.key == CommitKey(0, 0) && ctx.commit_key == pending.key {
+                return Ok(());
+            }
+
             println!(
                 "discarding existing pending commit {:?} for {:?}",
                 pending.key, ctx.commit_key

@@ -49,6 +49,10 @@ export class Bootstrapper {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
+	@inject(Identifiers.Snapshot.Legacy.Importer)
+	@optional()
+	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
+
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
@@ -109,6 +113,7 @@ export class Bootstrapper {
 
 	async #initState(): Promise<void> {
 		if (this.databaseService.isEmpty()) {
+			await this.#tryImportSnapshot();
 			await this.#processGenesisBlock();
 		} else {
 			const commit = await this.databaseService.getLastCommit();
@@ -140,5 +145,28 @@ export class Bootstrapper {
 		} catch (error) {
 			await this.app.terminate(`Failed to process block at height ${commit.block.data.height}`, error);
 		}
+	}
+
+	async #tryImportSnapshot(): Promise<void> {
+		const genesisBlock = this.stateStore.getGenesisCommit();
+		const milestone = this.configuration.getMilestone(0);
+
+		// assume snapshot is present if the previous block points to a non-zero hash
+		if (
+			genesisBlock.block.header.previousBlock ===
+			"0000000000000000000000000000000000000000000000000000000000000000"
+		) {
+			if (milestone.snapshot) {
+				throw new Error("previous block set to snapshot but no hash in milestone");
+			}
+
+			return;
+		}
+
+		if (!this.snapshotImporter) {
+			throw new Error("snapshot importer not loaded");
+		}
+
+		await this.snapshotImporter.run(genesisBlock);
 	}
 }

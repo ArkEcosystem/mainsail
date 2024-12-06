@@ -71,6 +71,43 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 	#nonce = 0n;
 
+	public async run(genesisBlock: Contracts.Crypto.Commit): Promise<Contracts.Snapshot.LegacyImportResult> {
+		const {
+			block: { header },
+		} = genesisBlock;
+
+		const milestone = this.configuration.getMilestone(0);
+		Utils.assert.defined(milestone.snapshot);
+
+		this.logger.info(`Importing genesis snapshot: ${milestone.snapshot.hash}`);
+
+		// TODO: fix hardcoded path
+		await this.prepare(`./snapshot-${milestone.snapshot.hash}.json`);
+
+		if (this.snapshotHash !== milestone.snapshot.hash) {
+			throw new Error("imported snapshot hash mismatch");
+		}
+
+		if (this.snapshotHash !== header.previousBlock) {
+			throw new Error("genesis block previous block hash mismatch ");
+		}
+
+		const result = await this.import({
+			commitKey: { height: BigInt(header.height), round: BigInt(header.round) },
+			timestamp: header.timestamp,
+		});
+
+		if (result.stateHash !== header.stateHash) {
+			throw new Error("genesis block snapshot state hash mismatch ");
+		}
+
+		if (result.initialTotalSupply !== header.totalAmount.toBigInt()) {
+			throw new Error("genesis block snapshot supply mismatch ");
+		}
+
+		return result;
+	}
+
 	public async prepare(snapshotPath: string): Promise<void> {
 		const snapshot = this.fileSystem.readJSONSync<Interfaces.LegacySnapshot>(snapshotPath);
 
@@ -167,6 +204,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
+		await this.evm.prepareNextCommit({ commitKey: { height: 0n, round: 0n } });
+
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
 
