@@ -9,8 +9,6 @@ export interface Transaction {
 
 	data: TransactionData;
 	serialized: Buffer;
-
-	deserialize(buf: ByteBuffer): Promise<void>;
 }
 
 export type TransactionSchema = Record<string, any>;

@@ -4,11 +4,14 @@ import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
-	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
+
+	@inject(Identifiers.Cryptography.Identity.Address.Serializer)
+	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
+
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Signature.Size)
 	@tagged("type", "wallet")
@@ -25,9 +28,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		this.deserializeCommon(data, buff);
 
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
-
-		// Deserialize type specific parts
-		await instance.deserialize(buff);
+		await this.#deserializeBody(instance.data, buff);
 
 		this.#deserializeSignatures(data, buff);
 
@@ -42,6 +43,22 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		transaction.gasPrice = buf.readUint32();
 		transaction.gasLimit = buf.readUint32();
 		transaction.value = BigNumber.ZERO;
+	}
+
+	async #deserializeBody(transaction: Contracts.Crypto.TransactionData, buf: ByteBuffer): Promise<void> {
+		transaction.value = BigNumber.make(buf.readUint256());
+
+		const recipientMarker = buf.readUint8();
+		if (recipientMarker === 1) {
+			transaction.recipientAddress = await this.addressFactory.fromBuffer(
+				this.addressSerializer.deserialize(buf),
+			);
+		}
+
+		const dataLength = buf.readUint32();
+		const dataBytes = buf.readBytes(dataLength);
+
+		transaction.data = dataBytes.toString("hex");
 	}
 
 	#deserializeSignatures(transaction: Contracts.Crypto.TransactionData, buf: ByteBuffer): void {

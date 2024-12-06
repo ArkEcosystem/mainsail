@@ -1,13 +1,9 @@
-import { inject, injectable } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { injectable } from "@mainsail/container";
+import { Contracts } from "@mainsail/contracts";
 import { extendSchema, Transaction, transactionBaseSchema } from "@mainsail/crypto-transaction";
-import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
 @injectable()
 export class EvmCallTransaction extends Transaction {
-	@inject(Identifiers.Cryptography.Identity.Address.Serializer)
-	private readonly addressSerializer!: Contracts.Crypto.AddressSerializer;
-
 	public static type: number = 0;
 	public static key = "evmCall";
 
@@ -23,21 +19,5 @@ export class EvmCallTransaction extends Transaction {
 			},
 			required: ["gasPrice", "gasLimit"],
 		});
-	}
-
-	public async deserialize(buf: ByteBuffer): Promise<void> {
-		const { data, addressFactory, addressSerializer } = this;
-
-		data.value = BigNumber.make(buf.readUint256());
-
-		const recipientMarker = buf.readUint8();
-		if (recipientMarker === 1) {
-			data.recipientAddress = await addressFactory.fromBuffer(addressSerializer.deserialize(buf));
-		}
-
-		const dataLength = buf.readUint32();
-		const dataBytes = buf.readBytes(dataLength);
-
-		data.data = dataBytes.toString("hex");
 	}
 }
