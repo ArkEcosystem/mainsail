@@ -34,15 +34,19 @@ export class Signature implements Contracts.Crypto.Signature {
 		).toString("hex");
 	}
 
-	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<string> {
+	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<Contracts.Crypto.EcdsaSignature> {
 		throw new Exceptions.NotImplemented(this.constructor.name, "signRecoverable");
 	}
 
-	public async verifyRecoverable(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
+	public async verifyRecoverable(
+		signature: Contracts.Crypto.EcdsaSignature,
+		message: Buffer,
+		publicKey: Buffer,
+	): Promise<boolean> {
 		throw new Exceptions.NotImplemented(this.constructor.name, "verifyRecoverable");
 	}
 
-	public recoverPublicKey(message: Buffer, signature: Buffer): string {
+	public recoverPublicKey(message: Buffer, signature: Contracts.Crypto.EcdsaSignature): string {
 		throw new Exceptions.NotImplemented(this.constructor.name, "recoverPublicKey");
 	}
 }

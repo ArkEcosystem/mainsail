@@ -273,7 +273,8 @@ export class Restore {
 						senderAddress: data.senderAddress,
 						senderPublicKey: data.senderPublicKey,
 						sequence: data.sequence as unknown as number,
-						signature: data.signature,
+						// signature: data.signature,
+						signature: "",
 						signatures: undefined, //data.signatures,
 						timestamp: block.header.timestamp.toFixed(),
 					});

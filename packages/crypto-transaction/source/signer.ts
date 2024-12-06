@@ -14,20 +14,22 @@ export class Signer {
 		transaction: Contracts.Crypto.TransactionData,
 		keys: Contracts.Crypto.KeyPair,
 		options?: Contracts.Crypto.SerializeOptions,
-	): Promise<string> {
+	): Promise<Contracts.Crypto.EcdsaSignature> {
 		if (!options || options.excludeSignature === undefined) {
 			options = { excludeSignature: true, ...options };
 		}
 
 		const hash: Buffer = await this.utils.toHash(transaction, options);
-		const signature: string = await this.signatureFactory.signRecoverable(
-			hash,
-			Buffer.from(keys.privateKey, "hex"),
-		);
+		const signature = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
-		if (!transaction.signature && !options.excludeMultiSignature) {
-			transaction.signature = signature;
-		}
+		// TODO: Check
+		// if (!transaction.signature && !options.excludeMultiSignature) {
+		// 	transaction.signature = signature;
+		// }
+
+		transaction.v = signature.v;
+		transaction.r = signature.r;
+		transaction.s = signature.s;
 
 		return signature;
 	}

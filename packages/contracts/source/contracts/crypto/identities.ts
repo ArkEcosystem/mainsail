@@ -70,6 +70,12 @@ export interface PublicKeySerializer {
 	deserialize(buffer: ByteBuffer): Buffer;
 }
 
+export interface EcdsaSignature {
+	r: string;
+	s: string;
+	v: number;
+}
+
 export interface Signature {
 	sign(message: Buffer, privateKey: Buffer): Promise<string>;
 
@@ -81,9 +87,9 @@ export interface Signature {
 
 	aggregate(signatures: Buffer[]): Promise<string>;
 
-	signRecoverable(message: Buffer, privateKey: Buffer): Promise<string>;
+	signRecoverable(message: Buffer, privateKey: Buffer): Promise<EcdsaSignature>;
 
-	verifyRecoverable(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean>;
+	verifyRecoverable(signature: EcdsaSignature, message: Buffer, publicKey: Buffer): Promise<boolean>;
 
-	recoverPublicKey(message: Buffer, signature: Buffer): string;
+	recoverPublicKey(message: Buffer, signature: EcdsaSignature): string;
 }

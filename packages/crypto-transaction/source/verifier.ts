@@ -74,9 +74,9 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	}
 
 	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
-		const { signature, senderPublicKey } = data;
+		const { v, r, s, senderPublicKey } = data;
 
-		if (!signature || !senderPublicKey) {
+		if (!v || !r || !s || !senderPublicKey) {
 			return false;
 		}
 
@@ -84,11 +84,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 			excludeSignature: true,
 		});
 
-		return this.signatureFactory.verifyRecoverable(
-			Buffer.from(signature, "hex"),
-			hash,
-			Buffer.from(senderPublicKey, "hex"),
-		);
+		return this.signatureFactory.verifyRecoverable({ r, s, v }, hash, Buffer.from(senderPublicKey, "hex"));
 	}
 
 	public async verifySchema(

@@ -13,12 +13,6 @@ export interface Transaction {
 
 export type TransactionSchema = Record<string, any>;
 
-export interface EcdsaSignature {
-	r: string;
-	s: string;
-	v: number;
-}
-
 export interface TransactionData {
 	network: number;
 
@@ -38,6 +32,10 @@ export interface TransactionData {
 	timestamp: number;
 
 	signature?: string;
+
+	v?: number;
+	r?: string;
+	s?: string;
 
 	sequence?: number;
 	gasUsed?: number;
