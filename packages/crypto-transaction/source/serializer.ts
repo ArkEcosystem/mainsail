@@ -36,7 +36,7 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		let size = 0;
 
 		const { data } = transaction;
-		if (data.signature && !options.excludeSignature) {
+		if (data.v && data.r && data.s && !options.excludeSignature) {
 			size += this.signatureSize;
 		}
 
@@ -126,8 +126,10 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 		buff: ByteBuffer,
 		options: Contracts.Crypto.SerializeOptions = {},
 	): void {
-		if (transaction.signature && !options.excludeSignature) {
-			buff.writeBytes(Buffer.from(transaction.signature, "hex"));
+		if (transaction.v && transaction.r && transaction.s && !options.excludeSignature) {
+			buff.writeUint8(transaction.v);
+			buff.writeBytes(Buffer.from(transaction.r, "hex"));
+			buff.writeBytes(Buffer.from(transaction.s, "hex"));
 		}
 
 		// if (transaction.signatures && !options.excludeMultiSignature) {

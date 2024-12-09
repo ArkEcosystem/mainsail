@@ -17,10 +17,6 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	@tagged("type", "wallet")
 	private readonly signatureSize!: number;
 
-	@inject(Identifiers.Cryptography.Signature.Instance)
-	@tagged("type", "wallet")
-	private readonly signatureSerializer!: Contracts.Crypto.Signature;
-
 	public async deserialize(serialized: string | Buffer): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
@@ -30,7 +26,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
 		await this.#deserializeBody(instance.data, buff);
 
-		this.#deserializeSignatures(data, buff);
+		this.#deserializeSignatures(instance.data, buff);
 
 		instance.serialized = buff.getResult();
 
@@ -62,13 +58,10 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 	}
 
 	#deserializeSignatures(transaction: Contracts.Crypto.TransactionData, buf: ByteBuffer): void {
-		if (
-			buf.getRemainderLength() &&
-			(buf.getRemainderLength() % this.signatureSize === 0 ||
-				buf.getRemainderLength() % (this.signatureSize + 1) !== 0)
-		) {
-			const signature = this.signatureSerializer.deserialize(buf);
-			transaction.signature = signature.toString("hex");
+		if (buf.getRemainderLength() && buf.getRemainderLength() % this.signatureSize === 0) {
+			transaction.v = buf.readUint8();
+			transaction.r = buf.readBytes(32).toString("hex");
+			transaction.s = buf.readBytes(32).toString("hex");
 		}
 
 		// if (buf.getRemainderLength()) {

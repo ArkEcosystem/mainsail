@@ -1,6 +1,6 @@
 import { BigNumber, ByteBuffer } from "@mainsail/utils";
 
-import type { KeyPair } from "./identities.js";
+import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
@@ -31,8 +31,6 @@ export interface TransactionData {
 	id: string;
 	timestamp: number;
 
-	signature?: string;
-
 	v?: number;
 	r?: string;
 	s?: string;
@@ -61,7 +59,9 @@ export interface TransactionJson {
 	id?: string;
 	timestamp?: number;
 
-	signature?: string;
+	v?: number;
+	r?: string;
+	s?: string;
 
 	sequence?: number;
 	gasUsed?: number;
@@ -99,7 +99,7 @@ export interface TransactionVerifier {
 }
 
 export interface TransactionSigner {
-	sign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<string>;
+	sign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<EcdsaSignature>;
 	multiSign(transaction: TransactionData, keys: KeyPair, index?: number): Promise<string>;
 }
 
