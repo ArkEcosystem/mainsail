@@ -45,6 +45,13 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		) {
 			throw new Exceptions.InsufficientBalanceError();
 		}
+
+		if (sender.hasLegacySecondPublicKey()) {
+			// TODO: enable
+			// if (!(await this.verifier.verifyHash(transaction.data, sender.legacySecondPublicKey()))) {
+			// 	throw new Exceptions.InvalidSignatureError();
+			// }
+		}
 	}
 
 	public emitEvents(transaction: Contracts.Crypto.Transaction): void {}

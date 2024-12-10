@@ -42,6 +42,7 @@ export interface TransactionData {
 	timestamp: number;
 
 	signature?: string;
+	secondSignature?: string;
 
 	sequence?: number;
 	gasUsed?: number;

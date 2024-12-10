@@ -65,4 +65,14 @@ export class Wallet implements Contracts.State.Wallet {
 	public decreaseNonce(): void {
 		this.setNonce(this.getNonce().minus(BigNumber.ONE));
 	}
+
+	// Legacy
+	public hasLegacySecondPublicKey(): boolean {
+		return !!this.legacyAttributes.secondPublicKey;
+	}
+
+	public legacySecondPublicKey(): string {
+		Utils.assert.defined(this.legacyAttributes.secondPublicKey);
+		return this.legacyAttributes.secondPublicKey;
+	}
 }

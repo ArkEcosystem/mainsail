@@ -12,6 +12,10 @@ export interface Wallet {
 	setNonce(nonce: BigNumber): void;
 	increaseNonce(): void;
 	decreaseNonce(): void;
+
+	// legacy
+	hasLegacySecondPublicKey(): boolean;
+	legacySecondPublicKey(): string;
 }
 
 export interface ValidatorWallet {
