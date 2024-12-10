@@ -9,6 +9,7 @@ use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    account::LegacyAccountAttributes,
     receipt::{map_execution_result, TxReceipt},
     state_changes,
     state_commit::StateCommit,
@@ -95,6 +96,8 @@ struct InnerStorage {
     accounts: heed::Database<AddressWrapper, heed::types::SerdeBincode<AccountInfo>>,
     commits: heed::Database<HeedHeight, heed::types::SerdeBincode<CommitReceipts>>,
     contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
+    legacy_attributes:
+        heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
     storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
 }
 
@@ -108,6 +111,9 @@ pub struct PendingCommit {
     pub cache: CacheState,
     pub results: BTreeMap<B256, ExecutionResult>,
     pub transitions: TransitionState,
+
+    // Map of legacy attributes sorted by account
+    pub legacy_attributes: BTreeMap<Address, LegacyAccountAttributes>,
 }
 
 #[derive(Clone, Debug)]
@@ -144,7 +150,7 @@ impl PersistentDB {
         std::fs::create_dir_all(&path)?;
 
         let mut env_builder = EnvOpenOptions::new();
-        env_builder.max_dbs(4);
+        env_builder.max_dbs(5);
         env_builder.map_size(1 * MAP_SIZE_UNIT);
         unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
@@ -178,7 +184,11 @@ impl PersistentDB {
                 &mut wtxn,
                 Some("contracts"),
             )?;
-
+        let legacy_attributes = env
+            .create_database::<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>(
+                &mut wtxn,
+                Some("legacy_attributes"),
+            )?;
         let storage = env
             .database_options()
             .types::<AddressWrapper, StorageEntryWrapper>()
@@ -195,6 +205,7 @@ impl PersistentDB {
                 accounts,
                 commits,
                 contracts,
+                legacy_attributes,
                 storage,
             }),
             genesis_info: None,
@@ -428,6 +439,7 @@ impl PersistentDB {
         let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
             let state_changes::StateChangeset {
                 ref mut accounts,
+                ref mut legacy_attributes,
                 ref mut storage,
                 ref mut contracts,
             } = change_set;
@@ -446,6 +458,15 @@ impl PersistentDB {
                     inner.accounts.delete(rwtxn, &address)?;
                 }
             }
+
+            // Update legacy attributes
+            for (address, legacy_attributes) in legacy_attributes.into_iter() {
+                let address = AddressWrapper(*address);
+                inner
+                    .legacy_attributes
+                    .put(rwtxn, &address, legacy_attributes)?;
+            }
+
             // Update contracts
             for (hash, bytecode) in contracts.into_iter() {
                 inner
@@ -591,6 +612,20 @@ impl PendingCommit {
             cache: Default::default(),
             results: Default::default(),
             transitions: Default::default(),
+            legacy_attributes: Default::default(),
+        }
+    }
+
+    pub fn import_account(
+        &mut self,
+        address: Address,
+        info: AccountInfo,
+        legacy_attributes: Option<LegacyAccountAttributes>,
+    ) {
+        self.cache.insert_account(address, info);
+
+        if let Some(legacy_attributes) = legacy_attributes {
+            self.legacy_attributes.insert(address, legacy_attributes);
         }
     }
 }
@@ -662,9 +697,8 @@ fn test_commit_changes() {
         &mut db,
         PendingCommit {
             key: CommitKey(0, 0),
-            cache: CacheState::default(),
-            results: Default::default(),
             transitions: TransitionState { transitions: state },
+            ..Default::default()
         },
     )
     .expect("ok");
@@ -742,9 +776,8 @@ fn test_storage() {
         &mut db,
         PendingCommit {
             key: CommitKey(0, 0),
-            cache: CacheState::default(),
-            results: Default::default(),
             transitions: TransitionState { transitions: state },
+            ..Default::default()
         },
     )
     .expect("ok");
@@ -802,9 +835,8 @@ fn test_storage_overwrite() {
         &mut db,
         PendingCommit {
             key: CommitKey(0, 0),
-            cache: CacheState::default(),
-            results: Default::default(),
             transitions: TransitionState { transitions: state },
+            ..Default::default()
         },
     )
     .expect("ok");
@@ -839,9 +871,8 @@ fn test_storage_overwrite() {
         &mut db,
         PendingCommit {
             key: CommitKey(1, 0),
-            cache: CacheState::default(),
-            results: Default::default(),
             transitions: TransitionState { transitions: state },
+            ..Default::default()
         },
     )
     .expect("ok");
@@ -901,9 +932,8 @@ fn test_resize_on_commit() {
 
         PendingCommit {
             key: CommitKey(height, 0),
-            cache: CacheState::default(),
-            results: Default::default(),
             transitions: TransitionState { transitions: state },
+            ..Default::default()
         }
     };
 
@@ -913,7 +943,7 @@ fn test_resize_on_commit() {
         .unwrap();
 
     let mut env_builder = EnvOpenOptions::new();
-    env_builder.max_dbs(4);
+    env_builder.max_dbs(5);
     env_builder.map_size(4096 * 10); // start with very small (few kB)
 
     unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };

@@ -7,6 +7,7 @@ use ctx::{
     PrepareNextCommitContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
 use mainsail_evm_core::{
+    account::AccountInfoExtended,
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
     receipt::{map_execution_result, TxReceipt},
     state_changes::AccountUpdate,
@@ -14,7 +15,7 @@ use mainsail_evm_core::{
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{CommitResult, JsAccountInfo, TxViewResult};
+use result::{CommitResult, JsAccountInfoExtended, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
     primitives::{
@@ -316,16 +317,17 @@ impl EvmInner {
         }
     }
 
-    pub fn seed_account_info(
+    pub fn import_account_info(
         &mut self,
         address: Address,
-        info: AccountInfo,
+        info: AccountInfoExtended,
     ) -> std::result::Result<(), EVMError<String>> {
         let pending = self.pending_commit.as_mut().unwrap();
         assert_eq!(pending.key, CommitKey(0, 0));
         assert!(!pending.cache.accounts.contains_key(&address));
 
-        pending.cache.insert_account(address, info);
+        let (info, legacy_attributes) = info.into_parts();
+        pending.import_account(address, info, legacy_attributes);
 
         Ok(())
     }
@@ -735,17 +737,17 @@ impl JsEvmWrapper {
     }
 
     #[napi(ts_return_type = "Promise<void>")]
-    pub fn seed_account_info(
+    pub fn import_account_info(
         &mut self,
         node_env: Env,
         address: JsString,
-        info: JsAccountInfo,
+        info: JsAccountInfoExtended,
     ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
-        let info: AccountInfo = info.try_into()?;
+        let info: AccountInfoExtended = info.try_into()?;
 
         node_env.execute_tokio_future(
-            Self::seed_account_info_async(self.evm.clone(), address, info),
+            Self::import_account_info_async(self.evm.clone(), address, info),
             |_, _| Ok(()),
         )
     }
@@ -864,13 +866,13 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn seed_account_info_async(
+    async fn import_account_info_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
-        info: AccountInfo,
+        info: AccountInfoExtended,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.seed_account_info(address, info);
+        let result = lock.import_account_info(address, info);
 
         match result {
             Ok(_) => Result::Ok(()),

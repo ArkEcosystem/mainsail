@@ -40,8 +40,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.getAccountInfo(address);
 	}
 
-	public async seedAccountInfo(address: string, info: Contracts.Evm.AccountInfo): Promise<void> {
-		return this.#evm.seedAccountInfo(address, info);
+	public async importAccountInfo(address: string, info: Contracts.Evm.AccountInfoExtended): Promise<void> {
+		return this.#evm.importAccountInfo(address, info);
 	}
 
 	public async getAccounts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetAccountsResult> {

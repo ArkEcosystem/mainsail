@@ -1,4 +1,8 @@
-use mainsail_evm_core::{receipt::TxReceipt, state_changes::AccountUpdate};
+use mainsail_evm_core::{
+    account::{AccountInfoExtended, LegacyAccountAttributes},
+    receipt::TxReceipt,
+    state_changes::AccountUpdate,
+};
 use napi::{JsBigInt, JsBoolean, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{AccountInfo, Bytes, B256};
@@ -172,6 +176,77 @@ impl JsAccountUpdate {
             unvote,
             username,
             username_resigned,
+        })
+    }
+}
+
+#[napi(object)]
+pub struct JsAccountInfoExtended {
+    pub balance: JsBigInt,
+    pub nonce: JsBigInt,
+    pub legacy_attributes: JsLegacyAttributes,
+}
+
+#[napi(object)]
+pub struct JsLegacyAttributes {
+    pub second_public_key: Option<JsString>,
+}
+
+impl JsLegacyAttributes {
+    pub fn new(
+        node_env: &napi::Env,
+        legacy_attributes: LegacyAccountAttributes,
+    ) -> anyhow::Result<Self> {
+        let second_public_key = if let Some(second_public_key) = legacy_attributes.second_public_key
+        {
+            Some(node_env.create_string(second_public_key.as_str())?)
+        } else {
+            None
+        };
+
+        Ok(JsLegacyAttributes { second_public_key })
+    }
+}
+
+impl TryInto<LegacyAccountAttributes> for JsLegacyAttributes {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<LegacyAccountAttributes, Self::Error> {
+        let second_public_key = if let Some(second_public_key) = self.second_public_key {
+            Some(second_public_key.into_utf8()?.into_owned()?)
+        } else {
+            None
+        };
+
+        Ok(LegacyAccountAttributes { second_public_key })
+    }
+}
+
+impl JsAccountInfoExtended {
+    pub fn new(
+        node_env: &napi::Env,
+        account_info: AccountInfo,
+        legacy_attributes: LegacyAccountAttributes,
+    ) -> anyhow::Result<Self> {
+        Ok(JsAccountInfoExtended {
+            nonce: node_env.create_bigint_from_u64(account_info.nonce)?,
+            balance: utils::convert_u256_to_bigint(node_env, account_info.balance)?,
+            legacy_attributes: JsLegacyAttributes::new(node_env, legacy_attributes)?,
+        })
+    }
+}
+
+impl TryInto<AccountInfoExtended> for JsAccountInfoExtended {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<AccountInfoExtended, Self::Error> {
+        Ok(AccountInfoExtended {
+            info: AccountInfo {
+                balance: utils::convert_bigint_to_u256(self.balance)?,
+                nonce: self.nonce.get_u64()?.0,
+                ..Default::default()
+            },
+            legacy_attributes: self.legacy_attributes.try_into()?,
         })
     }
 }
