@@ -1,4 +1,4 @@
-import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
 
 import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
@@ -109,8 +109,6 @@ export interface TransactionSerializer {
 
 export interface TransactionDeserializer {
 	deserialize(serialized: string | Buffer): Promise<Transaction>;
-
-	deserializeCommon(transaction: TransactionData, buf: ByteBuffer): void;
 }
 
 export interface TransactionFactory {
