@@ -192,6 +192,37 @@ pub struct JsLegacyAttributes {
     pub second_public_key: Option<JsString>,
 }
 
+impl JsAccountInfoExtended {
+    pub fn new(
+        node_env: &napi::Env,
+        account_info_extended: AccountInfoExtended,
+    ) -> anyhow::Result<Self> {
+        Ok(JsAccountInfoExtended {
+            nonce: node_env.create_bigint_from_u64(account_info_extended.info.nonce)?,
+            balance: utils::convert_u256_to_bigint(node_env, account_info_extended.info.balance)?,
+            legacy_attributes: JsLegacyAttributes::new(
+                node_env,
+                account_info_extended.legacy_attributes,
+            )?,
+        })
+    }
+}
+
+impl TryInto<AccountInfoExtended> for JsAccountInfoExtended {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<AccountInfoExtended, Self::Error> {
+        Ok(AccountInfoExtended {
+            info: AccountInfo {
+                balance: utils::convert_bigint_to_u256(self.balance)?,
+                nonce: self.nonce.get_u64()?.0,
+                ..Default::default()
+            },
+            legacy_attributes: self.legacy_attributes.try_into()?,
+        })
+    }
+}
+
 impl JsLegacyAttributes {
     pub fn new(
         node_env: &napi::Env,
@@ -219,35 +250,6 @@ impl TryInto<LegacyAccountAttributes> for JsLegacyAttributes {
         };
 
         Ok(LegacyAccountAttributes { second_public_key })
-    }
-}
-
-impl JsAccountInfoExtended {
-    pub fn new(
-        node_env: &napi::Env,
-        account_info: AccountInfo,
-        legacy_attributes: LegacyAccountAttributes,
-    ) -> anyhow::Result<Self> {
-        Ok(JsAccountInfoExtended {
-            nonce: node_env.create_bigint_from_u64(account_info.nonce)?,
-            balance: utils::convert_u256_to_bigint(node_env, account_info.balance)?,
-            legacy_attributes: JsLegacyAttributes::new(node_env, legacy_attributes)?,
-        })
-    }
-}
-
-impl TryInto<AccountInfoExtended> for JsAccountInfoExtended {
-    type Error = crate::Error;
-
-    fn try_into(self) -> Result<AccountInfoExtended, Self::Error> {
-        Ok(AccountInfoExtended {
-            info: AccountInfo {
-                balance: utils::convert_bigint_to_u256(self.balance)?,
-                nonce: self.nonce.get_u64()?.0,
-                ..Default::default()
-            },
-            legacy_attributes: self.legacy_attributes.try_into()?,
-        })
     }
 }
 

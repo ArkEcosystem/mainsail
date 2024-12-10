@@ -275,6 +275,18 @@ impl PersistentDB {
         )
     }
 
+    pub fn get_legacy_attributes(
+        &mut self,
+        address: Address,
+    ) -> Result<Option<LegacyAccountAttributes>, Error> {
+        let tx_env = self.env.read_txn()?;
+        Ok(self
+            .inner
+            .borrow()
+            .legacy_attributes
+            .get(&tx_env, &AddressWrapper(address))?)
+    }
+
     pub fn resize(&self) -> Result<(), Error> {
         let info = self.env.info();
 

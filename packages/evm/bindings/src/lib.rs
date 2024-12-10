@@ -317,6 +317,32 @@ impl EvmInner {
         }
     }
 
+    pub fn get_account_info_extended(
+        &mut self,
+        address: Address,
+    ) -> std::result::Result<AccountInfoExtended, EVMError<String>> {
+        let info = self
+            .persistent_db
+            .basic(address)
+            .map_err(|err| {
+                EVMError::Database(format!("account info lookup failed: {}", err).into())
+            })?
+            .unwrap_or_default();
+
+        let legacy_attributes = self
+            .persistent_db
+            .get_legacy_attributes(address)
+            .map_err(|err| {
+                EVMError::Database(format!("legacy attributes lookup failed: {}", err).into())
+            })?
+            .unwrap_or_default();
+
+        Ok(AccountInfoExtended {
+            info,
+            legacy_attributes,
+        })
+    }
+
     pub fn import_account_info(
         &mut self,
         address: Address,
@@ -736,6 +762,19 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsAccountInfoExtended>")]
+    pub fn get_account_info_extended(
+        &mut self,
+        node_env: Env,
+        address: JsString,
+    ) -> Result<JsObject> {
+        let address = utils::create_address_from_js_string(address)?;
+        node_env.execute_tokio_future(
+            Self::get_account_info_extended_async(self.evm.clone(), address),
+            |&mut node_env, result| Ok(result::JsAccountInfoExtended::new(&node_env, result)?),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<void>")]
     pub fn import_account_info(
         &mut self,
@@ -859,6 +898,19 @@ impl JsEvmWrapper {
     ) -> Result<AccountInfo> {
         let mut lock = evm.lock().await;
         let result = lock.get_account_info(address);
+
+        match result {
+            Ok(account) => Result::Ok(account),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_account_info_extended_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        address: Address,
+    ) -> Result<AccountInfoExtended> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_account_info_extended(address);
 
         match result {
             Ok(account) => Result::Ok(account),
