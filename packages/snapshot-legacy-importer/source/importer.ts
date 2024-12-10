@@ -148,10 +148,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				arkAddress: wallet.address,
 				balance,
 				ethAddress,
-				publicKey: wallet.publicKey,
 				legacyAttributes: {
 					secondPublicKey: wallet.attributes["secondPublicKey"] ?? undefined,
 				},
+				publicKey: wallet.publicKey,
 			});
 
 			if (wallet.attributes["vote"]) {
@@ -254,8 +254,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 			await this.evm.importAccountInfo(wallet.ethAddress, {
 				balance: wallet.balance,
-				nonce: 0n,
 				legacyAttributes: wallet.legacyAttributes,
+				nonce: 0n,
 			});
 
 			totalSupply += wallet.balance;
