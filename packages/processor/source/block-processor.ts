@@ -90,7 +90,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (this.apiSync) {
+		if (this.apiSync && unit.height > 0) {
 			await this.apiSync.beforeCommit();
 		}
 
@@ -111,7 +111,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
 
-		if (this.apiSync) {
+		if (this.apiSync && unit.height > 0) {
 			await this.apiSync.onCommit(unit);
 		}
 
