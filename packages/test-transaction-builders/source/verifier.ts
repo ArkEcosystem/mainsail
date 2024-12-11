@@ -26,4 +26,11 @@ export class AcceptAnyTransactionVerifier implements Contracts.Crypto.Transactio
 			value: data,
 		};
 	}
+
+	public async verifyLegacySecondSignature(
+		data: Contracts.Crypto.TransactionData,
+		legacySecondPublicKey: string,
+	): Promise<boolean> {
+		return true;
+	}
 }
