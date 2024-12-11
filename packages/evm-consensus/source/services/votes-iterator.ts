@@ -55,6 +55,7 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 			data: Buffer.from(data, "hex"),
 			recipient: consensusContractAddress,
 			specId: evmSpec,
+			gasLimit: 100_000_000n,
 		});
 
 		if (!result.success) {
