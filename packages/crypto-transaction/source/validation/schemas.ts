@@ -21,19 +21,24 @@ export const transactionBaseSchema: SchemaObject = {
 		gasLimit: { transactionGasLimit: {} },
 		gasPrice: { bignumber: { minimum: 0 } },
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
-		network: { $ref: "networkByte" },
-		nonce: { bignumber: { minimum: 0 } },
-		senderAddress: { $ref: "address" },
-		senderPublicKey: { $ref: "publicKey" },
-		signature: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
-		value: { bignumber: { maximum: undefined, minimum: 0 } },
-
 		// Legacy
 		legacySecondSignature: {
 			// TODO: double check format
 			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
 			type: "string",
 		},
+
+		network: { $ref: "networkByte" },
+
+		nonce: { bignumber: { minimum: 0 } },
+
+		senderAddress: { $ref: "address" },
+
+		senderPublicKey: { $ref: "publicKey" },
+
+		signature: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
+
+		value: { bignumber: { maximum: undefined, minimum: 0 } },
 		// signatures: {
 		// 	items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
 		// 	maxItems: 16,
