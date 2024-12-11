@@ -162,7 +162,7 @@ export class Deployer {
 			`Deployed Consensus PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
 		);
 
-		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
+		this.#emitContractDeployed({
 			activeImplementation: consensusContractAddress,
 			address: proxyResult.receipt.deployedContractAddress!,
 			implementations: [{ abi: ConsensusAbi.abi, address: consensusContractAddress }],
@@ -243,7 +243,7 @@ export class Deployer {
 			`Deployed Usernames PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
 		);
 
-		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
+		this.#emitContractDeployed({
 			activeImplementation: usernamesContractAddress,
 			address: proxyResult.receipt.deployedContractAddress!,
 			implementations: [{ abi: UsernamesAbi.abi, address: usernamesContractAddress }],
@@ -282,12 +282,22 @@ export class Deployer {
 			`Deployed MultiPayments contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
 		);
 
-		void this.events.dispatch(Events.DeployerEvent.ContractCreated, {
+		this.#emitContractDeployed({
 			address: result.receipt.deployedContractAddress!,
 			implementations: [{ abi: MultiPaymentAbi.abi, address: result.receipt.deployedContractAddress! }],
 			name: "multi-payments",
 		});
 
 		return result.receipt.deployedContractAddress!;
+	}
+
+	public getDeploymentEvents(): Contracts.Evm.DeployerContract[] {
+		return this.#deploymentEvents;
+	}
+
+	#deploymentEvents: Contracts.Evm.DeployerContract[] = [];
+	#emitContractDeployed(event: Contracts.Evm.DeployerContract): void {
+		this.#deploymentEvents.push(event);
+		void this.events.dispatch(Events.DeployerEvent.ContractCreated, event);
 	}
 }

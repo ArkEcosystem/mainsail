@@ -5,7 +5,7 @@ import { ValidatorWallet } from "../state/wallets.js";
 export interface DeployerContract {
 	readonly name: string;
 	readonly address: string;
-	readonly proxy: "UUPS" | undefined;
+	readonly proxy?: "UUPS";
 	readonly implementations: { address: string; abi: Record<string, any> }[];
 	readonly activeImplementation?: string;
 }

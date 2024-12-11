@@ -29,7 +29,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		Utils.assert.defined(genesisBlock);
 
-		await this.app.resolve(Deployer).deploy({
+		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
+
+		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy({
 			generatorAddress: genesisBlock.block.generatorAddress,
 			timestamp: genesisBlock.block.timestamp,
 			totalAmount: genesisBlock.block.totalAmount,

@@ -6,6 +6,7 @@ export const Identifiers = {
 		},
 	},
 	Internal: {
+		Deployer: Symbol.for("Evm.Consensus<Internal.Deployer>"),
 		Addresses: {
 			Deployer: Symbol.for("Evm.Consensus<Internal.Addresses.Deployer>"),
 		},
