@@ -418,6 +418,10 @@ export class Sync implements Contracts.ApiSync.Service {
 		updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
 		public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
 		attributes = jsonb_strip_nulls(jsonb_build_object(
+			-- legacy attributes are kept indefinitely
+			'isLegacy', EXCLUDED.attributes->>'isLegacy',
+			'secondPublicKey', EXCLUDED.attributes->>'secondPublicKey',
+
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',
 			CASE

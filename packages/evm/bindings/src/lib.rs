@@ -338,6 +338,7 @@ impl EvmInner {
             .unwrap_or_default();
 
         Ok(AccountInfoExtended {
+            address,
             info,
             legacy_attributes,
         })
@@ -345,14 +346,13 @@ impl EvmInner {
 
     pub fn import_account_info(
         &mut self,
-        address: Address,
         info: AccountInfoExtended,
     ) -> std::result::Result<(), EVMError<String>> {
         let pending = self.pending_commit.as_mut().unwrap();
         assert_eq!(pending.key, CommitKey(0, 0));
-        assert!(!pending.cache.accounts.contains_key(&address));
+        assert!(!pending.cache.accounts.contains_key(&info.address));
 
-        let (info, legacy_attributes) = info.into_parts();
+        let (address, info, legacy_attributes) = info.into_parts();
         pending.import_account(address, info, legacy_attributes);
 
         Ok(())
@@ -362,7 +362,7 @@ impl EvmInner {
         &mut self,
         offset: u64,
         limit: u64,
-    ) -> std::result::Result<(Option<u64>, Vec<AccountUpdate>), EVMError<String>> {
+    ) -> std::result::Result<(Option<u64>, Vec<AccountInfoExtended>), EVMError<String>> {
         match self.persistent_db.get_accounts(offset, limit) {
             Ok((next_offset, accounts)) => Ok((next_offset, accounts)),
             Err(err) => Err(EVMError::Database(
@@ -779,14 +779,12 @@ impl JsEvmWrapper {
     pub fn import_account_info(
         &mut self,
         node_env: Env,
-        address: JsString,
         info: JsAccountInfoExtended,
     ) -> Result<JsObject> {
-        let address = utils::create_address_from_js_string(address)?;
         let info: AccountInfoExtended = info.try_into()?;
 
         node_env.execute_tokio_future(
-            Self::import_account_info_async(self.evm.clone(), address, info),
+            Self::import_account_info_async(self.evm.clone(), info),
             |_, _| Ok(()),
         )
     }
@@ -920,11 +918,10 @@ impl JsEvmWrapper {
 
     async fn import_account_info_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
-        address: Address,
         info: AccountInfoExtended,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.import_account_info(address, info);
+        let result = lock.import_account_info(info);
 
         match result {
             Ok(_) => Result::Ok(()),
@@ -1046,7 +1043,7 @@ impl JsEvmWrapper {
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         offset: u64,
         limit: u64,
-    ) -> Result<(Option<u64>, Vec<AccountUpdate>)> {
+    ) -> Result<(Option<u64>, Vec<AccountInfoExtended>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_accounts(offset, limit);
 

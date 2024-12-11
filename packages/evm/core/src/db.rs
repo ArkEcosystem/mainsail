@@ -9,7 +9,7 @@ use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    account::LegacyAccountAttributes,
+    account::{AccountInfoExtended, LegacyAccountAttributes},
     receipt::{map_execution_result, TxReceipt},
     state_changes,
     state_commit::StateCommit,
@@ -220,7 +220,7 @@ impl PersistentDB {
         &self,
         offset: u64,
         limit: u64,
-    ) -> Result<(Option<u64>, Vec<state_changes::AccountUpdate>), Error> {
+    ) -> Result<(Option<u64>, Vec<AccountInfoExtended>), Error> {
         let tx_env = self.env.read_txn()?;
         let iter = self
             .inner
@@ -229,15 +229,18 @@ impl PersistentDB {
             .iter(&tx_env)?
             .skip(offset as usize);
 
-        self.get_items(
+        let (cursor, mut accounts) = self.get_items(
             iter,
             |item| match item {
                 Some(item) => {
                     let (address, info) = item?;
-                    Ok(Some(state_changes::AccountUpdate {
+                    Ok(Some(AccountInfoExtended {
                         address: address.0,
-                        balance: info.balance,
-                        nonce: info.nonce,
+                        info: AccountInfo {
+                            balance: info.balance,
+                            nonce: info.nonce,
+                            ..Default::default()
+                        },
                         ..Default::default()
                     }))
                 }
@@ -245,7 +248,20 @@ impl PersistentDB {
             },
             offset,
             limit,
-        )
+        )?;
+
+        for account in accounts.iter_mut() {
+            if let Some(legacy_attributes) = self
+                .inner
+                .borrow()
+                .legacy_attributes
+                .get(&tx_env, &AddressWrapper(account.address))?
+            {
+                account.legacy_attributes = legacy_attributes;
+            }
+        }
+
+        Ok((cursor, accounts))
     }
 
     pub fn get_receipts(
@@ -634,7 +650,25 @@ impl PendingCommit {
         info: AccountInfo,
         legacy_attributes: Option<LegacyAccountAttributes>,
     ) {
-        self.cache.insert_account(address, info);
+        let mut state = revm::State::builder()
+            .with_bundle_update()
+            .with_cached_prestate(std::mem::take(&mut self.cache))
+            .build();
+
+        state
+            .increment_balances(
+                vec![(address, info.balance.try_into().expect("fit u128"))]
+                    .into_iter()
+                    .collect::<HashMap<Address, u128>>(),
+            )
+            .expect("import account balance");
+
+        if let Some(transition_state) = state.transition_state.take() {
+            self.transitions
+                .add_transitions(transition_state.transitions.into_iter().collect());
+        }
+
+        self.cache = std::mem::take(&mut state.cache);
 
         if let Some(legacy_attributes) = legacy_attributes {
             self.legacy_attributes.insert(address, legacy_attributes);

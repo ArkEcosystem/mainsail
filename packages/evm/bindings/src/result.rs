@@ -182,6 +182,7 @@ impl JsAccountUpdate {
 
 #[napi(object)]
 pub struct JsAccountInfoExtended {
+    pub address: JsString,
     pub balance: JsBigInt,
     pub nonce: JsBigInt,
     pub legacy_attributes: JsLegacyAttributes,
@@ -198,6 +199,7 @@ impl JsAccountInfoExtended {
         account_info_extended: AccountInfoExtended,
     ) -> anyhow::Result<Self> {
         Ok(JsAccountInfoExtended {
+            address: node_env.create_string(&account_info_extended.address.to_string())?,
             nonce: node_env.create_bigint_from_u64(account_info_extended.info.nonce)?,
             balance: utils::convert_u256_to_bigint(node_env, account_info_extended.info.balance)?,
             legacy_attributes: JsLegacyAttributes::new(
@@ -213,6 +215,7 @@ impl TryInto<AccountInfoExtended> for JsAccountInfoExtended {
 
     fn try_into(self) -> Result<AccountInfoExtended, Self::Error> {
         Ok(AccountInfoExtended {
+            address: utils::create_address_from_js_string(self.address)?,
             info: AccountInfo {
                 balance: utils::convert_bigint_to_u256(self.balance)?,
                 nonce: self.nonce.get_u64()?.0,
@@ -256,14 +259,14 @@ impl TryInto<LegacyAccountAttributes> for JsLegacyAttributes {
 #[napi(object)]
 pub struct JsGetAccounts {
     pub next_offset: Option<JsBigInt>,
-    pub accounts: Vec<JsAccountUpdate>,
+    pub accounts: Vec<JsAccountInfoExtended>,
 }
 
 impl JsGetAccounts {
     pub fn new(
         node_env: &napi::Env,
         next_offset: Option<u64>,
-        accounts: Vec<AccountUpdate>,
+        accounts: Vec<AccountInfoExtended>,
     ) -> anyhow::Result<Self> {
         let next_offset = match next_offset {
             Some(next_offset) => Some(node_env.create_bigint_from_u64(next_offset)?),
@@ -272,7 +275,7 @@ impl JsGetAccounts {
 
         let mut mapped = Vec::with_capacity(accounts.len());
         for account in accounts {
-            mapped.push(JsAccountUpdate::new(node_env, account)?);
+            mapped.push(JsAccountInfoExtended::new(node_env, account)?);
         }
 
         Ok(JsGetAccounts {

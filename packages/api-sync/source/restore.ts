@@ -123,7 +123,7 @@ export class Restore {
 		Utils.assert.defined<Contracts.Crypto.Commit>(mostRecentCommit);
 
 		this.logger.info(
-			`Performing database restore of ${mostRecentCommit.block.header.height.toLocaleString()} blocks. this might take a while.`,
+			`Performing database restore of ${(mostRecentCommit.block.header.height + 1).toLocaleString()} blocks. this might take a while.`,
 		);
 
 		const t0 = performance.now();
@@ -191,7 +191,7 @@ export class Restore {
 		});
 
 		const t1 = performance.now();
-		this.logger.info(`Finished restore of ${restoredHeight.toLocaleString()} blocks in ${t1 - t0}ms`);
+		this.logger.info(`Finished restore of ${(restoredHeight + 1).toLocaleString()} blocks in ${t1 - t0}ms`);
 	}
 
 	async #ingestBlocksAndTransactions(context: RestoreContext): Promise<void> {
@@ -295,7 +295,7 @@ export class Restore {
 
 			if (currentHeight % 10_000 === 0 || currentHeight + BATCH_SIZE > mostRecentCommit.block.header.height) {
 				const t1 = performance.now();
-				this.logger.info(`Restored blocks: ${context.lastHeight.toLocaleString()} elapsed: ${t1 - t0}ms`);
+				this.logger.info(`Restored blocks: ${(context.lastHeight + 1).toLocaleString()} elapsed: ${t1 - t0}ms`);
 				await new Promise<void>((resolve) => setImmediate(resolve)); // Log might stuck if this line is removed
 			}
 
@@ -346,6 +346,7 @@ export class Restore {
 			for (const account of result.accounts) {
 				const validatorAttributes = context.validatorAttributes[account.address];
 				const userAttributes = context.userAttributes[account.address];
+				const { legacyAttributes } = account;
 
 				const username = await this.#readUsername(account.address);
 
@@ -382,6 +383,14 @@ export class Restore {
 							? {
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
 									...(username ? { username } : {}),
+								}
+							: {}),
+						...(legacyAttributes
+							? {
+									isLegacy: true,
+									...(legacyAttributes.secondPublicKey
+										? { secondPublicKey: legacyAttributes.secondPublicKey }
+										: {}),
 								}
 							: {}),
 					},

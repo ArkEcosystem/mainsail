@@ -252,7 +252,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				throw new Error("TODO");
 			}
 
-			await this.evm.importAccountInfo(wallet.ethAddress, {
+			await this.evm.importAccountInfo({
+				address: wallet.ethAddress,
 				balance: wallet.balance,
 				legacyAttributes: wallet.legacyAttributes,
 				nonce: 0n,

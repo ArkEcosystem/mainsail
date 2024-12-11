@@ -20,7 +20,7 @@ export interface Instance extends CommitHandler {
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	getAccountInfoExtended(address: string): Promise<AccountInfoExtended>;
-	importAccountInfo(address: string, info: AccountInfoExtended): Promise<void>;
+	importAccountInfo(info: AccountInfoExtended): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
@@ -49,6 +49,7 @@ export interface AccountInfo {
 }
 
 export interface AccountInfoExtended extends AccountInfo {
+	readonly address: string;
 	readonly legacyAttributes: LegacyAttributes;
 }
 
@@ -97,11 +98,12 @@ export interface TransactionViewContext {
 	readonly recipient: string;
 	readonly data: Buffer;
 	readonly specId: SpecId;
+	readonly gasLimit?: bigint;
 }
 
 export interface GetAccountsResult {
 	readonly nextOffset?: bigint;
-	readonly accounts: AccountUpdate[];
+	readonly accounts: AccountInfoExtended[];
 }
 
 export interface GetReceiptsResult {
