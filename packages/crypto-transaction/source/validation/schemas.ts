@@ -27,6 +27,13 @@ export const transactionBaseSchema: SchemaObject = {
 		senderPublicKey: { $ref: "publicKey" },
 		signature: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
 		value: { bignumber: { maximum: undefined, minimum: 0 } },
+
+		// Legacy
+		legacySecondSignature: {
+			// TODO: double check format
+			allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }],
+			type: "string",
+		},
 		// signatures: {
 		// 	items: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
 		// 	maxItems: 16,

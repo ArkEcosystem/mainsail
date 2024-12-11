@@ -46,11 +46,19 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			throw new Exceptions.InsufficientBalanceError();
 		}
 
+		// Legacy
 		if (sender.hasLegacySecondPublicKey()) {
-			// TODO: enable
-			// if (!(await this.verifier.verifyHash(transaction.data, sender.legacySecondPublicKey()))) {
-			// 	throw new Exceptions.InvalidSignatureError();
-			// }
+			if (!transaction.data.legacySecondSignature) {
+				throw new Exceptions.MissingLegacySecondSignatureError();
+			}
+
+			if (!(await this.verifier.verifyLegacySecondSignature(transaction.data, sender.legacySecondPublicKey()))) {
+				throw new Exceptions.InvalidLegacySecondSignatureError();
+			}
+		} else {
+			if (transaction.data.legacySecondSignature) {
+				throw new Exceptions.UnexpectedLegacySecondSignatureError();
+			}
 		}
 	}
 

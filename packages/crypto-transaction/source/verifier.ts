@@ -105,4 +105,25 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 
 		return this.validator.validate(strict ? `${$id}Strict` : `${$id}`, data);
 	}
+
+	public async verifyLegacySecondSignature(
+		data: Contracts.Crypto.TransactionData,
+		legacySecondPublicKey: string,
+	): Promise<boolean> {
+		const { legacySecondSignature } = data;
+
+		if (!legacySecondSignature) {
+			return false;
+		}
+
+		const hash: Buffer = await this.utils.toHash(data, {
+			excludeSignature: true,
+		});
+
+		return this.signatureFactory.verify(
+			Buffer.from(legacySecondSignature, "hex"),
+			hash,
+			Buffer.from(legacySecondPublicKey, "hex"),
+		);
+	}
 }
