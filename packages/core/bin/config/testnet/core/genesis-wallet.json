@@ -1,14 +1,14 @@
 {
-	"address": "0xe1B864823024e74C2ecB190E8721101b8F012e2E",
+	"address": "0xd1AD6bfA3540F25E21e6be808FB7F12562111CE5",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "2106a07f2593cf113f09ca388333acdeb0ac869c25ac49f5f2e1152ec9a8c866",
-		"publicKey": "aa33e334c07b27be65172b6da7d0e529e240b3ea3475b52d9fc411feb2001e1bff2cefe1f4db133394396c5a80b01a7d"
+		"privateKey": "34aff0a6add5bd9584432a9f2f5827bc0ad07954bbacad73d5d25f56c44e9156",
+		"publicKey": "b119b798f5b885a68ef7c9ad4d66aab566dae7f3179ed296dbe0bbc2c0ce0b9aef0c1c7d24ece78379153050892cd5a0"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "119c633ac90752df5cca7e8d4c2f34fff83ecd24be90322be29c5007059ab458",
-		"publicKey": "022ccab791bb3c7923a25e8df3f84f3ef246b3b84d881527525379c79e3bce1443"
+		"privateKey": "d3d68068b2993b5a7b5f35cbf3622c76a6580ea95b1b79ad18e63cecde7c8c87",
+		"publicKey": "03dc6981461d4b82df3e7db49b20a674745cef0dc5e7165168fe26490f5a24895a"
 	},
-	"passphrase": "fury emerge table silent bid brass help chaos wear wagon film together birth truth congress sock patch immense butter pig pigeon arrange edit frozen"
+	"passphrase": "gauge find shift stable position fog guard urge person hint frown disagree stem scout suggest focus actress side rhythm crush soccer accuse soccer arctic"
 }
