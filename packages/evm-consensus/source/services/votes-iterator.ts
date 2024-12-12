@@ -53,6 +53,7 @@ export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
 		const result = await this.evm.view({
 			caller: deployerAddress,
 			data: Buffer.from(data, "hex"),
+			gasLimit: 100_000_000n,
 			recipient: consensusContractAddress,
 			specId: evmSpec,
 		});

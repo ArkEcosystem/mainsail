@@ -11,6 +11,7 @@ describe<{
 		context.sandbox = new Sandbox();
 		context.sandbox.app.bind(Identifiers.Evm.Instance).toConstantValue({
 			getAccountInfo: async () => ({ balance: 0n, nonce: 0n }),
+			getAccountInfoExtended: async () => ({ balance: 0n, nonce: 0n, legacyAttributes: {} }),
 		});
 	});
 

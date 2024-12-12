@@ -7,6 +7,7 @@ use ctx::{
     PrepareNextCommitContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
 use mainsail_evm_core::{
+    account::AccountInfoExtended,
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
     receipt::{map_execution_result, TxReceipt},
     state_changes::AccountUpdate,
@@ -14,7 +15,7 @@ use mainsail_evm_core::{
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{CommitResult, JsAccountInfo, TxViewResult};
+use result::{CommitResult, JsAccountInfoExtended, TxViewResult};
 use revm::{
     db::{State, WrapDatabaseRef},
     primitives::{
@@ -316,16 +317,43 @@ impl EvmInner {
         }
     }
 
-    pub fn seed_account_info(
+    pub fn get_account_info_extended(
         &mut self,
         address: Address,
-        info: AccountInfo,
+    ) -> std::result::Result<AccountInfoExtended, EVMError<String>> {
+        let info = self
+            .persistent_db
+            .basic(address)
+            .map_err(|err| {
+                EVMError::Database(format!("account info lookup failed: {}", err).into())
+            })?
+            .unwrap_or_default();
+
+        let legacy_attributes = self
+            .persistent_db
+            .get_legacy_attributes(address)
+            .map_err(|err| {
+                EVMError::Database(format!("legacy attributes lookup failed: {}", err).into())
+            })?
+            .unwrap_or_default();
+
+        Ok(AccountInfoExtended {
+            address,
+            info,
+            legacy_attributes,
+        })
+    }
+
+    pub fn import_account_info(
+        &mut self,
+        info: AccountInfoExtended,
     ) -> std::result::Result<(), EVMError<String>> {
         let pending = self.pending_commit.as_mut().unwrap();
         assert_eq!(pending.key, CommitKey(0, 0));
-        assert!(!pending.cache.accounts.contains_key(&address));
+        assert!(!pending.cache.accounts.contains_key(&info.address));
 
-        pending.cache.insert_account(address, info);
+        let (address, info, legacy_attributes) = info.into_parts();
+        pending.import_account(address, info, legacy_attributes);
 
         Ok(())
     }
@@ -334,7 +362,7 @@ impl EvmInner {
         &mut self,
         offset: u64,
         limit: u64,
-    ) -> std::result::Result<(Option<u64>, Vec<AccountUpdate>), EVMError<String>> {
+    ) -> std::result::Result<(Option<u64>, Vec<AccountInfoExtended>), EVMError<String>> {
         match self.persistent_db.get_accounts(offset, limit) {
             Ok((next_offset, accounts)) => Ok((next_offset, accounts)),
             Err(err) => Err(EVMError::Database(
@@ -734,18 +762,29 @@ impl JsEvmWrapper {
         )
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
-    pub fn seed_account_info(
+    #[napi(ts_return_type = "Promise<JsAccountInfoExtended>")]
+    pub fn get_account_info_extended(
         &mut self,
         node_env: Env,
         address: JsString,
-        info: JsAccountInfo,
     ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
-        let info: AccountInfo = info.try_into()?;
+        node_env.execute_tokio_future(
+            Self::get_account_info_extended_async(self.evm.clone(), address),
+            |&mut node_env, result| Ok(result::JsAccountInfoExtended::new(&node_env, result)?),
+        )
+    }
+
+    #[napi(ts_return_type = "Promise<void>")]
+    pub fn import_account_info(
+        &mut self,
+        node_env: Env,
+        info: JsAccountInfoExtended,
+    ) -> Result<JsObject> {
+        let info: AccountInfoExtended = info.try_into()?;
 
         node_env.execute_tokio_future(
-            Self::seed_account_info_async(self.evm.clone(), address, info),
+            Self::import_account_info_async(self.evm.clone(), info),
             |_, _| Ok(()),
         )
     }
@@ -864,13 +903,25 @@ impl JsEvmWrapper {
         }
     }
 
-    async fn seed_account_info_async(
+    async fn get_account_info_extended_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
-        info: AccountInfo,
+    ) -> Result<AccountInfoExtended> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_account_info_extended(address);
+
+        match result {
+            Ok(account) => Result::Ok(account),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn import_account_info_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        info: AccountInfoExtended,
     ) -> Result<()> {
         let mut lock = evm.lock().await;
-        let result = lock.seed_account_info(address, info);
+        let result = lock.import_account_info(info);
 
         match result {
             Ok(_) => Result::Ok(()),
@@ -992,7 +1043,7 @@ impl JsEvmWrapper {
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         offset: u64,
         limit: u64,
-    ) -> Result<(Option<u64>, Vec<AccountUpdate>)> {
+    ) -> Result<(Option<u64>, Vec<AccountInfoExtended>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_accounts(offset, limit);
 

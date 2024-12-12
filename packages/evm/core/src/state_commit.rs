@@ -29,6 +29,7 @@ pub fn build_commit(
     let PendingCommit {
         key,
         cache,
+        legacy_attributes,
         results,
         transitions,
     } = pending_commit;
@@ -39,7 +40,9 @@ pub fn build_commit(
     state_builder.merge_transitions(revm::db::states::bundle_state::BundleRetention::PlainState);
 
     let bundle = state_builder.take_bundle();
-    let change_set = state_changes::bundle_into_change_set(bundle);
+    let mut change_set = state_changes::bundle_into_change_set(bundle);
+
+    change_set.legacy_attributes = legacy_attributes;
 
     Ok(StateCommit {
         key,

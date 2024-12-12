@@ -242,6 +242,24 @@ export class SenderWalletMismatchError extends Exception {
 	}
 }
 
+export class UnexpectedLegacySecondSignatureError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because wallet does not allow legacy second signatures.`);
+	}
+}
+
+export class InvalidLegacySecondSignatureError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because the legacy second signature could not be verified.`);
+	}
+}
+
+export class MissingLegacySecondSignatureError extends Exception {
+	public constructor() {
+		super(`Failed to apply transaction, because the legacy second signature is missing.`);
+	}
+}
+
 export class MissingMultiSignatureOnSenderError extends Exception {
 	public constructor() {
 		super(`Failed to apply transaction, because sender does not have a multi signature.`);

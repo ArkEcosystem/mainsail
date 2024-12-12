@@ -64,11 +64,12 @@ export class Bootstrapper {
 			await this.#setGenesisCommit();
 			await this.#checkStoredGenesisCommit();
 
-			if (this.apiSync) {
-				await this.apiSync.bootstrap();
+			if (this.databaseService.isEmpty()) {
+				await this.#initGenesisState();
+			} else {
+				await this.#initPostGenesisState();
 			}
 
-			await this.#initState();
 			this.state.setBootstrap(false);
 
 			this.validatorRepository.printLoadedValidators();
@@ -111,15 +112,31 @@ export class Bootstrapper {
 		}
 	}
 
-	async #initState(): Promise<void> {
-		if (this.databaseService.isEmpty()) {
-			await this.#tryImportSnapshot();
-			await this.#processGenesisBlock();
-		} else {
-			const commit = await this.databaseService.getLastCommit();
-			this.stateStore.setLastBlock(commit.block);
-			this.stateStore.setTotalRound(this.databaseService.getState().totalRound);
+	async #initApiSync(): Promise<void> {
+		if (this.apiSync) {
+			await this.apiSync.bootstrap();
 		}
+	}
+
+	async #initGenesisState(): Promise<void> {
+		if (!this.databaseService.isEmpty()) {
+			throw new Error("initGenesisState must be called on empty database");
+		}
+
+		await this.#tryImportSnapshot();
+		await this.#processGenesisBlock();
+		await this.validatorSet.restore();
+
+		// After genesis commit to restore all data
+		await this.#initApiSync();
+	}
+
+	async #initPostGenesisState(): Promise<void> {
+		await this.#initApiSync();
+
+		const commit = await this.databaseService.getLastCommit();
+		this.stateStore.setLastBlock(commit.block);
+		this.stateStore.setTotalRound(this.databaseService.getState().totalRound);
 
 		await this.validatorSet.restore();
 	}

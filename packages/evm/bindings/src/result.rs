@@ -1,4 +1,8 @@
-use mainsail_evm_core::{receipt::TxReceipt, state_changes::AccountUpdate};
+use mainsail_evm_core::{
+    account::{AccountInfoExtended, LegacyAccountAttributes},
+    receipt::TxReceipt,
+    state_changes::AccountUpdate,
+};
 use napi::{JsBigInt, JsBoolean, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{AccountInfo, Bytes, B256};
@@ -177,16 +181,92 @@ impl JsAccountUpdate {
 }
 
 #[napi(object)]
+pub struct JsAccountInfoExtended {
+    pub address: JsString,
+    pub balance: JsBigInt,
+    pub nonce: JsBigInt,
+    pub legacy_attributes: JsLegacyAttributes,
+}
+
+#[napi(object)]
+pub struct JsLegacyAttributes {
+    pub second_public_key: Option<JsString>,
+}
+
+impl JsAccountInfoExtended {
+    pub fn new(
+        node_env: &napi::Env,
+        account_info_extended: AccountInfoExtended,
+    ) -> anyhow::Result<Self> {
+        Ok(JsAccountInfoExtended {
+            address: node_env.create_string(&account_info_extended.address.to_string())?,
+            nonce: node_env.create_bigint_from_u64(account_info_extended.info.nonce)?,
+            balance: utils::convert_u256_to_bigint(node_env, account_info_extended.info.balance)?,
+            legacy_attributes: JsLegacyAttributes::new(
+                node_env,
+                account_info_extended.legacy_attributes,
+            )?,
+        })
+    }
+}
+
+impl TryInto<AccountInfoExtended> for JsAccountInfoExtended {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<AccountInfoExtended, Self::Error> {
+        Ok(AccountInfoExtended {
+            address: utils::create_address_from_js_string(self.address)?,
+            info: AccountInfo {
+                balance: utils::convert_bigint_to_u256(self.balance)?,
+                nonce: self.nonce.get_u64()?.0,
+                ..Default::default()
+            },
+            legacy_attributes: self.legacy_attributes.try_into()?,
+        })
+    }
+}
+
+impl JsLegacyAttributes {
+    pub fn new(
+        node_env: &napi::Env,
+        legacy_attributes: LegacyAccountAttributes,
+    ) -> anyhow::Result<Self> {
+        let second_public_key = if let Some(second_public_key) = legacy_attributes.second_public_key
+        {
+            Some(node_env.create_string(second_public_key.as_str())?)
+        } else {
+            None
+        };
+
+        Ok(JsLegacyAttributes { second_public_key })
+    }
+}
+
+impl TryInto<LegacyAccountAttributes> for JsLegacyAttributes {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<LegacyAccountAttributes, Self::Error> {
+        let second_public_key = if let Some(second_public_key) = self.second_public_key {
+            Some(second_public_key.into_utf8()?.into_owned()?)
+        } else {
+            None
+        };
+
+        Ok(LegacyAccountAttributes { second_public_key })
+    }
+}
+
+#[napi(object)]
 pub struct JsGetAccounts {
     pub next_offset: Option<JsBigInt>,
-    pub accounts: Vec<JsAccountUpdate>,
+    pub accounts: Vec<JsAccountInfoExtended>,
 }
 
 impl JsGetAccounts {
     pub fn new(
         node_env: &napi::Env,
         next_offset: Option<u64>,
-        accounts: Vec<AccountUpdate>,
+        accounts: Vec<AccountInfoExtended>,
     ) -> anyhow::Result<Self> {
         let next_offset = match next_offset {
             Some(next_offset) => Some(node_env.create_bigint_from_u64(next_offset)?),
@@ -195,7 +275,7 @@ impl JsGetAccounts {
 
         let mut mapped = Vec::with_capacity(accounts.len());
         for account in accounts {
-            mapped.push(JsAccountUpdate::new(node_env, account)?);
+            mapped.push(JsAccountInfoExtended::new(node_env, account)?);
         }
 
         Ok(JsGetAccounts {

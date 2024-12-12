@@ -19,7 +19,8 @@ export interface Instance extends CommitHandler {
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
-	seedAccountInfo(address: string, info: AccountInfo): Promise<void>;
+	getAccountInfoExtended(address: string): Promise<AccountInfoExtended>;
+	importAccountInfo(info: AccountInfoExtended): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
@@ -45,6 +46,15 @@ export interface CommitResult {}
 export interface AccountInfo {
 	readonly nonce: bigint;
 	readonly balance: bigint;
+}
+
+export interface AccountInfoExtended extends AccountInfo {
+	readonly address: string;
+	readonly legacyAttributes: LegacyAttributes;
+}
+
+export interface LegacyAttributes {
+	readonly secondPublicKey?: string;
 }
 
 export interface AccountUpdate {
@@ -88,11 +98,12 @@ export interface TransactionViewContext {
 	readonly recipient: string;
 	readonly data: Buffer;
 	readonly specId: SpecId;
+	readonly gasLimit?: bigint;
 }
 
 export interface GetAccountsResult {
 	readonly nextOffset?: bigint;
-	readonly accounts: AccountUpdate[];
+	readonly accounts: AccountInfoExtended[];
 }
 
 export interface GetReceiptsResult {

@@ -52,7 +52,17 @@ fn calculate_state_hash(
 }
 
 pub fn calculate_accounts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
-    calculate_hash(&state_changes.accounts)
+    if state_changes.legacy_attributes.is_empty() {
+        calculate_hash(&state_changes.accounts)
+    } else {
+        Ok(keccak256(
+            [
+                calculate_hash(&state_changes.accounts)?.as_slice(),
+                calculate_hash(&state_changes.legacy_attributes)?.as_slice(),
+            ]
+            .concat(),
+        ))
+    }
 }
 
 pub fn calculate_contracts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {

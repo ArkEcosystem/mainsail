@@ -148,6 +148,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				arkAddress: wallet.address,
 				balance,
 				ethAddress,
+				legacyAttributes: {
+					secondPublicKey: wallet.attributes["secondPublicKey"] ?? undefined,
+				},
 				publicKey: wallet.publicKey,
 			});
 
@@ -244,10 +247,15 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.logger.info(`seeding ${this.#data.wallets.length} wallets`);
 
 		for (const wallet of this.#data.wallets) {
-			Utils.assert.defined(wallet.ethAddress);
+			if (!wallet.ethAddress) {
+				// TODO: store cold wallet in account storage
+				throw new Error("TODO");
+			}
 
-			await this.evm.seedAccountInfo(wallet.ethAddress, {
+			await this.evm.importAccountInfo({
+				address: wallet.ethAddress,
 				balance: wallet.balance,
+				legacyAttributes: wallet.legacyAttributes,
 				nonce: 0n,
 			});
 

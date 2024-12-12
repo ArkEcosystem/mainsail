@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
@@ -12,12 +13,16 @@ export class Wallet implements Contracts.State.Wallet {
 	protected balance = BigNumber.ZERO;
 	protected nonce = BigNumber.ZERO;
 
+	protected legacyAttributes: Contracts.Evm.LegacyAttributes = {};
+
 	public async init(address: string): Promise<Wallet> {
 		this.address = address;
 
-		const accountInfo = await this.evm.getAccountInfo(address);
+		const accountInfo = await this.evm.getAccountInfoExtended(address);
 		this.balance = BigNumber.make(accountInfo.balance);
 		this.nonce = BigNumber.make(accountInfo.nonce);
+		this.legacyAttributes = accountInfo.legacyAttributes;
+
 		return this;
 	}
 
@@ -59,5 +64,15 @@ export class Wallet implements Contracts.State.Wallet {
 
 	public decreaseNonce(): void {
 		this.setNonce(this.getNonce().minus(BigNumber.ONE));
+	}
+
+	// Legacy
+	public hasLegacySecondPublicKey(): boolean {
+		return !!this.legacyAttributes.secondPublicKey;
+	}
+
+	public legacySecondPublicKey(): string {
+		Utils.assert.defined(this.legacyAttributes.secondPublicKey);
+		return this.legacyAttributes.secondPublicKey;
 	}
 }

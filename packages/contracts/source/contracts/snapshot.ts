@@ -27,6 +27,13 @@ export interface ImportedLegacyWallet {
 	readonly ethAddress?: string;
 	readonly publicKey?: string;
 	readonly balance: bigint; // WEI - 18 decimals
+
+	// Legacy attributes for the 'legacy' storage
+	readonly legacyAttributes: ImportedLegacyWalletAttributes;
+}
+
+export interface ImportedLegacyWalletAttributes {
+	readonly secondPublicKey?: string;
 }
 
 export interface ImportedLegacyVoter {

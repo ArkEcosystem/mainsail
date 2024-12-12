@@ -28,6 +28,7 @@ pub struct JsTransactionViewContext {
     pub recipient: JsString,
     pub data: JsBuffer,
     pub spec_id: JsString,
+    pub gas_limit: Option<JsBigInt>,
 }
 
 #[napi(object)]
@@ -102,6 +103,7 @@ pub struct TxViewContext {
     pub recipient: Address,
     pub data: Bytes,
     pub spec_id: SpecId,
+    pub gas_limit: Option<u64>,
 }
 
 #[derive(Debug)]
@@ -158,7 +160,7 @@ impl From<TxViewContext> for ExecutionContext {
         Self {
             caller: value.caller,
             recipient: Some(value.recipient),
-            gas_limit: None,
+            gas_limit: value.gas_limit,
             gas_price: None,
             value: U256::ZERO,
             nonce: None,
@@ -264,11 +266,18 @@ impl TryFrom<JsTransactionViewContext> for TxViewContext {
     fn try_from(value: JsTransactionViewContext) -> std::result::Result<Self, Self::Error> {
         let buf = value.data.into_value()?;
 
+        let gas_limit = if let Some(gas_limit) = value.gas_limit {
+            Some(gas_limit.get_u64()?.0)
+        } else {
+            None
+        };
+
         let tx_ctx = TxViewContext {
             caller: utils::create_address_from_js_string(value.caller)?,
             recipient: utils::create_address_from_js_string(value.recipient)?,
             data: Bytes::from(buf.as_ref().to_owned()),
             spec_id: parse_spec_id(value.spec_id)?,
+            gas_limit,
         };
 
         Ok(tx_ctx)
