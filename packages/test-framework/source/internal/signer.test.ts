@@ -21,7 +21,9 @@ describe<{
 
 		const entity = await signer.makeTransfer(options);
 
-		assert.defined(entity.data.signature);
+		assert.defined(entity.data.v);
+		assert.defined(entity.data.r);
+		assert.defined(entity.data.s);
 		// assert.defined(entity.data.vendorField);
 	});
 
@@ -95,9 +97,11 @@ describe<{
 
 		const entity = await signer.makeEvmCall(options);
 
-		assert.defined(entity.data.signature);
-		assert.equal(entity.data.recipientAddress, "0xD3D80a3Df661414a76aAd7738a136A8d7aAa1666");
-		assert.equal(entity.data.gasLimit, 21000);
+		assert.defined(entity.data.v);
+		assert.defined(entity.data.r);
+		assert.defined(entity.data.s);
+		assert.equal(entity.data.recipientAddress, "0xd3d80a3df661414a76aad7738a136a8d7aaa1666");
+		assert.equal(entity.data.gasLimit, 21_000);
 		assert.equal(
 			entity.data.data,
 			"a9059cbb000000000000000000000000bd6f65c58a46427af4b257cbe231d0ed69ed550800000000000000000000000000000000000000000000003635c9adc5dea00000",

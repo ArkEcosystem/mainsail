@@ -35,7 +35,9 @@ describe<{
 			.withStates("vendorField")
 			.make();
 
-		assert.undefined(transaction.data.signature);
+		assert.undefined(transaction.data.v);
+		assert.undefined(transaction.data.r);
+		assert.undefined(transaction.data.s);
 	});
 
 	it("Transfer - should sign it with a single passphrase", async ({ factoryBuilder }) => {
@@ -44,7 +46,9 @@ describe<{
 			.withStates("sign")
 			.make();
 
-		assert.defined(transaction.data.signature);
+		assert.defined(transaction.data.v);
+		assert.defined(transaction.data.r);
+		assert.defined(transaction.data.s);
 	});
 
 	// it("ValidatorRegistration - should create a signature builder", async ({ factoryBuilder }) => {
