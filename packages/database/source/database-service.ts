@@ -209,7 +209,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return [...this.#commitCache.values()].pop()!;
 		}
 
-		const height = this.blockIdStorage.getRange({ limit: 1, reverse: true }).asArray[0].value;
+		const height = Number(this.commitStorage.getRange({ limit: 1, reverse: true }).asArray[0].key);
 		return await this.commitFactory.fromBytes(this.#readCommitBytes(height)!);
 	}
 
