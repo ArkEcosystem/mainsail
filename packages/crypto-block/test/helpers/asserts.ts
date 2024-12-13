@@ -29,7 +29,9 @@ export const assertTransactionData = (assert, transactionData1, transactionData2
 		"network",
 		"value",
 		"recipientAddress",
-		"signature",
+		"v",
+		"r",
+		"s",
 	];
 
 	for (const field of transactionFields) {
