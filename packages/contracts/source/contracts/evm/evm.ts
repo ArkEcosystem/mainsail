@@ -55,6 +55,12 @@ export interface AccountInfoExtended extends AccountInfo {
 
 export interface LegacyAttributes {
 	readonly secondPublicKey?: string;
+	readonly multiSignature?: LegacyMultiSignatureAttribute;
+}
+
+export interface LegacyMultiSignatureAttribute {
+	readonly min: number;
+	readonly publicKeys: string[];
 }
 
 export interface AccountUpdate {

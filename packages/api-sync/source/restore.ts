@@ -3,7 +3,7 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 } from "@mainsail/api-database";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { UsernamesAbi } from "@mainsail/evm-contracts";
@@ -115,6 +115,10 @@ export class Restore {
 
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 	private readonly deployerAddress!: string;
+
+	@inject(Identifiers.Snapshot.Legacy.Importer)
+	@optional()
+	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
 	public async restore(): Promise<void> {
 		const mostRecentCommit = await (this.databaseService.isEmpty()
@@ -340,6 +344,15 @@ export class Restore {
 
 		const accounts: Models.Wallet[] = [];
 
+		if (this.snapshotImporter) {
+			for (const wallet of this.snapshotImporter.wallets) {
+				// add any imported address to the mapping
+				if (wallet.ethAddress && wallet.publicKey) {
+					context.addressToPublicKey[wallet.ethAddress] = wallet.publicKey;
+				}
+			}
+		}
+
 		do {
 			const result = await this.evm.getAccounts(offset ?? 0n, BATCH_SIZE);
 
@@ -385,11 +398,14 @@ export class Restore {
 									...(username ? { username } : {}),
 								}
 							: {}),
-						...(legacyAttributes
+						...(legacyAttributes && Object.keys(legacyAttributes).length > 0
 							? {
 									isLegacy: true,
 									...(legacyAttributes.secondPublicKey
 										? { secondPublicKey: legacyAttributes.secondPublicKey }
+										: {}),
+									...(legacyAttributes.multiSignature
+										? { multiSignature: legacyAttributes.multiSignature }
 										: {}),
 								}
 							: {}),

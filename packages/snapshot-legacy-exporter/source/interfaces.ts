@@ -9,5 +9,5 @@ export interface LegacyWallet {
 	readonly publicKey?: string;
 	readonly balance: string; // ARK - 8 decimals
 	readonly nonce: string;
-	readonly attributes: Record<string, string>;
+	readonly attributes: Record<string, any>;
 }

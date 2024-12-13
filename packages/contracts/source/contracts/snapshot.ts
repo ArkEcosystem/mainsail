@@ -34,6 +34,12 @@ export interface ImportedLegacyWallet {
 
 export interface ImportedLegacyWalletAttributes {
 	readonly secondPublicKey?: string;
+	readonly multiSignature?: ImportedLegacyMultiSignatureAttribute;
+}
+
+export interface ImportedLegacyMultiSignatureAttribute {
+	readonly min: number;
+	readonly publicKeys: string[];
 }
 
 export interface ImportedLegacyVoter {

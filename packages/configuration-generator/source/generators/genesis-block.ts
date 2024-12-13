@@ -299,7 +299,7 @@ export class GenesisBlockGenerator extends Generator {
 						options.snapshot?.stateHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					timestamp: dayjs(options.epoch).valueOf(),
-					totalAmount: Utils.BigNumber.make(options.premine),
+					totalAmount: options.snapshot ? Utils.BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,
 					totalGasUsed: totals.gasUsed,
 					transactions: transactionData,

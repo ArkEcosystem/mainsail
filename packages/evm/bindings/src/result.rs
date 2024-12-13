@@ -1,9 +1,9 @@
 use mainsail_evm_core::{
-    account::{AccountInfoExtended, LegacyAccountAttributes},
+    account::{AccountInfoExtended, LegacyAccountAttributes, LegacyMultiSignatureAttribute},
     receipt::TxReceipt,
     state_changes::AccountUpdate,
 };
-use napi::{JsBigInt, JsBoolean, JsBuffer, JsString};
+use napi::{JsBigInt, JsBoolean, JsBuffer, JsNumber, JsString};
 use napi_derive::napi;
 use revm::primitives::{AccountInfo, Bytes, B256};
 
@@ -191,6 +191,13 @@ pub struct JsAccountInfoExtended {
 #[napi(object)]
 pub struct JsLegacyAttributes {
     pub second_public_key: Option<JsString>,
+    pub multi_signature: Option<JsLegacyMultiSignatureAttribute>,
+}
+
+#[napi(object)]
+pub struct JsLegacyMultiSignatureAttribute {
+    pub min: JsNumber,
+    pub public_keys: Vec<JsString>,
 }
 
 impl JsAccountInfoExtended {
@@ -238,7 +245,25 @@ impl JsLegacyAttributes {
             None
         };
 
-        Ok(JsLegacyAttributes { second_public_key })
+        let multi_signature = if let Some(multi_signature) = legacy_attributes.multi_signature {
+            let mut public_keys = Vec::with_capacity(multi_signature.public_keys.len());
+
+            for public_key in multi_signature.public_keys {
+                public_keys.push(node_env.create_string(public_key.as_str())?);
+            }
+
+            Some(JsLegacyMultiSignatureAttribute {
+                min: node_env.create_uint32(multi_signature.min as u32)?,
+                public_keys,
+            })
+        } else {
+            None
+        };
+
+        Ok(JsLegacyAttributes {
+            second_public_key,
+            multi_signature,
+        })
     }
 }
 
@@ -252,7 +277,33 @@ impl TryInto<LegacyAccountAttributes> for JsLegacyAttributes {
             None
         };
 
-        Ok(LegacyAccountAttributes { second_public_key })
+        let multi_signature = if let Some(multi_signature) = self.multi_signature {
+            Some(multi_signature.try_into()?)
+        } else {
+            None
+        };
+
+        Ok(LegacyAccountAttributes {
+            second_public_key,
+            multi_signature,
+        })
+    }
+}
+
+impl TryInto<LegacyMultiSignatureAttribute> for JsLegacyMultiSignatureAttribute {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<LegacyMultiSignatureAttribute, Self::Error> {
+        let mut public_keys = Vec::with_capacity(self.public_keys.len());
+
+        for p in self.public_keys {
+            public_keys.push(p.into_utf8()?.into_owned()?);
+        }
+
+        Ok(LegacyMultiSignatureAttribute {
+            min: self.min.get_uint32()? as usize,
+            public_keys,
+        })
     }
 }
 
