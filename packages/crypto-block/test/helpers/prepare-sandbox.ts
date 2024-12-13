@@ -10,8 +10,8 @@ import { EvmCallBuilder, ServiceProvider as CoreCryptoTransactionEvmCall } from 
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
+import { BigNumber } from "@mainsail/utils/distribution/big-number.js";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
-import { BigNumber } from "packages/utils/distribution/big-number.js";
 
 import crypto from "../../../core/bin/config/testnet/core/crypto.json";
 import { Sandbox } from "../../../test-framework/source";
