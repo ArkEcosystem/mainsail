@@ -103,7 +103,7 @@ export class ConfigurationGenerator {
 			{
 				task: async () => {
 					if (!internalOptions.overwriteConfig && pathExistsSync(this.configurationPath)) {
-						//	throw new Error(`${this.configurationPath} already exists.`);
+						throw new Error(`${this.configurationPath} already exists.`);
 					}
 
 					ensureDirSync(this.configurationPath);
