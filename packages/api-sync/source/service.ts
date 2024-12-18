@@ -204,7 +204,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			return [
 				account.address,
-				addressToPublicKey[account.address] ?? "",
+				addressToPublicKey[account.address] ?? null,
 				Utils.BigNumber.make(account.balance).toFixed(),
 				Utils.BigNumber.make(account.nonce).toFixed(),
 				attributes,
@@ -221,7 +221,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			if (!accountUpdates[validatorAddress]) {
 				wallets.push([
 					validatorAddress,
-					"",
+					addressToPublicKey[validatorAddress] ?? null,
 					"-1",
 					"-1",
 					{

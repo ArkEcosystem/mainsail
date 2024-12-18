@@ -396,7 +396,7 @@ export class Restore {
 					},
 					balance: Utils.BigNumber.make(account.balance).toFixed(),
 					nonce: Utils.BigNumber.make(account.nonce).toFixed(),
-					publicKey: context.addressToPublicKey[account.address] ?? "",
+					publicKey: context.addressToPublicKey[account.address] ?? null,
 					updated_at: "0",
 				});
 			}

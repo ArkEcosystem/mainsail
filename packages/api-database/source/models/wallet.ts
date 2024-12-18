@@ -3,7 +3,6 @@ import { Column, Entity } from "typeorm";
 @Entity({
 	name: "wallets",
 })
-//@Unique("unique_wallet_public_key", ["publicKey"])
 export class Wallet {
 	@Column({
 		primary: true,
@@ -30,7 +29,6 @@ export class Wallet {
 	})
 	public nonce!: string;
 
-	// TODO: separate tables for 1:n attributes
 	@Column({
 		default: undefined,
 		nullable: true,
