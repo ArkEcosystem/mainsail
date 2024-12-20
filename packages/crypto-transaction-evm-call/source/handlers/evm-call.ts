@@ -60,7 +60,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 			return receipt;
 		} catch (error) {
-			return this.app.terminate("invalid EVM call", error);
+			throw new Error(`invalid EVM call: ${error.message}`);
 		}
 	}
 

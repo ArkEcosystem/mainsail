@@ -443,13 +443,8 @@ impl EvmInner {
                 match err {
                     EVMError::Transaction(err) => {
                         match err {
-                            revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit => {
-                                return Ok(TxReceipt {
-                                    gas_used: gas_limit,
-                                    ..Default::default()
-                                });
-                            }
-                            revm::primitives::InvalidTransaction::NonceTooHigh { .. }
+                            revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit
+                            | revm::primitives::InvalidTransaction::NonceTooHigh { .. }
                             | revm::primitives::InvalidTransaction::NonceTooLow { .. } => {
                                 return Err(EVMError::Transaction(err));
                             }
