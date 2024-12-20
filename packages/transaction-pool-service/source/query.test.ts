@@ -30,7 +30,7 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 100,
 				nonce: BigNumber.make(1),
-				senderPublicKey: "sender-public-key",
+				senderAddress: "sender1",
 				type: 1,
 				version: 2,
 			},
@@ -46,7 +46,7 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 200,
 				nonce: BigNumber.make(2),
-				senderPublicKey: "sender-public-key",
+				senderAddress: "sender1",
 				type: 1,
 				version: 2,
 			},
@@ -62,7 +62,7 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 300,
 				nonce: BigNumber.make(3),
-				senderPublicKey: "sender-public-key",
+				senderAddress: "sender2",
 				type: 1,
 				version: 2,
 			},
@@ -78,7 +78,7 @@ describe<{
 				amount: BigNumber.make(100),
 				gasPrice: 400,
 				nonce: BigNumber.make(4),
-				senderPublicKey: "sender-public-key",
+				senderAddress: "sender2",
 				type: 1,
 				version: 2,
 			},
@@ -121,26 +121,26 @@ describe<{
 		getSenderStub.calledWith("sender public key");
 	});
 
-	it("getFromLowestPriority - should return transactions reverse ordered by fee", async (context) => {
+	it("getFromLowestPriority - should return transactions reverse ordered by nonce/fee", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
 			{ getFromLatest: () => [context.sender1Transaction200, context.sender1Transaction100] },
-			{ getFromLatest: () => [context.sender2Transaction100, context.sender2Transaction200] },
+			{ getFromLatest: () => [context.sender2Transaction200, context.sender2Transaction100] },
 		]);
 
 		const query = context.container.resolve(Query);
 		const result = await query.getFromLowestPriority().all();
 
 		assert.equal(result, [
-			context.sender1Transaction100,
 			context.sender1Transaction200,
-			context.sender2Transaction100,
+			context.sender1Transaction100,
 			context.sender2Transaction200,
+			context.sender2Transaction100,
 		]);
 	});
 
-	it("getFromHighestPriority - should return transactions order by fee", async (context) => {
+	it("getFromHighestPriority - should return transactions order by nonce/fee", async (context) => {
 		stub(context.mempool, "getSenderMempools").returnValueOnce([
-			{ getFromEarliest: () => [context.sender1Transaction200, context.sender1Transaction100] },
+			{ getFromEarliest: () => [context.sender1Transaction100, context.sender1Transaction200] },
 			{ getFromEarliest: () => [context.sender2Transaction100, context.sender2Transaction200] },
 		]);
 
@@ -148,10 +148,10 @@ describe<{
 		const result = await query.getFromHighestPriority().all();
 
 		assert.equal(result, [
-			context.sender2Transaction200,
 			context.sender2Transaction100,
-			context.sender1Transaction200,
+			context.sender2Transaction200,
 			context.sender1Transaction100,
+			context.sender1Transaction200,
 		]);
 	});
 
