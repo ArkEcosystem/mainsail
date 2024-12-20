@@ -544,20 +544,20 @@ describe<{
 	it("should revert transaction if it exceeds gas limit", async ({ instance }) => {
 		const [sender] = wallets;
 
-		const commitKey = { height: BigInt(0), round: BigInt(0) };
-		const { receipt } = await instance.process({
-			caller: sender.address,
-			value: 0n,
-			nonce: 0n,
-			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey },
-			txHash: getRandomTxHash(),
-			gasLimit: 30_000n,
-			specId: Contracts.Evm.SpecId.SHANGHAI,
-		});
-
-		assert.false(receipt.success);
-		assert.equal(receipt.gasUsed, 30_000n);
+		await assert.rejects(
+			async () =>
+				instance.process({
+					caller: sender.address,
+					value: 0n,
+					nonce: 0n,
+					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+					txHash: getRandomTxHash(),
+					gasLimit: 30_000n,
+					specId: Contracts.Evm.SpecId.SHANGHAI,
+				}),
+			"transaction validation error: call gas cost exceeds the gas limit",
+		);
 	});
 
 	it("should reject invalid specId", async ({ instance }) => {

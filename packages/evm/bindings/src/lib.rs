@@ -431,7 +431,6 @@ impl EvmInner {
             assert!(pending.key == commit_key, "pending commit key mismatch");
         }
 
-        let gas_limit = tx_ctx.gas_limit;
         let result = self.transact_evm(tx_ctx.into());
 
         match result {
