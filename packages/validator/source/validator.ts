@@ -179,6 +179,9 @@ export class Validator implements Contracts.Validator.Validator {
 				candidateTransactions.push(transaction);
 			} catch (error) {
 				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
+
+				await this.txPoolWorker.removeTransaction(transaction.data.senderAddress, transaction.id);
+
 				failedSenders.add(transaction.data.senderPublicKey);
 			}
 		}
