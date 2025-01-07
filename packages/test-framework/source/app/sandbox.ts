@@ -93,8 +93,8 @@ export class Sandbox {
 			await this.#configApp
 				?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "ephemeral")
 				.dispose();
-		} catch (ex) {
-			console.log("ex", ex);
+		} catch (error) {
+			console.log("ex", error);
 			// We encountered a unexpected error.
 		}
 
