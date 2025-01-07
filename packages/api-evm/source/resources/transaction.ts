@@ -11,7 +11,7 @@ export class TransactionResource {
 			from: transaction.senderAddress,
 			gas: `0x${transaction.gasLimit.toString(16)}`,
 			gasPrice: `0x${transaction.gasPrice.toString(16)}`,
-			// hash: "0x88df016429689c079f3b2f6ad39fa052532c56795b733da78a91ebe6a713944b",
+			hash: `0x${transaction.id}`,
 			input: transaction.data === "0x" ? undefined : transaction.data,
 			nonce: `0x${transaction.nonce.toString(16)}`,
 			// eslint-disable-next-line unicorn/no-null
