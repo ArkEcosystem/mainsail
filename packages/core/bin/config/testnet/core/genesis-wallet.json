@@ -1,14 +1,14 @@
 {
-	"address": "0xd1AD6bfA3540F25E21e6be808FB7F12562111CE5",
+	"address": "0x9c83DE8A104da85A13A2D96D772dC7FB9a3147d1",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "34aff0a6add5bd9584432a9f2f5827bc0ad07954bbacad73d5d25f56c44e9156",
-		"publicKey": "b119b798f5b885a68ef7c9ad4d66aab566dae7f3179ed296dbe0bbc2c0ce0b9aef0c1c7d24ece78379153050892cd5a0"
+		"privateKey": "225de37b8e2a639823db786bbc41b1971f17702defa41465ab096b7f99b41236",
+		"publicKey": "88ead8d480aae6ec4643c1341b79675d74902183ebd35bdf05234da536cf1cc14569ca6239c90301387638268402f779"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "d3d68068b2993b5a7b5f35cbf3622c76a6580ea95b1b79ad18e63cecde7c8c87",
-		"publicKey": "03dc6981461d4b82df3e7db49b20a674745cef0dc5e7165168fe26490f5a24895a"
+		"privateKey": "aeeb33f7135a9251e5de837a437ebb2597e6faed4445f55526d37e4611da1efa",
+		"publicKey": "0253a5dea79ada0176abd694d7102b23a848228f8a0063a677f33b825cc7acbe55"
 	},
-	"passphrase": "gauge find shift stable position fog guard urge person hint frown disagree stem scout suggest focus actress side rhythm crush soccer accuse soccer arctic"
+	"passphrase": "fit kiwi anger speak traffic possible draft logic clock vessel guide flee essence body correct hand tattoo calm ethics antique ladder main jewel visit"
 }
