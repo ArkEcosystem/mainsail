@@ -20,9 +20,6 @@ export const assertBlockData = (assert, data1, data2) => {
 };
 
 export const assertTransactionData = (assert, transactionData1, transactionData2) => {
-	// console.log(transactionData1);
-	// console.log(transactionData2);
-
 	const transactionFields = [
 		"id",
 		"senderPublicKey",
@@ -38,9 +35,6 @@ export const assertTransactionData = (assert, transactionData1, transactionData2
 	];
 
 	for (const field of transactionFields) {
-		// console.log(field);
-		// console.log(transactionData1[field], transactionData2[field]);
-
 		assert.equal(transactionData1[field].toString(), transactionData2[field].toString());
 	}
 };
