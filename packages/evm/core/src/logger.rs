@@ -1,6 +1,6 @@
 use std::sync::mpsc::Sender;
 
-#[derive(Clone)]
+#[derive(Default, Clone)]
 pub struct Logger {
     // A channel is optional and if not present, log output is written via println!
     sender: Option<Sender<(LogLevel, String)>>,

@@ -48,7 +48,7 @@ unsafe impl Send for EvmInner {}
 impl EvmInner {
     pub fn new(path: PathBuf, logger_callback: Option<JsFunction>) -> Self {
         let logger = JsLogger::new(logger_callback).expect("logger ok");
-        let persistent_db = PersistentDB::new(path).expect("path ok");
+        let persistent_db = PersistentDB::new(path, Some(logger.inner())).expect("path ok");
 
         EvmInner {
             persistent_db,
