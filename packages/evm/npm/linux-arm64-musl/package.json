@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm-linux-arm64-musl",
-	"version": "0.0.1-evm.10",
+	"version": "0.0.1-evm.11",
 	"os": [
 		"linux"
 	],

@@ -207,7 +207,7 @@ fn test_apply_rewards() {
         .tempdir()
         .unwrap();
 
-    let mut db = PersistentDB::new(path.path().to_path_buf()).expect("database");
+    let mut db = PersistentDB::new(path.path().to_path_buf(), None).expect("database");
     let mut pending = PendingCommit::default();
 
     let account1 = revm::primitives::address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");

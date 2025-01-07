@@ -10,9 +10,9 @@ import { SandboxCallback } from "./contracts.js";
 
 export class Sandbox {
 	public readonly app: Application;
-
 	readonly #container: interfaces.Container;
 
+	#configApp?: Application;
 	#path = dirSync().name;
 
 	#configurationOptions: Contracts.NetworkGenerator.Options = {
@@ -55,6 +55,8 @@ export class Sandbox {
 		const configApp = await makeApplication(this.getConfigurationPath());
 		await configApp.resolve(ConfigurationGenerator).generate(this.#configurationOptions);
 
+		this.#configApp = configApp;
+
 		if (this.app.isBound(Identifiers.Cryptography.Configuration)) {
 			this.app
 				.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
@@ -76,8 +78,23 @@ export class Sandbox {
 
 	public async dispose(callback?: SandboxCallback): Promise<void> {
 		try {
-			await this.app.terminate();
-		} catch {
+			// Terminate calls process.exit(), which we cannot do during unit tests.
+			// However, due to exceptions it never gets that far currently so it happens to "work".
+			// await this.app.terminate();
+			//
+			// Furthermore, most unit tests fail to shutdown the sandbox correctly as the registered services are not tracked in
+			// the service registry meaning `#disposeServiceProviders` does not actually dispose them.
+			//
+			// Therefore, for now we simply manually dispose the services that are known to require explicit closing such as the EVM.
+			// In the future, we should automate this by tracking.
+			await this.#configApp
+				?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm")
+				.dispose();
+			await this.#configApp
+				?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "ephemeral")
+				.dispose();
+		} catch (error) {
+			console.log("ex", error);
 			// We encountered a unexpected error.
 		}
 
