@@ -6,9 +6,11 @@ use ctx::{
     JsTransactionContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
     PrepareNextCommitContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
 };
+use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
+    logger::LogLevel,
     receipt::{map_execution_result, TxReceipt},
     state_changes::AccountUpdate,
     state_commit, state_hash,
@@ -26,6 +28,7 @@ use revm::{
 };
 
 mod ctx;
+mod logger;
 mod result;
 mod utils;
 
@@ -35,18 +38,22 @@ pub struct EvmInner {
 
     // A pending commit consists of one or more transactions.
     pending_commit: Option<PendingCommit>,
+
+    logger: JsLogger,
 }
 
 // NOTE: we guarantee that this can be sent between threads, since it only is accessed through a mutex
 unsafe impl Send for EvmInner {}
 
 impl EvmInner {
-    pub fn new(path: PathBuf) -> Self {
+    pub fn new(path: PathBuf, logger_callback: Option<JsFunction>) -> Self {
+        let logger = JsLogger::new(logger_callback).expect("logger ok");
         let persistent_db = PersistentDB::new(path).expect("path ok");
 
         EvmInner {
             persistent_db,
             pending_commit: Default::default(),
+            logger,
         }
     }
 
@@ -57,9 +64,12 @@ impl EvmInner {
                 return Ok(());
             }
 
-            println!(
-                "discarding existing pending commit {:?} for {:?}",
-                pending.key, ctx.commit_key
+            self.logger.log(
+                LogLevel::Debug,
+                format!(
+                    "discarding existing pending commit {:?} for {:?}",
+                    pending.key, ctx.commit_key
+                ),
             );
         }
 
@@ -77,7 +87,8 @@ impl EvmInner {
         Ok(match result {
             Ok(r) => {
                 if !r.is_success() {
-                    println!("view call failed: {:?}", r);
+                    self.logger
+                        .log(LogLevel::Warning, format!("view call failed: {:?}", r));
                 }
 
                 TxViewResult {
@@ -198,10 +209,14 @@ impl EvmInner {
             tx_hash: None,
         }) {
             Ok(receipt) => {
-                println!(
-                    "calculate_active_validators {:?} {:?}",
-                    ctx.commit_key, receipt
+                self.logger.log(
+                    LogLevel::Info,
+                    format!(
+                        "calculate_active_validators {:?} {:?}",
+                        ctx.commit_key, receipt
+                    ),
                 );
+
                 assert!(
                     receipt.is_success(),
                     "calculate_active_validators unsuccessful"
@@ -285,12 +300,16 @@ impl EvmInner {
                     tx_hash: None,
                 }) {
                     Ok(receipt) => {
-                        println!(
-                            "vote_update {:?} {:?} {:?}",
-                            ctx.commit_key,
-                            receipt,
-                            voters.len()
+                        self.logger.log(
+                            LogLevel::Info,
+                            format!(
+                                "vote_update {:?} {:?} {:?}",
+                                ctx.commit_key,
+                                receipt,
+                                voters.len()
+                            ),
                         );
+
                         assert!(receipt.is_success(), "vote_update unsuccessful");
                         Ok(())
                     }
@@ -502,11 +521,15 @@ impl EvmInner {
 
         let outcome = match self.take_pending_commit() {
             Some(pending_commit) => {
-                // println!(
-                //     "committing {:?} with {} transactions",
-                //     commit_key,
-                //     pending_commit.diff.len(),
+                // self.logger.log(
+                //     LogLevel::Info,
+                //     format!(
+                //         "committing {:?} with {} transitions",
+                //         commit_key,
+                //         pending_commit.transitions.transitions.len(),
+                //     ),
                 // );
+
                 state_commit::commit_to_db(&mut self.persistent_db, pending_commit)
             }
             None => Ok(Default::default()),
@@ -684,10 +707,13 @@ pub struct JsEvmWrapper {
 #[napi]
 impl JsEvmWrapper {
     #[napi(constructor)]
-    pub fn new(path: JsString) -> Result<Self> {
+    pub fn new(path: JsString, logger_callback: Option<JsFunction>) -> Result<Self> {
         let path = path.into_utf8()?.into_owned()?;
         Ok(JsEvmWrapper {
-            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new(path.into()))),
+            evm: Arc::new(tokio::sync::Mutex::new(EvmInner::new(
+                path.into(),
+                logger_callback,
+            ))),
         })
     }
 
