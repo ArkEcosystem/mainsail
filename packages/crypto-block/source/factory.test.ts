@@ -120,7 +120,7 @@ describe<{
 		assert.string(block.serialized);
 	});
 
-	it.skip("#fromData - should create a block with transactions instance from an object", async (context) => {
+	it("#fromData - should create a block with transactions instance from an object", async (context) => {
 		const block = await context.factory.fromData(blockDataWithTransactionsOriginal);
 
 		assertBlockData(assert, block.data, blockDataWithTransactionsOriginal);
@@ -158,7 +158,7 @@ describe<{
 		);
 	});
 
-	it.only("#fromData - should throw on invalid transaction data", async ({ factory }) => {
+	it("#fromData - should throw on invalid transaction data", async ({ factory }) => {
 		// @ts-ignore
 		delete blockDataWithTransactionsClone.transactions[0].id;
 
@@ -168,7 +168,7 @@ describe<{
 		);
 	});
 
-	it.only("#fromJson - should create a block instance from JSON", async ({ factory }) => {
+	it("#fromJson - should create a block instance from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataJson);
 
 		// Recalculated id
@@ -180,7 +180,7 @@ describe<{
 		assert.string(block.serialized);
 	});
 
-	it.only("#fromJson - should create a block instance with transactions from JSON", async ({ factory }) => {
+	it("#fromJson - should create a block instance with transactions from JSON", async ({ factory }) => {
 		const block = await factory.fromJson(blockDataWithTransactionsJson);
 
 		// Recalculated id
