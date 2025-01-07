@@ -17,7 +17,7 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 
 		const callback = spyFn();
 
-		await assert.resolves(() => sandbox.boot(() => callback.call()));
+		await assert.resolves(() => sandbox.boot(() => callback.call())).then(() => sandbox.dispose());
 		callback.calledOnce();
 	});
 
@@ -48,6 +48,8 @@ describe("Sandbox", ({ it, assert, spyFn }) => {
 
 		const crypto = readJSONSync(join(sandbox.getConfigurationPath(), "crypto.json"));
 		assert.equal(crypto.network.client.token, "DARK");
+
+		await assert.resolves(() => sandbox.dispose());
 	});
 
 	it("should dispose", async () => {

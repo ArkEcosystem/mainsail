@@ -5,13 +5,21 @@ import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
 import { GenesisBlockGenerator } from "./genesis-block";
 import { MnemonicGenerator } from "./mnemonic";
+import { Application } from "@mainsail/kernel";
 
 describe<{
+	app: Application;
 	generator: GenesisBlockGenerator;
 	mnemonicGenerator: MnemonicGenerator;
-}>("GenesisBlockGenerator", ({ it, assert, beforeEach }) => {
+}>("GenesisBlockGenerator", ({ it, assert, afterEach, beforeEach }) => {
+	afterEach(async (context) => {
+		await context.app.getTagged<Contracts.Evm.Instance>(AppIdentifiers.Evm.Instance, "instance", "evm").dispose();
+	});
+
 	beforeEach(async (context) => {
 		const app = await makeApplication();
+
+		context.app = app;
 
 		// @ts-ignore
 		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig({

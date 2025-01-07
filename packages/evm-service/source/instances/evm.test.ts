@@ -80,7 +80,7 @@ describe<{
 			await evm.prepareNextCommit(commitKey);
 		}
 
-		await evm.dispose();
+		await new Promise((resolve) => setTimeout(resolve, 1000)).then(() => evm.dispose());
 
 		assert.equal(hookCalled, 100);
 	});
