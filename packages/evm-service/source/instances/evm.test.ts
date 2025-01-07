@@ -12,8 +12,13 @@ import { setGracefulCleanup } from "tmp";
 describe<{
 	sandbox: Sandbox;
 	instance: Contracts.Evm.Instance;
-}>("Instance", ({ it, assert, afterAll, beforeEach }) => {
+}>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
 	afterAll(() => setGracefulCleanup());
+
+	afterEach(async (context) => {
+		await context.sandbox.dispose();
+		await context.instance.dispose();
+	});
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);

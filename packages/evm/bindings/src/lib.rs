@@ -549,6 +549,14 @@ impl EvmInner {
         }
     }
 
+    pub fn dispose(&mut self) -> std::result::Result<(), EVMError<String>> {
+        // replace to drop any reference to logging hook
+        self.logger = JsLogger::new(None)
+            .map_err(|err| EVMError::Custom(format!("close logger err={err}")))?;
+
+        Ok(())
+    }
+
     fn transact_evm(
         &mut self,
         ctx: ExecutionContext,
@@ -869,6 +877,11 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<void>")]
+    pub fn dispose(&mut self, node_env: Env) -> Result<JsObject> {
+        node_env.execute_tokio_future(Self::dispose_async(self.evm.clone()), |_, _| Ok(()))
+    }
+
     async fn view_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         view_ctx: TxViewContext,
@@ -1060,6 +1073,16 @@ impl JsEvmWrapper {
     ) -> Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_receipts(offset, limit);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn dispose_async(evm: Arc<tokio::sync::Mutex<EvmInner>>) -> Result<()> {
+        let mut lock = evm.lock().await;
+        let result = lock.dispose();
 
         match result {
             Ok(result) => Result::Ok(result),

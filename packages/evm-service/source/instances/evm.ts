@@ -11,7 +11,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	@postConstruct()
 	public initialize() {
-		this.#evm = new Evm(this.app.dataPath());
+	public async dispose(): Promise<void> {
+		await this.#evm.dispose();
 	}
 
 	public async prepareNextCommit(context: Contracts.Evm.PrepareNextCommitContext): Promise<void> {

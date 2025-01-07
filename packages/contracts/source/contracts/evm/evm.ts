@@ -29,6 +29,7 @@ export interface Instance extends CommitHandler {
 	codeAt(address: string): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
 	mode(): EvmMode;
+	dispose(): Promise<void>;
 }
 
 export interface ProcessResult {
