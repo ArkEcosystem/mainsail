@@ -2,6 +2,17 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
+type SortFunction = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) => number;
+type SenderMempoolSelectorFunction = (
+	mempool: Contracts.TransactionPool.SenderMempool,
+) => Contracts.Crypto.Transaction[];
+
+const sortByHighestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
+	b.data.gasPrice - a.data.gasPrice;
+
+const sortByLowestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
+	a.data.gasPrice - b.data.gasPrice;
+
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	public transactions: Contracts.Crypto.Transaction[];
 	public predicates: Contracts.TransactionPool.QueryPredicate[] = [];
@@ -138,14 +149,3 @@ export class Query implements Contracts.TransactionPool.Query {
 		return new QueryIterable(selectedTransactions);
 	}
 }
-
-type SortFunction = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) => number;
-type SenderMempoolSelectorFunction = (
-	mempool: Contracts.TransactionPool.SenderMempool,
-) => Contracts.Crypto.Transaction[];
-
-const sortByHighestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
-	b.data.gasPrice - a.data.gasPrice;
-
-const sortByLowestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
-	a.data.gasPrice - b.data.gasPrice;
