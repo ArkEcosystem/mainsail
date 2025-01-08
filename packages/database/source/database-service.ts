@@ -178,11 +178,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return this.#transactionCache.get(id);
 		}
 
-		const transactionBytes: Buffer | undefined = this.transactionStorage.get(id);
-
-		if (!transactionBytes) {
+		const key: string | undefined = this.transactionIdStorage.get(id);
+		if (!key) {
 			return undefined;
 		}
+
+		const transactionBytes: Buffer | undefined = this.transactionStorage.get(id);
+		Utils.assert.defined<Buffer>(transactionBytes);
 
 		return await this.transactionFactory.fromBytes(transactionBytes);
 	}
@@ -236,8 +238,12 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 					height,
 					commit.block.transactions.map((tx) => tx.id),
 				);
+
 				for (const tx of commit.block.transactions) {
-					void this.transactionStorage.put(tx.id, tx.serialized);
+					Utils.assert.defined<number>(tx.data.sequence);
+					const key = `${height}-${tx.data.sequence}`;
+					void this.transactionIdStorage.put(tx.id, key);
+					void this.transactionStorage.put(key, tx.serialized);
 				}
 				void this.blockIdStorage.put(commit.block.data.id, height);
 			}
