@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import { Database, RootDatabase } from "lmdb";
+import type { Database, RootDatabase } from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
@@ -294,18 +294,21 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return;
 		}
 
-		const transactionIds: string[] | undefined = this.transactionIdStorage.get(height);
-		Utils.assert.defined<string[]>(transactionIds);
+		const blockHeader = await this.blockDeserializer.deserializeHeader(blockBuffer);
 
 		const transactions: Buffer[] = [];
-		for (const id of transactionIds) {
-			const transaction: Buffer | undefined = this.transactionStorage.get(id);
+		for (let index = 0; index < blockHeader.numberOfTransactions; index++) {
+			const key = `${height}-${index}`;
+			const transaction: Buffer | undefined = this.transactionStorage.get(key);
 			Utils.assert.defined<Buffer>(transaction);
 
 			const sizeBuff = Buffer.alloc(2);
 			sizeBuff.writeUInt16LE(transaction.length, 0);
 			transactions.push(sizeBuff, transaction);
 		}
+
+		const transactionIds: string[] | undefined = this.transactionIdStorage.get(height);
+		Utils.assert.defined<string[]>(transactionIds);
 
 		return Buffer.concat([blockBuffer, ...transactions]);
 	}
