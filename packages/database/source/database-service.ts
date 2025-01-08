@@ -23,8 +23,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.Storage.Transaction)
 	private readonly transactionStorage!: lmdb.Database;
 
-	@inject(Identifiers.Database.Storage.TransactionIds)
-	private readonly transactionIdsStorage!: lmdb.Database;
+	@inject(Identifiers.Database.Storage.TransactionId)
+	private readonly transactionIdStorage!: lmdb.Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
@@ -232,7 +232,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 				void this.commitStorage.put(height, buff.subarray(0, proofSize));
 				void this.blockStorage.put(height, buff.subarray(proofSize, proofSize + this.headerSize()));
-				void this.transactionIdsStorage.put(
+				void this.transactionIdStorage.put(
 					height,
 					commit.block.transactions.map((tx) => tx.id),
 				);
@@ -284,7 +284,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return;
 		}
 
-		const transactionIds: string[] | undefined = this.transactionIdsStorage.get(height);
+		const transactionIds: string[] | undefined = this.transactionIdStorage.get(height);
 		Utils.assert.defined<string[]>(transactionIds);
 
 		const transactions: Buffer[] = [];

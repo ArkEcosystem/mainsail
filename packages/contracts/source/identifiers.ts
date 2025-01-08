@@ -135,7 +135,7 @@ export const Identifiers = {
 			Commit: Symbol("Database<Storage.Commit>"),
 			State: Symbol("Database<Storage.State>"),
 			Transaction: Symbol("Database<Storage.Transaction>"),
-			TransactionIds: Symbol("Database<Storage.TransactionIds>"),
+			TransactionId: Symbol("Database<Storage.TransactionId>"),
 		},
 	},
 	Evm: {
