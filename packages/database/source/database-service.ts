@@ -70,7 +70,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 	}
 
 	public async getCommit(height: number): Promise<Contracts.Crypto.Commit | undefined> {
-		const bytes = this.#readCommitBytes(height);
+		const bytes = await this.#readCommitBytes(height);
 
 		if (bytes) {
 			return await this.commitFactory.fromBytes(bytes);
@@ -86,9 +86,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		const bytes = this.#readCommitBytes(height);
+		const bytes = await this.#readCommitBytes(height);
 		if (bytes) {
-			return await this.commitFactory.fromBytes(bytes);
+			return this.commitFactory.fromBytes(bytes);
 		}
 
 		return undefined;
@@ -105,19 +105,21 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			heights.push(height);
 		}
 
-		return heights
-			.map((height: number) => {
+		const blocks = await Promise.all(
+			heights.map(async (height: number) => {
 				try {
-					return this.#readCommitBytes(height);
+					return await this.#readCommitBytes(height);
 				} catch {
 					return;
 				}
-			})
-			.filter((block): block is Buffer => !!block);
+			}),
+		);
+
+		return blocks.filter((block): block is Buffer => !!block);
 	}
 
 	public async getBlock(height: number): Promise<Contracts.Crypto.Block | undefined> {
-		const bytes = this.#readBlockBytes(height);
+		const bytes = await this.#readBlockBytes(height);
 
 		if (bytes) {
 			return await this.blockFactory.fromBytes(bytes);
@@ -133,7 +135,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		const bytes = this.#readBlockBytes(height);
+		const bytes = await this.#readBlockBytes(height);
 		if (bytes) {
 			return await this.blockFactory.fromBytes(bytes);
 		}
@@ -191,7 +193,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
-			const data = this.#readCommitBytes(height);
+			const data = await this.#readCommitBytes(height);
 
 			if (!data) {
 				return;
@@ -211,7 +213,9 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return [...this.#commitCache.values()].pop()!;
 		}
 
-		return await this.commitFactory.fromBytes(this.#readCommitBytes(this.#state.height)!);
+		const bytes = await this.#readCommitBytes(this.#state.height);
+		Utils.assert.defined<Buffer>(bytes);
+		return await this.commitFactory.fromBytes(bytes);
 	}
 
 	public addCommit(commit: Contracts.Crypto.Commit): void {
@@ -264,7 +268,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return this.blockIdStorage.get(id);
 	}
 
-	#readCommitBytes(height: number): Buffer | undefined {
+	async #readCommitBytes(height: number): Promise<Buffer | undefined> {
 		if (this.#commitCache.has(height)) {
 			return Buffer.from(this.#commitCache.get(height)!.serialized, "hex");
 		}
@@ -274,13 +278,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return;
 		}
 
-		const blockBuffer: Buffer | undefined = this.#readBlockBytes(height);
+		const blockBuffer: Buffer | undefined = await this.#readBlockBytes(height);
 		Utils.assert.defined<Buffer>(blockBuffer);
 
 		return Buffer.concat([commitBuffer, blockBuffer]);
 	}
 
-	#readBlockBytes(height: number): Buffer | undefined {
+	async #readBlockBytes(height: number): Promise<Buffer | undefined> {
 		if (this.#commitCache.has(height)) {
 			return Buffer.from(this.#commitCache.get(height)!.serialized, "hex").subarray(this.proofSize());
 		}
@@ -319,7 +323,6 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
 		const result: T[] = [];
-
 		for (const [index, datum] of data.entries()) {
 			result[index] = await callback(datum);
 		}
