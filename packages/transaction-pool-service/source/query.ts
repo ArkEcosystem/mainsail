@@ -94,7 +94,7 @@ export class Query implements Contracts.TransactionPool.Query {
 	}
 
 	#getTransactions(selector: SenderMempoolSelectorFunction, prioritySort: SortFunction): QueryIterable {
-		// Get transactions by sender in ascending nonce order
+		// Group transactions by sender mempool
 		const transactionsBySenderMempool: Record<string, Contracts.Crypto.Transaction[]> = {};
 		for (const senderMempool of this.mempool.getSenderMempools()) {
 			const transactions = selector(senderMempool);
@@ -111,7 +111,7 @@ export class Query implements Contracts.TransactionPool.Query {
 			priorityQueue.push(transactions[0]);
 		}
 
-		// Sort by priority (nonces are per sender and already taken care by the caller)
+		// Sort by priority (nonces are per sender and already handled by the provided selector)
 		priorityQueue.sort(prioritySort);
 
 		// Lastly, select transactions from priority queue until all sender mempools are empty.
