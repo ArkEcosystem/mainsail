@@ -1,30 +1,30 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
-import * as lmdb from "lmdb";
+import { Database, RootDatabase } from "lmdb";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
 	@inject(Identifiers.Database.Root)
-	private readonly rootDb!: lmdb.RootDatabase;
+	private readonly rootDb!: RootDatabase;
 
 	@inject(Identifiers.Database.Storage.Commit)
-	private readonly commitStorage!: lmdb.Database;
+	private readonly commitStorage!: Database;
 
 	@inject(Identifiers.Database.Storage.Block)
-	private readonly blockStorage!: lmdb.Database;
+	private readonly blockStorage!: Database;
 
 	@inject(Identifiers.Database.Storage.BlockId)
-	private readonly blockIdStorage!: lmdb.Database;
+	private readonly blockIdStorage!: Database;
 
 	@inject(Identifiers.Database.Storage.State)
-	private readonly stateStorage!: lmdb.Database;
+	private readonly stateStorage!: Database;
 
 	@inject(Identifiers.Database.Storage.Transaction)
-	private readonly transactionStorage!: lmdb.Database;
+	private readonly transactionStorage!: Database;
 
 	@inject(Identifiers.Database.Storage.TransactionId)
-	private readonly transactionIdStorage!: lmdb.Database;
+	private readonly transactionIdStorage!: Database;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
