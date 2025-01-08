@@ -1,14 +1,23 @@
-FROM node:20
+FROM ubuntu:24.04
 
-WORKDIR /home/node
+ENV DEBIAN_FRONTEND=noninteractive
 
-ENV PNPM_HOME=/home/node/.pnpm/bin
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    build-essential \
+    libjemalloc2
+
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt-get install -y nodejs
+
+WORKDIR /home/ubuntu
+
+ENV PNPM_HOME=/home/ubuntu/.pnpm/bin
 ENV PATH="${PATH}:${PNPM_HOME}"
 
-RUN apt-get update && apt-get install build-essential -y \
-    && apt-get install libjemalloc2 \
-    && npm install -g npm@latest \
-    && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
-    && su node -c "export PNPM_HOME=/home/node/.pnpm/bin"
+RUN npm install -g npm@latest \
+    && su ubuntu -c "npm install --prefix=/home/ubuntu/.pnpm -g pnpm" \
+    && su ubuntu -c "export PNPM_HOME=/home/ubuntu/.pnpm/bin"
 
-USER node
+USER ubuntu
