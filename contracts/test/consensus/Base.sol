@@ -36,7 +36,7 @@ contract Base is Test {
         for (uint256 i = 0; i < length; i++) {
             for (uint256 j = i + 1; j < length; j++) {
                 // Sort in descending order by votersCount
-                if (_isGreater(validators[i], validators[j])) {
+                if (!_isGreater(validators[i], validators[j])) {
                     ConsensusV1.Validator memory temp = validators[i];
                     validators[i] = validators[j];
                     validators[j] = temp;
@@ -52,7 +52,7 @@ contract Base is Test {
         returns (bool)
     {
         if (validatorA.data.voteBalance == validatorB.data.voteBalance) {
-            return validatorA.addr > validatorB.addr;
+            return validatorA.addr < validatorB.addr;
         }
 
         return validatorA.data.voteBalance > validatorB.data.voteBalance;
