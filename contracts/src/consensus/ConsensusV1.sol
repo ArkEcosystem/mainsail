@@ -633,7 +633,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     function _isGreater(Validator memory validatorA, Validator memory validatorB) internal pure returns (bool) {
         if (validatorA.data.voteBalance == validatorB.data.voteBalance) {
-            return validatorA.addr > validatorB.addr;
+            return validatorA.addr < validatorB.addr;
         }
 
         return validatorA.data.voteBalance > validatorB.data.voteBalance;
