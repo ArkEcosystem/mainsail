@@ -152,7 +152,7 @@ contract ConsensusTest is Base {
             vm.deal(addr, balance);
 
             if (balance == highestBalance) {
-                if (addr > highest) {
+                if (addr < highest || highest == address(0)) {
                     highest = addr;
                 }
             }
@@ -179,15 +179,17 @@ contract ConsensusTest is Base {
 
         assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
         validators = sortValidators(validators);
-        assertEq(validators[activeValidators - 1].addr, address(0x35));
+        assertEq(validators[0].addr, highest);
+        assertEq(validators[activeValidators - 1].addr, address(53));
 
-        // Seccond attempt should return the same result
+        // Second attempt should return the same result
         consensus.calculateActiveValidators(uint8(activeValidators));
 
         validators = consensus.getActiveValidators();
         assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
         validators = sortValidators(validators);
         assertEq(validators.length, activeValidators);
-        assertEq(validators[activeValidators - 1].addr, address(0x35));
+        assertEq(validators[0].addr, highest);
+        assertEq(validators[activeValidators - 1].addr, address(53));
     }
 }
