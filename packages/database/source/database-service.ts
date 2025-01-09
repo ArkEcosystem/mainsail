@@ -248,10 +248,12 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		await this.rootDb.transaction(() => {
 			for (const [height, commit] of this.#commitCache.entries()) {
 				const proofSize = this.proofSize();
-				const buff = Buffer.from(commit.serialized, "hex"); // TODO: Slice to reduce buffer size
+				const headerSize = this.headerSize();
+
+				const buff = Buffer.from(commit.serialized.slice(0, (proofSize + headerSize) * 2), "hex");
 
 				void this.commitStorage.put(height, buff.subarray(0, proofSize));
-				void this.blockStorage.put(height, buff.subarray(proofSize, proofSize + this.headerSize()));
+				void this.blockStorage.put(height, buff.subarray(proofSize, proofSize + headerSize));
 				void this.transactionIdStorage.put(
 					height,
 					commit.block.transactions.map((tx) => tx.id),
