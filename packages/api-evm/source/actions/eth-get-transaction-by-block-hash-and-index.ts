@@ -16,15 +16,18 @@ export class EthGetTransactionByBlockHashAndIndex implements Contracts.Api.RPC.A
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
 
-		maxItems: 1,
-		minItems: 1,
+		maxItems: 2,
+		minItems: 2,
 
-		prefixItems: [{ $ref: "prefixedHex" }], // TODO: Use transaction id
+		prefixItems: [{ $ref: "prefixedHex" }, { $ref: "prefixedHex" }], // TODO: Use block id & limit sequence
 		type: "array",
 	};
 
-	public async handle(parameters: [string]): Promise<any> {
-		const transaction = await this.databaseService.getTransactionById(parameters[0].slice(2));
+	public async handle(parameters: [string, string]): Promise<any> {
+		const transaction = await this.databaseService.getTransactionByBlockIdAndIndex(
+			parameters[0].slice(2),
+			Number.parseInt(parameters[1]),
+		);
 
 		if (!transaction) {
 			return null;

@@ -186,23 +186,32 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		const transactionBytes: Buffer | undefined = this.transactionStorage.get(key);
-		Utils.assert.defined<Buffer>(transactionBytes);
+		return await this.#readTransaction(key);
+	}
 
-		const buffer = ByteBuffer.fromBuffer(transactionBytes);
-		const height = buffer.readUint32();
-		const sequence = buffer.readUint32();
-		const transaction = await this.transactionFactory.fromBytes(buffer.getRemainder());
+	public async getTransactionByBlockIdAndIndex(
+		blockId: string,
+		index: number,
+	): Promise<Contracts.Crypto.Transaction | undefined> {
+		// Verify if the block exists
+		const height = this.#getHeightById(blockId);
+		if (height === undefined) {
+			return undefined;
+		}
 
-		transaction.data.sequence = sequence;
-		transaction.data.blockHeight = height;
+		// Get TX from cache
+		if (this.#commitCache.has(height)) {
+			const block = this.#commitCache.get(height)!.block;
 
-		const blockBuffer = this.#readBlockHeaderBytes(height);
-		Utils.assert.defined<Buffer>(blockBuffer);
-		const block = await this.blockDeserializer.deserializeHeader(blockBuffer);
-		transaction.data.blockId = block.id;
+			if (block.transactions.length <= index) {
+				return undefined;
+			}
 
-		return transaction;
+			return block.transactions[index];
+		}
+
+		// Get TX from storage
+		return this.#readTransaction(`${height}-${index}`);
 	}
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
@@ -344,6 +353,26 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		}
 
 		return this.blockStorage.get(height);
+	}
+
+	async #readTransaction(key): Promise<Contracts.Crypto.Transaction | undefined> {
+		const transactionBytes: Buffer | undefined = this.transactionStorage.get(key);
+		Utils.assert.defined<Buffer>(transactionBytes);
+
+		const buffer = ByteBuffer.fromBuffer(transactionBytes);
+		const height = buffer.readUint32();
+		const sequence = buffer.readUint32();
+		const transaction = await this.transactionFactory.fromBytes(buffer.getRemainder());
+
+		transaction.data.sequence = sequence;
+		transaction.data.blockHeight = height;
+
+		const blockBuffer = this.#readBlockHeaderBytes(height);
+		Utils.assert.defined<Buffer>(blockBuffer);
+		const block = await this.blockDeserializer.deserializeHeader(blockBuffer);
+		transaction.data.blockId = block.id;
+
+		return transaction;
 	}
 
 	async #map<T>(data: unknown[], callback: (...arguments_: any[]) => Promise<T>): Promise<T[]> {
