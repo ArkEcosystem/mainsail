@@ -6,8 +6,8 @@ export class TransactionResource {
 	public async transform(transaction: Contracts.Crypto.TransactionData): Promise<object> {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
-			// blockHash: "0x1d59ff54b1eb26b013ce3cb5fc9dab3705b415a67127a003c3e61eb445bb8df2",
-			// blockNumber: "0x5daf3b", // 6139707
+			blockHash: `0x${transaction.blockId}`,
+			blockNumber: `0x${transaction.blockHeight?.toString(16)}`,
 			from: transaction.senderAddress,
 			gas: `0x${transaction.gasLimit.toString(16)}`,
 			gasPrice: `0x${transaction.gasPrice.toString(16)}`,
@@ -16,7 +16,7 @@ export class TransactionResource {
 			nonce: `0x${transaction.nonce.toString(16)}`,
 			// eslint-disable-next-line unicorn/no-null
 			to: transaction.recipientAddress || null,
-			// transactionIndex: "0x41", // 65
+			transactionIndex: `0x${transaction.sequence?.toString(16)}`,
 			value: `0x${transaction.value.toString(16)}`,
 			v: `0x${transaction.v}`,
 			r: `0x${transaction.r}`,

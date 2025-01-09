@@ -189,7 +189,20 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const transactionBytes: Buffer | undefined = this.transactionStorage.get(key);
 		Utils.assert.defined<Buffer>(transactionBytes);
 
-		return await this.transactionFactory.fromBytes(transactionBytes.subarray(8));
+		const buffer = ByteBuffer.fromBuffer(transactionBytes);
+		const height = buffer.readUint32();
+		const sequence = buffer.readUint32();
+		const transaction = await this.transactionFactory.fromBytes(buffer.getRemainder());
+
+		transaction.data.sequence = sequence;
+		transaction.data.blockHeight = height;
+
+		const blockBuffer = this.#readBlockHeaderBytes(height);
+		Utils.assert.defined<Buffer>(blockBuffer);
+		const block = await this.blockDeserializer.deserializeHeader(blockBuffer);
+		transaction.data.blockId = block.id;
+
+		return transaction;
 	}
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
