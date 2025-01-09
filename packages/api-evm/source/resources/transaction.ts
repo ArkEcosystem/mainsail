@@ -21,7 +21,6 @@ export class TransactionResource {
 			v: `0x${transaction.v}`,
 			r: `0x${transaction.r}`,
 			s: `0x${transaction.s}`,
-			tx: transaction,
 		};
 		/* eslint-enable sort-keys-fix/sort-keys-fix */
 	}
