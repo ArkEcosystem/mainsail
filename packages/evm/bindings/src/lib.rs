@@ -96,10 +96,17 @@ impl EvmInner {
                     output: r.into_output(),
                 }
             }
-            Err(_) => TxViewResult {
-                success: false,
-                output: None,
-            },
+            Err(err) => {
+                self.logger.log(
+                    LogLevel::Warning,
+                    format!("view call returned error: {:?}", err),
+                );
+
+                TxViewResult {
+                    success: false,
+                    output: None,
+                }
+            }
         })
     }
 
