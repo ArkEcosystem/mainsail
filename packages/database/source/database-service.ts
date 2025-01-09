@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 import type { Database, RootDatabase } from "lmdb";
+import { ByteBuffer } from "packages/utils/distribution/byte-buffer.js";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
@@ -188,7 +189,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		const transactionBytes: Buffer | undefined = this.transactionStorage.get(id);
 		Utils.assert.defined<Buffer>(transactionBytes);
 
-		return await this.transactionFactory.fromBytes(transactionBytes);
+		return await this.transactionFactory.fromBytes(transactionBytes.subarray(8));
 	}
 
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
@@ -247,7 +248,13 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 					Utils.assert.defined<number>(tx.data.sequence);
 					const key = `${height}-${tx.data.sequence}`;
 					void this.transactionIdStorage.put(tx.id, key);
-					void this.transactionStorage.put(key, tx.serialized);
+
+					const buff = ByteBuffer.fromSize(tx.serialized.length + 8);
+					buff.writeUint32(height);
+					buff.writeUint32(tx.data.sequence);
+					buff.writeBytes(tx.serialized);
+
+					void this.transactionStorage.put(key, buff.toBuffer());
 				}
 				void this.blockIdStorage.put(commit.block.data.id, height);
 			}
@@ -304,7 +311,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 
 			const sizeBuff = Buffer.alloc(2);
 			sizeBuff.writeUInt16LE(transaction.length, 0);
-			transactions.push(sizeBuff, transaction);
+			transactions.push(sizeBuff, transaction.subarray(8));
 		}
 
 		const transactionIds: string[] | undefined = this.transactionIdStorage.get(height);
