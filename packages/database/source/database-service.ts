@@ -323,7 +323,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			Utils.assert.defined<Buffer>(transaction);
 
 			const sizeBuff = Buffer.alloc(2);
-			sizeBuff.writeUInt16LE(transaction.length, 0);
+			sizeBuff.writeUInt16LE(transaction.length - 8, 0);
 			transactions.push(sizeBuff, transaction.subarray(8));
 		}
 
