@@ -1,8 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { ByteBuffer } from "@mainsail/utils";
 import type { Database, RootDatabase } from "lmdb";
-import { ByteBuffer } from "packages/utils/distribution/byte-buffer.js";
 
 @injectable()
 export class DatabaseService implements Contracts.Database.DatabaseService {
@@ -186,7 +186,7 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			return undefined;
 		}
 
-		const transactionBytes: Buffer | undefined = this.transactionStorage.get(id);
+		const transactionBytes: Buffer | undefined = this.transactionStorage.get(key);
 		Utils.assert.defined<Buffer>(transactionBytes);
 
 		return await this.transactionFactory.fromBytes(transactionBytes.subarray(8));

@@ -25,6 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"lmdb": "3.2.0"
 	},
 	"devDependencies": {
