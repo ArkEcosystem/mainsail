@@ -27,6 +27,7 @@ export interface DatabaseService {
 
 	getTransactionById(id: string): Promise<Transaction | undefined>;
 	getTransactionByBlockIdAndIndex(blockId: string, index: number): Promise<Transaction | undefined>;
+	getTransactionByBlockHeightAndIndex(height: number, index: number): Promise<Transaction | undefined>;
 
 	addCommit(block: Commit): void;
 	persist(): Promise<void>;

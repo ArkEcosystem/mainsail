@@ -214,6 +214,25 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 		return this.#readTransaction(`${height}-${index}`);
 	}
 
+	public async getTransactionByBlockHeightAndIndex(
+		height: number,
+		index: number,
+	): Promise<Contracts.Crypto.Transaction | undefined> {
+		// Get TX from cache
+		if (this.#commitCache.has(height)) {
+			const block = this.#commitCache.get(height)!.block;
+
+			if (block.transactions.length <= index) {
+				return undefined;
+			}
+
+			return block.transactions[index];
+		}
+
+		// Get TX from storage
+		return this.#readTransaction(`${height}-${index}`);
+	}
+
 	public async *readCommits(start: number, end: number): AsyncGenerator<Contracts.Crypto.Commit> {
 		for (let height = start; height <= end; height++) {
 			const data = await this.#readCommitBytes(height);
