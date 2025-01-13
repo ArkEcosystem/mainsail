@@ -11,6 +11,7 @@ export * from "./eth-get-transaction-by-block-hash-and-index.js";
 export * from "./eth-get-transaction-by-block-number-and-index.js";
 export * from "./eth-get-transaction-by-hash.js";
 export * from "./eth-get-transaction-count.js";
+export * from "./eth-get-transaction-receipt.js";
 export * from "./eth-get-uncle-by-block-hash-and-index.js";
 export * from "./eth-get-uncle-by-block-number-and-index.js";
 export * from "./eth-get-uncle-count-by-block-hash.js";
