@@ -16,13 +16,24 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.Evm.Instance)
 			.to(EphemeralInstance)
 			.inRequestScope()
-			.when(Selectors.anyAncestorOrTargetTaggedFirst("instance", "ephemeral"));
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("instance", "validator"));
+
+		this.app
+			.bind(Identifiers.Evm.Instance)
+			.to(EphemeralInstance)
+			.inRequestScope()
+			.when(Selectors.anyAncestorOrTargetTaggedFirst("instance", "transaction-pool"));
 	}
 
 	public async boot(): Promise<void> {}
 
 	public async dispose(): Promise<void> {
-		await this.app.getTagged<EvmInstance>(Identifiers.Evm.Instance, "instance", "ephemeral").dispose();
-		await this.app.getTagged<EvmInstance>(Identifiers.Evm.Instance, "instance", "evm").dispose();
+		for (const tag of ["evm", "validator", "transaction-pool"]) {
+			if (this.app.isBoundTagged(Identifiers.Evm.Instance, "instance", tag)) {
+				{
+					await this.app.getTagged<EvmInstance>(Identifiers.Evm.Instance, "instance", tag).dispose();
+				}
+			}
+		}
 	}
 }

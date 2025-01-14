@@ -23,8 +23,10 @@ async function run() {
 		// },
 	});
 
-	for (const tag of ["evm", "ephemeral"]) {
-		await app.getTagged(AppIdentifiers.Evm.Instance, "instance", tag).dispose();
+	for (const tag of ["evm", "valdiator", "transaction-pool"]) {
+		if (app.isBoundTagged(AppIdentifiers.Evm.Instance, "instance", tag)) {
+			await app.getTagged(AppIdentifiers.Evm.Instance, "instance", tag).dispose();
+		}
 	}
 }
 

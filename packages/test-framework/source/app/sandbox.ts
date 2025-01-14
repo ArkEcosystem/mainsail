@@ -87,12 +87,15 @@ export class Sandbox {
 			//
 			// Therefore, for now we simply manually dispose the services that are known to require explicit closing such as the EVM.
 			// In the future, we should automate this by tracking.
-			await this.#configApp
-				?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm")
-				.dispose();
-			await this.#configApp
-				?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "ephemeral")
-				.dispose();
+			for (const tag of ["evm", "validator", "transaction-pool"]) {
+				if (this.#configApp?.isBoundTagged(Identifiers.Evm.Instance, "instance", tag)) {
+					{
+						await this.#configApp
+							?.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", tag)
+							.dispose();
+					}
+				}
+			}
 		} catch (error) {
 			console.log("ex", error);
 			// We encountered a unexpected error.

@@ -13,7 +13,9 @@ describe<{
 	mnemonicGenerator: MnemonicGenerator;
 }>("GenesisBlockGenerator", ({ it, assert, afterEach, beforeEach }) => {
 	afterEach(async (context) => {
-		await context.app.getTagged<Contracts.Evm.Instance>(AppIdentifiers.Evm.Instance, "instance", "evm").dispose();
+		for (const tag of ["evm", "validator", "transaction-pool"]) {
+			await context.app.getTagged<Contracts.Evm.Instance>(AppIdentifiers.Evm.Instance, "instance", tag).dispose();
+		}
 	});
 
 	beforeEach(async (context) => {
