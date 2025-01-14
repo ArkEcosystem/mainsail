@@ -1,14 +1,14 @@
 {
-	"address": "0x9c83DE8A104da85A13A2D96D772dC7FB9a3147d1",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "225de37b8e2a639823db786bbc41b1971f17702defa41465ab096b7f99b41236",
-		"publicKey": "88ead8d480aae6ec4643c1341b79675d74902183ebd35bdf05234da536cf1cc14569ca6239c90301387638268402f779"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "aeeb33f7135a9251e5de837a437ebb2597e6faed4445f55526d37e4611da1efa",
-		"publicKey": "0253a5dea79ada0176abd694d7102b23a848228f8a0063a677f33b825cc7acbe55"
-	},
-	"passphrase": "fit kiwi anger speak traffic possible draft logic clock vessel guide flee essence body correct hand tattoo calm ethics antique ladder main jewel visit"
+    "address": "0x44e507ED72de56C63F66a00660cDf81026a0fFa4",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "3cad187d346f354f980b6bd16f5e9c4856c0f49b640ee09c8e5bc1a5d5a85a4d",
+        "publicKey": "a0881d4c089246c52fd7c502dc4581cbc803022ab082c334710383d7f55639be7c60ee402ce814d065e5c69de4ca9a6a"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "7862169c59903d7f0abaef410ddeae37bef9c79298d43aead6bec8424dd10483",
+        "publicKey": "029ac06a5a3c540dc4068fc2e7dab10ecbd468bb886813f2c7a41a8cffe3043b12"
+    },
+    "passphrase": "royal family force forget globe ready face rocket chaos owner minute scare tank captain travel screen obey poet ankle sail original box end rich"
 }
