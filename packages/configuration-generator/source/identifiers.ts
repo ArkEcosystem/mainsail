@@ -13,5 +13,4 @@ export const Identifiers = {
 		Peers: Symbol.for("Generator<Peers>"),
 		Wallet: Symbol.for("Generator<Wallet>"),
 	},
-	LogService: Symbol.for("Configuration<Logger>"),
 };

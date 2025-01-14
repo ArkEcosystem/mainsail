@@ -62,6 +62,12 @@ export class GenesisBlockGenerator extends Generator {
 						options.pubKeyHash,
 					)),
 				);
+
+				options.premine = transactions
+					.reduce((acc, curr) => {
+						return acc.plus(curr.data.value);
+					}, BigNumber.ZERO)
+					.toFixed();
 			} else {
 				transactions = transactions.concat(
 					await this.#createTransferTransaction(
