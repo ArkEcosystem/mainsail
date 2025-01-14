@@ -722,6 +722,61 @@ describe<{
 		const balance = ethers.toBigInt(slot);
 		assert.equal(balance, ethers.parseEther("100000000"));
 	});
+
+	it("should preverify transaction", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+
+		const initialSupply = ethers.parseEther("100");
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			initialSupply,
+			deployerAccount: ethers.ZeroAddress,
+			usernameContract: ethers.ZeroAddress,
+			validatorContract: ethers.ZeroAddress,
+		});
+
+		const ctx = {
+			nonce: 0n,
+			data: Buffer.alloc(0),
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
+			specId: Contracts.Evm.SpecId.SHANGHAI,
+		};
+
+		// Succeeds
+		let result = await instance.preverifyTransaction({
+			...ctx,
+			caller: sender.address,
+			recipient: recipient.address,
+			value: initialSupply - 21_000n * ethers.parseUnits("5", "gwei"),
+			data: Buffer.alloc(0),
+			gasLimit: 21_000n,
+			gasPrice: 5n,
+			blockGasLimit: 10_000_000n,
+		});
+
+		assert.equal(result, { success: true, initialGasUsed: 21000n });
+
+		// Fails
+		result = await instance.preverifyTransaction({
+			...ctx,
+			caller: sender.address,
+			recipient: undefined,
+			value: 0n,
+			nonce: 0n,
+			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+			gasLimit: 21_000n,
+			gasPrice: 5n,
+			blockGasLimit: 10_000_000n,
+		});
+
+		assert.equal(result, {
+			success: false,
+			initialGasUsed: 0n,
+			error: "preverify failed: transaction validation error: call gas cost exceeds the gas limit",
+		});
+	});
 });
 
 const getRandomTxHash = () => Buffer.from(randomBytes(32)).toString("hex");

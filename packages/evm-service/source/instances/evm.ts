@@ -58,6 +58,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.prepareNextCommit(context);
 	}
 
+	public async preverifyTransaction(txContext: Contracts.Evm.PreverifyTransactionContext): Promise<void> {
+		return this.#evm.preverifyTransaction(txContext);
+	}
+
 	public async view(viewContext: Contracts.Evm.TransactionViewContext): Promise<Contracts.Evm.ViewResult> {
 		return this.#evm.view(viewContext);
 	}

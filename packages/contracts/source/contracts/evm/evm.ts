@@ -15,6 +15,7 @@ export interface GenesisInfo {
 
 export interface Instance extends CommitHandler {
 	prepareNextCommit(context: PrepareNextCommitContext): Promise<void>;
+	preverifyTransaction(txContext: PreverifyTransactionContext): Promise<PreverifyTransactionResult>;
 	process(txContext: TransactionContext): Promise<ProcessResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
@@ -40,6 +41,12 @@ export interface ProcessResult {
 export interface ViewResult {
 	readonly success: boolean;
 	readonly output?: Buffer;
+}
+
+export interface PreverifyTransactionResult {
+	readonly success: boolean;
+	readonly initialGasUsed: bigint;
+	readonly error?: string;
 }
 
 export interface CommitResult {}
@@ -77,6 +84,21 @@ export interface AccountUpdateContext {
 
 export interface PrepareNextCommitContext {
 	readonly commitKey: CommitKey;
+}
+
+export interface PreverifyTransactionContext {
+	readonly caller: string;
+	/** Omit recipient when deploying a contract */
+	readonly recipient?: string;
+	readonly gasLimit: bigint;
+	readonly value: bigint;
+	readonly gasPrice?: bigint;
+	readonly nonce: bigint;
+	readonly data: Buffer;
+	readonly txHash: string;
+	readonly sequence?: number;
+	readonly specId: SpecId;
+	readonly blockGasLimit: bigint;
 }
 
 export interface TransactionContext {
