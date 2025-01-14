@@ -64,9 +64,7 @@ export class GenesisBlockGenerator extends Generator {
 				);
 
 				options.premine = transactions
-					.reduce((acc, curr) => {
-						return acc.plus(curr.data.value);
-					}, BigNumber.ZERO)
+					.reduce((accumulator, current) => accumulator.plus(current.data.value), BigNumber.ZERO)
 					.toFixed();
 			} else {
 				transactions = transactions.concat(
