@@ -775,7 +775,7 @@ impl JsEvmWrapper {
         })
     }
 
-    #[napi(ts_return_type = "Promise<void>")]
+    #[napi(ts_return_type = "Promise<JsPreverifyTransactionResult>")]
     pub fn preverify_transaction(
         &mut self,
         node_env: Env,
