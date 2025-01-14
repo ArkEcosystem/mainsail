@@ -438,7 +438,6 @@ impl EvmInner {
             assert!(pending.key == commit_key, "pending commit key mismatch");
         }
 
-        let gas_limit = tx_ctx.gas_limit;
         let result = self.transact_evm(tx_ctx.into());
 
         match result {
@@ -450,13 +449,8 @@ impl EvmInner {
                 match err {
                     EVMError::Transaction(err) => {
                         match err {
-                            revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit => {
-                                return Ok(TxReceipt {
-                                    gas_used: gas_limit,
-                                    ..Default::default()
-                                });
-                            }
-                            revm::primitives::InvalidTransaction::NonceTooHigh { .. }
+                            revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit
+                            | revm::primitives::InvalidTransaction::NonceTooHigh { .. }
                             | revm::primitives::InvalidTransaction::NonceTooLow { .. } => {
                                 return Err(EVMError::Transaction(err));
                             }
