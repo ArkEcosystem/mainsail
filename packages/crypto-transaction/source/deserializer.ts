@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
-import { decodeRlp } from "ethers";
+import { decodeRlp, ethers } from "ethers";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
@@ -21,7 +21,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		data.gasPrice = this.#parseNumber(decoded[3].toString());
 		data.gasLimit = this.#parseNumber(decoded[4].toString());
 		data.recipientAddress = this.#parseAddress(decoded[5].toString());
-		data.value = BigNumber.make(this.#parseNumber(decoded[6].toString()));
+		data.value = this.#parseBigNumber(decoded[6].toString());
 		data.data = this.#parseData(decoded[7].toString());
 
 		if (decoded.length === 12) {
@@ -40,6 +40,10 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 	#parseNumber(value: string): number {
 		return value === "0x" ? 0 : Number(value);
+	}
+
+	#parseBigNumber(value: string): BigNumber {
+		return value === "0x" ? BigNumber.ZERO : BigNumber.make(ethers.getBigInt(value));
 	}
 
 	#parseAddress(value: string): string | undefined {
