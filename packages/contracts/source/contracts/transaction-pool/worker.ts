@@ -8,6 +8,7 @@ export interface WorkerFlags extends KeyValuePair {}
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
 	getTransactions(): Promise<string[]>;
+	removeTransaction(address: string, id: string): Promise<void>;
 	commit(height: number, sendersAddresses: string[]): Promise<void>;
 	setPeer(ip: string): Promise<void>;
 	forgetPeer(ip: string): Promise<void>;
@@ -25,5 +26,6 @@ export interface Worker extends Omit<WorkerScriptHandler, "commit" | "getTransac
 	getQueueSize(): number;
 	kill(): Promise<number>;
 	getTransactionBytes(): Promise<Buffer[]>;
+	removeTransaction(address: string, id: string): Promise<void>;
 	registerEventHandler(event: string, callback: EventCallback<any>): void;
 }
