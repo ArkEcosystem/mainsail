@@ -66,20 +66,20 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		const milestone = this.configuration.getMilestone();
 
 		const preverified = await evm.preverifyTransaction({
+			blockGasLimit: BigInt(milestone.block.maxGasLimit),
 			caller: transaction.data.senderAddress,
-			gasPrice: BigInt(transaction.data.gasPrice),
+			data: Buffer.from(transaction.data.data, "hex"),
 			gasLimit: BigInt(transaction.data.gasLimit),
+			gasPrice: BigInt(transaction.data.gasPrice),
 			nonce: transaction.data.nonce.toBigInt(),
-			value: transaction.data.value.toBigInt(),
+			recipient: transaction.data.recipientAddress,
 			specId: milestone.evmSpec,
 			txHash: transaction.data.id,
-			recipient: transaction.data.recipientAddress,
-			blockGasLimit: BigInt(milestone.block.maxGasLimit),
-			data: Buffer.from(transaction.data.data, "hex"),
+			value: transaction.data.value.toBigInt(),
 		});
 
 		if (!preverified.success) {
-			throw new Exceptions.TransactionFailedToPreverifyError(transaction, Error(preverified.error));
+			throw new Exceptions.TransactionFailedToPreverifyError(transaction, new Error(preverified.error));
 		}
 	}
 

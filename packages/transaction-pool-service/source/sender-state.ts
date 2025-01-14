@@ -81,10 +81,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 			try {
 				await this.triggers.call("throwIfCannotBeApplied", {
+					evm: this.evm,
 					handler,
 					sender: this.#wallet,
 					transaction,
-					evm: this.evm,
 				});
 			} catch (error) {
 				throw new Exceptions.TransactionFailedToApplyError(transaction, error);
