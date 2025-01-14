@@ -46,6 +46,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.ContractRepositoryFactory)
+	private readonly contractRepositoryFactory!: ApiDatabaseContracts.ContractRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
 	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
 
@@ -495,6 +498,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		await this.dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 			const blockRepository = this.blockRepositoryFactory(entityManager);
+			const contractRepository = this.contractRepositoryFactory(entityManager);
 			const stateRepository = this.stateRepositoryFactory(entityManager);
 			const transactionRepository = this.transactionRepositoryFactory(entityManager);
 			const receiptRepository = this.receiptRepositoryFactory(entityManager);
@@ -505,6 +509,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			await Promise.all(
 				[
 					blockRepository,
+					contractRepository,
 					stateRepository,
 					transactionRepository,
 					receiptRepository,

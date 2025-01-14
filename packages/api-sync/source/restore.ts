@@ -5,7 +5,7 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
 import { chunk, validatorSetPack } from "@mainsail/utils";
@@ -16,6 +16,7 @@ interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
 	readonly blockRepository: ApiDatabaseContracts.BlockRepository;
 	readonly configurationRepository: ApiDatabaseContracts.ConfigurationRepository;
+	readonly contractRepository: ApiDatabaseContracts.ContractRepository;
 	readonly stateRepository: ApiDatabaseContracts.StateRepository;
 	readonly transactionRepository: ApiDatabaseContracts.TransactionRepository;
 	readonly transactionTypeRepository: ApiDatabaseContracts.TransactionTypeRepository;
@@ -86,6 +87,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.ConfigurationRepositoryFactory)
 	private readonly configurationRepositoryFactory!: ApiDatabaseContracts.ConfigurationRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.ContractRepositoryFactory)
+	private readonly contractRepositoryFactory!: ApiDatabaseContracts.ContractRepositoryFactory;
+
 	@inject(ApiDatabaseIdentifiers.ReceiptRepositoryFactory)
 	private readonly receiptRepositoryFactory!: ApiDatabaseContracts.ReceiptRepositoryFactory;
 
@@ -134,6 +138,7 @@ export class Restore {
 				addressToPublicKey: {},
 				blockRepository: this.blockRepositoryFactory(entityManager),
 				configurationRepository: this.configurationRepositoryFactory(entityManager),
+				contractRepository: this.contractRepositoryFactory(entityManager),
 				entityManager,
 				lastHeight: 0,
 				mostRecentCommit,
@@ -184,7 +189,10 @@ export class Restore {
 			// 8) Write `state` table
 			await this.#ingestState(context);
 
-			// 9) Update validator ranks
+			// 9) Write `contracts` table
+			await this.#ingestContracts(context);
+
+			// 10) Update validator ranks
 			await this.#updateValidatorRanks(context);
 
 			restoredHeight = context.lastHeight;
@@ -551,6 +559,27 @@ export class Restore {
 				id: 1,
 				supply: context.totalSupply.toFixed(),
 			})
+			.execute();
+	}
+
+	async #ingestContracts(context: RestoreContext): Promise<void> {
+		const deploymentEvents = this.app
+			.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
+			.getDeploymentEvents();
+
+		await context.contractRepository
+			.createQueryBuilder()
+			.insert()
+			.orIgnore()
+			.values(
+				deploymentEvents.map((event) => ({
+					activeImplementation: event.activeImplementation ?? event.address,
+					address: event.address,
+					implementations: event.implementations,
+					name: event.name,
+					proxy: event.proxy,
+				})),
+			)
 			.execute();
 	}
 

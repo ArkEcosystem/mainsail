@@ -4,6 +4,7 @@ import {
 	ApiNode,
 	Block,
 	Configuration,
+	Contract,
 	Peer,
 	Plugin,
 	Receipt,
@@ -36,6 +37,9 @@ export type BlockRepository = ExtendedRepository<Block> & BlockRepositoryExtensi
 
 export type ConfigurationRepositoryExtension = {};
 export type ConfigurationRepository = ExtendedRepository<Configuration> & ConfigurationRepositoryExtension;
+
+export type ContractRepositoryExtension = {};
+export type ContractRepository = ExtendedRepository<Contract> & ContractRepositoryExtension;
 
 export type ApiNodeRepositoryExtension = {
 	findManyByCriteria(
@@ -120,6 +124,7 @@ export type WalletRepository = ExtendedRepository<Wallet> & WalletRepositoryExte
 export type ApiNodeRepositoryFactory = (customDataSource?: RepositoryDataSource) => ApiNodeRepository;
 export type BlockRepositoryFactory = (customDataSource?: RepositoryDataSource) => BlockRepository;
 export type ConfigurationRepositoryFactory = (customDataSource?: RepositoryDataSource) => ConfigurationRepository;
+export type ContractRepositoryFactory = (customDataSource?: RepositoryDataSource) => ContractRepository;
 export type PeerRepositoryFactory = (customDataSource?: RepositoryDataSource) => PeerRepository;
 export type ReceiptRepositoryFactory = (customDataSource?: RepositoryDataSource) => ReceiptRepository;
 export type TransactionRepositoryFactory = (customDataSource?: RepositoryDataSource) => TransactionRepository;

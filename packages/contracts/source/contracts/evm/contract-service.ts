@@ -2,6 +2,14 @@ import { BigNumber } from "@mainsail/utils";
 
 import { ValidatorWallet } from "../state/wallets.js";
 
+export interface DeployerContract {
+	readonly name: string;
+	readonly address: string;
+	readonly proxy?: "UUPS";
+	readonly implementations: { address: string; abi: Record<string, any> }[];
+	readonly activeImplementation?: string;
+}
+
 export interface Vote {
 	validatorAddress: string;
 	voterAddress: string;

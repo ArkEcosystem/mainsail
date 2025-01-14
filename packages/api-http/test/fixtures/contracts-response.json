@@ -1,0 +1,20 @@
+{
+	"consensus": {
+		"address": "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1",
+		"proxy": "UUPS",
+		"implementations": ["0x522B3294E6d06aA25Ad0f1B8891242E335D3B459", "0x622B3294E6d06aA25Ad0f1B8891242E335D3B459"],
+		"activeImplementation": "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459"
+	},
+	"multi-payments": {
+		"address": "0x83769BeEB7e5405ef0B7dc3C66C43E3a51A6d27f",
+		"proxy": null,
+		"implementations": ["0x83769BeEB7e5405ef0B7dc3C66C43E3a51A6d27f"],
+		"activeImplementation": "0x83769BeEB7e5405ef0B7dc3C66C43E3a51A6d27f"
+	},
+	"usernames": {
+		"address": "0x2c1DE3b4Dbb4aDebEbB5dcECAe825bE2a9fc6eb6",
+		"proxy": "UUPS",
+		"implementations": ["0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc"],
+		"activeImplementation": "0xc051134F56d56160E8c8ed9bB3c439c78AB27cCc"
+	}
+}

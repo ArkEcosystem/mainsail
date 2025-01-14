@@ -41,7 +41,9 @@ export const makeApplication = async (configurationPath: string, options: Record
 
 	const app = new Application(new Container());
 	app.bind(Identifiers.Application.Name).toConstantValue(options.name);
-	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
+	app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
+		dispatch: () => {},
+	});
 	app.bind(Identifiers.Services.Log.Service).toConstantValue({
 		debug: (message: string) => console.log(message),
 		info: (message: string) => console.log(message),
