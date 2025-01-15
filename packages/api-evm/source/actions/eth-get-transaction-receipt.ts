@@ -2,9 +2,12 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
+import { ReceiptResource } from "../resources/index.js";
+
 @injectable()
 export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
-	public readonly name: string = "eth_getTransactionReceipt";
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
@@ -12,6 +15,8 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
+
+	public readonly name: string = "eth_getTransactionReceipt";
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
@@ -30,6 +35,7 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 		const transaction = await this.databaseService.getTransactionById(parameters[0].slice(2));
 
 		if (!transaction) {
+			// eslint-disable-next-line unicorn/no-null
 			return null;
 		}
 
@@ -37,27 +43,10 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action {
 
 		const { receipt } = await this.evm.getReceipt(transaction.data.blockHeight, transaction.id);
 		if (!receipt) {
+			// eslint-disable-next-line unicorn/no-null
 			return null;
 		}
 
-		/* eslint-disable sort-keys-fix/sort-keys-fix */
-		return {
-			blockHash: transaction.data.blockId,
-			blockNumber: `0x${transaction.data.blockHeight?.toString(16)}`,
-			contractAddress: receipt.deployedContractAddress,
-			cumulativeGasUsed: "", // The sum of the base fee and tip paid per unit of gas.
-			effectiveGasUsed: "", // The total amount of gas used when this transaction was executed in the block.
-
-			from: transaction.data.senderAddress,
-			gasUsed: `0x${receipt.gasUsed.toString(16)}`,
-			logs: receipt.logs,
-			logsBloom: "",
-			status: receipt.success ? "0x1" : "0x0",
-			to: transaction.data.recipientAddress,
-			transactionHash: transaction.id,
-			transactionIndex: `0x${transaction.data.sequence?.toString(16)}`,
-			type: "0x2",
-		};
-		/* eslint-enable sort-keys-fix/sort-keys-fix */
+		return this.app.resolve(ReceiptResource).transform(transaction.data, receipt);
 	}
 }
