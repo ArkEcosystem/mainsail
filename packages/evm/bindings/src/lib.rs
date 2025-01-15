@@ -18,8 +18,11 @@ use mainsail_evm_core::{
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{CommitResult, JsAccountInfoExtended, PreverifyTxResult, TxViewResult};
+use result::{
+    CommitResult, JsAccountInfoExtended, JsTransactionReceipt, PreverifyTxResult, TxViewResult,
+};
 use revm::interpreter::Host;
+
 use revm::{
     db::{State, WrapDatabaseRef},
     primitives::{
@@ -466,6 +469,19 @@ impl EvmInner {
                 ..Default::default()
             },
         })
+    }
+
+    pub fn get_receipt(
+        &mut self,
+        height: u64,
+        tx_hash: B256,
+    ) -> std::result::Result<Option<TxReceipt>, EVMError<String>> {
+        match self.persistent_db.get_receipt(height, tx_hash) {
+            Ok(receipt) => Ok(receipt),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading receipt: {}", err).into(),
+            )),
+        }
     }
 
     pub fn process(
@@ -930,6 +946,26 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsGetReceipt>")]
+    pub fn get_receipt(
+        &mut self,
+        node_env: Env,
+        height: JsBigInt,
+        tx_hash: JsString,
+    ) -> Result<JsObject> {
+        let height = height.get_u64()?.0;
+        let tx_hash = utils::convert_string_to_b256(tx_hash)?;
+
+        node_env.execute_tokio_future(
+            Self::get_receipt_async(self.evm.clone(), height, tx_hash),
+            move |&mut node_env, result| {
+                Ok(result::JsGetReceipt::new(
+                    &node_env, result, height, tx_hash,
+                )?)
+            },
+        )
+    }
+
     #[napi(ts_return_type = "Promise<string>")]
     pub fn code_at(&mut self, node_env: Env, address: JsString) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
@@ -1187,6 +1223,20 @@ impl JsEvmWrapper {
     ) -> Result<(Option<u64>, Vec<(u64, Vec<(B256, TxReceipt)>)>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_receipts(offset, limit);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_receipt_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        height: u64,
+        tx_hash: B256,
+    ) -> Result<Option<TxReceipt>> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_receipt(height, tx_hash);
 
         match result {
             Ok(result) => Result::Ok(result),

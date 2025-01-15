@@ -294,6 +294,17 @@ impl PersistentDB {
         )
     }
 
+    pub fn get_receipt(&self, height: u64, tx_hash: B256) -> Result<Option<TxReceipt>, Error> {
+        let tx_env = self.env.read_txn()?;
+
+        let commits = self.inner.borrow().commits.get(&tx_env, &height)?;
+
+        Ok(match commits {
+            Some(inner) => inner.tx_receipts.get(&tx_hash).cloned(),
+            None => None,
+        })
+    }
+
     pub fn get_legacy_attributes(
         &mut self,
         address: Address,
