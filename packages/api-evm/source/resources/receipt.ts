@@ -9,18 +9,19 @@ export class ReceiptResource {
 	): Promise<object> {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
 		return {
-			transactionHash: transaction.id,
+			transactionHash: `0x${transaction.id}`,
 			transactionIndex: `0x${transaction.sequence?.toString(16)}`,
-			blockHash: transaction.blockId,
+			blockHash: `0x${transaction.blockId}`,
 			blockNumber: `0x${transaction.blockHeight?.toString(16)}`,
 			from: transaction.senderAddress,
 			to: transaction.recipientAddress,
-			cumulativeGasUsed: "", // The sum of the base fee and tip paid per unit of gas.
-			effectiveGasUsed: "", // The total amount of gas used when this transaction was executed in the block.
+			// TODO: Calculate
+			cumulativeGasUsed: "0x0", // The sum of the base fee and tip paid per unit of gas.
+			effectiveGasUsed: "0x0", // The total amount of gas used when this transaction was executed in the block.
 			gasUsed: `0x${receipt.gasUsed.toString(16)}`,
 			contractAddress: receipt.deployedContractAddress,
 			logs: receipt.logs,
-			logsBloom: "",
+			logsBloom: "", // TODO: Implement logs bloom
 			type: "0x2",
 			status: receipt.success ? "0x1" : "0x0",
 		};
