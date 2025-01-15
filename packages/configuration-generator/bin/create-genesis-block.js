@@ -23,7 +23,7 @@ async function run() {
 		// },
 	});
 
-	for (const tag of ["evm", "valdiator", "transaction-pool"]) {
+	for (const tag of ["evm", "validator", "transaction-pool"]) {
 		if (app.isBoundTagged(AppIdentifiers.Evm.Instance, "instance", tag)) {
 			await app.getTagged(AppIdentifiers.Evm.Instance, "instance", tag).dispose();
 		}
