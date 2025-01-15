@@ -1,5 +1,6 @@
 import envPaths from "env-paths";
 import path from "path";
+import { Identifiers as AppIdentifiers } from "@mainsail/contracts";
 import { makeApplication } from "../distribution/application-factory.js";
 import { Identifiers } from "../distribution/identifiers.js";
 
@@ -16,11 +17,15 @@ async function run() {
 		symbol: "TѦ",
 		token: "ARK",
 		distribute: true,
-		premine: "12499999999999969",
+		premine: "125000000000000000000000000",
 		// snapshot: {
 		// 	path: "../../snapshot-19a87c96dbe8ad1be06d33e97cd17f5662eb952c29efd3d8bb00c9c75e7582bc.json",
 		// },
 	});
+
+	for (const tag of ["evm", "ephemeral"]) {
+		await app.getTagged(AppIdentifiers.Evm.Instance, "instance", tag).dispose();
+	}
 }
 
 run();

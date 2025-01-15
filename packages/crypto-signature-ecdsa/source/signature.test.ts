@@ -1,5 +1,6 @@
 import { describe } from "../../test-framework/source";
 import { Signature } from "./signature";
+import { secp256k1 } from "bcrypto";
 
 describe("Signature", ({ assert, it }) => {
 	it("should sign and verify", async () => {
@@ -20,6 +21,9 @@ describe("Signature", ({ assert, it }) => {
 
 	it("should sign recoverable and return r,s,v", async () => {
 		const privateKey = Buffer.from("814857ce48e291893feab95df02e1dbf7ad3994ba46f247f77e4eefd5d8734a2", "hex");
+		const publicKey = secp256k1.publicKeyCreate(privateKey, true).toString("hex");
+		assert.equal(publicKey, "03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f");
+
 		const message = Buffer.from("64726e3da8", "hex");
 
 		const signature = await new Signature().signRecoverable(message, privateKey);
@@ -30,9 +34,8 @@ describe("Signature", ({ assert, it }) => {
 			v: 28,
 		});
 
-		const publicKey = new Signature().recoverPublicKey(message, signature);
-		assert.equal(publicKey, "03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f");
-
+		const recoveredPublicKey = new Signature().recoverPublicKey(message, signature);
+		assert.equal(recoveredPublicKey, publicKey);
 		assert.true(await new Signature().verifyRecoverable(signature, message, Buffer.from(publicKey, "hex")));
 	});
 });

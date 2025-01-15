@@ -1,14 +1,14 @@
 {
-	"address": "0x9c83DE8A104da85A13A2D96D772dC7FB9a3147d1",
+	"address": "0x9f361bd521730723FACfe3F6b30c3fC0980fb47d",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "225de37b8e2a639823db786bbc41b1971f17702defa41465ab096b7f99b41236",
-		"publicKey": "88ead8d480aae6ec4643c1341b79675d74902183ebd35bdf05234da536cf1cc14569ca6239c90301387638268402f779"
+		"privateKey": "05d1ea741761e1547f16466b013e62f78b05db8554139b562af6644fefede29b",
+		"publicKey": "9738373c27086093aea9c9219cde4037a765de19c82eb947b9d7aafa70e902d78220a483b409c2fa35c0e311d1e7bcaf"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "aeeb33f7135a9251e5de837a437ebb2597e6faed4445f55526d37e4611da1efa",
-		"publicKey": "0253a5dea79ada0176abd694d7102b23a848228f8a0063a677f33b825cc7acbe55"
+		"privateKey": "56ccd5d637ff2650b9fc20bf4703828b627ee189f41aeac39484131769313d94",
+		"publicKey": "02b9b34c80b618498b7bb49e765f6d060715af22d6ac7d2c63de96bba18e5f3da9"
 	},
-	"passphrase": "fit kiwi anger speak traffic possible draft logic clock vessel guide flee essence body correct hand tattoo calm ethics antique ladder main jewel visit"
+	"passphrase": "romance math rack double punch bird thumb chicken viable yellow obvious labor slender grape rabbit art join only illness license tray kitchen amount shoot"
 }

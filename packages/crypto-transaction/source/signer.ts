@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class Signer {
@@ -22,11 +22,6 @@ export class Signer {
 		const hash: Buffer = await this.utils.toHash(transaction, options);
 		const signature = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
-		// TODO: Check
-		// if (!transaction.signature && !options.excludeMultiSignature) {
-		// 	transaction.signature = signature;
-		// }
-
 		transaction.v = signature.v;
 		transaction.r = signature.r;
 		transaction.s = signature.s;
@@ -39,22 +34,6 @@ export class Signer {
 		keys: Contracts.Crypto.KeyPair,
 		index = -1,
 	): Promise<string> {
-		// if (!transaction.signatures) {
-		// 	transaction.signatures = [];
-		// }
-
-		// index = index === -1 ? transaction.signatures.length : index;
-
-		// const hash: Buffer = await this.utils.toHash(transaction, {
-		// 	excludeMultiSignature: true,
-		// 	excludeSignature: true,
-		// });
-
-		// const signature: string = await this.signatureFactory.sign(hash, Buffer.from(keys.privateKey, "hex"));
-		// const indexedSignature = `${numberToHex(index)}${signature}`;
-		// transaction.signatures.push(indexedSignature);
-
-		//return indexedSignature;
-		return "TODO";
+		throw new Exceptions.NotImplemented(this.constructor.name, "multiSign");
 	}
 }
