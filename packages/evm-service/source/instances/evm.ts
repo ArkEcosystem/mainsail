@@ -96,7 +96,7 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.getReceipts(offset, limit);
 	}
 
-	public async getReceipt(height: number, txHash: string): Promise<Contracts.Evm.GetReceiptResult | undefined> {
+	public async getReceipt(height: number, txHash: string): Promise<Contracts.Evm.GetReceiptResult> {
 		return this.#evm.getReceipt(BigInt(height), txHash);
 	}
 
