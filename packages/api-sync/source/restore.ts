@@ -281,8 +281,7 @@ export class Restore {
 						senderAddress: data.senderAddress,
 						senderPublicKey: data.senderPublicKey,
 						sequence: data.sequence as unknown as number,
-						// signature: data.signature,
-						signature: "",
+						signature: `${data.r}${data.s}${data.v?.toString(16)}`,
 						signatures: undefined, //data.signatures,
 						timestamp: block.header.timestamp.toFixed(),
 					});
