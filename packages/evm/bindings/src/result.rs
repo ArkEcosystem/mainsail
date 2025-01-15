@@ -320,3 +320,30 @@ impl JsGetReceipts {
         })
     }
 }
+
+#[napi(object)]
+pub struct JsGetReceipt {
+    pub receipt: Option<JsTransactionReceipt>,
+}
+
+impl JsGetReceipt {
+    pub fn new(
+        node_env: &napi::Env,
+        receipt: Option<TxReceipt>,
+        height: u64,
+        tx_hash: B256,
+    ) -> anyhow::Result<Self> {
+        let receipt = match receipt {
+            Some(receipt) => {
+                let mut receipt = JsTransactionReceipt::new(node_env, receipt)?;
+                receipt.block_height = Some(node_env.create_bigint_from_u64(height)?);
+                receipt.tx_hash = Some(node_env.create_string_from_std(tx_hash.to_string())?);
+
+                Some(receipt)
+            }
+            None => None,
+        };
+
+        Ok(JsGetReceipt { receipt })
+    }
+}
