@@ -15,6 +15,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.Evm.Instance)
+	@tagged("instance", "transaction-pool")
+	private readonly evm!: Contracts.Evm.Instance;
+
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
@@ -77,6 +81,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 			try {
 				await this.triggers.call("throwIfCannotBeApplied", {
+					evm: this.evm,
 					handler,
 					sender: this.#wallet,
 					transaction,

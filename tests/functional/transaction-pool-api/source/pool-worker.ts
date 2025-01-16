@@ -36,6 +36,10 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 		return response.map((transaction: string) => Buffer.from(transaction, "hex"));
 	}
 
+	public async removeTransaction(address: string, id: string): Promise<void> {
+		await this.transactionPoolMempool.removeTransaction(address, id);
+	}
+
 	registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {}
 
 	async setPeer(ip: string): Promise<void> {}

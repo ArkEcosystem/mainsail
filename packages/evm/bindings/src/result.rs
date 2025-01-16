@@ -57,6 +57,29 @@ impl JsViewResult {
 }
 
 #[napi(object)]
+pub struct JsPreverifyTransactionResult {
+    pub success: JsBoolean,
+    pub initial_gas_used: JsBigInt,
+    pub error: Option<JsString>,
+}
+
+impl JsPreverifyTransactionResult {
+    pub fn new(node_env: &napi::Env, result: PreverifyTxResult) -> anyhow::Result<Self> {
+        let error = if let Some(error) = result.error {
+            Some(node_env.create_string(&error)?)
+        } else {
+            None
+        };
+
+        Ok(Self {
+            success: node_env.get_boolean(result.success)?,
+            initial_gas_used: node_env.create_bigint_from_u64(result.initial_gas_used)?,
+            error,
+        })
+    }
+}
+
+#[napi(object)]
 pub struct JsTransactionReceipt {
     pub block_height: Option<JsBigInt>,
     pub tx_hash: Option<JsString>,
@@ -79,6 +102,13 @@ pub struct CommitResult {
 pub struct TxViewResult {
     pub success: bool,
     pub output: Option<Bytes>,
+}
+
+#[derive(Default)]
+pub struct PreverifyTxResult {
+    pub success: bool,
+    pub initial_gas_used: u64,
+    pub error: Option<String>,
 }
 
 impl JsTransactionReceipt {

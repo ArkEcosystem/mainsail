@@ -30,6 +30,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	public async throwIfCannotBeApplied(
 		transaction: Contracts.Crypto.Transaction,
 		sender: Contracts.State.Wallet,
+		evm: Contracts.Evm.Instance,
 	): Promise<void> {
 		if (!sender.getNonce().isEqualTo(transaction.data.nonce)) {
 			throw new Exceptions.UnexpectedNonceError(transaction.data.nonce, sender);
@@ -47,6 +48,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		}
 
 		// Legacy
+		// TODO: move check
 		if (sender.hasLegacySecondPublicKey()) {
 			if (!transaction.data.legacySecondSignature) {
 				throw new Exceptions.MissingLegacySecondSignatureError();
@@ -59,6 +61,25 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			if (transaction.data.legacySecondSignature) {
 				throw new Exceptions.UnexpectedLegacySecondSignatureError();
 			}
+		}
+
+		const milestone = this.configuration.getMilestone();
+
+		const preverified = await evm.preverifyTransaction({
+			blockGasLimit: BigInt(milestone.block.maxGasLimit),
+			caller: transaction.data.senderAddress,
+			data: Buffer.from(transaction.data.data, "hex"),
+			gasLimit: BigInt(transaction.data.gasLimit),
+			gasPrice: BigInt(transaction.data.gasPrice),
+			nonce: transaction.data.nonce.toBigInt(),
+			recipient: transaction.data.recipientAddress,
+			specId: milestone.evmSpec,
+			txHash: transaction.data.id,
+			value: transaction.data.value.toBigInt(),
+		});
+
+		if (!preverified.success) {
+			throw new Exceptions.TransactionFailedToPreverifyError(transaction, new Error(preverified.error));
 		}
 	}
 

@@ -76,6 +76,15 @@ export class TransactionPoolFullError extends PoolError {
 	}
 }
 
+export class TransactionFailedToPreverifyError extends PoolError {
+	public readonly error: Error;
+
+	public constructor(transaction: Transaction, error: Error) {
+		super(`tx ${transaction.id} cannot be preverified: ${error.message}`, "ERR_PREVERIFY");
+		this.error = error;
+	}
+}
+
 export class TransactionFailedToApplyError extends PoolError {
 	public readonly error: Error;
 

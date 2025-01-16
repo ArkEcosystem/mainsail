@@ -23,6 +23,21 @@ pub struct JsTransactionContext {
 }
 
 #[napi(object)]
+pub struct JsPreverifyTransactionContext {
+    pub caller: JsString,
+    /// Omit recipient when deploying a contract
+    pub recipient: Option<JsString>,
+    pub gas_limit: JsBigInt,
+    pub gas_price: Option<JsBigInt>,
+    pub value: JsBigInt,
+    pub nonce: JsBigInt,
+    pub data: JsBuffer,
+    pub tx_hash: JsString,
+    pub spec_id: JsString,
+    pub block_gas_limit: JsBigInt,
+}
+
+#[napi(object)]
 pub struct JsTransactionViewContext {
     pub caller: JsString,
     pub recipient: JsString,
@@ -80,6 +95,21 @@ pub struct JsPrepareNextCommitContext {
 #[derive(Debug)]
 pub struct PrepareNextCommitContext {
     pub commit_key: CommitKey,
+}
+
+#[derive(Debug)]
+pub struct PreverifyTxContext {
+    pub caller: Address,
+    /// Omit recipient when deploying a contract
+    pub recipient: Option<Address>,
+    pub gas_limit: u64,
+    pub gas_price: Option<U256>,
+    pub value: U256,
+    pub nonce: u64,
+    pub data: Bytes,
+    pub tx_hash: B256,
+    pub spec_id: SpecId,
+    pub block_gas_limit: U256,
 }
 
 #[derive(Debug)]
@@ -253,6 +283,43 @@ impl TryFrom<JsTransactionContext> for TxContext {
                 &Bytes::from_str(value.tx_hash.into_utf8()?.as_str()?)?.as_ref()[..],
             )?,
             block_context: value.block_context.try_into()?,
+            spec_id: parse_spec_id(value.spec_id)?,
+        };
+
+        Ok(tx_ctx)
+    }
+}
+
+impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsPreverifyTransactionContext) -> std::result::Result<Self, Self::Error> {
+        let buf = value.data.into_value()?;
+
+        let recipient = if let Some(recipient) = value.recipient {
+            Some(utils::create_address_from_js_string(recipient)?)
+        } else {
+            None
+        };
+
+        let gas_price = if let Some(gas_price) = value.gas_price {
+            Some(utils::convert_bigint_to_u256(gas_price)?)
+        } else {
+            None
+        };
+
+        let tx_ctx = PreverifyTxContext {
+            recipient,
+            gas_limit: value.gas_limit.try_into()?,
+            gas_price,
+            caller: utils::create_address_from_js_string(value.caller)?,
+            value: utils::convert_bigint_to_u256(value.value)?,
+            nonce: value.nonce.get_u64()?.0,
+            data: Bytes::from(buf.as_ref().to_owned()),
+            tx_hash: B256::try_from(
+                &Bytes::from_str(value.tx_hash.into_utf8()?.as_str()?)?.as_ref()[..],
+            )?,
+            block_gas_limit: utils::convert_bigint_to_u256(value.block_gas_limit)?,
             spec_id: parse_spec_id(value.spec_id)?,
         };
 

@@ -3,8 +3,9 @@ use std::{collections::HashMap, path::PathBuf, sync::Arc, u64};
 use ctx::{
     BlockContext, CalculateActiveValidatorsContext, ExecutionContext, GenesisContext,
     JsCalculateActiveValidatorsContext, JsCommitKey, JsGenesisContext, JsPrepareNextCommitContext,
-    JsTransactionContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
-    PrepareNextCommitContext, TxContext, TxViewContext, UpdateRewardsAndVotesContext,
+    JsPreverifyTransactionContext, JsTransactionContext, JsTransactionViewContext,
+    JsUpdateRewardsAndVotesContext, PrepareNextCommitContext, PreverifyTxContext, TxContext,
+    TxViewContext, UpdateRewardsAndVotesContext,
 };
 use logger::JsLogger;
 use mainsail_evm_core::{
@@ -17,7 +18,11 @@ use mainsail_evm_core::{
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{CommitResult, JsAccountInfoExtended, JsTransactionReceipt, TxViewResult};
+use result::{
+    CommitResult, JsAccountInfoExtended, JsTransactionReceipt, PreverifyTxResult, TxViewResult,
+};
+use revm::interpreter::Host;
+
 use revm::{
     db::{State, WrapDatabaseRef},
     primitives::{
@@ -411,6 +416,61 @@ impl EvmInner {
         }
     }
 
+    pub fn preverify_transaction(
+        &mut self,
+        ctx: PreverifyTxContext,
+    ) -> std::result::Result<PreverifyTxResult, EVMError<String>> {
+        let state_builder = State::builder().with_bundle_update();
+
+        let state_db = state_builder
+            .with_database(WrapDatabaseRef(&self.persistent_db))
+            .build();
+
+        let mut evm = Evm::builder()
+            .with_db(state_db)
+            .with_spec_id(ctx.spec_id)
+            .modify_block_env(|block_env| {
+                block_env.gas_limit = ctx.block_gas_limit;
+            })
+            .modify_tx_env(|tx_env| {
+                tx_env.gas_limit = ctx.gas_limit;
+                tx_env.gas_price = ctx.gas_price.unwrap_or_else(|| U256::ZERO);
+                tx_env.caller = ctx.caller;
+                tx_env.value = ctx.value;
+                tx_env.nonce = Some(ctx.nonce);
+                tx_env.transact_to = match ctx.recipient {
+                    Some(recipient) => revm::primitives::TransactTo::Call(recipient),
+                    None => revm::primitives::TransactTo::Create,
+                };
+
+                tx_env.data = ctx.data;
+            })
+            .build();
+
+        // TODO: instead of validating only the initial_tx_gas, we can consider calling `evm.preverify_transaction()`
+        // which applies more checks against the given state. However, the current use cases (tx pool)
+        // do not require further checks (e.g. nonce) as they are already present. Furthermore, if we chose to do so
+        // we have to perform more book keeping of sender states while they live in the tx pool similar to how `PendingCommit` works.
+
+        let ctx = &mut evm.context;
+        let env = ctx.env();
+        let result = evm.handler.validation().initial_tx_gas(env);
+
+        evm.handler.post_execution().clear(ctx);
+
+        Ok(match result {
+            Ok(initial_gas_used) => PreverifyTxResult {
+                success: true,
+                initial_gas_used,
+                ..Default::default()
+            },
+            Err(err) => PreverifyTxResult {
+                error: Some(format!("preverify failed: {}", err.to_string())),
+                ..Default::default()
+            },
+        })
+    }
+
     pub fn get_receipt(
         &mut self,
         height: u64,
@@ -451,7 +511,6 @@ impl EvmInner {
             assert!(pending.key == commit_key, "pending commit key mismatch");
         }
 
-        let gas_limit = tx_ctx.gas_limit;
         let result = self.transact_evm(tx_ctx.into());
 
         match result {
@@ -463,13 +522,8 @@ impl EvmInner {
                 match err {
                     EVMError::Transaction(err) => {
                         match err {
-                            revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit => {
-                                return Ok(TxReceipt {
-                                    gas_used: gas_limit,
-                                    ..Default::default()
-                                });
-                            }
-                            revm::primitives::InvalidTransaction::NonceTooHigh { .. }
+                            revm::primitives::InvalidTransaction::CallGasCostMoreThanGasLimit
+                            | revm::primitives::InvalidTransaction::NonceTooHigh { .. }
                             | revm::primitives::InvalidTransaction::NonceTooLow { .. } => {
                                 return Err(EVMError::Transaction(err));
                             }
@@ -737,6 +791,23 @@ impl JsEvmWrapper {
         })
     }
 
+    #[napi(ts_return_type = "Promise<JsPreverifyTransactionResult>")]
+    pub fn preverify_transaction(
+        &mut self,
+        node_env: Env,
+        tx_ctx: JsPreverifyTransactionContext,
+    ) -> Result<JsObject> {
+        let tx_ctx = PreverifyTxContext::try_from(tx_ctx)?;
+        node_env.execute_tokio_future(
+            Self::preverify_transaction_async(self.evm.clone(), tx_ctx),
+            |&mut node_env, result| {
+                Ok(result::JsPreverifyTransactionResult::new(
+                    &node_env, result,
+                )?)
+            },
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsViewResult>")]
     pub fn view(&mut self, node_env: Env, view_ctx: JsTransactionViewContext) -> Result<JsObject> {
         let view_ctx = TxViewContext::try_from(view_ctx)?;
@@ -946,6 +1017,19 @@ impl JsEvmWrapper {
     #[napi(ts_return_type = "Promise<void>")]
     pub fn dispose(&mut self, node_env: Env) -> Result<JsObject> {
         node_env.execute_tokio_future(Self::dispose_async(self.evm.clone()), |_, _| Ok(()))
+    }
+
+    async fn preverify_transaction_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        tx_ctx: PreverifyTxContext,
+    ) -> Result<PreverifyTxResult> {
+        let mut lock = evm.lock().await;
+        let result = lock.preverify_transaction(tx_ctx);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
     }
 
     async fn view_async(

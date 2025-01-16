@@ -7,6 +7,7 @@ import {
 	ForgetPeerHandler,
 	GetTransactionsHandler,
 	ReloadWebhooksHandler,
+	RemoveTransactionHandler,
 	SetPeerHandler,
 	StartHandler,
 } from "./handlers/index.js";
@@ -37,6 +38,10 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 
 	public async getTransactions(): Promise<string[]> {
 		return await this.#app.resolve(GetTransactionsHandler).handle();
+	}
+
+	public async removeTransaction(address: string, id: string): Promise<void> {
+		await this.#app.resolve(RemoveTransactionHandler).handle(address, id);
 	}
 
 	public async setPeer(ip: string): Promise<void> {

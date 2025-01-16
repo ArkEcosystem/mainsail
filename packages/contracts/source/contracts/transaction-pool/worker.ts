@@ -8,6 +8,7 @@ export interface WorkerFlags extends KeyValuePair {}
 export interface WorkerScriptHandler {
 	boot(flags: WorkerFlags): Promise<void>;
 	getTransactions(): Promise<string[]>;
+	removeTransaction(address: string, id: string): Promise<void>;
 	commit(height: number, sendersAddresses: string[]): Promise<void>;
 	setPeer(ip: string): Promise<void>;
 	forgetPeer(ip: string): Promise<void>;
