@@ -43,6 +43,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX wallets_attributes ON wallets using GIN(attributes);
             CREATE INDEX wallets_validators ON wallets ((attributes->>'validatorPublicKey')) 
                             WHERE (attributes ? 'validatorPublicKey');
+            CREATE UNIQUE INDEX wallets_unique_public_key ON wallets (public_key)
+            WHERE public_key IS NOT NULL;
         `);
 	}
 
@@ -83,6 +85,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX wallets_balance;
             DROP INDEX wallets_attributes;
             DROP INDEX wallets_validators;
+            DROP INDEX wallets_unique_public_key;
         `);
 	}
 }

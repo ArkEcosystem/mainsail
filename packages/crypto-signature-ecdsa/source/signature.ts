@@ -62,13 +62,22 @@ export class Signature implements Contracts.Crypto.Signature {
 		throw new Exceptions.NotImplemented(this.constructor.name, "aggregate");
 	}
 
-	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<string> {
+	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<Contracts.Crypto.EcdsaSignature> {
 		const [signature, recoverId] = secp256k1.signRecoverable(message, privateKey);
-		return Buffer.concat([signature, Buffer.from([recoverId])]).toString("hex");
+
+		return {
+			r: signature.slice(0, 32).toString("hex"),
+			s: signature.slice(32, 64).toString("hex"),
+			v: recoverId + 27,
+		};
 	}
 
-	public async verifyRecoverable(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
-		const signatureRS = signature.subarray(0, 64);
+	public async verifyRecoverable(
+		signature: Contracts.Crypto.EcdsaSignature,
+		message: Buffer,
+		publicKey: Buffer,
+	): Promise<boolean> {
+		const signatureRS = Buffer.from(signature.r + signature.s, "hex");
 		if (!secp256k1.isLowS(signatureRS)) {
 			return false;
 		}
@@ -76,8 +85,9 @@ export class Signature implements Contracts.Crypto.Signature {
 		return secp256k1.verify(message, signatureRS, publicKey);
 	}
 
-	public recoverPublicKey(message: Buffer, signature: Buffer): string {
-		const v = signature.readUint8(64);
-		return secp256k1.recover(message, signature.subarray(0, 64), v, true).toString("hex");
+	public recoverPublicKey(message: Buffer, signature: Contracts.Crypto.EcdsaSignature): string {
+		const v = signature.v - 27;
+		const signatureRS = Buffer.from(signature.r + signature.s, "hex");
+		return secp256k1.recover(message, signatureRS, v, true).toString("hex");
 	}
 }

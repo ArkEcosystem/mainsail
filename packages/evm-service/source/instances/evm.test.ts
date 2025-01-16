@@ -1,4 +1,5 @@
 import { Contracts } from "@mainsail/contracts";
+import { Evm } from "@mainsail/evm";
 import { BigNumberish, ethers, randomBytes } from "ethers";
 
 import { describe, Sandbox } from "../../../test-framework/distribution";
@@ -12,8 +13,13 @@ import { setGracefulCleanup } from "tmp";
 describe<{
 	sandbox: Sandbox;
 	instance: Contracts.Evm.Instance;
-}>("Instance", ({ it, assert, afterAll, beforeEach }) => {
+}>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
 	afterAll(() => setGracefulCleanup());
+
+	afterEach(async (context) => {
+		await context.sandbox.dispose();
+		await context.instance.dispose();
+	});
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
@@ -54,6 +60,29 @@ describe<{
 		assert.true(receipt.success);
 		assert.equal(receipt.gasUsed, 964_156n);
 		assert.equal(receipt.deployedContractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
+	});
+
+	it("should call log hook", async ({ sandbox, instance }) => {
+		let hookCalled = 0;
+
+		const evm = new Evm(sandbox.app.dataPath("loghook"), (level, message) => {
+			//console.log("CALLED HOOK", { level, message, hookCalled });
+			hookCalled++;
+		});
+
+		assert.equal(hookCalled, 0);
+
+		const commitKey = { commitKey: { height: 1n, round: 1n } };
+		await evm.prepareNextCommit(commitKey);
+		assert.equal(hookCalled, 0);
+
+		for (let i = 0; i < 100; i++) {
+			await evm.prepareNextCommit(commitKey);
+		}
+
+		await new Promise((resolve) => setTimeout(resolve, 1000)).then(() => evm.dispose());
+
+		assert.equal(hookCalled, 100);
 	});
 
 	// Also see

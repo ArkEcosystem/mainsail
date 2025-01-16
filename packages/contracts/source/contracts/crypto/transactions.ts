@@ -1,6 +1,6 @@
-import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
 
-import type { KeyPair } from "./identities.js";
+import type { EcdsaSignature, KeyPair } from "./identities.js";
 import type { SchemaValidationResult } from "./validator.js";
 
 export interface Transaction {
@@ -9,19 +9,9 @@ export interface Transaction {
 
 	data: TransactionData;
 	serialized: Buffer;
-
-	assetSize(): number;
-	serialize(options?: SerializeOptions): Promise<ByteBuffer>;
-	deserialize(buf: ByteBuffer): Promise<void>;
 }
 
 export type TransactionSchema = Record<string, any>;
-
-export interface EcdsaSignature {
-	r: string;
-	s: string;
-	v: number;
-}
 
 export interface TransactionData {
 	network: number;
@@ -41,7 +31,9 @@ export interface TransactionData {
 	id: string;
 	timestamp: number;
 
-	signature?: string;
+	v?: number;
+	r?: string;
+	s?: string;
 	legacySecondSignature?: string;
 
 	sequence?: number;
@@ -68,7 +60,9 @@ export interface TransactionJson {
 	id?: string;
 	timestamp?: number;
 
-	signature?: string;
+	v?: number;
+	r?: string;
+	s?: string;
 
 	sequence?: number;
 	gasUsed?: number;
@@ -108,20 +102,16 @@ export interface TransactionVerifier {
 }
 
 export interface TransactionSigner {
-	sign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<string>;
+	sign(transaction: TransactionData, keys: KeyPair, options?: SerializeOptions): Promise<EcdsaSignature>;
 	multiSign(transaction: TransactionData, keys: KeyPair, index?: number): Promise<string>;
 }
 
 export interface TransactionSerializer {
-	getBytes(transaction: TransactionData, options?: SerializeOptions): Promise<Buffer>;
-
 	serialize(transaction: Transaction, options?: SerializeOptions): Promise<Buffer>;
 }
 
 export interface TransactionDeserializer {
 	deserialize(serialized: string | Buffer): Promise<Transaction>;
-
-	deserializeCommon(transaction: TransactionData, buf: ByteBuffer): void;
 }
 
 export interface TransactionFactory {

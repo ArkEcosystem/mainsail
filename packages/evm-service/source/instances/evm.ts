@@ -1,17 +1,57 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Evm } from "@mainsail/evm";
+import { Evm, LogLevel } from "@mainsail/evm";
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.Services.Log.Service)
+	protected readonly logger!: Contracts.Kernel.Logger;
+
 	#evm!: Evm;
 
 	@postConstruct()
 	public initialize() {
-		this.#evm = new Evm(this.app.dataPath());
+		this.#evm = new Evm(this.app.dataPath(), (level: LogLevel, message: string) => {
+			try {
+				switch (level) {
+					case LogLevel.Info: {
+						this.logger.info(message);
+						break;
+					}
+					case LogLevel.Debug: {
+						this.logger.debug(message);
+						break;
+					}
+					case LogLevel.Notice: {
+						this.logger.notice(message);
+						break;
+					}
+					case LogLevel.Emergency: {
+						this.logger.emergency(message);
+						break;
+					}
+					case LogLevel.Alert: {
+						this.logger.alert(message);
+						break;
+					}
+					case LogLevel.Critical: {
+						this.logger.critical(message);
+						break;
+					}
+					case LogLevel.Warning: {
+						this.logger.warning(message);
+						break;
+					}
+				}
+			} catch {}
+		});
+	}
+
+	public async dispose(): Promise<void> {
+		await this.#evm.dispose();
 	}
 
 	public async prepareNextCommit(context: Contracts.Evm.PrepareNextCommitContext): Promise<void> {
@@ -54,6 +94,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 
 	public async getReceipts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetReceiptsResult> {
 		return this.#evm.getReceipts(offset, limit);
+	}
+
+	public async getReceipt(height: number, txHash: string): Promise<Contracts.Evm.GetReceiptResult> {
+		return this.#evm.getReceipt(BigInt(height), txHash);
 	}
 
 	public async updateRewardsAndVotes(context: Contracts.Evm.UpdateRewardsAndVotesContext): Promise<void> {

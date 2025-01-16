@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/crypto-block",
-	"version": "0.0.1-evm.10",
+	"version": "0.0.1-evm.11",
 	"description": "Block utilities for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
@@ -42,7 +42,9 @@
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/lodash.clone": "^4.5.9",
+		"@types/lodash.clonedeep": "^4.5.9",
 		"lodash.clone": "^4.5.0",
+		"lodash.clonedeep": "^4.5.0",
 		"uvu": "^0.5.6"
 	},
 	"engines": {

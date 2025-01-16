@@ -38,8 +38,8 @@ export class ReceiptsController extends Controller {
 		}
 
 		const [receipts, totalCount] = await query
-			.orderBy("transaction.sequence", "DESC")
-			.addOrderBy("transaction.blockHeight", "DESC")
+			.orderBy("transaction.blockHeight", "DESC")
+			.addOrderBy("transaction.sequence", "DESC")
 			.offset(pagination.offset)
 			.limit(pagination.limit)
 			.select()
@@ -91,8 +91,8 @@ export class ReceiptsController extends Controller {
 		}
 
 		const [receipts, totalCount] = await query
-			.orderBy("transaction.sequence", "DESC")
-			.addOrderBy("transaction.blockHeight", "DESC")
+			.orderBy("transaction.blockHeight", "DESC")
+			.addOrderBy("transaction.sequence", "DESC")
 			.offset(pagination.offset)
 			.limit(pagination.limit)
 			.select()

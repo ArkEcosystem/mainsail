@@ -1,8 +1,13 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
+import { TransactionResource } from "./transaction.js";
+
 @injectable()
 export class BlockResource {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -31,10 +36,21 @@ export class BlockResource {
 			gasUsed: `0x${blockData.totalGasUsed.toString(16)}`,
 			timestamp: `0x${blockData.timestamp.toString(16)}`,
 			transactions: transactionObject
-				? block.transactions.map((transaction) => transaction.data)
+				? await this.#transformTransactions(block)
 				: block.transactions.map((transaction) => transaction.id),
 			uncles: [],
 		};
 		/* eslint-enable sort-keys-fix/sort-keys-fix */
+	}
+
+	async #transformTransactions(block: Contracts.Crypto.Block): Promise<object[]> {
+		const transactionResource = this.app.resolve(TransactionResource);
+		return Promise.all(
+			block.transactions.map(async (transaction) => {
+				transaction.data.blockId = block.data.id;
+				transaction.data.blockHeight = block.data.height;
+				return await transactionResource.transform(transaction.data);
+			}),
+		);
 	}
 }

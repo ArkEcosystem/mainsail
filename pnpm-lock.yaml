@@ -444,9 +444,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       joi:
         specifier: 17.12.2
         version: 17.12.2
@@ -1159,7 +1156,13 @@ importers:
       '@types/lodash.clone':
         specifier: ^4.5.9
         version: 4.5.9
+      '@types/lodash.clonedeep':
+        specifier: ^4.5.9
+        version: 4.5.9
       lodash.clone:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.clonedeep:
         specifier: ^4.5.0
         version: 4.5.0
       uvu:
@@ -1788,6 +1791,9 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
       lmdb:
         specifier: 3.2.0
         version: 3.2.0

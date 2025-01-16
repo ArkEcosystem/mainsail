@@ -117,7 +117,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 	}
 
 	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
-		if (!this.data.senderAddress || !this.data.senderPublicKey || !this.data.signature) {
+		if (!this.data.senderAddress || !this.data.senderPublicKey || !this.data.r || !this.data.s || !this.data.v) {
 			throw new Exceptions.MissingTransactionSignatureError();
 		}
 
@@ -126,9 +126,11 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			id: await this.utils.getId(await this.build()),
 			network: this.data.network,
 			nonce: this.data.nonce,
+			r: this.data.r,
+			s: this.data.s,
 			senderAddress: this.data.senderAddress,
 			senderPublicKey: this.data.senderPublicKey,
-			signature: this.data.signature,
+			v: this.data.v,
 		} as Contracts.Crypto.TransactionData;
 
 		// if (Array.isArray(this.data.signatures)) {
@@ -152,7 +154,11 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 			throw new Exceptions.ValidationFailed(error);
 		}
 
-		this.data.signature = await this.signer.sign(data, keys);
+		const signature = await this.signer.sign(data, keys);
+
+		this.data.v = signature.v;
+		this.data.r = signature.r;
+		this.data.s = signature.s;
 
 		return this.instance();
 	}

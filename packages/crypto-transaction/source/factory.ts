@@ -62,16 +62,19 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 
-			AppUtils.assert.defined<string>(transaction.data.signature);
+			AppUtils.assert.defined<number>(transaction.data.v);
+			AppUtils.assert.defined<string>(transaction.data.r);
+			AppUtils.assert.defined<string>(transaction.data.s);
 
 			const hash = await this.utils.toHash(transaction.data, {
 				excludeSignature: true,
 			});
 
-			transaction.data.senderPublicKey = this.signatureSerializer.recoverPublicKey(
-				hash,
-				Buffer.from(transaction.data.signature, "hex"),
-			);
+			transaction.data.senderPublicKey = this.signatureSerializer.recoverPublicKey(hash, {
+				r: transaction.data.r,
+				s: transaction.data.s,
+				v: transaction.data.v,
+			});
 			transaction.data.senderAddress = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
 			transaction.data.id = await this.utils.getId(transaction);
 

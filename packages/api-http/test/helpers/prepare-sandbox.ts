@@ -32,6 +32,12 @@ export class ApiContext {
 		)();
 	}
 
+	public get contractRepository(): ApiDatabaseContracts.ContractRepository {
+		return this.app.get<ApiDatabaseContracts.ContractRepositoryFactory>(
+			ApiDatabaseIdentifiers.ContractRepositoryFactory,
+		)();
+	}
+
 	public get transactionRepository(): ApiDatabaseContracts.TransactionRepository {
 		return this.app.get<ApiDatabaseContracts.TransactionRepositoryFactory>(
 			ApiDatabaseIdentifiers.TransactionRepositoryFactory,
@@ -41,12 +47,6 @@ export class ApiContext {
 	public get transactionTypeRepository(): ApiDatabaseContracts.TransactionTypeRepository {
 		return this.app.get<ApiDatabaseContracts.TransactionTypeRepositoryFactory>(
 			ApiDatabaseIdentifiers.TransactionTypeRepositoryFactory,
-		)();
-	}
-
-	public get mempoolTransactionRepository(): ApiDatabaseContracts.MempoolTransactionRepository {
-		return this.app.get<ApiDatabaseContracts.MempoolTransactionRepositoryFactory>(
-			ApiDatabaseIdentifiers.MempoolTransactionRepositoryFactory,
 		)();
 	}
 

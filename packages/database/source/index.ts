@@ -40,7 +40,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.Database.Storage.Transaction)
 			.toConstantValue(rootStorage.openDB({ name: "transaction" }));
 		this.app
-			.bind(Identifiers.Database.Storage.TransactionIds)
-			.toConstantValue(rootStorage.openDB({ name: "transactionIds" }));
+			.bind(Identifiers.Database.Storage.TransactionId)
+			.toConstantValue(rootStorage.openDB({ name: "transaction-id" }));
 	}
 }

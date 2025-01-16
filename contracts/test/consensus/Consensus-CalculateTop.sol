@@ -92,6 +92,52 @@ contract ConsensusTest is Base {
         assertEq(validators[1].addr, addr); // Second validator is duplicated
     }
 
+    function test_consensus_sortedValidators_sameVoteCounts() public {
+        vm.pauseGasMetering();
+        assertEq(consensus.registeredValidatorsCount(), 0);
+
+        uint256 n = 55;
+        uint256 balance = 50;
+        for (uint256 i = 0; i < n; i++) {
+            address addr = address(uint160(i + 1));
+            vm.deal(addr, balance);
+            vm.startPrank(addr);
+
+            if (balance > 0) {
+                balance -= 1; // the last spots share same number of votes
+            }
+
+            consensus.registerValidator(prepareBLSKey(addr));
+            consensus.vote(addr);
+            vm.stopPrank();
+        }
+
+        vm.resumeGasMetering();
+
+        uint160 activeValidators = 53;
+
+        consensus.calculateActiveValidators(uint8(activeValidators));
+        ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
+
+        for (uint256 i = 0; i < activeValidators; i++) {
+            ConsensusV1.Validator memory validator = validators[i];
+
+            // all addresses are below 0x35 (53) since they are sorted ascending if vote balance is equal.
+            assertEq(validator.addr <= address(0x35), true);
+        }
+
+        validators = sortValidators(validators);
+        assertEq(validators.length, activeValidators);
+
+        // highest voter balance at top (lowest address)
+        assertEq(validators[0].addr, address(0x01));
+        assertEq(validators[0].data.voteBalance, uint256(50));
+
+        // lowest voter balance at bottom (lowest address)
+        assertEq(validators[activeValidators - 1].addr, address(0x35));
+        assertEq(validators[activeValidators - 1].data.voteBalance, uint256(0));
+    }
+
     function test_consensus_200_topValidators() public {
         vm.pauseGasMetering();
         assertEq(consensus.registeredValidatorsCount(), 0);
@@ -106,7 +152,7 @@ contract ConsensusTest is Base {
             vm.deal(addr, balance);
 
             if (balance == highestBalance) {
-                if (addr > highest) {
+                if (addr < highest || highest == address(0)) {
                     highest = addr;
                 }
             }
@@ -131,17 +177,19 @@ contract ConsensusTest is Base {
         ConsensusV1.Validator[] memory validators = consensus.getActiveValidators();
         assertEq(validators.length, activeValidators);
 
-        assertEq(validators[activeValidators - 1].addr, address(0xAE)); // Shuffled address
+        assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
         validators = sortValidators(validators);
-        assertEq(validators[activeValidators - 1].addr, highest);
+        assertEq(validators[0].addr, highest);
+        assertEq(validators[activeValidators - 1].addr, address(53));
 
-        // Seccond attempt shoudl return the same result
+        // Second attempt should return the same result
         consensus.calculateActiveValidators(uint8(activeValidators));
 
         validators = consensus.getActiveValidators();
-        assertEq(validators[activeValidators - 1].addr, address(0xAE)); // Shuffled address
+        assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
         validators = sortValidators(validators);
         assertEq(validators.length, activeValidators);
-        assertEq(validators[activeValidators - 1].addr, highest);
+        assertEq(validators[0].addr, highest);
+        assertEq(validators[activeValidators - 1].addr, address(53));
     }
 }

@@ -26,7 +26,7 @@ export class Utils implements Contracts.Crypto.TransactionUtils {
 		const fields = [
 			toBeArray(transaction.network),
 			toBeArray(transaction.nonce.toBigInt()),
-			toBeArray(transaction.gasPrice), // maxPriorityFeePerGas
+			toBeArray(0), // maxPriorityFeePerGas
 			toBeArray(transaction.gasPrice), // maxFeePerGas
 			toBeArray(transaction.gasLimit),
 			transaction.recipientAddress || "0x",
@@ -36,14 +36,11 @@ export class Utils implements Contracts.Crypto.TransactionUtils {
 		];
 
 		if (options && !options.excludeSignature) {
-			AppUtils.assert.defined<string>(transaction.signature);
-			const signatureBuffer = Buffer.from(transaction.signature, "hex");
+			AppUtils.assert.defined<number>(transaction.v);
+			AppUtils.assert.defined<string>(transaction.r);
+			AppUtils.assert.defined<string>(transaction.s);
 
-			const r = signatureBuffer.subarray(0, 32);
-			const s = signatureBuffer.subarray(32, 64);
-			const v = signatureBuffer.readUint8(64);
-
-			fields.push(toBeArray(v), r, s);
+			fields.push(toBeArray(transaction.v - 27), `0x${transaction.r}`, `0x${transaction.s}`);
 		}
 
 		const eip1559Prefix = "02"; // marker for Type 2 (EIP1559) transaction which is the standard nowadays

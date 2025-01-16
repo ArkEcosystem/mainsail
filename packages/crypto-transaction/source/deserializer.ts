@@ -1,88 +1,56 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
+import { decodeRlp, ethers } from "ethers";
 
 @injectable()
 export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
-	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
 
-	@inject(Identifiers.Cryptography.Signature.Size)
-	@tagged("type", "wallet")
-	private readonly signatureSize!: number;
-
-	@inject(Identifiers.Cryptography.Signature.Instance)
-	@tagged("type", "wallet")
-	private readonly signatureSerializer!: Contracts.Crypto.Signature;
-
-	public async deserialize(serialized: string | Buffer): Promise<Contracts.Crypto.Transaction> {
+	public async deserialize(serialized: Buffer | string): Promise<Contracts.Crypto.Transaction> {
 		const data = {} as Contracts.Crypto.TransactionData;
 
-		const buff: ByteBuffer = this.#getByteBuffer(serialized);
-		this.deserializeCommon(data, buff);
+		const encodedRlp =
+			"0x" + (typeof serialized === "string" ? serialized.slice(2) : serialized.toString("hex").slice(2));
+
+		const decoded = decodeRlp(encodedRlp);
+
+		data.network = Number(decoded[0]);
+		data.nonce = BigNumber.make(this.#parseNumber(decoded[1].toString()));
+		data.gasPrice = this.#parseNumber(decoded[3].toString());
+		data.gasLimit = this.#parseNumber(decoded[4].toString());
+		data.recipientAddress = this.#parseAddress(decoded[5].toString());
+		data.value = this.#parseBigNumber(decoded[6].toString());
+		data.data = this.#parseData(decoded[7].toString());
+
+		if (decoded.length === 12) {
+			data.v = this.#parseNumber(decoded[9].toString()) + 27;
+			data.r = decoded[10].toString().slice(2);
+			data.s = decoded[11].toString().slice(2);
+		}
 
 		const instance: Contracts.Crypto.Transaction = this.transactionTypeFactory.create(data);
 
-		// Deserialize type specific parts
-		await instance.deserialize(buff);
-
-		this.#deserializeSignatures(data, buff);
-
-		instance.serialized = buff.getResult();
+		const eip1559Prefix = "02"; // marker for Type 2 (EIP1559) transaction which is the standard nowadays
+		instance.serialized = Buffer.from(`${eip1559Prefix}${encodedRlp.slice(2)}`, "hex");
 
 		return instance;
 	}
 
-	public deserializeCommon(transaction: Contracts.Crypto.TransactionData, buf: ByteBuffer): void {
-		transaction.network = buf.readUint8();
-		transaction.nonce = BigNumber.make(buf.readUint64());
-		transaction.gasPrice = buf.readUint32();
-		transaction.gasLimit = buf.readUint32();
-		transaction.value = BigNumber.ZERO;
+	#parseNumber(value: string): number {
+		return value === "0x" ? 0 : Number(value);
 	}
 
-	#deserializeSignatures(transaction: Contracts.Crypto.TransactionData, buf: ByteBuffer): void {
-		if (
-			buf.getRemainderLength() &&
-			(buf.getRemainderLength() % this.signatureSize === 0 ||
-				buf.getRemainderLength() % (this.signatureSize + 1) !== 0)
-		) {
-			const signature = this.signatureSerializer.deserialize(buf);
-			transaction.signature = signature.toString("hex");
-		}
-
-		// if (buf.getRemainderLength()) {
-		// 	if (buf.getRemainderLength() % (this.signatureSize + 1) === 0) {
-		// 		transaction.signatures = [];
-
-		// 		const count: number = buf.getRemainderLength() / (this.signatureSize + 1);
-		// 		const publicKeyIndexes: { [index: number]: boolean } = {};
-		// 		for (let index = 0; index < count; index++) {
-		// 			const multiSignaturePart: string = buf.readBytes(this.signatureSize + 1).toString("hex");
-		// 			const publicKeyIndex: number = Number.parseInt(multiSignaturePart.slice(0, 2), 16);
-
-		// 			if (!publicKeyIndexes[publicKeyIndex]) {
-		// 				publicKeyIndexes[publicKeyIndex] = true;
-		// 			} else {
-		// 				throw new Exceptions.DuplicateParticipantInMultiSignatureError();
-		// 			}
-
-		// 			transaction.signatures.push(multiSignaturePart);
-		// 		}
-		// 	} else {
-		// 		throw new Exceptions.InvalidTransactionBytesError("signature buffer not exhausted");
-		// 	}
-		// }
+	#parseBigNumber(value: string): BigNumber {
+		return value === "0x" ? BigNumber.ZERO : BigNumber.make(ethers.getBigInt(value));
 	}
 
-	#getByteBuffer(serialized: Buffer | string): ByteBuffer {
-		if (!(serialized instanceof Buffer)) {
-			serialized = Buffer.from(serialized, "hex");
-		}
+	#parseAddress(value: string): string | undefined {
+		return value === "0x" ? undefined : value;
+	}
 
-		return ByteBuffer.fromBuffer(serialized);
+	#parseData(value: string): string {
+		return value === "0x" ? "" : value;
 	}
 }

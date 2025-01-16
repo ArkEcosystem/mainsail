@@ -23,12 +23,14 @@ export interface Instance extends CommitHandler {
 	importAccountInfo(info: AccountInfoExtended): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
+	getReceipt(height: number, txHash: string): Promise<GetReceiptResult>;
 	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;
 	mode(): EvmMode;
+	dispose(): Promise<void>;
 }
 
 export interface ProcessResult {
@@ -115,6 +117,10 @@ export interface GetAccountsResult {
 export interface GetReceiptsResult {
 	readonly nextOffset?: bigint;
 	readonly receipts: TransactionReceipt[];
+}
+
+export interface GetReceiptResult {
+	readonly receipt?: TransactionReceipt;
 }
 
 export interface BlockContext {

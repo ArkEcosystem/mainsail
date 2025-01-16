@@ -31,12 +31,12 @@ export const transactionBaseSchema: SchemaObject = {
 		network: { $ref: "networkByte" },
 
 		nonce: { bignumber: { minimum: 0 } },
-
+		r: { type: "string" }, // TODO: prefixed hex
+		s: { type: "string" },
 		senderAddress: { $ref: "address" },
 
 		senderPublicKey: { $ref: "publicKey" },
-
-		signature: { allOf: [{ maxLength: 130, minLength: 130 }, { $ref: "alphanumeric" }], type: "string" },
+		v: { maximum: 28, minimum: 27, type: "number" },
 
 		value: { bignumber: { maximum: undefined, minimum: 0 } },
 		// signatures: {

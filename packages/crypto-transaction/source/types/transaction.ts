@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { BigNumber, ByteBuffer } from "@mainsail/utils";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export abstract class Transaction implements Contracts.Crypto.Transaction {
@@ -37,8 +37,4 @@ export abstract class Transaction implements Contracts.Crypto.Transaction {
 	public hasVendorField(): boolean {
 		return false;
 	}
-
-	public abstract assetSize(): number;
-	public abstract serialize(): Promise<ByteBuffer>;
-	public abstract deserialize(buf: ByteBuffer): Promise<void>;
 }

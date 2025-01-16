@@ -22,6 +22,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {}
 
 	public async dispose(): Promise<void> {
-		// TODO
+		await this.app.getTagged<EvmInstance>(Identifiers.Evm.Instance, "instance", "ephemeral").dispose();
+		await this.app.getTagged<EvmInstance>(Identifiers.Evm.Instance, "instance", "evm").dispose();
 	}
 }
