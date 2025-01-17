@@ -49,7 +49,6 @@ export type MilestoneGas = {
 	minimumGasLimit: number;
 	maximumGasLimit: number;
 	minimumGasFee: number;
-	nativeFeeMultiplier: number;
 };
 
 export type MilestoneSnapshot = {

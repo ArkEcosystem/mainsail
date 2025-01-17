@@ -373,8 +373,7 @@
 			"gas": {
 				"maximumGasLimit": 2000000,
 				"minimumGasFee": 5,
-				"minimumGasLimit": 21000,
-				"nativeFeeMultiplier": 100
+				"minimumGasLimit": 21000
 			},
 			"height": 0,
 			"reward": "0",

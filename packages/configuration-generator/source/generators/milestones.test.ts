@@ -51,7 +51,6 @@ describe<{
 						minimumGasFee: 5,
 						minimumGasLimit: 21_000,
 						maximumGasLimit: 2_000_000,
-						nativeFeeMultiplier: 100,
 					},
 					height: 0,
 					reward: "0",
