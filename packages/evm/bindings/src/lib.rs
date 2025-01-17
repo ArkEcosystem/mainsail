@@ -459,9 +459,9 @@ impl EvmInner {
         evm.handler.post_execution().clear(ctx);
 
         Ok(match result {
-            Ok(initial_gas_used) => PreverifyTxResult {
+            Ok(result) => PreverifyTxResult {
                 success: true,
-                initial_gas_used,
+                initial_gas_used: result.initial_gas,
                 ..Default::default()
             },
             Err(err) => PreverifyTxResult {
