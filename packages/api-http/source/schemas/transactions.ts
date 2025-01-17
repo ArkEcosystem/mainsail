@@ -24,7 +24,7 @@ export const transactionQueryLevelOptions = [
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "version" },
 	{ allowSecondOrderBy: true, asc: true, desc: true, diverse: true, field: "timestamp" },
 	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "amount" },
-	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "gasFee" },
+	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "gasPrice" },
 	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "gasLimit" },
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "nonce" },
 	{ allowSecondOrderBy: false, asc: false, desc: false, diverse: true, field: "id" },

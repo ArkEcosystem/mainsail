@@ -86,7 +86,6 @@ export const transactionCriteriaSchemas = {
 	data: orEqualCriteria(
 		Joi.alternatives().try(Joi.string().valid("", "0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
 	),
-	gasFee: orNumericCriteria(Joi.number().integer().min(0)),
 	gasPrice: orNumericCriteria(Joi.number().integer().min(0)),
 	id: orEqualCriteria(Joi.string().hex().length(64)),
 	nonce: orNumericCriteria(Joi.number().integer().positive()),

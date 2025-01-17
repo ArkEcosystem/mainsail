@@ -86,12 +86,6 @@ export class TransactionFilter {
 						handleComparisonCriteria("amount", c),
 					);
 				}
-				case "gasFee": {
-					return handleOrCriteria(criteria.gasFee, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("gasFee", c),
-					);
-				}
 				case "gasPrice": {
 					return handleOrCriteria(criteria.gasPrice, async (c) =>
 						// @ts-ignore
