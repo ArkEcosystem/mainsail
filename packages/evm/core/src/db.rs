@@ -536,14 +536,6 @@ impl PersistentDB {
                     }
                 }
 
-                if storage.is_empty() {
-                    self.logger.log(
-                        LogLevel::Info,
-                        format!("skipping empty storage from {:?}", address),
-                    );
-                    continue;
-                }
-
                 storage.par_sort_unstable_by_key(|a| a.0);
 
                 for value in storage.into_iter() {
