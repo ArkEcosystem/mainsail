@@ -18,9 +18,7 @@ use mainsail_evm_core::{
 };
 use napi::{bindgen_prelude::*, JsBigInt, JsObject, JsString};
 use napi_derive::napi;
-use result::{
-    CommitResult, JsAccountInfoExtended, JsTransactionReceipt, PreverifyTxResult, TxViewResult,
-};
+use result::{CommitResult, JsAccountInfoExtended, PreverifyTxResult, TxViewResult};
 use revm::interpreter::Host;
 
 use revm::{
