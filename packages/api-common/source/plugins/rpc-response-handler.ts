@@ -15,7 +15,11 @@ export const rpcResponseHandler = {
 
 				if (responseIsBoom(response)) {
 					return h.response(
-						Utils.prepareRcpError(Utils.getRcpId(request), Contracts.Api.RPC.ErrorCode.InternalError),
+						Utils.prepareRcpError(
+							Utils.getRcpId(request),
+							Contracts.Api.RPC.ErrorCode.InternalError,
+							response.output.payload.message,
+						),
 					);
 				}
 
