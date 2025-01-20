@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
-const ROUNDS_PER_REQUEST = 10_000;
+const ROUNDS_PER_REQUEST = 1_000;
 
 @injectable()
 export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm.ValidatorRound> {
@@ -57,6 +57,7 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 			data: Buffer.from(data, "hex"),
 			recipient: consensusContractAddress,
 			specId: evmSpec,
+			gasLimit: 100_000_000n,
 		});
 
 		if (!result.success) {
