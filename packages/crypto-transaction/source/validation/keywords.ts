@@ -143,8 +143,8 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	return {
 		bytecode,
 		network,
-		transactionGasPrice,
 		transactionGasLimit,
+		transactionGasPrice,
 		transactionType,
 	};
 };
