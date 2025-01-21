@@ -36,7 +36,8 @@ describe<{
 					// @ts-ignore
 					gas: {
 						maximumGasLimit: 2000000,
-						minimumGasFee: 5,
+						minimumGasPrice: 5,
+						maximumGasPrice: 10000,
 						minimumGasLimit: 21000,
 					},
 				},

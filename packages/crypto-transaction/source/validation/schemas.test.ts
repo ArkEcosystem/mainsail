@@ -86,7 +86,7 @@ describe<{
 
 	const transactionOriginal = {
 		gasLimit: 21_000,
-		gasPrice: 1,
+		gasPrice: 5,
 		id: "1".repeat(64),
 		network: 30,
 		nonce: 1,
@@ -165,10 +165,11 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - gasPrice should be number min 0", ({ validator }) => {
+	it("transactionBaseSchema - gasPrice should be number min 5", ({ sandbox, validator }) => {
+		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 		validator.addSchema(schema);
 
-		const validValues = [0, 1, 100];
+		const validValues = [5, 10, 100];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -178,7 +179,7 @@ describe<{
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [-1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
+		const invalidValues = [0, -1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
 
 		for (const value of invalidValues) {
 			const transaction = {
@@ -188,6 +189,23 @@ describe<{
 
 			assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
 		}
+	});
+
+	it("transactionBaseSchema - gasPrice should accept 0 for genesis block", ({ sandbox, validator }) => {
+		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(0);
+
+		validator.addSchema(schema);
+
+		const transaction = {
+			...transactionOriginal,
+			gasPrice: 0,
+		};
+
+		assert.undefined(validator.validate("transaction", transaction).error);
+
+		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
+
+		assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
 	});
 
 	it("transactionBaseSchema - id should be transactionId", ({ validator }) => {

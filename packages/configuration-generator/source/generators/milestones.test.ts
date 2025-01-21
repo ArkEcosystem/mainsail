@@ -48,7 +48,8 @@ describe<{
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
 					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 					gas: {
-						minimumGasFee: 5,
+						minimumGasPrice: 5,
+						maximumGasPrice: 10_000,
 						minimumGasLimit: 21_000,
 						maximumGasLimit: 2_000_000,
 					},

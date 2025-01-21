@@ -18,10 +18,14 @@ describe<{
 		context.sandbox.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
 		context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(cryptoJson);
 
-		const keywords = makeKeywords(context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration));
+		const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		configuration.setHeight(0);
+
+		const keywords = makeKeywords(configuration);
 		context.validator.addKeyword(keywords.transactionType);
 		context.validator.addKeyword(keywords.network);
 		context.validator.addKeyword(keywords.transactionGasLimit);
+		context.validator.addKeyword(keywords.transactionGasPrice);
 		context.validator.addKeyword(keywords.bytecode);
 	});
 
@@ -79,6 +83,34 @@ describe<{
 		assert.undefined(context.validator.validate("test", 30).error);
 		assert.undefined(context.validator.validate("test", 23).error);
 		assert.undefined(context.validator.validate("test", "a").error);
+	});
+
+	it("keyword transactionGasPrice should be ok", (context) => {
+		const schema = {
+			$id: "test",
+			transactionGasPrice: {},
+		};
+		context.validator.addSchema(schema);
+
+		// Accept 0 gasFee for genesis block
+		const configuration = context.sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		configuration.setHeight(1); // simulate non-genesis block
+
+		assert.undefined(context.validator.validate("test", cryptoJson.milestones[0].gas!.minimumGasPrice).error);
+		assert.undefined(context.validator.validate("test", "5").error);
+		assert.undefined(context.validator.validate("test", 10000).error);
+
+		assert.defined(context.validator.validate("test", 1).error);
+		assert.defined(context.validator.validate("test", 0).error);
+		assert.defined(context.validator.validate("test", -1).error);
+		assert.defined(context.validator.validate("test", 10001).error);
+		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
+
+		// Simulate genesis block
+		configuration.setHeight(0);
+
+		assert.defined(context.validator.validate("test", 1).error); // still fails
+		assert.undefined(context.validator.validate("test", 0).error); // now passes
 	});
 
 	it("keyword transactionGasLimit should be ok", (context) => {
