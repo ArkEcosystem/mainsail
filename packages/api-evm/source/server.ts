@@ -4,8 +4,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Identifiers } from "@mainsail/contracts";
 import { Providers } from "@mainsail/kernel";
 
-import * as Schemas from "./schemas.js";
-
 @injectable()
 export class Server extends AbstractServer {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -53,6 +51,6 @@ export class Server extends AbstractServer {
 	}
 
 	protected schemas(): any {
-		return Schemas;
+		return {};
 	}
 }
