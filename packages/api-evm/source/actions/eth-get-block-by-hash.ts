@@ -19,7 +19,7 @@ export class EthGetBlockByHashAction implements Contracts.Api.RPC.Action {
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ $ref: "prefixedHex" }, { type: "boolean" }], // TODO: Replace prefixedHex with prefixedBlockId
+		prefixItems: [{ $ref: "prefixedBlockId" }, { type: "boolean" }],
 		type: "array",
 	};
 

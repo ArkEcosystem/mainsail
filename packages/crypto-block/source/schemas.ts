@@ -1,6 +1,6 @@
 import { AnySchemaObject } from "ajv";
 
-export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObject> = {
+export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHeader", AnySchemaObject> = {
 	block: {
 		$id: "block",
 		$ref: "blockHeader",
@@ -53,6 +53,17 @@ export const schemas: Record<"block" | "blockId" | "blockHeader", AnySchemaObjec
 				$ref: "hex",
 				maxLength: 64,
 				minLength: 64,
+			},
+		],
+		type: "string",
+	},
+	prefixedBlockId: {
+		$id: "prefixedBlockId",
+		allOf: [
+			{
+				$ref: "prefixedHex",
+				maxLength: 66,
+				minLength: 66,
 			},
 		],
 		type: "string",
