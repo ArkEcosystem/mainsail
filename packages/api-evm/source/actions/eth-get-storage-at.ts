@@ -1,8 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
-type BlockTag = "latest" | "earliest" | "pending";
-
 @injectable()
 export class EthGetStorageAtAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
@@ -25,7 +23,7 @@ export class EthGetStorageAtAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: [string, string, BlockTag]): Promise<any> {
+	public async handle(parameters: [string, string, Contracts.Crypto.BlockTag]): Promise<any> {
 		const [address, slot] = parameters;
 
 		return await this.evm.storageAt(address, BigInt(slot));

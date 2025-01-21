@@ -9,6 +9,7 @@ export interface BlockVerification {
 	readonly containsMultiSignatures: boolean;
 }
 
+export type BlockTag = "latest" | "finalized" | "safe";
 export type BlockHeader = Exclude<BlockData, "transactions">;
 
 export interface Block {
