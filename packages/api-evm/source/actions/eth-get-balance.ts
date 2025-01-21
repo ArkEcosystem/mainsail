@@ -15,7 +15,7 @@ export class EthGetBalanceAction implements Contracts.Api.RPC.Action {
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ $ref: "address" }, { enum: ["latest", "finalized", "safe"], type: "string" }],
+		prefixItems: [{ $ref: "address" }, { $ref: "blockTag" }],
 		type: "array",
 	};
 

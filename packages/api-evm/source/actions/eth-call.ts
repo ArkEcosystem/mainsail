@@ -35,7 +35,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 				required: ["from", "to", "data"],
 				type: "object",
 			},
-			{ enum: ["latest", "finalized", "safe"], type: "string" },
+			{ $ref: "blockTag" },
 		],
 
 		type: "array",

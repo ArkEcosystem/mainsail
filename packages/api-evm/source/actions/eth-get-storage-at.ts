@@ -20,7 +20,7 @@ export class EthGetStorageAtAction implements Contracts.Api.RPC.Action {
 		prefixItems: [
 			{ $ref: "address" },
 			{ allOf: [{ $ref: "prefixedHex" }, { maxLength: 66, type: "string" }] },
-			{ enum: ["latest", "finalized", "safe"], type: "string" },
+			{ $ref: "blockTag" },
 		],
 		type: "array",
 	};
