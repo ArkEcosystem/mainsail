@@ -52,7 +52,6 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected getPlugins(): any[] {
 		const config = this.config().get<any>("plugins");
 
-		// @TODO: Implement RPC rate limiting & whitelist
 		return [
 			{
 				options: {
