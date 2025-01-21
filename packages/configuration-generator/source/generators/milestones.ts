@@ -19,7 +19,8 @@ export class MilestonesGenerator {
 				evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 				gas: {
 					maximumGasLimit: 2_000_000,
-					minimumGasFee: 5,
+					minimumGasPrice: 5,
+					maximumGasPrice: 10_000,
 					minimumGasLimit: 21_000,
 				},
 				height: 0,

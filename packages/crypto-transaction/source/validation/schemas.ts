@@ -19,7 +19,7 @@ export const schemas = {
 export const transactionBaseSchema: SchemaObject = {
 	properties: {
 		gasLimit: { transactionGasLimit: {} },
-		gasPrice: { bignumber: { minimum: 0 } },
+		gasPrice: { transactionGasPrice: {} },
 		id: { anyOf: [{ $ref: "transactionId" }, { type: "null" }] },
 		// Legacy
 		legacySecondSignature: {

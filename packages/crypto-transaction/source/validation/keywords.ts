@@ -33,6 +33,40 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 		},
 	};
 
+	const transactionGasPrice: FuncKeywordDefinition = {
+		// @ts-ignore
+		compile(schema) {
+			return (data) => {
+				const {
+					gas: { minimumGasPrice, maximumGasPrice },
+				} = configuration.getMilestone();
+
+				try {
+					const bignum = BigNumber.make(data);
+					if (bignum.isLessThan(minimumGasPrice)) {
+						// Accept 0 gasFee when processing genesis block only
+						const height = configuration.getHeight();
+						return height === 0 && bignum.isZero();
+					}
+
+					if (bignum.isGreaterThan(maximumGasPrice)) {
+						return false;
+					}
+				} catch {
+					return false;
+				}
+
+				return true;
+			};
+		},
+		errors: false,
+		keyword: "transactionGasPrice",
+		metaSchema: {
+			properties: {},
+			type: "object",
+		},
+	};
+
 	const transactionGasLimit: FuncKeywordDefinition = {
 		// @ts-ignore
 		compile(schema) {
@@ -107,6 +141,7 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	return {
 		bytecode,
 		network,
+		transactionGasPrice,
 		transactionGasLimit,
 		transactionType,
 	};

@@ -48,7 +48,8 @@ export type MilestoneTimeouts = {
 export type MilestoneGas = {
 	minimumGasLimit: number;
 	maximumGasLimit: number;
-	minimumGasFee: number;
+	minimumGasPrice: number;
+	maximumGasPrice: number;
 };
 
 export type MilestoneSnapshot = {
