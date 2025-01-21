@@ -49,6 +49,8 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 						return height === 0 && bignum.isZero();
 					}
 
+					// The upper limit technically isn't needed and solely acts as a safeguard
+					// as there's no legit reason to go beyond it.
 					if (bignum.isGreaterThan(maximumGasPrice)) {
 						return false;
 					}
