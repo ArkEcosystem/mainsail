@@ -7,6 +7,7 @@ import secrets from "../../internal/passphrases.json";
 import { Signer } from "../../internal/signer.js";
 import { FactoryBuilder } from "../factory-builder.js";
 import { generateApp } from "./generate-app.js";
+import { GAS_PRICE } from "./transaction.js";
 
 export const registerBlockFactory = async (
 	factory: FactoryBuilder,
@@ -40,7 +41,7 @@ export const registerBlockFactory = async (
 				transactions.push(
 					await signer.makeTransfer({
 						amount: ((options.amount || 2) + index).toString(),
-						gasPrice: options.fee || 1,
+						gasPrice: options.fee || GAS_PRICE,
 						passphrase: secrets[0],
 						recipientId: genesisAddresses[Math.floor(Math.random() * genesisAddresses.length)],
 					}),

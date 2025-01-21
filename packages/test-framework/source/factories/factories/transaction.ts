@@ -9,7 +9,7 @@ import { EvmCallOptions, TransactionOptions, TransferOptions } from "../types.js
 import { generateApp } from "./generate-app.js";
 
 const AMOUNT = 1;
-const GAS_PRICE = 1;
+export const GAS_PRICE = 5;
 
 interface EntityOptions<T extends TransactionBuilder<T>> {
 	entity: TransactionBuilder<T>;
