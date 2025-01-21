@@ -6,6 +6,12 @@ const transactionId: SchemaObject = {
 	type: "string",
 };
 
+const prefixedTransactionId: SchemaObject = {
+	$id: "prefixedTransactionId",
+	allOf: [{ maxLength: 66, minLength: 66 }, { $ref: "prefixedHex" }],
+	type: "string",
+};
+
 const networkByte: SchemaObject = {
 	$id: "networkByte",
 	network: true,
@@ -13,6 +19,7 @@ const networkByte: SchemaObject = {
 
 export const schemas = {
 	networkByte,
+	prefixedTransactionId,
 	transactionId,
 };
 

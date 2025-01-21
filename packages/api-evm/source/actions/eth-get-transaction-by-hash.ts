@@ -19,7 +19,7 @@ export class EthGetTransactionByHash implements Contracts.Api.RPC.Action {
 		maxItems: 1,
 		minItems: 1,
 
-		prefixItems: [{ $ref: "prefixedHex" }], // TODO: Use transaction id
+		prefixItems: [{ $ref: "prefixedTransactionId" }],
 		type: "array",
 	};
 
