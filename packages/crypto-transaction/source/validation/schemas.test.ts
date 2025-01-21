@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
@@ -192,7 +192,10 @@ describe<{
 	});
 
 	it("transactionBaseSchema - gasPrice should accept 0 for genesis block", ({ sandbox, validator }) => {
-		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(0);
+		const configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		configuration.setHeight(1);
+
+		const genesisBlock: Contracts.Crypto.BlockData = configuration.get("genesisBlock.block");
 
 		validator.addSchema(schema);
 
@@ -201,11 +204,17 @@ describe<{
 			gasPrice: 0,
 		};
 
+		genesisBlock.transactions.push(transaction as unknown as Contracts.Crypto.TransactionData);
+
 		assert.undefined(validator.validate("transaction", transaction).error);
 
-		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
-
+		// Fails for non-genesis tx
+		transaction.id = "2".repeat(64);
 		assert.true(validator.validate("transaction", transaction).error.includes("gasPrice"));
+
+		// But works on height 0
+		configuration.setHeight(0);
+		assert.undefined(validator.validate("transaction", transaction).error);
 	});
 
 	it("transactionBaseSchema - id should be transactionId", ({ validator }) => {

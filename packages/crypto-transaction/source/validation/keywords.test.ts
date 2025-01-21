@@ -105,12 +105,6 @@ describe<{
 		assert.defined(context.validator.validate("test", -1).error);
 		assert.defined(context.validator.validate("test", 10001).error);
 		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
-
-		// Simulate genesis block
-		configuration.setHeight(0);
-
-		assert.defined(context.validator.validate("test", 1).error); // still fails
-		assert.undefined(context.validator.validate("test", 0).error); // now passes
 	});
 
 	it("keyword transactionGasLimit should be ok", (context) => {

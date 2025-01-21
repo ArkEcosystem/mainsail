@@ -91,10 +91,13 @@ describe<{
 		}
 	});
 
-	it("#getSchema - gasPrice should be integer, min 0, max 1000", ({ validator }) => {
+	it("#getSchema - gasPrice should be integer, min 5, max 1000", ({ sandbox, validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
-		const validValues = [0, 5, 6, 1000];
+		const configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
+		configuration.setHeight(1);
+
+		const validValues = [5, 6, 1000];
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
@@ -104,7 +107,7 @@ describe<{
 			assert.undefined(validator.validate("evmCall", transaction).error);
 		}
 
-		const invalidValues = [-1, 1.1, "test", null, undefined, {}];
+		const invalidValues = [0, -1, 1.1, "test", null, undefined, {}];
 		for (const value of invalidValues) {
 			const transaction = {
 				...transactionOriginal,

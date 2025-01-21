@@ -36,7 +36,10 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	const transactionGasPrice: FuncKeywordDefinition = {
 		// @ts-ignore
 		compile(schema) {
-			return (data) => {
+			// Used as lazy cache
+			const genesisTransactionsLookup: Set<string> = new Set();
+
+			return (data, parentSchema: AnySchemaObject) => {
 				const {
 					gas: { minimumGasPrice, maximumGasPrice },
 				} = configuration.getMilestone();
@@ -45,8 +48,29 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 					const bignum = BigNumber.make(data);
 					if (bignum.isLessThan(minimumGasPrice)) {
 						// Accept 0 gasFee when processing genesis block only
+						if (!bignum.isZero()) {
+							return false;
+						}
+
+						// The height check is needed for when e.g. the genesis block itself is being built.
 						const height = configuration.getHeight();
-						return height === 0 && bignum.isZero();
+						let valid = height === 0;
+
+						// Otherwise lookup by transaction id
+						if (!valid && parentSchema && parentSchema.parentData && parentSchema.parentData.id) {
+							if (genesisTransactionsLookup.size === 0) {
+								const genesisBlock = configuration.get<Contracts.Crypto.BlockData | undefined>(
+									"genesisBlock.block",
+								);
+								for (const transaction of genesisBlock?.transactions || []) {
+									genesisTransactionsLookup.add(transaction.id);
+								}
+							}
+
+							valid = genesisTransactionsLookup.has(parentSchema.parentData.id);
+						}
+
+						return valid;
 					}
 
 					// The upper limit technically isn't needed and solely acts as a safeguard
