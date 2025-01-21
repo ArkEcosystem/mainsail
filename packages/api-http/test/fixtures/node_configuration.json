@@ -9,7 +9,8 @@
 		"epoch": "2024-05-31T00:00:00.000Z",
 		"evmSpec": "Shanghai",
 		"gas": {
-			"minimumGasFee": 5,
+			"minimumGasPrice": 5,
+			"maximumGasPrice": 10000,
 			"minimumGasLimit": 21000,
 			"maximumGasLimit": 2000000
 		},
