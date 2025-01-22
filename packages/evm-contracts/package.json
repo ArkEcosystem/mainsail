@@ -1,6 +1,6 @@
 {
 	"name": "@mainsail/evm-contracts",
-	"version": "0.0.1-evm.11",
+	"version": "0.0.1-evm.12",
 	"description": "EVM Contract ABIs for the Mainsail blockchain",
 	"license": "GPL-3.0-only",
 	"contributors": [],
