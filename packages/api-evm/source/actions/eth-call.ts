@@ -28,7 +28,10 @@ export class CallAction implements Contracts.Api.RPC.Action {
 				properties: {
 					data: { $ref: "prefixedHex" },
 					from: { $ref: "address" },
+					gas: { $ref: "prefixedHex" },
+					gasPrice: { $ref: "prefixedHex" },
 					to: { $ref: "address" },
+					value: { $ref: "prefixedHex" },
 				},
 				required: ["to", "data"],
 				type: "object",
