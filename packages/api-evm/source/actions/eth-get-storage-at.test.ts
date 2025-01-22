@@ -1,4 +1,7 @@
 import { Identifiers } from "@mainsail/contracts";
+import { schemas as keccak256Schemas } from "@mainsail/crypto-address-keccak256";
+import { schemas as blockSchemas } from "@mainsail/crypto-block";
+import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
 
 import { describe, Sandbox } from "../../../test-framework/source";
@@ -28,22 +31,9 @@ describe<{
 	});
 
 	it("schema should be ok", ({ action, validator }) => {
-		validator.addSchema({
-			$id: "address",
-			allOf: [
-				{
-					maxLength: 42,
-					minLength: 42,
-					pattern: "^0x[0123456789a-fA-F]+$",
-				},
-			],
-			type: "string",
-		});
-		validator.addSchema({
-			$id: "prefixedHex",
-			pattern: "^0x[0-9a-f]+$",
-			type: "string",
-		});
+		validator.addSchema(keccak256Schemas.address);
+		validator.addSchema(cryptoValidationSchemas.prefixedHex);
+		validator.addSchema(blockSchemas.blockTag);
 		validator.addSchema(action.schema);
 
 		assert.undefined(

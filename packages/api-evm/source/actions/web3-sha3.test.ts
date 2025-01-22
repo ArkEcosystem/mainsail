@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation";
+import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 
 import { describe, Sandbox } from "../../../test-framework/source";
 import { Web3Sha3 } from "./index.js";
@@ -25,11 +26,7 @@ describe<{
 	});
 
 	it("schema should be ok", ({ action, validator }) => {
-		validator.addSchema({
-			$id: "prefixedHex",
-			pattern: "^0x[0-9a-f]+$",
-			type: "string",
-		});
+		validator.addSchema(cryptoValidationSchemas.prefixedHex);
 
 		assert.equal(action.schema, {
 			$id: `jsonRpc_web3_sha3`,

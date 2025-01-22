@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
 import { Validator } from "@mainsail/validation";
+import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 
 import { describe, Sandbox } from "../../../test-framework/source";
 import { EthGetBlockTransactionCountByNumber } from "./index.js";
@@ -28,11 +29,7 @@ describe<{
 	});
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
-		validator.addSchema({
-			$id: "prefixedHex",
-			pattern: "^0x[0-9a-f]+$",
-			type: "string",
-		});
+		validator.addSchema(cryptoValidationSchemas.prefixedHex);
 		validator.addSchema(action.schema);
 
 		assert.undefined(validator.validate("jsonRpc_eth_getBlockTransactionCountByNumber", ["0x0"]).errors);

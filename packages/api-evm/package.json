@@ -32,6 +32,9 @@
 		"joi": "17.12.2"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-keccak256": "workspace:*",
+		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/semver": "7.5.8",
 		"uvu": "^0.5.6"

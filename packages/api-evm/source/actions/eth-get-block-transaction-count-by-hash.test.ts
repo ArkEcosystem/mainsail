@@ -1,4 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
+import { schemas as cryptoBlockSchemas } from "@mainsail/crypto-block";
+import { schemas as cryptoValidationSchemas } from "@mainsail/crypto-validation";
 import { Validator } from "@mainsail/validation";
 
 import { describe, Sandbox } from "../../../test-framework/source";
@@ -28,11 +30,8 @@ describe<{
 	});
 
 	it("schema should be array with 0 parameters", ({ action, validator }) => {
-		validator.addSchema({
-			$id: "prefixedHex",
-			pattern: "^0x[0-9a-f]+$",
-			type: "string",
-		});
+		validator.addSchema(cryptoValidationSchemas.prefixedHex);
+		validator.addSchema(cryptoBlockSchemas.prefixedBlockId);
 		validator.addSchema(action.schema);
 
 		assert.undefined(
