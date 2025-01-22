@@ -30,7 +30,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 					from: { $ref: "address" },
 					to: { $ref: "address" },
 				},
-				required: ["from", "to", "data"],
+				required: ["to", "data"],
 				type: "object",
 			},
 			{ $ref: "blockTag" },
@@ -43,7 +43,7 @@ export class CallAction implements Contracts.Api.RPC.Action {
 		const [data] = parameters;
 
 		const { success, output } = await this.evm.view({
-			caller: data.from,
+			caller: data.from ?? "0x" + "0".repeat(40), // default to zero address
 			data: Buffer.from(ethers.getBytes(data.data)),
 			recipient: data.to,
 			specId: Contracts.Evm.SpecId.LATEST,
