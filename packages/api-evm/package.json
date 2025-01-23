@@ -29,7 +29,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"ethers": "6.11.0",
-		"joi": "17.12.2"
+		"joi": "17.12.2",
+		"dayjs": "1.11.10"
 	},
 	"devDependencies": {
 		"@mainsail/crypto-address-keccak256": "workspace:*",

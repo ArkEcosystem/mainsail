@@ -1,19 +1,24 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { ethers } from "ethers";
+import dayjs from "dayjs";
 
 type TxData = {
-	from?: string;
+	from: string;
 	to: string;
 	data: string;
-	gas?: string;
+	gas: string;
+	gasPrice: string;
+	value: string;
 };
 
 @injectable()
 export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
+	@tagged("instance", "validator")
 	private readonly evm!: Contracts.Evm.Instance;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration!: Contracts.Crypto.Configuration;
 
 	public readonly name: string = "eth_estimateGas";
 
@@ -34,7 +39,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 					to: { $ref: "address" },
 					value: { $ref: "prefixedHex" },
 				},
-				required: ["to", "data"],
+				required: ["from", "to", "data", "gas", "gasPrice"],
 				type: "object",
 			},
 			{ $ref: "blockTag" },
@@ -46,16 +51,34 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
 		const [data] = parameters;
 
-		const { success, output } = await this.evm.view({
-			caller: data.from ?? "0x" + "0".repeat(40), // default to zero address
-			data: Buffer.from(ethers.getBytes(data.data)),
-			gasLimit: data.gas ? BigInt(data.gas) : undefined,
+		const { evmSpec } = this.configuration.getMilestone();
+		const accountInfo = await this.evm.getAccountInfo(data.from);
+
+		const dataToProcess = {
+			blockContext: {
+				commitKey: { height: BigInt(100), round: BigInt(0) },
+				gasLimit: BigInt(data.gas),
+				timestamp: BigInt(dayjs().valueOf()),
+				validatorAddress: "0x0000000000000000000000000000000000000001",
+			},
+			caller: data.from,
+			data: Buffer.from(data.data.slice(2), "hex"),
+			gasLimit: BigInt(data.gas),
+			gasPrice: BigInt(data.gasPrice),
+			nonce: accountInfo.nonce,
 			recipient: data.to,
-			specId: Contracts.Evm.SpecId.LATEST,
-		});
+			specId: evmSpec,
+			txHash: "0".repeat(64),
+			value: BigInt(data.value),
+		};
+
+		const { receipt } = await this.evm.process(dataToProcess);
+		const { success, gasUsed } = receipt;
+
+		// console.log(receipt);
 
 		if (success) {
-			return `0x${output?.toString("hex")}`;
+			return `0x${gasUsed.toString(16)}`;
 		}
 
 		throw new Exceptions.RpcError("execution reverted");
