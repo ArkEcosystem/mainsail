@@ -54,9 +54,11 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 		const { evmSpec } = this.configuration.getMilestone();
 		const accountInfo = await this.evm.getAccountInfo(data.from);
 
+		const commitKey = { height: BigInt(100), round: BigInt(0) };
+
 		const dataToProcess = {
 			blockContext: {
-				commitKey: { height: BigInt(100), round: BigInt(0) },
+				commitKey,
 				gasLimit: BigInt(data.gas),
 				timestamp: BigInt(dayjs().valueOf()),
 				validatorAddress: "0x0000000000000000000000000000000000000001",
@@ -72,10 +74,12 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			value: BigInt(data.value),
 		};
 
+		await this.evm.prepareNextCommit({
+			commitKey,
+		});
+
 		const { receipt } = await this.evm.process(dataToProcess);
 		const { success, gasUsed } = receipt;
-
-		// console.log(receipt);
 
 		if (success) {
 			return `0x${gasUsed.toString(16)}`;
