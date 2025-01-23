@@ -52,9 +52,10 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 		const [data] = parameters;
 
 		const { evmSpec } = this.configuration.getMilestone();
+
 		const accountInfo = await this.evm.getAccountInfo(data.from);
 
-		const commitKey = { height: BigInt(100), round: BigInt(0) };
+		const commitKey = { height: BigInt(this.configuration.getHeight()), round: BigInt(0) };
 
 		const dataToProcess = {
 			blockContext: {

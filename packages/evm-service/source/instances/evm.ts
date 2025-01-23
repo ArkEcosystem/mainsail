@@ -69,6 +69,8 @@ export class EvmInstance implements Contracts.Evm.Instance {
 	}
 
 	public async process(txContext: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.ProcessResult> {
+		console.log(txContext);
+
 		return this.#evm.process(txContext);
 	}
 
