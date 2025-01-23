@@ -1,5 +1,6 @@
 export * from "./eth-block-number.js";
 export * from "./eth-call.js";
+export * from "./eth-estimate-gas.js";
 export * from "./eth-get-balance.js";
 export * from "./eth-get-block-by-hash.js";
 export * from "./eth-get-block-by-number.js";

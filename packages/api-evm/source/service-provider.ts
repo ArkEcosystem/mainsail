@@ -5,6 +5,7 @@ import Joi from "joi";
 import {
 	CallAction,
 	EthBlockNumberAction,
+	EthEstimateGasAction,
 	EthGetBalanceAction,
 	EthGetBlockByHashAction,
 	EthGetBlockByNumberAction,
@@ -77,6 +78,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return [
 			this.app.resolve(CallAction),
 			this.app.resolve(EthBlockNumberAction),
+			this.app.resolve(EthEstimateGasAction),
 			this.app.resolve(EthGetBalanceAction),
 			this.app.resolve(EthGetBlockByHashAction),
 			this.app.resolve(EthGetBlockByNumberAction),
