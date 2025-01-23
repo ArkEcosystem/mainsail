@@ -100,7 +100,7 @@ describe<{
 		assert.defined(entity.data.v);
 		assert.defined(entity.data.r);
 		assert.defined(entity.data.s);
-		assert.equal(entity.data.recipientAddress, "0xd3d80a3df661414a76aad7738a136a8d7aaa1666");
+		assert.equal(entity.data.recipientAddress, "0xD3D80a3Df661414a76aAd7738a136A8d7aAa1666");
 		assert.equal(entity.data.gasLimit, 21_000);
 		assert.equal(
 			entity.data.data,
