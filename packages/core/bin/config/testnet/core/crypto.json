@@ -2595,7 +2595,7 @@
 			},
 			"timeouts": {
 				"blockPrepareTime": 4000,
-				"blockTime": 2000,
+				"blockTime": 8000,
 				"stageTimeout": 2000,
 				"stageTimeoutIncrease": 2000,
 				"tolerance": 100
