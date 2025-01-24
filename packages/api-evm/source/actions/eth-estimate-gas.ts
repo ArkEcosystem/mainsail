@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 type TxData = {
 	from: string;
 	to: string;
-	data: string;
+	data?: string;
 	gas: string;
 	gasPrice: string;
 	value: string;
@@ -39,7 +39,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 					to: { $ref: "address" },
 					value: { $ref: "prefixedHex" },
 				},
-				required: ["from", "to", "data", "gas", "gasPrice"],
+				required: ["from", "to", "gas", "gasPrice"],
 				type: "object",
 			},
 			{ $ref: "blockTag" },
@@ -51,39 +51,45 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
 		const [data] = parameters;
 
-		const { evmSpec } = this.configuration.getMilestone();
+		try {
+			const { evmSpec } = this.configuration.getMilestone();
 
-		const accountInfo = await this.evm.getAccountInfo(data.from);
+			const accountInfo = await this.evm.getAccountInfo(data.from);
 
-		const commitKey = { height: BigInt(this.configuration.getHeight()), round: BigInt(0) };
+			const commitKey = { height: BigInt(this.configuration.getHeight()), round: BigInt(0) };
 
-		const dataToProcess = {
-			blockContext: {
-				commitKey,
+			const dataToProcess = {
+				blockContext: {
+					commitKey,
+					gasLimit: BigInt(data.gas),
+					timestamp: BigInt(dayjs().valueOf()),
+					validatorAddress: "0x0000000000000000000000000000000000000001",
+				},
+				caller: data.from,
+				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
 				gasLimit: BigInt(data.gas),
-				timestamp: BigInt(dayjs().valueOf()),
-				validatorAddress: "0x0000000000000000000000000000000000000001",
-			},
-			caller: data.from,
-			data: Buffer.from(data.data.slice(2), "hex"),
-			gasLimit: BigInt(data.gas),
-			gasPrice: BigInt(data.gasPrice),
-			nonce: accountInfo.nonce,
-			recipient: data.to,
-			specId: evmSpec,
-			txHash: "0".repeat(64),
-			value: BigInt(data.value),
-		};
+				gasPrice: BigInt(data.gasPrice),
+				nonce: accountInfo.nonce,
+				recipient: data.to,
+				specId: evmSpec,
+				txHash: "0".repeat(64),
+				value: BigInt(data.value),
+			};
 
-		await this.evm.prepareNextCommit({
-			commitKey,
-		});
+			await this.evm.prepareNextCommit({
+				commitKey,
+			});
 
-		const { receipt } = await this.evm.process(dataToProcess);
-		const { success, gasUsed } = receipt;
+			const { receipt } = await this.evm.process(dataToProcess);
+			const { success, gasUsed } = receipt;
 
-		if (success) {
-			return `0x${gasUsed.toString(16)}`;
+			console.log("Receipt", receipt);
+
+			if (success) {
+				return `0x${gasUsed.toString(16)}`;
+			}
+		} catch (error) {
+			console.log(error);
 		}
 
 		throw new Exceptions.RpcError("execution reverted");
