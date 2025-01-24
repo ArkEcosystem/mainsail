@@ -6,7 +6,7 @@ type TxData = {
 	from: string;
 	to: string;
 	data?: string;
-	gas: string;
+	gas?: string;
 	gasPrice: string;
 	value: string;
 };
@@ -39,7 +39,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 					to: { $ref: "address" },
 					value: { $ref: "prefixedHex" },
 				},
-				required: ["from", "to", "gas", "gasPrice"],
+				required: ["from", "to", "gasPrice"],
 				type: "object",
 			},
 			{ $ref: "blockTag" },
@@ -52,7 +52,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 		const [data] = parameters;
 
 		try {
-			const { evmSpec } = this.configuration.getMilestone();
+			const { evmSpec, block } = this.configuration.getMilestone();
 
 			const accountInfo = await this.evm.getAccountInfo(data.from);
 
@@ -61,13 +61,13 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 			const dataToProcess = {
 				blockContext: {
 					commitKey,
-					gasLimit: BigInt(data.gas),
+					gasLimit: BigInt(block.maxGasLimit),
 					timestamp: BigInt(dayjs().valueOf()),
 					validatorAddress: "0x0000000000000000000000000000000000000001",
 				},
 				caller: data.from,
 				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
-				gasLimit: BigInt(data.gas),
+				gasLimit: data.gas ? BigInt(data.gas) : BigInt(block.maxGasLimit),
 				gasPrice: BigInt(data.gasPrice),
 				nonce: accountInfo.nonce,
 				recipient: data.to,
