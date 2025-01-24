@@ -8,7 +8,7 @@ type TxData = {
 	data?: string;
 	gas?: string;
 	gasPrice?: string;
-	value: string;
+	value?: string;
 };
 
 @injectable()
@@ -73,7 +73,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 				recipient: data.to,
 				specId: evmSpec,
 				txHash: "0".repeat(64),
-				value: BigInt(data.value),
+				value: data.value ? BigInt(data.value) : BigInt(0),
 			};
 
 			await this.evm.prepareNextCommit({
