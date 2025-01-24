@@ -29,11 +29,13 @@ describe<{
 
 	const deployConfig = {
 		gasLimit: BigInt(1_000_000),
+		gasPrice: BigInt(0),
 		specId: Contracts.Evm.SpecId.SHANGHAI,
 	};
 
 	const transferConfig = {
 		gasLimit: BigInt(60_000),
+		gasPrice: BigInt(0),
 		specId: Contracts.Evm.SpecId.SHANGHAI,
 	};
 
@@ -554,6 +556,7 @@ describe<{
 					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
+					gasPrice: 5n,
 					specId: Contracts.Evm.SpecId.SHANGHAI,
 				}),
 			"transaction validation error: call gas cost exceeds the gas limit",
@@ -573,6 +576,7 @@ describe<{
 					blockContext: { ...blockContext, commitKey: { height: BigInt(0), round: BigInt(0) } },
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
+					gasPrice: 5n,
 					specId: "asdf" as unknown as Contracts.Evm.SpecId,
 				}),
 			"invalid spec_id",
