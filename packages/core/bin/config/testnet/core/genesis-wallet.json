@@ -1,14 +1,14 @@
 {
-	"address": "0x9f361bd521730723FACfe3F6b30c3fC0980fb47d",
+	"address": "0x58f5C6F6951f744e521c2Dbc52143ab6f84F797a",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "05d1ea741761e1547f16466b013e62f78b05db8554139b562af6644fefede29b",
-		"publicKey": "9738373c27086093aea9c9219cde4037a765de19c82eb947b9d7aafa70e902d78220a483b409c2fa35c0e311d1e7bcaf"
+		"privateKey": "016f210996594272db6561311865eab311304036911a6835318ccfa10cd815cd",
+		"publicKey": "92c31ae4de3a3d707a42eadb85fb471f581ea5b75b4a50d3585b42af7d253c5ffa2e6f6c034f077a02b73bb55da77192"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "56ccd5d637ff2650b9fc20bf4703828b627ee189f41aeac39484131769313d94",
-		"publicKey": "02b9b34c80b618498b7bb49e765f6d060715af22d6ac7d2c63de96bba18e5f3da9"
+		"privateKey": "ddbdbf370efcdc289d0cfffec6da416b8fc16dc2b01fc8edf75d0bdb0f0f3a9d",
+		"publicKey": "03fef8c674b848b91ca84351e70be5420f39e9397f5b96cb32b899531bf523f00e"
 	},
-	"passphrase": "romance math rack double punch bird thumb chicken viable yellow obvious labor slender grape rabbit art join only illness license tray kitchen amount shoot"
+	"passphrase": "galaxy forest doll matter bundle mushroom ribbon girl kind effort crowd belt such image idle diesel sunny input term absorb pass horror problem exercise"
 }
