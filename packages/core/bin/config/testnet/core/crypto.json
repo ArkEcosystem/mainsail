@@ -2619,7 +2619,8 @@
 		},
 		"messagePrefix": "testnet message:\n",
 		"name": "testnet",
-		"nethash": "3d5bc85d691631b6182bb96052d2e3bb0ac09f7526e2a8e717662ecead43b8e5",
+		"nethash": "2710",
+		"chainId": 10000,
 		"pubKeyHash": 30,
 		"slip44": 1,
 		"wif": 186
