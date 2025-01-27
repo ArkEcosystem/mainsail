@@ -17,9 +17,9 @@ export class Sandbox {
 
 	#configurationOptions: Contracts.NetworkGenerator.Options = {
 		blockTime: 8000,
+		chainId: 99_999,
 		configPath: resolve(`${this.#path}/unitnet`),
 		distribute: true,
-		chainId: 99_999,
 		explorer: "http://uexplorer.ark.io",
 		maxBlockPayload: 2_097_152,
 		maxTxPerBlock: 150,
