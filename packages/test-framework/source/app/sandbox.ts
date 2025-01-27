@@ -29,6 +29,7 @@ export class Sandbox {
 		rewardHeight: 75_600,
 		symbol: "UѦ",
 		token: "UARK",
+		chainId: 99999,
 		validators: 53,
 		wif: 186,
 	};
