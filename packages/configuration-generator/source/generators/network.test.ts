@@ -11,7 +11,8 @@ describe<{
 
 	it("#generate - should generate network", ({ generator }) => {
 		assert.equal(
-			generator.generate("nethash", {
+			generator.generate({
+				chainId: 1,
 				explorer: "http://myn.com",
 				network: "testnet",
 				pubKeyHash: 123,
@@ -20,6 +21,7 @@ describe<{
 				wif: 44,
 			}),
 			{
+				chainId: 1,
 				client: {
 					explorer: "http://myn.com",
 					symbol: "my",
@@ -27,7 +29,7 @@ describe<{
 				},
 				messagePrefix: `testnet message:\n`,
 				name: "testnet",
-				nethash: "nethash",
+				nethash: "1",
 				pubKeyHash: 123,
 				slip44: 1,
 				wif: 44,

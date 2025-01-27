@@ -74,8 +74,8 @@ describe<{
 						vendorFieldLength: 255,
 					}),
 					match({
-						height: 1,
 						activeValidators: 53,
+						height: 1,
 					}),
 					match({
 						height: 75_600,
@@ -83,6 +83,7 @@ describe<{
 					}),
 				],
 				network: {
+					chainId: match.number,
 					client: { explorer: "", symbol: "my", token: "myn" },
 					messagePrefix: "testnet message:\n",
 					name: "testnet",
@@ -214,8 +215,8 @@ describe<{
 						vendorFieldLength: 255,
 					}),
 					match({
-						height: 1,
 						activeValidators: 53,
+						height: 1,
 					}),
 					match({
 						height: 23_000,
@@ -223,10 +224,12 @@ describe<{
 					}),
 				],
 				network: {
+					chainId: match.number,
 					client: { explorer: "myex.io", symbol: "my", token: "myn" },
 					messagePrefix: "testnet message:\n",
 					name: "testnet",
 					nethash: match.string,
+
 					pubKeyHash: 168,
 					slip44: 1,
 					wif: 27,
