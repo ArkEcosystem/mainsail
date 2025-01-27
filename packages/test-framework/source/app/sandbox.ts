@@ -19,6 +19,7 @@ export class Sandbox {
 		blockTime: 8000,
 		configPath: resolve(`${this.#path}/unitnet`),
 		distribute: true,
+		chainId: 99_999,
 		explorer: "http://uexplorer.ark.io",
 		maxBlockPayload: 2_097_152,
 		maxTxPerBlock: 150,
@@ -29,7 +30,6 @@ export class Sandbox {
 		rewardHeight: 75_600,
 		symbol: "UѦ",
 		token: "UARK",
-		chainId: 99999,
 		validators: 53,
 		wif: 186,
 	};
