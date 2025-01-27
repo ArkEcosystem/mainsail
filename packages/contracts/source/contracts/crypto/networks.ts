@@ -18,6 +18,7 @@ export type Network = {
 	messagePrefix: string;
 	pubKeyHash: number;
 	nethash: string;
+	chainId: number;
 	wif: number;
 	slip44: number;
 	client: {

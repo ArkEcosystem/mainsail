@@ -177,7 +177,7 @@ export class ConfigurationGenerator {
 						internalOptions,
 					);
 
-					const network = this.networkGenerator.generate(genesisBlock.block.payloadHash, internalOptions);
+					const network = this.networkGenerator.generate(internalOptions);
 
 					this.configurationWriter.writeCrypto(genesisBlock, milestones, network);
 				},

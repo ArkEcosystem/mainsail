@@ -26,6 +26,7 @@ export type NetworkOptions = {
 	explorer: string;
 	pubKeyHash: number;
 	wif: number;
+	chainId: number;
 };
 
 export type RewardOptions = {
@@ -66,6 +67,7 @@ export type Options = Partial<InternalOptions> & {
 	network: string;
 	token: string;
 	symbol: string;
+	chainId: number;
 };
 
 export type WriteOptions = {
