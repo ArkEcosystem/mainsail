@@ -1,5 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
+import { sha256 } from "ethers";
 
 @injectable()
 export class NetworkGenerator {
@@ -13,7 +14,7 @@ export class NetworkGenerator {
 			},
 			messagePrefix: `${options.network} message:\n`,
 			name: options.network,
-			nethash: options.chainId.toString(16),
+			nethash: sha256(Buffer.from(options.chainId.toString(16) + options.token)).slice(2),
 			pubKeyHash: options.pubKeyHash,
 			slip44: 1,
 			wif: options.wif,

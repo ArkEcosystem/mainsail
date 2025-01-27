@@ -29,7 +29,7 @@ describe<{
 				},
 				messagePrefix: `testnet message:\n`,
 				name: "testnet",
-				nethash: "1",
+				nethash: "5af6dc1dd8714713cf69dd13fbb4ffb1fc1836cb009682303248cbfede600d39",
 				pubKeyHash: 123,
 				slip44: 1,
 				wif: 44,
