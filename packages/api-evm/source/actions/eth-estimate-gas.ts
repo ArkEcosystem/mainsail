@@ -49,42 +49,44 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
-		const [data] = parameters;
+		try {
+			const [data] = parameters;
 
-		const { evmSpec, block, gas } = this.configuration.getMilestone();
+			const { evmSpec, block, gas } = this.configuration.getMilestone();
 
-		const accountInfo = await this.evm.getAccountInfo(data.from);
+			const accountInfo = await this.evm.getAccountInfo(data.from);
 
-		const commitKey = { height: BigInt(this.configuration.getHeight()), round: BigInt(0) };
+			const commitKey = { height: BigInt(this.configuration.getHeight()), round: BigInt(0) };
 
-		const dataToProcess = {
-			blockContext: {
+			const dataToProcess = {
+				blockContext: {
+					commitKey,
+					gasLimit: BigInt(block.maxGasLimit),
+					timestamp: BigInt(dayjs().valueOf()),
+					validatorAddress: "0x0000000000000000000000000000000000000001",
+				},
+				caller: data.from,
+				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
+				gasLimit: data.gas ? BigInt(data.gas) : BigInt(block.maxGasLimit),
+				gasPrice: data.gasPrice ? BigInt(data.gasPrice) : BigInt(gas.minimumGasPrice),
+				nonce: accountInfo.nonce,
+				recipient: data.to,
+				specId: evmSpec,
+				txHash: "0".repeat(64),
+				value: data.value ? BigInt(data.value) : BigInt(0),
+			};
+
+			await this.evm.prepareNextCommit({
 				commitKey,
-				gasLimit: BigInt(block.maxGasLimit),
-				timestamp: BigInt(dayjs().valueOf()),
-				validatorAddress: "0x0000000000000000000000000000000000000001",
-			},
-			caller: data.from,
-			data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
-			gasLimit: data.gas ? BigInt(data.gas) : BigInt(block.maxGasLimit),
-			gasPrice: data.gasPrice ? BigInt(data.gasPrice) : BigInt(gas.minimumGasPrice),
-			nonce: accountInfo.nonce,
-			recipient: data.to,
-			specId: evmSpec,
-			txHash: "0".repeat(64),
-			value: data.value ? BigInt(data.value) : BigInt(0),
-		};
+			});
 
-		await this.evm.prepareNextCommit({
-			commitKey,
-		});
+			const { receipt } = await this.evm.process(dataToProcess);
+			const { success, gasUsed } = receipt;
 
-		const { receipt } = await this.evm.process(dataToProcess);
-		const { success, gasUsed } = receipt;
-
-		if (success) {
-			return `0x${gasUsed.toString(16)}`;
-		}
+			if (success) {
+				return `0x${gasUsed.toString(16)}`;
+			}
+		} catch {}
 
 		throw new Exceptions.RpcError("execution reverted");
 	}
