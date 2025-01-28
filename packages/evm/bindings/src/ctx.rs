@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use mainsail_evm_core::db::CommitKey;
+use mainsail_evm_core::{db::CommitKey, legacy::LegacyAddress};
 use napi::{JsBigInt, JsBuffer, JsString};
 use napi_derive::napi;
 use revm::primitives::{Address, Bytes, SpecId, B256, U256};
@@ -10,6 +10,7 @@ use crate::utils;
 #[napi(object)]
 pub struct JsTransactionContext {
     pub caller: JsString,
+    pub legacy_address: Option<JsString>,
     /// Omit recipient when deploying a contract
     pub recipient: Option<JsString>,
     pub gas_limit: JsBigInt,
@@ -25,6 +26,7 @@ pub struct JsTransactionContext {
 #[napi(object)]
 pub struct JsPreverifyTransactionContext {
     pub caller: JsString,
+    pub legacy_address: Option<JsString>,
     /// Omit recipient when deploying a contract
     pub recipient: Option<JsString>,
     pub gas_limit: JsBigInt,
@@ -100,6 +102,7 @@ pub struct PrepareNextCommitContext {
 #[derive(Debug)]
 pub struct PreverifyTxContext {
     pub caller: Address,
+    pub legacy_address: Option<LegacyAddress>,
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub gas_limit: u64,
@@ -115,6 +118,7 @@ pub struct PreverifyTxContext {
 #[derive(Debug)]
 pub struct TxContext {
     pub caller: Address,
+    pub legacy_address: Option<LegacyAddress>,
     /// Omit recipient when deploying a contract
     pub recipient: Option<Address>,
     pub gas_limit: u64,
@@ -265,11 +269,18 @@ impl TryFrom<JsTransactionContext> for TxContext {
             None
         };
 
+        let legacy_address = if let Some(legacy_address) = value.legacy_address {
+            Some(utils::create_legacy_address_from_js_string(legacy_address)?)
+        } else {
+            None
+        };
+
         let tx_ctx = TxContext {
             recipient,
             gas_limit: value.gas_limit.try_into()?,
             gas_price: utils::convert_bigint_to_u256(value.gas_price)?,
             caller: utils::create_address_from_js_string(value.caller)?,
+            legacy_address,
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce: value.nonce.get_u64()?.0,
             data: Bytes::from(buf.as_ref().to_owned()),
@@ -296,11 +307,18 @@ impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
             None
         };
 
+        let legacy_address = if let Some(legacy_address) = value.legacy_address {
+            Some(utils::create_legacy_address_from_js_string(legacy_address)?)
+        } else {
+            None
+        };
+
         let tx_ctx = PreverifyTxContext {
             recipient,
             gas_limit: value.gas_limit.try_into()?,
             gas_price: utils::convert_bigint_to_u256(value.gas_price)?,
             caller: utils::create_address_from_js_string(value.caller)?,
+            legacy_address,
             value: utils::convert_bigint_to_u256(value.value)?,
             nonce: value.nonce.get_u64()?.0,
             data: Bytes::from(buf.as_ref().to_owned()),

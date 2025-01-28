@@ -29,9 +29,11 @@ pub fn build_commit(
     let PendingCommit {
         key,
         cache,
-        legacy_attributes,
         results,
         transitions,
+        legacy_attributes,
+        legacy_cold_wallets,
+        merged_legacy_cold_wallets,
     } = pending_commit;
 
     let mut state_builder = revm::State::builder().with_cached_prestate(cache).build();
@@ -43,6 +45,11 @@ pub fn build_commit(
     let mut change_set = state_changes::bundle_into_change_set(bundle);
 
     change_set.legacy_attributes = legacy_attributes;
+    change_set.legacy_cold_wallets = legacy_cold_wallets;
+    change_set.merged_legacy_cold_wallets = merged_legacy_cold_wallets
+        .into_iter()
+        .filter_map(|(key, legacy)| legacy.map(|v| (key, v)))
+        .collect();
 
     Ok(StateCommit {
         key,

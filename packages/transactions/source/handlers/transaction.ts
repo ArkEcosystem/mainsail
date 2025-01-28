@@ -68,6 +68,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 		const preverified = await evm.preverifyTransaction({
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
 			caller: transaction.data.senderAddress,
+			legacyAddress: transaction.data.senderAddress, // TODO: convert public key to base58
 			data: Buffer.from(transaction.data.data, "hex"),
 			gasLimit: BigInt(transaction.data.gasLimit),
 			gasPrice: BigInt(transaction.data.gasPrice),

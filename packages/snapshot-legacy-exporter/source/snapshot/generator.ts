@@ -88,8 +88,6 @@ export class Generator {
 				delete wallet.attributes["htlc"]; // ?
 				delete wallet.attributes["entities"]; // ?
 
-				// TODO: multiSignature
-
 				hash.update(JSON.stringify(wallet));
 				wallets.push(wallet);
 			}

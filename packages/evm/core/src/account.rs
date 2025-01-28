@@ -1,6 +1,8 @@
 use revm::primitives::{AccountInfo, Address};
 use serde::{Deserialize, Serialize};
 
+use crate::legacy::LegacyAccountAttributes;
+
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct AccountInfoExtended {
     pub address: Address,
@@ -20,22 +22,4 @@ impl AccountInfoExtended {
             },
         )
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
-pub struct LegacyAccountAttributes {
-    pub second_public_key: Option<String>,
-    pub multi_signature: Option<LegacyMultiSignatureAttribute>,
-}
-
-impl LegacyAccountAttributes {
-    pub fn is_empty(&self) -> bool {
-        self.second_public_key.is_none() && self.multi_signature.is_none()
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
-pub struct LegacyMultiSignatureAttribute {
-    pub min: usize,
-    pub public_keys: Vec<String>,
 }

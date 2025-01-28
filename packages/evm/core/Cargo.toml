@@ -22,6 +22,10 @@ tokio = { workspace = true }
 heed = { git = "https://github.com/oXtxNt9U/heed.git", branch = "mainsail", features = [
 ] }
 rayon = "1.10.0"
+derive_more = { version = "1.0" }
+bytes = { version = "1.0" }
+bs58 = { version = "0.5.1" }
+sha2 = { version = "0.10.8" }
 
 [dev-dependencies]
 tempfile = "3"

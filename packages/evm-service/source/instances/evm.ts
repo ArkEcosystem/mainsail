@@ -94,6 +94,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.importAccountInfo(info);
 	}
 
+	public async importLegacyColdWallet(wallet: Contracts.Evm.LegacyColdWallet): Promise<void> {
+		return this.#evm.importLegacyColdWallet(wallet);
+	}
+
 	public async getAccounts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetAccountsResult> {
 		return this.#evm.getAccounts(offset, limit);
 	}

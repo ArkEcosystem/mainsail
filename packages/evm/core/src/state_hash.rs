@@ -52,16 +52,25 @@ fn calculate_state_hash(
 }
 
 pub fn calculate_accounts_hash(state_changes: &StateChangeset) -> Result<B256, crate::db::Error> {
-    if state_changes.legacy_attributes.is_empty() {
-        calculate_hash(&state_changes.accounts)
+    let mut hashes = Vec::with_capacity(4);
+    hashes.push(calculate_hash(&state_changes.accounts)?);
+
+    if !state_changes.legacy_attributes.is_empty() {
+        hashes.push(calculate_hash(&state_changes.legacy_attributes)?);
+    }
+
+    if !state_changes.legacy_cold_wallets.is_empty() {
+        hashes.push(calculate_hash(&state_changes.legacy_cold_wallets)?);
+    }
+
+    if !state_changes.merged_legacy_cold_wallets.is_empty() {
+        hashes.push(calculate_hash(&state_changes.merged_legacy_cold_wallets)?);
+    }
+
+    if hashes.len() == 1 {
+        Ok(hashes.remove(0))
     } else {
-        Ok(keccak256(
-            [
-                calculate_hash(&state_changes.accounts)?.as_slice(),
-                calculate_hash(&state_changes.legacy_attributes)?.as_slice(),
-            ]
-            .concat(),
-        ))
+        Ok(keccak256(hashes.concat()))
     }
 }
 

@@ -9,7 +9,8 @@ use revm::{primitives::*, CacheState, Database, DatabaseRef, TransitionState};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    account::{AccountInfoExtended, LegacyAccountAttributes},
+    account::AccountInfoExtended,
+    legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::{LogLevel, Logger},
     receipt::{map_execution_result, TxReceipt},
     state_changes,
@@ -32,6 +33,24 @@ impl heed::BytesDecode<'_> for AddressWrapper {
 
     fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
         Ok(AddressWrapper(Address::from_slice(bytes)))
+    }
+}
+
+#[derive(Debug)]
+struct LegacyAddressWrapper(LegacyAddress);
+impl heed::BytesEncode<'_> for LegacyAddressWrapper {
+    type EItem = LegacyAddressWrapper;
+
+    fn bytes_encode(item: &Self::EItem) -> Result<Cow<[u8]>, heed::BoxedError> {
+        Ok(Cow::Borrowed(item.0.as_slice()))
+    }
+}
+
+impl heed::BytesDecode<'_> for LegacyAddressWrapper {
+    type DItem = LegacyAddressWrapper;
+
+    fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
+        Ok(LegacyAddressWrapper(LegacyAddress::from_slice(bytes)))
     }
 }
 
@@ -99,6 +118,8 @@ struct InnerStorage {
     contracts: heed::Database<ContractWrapper, heed::types::SerdeBincode<Bytecode>>,
     legacy_attributes:
         heed::Database<AddressWrapper, heed::types::SerdeBincode<LegacyAccountAttributes>>,
+    legacy_cold_wallets:
+        heed::Database<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>,
     storage: heed::Database<AddressWrapper, StorageEntryWrapper>,
 }
 
@@ -113,8 +134,17 @@ pub struct PendingCommit {
     pub results: BTreeMap<B256, ExecutionResult>,
     pub transitions: TransitionState,
 
-    // Map of legacy attributes sorted by account
+    // Map of legacy attributes
     pub legacy_attributes: BTreeMap<Address, LegacyAccountAttributes>,
+
+    // Map of legacy cold wallets
+    pub legacy_cold_wallets: BTreeMap<LegacyAddress, LegacyColdWallet>,
+
+    // Keeps track of all merged legacy cold wallets in this commit;
+    // If an address is found in the map, then a lookup for presence of cold wallet has been performed.
+    // The option indicates whether a corresponding cold wallet has been found and merged. To avoid
+    // redundant lookups, any address present in the map is skipped when processing a transaction.
+    pub merged_legacy_cold_wallets: BTreeMap<Address, Option<LegacyAddress>>,
 }
 
 #[derive(Clone, Debug)]
@@ -152,7 +182,7 @@ impl PersistentDB {
         std::fs::create_dir_all(&path)?;
 
         let mut env_builder = EnvOpenOptions::new();
-        env_builder.max_dbs(5);
+        env_builder.max_dbs(6);
         env_builder.map_size(1 * MAP_SIZE_UNIT);
         unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
 
@@ -191,6 +221,11 @@ impl PersistentDB {
                 &mut wtxn,
                 Some("legacy_attributes"),
             )?;
+        let legacy_cold_wallets = env
+            .create_database::<LegacyAddressWrapper, heed::types::SerdeBincode<LegacyColdWallet>>(
+                &mut wtxn,
+                Some("legacy_cold_wallets"),
+            )?;
         let storage = env
             .database_options()
             .types::<AddressWrapper, StorageEntryWrapper>()
@@ -208,6 +243,7 @@ impl PersistentDB {
                 commits,
                 contracts,
                 legacy_attributes,
+                legacy_cold_wallets,
                 storage,
             }),
             logger: logger.unwrap_or_default(),
@@ -315,6 +351,18 @@ impl PersistentDB {
             .borrow()
             .legacy_attributes
             .get(&tx_env, &AddressWrapper(address))?)
+    }
+
+    pub fn get_legacy_cold_wallet(
+        &mut self,
+        address: LegacyAddress,
+    ) -> Result<Option<LegacyColdWallet>, Error> {
+        let tx_env = self.env.read_txn()?;
+        Ok(self
+            .inner
+            .borrow()
+            .legacy_cold_wallets
+            .get(&tx_env, &LegacyAddressWrapper(address))?)
     }
 
     pub fn resize(&self) -> Result<(), Error> {
@@ -484,9 +532,11 @@ impl PersistentDB {
         let mut apply_changes = |rwtxn: &mut heed::RwTxn| -> Result<(), Error> {
             let state_changes::StateChangeset {
                 ref mut accounts,
-                ref mut legacy_attributes,
                 ref mut storage,
                 ref mut contracts,
+                ref mut legacy_attributes,
+                ref mut legacy_cold_wallets,
+                ref mut merged_legacy_cold_wallets,
             } = change_set;
 
             accounts.par_sort_by_key(|a| a.0);
@@ -510,6 +560,14 @@ impl PersistentDB {
                 inner
                     .legacy_attributes
                     .put(rwtxn, &address, legacy_attributes)?;
+            }
+
+            // Update legacy cold wallets
+            for (address, legacy_cold_wallets) in legacy_cold_wallets.into_iter() {
+                let address = LegacyAddressWrapper(*address);
+                inner
+                    .legacy_cold_wallets
+                    .put(rwtxn, &address, legacy_cold_wallets)?;
             }
 
             // Update contracts
@@ -574,6 +632,34 @@ impl PersistentDB {
                         }
                     }
                 }
+            }
+
+            // Delete merged legacy cold wallets from storage and migrate legacy attributes
+            for (address, legacy_address) in merged_legacy_cold_wallets {
+                self.logger.log(
+                    LogLevel::Info,
+                    format!(
+                        "merging legacy cold wallet '{}' with '{}'",
+                        legacy_address, address
+                    ),
+                );
+
+                let key = &LegacyAddressWrapper(*legacy_address);
+                let legacy_cold_wallet = inner
+                    .legacy_cold_wallets
+                    .get(&rwtxn, key)?
+                    .expect("legacy cold wallet to be found");
+
+                let success = inner.legacy_cold_wallets.delete(rwtxn, key)?;
+                assert!(success);
+
+                // The legacy balance has already been applied to the `PendingCommit`,
+                // thus only the legacy attributes need to be moved to a different storage.
+                inner.legacy_attributes.put(
+                    rwtxn,
+                    &AddressWrapper(*address),
+                    &legacy_cold_wallet.legacy_attributes,
+                )?;
             }
 
             // Finalize commit
@@ -653,6 +739,8 @@ impl PendingCommit {
             results: Default::default(),
             transitions: Default::default(),
             legacy_attributes: Default::default(),
+            legacy_cold_wallets: Default::default(),
+            merged_legacy_cold_wallets: Default::default(),
         }
     }
 
@@ -1001,7 +1089,7 @@ fn test_resize_on_commit() {
         .unwrap();
 
     let mut env_builder = EnvOpenOptions::new();
-    env_builder.max_dbs(5);
+    env_builder.max_dbs(6);
     env_builder.map_size(4096 * 10); // start with very small (few kB)
 
     unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };

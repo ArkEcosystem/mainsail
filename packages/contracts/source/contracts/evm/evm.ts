@@ -22,6 +22,7 @@ export interface Instance extends CommitHandler {
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	getAccountInfoExtended(address: string): Promise<AccountInfoExtended>;
 	importAccountInfo(info: AccountInfoExtended): Promise<void>;
+	importLegacyColdWallet(wallet: LegacyColdWallet): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	getReceipt(height: number, txHash: string): Promise<GetReceiptResult>;
@@ -62,6 +63,12 @@ export interface AccountInfoExtended extends AccountInfo {
 	readonly legacyAttributes: LegacyAttributes;
 }
 
+export interface LegacyColdWallet {
+	readonly address: string;
+	readonly balance: bigint;
+	readonly legacyAttributes: LegacyAttributes;
+}
+
 export interface LegacyAttributes {
 	readonly secondPublicKey?: string;
 	readonly multiSignature?: LegacyMultiSignatureAttribute;
@@ -95,6 +102,7 @@ export interface PrepareNextCommitContext {
 
 export interface PreverifyTransactionContext {
 	readonly caller: string;
+	readonly legacyAddress?: string;
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
 	readonly gasLimit: bigint;
@@ -110,6 +118,7 @@ export interface PreverifyTransactionContext {
 
 export interface TransactionContext {
 	readonly caller: string;
+	readonly legacyAddress?: string;
 	/** Omit recipient when deploying a contract */
 	readonly recipient?: string;
 	readonly gasLimit: bigint;

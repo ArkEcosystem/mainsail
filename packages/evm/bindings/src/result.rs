@@ -1,5 +1,6 @@
 use mainsail_evm_core::{
-    account::{AccountInfoExtended, LegacyAccountAttributes, LegacyMultiSignatureAttribute},
+    account::AccountInfoExtended,
+    legacy::{LegacyAccountAttributes, LegacyColdWallet, LegacyMultiSignatureAttribute},
     receipt::TxReceipt,
     state_changes::AccountUpdate,
 };
@@ -219,6 +220,13 @@ pub struct JsAccountInfoExtended {
 }
 
 #[napi(object)]
+pub struct JsLegacyColdWallet {
+    pub address: JsString,
+    pub balance: JsBigInt,
+    pub legacy_attributes: JsLegacyAttributes,
+}
+
+#[napi(object)]
 pub struct JsLegacyAttributes {
     pub second_public_key: Option<JsString>,
     pub multi_signature: Option<JsLegacyMultiSignatureAttribute>,
@@ -258,6 +266,18 @@ impl TryInto<AccountInfoExtended> for JsAccountInfoExtended {
                 nonce: self.nonce.get_u64()?.0,
                 ..Default::default()
             },
+            legacy_attributes: self.legacy_attributes.try_into()?,
+        })
+    }
+}
+
+impl TryInto<LegacyColdWallet> for JsLegacyColdWallet {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<LegacyColdWallet, Self::Error> {
+        Ok(LegacyColdWallet {
+            address: utils::create_legacy_address_from_js_string(self.address)?,
+            balance: utils::convert_bigint_to_u256(self.balance)?,
             legacy_attributes: self.legacy_attributes.try_into()?,
         })
     }

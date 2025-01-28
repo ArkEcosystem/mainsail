@@ -5,7 +5,7 @@ use revm::{
     primitives::{AccountInfo, Address, Bytecode, B256, KECCAK_EMPTY, U256},
 };
 
-use crate::account::LegacyAccountAttributes;
+use crate::legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet};
 
 /// Loosely based on https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/changes.rs and https://github.com/bluealloy/revm/blob/v36/crates/revm/src/db/states/bundle_state.rs#L449
 //
@@ -14,12 +14,16 @@ use crate::account::LegacyAccountAttributes;
 pub struct StateChangeset {
     /// Vector of **not** sorted accounts information.
     pub accounts: Vec<(Address, Option<AccountInfo>)>,
-    // Map of legacy attributes sorted by account
-    pub legacy_attributes: BTreeMap<Address, LegacyAccountAttributes>,
     /// Vector of **not** sorted storage.
     pub storage: Vec<StorageChangeset>,
     /// Vector of contracts by bytecode hash. **not** sorted.
     pub contracts: Vec<(B256, Bytecode)>,
+    // Map of legacy attributes
+    pub legacy_attributes: BTreeMap<Address, LegacyAccountAttributes>,
+    // Map of legacy cold wallet
+    pub legacy_cold_wallets: BTreeMap<LegacyAddress, LegacyColdWallet>,
+    // Map of merged legacy cold wallets
+    pub merged_legacy_cold_wallets: BTreeMap<Address, LegacyAddress>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]

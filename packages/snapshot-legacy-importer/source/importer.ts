@@ -119,7 +119,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const voters: Contracts.Snapshot.ImportedLegacyVoter[] = [];
 		const validators: Contracts.Snapshot.ImportedLegacyValidator[] = [];
 
-		let skippedColdWallets = 0;
+		let foundColdWallets = 0;
 
 		for (const wallet of snapshot.wallets) {
 			hash.update(JSON.stringify(wallet));
@@ -134,9 +134,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			}
 
 			if (!wallet.publicKey) {
-				// TODO: support cold wallets without a known public key
-				skippedColdWallets++;
-				continue;
+				foundColdWallets++;
 			}
 
 			let ethAddress: string | undefined;
@@ -171,6 +169,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			}
 
 			if (wallet.attributes["delegate"]) {
+				if (!wallet.publicKey) throw new Error("delegate is missing public key");
+
 				validators.push({
 					arkAddress: wallet.address,
 					blsPublicKey: "TODO", // TODO: get actual bls key; for now it gets replaced by the genesis block generator
@@ -180,10 +180,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					username: wallet.attributes["delegate"]["username"],
 				});
 			}
-		}
-
-		if (skippedColdWallets > 0) {
-			this.logger.debug(`>> skipped ${skippedColdWallets} cold wallets without publicKey`);
 		}
 
 		const calculatedHash = hash.digest("hex");
@@ -196,6 +192,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				validators: validators.length,
 				voters: voters.length,
 				wallets: wallets.length,
+				coldWallet: foundColdWallets,
 			})}`,
 		);
 
@@ -250,17 +247,20 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.logger.info(`seeding ${this.#data.wallets.length} wallets`);
 
 		for (const wallet of this.#data.wallets) {
-			if (!wallet.ethAddress) {
-				// TODO: store cold wallet in account storage
-				throw new Error("TODO");
+			if (wallet.ethAddress) {
+				await this.evm.importAccountInfo({
+					address: wallet.ethAddress,
+					balance: wallet.balance,
+					legacyAttributes: wallet.legacyAttributes,
+					nonce: 0n,
+				});
+			} else {
+				await this.evm.importLegacyColdWallet({
+					address: wallet.arkAddress,
+					balance: wallet.balance,
+					legacyAttributes: wallet.legacyAttributes,
+				});
 			}
-
-			await this.evm.importAccountInfo({
-				address: wallet.ethAddress,
-				balance: wallet.balance,
-				legacyAttributes: wallet.legacyAttributes,
-				nonce: 0n,
-			});
 
 			totalSupply += wallet.balance;
 		}
