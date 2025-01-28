@@ -59,7 +59,7 @@ export class GenesisBlockGenerator extends Generator {
 						genesisWallet,
 						validators,
 						options.premine,
-						options.pubKeyHash,
+						options.chainId,
 					)),
 				);
 
@@ -72,14 +72,14 @@ export class GenesisBlockGenerator extends Generator {
 						genesisWallet,
 						genesisWallet,
 						options.premine,
-						options.pubKeyHash,
+						options.chainId,
 					),
 				);
 			}
 
 			const validatorTransactions = [
-				...(await this.#buildValidatorTransactions(validators, options.pubKeyHash)),
-				...(await this.#buildVoteTransactions(validators, options.pubKeyHash)),
+				...(await this.#buildValidatorTransactions(validators, options.chainId)),
+				...(await this.#buildVoteTransactions(validators, options.chainId)),
 			];
 
 			transactions = [...transactions, ...validatorTransactions];
@@ -114,13 +114,13 @@ export class GenesisBlockGenerator extends Generator {
 		sender: Wallet,
 		recipient: Wallet,
 		amount: string,
-		pubKeyHash: number,
+		chainId: number,
 		nonce = 0,
 	): Promise<Contracts.Crypto.Transaction> {
 		return await (
 			await this.app
 				.resolve(EvmCallBuilder)
-				.network(pubKeyHash)
+				.network(chainId)
 				.recipientAddress(recipient.address)
 				.nonce(nonce.toFixed(0))
 				.value(amount)
@@ -135,20 +135,20 @@ export class GenesisBlockGenerator extends Generator {
 		sender: Wallet,
 		recipients: Wallet[],
 		totalPremine: string,
-		pubKeyHash: number,
+		chainId: number,
 	): Promise<Contracts.Crypto.Transaction[]> {
 		const amount: string = BigNumber.make(totalPremine).dividedBy(recipients.length).toString();
 
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, recipient] of recipients.entries()) {
-			result.push(await this.#createTransferTransaction(sender, recipient, amount, pubKeyHash, index));
+			result.push(await this.#createTransferTransaction(sender, recipient, amount, chainId, index));
 		}
 
 		return result;
 	}
 
-	async #buildValidatorTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+	async #buildValidatorTransactions(senders: Wallet[], chainId: number): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
@@ -161,7 +161,7 @@ export class GenesisBlockGenerator extends Generator {
 			result[index] = await (
 				await this.app
 					.resolve(EvmCallBuilder)
-					.network(pubKeyHash)
+					.network(chainId)
 					.recipientAddress(this.#consensusProxyContractAddress)
 					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
@@ -174,7 +174,7 @@ export class GenesisBlockGenerator extends Generator {
 		return result;
 	}
 
-	async #buildVoteTransactions(senders: Wallet[], pubKeyHash: number): Promise<Contracts.Crypto.Transaction[]> {
+	async #buildVoteTransactions(senders: Wallet[], chainId: number): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		const iface = new ethers.Interface(ConsensusAbi.abi);
@@ -185,7 +185,7 @@ export class GenesisBlockGenerator extends Generator {
 			result[index] = await (
 				await this.app
 					.resolve(EvmCallBuilder)
-					.network(pubKeyHash)
+					.network(chainId)
 					.recipientAddress(this.#consensusProxyContractAddress)
 					.nonce("1") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
 					.payload(data)
