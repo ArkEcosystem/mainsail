@@ -1,11 +1,11 @@
 import { Contracts, Identifiers as AppIdentifiers } from "@mainsail/contracts";
+import { Application } from "@mainsail/kernel";
 
 import { describe } from "../../../test-framework/source";
 import { makeApplication } from "../application-factory";
 import { Identifiers } from "../identifiers";
 import { GenesisBlockGenerator } from "./genesis-block";
 import { MnemonicGenerator } from "./mnemonic";
-import { Application } from "@mainsail/kernel";
 
 describe<{
 	app: Application;
@@ -27,19 +27,21 @@ describe<{
 		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig({
 			milestones: [
 				{
-					reward: "0",
 					address: { bech32m: "ark" },
-					block: { version: 1, maxGasLimit: 30_000_000, maxPayload: 2097152, maxTransactions: 150 },
+					block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, maxTransactions: 150, version: 1 },
 					blockTime: 8000,
-					height: 0,
 					evmSpec: Contracts.Evm.SpecId.SHANGHAI,
 					// @ts-ignore
 					gas: {
-						maximumGasLimit: 2000000,
+						maximumGasLimit: 2_000_000,
+						maximumGasPrice: 10_000,
+						minimumGasLimit: 21_000,
 						minimumGasPrice: 5,
-						maximumGasPrice: 10000,
-						minimumGasLimit: 21000,
 					},
+
+					height: 0,
+
+					reward: "0",
 				},
 			],
 		});
@@ -52,10 +54,10 @@ describe<{
 		const validatorsCount = 10;
 		assert.object(
 			await generator.generate(mnemonicGenerator.generate(), mnemonicGenerator.generateMany(validatorsCount), {
+				chainId: 123,
 				distribute: true,
 				epoch: new Date(),
 				premine: "2000000000",
-				pubKeyHash: 123,
 			}),
 		);
 	});
