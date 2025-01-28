@@ -67,7 +67,7 @@ describe<{
 	});
 
 	it("networkByte - should be ok", ({ validator }) => {
-		assert.undefined(validator.validate("networkByte", 30).error);
+		assert.undefined(validator.validate("networkByte", 10000).error);
 	});
 
 	it("networkByte - should not be ok", ({ validator }) => {
@@ -88,7 +88,7 @@ describe<{
 		gasLimit: 21_000,
 		gasPrice: 5,
 		id: "1".repeat(64),
-		network: 30,
+		network: 10_000,
 		nonce: 1,
 		senderAddress: "0x" + "a".repeat(40),
 		senderPublicKey: "a".repeat(66),

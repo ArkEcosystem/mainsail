@@ -53,7 +53,7 @@ describe<{
 		};
 		context.validator.addSchema(schema);
 
-		assert.undefined(context.validator.validate("test", 30).error);
+		assert.undefined(context.validator.validate("test", 10_000).error);
 
 		assert.defined(context.validator.validate("test", 23).error);
 		assert.defined(context.validator.validate("test", "a").error);
