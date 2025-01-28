@@ -19,11 +19,11 @@ export const makeKeywords = (configuration: Contracts.Crypto.Configuration) => {
 	const network: FuncKeywordDefinition = {
 		compile(schema) {
 			return (data) => {
-				const networkHash = configuration.get("network.pubKeyHash");
-				if (!networkHash) {
+				const chainId = configuration.get("network.chainId");
+				if (!chainId) {
 					return true;
 				}
-				return schema && data === networkHash;
+				return schema && data === chainId;
 			};
 		},
 		errors: false,

@@ -52,9 +52,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new Exceptions.TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
 
-		const currentNetwork: number = this.cryptoConfiguration.get("network.pubKeyHash");
-		if (transaction.data.network && transaction.data.network !== currentNetwork) {
-			throw new Exceptions.TransactionFromWrongNetworkError(transaction, currentNetwork);
+		const chainId: number = this.cryptoConfiguration.get("network.chainId");
+		if (transaction.data.network && transaction.data.network !== chainId) {
+			throw new Exceptions.TransactionFromWrongNetworkError(transaction, chainId);
 		}
 
 		if (await this.expirationService.isExpired(transaction)) {

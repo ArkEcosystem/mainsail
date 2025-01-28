@@ -191,7 +191,7 @@ export abstract class TransactionBuilder<TBuilder extends TransactionBuilder<TBu
 		this.data = {
 			gasPrice: 0,
 			id: undefined,
-			network: this.configuration.get<number>("network.pubKeyHash"),
+			network: this.configuration.get<number>("network.chainId"),
 			nonce: BigNumber.ZERO,
 		} as unknown as Contracts.Crypto.TransactionData;
 	}
