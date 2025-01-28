@@ -12,12 +12,12 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import crypto from "../../../core/bin/config/testnet/core/crypto.json";
 import { Sandbox } from "../../../test-framework/source";
 import { Deserializer } from "../../source/deserializer";
 import { BlockFactory } from "../../source/factory";
 import { IDFactory } from "../../source/id.factory";
 import { Serializer } from "../../source/serializer";
+import crypto from "../fixtures/crypto.json";
 
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
