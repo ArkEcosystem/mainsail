@@ -59,7 +59,7 @@ export class Processor implements Contracts.Api.RPC.Processor {
 			return true;
 		}
 
-		const { error } = this.validator.validate(action.schema.$id, parameters);
+		const { error } = this.validator.validate(action.schema.$id, parameters ?? []);
 
 		return !error;
 	}
