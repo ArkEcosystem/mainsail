@@ -1,14 +1,14 @@
 {
-	"address": "0x58f5C6F6951f744e521c2Dbc52143ab6f84F797a",
+	"address": "0x19603a3aD6F0b3A447c2623dD6653452914e55f3",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "016f210996594272db6561311865eab311304036911a6835318ccfa10cd815cd",
-		"publicKey": "92c31ae4de3a3d707a42eadb85fb471f581ea5b75b4a50d3585b42af7d253c5ffa2e6f6c034f077a02b73bb55da77192"
+		"privateKey": "00e7f2c2d3e91f82ff12e3567754e27882d007cafd6f7dc5d73b2670d3dc39c9",
+		"publicKey": "a1309ae4359975d11850d9adccb305b8ac0698b27153031751a72152367ecf6a29717243a52831e714467870b48d51a5"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "ddbdbf370efcdc289d0cfffec6da416b8fc16dc2b01fc8edf75d0bdb0f0f3a9d",
-		"publicKey": "03fef8c674b848b91ca84351e70be5420f39e9397f5b96cb32b899531bf523f00e"
+		"privateKey": "ad2a550d732084e1216819867d6a5a5074608d175b51f62ee13eb6c9577cc7de",
+		"publicKey": "02362e32d794f9c01287c21109777cb2dc7c81a28b37859825dd688baaa04dc831"
 	},
-	"passphrase": "galaxy forest doll matter bundle mushroom ribbon girl kind effort crowd belt such image idle diesel sunny input term absorb pass horror problem exercise"
+	"passphrase": "scale spare auction actual chase border village scrub payment benefit will depend rely solve pelican weekend outside spend margin rifle coin ribbon leader whip"
 }
