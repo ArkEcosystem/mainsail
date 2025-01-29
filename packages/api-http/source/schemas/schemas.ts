@@ -1,5 +1,6 @@
 import Joi from "joi";
 
+import { Schemas } from "@mainsail/api-common";
 import { walletAddressSchema } from "./wallets.js";
 
 // Old
@@ -47,52 +48,38 @@ export const numberFixedOrBetween = Joi.alternatives().try(
 export const blocksOrderBy = orderBy.default("height:desc");
 export const transactionsOrderBy = orderBy.default(["timestamp:desc", "sequence:desc"]);
 
-const equalCriteria = (value: any) => value;
-const numericCriteria = (value: any) =>
-	Joi.alternatives().try(
-		value,
-		Joi.object().keys({ from: value }),
-		Joi.object().keys({ to: value }),
-		Joi.object().keys({ from: value, to: value }),
-	);
-const containsCriteria = (value: any) => value;
-const orCriteria = (criteria: any) => Joi.alternatives().try(criteria, Joi.array().items(criteria));
-const orEqualCriteria = (value: any) => orCriteria(equalCriteria(value));
-const orNumericCriteria = (value: any) => orCriteria(numericCriteria(value));
-const orContainsCriteria = (value: any) => orCriteria(containsCriteria(value));
-
 export const blockCriteriaSchemas = {
-	blockSignature: orEqualCriteria(Joi.string().hex()),
-	generatorAddress: orEqualCriteria(Joi.string().hex().length(66)),
-	height: orNumericCriteria(Joi.number().integer().min(0)),
-	id: orEqualCriteria(blockId),
-	numberOfTransactions: orNumericCriteria(Joi.number().integer().min(0)),
-	payloadHash: orEqualCriteria(Joi.string().hex()),
-	payloadLength: orNumericCriteria(Joi.number().integer().min(0)),
-	previousBlock: orEqualCriteria(blockId),
-	reward: orNumericCriteria(Joi.number().integer().min(0)),
-	round: orNumericCriteria(Joi.number().integer().min(0)),
-	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
-	totalAmount: orNumericCriteria(Joi.number().integer().min(0)),
-	totalFee: orNumericCriteria(Joi.number().integer().min(0)),
-	version: orEqualCriteria(Joi.number().integer().min(0)),
+	blockSignature: Schemas.orEqualCriteria(Joi.string().hex()),
+	generatorAddress: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
+	height: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	id: Schemas.orEqualCriteria(blockId),
+	numberOfTransactions: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	payloadHash: Schemas.orEqualCriteria(Joi.string().hex()),
+	payloadLength: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	previousBlock: Schemas.orEqualCriteria(blockId),
+	reward: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	round: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	totalAmount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	totalFee: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	version: Schemas.orEqualCriteria(Joi.number().integer().min(0)),
 };
 
 export const transactionCriteriaSchemas = {
-	address: orEqualCriteria(address),
-	amount: orNumericCriteria(Joi.number().integer().min(0)),
-	asset: orContainsCriteria(Joi.object()),
-	blockId: orEqualCriteria(blockId),
-	data: orEqualCriteria(
+	address: Schemas.orEqualCriteria(address),
+	amount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	asset: Schemas.orContainsCriteria(Joi.object()),
+	blockId: Schemas.orEqualCriteria(blockId),
+	data: Schemas.orEqualCriteria(
 		Joi.alternatives().try(Joi.string().valid("", "0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
 	),
-	gasPrice: orNumericCriteria(Joi.number().integer().min(0)),
-	id: orEqualCriteria(Joi.string().hex().length(64)),
-	nonce: orNumericCriteria(Joi.number().integer().positive()),
-	recipientId: orEqualCriteria(address),
-	senderAddress: orEqualCriteria(address),
-	senderId: orEqualCriteria(address),
-	senderPublicKey: orEqualCriteria(Joi.string().hex().length(66)),
-	sequence: orNumericCriteria(Joi.number().integer().positive()),
-	timestamp: orNumericCriteria(Joi.number().integer().min(0)),
+	gasPrice: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	id: Schemas.orEqualCriteria(Joi.string().hex().length(64)),
+	nonce: Schemas.orNumericCriteria(Joi.number().integer().positive()),
+	recipientId: Schemas.orEqualCriteria(address),
+	senderAddress: Schemas.orEqualCriteria(address),
+	senderId: Schemas.orEqualCriteria(address),
+	senderPublicKey: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
+	sequence: Schemas.orNumericCriteria(Joi.number().integer().positive()),
+	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 };

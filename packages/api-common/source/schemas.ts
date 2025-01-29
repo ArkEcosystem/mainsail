@@ -100,3 +100,17 @@ export const pagination = Joi.object({
 	offset: Joi.number().integer().min(0),
 	page: Joi.number().integer().positive().default(1),
 });
+
+export const equalCriteria = (value: any) => value;
+export const numericCriteria = (value: any) =>
+	Joi.alternatives().try(
+		value,
+		Joi.object().keys({ from: value }),
+		Joi.object().keys({ to: value }),
+		Joi.object().keys({ from: value, to: value }),
+	);
+export const containsCriteria = (value: any) => value;
+export const orCriteria = (criteria: any) => Joi.alternatives().try(criteria, Joi.array().items(criteria));
+export const orEqualCriteria = (value: any) => orCriteria(equalCriteria(value));
+export const orNumericCriteria = (value: any) => orCriteria(numericCriteria(value));
+export const orContainsCriteria = (value: any) => orCriteria(containsCriteria(value));
