@@ -1,15 +1,12 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
-import { encodeRlp, toBeArray } from "ethers";
+import { encodeRlp, keccak256, toBeArray } from "ethers";
 
 @injectable()
 export class Utils implements Contracts.Crypto.TransactionUtils {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
-
-	@inject(Identifiers.Cryptography.Hash.Factory)
-	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.TypeFactory)
 	private readonly transactionTypeFactory!: Contracts.Transactions.TransactionTypeFactory;
@@ -45,7 +42,8 @@ export class Utils implements Contracts.Crypto.TransactionUtils {
 
 		const eip1559Prefix = "02"; // marker for Type 2 (EIP1559) transaction which is the standard nowadays
 		const encoded = encodeRlp(fields).slice(2); // remove 0x prefix
-		return this.hashFactory.sha256(Buffer.from(`${eip1559Prefix}${encoded}`, "hex"));
+
+		return Buffer.from(keccak256(Buffer.from(`${eip1559Prefix}${encoded}`, "hex")).slice(2), "hex");
 	}
 
 	public async getId(transaction: Contracts.Crypto.Transaction): Promise<string> {
