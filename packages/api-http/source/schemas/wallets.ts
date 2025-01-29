@@ -15,12 +15,7 @@ export const walletId = Joi.alternatives().try(
 );
 
 export const walletCriteriaSchemaObject = {
-	address: Joi.alternatives(
-		walletAddressSchema,
-		Joi.string()
-			.regex(/^[\d%A-Za-z]{1,34}$/)
-			.regex(/%/),
-	),
+	address: Schemas.orEqualCriteria(walletAddressSchema),
 	attributes: Joi.object(),
 	balance: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
 	nonce: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(0)),
@@ -33,5 +28,12 @@ export const walletCriteriaSchemaObject = {
 };
 
 export const walletParamSchema = Joi.alternatives(walletAddressSchema, walletPublicKeySchema, walletUsernameSchema);
-export const walletCriteriaSchema = Schemas.createCriteriaSchema(walletCriteriaSchemaObject);
-export const walletSortingSchema = Schemas.createSortingSchema(walletCriteriaSchemaObject, ["attributes"], false);
+export const walletCriteriaSchema = Schemas.createCriteriaSchema({
+	...walletCriteriaSchemaObject,
+	address: walletAddressSchema,
+});
+export const walletSortingSchema = Schemas.createSortingSchema(
+	{ ...walletCriteriaSchemaObject, address: walletAddressSchema },
+	["attributes"],
+	false,
+);

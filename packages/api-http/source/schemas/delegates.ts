@@ -2,10 +2,10 @@ import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 import { blockCriteriaSchemaObject } from "./blocks.js";
-import { walletCriteriaSchemaObject } from "./wallets.js";
+import { walletAddressSchema, walletCriteriaSchemaObject } from "./wallets.js";
 
 export const delegateCriteriaSchemaObject = {
-	address: walletCriteriaSchemaObject.address,
+	address: Schemas.orEqualCriteria(walletAddressSchema),
 	attributes: Joi.object(),
 	blocks: {
 		last: {
@@ -29,5 +29,15 @@ export const delegateCriteriaSchemaObject = {
 	votes: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
 };
 
-export const delegateCriteriaSchema = Schemas.createCriteriaSchema(delegateCriteriaSchemaObject);
-export const delegateSortingSchema = Schemas.createSortingSchema(delegateCriteriaSchemaObject, ["attributes"], false);
+export const delegateCriteriaSchema = Schemas.createCriteriaSchema({
+	...delegateCriteriaSchemaObject,
+	address: walletAddressSchema,
+});
+export const delegateSortingSchema = Schemas.createSortingSchema(
+	{
+		...delegateCriteriaSchemaObject,
+		address: walletAddressSchema,
+	},
+	["attributes"],
+	false,
+);
