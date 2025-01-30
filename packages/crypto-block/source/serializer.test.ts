@@ -24,7 +24,7 @@ describe<{
 	});
 
 	it("#size - should return size with transactions", async ({ serializer, sandbox }) => {
-		assert.equal(serializer.totalSize(blockDataWithTransactions), 446);
+		assert.equal(serializer.totalSize(blockDataWithTransactions), 449);
 	});
 
 	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {

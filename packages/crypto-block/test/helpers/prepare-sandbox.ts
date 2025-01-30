@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/contracts";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreCryptoConsensus } from "@mainsail/crypto-consensus-bls12-381";
@@ -12,12 +12,13 @@ import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
-import { Sandbox } from "../../../test-framework/source";
-import { Deserializer } from "../../source/deserializer";
-import { BlockFactory } from "../../source/factory";
-import { IDFactory } from "../../source/id.factory";
-import { Serializer } from "../../source/serializer";
-import crypto from "../fixtures/crypto.json";
+import crypto from "../../../core/bin/config/testnet/core/crypto.json" with { type: "json" };
+import { Sandbox } from "../../../test-framework/source/index.js";
+import { Deserializer } from "../../source/deserializer.js";
+import { BlockFactory } from "../../source/factory.js";
+import { IDFactory } from "../../source/id.factory.js";
+import { Serializer } from "../../source/serializer.js";
+// import { prepareBlock } from "./prepare-block.js";
 
 export const prepareSandbox = async (context) => {
 	context.sandbox = new Sandbox();
@@ -66,4 +67,6 @@ export const prepareSandbox = async (context) => {
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Deserializer).to(Deserializer);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.IDFactory).to(IDFactory);
 	context.sandbox.app.bind(Identifiers.Cryptography.Block.Factory).to(BlockFactory);
+
+	// await prepareBlock(context);
 };
