@@ -86,8 +86,11 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.getAccountInfo(address);
 	}
 
-	public async getAccountInfoExtended(address: string): Promise<Contracts.Evm.AccountInfoExtended> {
-		return this.#evm.getAccountInfoExtended(address);
+	public async getAccountInfoExtended(
+		address: string,
+		legacyAddress?: string,
+	): Promise<Contracts.Evm.AccountInfoExtended> {
+		return this.#evm.getAccountInfoExtended(address, legacyAddress);
 	}
 
 	public async importAccountInfo(info: Contracts.Evm.AccountInfoExtended): Promise<void> {

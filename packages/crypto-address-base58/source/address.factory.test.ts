@@ -15,16 +15,9 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	beforeEach(async (context) => {
 		context.app = new Application(new Container());
 		context.app.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-			milestones: [
-				// @ts-ignore
-				{
-					address: {
-						base58: 30,
-					},
-				},
-			],
-		});
+		context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.set("network.pubKeyHash", 30);
 
 		await context.app.resolve(CoreValidation).register();
 	});

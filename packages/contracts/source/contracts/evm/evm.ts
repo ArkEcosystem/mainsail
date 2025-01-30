@@ -20,7 +20,7 @@ export interface Instance extends CommitHandler {
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
 	getAccountInfo(address: string): Promise<AccountInfo>;
-	getAccountInfoExtended(address: string): Promise<AccountInfoExtended>;
+	getAccountInfoExtended(address: string, legacyAddress?: string): Promise<AccountInfoExtended>;
 	importAccountInfo(info: AccountInfoExtended): Promise<void>;
 	importLegacyColdWallet(wallet: LegacyColdWallet): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;

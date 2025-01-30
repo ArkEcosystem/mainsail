@@ -11,7 +11,7 @@ use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
-    legacy::LegacyColdWallet,
+    legacy::{LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     receipt::{map_execution_result, TxReceipt},
     state_changes::AccountUpdate,
@@ -354,8 +354,9 @@ impl EvmInner {
     pub fn get_account_info_extended(
         &mut self,
         address: Address,
+        legacy_address: Option<LegacyAddress>,
     ) -> std::result::Result<AccountInfoExtended, EVMError<String>> {
-        let info = self
+        let mut info = self
             .persistent_db
             .basic(address)
             .map_err(|err| {
@@ -363,15 +364,37 @@ impl EvmInner {
             })?
             .unwrap_or_default();
 
-        let legacy_attributes = self
-            .persistent_db
-            .get_legacy_attributes(address)
-            .map_err(|err| {
-                EVMError::Database(format!("legacy attributes lookup failed: {}", err).into())
-            })?
-            .unwrap_or_default();
+        let mut legacy_attributes = Default::default();
+        if let Some(legacy_address) = legacy_address {
+            let legacy_cold_wallet = self
+                .persistent_db
+                .get_legacy_cold_wallet(legacy_address)
+                .map_err(|err| {
+                    EVMError::Database(format!("legacy cold wallet lookup failed: {}", err).into())
+                })?;
 
-        // TODO: read legacy cold wallet and merge
+            if let Some(legacy_cold_wallet) = legacy_cold_wallet {
+                // Merge cold wallet with account
+                info.balance = info.balance.saturating_add(legacy_cold_wallet.balance);
+                legacy_attributes = Some(legacy_cold_wallet.legacy_attributes);
+            }
+        }
+
+        // Use cold wallet legacy attributes if present as they can't be present in both at the same time.
+        let legacy_attributes = {
+            match legacy_attributes {
+                Some(legacy_attributes) => legacy_attributes,
+                None => self
+                    .persistent_db
+                    .get_legacy_attributes(address)
+                    .map_err(|err| {
+                        EVMError::Database(
+                            format!("legacy attributes lookup failed: {}", err).into(),
+                        )
+                    })?
+                    .unwrap_or_default(),
+            }
+        };
 
         Ok(AccountInfoExtended {
             address,
@@ -983,10 +1006,17 @@ impl JsEvmWrapper {
         &mut self,
         node_env: Env,
         address: JsString,
+        legacy_address: Option<JsString>,
     ) -> Result<JsObject> {
         let address = utils::create_address_from_js_string(address)?;
+        let legacy_address = if let Some(legacy_address) = legacy_address {
+            Some(utils::create_legacy_address_from_js_string(legacy_address)?)
+        } else {
+            None
+        };
+
         node_env.execute_tokio_future(
-            Self::get_account_info_extended_async(self.evm.clone(), address),
+            Self::get_account_info_extended_async(self.evm.clone(), address, legacy_address),
             |&mut node_env, result| Ok(result::JsAccountInfoExtended::new(&node_env, result)?),
         )
     }
@@ -1174,9 +1204,10 @@ impl JsEvmWrapper {
     async fn get_account_info_extended_async(
         evm: Arc<tokio::sync::Mutex<EvmInner>>,
         address: Address,
+        legacy_address: Option<LegacyAddress>,
     ) -> Result<AccountInfoExtended> {
         let mut lock = evm.lock().await;
-        let result = lock.get_account_info_extended(address);
+        let result = lock.get_account_info_extended(address, legacy_address);
 
         match result {
             Ok(account) => Result::Ok(account),

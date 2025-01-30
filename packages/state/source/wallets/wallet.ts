@@ -18,7 +18,7 @@ export class Wallet implements Contracts.State.Wallet {
 	public async init(address: string): Promise<Wallet> {
 		this.address = address;
 
-		const accountInfo = await this.evm.getAccountInfoExtended(address);
+		const accountInfo = await this.evm.getAccountInfoExtended(address, undefined);
 		this.balance = BigNumber.make(accountInfo.balance);
 		this.nonce = BigNumber.make(accountInfo.nonce);
 		this.legacyAttributes = accountInfo.legacyAttributes;

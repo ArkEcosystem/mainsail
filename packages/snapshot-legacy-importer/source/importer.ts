@@ -192,7 +192,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				validators: validators.length,
 				voters: voters.length,
 				wallets: wallets.length,
-				coldWallet: foundColdWallets,
+				coldWallets: foundColdWallets,
 			})}`,
 		);
 
@@ -386,6 +386,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			caller: this.deployerAddress,
 			data: Buffer.from(options.data, "hex"),
 			gasLimit: BigInt(10_000_000),
+			gasPrice: BigInt(0),
 			nonce,
 			recipient: options.recipient,
 			specId: evmSpec,
