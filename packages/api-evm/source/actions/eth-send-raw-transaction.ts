@@ -10,7 +10,10 @@ export class EthSendRawTransactionAction implements Contracts.Api.RPC.Action {
 
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
-		maxItems: 0,
+		maxItems: 1,
+		minItems: 1,
+
+		prefixItems: [{ $ref: "prefixedHex" }],
 		type: "array",
 	};
 
