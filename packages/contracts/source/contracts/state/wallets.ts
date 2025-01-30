@@ -14,6 +14,7 @@ export interface Wallet {
 	decreaseNonce(): void;
 
 	// legacy
+	getLegacyAddress(): string | undefined;
 	hasLegacySecondPublicKey(): boolean;
 	legacySecondPublicKey(): string;
 }

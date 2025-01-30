@@ -17,8 +17,8 @@ export class SenderMempool implements Contracts.TransactionPool.SenderMempool {
 
 	readonly #transactions: Contracts.Crypto.Transaction[] = [];
 
-	public async configure(address: string): Promise<SenderMempool> {
-		await this.senderState.configure(address);
+	public async configure(address: string, legacyAddress?: string): Promise<SenderMempool> {
+		await this.senderState.configure(address, legacyAddress);
 		return this;
 	}
 

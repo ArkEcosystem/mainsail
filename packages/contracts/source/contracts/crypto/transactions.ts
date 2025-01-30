@@ -17,6 +17,7 @@ export interface TransactionData {
 	network: number;
 
 	senderAddress: string;
+	senderLegacyAddress?: string;
 	senderPublicKey: string;
 	recipientAddress?: string;
 

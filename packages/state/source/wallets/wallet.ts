@@ -10,15 +10,17 @@ export class Wallet implements Contracts.State.Wallet {
 	private readonly evm!: Contracts.Evm.Instance;
 
 	protected address!: string;
+	protected legacyAddress: string | undefined;
 	protected balance = BigNumber.ZERO;
 	protected nonce = BigNumber.ZERO;
 
 	protected legacyAttributes: Contracts.Evm.LegacyAttributes = {};
 
-	public async init(address: string): Promise<Wallet> {
+	public async init(address: string, legacyAddress?: string): Promise<Wallet> {
 		this.address = address;
+		this.legacyAddress = legacyAddress;
 
-		const accountInfo = await this.evm.getAccountInfoExtended(address, undefined);
+		const accountInfo = await this.evm.getAccountInfoExtended(address, legacyAddress);
 		this.balance = BigNumber.make(accountInfo.balance);
 		this.nonce = BigNumber.make(accountInfo.nonce);
 		this.legacyAttributes = accountInfo.legacyAttributes;
@@ -67,6 +69,10 @@ export class Wallet implements Contracts.State.Wallet {
 	}
 
 	// Legacy
+	public getLegacyAddress(): string | undefined {
+		return this.legacyAddress;
+	}
+
 	public hasLegacySecondPublicKey(): boolean {
 		return !!this.legacyAttributes.secondPublicKey;
 	}

@@ -639,7 +639,7 @@ impl PersistentDB {
                 self.logger.log(
                     LogLevel::Info,
                     format!(
-                        "merging legacy cold wallet '{}' with '{}'",
+                        "Merging legacy cold wallet '{}' with '{}'",
                         legacy_address, address
                     ),
                 );

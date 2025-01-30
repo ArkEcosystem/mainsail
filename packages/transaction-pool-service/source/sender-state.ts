@@ -37,13 +37,15 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	#corrupt = false;
 	#wallet!: Contracts.State.Wallet;
 
-	public async configure(address: string): Promise<SenderState> {
-		this.#wallet = await this.app.resolve(Wallets.Wallet).init(address);
+	public async configure(address: string, legacyAddress?: string): Promise<SenderState> {
+		this.#wallet = await this.app.resolve(Wallets.Wallet).init(address, legacyAddress);
 		return this;
 	}
 
 	public async reset(): Promise<void> {
-		this.#wallet = await this.app.resolve(Wallets.Wallet).init(this.#wallet.getAddress());
+		this.#wallet = await this.app
+			.resolve(Wallets.Wallet)
+			.init(this.#wallet.getAddress(), this.#wallet.getLegacyAddress());
 	}
 
 	public async apply(transaction: Contracts.Crypto.Transaction): Promise<void> {

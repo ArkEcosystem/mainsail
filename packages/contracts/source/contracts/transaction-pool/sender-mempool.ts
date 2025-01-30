@@ -12,4 +12,4 @@ export interface SenderMempool {
 	reAddTransactions(): Promise<Transaction[]>;
 }
 
-export type SenderMempoolFactory = (address: string) => Promise<SenderMempool>;
+export type SenderMempoolFactory = (address: string, legacyAddress?: string) => Promise<SenderMempool>;

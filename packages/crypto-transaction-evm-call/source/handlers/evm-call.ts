@@ -34,13 +34,14 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 
 		const { evmSpec } = this.configuration.getMilestone();
 
-		const { senderAddress } = transaction.data;
+		const { senderAddress, senderLegacyAddress } = transaction.data;
 
 		try {
 			const { instance, blockContext } = context.evm;
 			const { receipt } = await instance.process({
 				blockContext,
 				caller: senderAddress,
+				legacyAddress: senderLegacyAddress,
 				data: Buffer.from(transaction.data.data, "hex"),
 				gasLimit: BigInt(transaction.data.gasLimit),
 				gasPrice: BigInt(transaction.data.gasPrice),

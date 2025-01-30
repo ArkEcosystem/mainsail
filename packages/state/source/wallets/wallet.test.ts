@@ -22,6 +22,19 @@ describe<{
 		assert.equal(wallet.getAddress(), address);
 	});
 
+	it("returns the legacy address", async ({ sandbox }) => {
+		const address = "Abcde";
+		const legacyAddress = "Fghij";
+		const wallet = await sandbox.app.resolve(Wallet).init(address);
+		assert.equal(wallet.getAddress(), address);
+		assert.undefined(wallet.getLegacyAddress());
+
+		wallet.init(address, legacyAddress);
+
+		assert.equal(wallet.getAddress(), address);
+		assert.equal(wallet.getLegacyAddress(), legacyAddress);
+	});
+
 	it("should set and get balance", async ({ sandbox }) => {
 		const address = "Abcde";
 		const wallet = await sandbox.app.resolve(Wallet).init(address);
