@@ -18,6 +18,7 @@ export * from "./eth-get-uncle-by-block-hash-and-index.js";
 export * from "./eth-get-uncle-by-block-number-and-index.js";
 export * from "./eth-get-uncle-count-by-block-hash.js";
 export * from "./eth-get-uncle-count-by-block-number.js";
+export * from "./eth-send-raw-transaction.js";
 export * from "./net-listening.js";
 export * from "./net-peer-count.js";
 export * from "./net-version.js";
