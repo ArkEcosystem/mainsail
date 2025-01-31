@@ -6,6 +6,7 @@ import { schemas } from "./schemas.js";
 import { AddressSerializer } from "./serializer.js";
 
 export * from "./schemas.js";
+export * from "./address.factory.js";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

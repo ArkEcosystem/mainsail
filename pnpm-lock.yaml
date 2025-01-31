@@ -885,6 +885,9 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
+      '@mainsail/crypto-legacy-support':
+        specifier: workspace:*
+        version: link:../crypto-legacy-support
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
@@ -1494,6 +1497,22 @@ importers:
       bip39:
         specifier: 3.1.0
         version: 3.1.0
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
+  packages/crypto-legacy-support:
+    dependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+    devDependencies:
       uvu:
         specifier: ^0.5.6
         version: 0.5.6

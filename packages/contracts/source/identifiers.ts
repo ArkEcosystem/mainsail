@@ -98,6 +98,11 @@ export const Identifiers = {
 				Factory: Symbol("Crypto<Identity.Wif.Factory>"),
 			},
 		},
+		Legacy: {
+			Identity: {
+				AddressFactory: Symbol("Crypto<Legacy.Identity.Address.Factory>"),
+			},
+		},
 		Message: {
 			Deserializer: Symbol("Crypto<Message.Deserializer>"),
 			Factory: Symbol("Crypto<Message.Factory>"),
