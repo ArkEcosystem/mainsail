@@ -1,4 +1,4 @@
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils as AppUtils } from "@mainsail/kernel";
 
@@ -9,6 +9,10 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 
 	@inject(Identifiers.Cryptography.Identity.Address.Factory)
 	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
+	@inject(Identifiers.Cryptography.Legacy.Identity.AddressFactory)
+	@optional()
+	private readonly legacyAddressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Cryptography.Signature.Instance)
 	@tagged("type", "wallet")
@@ -76,6 +80,13 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 				v: transaction.data.v,
 			});
 			transaction.data.senderAddress = await this.addressFactory.fromPublicKey(transaction.data.senderPublicKey);
+
+			if (this.legacyAddressFactory) {
+				transaction.data.senderLegacyAddress = await this.legacyAddressFactory.fromPublicKey(
+					transaction.data.senderPublicKey,
+				);
+			}
+
 			transaction.data.id = await this.utils.getId(transaction);
 
 			const { error } = await this.verifier.verifySchema(transaction.data, strict);
