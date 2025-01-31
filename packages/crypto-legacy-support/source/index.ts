@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/contracts";
-import { Providers } from "@mainsail/kernel";
 import { AddressFactory as Base58AddressFactory } from "@mainsail/crypto-address-base58";
+import { Providers } from "@mainsail/kernel";
 
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {

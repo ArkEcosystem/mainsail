@@ -23,8 +23,8 @@
 	},
 	"dependencies": {
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
-		"@mainsail/crypto-address-base58": "workspace:*"
+		"@mainsail/crypto-address-base58": "workspace:*",
+		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
 		"uvu": "^0.5.6"

@@ -169,7 +169,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			}
 
 			if (wallet.attributes["delegate"]) {
-				if (!wallet.publicKey) throw new Error("delegate is missing public key");
+				if (!wallet.publicKey) {
+					throw new Error("delegate is missing public key");
+				}
 
 				validators.push({
 					arkAddress: wallet.address,
@@ -189,10 +191,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(
 			`snapshot stats: ${JSON.stringify({
+				coldWallets: foundColdWallets,
 				validators: validators.length,
 				voters: voters.length,
 				wallets: wallets.length,
-				coldWallets: foundColdWallets,
 			})}`,
 		);
 
