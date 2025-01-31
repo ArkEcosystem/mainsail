@@ -37,7 +37,10 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoValidation).register();
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 
-	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({});
+	context.sandbox.app.bind(Identifiers.Services.Log.Service).toConstantValue({
+		info: (msg) => console.log(msg),
+		debug: (msg) => console.log(msg),
+	});
 	context.sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
 
 	context.sandbox.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });

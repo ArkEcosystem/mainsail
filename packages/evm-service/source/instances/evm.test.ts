@@ -217,6 +217,102 @@ describe<{
 		assert.equal(amount, balanceAfter);
 	});
 
+	it("should merge with cold wallet", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+		const legacyAddress = "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt";
+
+		let commitKey = { height: BigInt(0), round: BigInt(0) };
+
+		const commit = async (commitKey) =>
+			instance.onCommit({
+				height: commitKey.height,
+				round: commitKey.round,
+				getBlock: () => ({
+					data: { height: commitKey.height, round: commitKey.round },
+				}),
+				setAccountUpdates: () => {},
+			} as any);
+
+		// No legacy balance present yet
+		let extendedInfo = await instance.getAccountInfoExtended(sender.address, legacyAddress);
+		assert.equal(extendedInfo.balance, 0n);
+
+		// Import legacy cold wallet with 10n balance
+		await instance.prepareNextCommit({ commitKey });
+		await instance.importLegacyColdWallet({
+			address: legacyAddress,
+			balance: 10n,
+			legacyAttributes: {},
+		});
+		await commit(commitKey);
+
+		extendedInfo = await instance.getAccountInfoExtended(sender.address, legacyAddress);
+		assert.equal(extendedInfo.balance, 10n);
+		extendedInfo = await instance.getAccountInfoExtended(sender.address, undefined);
+		assert.equal(extendedInfo.balance, 0n);
+
+		// Load without imported cold wallet (pre-merge)
+		let info = await instance.getAccountInfo(sender.address);
+		assert.equal(info.balance, 0n);
+
+		// Perform tx from sender, to initiate a cold wallet merge
+		commitKey = { height: BigInt(1), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+		let receipt = await instance.process({
+			caller: sender.address,
+			legacyAddress: legacyAddress,
+			value: 0n,
+			nonce: 0n,
+			data: Buffer.alloc(0),
+			recipient: recipient.address,
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey },
+			...transferConfig,
+		});
+		assert.true(receipt.receipt.success);
+		await commit(commitKey);
+
+		// Legacy cold balance moved to native balance
+		extendedInfo = await instance.getAccountInfoExtended(sender.address, legacyAddress);
+		assert.equal(extendedInfo.balance, 10n);
+		extendedInfo = await instance.getAccountInfoExtended(sender.address, undefined);
+		assert.equal(extendedInfo.balance, 10n);
+
+		info = await instance.getAccountInfo(sender.address);
+		assert.equal(info.balance, 10n);
+
+		// Move all funds to different wallet
+		commitKey = { height: BigInt(2), round: BigInt(0) };
+		await instance.prepareNextCommit({ commitKey });
+		receipt = await instance.process({
+			caller: sender.address,
+			value: 10n,
+			nonce: 1n,
+			data: Buffer.alloc(0),
+			recipient: recipient.address,
+			txHash: getRandomTxHash(),
+			blockContext: { ...blockContext, commitKey },
+			...transferConfig,
+		});
+		assert.true(receipt.receipt.success);
+		await commit(commitKey);
+
+		// Sender depleted whole balance
+		extendedInfo = await instance.getAccountInfoExtended(sender.address, legacyAddress);
+		assert.equal(extendedInfo.balance, 0n);
+		extendedInfo = await instance.getAccountInfoExtended(sender.address, undefined);
+		assert.equal(extendedInfo.balance, 0n);
+
+		info = await instance.getAccountInfo(sender.address);
+		assert.equal(info.balance, 0n);
+
+		// Recipient now has the original "legacy" balance
+		const recipientExtendedInfo = await instance.getAccountInfoExtended(recipient.address, undefined);
+		assert.equal(recipientExtendedInfo.balance, 10n);
+		info = await instance.getAccountInfo(recipientExtendedInfo.address);
+		assert.equal(info.balance, 10n);
+	});
+
 	it("should revert on invalid call", async ({ instance }) => {
 		const [sender] = wallets;
 
