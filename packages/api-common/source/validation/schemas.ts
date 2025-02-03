@@ -40,14 +40,7 @@ const jsonRpcResult: SchemaObject = {
 	type: "object",
 };
 
-export const jsonRpcResponseSchema: SchemaObject = {
-	$id: "jsonRpcResponse",
-	oneOf: [jsonRpcError, jsonRpcResult],
-};
-
-export const jsonRpcPayloadSchema: SchemaObject = {
-	$id: "jsonRpcPayload",
-
+const jsonRpcRequest: SchemaObject = {
 	additionalProperties: false,
 
 	properties: {
@@ -58,4 +51,14 @@ export const jsonRpcPayloadSchema: SchemaObject = {
 	},
 	required: ["id", "jsonrpc", "method"],
 	type: "object",
+};
+
+export const jsonRpcResponseSchema: SchemaObject = {
+	$id: "jsonRpcResponse",
+	oneOf: [jsonRpcError, jsonRpcResult],
+};
+
+export const jsonRpcPayloadSchema: SchemaObject = {
+	$id: "jsonRpcPayload",
+	oneOf: [jsonRpcRequest, { items: jsonRpcRequest, type: "array" }],
 };
