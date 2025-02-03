@@ -3,7 +3,7 @@ import { SchemaObject } from "ajv";
 
 export type Processor = {
 	registerAction(action: Action): void;
-	process(request: Hapi.Request): Promise<Response | Error>;
+	process(request: Hapi.Request): Promise<Response | Error | (Response | Error)[]>;
 };
 
 export type Id = string | number | null;
