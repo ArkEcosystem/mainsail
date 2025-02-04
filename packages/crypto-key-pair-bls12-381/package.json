@@ -42,5 +42,10 @@
 	},
 	"engines": {
 		"node": ">=20.x"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@chainsafe/blst"
+		]
 	}
 }
