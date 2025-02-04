@@ -67,5 +67,10 @@
 		"core": {
 			"alias": "p2p"
 		}
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"protobufjs"
+		]
 	}
 }

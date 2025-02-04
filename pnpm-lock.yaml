@@ -2631,6 +2631,15 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
+      '@mainsail/crypto-transaction-evm-call':
+        specifier: workspace:*
+        version: link:../crypto-transaction-evm-call
+      '@mainsail/evm-contracts':
+        specifier: workspace:*
+        version: link:../evm-contracts
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../test-framework
@@ -3132,9 +3141,9 @@ importers:
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../../../packages/crypto-messages
-      '@mainsail/crypto-signature-schnorr':
+      '@mainsail/crypto-signature-ecdsa':
         specifier: workspace:*
-        version: link:../../../packages/crypto-signature-schnorr
+        version: link:../../../packages/crypto-signature-ecdsa
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../../../packages/crypto-transaction

@@ -73,6 +73,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 			initializeGenesis: async () => {},
 			prepareNextCommit: async () => {},
 			updateRewardsAndVotes: async () => {},
+			dispose: async () => {},
 		}),
 	};
 	context.sandbox.app.rebind(Identifiers.Transaction.Validator.Factory).toConstantValue(() => validator);

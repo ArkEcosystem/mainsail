@@ -23,12 +23,13 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 		return 0;
 	}
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const block = unit.getBlock();
-		for (const transaction of block.transactions) {
-			await this.transactionPoolMempool.removeForgedTransaction(transaction.data.senderPublicKey, transaction.id);
+		const sendersAddresses: Set<string> = new Set();
+
+		for (const transaction of unit.getBlock().transactions) {
+			sendersAddresses.add(transaction.data.senderAddress);
 		}
 
-		await this.transactionPoolMempool.fixInvalidStates();
+		await this.transactionPoolMempool.reAddTransactions([...sendersAddresses.keys()]);
 	}
 
 	public async getTransactionBytes(): Promise<Buffer[]> {

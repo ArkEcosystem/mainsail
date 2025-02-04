@@ -1,9 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
-import { ContractAbis, Identifiers as EvmDevelopmentIdentifiers } from "@mainsail/evm-development";
-import { BigNumber } from "@mainsail/utils";
 import { BigNumberish, ethers } from "ethers";
 
+import { default as DARK20 } from "./abis/DARK20.json" assert { type: "json" };
 import { Context, EvmCallOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey } from "./utils.js";
 
@@ -13,28 +12,30 @@ export const makeEvmCall = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { amount, sender, recipient, fee, gasLimit, payload } = options;
+	let { value, sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
-	fee = fee ?? "5";
+	gasPrice = gasPrice ?? 5;
 
 	if (!payload) {
 		const senderRecipient = await getAddressByPublicKey({ sandbox }, sender.publicKey);
 		payload = encodeErc20Transfer(senderRecipient, ethers.parseEther("1"));
 	}
 
-	recipient = recipient ?? sandbox.app.get<string>(EvmDevelopmentIdentifiers.Contracts.Addresses.Erc20);
-	let builder = app.resolve(EvmCallBuilder).fee(BigNumber.make(fee).toFixed());
-
-	if (amount) {
-		builder = builder.amount(amount.toString());
+	if (recipient === undefined) {
+		throw new Error("missing recipient");
 	}
 
-	if (recipient) {
-		builder = builder.recipientId(recipient);
+	let builder = app.resolve(EvmCallBuilder).gasPrice(gasPrice);
+
+	if (value) {
+		builder = builder.value(value.toString());
 	}
 
-	builder = builder.gasLimit(gasLimit ?? 100_000).payload(payload);
+	builder = builder
+		.recipientAddress(recipient)
+		.gasLimit(gasLimit ?? 100_000)
+		.payload(payload);
 
 	return buildSignedTransaction(sandbox, builder, sender, options);
 };
@@ -45,18 +46,18 @@ export const makeEvmCallDeployErc20Contract = async (
 ): Promise<Contracts.Crypto.Transaction> => {
 	const { app } = sandbox;
 
-	let { sender, fee, gasLimit, payload } = options;
+	let { sender, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
-	fee = fee ?? "5";
+	gasPrice = gasPrice ?? 5;
 
 	if (!payload) {
-		payload = Buffer.from(ethers.getBytes(ContractAbis.ERC20.abi.bytecode)).toString("hex");
+		payload = Buffer.from(ethers.getBytes(DARK20.bytecode)).toString("hex");
 	}
 
 	const builder = app
 		.resolve(EvmCallBuilder)
-		.fee(BigNumber.make(fee).toFixed())
+		.gasPrice(gasPrice)
 		.gasLimit(gasLimit ?? 2_000_000)
 		.payload(payload);
 
@@ -64,7 +65,7 @@ export const makeEvmCallDeployErc20Contract = async (
 };
 
 export const encodeErc20Transfer = (recipient: string, amount: BigNumberish): string => {
-	const iface = new ethers.Interface(ContractAbis.ERC20.abi.abi);
+	const iface = new ethers.Interface(DARK20.abi);
 	return iface.encodeFunctionData("transfer", [recipient, amount]).slice(2);
 };
 
@@ -73,7 +74,7 @@ export const getErc20BalanceOf = async (
 	erc20ContractAddress: string,
 	walletAddress: string,
 ): Promise<BigNumberish> => {
-	const iface = new ethers.Interface(ContractAbis.ERC20.abi.abi);
+	const iface = new ethers.Interface(DARK20.abi);
 
 	const payload = iface.encodeFunctionData("balanceOf", [walletAddress]).slice(2);
 
@@ -95,4 +96,4 @@ export const callViewFunction = async (
 	return instance.view({ ...viewContext, specId: Contracts.Evm.SpecId.LATEST });
 };
 
-export { ContractAbis } from "@mainsail/evm-development";
+export * as ContractAbis from "@mainsail/evm-contracts";

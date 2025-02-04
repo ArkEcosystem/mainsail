@@ -35,5 +35,10 @@
 	},
 	"engines": {
 		"node": ">=20.x"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"lmdb"
+		]
 	}
 }

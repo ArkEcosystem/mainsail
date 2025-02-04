@@ -23,7 +23,7 @@
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
-		"@mainsail/crypto-signature-schnorr": "workspace:*",
+		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",

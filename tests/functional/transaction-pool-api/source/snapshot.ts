@@ -2,15 +2,15 @@ import { Contracts, Identifiers, Events } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
-
-import { getWalletByAddressOrPublicKey } from "./utils.js";
+import { getAccountByAddressOrPublicKey } from "./utils.js";
 
 export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 	const snapshot = new Snapshot(sandbox);
-	const { walletRepository } = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+	const instance = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
-	for (const wallet of walletRepository.allByAddress()) {
-		await snapshot.add(wallet.getAddress()!);
+	const { accounts } = await instance.getAccounts(0n, 1000n);
+	for (const account of accounts) {
+		await snapshot.add(account);
 	}
 
 	return snapshot;
@@ -23,7 +23,7 @@ interface WalletState {
 
 export class Snapshot {
 	private states: Record<string, WalletState> = {};
-	private receipts: Record<string, { sender: string; receipt: Contracts.Evm.TransactionReceipt }[]> = {};
+	private receipts: Record<string, { sender: string; receipt: Contracts.Evm.TransactionReceipt }> = {};
 	private manualDeltas: Record<string, WalletState> = {};
 
 	public constructor(public sandbox: Sandbox) {
@@ -45,31 +45,26 @@ export class Snapshot {
 				const { sender, receipt, transactionId } = data;
 
 				console.log("got receipt", sender, transactionId, receipt);
-
-				if (!this.receipts[transactionId]) {
-					this.receipts[transactionId] = [];
-				}
-
-				this.receipts[transactionId].push({ sender, receipt });
+				this.receipts[transactionId] = { sender, receipt };
 			},
 		};
 
 		eventDispatcher.listen(event, listener);
 	}
 
-	public async add(addressOrPublicKey: string): Promise<void> {
-		const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
-		this.states[wallet.getAddress()] = { balance: wallet.getBalance(), nonce: wallet.getNonce() };
+	public async add(account: Contracts.Evm.AccountInfoExtended): Promise<void> {
+		this.states[account.address] = {
+			balance: BigNumber.make(account.balance),
+			nonce: BigNumber.make(account.nonce),
+		};
 	}
 
 	public async addManualDelta(addressOrPublicKey: string, delta: Partial<WalletState>): Promise<void> {
-		const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
-
-		if (!this.manualDeltas[wallet.getAddress()]) {
-			this.manualDeltas[wallet.getAddress()] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
+		const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
+		if (!this.manualDeltas[account.address]) {
+			this.manualDeltas[account.address] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
 		}
-
-		const manualDelta = this.manualDeltas[wallet.getAddress()];
+		const manualDelta = this.manualDeltas[account.address];
 		if (delta.balance) {
 			manualDelta.balance = manualDelta.balance.plus(delta.balance);
 		}
@@ -79,23 +74,19 @@ export class Snapshot {
 	}
 
 	public async validate(): Promise<void> {
-		const { walletRepository } = this.sandbox.app
-			.get<Contracts.State.Service>(Identifiers.State.Service)
-			.getStore();
-
-		// All wallet changes from block 1 onwards
-		const walletDeltas = await this.collectWalletDeltas();
+		// All account changes from block 0 onwards
+		const accountDeltas = await this.collectAccountDeltas();
 
 		// Verify final balance of all wallets matches with delta and snapshot taken at block 0
-		const validateBalance = async (wallet: Contracts.State.Wallet): Promise<boolean> => {
-			const currentBalance = wallet.getBalance();
-			const currentNonce = wallet.getNonce();
+		const validateBalance = async (account: Contracts.Evm.AccountInfoExtended): Promise<boolean> => {
+			const currentBalance = BigNumber.make(account.balance);
+			const currentNonce = BigNumber.make(account.nonce);
 
-			const previousState = this.states[wallet.getAddress()] ?? {
+			const previousState = this.states[account.address] ?? {
 				balance: BigNumber.ZERO,
 				nonce: BigNumber.ZERO,
 			};
-			const walletDelta = walletDeltas[wallet.getAddress()] ?? {
+			const walletDelta = accountDeltas[account.address] ?? {
 				balance: BigNumber.ZERO,
 				nonce: BigNumber.ZERO,
 			};
@@ -109,7 +100,7 @@ export class Snapshot {
 			if (!currentBalance.isEqualTo(expected.balance)) {
 				console.log(
 					"-- BALANCE MISMATCH",
-					wallet.getAddress(),
+					account.address,
 					"EXPECTED",
 					expected.balance.toString(),
 					"ACTUAL",
@@ -124,7 +115,7 @@ export class Snapshot {
 			if (!currentNonce.isEqualTo(expected.nonce)) {
 				console.log(
 					"-- NONCE MISMATCH",
-					wallet.getAddress(),
+					account.address,
 					"EXPECTED",
 					expected.nonce.toString(),
 					"ACTUAL",
@@ -140,14 +131,10 @@ export class Snapshot {
 		};
 
 		let allValid = true;
-		for (const wallet of walletRepository.allByPublicKey()) {
-			if (!(await validateBalance(wallet))) {
-				allValid = false;
-			}
-		}
-
-		for (const wallet of walletRepository.allByAddress()) {
-			if (!(await validateBalance(wallet))) {
+		const evm = this.sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+		const { accounts } = await evm.getAccounts(0n, 1000n);
+		for (const account of accounts) {
+			if (!(await validateBalance(account))) {
 				allValid = false;
 			}
 		}
@@ -159,7 +146,7 @@ export class Snapshot {
 		assert.true(allValid);
 	}
 
-	private async collectWalletDeltas(): Promise<Record<string, WalletState>> {
+	private async collectAccountDeltas(): Promise<Record<string, WalletState>> {
 		const database = this.sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 		const gasFeeCalculator = this.sandbox.app.get<Contracts.Evm.GasFeeCalculator>(
 			Identifiers.Evm.Gas.FeeCalculator,
@@ -172,13 +159,13 @@ export class Snapshot {
 
 		const blocks = await database.findBlocks(0, (await database.getLastCommit()).block.header.height);
 		const updateBalanceDelta = async (addressOrPublicKey: string, delta: BigNumber): Promise<void> => {
-			const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
+			const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
 
-			if (!stateDeltas[wallet.getAddress()]) {
-				stateDeltas[wallet.getAddress()] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
+			if (!stateDeltas[account.address]) {
+				stateDeltas[account.address] = { balance: BigNumber.ZERO, nonce: BigNumber.ZERO };
 			}
 
-			stateDeltas[wallet.getAddress()].balance = stateDeltas[wallet.getAddress()].balance.plus(delta);
+			stateDeltas[account.address].balance = stateDeltas[account.address].balance.plus(delta);
 		};
 
 		const positiveBalanceChange = async (addressOrPublicKey: string, amount: BigNumber): Promise<void> => {
@@ -190,55 +177,53 @@ export class Snapshot {
 		};
 
 		const incrementNonce = async (addressOrPublicKey: string): Promise<void> => {
-			const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
+			const account = await getAccountByAddressOrPublicKey({ sandbox: this.sandbox }, addressOrPublicKey);
 
-			if (!stateDeltas[wallet.getAddress()]) {
-				stateDeltas[wallet.getAddress()] = {
+			if (!stateDeltas[account.address]) {
+				stateDeltas[account.address] = {
 					balance: BigNumber.ZERO,
 					nonce: BigNumber.ZERO,
 				};
 			}
 
-			stateDeltas[wallet.getAddress()].nonce = stateDeltas[wallet.getAddress()].nonce.plus(BigNumber.ONE);
+			stateDeltas[account.address].nonce = stateDeltas[account.address].nonce.plus(BigNumber.ONE);
 		};
 
 		for (const block of blocks) {
 			let totalValidatorFeeReward = BigNumber.ZERO;
 
 			for (const transaction of block.transactions) {
-				const receipts = this.receipts[transaction.id!];
-				if (receipts && receipts.length) {
-					for (const receipt of receipts) {
-						const consumedGas = gasFeeCalculator.calculateConsumed(
-							transaction.data.gasPrice,
-							Number(receipt.receipt.gasUsed),
-						);
-						console.log(
-							"found receipt with",
-							receipt.sender,
-							receipt.receipt.gasUsed,
-							transaction.data.gasPrice,
-							consumedGas,
-						);
+				const receipt = this.receipts[transaction.id!];
+				if (receipt) {
+					const consumedGas = gasFeeCalculator.calculateConsumed(
+						transaction.data.gasPrice,
+						Number(receipt.receipt.gasUsed),
+					);
+					console.log(
+						"found receipt with",
+						receipt.sender,
+						receipt.receipt.gasUsed,
+						transaction.data.gasPrice,
+						consumedGas,
+					);
 
-						totalValidatorFeeReward = totalValidatorFeeReward.plus(consumedGas);
+					totalValidatorFeeReward = totalValidatorFeeReward.plus(consumedGas);
 
-						// subtract fee and increase nonce of sender
-						await negativeBalanceChange(receipt.sender, consumedGas);
-						await incrementNonce(receipt.sender);
+					// subtract fee and increase nonce of sender
+					await negativeBalanceChange(receipt.sender, consumedGas);
+					await incrementNonce(receipt.sender);
 
-						if (receipt.receipt.deployedContractAddress) {
-							// As per EIP-161, the initial nonce for a new contract starts at 1 and not 0.
-							//
-							// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-161.md#specification
-							await incrementNonce(receipt.receipt.deployedContractAddress);
-						}
+					if (receipt.receipt.deployedContractAddress) {
+						// As per EIP-161, the initial nonce for a new contract starts at 1 and not 0.
+						//
+						// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-161.md#specification
+						await incrementNonce(receipt.receipt.deployedContractAddress);
+					}
 
-						// add transferred value to recipient (if any)
-						if (transaction.data.recipientId && transaction.data.amount.isGreaterThan(0)) {
-							await negativeBalanceChange(receipt.sender, transaction.data.amount);
-							await positiveBalanceChange(transaction.data.recipientId, transaction.data.amount);
-						}
+					// add transferred value to recipient (if any)
+					if (transaction.data.recipientAddress && transaction.data.value.isGreaterThan(0)) {
+						await negativeBalanceChange(receipt.sender, transaction.data.value);
+						await positiveBalanceChange(transaction.data.recipientAddress, transaction.data.value);
 					}
 				}
 			}
@@ -254,16 +239,14 @@ export class Snapshot {
 		}
 
 		for (const [address, delta] of Object.entries(this.manualDeltas)) {
-			const wallet = await getWalletByAddressOrPublicKey({ sandbox: this.sandbox }, address);
-
-			if (!stateDeltas[wallet.getAddress()]) {
-				stateDeltas[wallet.getAddress()] = {
+			if (!stateDeltas[address]) {
+				stateDeltas[address] = {
 					balance: BigNumber.ZERO,
 					nonce: BigNumber.ZERO,
 				};
 			}
 
-			const stateDelta = stateDeltas[wallet.getAddress()];
+			const stateDelta = stateDeltas[address];
 			stateDelta.balance = stateDelta.balance.plus(delta.balance);
 			stateDelta.nonce = stateDelta.nonce.plus(delta.nonce);
 		}
