@@ -1,14 +1,8 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
-import { Transfers } from "@mainsail/test-transaction-builders";
+import { EvmCalls } from "@mainsail/test-transaction-builders";
 import { BigNumber, sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
-
-export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
-	const { app } = sandbox;
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-	return (await walletRepository.findByPublicKey(publicKey)).getNonce();
-};
 
 export const getAddressByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<string> => {
 	const { app } = sandbox;
@@ -36,9 +30,9 @@ export const getRandomFundedWallet = async (
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(randomKeyPair.publicKey);
 
-	amount = amount ?? BigNumber.make("10000000000");
+	amount = amount ?? BigNumber.make("1000000000000000000");
 
-	const fundTx = await Transfers.makeTransfer(context, { amount, recipient, sender: funder });
+	const fundTx = await EvmCalls.makeEvmCall(context, { value: amount.toBigInt(), recipient, sender: funder });
 
 	await addTransactionsToPool(context, [fundTx]);
 	await waitBlock(context);
@@ -104,17 +98,17 @@ export const addTransactionsToPool = async (
 };
 
 export const waitBlock = async ({ sandbox }: { sandbox: Sandbox }, count: number = 1) => {
-	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 	const query = sandbox.app.get<Contracts.TransactionPool.Query>(Identifiers.TransactionPool.Query);
 
 	let remainingTransactions = await query.getAll().all();
 
-	let currentHeight = state.getStore().getHeight();
+	let currentHeight = store.getHeight();
 	let targetHeight = currentHeight + count;
 
 	do {
 		await sleep(100);
-		currentHeight = state.getStore().getHeight();
+		currentHeight = store.getHeight();
 		remainingTransactions = await query.getAll().all();
 
 		if (remainingTransactions.length > 0) {
@@ -123,111 +117,114 @@ export const waitBlock = async ({ sandbox }: { sandbox: Sandbox }, count: number
 	} while (currentHeight < targetHeight);
 };
 
-export const hasVotedFor = async (
-	{ sandbox }: { sandbox: Sandbox },
-	voterPublicKey: string,
-	votePublicKey: string,
-): Promise<boolean> => {
-	const { app } = sandbox;
+// export const hasVotedFor = async (
+// 	{ sandbox }: { sandbox: Sandbox },
+// 	voterPublicKey: string,
+// 	votePublicKey: string,
+// ): Promise<boolean> => {
+// 	const { app } = sandbox;
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 
-	const voterWallet = await walletRepository.findByPublicKey(voterPublicKey);
-	return voterWallet.getAttribute("vote") === votePublicKey;
-};
+// 	const voterWallet = await walletRepository.findByPublicKey(voterPublicKey);
+// 	return voterWallet.getAttribute("vote") === votePublicKey;
+// };
 
-export const isValidator = async ({ sandbox }: { sandbox: Sandbox }, publicKey: string): Promise<boolean> => {
-	const { app } = sandbox;
+// export const isValidator = async ({ sandbox }: { sandbox: Sandbox }, publicKey: string): Promise<boolean> => {
+// 	const { app } = sandbox;
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 
-	const wallet = await walletRepository.findByPublicKey(publicKey);
-	return wallet.hasAttribute("validatorPublicKey");
-};
+// 	const wallet = await walletRepository.findByPublicKey(publicKey);
+// 	return wallet.hasAttribute("validatorPublicKey");
+// };
 
-export const hasUsername = async (
-	{ sandbox }: { sandbox: Sandbox },
-	publicKey: string,
-	username?: string,
-): Promise<boolean> => {
-	const { app } = sandbox;
+// export const hasUsername = async (
+// 	{ sandbox }: { sandbox: Sandbox },
+// 	publicKey: string,
+// 	username?: string,
+// ): Promise<boolean> => {
+// 	const { app } = sandbox;
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 
-	const wallet = await walletRepository.findByPublicKey(publicKey);
-	if (username) {
-		return wallet.getAttribute("username") === username;
-	}
+// 	const wallet = await walletRepository.findByPublicKey(publicKey);
+// 	if (username) {
+// 		return wallet.getAttribute("username") === username;
+// 	}
 
-	return wallet.hasAttribute("username");
-};
+// 	return wallet.hasAttribute("username");
+// };
 
-export const hasUnvoted = async ({ sandbox }: { sandbox: Sandbox }, voterPublicKey: string): Promise<boolean> => {
-	const { app } = sandbox;
+// export const hasUnvoted = async ({ sandbox }: { sandbox: Sandbox }, voterPublicKey: string): Promise<boolean> => {
+// 	const { app } = sandbox;
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 
-	const voterWallet = await walletRepository.findByPublicKey(voterPublicKey);
-	return !voterWallet.hasAttribute("vote");
-};
+// 	const voterWallet = await walletRepository.findByPublicKey(voterPublicKey);
+// 	return !voterWallet.hasAttribute("vote");
+// };
 
-export const hasResigned = async ({ sandbox }: { sandbox: Sandbox }, publicKey: string): Promise<boolean> => {
-	const { app } = sandbox;
+// export const hasResigned = async ({ sandbox }: { sandbox: Sandbox }, publicKey: string): Promise<boolean> => {
+// 	const { app } = sandbox;
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
 
-	const wallet = await walletRepository.findByPublicKey(publicKey);
-	return wallet.hasAttribute("validatorResigned");
-};
+// 	const wallet = await walletRepository.findByPublicKey(publicKey);
+// 	return wallet.hasAttribute("validatorResigned");
+// };
 
 export const hasBalance = async (
 	{ sandbox }: { sandbox: Sandbox },
 	address: string,
 	balance: number | string | BigNumber,
-): Promise<boolean> => getBalanceByAddress(sandbox, address).isEqualTo(balance);
+): Promise<boolean> => (await getBalanceByAddress(sandbox, address)).isEqualTo(balance);
 
-export const getMultiSignatureWallet = async (
-	{ sandbox }: { sandbox: Sandbox },
-	asset: Contracts.Crypto.MultiSignatureAsset,
-): Promise<Contracts.State.Wallet> => {
+// export const getMultiSignatureWallet = async (
+// 	{ sandbox }: { sandbox: Sandbox },
+// 	asset: Contracts.Crypto.MultiSignatureAsset,
+// ): Promise<Contracts.State.Wallet> => {
+// 	const { app } = sandbox;
+
+// 	const multiSigPublicKey = await app
+// 		.getTagged<Contracts.Crypto.PublicKeyFactory>(
+// 			Identifiers.Cryptography.Identity.PublicKey.Factory,
+// 			"type",
+// 			"wallet",
+// 		)
+// 		.fromMultiSignatureAsset(asset);
+
+// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+// 	return walletRepository.findByPublicKey(multiSigPublicKey);
+// };
+
+const publicKeyToAddress = async (sandbox: Sandbox, publicKey: string): Promise<string> => {
 	const { app } = sandbox;
-
-	const multiSigPublicKey = await app
-		.getTagged<Contracts.Crypto.PublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKey.Factory,
-			"type",
-			"wallet",
-		)
-		.fromMultiSignatureAsset(asset);
-
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-	return walletRepository.findByPublicKey(multiSigPublicKey);
+	return app
+		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+		.fromPublicKey(publicKey);
 };
 
 export const getBalanceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
-	const { app } = sandbox;
-
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-
-	const wallet = await walletRepository.findByPublicKey(publicKey);
-	return wallet.getBalance();
+	const address = await publicKeyToAddress(sandbox, publicKey);
+	return getBalanceByAddress(sandbox, address);
 };
 
-export const getBalanceByAddress = (sandbox: Sandbox, address: string): BigNumber => {
+export const getBalanceByAddress = async (sandbox: Sandbox, address: string): Promise<BigNumber> => {
 	const { app } = sandbox;
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+	const accountInfo = await instance.getAccountInfo(address);
 
-	const wallet = walletRepository.findByAddress(address);
-	return wallet.getBalance();
+	return BigNumber.make(accountInfo.balance);
 };
 
 export const isTransactionCommitted = async (
 	{ sandbox, wallets }: { sandbox: Sandbox; wallets: Contracts.Crypto.KeyPair[] },
 	{ id }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
-	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
-	const currentHeight = state.getStore().getHeight();
+	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
+	const currentHeight = store.getHeight();
 
 	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 	const forgedBlocks = await database.findBlocks(
@@ -264,20 +261,16 @@ export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.Key
 	return wallets;
 };
 
-export const getWalletByAddressOrPublicKey = async (
+export const getAccountByAddressOrPublicKey = async (
 	{ sandbox }: { sandbox: Sandbox },
 	addressOrPublicKey: string,
-): Promise<Contracts.State.Wallet> => {
+): Promise<Contracts.Evm.AccountInfoExtended> => {
 	const { app } = sandbox;
+	const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-
-	let wallet: Contracts.State.Wallet;
-	if (walletRepository.hasByPublicKey(addressOrPublicKey)) {
-		wallet = await walletRepository.findByPublicKey(addressOrPublicKey);
-	} else {
-		wallet = walletRepository.findByAddress(addressOrPublicKey);
+	try {
+		return evm.getAccountInfoExtended(addressOrPublicKey);
+	} catch {
+		return evm.getAccountInfoExtended(await publicKeyToAddress(sandbox, addressOrPublicKey));
 	}
-
-	return wallet;
 };

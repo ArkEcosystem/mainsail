@@ -8,10 +8,17 @@ import { randomBytes } from "crypto";
 import { Context, TransactionOptions } from "./types.js";
 import { AcceptAnyTransactionVerifier } from "./verifier.js";
 
-const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
+export const getNonceByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<BigNumber> => {
 	const { app } = sandbox;
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-	return (await walletRepository.findByPublicKey(publicKey)).getNonce();
+
+	const address = await app
+		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+		.fromPublicKey(publicKey);
+
+	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+	const accountInfo = await instance.getAccountInfo(address);
+
+	return BigNumber.make(accountInfo.nonce);
 };
 
 const applyCustomSignature = async (
@@ -30,7 +37,9 @@ const applyCustomSignature = async (
 	serialized = Buffer.concat([serialized, Buffer.from(signature, "hex")]);
 
 	transaction.serialized = serialized;
-	transaction.data.signature = signature;
+
+	// TODO
+	//transaction.data.signature = signature;
 };
 
 const applyCustomSignatures = async (
@@ -38,24 +47,25 @@ const applyCustomSignatures = async (
 	transaction: Contracts.Crypto.Transaction,
 	{ omitParticipantSignatures, participantSignatures }: TransactionOptions,
 ) => {
-	if (!omitParticipantSignatures || !participantSignatures) {
-		return;
-	}
+	throw new Error("unsupported");
+	// if (!omitParticipantSignatures || !participantSignatures) {
+	// 	return;
+	// }
 
-	let transactionHex = transaction.serialized.toString("hex");
+	// let transactionHex = transaction.serialized.toString("hex");
 
-	omitParticipantSignatures.sort((a, b) => b - a);
+	// omitParticipantSignatures.sort((a, b) => b - a);
 
-	for (const index of omitParticipantSignatures) {
-		const signatureToOmit = participantSignatures[index];
+	// for (const index of omitParticipantSignatures) {
+	// 	const signatureToOmit = participantSignatures[index];
 
-		const signatureIndex = transactionHex.indexOf(signatureToOmit);
-		transactionHex = transactionHex.slice(0, signatureIndex);
+	// 	const signatureIndex = transactionHex.indexOf(signatureToOmit);
+	// 	transactionHex = transactionHex.slice(0, signatureIndex);
 
-		transaction.data.signatures!.splice(transaction.data.signatures!.indexOf(signatureToOmit), 1);
-	}
+	// 	transaction.data.signatures!.splice(transaction.data.signatures!.indexOf(signatureToOmit), 1);
+	// }
 
-	transaction.serialized = Buffer.from(transactionHex, "hex");
+	// transaction.serialized = Buffer.from(transactionHex, "hex");
 };
 
 export const buildSignedTransaction = async <TBuilder extends TransactionBuilder<TBuilder>>(
@@ -69,26 +79,27 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	(builder as any).factory = sandbox.app.resolve(TransactionFactory);
 
 	if (options.multiSigKeys) {
-		const participants = options.multiSigKeys;
-		const multiSigPublicKey = await sandbox.app
-			.getTagged<Contracts.Crypto.PublicKeyFactory>(
-				Identifiers.Cryptography.Identity.PublicKey.Factory,
-				"type",
-				"wallet",
-			)
-			.fromMultiSignatureAsset({
-				min: participants.length,
-				publicKeys: participants.map((p) => p.publicKey),
-			});
+		throw new Error("unsupported");
+		// const participants = options.multiSigKeys;
+		// const multiSigPublicKey = await sandbox.app
+		// 	.getTagged<Contracts.Crypto.PublicKeyFactory>(
+		// 		Identifiers.Cryptography.Identity.PublicKey.Factory,
+		// 		"type",
+		// 		"wallet",
+		// 	)
+		// 	.fromMultiSignatureAsset({
+		// 		min: participants.length,
+		// 		publicKeys: participants.map((p) => p.publicKey),
+		// 	});
 
-		const nonce = await getNonceByPublicKey(sandbox, multiSigPublicKey);
+		// const nonce = await getNonceByPublicKey(sandbox, multiSigPublicKey);
 
-		const { multiSigKeys, nonceOffset = 0 } = options;
-		builder = builder.nonce(nonce.plus(nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
+		// const { multiSigKeys, nonceOffset = 0 } = options;
+		// builder = builder.nonce(nonce.plus(nonceOffset).toString()).senderPublicKey(multiSigPublicKey);
 
-		for (const [index, participant] of multiSigKeys.entries()) {
-			builder = await builder.multiSignWithKeyPair(participant, index);
-		}
+		// for (const [index, participant] of multiSigKeys.entries()) {
+		// 	builder = await builder.multiSignWithKeyPair(participant, index);
+		// }
 	} else {
 		const nonce = await getNonceByPublicKey(sandbox, keyPair.publicKey);
 		const { nonceOffset = 0 } = options;
@@ -106,30 +117,32 @@ export const buildSignedTransaction = async <TBuilder extends TransactionBuilder
 	}
 
 	if (options.callback) {
+		throw new Error("unsupported");
+		// TODO
 		// manipulates the buffer, so signature has to be re-calculated
-		await options.callback(transaction);
+		//		await options.callback(transaction);
 
-		const signatureFactory = sandbox.app.getTagged<Contracts.Crypto.Signature>(
-			Identifiers.Cryptography.Signature.Instance,
-			"type",
-			"wallet",
-		);
+		// const signatureFactory = sandbox.app.getTagged<Contracts.Crypto.Signature>(
+		// 	Identifiers.Cryptography.Signature.Instance,
+		// 	"type",
+		// 	"wallet",
+		// );
 
-		const hashFactory = sandbox.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
-		const transactionHex = transaction.serialized.toString("hex");
+		// const hashFactory = sandbox.app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
+		// const transactionHex = transaction.serialized.toString("hex");
 
-		const signatureIndex = transactionHex.indexOf(transaction.data.signature!);
-		const dataPart = transactionHex.slice(0, signatureIndex);
+		// const signatureIndex = transactionHex.indexOf(transaction.data.signature!);
+		// const dataPart = transactionHex.slice(0, signatureIndex);
 
-		const newSignature = await signatureFactory.sign(
-			await hashFactory.sha256(Buffer.from(dataPart, "hex")),
-			Buffer.from(keyPair.privateKey, "hex"),
-		);
+		// const newSignature = await signatureFactory.sign(
+		// 	await hashFactory.sha256(Buffer.from(dataPart, "hex")),
+		// 	Buffer.from(keyPair.privateKey, "hex"),
+		// );
 
-		transaction.serialized = Buffer.from(
-			transaction.serialized.toString("hex").replace(transaction.data.signature!, newSignature),
-			"hex",
-		);
+		// transaction.serialized = Buffer.from(
+		// 	transaction.serialized.toString("hex").replace(transaction.data.signature!, newSignature),
+		// 	"hex",
+		// );
 	}
 
 	// !! Reset
@@ -148,14 +161,14 @@ export const addTransactionsToPool = async (
 };
 
 export const waitBlock = async (sandbox: Sandbox, count: number = 1) => {
-	const state = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
+	const state = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 
-	let currentHeight = state.getStore().getHeight();
+	let currentHeight = state.getHeight();
 	const targetHeight = currentHeight + count;
 
 	do {
 		await sleep(200);
-		currentHeight = state.getStore().getHeight();
+		currentHeight = state.getHeight();
 	} while (currentHeight < targetHeight);
 };
 
@@ -170,26 +183,25 @@ export const getRandomFundedWallet = async (
 	const { sandbox, wallets } = context;
 	const { app } = sandbox;
 
-	const seed = randomBytes(32).toString("hex");
+	//const seed = randomBytes(32).toString("hex");
 
 	const randomKeyPair = await app
 		.getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")
-		.fromMnemonic(seed);
+		.fromMnemonic("ladder pet busy silver convince lens either observe gap program debate film");
 
 	const recipient = await app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(randomKeyPair.publicKey);
-
-	amount = amount ?? BigNumber.make("10000000000");
+	amount = amount ?? BigNumber.make("1000000000000000000");
 
 	const nonce = await getNonceByPublicKey(sandbox, wallets[0].publicKey);
 
 	const fundTx = await (
 		await app
 			.resolve(EvmCallBuilder)
-			.fee(BigNumber.make("10000000").toFixed())
-			.recipientId(recipient)
-			.amount(BigNumber.make(amount).toFixed())
+			.gasPrice(5)
+			.recipientAddress(recipient)
+			.value(BigNumber.make(amount).toFixed())
 			.nonce(nonce.plus(1).toFixed())
 			.signWithKeyPair(wallets[0])
 	).build();
@@ -254,20 +266,20 @@ export const getAddressByPublicKey = async ({ sandbox }: { sandbox: Sandbox }, p
 		.fromPublicKey(publicKey);
 };
 
-export const getMultiSignatureWallet = async (
-	{ sandbox }: { sandbox: Sandbox },
-	asset: Contracts.Crypto.MultiSignatureAsset,
-): Promise<Contracts.State.Wallet> => {
-	const { app } = sandbox;
+// export const getMultiSignatureWallet = async (
+// 	{ sandbox }: { sandbox: Sandbox },
+// 	asset: Contracts.Crypto.MultiSignatureAsset,
+// ): Promise<Contracts.State.Wallet> => {
+// 	const { app } = sandbox;
 
-	const multiSigPublicKey = await app
-		.getTagged<Contracts.Crypto.PublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKey.Factory,
-			"type",
-			"wallet",
-		)
-		.fromMultiSignatureAsset(asset);
+// 	const multiSigPublicKey = await app
+// 		.getTagged<Contracts.Crypto.PublicKeyFactory>(
+// 			Identifiers.Cryptography.Identity.PublicKey.Factory,
+// 			"type",
+// 			"wallet",
+// 		)
+// 		.fromMultiSignatureAsset(asset);
 
-	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
-	return walletRepository.findByPublicKey(multiSigPublicKey);
-};
+// 	const { walletRepository } = app.get<Contracts.State.Service>(Identifiers.State.Service).getStore();
+// 	return walletRepository.findByPublicKey(multiSigPublicKey);
+// };

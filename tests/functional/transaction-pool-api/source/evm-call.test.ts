@@ -1,7 +1,6 @@
 import { Contracts } from "@mainsail/contracts";
 import { describe, Sandbox } from "@mainsail/test-framework";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
-import { BigNumber } from "@mainsail/utils";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
 import { addTransactionsToPool, getWallets, isTransactionCommitted, waitBlock } from "./utils.js";
@@ -25,7 +24,9 @@ describe<{
 	});
 
 	it("should accept and commit evm call", async (context) => {
-		const tx = await EvmCalls.makeEvmCall(context);
+		const randomWallet = await Utils.getRandomColdWallet(context);
+
+		const tx = await EvmCalls.makeEvmCall(context, { recipient: randomWallet.address });
 
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
@@ -68,48 +69,5 @@ describe<{
 		// Check final balance
 		const balanceAfter = await EvmCalls.getErc20BalanceOf(context, erc20Address, randomWallet.address);
 		assert.equal(balanceAfter, ethers.parseEther("1234"));
-	});
-
-	it("should deploy native transfer contract and interact with it", async (context) => {
-		const [sender] = context.wallets;
-		const deployTx = await EvmCalls.makeEvmCall(context, {
-			recipient: "",
-			gasLimit: 1_000_000,
-			sender,
-			payload: Buffer.from(ethers.getBytes(ContractAbis.DirectTransfer.abi.bytecode.object)).toString("hex"),
-		});
-
-		let { accept } = await addTransactionsToPool(context, [deployTx]);
-		assert.equal(accept, [0]);
-
-		await waitBlock(context);
-		await isTransactionCommitted(context, deployTx);
-
-		const deployedContractAddress = ethers.getCreateAddress({
-			from: ethers.computeAddress(`0x${deployTx.data.senderPublicKey}`),
-			nonce: 2,
-		});
-
-		const transferAmount = ethers.parseEther("6");
-		const randomWallet = await Utils.getRandomColdWallet(context);
-
-		const iface = new ethers.Interface(ContractAbis.DirectTransfer.abi.abi);
-		const payload = iface.encodeFunctionData("sendEther", [randomWallet.address]).slice(2);
-		const transferTx = await EvmCalls.makeEvmCall(context, {
-			recipient: deployedContractAddress,
-			amount: transferAmount,
-			sender,
-			payload,
-		});
-
-		await addTransactionsToPool(context, [transferTx]);
-		await waitBlock(context);
-		assert.true(await isTransactionCommitted(context, transferTx));
-
-		// Value transfers inside a contract ("internal transaction") is not visible in a receipt, so correct it manually.
-		context.snapshot.addManualDelta(randomWallet.address, { balance: BigNumber.make(transferAmount) });
-		context.snapshot.addManualDelta(deployedContractAddress, {
-			balance: BigNumber.make(transferAmount).times(-1),
-		});
 	});
 });

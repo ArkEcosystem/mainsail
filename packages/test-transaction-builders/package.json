@@ -25,6 +25,9 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-framework": "workspace:*",
+		"@mainsail/evm-contracts": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/crypto-transaction-evm-call": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ethers": "^6.11.0"
 	},

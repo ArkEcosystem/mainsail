@@ -87,15 +87,13 @@ const setup = async () => {
 		"@mainsail/crypto-config",
 		"@mainsail/crypto-validation",
 		"@mainsail/crypto-hash-bcrypto",
-		"@mainsail/crypto-signature-schnorr",
+		"@mainsail/crypto-signature-ecdsa",
 		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-consensus-bls12-381",
 		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
 		"@mainsail/crypto-block",
-		"@mainsail/fees",
-		"@mainsail/fees-static",
 		"@mainsail/evm-service",
 		"@mainsail/evm-gas-fee",
 		"@mainsail/crypto-transaction",
@@ -171,18 +169,12 @@ const getPluginConfiguration = async (
 const bootstrap = async (sandbox: Sandbox) => {
 	const configuration = sandbox.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const commitFactory = sandbox.app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
-	const genesisCommitJson = configuration.get("genesisBlock");
 
+	const genesisCommitJson = configuration.get("genesisBlock");
 	const genesisCommit = await commitFactory.fromJson(genesisCommitJson);
 
-	const stateService = sandbox.app.get<Contracts.State.Service>(Identifiers.State.Service);
-	const store = stateService.getStore();
-
+	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
 	store.setGenesisCommit(genesisCommit);
-	store.setLastBlock(genesisCommit.block);
-
-	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
-	validatorSet.restore(store);
 
 	const commitState = sandbox.app.get<Contracts.Consensus.CommitStateFactory>(
 		Identifiers.Consensus.CommitState.Factory,
@@ -195,6 +187,9 @@ const bootstrap = async (sandbox: Sandbox) => {
 		throw new Error("Failed to process genesis block");
 	}
 	await blockProcessor.commit(commitState);
+
+	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
+	validatorSet.restore();
 
 	sandbox.app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 

@@ -3,6 +3,8 @@ import { Contracts } from "@mainsail/contracts";
 
 @injectable()
 export class MemoryDatabase implements Contracts.Database.DatabaseService {
+	async initialize(): Promise<void> {}
+
 	#commits: Contracts.Crypto.Commit[] = [];
 
 	public isEmpty(): boolean {
@@ -44,5 +46,42 @@ export class MemoryDatabase implements Contracts.Database.DatabaseService {
 
 	public async persist(): Promise<void> {
 		// Nothing to do here
+	}
+
+	getState(): Contracts.Database.State {
+		throw new Error("Method not implemented.");
+	}
+
+	getCommitById(id: string): Promise<Contracts.Crypto.Commit | undefined> {
+		throw new Error("Method not implemented.");
+	}
+	hasCommitById(id: string): boolean {
+		throw new Error("Method not implemented.");
+	}
+
+	getBlock(height: number): Promise<Contracts.Crypto.Block | undefined> {
+		throw new Error("Method not implemented.");
+	}
+
+	getBlockById(id: string): Promise<Contracts.Crypto.Block | undefined> {
+		throw new Error("Method not implemented.");
+	}
+	getBlockHeader(height: number): Promise<Contracts.Crypto.BlockHeader | undefined> {
+		throw new Error("Method not implemented.");
+	}
+	getBlockHeaderById(id: string): Promise<Contracts.Crypto.BlockHeader | undefined> {
+		throw new Error("Method not implemented.");
+	}
+	getTransactionById(id: string): Promise<Contracts.Crypto.Transaction | undefined> {
+		throw new Error("Method not implemented.");
+	}
+	getTransactionByBlockIdAndIndex(blockId: string, index: number): Promise<Contracts.Crypto.Transaction | undefined> {
+		throw new Error("Method not implemented.");
+	}
+	getTransactionByBlockHeightAndIndex(
+		height: number,
+		index: number,
+	): Promise<Contracts.Crypto.Transaction | undefined> {
+		throw new Error("Method not implemented.");
 	}
 }

@@ -14,7 +14,7 @@ export interface Context {
 
 export interface TransactionOptions {
 	sender?: Contracts.Crypto.KeyPair;
-	fee?: number | string | BigNumber;
+	gasPrice?: number;
 	signature?: string;
 	omitParticipantSignatures?: number[];
 	nonceOffset?: number;
@@ -56,5 +56,5 @@ export interface EvmCallOptions extends TransactionOptions {
 	gasLimit?: number;
 	payload?: string;
 	recipient?: string;
-	amount?: BigNumberish;
+	value?: BigNumberish;
 }
