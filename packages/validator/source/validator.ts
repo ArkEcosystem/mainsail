@@ -134,82 +134,90 @@ export class Validator implements Contracts.Validator.Validator {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
-		await validator.getEvm().initializeGenesis(this.genesisInfo);
-		await validator.getEvm().prepareNextCommit({ commitKey });
 
-		const candidateTransactions: Contracts.Crypto.Transaction[] = [];
-		const failedSenders: Set<string> = new Set();
+		try {
+			await validator.getEvm().initializeGenesis(this.genesisInfo);
+			await validator.getEvm().prepareNextCommit({ commitKey });
 
-		const previousBlock = this.stateStore.getLastBlock();
-		const milestone = this.cryptoConfiguration.getMilestone();
-		let gasLeft = milestone.block.maxGasLimit;
+			const candidateTransactions: Contracts.Crypto.Transaction[] = [];
+			const failedSenders: Set<string> = new Set();
 
-		// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
-		const timeLimit =
-			performance.now() +
-			milestone.timeouts.blockPrepareTime * this.configuration.getRequired<number>("txCollatorFactor");
+			const previousBlock = this.stateStore.getLastBlock();
+			const milestone = this.cryptoConfiguration.getMilestone();
+			let gasLeft = milestone.block.maxGasLimit;
 
-		for (const bytes of transactionBytes) {
-			if (performance.now() > timeLimit) {
-				break;
-			}
+			// txCollatorFactor% of the time for block preparation, the rest is for  block and proposal serialization and signing
+			const timeLimit =
+				performance.now() +
+				milestone.timeouts.blockPrepareTime * this.configuration.getRequired<number>("txCollatorFactor");
 
-			const transaction = await this.transactionFactory.fromBytes(bytes);
-			transaction.data.sequence = candidateTransactions.length;
-
-			if (failedSenders.has(transaction.data.senderPublicKey)) {
-				continue;
-			}
-
-			try {
-				const gasLimit = transaction.data.gasLimit;
-
-				if (gasLeft - gasLimit < 0) {
+			for (const bytes of transactionBytes) {
+				if (performance.now() > timeLimit) {
 					break;
 				}
 
-				const result = await validator.validate(
-					{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
-					transaction,
-				);
+				const transaction = await this.transactionFactory.fromBytes(bytes);
+				transaction.data.sequence = candidateTransactions.length;
 
-				gasLeft -= Number(result.gasUsed);
+				if (failedSenders.has(transaction.data.senderPublicKey)) {
+					continue;
+				}
 
-				transaction.data.gasUsed = Number(result.gasUsed);
-				candidateTransactions.push(transaction);
-			} catch (error) {
-				this.logger.warning(`${transaction.id} failed to collate: ${error.message}`);
+				try {
+					const gasLimit = transaction.data.gasLimit;
 
-				await this.txPoolWorker.removeTransaction(transaction.data.senderAddress, transaction.id);
+					if (gasLeft - gasLimit < 0) {
+						break;
+					}
 
-				failedSenders.add(transaction.data.senderPublicKey);
+					const result = await validator.validate(
+						{ commitKey, gasLimit: milestone.block.maxGasLimit, generatorAddress, timestamp },
+						transaction,
+					);
+
+					gasLeft -= Number(result.gasUsed);
+
+					transaction.data.gasUsed = Number(result.gasUsed);
+					candidateTransactions.push(transaction);
+				} catch (error) {
+					this.logger.warning(
+						`tx ${transaction.id} from ${transaction.data.senderAddress} failed to collate: ${error.message}`,
+					);
+
+					await this.txPoolWorker.removeTransaction(transaction.data.senderAddress, transaction.id);
+
+					failedSenders.add(transaction.data.senderPublicKey);
+				}
 			}
-		}
 
-		await validator.getEvm().updateRewardsAndVotes({
-			blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
-			commitKey,
-			specId: milestone.evmSpec,
-			timestamp: BigInt(timestamp),
-			validatorAddress: generatorAddress,
-		});
-
-		if (Utils.roundCalculator.isNewRound(previousBlock.header.height + 2, this.cryptoConfiguration)) {
-			const { activeValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.height + 2);
-
-			await validator.getEvm().calculateActiveValidators({
-				activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
+			await validator.getEvm().updateRewardsAndVotes({
+				blockReward: Utils.BigNumber.make(milestone.reward).toBigInt(),
 				commitKey,
 				specId: milestone.evmSpec,
 				timestamp: BigInt(timestamp),
 				validatorAddress: generatorAddress,
 			});
-		}
 
-		return {
-			stateHash: await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash),
-			transactions: candidateTransactions,
-		};
+			if (Utils.roundCalculator.isNewRound(previousBlock.header.height + 2, this.cryptoConfiguration)) {
+				const { activeValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.height + 2);
+
+				await validator.getEvm().calculateActiveValidators({
+					activeValidators: Utils.BigNumber.make(activeValidators).toBigInt(),
+					commitKey,
+					specId: milestone.evmSpec,
+					timestamp: BigInt(timestamp),
+					validatorAddress: generatorAddress,
+				});
+			}
+
+			const stateHash = await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash);
+			return {
+				stateHash,
+				transactions: candidateTransactions,
+			};
+		} finally {
+			await validator.getEvm().dispose();
+		}
 	}
 
 	async #makeBlock(

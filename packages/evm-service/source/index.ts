@@ -21,7 +21,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(Identifiers.Evm.Instance)
 			.to(EphemeralInstance)
-			.inRequestScope()
+			.inSingletonScope()
 			.when(Selectors.anyAncestorOrTargetTaggedFirst("instance", "transaction-pool"));
 	}
 
