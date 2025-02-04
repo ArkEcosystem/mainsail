@@ -65,5 +65,21 @@
 		"typescript": "5.4.2",
 		"typesync": "^0.12.1",
 		"yaml": "^2.3.4"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"@chainsafe/blst",
+			"@parcel/watcher",
+			"bcrypto",
+			"better-sqlite3",
+			"bstring",
+			"es5-ext",
+			"esbuild",
+			"lmdb",
+			"msgpackr-extract",
+			"nsfw",
+			"nx",
+			"protobufjs"
+		]
 	}
 }
