@@ -2,10 +2,9 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { EvmCallBuilder } from "@mainsail/crypto-transaction-evm-call";
 import { BigNumberish, ethers } from "ethers";
 
+import { default as DARK20 } from "./abis/DARK20.json" assert { type: "json" };
 import { Context, EvmCallOptions } from "./types.js";
 import { buildSignedTransaction, getAddressByPublicKey } from "./utils.js";
-
-import { default as DARK20 } from "./abis/DARK20.json" assert { type: "json" };
 
 export const makeEvmCall = async (
 	{ sandbox, wallets }: Context,
