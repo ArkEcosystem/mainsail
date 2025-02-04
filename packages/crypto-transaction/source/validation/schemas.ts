@@ -46,16 +46,7 @@ export const transactionBaseSchema: SchemaObject = {
 
 		senderAddress: { $ref: "address" },
 
-		senderLegacyAddress: {
-			allOf: [
-				{
-					maxLength: 34,
-					minLength: 34,
-					pattern: "^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]+$",
-				},
-			],
-			type: "string",
-		},
+		senderLegacyAddress: { $ref: "legacyAddress" },
 
 		senderPublicKey: { $ref: "publicKey" },
 

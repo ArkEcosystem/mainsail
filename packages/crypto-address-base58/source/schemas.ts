@@ -1,6 +1,6 @@
 export const schemas = {
-	address: {
-		$id: "address",
+	legacyAddress: {
+		$id: "legacyAddress",
 		allOf: [
 			{
 				maxLength: 34,

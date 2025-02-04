@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
+import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoConfig } from "@mainsail/crypto-config";
 import { ServiceProvider as CoreConsensusBls12381 } from "@mainsail/crypto-consensus-bls12-381";
@@ -37,6 +38,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 	await context.sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
 	await context.sandbox.app.resolve(CoreCryptoKeyPairEcdsa).register();
 	await context.sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
+	await context.sandbox.app.resolve(CoreCryptoAddressBase58).register();
 	await context.sandbox.app.resolve(CoreCryptoWif).register();
 	await context.sandbox.app.resolve(CoreConsensusBls12381).register();
 	await context.sandbox.app.resolve(CoreCryptoTransaction).register();

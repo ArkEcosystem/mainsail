@@ -1,4 +1,5 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CoreCryptoCommit } from "@mainsail/crypto-commit";
@@ -32,6 +33,7 @@ export const generateApp = async (
 	await sandbox.app.resolve(CoreValidation).register();
 	await sandbox.app.resolve(CoreCryptoValidation).register();
 	await sandbox.app.resolve(CoreCryptoAddressKeccak256).register();
+	await sandbox.app.resolve(CoreCryptoAddressBase58).register();
 	await sandbox.app.resolve(CoreCryptoKeyPairEcdsa).register();
 	await sandbox.app.resolve(CoreCryptoSignatureEcdsa).register();
 	await sandbox.app.resolve(CoreCryptoHashBcrypto).register();

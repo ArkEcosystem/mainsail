@@ -1,5 +1,6 @@
 import { Container } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { ServiceProvider as CoreCryptoAddressBase58 } from "@mainsail/crypto-address-base58";
 import { ServiceProvider as CoreCryptoAddressKeccak256 } from "@mainsail/crypto-address-keccak256";
 import { ServiceProvider as CoreCryptoBlock } from "@mainsail/crypto-block";
 import { ServiceProvider as CryptoCommit } from "@mainsail/crypto-commit";
@@ -65,6 +66,7 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoHashBcrypto).register();
 	await app.resolve(CoreCryptoSignatureEcdsa).register();
 	await app.resolve(CoreCryptoKeyPairEcdsa).register();
+	await app.resolve(CoreCryptoAddressBase58).register();
 	await app.resolve(CoreCryptoAddressKeccak256).register();
 	await app.resolve(CryptoMessages).register();
 	await app.resolve(CryptoCommit).register();
@@ -109,6 +111,8 @@ export const makeApplication = async (configurationPath: string, options: Record
 	app.bind(InternalIdentifiers.Generator.Network).to(NetworkGenerator);
 	app.bind(InternalIdentifiers.Generator.Wallet).to(WalletGenerator);
 	app.bind(InternalIdentifiers.Generator.Peers).to(PeersGenerator);
+
+	app.unbind(Identifiers.Cryptography.Legacy.Identity.AddressFactory);
 
 	return app;
 };

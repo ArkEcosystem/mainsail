@@ -1,5 +1,6 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { schemas as addressSchemas } from "@mainsail/crypto-address-keccak256";
+import { schemas as base58addressSchemas } from "@mainsail/crypto-address-base58";
 import { Configuration } from "@mainsail/crypto-config";
 import { schemas as keyPairSchemas } from "@mainsail/crypto-key-pair-ecdsa";
 import { makeKeywords as makeBaseKeywords, schemas as baseSchemas } from "@mainsail/crypto-validation";
@@ -36,6 +37,7 @@ describe<{
 			...keyPairSchemas,
 			...schemas,
 			...addressSchemas,
+			...base58addressSchemas,
 		})) {
 			context.validator.addSchema(schema);
 		}

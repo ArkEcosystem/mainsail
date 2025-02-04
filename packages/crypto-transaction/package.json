@@ -30,6 +30,7 @@
 		"ethers": "6.11.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",

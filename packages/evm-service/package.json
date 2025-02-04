@@ -28,6 +28,7 @@
 		"@mainsail/kernel": "workspace:*"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",

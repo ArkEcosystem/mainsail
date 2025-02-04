@@ -30,6 +30,7 @@
 		"ajv": "8.12.0"
 	},
 	"devDependencies": {
+		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",

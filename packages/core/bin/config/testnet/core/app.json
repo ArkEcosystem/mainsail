@@ -22,6 +22,9 @@
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
+			"package": "@mainsail/crypto-address-base58"
+		},
+		{
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{

@@ -628,6 +628,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -861,6 +864,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -885,9 +891,6 @@ importers:
       '@mainsail/crypto-key-pair-schnorr':
         specifier: workspace:*
         version: link:../crypto-key-pair-schnorr
-      '@mainsail/crypto-legacy-support':
-        specifier: workspace:*
-        version: link:../crypto-legacy-support
       '@mainsail/crypto-messages':
         specifier: workspace:*
         version: link:../crypto-messages
@@ -1138,6 +1141,9 @@ importers:
         specifier: 8.12.0
         version: 8.12.0
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -1202,6 +1208,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -1501,22 +1510,6 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
-  packages/crypto-legacy-support:
-    dependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/crypto-address-base58':
-        specifier: workspace:*
-        version: link:../crypto-address-base58
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-    devDependencies:
-      uvu:
-        specifier: ^0.5.6
-        version: 0.5.6
-
   packages/crypto-messages:
     dependencies:
       '@mainsail/container':
@@ -1535,6 +1528,9 @@ importers:
         specifier: 8.12.0
         version: 8.12.0
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -1665,6 +1661,9 @@ importers:
         specifier: 6.11.0
         version: 6.11.0
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -1705,6 +1704,9 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -1928,6 +1930,9 @@ importers:
         specifier: workspace:*
         version: link:../kernel
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -2504,6 +2509,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256
@@ -2898,6 +2906,9 @@ importers:
         specifier: 17.12.2
         version: 17.12.2
     devDependencies:
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
       '@mainsail/crypto-address-keccak256':
         specifier: workspace:*
         version: link:../crypto-address-keccak256

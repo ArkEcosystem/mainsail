@@ -25,6 +25,9 @@
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
+			"package": "@mainsail/crypto-address-base58"
+		},
+		{
 			"package": "@mainsail/crypto-wif"
 		},
 		{

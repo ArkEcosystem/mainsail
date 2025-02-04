@@ -63,7 +63,6 @@ const EXCEPTIONS = {
 			"@mainsail/crypto-key-pair-ecdsa",
 			"@mainsail/crypto-key-pair-ed25519",
 			"@mainsail/crypto-key-pair-schnorr",
-			"@mainsail/crypto-legacy-support",
 			"@mainsail/crypto-messages",
 			"@mainsail/crypto-signature-schnorr-secp256k1",
 			"@mainsail/crypto-signature-schnorr",
