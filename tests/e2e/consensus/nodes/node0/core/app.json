@@ -22,10 +22,10 @@
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
-			"package": "@mainsail/crypto-address-keccak256"
+			"package": "@mainsail/crypto-address-base58"
 		},
 		{
-			"package": "@mainsail/crypto-address-base58"
+			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
 			"package": "@mainsail/crypto-wif"
@@ -53,6 +53,9 @@
 		},
 		{
 			"package": "@mainsail/logger-pino"
+		},
+		{
+			"package": "@mainsail/snapshot-legacy-importer"
 		},
 		{
 			"package": "@mainsail/state"
@@ -129,6 +132,9 @@
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
+			"package": "@mainsail/crypto-address-base58"
+		},
+		{
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
@@ -173,6 +179,9 @@
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
+			"package": "@mainsail/crypto-address-base58"
+		},
+		{
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
@@ -200,13 +209,7 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/state",
-			"options": {
-				"snapshots": {
-					"enabled": false,
-					"skipUnknownAttributes": true
-				}
-			}
+			"package": "@mainsail/state"
 		},
 		{
 			"package": "@mainsail/transaction-pool-service"
@@ -247,6 +250,9 @@
 			"package": "@mainsail/crypto-consensus-bls12-381"
 		},
 		{
+			"package": "@mainsail/crypto-address-base58"
+		},
+		{
 			"package": "@mainsail/crypto-address-keccak256"
 		},
 		{
@@ -259,6 +265,12 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
+			"package": "@mainsail/crypto-messages"
+		},
+		{
+			"package": "@mainsail/crypto-commit"
+		},
+		{
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
@@ -268,13 +280,10 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/state",
-			"options": {
-				"snapshots": {
-					"enabled": false,
-					"skipUnknownAttributes": true
-				}
-			}
+			"package": "@mainsail/state"
+		},
+		{
+			"package": "@mainsail/database"
 		},
 		{
 			"package": "@mainsail/evm-service"
