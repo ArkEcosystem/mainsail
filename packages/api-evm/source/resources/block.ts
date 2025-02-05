@@ -21,7 +21,7 @@ export class BlockResource {
 			number: `0x${blockData.height.toString(16)}`,
 			hash: `0x${blockData.id}`,
 			parentHash: `0x${blockData.previousBlock}`,
-			nonce: "0x0",
+			nonce: "0x0000000000000000",
 			sha3Uncles: "0x1dcc4de8dec75d7aab85b567b6ccd41ad4e2a311b82e5872087ed76f0f1ccf8f", // No uncles in ARK, this is hash of empty list
 			logsBloom: "", // TODO: Implement logs bloom,
 			transactionsRoot: `0x${blockData.stateHash}`,
