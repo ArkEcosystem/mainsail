@@ -25,8 +25,8 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 	public readonly schema = {
 		$id: `jsonRpc_${this.name}`,
 
-		maxItems: 2,
-		minItems: 2,
+		maxItems: 1,
+		minItems: 1,
 
 		prefixItems: [
 			{
@@ -42,13 +42,12 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action {
 				required: ["from", "to"],
 				type: "object",
 			},
-			{ $ref: "blockTag" },
 		],
 
 		type: "array",
 	};
 
-	public async handle(parameters: [TxData, Contracts.Crypto.BlockTag]): Promise<any> {
+	public async handle(parameters: [TxData]): Promise<any> {
 		try {
 			const [data] = parameters;
 
