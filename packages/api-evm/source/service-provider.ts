@@ -7,6 +7,7 @@ import {
 	EthBlockNumberAction,
 	EthChainIdAction,
 	EthEstimateGasAction,
+	EthGasPriceAction,
 	EthGetBalanceAction,
 	EthGetBlockByHashAction,
 	EthGetBlockByNumberAction,
@@ -79,6 +80,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 	protected getActions(): Contracts.Api.RPC.Action[] {
 		return [
 			this.app.resolve(CallAction),
+			this.app.resolve(EthGasPriceAction),
 			this.app.resolve(EthBlockNumberAction),
 			this.app.resolve(EthChainIdAction),
 			this.app.resolve(EthEstimateGasAction),
