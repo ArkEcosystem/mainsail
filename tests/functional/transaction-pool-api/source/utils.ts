@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 import { BigNumber, sleep } from "@mainsail/utils";
-import { createSecretKey, randomBytes } from "crypto";
+import { randomBytes } from "crypto";
 
 export const getAddressByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<string> => {
 	const { app } = sandbox;
