@@ -46,7 +46,7 @@ export const transactionBaseSchema: SchemaObject = {
 
 		senderAddress: { $ref: "address" },
 
-		senderLegacyAddress: { $ref: "legacyAddress" },
+		senderLegacyAddress: { type: "string" },
 
 		senderPublicKey: { $ref: "publicKey" },
 
