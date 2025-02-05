@@ -25,6 +25,7 @@
 		"@mainsail/crypto-hash-bcrypto": "workspace:*",
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-key-pair-ecdsa": "workspace:*",
+		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-key-pair-schnorr": "workspace:*",
 		"@mainsail/crypto-consensus-bls12-381": "workspace:*",
