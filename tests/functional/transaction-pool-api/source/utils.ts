@@ -2,7 +2,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Sandbox } from "@mainsail/test-framework";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 import { BigNumber, sleep } from "@mainsail/utils";
-import { randomBytes } from "crypto";
+import { createSecretKey, randomBytes } from "crypto";
 
 export const getAddressByPublicKey = async (sandbox: Sandbox, publicKey: string): Promise<string> => {
 	const { app } = sandbox;
@@ -243,6 +243,29 @@ export const isTransactionCommitted = async (
 	return found;
 };
 
+export const getTransactionReceipt = async (
+	{ sandbox }: { sandbox: Sandbox },
+	{ id }: Contracts.Crypto.Transaction,
+): Promise<Contracts.Evm.TransactionReceipt | undefined> => {
+	const store = sandbox.app.get<Contracts.State.Store>(Identifiers.State.Store);
+	const currentHeight = store.getHeight();
+
+	const database = sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+	const forgedBlocks = await database.findBlocks(0, currentHeight);
+
+	for (const block of forgedBlocks) {
+		if (!block.transactions.some((transaction) => transaction.id === id)) {
+			continue;
+		}
+
+		const evm = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+		const { receipt } = await evm.getReceipt(block.header.height, id);
+		return receipt;
+	}
+
+	return undefined;
+};
+
 export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.KeyPair[]> => {
 	const walletKeyPairFactory = sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
 		Identifiers.Cryptography.Identity.KeyPair.Factory,
@@ -259,6 +282,53 @@ export const getWallets = async (sandbox: Sandbox): Promise<Contracts.Crypto.Key
 	}
 
 	return wallets;
+};
+
+export const getLegacyColdWallets = async (
+	sandbox: Sandbox,
+): Promise<
+	{ keyPair: Contracts.Crypto.KeyPair; mainsailAddress: string; legacyColdWallet: Contracts.Evm.LegacyColdWallet }[]
+> => {
+	const walletKeyPairFactory = sandbox.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+		Identifiers.Cryptography.Identity.KeyPair.Factory,
+		"type",
+		"wallet",
+	);
+
+	const mainsailAddressFactory = sandbox.app.get<Contracts.Crypto.AddressFactory>(
+		Identifiers.Cryptography.Identity.Address.Factory,
+	);
+
+	const legacyAddressFactory = sandbox.app.get<Contracts.Crypto.AddressFactory>(
+		Identifiers.Cryptography.Legacy.Identity.AddressFactory,
+	);
+
+	const secrets = sandbox.app.config("validators.secrets");
+	const legacyColdWallets: {
+		keyPair: Contracts.Crypto.KeyPair;
+		mainsailAddress: string;
+		legacyColdWallet: Contracts.Evm.LegacyColdWallet;
+	}[] = [];
+	for (const secret of secrets.values()) {
+		// use reversed secret as seed to not conflict with validators
+		const reversed = secret.split(" ").reverse().join(" ");
+
+		const walletKeyPair = await walletKeyPairFactory.fromMnemonic(reversed);
+
+		const mainsailAddress = await mainsailAddressFactory.fromPublicKey(walletKeyPair.publicKey);
+		const legacyAddress = await legacyAddressFactory.fromPublicKey(walletKeyPair.publicKey);
+		legacyColdWallets.push({
+			keyPair: walletKeyPair,
+			mainsailAddress,
+			legacyColdWallet: {
+				address: legacyAddress,
+				balance: 1_000_000_000_000_000_000n,
+				legacyAttributes: {},
+			},
+		});
+	}
+
+	return legacyColdWallets;
 };
 
 export const getAccountByAddressOrPublicKey = async (

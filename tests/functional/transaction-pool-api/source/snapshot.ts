@@ -2,7 +2,7 @@ import { Contracts, Identifiers, Events } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
-import { getAccountByAddressOrPublicKey } from "./utils.js";
+import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utils.js";
 
 export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 	const snapshot = new Snapshot(sandbox);
@@ -11,6 +11,14 @@ export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 	const { accounts } = await instance.getAccounts(0n, 1000n);
 	for (const account of accounts) {
 		await snapshot.add(account);
+	}
+
+	const legacyColdWallets = await getLegacyColdWallets(sandbox);
+	for (const { mainsailAddress, legacyColdWallet } of legacyColdWallets) {
+		await snapshot.addLegacyColdWallet(
+			mainsailAddress,
+			await instance.getAccountInfoExtended(mainsailAddress, legacyColdWallet.address),
+		);
 	}
 
 	return snapshot;
@@ -23,6 +31,7 @@ interface WalletState {
 
 export class Snapshot {
 	private states: Record<string, WalletState> = {};
+	private legacyColdWallets: Record<string, Contracts.Evm.LegacyColdWallet> = {};
 	private receipts: Record<string, { sender: string; receipt: Contracts.Evm.TransactionReceipt }> = {};
 	private manualDeltas: Record<string, WalletState> = {};
 
@@ -57,6 +66,13 @@ export class Snapshot {
 			balance: BigNumber.make(account.balance),
 			nonce: BigNumber.make(account.nonce),
 		};
+	}
+
+	public async addLegacyColdWallet(
+		mainsailAddress: string,
+		legacyWallet: Contracts.Evm.LegacyColdWallet,
+	): Promise<void> {
+		this.legacyColdWallets[mainsailAddress] = legacyWallet;
 	}
 
 	public async addManualDelta(addressOrPublicKey: string, delta: Partial<WalletState>): Promise<void> {
@@ -98,18 +114,25 @@ export class Snapshot {
 
 			let ok = true;
 			if (!currentBalance.isEqualTo(expected.balance)) {
-				console.log(
-					"-- BALANCE MISMATCH",
-					account.address,
-					"EXPECTED",
-					expected.balance.toString(),
-					"ACTUAL",
-					currentBalance.toString(),
-					"DIFF",
-					expected.balance.minus(currentBalance).toString(),
-				);
+				// If it doesn't match; the discrepancy must come from a merged legacy cold wallet
+				const legacyColdWallet = this.legacyColdWallets[account.address];
+				if (
+					!legacyColdWallet ||
+					!BigNumber.make(legacyColdWallet.balance).isEqualTo(currentBalance.minus(expected.balance))
+				) {
+					console.log(
+						"-- BALANCE MISMATCH",
+						account.address,
+						"EXPECTED",
+						expected.balance.toString(),
+						"ACTUAL",
+						currentBalance.toString(),
+						"DIFF",
+						expected.balance.minus(currentBalance).toString(),
+					);
 
-				ok = false;
+					ok = false;
+				}
 			}
 
 			if (!currentNonce.isEqualTo(expected.nonce)) {

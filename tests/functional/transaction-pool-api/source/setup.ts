@@ -7,6 +7,7 @@ import { dirSync } from "tmp";
 import { MemoryDatabase } from "./database.js";
 import { PoolWorker } from "./pool-worker.js";
 import { Worker } from "./worker.js";
+import { getLegacyColdWallets } from "./utils.js";
 
 type PluginOptions = Record<string, any>;
 
@@ -90,6 +91,7 @@ const setup = async () => {
 		"@mainsail/crypto-signature-ecdsa",
 		"@mainsail/crypto-key-pair-ecdsa",
 		"@mainsail/crypto-consensus-bls12-381",
+		"@mainsail/crypto-address-base58",
 		"@mainsail/crypto-address-keccak256",
 		"@mainsail/crypto-wif",
 		"@mainsail/serializer",
@@ -186,6 +188,15 @@ const bootstrap = async (sandbox: Sandbox) => {
 	if (!result) {
 		throw new Error("Failed to process genesis block");
 	}
+
+	// Import some legacy cold wallets
+	const legacyColdWallets = await getLegacyColdWallets(sandbox);
+	const evm = sandbox.app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
+	for (const { legacyColdWallet } of legacyColdWallets) {
+		await evm.importLegacyColdWallet(legacyColdWallet);
+	}
+	//
+
 	await blockProcessor.commit(commitState);
 
 	const validatorSet = sandbox.app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
