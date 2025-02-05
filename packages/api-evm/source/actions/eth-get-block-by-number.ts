@@ -22,7 +22,7 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 		maxItems: 2,
 		minItems: 2,
 
-		prefixItems: [{ oneOf: [{ $ref: "prefixedHex" }, { $ref: "blockTag" }] }, { type: "boolean" }],
+		prefixItems: [{ $ref: "blockTag" }, { type: "boolean" }],
 		type: "array",
 	};
 

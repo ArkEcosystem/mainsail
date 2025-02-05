@@ -59,8 +59,15 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockTag
 	},
 	blockTag: {
 		$id: "blockTag",
-		enum: ["latest", "finalized", "safe"],
-		type: "string",
+		anyOf: [
+			{
+				enum: ["latest", "finalized", "safe"],
+				type: "string",
+			},
+			{
+				$ref: "prefixedHex",
+			},
+		],
 	},
 	prefixedBlockId: {
 		$id: "prefixedBlockId",
