@@ -30,6 +30,7 @@ export class BlockResource {
 			miner: blockData.generatorAddress,
 			difficulty: "0x0",
 			totalDifficulty: "0x0",
+			baseFeePerGas: "0x0",
 			extraData: "0x",
 			size: `0x${blockData.payloadLength.toString(16)}`, // TODO: Implement block size
 			gasLimit: `0x${milestone.block.maxGasLimit.toString(16)}`,
