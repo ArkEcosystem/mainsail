@@ -1,5 +1,5 @@
 use bs58;
-use revm::primitives::{alloy_primitives::wrap_fixed_bytes, U256};
+use revm::primitives::{alloy_primitives::wrap_fixed_bytes, Address, B256, U256};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
@@ -8,6 +8,7 @@ pub struct LegacyColdWallet {
     pub address: LegacyAddress,
     pub balance: U256,
     pub legacy_attributes: LegacyAccountAttributes,
+    pub merge_info: Option<(B256, Address)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]

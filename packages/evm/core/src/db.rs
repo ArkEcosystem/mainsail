@@ -144,7 +144,7 @@ pub struct PendingCommit {
     // If an address is found in the map, then a lookup for presence of cold wallet has been performed.
     // The option indicates whether a corresponding cold wallet has been found and merged. To avoid
     // redundant lookups, any address present in the map is skipped when processing a transaction.
-    pub merged_legacy_cold_wallets: BTreeMap<Address, Option<LegacyAddress>>,
+    pub merged_legacy_cold_wallets: BTreeMap<Address, Option<(B256, LegacyAddress)>>,
 }
 
 #[derive(Clone, Debug)]
@@ -301,6 +301,33 @@ impl PersistentDB {
         }
 
         Ok((cursor, accounts))
+    }
+
+    pub fn get_legacy_cold_wallets(
+        &self,
+        offset: u64,
+        limit: u64,
+    ) -> Result<(Option<u64>, Vec<LegacyColdWallet>), Error> {
+        let tx_env = self.env.read_txn()?;
+        let iter = self
+            .inner
+            .borrow()
+            .legacy_cold_wallets
+            .iter(&tx_env)?
+            .skip(offset as usize);
+
+        self.get_items(
+            iter,
+            |item| match item {
+                Some(item) => {
+                    let (_, legacy_cold_wallet) = item?;
+                    Ok(Some(legacy_cold_wallet))
+                }
+                None => Ok(None),
+            },
+            offset,
+            limit,
+        )
     }
 
     pub fn get_receipts(
@@ -634,24 +661,28 @@ impl PersistentDB {
                 }
             }
 
-            // Delete merged legacy cold wallets from storage and migrate legacy attributes
-            for (address, legacy_address) in merged_legacy_cold_wallets {
+            // Mark legacy cold wallets as merged in storage and migrate legacy attributes
+            for (address, legacy) in merged_legacy_cold_wallets {
                 self.logger.log(
                     LogLevel::Info,
                     format!(
                         "Merging legacy cold wallet '{}' with '{}'",
-                        legacy_address, address
+                        legacy.1, address
                     ),
                 );
 
-                let key = &LegacyAddressWrapper(*legacy_address);
-                let legacy_cold_wallet = inner
+                let key = &LegacyAddressWrapper(legacy.1);
+                let mut legacy_cold_wallet = inner
                     .legacy_cold_wallets
                     .get(&rwtxn, key)?
                     .expect("legacy cold wallet to be found");
 
-                let success = inner.legacy_cold_wallets.delete(rwtxn, key)?;
-                assert!(success);
+                assert!(legacy_cold_wallet.merge_info.is_none());
+                legacy_cold_wallet.merge_info.replace((legacy.0, *address));
+
+                inner
+                    .legacy_cold_wallets
+                    .put(rwtxn, key, &legacy_cold_wallet)?;
 
                 // The legacy balance has already been applied to the `PendingCommit`,
                 // thus only the legacy attributes need to be moved to a different storage.

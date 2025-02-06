@@ -366,17 +366,18 @@ impl EvmInner {
 
         let mut legacy_attributes = Default::default();
         if let Some(legacy_address) = legacy_address {
-            let legacy_cold_wallet = self
+            match self
                 .persistent_db
                 .get_legacy_cold_wallet(legacy_address)
                 .map_err(|err| {
                     EVMError::Database(format!("legacy cold wallet lookup failed: {}", err).into())
-                })?;
-
-            if let Some(legacy_cold_wallet) = legacy_cold_wallet {
-                // Merge cold wallet with account
-                info.balance = info.balance.saturating_add(legacy_cold_wallet.balance);
-                legacy_attributes = Some(legacy_cold_wallet.legacy_attributes);
+                })? {
+                Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
+                    // Merge cold wallet with account
+                    info.balance = info.balance.saturating_add(legacy_cold_wallet.balance);
+                    legacy_attributes = Some(legacy_cold_wallet.legacy_attributes);
+                }
+                _ => (),
             }
         }
 
@@ -443,6 +444,19 @@ impl EvmInner {
         }
     }
 
+    pub fn get_legacy_cold_wallets(
+        &mut self,
+        offset: u64,
+        limit: u64,
+    ) -> std::result::Result<(Option<u64>, Vec<LegacyColdWallet>), EVMError<String>> {
+        match self.persistent_db.get_legacy_cold_wallets(offset, limit) {
+            Ok((next_offset, accounts)) => Ok((next_offset, accounts)),
+            Err(err) => Err(EVMError::Database(
+                format!("failed reading legacy cold wallets: {}", err).into(),
+            )),
+        }
+    }
+
     pub fn get_receipts(
         &mut self,
         offset: u64,
@@ -465,27 +479,30 @@ impl EvmInner {
 
         // Make legacy balance available to account in pending commit during preverification
         if let Some(legacy_address) = ctx.legacy_address {
-            if let Some(legacy_cold_wallet) = self
+            match self
                 .persistent_db
                 .get_legacy_cold_wallet(legacy_address)
                 .map_err(|err| {
                     EVMError::Database(format!("failed reading legacy cold wallet: {}", err).into())
-                })?
-            {
-                let mut legacy_balances = HashMap::<Address, u128>::new();
-                legacy_balances.insert(
-                    ctx.caller,
-                    legacy_cold_wallet.balance.try_into().expect("fit u128"),
-                );
-
-                state_commit::apply_rewards(
-                    &mut self.persistent_db,
-                    &mut pending_commit,
-                    legacy_balances,
-                )
-                .map_err(|err| {
-                    EVMError::Database(format!("failed to apply legacy balance: {}", err).into())
-                })?;
+                })? {
+                Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
+                    let mut legacy_balances = HashMap::<Address, u128>::new();
+                    legacy_balances.insert(
+                        ctx.caller,
+                        legacy_cold_wallet.balance.try_into().expect("fit u128"),
+                    );
+                    state_commit::apply_rewards(
+                        &mut self.persistent_db,
+                        &mut pending_commit,
+                        legacy_balances,
+                    )
+                    .map_err(|err| {
+                        EVMError::Database(
+                            format!("failed to apply legacy balance: {}", err).into(),
+                        )
+                    })?;
+                }
+                _ => (),
             }
         }
 
@@ -586,40 +603,42 @@ impl EvmInner {
                     .contains_key(&tx_ctx.caller)
                 {
                     // Make legacy balance available to account in pending commit
-                    if let Some(legacy_cold_wallet) = self
+                    match self
                         .persistent_db
                         .get_legacy_cold_wallet(legacy_address)
                         .map_err(|err| {
                             EVMError::Database(
                                 format!("failed reading legacy cold wallet: {}", err).into(),
                             )
-                        })?
-                    {
-                        let mut legacy_balances = HashMap::<Address, u128>::new();
-                        legacy_balances.insert(
-                            tx_ctx.caller,
-                            legacy_cold_wallet.balance.try_into().expect("fit u128"),
-                        );
+                        })? {
+                        Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
+                            let mut legacy_balances = HashMap::<Address, u128>::new();
+                            legacy_balances.insert(
+                                tx_ctx.caller,
+                                legacy_cold_wallet.balance.try_into().expect("fit u128"),
+                            );
 
-                        state_commit::apply_rewards(
-                            &mut self.persistent_db,
-                            &mut pending,
-                            legacy_balances,
-                        )
-                        .map_err(|err| {
-                            EVMError::Database(
-                                format!("failed to apply legacy balance: {}", err).into(),
+                            state_commit::apply_rewards(
+                                &mut self.persistent_db,
+                                &mut pending,
+                                legacy_balances,
                             )
-                        })?;
+                            .map_err(|err| {
+                                EVMError::Database(
+                                    format!("failed to apply legacy balance: {}", err).into(),
+                                )
+                            })?;
 
-                        pending
-                            .merged_legacy_cold_wallets
-                            .insert(tx_ctx.caller, Some(legacy_address));
-                    } else {
-                        // Prevent subsequent look ups for same sender in same commit
-                        pending
-                            .merged_legacy_cold_wallets
-                            .insert(tx_ctx.caller, None);
+                            pending
+                                .merged_legacy_cold_wallets
+                                .insert(tx_ctx.caller, Some((tx_ctx.tx_hash, legacy_address)));
+                        }
+                        _ => {
+                            // Prevent subsequent look ups for same sender in same commit
+                            pending
+                                .merged_legacy_cold_wallets
+                                .insert(tx_ctx.caller, None);
+                        }
                     }
                 }
             }
@@ -1065,6 +1084,26 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<JsGetLegacyColdWallets>")]
+    pub fn get_legacy_cold_wallets(
+        &mut self,
+        node_env: Env,
+        offset: JsBigInt,
+        limit: JsBigInt,
+    ) -> Result<JsObject> {
+        let offset = offset.get_u64()?.0;
+        let limit = limit.get_u64()?.0;
+
+        node_env.execute_tokio_future(
+            Self::get_legacy_cold_wallets_async(self.evm.clone(), offset, limit),
+            |&mut node_env, result| {
+                Ok(result::JsGetLegacyColdWallets::new(
+                    &node_env, result.0, result.1,
+                )?)
+            },
+        )
+    }
+
     #[napi(ts_return_type = "Promise<JsGetReceipts>")]
     pub fn get_receipts(
         &mut self,
@@ -1358,6 +1397,20 @@ impl JsEvmWrapper {
     ) -> Result<(Option<u64>, Vec<AccountInfoExtended>)> {
         let mut lock = evm.lock().await;
         let result = lock.get_accounts(offset, limit);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn get_legacy_cold_wallets_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        offset: u64,
+        limit: u64,
+    ) -> Result<(Option<u64>, Vec<LegacyColdWallet>)> {
+        let mut lock = evm.lock().await;
+        let result = lock.get_legacy_cold_wallets(offset, limit);
 
         match result {
             Ok(result) => Result::Ok(result),

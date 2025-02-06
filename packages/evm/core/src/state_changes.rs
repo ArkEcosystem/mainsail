@@ -23,7 +23,7 @@ pub struct StateChangeset {
     // Map of legacy cold wallet
     pub legacy_cold_wallets: BTreeMap<LegacyAddress, LegacyColdWallet>,
     // Map of merged legacy cold wallets
-    pub merged_legacy_cold_wallets: BTreeMap<Address, LegacyAddress>,
+    pub merged_legacy_cold_wallets: BTreeMap<Address, (B256, LegacyAddress)>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Default, serde::Serialize, serde::Deserialize)]
@@ -49,6 +49,14 @@ pub struct AccountUpdate {
     pub username: Option<String>,
     // Set when commit receipt contains "UsernameResigned" event
     pub username_resigned: bool,
+    // Set when merge with legacy cold wallet happened
+    pub merge_info: Option<AccountMergeInfo>,
+}
+
+#[derive(Default, Debug)]
+pub struct AccountMergeInfo {
+    pub legacy_address: LegacyAddress,
+    pub transaction_hash: B256,
 }
 
 pub fn bundle_into_change_set(bundle_state: BundleState) -> StateChangeset {

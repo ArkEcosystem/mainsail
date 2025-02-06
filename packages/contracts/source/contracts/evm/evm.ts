@@ -22,8 +22,9 @@ export interface Instance extends CommitHandler {
 	getAccountInfo(address: string): Promise<AccountInfo>;
 	getAccountInfoExtended(address: string, legacyAddress?: string): Promise<AccountInfoExtended>;
 	importAccountInfo(info: AccountInfoExtended): Promise<void>;
-	importLegacyColdWallet(wallet: LegacyColdWallet): Promise<void>;
+	importLegacyColdWallet(wallet: ImportLegacyColdWallet): Promise<void>;
 	getAccounts(offset: bigint, limit: bigint): Promise<GetAccountsResult>;
+	getLegacyColdWallets(offset: bigint, limit: bigint): Promise<GetLegacyColdWalletsResult>;
 	getReceipts(offset: bigint, limit: bigint): Promise<GetReceiptsResult>;
 	getReceipt(height: number, txHash: string): Promise<GetReceiptResult>;
 	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
@@ -63,10 +64,22 @@ export interface AccountInfoExtended extends AccountInfo {
 	readonly legacyAttributes: LegacyAttributes;
 }
 
+export interface ImportLegacyColdWallet {
+	readonly address: string;
+	readonly balance: bigint;
+	readonly legacyAttributes: LegacyAttributes;
+}
+
 export interface LegacyColdWallet {
 	readonly address: string;
 	readonly balance: bigint;
 	readonly legacyAttributes: LegacyAttributes;
+	readonly mergeInfo?: AccountMergeInfo;
+}
+
+export interface AccountMergeInfo {
+	readonly address: string;
+	readonly txHash: string;
 }
 
 export interface LegacyAttributes {
@@ -88,6 +101,7 @@ export interface AccountUpdate {
 	readonly unvote?: string;
 	readonly username?: string;
 	readonly usernameResigned: boolean;
+	readonly legacyMergeInfo?: AccountMergeInfo;
 }
 
 export interface AccountUpdateContext {
@@ -143,6 +157,11 @@ export interface TransactionViewContext {
 export interface GetAccountsResult {
 	readonly nextOffset?: bigint;
 	readonly accounts: AccountInfoExtended[];
+}
+
+export interface GetLegacyColdWalletsResult {
+	readonly nextOffset?: bigint;
+	readonly wallets: LegacyColdWallet[];
 }
 
 export interface GetReceiptsResult {

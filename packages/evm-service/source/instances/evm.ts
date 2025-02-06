@@ -97,12 +97,19 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.importAccountInfo(info);
 	}
 
-	public async importLegacyColdWallet(wallet: Contracts.Evm.LegacyColdWallet): Promise<void> {
-		return this.#evm.importLegacyColdWallet(wallet);
+	public async importLegacyColdWallet(wallet: Contracts.Evm.ImportLegacyColdWallet): Promise<void> {
+		return this.#evm.importLegacyColdWallet({ ...wallet, mergeInfo: undefined });
 	}
 
 	public async getAccounts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetAccountsResult> {
 		return this.#evm.getAccounts(offset, limit);
+	}
+
+	public async getLegacyColdWallets(
+		offset: bigint,
+		limit: bigint,
+	): Promise<Contracts.Evm.GetLegacyColdWalletsResult> {
+		return this.#evm.getLegacyColdWallets(offset, limit);
 	}
 
 	public async getReceipts(offset: bigint, limit: bigint): Promise<Contracts.Evm.GetReceiptsResult> {

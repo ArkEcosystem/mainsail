@@ -8,7 +8,7 @@ use revm::{
 
 use crate::{
     db::{CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
-    state_changes::{self, AccountUpdate},
+    state_changes::{self, AccountMergeInfo, AccountUpdate},
 };
 
 #[derive(Debug, Default)]
@@ -124,6 +124,14 @@ fn collect_dirty_accounts(
                     unvote: None,
                     username: None,
                     username_resigned: false,
+                    merge_info: commit
+                        .change_set
+                        .merged_legacy_cold_wallets
+                        .get(&address)
+                        .map(|value| AccountMergeInfo {
+                            legacy_address: value.1,
+                            transaction_hash: value.0,
+                        }),
                 },
             );
         }

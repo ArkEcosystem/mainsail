@@ -178,6 +178,7 @@ pub struct JsAccountUpdate {
     pub unvote: Option<JsString>,
     pub username: Option<JsString>,
     pub username_resigned: JsBoolean,
+    pub legacy_merge_info: Option<JsAccountMergeInfo>,
 }
 
 impl JsAccountUpdate {
@@ -199,6 +200,16 @@ impl JsAccountUpdate {
 
         let username_resigned = node_env.get_boolean(account_update.username_resigned)?;
 
+        let legacy_merge_info = match &account_update.merge_info {
+            Some(legacy_merge_info) => Some(JsAccountMergeInfo {
+                address: node_env
+                    .create_string_from_std(legacy_merge_info.legacy_address.to_string())?,
+                tx_hash: node_env
+                    .create_string_from_std(legacy_merge_info.transaction_hash.to_string())?,
+            }),
+            None => None,
+        };
+
         Ok(JsAccountUpdate {
             address: node_env.create_string_from_std(account_update.address.to_checksum(None))?,
             nonce: node_env.create_bigint_from_u64(account_update.nonce)?,
@@ -207,6 +218,7 @@ impl JsAccountUpdate {
             unvote,
             username,
             username_resigned,
+            legacy_merge_info,
         })
     }
 }
@@ -224,6 +236,33 @@ pub struct JsLegacyColdWallet {
     pub address: JsString,
     pub balance: JsBigInt,
     pub legacy_attributes: JsLegacyAttributes,
+    pub merge_info: Option<JsAccountMergeInfo>,
+}
+
+#[napi(object)]
+pub struct JsAccountMergeInfo {
+    pub address: JsString,
+    pub tx_hash: JsString,
+}
+
+impl JsLegacyColdWallet {
+    pub fn new(node_env: &napi::Env, wallet: LegacyColdWallet) -> anyhow::Result<Self> {
+        let merge_info = if let Some(merged_account) = wallet.merge_info {
+            Some(JsAccountMergeInfo {
+                address: node_env.create_string(&merged_account.1.to_string())?,
+                tx_hash: node_env.create_string(&merged_account.0.to_string())?,
+            })
+        } else {
+            None
+        };
+
+        Ok(JsLegacyColdWallet {
+            address: node_env.create_string(&wallet.address.to_string())?,
+            balance: utils::convert_u256_to_bigint(node_env, wallet.balance)?,
+            legacy_attributes: JsLegacyAttributes::new(node_env, wallet.legacy_attributes)?,
+            merge_info,
+        })
+    }
 }
 
 #[napi(object)]
@@ -275,10 +314,20 @@ impl TryInto<LegacyColdWallet> for JsLegacyColdWallet {
     type Error = crate::Error;
 
     fn try_into(self) -> Result<LegacyColdWallet, Self::Error> {
+        let merge_info = if let Some(merge_info) = self.merge_info {
+            Some((
+                utils::convert_string_to_b256(merge_info.tx_hash)?,
+                utils::create_address_from_js_string(merge_info.address)?,
+            ))
+        } else {
+            None
+        };
+
         Ok(LegacyColdWallet {
             address: utils::create_legacy_address_from_js_string(self.address)?,
             balance: utils::convert_bigint_to_u256(self.balance)?,
             legacy_attributes: self.legacy_attributes.try_into()?,
+            merge_info,
         })
     }
 }
@@ -382,6 +431,35 @@ impl JsGetAccounts {
         Ok(JsGetAccounts {
             next_offset,
             accounts: mapped,
+        })
+    }
+}
+
+#[napi(object)]
+pub struct JsGetLegacyColdWallets {
+    pub next_offset: Option<JsBigInt>,
+    pub wallets: Vec<JsLegacyColdWallet>,
+}
+
+impl JsGetLegacyColdWallets {
+    pub fn new(
+        node_env: &napi::Env,
+        next_offset: Option<u64>,
+        wallets: Vec<LegacyColdWallet>,
+    ) -> anyhow::Result<Self> {
+        let next_offset = match next_offset {
+            Some(next_offset) => Some(node_env.create_bigint_from_u64(next_offset)?),
+            None => None,
+        };
+
+        let mut mapped = Vec::with_capacity(wallets.len());
+        for wallet in wallets {
+            mapped.push(JsLegacyColdWallet::new(node_env, wallet)?);
+        }
+
+        Ok(JsGetLegacyColdWallets {
+            next_offset,
+            wallets: mapped,
         })
     }
 }
