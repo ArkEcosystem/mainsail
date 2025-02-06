@@ -33,8 +33,17 @@ import {
 } from "./actions/index.js";
 import Handlers from "./handlers.js";
 import { Server } from "./server.js";
+import { schemas } from "./validation/index.js";
 
 export class ServiceProvider extends AbstractServiceProvider<Server> {
+	public async register(): Promise<void> {
+		for (const schema of Object.values(schemas)) {
+			this.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator).addSchema(schema);
+		}
+
+		await super.register();
+	}
+
 	protected httpIdentifier(): symbol {
 		return Identifiers.Evm.API.HTTP;
 	}

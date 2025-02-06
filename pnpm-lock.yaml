@@ -327,6 +327,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      ajv:
+        specifier: 8.12.0
+        version: 8.12.0
       dayjs:
         specifier: 1.11.10
         version: 1.11.10
