@@ -10,6 +10,7 @@ export const schemas: Record<"blockTag", AnySchemaObject> = {
 			},
 			{
 				$ref: "prefixedHex",
+				currentHeightHex: true,
 			},
 		],
 	},
