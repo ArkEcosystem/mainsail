@@ -150,8 +150,8 @@ export class Restore {
 				contractRepository: this.contractRepositoryFactory(entityManager),
 				entityManager,
 				lastHeight: 0,
-				mostRecentCommit,
 				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
+				mostRecentCommit,
 				publicKeyToAddress: {},
 				receiptRepository: this.receiptRepositoryFactory(entityManager),
 
