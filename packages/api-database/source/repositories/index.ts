@@ -2,6 +2,7 @@ export { makeApiNodeRepository } from "./api-node-repository.js";
 export { makeBlockRepository } from "./block-repository.js";
 export { makeConfigurationRepository } from "./configuration-repository.js";
 export { makeContractRepository } from "./contract-repository.js";
+export { makeLegacyColdWalletRepository } from "./legacy-cold-wallet-repository.js";
 export { makePeerRepository } from "./peer-repository.js";
 export { makePluginRepository } from "./plugin-repository.js";
 export { makeReceiptRepository } from "./receipt-repository.js";

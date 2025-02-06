@@ -11,6 +11,7 @@ export const Identifiers = {
 	StateRepositoryFactory: Symbol.for("API<Factory.StateRepositoryFactory>"),
 	TransactionRepositoryFactory: Symbol.for("API<Factory.TransactionRepositoryFactory>"),
 	TransactionTypeRepositoryFactory: Symbol.for("API<Factory.TransactionTypeRepositoryFactory>"),
+	LegacyColdWalletRepositoryFactory: Symbol.for("API<Factory.LegacyColdWalletRepositoryFactory>"),
 	ValidatorRoundRepositoryFactory: Symbol.for("API<Factory.ValidatorRoundRepositoryFactory>"),
 	WalletRepositoryFactory: Symbol.for("API<Factory.WalletRepositoryFactory>"),
 };

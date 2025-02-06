@@ -22,7 +22,7 @@ export class Receipt {
 		nullable: false,
 		type: "bigint",
 	})
-	public blockHeight!: string;
+	public readonly blockHeight!: string;
 
 	@Column({
 		nullable: false,

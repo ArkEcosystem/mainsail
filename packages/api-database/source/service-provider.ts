@@ -13,6 +13,7 @@ import {
 	Peer,
 	Plugin,
 	Receipt,
+	LegacyColdWallet,
 	State,
 	Transaction,
 	TransactionType,
@@ -24,6 +25,7 @@ import {
 	makeBlockRepository,
 	makeConfigurationRepository,
 	makeContractRepository,
+	makeLegacyColdWalletRepository,
 	makePeerRepository,
 	makePluginRepository,
 	makeReceiptRepository,
@@ -73,6 +75,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					Transaction,
 					ValidatorRound,
 					Wallet,
+					LegacyColdWallet,
 				],
 				migrations: [new URL(".", import.meta.url).pathname + "/migrations/*.js"],
 				migrationsRun: false,
@@ -170,6 +173,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.toFactory(
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeWalletRepository(customDataSource ?? dataSource),
+				);
+
+			this.app
+				.bind(Identifiers.LegacyColdWalletRepositoryFactory)
+				.toFactory(
+					() => (customDataSource?: RepositoryDataSource) =>
+						makeLegacyColdWalletRepository(customDataSource ?? dataSource),
 				);
 		} catch (error) {
 			await this.app.terminate("Failed to configure database!", error);

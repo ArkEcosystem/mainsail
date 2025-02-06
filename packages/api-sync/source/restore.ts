@@ -23,6 +23,7 @@ interface RestoreContext {
 	readonly receiptRepository: ApiDatabaseContracts.ReceiptRepository;
 	readonly validatorRoundRepository: ApiDatabaseContracts.ValidatorRoundRepository;
 	readonly walletRepository: ApiDatabaseContracts.WalletRepository;
+	readonly legacyColdWalletRepository: ApiDatabaseContracts.LegacyColdWalletRepository;
 
 	// lookups
 	readonly addressToPublicKey: Record<string, string>;
@@ -52,6 +53,7 @@ interface ValidatorAttributes {
 
 interface UserAttributes {
 	vote?: string;
+	legacyMerge?: Contracts.Evm.AccountMergeInfo;
 }
 
 @injectable()
@@ -111,6 +113,9 @@ export class Restore {
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
 
+	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
+	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;
+
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
 
@@ -160,6 +165,7 @@ export class Restore {
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
+				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 			};
 
 			// The restore keeps a long-lived postgres transaction while it ingests all data.
@@ -172,31 +178,35 @@ export class Restore {
 			// - `blocks` table and `transactions` table respectively
 			await this.#ingestBlocksAndTransactions(context);
 
-			// 3) All `accounts` are read from the EVM storage and written to:
+			// 3) All `legacyColdWallets` are read from the EVM storage and written to:
+			// - `legacy_cold_wallets` table
+			await this.#ingestLegacyColdWallets(context);
+
+			// 4) All `accounts` are read from the EVM storage and written to:
 			// - `wallets` table
 			await this.#ingestWallets(context);
 
-			// 4) All `receipts` are read from the EVM storage and written to:
+			// 5) All `receipts` are read from the EVM storage and written to:
 			// - `receipts` table
 			await this.#ingestReceipts(context);
 
-			// 5) All `validator_rounds` are read from the EVM storage and written to:
+			// 6) All `validator_rounds` are read from the EVM storage and written to:
 			// - `validator_rounds` table
 			await this.#ingestValidatorRounds(context);
 
-			// 6) Write `transction_types` table
+			// 7) Write `transction_types` table
 			await this.#ingestTransactionTypes(context);
 
-			// 7) Write `configuration` table
+			// 8) Write `configuration` table
 			await this.#ingestConfiguration(context);
 
-			// 8) Write `state` table
+			// 9) Write `state` table
 			await this.#ingestState(context);
 
-			// 9) Write `contracts` table
+			// 10) Write `contracts` table
 			await this.#ingestContracts(context);
 
-			// 10) Update validator ranks
+			// 11) Update validator ranks
 			await this.#updateValidatorRanks(context);
 
 			restoredHeight = context.lastHeight;
@@ -404,6 +414,7 @@ export class Restore {
 							? {
 									...(userAttributes.vote ? { vote: userAttributes.vote } : {}),
 									...(username ? { username } : {}),
+									...(userAttributes.legacyMerge ? { legacyMerge: userAttributes.legacyMerge } : {}),
 								}
 							: {}),
 						...(legacyAttributes && Object.keys(legacyAttributes).length > 0
@@ -434,6 +445,50 @@ export class Restore {
 
 		const t1 = performance.now();
 		this.logger.info(`Restored ${accounts.length.toLocaleString()} wallets in ${t1 - t0}ms`);
+	}
+
+	async #ingestLegacyColdWallets(context: RestoreContext): Promise<void> {
+		const t0 = performance.now();
+
+		const BATCH_SIZE = 1000n;
+		let offset: bigint | undefined = 0n;
+
+		const legacyColdWallets: Models.LegacyColdWallet[] = [];
+
+		do {
+			const result = await this.evm.getLegacyColdWallets(offset ?? 0n, BATCH_SIZE);
+
+			for (const wallet of result.wallets) {
+				legacyColdWallets.push({
+					address: wallet.address,
+					balance: Utils.BigNumber.make(wallet.balance).toFixed(),
+					...(Object.keys(wallet.legacyAttributes).length > 0 ? { attributes: wallet.legacyAttributes } : {}),
+					mergeInfoWalletAddress: wallet.mergeInfo?.address,
+					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
+				});
+
+				if (wallet.mergeInfo) {
+					const userAttributes = context.userAttributes[wallet.mergeInfo.address] ?? {};
+
+					context.userAttributes[wallet.mergeInfo.address] = {
+						...userAttributes,
+						legacyMerge: {
+							address: wallet.address, // legacyAddress
+							txHash: wallet.mergeInfo.txHash,
+						},
+					};
+				}
+			}
+
+			offset = result.nextOffset;
+		} while (offset);
+
+		for (const batch of chunk(legacyColdWallets, 256)) {
+			await context.legacyColdWalletRepository.createQueryBuilder().insert().orIgnore().values(batch).execute();
+		}
+
+		const t1 = performance.now();
+		this.logger.info(`Restored ${legacyColdWallets.length.toLocaleString()} legacy cold wallets in ${t1 - t0}ms`);
 	}
 
 	async #ingestReceipts(context: RestoreContext): Promise<void> {

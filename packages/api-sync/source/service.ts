@@ -18,6 +18,7 @@ interface DeferredSync {
 	receipts: Models.Receipt[];
 	validatorRound?: Models.ValidatorRound;
 	wallets: Array<Array<any>>;
+	mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[];
 	newMilestones?: Record<string, any>;
 }
 
@@ -66,6 +67,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.WalletRepositoryFactory)
 	private readonly walletRepositoryFactory!: ApiDatabaseContracts.WalletRepositoryFactory;
+
+	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
+	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;
 
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
@@ -123,6 +127,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		const addressToPublicKey: Record<string, string> = {};
 		const publicKeyToAddress: Record<string, string> = {};
 		const transactionReceipts: Models.Receipt[] = [];
+		const mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[] = [];
 
 		const receipts = unit.getProcessorResult().receipts;
 
@@ -205,6 +210,15 @@ export class Sync implements Contracts.ApiSync.Service {
 						: {}),
 			};
 
+			if (account.legacyMergeInfo) {
+				attributes["legacyMerge"] = account.legacyMergeInfo;
+				mergedLegacyColdWallets.push({
+					address: account.address, // mainsail address
+					legacyAddress: account.legacyMergeInfo.address,
+					txHash: account.legacyMergeInfo.txHash,
+				});
+			}
+
 			return [
 				account.address,
 				addressToPublicKey[account.address] ?? null,
@@ -279,6 +293,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			})),
 
 			wallets,
+			mergedLegacyColdWallets,
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
@@ -357,6 +372,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const receiptRepository = this.receiptRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
+			const legacyColdwalletRepository = this.legacyColdWalletRepositoryFactory(entityManager);
 
 			await blockRepository.createQueryBuilder().insert().orIgnore().values(deferred.block).execute();
 
@@ -400,6 +416,18 @@ export class Sync implements Contracts.ApiSync.Service {
 				.where("id = :id", { id: 1 })
 				.execute();
 
+			for (const merge of deferred.mergedLegacyColdWallets) {
+				await legacyColdwalletRepository
+					.createQueryBuilder()
+					.update()
+					.set({
+						mergeInfoWalletAddress: merge.address,
+						mergeInfoTransactionHash: merge.txHash,
+					})
+					.where("address = :legacyAddress", { legacyAddress: merge.legacyAddress })
+					.execute();
+			}
+
 			for (const batch of chunk(deferred.wallets, 256)) {
 				const batchParameterLength = 6;
 				const placeholders = batch
@@ -424,6 +452,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			-- legacy attributes are kept indefinitely
 			'isLegacy', EXCLUDED.attributes->>'isLegacy',
 			'secondPublicKey', EXCLUDED.attributes->>'secondPublicKey',
+			'legacyMerge', EXCLUDED.attributes->>'legacyMerge',
 
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',
@@ -503,6 +532,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const receiptRepository = this.receiptRepositoryFactory(entityManager);
 			const validatorRoundRepository = this.validatorRoundRepositoryFactory(entityManager);
 			const walletRepository = this.walletRepositoryFactory(entityManager);
+			const legacyColdwalletRepository = this.legacyColdWalletRepositoryFactory(entityManager);
 
 			// Ensure all tables are truncated (already supposed to be idempotent, but it's cleaner)
 			await Promise.all(
@@ -514,6 +544,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					receiptRepository,
 					validatorRoundRepository,
 					walletRepository,
+					legacyColdwalletRepository,
 				].map((repo) => repo.clear()),
 			);
 		});

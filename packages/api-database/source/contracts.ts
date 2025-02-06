@@ -5,6 +5,7 @@ import {
 	Block,
 	Configuration,
 	Contract,
+	LegacyColdWallet,
 	Peer,
 	Plugin,
 	Receipt,
@@ -88,6 +89,8 @@ export type TransactionRepositoryExtension = {
 };
 export type TransactionRepository = ExtendedRepository<Transaction> & TransactionRepositoryExtension;
 
+export type LegacyColdWalletRepositoryExtension = {};
+export type LegacyColdWalletRepository = ExtendedRepository<LegacyColdWallet> & LegacyColdWalletRepositoryExtension;
 export type ValidatorRoundRepositoryExtension = {};
 export type ValidatorRoundRepository = ExtendedRepository<ValidatorRound> & ValidatorRoundRepositoryExtension;
 export type PluginRepositoryExtension = {};
@@ -133,6 +136,7 @@ export type ValidatorRoundRepositoryFactory = (customDataSource?: RepositoryData
 export type PluginRepositoryFactory = (customDataSource?: RepositoryDataSource) => PluginRepository;
 export type StateRepositoryFactory = (customDataSource?: RepositoryDataSource) => StateRepository;
 export type WalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => WalletRepository;
+export type LegacyColdWalletRepositoryFactory = (customDataSource?: RepositoryDataSource) => LegacyColdWalletRepository;
 
 export { Brackets, Entity, Repository } from "typeorm";
 export { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";

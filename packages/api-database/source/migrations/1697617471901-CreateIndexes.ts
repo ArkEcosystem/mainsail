@@ -45,6 +45,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                             WHERE (attributes ? 'validatorPublicKey');
             CREATE UNIQUE INDEX wallets_unique_public_key ON wallets (public_key)
             WHERE public_key IS NOT NULL;
+
+            CREATE UNIQUE INDEX legacy_cold_wallets_unique_merge_address ON legacy_cold_wallets (merge_info_wallet_address)
+            WHERE merge_info_wallet_address IS NOT NULL;
         `);
 	}
 
@@ -86,6 +89,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX wallets_attributes;
             DROP INDEX wallets_validators;
             DROP INDEX wallets_unique_public_key;
+
+            DROP INDEX legacy_cold_wallets_unique_merge_address;
         `);
 	}
 }
