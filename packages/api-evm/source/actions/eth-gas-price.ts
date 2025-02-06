@@ -1,8 +1,11 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class EthGasPriceAction implements Contracts.Api.RPC.Action {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	public readonly name: string = "eth_gasPrice";
 
 	public readonly schema = {
@@ -12,6 +15,8 @@ export class EthGasPriceAction implements Contracts.Api.RPC.Action {
 	};
 
 	public async handle(): Promise<string> {
-		return `0x5`;
+		const milestone = this.configuration.getMilestone();
+
+		return `0x${milestone.gas.minimumGasPrice.toString(16)}`;
 	}
 }
