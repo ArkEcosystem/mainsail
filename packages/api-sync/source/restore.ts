@@ -151,21 +151,21 @@ export class Restore {
 				entityManager,
 				lastHeight: 0,
 				mostRecentCommit,
+				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 				publicKeyToAddress: {},
 				receiptRepository: this.receiptRepositoryFactory(entityManager),
+
 				stateRepository: this.stateRepositoryFactory(entityManager),
 
 				totalSupply: this.databaseService.isEmpty()
 					? this.stateStore.getGenesisCommit().block.data.totalAmount
 					: Utils.BigNumber.ZERO,
-
 				transactionRepository: this.transactionRepositoryFactory(entityManager),
 				transactionTypeRepository: this.transactionTypeRepositoryFactory(entityManager),
 				userAttributes: {},
 				validatorAttributes: {},
 				validatorRoundRepository: this.validatorRoundRepositoryFactory(entityManager),
 				walletRepository: this.walletRepositoryFactory(entityManager),
-				legacyColdWalletRepository: this.legacyColdWalletRepositoryFactory(entityManager),
 			};
 
 			// The restore keeps a long-lived postgres transaction while it ingests all data.
@@ -463,8 +463,8 @@ export class Restore {
 					address: wallet.address,
 					balance: Utils.BigNumber.make(wallet.balance).toFixed(),
 					...(Object.keys(wallet.legacyAttributes).length > 0 ? { attributes: wallet.legacyAttributes } : {}),
-					mergeInfoWalletAddress: wallet.mergeInfo?.address,
 					mergeInfoTransactionHash: wallet.mergeInfo?.txHash,
+					mergeInfoWalletAddress: wallet.mergeInfo?.address,
 				});
 
 				if (wallet.mergeInfo) {

@@ -6,6 +6,7 @@ import * as Blocks from "./routes/blocks.js";
 import * as Commits from "./routes/commits.js";
 import * as DeployedContracts from "./routes/contracts.js";
 import * as Delegates from "./routes/delegates.js";
+import * as Legacy from "./routes/legacy.js";
 import * as Node from "./routes/node.js";
 import * as Peers from "./routes/peers.js";
 import * as Receipts from "./routes/receipts.js";
@@ -13,7 +14,6 @@ import * as Transactions from "./routes/transactions.js";
 import * as ValidatorRounds from "./routes/validator-rounds.js";
 import * as Votes from "./routes/votes.js";
 import * as Wallets from "./routes/wallets.js";
-import * as Legacy from "./routes/legacy.js";
 
 const config = {
 	name: "Public API",

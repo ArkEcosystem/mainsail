@@ -272,6 +272,8 @@ export class Sync implements Contracts.ApiSync.Service {
 				version: header.version,
 			},
 
+			mergedLegacyColdWallets,
+
 			receipts: transactionReceipts,
 
 			transactions: transactions.map(({ data }) => ({
@@ -291,9 +293,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				signatures: undefined, //data.signatures,
 				timestamp: header.timestamp.toFixed(),
 			})),
-
 			wallets,
-			mergedLegacyColdWallets,
 
 			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
@@ -421,8 +421,8 @@ export class Sync implements Contracts.ApiSync.Service {
 					.createQueryBuilder()
 					.update()
 					.set({
-						mergeInfoWalletAddress: merge.address,
 						mergeInfoTransactionHash: merge.txHash,
+						mergeInfoWalletAddress: merge.address,
 					})
 					.where("address = :legacyAddress", { legacyAddress: merge.legacyAddress })
 					.execute();
