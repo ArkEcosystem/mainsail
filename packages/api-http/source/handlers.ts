@@ -13,6 +13,7 @@ import * as Transactions from "./routes/transactions.js";
 import * as ValidatorRounds from "./routes/validator-rounds.js";
 import * as Votes from "./routes/votes.js";
 import * as Wallets from "./routes/wallets.js";
+import * as Legacy from "./routes/legacy.js";
 
 const config = {
 	name: "Public API",
@@ -31,6 +32,7 @@ const config = {
 			ValidatorRounds,
 			Votes,
 			Wallets,
+			Legacy,
 		];
 
 		for (const handler of handlers) {

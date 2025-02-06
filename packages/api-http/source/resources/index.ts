@@ -6,3 +6,4 @@ export * from "./receipt.js";
 export * from "./transaction.js";
 export * from "./validator-round.js";
 export * from "./wallet.js";
+export * from "./legacy-cold-wallet.js";
