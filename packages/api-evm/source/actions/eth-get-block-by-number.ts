@@ -2,6 +2,7 @@ import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 
 import { BlockResource } from "../resources/index.js";
+import { resolveBlockTag } from "../utils/resolve-block-tag.js";
 
 @injectable()
 export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
@@ -26,8 +27,8 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action {
 		type: "array",
 	};
 
-	public async handle(parameters: [string, boolean]): Promise<object | null> {
-		const height = parameters[0].startsWith("0x") ? Number.parseInt(parameters[0]) : this.stateStore.getHeight();
+	public async handle(parameters: [string | Contracts.Crypto.BlockTag, boolean]): Promise<object | null> {
+		const height = await resolveBlockTag(this.stateStore, parameters[0]);
 		const transactionObject = parameters[1];
 
 		const block = await this.databaseService.getBlock(height);

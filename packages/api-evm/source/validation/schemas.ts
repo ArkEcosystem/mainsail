@@ -5,7 +5,7 @@ export const schemas: Record<"blockTag", AnySchemaObject> = {
 		$id: "blockTag",
 		anyOf: [
 			{
-				enum: ["latest", "finalized", "safe"],
+				enum: ["latest", "safe", "finalized"],
 				type: "string",
 			},
 			{
