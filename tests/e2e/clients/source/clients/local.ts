@@ -11,6 +11,10 @@ export class LocalClient implements Client {
 		return Number.parseInt(await this.#JSONRPCCall<string>("eth_blockNumber", []));
 	}
 
+	public async getBlock(): Promise<Record<string, any>> {
+		return this.#JSONRPCCall<Record<string, any>>("eth_getBlockByNumber", ["latest", true]);
+	}
+
 	async #JSONRPCCall<T>(method: string, parameters: any[]): Promise<T> {
 		const response = await http.post(this.url, {
 			body: {

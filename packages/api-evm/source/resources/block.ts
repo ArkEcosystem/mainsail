@@ -27,7 +27,7 @@ export class BlockResource {
 			transactionsRoot: `0x${blockData.stateHash}`,
 			stateRoot: `0x${blockData.stateHash}`,
 			receiptsRoot: `0x${blockData.stateHash}`,
-			miner: blockData.generatorAddress,
+			miner: blockData.generatorAddress.toLowerCase(),
 			difficulty: "0x0",
 			totalDifficulty: "0x0",
 			baseFeePerGas: "0x0",

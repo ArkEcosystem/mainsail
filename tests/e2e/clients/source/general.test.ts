@@ -6,13 +6,12 @@ import { Client } from "./types";
 const URL = "http://127.0.0.1:4008/api";
 
 describe<{
-	localClient: Client;
+	localClient: LocalClient;
 	clients: Client[];
 }>("General", ({ beforeEach, it, assert, nock }) => {
 	beforeEach((context) => {
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
-
 		context.clients = [new Web3Client(URL), new EthersClient(URL), new ViemClient(URL)];
 	});
 
@@ -22,6 +21,48 @@ describe<{
 
 		for (const client of clients) {
 			assert.equal(height, await client.getHeight());
+		}
+	});
+
+	it.only("should get latest block", async ({ localClient, clients }) => {
+		const lastBlock = await localClient.getBlock();
+
+		const numericFields = [
+			"number",
+			"nonce",
+			"difficulty",
+			// "totalDifficulty",
+			"baseFeePerGas",
+			// "size",
+			"gasLimit",
+			"gasUsed",
+			"timestamp",
+		];
+
+		const hexFields = [
+			"hash",
+			"parentHash",
+			// "sha3Uncles",
+			// "transactionsRoot",
+			"stateRoot",
+			"receiptsRoot",
+			"miner",
+			"extraData",
+		];
+
+		const compareBlocks = (a: Record<string, any>, b: Record<string, any>) => {
+			for (const field of numericFields) {
+				assert.equal(Number(a[field]), Number(b[field]));
+			}
+
+			for (const field of hexFields) {
+				assert.equal(a[field].toLowerCase(), b[field].toLowerCase());
+			}
+		};
+
+		for (const client of clients) {
+			const b = await client.getBlock();
+			compareBlocks(lastBlock, b);
 		}
 	});
 });

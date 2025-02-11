@@ -12,4 +12,8 @@ export class Web3Client implements Client {
 	public async getHeight(): Promise<number> {
 		return Number(await this.#client.getBlockNumber());
 	}
+
+	public async getBlock(): Promise<Record<string, any>> {
+		return this.#client.getBlock("latest");
+	}
 }

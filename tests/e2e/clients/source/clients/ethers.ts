@@ -12,4 +12,14 @@ export class EthersClient implements Client {
 	public async getHeight(): Promise<number> {
 		return await this.#client.getBlockNumber();
 	}
+
+	public async getBlock(): Promise<Record<string, any>> {
+		const block = await this.#client.getBlock("latest");
+
+		if (block) {
+			return block;
+		}
+
+		throw new Error("Block is missing");
+	}
 }
