@@ -1,6 +1,6 @@
 import { describe } from "@mainsail/test-framework";
 
-import { EthersClient, LocalClient, ViemClient, Web3Client } from "./clients/index.js";
+import { EthersClient, LocalClient, ViemClient } from "./clients/index.js";
 import { Client } from "./types";
 import { compareBlocks } from "./utils/index.js";
 
@@ -13,7 +13,7 @@ describe<{
 	beforeEach((context) => {
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
-		context.clients = [new Web3Client(URL), new EthersClient(URL), new ViemClient(URL)];
+		context.clients = [new EthersClient(URL), new ViemClient(URL)];
 	});
 
 	it("#eth_blockNumber - should return current block height", async ({ localClient, clients }) => {
