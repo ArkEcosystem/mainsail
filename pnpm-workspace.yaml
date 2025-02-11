@@ -1,4 +1,4 @@
 packages:
     - "packages/**"
     - "tests/**"
-    - "!tests/e2e/**"
+    - "!tests/e2e/consensus"
