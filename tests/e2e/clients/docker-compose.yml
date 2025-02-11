@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+    node0:
+        build: ./
+        image: mainsail
+        volumes:
+            - ./../../../:/mainsail
+        ports:
+            - 0.0.0.0:4008:4008
+        command:
+            - /bin/sh
+            - -c
+            - /mainsail/packages/core/bin/run.js core:run --network=testnet
+        environment: &nodeEnvironment
+            CORE_PATH_CONFIG: /mainsail/tests/e2e/clients/config
