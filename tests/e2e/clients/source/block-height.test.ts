@@ -1,6 +1,6 @@
 import { describe } from "@mainsail/test-framework";
 
-import { LocalClient, Web3Client } from "./clients/index.js";
+import { EthersClient, LocalClient, Web3Client } from "./clients/index.js";
 import { Client } from "./types";
 
 const URL = "http://127.0.0.1:4008/api";
@@ -13,7 +13,7 @@ describe<{
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
 
-		context.clients = [new Web3Client(URL)];
+		context.clients = [new Web3Client(URL), new EthersClient(URL)];
 	});
 
 	it("should return correct block height", async ({ localClient, clients }) => {
