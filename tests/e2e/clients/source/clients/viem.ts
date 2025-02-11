@@ -1,0 +1,17 @@
+import { createPublicClient, http, PublicClient } from "viem";
+
+import { Client } from "../types.js";
+
+export class ViemClient implements Client {
+	#client: PublicClient;
+
+	public constructor(url: string) {
+		this.#client = createPublicClient({
+			transport: http(url),
+		});
+	}
+
+	public async getHeight(): Promise<number> {
+		return Number(await this.#client.getBlockNumber());
+	}
+}
