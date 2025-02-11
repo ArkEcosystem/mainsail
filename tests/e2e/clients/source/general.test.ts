@@ -26,11 +26,20 @@ describe<{
 	});
 
 	it.only("should get latest block", async ({ localClient, clients }) => {
-		const lastBlock = await localClient.getBlock();
+		const lastBlock = await localClient.getBlock("latest");
 
 		for (const client of clients) {
-			const b = await client.getBlock();
+			const b = await client.getBlock("latest");
 			compareBlocks(assert, lastBlock, b);
 		}
 	});
+
+	// it.only("should get genesis block", async ({ localClient, clients }) => {
+	// 	const lastBlock = await localClient.getBlock();
+
+	// 	for (const client of clients) {
+	// 		const b = await client.getBlock();
+	// 		compareBlocks(assert, lastBlock, b);
+	// 	}
+	// });
 });

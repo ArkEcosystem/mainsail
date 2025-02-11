@@ -13,8 +13,8 @@ export class EthersClient implements Client {
 		return await this.#client.getBlockNumber();
 	}
 
-	public async getBlock(): Promise<Record<string, any>> {
-		const block = await this.#client.getBlock("latest");
+	public async getBlock(tagOrNumber: string | number): Promise<Record<string, any>> {
+		const block = await this.#client.getBlock(tagOrNumber);
 
 		if (block) {
 			return block;

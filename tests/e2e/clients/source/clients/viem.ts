@@ -15,7 +15,7 @@ export class ViemClient implements Client {
 		return Number(await this.#client.getBlockNumber());
 	}
 
-	public async getBlock(): Promise<Record<string, any>> {
-		return this.#client.getBlock();
+	public async getBlock(tagOrNumber: string | number): Promise<Record<string, any>> {
+		return this.#client.getBlock(tagOrNumber);
 	}
 }
