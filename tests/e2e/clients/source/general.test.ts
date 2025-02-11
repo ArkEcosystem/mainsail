@@ -8,7 +8,7 @@ const URL = "http://127.0.0.1:4008/api";
 describe<{
 	localClient: Client;
 	clients: Client[];
-}>("BlockHeight", ({ beforeEach, it, assert, nock }) => {
+}>("General", ({ beforeEach, it, assert, nock }) => {
 	beforeEach((context) => {
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
@@ -16,13 +16,12 @@ describe<{
 		context.clients = [new Web3Client(URL), new EthersClient(URL), new ViemClient(URL)];
 	});
 
-	it("should return correct block height", async ({ localClient, clients }) => {
+	it("#eth_blockNumber - should return current block height", async ({ localClient, clients }) => {
 		const height = await localClient.getHeight();
 		assert.number(height);
 
 		for (const client of clients) {
-			const h = await client.getHeight();
-			assert.equal(height, h);
+			assert.equal(height, await client.getHeight());
 		}
 	});
 });
