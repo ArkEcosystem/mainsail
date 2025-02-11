@@ -18,6 +18,10 @@ export class LocalClient implements Client {
 		]);
 	}
 
+	public async getTransaction(hash: string): Promise<Record<string, any>> {
+		return this.#JSONRPCCall<Record<string, any>>("eth_getTransactionByHash", [hash]);
+	}
+
 	async #JSONRPCCall<T>(method: string, parameters: any[]): Promise<T> {
 		const response = await http.post(this.url, {
 			body: {

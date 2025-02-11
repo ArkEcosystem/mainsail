@@ -26,4 +26,10 @@ export class ViemClient implements Client {
 					},
 		);
 	}
+
+	public async getTransaction(hash: string): Promise<Record<string, any>> {
+		return this.#client.getTransaction({
+			hash,
+		});
+	}
 }

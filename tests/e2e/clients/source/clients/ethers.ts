@@ -22,4 +22,14 @@ export class EthersClient implements Client {
 
 		throw new Error("Block is missing");
 	}
+
+	public async getTransaction(hash: string): Promise<Record<string, any>> {
+		const transaction = await this.#client.getTransaction(hash);
+
+		if (transaction) {
+			return transaction;
+		}
+
+		throw new Error("Transaction is missing");
+	}
 }
