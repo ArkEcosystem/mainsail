@@ -16,6 +16,14 @@ export class ViemClient implements Client {
 	}
 
 	public async getBlock(tagOrNumber: string | number): Promise<Record<string, any>> {
-		return this.#client.getBlock(tagOrNumber);
+		return this.#client.getBlock(
+			typeof tagOrNumber === "string"
+				? {
+						blockTag: tagOrNumber,
+					}
+				: {
+						blockNumber: tagOrNumber,
+					},
+		);
 	}
 }

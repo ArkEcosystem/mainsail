@@ -25,7 +25,7 @@ describe<{
 		}
 	});
 
-	it.only("should get latest block", async ({ localClient, clients }) => {
+	it("should get latest block", async ({ localClient, clients }) => {
 		const lastBlock = await localClient.getBlock("latest");
 
 		for (const client of clients) {
@@ -34,12 +34,12 @@ describe<{
 		}
 	});
 
-	// it.only("should get genesis block", async ({ localClient, clients }) => {
-	// 	const lastBlock = await localClient.getBlock();
+	it("should get genesis block", async ({ localClient, clients }) => {
+		const lastBlock = await localClient.getBlock(0);
 
-	// 	for (const client of clients) {
-	// 		const b = await client.getBlock();
-	// 		compareBlocks(assert, lastBlock, b);
-	// 	}
-	// });
+		for (const client of clients) {
+			const b = await client.getBlock(0);
+			compareBlocks(assert, lastBlock, b);
+		}
+	});
 });
