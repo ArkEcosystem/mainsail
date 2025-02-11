@@ -1,1 +1,1 @@
-export * from "./compare-blocks.js";
+export * from "./compare.js";

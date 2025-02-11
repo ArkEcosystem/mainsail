@@ -3,7 +3,7 @@ import { genesisBlock } from "../config/core/crypto.json";
 
 import { EthersClient, LocalClient, ViemClient } from "./clients/index.js";
 import { Client } from "./types";
-import { compareBlocks } from "./utils/index.js";
+import { compareBlocks, compareTransactions } from "./utils/index.js";
 
 const URL = "http://127.0.0.1:4008/api";
 
@@ -49,12 +49,9 @@ describe<{
 		const hash = `0x${genesisBlock.block.transactions[0].id}`;
 		const tx = await localClient.getTransaction(hash);
 
-		console.log(tx);
-
 		for (const client of clients) {
 			const t = await client.getTransaction(hash);
-
-			console.log(t);
+			compareTransactions(assert, tx, t);
 		}
 	});
 });
