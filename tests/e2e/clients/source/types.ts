@@ -10,4 +10,5 @@ export interface Client {
 	getNonce(address: string): Promise<number>;
 	getCode(address: string): Promise<string>;
 	getStorageAt(address: string, position: string): Promise<string>;
+	call(address: string, data: string): Promise<string>;
 }

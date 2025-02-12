@@ -1,4 +1,6 @@
+import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { describe } from "@mainsail/test-framework";
+import { encodeFunctionData } from "viem";
 
 import { genesisBlock, network } from "../config/core/crypto.json";
 import { EthersClient, LocalClient, ViemClient } from "./clients/index.js";
@@ -15,6 +17,7 @@ describe<{
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
 		context.clients = [new EthersClient(URL), new ViemClient(URL)];
+		// context.clients = [new EthersClient(URL)];
 	});
 
 	it("Network - should get chainId", async ({ localClient, clients }) => {
@@ -136,15 +139,20 @@ describe<{
 		}
 	});
 
-	it.skip("Contract - get storage", async ({ localClient, clients }) => {
+	only("Contract - call", async ({ localClient, clients }) => {
 		const address = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1"; // Consensus contract PROXY
-		const storage = await localClient.getStorageAt(address, position);
+		const data = encodeFunctionData({
+			abi: ConsensusAbi.abi,
+			functionName: "activeValidatorsCount",
+		});
 
-		assert.equal(storage, "0x000000000000000000000000522b3294e6d06aa25ad0f1b8891242e335d3b459");
+		const result = await localClient.call(address, data);
+
+		assert.equal(Number(result), 5);
 
 		for (const client of clients) {
-			const s = await client.getStorageAt(address, position);
-			assert.equal(storage, s);
+			const r = await client.call(address, data);
+			assert.equal(result, r);
 		}
 	});
 });

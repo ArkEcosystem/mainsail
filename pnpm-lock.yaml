@@ -3012,6 +3012,9 @@ importers:
 
   tests/e2e/clients:
     devDependencies:
+      '@mainsail/evm-contracts':
+        specifier: workspace:*
+        version: link:../../../packages/evm-contracts
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../../../packages/test-framework

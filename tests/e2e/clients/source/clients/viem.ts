@@ -84,4 +84,14 @@ export class ViemClient implements Client {
 			slot: position,
 		});
 	}
+
+	public async call(address: string, data: string): Promise<string> {
+		return (
+			await this.#client.call({
+				to: address,
+				blockTag: "latest",
+				data,
+			})
+		).data;
+	}
 }

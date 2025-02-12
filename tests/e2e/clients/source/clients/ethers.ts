@@ -68,4 +68,11 @@ export class EthersClient implements Client {
 	public async getStorageAt(address: string, position: string): Promise<string> {
 		return this.#client.getStorage(address, position);
 	}
+
+	public async call(address: string, data: string): Promise<string> {
+		return this.#client.call({
+			data,
+			to: address,
+		});
+	}
 }

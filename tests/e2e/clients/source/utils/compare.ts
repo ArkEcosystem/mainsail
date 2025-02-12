@@ -73,8 +73,6 @@ export const compareReceipts = (assert, a: Record<string, any>, b: Record<string
 		// "type",
 		// "status",
 	]) {
-		console.log(field);
-
 		assert.equal(Number(a[field]), Number(b[field]));
 	}
 
@@ -85,7 +83,6 @@ export const compareReceipts = (assert, a: Record<string, any>, b: Record<string
 		"from",
 		"to",
 	]) {
-		console.log(field);
 		assert.equal(a[field].toLowerCase(), b[field].toLowerCase());
 	}
 };
