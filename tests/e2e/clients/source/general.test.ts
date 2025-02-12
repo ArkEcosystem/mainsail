@@ -54,7 +54,7 @@ describe<{
 		}
 	});
 
-	it.only("Transaction - should get genesis transaction by index", async ({ localClient, clients }) => {
+	it("Transaction - should get genesis transaction by index", async ({ localClient, clients }) => {
 		const tx = await localClient.getTransactionByBlockNumberAndIndex(0, 0);
 
 		for (const client of clients.filter((client) => client.name !== "ethers")) {
@@ -63,7 +63,7 @@ describe<{
 		}
 	});
 
-	it.only("Account - should get wallet balance", async ({ localClient, clients }) => {
+	it("Account - should get wallet balance", async ({ localClient, clients }) => {
 		const address = genesisBlock.block.transactions[0].recipientAddress;
 		const balance = await localClient.getBalance(address);
 
@@ -72,6 +72,18 @@ describe<{
 		for (const client of clients) {
 			const b = await client.getBalance(address);
 			assert.equal(balance, b);
+		}
+	});
+
+	it.only("Account - should get wallet nonce", async ({ localClient, clients }) => {
+		const address = genesisBlock.block.transactions[0].senderAddress;
+		const nonce = await localClient.getNonce(address);
+
+		assert.not.equal(nonce, 0);
+
+		for (const client of clients) {
+			const n = await client.getNonce(address);
+			assert.equal(nonce, n);
 		}
 	});
 });

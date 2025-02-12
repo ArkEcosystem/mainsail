@@ -50,4 +50,13 @@ export class ViemClient implements Client {
 			}),
 		);
 	}
+
+	public async getNonce(address: string): Promise<number> {
+		return Number(
+			await this.#client.getTransactionCount({
+				address,
+				blockTag: "latest",
+			}),
+		);
+	}
 }
