@@ -14,7 +14,7 @@ describe<{
 	it("should make transfer", async ({ signer }) => {
 		const options: Types.TransferOptions = {
 			amount: "100",
-			gasPrice: 5,
+			gasPrice: 5 * 1e9,
 			passphrase: passphrases[0],
 			vendorField: "dummy",
 		};
@@ -89,7 +89,7 @@ describe<{
 				payload:
 					"a9059cbb000000000000000000000000bd6f65c58a46427af4b257cbe231d0ed69ed550800000000000000000000000000000000000000000000003635c9adc5dea00000",
 			},
-			gasPrice: 5,
+			gasPrice: 5 * 1e9,
 			passphrase:
 				"violin hello resist adult roof breeze blood old tell source enforce token void wagon sweet detail raw coast viable garden cause gasp soap fat",
 			recipientAddress: "0xD3D80a3Df661414a76aAd7738a136A8d7aAa1666",

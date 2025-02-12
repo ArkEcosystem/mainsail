@@ -10,7 +10,7 @@ describe<{
 		context.transaction = {
 			data: {
 				amount: BigNumber.make(100),
-				gasPrice: 900,
+				gasPrice: 900 * 1e9,
 				id: "dummy-tx-id",
 				network: 30,
 				nonce: BigNumber.make(1),
@@ -75,11 +75,14 @@ describe<{
 	});
 
 	it("TransactionPoolFullError", (context) => {
-		const error = new Exceptions.TransactionPoolFullError(context.transaction, new BigNumber(1000));
+		const error = new Exceptions.TransactionPoolFullError(context.transaction, new BigNumber(1000 * 1e9));
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_POOL_FULL");
-		assert.equal(error.message, `tx ${context.transaction.id} fee 900 is lower than 1000 already in pool`);
+		assert.equal(
+			error.message,
+			`tx ${context.transaction.id} fee 900000000000 is lower than 1000000000000 already in pool`,
+		);
 	});
 
 	it("TransactionFailedToApplyError", (context) => {

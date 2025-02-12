@@ -97,13 +97,14 @@ describe<{
 		configuration.setHeight(1); // simulate non-genesis block
 
 		assert.undefined(context.validator.validate("test", cryptoJson.milestones[0].gas!.minimumGasPrice).error);
-		assert.undefined(context.validator.validate("test", "5").error);
-		assert.undefined(context.validator.validate("test", 10000).error);
+		assert.undefined(context.validator.validate("test", "5000000000").error);
+		assert.undefined(context.validator.validate("test", 10000000000000).error);
 
 		assert.defined(context.validator.validate("test", 1).error);
 		assert.defined(context.validator.validate("test", 0).error);
 		assert.defined(context.validator.validate("test", -1).error);
-		assert.defined(context.validator.validate("test", 10001).error);
+		assert.defined(context.validator.validate("test", "5").error);
+		assert.defined(context.validator.validate("test", 10001000000000).error);
 		assert.defined(context.validator.validate("test", Number.MAX_SAFE_INTEGER).error);
 	});
 

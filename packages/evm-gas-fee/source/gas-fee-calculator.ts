@@ -13,6 +13,6 @@ export class GasFeeCalculator implements Contracts.Evm.GasFeeCalculator {
 	}
 
 	#calculate(gasPrice: number, gasUsed: number): Utils.BigNumber {
-		return Utils.BigNumber.make(gasPrice).times(gasUsed).times(1e9);
+		return Utils.BigNumber.make(gasPrice).times(gasUsed);
 	}
 }

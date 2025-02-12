@@ -28,7 +28,7 @@ describe<{
 		context.sender1Transaction100 = {
 			data: {
 				amount: BigNumber.make(100),
-				gasPrice: 100,
+				gasPrice: 100 * 1e9,
 				nonce: BigNumber.make(1),
 				senderAddress: "sender1",
 				type: 1,
@@ -44,7 +44,7 @@ describe<{
 		context.sender1Transaction200 = {
 			data: {
 				amount: BigNumber.make(100),
-				gasPrice: 200,
+				gasPrice: 200 * 1e9,
 				nonce: BigNumber.make(2),
 				senderAddress: "sender1",
 				type: 1,
@@ -60,7 +60,7 @@ describe<{
 		context.sender2Transaction100 = {
 			data: {
 				amount: BigNumber.make(100),
-				gasPrice: 300,
+				gasPrice: 300 * 1e9,
 				nonce: BigNumber.make(3),
 				senderAddress: "sender2",
 				type: 1,
@@ -76,7 +76,7 @@ describe<{
 		context.sender2Transaction200 = {
 			data: {
 				amount: BigNumber.make(100),
-				gasPrice: 400,
+				gasPrice: 400 * 1e9,
 				nonce: BigNumber.make(4),
 				senderAddress: "sender2",
 				type: 1,

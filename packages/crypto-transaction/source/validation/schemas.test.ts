@@ -88,7 +88,7 @@ describe<{
 
 	const transactionOriginal = {
 		gasLimit: 21_000,
-		gasPrice: 5,
+		gasPrice: 5 * 1e9,
 		id: "1".repeat(64),
 		network: 10_000,
 		nonce: 1,
@@ -167,7 +167,7 @@ describe<{
 		}
 	});
 
-	it("transactionBaseSchema - gasPrice should be number min 5", ({ sandbox, validator }) => {
+	it("transactionBaseSchema - gasPrice should be number min 5 gwei", ({ sandbox, validator }) => {
 		sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
 		validator.addSchema(schema);
 
@@ -175,13 +175,13 @@ describe<{
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
-				gasPrice: value,
+				gasPrice: value * 1e9,
 			};
 
 			assert.undefined(validator.validate("transaction", transaction).error);
 		}
 
-		const invalidValues = [0, -1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test"];
+		const invalidValues = [0, -1, "-1", 1.1, BigNumber.make(-1), -1, null, undefined, {}, "test", 1 + 10000 * 1e9];
 
 		for (const value of invalidValues) {
 			const transaction = {
