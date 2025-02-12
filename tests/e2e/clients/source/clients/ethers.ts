@@ -38,4 +38,8 @@ export class EthersClient implements Client {
 	public async getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Record<string, any>> {
 		throw new Error("Not implemented");
 	}
+
+	public async getBalance(address: string): Promise<number> {
+		return Number(await this.#client.getBalance(address));
+	}
 }

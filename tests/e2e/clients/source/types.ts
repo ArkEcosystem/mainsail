@@ -4,4 +4,5 @@ export interface Client {
 	getBlock(tagOrNumber: string | number): Promise<Record<string, any>>;
 	getTransaction(hash: string): Promise<Record<string, any>>;
 	getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Record<string, any>>;
+	getBalance(address: string): Promise<number>;
 }

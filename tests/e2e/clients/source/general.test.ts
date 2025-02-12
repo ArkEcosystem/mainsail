@@ -62,4 +62,16 @@ describe<{
 			compareTransactions(assert, tx, t);
 		}
 	});
+
+	it.only("Account - should get wallet balance", async ({ localClient, clients }) => {
+		const address = genesisBlock.block.transactions[0].recipientAddress;
+		const balance = await localClient.getBalance(address);
+
+		assert.not.equal(balance, 0);
+
+		for (const client of clients) {
+			const b = await client.getBalance(address);
+			assert.equal(balance, b);
+		}
+	});
 });

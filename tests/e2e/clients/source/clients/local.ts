@@ -31,6 +31,10 @@ export class LocalClient implements Client {
 		]);
 	}
 
+	public async getBalance(address: string): Promise<number> {
+		return Number.parseInt(await this.#JSONRPCCall<string>("eth_getBalance", [address, `latest`]));
+	}
+
 	async #JSONRPCCall<T>(method: string, parameters: any[]): Promise<T> {
 		const response = await http.post(this.url, {
 			body: {

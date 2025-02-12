@@ -41,4 +41,13 @@ export class ViemClient implements Client {
 			index,
 		});
 	}
+
+	public async getBalance(address: string): Promise<number> {
+		return Number(
+			await this.#client.getBalance({
+				address,
+				blockTag: "latest",
+			}),
+		);
+	}
 }
