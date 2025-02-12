@@ -38,8 +38,6 @@ mod logger;
 mod result;
 mod utils;
 
-const ONE_GWEI: u64 = 1_000_000_000;
-
 // A complex struct which cannot be exposed to JavaScript directly.
 pub struct EvmInner {
     persistent_db: PersistentDB,
@@ -520,7 +518,7 @@ impl EvmInner {
             })
             .modify_tx_env(|tx_env| {
                 tx_env.gas_limit = ctx.gas_limit;
-                tx_env.gas_price = ctx.gas_price.saturating_mul(U256::from(ONE_GWEI));
+                tx_env.gas_price = ctx.gas_price;
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
                 tx_env.nonce = Some(ctx.nonce);
@@ -822,7 +820,7 @@ impl EvmInner {
             })
             .modify_tx_env(|tx_env| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or_else(|| 15_000_000);
-                tx_env.gas_price = ctx.gas_price.saturating_mul(U256::from(ONE_GWEI));
+                tx_env.gas_price = ctx.gas_price;
                 tx_env.caller = ctx.caller;
                 tx_env.value = ctx.value;
                 tx_env.nonce = ctx.nonce;
