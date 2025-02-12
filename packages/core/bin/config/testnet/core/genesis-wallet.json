@@ -1,14 +1,14 @@
 {
-    "address": "0x87aC00e2bD4850a838DA627369ea3793196Fb067",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "33fceede99d461bbce1485d3f0e7f3aa5a2028fa4c15b95b280d607121488941",
-        "publicKey": "a865d7ead390ea5592389e6a7ee5c24f6e8c30b66cc1987d166659429c5d37b855ef5c405a3ba6f9066d0a5b5abbcb10"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "20df1130a6276aed8c17c077aad8529a51068719366c51c14db579fb077c044e",
-        "publicKey": "036f1ed96c002d5ee0d5ccc13de76b7d72b415b7adbec570b4af84faee6dea5c73"
-    },
-    "passphrase": "demand target then charge rib gate thought pride frost convince hover tenant unfold half nuclear grit render void rule angle lawn suggest start very"
+	"address": "0x87aC00e2bD4850a838DA627369ea3793196Fb067",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "33fceede99d461bbce1485d3f0e7f3aa5a2028fa4c15b95b280d607121488941",
+		"publicKey": "a865d7ead390ea5592389e6a7ee5c24f6e8c30b66cc1987d166659429c5d37b855ef5c405a3ba6f9066d0a5b5abbcb10"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "20df1130a6276aed8c17c077aad8529a51068719366c51c14db579fb077c044e",
+		"publicKey": "036f1ed96c002d5ee0d5ccc13de76b7d72b415b7adbec570b4af84faee6dea5c73"
+	},
+	"passphrase": "demand target then charge rib gate thought pride frost convince hover tenant unfold half nuclear grit render void rule angle lawn suggest start very"
 }
