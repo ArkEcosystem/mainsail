@@ -5,6 +5,8 @@ import { Client } from "../types.js";
 export class EthersClient implements Client {
 	#client: ethers.JsonRpcProvider;
 
+	public readonly name = "ethers";
+
 	public constructor(url: string) {
 		this.#client = new ethers.JsonRpcProvider(url);
 	}
@@ -31,5 +33,9 @@ export class EthersClient implements Client {
 		}
 
 		throw new Error("Transaction is missing");
+	}
+
+	public async getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Record<string, any>> {
+		throw new Error("Not implemented");
 	}
 }

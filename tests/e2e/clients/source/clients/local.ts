@@ -5,6 +5,8 @@ import { Client } from "../types.js";
 export class LocalClient implements Client {
 	#id = 0;
 
+	public readonly name = "local";
+
 	public constructor(private url: string) {}
 
 	public async getHeight(): Promise<number> {
@@ -20,6 +22,13 @@ export class LocalClient implements Client {
 
 	public async getTransaction(hash: string): Promise<Record<string, any>> {
 		return this.#JSONRPCCall<Record<string, any>>("eth_getTransactionByHash", [hash]);
+	}
+
+	public async getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Record<string, any>> {
+		return this.#JSONRPCCall<Record<string, any>>("eth_getTransactionByBlockNumberAndIndex", [
+			`0x${blockNumber.toString(16)}`,
+			`0x${index.toString(16)}`,
+		]);
 	}
 
 	async #JSONRPCCall<T>(method: string, parameters: any[]): Promise<T> {

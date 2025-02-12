@@ -1,6 +1,6 @@
 import { describe } from "@mainsail/test-framework";
-import { genesisBlock } from "../config/core/crypto.json";
 
+import { genesisBlock } from "../config/core/crypto.json";
 import { EthersClient, LocalClient, ViemClient } from "./clients/index.js";
 import { Client } from "./types";
 import { compareBlocks, compareTransactions } from "./utils/index.js";
@@ -15,7 +15,6 @@ describe<{
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
 		context.clients = [new EthersClient(URL), new ViemClient(URL)];
-		// context.clients = [new EthersClient(URL)];
 	});
 
 	it("Block - should return current block height", async ({ localClient, clients }) => {
@@ -45,12 +44,21 @@ describe<{
 		}
 	});
 
-	it.only("Transaction - should get genesis transaction by hash", async ({ localClient, clients }) => {
+	it("Transaction - should get genesis transaction by hash", async ({ localClient, clients }) => {
 		const hash = `0x${genesisBlock.block.transactions[0].id}`;
 		const tx = await localClient.getTransaction(hash);
 
 		for (const client of clients) {
 			const t = await client.getTransaction(hash);
+			compareTransactions(assert, tx, t);
+		}
+	});
+
+	it.only("Transaction - should get genesis transaction by index", async ({ localClient, clients }) => {
+		const tx = await localClient.getTransactionByBlockNumberAndIndex(0, 0);
+
+		for (const client of clients.filter((client) => client.name !== "ethers")) {
+			const t = await client.getTransactionByBlockNumberAndIndex(0, 0);
 			compareTransactions(assert, tx, t);
 		}
 	});

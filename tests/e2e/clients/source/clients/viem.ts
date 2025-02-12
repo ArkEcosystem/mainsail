@@ -5,6 +5,8 @@ import { Client } from "../types.js";
 export class ViemClient implements Client {
 	#client: PublicClient;
 
+	public readonly name = "viem";
+
 	public constructor(url: string) {
 		this.#client = createPublicClient({
 			transport: http(url),
@@ -30,6 +32,13 @@ export class ViemClient implements Client {
 	public async getTransaction(hash: string): Promise<Record<string, any>> {
 		return this.#client.getTransaction({
 			hash,
+		});
+	}
+
+	public async getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Record<string, any>> {
+		return this.#client.getTransaction({
+			blockNumber,
+			index,
 		});
 	}
 }
