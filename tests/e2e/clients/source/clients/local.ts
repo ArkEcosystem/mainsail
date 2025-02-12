@@ -9,6 +9,10 @@ export class LocalClient implements Client {
 
 	public constructor(private url: string) {}
 
+	public async getChainId(): Promise<number> {
+		return Number.parseInt(await this.#JSONRPCCall<string>("eth_chainId", []));
+	}
+
 	public async getHeight(): Promise<number> {
 		return Number.parseInt(await this.#JSONRPCCall<string>("eth_blockNumber", []));
 	}

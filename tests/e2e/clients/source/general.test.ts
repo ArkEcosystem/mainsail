@@ -1,6 +1,6 @@
 import { describe } from "@mainsail/test-framework";
 
-import { genesisBlock } from "../config/core/crypto.json";
+import { genesisBlock, network } from "../config/core/crypto.json";
 import { EthersClient, LocalClient, ViemClient } from "./clients/index.js";
 import { Client } from "./types";
 import { compareBlocks, compareTransactions } from "./utils/index.js";
@@ -15,6 +15,16 @@ describe<{
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
 		context.clients = [new EthersClient(URL), new ViemClient(URL)];
+	});
+
+	it("Network - should get chainId", async ({ localClient, clients }) => {
+		const chainId = await localClient.getChainId();
+		assert.equal(chainId, network.chainId);
+
+		for (const client of clients) {
+			const c = await client.getChainId();
+			assert.equal(chainId, c);
+		}
 	});
 
 	it("Block - should return current block height", async ({ localClient, clients }) => {
@@ -87,7 +97,7 @@ describe<{
 		}
 	});
 
-	it.only("Account - should get code", async ({ localClient, clients }) => {
+	it("Account - should get code", async ({ localClient, clients }) => {
 		const address = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459"; // Consensus contract
 		const code = await localClient.getCode(address);
 

@@ -11,6 +11,10 @@ export class EthersClient implements Client {
 		this.#client = new ethers.JsonRpcProvider(url);
 	}
 
+	public async getChainId(): Promise<number> {
+		return Number((await this.#client.getNetwork()).chainId);
+	}
+
 	public async getHeight(): Promise<number> {
 		return await this.#client.getBlockNumber();
 	}

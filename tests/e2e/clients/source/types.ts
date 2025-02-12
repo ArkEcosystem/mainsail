@@ -1,5 +1,6 @@
 export interface Client {
 	readonly name: string;
+	getChainId(): Promise<number>;
 	getHeight(): Promise<number>;
 	getBlock(tagOrNumber: string | number): Promise<Record<string, any>>;
 	getTransaction(hash: string): Promise<Record<string, any>>;

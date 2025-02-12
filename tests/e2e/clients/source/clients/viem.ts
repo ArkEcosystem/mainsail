@@ -13,6 +13,10 @@ export class ViemClient implements Client {
 		});
 	}
 
+	public async getChainId(): Promise<number> {
+		return this.#client.getChainId();
+	}
+
 	public async getHeight(): Promise<number> {
 		return Number(await this.#client.getBlockNumber());
 	}
