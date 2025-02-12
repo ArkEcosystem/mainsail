@@ -3,7 +3,7 @@ import { describe } from "@mainsail/test-framework";
 import { genesisBlock, network } from "../config/core/crypto.json";
 import { EthersClient, LocalClient, ViemClient } from "./clients/index.js";
 import { Client } from "./types";
-import { compareBlocks, compareTransactions } from "./utils/index.js";
+import { compareBlocks, compareReceipts, compareTransactions } from "./utils/index.js";
 
 const URL = "http://127.0.0.1:4008/api";
 
@@ -70,6 +70,20 @@ describe<{
 		for (const client of clients.filter((client) => client.name !== "ethers")) {
 			const t = await client.getTransactionByBlockNumberAndIndex(0, 0);
 			compareTransactions(assert, tx, t);
+		}
+	});
+
+	it("Transaction - should get genesis receipt by hash", async ({ localClient, clients }) => {
+		const hash = `0x${genesisBlock.block.transactions[0].id}`;
+		const receipt = await localClient.getReceipt(hash);
+
+		console.log(receipt);
+
+		for (const client of clients) {
+			const r = await client.getReceipt(hash);
+			console.log(r);
+
+			compareReceipts(assert, receipt, r);
 		}
 	});
 

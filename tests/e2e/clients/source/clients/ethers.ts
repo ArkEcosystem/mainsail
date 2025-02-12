@@ -43,6 +43,16 @@ export class EthersClient implements Client {
 		throw new Error("Not implemented");
 	}
 
+	public async getReceipt(hash: string): Promise<Record<string, any>> {
+		const receipt = await this.#client.getTransactionReceipt(hash);
+
+		if (receipt) {
+			return receipt;
+		}
+
+		throw new Error("Receipt is missing");
+	}
+
 	public async getBalance(address: string): Promise<number> {
 		return Number(await this.#client.getBalance(address));
 	}

@@ -35,6 +35,10 @@ export class LocalClient implements Client {
 		]);
 	}
 
+	public async getReceipt(hash: string): Promise<Record<string, any>> {
+		return this.#JSONRPCCall<Record<string, any>>("eth_getTransactionReceipt", [hash]);
+	}
+
 	public async getBalance(address: string): Promise<number> {
 		return Number.parseInt(await this.#JSONRPCCall<string>("eth_getBalance", [address, `latest`]));
 	}

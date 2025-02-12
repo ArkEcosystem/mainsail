@@ -46,6 +46,12 @@ export class ViemClient implements Client {
 		});
 	}
 
+	public async getReceipt(hash: string): Promise<Record<string, any>> {
+		return this.#client.getTransactionReceipt({
+			hash,
+		});
+	}
+
 	public async getBalance(address: string): Promise<number> {
 		return Number(
 			await this.#client.getBalance({

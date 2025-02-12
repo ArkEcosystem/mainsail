@@ -60,3 +60,32 @@ export const compareTransactions = (assert, a: Record<string, any>, b: Record<st
 		assert.equal(a[field].toLowerCase(), b[field].toLowerCase());
 	}
 };
+
+export const compareReceipts = (assert, a: Record<string, any>, b: Record<string, any>) => {
+	// Numeric fields
+	for (const field of [
+		// "transactionIndex",
+		"blockHash",
+		"blockNumber",
+		"gasUsed",
+		"cumulativeGasUsed",
+		"gasUsed",
+		// "type",
+		// "status",
+	]) {
+		console.log(field);
+
+		assert.equal(Number(a[field]), Number(b[field]));
+	}
+
+	// Hex fields
+	for (const field of [
+		// "transactionHash",
+		"logsBloom",
+		"from",
+		"to",
+	]) {
+		console.log(field);
+		assert.equal(a[field].toLowerCase(), b[field].toLowerCase());
+	}
+};
