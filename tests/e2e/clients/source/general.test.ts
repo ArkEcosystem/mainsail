@@ -111,7 +111,7 @@ describe<{
 		}
 	});
 
-	it("Account - should get code", async ({ localClient, clients }) => {
+	it("Contract - should get code", async ({ localClient, clients }) => {
 		const address = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459"; // Consensus contract
 		const code = await localClient.getCode(address);
 
@@ -120,6 +120,19 @@ describe<{
 		for (const client of clients) {
 			const c = await client.getCode(address);
 			assert.equal(code, c);
+		}
+	});
+
+	it.only("Contract - get storage", async ({ localClient, clients }) => {
+		const address = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1"; // Consensus contract PROXY
+		const position = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"; //Slot for original address
+		const storage = await localClient.getStorageAt(address, position);
+
+		assert.equal(storage, "0x000000000000000000000000522b3294e6d06aa25ad0f1b8891242e335d3b459");
+
+		for (const client of clients) {
+			const s = await client.getStorageAt(address, position);
+			assert.equal(storage, s);
 		}
 	});
 });

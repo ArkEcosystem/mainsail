@@ -51,6 +51,10 @@ export class LocalClient implements Client {
 		return this.#JSONRPCCall<string>("eth_getCode", [address, `latest`]);
 	}
 
+	public async getStorageAt(address: string, position: string): Promise<string> {
+		return this.#JSONRPCCall<string>("eth_getStorageAt", [address, position, "latest"]);
+	}
+
 	async #JSONRPCCall<T>(method: string, parameters: any[]): Promise<T> {
 		const response = await http.post(this.url, {
 			body: {

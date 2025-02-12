@@ -76,4 +76,12 @@ export class ViemClient implements Client {
 			blockTag: "latest",
 		});
 	}
+
+	public async getStorageAt(address: string, position: string): Promise<string> {
+		return this.#client.getStorageAt({
+			address,
+			blockTag: "latest",
+			slot: position,
+		});
+	}
 }

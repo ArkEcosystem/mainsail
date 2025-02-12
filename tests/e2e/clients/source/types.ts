@@ -9,4 +9,5 @@ export interface Client {
 	getBalance(address: string): Promise<number>;
 	getNonce(address: string): Promise<number>;
 	getCode(address: string): Promise<string>;
+	getStorageAt(address: string, position: string): Promise<string>;
 }
