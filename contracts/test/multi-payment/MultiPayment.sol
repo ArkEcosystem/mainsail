@@ -353,6 +353,7 @@ contract MultiPaymentTest is Test {
         vm.stopPrank();
     }
 
+    /// forge-config: default.allow_internal_expect_revert = true
     function test_pay_fail_if_no_enough_balance() public {
         address payable sender = payable(address(this));
         vm.deal(sender, 100 ether);
