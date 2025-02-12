@@ -52,9 +52,8 @@ describe<{
 
 	const transactionOriginal = {
 		value: 0,
-		gasPrice: 5,
+		gasPrice: 5 * 1e9,
 		gasLimit: 21000,
-		fee: 5,
 		nonce: 1,
 		recipientId: ethers.ZeroAddress,
 		senderPublicKey: "a".repeat(66),
@@ -93,7 +92,7 @@ describe<{
 		}
 	});
 
-	it("#getSchema - gasPrice should be integer, min 5, max 1000", ({ sandbox, validator }) => {
+	it("#getSchema - gasPrice should be integer, min 5, max 1000 gwei", ({ sandbox, validator }) => {
 		validator.addSchema(EvmCallTransaction.getSchema());
 
 		const configuration = sandbox.app.get<Configuration>(Identifiers.Cryptography.Configuration);
@@ -103,7 +102,7 @@ describe<{
 		for (const value of validValues) {
 			const transaction = {
 				...transactionOriginal,
-				gasPrice: value,
+				gasPrice: value * 1e9,
 			};
 
 			assert.undefined(validator.validate("evmCall", transaction).error);

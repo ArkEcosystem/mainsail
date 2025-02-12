@@ -113,7 +113,7 @@ describe<{
 		await isTransactionCommitted(context, tx);
 
 		const legacyAfter = await evm.getAccountInfo(legacyColdWallet.mainsailAddress);
-		assert.equal(legacyAfter.balance, legacyBefore.balance - 108100000000000n - 5n);
+		assert.equal(legacyAfter.balance, legacyBefore.balance - 108160000000000n - 5n);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientAfter.balance, 5n);
@@ -135,7 +135,7 @@ describe<{
 		const recipientBefore = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientBefore.balance, 0n);
 
-		const gasSpentPerTx = 108100000000000n;
+		const gasSpentPerTx = 108160000000000n;
 		const valuePerTx = 5n;
 		const N = 10n;
 
@@ -197,7 +197,7 @@ describe<{
 			sender: legacyColdWallet.keyPair,
 			recipient: randomWallet.address,
 			gasLimit: 30_000,
-			gasPrice: 5,
+			gasPrice: 5 * 1e9,
 			value: spentValue,
 		});
 
@@ -219,7 +219,7 @@ describe<{
 			legacyAfterSpent.balance,
 			legacyAfter.balance -
 				spentValue -
-				ethers.parseUnits((receipt!.gasUsed * BigInt(spentTx.data.gasPrice)).toString(), "gwei"),
+				ethers.parseUnits((receipt!.gasUsed * BigInt(spentTx.data.gasPrice)).toString(), "wei"),
 		);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);

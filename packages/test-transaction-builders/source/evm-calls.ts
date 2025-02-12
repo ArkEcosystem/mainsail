@@ -15,7 +15,7 @@ export const makeEvmCall = async (
 	let { value, sender, recipient, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
-	gasPrice = gasPrice ?? 5;
+	gasPrice = gasPrice ?? 5 * 1e9;
 
 	if (!payload) {
 		const senderRecipient = await getAddressByPublicKey({ sandbox }, sender.publicKey);
@@ -49,7 +49,7 @@ export const makeEvmCallDeployErc20Contract = async (
 	let { sender, gasPrice, gasLimit, payload } = options;
 	sender = sender ?? wallets[0];
 
-	gasPrice = gasPrice ?? 5;
+	gasPrice = gasPrice ?? 5 * 1e9;
 
 	if (!payload) {
 		payload = Buffer.from(ethers.getBytes(DARK20.bytecode)).toString("hex");

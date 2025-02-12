@@ -12,7 +12,7 @@ export class EvmCallBuilder extends TransactionBuilder<EvmCallBuilder> {
 		this.data.value = BigNumber.ZERO;
 		this.data.senderAddress = "";
 		this.data.gasLimit = 1_000_000;
-		this.data.gasPrice = 5;
+		this.data.gasPrice = 5 * 1e9;
 		this.data.data = "";
 	}
 
