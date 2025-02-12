@@ -3012,111 +3012,12 @@ importers:
 
   tests/e2e/clients:
     devDependencies:
-      '@mainsail/consensus':
-        specifier: workspace:*
-        version: link:../../../packages/consensus
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../../../packages/container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../../../packages/contracts
-      '@mainsail/crypto-address-keccak256':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-address-keccak256
-      '@mainsail/crypto-block':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-block
-      '@mainsail/crypto-commit':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-commit
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-config
-      '@mainsail/crypto-consensus-bls12-381':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-consensus-bls12-381
-      '@mainsail/crypto-hash-bcrypto':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-hash-bcrypto
-      '@mainsail/crypto-key-pair-ecdsa':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-key-pair-ecdsa
-      '@mainsail/crypto-messages':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-messages
-      '@mainsail/crypto-signature-schnorr':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-signature-schnorr
-      '@mainsail/crypto-transaction':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction
-      '@mainsail/crypto-transaction-evm-call':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-transaction-evm-call
-      '@mainsail/crypto-validation':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-validation
-      '@mainsail/crypto-wif':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-wif
-      '@mainsail/crypto-worker':
-        specifier: workspace:*
-        version: link:../../../packages/crypto-worker
-      '@mainsail/database':
-        specifier: workspace:*
-        version: link:../../../packages/database
-      '@mainsail/evm-api-worker':
-        specifier: workspace:*
-        version: link:../../../packages/evm-api-worker
-      '@mainsail/evm-gas-fee':
-        specifier: workspace:*
-        version: link:../../../packages/evm-gas-fee
-      '@mainsail/evm-service':
-        specifier: workspace:*
-        version: link:../../../packages/evm-service
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../../../packages/kernel
-      '@mainsail/logger-pino':
-        specifier: workspace:*
-        version: link:../../../packages/logger-pino
-      '@mainsail/processor':
-        specifier: workspace:*
-        version: link:../../../packages/processor
-      '@mainsail/serializer':
-        specifier: workspace:*
-        version: link:../../../packages/serializer
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../../../packages/state
       '@mainsail/test-framework':
         specifier: workspace:*
         version: link:../../../packages/test-framework
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../../../packages/test-runner
-      '@mainsail/test-transaction-builders':
-        specifier: workspace:*
-        version: link:../../../packages/test-transaction-builders
-      '@mainsail/transaction-pool-service':
-        specifier: workspace:*
-        version: link:../../../packages/transaction-pool-service
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../../../packages/transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../../../packages/utils
-      '@mainsail/validation':
-        specifier: workspace:*
-        version: link:../../../packages/validation
-      '@mainsail/validator':
-        specifier: workspace:*
-        version: link:../../../packages/validator
-      '@types/tmp':
-        specifier: 0.2.6
-        version: 0.2.6
       date-fns:
         specifier: 3.6.0
         version: 3.6.0
@@ -3126,9 +3027,6 @@ importers:
       fs-extra:
         specifier: 11.2.0
         version: 11.2.0
-      tmp:
-        specifier: 0.2.3
-        version: 0.2.3
       uvu:
         specifier: ^0.5.6
         version: 0.5.6
