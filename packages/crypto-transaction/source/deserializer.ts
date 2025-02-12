@@ -20,6 +20,12 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		data.network = Number(decoded[0]);
 		data.nonce = BigNumber.make(this.#parseNumber(decoded[1].toString()));
+
+		// we do not support a priority fee and thus always expect a 0 value here.
+		if (this.#parseNumber(decoded[2].toString()) !== 0) {
+			throw new Error("priority fee must be 0");
+		}
+
 		data.gasPrice = this.#parseNumber(decoded[3].toString());
 		data.gasLimit = this.#parseNumber(decoded[4].toString());
 		data.recipientAddress = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
