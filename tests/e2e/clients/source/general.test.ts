@@ -75,7 +75,7 @@ describe<{
 		}
 	});
 
-	it.only("Account - should get wallet nonce", async ({ localClient, clients }) => {
+	it("Account - should get wallet nonce", async ({ localClient, clients }) => {
 		const address = genesisBlock.block.transactions[0].senderAddress;
 		const nonce = await localClient.getNonce(address);
 
@@ -84,6 +84,18 @@ describe<{
 		for (const client of clients) {
 			const n = await client.getNonce(address);
 			assert.equal(nonce, n);
+		}
+	});
+
+	it.only("Account - should get code", async ({ localClient, clients }) => {
+		const address = "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459"; // Consensus contract
+		const code = await localClient.getCode(address);
+
+		assert.not.equal(code, "0x");
+
+		for (const client of clients) {
+			const c = await client.getCode(address);
+			assert.equal(code, c);
 		}
 	});
 });

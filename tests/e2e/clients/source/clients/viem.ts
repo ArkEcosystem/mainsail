@@ -59,4 +59,11 @@ export class ViemClient implements Client {
 			}),
 		);
 	}
+
+	public async getCode(address: string): Promise<string> {
+		return this.#client.getCode({
+			address,
+			blockTag: "latest",
+		});
+	}
 }

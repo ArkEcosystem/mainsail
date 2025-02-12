@@ -6,4 +6,5 @@ export interface Client {
 	getTransactionByBlockNumberAndIndex(blockNumber: number, index: number): Promise<Record<string, any>>;
 	getBalance(address: string): Promise<number>;
 	getNonce(address: string): Promise<number>;
+	getCode(address: string): Promise<string>;
 }

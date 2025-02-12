@@ -46,4 +46,8 @@ export class EthersClient implements Client {
 	public async getNonce(address: string): Promise<number> {
 		return Number(await this.#client.getTransactionCount(address));
 	}
+
+	public async getCode(address: string): Promise<string> {
+		return this.#client.getCode(address);
+	}
 }
