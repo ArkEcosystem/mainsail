@@ -21,7 +21,7 @@ export class ReceiptResource {
 			gasUsed: `0x${receipt.gasUsed.toString(16)}`,
 			contractAddress: receipt.deployedContractAddress,
 			logs: receipt.logs,
-			logsBloom: "", // TODO: Implement logs bloom
+			logsBloom: `0x${"0".repeat(128)}`, // TODO: Implement logs bloom
 			type: "0x2",
 			status: receipt.success ? "0x1" : "0x0",
 		};
