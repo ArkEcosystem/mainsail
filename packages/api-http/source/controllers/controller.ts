@@ -53,18 +53,11 @@ export class Controller extends AbstractController {
 	protected async getReceipts(ids: string[], full = false): Promise<Record<string, Models.Receipt>> {
 		const receiptRepository = this.receiptRepositoryFactory();
 
-		let columns = [
-			"Receipt.id",
-			"Receipt.success",
-			"Receipt.gasUsed",
-			"Receipt.gasRefunded",
-			"Receipt.deployedContractAddress",
-		];
-		if (full) {
-			columns = [...columns, "Receipt.output", "Receipt.logs"];
-		}
-
-		const receipts = await receiptRepository.createQueryBuilder().select(columns).whereInIds(ids).getMany();
+		const receipts = await receiptRepository
+			.createQueryBuilder("receipt")
+			.select(this.getReceiptColumns(full))
+			.whereInIds(ids)
+			.getMany();
 
 		return receipts.reduce((accumulator, current) => {
 			accumulator[current.id] = current;
@@ -168,5 +161,20 @@ export class Controller extends AbstractController {
 		const asHeight = Number(idOrHeight);
 		// NOTE: This assumes all block ids are sha256 and never a valid number below this threshold.
 		return !isNaN(asHeight) && asHeight <= Number.MAX_SAFE_INTEGER ? { height: asHeight } : { id: idOrHeight };
+	}
+
+	protected getReceiptColumns(fullReceipt?: boolean): string[] {
+		let columns = [
+			"receipt.id",
+			"receipt.success",
+			"receipt.gasUsed",
+			"receipt.gasRefunded",
+			"receipt.deployedContractAddress",
+		];
+		if (fullReceipt) {
+			columns = [...columns, "receipt.output", "receipt.logs"];
+		}
+
+		return columns;
 	}
 }
