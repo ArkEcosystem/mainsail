@@ -237,7 +237,6 @@ contract MultiPaymentTest is Test {
         assertEq(recipient3.balance, 30 ether);
         assertEq(sender.balance, 60 ether);
 
-        vm.stopPrank();
     }
 
     function test_pay_pass_with_multiple_payments_same_address() public {
