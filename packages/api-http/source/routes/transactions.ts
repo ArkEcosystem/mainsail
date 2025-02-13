@@ -22,9 +22,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			validate: {
 				query: Joi.object({
 					...server.app.schemas.transactionCriteriaSchemas,
+					fullReceipt: Joi.bool().default(false),
 					orderBy: server.app.schemas.transactionsOrderBy,
 					transform: Joi.bool().default(true),
-					fullReceipt: Joi.bool().default(false),
 				})
 					.concat(transactionSortingSchema)
 					.concat(Schemas.pagination),
@@ -42,8 +42,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					id: Joi.string().hex().length(64),
 				}),
 				query: Joi.object({
-					transform: Joi.bool().default(true),
 					fullReceipt: Joi.bool().default(false),
+					transform: Joi.bool().default(true),
 				}),
 			},
 		},
