@@ -279,9 +279,9 @@
 			"evmSpec": "Shanghai",
 			"gas": {
 				"maximumGasLimit": 2000000,
-				"maximumGasPrice": 10000,
+				"maximumGasPrice": 10000000000000,
 				"minimumGasLimit": 21000,
-				"minimumGasPrice": 5
+				"minimumGasPrice": 5000000000
 			},
 			"height": 0,
 			"reward": "0",
