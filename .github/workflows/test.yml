@@ -287,7 +287,8 @@ jobs:
             - name: Test api-http
               run: cd packages/api-http && pnpm run test:integration
 
-    e2e:
+    e2e-consensus:
+        name: "E2E Consensus"
         needs:
             - build
         concurrency:
@@ -362,3 +363,62 @@ jobs:
             - name: Show logs - node4
               if: always()
               run: docker logs consensus-node4-1
+
+    e2e-clients:
+        name: "E2E Clients"
+        needs:
+            - build
+        concurrency:
+            cancel-in-progress: true
+            group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
+        runs-on: ubuntu-latest
+
+        timeout-minutes: 1
+
+        strategy:
+            matrix:
+                node-version: [20.x]
+                name: ["clients"]
+
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.head_ref }}
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  run_install: false
+                  version: latest
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+              shell: bash
+            - name: Cache pnpm modules
+              uses: actions/cache@v4
+              with:
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+            - name: Cache lerna
+              uses: actions/cache@v4
+              with:
+                  key: lerna-${{ runner.os }}
+                  path: ./.cache
+                  restore-keys: lerna-${{ runner.os }}-
+            - name: Install dependencies
+              run: pnpm install
+            - name: Build
+              run: pnpm run build
+
+            - name: Docker Up
+              run: docker compose up -d
+            - name: Delay
+              run: sleep 20
+            - name: Running checks for ${{ matrix.name }}
+              run: pnpm run test
+            - name: Show logs
+              if: always()
+              run: docker logs TODO
