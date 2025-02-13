@@ -49,7 +49,8 @@ export class Deployer {
 		const usernamesContractAddress = await this.#deployUsernamesContract();
 		await this.#deployUsernamesProxy(usernamesContractAddress);
 
-		await this.#deployMultiPaymentsContract();
+		const multiPaymentContractAddress = await this.#deployMultiPaymentContract();
+		await this.#deployMultiPaymentProxy(multiPaymentContractAddress);
 
 		await this.evm.onCommit({
 			...this.#getBlockContext().commitKey,
@@ -260,7 +261,7 @@ export class Deployer {
 			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
 	}
 
-	async #deployMultiPaymentsContract(): Promise<string> {
+	async #deployMultiPaymentContract(): Promise<string> {
 		const result = await this.evm.process({
 			blockContext: this.#getBlockContext(),
 			caller: this.deployerAddress,
@@ -274,7 +275,7 @@ export class Deployer {
 		});
 
 		if (!result.receipt.success) {
-			throw new Error("failed to deploy MultiPayments contract");
+			throw new Error("failed to deploy MultiPayment contract");
 		}
 
 		if (
@@ -284,16 +285,63 @@ export class Deployer {
 		}
 
 		this.logger.info(
-			`Deployed MultiPayments contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
+			`Deployed MultiPayment contract from ${this.deployerAddress} to ${result.receipt.deployedContractAddress}`,
+		);
+
+		return result.receipt.deployedContractAddress!;
+	}
+
+	async #deployMultiPaymentProxy(multiPaymentAddress: string): Promise<void> {
+		// Logic contract initializer function ABI
+		const logicInterface = new ethers.Interface(MultiPaymentAbi.abi);
+		// Encode the initializer call
+		const initializerCalldata = logicInterface.encodeFunctionData("initialize");
+		// Prepare the constructor arguments for the proxy contract
+		const proxyConstructorArguments = new ethers.AbiCoder()
+			.encode(["address", "bytes"], [multiPaymentAddress, initializerCalldata])
+			.slice(2);
+
+		const proxyResult = await this.evm.process({
+			blockContext: this.#getBlockContext(),
+			caller: this.deployerAddress,
+			data: Buffer.concat([
+				Buffer.from(ethers.getBytes(ERC1967ProxyAbi.bytecode.object)),
+				Buffer.from(proxyConstructorArguments, "hex"),
+			]),
+			gasLimit: BigInt(10_000_000),
+			gasPrice: BigInt(0),
+			nonce: BigInt(5),
+			specId: this.#getSpecId(),
+			txHash: this.#generateTxHash(),
+			value: 0n,
+		});
+
+		if (!proxyResult.receipt.success) {
+			throw new Error("failed to deploy MultiPayment PROXY contract");
+		}
+
+		if (
+			proxyResult.receipt.deployedContractAddress !==
+			ethers.getCreateAddress({ from: this.deployerAddress, nonce: 5 })
+		) {
+			throw new Error("Contract address mismatch");
+		}
+
+		this.logger.info(
+			`Deployed MultiPayment PROXY contract from ${this.deployerAddress} to ${proxyResult.receipt.deployedContractAddress}`,
 		);
 
 		this.#emitContractDeployed({
-			address: result.receipt.deployedContractAddress!,
-			implementations: [{ abi: MultiPaymentAbi.abi, address: result.receipt.deployedContractAddress! }],
+			activeImplementation: multiPaymentAddress,
+			address: proxyResult.receipt.deployedContractAddress!,
+			implementations: [{ abi: MultiPaymentAbi.abi, address: multiPaymentAddress }],
 			name: "multi-payments",
+			proxy: "UUPS",
 		});
 
-		return result.receipt.deployedContractAddress!;
+		this.app
+			.bind(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment)
+			.toConstantValue(proxyResult.receipt.deployedContractAddress!);
 	}
 
 	public getDeploymentEvents(): Contracts.Evm.DeployerContract[] {
