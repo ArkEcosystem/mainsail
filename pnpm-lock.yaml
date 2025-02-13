@@ -3012,6 +3012,12 @@ importers:
 
   tests/e2e/clients:
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../../../packages/contracts
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../../../packages/crypto-key-pair-ecdsa
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../../../packages/evm-contracts

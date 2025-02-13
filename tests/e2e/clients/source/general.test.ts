@@ -1,5 +1,7 @@
+import { Identifiers } from "@mainsail/contracts";
+import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { describe } from "@mainsail/test-framework";
+import { describe, Sandbox } from "@mainsail/test-framework";
 import { encodeFunctionData } from "viem";
 
 import { genesisBlock, network } from "../config/core/crypto.json";
@@ -12,12 +14,20 @@ const URL = "http://127.0.0.1:4008/api";
 describe<{
 	localClient: LocalClient;
 	clients: Client[];
+	privateKey: string;
 }>("General", ({ beforeEach, it, assert, nock }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
 		context.clients = [new EthersClient(URL), new ViemClient(URL)];
 		// context.clients = [new EthersClient(URL)];
+
+		const sandbox = new Sandbox();
+		sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
+
+		const keyPairFactory = sandbox.app.resolve(KeyPairFactory);
+		const keyPair = await keyPairFactory.fromMnemonic("");
+		context.privateKey = `0x${keyPair.privateKey}`;
 	});
 
 	it("Network - should get chainId", async ({ localClient, clients }) => {
@@ -139,7 +149,7 @@ describe<{
 		}
 	});
 
-	only("Contract - call", async ({ localClient, clients }) => {
+	it("Contract - call", async ({ localClient, clients }) => {
 		const address = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1"; // Consensus contract PROXY
 		const data = encodeFunctionData({
 			abi: ConsensusAbi.abi,
@@ -155,4 +165,21 @@ describe<{
 			assert.equal(result, r);
 		}
 	});
+
+	// it("Transactions - transfer", async ({ localClient, clients }) => {
+	// 	const address = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1"; // Consensus contract PROXY
+	// 	const data = encodeFunctionData({
+	// 		abi: ConsensusAbi.abi,
+	// 		functionName: "activeValidatorsCount",
+	// 	});
+
+	// 	const result = await localClient.call(address, data);
+
+	// 	assert.equal(Number(result), 5);
+
+	// 	for (const client of clients) {
+	// 		const r = await client.call(address, data);
+	// 		assert.equal(result, r);
+	// 	}
+	// });
 });
