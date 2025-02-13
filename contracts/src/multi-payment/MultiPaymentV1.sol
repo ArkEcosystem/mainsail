@@ -36,7 +36,9 @@ contract MultiPaymentV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert InvalidValue();
         }
 
-        uint256 numRecipients = recipients.length;
+        if (recipients.length == 0) {
+            return;
+        }
         if (numRecipients == 0) {
             return;
         }
