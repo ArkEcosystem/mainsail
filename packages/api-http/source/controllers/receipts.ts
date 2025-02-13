@@ -118,7 +118,13 @@ export class ReceiptsController extends Controller {
 	}
 
 	#getColumns(fullReceipt?: boolean): string[] {
-		let columns = ["receipt.id", "receipt.success", "receipt.gasUsed", "receipt.deployedContractAddress"];
+		let columns = [
+			"receipt.id",
+			"receipt.success",
+			"receipt.gasUsed",
+			"receipt.gasRefunded",
+			"receipt.deployedContractAddress",
+		];
 		if (fullReceipt) {
 			columns = [...columns, "receipt.output", "receipt.logs"];
 		}

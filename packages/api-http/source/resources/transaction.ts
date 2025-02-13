@@ -50,6 +50,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 						receipt: {
 							deployedContractAddress: resource.receipt.deployedContractAddress ?? undefined,
 							gasUsed: resource.receipt.gasUsed,
+							gasRefunded: resource.receipt.gasRefunded,
 							success: resource.receipt.success,
 							output: resource.receipt.output,
 							logs: resource.receipt.logs,

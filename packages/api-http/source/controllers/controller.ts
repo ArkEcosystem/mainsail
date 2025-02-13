@@ -53,7 +53,13 @@ export class Controller extends AbstractController {
 	protected async getReceipts(ids: string[], full = false): Promise<Record<string, Models.Receipt>> {
 		const receiptRepository = this.receiptRepositoryFactory();
 
-		let columns = ["Receipt.id", "Receipt.success", "Receipt.gasUsed", "Receipt.deployedContractAddress"];
+		let columns = [
+			"Receipt.id",
+			"Receipt.success",
+			"Receipt.gasUsed",
+			"Receipt.gasRefunded",
+			"Receipt.deployedContractAddress",
+		];
 		if (full) {
 			columns = [...columns, "Receipt.output", "Receipt.logs"];
 		}
