@@ -50,13 +50,15 @@ export class Controller extends AbstractController {
 		return configuration ?? ({} as Models.Configuration);
 	}
 
-	protected async getReceipts(ids: string[]): Promise<Record<string, Models.Receipt>> {
+	protected async getReceipts(ids: string[], full = false): Promise<Record<string, Models.Receipt>> {
 		const receiptRepository = this.receiptRepositoryFactory();
-		const receipts = await receiptRepository
-			.createQueryBuilder()
-			.select(["Receipt.id", "Receipt.success", "Receipt.gasUsed", "Receipt.deployedContractAddress"])
-			.whereInIds(ids)
-			.getMany();
+
+		let columns = ["Receipt.id", "Receipt.success", "Receipt.gasUsed", "Receipt.deployedContractAddress"];
+		if (full) {
+			columns = [...columns, "Receipt.output", "Receipt.logs"];
+		}
+
+		const receipts = await receiptRepository.createQueryBuilder().select(columns).whereInIds(ids).getMany();
 
 		return receipts.reduce((accumulator, current) => {
 			accumulator[current.id] = current;
@@ -122,17 +124,22 @@ export class Controller extends AbstractController {
 
 	protected async enrichTransactionResult(
 		resultPage: Search.ResultsPage<Models.Transaction>,
-		context?: { state?: Models.State },
+		context?: { state?: Models.State; fullReceipt?: boolean },
 	): Promise<Search.ResultsPage<EnrichedTransaction>> {
 		const [state, receipts] = await Promise.all([
 			context?.state ?? this.getState(),
-			this.getReceipts(resultPage.results.map((tx) => tx.id)),
+			this.getReceipts(
+				resultPage.results.map((tx) => tx.id),
+				context?.fullReceipt ?? false,
+			),
 		]);
 
 		return {
 			...resultPage,
 			results: await Promise.all(
-				resultPage.results.map((tx) => this.enrichTransaction(tx, state, receipts[tx.id] ?? null)),
+				resultPage.results.map((tx) =>
+					this.enrichTransaction(tx, state, receipts[tx.id] ?? null, context?.fullReceipt),
+				),
 			),
 		};
 	}
@@ -141,10 +148,11 @@ export class Controller extends AbstractController {
 		transaction: Models.Transaction,
 		state?: Models.State,
 		receipt?: Models.Receipt | null,
+		fullReceipt?: boolean,
 	): Promise<EnrichedTransaction> {
 		const [_state, receipts] = await Promise.all([
 			state ? state : this.getState(),
-			receipt !== undefined ? receipt : this.getReceipts([transaction.id]),
+			receipt !== undefined ? receipt : this.getReceipts([transaction.id], fullReceipt),
 		]);
 
 		return { ...transaction, receipt: receipt ?? receipts?.[transaction.id] ?? undefined, state: _state };
