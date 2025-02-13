@@ -1,16 +1,26 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
 pragma solidity ^0.8.27;
 
-contract MultiPayment {
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+
+contract MultiPaymentV1 is UUPSUpgradeable, OwnableUpgradeable {
     error RecipientsAndAmountsMismatch();
     error InvalidValue();
 
     event Payment(address indexed recipient, uint256 amount, bool success);
 
-    // Gas costs for dynamic recipient gas stipend calculation
-    uint256 private constant EVENT_COST = 2250;
-    uint256 private constant LOOP_OVERHEAD = 1000;
-    uint256 private constant SAFETY_MARGIN = 10000;
+    // Initializers
+    function initialize() public initializer {
+        __Ownable_init(msg.sender);
+    }
+
+    // Overrides
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+    function version() external pure returns (uint256) {
+        return 1;
+    }
 
     function pay(address payable[] calldata recipients, uint256[] calldata amounts) external payable {
         if (recipients.length != amounts.length) {
@@ -31,15 +41,8 @@ contract MultiPayment {
             return;
         }
 
-        uint256 availableGas = gasleft();
-
-        // Calculate dynamic gas limit based on number of recipients
-        uint256 operationBuffer = (EVENT_COST * numRecipients) + (LOOP_OVERHEAD * numRecipients) + SAFETY_MARGIN;
-        uint256 effectiveAvailableGas = availableGas > operationBuffer ? availableGas - operationBuffer : availableGas;
-        uint256 gasPerRecipient = effectiveAvailableGas / numRecipients;
-
         for (uint256 i = 0; i < recipients.length; i++) {
-            (bool sent,) = recipients[i].call{value: amounts[i], gas: gasPerRecipient}("");
+            (bool sent,) = recipients[i].call{value: amounts[i], gas: 5000}("");
             if (sent) {
                 total -= amounts[i];
             }

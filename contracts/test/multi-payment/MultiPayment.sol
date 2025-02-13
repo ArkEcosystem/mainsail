@@ -2,7 +2,9 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "@forge-std/Test.sol";
-import {MultiPayment} from "@contracts/multi-payment/MultiPayment.sol";
+import {MultiPaymentV1} from "@contracts/multi-payment/MultiPaymentV1.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 contract RejectPayments {
     fallback() external payable {
@@ -15,10 +17,12 @@ contract RejectPayments {
 }
 
 contract MultiPaymentTest is Test {
-    MultiPayment public multiPayment;
+    MultiPaymentV1 public multiPayment;
 
     function setUp() public {
-        multiPayment = new MultiPayment();
+        bytes memory data = abi.encode(MultiPaymentV1.initialize.selector);
+        address proxy = address(new ERC1967Proxy(address(new MultiPaymentV1()), data));
+        multiPayment = MultiPaymentV1(proxy);
     }
 
     function test_pay_pass_with_zero_payment() public {
@@ -170,13 +174,13 @@ contract MultiPaymentTest is Test {
 
         // Events
         vm.expectEmit();
-        emit MultiPayment.Payment(recipient1, 10 ether, true);
+        emit MultiPaymentV1.Payment(recipient1, 10 ether, true);
 
         vm.expectEmit();
-        emit MultiPayment.Payment(recipient2, 20 ether, true);
+        emit MultiPaymentV1.Payment(recipient2, 20 ether, true);
 
         vm.expectEmit();
-        emit MultiPayment.Payment(recipient3, 30 ether, true);
+        emit MultiPaymentV1.Payment(recipient3, 30 ether, true);
 
         // Act
         multiPayment.pay{value: 60 ether}(recipients, amounts);
@@ -216,13 +220,13 @@ contract MultiPaymentTest is Test {
         // Force recipient2 to reject payment
 
         vm.expectEmit();
-        emit MultiPayment.Payment(recipient1, 10 ether, true);
+        emit MultiPaymentV1.Payment(recipient1, 10 ether, true);
 
         vm.expectEmit();
-        emit MultiPayment.Payment(recipient2, 20 ether, false);
+        emit MultiPaymentV1.Payment(recipient2, 20 ether, false);
 
         vm.expectEmit();
-        emit MultiPayment.Payment(recipient3, 30 ether, true);
+        emit MultiPaymentV1.Payment(recipient3, 30 ether, true);
 
         // Act
         multiPayment.pay{value: 60 ether}(recipients, amounts);
@@ -305,7 +309,7 @@ contract MultiPaymentTest is Test {
         amounts[1] = 60 ether;
 
         // Act
-        vm.expectRevert(MultiPayment.RecipientsAndAmountsMismatch.selector);
+        vm.expectRevert(MultiPaymentV1.RecipientsAndAmountsMismatch.selector);
         multiPayment.pay{value: 100 ether}(recipients, amounts);
     }
 
@@ -324,7 +328,7 @@ contract MultiPaymentTest is Test {
         amounts[0] = 40 ether;
 
         // Act
-        vm.expectRevert(MultiPayment.InvalidValue.selector);
+        vm.expectRevert(MultiPaymentV1.InvalidValue.selector);
         multiPayment.pay{value: 50 ether}(recipients, amounts);
     }
 
