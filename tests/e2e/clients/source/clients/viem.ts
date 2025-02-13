@@ -94,4 +94,10 @@ export class ViemClient implements Client {
 			})
 		).data;
 	}
+
+	public async sendTx(serialized: string): Promise<string> {
+		return this.#client.sendRawTransaction({
+			serializedTransaction: serialized,
+		});
+	}
 }

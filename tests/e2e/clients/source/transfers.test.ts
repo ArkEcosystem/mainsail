@@ -1,69 +1,73 @@
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { KeyPairFactory } from "@mainsail/crypto-key-pair-ecdsa";
 import { describe, Factories, Sandbox } from "@mainsail/test-framework";
+import { ethers } from "ethers";
 
 import crypto from "../config/core/crypto.json";
 import { secrets } from "../config/core/validators.json";
-import { LocalClient } from "./clients/index.js";
+import { EthersClient, LocalClient, ViemClient } from "./clients/index.js";
 import { Client } from "./types";
 
 const URL = "http://127.0.0.1:4008/api";
+const TX_INCLUDE_DELAY = 5000;
 
 describe<{
 	sandbox: Sandbox;
 	localClient: LocalClient;
 	clients: Client[];
 	privateKey: string;
+	address: string;
 }>("General", ({ beforeEach, it, assert, nock }) => {
 	beforeEach(async (context) => {
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
-		context.clients = [];
-		// context.clients = [new EthersClient(URL), new ViemClient(URL)];
-		// context.clients = [new EthersClient(URL)];
+		context.clients = [context.localClient];
+		context.clients = [context.localClient, new EthersClient(URL), new ViemClient(URL)];
 
 		const sandbox = new Sandbox();
-		// const sandbox = new Sandbox().withConfigurationOptions({
-		// 	chainId: crypto.network.chainId,
-		// 	network: crypto.network.name,
-		// 	symbol: crypto.network.client.symbol,
-		// 	token: crypto.network.client.token,
-		// });
 		context.sandbox = sandbox;
 		sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
 		const keyPairFactory = sandbox.app.resolve(KeyPairFactory);
-		const keyPair = await keyPairFactory.fromMnemonic("");
+		const keyPair = await keyPairFactory.fromMnemonic(secrets[0]);
 		context.privateKey = `0x${keyPair.privateKey}`;
+		context.address = ethers.computeAddress(`0x${keyPair.publicKey}`);
 	});
 
-	it("Contract - call", async ({ localClient, clients }) => {
-		// const address = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1"; // Consensus contract PROXY
-		// const data = encodeFunctionData({
-		// 	abi: ConsensusAbi.abi,
-		// 	functionName: "activeValidatorsCount",
-		// });
-		// const result = await localClient.call(address, data);
-		// assert.equal(Number(result), 5);
-		// for (const client of clients) {
-		// 	const r = await client.call(address, data);
-		// 	assert.equal(result, r);
-		// }
+	it("Contract - call", async ({ localClient, clients, address }) => {
 		const factoryBuilder = new Factories.FactoryBuilder();
 		await Factories.Factories.registerTransactionFactory(factoryBuilder, crypto);
-		const transaction: Contracts.Crypto.Transaction = await (
-			await factoryBuilder
-				.get("Transfer")
-				.withOptions({
-					nonce: 1,
-					passphrase: secrets[0],
-				})
-				.withStates("sign")
-				.make()
-		).build();
+		let nonce = await localClient.getNonce(address);
 
-		const serialized = console.log(transaction.serialized.toString("hex"));
+		const ids: string[] = [];
 
-		console.log(serialized);
+		for (const client of clients) {
+			const transaction: Contracts.Crypto.Transaction = await (
+				await factoryBuilder
+					.get("Transfer")
+					.withOptions({
+						nonce: nonce++,
+						passphrase: secrets[0],
+					})
+					.withStates("sign")
+					.make()
+			).build();
+
+			const serialized = `0x${transaction.serialized.toString("hex")}`;
+
+			const result = await client.sendTx(serialized);
+			ids.push(result);
+
+			assert.equal(`0x${transaction.id}`, result);
+		}
+
+		await new Promise((resolve) => {
+			setTimeout(resolve, TX_INCLUDE_DELAY);
+		});
+
+		for (const id of ids) {
+			const receipt = await localClient.getReceipt(id);
+			assert.equal(receipt.status, "0x1");
+		}
 	});
 });

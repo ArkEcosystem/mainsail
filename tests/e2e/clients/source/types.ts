@@ -11,4 +11,5 @@ export interface Client {
 	getCode(address: string): Promise<string>;
 	getStorageAt(address: string, position: string): Promise<string>;
 	call(address: string, data: string): Promise<string>;
+	sendTx(serialized: string): Promise<string>;
 }

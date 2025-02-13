@@ -75,4 +75,8 @@ export class EthersClient implements Client {
 			to: address,
 		});
 	}
+
+	public async sendTx(serialized: string): Promise<string> {
+		return (await this.#client.broadcastTransaction(serialized)).hash;
+	}
 }

@@ -59,6 +59,10 @@ export class LocalClient implements Client {
 		return this.#JSONRPCCall<string>("eth_call", [{ to: address, data }, "latest"]);
 	}
 
+	public async sendTx(serialized: string): Promise<string> {
+		return this.#JSONRPCCall<string>("eth_sendRawTransaction", [serialized]);
+	}
+
 	async #JSONRPCCall<T>(method: string, parameters: any[]): Promise<T> {
 		const response = await http.post(this.url, {
 			body: {
