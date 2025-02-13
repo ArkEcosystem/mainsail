@@ -3,6 +3,7 @@ export const Identifiers = {
 		Addresses: {
 			Consensus: Symbol.for("Evm.Consensus<Contracts.Addresses.Consensus>"),
 			Usernames: Symbol.for("Evm.Consensus<Contracts.Addresses.Usernames>"),
+			MultiPayment: Symbol.for("Evm.Consensus<Contracts.Addresses.MultiPayment>"),
 		},
 	},
 	Internal: {
