@@ -39,9 +39,6 @@ contract MultiPaymentV1 is UUPSUpgradeable, OwnableUpgradeable {
         if (recipients.length == 0) {
             return;
         }
-        if (numRecipients == 0) {
-            return;
-        }
 
         for (uint256 i = 0; i < recipients.length; i++) {
             (bool sent,) = recipients[i].call{value: amounts[i], gas: 5000}("");
