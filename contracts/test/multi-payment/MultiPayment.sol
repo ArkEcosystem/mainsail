@@ -267,7 +267,6 @@ contract MultiPaymentTest is Test {
 
     function test_pay_pass_with_multiple_payments_large() public {
         uint256 payments = 100;
-        // 21 000 000
         address payable[] memory recipients = new address payable[](payments);
         uint256[] memory amounts = new uint256[](payments);
 
