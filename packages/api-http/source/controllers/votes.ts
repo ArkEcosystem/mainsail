@@ -36,7 +36,7 @@ export class VotesController extends Controller {
 		);
 
 		return this.toPagination(
-			await this.enrichTransactionResult(transactions),
+			await this.enrichTransactionResult(transactions, { fullReceipt: request.query.fullReceipt }),
 			TransactionResource,
 			request.query.transform,
 		);
@@ -55,7 +55,7 @@ export class VotesController extends Controller {
 		}
 
 		return this.respondWithResource(
-			await this.enrichTransaction(transaction),
+			await this.enrichTransaction(transaction, undefined, undefined, request.query.fullReceipt),
 			TransactionResource,
 			request.query.transform,
 		);

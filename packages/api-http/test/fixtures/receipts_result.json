@@ -1,0 +1,32 @@
+[
+	{
+		"id": "d76eface634cab46ccc57f373a03e83cfbdaa7bedb84228ed8ce30bea128649a",
+		"success": true,
+		"gasUsed": 116802,
+		"gasRefunded": 0,
+		"deployedContractAddress": null,
+		"logs": [
+			{
+				"data": "0x000000000000000000000000db1a9acdd71eb5f846059034ef6d2cb144ccd1a9000000000000000000000000db1a9acdd71eb5f846059034ef6d2cb144ccd1a9",
+				"topics": ["0xce0c7a2a940807f7dc2ce7a615c2532e915e6c0ac9a08bc4ed9d515a710a53e2"],
+				"address": "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459"
+			}
+		],
+		"output": "0x"
+	},
+	{
+		"id": "29c12f5fc3c25323eec3bae1ddbe72a1113cba634e0079735a34074d4dc8ac0b",
+		"success": true,
+		"gasUsed": 116802,
+		"gasRefunded": 0,
+		"deployedContractAddress": "0x0a26D3630D5EC868767d7F4563Fab98D31601A6e",
+		"logs": [
+			{
+				"data": "0x0000000000000000000000007b962da995bf5e0a7b10351b7a4381f7826504320000000000000000000000007b962da995bf5e0a7b10351b7a4381f782650432",
+				"topics": ["0xce0c7a2a940807f7dc2ce7a615c2532e915e6c0ac9a08bc4ed9d515a710a53e2"],
+				"address": "0x522B3294E6d06aA25Ad0f1B8891242E335D3B459"
+			}
+		],
+		"output": "0x"
+	}
+]

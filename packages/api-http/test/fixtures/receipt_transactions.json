@@ -19,6 +19,7 @@
 			"id": "d76eface634cab46ccc57f373a03e83cfbdaa7bedb84228ed8ce30bea128649a",
 			"success": true,
 			"gasUsed": 116802,
+			"gasRefunded": 0,
 			"deployedContractAddress": null
 		}
 	},
@@ -42,6 +43,7 @@
 			"id": "29c12f5fc3c25323eec3bae1ddbe72a1113cba634e0079735a34074d4dc8ac0b",
 			"success": true,
 			"gasUsed": 116802,
+			"gasRefunded": 0,
 			"deployedContractAddress": "0x0a26D3630D5EC868767d7F4563Fab98D31601A6e"
 		}
 	}

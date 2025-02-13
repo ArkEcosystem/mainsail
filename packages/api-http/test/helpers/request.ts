@@ -12,7 +12,13 @@ export const request = async <T = Record<string, any>>(
 		transform += path.includes("?") ? "&transform=false" : "?transform=false";
 	}
 
-	const response = await got(`http://localhost:4003/api/${path}${transform}`);
+	let fullReceipt = "";
+	if (options?.fullReceipt !== undefined) {
+		fullReceipt +=
+			(path.includes("?") || transform.includes("?") ? "&" : "?") + `fullReceipt=${options.fullReceipt}`;
+	}
+
+	const response = await got(`http://localhost:4003/api/${path}${transform}${fullReceipt}`);
 	const { statusCode, headers, body } = response;
 	return { data: JSON.parse(body) as T, headers, statusCode };
 };

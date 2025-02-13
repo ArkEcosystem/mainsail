@@ -15,6 +15,7 @@ export class ReceiptsController extends Controller {
 
 		const query = this.receiptRepositoryFactory()
 			.createQueryBuilder("receipt")
+			.select(this.getReceiptColumns(request.query.fullReceipt))
 			.innerJoin(Models.Transaction, "transaction", "receipt.id = transaction.id");
 
 		if (criteria.txHash) {
@@ -58,8 +59,8 @@ export class ReceiptsController extends Controller {
 
 	public async show(request: Hapi.Request) {
 		const receipt = await this.receiptRepositoryFactory()
-			.createQueryBuilder()
-			.select()
+			.createQueryBuilder("receipt")
+			.select(this.getReceiptColumns(request.query.fullReceipt))
 			.where("id = :id", { id: request.params.id })
 			.getOne();
 
@@ -76,6 +77,7 @@ export class ReceiptsController extends Controller {
 
 		const query = this.receiptRepositoryFactory()
 			.createQueryBuilder("receipt")
+			.select(this.getReceiptColumns(request.query.fullReceipt))
 			.innerJoin(Models.Transaction, "transaction", "receipt.id = transaction.id")
 			.where("receipt.deployedContractAddress IS NOT NULL");
 
