@@ -414,11 +414,11 @@ jobs:
               run: pnpm run build
 
             - name: Docker Up
-              run: cd tests/e2e/${{ matrix.name }} && docker compose up -d
+              run: cd tests/e2e/clients && docker compose up -d
             - name: Delay
               run: sleep 20
             - name: Running checks for ${{ matrix.name }}
-              run: pnpm run test
+              run: cd tests/e2e/clients && pnpm run test
             - name: Show logs
               if: always()
               run: docker logs mainsail
