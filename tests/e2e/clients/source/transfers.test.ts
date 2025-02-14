@@ -34,7 +34,7 @@ describe<{
 		context.address = ethers.computeAddress(`0x${keyPair.publicKey}`);
 	});
 
-	it("Contract - call", async ({ localClient, clients, address }) => {
+	it("Transactions - transfer should be accepted", async ({ localClient, clients, address }) => {
 		const factoryBuilder = new Factories.FactoryBuilder();
 		await Factories.Factories.registerTransactionFactory(factoryBuilder, crypto);
 		let nonce = await localClient.getNonce(address);
