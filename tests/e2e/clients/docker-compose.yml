@@ -2,6 +2,7 @@ version: "3.8"
 services:
     node0:
         build: ./
+        container_name: mainsail
         image: mainsail
         volumes:
             - ./../../../:/mainsail
