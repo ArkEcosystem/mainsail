@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libjemalloc2
 
-RUN curl -fsSL https://deb.nodesource.com/setup_21.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs
 
 WORKDIR /home/ubuntu
