@@ -20,7 +20,6 @@ describe<{
 		nock.enableNetConnect();
 		context.localClient = new LocalClient(URL);
 		context.clients = [new EthersClient(URL), new ViemClient(URL)];
-		// context.clients = [new EthersClient(URL)];
 
 		const sandbox = new Sandbox();
 		sandbox.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
@@ -90,12 +89,8 @@ describe<{
 		const hash = `0x${genesisBlock.block.transactions[0].id}`;
 		const receipt = await localClient.getReceipt(hash);
 
-		console.log(receipt);
-
 		for (const client of clients) {
 			const r = await client.getReceipt(hash);
-			console.log(r);
-
 			compareReceipts(assert, receipt, r);
 		}
 	});
@@ -165,21 +160,4 @@ describe<{
 			assert.equal(result, r);
 		}
 	});
-
-	// it("Transactions - transfer", async ({ localClient, clients }) => {
-	// 	const address = "0x535B3D7A252fa034Ed71F0C53ec0C6F784cB64E1"; // Consensus contract PROXY
-	// 	const data = encodeFunctionData({
-	// 		abi: ConsensusAbi.abi,
-	// 		functionName: "activeValidatorsCount",
-	// 	});
-
-	// 	const result = await localClient.call(address, data);
-
-	// 	assert.equal(Number(result), 5);
-
-	// 	for (const client of clients) {
-	// 		const r = await client.call(address, data);
-	// 		assert.equal(result, r);
-	// 	}
-	// });
 });
