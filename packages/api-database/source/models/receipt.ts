@@ -57,4 +57,11 @@ export class Receipt {
 		type: "bytea",
 	})
 	public readonly output: Buffer | undefined;
+
+	@Column({
+		default: undefined,
+		nullable: true,
+		type: "varchar",
+	})
+	public readonly humanReadableError: string | undefined;
 }

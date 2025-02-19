@@ -170,6 +170,7 @@ export class Controller extends AbstractController {
 			"receipt.gasUsed",
 			"receipt.gasRefunded",
 			"receipt.deployedContractAddress",
+			"receipt.humanReadableError",
 		];
 		if (fullReceipt) {
 			columns = [...columns, "receipt.output", "receipt.logs"];

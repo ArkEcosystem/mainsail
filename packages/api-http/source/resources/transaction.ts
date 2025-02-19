@@ -54,6 +54,9 @@ export class TransactionResource implements Contracts.Api.Resource {
 							logs: resource.receipt.logs,
 							output: resource.receipt.output,
 							success: resource.receipt.success,
+							...(resource.receipt.humanReadableError
+								? { humanReadableError: resource.receipt.humanReadableError }
+								: {}),
 						},
 					}
 				: {}),
