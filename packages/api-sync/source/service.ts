@@ -5,9 +5,9 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { Providers, Types, Utils } from "@mainsail/kernel";
 import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
-import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
@@ -151,11 +151,11 @@ export class Sync implements Contracts.ApiSync.Service {
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
+					humanReadableError: tryParseReceiptError(wellKnownContracts, receipt),
 					id: transaction.id,
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
-					humanReadableError: tryParseReceiptError(wellKnownContracts, receipt),
 				});
 			}
 		}

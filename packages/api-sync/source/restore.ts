@@ -11,6 +11,7 @@ import { Utils } from "@mainsail/kernel";
 import { chunk, validatorSetPack } from "@mainsail/utils";
 import { ethers } from "ethers";
 import { performance } from "perf_hooks";
+
 import { tryParseReceiptError } from "./utils.js";
 
 interface RestoreContext {
@@ -522,11 +523,11 @@ export class Restore {
 					deployedContractAddress: receipt.deployedContractAddress,
 					gasRefunded: Number(receipt.gasRefunded),
 					gasUsed: Number(receipt.gasUsed),
+					humanReadableError: tryParseReceiptError(deploymentEvents, receipt),
 					id: receipt.txHash.slice(2),
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
-					humanReadableError: tryParseReceiptError(deploymentEvents, receipt),
 				});
 			}
 
