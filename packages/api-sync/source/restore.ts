@@ -11,6 +11,7 @@ import { Utils } from "@mainsail/kernel";
 import { chunk, validatorSetPack } from "@mainsail/utils";
 import { ethers } from "ethers";
 import { performance } from "perf_hooks";
+import { tryParseReceiptError } from "./utils.js";
 
 interface RestoreContext {
 	readonly entityManager: ApiDatabaseContracts.RepositoryDataSource;
@@ -186,25 +187,25 @@ export class Restore {
 			// - `wallets` table
 			await this.#ingestWallets(context);
 
-			// 5) All `receipts` are read from the EVM storage and written to:
+			// 5) Write `contracts` table
+			await this.#ingestContracts(context);
+
+			// 6) All `receipts` are read from the EVM storage and written to:
 			// - `receipts` table
 			await this.#ingestReceipts(context);
 
-			// 6) All `validator_rounds` are read from the EVM storage and written to:
+			// 7) All `validator_rounds` are read from the EVM storage and written to:
 			// - `validator_rounds` table
 			await this.#ingestValidatorRounds(context);
 
-			// 7) Write `transction_types` table
+			// 8) Write `transction_types` table
 			await this.#ingestTransactionTypes(context);
 
-			// 8) Write `configuration` table
+			// 9) Write `configuration` table
 			await this.#ingestConfiguration(context);
 
-			// 9) Write `state` table
+			// 10) Write `state` table
 			await this.#ingestState(context);
-
-			// 10) Write `contracts` table
-			await this.#ingestContracts(context);
 
 			// 11) Update validator ranks
 			await this.#updateValidatorRanks(context);
@@ -499,6 +500,10 @@ export class Restore {
 
 		let totalReceipts = 0;
 
+		const deploymentEvents = this.app
+			.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
+			.getDeploymentEvents();
+
 		do {
 			const receipts: Models.Receipt[] = [];
 			const result = await this.evm.getReceipts(offset ?? 0n, BATCH_SIZE);
@@ -521,6 +526,7 @@ export class Restore {
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
+					humanReadableError: tryParseReceiptError(deploymentEvents, receipt),
 				});
 			}
 

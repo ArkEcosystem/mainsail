@@ -7,10 +7,12 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Providers, Types, Utils } from "@mainsail/kernel";
 import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
+import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { performance } from "perf_hooks";
 
 import { Listeners } from "./contracts.js";
 import { Restore } from "./restore.js";
+import { tryParseReceiptError } from "./utils.js";
 
 interface DeferredSync {
 	block: Models.Block;
@@ -130,6 +132,9 @@ export class Sync implements Contracts.ApiSync.Service {
 		const mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[] = [];
 
 		const receipts = unit.getProcessorResult().receipts;
+		const wellKnownContracts = this.app
+			.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
+			.getDeploymentEvents();
 
 		for (const transaction of transactions) {
 			const { senderPublicKey } = transaction.data;
@@ -150,6 +155,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					logs: receipt.logs,
 					output: receipt.output,
 					success: receipt.success,
+					humanReadableError: tryParseReceiptError(wellKnownContracts, receipt),
 				});
 			}
 		}
