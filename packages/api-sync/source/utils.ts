@@ -16,13 +16,20 @@ export const tryParseReceiptError = (
 	for (const contract of contracts) {
 		for (const { abi } of contract.implementations) {
 			const iface = new ethers.Interface(abi as InterfaceAbi);
-			const error = iface.parseError(receipt.output);
-			if (!error) {
-				continue;
-			}
+			try {
+				const error = iface.parseError(receipt.output);
+				if (!error) {
+					continue;
+				}
 
-			// console.log("found error", contract.name, address, error);
-			return error.name;
+				// console.log("found error", contract.name, error);
+
+				if (error.args.length > 0) {
+					return `${error.name} (${error.args.join(",")})`;
+				}
+
+				return error.name;
+			} catch {}
 		}
 	}
 
