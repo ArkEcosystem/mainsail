@@ -20,7 +20,8 @@
 			"success": true,
 			"gasUsed": 116802,
 			"gasRefunded": 0,
-			"deployedContractAddress": null
+			"deployedContractAddress": null,
+			"humanReadableError": null
 		}
 	},
 	{
@@ -44,7 +45,8 @@
 			"success": true,
 			"gasUsed": 116802,
 			"gasRefunded": 0,
-			"deployedContractAddress": "0x0a26D3630D5EC868767d7F4563Fab98D31601A6e"
+			"deployedContractAddress": "0x0a26D3630D5EC868767d7F4563Fab98D31601A6e",
+			"humanReadableError": null
 		}
 	}
 ]
