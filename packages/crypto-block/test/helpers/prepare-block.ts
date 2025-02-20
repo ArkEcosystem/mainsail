@@ -10,7 +10,7 @@ export const prepareBlock = async (context) => {
 
 	const tx1 = await (
 		await builder
-			.gasPrice(10)
+			.gasPrice(5000000000)
 			.gasLimit(1_000_000)
 			.nonce(0)
 			.recipientAddress("0xBe89811e15f611C1db12e59679b6F3DC1F430155")
@@ -23,7 +23,7 @@ export const prepareBlock = async (context) => {
 
 	const tx2 = await (
 		await builder
-			.gasPrice(10)
+			.gasPrice(5000000000)
 			.gasLimit(1_000_000)
 			.nonce(1)
 			.recipientAddress("0xBe89811e15f611C1db12e59679b6F3DC1F430155")
@@ -41,7 +41,7 @@ export const prepareBlock = async (context) => {
 		fee: BigNumber.ZERO,
 		gasUsed: 0,
 	};
-	let payloadLength = transactions.length * 2;
+	let payloadLength = transactions.length * 4;
 	const payloadBuffers: Buffer[] = [];
 	const transactionData: Contracts.Crypto.TransactionData[] = [];
 
@@ -82,6 +82,4 @@ export const prepareBlock = async (context) => {
 
 	console.log(block);
 	console.log(block.transactions);
-
-	process.exit(0);
 };
