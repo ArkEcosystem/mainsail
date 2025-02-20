@@ -352,8 +352,8 @@ export class DatabaseService implements Contracts.Database.DatabaseService {
 			const transaction: Buffer | undefined = this.transactionStorage.get(key);
 			Utils.assert.defined<Buffer>(transaction);
 
-			const sizeBuff = ByteBuffer.fromSize(2);
-			sizeBuff.writeUint16(transaction.length - 8);
+			const sizeBuff = ByteBuffer.fromSize(4);
+			sizeBuff.writeUint32(transaction.length - 8);
 			transactions.push(sizeBuff.toBuffer(), transaction.subarray(8));
 		}
 
