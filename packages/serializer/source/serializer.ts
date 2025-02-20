@@ -242,7 +242,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				target[property] = [];
 
 				for (let index = 0; index < (target as any).numberOfTransactions; index++) {
-					target[property].push(source.readBytes(source.readUint16()));
+					target[property].push(source.readBytes(source.readUint32()));
 				}
 				continue;
 			}
