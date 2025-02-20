@@ -290,8 +290,8 @@
 				"denomination": 1000000000000000000
 			},
 			"timeouts": {
-				"blockPrepareTime": 4000,
-				"blockTime": 8000,
+				"blockPrepareTime": 2000,
+				"blockTime": 2000,
 				"stageTimeout": 2000,
 				"stageTimeoutIncrease": 2000,
 				"tolerance": 100
