@@ -79,6 +79,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.#updateRewardsAndVotes(unit);
 			await this.#calculateActiveValidators(unit);
 			await this.#verifyStateHash(block);
+			await this.#verifyLogsBloom(block);
 
 			processResult.success = true;
 		} catch (error) {
@@ -184,6 +185,21 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		if (block.header.stateHash !== stateHash) {
 			throw new Error(`State hash mismatch! ${block.header.stateHash} != ${stateHash}`);
+		}
+	}
+
+	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
+		if (block.header.height === 0) {
+			return;
+		}
+
+		const logsBloom = await this.evm.logsBloom({
+			height: BigInt(block.header.height),
+			round: BigInt(block.header.round),
+		});
+
+		if (block.header.logsBloom !== logsBloom) {
+			throw new Error(`Logs bloom mismatch! ${block.header.stateHash} != ${logsBloom}`);
 		}
 	}
 

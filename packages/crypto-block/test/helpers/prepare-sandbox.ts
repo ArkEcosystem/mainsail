@@ -37,6 +37,7 @@ export const prepareSandbox = async (context) => {
 			4 + // round
 			hashByteLength + // previousBlock
 			hashByteLength + // stateHash
+			256 + // logsBloom
 			2 + // numberOfTransactions
 			4 + // totalGasUsed
 			32 + // totalAmount

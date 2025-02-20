@@ -56,7 +56,7 @@ export const registerBlockFactory = async (
 		};
 		const payloadBuffers: Buffer[] = [];
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
-		let payloadLength = transactions.length * 2;
+		let payloadLength = transactions.length * 4;
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;
@@ -94,7 +94,8 @@ export const registerBlockFactory = async (
 					previousBlock: previousBlock.id,
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
-					stateHash: "TODO",
+					stateHash: "0".repeat(64),
+					logsBloom: "0".repeat(512),
 					timestamp: options.timestamp || dayjs().valueOf(),
 					totalAmount: BigNumber.make(totals.value),
 					totalFee: BigNumber.make(totals.gasPrice),

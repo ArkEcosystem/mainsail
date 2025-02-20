@@ -48,7 +48,7 @@ describe<{
 		assertBlockData(assert, block.data, blockData);
 		assertBlockData(assert, block.header, blockData);
 		assert.equal(block.transactions, []);
-		assert.string(block.serialized);
+		assert.equal(block.serialized, serialized);
 	});
 
 	it("#make - should make a block with transactions", async ({ factory }) => {
@@ -62,7 +62,7 @@ describe<{
 		assertBlockData(assert, block.data, blockDataWithTransactionsOriginal);
 		assertBlockData(assert, block.header, blockDataWithTransactionsOriginal);
 		assert.length(block.transactions, blockDataWithTransactionsOriginal.transactions.length);
-		assert.string(block.serialized);
+		assert.equal(block.serialized, serializedWithTransactions);
 
 		for (let index = 0; index < blockDataWithTransactionsOriginal.transactions.length; index++) {
 			assertTransactionData(

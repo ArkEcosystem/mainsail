@@ -739,6 +739,11 @@ describe<{
 		assert.equal(hash, "d704de6546d2278905030a0c9f180a649964dbae8112f250a72a01629ec25f83");
 	});
 
+	it("should return logs bloom", async ({ instance }) => {
+		const logsBloom = await instance.logsBloom({ height: BigInt(0), round: BigInt(0) });
+		assert.equal(logsBloom, "0".repeat(512));
+	});
+
 	it("should return code", async ({ instance }) => {
 		const [sender] = wallets;
 

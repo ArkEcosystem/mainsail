@@ -148,6 +148,10 @@ export class EvmInstance implements Contracts.Evm.Instance {
 		return this.#evm.stateHash(commitKey, currentHash);
 	}
 
+	public async logsBloom(commitKey: Contracts.Evm.CommitKey): Promise<string> {
+		return this.#evm.logsBloom(commitKey);
+	}
+
 	public mode(): Contracts.Evm.EvmMode {
 		return Contracts.Evm.EvmMode.Persistent;
 	}

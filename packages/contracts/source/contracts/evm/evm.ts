@@ -29,6 +29,7 @@ export interface Instance extends CommitHandler {
 	getReceipt(height: number, txHash: string): Promise<GetReceiptResult>;
 	calculateActiveValidators(context: CalculateActiveValidatorsContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
+	logsBloom(commitKey: CommitKey): Promise<string>;
 	stateHash(commitKey: CommitKey, currentHash: string): Promise<string>;
 	codeAt(address: string): Promise<string>;
 	storageAt(address: string, slot: bigint): Promise<string>;

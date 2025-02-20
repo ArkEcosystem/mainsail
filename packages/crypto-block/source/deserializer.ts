@@ -71,6 +71,10 @@ export class Deserializer implements Contracts.Crypto.BlockDeserializer {
 				stateHash: {
 					type: "hash",
 				},
+				logsBloom: {
+					type: "hash",
+					size: 256,
+				},
 				numberOfTransactions: {
 					type: "uint16",
 				},

@@ -72,6 +72,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 		validate: async () => true,
 		getEvm: () => ({
 			stateHash: async () => "0000000000000000000000000000000000000000000000000000000000000000",
+			logsBloom: async () => "0".repeat(512),
 			initializeGenesis: async () => {},
 			prepareNextCommit: async () => {},
 			updateRewardsAndVotes: async () => {},
@@ -90,6 +91,7 @@ export const prepareSandbox = async (context: { sandbox?: Sandbox }) => {
 				id: "0000000000000000000000000000000000000000000000000000000000000000",
 				previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
 				stateHash: "0000000000000000000000000000000000000000000000000000000000000000",
+				logsBloom: "0".repeat(512),
 			},
 		}),
 	});

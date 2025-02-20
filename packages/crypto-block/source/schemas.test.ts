@@ -70,6 +70,7 @@ describe<{
 		previousBlock: "0".repeat(64),
 		reward: 0,
 		stateHash: "0".repeat(64),
+		logsBloom: "0".repeat(512),
 		timestamp: 0,
 		totalAmount: 0,
 		totalFee: 0,

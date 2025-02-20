@@ -64,11 +64,15 @@ export class Validator implements Contracts.Validator.Validator {
 		const previousBlock = this.stateStore.getLastBlock();
 		const height = previousBlock.header.height + 1;
 
-		const { stateHash, transactions } = await this.#getTransactionsForForging(generatorAddress, timestamp, {
-			height: BigInt(height),
-			round: BigInt(round),
-		});
-		return this.#makeBlock(round, generatorAddress, stateHash, transactions, timestamp);
+		const { logsBloom, stateHash, transactions } = await this.#getTransactionsForForging(
+			generatorAddress,
+			timestamp,
+			{
+				height: BigInt(height),
+				round: BigInt(round),
+			},
+		);
+		return this.#makeBlock(round, generatorAddress, logsBloom, stateHash, transactions, timestamp);
 	}
 
 	public async propose(
@@ -130,7 +134,7 @@ export class Validator implements Contracts.Validator.Validator {
 		generatorAddress: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
-	): Promise<{ stateHash: string; transactions: Contracts.Crypto.Transaction[] }> {
+	): Promise<{ logsBloom: string; stateHash: string; transactions: Contracts.Crypto.Transaction[] }> {
 		const transactionBytes = await this.txPoolWorker.getTransactionBytes();
 
 		const validator = this.createTransactionValidator();
@@ -210,8 +214,11 @@ export class Validator implements Contracts.Validator.Validator {
 				});
 			}
 
+			const logsBloom = await validator.getEvm().logsBloom(commitKey);
 			const stateHash = await validator.getEvm().stateHash(commitKey, previousBlock.header.stateHash);
+
 			return {
+				logsBloom,
 				stateHash,
 				transactions: candidateTransactions,
 			};
@@ -223,6 +230,7 @@ export class Validator implements Contracts.Validator.Validator {
 	async #makeBlock(
 		round: number,
 		generatorAddress: string,
+		logsBloom: string,
 		stateHash: string,
 		transactions: Contracts.Crypto.Transaction[],
 		timestamp: number,
@@ -269,6 +277,7 @@ export class Validator implements Contracts.Validator.Validator {
 				reward: BigNumber.make(milestone.reward),
 				round,
 				stateHash,
+				logsBloom,
 				timestamp,
 				totalAmount: totals.amount,
 				totalFee: totals.fee,

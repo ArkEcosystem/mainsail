@@ -5,6 +5,7 @@ import { Contracts } from "@mainsail/contracts";
 export class ReceiptResource {
 	public async transform(
 		transaction: Contracts.Crypto.TransactionData,
+		header: Contracts.Crypto.BlockHeader,
 		receipt: Contracts.Evm.TransactionReceipt,
 	): Promise<object> {
 		/* eslint-disable sort-keys-fix/sort-keys-fix */
@@ -21,7 +22,7 @@ export class ReceiptResource {
 			gasUsed: `0x${receipt.gasUsed.toString(16)}`,
 			contractAddress: receipt.deployedContractAddress,
 			logs: receipt.logs,
-			logsBloom: `0x${"0".repeat(128)}`, // TODO: Implement logs bloom
+			logsBloom: `0x${header.logsBloom}`,
 			type: "0x2",
 			status: receipt.success ? "0x1" : "0x0",
 		};

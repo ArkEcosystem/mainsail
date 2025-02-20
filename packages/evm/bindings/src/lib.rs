@@ -13,6 +13,7 @@ use mainsail_evm_core::{
     db::{CommitKey, GenesisInfo, PendingCommit, PersistentDB},
     legacy::{LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
+    logs_bloom,
     receipt::{map_execution_result, TxReceipt},
     state_changes::AccountUpdate,
     state_commit, state_hash,
@@ -777,6 +778,36 @@ impl EvmInner {
         }
     }
 
+    pub fn logs_bloom(
+        &mut self,
+        commit_key: CommitKey,
+    ) -> std::result::Result<String, EVMError<String>> {
+        if self
+            .pending_commit
+            .as_ref()
+            .is_some_and(|pending| pending.key != commit_key)
+        {
+            self.drop_pending_commit();
+        }
+
+        let pending_commit = self
+            .pending_commit
+            .get_or_insert_with(|| PendingCommit {
+                key: commit_key,
+                ..Default::default()
+            })
+            .clone();
+
+        let result = logs_bloom::calculate(&pending_commit);
+
+        match result {
+            Ok(result) => Ok(result.encode_hex()),
+            Err(err) => Err(EVMError::Database(
+                format!("logs_bloom failed: {}", err).into(),
+            )),
+        }
+    }
+
     pub fn dispose(&mut self) -> std::result::Result<(), EVMError<String>> {
         // replace to drop any reference to logging hook
         self.logger = JsLogger::new(None)
@@ -1186,6 +1217,15 @@ impl JsEvmWrapper {
         )
     }
 
+    #[napi(ts_return_type = "Promise<string>")]
+    pub fn logs_bloom(&mut self, node_env: Env, commit_key: JsCommitKey) -> Result<JsObject> {
+        let commit_key = CommitKey::try_from(commit_key)?;
+        node_env.execute_tokio_future(
+            Self::logs_bloom_async(self.evm.clone(), commit_key),
+            |&mut node_env, result| Ok(node_env.create_string_from_std(result)?),
+        )
+    }
+
     #[napi(ts_return_type = "Promise<void>")]
     pub fn dispose(&mut self, node_env: Env) -> Result<JsObject> {
         node_env.execute_tokio_future(Self::dispose_async(self.evm.clone()), |_, _| Ok(()))
@@ -1381,6 +1421,19 @@ impl JsEvmWrapper {
     ) -> Result<String> {
         let mut lock = evm.lock().await;
         let result = lock.state_hash(commit_key, current_hash);
+
+        match result {
+            Ok(result) => Result::Ok(result),
+            Err(err) => Result::Err(serde::de::Error::custom(err)),
+        }
+    }
+
+    async fn logs_bloom_async(
+        evm: Arc<tokio::sync::Mutex<EvmInner>>,
+        commit_key: CommitKey,
+    ) -> Result<String> {
+        let mut lock = evm.lock().await;
+        let result = lock.logs_bloom(commit_key);
 
         match result {
             Ok(result) => Result::Ok(result),
