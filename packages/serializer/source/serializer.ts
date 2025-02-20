@@ -134,7 +134,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 				for (const transaction of value) {
 					const serialized: Buffer = await this.transactionUtils.toBytes(transaction);
 
-					result.writeUint16(serialized.length);
+					result.writeUint32(serialized.length);
 					result.writeBytes(serialized);
 				}
 				continue;
