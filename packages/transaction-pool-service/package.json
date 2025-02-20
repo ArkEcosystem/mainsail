@@ -45,10 +45,5 @@
 		"core": {
 			"alias": "transactionPool"
 		}
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"better-sqlite3"
-		]
 	}
 }

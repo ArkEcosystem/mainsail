@@ -32,10 +32,5 @@
 	},
 	"engines": {
 		"node": ">=20.x"
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"bcrypto"
-		]
 	}
 }
