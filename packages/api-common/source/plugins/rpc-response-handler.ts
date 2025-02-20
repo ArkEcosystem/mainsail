@@ -13,7 +13,7 @@ export const rpcResponseHandler = {
 			method(request, h) {
 				const response = request.response;
 
-				if (responseIsBoom(response)) {
+				if (responseIsBoom(response) && request.method === "post" && request.path === "") {
 					return h.response(
 						Utils.prepareRcpError(
 							Utils.getRcpId(request),
