@@ -66,7 +66,7 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 	it("should derive an address from wif", async (context) => {
 		await context.app.resolve<Schnorr>(Schnorr).register();
 
-		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "DRuQRMywxznq9pMQUAXLcwt7C8ZLs8NDBv");
+		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "D5jdQXLMgL2TumzdJ8B1zVAGtYWc43VQSx");
 	});
 
 	it("should validate addresses", async (context) => {
