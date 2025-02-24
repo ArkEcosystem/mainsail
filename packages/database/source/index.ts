@@ -27,7 +27,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerStorage() {
 		const rootStorage = open({
-			compression: true,
+			compression: {
+				threshold: 0,
+			},
 			name: "core",
 			path: join(this.app.dataPath(), "ledger.mdb"),
 		});
