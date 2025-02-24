@@ -3,15 +3,16 @@ import { Identifiers } from "@mainsail/contracts";
 import { Configuration } from "@mainsail/crypto-config";
 import { ServiceProvider as ECDSA } from "@mainsail/crypto-key-pair-ecdsa";
 import { ServiceProvider as Schnorr } from "@mainsail/crypto-key-pair-schnorr";
-import { ServiceProvider as CoreValidation } from "@mainsail/validation";
-
 import { Application } from "@mainsail/kernel";
+import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import { describe } from "../../test-framework/source";
 import { AddressFactory } from "./address.factory";
 
 const mnemonic =
 	"program fragile industry scare sun visit race erase daughter empty anxiety cereal cycle hunt airport educate giggle picture sunset apart jewel similar pulp moment";
+
+const wif = "SDuW66dyGZ1zPZdN7ncEevbJdjaQTj9pT4LcmKzQ7eLFoyCXEdkx";
 
 describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) => {
 	beforeEach(async (context) => {
@@ -59,6 +60,12 @@ describe<{ app: Application }>("AddressFactory", ({ assert, beforeEach, it }) =>
 				.fromPublicKey("03e84093c072af70004a38dd95e34def119d2348d5261228175d032e5f2070e19f"),
 			"0xC7C50f33278bDe272ffe23865fF9fBd0155a5175",
 		);
+	});
+
+	it("should derive an address from wif", async (context) => {
+		await context.app.resolve<Schnorr>(Schnorr).register();
+
+		assert.is(await context.app.resolve(AddressFactory).fromWIF(wif), "0x4D9AED240463043cFcf5B5Df16b9ad523930A181");
 	});
 
 	it("should validate addresses", async (context) => {
