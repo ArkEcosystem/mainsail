@@ -13,13 +13,16 @@
 			"package": "@mainsail/crypto-hash-bcrypto"
 		},
 		{
-			"package": "@mainsail/crypto-signature-schnorr"
+			"package": "@mainsail/crypto-signature-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
+		},
+		{
+			"package": "@mainsail/crypto-address-base58"
 		},
 		{
 			"package": "@mainsail/crypto-address-keccak256"
@@ -32,12 +35,6 @@
 		},
 		{
 			"package": "@mainsail/crypto-block"
-		},
-		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
 		},
 		{
 			"package": "@mainsail/evm-service"
@@ -56,6 +53,9 @@
 		},
 		{
 			"package": "@mainsail/logger-pino"
+		},
+		{
+			"package": "@mainsail/snapshot-legacy-importer"
 		},
 		{
 			"package": "@mainsail/state"
@@ -123,13 +123,16 @@
 			"package": "@mainsail/crypto-hash-bcrypto"
 		},
 		{
-			"package": "@mainsail/crypto-signature-schnorr"
+			"package": "@mainsail/crypto-signature-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
+		},
+		{
+			"package": "@mainsail/crypto-address-base58"
 		},
 		{
 			"package": "@mainsail/crypto-address-keccak256"
@@ -144,31 +147,10 @@
 			"package": "@mainsail/crypto-block"
 		},
 		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
-		},
-		{
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
-			"package": "@mainsail/crypto-transaction-validator-registration"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-validator-resignation"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-multi-payment"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-multi-signature-registration"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-transfer"
-		},
-		{
-			"package": "@mainsail/crypto-transaction-vote"
+			"package": "@mainsail/crypto-transaction-evm-call"
 		}
 	],
 	"transaction-pool": [
@@ -188,13 +170,16 @@
 			"package": "@mainsail/crypto-hash-bcrypto"
 		},
 		{
-			"package": "@mainsail/crypto-signature-schnorr"
+			"package": "@mainsail/crypto-signature-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
+		},
+		{
+			"package": "@mainsail/crypto-address-base58"
 		},
 		{
 			"package": "@mainsail/crypto-address-keccak256"
@@ -204,12 +189,6 @@
 		},
 		{
 			"package": "@mainsail/serializer"
-		},
-		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
 		},
 		{
 			"package": "@mainsail/evm-service"
@@ -230,13 +209,7 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/state",
-			"options": {
-				"snapshots": {
-					"enabled": false,
-					"skipUnknownAttributes": true
-				}
-			}
+			"package": "@mainsail/state"
 		},
 		{
 			"package": "@mainsail/transaction-pool-service"
@@ -268,13 +241,16 @@
 			"package": "@mainsail/crypto-hash-bcrypto"
 		},
 		{
-			"package": "@mainsail/crypto-signature-schnorr"
+			"package": "@mainsail/crypto-signature-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-key-pair-ecdsa"
 		},
 		{
 			"package": "@mainsail/crypto-consensus-bls12-381"
+		},
+		{
+			"package": "@mainsail/crypto-address-base58"
 		},
 		{
 			"package": "@mainsail/crypto-address-keccak256"
@@ -286,13 +262,13 @@
 			"package": "@mainsail/serializer"
 		},
 		{
-			"package": "@mainsail/fees"
-		},
-		{
-			"package": "@mainsail/fees-static"
-		},
-		{
 			"package": "@mainsail/crypto-block"
+		},
+		{
+			"package": "@mainsail/crypto-messages"
+		},
+		{
+			"package": "@mainsail/crypto-commit"
 		},
 		{
 			"package": "@mainsail/crypto-transaction"
@@ -304,13 +280,10 @@
 			"package": "@mainsail/transactions"
 		},
 		{
-			"package": "@mainsail/state",
-			"options": {
-				"snapshots": {
-					"enabled": false,
-					"skipUnknownAttributes": true
-				}
-			}
+			"package": "@mainsail/state"
+		},
+		{
+			"package": "@mainsail/database"
 		},
 		{
 			"package": "@mainsail/evm-service"
