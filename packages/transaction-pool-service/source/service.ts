@@ -24,9 +24,6 @@ export class Service implements Contracts.TransactionPool.Service {
 	@inject(Identifiers.TransactionPool.Query)
 	private readonly poolQuery!: Contracts.TransactionPool.Query;
 
-	@inject(Identifiers.TransactionPool.ExpirationService)
-	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -178,7 +175,6 @@ export class Service implements Contracts.TransactionPool.Service {
 
 	async #cleanUp(): Promise<void> {
 		await this.#removeOldTransactions();
-		await this.#removeExpiredTransactions();
 		await this.#removeLowestPriorityTransactions();
 	}
 
@@ -198,23 +194,6 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.debug(`Removed old tx ${removedTransaction.id}`);
 
 				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.data);
-			}
-		}
-	}
-
-	async #removeExpiredTransactions(): Promise<void> {
-		for (const transaction of await this.poolQuery.getAll().all()) {
-			if (await this.expirationService.isExpired(transaction)) {
-				const removedTransactions = await this.mempool.removeTransaction(
-					transaction.data.senderAddress,
-					transaction.id,
-				);
-
-				for (const removedTransaction of removedTransactions) {
-					this.storage.removeTransaction(removedTransaction.id);
-					this.logger.debug(`Removed expired tx ${removedTransaction.id}`);
-					void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.data);
-				}
 			}
 		}
 	}

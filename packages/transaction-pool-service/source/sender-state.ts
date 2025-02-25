@@ -1,5 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Providers, Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
 
@@ -25,14 +25,8 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Evm.Gas.FeeCalculator)
 	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
 
-	@inject(Identifiers.TransactionPool.ExpirationService)
-	private readonly expirationService!: Contracts.TransactionPool.ExpirationService;
-
 	@inject(Identifiers.Services.Trigger.Service)
 	private readonly triggers!: Services.Triggers.Triggers;
-
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	#corrupt = false;
 	#wallet!: Contracts.State.Wallet;
@@ -57,15 +51,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		const chainId: number = this.cryptoConfiguration.get("network.chainId");
 		if (transaction.data.network && transaction.data.network !== chainId) {
 			throw new Exceptions.TransactionFromWrongNetworkError(transaction, chainId);
-		}
-
-		if (await this.expirationService.isExpired(transaction)) {
-			await this.events.dispatch(Events.TransactionEvent.Expired, transaction.data);
-
-			throw new Exceptions.TransactionHasExpiredError(
-				transaction,
-				await this.expirationService.getExpirationHeight(transaction),
-			);
 		}
 
 		const handler: Contracts.Transactions.TransactionHandler =

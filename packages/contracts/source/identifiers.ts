@@ -284,7 +284,6 @@ export const Identifiers = {
 			HTTPS: Symbol.for("TransactionPool<API.HTTPS>"),
 		},
 		Broadcaster: Symbol("TransactionPoolBroadcaster<Broadcaster>"),
-		ExpirationService: Symbol("TransactionPool<ExpirationService>"),
 		Mempool: Symbol("TransactionPool<Mempool>"),
 		Peer: {
 			Communicator: Symbol("TransactionPoolBroadcaster<Peer.Communicator>"),

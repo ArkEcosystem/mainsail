@@ -1,6 +1,5 @@
 export * from "./broadcaster.js";
 export * from "./client.js";
-export * from "./expiration-service.js";
 export * from "./mempool.js";
 export * from "./processor.js";
 export * from "./query.js";
