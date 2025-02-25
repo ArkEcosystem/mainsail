@@ -99,14 +99,6 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 					result.errors.push(`Encountered duplicate transaction: ${transaction.id}`);
 				}
 
-				// if (
-				// 	transaction.data.expiration &&
-				// 	transaction.data.expiration > 0 &&
-				// 	transaction.data.expiration <= blockData.height
-				// ) {
-				// 	result.errors.push(`Encountered expired transaction: ${transaction.id}`);
-				// }
-
 				appliedTransactions[transaction.id] = transaction.data;
 
 				totalAmount = totalAmount.plus(transaction.data.value);
