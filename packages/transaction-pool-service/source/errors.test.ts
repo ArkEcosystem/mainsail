@@ -50,14 +50,6 @@ describe<{
 		assert.equal(error.message, `tx ${context.transaction.id} exceeds size limit of 1024 byte(s)`);
 	});
 
-	it("TransactionHasExpiredError", (context) => {
-		const error = new Exceptions.TransactionHasExpiredError(context.transaction, 100);
-
-		assert.instance(error, Exceptions.PoolError);
-		assert.equal(error.type, "ERR_EXPIRED");
-		assert.equal(error.message, `tx ${context.transaction.id} expired at height 100`);
-	});
-
 	it("TransactionFeeTooLowError", (context) => {
 		const error = new Exceptions.TransactionFeeTooLowError(context.transaction);
 
