@@ -287,6 +287,7 @@ export class GenesisBlockGenerator extends Generator {
 						)
 						.fromPublicKey(keys.publicKey),
 					height: 0,
+					logsBloom: "0".repeat(512),
 					numberOfTransactions: transactions.length,
 					payloadHash: (
 						await this.app
@@ -302,7 +303,6 @@ export class GenesisBlockGenerator extends Generator {
 					stateHash:
 						options.snapshot?.stateHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
-					logsBloom: "0".repeat(512),
 					timestamp: dayjs(options.epoch).valueOf(),
 					totalAmount: options.snapshot ? Utils.BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,

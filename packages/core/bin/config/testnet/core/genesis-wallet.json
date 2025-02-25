@@ -1,14 +1,14 @@
 {
-    "address": "0xEA1EAD8086c960Ee580735a23948b706017Fd96D",
-    "consensusKeys": {
-        "compressed": true,
-        "privateKey": "67394312e4c0bd7bf9da2ac8f8a83b976d1914688314b2a72fa08778106a640d",
-        "publicKey": "952c2d7f3098f9003a7c72b92902fc02a051776df934e2fe7d472e52e417f7c97eb9222a96a2731c0d4b22e8fedadbc2"
-    },
-    "keys": {
-        "compressed": true,
-        "privateKey": "233fdfa144f4396a12cce51c9916e01ea1482783ac57fb60f489ad09c0f3dada",
-        "publicKey": "03fa38d810ab7a16eb5817d4a954edf69174696ad48a0b87e7c155f2685505c0b1"
-    },
-    "passphrase": "abandon damage quick narrow client resource agree bird hamster zebra render flame sugar slide cheap frog welcome drift skate junior nerve tiny final dog"
+	"address": "0xEA1EAD8086c960Ee580735a23948b706017Fd96D",
+	"consensusKeys": {
+		"compressed": true,
+		"privateKey": "67394312e4c0bd7bf9da2ac8f8a83b976d1914688314b2a72fa08778106a640d",
+		"publicKey": "952c2d7f3098f9003a7c72b92902fc02a051776df934e2fe7d472e52e417f7c97eb9222a96a2731c0d4b22e8fedadbc2"
+	},
+	"keys": {
+		"compressed": true,
+		"privateKey": "233fdfa144f4396a12cce51c9916e01ea1482783ac57fb60f489ad09c0f3dada",
+		"publicKey": "03fa38d810ab7a16eb5817d4a954edf69174696ad48a0b87e7c155f2685505c0b1"
+	},
+	"passphrase": "abandon damage quick narrow client resource agree bird hamster zebra render flame sugar slide cheap frog welcome drift skate junior nerve tiny final dog"
 }

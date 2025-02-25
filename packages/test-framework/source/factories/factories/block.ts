@@ -84,6 +84,7 @@ export const registerBlockFactory = async (
 						)
 						.fromMnemonic(passphrase),
 					height: previousBlock.height + 1,
+					logsBloom: "0".repeat(512),
 					numberOfTransactions: transactions.length,
 					payloadHash: (
 						await app
@@ -95,7 +96,6 @@ export const registerBlockFactory = async (
 					reward: BigNumber.make(options.reward || reward),
 					round: 0,
 					stateHash: "0".repeat(64),
-					logsBloom: "0".repeat(512),
 					timestamp: options.timestamp || dayjs().valueOf(),
 					totalAmount: BigNumber.make(totals.value),
 					totalFee: BigNumber.make(totals.gasPrice),

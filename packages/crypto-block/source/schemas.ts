@@ -20,13 +20,13 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 			generatorAddress: { $ref: "address" },
 			height: { minimum: 0, type: "integer" },
 			id: { $ref: "blockId" },
+			logsBloom: { $ref: "logsBloom" },
 			numberOfTransactions: { minimum: 0, type: "integer" },
 			payloadHash: { $ref: "hex" },
 			payloadLength: { minimum: 0, type: "integer" },
 			previousBlock: { $ref: "blockId" },
 			reward: { bignumber: { minimum: 0 } },
 			stateHash: { $ref: "hex" },
-			logsBloom: { $ref: "logsBloom" },
 			timestamp: { maximum: 2 ** 48 - 1, minimum: 0, type: "integer" },
 			totalAmount: { bignumber: { minimum: 0 } },
 			totalFee: { bignumber: { minimum: 0 } },
@@ -59,17 +59,6 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 		],
 		type: "string",
 	},
-	prefixedBlockId: {
-		$id: "prefixedBlockId",
-		allOf: [
-			{
-				$ref: "prefixedHex",
-				maxLength: 66,
-				minLength: 66,
-			},
-		],
-		type: "string",
-	},
 	logsBloom: {
 		$id: "logsBloom",
 		allOf: [
@@ -77,6 +66,17 @@ export const schemas: Record<"block" | "blockId" | "prefixedBlockId" | "blockHea
 				$ref: "hex",
 				maxLength: 512,
 				minLength: 512,
+			},
+		],
+		type: "string",
+	},
+	prefixedBlockId: {
+		$id: "prefixedBlockId",
+		allOf: [
+			{
+				$ref: "prefixedHex",
+				maxLength: 66,
+				minLength: 66,
 			},
 		],
 		type: "string",

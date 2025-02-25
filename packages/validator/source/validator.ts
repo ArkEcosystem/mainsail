@@ -270,6 +270,7 @@ export class Validator implements Contracts.Validator.Validator {
 			{
 				generatorAddress,
 				height,
+				logsBloom,
 				numberOfTransactions: transactionData.length,
 				payloadHash: (await this.hashFactory.sha256(payloadBuffers)).toString("hex"),
 				payloadLength,
@@ -277,7 +278,6 @@ export class Validator implements Contracts.Validator.Validator {
 				reward: BigNumber.make(milestone.reward),
 				round,
 				stateHash,
-				logsBloom,
 				timestamp,
 				totalAmount: totals.amount,
 				totalFee: totals.fee,
