@@ -90,8 +90,6 @@ export class Service implements Contracts.TransactionPool.Service {
 			});
 
 			try {
-				// TODO: Check if can enter pool
-				// await this.feeMatcher.throwIfCannotEnterPool(transaction);
 				await this.#addTransactionToMempool(transaction);
 				this.logger.debug(`tx ${transaction.id} added to pool`);
 
