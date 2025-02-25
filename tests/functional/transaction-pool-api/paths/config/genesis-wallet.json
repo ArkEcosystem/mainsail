@@ -1,14 +1,14 @@
 {
-	"address": "0x2997aA407Be8eD26779bC37E30c482Be3fe82DdD",
+	"address": "0xEA1EAD8086c960Ee580735a23948b706017Fd96D",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "0347456161c2fd417b460c4b767ad4b979cb04b315f3b6876e333eecf62af29f",
-		"publicKey": "a66b0aeb1e08f8f8b93e315c4202d5f4c7f267112f67f76cfcc857294071b0ad39ff91dd577fcc111cf05fedc1d10ad3"
+		"privateKey": "67394312e4c0bd7bf9da2ac8f8a83b976d1914688314b2a72fa08778106a640d",
+		"publicKey": "952c2d7f3098f9003a7c72b92902fc02a051776df934e2fe7d472e52e417f7c97eb9222a96a2731c0d4b22e8fedadbc2"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "a9cde36bb3e2673ba9d11fad03fc0db641d7df085a2e602bcbe2a672eb053e48",
-		"publicKey": "02e66437b21cd09ff771a7c32a936d1acdc47b08d0977fbb6f4972c0dc243f03a5"
+		"privateKey": "233fdfa144f4396a12cce51c9916e01ea1482783ac57fb60f489ad09c0f3dada",
+		"publicKey": "03fa38d810ab7a16eb5817d4a954edf69174696ad48a0b87e7c155f2685505c0b1"
 	},
-	"passphrase": "ring segment charge acid muscle derive field second soda clay trial menu welcome off perfect skirt impact supply sting buddy ugly pact pole dove"
+	"passphrase": "abandon damage quick narrow client resource agree bird hamster zebra render flame sugar slide cheap frog welcome drift skate junior nerve tiny final dog"
 }
