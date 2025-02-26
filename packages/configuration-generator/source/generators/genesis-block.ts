@@ -30,15 +30,12 @@ export class GenesisBlockGenerator extends Generator {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
-	private readonly deployerAddress!: string;
-
 	#consensusProxyContractAddress!: string;
 
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
-		options: Contracts.NetworkGenerator.GenesisBlockOptions,
+		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.CommitData> {
 		const genesisWallet = await this.createWallet(genesisMnemonic);
 
@@ -96,13 +93,14 @@ export class GenesisBlockGenerator extends Generator {
 
 	async #prepareEvm(
 		genesisWalletAddress: string,
-		_validatorsCount: number,
-		options: Contracts.NetworkGenerator.GenesisBlockOptions,
+		validatorsCount: number,
+		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
 			timestamp: dayjs(options.epoch).valueOf(),
-			totalAmount: options.premine,
+			// Ensure no left over remains after distributing all funds from the genesis address (see `#createTransferTransactions`)
+			totalAmount: BigNumber.make(options.premine).dividedBy(validatorsCount).times(validatorsCount).toString(),
 		});
 
 		this.#consensusProxyContractAddress = this.app.get<string>(
@@ -201,7 +199,7 @@ export class GenesisBlockGenerator extends Generator {
 	async #createGenesisCommit(
 		premineKeys: Contracts.Crypto.KeyPair,
 		transactions: Contracts.Crypto.Transaction[],
-		options: Contracts.NetworkGenerator.GenesisBlockOptions,
+		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.Commit> {
 		const genesisBlock = await this.#createGenesisBlock(premineKeys, transactions, options);
 
@@ -225,7 +223,7 @@ export class GenesisBlockGenerator extends Generator {
 	async #createGenesisBlock(
 		keys: Contracts.Crypto.KeyPair,
 		transactions: Contracts.Crypto.Transaction[],
-		options: Contracts.NetworkGenerator.GenesisBlockOptions,
+		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
 		const totals: { amount: BigNumber; fee: BigNumber; gasUsed: number } = {
 			amount: BigNumber.ZERO,
@@ -234,10 +232,24 @@ export class GenesisBlockGenerator extends Generator {
 		};
 
 		const payloadBuffers: Buffer[] = [];
+		const commitKey = {
+			height: BigInt(0),
+			round: BigInt(0),
+		};
+		const timestamp = BigInt(dayjs(options.epoch).valueOf());
+		const generatorAddress = await this.app
+			.getTagged<Contracts.Crypto.AddressFactory>(
+				Identifiers.Cryptography.Identity.Address.Factory,
+				"type",
+				"wallet",
+			)
+			.fromPublicKey(keys.publicKey);
 
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
 		let payloadLength = transactions.length * 4;
+
+		await this.evm.prepareNextCommit({ commitKey });
 
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 		for (const transaction of transactions) {
@@ -247,13 +259,10 @@ export class GenesisBlockGenerator extends Generator {
 
 			const { receipt } = await this.evm.process({
 				blockContext: {
-					commitKey: {
-						height: BigInt(0),
-						round: BigInt(0),
-					},
+					commitKey,
 					gasLimit: BigInt(30_000_000),
-					timestamp: BigInt(dayjs(options.epoch).valueOf()),
-					validatorAddress: this.deployerAddress,
+					timestamp,
+					validatorAddress: generatorAddress,
 				},
 				caller: transaction.data.senderAddress,
 				data: Buffer.from(transaction.data.data, "hex"),
@@ -276,16 +285,26 @@ export class GenesisBlockGenerator extends Generator {
 			payloadLength += serialized.length;
 		}
 
+		await this.evm.updateRewardsAndVotes({
+			blockReward: 0n,
+			commitKey,
+			specId: Contracts.Evm.SpecId.SHANGHAI,
+			timestamp,
+			validatorAddress: generatorAddress,
+		});
+
+		await this.evm.calculateActiveValidators({
+			activeValidators: Utils.BigNumber.make(options.validators).toBigInt(),
+			commitKey,
+			specId: Contracts.Evm.SpecId.SHANGHAI,
+			timestamp,
+			validatorAddress: generatorAddress,
+		});
+
 		return {
 			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 				{
-					generatorAddress: await this.app
-						.getTagged<Contracts.Crypto.AddressFactory>(
-							Identifiers.Cryptography.Identity.Address.Factory,
-							"type",
-							"wallet",
-						)
-						.fromPublicKey(keys.publicKey),
+					generatorAddress,
 					height: 0,
 					logsBloom: "0".repeat(512),
 					numberOfTransactions: transactions.length,
@@ -302,7 +321,10 @@ export class GenesisBlockGenerator extends Generator {
 					round: 0,
 					stateHash:
 						options.snapshot?.stateHash ??
-						"0000000000000000000000000000000000000000000000000000000000000000",
+						(await this.evm.stateHash(
+							commitKey,
+							"0000000000000000000000000000000000000000000000000000000000000000",
+						)),
 					timestamp: dayjs(options.epoch).valueOf(),
 					totalAmount: options.snapshot ? Utils.BigNumber.make(options.premine) : totals.amount,
 					totalFee: totals.fee,

@@ -173,14 +173,23 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #verifyStateHash(block: Contracts.Crypto.Block): Promise<void> {
+		let previousStateHash;
 		if (block.header.height === 0) {
-			return;
+			// Assume snapshot is present if the previous block points to a non-zero hash
+			// and skip state hash check since it will be performed during import.
+			if (block.header.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
+				return;
+			}
+
+			previousStateHash = "0000000000000000000000000000000000000000000000000000000000000000";
+		} else {
+			const previousBlock = this.stateStore.getLastBlock();
+			previousStateHash = previousBlock.header.stateHash;
 		}
 
-		const previousBlock = this.stateStore.getLastBlock();
 		const stateHash = await this.evm.stateHash(
 			{ height: BigInt(block.header.height), round: BigInt(block.header.round) },
-			previousBlock.header.stateHash,
+			previousStateHash,
 		);
 
 		if (block.header.stateHash !== stateHash) {

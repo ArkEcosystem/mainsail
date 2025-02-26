@@ -58,7 +58,8 @@ describe<{
 				distribute: true,
 				epoch: new Date(),
 				premine: "2000000000",
-			}),
+				validators: 53,
+			} as Contracts.NetworkGenerator.InternalOptions),
 		);
 	});
 });
