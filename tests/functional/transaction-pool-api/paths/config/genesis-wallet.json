@@ -1,14 +1,14 @@
 {
-	"address": "0xEA1EAD8086c960Ee580735a23948b706017Fd96D",
+	"address": "0xbeD188132e6edcCB4A45027D127902292a06BDca",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "67394312e4c0bd7bf9da2ac8f8a83b976d1914688314b2a72fa08778106a640d",
-		"publicKey": "952c2d7f3098f9003a7c72b92902fc02a051776df934e2fe7d472e52e417f7c97eb9222a96a2731c0d4b22e8fedadbc2"
+		"privateKey": "3343dc431b651a0e14fccdb01eccc6a02c0be4c9f1593b08e4b3ea37ac009fb1",
+		"publicKey": "8632fb34c815641c6c5fc991bd913d3ea60ad055de7c034d1fea1e10ad04ca889b87445f3d64fdb60933bab3546bfd46"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "233fdfa144f4396a12cce51c9916e01ea1482783ac57fb60f489ad09c0f3dada",
-		"publicKey": "03fa38d810ab7a16eb5817d4a954edf69174696ad48a0b87e7c155f2685505c0b1"
+		"privateKey": "d57d2069e8165aa7814312fa4abaeb022d7a59534098bc51e3972604bf268163",
+		"publicKey": "03ca0529f6b85c79570cca07b504a6b6d5be6f0675a4f4b1c3c146fcb9f6eb7a6c"
 	},
-	"passphrase": "abandon damage quick narrow client resource agree bird hamster zebra render flame sugar slide cheap frog welcome drift skate junior nerve tiny final dog"
+	"passphrase": "praise boss digital athlete bamboo country define balance tragic horse habit interest sign sample sail empower husband trouble program bundle clever shoe clump goat"
 }
