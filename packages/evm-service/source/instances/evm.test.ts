@@ -736,7 +736,7 @@ describe<{
 			{ height: BigInt(0), round: BigInt(0) },
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);
-		assert.equal(hash, "d704de6546d2278905030a0c9f180a649964dbae8112f250a72a01629ec25f83");
+		assert.equal(hash, "0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab");
 	});
 
 	it("should return logs bloom", async ({ instance }) => {

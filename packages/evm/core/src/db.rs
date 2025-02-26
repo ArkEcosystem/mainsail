@@ -147,7 +147,7 @@ pub struct PendingCommit {
     pub merged_legacy_cold_wallets: BTreeMap<Address, Option<(B256, LegacyAddress)>>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct GenesisInfo {
     pub account: Address,
     pub deployer_account: Address,

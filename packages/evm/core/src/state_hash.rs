@@ -3,7 +3,7 @@ use revm::primitives::{keccak256, B256};
 use serde::Serialize;
 
 use crate::{
-    db::{PendingCommit, PersistentDB},
+    db::{GenesisInfo, PendingCommit, PersistentDB},
     state_changes::StateChangeset,
     state_commit::{build_commit, StateCommit},
 };
@@ -16,13 +16,19 @@ pub fn calculate(
     let committed_hashes = db.get_committed_hashes(pending_commit.key.0)?;
     let state_commit = build_commit(db, pending_commit, false)?;
 
-    calculate_state_hash(current_hash, &state_commit, committed_hashes)
+    calculate_state_hash(
+        current_hash,
+        &state_commit,
+        committed_hashes,
+        &db.genesis_info,
+    )
 }
 
 fn calculate_state_hash(
     current_hash: B256,
     state: &StateCommit,
     committed_hashes: Option<(B256, B256, B256)>,
+    genesis_info: &Option<GenesisInfo>,
 ) -> Result<B256, crate::db::Error> {
     let (accounts_hash, contracts_hash, storage_hash) =
         if let Some(committed_hashes) = committed_hashes {
@@ -37,16 +43,23 @@ fn calculate_state_hash(
             )
         };
 
-    let result = keccak256(
-        [
-            state.key.0.to_le_bytes().as_slice(),
-            current_hash.as_slice(),
-            accounts_hash.as_slice(),
-            contracts_hash.as_slice(),
-            storage_hash.as_slice(),
-        ]
-        .concat(),
-    );
+    let mut hashes = Vec::with_capacity(5);
+
+    let height = state.key.0.to_le_bytes();
+    hashes.push(height.as_slice());
+
+    let genesis_info_hash = match genesis_info {
+        Some(info) => calculate_hash(info)?,
+        None => B256::ZERO,
+    };
+
+    hashes.push(genesis_info_hash.as_slice());
+    hashes.push(current_hash.as_slice());
+    hashes.push(accounts_hash.as_slice());
+    hashes.push(contracts_hash.as_slice());
+    hashes.push(storage_hash.as_slice());
+
+    let result = keccak256(hashes.concat());
 
     Ok(result)
 }
@@ -103,9 +116,9 @@ fn prepare(state: &StateCommit) -> StateChangeset {
 
 #[test]
 fn test_calculate_state_hash() {
-    let result = calculate_state_hash(B256::ZERO, &Default::default(), None).expect("ok");
+    let result = calculate_state_hash(B256::ZERO, &Default::default(), None, &None).expect("ok");
     assert_eq!(
         result,
-        revm::primitives::b256!("d704de6546d2278905030a0c9f180a649964dbae8112f250a72a01629ec25f83")
+        revm::primitives::b256!("0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab")
     );
 }
