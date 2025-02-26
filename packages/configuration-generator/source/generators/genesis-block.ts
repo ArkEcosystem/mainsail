@@ -306,7 +306,7 @@ export class GenesisBlockGenerator extends Generator {
 				{
 					generatorAddress,
 					height: 0,
-					logsBloom: "0".repeat(512),
+					logsBloom: await this.evm.logsBloom(commitKey),
 					numberOfTransactions: transactions.length,
 					payloadHash: (
 						await this.app

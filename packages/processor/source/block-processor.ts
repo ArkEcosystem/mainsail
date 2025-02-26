@@ -198,10 +198,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
-		if (block.header.height === 0) {
-			return;
-		}
-
 		const logsBloom = await this.evm.logsBloom({
 			height: BigInt(block.header.height),
 			round: BigInt(block.header.round),
