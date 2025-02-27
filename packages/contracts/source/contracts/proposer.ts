@@ -1,5 +1,3 @@
-import { CommitHandler } from "./crypto/commit.js";
-
-export interface Selector extends CommitHandler {
+export interface Selector {
 	getValidatorIndex(round: number): number;
 }
