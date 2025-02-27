@@ -153,9 +153,6 @@ export const Identifiers = {
 		ContractService: {
 			Consensus: Symbol("Evm<ContractService.Consensus>"),
 		},
-		Gas: {
-			Limits: Symbol("Evm<Gas.Limits>"),
-		},
 		Instance: Symbol("Evm<Instance>"),
 		State: Symbol("Evm<State>"),
 		Worker: Symbol("Evm<Worker>"),
