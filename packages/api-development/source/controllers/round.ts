@@ -6,9 +6,6 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class RoundController extends Controller {
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
@@ -30,7 +27,7 @@ export class RoundController extends Controller {
 
 		return {
 			height,
-			...this.roundCalculator.calculateRound(height, this.configuration),
+			...this.roundCalculator.calculateRound(height),
 			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix

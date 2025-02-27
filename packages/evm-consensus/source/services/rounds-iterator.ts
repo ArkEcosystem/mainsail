@@ -76,8 +76,7 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 
 			validatorRounds.push({
 				round: roundNumber,
-				roundHeight: this.roundCalculator.calculateRoundInfoByRound(roundNumber, this.configuration)
-					.roundHeight,
+				roundHeight: this.roundCalculator.calculateRoundInfoByRound(roundNumber).roundHeight,
 				validators: validators.map((validator) => {
 					const [validatorAddress, voteBalance] = validator;
 

@@ -254,7 +254,7 @@ export class Restore {
 					totalAmount: block.header.totalAmount.toFixed(),
 					totalFee: block.header.totalFee.toFixed(),
 					totalGasUsed: block.header.totalGasUsed,
-					validatorRound: this.roundCalculator.calculateRound(block.header.height, this.configuration).round,
+					validatorRound: this.roundCalculator.calculateRound(block.header.height).round,
 					validatorSet: validatorSetPack(proof.validators).toString(),
 					version: block.header.version,
 				});

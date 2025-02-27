@@ -1,6 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { Configuration, Transaction } from "./crypto/index.js";
+import { Transaction } from "./crypto/index.js";
 import { RoundInfo } from "./shared/rounds.js";
 
 export interface FeeCalculator {
@@ -9,7 +9,7 @@ export interface FeeCalculator {
 }
 
 export interface RoundCalculator {
-	isNewRound(height: number, configuration: Configuration): boolean;
-	calculateRound(height: number, configuration: Configuration): RoundInfo;
-	calculateRoundInfoByRound(round: number, configuration: Configuration): RoundInfo;
+	isNewRound(height: number): boolean;
+	calculateRound(height: number): RoundInfo;
+	calculateRoundInfoByRound(round: number): RoundInfo;
 }

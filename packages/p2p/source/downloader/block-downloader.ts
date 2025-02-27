@@ -134,7 +134,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			const bytesForProcess = [...job.blocks];
 
 			while (bytesForProcess.length > 0) {
-				const roundInfo = this.roundCalculator.calculateRound(height, this.configuration);
+				const roundInfo = this.roundCalculator.calculateRound(height);
 
 				// TODO: Check if can use workers
 				// Slice to the end of the round, to ensure validator set is the same

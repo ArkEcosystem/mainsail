@@ -140,8 +140,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
 		const height = unit.getBlock().data.height;
-		if (this.roundCalculator.isNewRound(height + 1, this.configuration)) {
-			const roundInfo = this.roundCalculator.calculateRound(height + 1, this.configuration);
+		if (this.roundCalculator.isNewRound(height + 1)) {
+			const roundInfo = this.roundCalculator.calculateRound(height + 1);
 
 			if (!this.state.isBootstrap()) {
 				this.logger.debug(
@@ -236,7 +236,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #calculateActiveValidators(unit: Contracts.Processor.ProcessableUnit) {
-		if (!this.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
+		if (!this.roundCalculator.isNewRound(unit.height + 1)) {
 			return;
 		}
 

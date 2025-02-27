@@ -49,10 +49,10 @@ describe<Context>("Round Calculator - calculateRoundInfoByRound", ({ assert, bef
 		];
 
 		for (const { round, roundHeight, nextRound, activeValidators } of testVector) {
-			const result = roundCalculator.calculateRoundInfoByRound(round, configuration);
+			const result = roundCalculator.calculateRoundInfoByRound(round);
 			assert.is(result.round, round);
 			assert.is(result.roundHeight, roundHeight);
-			assert.true(roundCalculator.isNewRound(result.roundHeight, configuration));
+			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, nextRound);
 			assert.is(result.maxValidators, activeValidators);
 		}
@@ -69,7 +69,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		const { activeValidators } = configuration.getMilestone(1);
 
 		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
-			const { round, nextRound } = roundCalculator.calculateRound(height - 1, configuration);
+			const { round, nextRound } = roundCalculator.calculateRound(height - 1);
 			assert.is(round, index + 1);
 			assert.is(nextRound, index + 1);
 		}
@@ -82,7 +82,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		const { activeValidators } = configuration.getMilestone(1);
 
 		for (let index = 0, height = activeValidators; index < 1000; index++, height += activeValidators) {
-			const { round, nextRound } = roundCalculator.calculateRound(height, configuration);
+			const { round, nextRound } = roundCalculator.calculateRound(height);
 			assert.is(round, index + 1);
 			assert.is(nextRound, index + 2);
 		}
@@ -92,7 +92,7 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		const { activeValidators } = configuration.getMilestone(1);
 
 		for (let index = 0; index < 1000; index++) {
-			const { round, nextRound } = roundCalculator.calculateRound(index + 1, configuration);
+			const { round, nextRound } = roundCalculator.calculateRound(index + 1);
 			assert.is(round, Math.floor(index / activeValidators) + 1);
 			assert.is(nextRound, Math.floor((index + 1) / activeValidators) + 1);
 		}
@@ -128,10 +128,10 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		];
 
 		for (const item of testVector) {
-			const result = roundCalculator.calculateRound(item.height, configuration);
+			const result = roundCalculator.calculateRound(item.height);
 			assert.is(result.round, item.round);
 			assert.is(result.roundHeight, item.roundHeight);
-			assert.true(roundCalculator.isNewRound(result.roundHeight, configuration));
+			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, item.nextRound);
 			assert.is(result.maxValidators, item.activeValidators);
 		}
@@ -178,10 +178,10 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		];
 
 		for (const { height, round, roundHeight, nextRound, activeValidators } of testVector) {
-			const result = roundCalculator.calculateRound(height, configuration);
+			const result = roundCalculator.calculateRound(height);
 			assert.is(result.round, round);
 			assert.is(result.roundHeight, roundHeight);
-			assert.true(roundCalculator.isNewRound(result.roundHeight, configuration));
+			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, nextRound);
 			assert.is(result.maxValidators, activeValidators);
 		}
@@ -223,11 +223,11 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		for (const { height, round, roundHeight, nextRound, activeValidators } of testVector) {
 			configuration.setHeight(height);
 
-			const result = roundCalculator.calculateRound(height, configuration);
+			const result = roundCalculator.calculateRound(height);
 
 			assert.is(result.round, round);
 			assert.is(result.roundHeight, roundHeight);
-			assert.true(roundCalculator.isNewRound(result.roundHeight, configuration));
+			assert.true(roundCalculator.isNewRound(result.roundHeight));
 			assert.is(result.nextRound, nextRound);
 			assert.is(result.maxValidators, activeValidators);
 		}
@@ -285,15 +285,15 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 				height: 5,
 			});
 
-		roundCalculator.calculateRound(1, configuration);
+		roundCalculator.calculateRound(1);
 
 		stubGetNextMilestoneWithKey.reset();
-		roundCalculator.calculateRound(2, configuration);
+		roundCalculator.calculateRound(2);
 
 		stubGetNextMilestoneWithKey.reset();
 
 		assert.throws(
-			() => roundCalculator.calculateRound(5, configuration),
+			() => roundCalculator.calculateRound(5),
 			new Exceptions.InvalidMilestoneConfigurationError(
 				"Bad milestone at height: 5. The number of validators can only be changed at the beginning of a new round.",
 			),
@@ -305,15 +305,15 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 	beforeEach(setup);
 
 	it("should determine the beginning of a new round", ({ configuration, roundCalculator }) => {
-		assert.true(roundCalculator.isNewRound(0, configuration));
-		assert.true(roundCalculator.isNewRound(1, configuration));
-		assert.false(roundCalculator.isNewRound(2, configuration));
-		assert.false(roundCalculator.isNewRound(52, configuration));
-		assert.false(roundCalculator.isNewRound(53, configuration));
-		assert.true(roundCalculator.isNewRound(54, configuration));
-		assert.false(roundCalculator.isNewRound(103, configuration));
-		assert.true(roundCalculator.isNewRound(107, configuration));
-		assert.false(roundCalculator.isNewRound(159, configuration));
+		assert.true(roundCalculator.isNewRound(0));
+		assert.true(roundCalculator.isNewRound(1));
+		assert.false(roundCalculator.isNewRound(2));
+		assert.false(roundCalculator.isNewRound(52));
+		assert.false(roundCalculator.isNewRound(53));
+		assert.true(roundCalculator.isNewRound(54));
+		assert.false(roundCalculator.isNewRound(103));
+		assert.true(roundCalculator.isNewRound(107));
+		assert.false(roundCalculator.isNewRound(159));
 	});
 
 	it("should be ok when changing delegate count", ({ configuration, roundCalculator }) => {
@@ -329,26 +329,26 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 		configuration.set("milestones", milestones);
 
 		// 1 Delegate
-		assert.true(roundCalculator.isNewRound(0, configuration));
+		assert.true(roundCalculator.isNewRound(0));
 
 		// 2 Delegates
-		assert.true(roundCalculator.isNewRound(1, configuration));
-		assert.false(roundCalculator.isNewRound(2, configuration));
+		assert.true(roundCalculator.isNewRound(1));
+		assert.false(roundCalculator.isNewRound(2));
 
 		// 3 Delegates
-		assert.true(roundCalculator.isNewRound(3, configuration));
-		assert.false(roundCalculator.isNewRound(4, configuration));
-		assert.false(roundCalculator.isNewRound(5, configuration));
+		assert.true(roundCalculator.isNewRound(3));
+		assert.false(roundCalculator.isNewRound(4));
+		assert.false(roundCalculator.isNewRound(5));
 
 		// 1 Delegate
-		assert.true(roundCalculator.isNewRound(6, configuration));
-		assert.true(roundCalculator.isNewRound(7, configuration));
-		assert.true(roundCalculator.isNewRound(8, configuration));
-		assert.true(roundCalculator.isNewRound(9, configuration));
+		assert.true(roundCalculator.isNewRound(6));
+		assert.true(roundCalculator.isNewRound(7));
+		assert.true(roundCalculator.isNewRound(8));
+		assert.true(roundCalculator.isNewRound(9));
 
 		// 53 Delegates
-		assert.true(roundCalculator.isNewRound(10, configuration));
-		assert.false(roundCalculator.isNewRound(11, configuration));
-		assert.true(roundCalculator.isNewRound(63, configuration));
+		assert.true(roundCalculator.isNewRound(10));
+		assert.false(roundCalculator.isNewRound(11));
+		assert.true(roundCalculator.isNewRound(63));
 	});
 });

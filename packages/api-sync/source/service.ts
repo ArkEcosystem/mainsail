@@ -270,7 +270,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				totalGasUsed: header.totalGasUsed,
-				validatorRound: this.roundCalculator.calculateRound(header.height, this.configuration).round,
+				validatorRound: this.roundCalculator.calculateRound(header.height).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,
 			},
@@ -298,7 +298,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			})),
 			wallets,
 
-			...(this.roundCalculator.isNewRound(header.height + 1, this.configuration)
+			...(this.roundCalculator.isNewRound(header.height + 1)
 				? {
 						validatorRound: this.#createValidatorRound(header.height + 1),
 					}
@@ -324,7 +324,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		);
 
 		return {
-			...this.roundCalculator.calculateRound(height, this.configuration),
+			...this.roundCalculator.calculateRound(height),
 			validators: validatorWallets.map((v) => v.address),
 			votes: validatorWallets.map((v) => v.voteBalance.toFixed()),
 		};

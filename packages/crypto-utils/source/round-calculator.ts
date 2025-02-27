@@ -1,13 +1,16 @@
-import { injectable } from "@mainsail/container";
-import { Contracts, Exceptions } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
 import { getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info.js";
 
 @injectable()
 export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
-	public isNewRound(height: number, configuration: Contracts.Crypto.Configuration): boolean {
-		const milestones = configuration.get("milestones");
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	public isNewRound(height: number): boolean {
+		const milestones = this.configuration.get("milestones");
 
 		// Since milestones are merged, find the first milestone to introduce the validator count.
 		let milestone;
@@ -27,9 +30,9 @@ export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
 		return height === 0 || (height - Math.max(milestone.height, 1)) % milestone.activeValidators === 0;
 	}
 
-	public calculateRound(height: number, configuration: Contracts.Crypto.Configuration): Contracts.Shared.RoundInfo {
-		let nextMilestone = configuration.getNextMilestoneWithNewKey(0, "activeValidators");
-		let activeValidators = configuration.getMilestone(0).activeValidators;
+	public calculateRound(height: number): Contracts.Shared.RoundInfo {
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(0, "activeValidators");
+		let activeValidators = this.configuration.getMilestone(0).activeValidators;
 
 		// Genesis round requires special treatment
 		if (height === 0) {
@@ -45,7 +48,7 @@ export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
 
 		let milestoneHeight = 0;
 
-		const milestones = getMilestonesWhichAffectActiveValidatorCount(configuration);
+		const milestones = getMilestonesWhichAffectActiveValidatorCount(this.configuration);
 		for (let index = 0; index < milestones.length - 1; index++) {
 			if (height < nextMilestone.height) {
 				break;
@@ -66,7 +69,7 @@ export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
 			activeValidators = nextMilestone.data;
 			milestoneHeight = nextMilestone.height - 1;
 
-			nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "activeValidators");
 		}
 
 		const minActiveValidators = Math.max(1, activeValidators);
@@ -82,16 +85,13 @@ export class RoundCalculator implements Contracts.CryptoUtils.RoundCalculator {
 		return result;
 	}
 
-	public calculateRoundInfoByRound(
-		round: number,
-		configuration: Contracts.Crypto.Configuration,
-	): Contracts.Shared.RoundInfo {
+	public calculateRoundInfoByRound(round: number): Contracts.Shared.RoundInfo {
 		// Genesis round requires special treatment
 		if (round === 0) {
 			return { maxValidators: 0, nextRound: 1, round: 0, roundHeight: 0 };
 		}
 
-		const milestones = configuration.getMilestones();
+		const milestones = this.configuration.getMilestones();
 
 		let roundHeight = 1;
 		let maxValidators = 0;

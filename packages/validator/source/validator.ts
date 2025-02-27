@@ -205,7 +205,7 @@ export class Validator implements Contracts.Validator.Validator {
 				validatorAddress: generatorAddress,
 			});
 
-			if (this.roundCalculator.isNewRound(previousBlock.header.height + 2, this.cryptoConfiguration)) {
+			if (this.roundCalculator.isNewRound(previousBlock.header.height + 2)) {
 				const { activeValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.height + 2);
 
 				await validator.getEvm().calculateActiveValidators({
