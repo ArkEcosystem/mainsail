@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { feeCalculator } from "@mainsail/crypto-utils";
 import { Utils as AppUtils } from "@mainsail/kernel";
 
 @injectable()
@@ -16,6 +15,9 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
+
+	@inject(Identifiers.CryptoUtils.FeeCalculator)
+	protected readonly feeCalculator!: Contracts.CryptoUtils.FeeCalculator;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
@@ -38,7 +40,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 			sender
 				.getBalance()
 				.minus(transaction.data.value)
-				.minus(feeCalculator.calculate(transaction))
+				.minus(this.feeCalculator.calculate(transaction))
 				.isNegative() &&
 			this.configuration.getHeight() > 0
 		) {

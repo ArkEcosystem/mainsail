@@ -1,10 +1,14 @@
+import { injectable } from "@mainsail/container";
 import { Contracts } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
 
-const calculate = (transaction: Contracts.Crypto.Transaction): Utils.BigNumber =>
-	Utils.BigNumber.make(transaction.data.gasPrice).times(transaction.data.gasLimit);
+@injectable()
+export class FeeCalculator implements Contracts.CryptoUtils.FeeCalculator {
+	public calculate(transaction: Contracts.Crypto.Transaction): Utils.BigNumber {
+		return Utils.BigNumber.make(transaction.data.gasPrice).times(transaction.data.gasLimit);
+	}
 
-const calculateConsumed = (gasPrice: number, gasUsed: number): Utils.BigNumber =>
-	Utils.BigNumber.make(gasPrice).times(gasUsed);
-
-export { calculate, calculateConsumed };
+	public calculateConsumed(gasPrice: number, gasUsed: number): Utils.BigNumber {
+		return Utils.BigNumber.make(gasPrice).times(gasUsed);
+	}
+}

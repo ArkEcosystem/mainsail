@@ -1,6 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { formatCurrency, feeCalculator } from "@mainsail/crypto-utils";
+import { formatCurrency } from "@mainsail/crypto-utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
@@ -16,6 +16,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.CryptoUtils.FeeCalculator)
+	private readonly feeCalculator!: Contracts.CryptoUtils.FeeCalculator;
 
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
@@ -50,7 +53,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 		const receipt = await transactionHandler.apply(transactionHandlerContext, transaction);
 
-		const feeConsumed = feeCalculator.calculateConsumed(transaction.data.gasPrice, Number(receipt.gasUsed));
+		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.data.gasPrice, Number(receipt.gasUsed));
 		this.logger.debug(
 			`executed EVM call (success=${receipt.success}, from=${transaction.data.senderAddress} to=${transaction.data.recipientAddress} gasUsed=${receipt.gasUsed} paidNativeFee=${formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.deployedContractAddress})`,
 		);

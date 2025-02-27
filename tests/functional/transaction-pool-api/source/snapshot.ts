@@ -2,8 +2,8 @@ import { Contracts, Identifiers, Events } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
-import { feeCalculator } from "@mainsail/crypto-utils";
 import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utils.js";
+import { FeeCalculator } from "packages/crypto-utils/distribution/fee-calculator.js";
 
 export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 	const snapshot = new Snapshot(sandbox);
@@ -216,10 +216,9 @@ export class Snapshot {
 			for (const transaction of block.transactions) {
 				const receipt = this.receipts[transaction.id!];
 				if (receipt) {
-					const consumedGas = feeCalculator.calculateConsumed(
-						transaction.data.gasPrice,
-						Number(receipt.receipt.gasUsed),
-					);
+					const consumedGas = this.sandbox.app
+						.get<Contracts.CryptoUtils.FeeCalculator>(Identifiers.CryptoUtils.FeeCalculator)
+						.calculateConsumed(transaction.data.gasPrice, Number(receipt.receipt.gasUsed));
 					console.log(
 						"found receipt with",
 						receipt.sender,

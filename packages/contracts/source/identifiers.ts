@@ -43,6 +43,12 @@ export const Identifiers = {
 			Proposal: Symbol("ConsensusStorage<Storage.Proposal>"),
 		},
 	},
+	CryptoUtils: {
+		FeeCalculator: Symbol("CryptoUtils<FeeCalculator>"),
+		RoundCalculator: Symbol("CryptoUtils<RoundCalculator>"),
+		SupplyCalculator: Symbol("CryptoUtils<SupplyCalculator>"),
+		TimestampCalculator: Symbol("CryptoUtils<TimestampCalculator>"),
+	},
 	CryptoWorker: {
 		Worker: {
 			Factory: Symbol("CryptoWorker<Worker.Factory>"),
@@ -128,6 +134,7 @@ export const Identifiers = {
 			Utils: Symbol("Crypto<Transaction.Utils>"),
 			Verifier: Symbol("Crypto<Transaction.Verifier>"),
 		},
+
 		Validator: Symbol("Crypto<Validator>"),
 	},
 	Database: {
@@ -208,6 +215,7 @@ export const Identifiers = {
 	Proposer: {
 		Selector: Symbol("Proposer<Selector>"),
 	},
+
 	ServiceProvider: {
 		Configuration: Symbol("ServiceProvider<Configuration>"),
 		Repository: Symbol("ServiceProvider<Repository>"),

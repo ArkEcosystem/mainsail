@@ -3,6 +3,7 @@ export * as ApiSync from "./api-sync.js";
 export * as Consensus from "./consensus/index.js";
 export * as ConsensusStorage from "./consensus-storage.js";
 export * as Crypto from "./crypto/index.js";
+export * as CryptoUtils from "./crypto-utils.js";
 export * as Database from "./database.js";
 export * as Evm from "./evm/index.js";
 export * as Kernel from "./kernel/index.js";
