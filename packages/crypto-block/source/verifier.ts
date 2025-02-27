@@ -81,7 +81,6 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 			const appliedTransactions: Record<string, Contracts.Crypto.TransactionData> = {};
 
 			let totalAmount: BigNumber = BigNumber.ZERO;
-			let totalFee: BigNumber = BigNumber.ZERO;
 
 			// The initial payload length takes the overhead for each serialized transaction into account
 			// which is a uint32 per transaction to store the individual length.
@@ -102,8 +101,6 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				appliedTransactions[transaction.id] = transaction.data;
 
 				totalAmount = totalAmount.plus(transaction.data.value);
-				// TODO: total fee should refer to consumed gas instead?
-				totalFee = totalFee.plus(transaction.data.gasPrice);
 				totalPayloadLength += transaction.serialized.byteLength;
 
 				payloadBuffers.push(bytes);
@@ -114,10 +111,6 @@ export class Verifier implements Contracts.Crypto.BlockVerifier {
 				(block.header.height > 0 || block.header.transactions.length > 0)
 			) {
 				result.errors.push("Invalid total amount");
-			}
-
-			if (!totalFee.isEqualTo(blockData.totalFee)) {
-				result.errors.push("Invalid total fee");
 			}
 
 			if (totalPayloadLength !== blockData.payloadLength) {
