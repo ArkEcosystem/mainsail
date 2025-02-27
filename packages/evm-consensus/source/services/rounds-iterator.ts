@@ -1,6 +1,5 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { roundCalculator } from "@mainsail/crypto-utils";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { BigNumber } from "@mainsail/utils";
 import { ethers } from "ethers";
@@ -16,6 +15,9 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.CryptoUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
@@ -74,7 +76,8 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 
 			validatorRounds.push({
 				round: roundNumber,
-				roundHeight: roundCalculator.calculateRoundInfoByRound(roundNumber, this.configuration).roundHeight,
+				roundHeight: this.roundCalculator.calculateRoundInfoByRound(roundNumber, this.configuration)
+					.roundHeight,
 				validators: validators.map((validator) => {
 					const [validatorAddress, voteBalance] = validator;
 

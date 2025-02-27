@@ -1,7 +1,6 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { roundCalculator } from "@mainsail/crypto-utils";
 
 import { Controller } from "./controller.js";
 
@@ -16,6 +15,9 @@ export class RoundController extends Controller {
 	@inject(Identifiers.Proposer.Selector)
 	private readonly proposerSelector!: Contracts.Proposer.Selector;
 
+	@inject(Identifiers.CryptoUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
+
 	public async index(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 		const activeValidators = this.validatorSet.getActiveValidators();
 
@@ -28,7 +30,7 @@ export class RoundController extends Controller {
 
 		return {
 			height,
-			...roundCalculator.calculateRound(height, this.configuration),
+			...this.roundCalculator.calculateRound(height, this.configuration),
 			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix

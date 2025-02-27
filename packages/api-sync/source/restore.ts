@@ -8,7 +8,6 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
-import { roundCalculator } from "@mainsail/crypto-utils";
 import { chunk, validatorSetPack } from "@mainsail/utils";
 import { ethers } from "ethers";
 import { performance } from "perf_hooks";
@@ -83,6 +82,9 @@ export class Restore {
 
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
+
+	@inject(Identifiers.CryptoUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
 
 	@inject(ApiDatabaseIdentifiers.BlockRepositoryFactory)
 	private readonly blockRepositoryFactory!: ApiDatabaseContracts.BlockRepositoryFactory;
@@ -252,7 +254,7 @@ export class Restore {
 					totalAmount: block.header.totalAmount.toFixed(),
 					totalFee: block.header.totalFee.toFixed(),
 					totalGasUsed: block.header.totalGasUsed,
-					validatorRound: roundCalculator.calculateRound(block.header.height, this.configuration).round,
+					validatorRound: this.roundCalculator.calculateRound(block.header.height, this.configuration).round,
 					validatorSet: validatorSetPack(proof.validators).toString(),
 					version: block.header.version,
 				});

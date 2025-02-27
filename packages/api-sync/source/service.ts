@@ -5,7 +5,6 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { roundCalculator } from "@mainsail/crypto-utils";
 import { Providers, Types, Utils } from "@mainsail/kernel";
 import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
@@ -35,6 +34,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.CryptoUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
 
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	private readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
@@ -268,7 +270,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				totalGasUsed: header.totalGasUsed,
-				validatorRound: roundCalculator.calculateRound(header.height, this.configuration).round,
+				validatorRound: this.roundCalculator.calculateRound(header.height, this.configuration).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,
 			},
@@ -296,7 +298,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			})),
 			wallets,
 
-			...(roundCalculator.isNewRound(header.height + 1, this.configuration)
+			...(this.roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
 						validatorRound: this.#createValidatorRound(header.height + 1),
 					}
@@ -322,7 +324,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		);
 
 		return {
-			...roundCalculator.calculateRound(height, this.configuration),
+			...this.roundCalculator.calculateRound(height, this.configuration),
 			validators: validatorWallets.map((v) => v.address),
 			votes: validatorWallets.map((v) => v.voteBalance.toFixed()),
 		};

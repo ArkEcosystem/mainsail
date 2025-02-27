@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { roundCalculator } from "@mainsail/crypto-utils";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
@@ -9,6 +8,9 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
+
+	@inject(Identifiers.CryptoUtils.RoundCalculator)
+	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
 
 	#topValidators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
@@ -24,7 +26,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
+		if (this.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			await this.#buildActiveValidators();
 		}
 
