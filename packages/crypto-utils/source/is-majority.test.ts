@@ -1,5 +1,5 @@
-import { describe } from "../../../test-framework/source";
-import { majorityMinority } from "../../test/fixtures/active-validators";
+import { describe } from "../../test-framework/source";
+import { majorityMinority } from "../test/fixtures/active-validators";
 import { isMajority } from "./is-majority";
 
 describe("isMajority", ({ assert, it }) => {

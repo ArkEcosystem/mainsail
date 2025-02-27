@@ -1,10 +1,10 @@
 import { Identifiers } from "@mainsail/contracts";
-
-import crypto from "../../../core/bin/config/testnet/core/crypto.json";
-import { Configuration } from "../../../crypto-config/distribution/index";
-import { describe, Sandbox } from "../../../test-framework/source";
-import { formatCurrency } from "./format-currency.js";
 import { BigNumber } from "@mainsail/utils";
+
+import crypto from "../../core/bin/config/testnet/core/crypto.json";
+import { Configuration } from "../../crypto-config/distribution/index";
+import { describe, Sandbox } from "../../test-framework/source";
+import { formatCurrency } from "./format-currency.js";
 
 describe<{
 	sandbox: Sandbox;

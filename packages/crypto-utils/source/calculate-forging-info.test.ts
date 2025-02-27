@@ -1,10 +1,10 @@
 import { Identifiers } from "@mainsail/contracts";
-
-import crypto from "../../../core/bin/config/testnet/core/crypto.json";
-import { Configuration } from "../../../crypto-config/distribution/index";
-import { describe, Sandbox } from "../../../test-framework/source";
-import { calculateApproval, getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 import { BigNumber } from "@mainsail/utils";
+
+import crypto from "../../core/bin/config/testnet/core/crypto.json";
+import { Configuration } from "../../crypto-config/distribution/index";
+import { describe, Sandbox } from "../../test-framework/source";
+import { calculateApproval, getMilestonesWhichAffectActiveValidatorCount } from "./calculate-forging-info";
 
 describe<{
 	sandbox: Sandbox;
@@ -44,16 +44,16 @@ describe<{
 	configuration: Configuration;
 }>("calculateApproval", ({ assert, it }) => {
 	const toBalance = (n: number) => BigNumber.WEI.times(n);
-	const totalSupply = BigNumber.make(toBalance(1000000));
+	const totalSupply = BigNumber.make(toBalance(1_000_000));
 
 	it("should calculate correctly", () => {
-		const voteBalance = toBalance(10000);
+		const voteBalance = toBalance(10_000);
 		const approval = calculateApproval(voteBalance, totalSupply);
-		assert.equal(approval, 1.0);
+		assert.equal(approval, 1);
 	});
 
 	it("should calculate correctly with 2 decimals", () => {
-		const voteBalance = toBalance(16500);
+		const voteBalance = toBalance(16_500);
 		const approval = calculateApproval(voteBalance, totalSupply);
 		assert.equal(approval, 1.65);
 	});
