@@ -10,6 +10,7 @@ export interface LegacyImporter {
 	validators: ImportedLegacyValidator[];
 	voters: ImportedLegacyVoter[];
 	snapshotHash: string;
+	result: LegacyImportResult | undefined;
 }
 
 export interface LegacyImportOptions {

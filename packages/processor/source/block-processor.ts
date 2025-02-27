@@ -51,6 +51,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
+	@inject(Identifiers.Snapshot.Legacy.Importer)
+	@optional()
+	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
+
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
 		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
 
@@ -176,12 +180,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		let previousStateHash;
 		if (block.header.height === 0) {
 			// Assume snapshot is present if the previous block points to a non-zero hash
-			// and skip state hash check since it will be performed during import.
 			if (block.header.previousBlock !== "0000000000000000000000000000000000000000000000000000000000000000") {
-				return;
+				Utils.assert.defined(this.snapshotImporter);
+				Utils.assert.defined(this.snapshotImporter.result);
+				previousStateHash = this.snapshotImporter.result.stateHash;
+			} else {
+				previousStateHash = "0000000000000000000000000000000000000000000000000000000000000000";
 			}
-
-			previousStateHash = "0000000000000000000000000000000000000000000000000000000000000000";
 		} else {
 			const previousBlock = this.stateStore.getLastBlock();
 			previousStateHash = previousBlock.header.stateHash;
