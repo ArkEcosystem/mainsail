@@ -1,6 +1,7 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Utils } from "@mainsail/kernel";
+import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -55,6 +56,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
 		const processResult = { gasUsed: 0, receipts: new Map(), success: false };
 
@@ -80,6 +84,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
+			this.#verifyTotalFee(block);
 			await this.#updateRewardsAndVotes(unit);
 			await this.#calculateActiveValidators(unit);
 			await this.#verifyStateHash(block);
@@ -173,6 +178,25 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const totalGas = block.header.totalGasUsed;
 		if (totalGas !== processorResult.gasUsed) {
 			throw new Error(`Block gas ${totalGas} does not match consumed gas ${processorResult.gasUsed}`);
+		}
+	}
+
+	#verifyTotalFee(block: Contracts.Crypto.Block): void {
+		if (block.data.height === 0) {
+			return;
+		}
+
+		let totalGas = BigNumber.ZERO;
+		for (const transaction of block.transactions) {
+			Utils.assert.defined(transaction.data.gasUsed);
+
+			totalGas = totalGas.plus(
+				this.gasFeeCalculator.calculateConsumed(transaction.data.gasUsed, transaction.data.gasPrice),
+			);
+		}
+
+		if (!totalGas.isEqualTo(block.header.totalFee)) {
+			throw new Error(`Block fee ${block.header.totalFee} does not match consumed fee ${totalGas}`);
 		}
 	}
 

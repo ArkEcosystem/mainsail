@@ -44,6 +44,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
+	@inject(Identifiers.Evm.Gas.FeeCalculator)
+	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -258,7 +261,7 @@ export class Validator implements Contracts.Validator.Validator {
 
 			totals.amount = totals.amount.plus(data.value);
 			Utils.assert.defined<number>(data.gasUsed);
-			totals.fee = totals.fee.plus(data.gasUsed);
+			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(data.gasPrice, data.gasUsed));
 			totals.gasUsed += data.gasUsed;
 
 			payloadBuffers.push(Buffer.from(data.id, "hex"));
