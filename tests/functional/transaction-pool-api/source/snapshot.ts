@@ -2,6 +2,7 @@ import { Contracts, Identifiers, Events } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
+import { feeCalculator } from "@mainsail/crypto-utils";
 import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utils.js";
 
 export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
@@ -171,9 +172,6 @@ export class Snapshot {
 
 	private async collectAccountDeltas(): Promise<Record<string, WalletState>> {
 		const database = this.sandbox.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
-		const gasFeeCalculator = this.sandbox.app.get<Contracts.Evm.GasFeeCalculator>(
-			Identifiers.Evm.Gas.FeeCalculator,
-		);
 
 		const stateDeltas: Record<string, WalletState> = {};
 		if (database.isEmpty()) {
@@ -218,7 +216,7 @@ export class Snapshot {
 			for (const transaction of block.transactions) {
 				const receipt = this.receipts[transaction.id!];
 				if (receipt) {
-					const consumedGas = gasFeeCalculator.calculateConsumed(
+					const consumedGas = feeCalculator.calculateConsumed(
 						transaction.data.gasPrice,
 						Number(receipt.receipt.gasUsed),
 					);

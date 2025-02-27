@@ -15,7 +15,6 @@ import { ServiceProvider as CoreCryptoTransactionEvmCall } from "@mainsail/crypt
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { ServiceProvider as CoreEvmConsensus } from "@mainsail/evm-consensus";
-import { ServiceProvider as CoreEvmGasFee } from "@mainsail/evm-gas-fee";
 import { ServiceProvider as EvmService } from "@mainsail/evm-service";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
@@ -73,7 +72,6 @@ export const makeApplication = async (configurationPath: string, options: Record
 	await app.resolve(CoreCryptoConsensus).register();
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();
-	await app.resolve(CoreEvmGasFee).register();
 	await app.resolve(CoreEvmConsensus).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreCryptoTransactionEvmCall).register();

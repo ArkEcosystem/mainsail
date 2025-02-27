@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { feeCalculator } from "@mainsail/crypto-utils";
 import { Providers, Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
 
@@ -21,9 +22,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private readonly handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
-
-	@inject(Identifiers.Evm.Gas.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.Evm.GasFeeCalculator;
 
 	@inject(Identifiers.Services.Trigger.Service)
 	private readonly triggers!: Services.Triggers.Triggers;
@@ -78,7 +76,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			}
 
 			this.#wallet.increaseNonce();
-			this.#wallet.decreaseBalance(transaction.data.value.plus(this.gasFeeCalculator.calculate(transaction)));
+			this.#wallet.decreaseBalance(transaction.data.value.plus(feeCalculator.calculate(transaction)));
 		} else {
 			throw new Exceptions.TransactionFailedToVerifyError(transaction);
 		}
@@ -86,6 +84,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	public revert(transaction: Contracts.Crypto.Transaction): void {
 		this.#wallet.decreaseNonce();
-		this.#wallet.increaseBalance(transaction.data.value.plus(this.gasFeeCalculator.calculate(transaction)));
+		this.#wallet.increaseBalance(transaction.data.value.plus(feeCalculator.calculate(transaction)));
 	}
 }
