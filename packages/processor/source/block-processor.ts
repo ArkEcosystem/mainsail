@@ -182,10 +182,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#verifyTotalFee(block: Contracts.Crypto.Block): void {
-		if (block.data.height === 0) {
-			return;
-		}
-
 		let totalGas = BigNumber.ZERO;
 		for (const transaction of block.transactions) {
 			Utils.assert.defined(transaction.data.gasUsed);
