@@ -5,6 +5,7 @@ import {
 } from "@mainsail/api-database";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { roundCalculator } from "@mainsail/crypto-utils";
 import { Providers, Types, Utils } from "@mainsail/kernel";
 import { chunk, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
@@ -267,7 +268,7 @@ export class Sync implements Contracts.ApiSync.Service {
 				totalAmount: header.totalAmount.toFixed(),
 				totalFee: header.totalFee.toFixed(),
 				totalGasUsed: header.totalGasUsed,
-				validatorRound: Utils.roundCalculator.calculateRound(header.height, this.configuration).round,
+				validatorRound: roundCalculator.calculateRound(header.height, this.configuration).round,
 				validatorSet: validatorSetPack(proof.validators).toString(),
 				version: header.version,
 			},
@@ -295,7 +296,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			})),
 			wallets,
 
-			...(Utils.roundCalculator.isNewRound(header.height + 1, this.configuration)
+			...(roundCalculator.isNewRound(header.height + 1, this.configuration)
 				? {
 						validatorRound: this.#createValidatorRound(header.height + 1),
 					}
@@ -321,7 +322,7 @@ export class Sync implements Contracts.ApiSync.Service {
 		);
 
 		return {
-			...Utils.roundCalculator.calculateRound(height, this.configuration),
+			...roundCalculator.calculateRound(height, this.configuration),
 			validators: validatorWallets.map((v) => v.address),
 			votes: validatorWallets.map((v) => v.voteBalance.toFixed()),
 		};

@@ -281,6 +281,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-utils':
+        specifier: workspace:*
+        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -419,6 +422,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-utils':
+        specifier: workspace:*
+        version: link:../crypto-utils
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
@@ -746,6 +752,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-utils':
+        specifier: workspace:*
+        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -1896,6 +1905,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-utils':
+        specifier: workspace:*
+        version: link:../crypto-utils
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -2291,6 +2303,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-utils':
+        specifier: workspace:*
+        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2376,6 +2391,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-utils':
+        specifier: workspace:*
+        version: link:../crypto-utils
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2912,6 +2930,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-utils':
+        specifier: workspace:*
+        version: link:../crypto-utils
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus

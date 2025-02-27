@@ -1,5 +1,6 @@
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
+import { roundCalculator } from "@mainsail/crypto-utils";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
@@ -141,8 +142,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
 		const height = unit.getBlock().data.height;
-		if (Utils.roundCalculator.isNewRound(height + 1, this.configuration)) {
-			const roundInfo = Utils.roundCalculator.calculateRound(height + 1, this.configuration);
+		if (roundCalculator.isNewRound(height + 1, this.configuration)) {
+			const roundInfo = roundCalculator.calculateRound(height + 1, this.configuration);
 
 			if (!this.state.isBootstrap()) {
 				this.logger.debug(
@@ -237,7 +238,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #calculateActiveValidators(unit: Contracts.Processor.ProcessableUnit) {
-		if (!Utils.roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
+		if (!roundCalculator.isNewRound(unit.height + 1, this.configuration)) {
 			return;
 		}
 

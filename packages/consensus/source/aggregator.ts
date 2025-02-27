@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { isMajority } from "@mainsail/crypto-utils";
 
 @injectable()
 export class Aggregator implements Contracts.Consensus.Aggregator {
@@ -14,7 +14,7 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 		majority: Map<number, { signature: string }>,
 		activeValidators: number,
 	): Promise<Contracts.Crypto.AggregatedSignature> {
-		if (!Utils.isMajority(majority.size, activeValidators)) {
+		if (!isMajority(majority.size, activeValidators)) {
 			throw new Error("Failed to aggregate signatures, because the majority is not reached.");
 		}
 
@@ -45,7 +45,7 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 			.map((v, index) => (v ? Buffer.from(this.validatorSet.getValidator(index).blsPublicKey, "hex") : undefined))
 			.filter((item): item is Buffer => !!item);
 
-		if (!Utils.isMajority(validatorPublicKeys.length, activeValidators)) {
+		if (!isMajority(validatorPublicKeys.length, activeValidators)) {
 			return false;
 		}
 

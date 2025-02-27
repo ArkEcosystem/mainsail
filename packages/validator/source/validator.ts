@@ -1,5 +1,6 @@
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { roundCalculator } from "@mainsail/crypto-utils";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { Providers, Utils } from "@mainsail/kernel";
 import { BigNumber } from "@mainsail/utils";
@@ -202,7 +203,7 @@ export class Validator implements Contracts.Validator.Validator {
 				validatorAddress: generatorAddress,
 			});
 
-			if (Utils.roundCalculator.isNewRound(previousBlock.header.height + 2, this.cryptoConfiguration)) {
+			if (roundCalculator.isNewRound(previousBlock.header.height + 2, this.cryptoConfiguration)) {
 				const { activeValidators } = this.cryptoConfiguration.getMilestone(previousBlock.header.height + 2);
 
 				await validator.getEvm().calculateActiveValidators({

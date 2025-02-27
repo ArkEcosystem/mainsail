@@ -8,6 +8,7 @@ import { Contracts, Identifiers } from "@mainsail/contracts";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { UsernamesAbi } from "@mainsail/evm-contracts";
 import { Utils } from "@mainsail/kernel";
+import { roundCalculator } from "@mainsail/crypto-utils";
 import { chunk, validatorSetPack } from "@mainsail/utils";
 import { ethers } from "ethers";
 import { performance } from "perf_hooks";
@@ -251,7 +252,7 @@ export class Restore {
 					totalAmount: block.header.totalAmount.toFixed(),
 					totalFee: block.header.totalFee.toFixed(),
 					totalGasUsed: block.header.totalGasUsed,
-					validatorRound: Utils.roundCalculator.calculateRound(block.header.height, this.configuration).round,
+					validatorRound: roundCalculator.calculateRound(block.header.height, this.configuration).round,
 					validatorSet: validatorSetPack(proof.validators).toString(),
 					version: block.header.version,
 				});

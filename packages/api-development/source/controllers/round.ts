@@ -1,7 +1,7 @@
 import Hapi from "@hapi/hapi";
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { roundCalculator } from "@mainsail/crypto-utils";
 
 import { Controller } from "./controller.js";
 
@@ -28,7 +28,7 @@ export class RoundController extends Controller {
 
 		return {
 			height,
-			...Utils.roundCalculator.calculateRound(height, this.configuration),
+			...roundCalculator.calculateRound(height, this.configuration),
 			// Map the active validator set (static, vote-weighted, etc.) to actual proposal order
 			validators: orderedValidators.map((validator) => ({
 				// eslint-disable-next-line sort-keys-fix/sort-keys-fix

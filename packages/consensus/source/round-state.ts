@@ -1,5 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
+import { isMajority, isMinority } from "@mainsail/crypto-utils";
 import { Utils } from "@mainsail/kernel";
 
 @injectable()
@@ -284,12 +285,12 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	#isMajority(size: number): boolean {
 		const { activeValidators } = this.configuration.getMilestone(this.#height);
-		return Utils.isMajority(size, activeValidators);
+		return isMajority(size, activeValidators);
 	}
 
 	#isMinority(size: number): boolean {
 		const { activeValidators } = this.configuration.getMilestone(this.#height);
-		return Utils.isMinority(size, activeValidators);
+		return isMinority(size, activeValidators);
 	}
 
 	#increasePrevoteCount(blockId?: string): void {

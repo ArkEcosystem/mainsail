@@ -1,6 +1,6 @@
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts, Events, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { isMajority, isMinority } from "@mainsail/crypto-utils";
 
 import { getRandomPeer } from "../utils/index.js";
 
@@ -168,7 +168,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const { activeValidators } = this.cryptoConfiguration.getMilestone(ourHeader.height);
 
-		if (Utils.isMinority(peerHeader.validatorsSignedPrevote.filter(Boolean).length, activeValidators)) {
+		if (isMinority(peerHeader.validatorsSignedPrevote.filter(Boolean).length, activeValidators)) {
 			return peerHeader.round;
 		}
 
@@ -268,11 +268,11 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	) {
 		const { activeValidators } = this.cryptoConfiguration.getMilestone(job.height);
 
-		if (!Utils.isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), activeValidators)) {
+		if (!isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), activeValidators)) {
 			throw new Error(`Peer didn't return enough prevotes for +2/3 majority`);
 		}
 
-		if (!Utils.isMajority(precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(), activeValidators)) {
+		if (!isMajority(precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(), activeValidators)) {
 			throw new Error(`Peer didn't return enough precommits for +2/3 majority`);
 		}
 	}

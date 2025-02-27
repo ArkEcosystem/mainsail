@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { timestampCalculator } from "@mainsail/crypto-utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -25,7 +25,7 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 
 		if (
 			unit.getBlock().data.timestamp <
-			Utils.timestampCalculator.calculateMinimalTimestamp(
+			timestampCalculator.calculateMinimalTimestamp(
 				this.stateStore.getLastBlock(),
 				unit.getBlock().data.round,
 				this.configuration,

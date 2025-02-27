@@ -1,6 +1,6 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { Utils } from "@mainsail/kernel";
+import { timestampCalculator } from "@mainsail/crypto-utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -23,7 +23,7 @@ export class AbstractProcessor {
 
 	protected isRoundInBounds(message: { round: number }): boolean {
 		const earliestTime =
-			Utils.timestampCalculator.calculateMinimalTimestamp(
+			timestampCalculator.calculateMinimalTimestamp(
 				this.stateStore.getLastBlock(),
 				message.round,
 				this.cryptoConfiguration,
