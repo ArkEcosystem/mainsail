@@ -3,6 +3,8 @@ import { calculateRound, calculateRoundInfoByRound, isNewRound } from "./round-c
 import { calculateSupply } from "./supply-calculator.js";
 import { calculateMinimalTimestamp } from "./timestamp-calculator.js";
 
+export * as feeCalculator from "./fee-calculator.js";
+
 export const roundCalculator = { calculateRound, calculateRoundInfoByRound, isNewRound };
 export const supplyCalculator = { calculateSupply };
 export const validatorCalculator = { calculateApproval };
