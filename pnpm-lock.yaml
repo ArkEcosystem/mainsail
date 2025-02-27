@@ -1732,6 +1732,12 @@ importers:
         specifier: ^0.5.6
         version: 0.5.6
 
+  packages/crypto-utils:
+    devDependencies:
+      uvu:
+        specifier: ^0.5.6
+        version: 0.5.6
+
   packages/crypto-validation:
     dependencies:
       '@mainsail/contracts':
