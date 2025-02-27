@@ -1,13 +1,16 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 import { BigNumber } from "@mainsail/utils";
 
 @injectable()
 export class SupplyCalculator implements Contracts.CryptoUtils.SupplyCalculator {
-	calculateSupply(height: number, configuration: Contracts.Crypto.Configuration): BigNumber {
-		const initialSupply = BigNumber.make(configuration.get("genesisBlock.block.totalAmount"));
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
 
-		const milestones = configuration.get("milestones");
+	calculateSupply(height: number): BigNumber {
+		const initialSupply = BigNumber.make(this.configuration.get("genesisBlock.block.totalAmount"));
+
+		const milestones = this.configuration.get("milestones");
 		if (height === 0 || milestones.length === 0) {
 			return initialSupply;
 		}

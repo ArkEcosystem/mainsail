@@ -33,22 +33,22 @@ const initialSupply = BigNumber.make(crypto.genesisBlock.block.totalAmount);
 describe<Context>("Supply Calculator - calculateSupply", ({ assert, beforeEach, it, each }) => {
 	beforeEach(setup);
 
-	it("should calculate initial supply at height 0", ({ configuration, supplyCalculator }) => {
-		const supply = supplyCalculator.calculateSupply(0, configuration);
+	it("should calculate initial supply at height 0", ({ supplyCalculator }) => {
+		const supply = supplyCalculator.calculateSupply(0);
 		assert.equal(supply, initialSupply);
 	});
 
-	it("should calculate supply with milestone at height 2", ({ configuration, supplyCalculator }) => {
+	it("should calculate supply with milestone at height 2", ({ supplyCalculator }) => {
 		const height = 2;
 
-		const supply = supplyCalculator.calculateSupply(height, configuration);
+		const supply = supplyCalculator.calculateSupply(height);
 		assert.equal(supply, initialSupply.plus(blockReward(2).times(height)));
 	});
 
 	each(
 		"should calculate the genesis supply without milestone at height: ",
 		({ dataset, context }) => {
-			const supply = context.supplyCalculator.calculateSupply(dataset, context.configuration);
+			const supply = context.supplyCalculator.calculateSupply(dataset);
 			assert.equal(supply, initialSupply.plus(blockReward(2).times(dataset)));
 		},
 		[0, 5, 100, 2000, 4000, 8000],
@@ -70,7 +70,7 @@ describe<Context>("Supply Calculator - calculateSupply", ({ assert, beforeEach, 
 					.plus(blockReward(3).times(current - 7999));
 			};
 
-			const supply = context.supplyCalculator.calculateSupply(dataset, context.configuration);
+			const supply = context.supplyCalculator.calculateSupply(dataset);
 			assert.equal(supply, initialSupply.plus(reward(dataset)));
 		},
 		[0, 5, 100, 2000, 4000, 8000, 16_000],
@@ -105,7 +105,7 @@ describe<Context>("Supply Calculator - calculateSupply", ({ assert, beforeEach, 
 				return reward(63_999).plus(blockReward(15).times(current - 63_999));
 			};
 
-			const supply = context.supplyCalculator.calculateSupply(dataset, context.configuration);
+			const supply = context.supplyCalculator.calculateSupply(dataset);
 			assert.equal(supply, initialSupply.plus(reward(dataset)));
 		},
 		[0, 4000, 8000, 12_000, 16_000, 20_000, 32_000, 48_000, 64_000, 128_000],

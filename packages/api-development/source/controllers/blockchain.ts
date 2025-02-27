@@ -5,9 +5,6 @@ import { Controller } from "./controller.js";
 
 @injectable()
 export class BlockchainController extends Controller {
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.CryptoUtils.SupplyCalculator)
 	private readonly supplyCalculator!: Contracts.CryptoUtils.SupplyCalculator;
 
@@ -20,7 +17,7 @@ export class BlockchainController extends Controller {
 					height: data.height,
 					id: data.id,
 				},
-				supply: this.supplyCalculator.calculateSupply(data.height, this.cryptoConfiguration),
+				supply: this.supplyCalculator.calculateSupply(data.height),
 			},
 		};
 	}

@@ -1,6 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { Configuration, Transaction } from "./crypto/index.js";
+import { Transaction } from "./crypto/index.js";
 import { RoundInfo } from "./shared/rounds.js";
 
 export interface FeeCalculator {
@@ -15,5 +15,5 @@ export interface RoundCalculator {
 }
 
 export interface SupplyCalculator {
-	calculateSupply(height: number, configuration: Configuration): BigNumber;
+	calculateSupply(height: number): BigNumber;
 }
