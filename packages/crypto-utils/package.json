@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/container": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/kernel": "workspace:*"
 	},

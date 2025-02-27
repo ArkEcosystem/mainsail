@@ -27,9 +27,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Transaction.Handler.Registry)
 	private handlerRegistry!: Contracts.Transactions.TransactionHandlerRegistry;
 
-	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.Selector;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -113,7 +110,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.stateStore.onCommit(unit);
 		await this.evm.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
-		await this.proposerSelector.onCommit(unit);
 		await this.txPoolWorker.onCommit(unit);
 		await this.evmWorker.onCommit(unit);
 

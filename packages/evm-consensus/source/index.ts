@@ -4,7 +4,6 @@ import { Providers, Utils } from "@mainsail/kernel";
 
 import { Deployer } from "./deployer.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
-import { Selector } from "./selector.js";
 import { ConsensusContractService } from "./services/consensus-contract-service.js";
 import { ValidatorSet } from "./validator-set.js";
 
@@ -15,7 +14,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 
-		this.app.bind(Identifiers.Proposer.Selector).to(Selector).inSingletonScope();
 		this.app.bind(Identifiers.Evm.ContractService.Consensus).to(ConsensusContractService);
 
 		this.app

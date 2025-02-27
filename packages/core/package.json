@@ -77,6 +77,7 @@
 		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/transaction-pool-worker": "workspace:*",
 		"@mainsail/transactions": "workspace:*",
+		"@mainsail/crypto-utils": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/validator": "workspace:*",
