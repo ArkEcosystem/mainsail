@@ -99,8 +99,11 @@ export class GenesisBlockGenerator extends Generator {
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
 			timestamp: dayjs(options.epoch).valueOf(),
-			// Ensure no left over remains after distributing all funds from the genesis address (see `#createTransferTransactions`)
-			totalAmount: BigNumber.make(options.premine).dividedBy(validatorsCount).times(validatorsCount).toString(),
+			totalAmount: (options.distribute
+				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
+					BigNumber.make(options.premine).dividedBy(validatorsCount).times(validatorsCount)
+				: BigNumber.make(options.premine)
+			).toString(),
 		});
 
 		this.#consensusProxyContractAddress = this.app.get<string>(
