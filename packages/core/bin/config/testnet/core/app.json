@@ -40,9 +40,6 @@
 			"package": "@mainsail/evm-service"
 		},
 		{
-			"package": "@mainsail/evm-gas-fee"
-		},
-		{
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
@@ -192,9 +189,6 @@
 		},
 		{
 			"package": "@mainsail/evm-service"
-		},
-		{
-			"package": "@mainsail/evm-gas-fee"
 		},
 		{
 			"package": "@mainsail/crypto-block"
