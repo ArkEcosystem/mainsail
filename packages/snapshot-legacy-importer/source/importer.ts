@@ -48,11 +48,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		snapshotHash: string;
 		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
+		result: undefined,
 		snapshotHash: "",
 		validators: [],
 		voters: [],
 		wallets: [],
-		result: undefined,
 	};
 
 	public get voters(): Contracts.Snapshot.ImportedLegacyVoter[] {
@@ -207,11 +207,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		);
 
 		this.#data = {
+			result: undefined,
 			snapshotHash: calculatedHash,
 			validators,
 			voters,
 			wallets,
-			result: undefined,
 		};
 	}
 
