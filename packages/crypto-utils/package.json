@@ -21,7 +21,11 @@
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"@mainsail/contracts": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"@mainsail/kernel": "workspace:*"
+	},
 	"devDependencies": {
 		"uvu": "^0.5.6"
 	},

@@ -1733,6 +1733,16 @@ importers:
         version: 0.5.6
 
   packages/crypto-utils:
+    dependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       uvu:
         specifier: ^0.5.6
