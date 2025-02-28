@@ -1,9 +1,14 @@
-import { Contracts, Identifiers, Events } from "@mainsail/contracts";
+import { Contracts, Events, Identifiers } from "@mainsail/contracts";
 import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert, Sandbox } from "@mainsail/test-framework";
 import { BigNumber } from "@mainsail/utils";
+
 import { getAccountByAddressOrPublicKey, getLegacyColdWallets } from "./utils.js";
-import { FeeCalculator } from "packages/blockchain-utils/distribution/fee-calculator.js";
+
+interface WalletState {
+	balance: BigNumber;
+	nonce: BigNumber;
+}
 
 export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 	const snapshot = new Snapshot(sandbox);
@@ -24,11 +29,6 @@ export const takeSnapshot = async (sandbox: Sandbox): Promise<Snapshot> => {
 
 	return snapshot;
 };
-
-interface WalletState {
-	balance: BigNumber;
-	nonce: BigNumber;
-}
 
 export class Snapshot {
 	private states: Record<string, WalletState> = {};
@@ -55,7 +55,7 @@ export class Snapshot {
 				const { sender, receipt, transactionId } = data;
 
 				console.log("got receipt", sender, transactionId, receipt);
-				this.receipts[transactionId] = { sender, receipt };
+				this.receipts[transactionId] = { receipt, sender };
 			},
 		};
 
