@@ -51,7 +51,7 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public get header(): Contracts.P2P.HeaderData {
 		// State can be undefined when the peer is not yet verified.
-		Utils.assert.defined<Contracts.P2P.HeaderData>(this.#header);
+		Utils.assert.defined(this.#header);
 
 		return this.#header;
 	}

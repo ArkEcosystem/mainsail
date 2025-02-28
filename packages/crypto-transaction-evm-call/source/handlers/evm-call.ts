@@ -30,7 +30,7 @@ export class EvmCallTransactionHandler extends Handlers.TransactionHandler {
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		Utils.assert.defined<string>(transaction.id);
+		Utils.assert.string(transaction.id);
 
 		const { evmSpec } = this.configuration.getMilestone();
 

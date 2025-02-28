@@ -145,14 +145,15 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 	#loadFromLocation(files: string[]): KeyValuePair {
 		for (const file of files) {
+			3;
 			const fullPath: string = this.app.configPath(file);
 			if (existsSync(fullPath)) {
-				const config: KeyValuePair =
+				const config: KeyValuePair | undefined =
 					extname(fullPath) === ".json"
 						? JSON.parse(readFileSync(fullPath).toString())
 						: readFileSync(fullPath);
 
-				assert.defined<KeyValuePair>(config);
+				assert.defined(config);
 
 				return config;
 			}

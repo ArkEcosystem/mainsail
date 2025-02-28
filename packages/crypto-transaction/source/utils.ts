@@ -33,9 +33,9 @@ export class Utils implements Contracts.Crypto.TransactionUtils {
 		];
 
 		if (options && !options.excludeSignature) {
-			AppUtils.assert.defined<number>(transaction.v);
-			AppUtils.assert.defined<string>(transaction.r);
-			AppUtils.assert.defined<string>(transaction.s);
+			AppUtils.assert.number(transaction.v);
+			AppUtils.assert.string(transaction.r);
+			AppUtils.assert.string(transaction.s);
 
 			fields.push(toBeArray(transaction.v - 27), `0x${transaction.r}`, `0x${transaction.s}`);
 		}

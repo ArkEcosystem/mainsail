@@ -25,7 +25,7 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 		for (const [name, serviceProvider] of this.serviceProviders.all()) {
 			const serviceProviderName: string | undefined = serviceProvider.name();
 
-			assert.defined<string>(serviceProviderName);
+			assert.string(serviceProviderName);
 
 			if (await serviceProvider.bootWhen()) {
 				try {

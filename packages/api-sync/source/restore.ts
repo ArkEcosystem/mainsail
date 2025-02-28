@@ -136,7 +136,6 @@ export class Restore {
 		const mostRecentCommit = await (this.databaseService.isEmpty()
 			? this.stateStore.getGenesisCommit()
 			: this.databaseService.getLastCommit());
-		Utils.assert.defined<Contracts.Crypto.Commit>(mostRecentCommit);
 
 		this.logger.info(
 			`Performing database restore of ${(mostRecentCommit.block.header.height + 1).toLocaleString()} blocks. this might take a while.`,
@@ -597,8 +596,7 @@ export class Restore {
 			const constructor = handler.getConstructor();
 
 			const key: string | undefined = constructor.key;
-
-			Utils.assert.defined<string>(key);
+			Utils.assert.string(key);
 
 			types.push({ key, schema: constructor.getSchema().properties });
 		}

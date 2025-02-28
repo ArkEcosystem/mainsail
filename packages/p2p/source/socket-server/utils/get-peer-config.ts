@@ -34,7 +34,7 @@ const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Applica
 
 		const serviceProviderName: string | undefined = serviceProvider.name();
 
-		Utils.assert.defined<string>(serviceProviderName);
+		Utils.assert.string(serviceProviderName);
 
 		return {
 			options: serviceProvider.config().all(),

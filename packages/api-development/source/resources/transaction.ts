@@ -8,7 +8,7 @@ export class TransactionResource implements Contracts.Api.Resource {
 	}
 
 	public async transform(resource: Contracts.Crypto.TransactionData): Promise<object> {
-		//	AppUtils.assert.defined<string>(resource.senderPublicKey);
+		//	AppUtils.assert.string(resource.senderPublicKey);
 
 		return {
 			// amount: resource.amount.toFixed(),

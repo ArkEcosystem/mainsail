@@ -215,7 +215,7 @@ export class TransactionFactory {
 			return this.#nonce;
 		}
 
-		AppUtils.assert.defined<string>(this.#senderPublicKey);
+		AppUtils.assert.string(this.#senderPublicKey);
 
 		return getWalletNonce(this.app, this.#senderPublicKey);
 	}
@@ -232,7 +232,7 @@ export class TransactionFactory {
 	}
 
 	async #sign<T>(quantity: number, method: string): Promise<T[]> {
-		Utils.assert.defined<Contracts.Crypto.NetworkConfig>(this.#networkConfig);
+		Utils.assert.defined(this.#networkConfig);
 		this.configuration.setConfig(this.#networkConfig);
 
 		if (!this.#senderPublicKey) {

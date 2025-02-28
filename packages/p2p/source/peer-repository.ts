@@ -24,7 +24,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	public getPeer(ip: string): Contracts.P2P.Peer {
 		const peer: Contracts.P2P.Peer | undefined = this.#peers.get(ip);
 
-		Utils.assert.defined<Contracts.P2P.Peer>(peer);
+		Utils.assert.defined(peer);
 
 		return peer;
 	}
@@ -50,9 +50,9 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 	}
 
 	public getPendingPeer(ip: string): Contracts.P2P.Peer {
-		const peer: Contracts.P2P.Peer | undefined = this.#peersPending.get(ip);
+		const peer = this.#peersPending.get(ip);
 
-		Utils.assert.defined<Contracts.P2P.Peer>(peer);
+		Utils.assert.defined(peer);
 
 		return peer;
 	}

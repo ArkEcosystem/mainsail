@@ -258,7 +258,7 @@ export class GenesisBlockGenerator extends Generator {
 		for (const transaction of transactions) {
 			const { serialized, data } = transaction;
 
-			Utils.assert.defined<string>(data.id);
+			Utils.assert.string(data.id);
 
 			const { receipt } = await this.evm.process({
 				blockContext: {

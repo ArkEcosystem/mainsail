@@ -67,7 +67,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 
 			result.round += spanHeight / Math.max(1, activeValidators);
 			result.roundHeight = nextMilestone.height;
-			Utils.assert.defined<number>(nextMilestone.data);
+			Utils.assert.number(nextMilestone.data);
 			result.maxValidators = nextMilestone.data;
 
 			activeValidators = nextMilestone.data;

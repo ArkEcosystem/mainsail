@@ -26,7 +26,7 @@ export class TransactionHandlerRegistry implements Contracts.Transactions.Transa
 
 	public getRegisteredHandlerByType(internalType: number, version = 0): TransactionHandler {
 		const [handler] = this.handlers;
-		Utils.assert.defined<TransactionHandler>(handler);
+		Utils.assert.defined(handler);
 		return handler;
 	}
 

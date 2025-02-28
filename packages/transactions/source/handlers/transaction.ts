@@ -23,7 +23,7 @@ export abstract class TransactionHandler implements Contracts.Transactions.Trans
 	protected readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
-		AppUtils.assert.defined<string>(transaction.data.senderAddress);
+		AppUtils.assert.string(transaction.data.senderAddress);
 		return this.verifier.verifyHash(transaction.data);
 	}
 

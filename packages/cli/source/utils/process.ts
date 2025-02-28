@@ -61,7 +61,7 @@ export class Process implements IProcess {
 			.render(["ID", "Name", "Version", "Status", "Uptime", "CPU", "RAM"], (table) => {
 				const app: ProcessDescription | undefined = this.processManager.describe(this.#processName);
 
-				Utils.assert.defined<ProcessDescription>(app);
+				Utils.assert.defined(app);
 
 				table.push([
 					app.pid,
@@ -80,7 +80,7 @@ export class Process implements IProcess {
 
 		const proc: Record<string, any> | undefined = this.processManager.describe(this.#processName);
 
-		Utils.assert.defined<Record<string, any>>(proc);
+		Utils.assert.defined(proc);
 
 		const file = showErrors ? proc.pm2_env.pm_err_log_path : proc.pm2_env.pm_out_log_path;
 

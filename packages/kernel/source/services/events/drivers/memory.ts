@@ -140,7 +140,7 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 
 		const listener: Set<Contracts.Kernel.EventListener> | undefined = this.#listeners.get(name);
 
-		assert.defined<Set<Contracts.Kernel.EventListener>>(listener);
+		assert.defined(listener);
 
 		return listener;
 	}

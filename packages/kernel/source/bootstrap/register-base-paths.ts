@@ -42,7 +42,7 @@ export class RegisterBasePaths implements Contracts.Kernel.Bootstrapper {
 
 			path = resolve(expandTilde(path));
 
-			assert.defined<string>(path);
+			assert.string(path);
 
 			this.fileSystem.ensureDirSync(path);
 
@@ -50,7 +50,7 @@ export class RegisterBasePaths implements Contracts.Kernel.Bootstrapper {
 
 			const pathMethod: string | undefined = camelCase(`use_${type}_path`);
 
-			assert.defined<string>(pathMethod);
+			assert.string(pathMethod);
 
 			this.app[pathMethod](path);
 

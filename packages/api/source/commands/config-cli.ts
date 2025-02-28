@@ -36,7 +36,7 @@ export class Command extends Commands.Command {
 
 			spinner.start();
 
-			Utils.assert.defined<string>(this.pkg.name);
+			Utils.assert.string(this.pkg.name);
 			this.installer.install(this.pkg.name, newChannel);
 
 			spinner.succeed();

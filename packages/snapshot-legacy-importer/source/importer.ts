@@ -164,7 +164,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			});
 
 			if (wallet.attributes["vote"]) {
-				Utils.assert.defined<string>(wallet.publicKey);
+				Utils.assert.string(wallet.publicKey);
 
 				const vote = await this.addressFactory.fromPublicKey(wallet.attributes["vote"]);
 

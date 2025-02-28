@@ -80,7 +80,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public getValidator(consensusPublicKey: string): Contracts.State.ValidatorWallet {
 		const validator = this.#validators.get(consensusPublicKey);
-		Utils.assert.defined<Contracts.State.ValidatorWallet>(validator);
+		Utils.assert.defined(validator);
 		return validator;
 	}
 
@@ -113,7 +113,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			const majority = await this.aggregatePrecommits();
 
 			const proposal = this.getProposal();
-			Utils.assert.defined<Contracts.Crypto.Proposal>(proposal);
+			Utils.assert.defined(proposal);
 
 			const round = proposal.round;
 			const block = proposal.getData().block;
@@ -310,7 +310,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	}
 
 	#getSignatures(s: Map<number, { signature: string; blockId?: string }>): Map<number, { signature: string }> {
-		Utils.assert.defined<Contracts.Crypto.Proposal>(this.#proposal);
+		Utils.assert.defined(this.#proposal);
 		const filtered: Map<number, { signature: string }> = new Map();
 
 		const block = this.#proposal.getData().block;

@@ -15,7 +15,7 @@ export class ConfigRepository implements Contracts.Kernel.Repository {
 	public get<T>(key: string, defaultValue?: T): T {
 		const value: T | undefined = get(this.#items, key, defaultValue);
 
-		assert.defined<T>(value);
+		assert.defined(value);
 
 		return value;
 	}

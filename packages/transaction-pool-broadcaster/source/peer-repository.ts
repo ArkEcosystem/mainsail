@@ -16,7 +16,7 @@ export class PeerRepository implements Contracts.TransactionPool.PeerRepository 
 	public getPeer(ip: string): Contracts.TransactionPool.Peer {
 		const peer = this.#peers.get(ip);
 
-		Utils.assert.defined<Contracts.TransactionPool.Peer>(peer);
+		Utils.assert.defined(peer);
 
 		return peer;
 	}

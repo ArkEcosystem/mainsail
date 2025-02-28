@@ -43,7 +43,7 @@ export class Configuration implements Contracts.Crypto.Configuration {
 			};
 		}
 
-		Utils.assert.defined<Contracts.Crypto.NetworkConfig>(this.#config);
+		Utils.assert.defined(this.#config);
 		set(this.#config, key, clone(value));
 
 		try {
@@ -166,7 +166,6 @@ export class Configuration implements Contracts.Crypto.Configuration {
 	}
 
 	public getMaxActiveValidators(): number {
-		Utils.assert.defined<number>(this.#maxActiveValidators);
 		return this.#maxActiveValidators;
 	}
 

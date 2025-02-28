@@ -28,7 +28,7 @@ export class Generator {
 			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
 
 		const options = pluginConfig.get<DatabaseOptions>("database");
-		Utils.assert.defined<DatabaseOptions>(options);
+		Utils.assert.defined(options);
 
 		const dataSource = new DataSource({
 			...options,

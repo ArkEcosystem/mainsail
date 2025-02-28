@@ -22,9 +22,9 @@ export class TransactionsController extends Controller {
 			const typeGroup: number | undefined = constructor.typeGroup;
 			const key: string | undefined = constructor.key;
 
-			AppUtils.assert.defined<number>(type);
-			AppUtils.assert.defined<number>(typeGroup);
-			AppUtils.assert.defined<string>(key);
+			AppUtils.assert.number(type);
+			AppUtils.assert.number(typeGroup);
+			AppUtils.assert.string(key);
 
 			if (typeGroups[typeGroup] === undefined) {
 				typeGroups[typeGroup] = {};
@@ -46,8 +46,8 @@ export class TransactionsController extends Controller {
 			const type: number | undefined = constructor.type;
 			const typeGroup: number | undefined = constructor.typeGroup;
 
-			AppUtils.assert.defined<number>(type);
-			AppUtils.assert.defined<number>(typeGroup);
+			AppUtils.assert.number(type);
+			AppUtils.assert.number(typeGroup);
 
 			if (schemasByType[typeGroup] === undefined) {
 				schemasByType[typeGroup] = {};

@@ -46,7 +46,7 @@ export class Triggers {
 
 		const trigger: Action | undefined = this.#triggers.get(name);
 
-		assert.defined<Action>(trigger);
+		assert.defined(trigger);
 
 		return trigger;
 	}

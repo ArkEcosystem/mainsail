@@ -66,9 +66,9 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const transaction = await this.deserializer.deserialize(serialized);
 
-			AppUtils.assert.defined<number>(transaction.data.v);
-			AppUtils.assert.defined<string>(transaction.data.r);
-			AppUtils.assert.defined<string>(transaction.data.s);
+			AppUtils.assert.number(transaction.data.v);
+			AppUtils.assert.string(transaction.data.r);
+			AppUtils.assert.string(transaction.data.s);
 
 			const hash = await this.utils.toHash(transaction.data, {
 				excludeSignature: true,

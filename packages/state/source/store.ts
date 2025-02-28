@@ -23,7 +23,7 @@ export class Store implements Contracts.State.Store {
 	}
 
 	public getGenesisCommit(): Contracts.Crypto.Commit {
-		Utils.assert.defined<Contracts.Crypto.Commit>(this.#genesisBlock);
+		Utils.assert.defined(this.#genesisBlock);
 
 		return this.#genesisBlock;
 	}
@@ -34,7 +34,7 @@ export class Store implements Contracts.State.Store {
 	}
 
 	public getLastBlock(): Contracts.Crypto.Block {
-		Utils.assert.defined<Contracts.Crypto.Block>(this.#lastBlock);
+		Utils.assert.defined(this.#lastBlock);
 		return this.#lastBlock;
 	}
 

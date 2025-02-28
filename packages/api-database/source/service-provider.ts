@@ -56,7 +56,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		const options = this.config().get<PostgresConnectionOptions>("database");
-		Utils.assert.defined<PostgresConnectionOptions>(options);
+		Utils.assert.defined(options);
 
 		try {
 			const dataSource = new DataSource({

@@ -60,7 +60,7 @@ export const registerBlockFactory = async (
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;
-			Utils.assert.defined<string>(data.id);
+			Utils.assert.string(data.id);
 
 			totals.value = totals.value.plus(data.value);
 			totals.gasPrice = totals.gasPrice.plus(data.gasPrice);

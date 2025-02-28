@@ -24,7 +24,7 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 
 	protected getEventId(event: Contracts.P2P.Peer): string {
 		const ip = event.ip;
-		Utils.assert.defined<string>(ip);
+		Utils.assert.string(ip);
 		return ip;
 	}
 

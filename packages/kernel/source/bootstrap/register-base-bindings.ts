@@ -20,7 +20,7 @@ export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {
 		);
 
 		assert.defined(version);
-		assert.defined<Record<string, string>>(flags);
+		assert.defined(flags);
 
 		this.app.bind<string>(Identifiers.Application.Environment).toConstantValue(flags.env);
 		this.app.bind<string>(Identifiers.Application.Name).toConstantValue(flags.name);

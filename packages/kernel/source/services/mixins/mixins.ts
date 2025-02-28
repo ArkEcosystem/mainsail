@@ -10,7 +10,7 @@ export class MixinService {
 	public get(name: string): Function {
 		const mixin: Function | undefined = this.#mixins.get(name);
 
-		assert.defined<Function>(mixin);
+		assert.defined(mixin);
 
 		return mixin;
 	}

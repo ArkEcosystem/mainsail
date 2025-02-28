@@ -44,7 +44,7 @@ export class RateLimiter {
 		if (endpoint && this.#endpoints.has(endpoint)) {
 			const rateLimiter: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
 
-			Utils.assert.defined<RateLimiterMemory>(rateLimiter);
+			Utils.assert.defined(rateLimiter);
 
 			await rateLimiter.consume(ip);
 		}
@@ -69,7 +69,7 @@ export class RateLimiter {
 		if (endpoint && this.#endpoints.has(endpoint)) {
 			const endpointLimiters: RateLimiterMemory | undefined = this.#endpoints.get(endpoint);
 
-			Utils.assert.defined<RateLimiterMemory>(endpointLimiters);
+			Utils.assert.defined(endpointLimiters);
 
 			const endpointLimiter = await endpointLimiters.get(ip);
 			if (endpointLimiter !== null && endpointLimiter.remainingPoints <= 0) {

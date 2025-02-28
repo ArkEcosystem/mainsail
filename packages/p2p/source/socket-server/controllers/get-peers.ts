@@ -23,8 +23,8 @@ export class GetPeersController implements Contracts.P2P.Controller {
 				.filter((peer) => peer.ip !== peerIp)
 				.filter((peer) => peer.port !== -1)
 				.sort((a, b) => {
-					Utils.assert.defined<number>(a.latency);
-					Utils.assert.defined<number>(b.latency);
+					Utils.assert.number(a.latency);
+					Utils.assert.number(b.latency);
 
 					return a.latency - b.latency;
 				})

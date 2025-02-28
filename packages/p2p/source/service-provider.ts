@@ -98,7 +98,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	#registerFactories(): void {
 		this.app.bind(Identifiers.P2P.Peer.Factory).toFactory<Peer, [string]>(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
-			Utils.assert.defined<string>(sanitizedIp);
+			Utils.assert.string(sanitizedIp);
 
 			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
 		});
@@ -110,7 +110,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.P2P.TxPoolNode.Factory).toFactory<TxPoolNode, [string]>(() => (ip: string) => {
 			const sanitizedIp = sanitizeRemoteAddress(ip);
-			Utils.assert.defined<string>(sanitizedIp);
+			Utils.assert.string(sanitizedIp);
 
 			return this.app.resolve(TxPoolNode).init(sanitizedIp, this.config().getRequired<number>("txPoolPort"));
 		});

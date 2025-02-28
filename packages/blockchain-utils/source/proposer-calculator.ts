@@ -18,7 +18,7 @@ export class ProposerCalculator implements Contracts.BlockchainUtils.ProposerCal
 
 		const offset = (this.stateStore.getTotalRound() + round) % activeValidators;
 		const result = this.validatorMatrix[offset % activeValidators];
-		Utils.assert.defined<number>(result);
+		Utils.assert.number(result);
 		return result;
 	}
 }

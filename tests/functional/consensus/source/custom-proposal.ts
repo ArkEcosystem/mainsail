@@ -85,7 +85,7 @@ export const makeCustomProposal = async (
 		}
 
 		const { data, serialized } = transaction;
-		Utils.assert.defined<string>(data.id);
+		Utils.assert.string(data.id);
 
 		totals.amount = totals.amount.plus(data.amount);
 		totals.fee = totals.fee.plus(data.fee);

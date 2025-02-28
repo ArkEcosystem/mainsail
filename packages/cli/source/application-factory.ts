@@ -68,11 +68,11 @@ export class ApplicationFactory {
 		app.bind(Identifiers.Package).toConstantValue(package_);
 
 		// Paths
-		Utils.assert.defined<string>(package_.name);
+		Utils.assert.string(package_.name);
 		app.bind(Identifiers.ConsolePaths).toConstantValue(environmentPaths.get(package_.name));
 
 		const applicationName = package_.name?.split("/")[1];
-		Utils.assert.defined<string>(applicationName);
+		Utils.assert.string(applicationName);
 
 		app.bind(Identifiers.Application.Name).toConstantValue(applicationName);
 

@@ -20,7 +20,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		const { name } = readJSONSync(path.resolve(new URL(".", import.meta.url).pathname, "../../package.json"));
-		AppUtils.assert.defined<string>(name);
+		AppUtils.assert.string(name);
 
 		const flags: Contracts.AnyObject = {
 			...this.getFlags(),

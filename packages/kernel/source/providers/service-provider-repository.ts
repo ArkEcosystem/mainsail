@@ -34,8 +34,7 @@ export class ServiceProviderRepository {
 		const serviceProvider: ServiceProvider | undefined = this.#serviceProviders.get(
 			this.#aliases.get(name) || name,
 		);
-
-		assert.defined<ServiceProvider>(serviceProvider);
+		assert.defined(serviceProvider);
 
 		return serviceProvider;
 	}

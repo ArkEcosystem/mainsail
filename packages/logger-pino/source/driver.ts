@@ -138,7 +138,7 @@ export class PinoLogger implements Contracts.Kernel.Logger {
 				this.#combinedFileStream.end();
 
 				return new Promise<void>((resolve) => {
-					Utils.assert.defined<Writable>(this.#combinedFileStream);
+					Utils.assert.defined(this.#combinedFileStream);
 					this.#combinedFileStream.on("finish", () => {
 						resolve();
 					});

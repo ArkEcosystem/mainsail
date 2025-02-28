@@ -259,11 +259,11 @@ export class Validator implements Contracts.Validator.Validator {
 
 		for (const transaction of transactions) {
 			const { data, serialized } = transaction;
-			Utils.assert.defined<string>(data.id);
-			Utils.assert.defined<number>(data.gasUsed);
+			Utils.assert.string(data.id);
+			Utils.assert.number(data.gasUsed);
 
 			totals.amount = totals.amount.plus(data.value);
-			Utils.assert.defined<number>(data.gasUsed);
+			Utils.assert.number(data.gasUsed);
 			totals.fee = totals.fee.plus(this.gasFeeCalculator.calculateConsumed(data.gasPrice, data.gasUsed));
 			totals.gasUsed += data.gasUsed;
 
