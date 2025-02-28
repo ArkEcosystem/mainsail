@@ -66,7 +66,6 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-state": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/networking-dns": "workspace:*",
 		"@mainsail/networking-ntp": "workspace:*",

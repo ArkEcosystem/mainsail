@@ -24,6 +24,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"chalk": "^5.3.0",
 		"joi": "17.12.2",
 		"pino": "9.2.0",
@@ -35,7 +36,6 @@
 		"split2": "4.2.0"
 	},
 	"devDependencies": {
-		"@mainsail/utils": "workspace:*",
 		"@types/capture-console": "1.0.5",
 		"@types/chalk": "^2.2.0",
 		"@types/fs-extra": "11.0.4",

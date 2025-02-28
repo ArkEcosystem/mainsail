@@ -88,7 +88,6 @@ const EXCEPTIONS = {
 			"@mainsail/evm-consensus",
 			"@mainsail/evm-consensus",
 			"@mainsail/evm-contracts",
-			"@mainsail/evm-gas-fee",
 			"@mainsail/evm-service",
 			"@mainsail/evm-state",
 			"@mainsail/fees-static",

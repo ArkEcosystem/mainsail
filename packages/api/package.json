@@ -33,7 +33,6 @@
 		"@mainsail/cli": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
