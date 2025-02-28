@@ -45,6 +45,7 @@ export const Identifiers = {
 	},
 	CryptoUtils: {
 		FeeCalculator: Symbol("CryptoUtils<FeeCalculator>"),
+		ProposerCalculator: Symbol("CryptoUtils<ProposerCalculator>"),
 		RoundCalculator: Symbol("CryptoUtils<RoundCalculator>"),
 		SupplyCalculator: Symbol("CryptoUtils<SupplyCalculator>"),
 		TimestampCalculator: Symbol("CryptoUtils<TimestampCalculator>"),
@@ -212,10 +213,6 @@ export const Identifiers = {
 		BlockVerifier: Symbol("Processor<Block.Verifier>"),
 		TransactionProcessor: Symbol("Processor<Transaction.Processor>"),
 	},
-	Proposer: {
-		Selector: Symbol("Proposer<Selector>"),
-	},
-
 	ServiceProvider: {
 		Configuration: Symbol("ServiceProvider<Configuration>"),
 		Repository: Symbol("ServiceProvider<Repository>"),

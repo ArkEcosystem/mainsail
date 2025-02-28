@@ -18,8 +18,8 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
-	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.Selector;
+	@inject(Identifiers.CryptoUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.CryptoUtils.ProposerCalculator;
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
@@ -108,7 +108,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	}
 
 	#hasValidProposer(proposal: Contracts.Crypto.Proposal): boolean {
-		return proposal.validatorIndex === this.proposerSelector.getValidatorIndex(proposal.round);
+		return proposal.validatorIndex === this.proposerCalculator.getValidatorIndex(proposal.round);
 	}
 
 	async #hasValidSignature(proposal: Contracts.Crypto.Proposal): Promise<boolean> {

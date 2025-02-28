@@ -6,8 +6,8 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 	@inject(Identifiers.Application.Instance)
 	protected readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.Selector;
+	@inject(Identifiers.CryptoUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.CryptoUtils.ProposerCalculator;
 
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
@@ -17,7 +17,7 @@ export class GeneratorVerifier implements Contracts.Processor.Handler {
 			return;
 		}
 
-		const validatorIndex = this.proposerSelector.getValidatorIndex(unit.getBlock().data.round);
+		const validatorIndex = this.proposerCalculator.getValidatorIndex(unit.getBlock().data.round);
 		const validator = this.validatorSet.getValidator(validatorIndex);
 
 		if (unit.getBlock().data.generatorAddress !== validator.address) {

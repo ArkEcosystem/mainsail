@@ -21,7 +21,7 @@ import { KeyPairFactory } from "../../crypto-key-pair-schnorr/source/pair";
 import { PublicKeyFactory } from "../../crypto-key-pair-schnorr/source/public";
 import { PublicKeySerializer } from "../../crypto-key-pair-schnorr/source/serializer";
 import { Signature } from "../../crypto-signature-schnorr/source/signature";
-import { Selector } from "../../proposer/source/selector";
+import { ProposalCalculator } from "../../crypto.utils/source/proposal-calculator";
 import { Factories, Sandbox } from "../../test-framework/source";
 import { Validator } from "../../validation/source/validator";
 import { AttributeRepository } from "../source/attributes";
@@ -279,7 +279,7 @@ export const setUp = async (setUpOptions = setUpDefaults, skipBoot = false): Pro
 
 	sandbox.app.bind(Identifiers.Cryptography.Block.Factory).toConstantValue(blockFactory);
 
-	sandbox.app.bind(Identifiers.Proposer.Selector).to(Selector);
+	sandbox.app.bind(Identifiers.CryptoUtils.ProposerCalculator).to(ProposalCalculator);
 
 	if (!skipBoot) {
 		try {

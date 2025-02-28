@@ -21,3 +21,7 @@ export interface SupplyCalculator {
 export interface TimestampCalculator {
 	calculateMinimalTimestamp(previousBlock: Block, round: number): number;
 }
+
+export interface ProposerCalculator {
+	getValidatorIndex(round: number): number;
+}

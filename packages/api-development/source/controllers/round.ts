@@ -9,8 +9,8 @@ export class RoundController extends Controller {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.Selector;
+	@inject(Identifiers.CryptoUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.CryptoUtils.ProposerCalculator;
 
 	@inject(Identifiers.CryptoUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.CryptoUtils.RoundCalculator;
@@ -20,7 +20,7 @@ export class RoundController extends Controller {
 
 		const orderedValidators = Array.from(
 			{ length: activeValidators.length },
-			(_, index) => activeValidators[this.proposerSelector.getValidatorIndex(index)],
+			(_, index) => activeValidators[this.proposerCalculator.getValidatorIndex(index)],
 		);
 
 		const height = this.stateStore.getHeight();

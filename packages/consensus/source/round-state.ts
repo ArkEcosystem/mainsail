@@ -14,8 +14,8 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
-	@inject(Identifiers.Proposer.Selector)
-	private readonly proposerSelector!: Contracts.Proposer.Selector;
+	@inject(Identifiers.CryptoUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.CryptoUtils.ProposerCalculator;
 
 	@inject(Identifiers.Cryptography.Commit.Serializer)
 	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
@@ -71,7 +71,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 			this.#validatorsSignedPrevote.push(false);
 		}
 
-		const validatorIndex = this.proposerSelector.getValidatorIndex(round);
+		const validatorIndex = this.proposerCalculator.getValidatorIndex(round);
 
 		this.#proposer = validators[validatorIndex];
 
