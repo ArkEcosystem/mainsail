@@ -1,6 +1,6 @@
 import { BigNumber } from "@mainsail/utils";
 
-import { Block, Configuration, Transaction } from "./crypto/index.js";
+import { Block, Transaction } from "./crypto/index.js";
 import { RoundInfo } from "./shared/rounds.js";
 
 export interface FeeCalculator {
@@ -19,5 +19,5 @@ export interface SupplyCalculator {
 }
 
 export interface TimestampCalculator {
-	calculateMinimalTimestamp(previousBlock: Block, round: number, configuration: Configuration): number;
+	calculateMinimalTimestamp(previousBlock: Block, round: number): number;
 }

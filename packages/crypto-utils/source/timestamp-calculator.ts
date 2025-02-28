@@ -1,19 +1,18 @@
-import { injectable } from "@mainsail/container";
-import { Contracts } from "@mainsail/contracts";
+import { inject, injectable } from "@mainsail/container";
+import { Contracts, Identifiers } from "@mainsail/contracts";
 
 @injectable()
 export class TimestampCalculator implements Contracts.CryptoUtils.TimestampCalculator {
-	calculateMinimalTimestamp = (
-		previousBlock: Contracts.Crypto.Block,
-		round: number,
-		configuration: Contracts.Crypto.Configuration,
-	): number => {
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	calculateMinimalTimestamp = (previousBlock: Contracts.Crypto.Block, round: number): number => {
 		// Hard limit to prevent overflow
 		if (round > 100_000) {
 			throw new Error(`Round ${round} is too high`);
 		}
 
-		const milestone = configuration.getMilestone(previousBlock.data.height + 1);
+		const milestone = this.configuration.getMilestone(previousBlock.data.height + 1);
 		const roundForMath = Math.max(0, round - 1);
 
 		return (

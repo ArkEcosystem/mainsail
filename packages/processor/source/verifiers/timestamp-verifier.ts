@@ -30,7 +30,6 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 			this.timestampCalculator.calculateMinimalTimestamp(
 				this.stateStore.getLastBlock(),
 				unit.getBlock().data.round,
-				this.configuration,
 			)
 		) {
 			throw new Exceptions.InvalidTimestamp(unit.getBlock());
