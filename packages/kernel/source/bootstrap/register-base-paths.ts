@@ -1,11 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { camelCase, expandTilde, set } from "@mainsail/utils";
+import { assert, camelCase, expandTilde, set } from "@mainsail/utils";
 import envPaths from "env-paths";
 import { join, resolve } from "path";
 
 import { ConfigRepository } from "../services/config/index.js";
-import { assert } from "../utils/assert.js";
 
 @injectable()
 export class RegisterBasePaths implements Contracts.Kernel.Bootstrapper {

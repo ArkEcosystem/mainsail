@@ -1,9 +1,8 @@
 import { inject, injectable } from "@mainsail/container";
 import { Constants, Contracts, Identifiers } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 import path from "path";
 import { URL } from "url";
-
-import { assert } from "../utils/assert.js";
 
 @injectable()
 export class RegisterBaseBindings implements Contracts.Kernel.Bootstrapper {

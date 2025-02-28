@@ -1,10 +1,10 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 import semver from "semver";
 
 import { PluginConfiguration, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 import { ValidationManager } from "../services/validation/index.js";
-import { assert } from "../utils/assert.js";
 
 // @TODO review the implementation
 

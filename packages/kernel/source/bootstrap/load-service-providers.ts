@@ -1,11 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 import path from "path";
 import { URL } from "url";
 
 import { PluginConfiguration, PluginManifest, ServiceProvider, ServiceProviderRepository } from "../providers/index.js";
 import { ConfigRepository } from "../services/config/index.js";
-import { assert } from "../utils/assert.js";
 
 interface PluginEntry {
 	package: string;

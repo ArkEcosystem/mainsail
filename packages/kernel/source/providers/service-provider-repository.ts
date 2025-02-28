@@ -1,7 +1,7 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Events, Exceptions, Identifiers } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 
-import { assert } from "../utils/assert.js";
 import { ServiceProvider } from "./service-provider.js";
 
 @injectable()

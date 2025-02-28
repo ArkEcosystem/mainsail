@@ -1,4 +1,3 @@
-export * from "./assert.js";
 export * as IpAddress from "./ip-address.js";
 export { isBlacklisted } from "./is-blacklisted.js";
 export { isWhitelisted } from "./is-whitelisted.js";

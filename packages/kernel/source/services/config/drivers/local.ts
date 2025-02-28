@@ -1,12 +1,11 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Exceptions, Identifiers } from "@mainsail/contracts";
-import { dotenv, get, set } from "@mainsail/utils";
+import { assert, dotenv, get, set } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 import { extname } from "path";
 
 import { KeyValuePair } from "../../../types/index.js";
-import { assert } from "../../../utils/assert.js";
 import { ConfigRepository } from "../repository.js";
 
 @injectable()

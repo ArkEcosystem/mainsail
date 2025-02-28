@@ -1,7 +1,7 @@
 import { injectable } from "@mainsail/container";
+import { assert } from "@mainsail/utils";
 
 import { Constructor } from "../../types/container.js";
-import { assert } from "../../utils/assert.js";
 
 @injectable()
 export class MixinService {

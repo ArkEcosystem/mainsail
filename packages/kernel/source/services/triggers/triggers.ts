@@ -1,8 +1,8 @@
 import { injectable } from "@mainsail/container";
 import { Exceptions } from "@mainsail/contracts";
+import { assert } from "@mainsail/utils";
 
 import { ActionArguments } from "../../types/index.js";
-import { assert } from "../../utils/assert.js";
 import { Action } from "./action.js";
 
 @injectable()
