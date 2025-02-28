@@ -9,7 +9,7 @@ export const assert = {
 	bigint: (value: unknown): asserts value is bigint => assertType(typeof value === "bigint", "bigint"),
 	boolean: (value: unknown): asserts value is boolean => assertType(typeof value === "boolean", "boolean"),
 	buffer: (value: unknown): asserts value is Buffer => assertType(value instanceof Buffer, "buffer"),
-	defined: <T>(value: unknown): asserts value is NonNullable<T> =>
+	defined: <T>(value: undefined | null | T): asserts value is NonNullable<T> =>
 		assertType(value !== undefined && value !== null, "non-null and non-undefined"),
 	number: (value: unknown): asserts value is number => assertType(typeof value === "number", "number"),
 	object: (value: unknown): asserts value is Record<string, any> => assertType(typeof value === "object", "object"),

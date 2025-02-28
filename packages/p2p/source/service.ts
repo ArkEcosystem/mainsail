@@ -160,12 +160,7 @@ export class Service implements Contracts.P2P.Service {
 			.getPeers()
 			.filter((peer) => peer.header.height)
 			.map((peer) => peer.header.height)
-			.sort((a, b) => {
-				Utils.assert.defined<string>(a);
-				Utils.assert.defined<string>(b);
-
-				return a - b;
-			});
+			.sort((a, b) => a - b);
 
 		return medians[Math.floor(medians.length / 2)] || 0;
 	}

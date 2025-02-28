@@ -115,8 +115,8 @@ export class Controller extends AbstractController {
 			await Promise.all(promises);
 		}
 
-		Utils.assert.defined<Models.Wallet>(generator);
-		Utils.assert.defined<Models.Wallet>(state);
+		Utils.assert.defined(generator);
+		Utils.assert.defined(state);
 
 		return { ...block, generator, state };
 	}
