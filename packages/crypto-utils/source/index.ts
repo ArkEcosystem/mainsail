@@ -6,10 +6,9 @@ import { FeeCalculator } from "./fee-calculator.js";
 import { RoundCalculator } from "./round-calculator.js";
 import { Selector } from "./selector.js";
 import { SupplyCalculator } from "./supply-calculator.js";
-import { calculateMinimalTimestamp } from "./timestamp-calculator.js";
+import { TimestampCalculator } from "./timestamp-calculator.js";
 
 export const validatorCalculator = { calculateApproval };
-export const timestampCalculator = { calculateMinimalTimestamp };
 
 export { formatCurrency } from "./format-currency.js";
 export { getBlockNotChainedErrorMessage, isBlockChained } from "./is-block-chained.js";
@@ -22,5 +21,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.CryptoUtils.FeeCalculator).to(FeeCalculator).inSingletonScope();
 		this.app.bind(Identifiers.CryptoUtils.RoundCalculator).to(RoundCalculator).inSingletonScope();
 		this.app.bind(Identifiers.CryptoUtils.SupplyCalculator).to(SupplyCalculator).inSingletonScope();
+		this.app.bind(Identifiers.CryptoUtils.TimestampCalculator).to(TimestampCalculator).inSingletonScope();
 	}
 }

@@ -1,6 +1,5 @@
 import { inject, injectable } from "@mainsail/container";
 import { Contracts, Identifiers } from "@mainsail/contracts";
-import { timestampCalculator } from "@mainsail/crypto-utils";
 import dayjs from "dayjs";
 
 @injectable()
@@ -17,13 +16,16 @@ export class AbstractProcessor {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.CryptoUtils.TimestampCalculator)
+	private readonly timestampCalculator!: Contracts.CryptoUtils.TimestampCalculator;
+
 	protected hasValidHeightOrRound(message: { height: number; round: number }): boolean {
 		return message.height === this.getConsensus().getHeight() && message.round >= this.getConsensus().getRound();
 	}
 
 	protected isRoundInBounds(message: { round: number }): boolean {
 		const earliestTime =
-			timestampCalculator.calculateMinimalTimestamp(
+			this.timestampCalculator.calculateMinimalTimestamp(
 				this.stateStore.getLastBlock(),
 				message.round,
 				this.cryptoConfiguration,
